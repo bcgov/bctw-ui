@@ -1,3 +1,2 @@
-# bctw-ui
-BC Telemetry Warehouse UI
+# BC Telemetry Warehouse UI
 Front-end for the BC Telemetry Warehouse.
