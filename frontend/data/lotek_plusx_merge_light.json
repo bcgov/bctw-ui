@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "lotek_plusx_merge_light",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "No": null, "CollarID": null, "UTC_Date": null, "UTC_Time": null, "Device Name": "               ", "Device ID": 81267, "Date & Time [GMT]": 43169.084062499998, "Altitude": 675.284 }, "geometry": { "type": "Point", "coordinates": [ -133.7070722, 59.5749606 ] } },
+{ "type": "Feature", "properties": { "No": null, "CollarID": null, "UTC_Date": null, "UTC_Time": null, "Device Name": "               ", "Device ID": 81267, "Date & Time [GMT]": 43169.584074074002, "Altitude": 665.708 }, "geometry": { "type": "Point", "coordinates": [ -133.7068839, 59.5749297 ] } },
+{ "type": "Feature", "properties": { "No": null, "CollarID": null, "UTC_Date": null, "UTC_Time": null, "Device Name": "               ", "Device ID": 81267, "Date & Time [GMT]": 43739.74375, "Altitude": -0.008 }, "geometry": { "type": "Point", "coordinates": [ -133.6997917, 59.5596547 ] } }
+]
+}

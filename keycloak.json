@@ -1,0 +1,8 @@
+{
+  "realm": "0jjhl1lc",
+  "auth-server-url": "https://sso-dev.pathfinder.gov.bc.ca/auth",
+  "ssl-required": "external",
+  "resource": "bctw-ui",
+  "public-client": true,
+  "confidential-port": 0
+}

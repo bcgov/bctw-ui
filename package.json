@@ -1,0 +1,73 @@
+{
+  "name": "bctelemetrywarehouse",
+  "version": "0.0.1",
+  "description": "Application for viewing telemetry data from GPS-equipped collars.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cp ./frontend/data/*.json ./frontend/dist/ && parcel ./frontend/src/index.html --out-dir ./frontend/dist --open --port 1111",
+    "prestart": "cp ./frontend/data/*.json ./frontend/dist/",
+    "start": "node backend/js/server.js",
+    "build": "parcel build ./frontend/src/index.html NODE_ENV=prod --no-source-maps --public-url ./ --out-dir ./frontend/dist",
+    "postbuild": "cp ./frontend/data/*.json ./frontend/dist/",
+    "lint": "eslint --ext .js,.vue src"
+  },
+  "keywords": [
+    "Vue",
+    "Livescript",
+    "Parcel"
+  ],
+  "author": "BC Telemetry Warehouse",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@risingstack/protect": "^1.2.0",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "connect-sqlite3": "^0.9.11",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "helmet": "^3.21.2",
+    "keycloak-connect": "^9.0.3",
+    "livescript": "^1.6.0",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.0.3",
+    "pug": "^2.0.4",
+    "sqlite3": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^3.0.0",
+    "autoprefixer": "^9.6.1",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-vue": "^2.0.2",
+    "eslint": "^6.1.0",
+    "eslint-plugin-vue": "^5.2.3",
+    "leaflet": "^1.5.1",
+    "leaflet-draw": "^1.0.4",
+    "leaflet.markercluster": "^1.4.1",
+    "material-icons": "^0.3.1",
+    "parcel-bundler": "^1.12.3",
+    "parcel-plugin-livescript": "^1.1.0",
+    "postcss-modules": "^1.4.1",
+    "request": "^2.88.0",
+    "stylus": "^0.54.5",
+    "topojson": "^3.0.2",
+    "vue": "^2.6.10",
+    "vue-cesium": "^1.0.2",
+    "vue-hot-reload-api": "^2.3.3",
+    "vue-router": "^3.1.2",
+    "vue-template-compiler": "^2.6.10",
+    "vuesax": "^3.10.2",
+    "vuex": "^3.1.1"
+  },
+  "vue": {
+    "presets": [
+      "env",
+      "vue"
+    ]
+  }
+}
