@@ -1,7 +1,7 @@
 #=========================================================
 # OpenShift template parameters for:
 # Component: .
-# Template File: ../openshift/templates/bctw-ui/bctw-ui.yaml
+# Template File: ../openshift/templates/bctw-ui/bctw-ui-build.yaml
 #=========================================================
 NAME=bctw-ui
 GIT_REPO_URL=https://github.com/bcgov/bctw-ui.git
