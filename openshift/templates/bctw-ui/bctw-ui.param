@@ -1,0 +1,17 @@
+#=========================================================
+# OpenShift template parameters for:
+# Component: .
+# Template File: ../openshift/templates/bctw-ui/bctw-ui.yaml
+#=========================================================
+NAME=bctw-ui
+GIT_REPO_URL=https://github.com/bcgov/bctw-ui.git
+GIT_REF=master
+SOURCE_CONTEXT_DIR=
+SOURCE_IMAGE_KIND=DockerImage
+SOURCE_IMAGE_NAME=centos/nodejs-12-centos7
+SOURCE_IMAGE_TAG=latest
+OUTPUT_IMAGE_TAG=latest
+CPU_REQUEST=10m
+CPU_LIMIT=1000m
+MEMORY_REQUEST=10Mi
+MEMORY_LIMIT=1Gi
