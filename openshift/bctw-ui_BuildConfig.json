@@ -1,0 +1,68 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {},
+    "items": [
+        {
+            "apiVersion": "image.openshift.io/v1",
+            "kind": "ImageStream",
+            "metadata": {
+                "name": "bctw-ui"
+            }
+        },
+        {
+            "apiVersion": "build.openshift.io/v1",
+            "kind": "BuildConfig",
+            "metadata": {
+                "labels": {
+                    "app": "bctw-ui"
+                },
+                "name": "bctw-ui"
+            },
+            "spec": {
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "bctw-ui:latest"
+                    }
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1000m",
+                        "memory": "1Gi"
+                    },
+                    "requests": {
+                        "cpu": "10m",
+                        "memory": "10Mi"
+                    }
+                },
+                "runPolicy": "Serial",
+                "source": {
+                    "contextDir": "",
+                    "git": {
+                        "ref": "master",
+                        "uri": "https://github.com/bcgov/bctw-ui.git"
+                    },
+                    "type": "Git"
+                },
+                "strategy": {
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "centos/nodejs-12-centos7:latest"
+                        }
+                    },
+                    "type": "Source"
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        }
+    ]
+}
