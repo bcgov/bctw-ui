@@ -20,7 +20,7 @@ export default new Vuex.Store({
       const h2 = location.hostname;
       const url = (state.prod) ? 
         `${h1}//${h2}/get-collars` :
-        `${h1}//${h2}:8080/get-collars`;
+        `${h1}//${h2}:3000/get-collars`;
       request(url, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
         state.pings = JSON.parse(body);
