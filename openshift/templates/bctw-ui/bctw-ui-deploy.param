@@ -1,0 +1,15 @@
+#=========================================================
+# OpenShift template parameters for:
+# Component: .
+# Template File: ../openshift/templates/bctw-ui/bctw-ui-deploy.yaml
+#=========================================================
+NAME=bctw-ui
+APP_GROUP=bctw
+SOURCE_IMAGE_NAME=bctw-ui
+IMAGE_NAMESPACE=dgsbmb-tools
+TAG_NAME=dev
+APPLICATION_DOMAIN=bctw-ui-dgsbmb-dev.pathfinder.gov.bc.ca
+CPU_REQUEST=10m
+CPU_LIMIT=500m
+MEMORY_REQUEST=10Mi
+MEMORY_LIMIT=512Mi

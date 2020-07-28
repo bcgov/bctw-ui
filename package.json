@@ -7,7 +7,7 @@
     "dev": "cp ./frontend/data/*.json ./frontend/dist/ && parcel ./frontend/src/index.html --out-dir ./frontend/dist --open --port 1111",
     "prestart": "cp ./frontend/data/*.json ./frontend/dist/",
     "start": "node backend/js/server.js",
-    "build": "parcel build ./frontend/src/index.html NODE_ENV=prod --no-source-maps --public-url ./ --out-dir ./frontend/dist",
+    "build": "parcel build ./frontend/src/index.html NODE_ENV=production --no-source-maps --public-url ./ --out-dir ./frontend/dist",
     "postbuild": "cp ./frontend/data/*.json ./frontend/dist/",
     "lint": "eslint --ext .js,.vue src"
   },
@@ -34,9 +34,6 @@
     "passport-local": "^1.0.0",
     "pg": "^8.0.3",
     "pug": "^2.0.4",
-    "sqlite3": "^4.1.0"
-  },
-  "devDependencies": {
     "@vue/component-compiler-utils": "^3.0.0",
     "autoprefixer": "^9.6.1",
     "babel-core": "^6.26.3",
@@ -63,6 +60,9 @@
     "vue-template-compiler": "^2.6.10",
     "vuesax": "^3.10.2",
     "vuex": "^3.1.1"
+  },
+  "devDependencies": {
+
   },
   "vue": {
     "presets": [
