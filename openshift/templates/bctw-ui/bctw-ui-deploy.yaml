@@ -50,30 +50,14 @@ objects:
           env:
           - name: NODE_ENV
             value: production
-          - name: POSTGRES_USER
-            valueFrom:
-              secretKeyRef:
-                key: username
-                name: bctw
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: password
-                name: bctw
-          - name: BCTW_IS_LIVE_DATA
-            value: 'true'
           - name: BCTW_SESSION_SALT
             value: qrjewvcu78ds97f234523jkldvjdjdsl
           - name: BASE_URL
             value: /
-          - name: DEV_MODE
-            value: 'true'
-          - name: POSTGRES_SERVER_HOST
-            value: bctw-db.dgsbmb-dev.svc.cluster.local
-          - name: POSTGRES_SERVER_PORT
-            value: '5432'
-          - name: POSTGRES_DB
-            value: bctw
+          - name: BCTW_API_HOST
+            value: bctw-api
+          - name: BCTW_API_PORT
+            value: '3000'
 
 - kind: Service
   apiVersion: v1
@@ -95,26 +79,6 @@ objects:
       name: "${NAME}"
     type: ClusterIP
     sessionAffinity: None
-
-- apiVersion: v1
-  kind: Route
-  metadata:
-    labels:
-      name: ${NAME}
-      app: ${APP_GROUP}
-      app-group: ${APP_GROUP}
-    name: "${NAME}"
-  spec:
-    host: "${APPLICATION_DOMAIN}"
-    port:
-      targetPort: 8080-tcp
-    tls:
-      insecureEdgeTerminationPolicy: Redirect
-      termination: edge
-    to:
-      kind: Service
-      name: "${NAME}"
-      weight: 100
 
 - kind: HorizontalPodAutoscaler
   apiVersion: autoscaling/v1
@@ -157,10 +121,6 @@ parameters:
   description: The TAG name for this environment, e.g., dev, test, prod
   required: true
   value: dev
-- name: APPLICATION_DOMAIN
-  description: The exposed hostname that will route to the service, e.g., myappname.pathfinder.gov.bc.ca, if left blank a value will be defaulted.
-  displayName: Application Domain
-  value: bctw-ui-dgsbmb-dev.pathfinder.gov.bc.ca
 - name: CPU_REQUEST
   displayName: CPU Request
   description: Starting amount of CPU the container can use.

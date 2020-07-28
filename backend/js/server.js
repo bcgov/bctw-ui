@@ -5,6 +5,7 @@ const cors = require('cors');
 const http = require('http');
 const morgan = require('morgan');
 const helmet = require('helmet');
+const needle = require('needle');
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -14,8 +15,9 @@ const keycloakConnect = require('keycloak-connect');
 
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
-const isProd = process.env.NODE_ENV === 'prod' ? true : false;
-const isLiveData = process.env.BCTW_IS_LIVE_DATA;
+const isProd = process.env.NODE_ENV === 'production' ? true : false;
+const apiHost = process.env.BCTW_API_HOST;
+const apiPort = process.env.BCTW_API_PORT;
 
 var memoryStore = new expressSession.MemoryStore();
 var keycloak = new keycloakConnect({ store: memoryStore });
@@ -31,14 +33,26 @@ var session = {
   }
 };
 
-var pgPool = new pg.Pool({
-  user: process.env.POSTGRES_USER,
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  host: isProd ? process.env.POSTGRES_SERVER_HOST : 'localhost',
-  port: isProd ? process.env.POSTGRES_SERVER_PORT : 5432,
-  max: 10
-});
+/* ## proxyApi
+  The api is not exposed publicly. This service is protected
+  by keycloak. So forward all authenticated traffic.
+  @param req {object} Node/Express request object
+  @param res {object} Node/Express response object
+  @param next {function} Node/Express function for flow control
+ */
+const proxyApi = function (req, res, next) {
+  const endpoint = req.params.endpoint;
+  const url = `${apiHost}:${apiPort}/${endpoint}`;
+  // Right now it's just a get
+  needle(url,(err,_,body) => {
+    if (err) {
+      console.error("Error communicating with the API: ",err);
+      return res.status(500).json({error: err});
+    }
+
+    res.json(body);
+  })
+};
 
 /* ## gardenGate
   Check that the user is authenticated before continuing.
@@ -73,55 +87,6 @@ const pageHandler = function (req, res, next) {
   return next();
 };
 
-/* ## getFileCollars
-  Get collar data from the test file
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
-  @param next {function} Node/Express function for flow control
- */
-const getFileCollars = function (req, res, next) {
-  console.log("Retrieving collar data from local file on server.");
-  fs.readFile(__dirname + '/../../data/lotek_plusx_merge_light.json', (err,data) => {
-    if (err) {
-      return res.status(500).send('Failed to read sample GeoJSON file');
-    }
-    res.send(data.toString());
-  });
-};
-
-/* ## getDBCollars
-  Get collar data from the database. Returns GeoJSON through Express.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
-  @param next {function} Node/Express function for flow control
- */
-const getDBCollars = function (req, res, next) {
-  console.log("Retrieving collar data from database.");
-  const sql = `
-    SELECT row_to_json(fc)
-     FROM ( SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features
-     FROM (
-      SELECT 'Feature' As type,
-        ST_AsGeoJSON(lg.geometry)::json As geometry,
-        row_to_json((
-          animal_id,
-          collar_id,
-          local_timestamp
-        )) As properties
-       FROM vendor_data_merge As lg
-       order by local_timestamp desc
-       limit 2000
-    ) As f )  As fc;
-  `;
-  const done = function (err,data) {
-    if (err) {
-      return res.status(500).send('Failed to query database');
-    }
-    res.send(data.rows[0].row_to_json);
-  };
-  pgPool.query(sql,done);
-};
-
 // use enhanced logging in non-prod environments
 const logger = isProd ? 'combined' : 'dev';
 
@@ -145,11 +110,12 @@ var app = express()
   .use(keycloak.middleware())
   .use(gardenGate)
   .get('/', keycloak.protect(), pageHandler)
+  .get('/api/:endpoint', keycloak.protect(), proxyApi)
+  // .get('/api/:endpoint', proxyApi)
   .use(express['static']('frontend/www'))
   .use(express['static']('frontend/dist'))
   .set('view engine', 'pug')
   .set('views', 'backend/pug')
-  .get('/get-collars',(isLiveData === 'true') ? getDBCollars : getFileCollars)
   .get('*', notFound);
 
 http.createServer(app).listen(8080);

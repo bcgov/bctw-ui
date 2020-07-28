@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import request from 'request';
+import needle from 'needle';
 
 Vue.use(Vuex);
 
@@ -18,12 +18,13 @@ export default new Vuex.Store({
     requestPings(state,callback) {
       const h1 = location.protocol;
       const h2 = location.hostname;
-      const url = (state.prod) ? 
-        `${h1}//${h2}/get-collars` :
-        `${h1}//${h2}:3000/get-collars`;
-      request(url, (err,_,body) => {
+      const h3 = location.port;
+      const url = `${h1}//${h2}:${h3}/api/get-collars`;
+      console.log(url);
+      needle(url, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
-        state.pings = JSON.parse(body);
+        console.log(body);
+        state.pings = body;
         callback(); // run the callback
       });
     },
