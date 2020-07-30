@@ -20,10 +20,11 @@ export default new Vuex.Store({
       const h2 = location.hostname;
       const h3 = location.port;
       const url = `${h1}//${h2}:${h3}/api/get-collars`;
-      console.log(url);
-      needle(url, (err,_,body) => {
+      const options = {
+        headers: {'accept-encoding': 'gzip,deflate'}
+      };
+      needle(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
-        console.log(body);
         state.pings = body;
         callback(); // run the callback
       });
