@@ -21,7 +21,9 @@ export default new Vuex.Store({
       const h3 = location.port;
       const url = `${h1}//${h2}:${h3}/api/get-collars`;
       const options = {
-        compressed: true
+        compressed: true,
+        follow: 10,
+        accept: 'application/vnd.github.full+json'
       };
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
