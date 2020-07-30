@@ -9,7 +9,6 @@ const needle = require('needle');
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
-const protect = require('@risingstack/protect');
 const expressSession = require('express-session');
 const keycloakConnect = require('keycloak-connect');
 
@@ -95,10 +94,6 @@ const logger = isProd ? 'combined' : 'dev';
 var app = express()
   .use(helmet())
   .use(cors())
-  .use(protect.express.sqlInjection({
-    body: true,
-    loggerFunction: console.error
-  }))
   .use(morgan(logger))
   // .use(compression())
   .use(bodyParser.json({

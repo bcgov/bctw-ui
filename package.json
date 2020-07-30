@@ -19,7 +19,6 @@
   "author": "BC Telemetry Warehouse",
   "license": "UNLICENSED",
   "dependencies": {
-    "@risingstack/protect": "^1.2.0",
     "@vue/component-compiler-utils": "^3.0.0",
     "autoprefixer": "^9.6.1",
     "babel-core": "^6.26.3",
