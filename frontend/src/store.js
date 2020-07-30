@@ -20,6 +20,7 @@ export default new Vuex.Store({
       const h2 = location.hostname;
       const h3 = location.port;
       const url = `${h1}//${h2}:${h3}/api/get-collars`;
+      console.log(url);
       const options = {
         compressed: true,
         follow: 10,

@@ -100,7 +100,7 @@ var app = express()
     loggerFunction: console.error
   }))
   .use(morgan(logger))
-  .use(compression())
+  // .use(compression())
   .use(bodyParser.json({
     limit: '50mb'
   }))
