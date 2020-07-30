@@ -44,11 +44,13 @@ const proxyApi = function (req, res, next) {
   const endpoint = req.params.endpoint;
   const url = `${apiHost}:${apiPort}/${endpoint}`;
   // Right now it's just a get
+  console.log('yo');
   needle(url,(err,_,body) => {
     if (err) {
       console.error("Error communicating with the API: ",err);
       return res.status(500).json({error: err});
     }
+    console.log(body);
 
     res.json(body);
   })
@@ -109,8 +111,9 @@ var app = express()
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate)
-  .get('/', keycloak.protect(), pageHandler)
+  // .get('/', keycloak.protect(), pageHandler)
   // .get('/api/:endpoint', keycloak.protect(), proxyApi)
+  .get('/', pageHandler)
   .get('/api/:endpoint', proxyApi)
   .use(express['static']('frontend/www'))
   .use(express['static']('frontend/dist'))
