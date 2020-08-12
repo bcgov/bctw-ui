@@ -29,9 +29,8 @@ var keyCloakConfig = {
 
 // instantiate Keycloak Node.js adapter
 var keycloak = new keycloakConnect({
-  config: keyCloakConfig,
   store: memoryStore
-});
+}, keyCloakConfig);
 
 var session = {
   cookie: {
