@@ -1,6 +1,6 @@
 /* Bare bones static file server */
-const fs = require('fs');
-const pg = require('pg');
+//const fs = require('fs');
+//const pg = require('pg');
 const cors = require('cors');
 const http = require('http');
 const morgan = require('morgan');
@@ -18,23 +18,35 @@ const isProd = process.env.NODE_ENV === 'production' ? true : false;
 const apiHost = process.env.BCTW_API_HOST;
 const apiPort = process.env.BCTW_API_PORT;
 
+// configure Keycloak environment
 var memoryStore = new expressSession.MemoryStore();
-var keycloak = new keycloakConnect({ store: memoryStore });
+var keyCloakConfig = {
+  authServerUrl: process.env.KEYCLOAK_SERVER_URL,
+  clientId: "bctw-ui",
+  public: true,
+  realm: process.env.KEYCLOAK_REALM
+};
+
+// instantiate Keycloak Node.js adapter
+var keycloak = new keycloakConnect({
+  config: keyCloakConfig,
+  store: memoryStore
+});
 
 var session = {
-  secret: sessionSalt,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 1000 days
+    secure: false
+  },
   resave: false,
   saveUninitialized: true,
-  store: memoryStore,
-  cookie: {
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: false
-  }
+  secret: sessionSalt,
+  store: memoryStore
 };
 
 /* ## proxyApi
   The api is not exposed publicly. This service is protected
-  by keycloak. So forward all authenticated traffic.
+  by Keycloak. So forward all authenticated traffic.
   @param req {object} Node/Express request object
   @param res {object} Node/Express response object
   @param next {function} Node/Express function for flow control
@@ -88,7 +100,7 @@ const pageHandler = function (req, res, next) {
   return next();
 };
 
-// use enhanced logging in non-prod environments
+// use enhanced logging in non-production environments
 const logger = isProd ? 'combined' : 'dev';
 
 var app = express()
