@@ -1,14 +1,21 @@
 <template lang="pug">
 .popup
-  div Device ID: {{$store.getters.pingActive.CollarID || $store.getters.pingActive['Device ID']}}
-  div Date: {{$store.getters.pingActive.UTC_Date || $store.getters.pingActive['Date & Time [GMT]']}}
+  div Species: {{$store.getters.pingActive.species}}
+  div Animal Status: {{$store.getters.pingActive.animal_status}}
+  div(v-if='$store.getters.pingActive.animal_id')
+    | Animal_id: {{$store.getters.pingActive.animal_id}}
+  div(v-if='$store.getters.pingActive.population_unit')
+    | Population Unit: {{$store.getters.pingActive.population_unit}}
+  div Device ID: {{$store.getters.pingActive.device_id}}
+  div Device Vendor: {{$store.getters.pingActive.device_vendor}}
+  div(v-if='$store.getters.pingActive.radio_frequency')
+    | Radio Frequency: {{$store.getters.pingActive.radio_frequency}}
 
   //- vs-button(
   //-   class='btn-3d'
   //-   type='line'
   //-   @click='view3D()'
   //- ) View in 3D
-
 </template>
 
 <script lang='ls'>
