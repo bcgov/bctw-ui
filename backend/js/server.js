@@ -18,23 +18,25 @@ const isProd = process.env.NODE_ENV === 'production' ? true : false;
 const apiHost = process.env.BCTW_API_HOST;
 const apiPort = process.env.BCTW_API_PORT;
 
-// configure Keycloak environment
 var memoryStore = new expressSession.MemoryStore();
+
+// Keycloak config object (deprecates use of keycloak.json)
+// see: https://wjw465150.gitbooks.io/keycloak-documentation/content/securing_apps/topics/oidc/nodejs-adapter.html
 var keyCloakConfig = {
   authServerUrl: process.env.KEYCLOAK_SERVER_URL,
-  clientId: "bctw-ui",
+  clientId: process.env.KEYCLOAK_CLIENT_ID,
   public: true,
   realm: process.env.KEYCLOAK_REALM
 };
 
-// instantiate Keycloak Node.js adapter
+// instantiate Keycloak Node.js adapter, passing in configuration
 var keycloak = new keycloakConnect({
   store: memoryStore
 }, keyCloakConfig);
 
 var session = {
   cookie: {
-    maxAge: 24 * 60 * 60 * 1000, // 1000 days
+    maxAge: 24 * 60 * 60 * 1000, // 1,000 days
     secure: false
   },
   resave: false,
