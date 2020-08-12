@@ -18,8 +18,9 @@ export default new Vuex.Store({
     requestPings(state,callback) {
       const h1 = location.protocol;
       const h2 = location.hostname;
-      const h3 = location.port;
-      const url = `${h1}//${h2}:${h3}/api/get-collars`;
+      const h3 = state.prod ? location.port : 3000;
+      const h4 = state.prod ? '/api' : '';
+      const url = `${h1}//${h2}:${h3}${h4}/get-critters`;
       console.log(url);
       const options = {
         compressed: true,
