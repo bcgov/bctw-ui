@@ -10,6 +10,7 @@
   div Device Vendor: {{$store.getters.pingActive.device_vendor}}
   div(v-if='$store.getters.pingActive.radio_frequency')
     | Radio Frequency: {{$store.getters.pingActive.radio_frequency}}
+  div Date: {{betterDate($store.getters.pingActive.date_recorded)}}
 
   //- vs-button(
   //-   class='btn-3d'
@@ -19,7 +20,7 @@
 </template>
 
 <script lang='ls'>
-``import request from 'request'``
+moment = require('moment')
 
 /* ## view3D
   Go to the terrain screen with the terrain-centroid 
@@ -34,12 +35,18 @@ view3D = ->
   #// Send a signal if the map is already initialized
   @$root.$emit 'redraw-terrain', id
 
+/* ## betterDate
+  Format user friendly date
+  @param it {string} UTC formatted date
+ */
+betterDate = -> moment(it).format('LLLL')
 
 ``
 export default {
   name: 'pingPopup',
   methods: {
-    view3D
+    view3D,
+    betterDate
   }
 }
 ``
