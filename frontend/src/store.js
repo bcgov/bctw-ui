@@ -6,9 +6,10 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    pings: null,
     prod: location.port == 1111 ? false : true,
-    pingActive: {}
+    pings: null,
+    pingActive: {},
+    pingsFocused: []
   },
   mutations: {
     pingActive (state,properties) {
