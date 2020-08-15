@@ -56,6 +56,8 @@
 </template>
 
 <script lang="ls">
+``import download from 'downloadjs'``
+
 #//view3D = (mutation) ->
 #//  @$router
 #//    .push query: 'terrain-centroid': mutation.payload.id
@@ -74,8 +76,8 @@ selectChanged = ->
   @$store.commit 'requestPings', callback
 
 downloadData = ->
-  pings = @$store.getters.pings
-  console.log pings
+  pings = JSON.stringify @$store.getters.pings
+  download pings, 'collars.geojson', 'application/json'
 
 ``
 export default {
