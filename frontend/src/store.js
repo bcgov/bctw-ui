@@ -9,20 +9,22 @@ export default new Vuex.Store({
     prod: location.port == 1111 ? false : true,
     pings: null,
     pingActive: {},
-    pingsFocused: []
+    pingsFocused: [],
+    timeWindow: '1 days'
   },
   mutations: {
     pingActive (state,properties) {
-      console.log(properties);
       state.pingActive = properties;
+    },
+    timeWindow (state,time) {
+      state.timeWindow = time;
     },
     requestPings(state,callback) {
       const h1 = location.protocol;
       const h2 = location.hostname;
       const h3 = state.prod ? location.port : 3000;
       const h4 = state.prod ? '/api' : '';
-      const url = `${h1}//${h2}:${h3}${h4}/get-critters`;
-      console.log(url);
+      const url = `${h1}//${h2}:${h3}${h4}/get-critters?time=${state.timeWindow}`;
       const options = {
         compressed: true,
         follow: 10,

@@ -30,6 +30,7 @@
     "compression": "^1.7.4",
     "connect-sqlite3": "^0.9.11",
     "cors": "^2.8.5",
+    "downloadjs": "^1.4.7",
     "eslint": "^6.1.0",
     "eslint-plugin-vue": "^5.2.3",
     "express": "^4.17.1",

@@ -24,12 +24,8 @@
 
 map = {}
 
-drawPingLayer = ->
-  clusterLayer = L.markerClusterGroup do
-    disableClusteringAtZoom: 14
-
+makeMarkers = ->
   markers = L.geoJson @$store.getters.pings, do
-
     pointToLayer: (feature,latlng) ->
       pointStyle = do
         radius: 8
@@ -42,24 +38,36 @@ drawPingLayer = ->
 
     onEachFeature: (feature,layer) ->
       layer.bindPopup document.querySelector '#popup .popup'
-  
+
   storeData = ~> @$store.commit 'pingActive', it.layer.feature.properties
 
-  markers
-    .on 'click',storeData
+  markers.on 'click',storeData
+
+
+drawPingLayer = ->
+  clusterLayer = L.markerClusterGroup do
+    disableClusteringAtZoom: 14
+
+  markers = makeMarkers.call @
 
   clusterLayer.addLayer markers
   map.addLayer clusterLayer
 
+  @$root.$on 'redrawClusterLayer', ~>
+    clusterLayer.clearLayers!
+    markers = makeMarkers.call @
+    clusterLayer.addLayers markers
+
+
 draw = ->
   map := L.map 'map', zoomControl: no
     .setView [55,-128], 6
+
   L.control.zoom position: 'bottomright'
     .addTo map
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">ESRI Basemap</a> ',
     maxZoom: 18
   }).addTo(map);
 
@@ -76,7 +84,7 @@ draw = ->
       featureGroup: drawnItems
 
 
-  map.addControl drawControl
+  #//map.addControl drawControl #These don't do anything yet.
 
   map.on 'draw:created', -> map.addLayer it.layer
 ``

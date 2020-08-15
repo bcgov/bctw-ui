@@ -9,7 +9,6 @@
       )
         .header-sidebar(slot="header")
           h4.name BCTW
-          h5.name &nbsp;
           h5.name Caribou Recovery Program
 
         vs-sidebar-item(index='1' icon='home' class='page-home')
@@ -26,29 +25,29 @@
 
         vs-divider(position='center') Filters
 
-        vs-slider(
-          id="temporal"
-          ticks
-          steps=50
-          v-model="value1"
+        vs-select(
+          label='Time Window'
+          class='select-time--window'
+          v-model="select"
+          @change="selectChanged(select)"
         )
-
-        div.collors
-          div.collor
-            vs-checkbox(v-model='value2') Collar A
-          div.collor
-            vs-checkbox(v-model='value3') Collar B
-          div.collor
-            vs-checkbox(v-model='value4') Collar C
-          div.collor
-            vs-checkbox(v-model='value5') Collar D
-
+          vs-select-item(
+            :key='index'
+            :value='item.value'
+            :text='item.text'
+            v-for='item,index in times'
+          )
         vs-button(
           class='download'
           color='primary'
-          type='filled'
+          type='line'
+          size='small'
           icon="cloud_download"
+          @click="downloadData"
           ) Download
+
+
+
 
     #page
       transition(name='fade', mode='out-in')
@@ -67,16 +66,34 @@ connect = ->
     #//switch mutation.type
     #//| 'terrainCentroidActive' => view3D.call @,mutation
 
+selectChanged = ->
+  #// Signal map to refresh collar layer
+  callback =  ~> @$root.$emit 'redrawClusterLayer'
+
+  @$store.commit 'timeWindow', it
+  @$store.commit 'requestPings', callback
+
+downloadData = ->
+  pings = @$store.getters.pings
+  console.log pings
+
 ``
 export default {
   mounted: connect,
+  methods: {
+    selectChanged,
+    downloadData
+  },
   data:()=>({
     active: true,
-    value1: [10,50],
-    value2: true,
-    value3: true,
-    value4: true,
-    value5: true
+    select: '1 days',
+    times: [
+      {text: '1 day', value: '1 days'},
+      {text: '1 week', value: '1 weeks'},
+      {text: '1 month', value: '1 months'},
+      {text: '3 months', value: '3 months'},
+      {text: '6 months', value: '6 months'},
+    ]
   })
 }
 ``
@@ -85,6 +102,9 @@ export default {
 <style lang="stylus">
 body
   font-family Avenir, Helvetica, Arial, sans-serif
+
+  .vs-select--options
+    z-index 100000 !important
 
 #app
   font-family 'Avenir', Helvetica, Arial, sans-serif
@@ -95,14 +115,29 @@ body
 
   #sidebar
 
+    button.download i
+      top 0.4rem
+
+    .select-time--window
+      display inline-block
+      width 8rem
+
+      label
+        position relative
+        left -1.5rem
+
+    .download  
+      display inline-block
+      margin-left 0.5rem
+      float none
+
     .collors
       i
         font-size 16px
       .collor
         margin: 0.5rem 0 0.5rem 0
 
-    .download  
-      margin 1rem 0 0 8rem
+    
 
     header 
       text-align left
@@ -121,9 +156,10 @@ body
       border-color orange
       border-width 4px
 
-    #temporal
-      margin 10%
-      min-width 0
-      width 80%
+    .header-sidebar h4
+      margin-top 0.5rem
+      margin-bottom 0.2rem
+      
+
 
 </style>
