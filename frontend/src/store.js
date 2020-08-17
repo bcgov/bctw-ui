@@ -24,8 +24,7 @@ export default new Vuex.Store({
       const h2 = location.hostname;
       const h3 = state.prod ? location.port : 3000;
       const h4 = state.prod ? '/api' : '';
-      const url = `${h1}//${h2}:${h3}${h4}/get-critters?time=1week`;
-      // const url = `${h1}//${h2}:${h3}${h4}/get-critters?time=${state.timeWindow}`;
+      const url = `${h1}//${h2}:${h3}${h4}/get-critters?time=${state.timeWindow}`;
       const options = {
         compressed: true,
         follow: 10,
