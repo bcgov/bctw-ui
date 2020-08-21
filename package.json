@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cp ./frontend/data/*.json ./frontend/dist/ && parcel ./frontend/src/index.html --out-dir ./frontend/dist --open --port 1111",
     "prestart": "cp ./frontend/data/*.json ./frontend/dist/",
-    "start": "node backend/js/server.js",
+    "start": "npx pm2@4.4.0 --no-daemon start backend/js/server.js",
     "build": "parcel build ./frontend/src/index.html NODE_ENV=production --no-source-maps --public-url ./ --out-dir ./frontend/dist",
     "postbuild": "cp ./frontend/data/*.json ./frontend/dist/",
     "lint": "eslint --ext .js,.vue src"
