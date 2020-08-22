@@ -25,10 +25,16 @@
 
         vs-divider(position='center') Filters
 
+        vs-checkbox(
+          class='latest-pings'
+          v-model='latestPings'
+        ) most recent locations
+
         vs-select(
           label='Time Window'
           class='select-time--window'
           v-model="select"
+          :disabled="latestPings"
           @change="selectChanged(select)"
         )
           vs-select-item(
@@ -89,6 +95,7 @@ export default {
   data:()=>({
     active: true,
     select: '1 days',
+    latestPings: false,
     times: [
       {text: '1 day', value: '1 days'},
       {text: '1 week', value: '1 weeks'},
@@ -116,6 +123,18 @@ body
   color #2c3e50
 
   #sidebar
+
+    .con-vs-checkbox i 
+      font-size 18px
+
+
+
+    .latest-pings
+      justify-content left
+      margin 1rem
+
+      .con-slot-label
+        font-size 15px !important
 
     button.download i
       top 0.4rem
