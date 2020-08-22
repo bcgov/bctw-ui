@@ -28,6 +28,7 @@
         vs-checkbox(
           class='latest-pings'
           v-model='latestPings'
+          @change="checkChanged(latestPings)"
         ) most recent locations
 
         vs-select(
@@ -81,6 +82,15 @@ selectChanged = ->
   @$store.commit 'timeWindow', it
   @$store.commit 'requestPings', callback
 
+checkChanged = (checked) ->
+  #// Signal map to refresh collar layer
+  callback =  ~> @$root.$emit 'redrawClusterLayer'
+
+  if checked
+    @$store.commit 'requestMostRecentPings', callback
+  else
+    @$store.commit 'requestPings', callback
+
 downloadData = ->
   pings = JSON.stringify @$store.getters.pings
   download pings, 'collars.geojson', 'application/json'
@@ -90,6 +100,7 @@ export default {
   mounted: connect,
   methods: {
     selectChanged,
+    checkChanged,
     downloadData
   },
   data:()=>({
@@ -127,8 +138,6 @@ body
     .con-vs-checkbox i 
       font-size 18px
 
-
-
     .latest-pings
       justify-content left
       margin 1rem
@@ -158,8 +167,6 @@ body
       .collor
         margin: 0.5rem 0 0.5rem 0
 
-    
-
     header 
       text-align left
       background #036
@@ -181,6 +188,4 @@ body
       margin-top 0.5rem
       margin-bottom 0.2rem
       
-
-
 </style>
