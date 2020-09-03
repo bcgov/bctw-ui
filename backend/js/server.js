@@ -107,7 +107,7 @@ const pageHandler = function (req, res, next) {
 const logger = isProd ? 'combined' : 'dev';
 
 const authenticate = function (req,_,next) {
-  console.log("access_token:",req.kauth.grant.access_token);
+  console.log("req:",req);
   next();
 };
 
