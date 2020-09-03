@@ -106,6 +106,11 @@ const pageHandler = function (req, res, next) {
 // use enhanced logging in non-production environments
 const logger = isProd ? 'combined' : 'dev';
 
+const authenticate = function (req,_,next) {
+  console.log("access_token:",req.kauth.grant.access_token);
+  next();
+};
+
 var app = express()
   .use(helmet())
   .use(cors())
@@ -120,6 +125,7 @@ var app = express()
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate)
+  .use(authenticate)
   .get('/', keycloak.protect(), pageHandler)
   .get('/api/:endpoint', keycloak.protect(), proxyApi)
   // .get('/api/:endpoint', proxyApi)
