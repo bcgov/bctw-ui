@@ -114,7 +114,11 @@ const authenticate = function (req,res,next) {
     return next();
   }
 
-  // Check if keycloak user has access
+  // TODO: Pass through unless the following
+  // if (req.kauth && req.kauth.grant) {
+
+
+  // Check if keycluak user has access
   try {
     console.log(req);
     const domain = req.kauth.grant.access_token.content.preferred_username; 
