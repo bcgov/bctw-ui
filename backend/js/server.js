@@ -116,7 +116,7 @@ const authenticate = function (req,res,next) {
 
   // Check if keycloak user has access
   try {
-    console.log(req.kauth);
+    console.log(req);
     const domain = req.kauth.grant.access_token.content.preferred_username; 
     const user = domain.split('@')[0];
     if (authorizedUsers.includes(user)) {
