@@ -29,11 +29,11 @@ makeMarkers = ->
     pointToLayer: (feature,latlng) ->
       pointStyle = do
         radius: 8
-        fillColor: 'green'
+        fillColor: 'yellow'
         color: "#000"
         weight: 1
         opacity: 1
-        fillOpacity: 0.5
+        fillOpacity: 0.9
       L.circleMarker latlng, pointStyle
 
     onEachFeature: (feature,layer) ->
