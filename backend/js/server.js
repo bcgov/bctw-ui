@@ -1,6 +1,7 @@
 /* Bare bones static file server */
 //const fs = require('fs');
 //const pg = require('pg');
+const pug = require('pug');
 const cors = require('cors');
 const http = require('http');
 const morgan = require('morgan');
@@ -17,6 +18,10 @@ const sessionSalt = process.env.BCTW_SESSION_SALT;
 const isProd = process.env.NODE_ENV === 'production' ? true : false;
 const apiHost = process.env.BCTW_API_HOST;
 const apiPort = process.env.BCTW_API_PORT;
+
+const authorizedUsers = [
+  'biff'
+];
 
 var memoryStore = new expressSession.MemoryStore();
 
@@ -90,7 +95,7 @@ const gardenGate = function (req, res, next) {
   @param res {object} Node/Express response object
  */
 const notFound = function (req, res) {
-  return res.sendStatus(404);
+  return res.status(404).send('<p>Sorry... You must be lost &#x2639;.</p>');
 };
 
 /* ## pageHandler
@@ -103,15 +108,39 @@ const pageHandler = function (req, res, next) {
   return next();
 };
 
+const authenticate = function (req,res,next) {
+  // Pass through if in dev
+  if (!isProd) {
+    return next();
+  }
+
+  // Check if keycloak user has access
+  try {
+    const domain = req.kauth.grant.access_token.content.preferred_username; 
+    const user = domain.split('@')[0];
+    if (authorizedUsers.includes(user)) {
+      next(); // Authorized... pass through
+    } else {
+      res.render('denied',req); // Nope... Denied
+    }
+  }
+  catch (err) {
+    console.error("Failed to authenticate:",err)
+    res.render('denied',req); // Denied
+  }
+};
+
+/* ## denied
+  The route to the denied service page
+  @param req {object} Node/Express request object
+  @param res {object} Node/Express response object
+*/
+const denied = function (req,res) {
+  res.render('denied',req);
+}
+
 // use enhanced logging in non-production environments
 const logger = isProd ? 'combined' : 'dev';
-
-const authenticate = function (req,_,next) {
-  if (req.kauth && req.kauth.grant) {
-    console.log("req content:",req.kauth.grant.access_token.content);
-  }
-  next();
-};
 
 var app = express()
   .use(helmet())
@@ -128,6 +157,7 @@ var app = express()
   .use(keycloak.middleware())
   .use(gardenGate)
   .use(authenticate)
+  .get('/denied',denied)
   .get('/', keycloak.protect(), pageHandler)
   .get('/api/:endpoint', keycloak.protect(), proxyApi)
   // .get('/api/:endpoint', proxyApi)
