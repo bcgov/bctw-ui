@@ -109,8 +109,8 @@ const pageHandler = function (req, res, next) {
 };
 
 const authenticate = function (req,res,next) {
-  // Pass through if in dev
-  if (!isProd) {
+  // Pass through if in dev or keycloak isn't configured yet
+  if (!isProd || !req.kauth.grant) {
     return next();
   }
 
@@ -120,7 +120,6 @@ const authenticate = function (req,res,next) {
 
   // Check if keycluak user has access
   try {
-    console.log(req);
     const domain = req.kauth.grant.access_token.content.preferred_username; 
     const user = domain.split('@')[0];
     if (authorizedUsers.includes(user)) {
