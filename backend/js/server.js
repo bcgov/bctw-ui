@@ -8,7 +8,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const needle = require('needle');
 const express = require('express');
-const compression = require('compression');
+// const compression = require('compression'); This messes with keycloak
 const bodyParser = require('body-parser');
 const expressSession = require('express-session');
 const keycloakConnect = require('keycloak-connect');
@@ -108,17 +108,25 @@ const pageHandler = function (req, res, next) {
   return next();
 };
 
+/* ## authenticate
+  After keycloak has been authenticated we need to check if 
+  the account has access to the site.
+  If yes... Pass through.
+  If not... Redirect to access-denied page.
+  @param req {object} Node/Express request object
+  @param res {object} Node/Express response object
+  @param next {function} Node/Express function for flow control
+ */
 const authenticate = function (req,res,next) {
   // Pass through if in dev or keycloak isn't configured yet
   if (!isProd || !req.kauth.grant) {
     return next();
   }
 
-  // TODO: Pass through unless the following
-  // if (req.kauth && req.kauth.grant) {
-
-
-  // Check if keycluak user has access
+  /*
+    Check if keycloak user has access.
+    If something's wrong with the keycloak info... Don't crash the server.
+   */
   try {
     const domain = req.kauth.grant.access_token.content.preferred_username; 
     const user = domain.split('@')[0];
@@ -127,12 +135,12 @@ const authenticate = function (req,res,next) {
     } else {
       res.render('denied',req); // Nope... Denied
     }
-  }
-  catch (err) {
+  } catch (err) { // Something's wrong with keycloak
     console.error("Failed to authenticate:",err)
     res.render('denied',req); // Denied
   }
 };
+
 
 /* ## denied
   The route to the denied service page
@@ -146,6 +154,7 @@ const denied = function (req,res) {
 // use enhanced logging in non-production environments
 const logger = isProd ? 'combined' : 'dev';
 
+// Server configuration
 var app = express()
   .use(helmet())
   .use(cors())
@@ -159,18 +168,28 @@ var app = express()
   }))
   .use(expressSession(session))
   .use(keycloak.middleware())
-  .use(gardenGate)
-  .use(authenticate)
-  .get('/denied',denied)
-  .get('/', keycloak.protect(), pageHandler)
-  .get('/api/:endpoint', keycloak.protect(), proxyApi)
-  // .get('/api/:endpoint', proxyApi)
-  // .get('/', pageHandler)
-  // .use(compression())
+  .use(gardenGate) // Keycloak Gate
+  .use(authenticate) // BCTW Gate
+  .get('/denied',denied);
+
+// Use keycloak authentication only in Production
+if (isProd) {
+  app
+    .get('/', keycloak.protect(), pageHandler)
+    .get('/api/:endpoint', keycloak.protect(), proxyApi)
+} else {
+  app
+    .get('/api/:endpoint', proxyApi)
+    .get('/', pageHandler)
+}
+
+// Remaining server configuration
+app
   .use(express['static']('frontend/www'))
   .use(express['static']('frontend/dist'))
   .set('view engine', 'pug')
   .set('views', 'backend/pug')
   .get('*', notFound);
 
+// Start server
 http.createServer(app).listen(8080);
