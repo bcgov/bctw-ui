@@ -20,7 +20,7 @@ const apiHost = process.env.BCTW_API_HOST;
 const apiPort = process.env.BCTW_API_PORT;
 
 const authorizedUsers = [
-  'biff'
+  'jrpopkin'
 ];
 
 var memoryStore = new expressSession.MemoryStore();
