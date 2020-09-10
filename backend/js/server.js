@@ -25,7 +25,8 @@ const authorizedUsers = [
   'nldodd',
   'vchong',
   'warobins',
-  'jkubian'
+  'jkubian',
+  'dcolpman'
 ];
 
 var memoryStore = new expressSession.MemoryStore();
