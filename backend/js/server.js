@@ -21,12 +21,15 @@ const apiPort = process.env.BCTW_API_PORT;
 
 // Dummy list
 const authorizedUsers = [
-  'jrpopkin',
-  'nldodd',
-  'vchong',
-  'warobins',
+  'dcolpman',
   'jkubian',
-  'dcolpman'
+  'jrpopkin',
+  'mbaerg',
+  'nldodd',
+  'robmunro',
+  'tadekens',
+  'vchong',
+  'warobins'
 ];
 
 var memoryStore = new expressSession.MemoryStore();
