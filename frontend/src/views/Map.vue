@@ -64,7 +64,8 @@ drawPingLayer = ->
 
   @$root.$on 'refreshCritterLayers', ~>
     clusterLayer.clearLayers!
-    markers := makeMarkers.call @
+    map.removeLayer markers
+    markers := makeMarkers.call @ #// Parent function wide 
     clusterLayer.addLayers markers
     chooseToToggleCluster!
 

@@ -37,7 +37,7 @@
         vs-checkbox(
           class='latest-pings'
           v-model='latestPings'
-          @change="checkChanged(latestPings)"
+          @change="toggleLatestCritters(latestPings)"
         ) most recent locations
 
         vs-select(
@@ -91,7 +91,7 @@ selectChanged = ->
   @$store.commit 'timeWindow', it
   @$store.commit 'requestPings', callback
 
-checkChanged = (checked) ->
+toggleLatestCritters = (checked) ->
   #// Signal map to refresh collar layer
   callback =  ~> @$root.$emit 'refreshCritterLayers'
 
@@ -114,7 +114,7 @@ export default {
   mounted: connect,
   methods: {
     selectChanged,
-    checkChanged,
+    toggleLatestCritters,
     downloadData,
     toggleClusterCritters
   },
