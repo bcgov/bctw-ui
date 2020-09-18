@@ -79,10 +79,15 @@
 #//    .push query: 'terrain-centroid': mutation.payload.id
 #//    .catch  -> if it then console.error it
 
+#//pingsHaveChanged = (mutation,state) ->
+#//  console.log state.pings
+#//  console.log mutation.payload!$store.getters.pings
+
 connect = -> 
-  this.$store.subscribe (mutation) ~>
-    #//switch mutation.type
-    #//| 'terrainCentroidActive' => view3D.call @,mutation
+  #//this.$store.subscribe (mutation,state) ~>
+  #//  switch mutation.type
+  #//  | 'requestPings' => pingsHaveChanged.call @,mutation,state
+  #//  #//| 'terrainCentroidActive' => view3D.call @,mutation
 
 selectChanged = ->
   #// Signal map to refresh collar layer

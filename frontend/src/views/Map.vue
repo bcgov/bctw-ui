@@ -62,6 +62,9 @@ drawPingLayer = ->
 
   chooseToToggleCluster!
 
+  /*
+    Refresh all critter layers.
+   */
   @$root.$on 'refreshCritterLayers', ~>
     clusterLayer.clearLayers!
     map.removeLayer markers
@@ -69,6 +72,9 @@ drawPingLayer = ->
     clusterLayer.addLayers markers
     chooseToToggleCluster!
 
+  /*
+    Toggle the critter clustering
+   */
   @$root.$on 'toggleClusterCritters', chooseToToggleCluster
 
 
