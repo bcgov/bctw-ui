@@ -10,7 +10,8 @@ export default new Vuex.Store({
     pings: null,
     pingActive: {},
     pingsFocused: [],
-    timeWindow: '1 days'
+    timeWindow: '1 days',
+    clusterCritters: true
   },
   mutations: {
     pingActive (state,properties) {
@@ -18,6 +19,9 @@ export default new Vuex.Store({
     },
     timeWindow (state,time) {
       state.timeWindow = time;
+    },
+    toggleClusterCritters (state,checked) {
+      state.clusterCritters = checked;
     },
     requestPings(state,callback) {
       const h1 = location.protocol;
@@ -63,6 +67,9 @@ export default new Vuex.Store({
     },
     pingActive (state) {
       return state.pingActive;
+    },
+    clusterCritters (state) {
+      return state.clusterCritters;
     }
   },
   actions: {

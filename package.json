@@ -58,7 +58,7 @@
     "vue-hot-reload-api": "^2.3.3",
     "vue-router": "^3.1.2",
     "vue-template-compiler": "^2.6.10",
-    "vuesax": "^3.10.2",
+    "vuesax": "^3.12.0",
     "vuex": "^3.1.1"
   },
   "devDependencies": {},

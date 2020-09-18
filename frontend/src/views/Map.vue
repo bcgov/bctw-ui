@@ -48,15 +48,27 @@ drawPingLayer = ->
   clusterLayer = L.markerClusterGroup do
     disableClusteringAtZoom: 14
 
+  #// Define the marker layer
   markers = makeMarkers.call @
-
   clusterLayer.addLayer markers
-  map.addLayer clusterLayer
 
-  @$root.$on 'redrawClusterLayer', ~>
+  chooseToToggleCluster = ~> 
+    if @$store.getters.clusterCritters
+      map.removeLayer markers
+      map.addLayer clusterLayer
+    else
+      map.addLayer markers
+      map.removeLayer clusterLayer
+
+  chooseToToggleCluster!
+
+  @$root.$on 'refreshCritterLayers', ~>
     clusterLayer.clearLayers!
-    markers = makeMarkers.call @
+    markers := makeMarkers.call @
     clusterLayer.addLayers markers
+    chooseToToggleCluster!
+
+  @$root.$on 'toggleClusterCritters', chooseToToggleCluster
 
 
 draw = ->

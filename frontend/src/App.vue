@@ -23,7 +23,16 @@
         vs-sidebar-item(index='4' icon='exit_to_app' class='page-logout')
           a(href='/logout') Logout
 
-        vs-divider(position='center') Filters
+        vs-divider(position='center') Controls
+
+        vs-checkbox(
+          class='cluster-critters'
+          v-model='clusterCritters'
+          @change="toggleClusterCritters(clusterCritters)"
+        ) Cluster critters
+        
+
+        vs-divider(position='center') Temporal Filters
 
         vs-checkbox(
           class='latest-pings'
@@ -77,14 +86,14 @@ connect = ->
 
 selectChanged = ->
   #// Signal map to refresh collar layer
-  callback =  ~> @$root.$emit 'redrawClusterLayer'
+  callback =  ~> @$root.$emit 'refreshCritterLayers'
 
   @$store.commit 'timeWindow', it
   @$store.commit 'requestPings', callback
 
 checkChanged = (checked) ->
   #// Signal map to refresh collar layer
-  callback =  ~> @$root.$emit 'redrawClusterLayer'
+  callback =  ~> @$root.$emit 'refreshCritterLayers'
 
   if checked
     @$store.commit 'requestMostRecentPings', callback
@@ -95,18 +104,25 @@ downloadData = ->
   pings = JSON.stringify @$store.getters.pings
   download pings, 'collars.geojson', 'application/json'
 
+toggleClusterCritters = (checked) ->
+  @$store.commit 'toggleClusterCritters', checked
+  @$root.$emit 'toggleClusterCritters'
+
+
 ``
 export default {
   mounted: connect,
   methods: {
     selectChanged,
     checkChanged,
-    downloadData
+    downloadData,
+    toggleClusterCritters
   },
   data:()=>({
     active: true,
     select: '1 days',
     latestPings: false,
+    clusterCritters: true,
     times: [
       {text: '1 day', value: '1 days'},
       {text: '1 week', value: '1 weeks'},
@@ -138,7 +154,7 @@ body
     .con-vs-checkbox i 
       font-size 18px
 
-    .latest-pings
+    .latest-pings,.cluster-critters
       justify-content left
       margin 1rem
 
