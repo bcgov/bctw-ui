@@ -22,6 +22,7 @@ const apiPort = process.env.BCTW_API_PORT;
 // Dummy list
 const authorizedUsers = [
   'dcolpman',
+  'jcraven',
   'jkubian',
   'jrpopkin',
   'mbaerg',
