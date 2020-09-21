@@ -63,6 +63,7 @@
           ) Download
 
 
+        vs-divider(position='center') On Display
 
 
     #page
@@ -79,14 +80,28 @@
 #//    .push query: 'terrain-centroid': mutation.payload.id
 #//    .catch  -> if it then console.error it
 
-#//pingsHaveChanged = (mutation,state) ->
-#//  console.log state.pings
-#//  console.log mutation.payload!$store.getters.pings
+pingsHaveChanged = (state) ->
+  herds = state.pings.features.reduce (pV,cV,cI) ->
+    herd = cV.properties.population_unit
+    return pV unless herd #// No null please
+    unless pV.includes(herd) then pV.push(herd)
+    pV
+  ,[]
+
+  species = state.pings.features.reduce (pV,cV,cI) ->
+    sp = cV.properties.species
+    return pV unless sp #// No null please
+    unless pV.includes(sp) then pV.push(sp)
+    pV
+  ,[]
+
+  console.log herds
+  console.log species
 
 connect = -> 
-  #//this.$store.subscribe (mutation,state) ~>
-  #//  switch mutation.type
-  #//  | 'requestPings' => pingsHaveChanged.call @,mutation,state
+  this.$store.subscribe (mutation,state) ~>
+    switch mutation.type
+    | 'writePings' => pingsHaveChanged.call @,state
   #//  #//| 'terrainCentroidActive' => view3D.call @,mutation
 
 selectChanged = ->
