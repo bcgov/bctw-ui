@@ -30,7 +30,7 @@ fetchPings = ->
   if @$store.getters.hasPings
     drawPing.call @
   else
-    @$store.commit 'requestPings', drawPing.bind(@)
+    @$store.dispatch 'requestPings', drawPing.bind(@)
 
   #// Vue.$vs.notify do
   #//   title: 'Error'

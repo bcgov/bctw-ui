@@ -94,16 +94,16 @@ selectChanged = ->
   callback =  ~> @$root.$emit 'refreshCritterLayers'
 
   @$store.commit 'timeWindow', it
-  @$store.commit 'requestPings', callback
+  @$store.dispatch 'requestPings', callback
 
 toggleLatestCritters = (checked) ->
   #// Signal map to refresh collar layer
   callback =  ~> @$root.$emit 'refreshCritterLayers'
 
   if checked
-    @$store.commit 'requestMostRecentPings', callback
+    @$store.dispatch 'requestMostRecentPings', callback
   else
-    @$store.commit 'requestPings', callback
+    @$store.dispatch 'requestPings', callback
 
 downloadData = ->
   pings = JSON.stringify @$store.getters.pings

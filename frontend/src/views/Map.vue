@@ -93,7 +93,7 @@ draw = ->
   if @$store.getters.hasPings #// If terrain data exists
     drawPingLayer.call @ #// Draw terrain layer
   else #// If not.. request data then draw terrain layer
-    @$store.commit 'requestPings', drawPingLayer.bind(@)
+    @$store.dispatch 'requestPings', drawPingLayer.bind(@)
 
   drawnItems = new L.FeatureGroup!
   map.addLayer drawnItems

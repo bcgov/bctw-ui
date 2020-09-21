@@ -23,39 +23,8 @@ export default new Vuex.Store({
     toggleClusterCritters (state,checked) {
       state.clusterCritters = checked;
     },
-    requestPings(state,callback) {
-      const h1 = location.protocol;
-      const h2 = location.hostname;
-      const h3 = state.prod ? location.port : 3000;
-      const h4 = state.prod ? '/api' : '';
-      const url = `${h1}//${h2}:${h3}${h4}/get-critters?time=${state.timeWindow}`;
-      const options = {
-        compressed: true,
-        follow: 10,
-        accept: 'application/vnd.github.full+json'
-      };
-      needle.get(url, options, (err,_,body) => {
-        if (err) {return console.error('Failed to fetch collars: ',err)};
-        state.pings = body;
-        callback(); // run the callback
-      })
-    },
-    requestMostRecentPings(state,callback) {
-      const h1 = location.protocol;
-      const h2 = location.hostname;
-      const h3 = state.prod ? location.port : 3000;
-      const h4 = state.prod ? '/api' : '';
-      const url = `${h1}//${h2}:${h3}${h4}/get-last-pings`;
-      const options = {
-        compressed: true,
-        follow: 10,
-        accept: 'application/vnd.github.full+json'
-      };
-      needle.get(url, options, (err,_,body) => {
-        if (err) {return console.error('Failed to fetch collars: ',err)};
-        state.pings = body;
-        callback(); // run the callback
-      })
+    writePings(state,pings) {
+      state.pings = pings;
     }
   },
   getters: {
@@ -73,6 +42,39 @@ export default new Vuex.Store({
     }
   },
   actions: {
-
+    requestPings(context,callback) {
+      const h1 = location.protocol;
+      const h2 = location.hostname;
+      const h3 = context.state.prod ? location.port : 3000;
+      const h4 = context.state.prod ? '/api' : '';
+      const url = `${h1}//${h2}:${h3}${h4}/get-critters?time=${context.state.timeWindow}`;
+      const options = {
+        compressed: true,
+        follow: 10,
+        accept: 'application/vnd.github.full+json'
+      };
+      needle.get(url, options, (err,_,body) => {
+        if (err) {return console.error('Failed to fetch collars: ',err)};
+        context.commit('writePings',body);
+        callback(); // run the callback
+      })
+    },
+    requestMostRecentPings(context,callback) {
+      const h1 = location.protocol;
+      const h2 = location.hostname;
+      const h3 = context.state.prod ? location.port : 3000;
+      const h4 = context.state.prod ? '/api' : '';
+      const url = `${h1}//${h2}:${h3}${h4}/get-last-pings`;
+      const options = {
+        compressed: true,
+        follow: 10,
+        accept: 'application/vnd.github.full+json'
+      };
+      needle.get(url, options, (err,_,body) => {
+        if (err) {return console.error('Failed to fetch collars: ',err)};
+        context.commit('writePings',body);
+        callback(); // run the callback
+      })
+    }
   }
 });
