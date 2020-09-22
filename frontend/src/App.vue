@@ -65,27 +65,28 @@
 
         vs-divider(position='center') On Display
 
-        vs-list
-          vs-list-header(
-            icon='supervisor_account'
-            title='Population Units'
-          )
-          vs-list-item(
-            icon='check'
-            :title="item"
-            v-for='item,index in $store.getters.unitsActive'
-          )
+        div#critter-list.vs-con-loading__container
+          vs-list
+            vs-list-header(
+              icon='supervisor_account'
+              title='Population Units'
+            )
+            vs-list-item(
+              icon='check'
+              :title="item"
+              v-for='item,index in $store.getters.unitsActive'
+            )
+          vs-list
+            vs-list-header(
+              icon='supervisor_account'
+              title='Species'
+            )
+            vs-list-item(
+              icon='check'
+              :title="item"
+              v-for='item,index in $store.getters.speciesActive'
+            )
 
-        vs-list
-          vs-list-header(
-            icon='supervisor_account'
-            title='Species'
-          )
-          vs-list-item(
-            icon='check'
-            :title="item"
-            v-for='item,index in $store.getters.speciesActive'
-          )
 
 
     #page
@@ -119,8 +120,7 @@ pingsHaveChanged = (state) ->
 
   @$store.commit 'unitsActive', units
   @$store.commit 'speciesActive', species
-  console.log units
-  console.log species
+
 
 connect = -> 
   this.$store.subscribe (mutation,state) ~>
@@ -129,24 +129,38 @@ connect = ->
   #//  #//| 'terrainCentroidActive' => view3D.call @,mutation
 
 selectChanged = ->
-  #// Signal map to refresh collar layer
-  callback =  ~> @$root.$emit 'refreshCritterLayers'
+  @$vs.loading do
+    container: '#critter-list'
+    type: 'sound'
+
+  callback = ~>
+    @$vs.loading.close '#critter-list > .con-vs-loading'
+    @$root.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
 
   @$store.commit 'timeWindow', it
   @$store.dispatch 'requestPings', callback
 
+
 toggleLatestCritters = (checked) ->
-  #// Signal map to refresh collar layer
-  callback =  ~> @$root.$emit 'refreshCritterLayers'
+
+  @$vs.loading do
+    container: '#critter-list'
+    type: 'sound'
+
+  callback = ~>
+    @$vs.loading.close '#critter-list > .con-vs-loading'
+    @$root.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
 
   if checked
     @$store.dispatch 'requestMostRecentPings', callback
   else
     @$store.dispatch 'requestPings', callback
 
+
 downloadData = ->
   pings = JSON.stringify @$store.getters.pings
   download pings, 'collars.geojson', 'application/json'
+
 
 toggleClusterCritters = (checked) ->
   @$store.commit 'toggleClusterCritters', checked
