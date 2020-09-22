@@ -65,6 +65,28 @@
 
         vs-divider(position='center') On Display
 
+        vs-list
+          vs-list-header(
+            icon='supervisor_account'
+            title='Population Units'
+          )
+          vs-list-item(
+            icon='check'
+            :title="item"
+            v-for='item,index in $store.getters.unitsActive'
+          )
+
+        vs-list
+          vs-list-header(
+            icon='supervisor_account'
+            title='Species'
+          )
+          vs-list-item(
+            icon='check'
+            :title="item"
+            v-for='item,index in $store.getters.speciesActive'
+          )
+
 
     #page
       transition(name='fade', mode='out-in')
@@ -81,7 +103,7 @@
 #//    .catch  -> if it then console.error it
 
 pingsHaveChanged = (state) ->
-  herds = state.pings.features.reduce (pV,cV,cI) ->
+  units = state.pings.features.reduce (pV,cV,cI) ->
     herd = cV.properties.population_unit
     return pV unless herd #// No null please
     unless pV.includes(herd) then pV.push(herd)
@@ -95,7 +117,9 @@ pingsHaveChanged = (state) ->
     pV
   ,[]
 
-  console.log herds
+  @$store.commit 'unitsActive', units
+  @$store.commit 'speciesActive', species
+  console.log units
   console.log species
 
 connect = -> 

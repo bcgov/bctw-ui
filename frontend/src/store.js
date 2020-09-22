@@ -10,6 +10,8 @@ export default new Vuex.Store({
     pings: null,
     pingActive: {},
     pingsFocused: [],
+    unitsActive: [],
+    speciesActive: [],
     timeWindow: '1 days',
     clusterCritters: true
   },
@@ -23,8 +25,14 @@ export default new Vuex.Store({
     toggleClusterCritters (state,checked) {
       state.clusterCritters = checked;
     },
-    writePings(state,pings) {
+    writePings (state,pings) {
       state.pings = pings;
+    },
+    unitsActive (state,units) {
+      state.unitsActive = units;
+    },
+    speciesActive (state,species) {
+      state.speciesActive = species;
     }
   },
   getters: {
@@ -39,6 +47,12 @@ export default new Vuex.Store({
     },
     clusterCritters (state) {
       return state.clusterCritters;
+    },
+    unitsActive (state) {
+      return state.unitsActive;
+    },
+    speciesActive (state) {
+      return state.speciesActive;
     }
   },
   actions: {
