@@ -244,6 +244,15 @@ body
       border-color orange
       border-width 4px
 
+    .vs-list--title
+      font-size 14px
+      font-weight 400
+
+    .vs-list--item
+      padding 0 5px 0 5px
+    .vs-list--header 
+      padding 5px 0 0 0
+
     .header-sidebar h4
       margin-top 0.5rem
       margin-bottom 0.2rem
