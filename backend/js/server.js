@@ -19,19 +19,7 @@ const isProd = process.env.NODE_ENV === 'production' ? true : false;
 const apiHost = process.env.BCTW_API_HOST;
 const apiPort = process.env.BCTW_API_PORT;
 
-// Dummy list
-const authorizedUsers = [
-  'dcolpman',
-  'jcraven',
-  'jkubian',
-  'jrpopkin',
-  'mbaerg',
-  'nldodd',
-  'robmunro',
-  'tadekens',
-  'vchong',
-  'warobins'
-];
+const authorizedUsers = JSON.parse(process.env.BCTW_AUTHORIZED_USERS);
 
 var memoryStore = new expressSession.MemoryStore();
 
