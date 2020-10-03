@@ -73,6 +73,7 @@ const proxyApi = function (req, res, next) {
   } else {
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&domain=user`;
   }
+
   console.log(url);
   // Right now it's just a get
   needle(url,(err,_,body) => {
