@@ -56,11 +56,23 @@ var session = {
   @param next {function} Node/Express function for flow control
  */
 const proxyApi = function (req, res, next) {
-  const endpoint = req.params.endpoint;
+  const endpoint = req.params.endpoint; // The url
+
+  // The parameter string
   const query = Object.keys(req.query).map( (key) => {
     return `${key}=${req.query[key]}`
   }).join('&');
-  const url = `${apiHost}:${apiPort}/${endpoint}?${query}`;
+
+  // The domain and username
+  var url;
+  if (isProd) {
+    const cred = req.kauth.grant.access_token.content.preferred_username; 
+    const domain = cred.split('@')[1];
+    const user = cred.split('@')[0];
+    url = `${apiHost}:${apiPort}/${endpoint}?${query}&${domain}=${user}`;
+  } else {
+    url = `${apiHost}:${apiPort}/${endpoint}?${query}&domain=user`;
+  }
   console.log(url);
   // Right now it's just a get
   needle(url,(err,_,body) => {
