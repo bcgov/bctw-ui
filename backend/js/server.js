@@ -71,7 +71,7 @@ const proxyApi = function (req, res, next) {
     const user = cred.split('@')[0];
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&${domain}=${user}`;
   } else {
-    url = `${apiHost}:${apiPort}/${endpoint}?${query}&domain=user`;
+    url = `${apiHost}:${apiPort}/${endpoint}?${query}&idir=user`;
   }
 
   console.log(url);
