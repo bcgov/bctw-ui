@@ -9,9 +9,12 @@ export default new Vuex.Store({
     prod: location.port == 1111 ? false : true,
     pings: null,
     pingActive: {},
+    pingsActive: [],
     pingsFocused: [],
-    unitsActive: [],
-    speciesActive: [],
+    filters: {
+      herdsActive: [],
+      speciesActive: []
+    },
     timeWindow: '1 days',
     clusterCritters: true
   },
@@ -28,11 +31,11 @@ export default new Vuex.Store({
     writePings (state,pings) {
       state.pings = pings;
     },
-    unitsActive (state,units) {
-      state.unitsActive = units;
+    herdsActive (state,units) {
+      state.filters.herdsActive = units;
     },
     speciesActive (state,species) {
-      state.speciesActive = species;
+      state.filters.speciesActive = species;
     }
   },
   getters: {
@@ -48,11 +51,11 @@ export default new Vuex.Store({
     clusterCritters (state) {
       return state.clusterCritters;
     },
-    unitsActive (state) {
-      return state.unitsActive;
+    herdsActive (state) {
+      return state.filters.herdsActive;
     },
     speciesActive (state) {
-      return state.speciesActive;
+      return state.filters.speciesActive;
     }
   },
   actions: {
