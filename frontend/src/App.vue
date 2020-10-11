@@ -66,22 +66,15 @@
         vs-divider(position='center') On Display
 
         div#critter-list.vs-con-loading__container
+
+          h3 Population Units
+
           vs-checkbox(
-            :v-model='item'
+            v-model='item.on'
             v-for='item,index in $store.getters.herdsActive'
             @change="$store.commit('filterPings',item)"
-          ) {{item}}
+          ) {{item.name}}
 
-          vs-list
-            vs-list-header(
-              icon='supervisor_account'
-              title='Population Units'
-            )
-            vs-list-item(
-              icon='check'
-              :title="item"
-              v-for='item,index in $store.getters.herdsActive'
-            )
           vs-list
             vs-list-header(
               icon='supervisor_account'
@@ -112,16 +105,8 @@
 pingsHaveChanged = (state) ->
 
   herds = state.pings.features.reduce (pV,cV,cI) ->
-    herd = cV.properties.population_unit
-    return pV unless herd #// No null please
-    unless pV.includes(herd) then pV.push(herd)
-    pV.on = yes #// Default to on
-    pV
-  ,[]
-
-  test = state.pings.features.reduce (pV,cV,cI) ->
-    herd = cV.properties.population_unit
-    return pV unless herd #// No nulls please
+    herd = cV.properties.population_unit || 'other'
+    #// return pV unless herd #// No nulls please
 
     #// Check if this item is already there
     duplicate = pV.some -> it.name === herd

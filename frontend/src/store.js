@@ -36,6 +36,9 @@ export default new Vuex.Store({
     },
     speciesActive (state,species) {
       state.filters.speciesActive = species;
+    },
+    filterPings (state) {
+      console.log('filter')
     }
   },
   getters: {
