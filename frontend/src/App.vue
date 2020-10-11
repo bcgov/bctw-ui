@@ -110,14 +110,30 @@
 #//    .catch  -> if it then console.error it
 
 pingsHaveChanged = (state) ->
-  units = state.pings.features.reduce (pV,cV,cI) ->
-    console.log cV.properties
+
+  herds = state.pings.features.reduce (pV,cV,cI) ->
     herd = cV.properties.population_unit
     return pV unless herd #// No null please
     unless pV.includes(herd) then pV.push(herd)
     pV.on = yes #// Default to on
     pV
   ,[]
+
+  test = state.pings.features.reduce (pV,cV,cI) ->
+    herd = cV.properties.population_unit
+    return pV unless herd #// No nulls please
+
+    #// Check if this item is already there
+    duplicate = pV.some -> it.name === herd
+
+    #// If not there yet
+    unless duplicate then pV.push do
+      name: herd
+      on: yes
+
+    pV
+  ,[]
+  
 
   species = state.pings.features.reduce (pV,cV,cI) ->
     sp = cV.properties.species
@@ -127,7 +143,7 @@ pingsHaveChanged = (state) ->
     pV
   ,[]
 
-  @$store.commit 'herdsActive', units
+  @$store.commit 'herdsActive', herds
   @$store.commit 'speciesActive', species
 
 
