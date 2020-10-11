@@ -25,7 +25,7 @@
 map = {}
 
 makeMarkers = ->
-  markers = L.geoJson @$store.getters.pings, do
+  markers = L.geoJson @$store.getters.pingsActive, do
     pointToLayer: (feature,latlng) ->
       pointStyle = do
         radius: 8
@@ -62,16 +62,17 @@ drawPingLayer = ->
 
   chooseToToggleCluster!
 
-  /*
-    Refresh all critter layers.
-   */
-  @$root.$on 'refreshCritterLayers', ~>
+  refreshCritters = ~>
     clusterLayer.clearLayers!
     map.removeLayer markers
     markers := makeMarkers.call @ #// Parent function wide 
     clusterLayer.addLayers markers
     chooseToToggleCluster!
-
+  /*
+    Refresh all critter layers.
+   */
+  @$root.$on 'refreshCritterLayers', refreshCritters
+  
   /*
     Toggle the critter clustering
    */

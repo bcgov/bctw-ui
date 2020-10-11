@@ -105,8 +105,7 @@
 pingsHaveChanged = (state) ->
 
   herds = state.pings.features.reduce (pV,cV,cI) ->
-    herd = cV.properties.population_unit || 'other'
-    #// return pV unless herd #// No nulls please
+    herd = cV.properties.population_unit || 'Other'
 
     #// Check if this item is already there
     duplicate = pV.some -> it.name === herd
@@ -135,7 +134,8 @@ pingsHaveChanged = (state) ->
 connect = -> 
   this.$store.subscribe (mutation,state) ~>
     switch mutation.type
-    | 'writePings' => pingsHaveChanged.call @,state
+    | 'writePings'  => pingsHaveChanged.call @,state
+    | 'filterPings' => this.$root.$emit 'refreshCritterLayers'
   #//  #//| 'terrainCentroidActive' => view3D.call @,mutation
 
 selectChanged = ->
