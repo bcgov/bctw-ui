@@ -38,7 +38,9 @@ export default new Vuex.Store({
       state.filters.speciesActive = species;
     },
     filterPings (state) {
-      console.log('filter')
+      console.log(state.filters.herdsActive);
+      console.log(state.pingsActive);
+      console.log(state.pings);
     }
   },
   getters: {
@@ -76,6 +78,7 @@ export default new Vuex.Store({
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
         context.commit('writePings',body);
+        // TODO: run filterPings
         callback(); // run the callback
       })
     },
