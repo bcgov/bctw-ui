@@ -40,11 +40,18 @@ export default new Vuex.Store({
     filterPings (state) {
       const filteredHerds = state.pings.features.filter((ping) => {
         const herd = ping.properties.population_unit || 'Other';
+        const species = ping.properties.species || 'Other';
 
         const herdStatus = state.filters.herdsActive.find((i) => {
           return i.name === herd;
         });
-        return herdStatus.on;
+
+        const speciesStatus = state.filters.speciesActive.find((i) => {
+          return i.name === species;
+        });
+
+        // Only return true if both species and population unit are true
+        return herdStatus.on && speciesStatus.on;
       })
 
       state.pingsActive = {...state.pings};

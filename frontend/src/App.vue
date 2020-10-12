@@ -144,14 +144,6 @@ pingsHaveChanged = (state) ->
   #// Sort
   species.sort (a,b) -> if a.name < b.name then -1 else 1
 
-  #// species = state.pings.features.reduce (pV,cV,cI) ->
-  #//   sp = cV.properties.species
-  #//   return pV unless sp #// No null please
-  #//   unless pV.includes(sp) then pV.push(sp)
-  #//   pV.on = yes #// Default to on
-  #//   pV
-  #// ,[]
-
   @$store.commit 'herdsActive', herds
   @$store.commit 'speciesActive', species
 
