@@ -68,6 +68,7 @@ drawPingLayer = ->
     markers := makeMarkers.call @ #// Parent function wide 
     clusterLayer.addLayers markers
     chooseToToggleCluster!
+
   /*
     Refresh all critter layers.
    */

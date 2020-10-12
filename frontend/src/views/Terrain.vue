@@ -36,6 +36,7 @@ fetchPings = ->
   #//   title: 'Error'
   #//   text: "Failed to fetch terrain file terrain-#id.json"
 
+
 connect = ->
 
   #// Set up a listener to redraw data
@@ -72,6 +73,8 @@ connect = ->
 
   #// if @$route.query['terrain-centroid'] then fetchPings.call @, that
   fetchPings.call @
+
+  @$root.$on 'refreshCritterLayers', ~> drawPing.call @
   
 
 ``
