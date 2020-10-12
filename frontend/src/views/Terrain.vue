@@ -11,7 +11,7 @@ viewer = null
 
 drawPing = ->
 
-  json = @$store.getters.pings
+  json = @$store.getters.pingsActive
   geoms = json.features
 
   terrain = new Cesium.GeoJsonDataSource 'terrain'

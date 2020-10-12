@@ -185,7 +185,7 @@ toggleLatestCritters = (checked) ->
 
 
 downloadData = ->
-  pings = JSON.stringify @$store.getters.pings
+  pings = JSON.stringify @$store.getters.pingsActive
   download pings, 'collars.geojson', 'application/json'
 
 
