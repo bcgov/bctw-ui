@@ -70,21 +70,21 @@
           h3 Population Units
 
           vs-checkbox(
+            class='check-filter'
             v-model='item.on'
             v-for='item,index in $store.getters.herdsActive'
             @change="$store.commit('filterPings',item)"
           ) {{item.name}}
 
-          vs-list
-            vs-list-header(
-              icon='supervisor_account'
-              title='Species'
-            )
-            vs-list-item(
-              icon='check'
-              :title="item"
-              v-for='item,index in $store.getters.speciesActive'
-            )
+
+          h3.more-header Species
+
+          vs-checkbox(
+            class='check-filter'
+            v-model='item.on'
+            v-for='item,index in $store.getters.speciesActive'
+            @change="$store.commit('filterPings',item)"
+          ) {{item.name}}
 
 
 
@@ -102,6 +102,11 @@
 #//    .push query: 'terrain-centroid': mutation.payload.id
 #//    .catch  -> if it then console.error it
 
+/* ## pingsHaveChanged
+  There has been a change in the pings array through a fresh 
+  request to the API. Calculate the groups to display for online filtering
+  @param state {object} The Vuex state object
+ */
 pingsHaveChanged = (state) ->
 
   herds = state.pings.features.reduce (pV,cV,cI) ->
@@ -117,15 +122,35 @@ pingsHaveChanged = (state) ->
 
     pV
   ,[]
+
+  #// Sort
+  herds.sort (a,b) -> if a.name < b.name then -1 else 1
   
 
   species = state.pings.features.reduce (pV,cV,cI) ->
-    sp = cV.properties.species
-    return pV unless sp #// No null please
-    unless pV.includes(sp) then pV.push(sp)
-    pV.on = yes #// Default to on
+    sp = cV.properties.species || 'Other'
+
+    #// Check if this item is already there
+    duplicate = pV.some -> it.name === sp
+
+    #// If not there yet
+    unless duplicate then pV.push do
+      name: sp
+      on: yes
+
     pV
   ,[]
+
+  #// Sort
+  species.sort (a,b) -> if a.name < b.name then -1 else 1
+
+  #// species = state.pings.features.reduce (pV,cV,cI) ->
+  #//   sp = cV.properties.species
+  #//   return pV unless sp #// No null please
+  #//   unless pV.includes(sp) then pV.push(sp)
+  #//   pV.on = yes #// Default to on
+  #//   pV
+  #// ,[]
 
   @$store.commit 'herdsActive', herds
   @$store.commit 'speciesActive', species
@@ -218,6 +243,20 @@ body
   color #2c3e50
 
   #sidebar
+
+    #critter-list
+      text-align left
+
+      h3
+        margin 0 0 0.5rem .5rem
+
+      h3.more-header
+        margin 1rem 0 0.5rem .5rem
+
+      .check-filter
+        justify-content left
+        margin 0.5rem 0 0.5rem 1rem
+
 
     .con-vs-checkbox i 
       font-size 18px
