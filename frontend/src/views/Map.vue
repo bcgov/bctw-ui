@@ -60,6 +60,7 @@ drawPingLayer = ->
         'marker-cluster marker-cluster-large'
       else
         'marker-cluster marker-cluster-small'
+
       new L.DivIcon do
         html: "<div><span>#count</span></div>"
         className: cl
