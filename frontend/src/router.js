@@ -31,6 +31,11 @@ var router = new Router({
       path: '/protected/terrain',
       name: 'terrain',
       component: () => import('./views/Terrain.vue')
+    },
+    {
+      path: '/protected/data',
+      name: 'data',
+      component: () => import('./views/Data.vue')
     }
   ]
 });

@@ -16,7 +16,11 @@ export default new Vuex.Store({
       speciesActive: []
     },
     timeWindow: '1 days',
-    clusterCritters: true
+    clusterCritters: true,
+    collars: {
+      availableCollars: [],
+      assignableCollars: []
+    }
   },
   mutations: {
     pingActive (state,properties) {
@@ -56,6 +60,12 @@ export default new Vuex.Store({
 
       state.pingsActive = {...state.pings};
       state.pingsActive.features = filteredHerds;
+    },
+    writeAvailableCollars (state, collars) {
+      state.collars.availableCollars = collars;
+    },
+    writeAssignableCollars (state, collars) {
+      state.collars.assignableCollars = collars;
     }
   },
   getters: {
@@ -79,20 +89,18 @@ export default new Vuex.Store({
     },
     speciesActive (state) {
       return state.filters.speciesActive;
+    },
+    assignedCollars(state) {
+      return state.assignedCollars;
+    },
+    availableCollars(state) {
+      return state.availableCollars;
     }
   },
   actions: {
     requestPings(context,callback) {
-      const h1 = location.protocol;
-      const h2 = location.hostname;
-      const h3 = context.state.prod ? location.port : 3000;
-      const h4 = context.state.prod ? '/api' : '';
-      const url = `${h1}//${h2}:${h3}${h4}/get-critters?time=${context.state.timeWindow}`;
-      const options = {
-        compressed: true,
-        follow: 10,
-        accept: 'application/vnd.github.full+json'
-      };
+      const url = createUrl(context, `get-critters?time=${context.state.timeWindow}`);
+      const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
         context.commit('writePings',body);
@@ -101,21 +109,44 @@ export default new Vuex.Store({
       })
     },
     requestMostRecentPings(context,callback) {
-      const h1 = location.protocol;
-      const h2 = location.hostname;
-      const h3 = context.state.prod ? location.port : 3000;
-      const h4 = context.state.prod ? '/api' : '';
-      const url = `${h1}//${h2}:${h3}${h4}/get-last-pings`;
-      const options = {
-        compressed: true,
-        follow: 10,
-        accept: 'application/vnd.github.full+json'
-      };
+      const url = createUrl(context, 'get-last-pings');
+      const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
         context.commit('writePings',body);
         callback(); // run the callback
       })
+    },
+    requestCollars(context, callback) {
+      const urlAvail = createUrl(context, 'get-available-collars')
+      const urlAssign = createUrl(context, 'get-assigned-collars')
+      const options = createOptions({});
+      needle.get(urlAvail, options, (err,_,body) => {
+        if (err) {return console.error('Failed to fetch collars: ',err)};
+        context.commit('writeAvailableCollars',body);
+      })
+      needle.get(urlAssign, options, (err,_,body) => {
+        if (err) {return console.error('Failed to fetch collars: ',err)};
+        context.commit('writeAssignableCollars',body);
+        callback(); // run the callback
+      })
     }
   }
 });
+
+const createUrl = function(context, apiString) {
+  const h1 = location.protocol;
+  const h2 = location.hostname;
+  const h3 = context.state.prod ? location.port : 3000;
+  const h4 = context.state.prod ? '/api' : '';
+  const url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
+  return url;
+}
+
+const createOptions = (obj) => {
+  return {
+    compressed: true,
+    follow: 10,
+    ...obj
+  }
+}
