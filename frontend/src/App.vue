@@ -20,7 +20,10 @@
         vs-sidebar-item(index='3' icon='terrain' class='page-terrain')
           router-link(to='/protected/terrain') Terrain Viewer
 
-        vs-sidebar-item(index='4' icon='exit_to_app' class='page-logout')
+        vs-sidebar-item(index='4' icon='dashboard' class='')
+          router-link(to='/protected/data') Data Management
+
+        vs-sidebar-item(index='5' icon='exit_to_app' class='page-logout')
           a(href='/logout') Logout
 
         vs-divider(position='center') Controls
