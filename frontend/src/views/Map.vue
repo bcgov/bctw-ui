@@ -47,6 +47,23 @@ makeMarkers = ->
 drawPingLayer = ->
   clusterLayer = L.markerClusterGroup do
     disableClusteringAtZoom: 14
+    iconCreateFunction: (cluster) ->
+      count = cluster.getChildCount!
+      points = cluster.getAllChildMarkers!
+
+      mortality = no
+      for point in points
+        p = point.feature.properties
+        if p.animal_status == 'Mortality' then mortality = yes
+
+      cl = if mortality
+        'marker-cluster marker-cluster-large'
+      else
+        'marker-cluster marker-cluster-small'
+      new L.DivIcon do
+        html: "<div><span>#count</span></div>"
+        className: cl
+        iconSize: new L.Point 40,40
 
   #// Define the marker layer
   markers = makeMarkers.call @
