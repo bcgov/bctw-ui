@@ -1,4 +1,8 @@
 <template>
+<!--
+  todo:
+  - move tabs to left side of page stacked vertically
+-->
   <div class="ss">
     <vs-tabs>
       <vs-tab

@@ -1,4 +1,11 @@
 <template>
+<!-- todo:
+  - fix pagination not working
+  - add limit option to backend query to only request page max size
+  - sorting
+  - multi-select? wireframe has checkboxs to select multipe rows
+  - make inputs type specific
+-->
   <div >
     <!-- iterate the collars object  -->
     <div v-for="(value, propertyName) in collars" :key="propertyName">
@@ -32,14 +39,21 @@
     <br/>
     </div> <!-- end iterate properties of $store.collars -->
     <div>
-      <vs-button type="border">Register New Collar</vs-button>
-      <vs-button type="border">Retire Collar</vs-button>
-      <vs-button @click="handleEditClick" type="border">See Collar Details</vs-button>
+      <vs-button type="border" @click="handleRegisterClick">Register New Collar</vs-button>
+      <vs-button disabled type="border">Retire Collar</vs-button>
+      <vs-button :disabled="Object.keys(selected).length === 0" @click="handleEditClick" type="border">See Collar Details</vs-button>
     </div>
     <edit-modal 
       v-on:update:modal="handleEditClick" 
-      :active="showEditModal">
-    </edit-modal>
+      :active="showEditModal"
+      title="Edit Collar"
+      :editing="selected"
+    ></edit-modal>
+    <register-modal 
+      v-on:update:modal="handleRegisterClick" 
+      :active="showRegisterModal"
+    ></register-modal>
+    <!-- <pre>{{selected}}</pre> -->
   </div>
 </template>
 
@@ -47,8 +61,10 @@
 import Vue from 'vue';
 import { mapState } from 'vuex';
 import EditModal from './EditModal';
+import RegisterCollarModal from './RegisterCollar';
 
 Vue.component('edit-modal', EditModal);
+Vue.component('register-modal', RegisterCollarModal);
 
 export default {
   props: {
@@ -59,16 +75,20 @@ export default {
   data: function() {
     return {
       showEditModal: false,
-      showAddModal: false,
-      selected: [],
+      showRegisterModal: false,
+      selected: {},
     }
   },
   methods: {
     handleSelected(tr) {
       this.$vs.notify({ title: `device ${tr['Device ID']} selected` })
     },
-    handleEditClick() {
+    handleEditClick(v) {
       this.showEditModal = !this.showEditModal;
+    },
+    handleRegisterClick(v) {
+      console.log(v)
+      this.showRegisterModal = !this.showRegisterModal;
     }
   },
   mounted() {
@@ -91,4 +111,3 @@ const callback = () => {
     padding: 3px 15px;
   }
 </style>
-
