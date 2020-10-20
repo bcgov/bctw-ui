@@ -7,16 +7,16 @@
   - make inputs type specific
 -->
   <div >
+
     <!-- iterate the collars object  -->
     <div v-for="(value, propertyName) in collars" :key="propertyName">
       <vs-table
-        pagination
         :data="value"
         v-model="selected"
         @selected="handleSelected"
       >
       <template slot="header">
-        <h3>{{propertyName === 'availableCollars' ? 'Available Collars' : 'Assignable Collars'}}</h3>
+        <h3>{{propertyName === 'availableCollars' ? 'Available Collars' : 'Assigned Collars'}}</h3>
       </template>
 
       <!-- iterate the properties of the first collar 
@@ -45,6 +45,7 @@
     </div>
     <edit-modal 
       v-on:update:modal="handleEditClick" 
+      v-on:update:save="save"
       :active="showEditModal"
       title="Edit Collar"
       :editing="selected"
@@ -81,7 +82,8 @@ export default {
   },
   methods: {
     handleSelected(tr) {
-      this.$vs.notify({ title: `device ${tr['Device ID']} selected` })
+      this.$store.commit('updateEditingObject', tr);
+      // this.$vs.notify({ title: `device ${tr['Device ID']} selected` })
     },
     handleEditClick(v) {
       this.showEditModal = !this.showEditModal;
@@ -89,6 +91,14 @@ export default {
     handleRegisterClick(v) {
       console.log(v)
       this.showRegisterModal = !this.showRegisterModal;
+    },
+    save(collar) {
+      this.$vs.notify({ title: `saving collar ID ${collar['Device ID']}`})
+      const payload = {
+        type: collar.hasOwnProperty('Individual ID') ? 'assignedCollars' : 'availableCollars',
+        collar
+      }
+      this.$store.commit('updateCollars', payload)
     }
   },
   mounted() {
@@ -99,8 +109,6 @@ export default {
 const callback = () => {
   console.log('loading collars completed' )
 }
-
-
 </script>
 
 <style scoped>

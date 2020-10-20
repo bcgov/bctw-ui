@@ -19,8 +19,10 @@ export default new Vuex.Store({
     clusterCritters: true,
     collars: {
       availableCollars: [],
-      assignableCollars: []
-    }
+      assignedCollars: []
+    },
+    animals: [],
+    editObject: {},
   },
   mutations: {
     pingActive (state,properties) {
@@ -64,8 +66,25 @@ export default new Vuex.Store({
     writeAvailableCollars (state, collars) {
       state.collars.availableCollars = collars;
     },
-    writeAssignableCollars (state, collars) {
-      state.collars.assignableCollars = collars;
+    writeAssignedCollars (state, collars) {
+      state.collars.assignedCollars = collars;
+    },
+    writeAnimals (state, animals) {
+      state.animals = animals;
+    },
+    updateEditingObject (state, newObj) {
+      state.editObject = newObj;
+    },
+    updateAnimals (state, newAnimal) {
+      const foundIndex = state.animals.findIndex(animal => animal['Animal ID'] === newAnimal['Animal ID']);
+      state.animals[foundIndex] = newAnimal;
+    },
+    updateCollars (state, payload) {
+      const type = payload.type;
+      const collar = payload.collar;
+      const collars = state.collars[type];
+      const foundIndex = collars.findIndex(c => c['Device ID'] === collar['Device ID']);
+      state.collars[type][foundIndex] = collar;
     }
   },
   getters: {
@@ -95,6 +114,9 @@ export default new Vuex.Store({
     },
     availableCollars(state) {
       return state.availableCollars;
+    },
+    editObject(state) {
+      return state.editObject
     }
   },
   actions: {
@@ -127,10 +149,19 @@ export default new Vuex.Store({
       })
       needle.get(urlAssign, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
-        context.commit('writeAssignableCollars',body);
+        context.commit('writeAssignedCollars',body);
         callback(); // run the callback
       })
-    }
+    },
+    requestAnimals(context, callback) {
+      const urlAvail = createUrl(context, 'get-animals')
+      const options = createOptions({});
+      needle.get(urlAvail, options, (err,_,body) => {
+        if (err) {return console.error('Failed to fetch animals: ',err)};
+        context.commit('writeAnimals',body);
+      })
+      callback();
+    },
   }
 });
 

@@ -4,15 +4,22 @@
     :title="title"
     :active.sync="shouldShow">
     <!-- todo: make inputs inline -->
-      <div v-for="(val, prop) in editing" :key="prop">
+      <div v-for="(val, prop) in this.$store.getters.editObject" :key="prop">
         <input-type 
           :label="prop" 
           :val="val"
           :isDisabled="flagDisabled(prop)"
           v-on:update:model="handleInputChange"
+          :isVisible=shouldShow
         />
       </div>
-  <vs-button button="submit" @click="save" class="btn-save" type="border">Save</vs-button>
+  <vs-button
+    button="submit"
+    @click="save"
+    class="btn-save"
+    type="border"
+    :disabled="!canSave"
+  >Save</vs-button>
   </vs-popup>
 </template>
   
@@ -27,30 +34,30 @@ export default {
   props: {
     title: String,
     active: Boolean,
-    editing: Object
   },
   data() {
     return {
-      // todo: figure this out...
-      cannotEdit: ['Device ID', 'Last Contact', 'Next Update'],
-      objectEditing: this.editing
+      cannotEdit: ['Device ID', 'Last Contact', 'Next Update', 'Animal ID'],
+      canSave: false,
+      changedValues: {}
     }
   },
   methods: {
+    // disable editing on these fields
     flagDisabled(v) {
       return this.cannotEdit.indexOf(v) === -1 ? false : true;
     },
     save() {
-      // assume the first object key/val is always device/critter id?
-      const firstKey = Object.keys(this.editing)[0];
-      const firstVal = this.editing[firstKey];
-      this.$vs.notify({ title: `saving ${firstKey} ${firstVal}`})
-      // todo: save
+      this.shouldShow = false;
+      const newObj = { ...this.$store.getters.editObject, ...this.changedValues }
+      this.$emit('update:save', newObj)
     },
     handleInputChange(e) {
-      const newObj = Object.assign(this.editing, e)
-      console.log(`${JSON.stringify(newObj)}`)
-      // todo: update data
+      this.changedValues = {...this.changedValues, ...e}
+      this.canSave = true;
+    },
+    handleClose() {
+      this.canSave = false;
     }
   },
   computed: {
@@ -60,6 +67,10 @@ export default {
       },
       set: function(newValue) {
         this.$emit('update:modal', newValue)
+        // trigger on closing of modal
+        if (!newValue) {
+          this.handleClose();
+        }
       }
     }
   }
