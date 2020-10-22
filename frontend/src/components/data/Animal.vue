@@ -1,4 +1,3 @@
-
 <template>
   <div >
     <vs-table
@@ -7,8 +6,8 @@
       @selected="handleSelected"
     >
       <template slot="thead">
-        <vs-th v-for="(value, propName) in animals[0]" :key="propName">
-          {{propName}}
+        <vs-th v-for="(value, prop) in animals[0]" :key="prop">
+          {{toHeader(prop)}}
         </vs-th>
       </template>
       <template slot-scope="{data}">
@@ -21,7 +20,7 @@
     </vs-table>
     <!-- <pre>{{selected}}</pre> -->
     <br/>
-    <vs-button disabled type="border">Add Individual</vs-button>
+    <vs-button @click="handleAddClick" type="border">Add Individual</vs-button>
     <vs-button @click="handleEditClick" :disabled="Object.keys(selected).length === 0" type="border">Edit Individual</vs-button>
       <!-- :editing="selected" -->
     <edit-modal 
@@ -29,13 +28,26 @@
       v-on:update:save="save"
       :active="showEditModal"
       title="Edit Individual"
-    ></edit-modal>
+      :formatHeader="toHeader"
+    >
+    <!-- testing slots -->
+    <!-- <p> hey there </p> -->
+    </edit-modal>
+    <add-animal
+      :active="showAddModal"
+      v-on:update:modal="handleAddClick"
+    ></add-animal>
+    <!-- <pre>{{selected}}</pre> -->
   </div>
 </template>
 
 <script>
 import Vue from 'vue';
+import AddAnimal from './AddAnimal'
 import { mapState } from 'vuex';
+import { animalPropToDisplay } from '../../types/animal'
+
+Vue.component('add-animal', AddAnimal);
 
 export default {
   name: 'animals',
@@ -46,6 +58,7 @@ export default {
   data: function() {
     return {
       showEditModal: false,
+      showAddModal: false,
       selected: {}
     }
   },
@@ -56,15 +69,28 @@ export default {
     handleEditClick(v) {
       this.showEditModal = !this.showEditModal;
     },
+    handleAddClick(v) {
+      this.showAddModal = !this.showAddModal;
+    },
     save(animal) {
-      this.$vs.notify({ title: `saving individual with ID ${animal['Animal ID']}`})
-      // console.log(`im saving!!! ${JSON.stringify(animal)}`)
-      this.$store.commit('updateAnimals', animal);
+      this.$vs.notify({ title: `saving animal ID ${animal.animal_id}`})
+      const payload = {
+        callback: cbAnimalSaved,
+        animal
+      }
+      this.$store.dispatch('upsertAnimal', payload)
+    },
+    toHeader(str) {
+      return animalPropToDisplay(str);
     }
   },
   mounted() {
     this.$store.dispatch('requestAnimals', callback);
   }
+}
+
+const cbAnimalSaved = () => {
+  console.log('add_animal success')
 }
 
 const callback = () => {

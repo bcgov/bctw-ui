@@ -4,22 +4,26 @@
     :title="title"
     :active.sync="shouldShow">
     <!-- todo: make inputs inline -->
+    <div class="inRow">
       <div v-for="(val, prop) in this.$store.getters.editObject" :key="prop">
         <input-type 
-          :label="prop" 
+          :label="formatHeader(prop)" 
+          :propId="prop"
           :val="val"
           :isDisabled="flagDisabled(prop)"
           v-on:update:model="handleInputChange"
           :isVisible=shouldShow
         />
       </div>
-  <vs-button
-    button="submit"
-    @click="save"
-    class="btn-save"
-    type="border"
-    :disabled="!canSave"
-  >Save</vs-button>
+    </div>
+    <vs-button
+      button="submit"
+      @click="save"
+      class="btn-save"
+      type="border"
+      :disabled="!canSave"
+    >Save</vs-button>
+    <slot></slot>
   </vs-popup>
 </template>
   
@@ -34,10 +38,11 @@ export default {
   props: {
     title: String,
     active: Boolean,
+    formatHeader: Function
   },
   data() {
     return {
-      cannotEdit: ['Device ID', 'Last Contact', 'Next Update', 'Animal ID'],
+      cannotEdit: ['device_id', 'max_transmission_date', 'interval', 'animal_id'],
       canSave: false,
       changedValues: {}
     }
@@ -58,7 +63,7 @@ export default {
     },
     handleClose() {
       this.canSave = false;
-    }
+    },
   },
   computed: {
     shouldShow: {
@@ -80,5 +85,14 @@ export default {
 <style>
 .btn-save {
   float:right;
+}
+.inRow {
+  display: flex;
+  flex-direction: row;
+  /* flex-grow: 1; */
+  flex-wrap: wrap;
+}
+.editinput {
+  width: calc(100% * (2/3) );
 }
 </style>

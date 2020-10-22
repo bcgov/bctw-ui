@@ -76,14 +76,16 @@ export default new Vuex.Store({
       state.editObject = newObj;
     },
     updateAnimals (state, newAnimal) {
-      const foundIndex = state.animals.findIndex(animal => animal['Animal ID'] === newAnimal['Animal ID']);
-      state.animals[foundIndex] = newAnimal;
+      const foundIndex = state.animals.findIndex(animal => animal.animal_id === newAnimal.animal_id);
+      if (foundIndex !== -1) {
+        state.animals[foundIndex] = newAnimal;
+      } else state.animals.push(newAnimal)
     },
     updateCollars (state, payload) {
       const type = payload.type;
       const collar = payload.collar;
       const collars = state.collars[type];
-      const foundIndex = collars.findIndex(c => c['Device ID'] === collar['Device ID']);
+      const foundIndex = collars.findIndex(c => c.device_id === collar.device_id);
       state.collars[type][foundIndex] = collar;
     }
   },
@@ -136,7 +138,7 @@ export default new Vuex.Store({
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
         context.commit('writePings',body);
-        callback(); // run the callback
+        callback();
       })
     },
     requestCollars(context, callback) {
@@ -162,15 +164,58 @@ export default new Vuex.Store({
       })
       callback();
     },
+    async upsertCollar(context, payload) {
+      const url = createUrl(context, 'add-collar')
+      const options = createOptions({});
+      needle.post(url, payload.collar, options, (err, resp) => {
+        if (err) {
+          return console.error('unable to upsert collar',err)
+        };
+        const body = resp.body['add_collar'];
+        context.commit('updateCollars', payload);
+      });
+      payload.callback();
+    },
+    async upsertAnimal(context, payload) {
+      const url = createUrl(context, 'add-animal')
+      const options = createOptions({});
+      needle.post(url, payload.animal, options, (err, resp) => {
+        if (err) {
+          return console.error('unable to upsert animal',err)
+        };
+        const body = resp.body['add_animal'];
+        context.commit('updateAnimals', payload.animal);
+      });
+      payload.callback();
+    },
+    async linkOrUnlinkCritterCollar(context, payload) {
+      const isLink = payload.isLinking;
+      const url = createUrl(context, isLink ? 'link-animal-collar' : 'unlink-animal-collar');
+      const data = payload.data;
+      const options = createOptions({});
+      needle.post(url, data, options, (err, resp) => {
+        if (err) {
+          return console.error('unable to link animal to collar',err)
+        };
+        const body = resp.body;
+        let p = 1;
+      });
+      payload.callback();
+    },
   }
 });
+
+const isDev = process.env.ENV === 'DEV';
 
 const createUrl = function(context, apiString) {
   const h1 = location.protocol;
   const h2 = location.hostname;
   const h3 = context.state.prod ? location.port : 3000;
   const h4 = context.state.prod ? '/api' : '';
-  const url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
+  let url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
+  if (isDev) {
+    url += `?idir='${process.env.IDIR}'`
+  }
   return url;
 }
 

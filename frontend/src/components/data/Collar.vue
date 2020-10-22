@@ -7,7 +7,6 @@
   - make inputs type specific
 -->
   <div >
-
     <!-- iterate the collars object  -->
     <div v-for="(value, propertyName) in collars" :key="propertyName">
       <vs-table
@@ -23,7 +22,7 @@
       in each collar type to get the table headers -->
       <template slot="thead">
         <vs-th v-for="(v, p) in value[0]" :key="p">
-          {{p}}
+          {{toHeader(p)}}
         </vs-th>
       </template>
 
@@ -49,6 +48,7 @@
       :active="showEditModal"
       title="Edit Collar"
       :editing="selected"
+      :formatHeader="toHeader"
     ></edit-modal>
     <register-modal 
       v-on:update:modal="handleRegisterClick" 
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import { collarPropToDisplay } from '../../types/collar'
 import Vue from 'vue';
 import { mapState } from 'vuex';
 import EditModal from './EditModal';
@@ -92,13 +93,17 @@ export default {
       console.log(v)
       this.showRegisterModal = !this.showRegisterModal;
     },
-    save(collar) {
-      this.$vs.notify({ title: `saving collar ID ${collar['Device ID']}`})
+    async save(collar) {
+      this.$vs.notify({ title: `saving collar ID ${collar.device_id}`})
       const payload = {
-        type: collar.hasOwnProperty('Individual ID') ? 'assignedCollars' : 'availableCollars',
-        collar
+        callback: cbCollarSaved,
+        collar,
+        type: collar.hasOwnProperty('animal_id') ? 'assignedCollars' : 'availableCollars'
       }
-      this.$store.commit('updateCollars', payload)
+      this.$store.dispatch('upsertCollar', payload)
+    },
+    toHeader(str) {
+      return collarPropToDisplay(str);
     }
   },
   mounted() {
@@ -109,6 +114,11 @@ export default {
 const callback = () => {
   console.log('loading collars completed' )
 }
+
+const cbCollarSaved = (payload) => {
+  console.log(`add_collar success`);
+}
+
 </script>
 
 <style scoped>

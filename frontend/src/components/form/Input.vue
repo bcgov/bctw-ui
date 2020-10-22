@@ -1,7 +1,6 @@
 <template lang="html">
   <!-- <span class="centerx default-input"> -->
      <vs-input 
-        class="inputx"
         v-model="value"
         :label="label"
         :disabled="isDisabled"
@@ -13,11 +12,13 @@
 
 <script>
 export default {
+  name: 'Input',
   props: {
     label: String,
     isDisabled: Boolean,
     isVisible: Boolean,
     val: String | Number | Date,
+    propId: String, // the non header version ex. device_id
   },
   data(){
     return {
@@ -36,7 +37,7 @@ export default {
     handleChange(event) {
       if (this.isChanged(event.target.value)) {
         let r = {}
-        r[this.label] = this.value
+        r[this.propId] = this.value
         // console.log(`changed! to ${this.value}`)
         this.$emit('update:model', r)
       }
