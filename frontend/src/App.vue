@@ -65,6 +65,7 @@
           @click="downloadData"
           ) Download
 
+        TemporalSlider
 
         vs-divider(position='center') On Display
 
@@ -90,7 +91,6 @@
           ) {{item.name}}
 
 
-
     #page
       transition(name='fade', mode='out-in')
         keep-alive
@@ -98,7 +98,10 @@
 </template>
 
 <script lang="ls">
-``import download from 'downloadjs'``
+``
+import download from 'downloadjs'
+import TemporalSlider from './components/TemporalSlider.vue'
+``
 
 #//view3D = (mutation) ->
 #//  @$router
@@ -206,6 +209,9 @@ export default {
     downloadData,
     toggleClusterCritters
   },
+  components: {
+    TemporalSlider
+  },
   data:()=>({
     active: true,
     select: '1 days',
@@ -238,6 +244,8 @@ body
   color #2c3e50
 
   #sidebar
+    .temporal-slider
+      margin-top 2rem
 
     #critter-list
       text-align left
@@ -314,5 +322,6 @@ body
     .header-sidebar h4
       margin-top 0.5rem
       margin-bottom 0.2rem
+
       
 </style>

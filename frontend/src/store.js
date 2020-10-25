@@ -11,6 +11,7 @@ export default new Vuex.Store({
     pingActive: {},
     pingsActive: [],
     pingsFocused: [],
+    pingExtent: {},
     filters: {
       herdsActive: [],
       speciesActive: []
@@ -36,6 +37,9 @@ export default new Vuex.Store({
     },
     writePings (state,pings) {
       state.pings = pings;
+    },
+    writePingExtent (state,extent) {
+      state.pingExtent = extent;
     },
     herdsActive (state,units) {
       state.filters.herdsActive = units;
@@ -102,6 +106,9 @@ export default new Vuex.Store({
     pingActive (state) {
       return state.pingActive;
     },
+    pingExtent (state) {
+      return state.pingExtent;
+    },
     clusterCritters (state) {
       return state.clusterCritters;
     },
@@ -138,6 +145,15 @@ export default new Vuex.Store({
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
         context.commit('writePings',body);
+        callback();
+      })
+    },
+    requestPingExtent(context,callback) {
+      const url = createUrl(context, 'get-ping-extent');
+      const options = createOptions({accept: 'application/vnd.github.full+json'});
+      needle.get(url, options, (err,_,body) => {
+        if (err) {return console.error('Failed to fetch collars: ',err)};
+        context.commit('writePingExtent',body);
         callback();
       })
     },
