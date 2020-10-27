@@ -22,6 +22,7 @@
 <script>
 import Collar from './Collar';
 import Animal from './Animal';
+import Settings from './Settings';
 
 export default {
   name: 'dataTabs',
@@ -31,9 +32,9 @@ export default {
   computed: {
     items() {
       return [
+        { title: 'Settings', disabled: false, key: 2, component: Settings },
         { title: 'Critters', disabled: false, key: 0, component: Animal },
         { title: 'Collars', disabled: false, key: 1, component: Collar },
-        { title: 'Settings', disabled: true, key: 2 },
         { title: 'Profile', disabled: true, key: 3 }
       ]
     }
