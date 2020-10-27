@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import needle from 'needle';
+import moment from 'moment';
 
 Vue.use(Vuex);
 
@@ -11,12 +12,12 @@ export default new Vuex.Store({
     pingActive: {},
     pingsActive: [],
     pingsFocused: [],
-    pingExtent: {},
+    pingExtent: {}, // Amount of data available in the database
     filters: {
       herdsActive: [],
       speciesActive: []
     },
-    timeWindow: '1 days',
+    timeWindow: '1 days', // TODO: Deprecate the timeExtent is active
     clusterCritters: true,
     collars: {
       availableCollars: [],
@@ -148,13 +149,17 @@ export default new Vuex.Store({
         callback();
       })
     },
-    requestPingExtent(context,callback) {
+    requestPingExtent(context) {
       const url = createUrl(context, 'get-ping-extent');
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
+        const a = moment(body.min)
+        const b = moment(body.max)
+        body.days =  b.diff(a, 'days');
+
         context.commit('writePingExtent',body);
-        callback();
+        console.log(body);
       })
     },
     requestCollars(context, callback) {
