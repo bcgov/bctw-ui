@@ -17,7 +17,7 @@ export default new Vuex.Store({
       herdsActive: [],
       speciesActive: []
     },
-    timeWindow: '1 days', // TODO: Deprecate the timeExtent is active
+    timeWindow: '1 days', // TODO: Deprecate when pingExtent is active
     clusterCritters: true,
     collars: {
       availableCollars: [],
