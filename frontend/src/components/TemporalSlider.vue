@@ -30,13 +30,17 @@ marks = (date) ->
   extent = @$store.getters.pingExtent
   config = do
     labelStyle:
-      opacity: 0.7
+      'opacity': 0.7
+      'font-size': '10px'
+      'width': '35px'
+      'white-space': 'normal'
+      'word-break':'break-word'
     
   if date == 0
-    config.label = 'first'
+    config.label = moment(extent.min).format('ll')
     config
   else if date == extent.days
-    config.label = 'yo'
+    config.label = moment(extent.max).format('ll')
     config
   else
     no
