@@ -36,6 +36,7 @@ import 'vue-slider-component/theme/default.css';
 /* ## marks
   Custom mark formatting function
   @param date {object} Date object
+  @return {string} Formatted date string
  */
 marks = (date) ->
   extent = @$store.getters.pingExtent
@@ -56,13 +57,16 @@ marks = (date) ->
   else
     no
 
+/* ## tooltip
+  Custom tooltip formatting function
+  @param data {object} Date object
+  @return {string} Formatted date string
+ */
 tooltip = (date) ->
   extent = @$store.getters.pingExtent
-  console.log "date: #date   max #{@$store.getters.pingExtent.days}"
   d = date
   if date == extent.days then d++
-  start = extent.min
-  now = moment(start).add d, 'days'
+  now = moment(extent.min).add d, 'days'
   now.format 'll'
 
 ``
