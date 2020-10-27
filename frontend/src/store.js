@@ -159,7 +159,6 @@ export default new Vuex.Store({
         body.days =  b.diff(a, 'days');
 
         context.commit('writePingExtent',body);
-        console.log(body);
       })
     },
     requestCollars(context, callback) {

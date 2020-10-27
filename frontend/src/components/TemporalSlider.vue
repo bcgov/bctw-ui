@@ -1,7 +1,12 @@
-<style lang="stylus" scoped>
+<style lang="stylus">
 .temporal-slider
   margin 1rem
-  width 220px
+  width 210px
+
+.vue-slider-dot-tooltip-inner
+  width 50px !important
+  white-space normal !important
+
 </style>
 
 
@@ -14,6 +19,8 @@
     :max="$store.getters.pingExtent.days"
     :max-range="1000"
     :marks="marks"
+    :interval="1"
+    :tooltip-formatter="tooltip"
   )
 
 </template>
@@ -26,6 +33,10 @@ import moment from 'moment';
 import 'vue-slider-component/theme/default.css';
 ``
 
+/* ## marks
+  Custom mark formatting function
+  @param date {object} Date object
+ */
 marks = (date) ->
   extent = @$store.getters.pingExtent
   config = do
@@ -45,6 +56,14 @@ marks = (date) ->
   else
     no
 
+tooltip = (date) ->
+  extent = @$store.getters.pingExtent
+  console.log "date: #date   max #{@$store.getters.pingExtent.days}"
+  d = date
+  if date == extent.days then d++
+  start = extent.min
+  now = moment(start).add d, 'days'
+  now.format 'll'
 
 ``
 export default {
@@ -53,7 +72,8 @@ export default {
     VueSlider
   },
   methods: {
-    marks
+    marks,
+    tooltip
   },
   data: () => ({
     values: [20,500]
