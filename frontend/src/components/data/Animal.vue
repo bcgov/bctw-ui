@@ -1,6 +1,7 @@
 <template>
   <div >
     <vs-table
+      v-if="animals"
       :data="animals"
       v-model="selected"
       @selected="handleSelected"
@@ -51,7 +52,11 @@ Vue.component('add-animal', AddAnimal);
 
 export default {
   name: 'animals',
-  computed: mapState(['animals']),
+  computed: {
+    animals () {
+      return this.$store.state.rootModule.animals
+    }
+  },
   props: {
     title: String,
   },
@@ -93,8 +98,8 @@ const cbAnimalSaved = () => {
   console.log('add_animal success')
 }
 
-const callback = () => {
-  console.log('loading animals completed' )
+const callback = (body) => {
+  console.log(`loaded ${body.length} animals` )
 }
 </script>
 

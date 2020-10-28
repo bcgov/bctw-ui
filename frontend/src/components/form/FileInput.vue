@@ -1,38 +1,31 @@
 <template>
-  <div id="app">
-    <div class="container">
-      <form enctype="multipart/form-data" novalidate v-if="isInitial || isSaving">
-        <h3>Upload .csv</h3>
-        <div class="dropbox">
-          <input type="file" single :name="uploadFieldName" :disabled="isSaving" @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
-            accept=".csv" class="input-file">
-            <p v-if="isInitial">
-              Drag csv file here<br> or click to browse
-            </p>
-            <p v-if="isSaving">
-              Uploading {{ fileCount }} files...
-            </p>
-        </div>
-      </form>
-      <div v-if="isSuccess">
-        <h2>import {{ uploadedFiles.length }} file(s) successfully.</h2>
-        <p>
-          <a href="javascript:void(0)" @click="reset()">Upload again</a>
-        </p>
-        <ul class="list-unstyled">
-          <!-- <li v-for="(item, idx) in uploadedFiles" :key="idx">
-            <img :src="item.url" class="img-responsive img-thumbnail" :alt="item.originalName">
-          </li> -->
-        </ul>
+  <div class="container">
+    <form enctype="multipart/form-data" novalidate v-if="isInitial || isSaving">
+      <div class="dropbox">
+        <input type="file" single :name="uploadFieldName" :disabled="isSaving" @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
+          accept=".csv" class="input-file">
+          <p v-if="isInitial">
+            Drag csv file here<br> or click to browse
+          </p>
+          <p v-if="isSaving">
+            Uploading file...
+          </p>
       </div>
-      <!--FAILED-->
-      <div v-if="isFailed">
-        <h2>import failed.</h2>
-        <p>
-          <a href="javascript:void(0)" @click="reset()">Try again</a>
-        </p>
-        <pre>{{ uploadError }}</pre>
-      </div>
+    </form>
+    <div v-if="isSuccess">
+      <h2>import file successfully.</h2>
+      <p><a href="javascript:void(0)" @click="reset()">Upload again</a></p>
+      <ul class="list-unstyled">
+        <!-- <li v-for="(item, idx) in uploadedFiles" :key="idx">
+          <img :src="item.url" class="img-responsive img-thumbnail" :alt="item.originalName">
+        </li> -->
+      </ul>
+    </div>
+    <!--FAILED-->
+    <div v-if="isFailed">
+      <h2>import failed.</h2>
+      <p><a href="javascript:void(0)" @click="reset()">Try again</a></p>
+      <pre>{{ uploadError }}</pre>
     </div>
   </div>
 </template>
@@ -103,26 +96,26 @@ export default {
     background: lightcyan;
     color: dimgray;
     padding: 10px 10px;
-    min-height: 200px; /* minimum height */
+    min-height: 100px;
     position: relative;
     cursor: pointer;
   }
 
   .input-file {
-    opacity: 0; /* invisible but it's there! */
+    opacity: 0;
     width: 100%;
-    height: 200px;
-    position: absolute;
+    height: 100px;
     cursor: pointer;
+    position: absolute;
+    right: 30px; /* fix */
   }
 
   .dropbox:hover {
-    background: lightblue; /* when mouse over to the drop zone, change color */
+    background: lightblue;
   }
 
   .dropbox p {
-    font-size: 1.2em;
     text-align: center;
-    padding: 50px 0;
+    padding: 25px 0;
   }
 </style>

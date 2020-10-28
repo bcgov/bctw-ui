@@ -115,7 +115,7 @@ import TemporalSlider from './components/TemporalSlider.vue'
  */
 pingsHaveChanged = (state) ->
 
-  herds = state.pings.features.reduce (pV,cV,cI) ->
+  herds = state.rootModule.pings.features.reduce (pV,cV,cI) ->
     herd = cV.properties.population_unit || 'Other'
 
     #// Check if this item is already there
@@ -133,7 +133,7 @@ pingsHaveChanged = (state) ->
   herds.sort (a,b) -> if a.name < b.name then -1 else 1
   
 
-  species = state.pings.features.reduce (pV,cV,cI) ->
+  species = state.rootModule.pings.features.reduce (pV,cV,cI) ->
     sp = cV.properties.species || 'Other'
 
     #// Check if this item is already there

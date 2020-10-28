@@ -1,7 +1,9 @@
 <template>
-  <vs-popup class='grp-col'
+  <modal 
+    class='grp-col'
     title="Add Animal"
-    :active.sync="show">
+    :active="active"
+    :handleClose="handleClose">
       <h3>General Information</h3><hr/>
       <div class="grp">
         <input-type label="Nickname" propId="nickname" :val="nickname"></input-type>
@@ -24,17 +26,10 @@
     </div>
 
     <vs-button disabled button="submit" @click="save" class="btn-save" type="border">Save</vs-button>
-  </vs-popup>
+  </modal>
 </template>
 
 <script>
-import Vue from 'vue';
-import Input from '../form/Input';
-import Select from '../form/Select';
-
-Vue.component('input-type', Input);
-Vue.component('input-select', Select);
-
 export default {
   name: 'AddAnimal',
   props: {
@@ -51,17 +46,10 @@ export default {
     }
   },
   methods: {
+    handleClose() {
+      this.$emit('update:modal')
+    },
     save() {
-    }
-  },
-  computed: {
-    show: {
-      get: function() {
-        return this.active;
-      },
-      set: function(newValue) {
-        this.$emit('update:modal', newValue)
-      }
     }
   },
 }

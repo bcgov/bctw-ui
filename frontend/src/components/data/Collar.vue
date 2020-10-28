@@ -6,7 +6,7 @@
   - multi-select? wireframe has checkboxs to select multipe rows
   - make inputs type specific
 -->
-  <div >
+  <div v-if="collars">
     <!-- iterate the collars object  -->
     <div v-for="(value, propertyName) in collars" :key="propertyName">
       <vs-table
@@ -53,6 +53,7 @@
     <register-modal 
       v-on:update:modal="handleRegisterClick" 
       :active="showRegisterModal"
+      title="Register A New Vectronics Collar"
     ></register-modal>
     <!-- <pre>{{selected}}</pre> -->
   </div>
@@ -62,10 +63,8 @@
 import { collarPropToDisplay } from '../../types/collar'
 import Vue from 'vue';
 import { mapState } from 'vuex';
-import EditModal from './EditModal';
 import RegisterCollarModal from './RegisterCollar';
 
-Vue.component('edit-modal', EditModal);
 Vue.component('register-modal', RegisterCollarModal);
 
 export default {
@@ -73,7 +72,11 @@ export default {
     title: String,
   },
   name: 'collars',
-  computed: mapState(['collars']),
+  computed: {
+    collars () {
+      return this.$store.state.rootModule.collars
+    }
+  },
   data: function() {
     return {
       showEditModal: false,
@@ -90,7 +93,6 @@ export default {
       this.showEditModal = !this.showEditModal;
     },
     handleRegisterClick(v) {
-      console.log(v)
       this.showRegisterModal = !this.showRegisterModal;
     },
     async save(collar) {

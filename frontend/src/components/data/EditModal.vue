@@ -1,9 +1,9 @@
 <template>
-  <vs-popup 
-    class="holamundo" 
+  <modal
     :title="title"
-    :active.sync="shouldShow">
-    <!-- todo: make inputs inline -->
+    :active="active"
+    :handleClose="handleClose"
+  >
     <div class="inRow">
       <div v-for="(val, prop) in this.$store.getters.editObject" :key="prop">
         <input-type 
@@ -12,8 +12,8 @@
           :val="val"
           :isDisabled="flagDisabled(prop)"
           v-on:update:model="handleInputChange"
-          :isVisible=shouldShow
         />
+        <!-- :isVisible=shouldShow todo: confirm its ok to remove this from input-type? -->
       </div>
     </div>
     <vs-button
@@ -23,16 +23,10 @@
       type="border"
       :disabled="!canSave"
     >Save</vs-button>
-    <slot></slot>
-  </vs-popup>
+  </modal>
 </template>
   
 <script>
-import Vue from 'vue';
-import Input from '../form/Input';
-
-Vue.component('input-type', Input);
-
 export default {
   name: 'EditModal',
   props: {
@@ -62,23 +56,12 @@ export default {
       this.canSave = true;
     },
     handleClose() {
+      // bubble this event to parent component
+      // as changing the prop itself "active" is bad
+      this.$emit('update:modal')
       this.canSave = false;
     },
   },
-  computed: {
-    shouldShow: {
-      get: function() {
-        return this.active;
-      },
-      set: function(newValue) {
-        this.$emit('update:modal', newValue)
-        // trigger on closing of modal
-        if (!newValue) {
-          this.handleClose();
-        }
-      }
-    }
-  }
 }
 </script>
 

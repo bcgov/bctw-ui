@@ -23,6 +23,18 @@
 import Collar from './Collar';
 import Animal from './Animal';
 import Settings from './Settings';
+import Input from '../form/Input';
+import Select from '../form/Select';
+import Modal from '../Modal';
+import EditModal from '../data/EditModal'
+import FileInput from '../form/FileInput';
+import Vue from 'vue';
+
+Vue.component('edit-modal', EditModal);
+Vue.component('file-input', FileInput);
+Vue.component('input-type', Input);
+Vue.component('input-select', Select);
+Vue.component('modal', Modal);
 
 export default {
   name: 'dataTabs',

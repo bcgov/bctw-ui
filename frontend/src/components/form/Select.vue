@@ -2,48 +2,60 @@
   <div class="con-select-example">
     <vs-select
       class="selectExample"
-      label="Figuras"
-      v-model="select2"
-      >
-      <vs-select-item
-        :key="index"
-        :value="item.value"
-        :text="item.text"
-        v-for="item,index in options2" />
-    </vs-select>
+      :label="label"
+      v-model="selected"
+    ><vs-select-item
+      v-if="codes"
+      :key="item.id"
+      :value="item.code"
+      :text="item.description"
+      v-for="item in codes" /
+    ></vs-select>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   name: 'Select',
   props: {
-
+    label: String,
+    header: String
+  },
+  computed: {
+    localComputed () {
+    },
+    ...mapState({
+      codes(state) {
+        return state.codeModule.codes[this.header];
+      }
+    })
   },
   data(){
     return {
-      select2:7,
-      options2:[
-        {text: 'Square', value: 1},
-        {text: 'Rectangle', value: 2},
-        {text: 'Rombo', value: 3},
-        {text: 'Romboid', value: 4},
-        {text: 'Trapeze', value: 5},
-        {text: 'Triangle', value: 6},
-        {text: 'Polygon', value: 7},
-        {text: 'Regular polygon', value: 8},
-        {text: 'Circumference', value: 9},
-        {text: 'Circle', value: 10},
-        {text: 'Circular sector', value: 11},
-        {text: 'Circular trapeze', value: 12},
-      ],
+      loading: false,
+      selected: '',
+      error: null,
+      
     }
   },
   methods:{
-    prueba(){
-      console.log("prueba de focsu");
+    fetchData() {
+      this.error = null;
+      this.loading = true;
+      this.$store.dispatch('requestCodes', {codeHeader: this.header}).then(d => {
+        this.loading = false;
+      });
     }
-  }
+  },
+  created() {
+    this.fetchData();
+  },
+  mounted() {
+    // this.$store.dispatch('requestCodes', {codeHeader: this.header, callback: cb })
+  } 
+}
+const cb = () => {
 }
 </script>
 

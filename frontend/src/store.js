@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import needle from 'needle';
+import {createOptions, createUrl} from './api/api_helpers';
+import { codeModule } from './api/code_module';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const rootModule = {
   state: {
     prod: location.port == 1111 ? false : true,
     pings: null,
@@ -91,7 +93,7 @@ export default new Vuex.Store({
       const collars = state.collars[type];
       const foundIndex = collars.findIndex(c => c.device_id === collar.device_id);
       state.collars[type][foundIndex] = collar;
-    }
+    },
   },
   getters: {
     hasPings (state) {
@@ -177,8 +179,8 @@ export default new Vuex.Store({
       needle.get(urlAvail, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch animals: ',err)};
         context.commit('writeAnimals',body);
+        callback(body);
       })
-      callback();
     },
     async upsertCollar(context, payload) {
       const url = createUrl(context, 'add-collar')
@@ -229,28 +231,13 @@ export default new Vuex.Store({
         result = await response.json();
       }
       console.log(result);
-    }
-  }
-});
-
-const isDev = process.env.ENV === 'DEV';
-
-const createUrl = function(context, apiString) {
-  const h1 = location.protocol;
-  const h2 = location.hostname;
-  const h3 = context.state.prod ? location.port : 3000;
-  const h4 = context.state.prod ? '/api' : '';
-  let url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
-  if (isDev) {
-    url += `?idir=${process.env.IDIR}`
-  }
-  return url;
-}
-
-const createOptions = (obj) => {
-  return {
-    compressed: true,
-    follow: 10,
-    ...obj
+    },
   }
 }
+
+export default new Vuex.Store({
+  modules: {
+    codeModule,
+    rootModule
+  }
+})
