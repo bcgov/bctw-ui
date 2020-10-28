@@ -161,6 +161,8 @@ connect = ->
     | 'filterPings' => this.$root.$emit 'refreshCritterLayers'
   #//  #//| 'terrainCentroidActive' => view3D.call @,mutation
 
+  @$store.dispatch 'requestPingExtent'
+
 selectChanged = ->
   @$vs.loading do
     container: '#critter-list'
@@ -246,6 +248,7 @@ body
   #sidebar
     .temporal-slider
       margin-top 2rem
+      margin-bottom 2rem
 
     #critter-list
       text-align left
