@@ -43,7 +43,7 @@ export default {
     fetchData() {
       this.error = null;
       this.loading = true;
-      this.$store.dispatch('requestCodes', {codeHeader: this.header}).then(d => {
+      this.$store.dispatch('requestCodes', {body: this.header}).then(d => {
         this.loading = false;
       });
     }
@@ -51,9 +51,6 @@ export default {
   created() {
     this.fetchData();
   },
-  mounted() {
-    // this.$store.dispatch('requestCodes', {codeHeader: this.header, callback: cb })
-  } 
 }
 const cb = () => {
 }

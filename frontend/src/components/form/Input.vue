@@ -1,59 +1,56 @@
-<template lang="html">
-  <!-- <span class="centerx default-input"> -->
-     <vs-input 
-        v-model="value"
-        :label="label"
-        :disabled="isDisabled"
-        @change="handleChange"
-        :isVisible="isVisible"
-      />
-   <!-- </span> -->
-</template>
 
+<template lang="html">
+  <vs-input 
+    v-bind:value="value"
+    v-on:input="onChange"
+    :label="label"
+    :disabled="isDisabled"
+  ></vs-input>
+</template>
 <script>
+/*
+  how to use this component:
+    - to bind it to a model: v-model (not :v-model!)
+    - to listen to changes: v-on:input
+    - to get an object version in the form of {propid : value}: listen to v-on:update:model
+*/
 export default {
   name: 'Input',
   props: {
     label: String,
     isDisabled: Boolean,
     isVisible: Boolean,
-    val: String | Number | Date,
     propId: String, // the non header version ex. device_id
   },
   data(){
     return {
-      originalValue: this.val || '',
-      value: this.val || '',
+      originalValue: this.value,
+      value: '',
       visible: this.isVisible
     }
   },
-  methods: {
+  computed: {
     isChanged() {
       const changed = this.value !== this.originalValue;
-      // console.log(`new: ${this.value} old: ${this.originalValue}`)
-      // console.log(changed)
       return changed;
+    }
+  },
+  methods: {
+    // note: vs-input seems to emit only the value of event.target.value
+    // while the original input emits the entire event
+    onChange(v) {
+      this.value = v;
+      this.$emit('input', v);
+      this.emitAsObject(v);
     },
-    handleChange(event) {
-      if (this.isChanged(event.target.value)) {
-        let r = {}
-        r[this.propId] = this.value
-        // console.log(`changed! to ${this.value}`)
-        this.$emit('update:model', r)
+    emitAsObject(v) {
+      if (this.isChanged) {
+        let o = {}
+        o[this.propId] = this.value
+        this.$emit('update:model', o)
       }
     },
   },
-  watch: {
-    // revert value when input is no longer visible (modal)
-    //todo: fix
-    isVisible: function(newv, oldv) {
-      if (newv) { //showing the window? set values to assigned ones
-        this.value = this.val
-      } else {
-        this.value = '';
-      }
-    }
-  }
 }
 </script>
 

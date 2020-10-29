@@ -24,8 +24,22 @@ const createOptions = (obj) => {
 
 const isDev = process.env.ENV === 'DEV';
 
+
+// response: resolved fetch response
+// payload: object containing a function called callback
+const handleFetchResult = (response, callback) => {
+  if (response.ok) {
+    response.json().then(d => callback(d));
+  } else {
+    // bad status returned, probably can't parse as json.
+    response.text().then(e => callback(null, e));
+  }
+}
+
 export {
   createUrl,
   createOptions,
-  isDev
+  isDev,
+  handleFetchResult
 }
+

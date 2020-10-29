@@ -1,24 +1,18 @@
 <template>
   <modal
-    title="Add Code Header"
+    title="Add New Code Type"
     :active="active"
     :handleClose="handleClose"
   >
-    <input-type label="Name" propId="header_name" :val="header_name"></input-type>
-    <input-type label="Title" propId="header_title" :val="header_title"></input-type>
-    <input-type label="Name" propId="header_description" :val="header_description"></input-type>
-
-    <vs-button
-      button="submit"
-      @click="save"
-      class="btn-save"
-      type="border"
-      :disabled="!canSave"
-    >Save</vs-button>
+    <input-type label="Name" propId="code_header_name" v-model="header_name" v-on:input="canSave"></input-type>
+    <input-type label="Title" propId="code_header_title" v-model="header_title" v-on:input="canSave"></input-type>
+    <input-type label="Description" propId="code_header_description" v-model="header_description" v-on:input="canSave"></input-type>
+    <vs-button button="submit" @click="save" class="btn-save" type="border" :disabled="!saveable" >Save</vs-button>
   </modal>
 </template>
 
 <script>
+import { getNotifyProps} from '../../notify';
 export default {
   name: 'AddCodeHeader',
   props: {
@@ -29,16 +23,39 @@ export default {
       header_name: '',
       header_title: '',
       header_description: '',
-      canSave: false
+      saveable: false
     }
   },
   methods: {
+    canSave(d) {
+      this.saveable = !!(this.header_name && this.header_title && this.header_description);
+    },
     handleClose() {
       this.$emit('update:modal');
     },
     save() {
-      const header = {header_name, header_title, header_description};
-      this.$store.dispatch('upsertCodeHeader', header);
+      const body = {
+        code_header_name: this.header_name,
+        code_header_title: this.header_title,
+        code_header_description: this.header_description
+      };
+      const payload = { body, callback: this.callback };
+      this.$store.dispatch('upsertCodeHeader', payload);
+    },
+    reset() {
+      this.header_name = '';
+      this.header_title = '';
+      this.header_description = '';
+    },
+    callback(data, err) {
+      let msg; 
+      if (err) {
+        msg = `error adding code header ${err}`;
+      } else {
+        const item = data && data[0] && data[0].code_header_name;
+        msg = `added code type ${item}`;
+      }
+      this.$vs.notify(getNotifyProps(msg, !!err))
     }
   }
 }

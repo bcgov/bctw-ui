@@ -11,7 +11,7 @@
     <br/><br/>
     <div>Device ID: {{device_id}}</div>
     <div>Satellite Network: {{sat_network}}</div>
-    <vs-button disabled button="submit" @click="save" class="btn-save" type="border">Save</vs-button>
+    <vs-button button="submit" @click="save" class="btn-save" type="border">Save</vs-button>
   </modal>
 </template>
 
@@ -54,6 +54,8 @@ export default {
       reader.readAsText(this.file);
     },
     save() {
+      console.log(this.device_id);
+      console.log(this.sat_network);
     },
     handleClose() {
       this.reset();

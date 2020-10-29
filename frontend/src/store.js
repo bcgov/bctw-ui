@@ -224,18 +224,6 @@ const rootModule = {
       });
       payload.callback();
     },
-    async uploadCsv(context, payload) {
-      const url = createUrl(context, 'import');
-      // fixme: some kind of issue with needle/multer.
-      // need to figure out how to send this with needle
-      // so that multer can properly grab the file
-      const response = await fetch(url, {method: 'POST', body: payload})
-      let result;
-      if (response.ok) {
-        result = await response.json();
-      }
-      console.log(result);
-    },
   }
 }
 

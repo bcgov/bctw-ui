@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { getNotifyProps } from '../notify';
 const STATUS_INITIAL = 0, STATUS_SAVING = 1, STATUS_SUCCESS = 2, STATUS_FAILED = 3;
 export default {
   name: 'fileInput', 
@@ -67,13 +68,8 @@ export default {
       },
       save(formData) {
         this.currentStatus = STATUS_SAVING;
-        this.$store.dispatch('uploadCsv', formData).then(x => {
-          console.log('maybe wowrked??');
-          this.currentStatus = STATUS_SUCCESS;
-        }).catch(err => {
-            this.uploadError = err.response;
-            this.currentStatus = STATUS_FAILED;
-        })
+        const payload = {body: formData, callback: this.onResultsCallback}
+        this.$store.dispatch('uploadCsv', payload)
       },
       filesChange(fieldName, fileList) {
         const formData = new FormData();
@@ -84,6 +80,18 @@ export default {
             formData.append(fieldName, fileList[x], fileList[x].name);
           });
         this.save(formData);
+    },
+    onResultsCallback(data, err) {
+      let msg;
+      if (err) {
+        msg = `error uploading csv ${err}`;
+        this.currentStatus = STATUS_FAILED;
+        this.uploadError = err;
+      } else {
+        msg = `added ${data[0].length} items successfully`;
+        this.currentStatus = STATUS_SUCCESS;
+      }
+      this.$vs.notify(getNotifyProps(msg, !!err))
     }
   }
 }
@@ -99,6 +107,7 @@ export default {
     min-height: 100px;
     position: relative;
     cursor: pointer;
+    margin-bottom: 10px;
   }
 
   .input-file {

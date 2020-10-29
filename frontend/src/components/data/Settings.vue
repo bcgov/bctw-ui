@@ -7,6 +7,7 @@
       header="region"
       label="Region"
     ></input-select>
+    <br/>
     <vs-button type="border" @click="handleAddClick">Add New Code Type</vs-button>
     <add-code
       :active="showAddCodeHeader"
