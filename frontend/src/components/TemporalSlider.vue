@@ -7,6 +7,8 @@
   width 50px !important
   white-space normal !important
 
+.fetch-data
+  margin 1.5rem 1rem
 </style>
 
 
@@ -22,6 +24,11 @@
     :interval="1"
     :tooltip-formatter="tooltip"
   )
+  vs-button(
+    icon="play_arrow"
+    size="small"
+    class="fetch-data"
+  ) Fetching Data in 5
 
 </template>
 
