@@ -1,4 +1,4 @@
-const createUrl = function(context, apiString, queryString) {
+const createUrl = (context, apiString: string, queryString?: string) => {
   const h1 = location.protocol;
   const h2 = location.hostname;
   const h3 = context.state.prod ? location.port : 3000;
@@ -36,10 +36,11 @@ const handleFetchResult = (response, callback) => {
   }
 }
 
+
 export {
   createUrl,
   createOptions,
   isDev,
-  handleFetchResult
-}
+  handleFetchResult,
+};
 

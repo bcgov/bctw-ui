@@ -20,9 +20,9 @@
 //   trans_location: boolean,
 // }
 
-const animalPropToDisplay = function(propName) {
-  switch(propName) {
-    case 'animal_id': 
+const animalPropToDisplay = (propName) => {
+  switch (propName) {
+    case 'animal_id':
       return 'Animal ID';
     case 'nickname':
       return 'Nickname';
@@ -43,8 +43,8 @@ const animalPropToDisplay = function(propName) {
     case 'release_date':
       return 'Release Date';
   }
-}
+};
 
 export {
   animalPropToDisplay,
-}
+};

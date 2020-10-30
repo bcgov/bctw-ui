@@ -4,12 +4,14 @@
     :active="active"
     :handleClose="handleClose"
   >
-    <div class="inRow">
-      <div v-for="(val, prop) in this.$store.getters.editObject" :key="prop">
+    <div v-if="editObject" class="inRow">
+      <div v-for="(val, prop) in editObject" :key="prop">
+        <!-- <p>{{prop}}:{{val}} -->
         <input-type 
           :label="formatHeader(prop)" 
+          v-model="editObject[prop]"
           :propId="prop"
-          :val="val"
+          :initialValue="editObject[prop]"
           :isDisabled="flagDisabled(prop)"
           v-on:update:model="handleInputChange"
         />
@@ -27,6 +29,7 @@
 </template>
   
 <script>
+import { mapGetters } from 'vuex';
 export default {
   name: 'EditModal',
   props: {
@@ -38,8 +41,12 @@ export default {
     return {
       cannotEdit: ['device_id', 'max_transmission_date', 'interval', 'animal_id'],
       canSave: false,
-      changedValues: {}
+      changedValues: {},
+      // editing: this.$store.getters.editObject
     }
+  },
+  computed: {
+    ...mapGetters(["editObject"])
   },
   methods: {
     // disable editing on these fields

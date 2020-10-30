@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
 import AddAnimal from './AddAnimal'
 import { mapState } from 'vuex';

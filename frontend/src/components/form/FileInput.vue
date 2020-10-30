@@ -5,7 +5,7 @@
         <input type="file" single :name="uploadFieldName" :disabled="isSaving" @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
           accept=".csv" class="input-file">
           <p v-if="isInitial">
-            Drag csv file here<br> or click to browse
+            <b>{{title}}</b><br><br>Drag csv file here<br>or click to browse
           </p>
           <p v-if="isSaving">
             Uploading file...
@@ -30,31 +30,42 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { getNotifyProps } from '../notify';
-const STATUS_INITIAL = 0, STATUS_SAVING = 1, STATUS_SUCCESS = 2, STATUS_FAILED = 3;
+import { FetchPayload } from '../../types/api';
+
+enum LoadStatus {
+  INITIAL = 0,
+  SAVING = 1,
+  SUCCESS = 2,
+  FAILED = 3
+}
+
 export default {
   name: 'fileInput', 
+  props: {
+    title: String,
+  },
   data() {
     return {
       uploadedFiles: [],
       uploadError: null,
-      currentStatus: null,
+      currentStatus: LoadStatus.INITIAL, 
       uploadFieldName: 'csv'
     }
   },
   computed: {
       isInitial() {
-        return this.currentStatus === STATUS_INITIAL;
+        return this.currentStatus === LoadStatus.INITIAL;
       },
       isSaving() {
-        return this.currentStatus === STATUS_SAVING;
+        return this.currentStatus === LoadStatus.SAVING;
       },
       isSuccess() {
-        return this.currentStatus === STATUS_SUCCESS;
+        return this.currentStatus === LoadStatus.SUCCESS;
       },
       isFailed() {
-        return this.currentStatus === STATUS_FAILED;
+        return this.currentStatus === LoadStatus.FAILED;
       }
     },
     mounted () {
@@ -62,16 +73,16 @@ export default {
     },
     methods: {
       reset() {
-        this.currentStatus = STATUS_INITIAL;
+        this.currentStatus = LoadStatus.INITIAL;
         this.uploadedFiles = [];
         this.uploadError = null;
       },
       save(formData) {
-        this.currentStatus = STATUS_SAVING;
-        const payload = {body: formData, callback: this.onResultsCallback}
+        this.currentStatus = LoadStatus.SAVING;
+        const payload:FetchPayload = {body: formData, callback: this.onResultsCallback}
         this.$store.dispatch('uploadCsv', payload)
       },
-      filesChange(fieldName, fileList) {
+      filesChange(fieldName: string, fileList) {
         const formData = new FormData();
         if (!fileList.length) return;
         Array
@@ -80,19 +91,19 @@ export default {
             formData.append(fieldName, fileList[x], fileList[x].name);
           });
         this.save(formData);
-    },
-    onResultsCallback(data, err) {
-      let msg;
-      if (err) {
-        msg = `error uploading csv ${err}`;
-        this.currentStatus = STATUS_FAILED;
-        this.uploadError = err;
-      } else {
-        msg = `added ${data[0].length} items successfully`;
-        this.currentStatus = STATUS_SUCCESS;
+      },
+      onResultsCallback(data, err) {
+        let msg;
+        if (err) {
+          msg = `error uploading csv ${err}`;
+          this.currentStatus = LoadStatus.FAILED;
+          this.uploadError = err;
+        } else {
+          msg = `added ${data[0].length} items successfully`;
+          this.currentStatus = LoadStatus.SUCCESS;
+        }
+        this.$vs.notify(getNotifyProps(msg, !!err))
       }
-      this.$vs.notify(getNotifyProps(msg, !!err))
-    }
   }
 }
 </script>

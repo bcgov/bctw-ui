@@ -11,7 +11,8 @@
   </modal>
 </template>
 
-<script>
+<script lang="ts">
+import { FetchPayload } from 'frontend/src/types/api';
 import { getNotifyProps} from '../../notify';
 export default {
   name: 'AddCodeHeader',
@@ -39,13 +40,17 @@ export default {
         code_header_title: this.header_title,
         code_header_description: this.header_description
       };
-      const payload = { body, callback: this.callback };
+      const payload:FetchPayload = { body, callback: this.callback };
       this.$store.dispatch('upsertCodeHeader', payload);
+      this.handleClose();
     },
     reset() {
       this.header_name = '';
       this.header_title = '';
       this.header_description = '';
+      console.log('hi')
+      console.log('hi')
+      console.log('hi')
     },
     callback(data, err) {
       let msg; 

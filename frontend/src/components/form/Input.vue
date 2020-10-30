@@ -21,11 +21,12 @@ export default {
     isDisabled: Boolean,
     isVisible: Boolean,
     propId: String, // the non header version ex. device_id
+    initialValue: [String, Number, Boolean]
   },
   data(){
     return {
       originalValue: this.value,
-      value: '',
+      value: this.initialValue,
       visible: this.isVisible
     }
   },
