@@ -13,7 +13,7 @@
       </div>
     </form>
     <div v-if="isSuccess">
-      <h2>import file successfully.</h2>
+      <h2>imported csv successfully.</h2>
       <p><a href="javascript:void(0)" @click="reset()">Upload again</a></p>
       <ul class="list-unstyled">
         <!-- <li v-for="(item, idx) in uploadedFiles" :key="idx">

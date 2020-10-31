@@ -7,7 +7,12 @@ const codeModule = {
   state: () => ({
     codes: {
       region: [], // must define known code headers here to make it reactive
+      species: [],
     },
+    //todo: commit to state
+    headers: [
+
+    ],
   }),
   mutations: {
     writeCodes(state, payload) {
@@ -36,6 +41,7 @@ const codeModule = {
         const response = await needle('get', url, createOptions({}));
         if (response && response.statusCode === 200) {
           context.commit('writeCodes', { codeHeader: header, body: response.body });
+          console.log(`loaded ${response.body[0].length} ${header} codes`);
         }
       } catch (err) {
         console.log(`err fetching ${header} codes: ${err}`);

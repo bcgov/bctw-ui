@@ -5,6 +5,8 @@
     v-on:input="onChange"
     :label="label"
     :disabled="isDisabled"
+    label-placeholder=""
+    :type="type"
   ></vs-input>
 </template>
 <script>
@@ -17,16 +19,17 @@
 export default {
   name: 'Input',
   props: {
-    label: String,
     isDisabled: Boolean,
+    initialValue: [String, Number],
     isVisible: Boolean,
+    label: String,
     propId: String, // the non header version ex. device_id
-    initialValue: [String, Number, Boolean]
+    type: String
   },
   data(){
     return {
       originalValue: this.value,
-      value: this.initialValue,
+      value: this.initialValue ?? '',
       visible: this.isVisible
     }
   },
@@ -38,7 +41,7 @@ export default {
   },
   methods: {
     // note: vs-input seems to emit only the value of event.target.value
-    // while the original input emits the entire event
+    // while the original vue input emits the entire event
     onChange(v) {
       this.value = v;
       this.$emit('input', v);

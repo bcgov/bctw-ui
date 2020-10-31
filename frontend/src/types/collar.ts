@@ -1,5 +1,5 @@
-const collarPropToDisplay = function(propertyName) {
-  switch(propertyName) {
+const collarPropToDisplay = (propertyName: string): string => {
+  switch (propertyName) {
     case 'device_id':
       return 'Device ID';
     case 'make':
@@ -15,8 +15,8 @@ const collarPropToDisplay = function(propertyName) {
     case 'animal_id':
       return 'Individual ID';
   }
-}
+};
 
 export {
-  collarPropToDisplay
-}
+  collarPropToDisplay,
+};

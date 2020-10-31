@@ -27,6 +27,7 @@ const rootModule = {
     },
     animals: [],
     editObject: {},
+    addObject: {},
   },
   mutations: {
     pingActive(state, properties) {
@@ -77,7 +78,12 @@ const rootModule = {
       state.collars.assignedCollars = collars;
     },
     writeAnimals(state, animals) {
-      state.animals = animals;
+      state.animals = [...state.animals, ...animals];
+      // state.animals = animals;
+    },
+    updateAddObject(state, obj) {
+      console.log(`current obj ${JSON.stringify(state.addObject)}, newObj: ${JSON.stringify(obj)}`);
+      state.addObject = obj;
     },
     updateEditingObject(state, newObj) {
       // console.log(`updated edit object ${JSON.stringify(newObj)}`);
@@ -133,8 +139,14 @@ const rootModule = {
     availableCollars(state) {
       return state.availableCollars;
     },
+    addObject(state) {
+      return state.addObject;
+    },
     editObject(state) {
       return state.editObject;
+    },
+    animals(state) {
+      return state.animals;
     },
   },
   actions: {
@@ -166,12 +178,12 @@ const rootModule = {
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
-        const a = moment(body.min)
-        const b = moment(body.max)
+        const a = moment(body.min);
+        const b = moment(body.max);
         body.days =  b.diff(a, 'days');
 
-        context.commit('writePingExtent',body);
-      })
+        context.commit('writePingExtent', body);
+      });
     },
     requestCollars(context, callback) {
       const urlAvail = createUrl(context, 'get-available-collars')
@@ -191,7 +203,7 @@ const rootModule = {
         callback(); // run the callback
       });
     },
-    requestAnimals(context, callback) {
+    getAnimals(context, callback) {
       const urlAvail = createUrl(context, 'get-animals');
       const options = createOptions({});
       needle.get(urlAvail, options, (err, _, body) => {

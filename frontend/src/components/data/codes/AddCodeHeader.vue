@@ -2,11 +2,12 @@
   <modal
     title="Add New Code Type"
     :active="active"
-    :handleClose="handleClose"
-  >
-    <input-type label="Name" propId="code_header_name" v-model="header_name" v-on:input="canSave"></input-type>
-    <input-type label="Title" propId="code_header_title" v-model="header_title" v-on:input="canSave"></input-type>
-    <input-type label="Description" propId="code_header_description" v-model="header_description" v-on:input="canSave"></input-type>
+    :handleClose="handleClose">
+    <div class="grp">
+      <input-type label="Name" propId="code_header_name" v-model="header_name" v-on:input="canSave" ></input-type>
+      <input-type label="Title" propId="code_header_title" v-model="header_title" v-on:input="canSave"></input-type>
+      <input-type label="Description" propId="code_header_description" v-model="header_description" v-on:input="canSave"></input-type>
+    </div>
     <vs-button button="submit" @click="save" class="btn-save" type="border" :disabled="!saveable" >Save</vs-button>
   </modal>
 </template>
@@ -67,6 +68,10 @@ export default {
 </script>
 
 <style scoped>
+  .grp {
+    display: flex;
+    flex-direction: row;
+  }
   .btn-save {
     float:right;
   }

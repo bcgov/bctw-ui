@@ -1,43 +1,20 @@
 <template>
   <div >
-    <vs-table
-      v-if="animals"
-      :data="animals"
-      v-model="selected"
-      @selected="handleSelected"
-    >
-      <template slot="thead">
-        <vs-th v-for="(value, prop) in animals[0]" :key="prop">
-          {{toHeader(prop)}}
-        </vs-th>
-      </template>
-      <template slot-scope="{data}">
-        <vs-tr :key="index" v-for="(animal, index) in animals" :data="animal" >
-          <vs-td :key="v" v-for="(k, v) in animal" :data="k">
-            {{k}}
-          </vs-td>
-        </vs-tr> 
-      </template>
-    </vs-table>
-    <!-- <pre>{{selected}}</pre> -->
-    <br/>
+    <state-table title="" v-model="animals"></state-table><br/>
     <vs-button @click="handleAddClick" type="border">Add Individual</vs-button>
-    <vs-button @click="handleEditClick" :disabled="Object.keys(selected).length === 0" type="border">Edit Individual</vs-button>
-      <!-- :editing="selected" -->
+    <vs-button @click="handleEditClick" :disabled="Object.keys(editObject).length === 0" type="border">Edit Individual</vs-button>
     <edit-modal 
-      v-on:update:modal="handleEditClick" 
-      v-on:update:save="save"
       :active="showEditModal"
-      title="Edit Individual"
       :formatHeader="toHeader"
-    >
-    <!-- testing slots -->
-    <!-- <p> hey there </p> -->
+      title="Edit Individual"
+      v-on:update:modal="handleEditClick" 
+      v-on:update:save="save">
     </edit-modal>
     <add-animal
       :active="showAddModal"
       v-on:update:modal="handleAddClick"
-    ></add-animal>
+      v-on:save:animal="save">
+    </add-animal>
     <!-- <pre>{{selected}}</pre> -->
   </div>
 </template>
@@ -45,17 +22,15 @@
 <script lang="ts">
 import Vue from 'vue';
 import AddAnimal from './AddAnimal'
-import { mapState } from 'vuex';
-import { animalPropToDisplay } from '../../types/animal'
+import { mapGetters, mapState } from 'vuex';
+import { animalPropToDisplay } from '../../../types/animal'
 
 Vue.component('add-animal', AddAnimal);
 
 export default {
   name: 'animals',
   computed: {
-    animals () {
-      return this.$store.state.rootModule.animals
-    }
+    ...mapGetters(['animals','editObject'])
   },
   props: {
     title: String,
@@ -64,13 +39,10 @@ export default {
     return {
       showEditModal: false,
       showAddModal: false,
-      selected: {}
+      selected: {},
     }
   },
   methods: {
-    handleSelected(tr) {
-      this.$store.commit('updateEditingObject', tr);
-    },
     handleEditClick(v) {
       this.showEditModal = !this.showEditModal;
     },
@@ -78,6 +50,8 @@ export default {
       this.showAddModal = !this.showAddModal;
     },
     save(animal) {
+      console.log('im saving an animal!');
+      return;
       this.$vs.notify({ title: `saving animal ID ${animal.animal_id}`})
       const payload = {
         callback: cbAnimalSaved,
@@ -89,8 +63,11 @@ export default {
       return animalPropToDisplay(str);
     }
   },
-  mounted() {
-    this.$store.dispatch('requestAnimals', callback);
+  created() {
+    this.$store.commit('editObject', {});
+    if (!this.animals?.length) {
+      this.$store.dispatch('getAnimals', callback);
+    }
   }
 }
 

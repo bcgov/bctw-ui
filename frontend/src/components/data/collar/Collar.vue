@@ -1,9 +1,7 @@
 <template>
 <!-- todo:
-  - fix pagination not working
+  - convert this to use state-table
   - add limit option to backend query to only request page max size
-  - sorting
-  - multi-select? wireframe has checkboxs to select multipe rows
   - make inputs type specific
 -->
   <div v-if="collars">
@@ -60,7 +58,7 @@
 </template>
 
 <script>
-import { collarPropToDisplay } from '../../types/collar'
+import { collarPropToDisplay } from '../../../types/collar'
 import Vue from 'vue';
 import { mapState } from 'vuex';
 import RegisterCollarModal from './RegisterCollar';

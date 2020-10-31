@@ -2,28 +2,47 @@
   <div class="con-select-example">
     <vs-select
       class="selectExample"
-      :label="label"
+      :label="loading ? 'Loading...' : label"
+      :autocomplete="!!autocomplete"
       v-model="selected"
+      v-on:change="$emit('change:select', $event)"
     ><vs-select-item
       v-if="codes"
       :key="item.id"
       :value="item.code"
       :text="item.description"
-      v-for="item in codes" /
+      v-for="item in codes"
     ></vs-select>
   </div>
 </template>
 
 <script lang="ts">
+/*
+  - to bind the changes of this component to state
+  use the v-on:change directive 
+*/
 import { mapState } from 'vuex';
 export default {
   name: 'Select',
   props: {
     label: String,
-    header: String
+    header: String, // required 
+    autocomplete: String,
+    val : [String, Number]
+  },
+  data(){
+    return {
+      loading: false,
+      selected: '',
+      error: null,
+    }
   },
   computed: {
+    // todo: disable while loading
     localComputed () {
+      // disabled () {
+      //   return this.loading;
+      // }
     },
     ...mapState({
       codes(state) {
@@ -31,15 +50,11 @@ export default {
       }
     })
   },
-  data(){
-    return {
-      loading: false,
-      selected: '',
-      error: null,
-      
-    }
-  },
   methods:{
+    onChange(v) {
+      console.log(this.val)
+      console.log(`changed to: ${v}`);
+    },
     fetchData() {
       this.error = null;
       this.loading = true;
