@@ -43,19 +43,6 @@
           @change="toggleLatestCritters(latestPings)"
         ) most recent locations
 
-        vs-select(
-          label='Time Window'
-          class='select-time--window'
-          v-model="select"
-          :disabled="latestPings"
-          @change="selectChanged(select)"
-        )
-          vs-select-item(
-            :key='index'
-            :value='item.value'
-            :text='item.text'
-            v-for='item,index in times'
-          )
         vs-button(
           class='download'
           color='primary'
@@ -163,18 +150,6 @@ connect = ->
 
   @$store.dispatch 'requestPingExtent'
 
-selectChanged = ->
-  @$vs.loading do
-    container: '#critter-list'
-    type: 'sound'
-
-  callback = ~>
-    @$vs.loading.close '#critter-list > .con-vs-loading'
-    @$root.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
-
-  @$store.commit 'timeWindow', it
-  @$store.dispatch 'requestPings', callback
-
 
 toggleLatestCritters = (checked) ->
 
@@ -206,7 +181,6 @@ toggleClusterCritters = (checked) ->
 export default {
   mounted: connect,
   methods: {
-    selectChanged,
     toggleLatestCritters,
     downloadData,
     toggleClusterCritters

@@ -62,7 +62,8 @@ countDownStart = ->
 
 countDownStop = -> if @counter then clearInterval that
 
-requestCollars = -> console.log 'Request collars'
+requestCollars = ->
+
 
 /* ## marks
   Custom mark formatting function
@@ -114,7 +115,7 @@ export default {
     requestCollars
   },
   data: () => ({
-    values: [20,500],
+    values: [20,100], // TODO: Pull this from a timeWindow in vuex
     counter: null,
     count: 0
   })
