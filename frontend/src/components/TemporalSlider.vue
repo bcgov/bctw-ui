@@ -45,6 +45,7 @@
 import VueSlider from 'vue-slider-component';
 import moment from 'moment';
 import 'vue-slider-component/theme/default.css';
+import {bus} from '../main'
 ``
 
 countDownStart = ->
@@ -61,7 +62,7 @@ countDownStart = ->
 
       callback = ~>
         @$vs.loading.close '#critter-list > .con-vs-loading'
-        @$root.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
+        bus.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
 
       clearInterval @counter
       @counter = null

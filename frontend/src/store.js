@@ -135,7 +135,11 @@ export default new Vuex.Store({
   actions: {
     requestPings(context,callback) {
       const t = context.state.timeWindow;
-      const url = createUrl(context, `get-critters?start=${t[0]}&end=${t[1]}`);
+      const e = context.getters.pingExtent;
+      const start = moment(e.min).add(t[0], 'days').format('YYYY-MM-DD');
+      const end = moment(e.min).add(t[1], 'days').format('YYYY-MM-DD');
+
+      const url = createUrl(context, `get-critters?start=${start}&end=${end}`);
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
@@ -153,7 +157,8 @@ export default new Vuex.Store({
         callback();
       })
     },
-    requestPingExtent(context) {
+    requestPingExtent(context,callback) {
+      console.log('callback:',callback);
       const url = createUrl(context, 'get-ping-extent');
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
@@ -168,6 +173,7 @@ export default new Vuex.Store({
         const end = body.days - 1;
         const start = body.days - 50;
         context.commit('writeTimeWindow',[start,end]);
+        callback();
       })
     },
     requestCollars(context, callback) {
