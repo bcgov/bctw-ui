@@ -19,7 +19,7 @@ const rootModule = {
       herdsActive: [],
       speciesActive: [],
     },
-    timeWindow: '1 days', // TODO: Deprecate when pingExtent is active
+    timeWindow: [], // TODO: to be calculated on getPingExtent
     clusterCritters: true,
     collars: {
       availableCollars: [],
@@ -151,7 +151,8 @@ const rootModule = {
   },
   actions: {
     requestPings(context,callback) {
-      const url = createUrl(context, `get-critters?time=${context.state.timeWindow}`);
+      const t = context.state.timeWindow;
+      const url = createUrl(context, `get-critters?start=${t[0]}&end=${t[1]}`);
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {
@@ -181,6 +182,8 @@ const rootModule = {
         const a = moment(body.min);
         const b = moment(body.max);
         body.days =  b.diff(a, 'days');
+        console.log(body);
+        // TODO: Should also commit to the timeWindow array
 
         context.commit('writePingExtent', body);
       });

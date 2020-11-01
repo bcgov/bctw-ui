@@ -7,6 +7,11 @@
   width 50px !important
   white-space normal !important
 
+.fetch-data
+  float right !important
+  margin 2rem 0rem
+  width 10rem
+  padding 0.5rem 0.8rem 0.5rem 0.5rem !important
 </style>
 
 
@@ -21,7 +26,16 @@
     :marks="marks"
     :interval="1"
     :tooltip-formatter="tooltip"
+    @drag-start="countDownStop"
+    @drag-end="countDownStart"
   )
+  vs-button(
+    icon="play_arrow"
+    size="small"
+    class="fetch-data"
+    :disabled="count == 0"
+    @click="requestCollars"
+  ) Fetching Data in {{count}}
 
 </template>
 
@@ -32,6 +46,24 @@ import VueSlider from 'vue-slider-component';
 import moment from 'moment';
 import 'vue-slider-component/theme/default.css';
 ``
+
+countDownStart = ->
+  #// Reset counter
+  @count = 10
+  if @counter then clearInterval that
+  
+  @counter = setInterval( ~>
+    --@count
+    if @count < 1
+      clearInterval @counter
+      @counter = null
+      console.log 'getting collars'
+  ,1000)
+
+countDownStop = -> if @counter then clearInterval that
+
+requestCollars = ->
+
 
 /* ## marks
   Custom mark formatting function
@@ -77,10 +109,15 @@ export default {
   },
   methods: {
     marks,
-    tooltip
+    tooltip,
+    countDownStart,
+    countDownStop,
+    requestCollars
   },
   data: () => ({
-    values: [20,500]
+    values: [20,100], // TODO: Pull this from a timeWindow in vuex
+    counter: null,
+    count: 0
   })
 }
 ``
