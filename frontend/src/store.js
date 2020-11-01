@@ -30,7 +30,7 @@ export default new Vuex.Store({
     pingActive (state,properties) {
       state.pingActive = properties;
     },
-    timeWindow (state,time) {
+    writeTimeWindow (state,time) {
       state.timeWindow = time;
     },
     toggleClusterCritters (state,checked) {
@@ -110,6 +110,9 @@ export default new Vuex.Store({
     pingExtent (state) {
       return state.pingExtent;
     },
+    timeWindow (state) {
+      return state.timeWindow;
+    },
     clusterCritters (state) {
       return state.clusterCritters;
     },
@@ -155,13 +158,16 @@ export default new Vuex.Store({
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
+        /* Calculate the temporal extent of all pings */
         const a = moment(body.min)
         const b = moment(body.max)
         body.days =  b.diff(a, 'days');
-        console.log(body);
-        // TODO: Should also commit to the timeWindow array
-
         context.commit('writePingExtent',body);
+
+        /* Calculate the temporal window of downloaded pings */
+        const end = body.days - 1;
+        const start = body.days - 50;
+        context.commit('writeTimeWindow',[start,end]);
       })
     },
     requestCollars(context, callback) {
