@@ -1,32 +1,39 @@
 import needle, { NeedleResponse } from 'needle';
 import { FetchPayload } from '../types/api';
 import { createOptions, createUrl, handleFetchResult} from './api_helpers';
-import { ICode } from '../types/code';
+import { ICodeHeader } from '../types/code';
+import { ActionPayload } from '../types/store';
 
 const codeModule = {
   state: () => ({
     codes: {
-      region: [], // must define known code headers here to make it reactive
-      species: [],
+      // must define known code headers here to make it reactive
+      region: [], species: [], population_unit: [], animal_status: [],
     },
-    //todo: commit to state
-    headers: [
-
-    ],
+    headers: [] as ICodeHeader[],
   }),
   mutations: {
     writeCodes(state, payload) {
       state.codes[payload.codeHeader] = [ ...payload.body[0]];
     },
+    writeHeaders(state, body) {
+      state.headers = body;
+    },
   },
   getters: {
+    getHeader: (state) => (headerId): string => {
+      const header = state.headers.find((h: ICodeHeader) => h.type === headerId);
+      return header?.title ?? headerId;
+    },
+    headers(state) {
+      return state.headers;
+    },
     codes(state) {
       return state.codes;
     },
   },
-  // payload: {body: any, callback: () => void}
   actions: {
-    async requestCodes(context, payload) {
+    async requestCodes(context, payload: ActionPayload) {
       const header = payload.body;
       if (!header) {
         return;
@@ -52,7 +59,8 @@ const codeModule = {
       try {
         const response: NeedleResponse = await needle('get', url, createOptions({}));
         if (response && response.statusCode === 200) {
-          const body: ICode[] = response.body;
+          const body: ICodeHeader[] = response.body;
+          context.commit('writeHeaders', body);
           payload.callback(body);
         }
         } catch (err) {

@@ -71,9 +71,9 @@ export default {
     this.reset();
   }
 }
-const parseFile = () => {
-  console.log('loading collars completed' )
-}
+// const parseFile = () => {
+//   console.log('loading collars completed' )
+// }
 </script>
 
 <style scoped>

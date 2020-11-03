@@ -7,73 +7,117 @@
   >
     <h3>General Information</h3><vs-divider></vs-divider>
     <div class="grp">
-      <input-type label="Nickname"   propId="nickname"  v-model="addObject.nickname"></input-type>
-      <input-type label="Animal ID*" propId="animal_id" v-model="addObject.animal_id"></input-type>
-      <input-type label="WLHID*"     propId="wlh_id"    v-model="addObject.wlh_id"></input-type>
+      <input-type label="Nickname"   propId="nickname"  v-model="animal.nickname"></input-type>
+      <input-type label="Animal ID*" propId="animal_id" v-model="animal.animal_id"></input-type>
+      <input-type label="WLHID*"     propId="wlh_id"    v-model="animal.wlh_id"></input-type>
     </div>
+
     <h3>Group Management</h3><vs-divider></vs-divider>
     <div class="grp"> 
-      <input-select header="species"         label="Species*"        v-on:change:select="addObject.species = $event"></input-select>
-      <input-select header="region"          label="Region*"         v-on:change:select="addObject.region = $event"></input-select>
-      <input-select header="population_unit" label="Population Unit" v-on:change:select="addObject.region = $event" autocomplete="true"></input-select>
+      <input-select header="species"         label="Species*"        v-on:change:select="handleSelect"></input-select>
+      <input-select header="region"          label="Region*"         v-on:change:select="handleSelect"></input-select>
+      <input-select header="population_unit" label="Population Unit" v-on:change:select="handleSelect" autocomplete="true"></input-select>
     </div>
+
     <h3>Individual Characteristics</h3><vs-divider></vs-divider>
     <div class="grp">
-      <!-- <input-select header="species" label="Species"></input-select> -->
-      <input-check v-model="addObject.calf_at_heel" propId="calf_at_heel" label="Calf at heel?"></input-check>
+      <input-check v-model="animal.calf_at_heel" propId="calf_at_heel" label="Calf at heel?"></input-check>
     </div>
-    <h3>Assigned GPS Collar</h3><vs-divider></vs-divider>
-    <div class="grp">
-    <vs-divider></vs-divider>
-      <vs-button disabled >Assign Collar</vs-button>
+
+    <div>
+      <h3>Assigned GPS Collar</h3><vs-divider></vs-divider>
+      <state-table v-if="assignment" :propsToDisplay="toDisplay" :getHeader="(s) => s" v-model="assignment"></state-table>
+      <br/><vs-divider></vs-divider>
     </div>
-    <!-- fixme: -->
-    <vs-button color="red" button="submit" @click="save" class="btn-save" type="border">Add Animal</vs-button>
-    <!-- todo: display working version in modal -->
-    <!-- <assign-collar></assign-collar> -->
+    <!-- <div class="grp"> -->
+      <vs-button :disabled="!canAssignCollar" type="filled" @click="showAssignModal">Assign Collar</vs-button>
+    <!-- </div> -->
+
+    <vs-button :disabled="!canSave" button="submit" @click="save" class="btn-save" type="border">Save Animal</vs-button>
+    <assign-collar 
+      :active="showAssignCollarModal"
+      :critter="animal"
+      v-on:update:innerModal="showAssignModal"
+      v-on:collar:assigned="handleAssignment"
+    ></assign-collar>
+    <pre>{{assignment}}</pre>
   </modal>
 </template>
 <script lang="ts">
 import { Animal } from '../../../types/animal';
 import { mapGetters } from 'vuex';
-import AssignCollar from './AssignCollar';
 import Vue from 'vue';
+import { getNotifyProps } from '../../notify';
+import { ICollarLinkResult } from 'frontend/src/types/collar';
 
-Vue.component('assign-collar', AssignCollar);
-export default {
+export default Vue.extend({
   name: 'AddAnimal',
   props: {
     active: Boolean,
   },
   data() {
     return {
-      animal_id: '',
-      wlh_id: '',
-      nickname: '',
-      region: '',
-      species: '',
-      device_id: '',
-      calf: false
+      animal: {} as Animal,
+      canAssignCollar: true as boolean,
+      canSave: false as boolean,
+      requiredFields: ['animal_id', 'wlh_id', 'region', 'species'] as string[],
+      showAssignCollarModal: false as boolean,
+      assignment: [] as ICollarLinkResult[], // make it array so can display in state-table component
+      toDisplay: ['animal_id', 'device_id', 'effective_date', 'end_date']
     }
   },
   computed: {
-    localComputed () {
-    },
-    ...mapGetters(["addObject"])
+    // ...mapGetters(["editObject"])
   },
   methods: {
+    handleSelect(keyVal: any) {
+      this.animal = Object.assign({}, this.animal, keyVal)
+    },
+    showAssignModal() {
+      this.showAssignCollarModal = !this.showAssignCollarModal;
+    },
     handleClose() {
       this.reset();
-      this.$emit('update:modal')
+      this.$emit('update:modal') //parent handler to close modal
     },
     save() {
+      const payload = {
+        body: this.animal,
+        callback: this.cbSaveNewCritter,
+      }
+      this.$store.dispatch('upsertAnimal', payload);
       this.$emit('save:animal');
     },
     reset() {
-      this.$store.commit('updateAddObject', {});
+      // this.$store.commit('updateEditObject', {});
+      this.canAssignCollar = false;
+    },
+    cbSaveNewCritter(data: Animal[], err: Error) {
+      if (err) {
+        this.$vs.notify(getNotifyProps(err, true));
+      } else {
+        this.$vs.notify(getNotifyProps(`critter ${data[0].animal_id} saved`));
+        this.canAssignCollar = true;
+      }
+    },
+    handleAssignment(data: ICollarLinkResult) {
+      this.showAssignModal(); // close the collar modal
+      console.log('AddAnimal: collar assigned')
+      this.assignment.push(data);
     }
   },
-}
+  watch: {
+    animal() {
+      let r = true;
+      this.requiredFields.forEach((field) => {
+        if (!this.animal[field]) {
+          r = false;
+        }
+      });
+      this.canSave = r;
+    }
+  },
+});
 </script>
 
 <style scoped>

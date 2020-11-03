@@ -1,11 +1,17 @@
 <template>
   <div >
-    <state-table title="" v-model="animals"></state-table><br/>
+    <state-table
+      v-model="animals"
+      :getHeader="getHeader"
+      :propsToDisplay="toDisplay">
+    </state-table>
+    <br/>
+    <vs-divider></vs-divider>
     <vs-button @click="handleAddClick" type="border">Add Individual</vs-button>
     <vs-button @click="handleEditClick" :disabled="Object.keys(editObject).length === 0" type="border">Edit Individual</vs-button>
     <edit-modal 
       :active="showEditModal"
-      :formatHeader="toHeader"
+      :formatHeader="getHeader"
       title="Edit Individual"
       v-on:update:modal="handleEditClick" 
       v-on:update:save="save">
@@ -21,13 +27,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import AddAnimal from './AddAnimal'
-import { mapGetters, mapState } from 'vuex';
-import { animalPropToDisplay } from '../../../types/animal'
+import { mapGetters } from 'vuex';
+import { Animal } from '../../../types/animal'
+import { getNotifyProps } from '../../notify';
 
-Vue.component('add-animal', AddAnimal);
-
-export default {
+export default Vue.extend({
   name: 'animals',
   computed: {
     ...mapGetters(['animals','editObject'])
@@ -40,44 +44,34 @@ export default {
       showEditModal: false,
       showAddModal: false,
       selected: {},
+      toDisplay: ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id']
     }
   },
   methods: {
-    handleEditClick(v) {
+    handleEditClick() {
       this.showEditModal = !this.showEditModal;
     },
-    handleAddClick(v) {
+    handleAddClick() {
       this.showAddModal = !this.showAddModal;
     },
-    save(animal) {
-      console.log('im saving an animal!');
-      return;
-      this.$vs.notify({ title: `saving animal ID ${animal.animal_id}`})
-      const payload = {
-        callback: cbAnimalSaved,
-        animal
-      }
-      this.$store.dispatch('upsertAnimal', payload)
+    save() {
+      console.log('Animal: an animal was saved!')
+      // this.$store.dispatch('upsertAnimal', payload);
     },
-    toHeader(str) {
-      return animalPropToDisplay(str);
+    getHeader: (str: string) => Animal.getTitle(str),
+    callback (data: any, err: Error) {
+      if (err) {
+        this.$vs.notify(getNotifyProps(err, true));
+      }
     }
   },
   created() {
-    this.$store.commit('editObject', {});
+    this.$store.commit('updateEditObject', {});
     if (!this.animals?.length) {
-      this.$store.dispatch('getAnimals', callback);
+      this.$store.dispatch('getAnimals', this.callback);
     }
   }
-}
-
-const cbAnimalSaved = () => {
-  console.log('add_animal success')
-}
-
-const callback = (body) => {
-  console.log(`loaded ${body.length} animals` )
-}
+});
 </script>
 
 <style lang="stylus" scoped>

@@ -12,30 +12,29 @@ const createUrl = (context, apiString: string, queryString?: string) => {
     url += queryString;
   }
   return url;
-}
+};
 
 const createOptions = (obj) => {
   return {
     compressed: true,
     follow: 10,
-    ...obj
-  }
-}
+    ...obj,
+  };
+};
 
 const isDev = process.env.ENV === 'DEV';
 
 
 // response: resolved fetch response
 // payload: object containing a function called callback
-const handleFetchResult = (response, callback) => {
+const handleFetchResult = (response: Response, callback) => {
   if (response.ok) {
-    response.json().then(d => callback(d));
+    response.json().then((d) => callback(d));
   } else {
     // bad status returned, probably can't parse as json.
-    response.text().then(e => callback(null, e));
+    response.text().then((e) => callback(null, e));
   }
-}
-
+};
 
 export {
   createUrl,

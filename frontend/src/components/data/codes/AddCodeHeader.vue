@@ -15,7 +15,8 @@
 <script lang="ts">
 import { FetchPayload } from 'frontend/src/types/api';
 import { getNotifyProps} from '../../notify';
-export default {
+import Vue from 'vue';
+export default Vue.extend({
   name: 'AddCodeHeader',
   props: {
     active: Boolean
@@ -29,7 +30,7 @@ export default {
     }
   },
   methods: {
-    canSave(d) {
+    canSave() {
       this.saveable = !!(this.header_name && this.header_title && this.header_description);
     },
     handleClose() {
@@ -53,7 +54,7 @@ export default {
       console.log('hi')
       console.log('hi')
     },
-    callback(data, err) {
+    callback(data: any, err: Error) {
       let msg; 
       if (err) {
         msg = `error adding code header ${err}`;
@@ -64,7 +65,7 @@ export default {
       this.$vs.notify(getNotifyProps(msg, !!err))
     }
   }
-}
+})
 </script>
 
 <style scoped>

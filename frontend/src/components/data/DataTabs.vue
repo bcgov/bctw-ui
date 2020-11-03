@@ -20,6 +20,9 @@
 </template>
 
 <script>
+import AddAnimal from './animal/AddAnimal';
+import AddCodeHeader from './codes/AddCodeHeader';
+import AssignCollar from './animal/AssignCollar';
 import Collar from './collar/Collar';
 import Animal from './animal/Animal';
 import Settings from './Settings';
@@ -32,6 +35,9 @@ import EditModal from '../data/EditModal'
 import StateTable from '../Table';
 import Vue from 'vue';
 
+Vue.component('add-animal', AddAnimal, );
+Vue.component('add-code', AddCodeHeader);
+Vue.component('assign-collar', AssignCollar);
 Vue.component('edit-modal', EditModal);
 Vue.component('file-input', FileInput);
 Vue.component('input-check', Checkbox);

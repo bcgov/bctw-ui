@@ -1,11 +1,13 @@
 <template lang="html">
   <div class="con-select-example">
+      <!-- v-on:change="$emit('change:select', $event)" -->
+      <!-- todo: fix v-model to not require parent handler -->
     <vs-select
       class="selectExample"
       :label="loading ? 'Loading...' : label"
       :autocomplete="!!autocomplete"
       v-model="selected"
-      v-on:change="$emit('change:select', $event)"
+      v-on:change="$emit('change:select', {[header]: $event})"
     ><vs-select-item
       v-if="codes"
       :key="item.id"
@@ -22,7 +24,9 @@
   use the v-on:change directive 
 */
 import { mapState } from 'vuex';
-export default {
+import Vue from 'vue';
+
+export default Vue.extend({
   name: 'Select',
   props: {
     label: String,
@@ -32,17 +36,15 @@ export default {
   },
   data(){
     return {
-      loading: false,
-      selected: '',
+      loading: false as boolean,
+      selected: '' as string,
       error: null,
     }
   },
   computed: {
     // todo: disable while loading
-    localComputed () {
-      // disabled () {
-      //   return this.loading;
-      // }
+    disabled () {
+      return this.loading;
     },
     ...mapState({
       codes(state) {
@@ -52,7 +54,6 @@ export default {
   },
   methods:{
     onChange(v) {
-      console.log(this.val)
       console.log(`changed to: ${v}`);
     },
     fetchData() {
@@ -64,9 +65,11 @@ export default {
     }
   },
   created() {
+    console.log(this.val);
     this.fetchData();
   },
-}
+})
+
 const cb = () => {
 }
 </script>

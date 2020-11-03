@@ -29,7 +29,7 @@ export default {
   data(){
     return {
       originalValue: this.value,
-      value: this.initialValue ?? '',
+      value: this.init(),
       visible: this.isVisible
     }
   },
@@ -40,6 +40,11 @@ export default {
     }
   },
   methods: {
+    init() {
+      if (typeof this.initialValue === 'string') return this.initialValue;
+      if (typeof this.initialValue === 'number') return this.initialValue;
+      return ''
+    },
     // note: vs-input seems to emit only the value of event.target.value
     // while the original vue input emits the entire event
     onChange(v) {

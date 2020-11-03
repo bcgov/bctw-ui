@@ -5,6 +5,11 @@ interface ICode {
   description: string;
 }
 
+interface ICodeHeader extends ICode {
+  title: string;
+}
+
 export {
   ICode,
+  ICodeHeader,
 };

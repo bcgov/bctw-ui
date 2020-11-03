@@ -5,10 +5,10 @@
     <file-input name="csv" title="Bulk upload codes"></file-input>
     <vs-divider></vs-divider>
     <h4>sample code select component</h4><br/>
-    <!-- <div class='testform'>
+    <div class='testform'>
       <input-select header="region" label="Region"></input-select>
       <input-select header="species" label="Species"></input-select>
-    </div> -->
+    </div>
     <vs-divider></vs-divider>
     <h4>sample component for adding a new code header</h4><br/>
     <vs-button type="border" @click="handleAddClick">Add Code Type</vs-button>
@@ -37,12 +37,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import AddCodeHeader from './codes/AddCodeHeader';
 import { ICode } from '../../types/code';
 import { mapState } from 'vuex';
-Vue.component('add-code', AddCodeHeader);
 
-export default {
+export default Vue.extend({
   name: 'Settings',
   data () {
     return {
@@ -82,7 +80,7 @@ export default {
   mounted() {
     this.$store.dispatch('requestHeaders', {callback: this.loadedHeadersCb})
   }
-}
+})
 </script>
 
 <style scoped>

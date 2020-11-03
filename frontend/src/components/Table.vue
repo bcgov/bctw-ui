@@ -4,14 +4,15 @@
     <vs-table :data="value" v-model="selected" @selected="handleSelect">
       <template slot="header"><h3>{{title}}</h3></template> 
       <template slot="thead">
-        <!-- iterate first object in the array for headers -->
-        <vs-th v-for="(v, p) in value[0]" :key="p">{{p}}</vs-th>
+        <vs-th v-for="(v, p) in value[0]" :key="p">
+          {{propsToDisplay.includes(p) ? getHeader(p) : null}}
+        </vs-th>
       </template>
       <template slot-scope="">
         <!-- each object in array is a row -->
         <vs-tr v-for="(obj, prop) in value" :key="prop" :data="obj">
           <vs-td :key="v" v-for="(k, v) in obj" :data="k">
-            {{k}}
+            {{propsToDisplay.includes(v) ? k : null}}
           </vs-td>
         </vs-tr> 
       </template>
@@ -20,25 +21,26 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
-import { mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 
 export default Vue.extend({
   name: 'StateTable',
   props: {
-    value: {
-      type: Array,
-      required: true
-    },
-    title: String,
+    getHeader: { type: Function, required: true },
+    propsToDisplay: { type: Array, required: true },
+    title: { type: String, required: false },
+    value: { type: Array, required: true, },
   },
   data: function() {
     return {
       selected: {}
     }
   },
+  computed: {
+  },
   methods: {
     handleSelect(tr: any) {
-      this.$store.commit('updateEditingObject', tr);
+      this.$store.commit('updateEditObject', tr);
     }
   }
 })

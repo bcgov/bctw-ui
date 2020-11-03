@@ -1,9 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import needle from 'needle';
+import needle, { NeedleResponse } from 'needle';
 import {createOptions, createUrl} from './api/api_helpers';
 import { codeModule } from './api/code_module';
 import moment from 'moment';
+import { Animal } from './types/animal';
+import { ICollar } from './types/collar';
+import { ActionPayload } from './types/store';
+import { FetchPayload } from './types/api';
 
 Vue.use(Vuex);
 
@@ -27,7 +31,6 @@ const rootModule = {
     },
     animals: [],
     editObject: {},
-    addObject: {},
   },
   mutations: {
     pingActive(state, properties) {
@@ -81,20 +84,16 @@ const rootModule = {
       state.animals = [...state.animals, ...animals];
       // state.animals = animals;
     },
-    updateAddObject(state, obj) {
-      console.log(`current obj ${JSON.stringify(state.addObject)}, newObj: ${JSON.stringify(obj)}`);
-      state.addObject = obj;
+    updateEditObject(state, obj) {
+      // console.log(`current obj ${JSON.stringify(state.editObject)}, newObj: ${JSON.stringify(obj)}`);
+      state.editObject = obj;
     },
-    updateEditingObject(state, newObj) {
-      // console.log(`updated edit object ${JSON.stringify(newObj)}`);
-      state.editObject = newObj;
-    },
-    updateAnimals(state, newAnimal) {
-      const foundIndex = state.animals.findIndex(animal => animal.animal_id === newAnimal.animal_id);
+    updateAnimals(state, newAnimal: Animal) {
+      const foundIndex = state.animals.findIndex((animal: Animal) => animal.animal_id === newAnimal.animal_id);
       if (foundIndex !== -1) {
         state.animals[foundIndex] = newAnimal;
       } else {
-        state.animals.push(newAnimal);
+        state.animals.unshift(newAnimal);
       }
     },
     upsertCodeHeader(state, payload) {
@@ -104,7 +103,7 @@ const rootModule = {
       const type = payload.type;
       const collar = payload.collar;
       const collars = state.collars[type];
-      const foundIndex = collars.findIndex(c => c.device_id === collar.device_id);
+      const foundIndex = collars.findIndex((c: ICollar) => c.device_id === collar.device_id);
       state.collars[type][foundIndex] = collar;
     },
   },
@@ -134,13 +133,10 @@ const rootModule = {
       return state.filters.speciesActive;
     },
     assignedCollars(state) {
-      return state.assignedCollars;
+      return state.collars.assignedCollars;
     },
     availableCollars(state) {
-      return state.availableCollars;
-    },
-    addObject(state) {
-      return state.addObject;
+      return state.collars.availableCollars;
     },
     editObject(state) {
       return state.editObject;
@@ -178,7 +174,7 @@ const rootModule = {
       const url = createUrl(context, 'get-ping-extent');
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
-        if (err) {return console.error('Failed to fetch collars: ',err)};
+        if (err) {return console.error('Failed to fetch collars: ', err); }
         const a = moment(body.min);
         const b = moment(body.max);
         body.days =  b.diff(a, 'days');
@@ -188,37 +184,57 @@ const rootModule = {
         context.commit('writePingExtent', body);
       });
     },
-    requestCollars(context, callback) {
-      const urlAvail = createUrl(context, 'get-available-collars')
-      const urlAssign = createUrl(context, 'get-assigned-collars')
-      const options = createOptions({});
-      needle.get(urlAvail, options, (err,_,body) => {
-        if (err) {
-          return console.error('Failed to fetch collars: ', err);
-        }
-        context.commit('writeAvailableCollars', body);
-      });
-      needle.get(urlAssign, options, (err, _, body) => {
-        if (err) {
-          return console.error('Failed to fetch collars: ', err);
-        }
-        context.commit('writeAssignedCollars', body);
-        callback(); // run the callback
-      });
+    async requestCollars(context, callback) {
+      await context.dispatch('getAvailableCollars');
+      await context.dispatch('getAssignedCollars');
+      callback();
     },
-    getAnimals(context, callback) {
+    async getAvailableCollars(context, callback) {
+      const urlAvail = createUrl(context, 'get-available-collars');
+      const errMsg = `error fetching available collars:`;
+      try {
+        const response: NeedleResponse = await needle('get', urlAvail, createOptions({}));
+        const body = response.body;
+        if (response && response.statusCode === 200) {
+          context.commit('writeAvailableCollars', body);
+        } else {
+          callback(null, `${errMsg} ${body}`);
+        }
+      } catch (e) {
+          callback(null, `${errMsg} ${e}`);
+      }
+    },
+    async getAssignedCollars(context, callback) {
+      const urlAssign = createUrl(context, 'get-assigned-collars');
+      const errMsg = `error fetching assigned collars:`;
+      try {
+        const response: NeedleResponse = await needle('get', urlAssign, createOptions({}));
+        const body = response.body;
+        if (response && response.statusCode === 200) {
+          context.commit('writeAssignedCollars', body);
+        } else {
+          callback(null, `${errMsg} ${body}`);
+        }
+      } catch (e) {
+          callback(null, `${errMsg} ${e}`);
+      }
+    },
+    async getAnimals(context, callback) {
       const urlAvail = createUrl(context, 'get-animals');
-      const options = createOptions({});
-      needle.get(urlAvail, options, (err, _, body) => {
-        if (err) {
-          return console.error('Failed to fetch animals: ', err);
+      try {
+        const response: NeedleResponse = await needle('get', urlAvail, createOptions({}));
+        const body = response.body;
+        if (response && response.statusCode === 200) {
+          context.commit('writeAnimals', body);
+        } else {
+          callback(null, `error fetching animals: ${body}`);
         }
-        context.commit('writeAnimals', body);
-        callback(body);
-      });
+      } catch (e) {
+          callback(null, `error fetching critters ${e}`);
+      }
     },
-    async upsertCollar(context, payload) {
-      const url = createUrl(context, 'add-collar')
+    upsertCollar(context, payload) {
+      const url = createUrl(context, 'add-collar');
       const options = createOptions({});
       needle.post(url, payload.collar, options, (err, resp) => {
         if (err) {
@@ -229,30 +245,35 @@ const rootModule = {
       });
       payload.callback();
     },
-    async upsertAnimal(context, payload) {
-      const url = createUrl(context, 'add-animal')
-      const options = createOptions({});
-      needle.post(url, payload.animal, options, (err, resp) => {
-        if (err) {
-          return console.error('unable to upsert animal', err);
+    async upsertAnimal(context, payload: ActionPayload) {
+      const url = createUrl(context, 'add-animal');
+      try {
+        const response = await needle('post', url, payload.body, createOptions({}));
+        const body: Animal[] = response.body;
+        if (response && response.statusCode === 200) {
+          context.commit('updateAnimals', payload.body); // change to body?
+          payload.callback(body);
+        } else {
+          payload.callback(null, `error adding animal: ${body}`);
         }
-        const body = resp.body?.add_animal;
-        context.commit('updateAnimals', payload.animal);
-      });
-      payload.callback();
+      } catch (e) {
+          payload.callback(null, `caught exception adding animal: ${e}`);
+      }
     },
-    async linkOrUnlinkCritterCollar(context, payload) {
-      const isLink = payload.isLinking;
-      const url = createUrl(context, isLink ? 'link-animal-collar' : 'unlink-animal-collar');
-      const data = payload.data;
-      const options = createOptions({});
-      needle.post(url, data, options, (err, resp) => {
-        if (err) {
-          return console.error('unable to link animal to collar', err);
+    async linkOrUnlinkCritterCollar(context, payload: FetchPayload, isLink: boolean) {
+      const link = (payload.body as any).link;
+      const url = createUrl(context, link ? 'link-animal-collar' : 'unlink-animal-collar');
+      try {
+        const response = await needle('post', url, { data: (payload.body as any).data });
+        const body = response.body;
+        if (response && response.statusCode === 200) {
+          payload.callback(body.link_collar_to_animal);
+        } else {
+          payload.callback(null, `status ${response.statusCode} returned while linking collar: ${response.body}`);
         }
-        const body = resp.body;
-      });
-      payload.callback();
+      } catch (e) {
+          payload.callback(null, `caught exception linking collar ${e}`);
+      }
     },
   },
 };
