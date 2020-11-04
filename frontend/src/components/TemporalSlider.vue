@@ -19,7 +19,7 @@
 
 .temporal-slider
   VueSlider(
-    v-model="$store.getters.timeWindow"
+    v-model="timeWindow"
     :min=0
     :max="$store.getters.pingExtent.days"
     :max-range="1000"
@@ -48,9 +48,10 @@ import 'vue-slider-component/theme/default.css';
 import {bus} from '../main'
 ``
 
+
 countDownStart = ->
   #// Reset counter
-  @count = 2 
+  @count = 5 
   if @counter then clearInterval that
   
   @counter = setInterval( ~>
@@ -71,7 +72,21 @@ countDownStart = ->
 
 countDownStop = -> if @counter then clearInterval that
 
-requestCollars = -> console.log 'reqestCollars'
+requestCollars = ->
+  @$vs.loading do
+    container: '#critter-list'
+    type: 'sound'
+
+  callback = ~>
+    @$vs.loading.close '#critter-list > .con-vs-loading'
+    bus.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
+
+  countDownStop.call @
+  @count = 0
+  @counter = null
+  @$store.dispatch 'requestPings', callback
+
+console.log 'reqestCollars'
 
 
 /* ## marks
@@ -126,7 +141,13 @@ export default {
   data: () => ({
     counter: null,
     count: 0
-  })
+  }),
+  computed: {
+    timeWindow:{
+      get(){return this.$store.getters.timeWindow;},
+      set(value){this.$store.commit('writeTimeWindow',value);}
+    }
+  }
 }
 ``
 

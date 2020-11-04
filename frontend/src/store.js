@@ -143,6 +143,7 @@ export default new Vuex.Store({
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ',err)};
+        console.log("pings sent: ",body.features.length);
         context.commit('writePings',body);
         context.commit('filterPings');
         callback(); // run the callback
