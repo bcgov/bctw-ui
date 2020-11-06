@@ -10,22 +10,22 @@
     <div>  
       <vs-button type="border" @click="handleRegisterClick">Register New Collar</vs-button>
       <vs-button disabled type="border">Retire Collar</vs-button>
-      <vs-button :disabled="Object.keys(selected).length === 0" @click="handleEditClick" type="border">See Collar Details</vs-button>
+      <vs-button :disabled="Object.keys(editObject).length === 0" @click="handleEditClick" type="border">See Collar Details</vs-button>
     </div>
     <edit-modal 
-      v-on:update:modal="handleEditClick" 
+      v-on:update:close="close"
       v-on:update:save="save"
       :active="showEditModal"
       title="Edit Collar"
       :editing="selected"
+      :getHeader="getHeader"
     ></edit-modal>
     <register-modal 
-      v-on:update:modal="handleRegisterClick" 
+      v-on:update:close="close" 
       :active="showRegisterModal"
       title="Register A New Vectronics Collar"
-      :formatHeader="getHeader"
     ></register-modal>
-  <!-- <pre>{{selected}}</pre> -->
+  <!-- <pre>{{editObject}}</pre> -->
   </div>
 </template>
 
@@ -42,7 +42,7 @@ export default Vue.extend({
     title: String,
   },
   name: 'collars',
-  computed: mapGetters(['assignedCollars', 'availableCollars']),
+  computed: mapGetters(['assignedCollars', 'availableCollars', 'editObject']),
   data: function() {
     return {
       showEditModal: false,
@@ -53,9 +53,9 @@ export default Vue.extend({
   },
   methods: {
     getHeader: (s) => Collar.getTitle(s),
-    handleSelected(tr) {
-      this.$store.commit('updateEditObject', tr);
-      // this.$vs.notify({ title: `device ${tr['Device ID']} selected` })
+    close() {
+      this.showEditModal = false;
+      this.showRegisterModal = false;
     },
     handleEditClick(v) {
       this.showEditModal = !this.showEditModal;

@@ -1,4 +1,5 @@
 interface IAnimal {
+  id: string;
   animal_id: string;
   animal_status: string;
   calf_at_heel: string;
@@ -32,6 +33,8 @@ interface IAnimal {
 class Animal implements IAnimal {
   public static getTitle(str: string): string {
     switch (str) {
+      case 'id':
+        return 'ID';
       case 'animal_id':
         return 'Animal ID';
       case 'nickname':
@@ -54,6 +57,7 @@ class Animal implements IAnimal {
         return 'Release Date';
     }
   }
+  id: string;
   animal_id: string;
   animal_status: string;
   calf_at_heel: string;

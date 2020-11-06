@@ -3,23 +3,19 @@
     <state-table
       v-model="animals"
       :getHeader="getHeader"
-      :propsToDisplay="toDisplay">
+      :propsToDisplay="toDisplay"
+      v-on:page:change="loadNewAnimals">
     </state-table>
     <br/>
     <vs-divider></vs-divider>
-    <vs-button @click="handleAddClick" type="border">Add Individual</vs-button>
-    <vs-button @click="handleEditClick" :disabled="Object.keys(editObject).length === 0" type="border">Edit Individual</vs-button>
-    <edit-modal 
-      :active="showEditModal"
-      :formatHeader="getHeader"
-      title="Edit Individual"
-      v-on:update:modal="handleEditClick" 
-      v-on:update:save="save">
-    </edit-modal>
+    <vs-button @click="() => handleEditClick(false)" type="border">Add Individual</vs-button>
+    <vs-button @click="() => handleEditClick(true)" :disabled="Object.keys(editObject).length === 0" type="border">Edit Individual</vs-button>
     <add-animal
       :active="showAddModal"
-      v-on:update:modal="handleAddClick"
-      v-on:save:animal="save">
+      v-on:update:modal="handleEditClick"
+      v-on:update:close="close"
+      v-on:save:animal="save"
+      :isEdit="isEditMode">
     </add-animal>
     <!-- <pre>{{selected}}</pre> -->
   </div>
@@ -27,7 +23,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapGetters } from 'vuex';
+import { DispatchOptions, mapGetters } from 'vuex';
 import { Animal } from '../../../types/animal'
 import { getNotifyProps } from '../../notify';
 
@@ -41,35 +37,41 @@ export default Vue.extend({
   },
   data: function() {
     return {
-      showEditModal: false,
+      isEditMode: false,
       showAddModal: false,
       selected: {},
-      toDisplay: ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id']
+      toDisplay: ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id']
     }
   },
   methods: {
-    handleEditClick() {
-      this.showEditModal = !this.showEditModal;
+    close() {
+      this.showAddModal = false
     },
-    handleAddClick() {
+    handleEditClick(isEdit: boolean) {
+      this.isEditMode = isEdit;
       this.showAddModal = !this.showAddModal;
     },
     save() {
       console.log('Animal: an animal was saved!')
-      // this.$store.dispatch('upsertAnimal', payload);
     },
     getHeader: (str: string) => Animal.getTitle(str),
-    callback (data: any, err: Error) {
+    cbLoadCritters (data: any, err: Error) {
       if (err) {
         this.$vs.notify(getNotifyProps(err, true));
       }
+    },
+    loadNewAnimals(page: number = 1) {
+      // console.log('Animal: new animals called: page', page);
+      const payload = {
+        page: page,
+        callback: this.cbLoadCritters
+      }
+      this.$store.dispatch('getAnimals', payload);
+
     }
   },
   created() {
     this.$store.commit('updateEditObject', {});
-    if (!this.animals?.length) {
-      this.$store.dispatch('getAnimals', this.callback);
-    }
   }
 });
 </script>

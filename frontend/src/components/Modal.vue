@@ -13,7 +13,7 @@ export default {
   props: {
     title: String,
     active: Boolean,
-    handleClose: Function
+    //handleClose: any// Function
   },
   data() {
     return {
@@ -26,10 +26,6 @@ export default {
       },
       set: function(newValue) {
         this.$emit('update:modal', newValue)
-        // trigger on closing of modal
-        if (!newValue) {
-          this.handleClose();
-        }
       }
     }
   }

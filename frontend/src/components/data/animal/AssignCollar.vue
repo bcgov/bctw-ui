@@ -2,7 +2,7 @@
   <modal
     :title="title"
     :active="active"
-    :handleClose="handleClose"
+    v-on:update:modal="$emit('update:close')"
   >
   <div v-if="collars">
     <state-table :getHeader="getHeader" v-model="collars" :propsToDisplay="toDisplay"></state-table><br/>
@@ -16,11 +16,12 @@
 
 <script lang="ts">
 // todo: date picker for collar assignment duration
-import { Animal } from 'frontend/src/types/animal';
+import { Animal } from '../../../types/animal';
 import Vue from 'vue';
 import { mapGetters, mapState } from 'vuex';
 import { getNotifyProps } from '../../notify';
 import { Collar, ICollarLinkResult, collarPropsToDisplay } from '../../../types/collar';
+import { formattedNow } from '../../../api/api_helpers';
 
 export default Vue.extend({
   name: 'AssignCollar',
@@ -34,7 +35,7 @@ export default Vue.extend({
       required: true,
     } 
   },
-  data: function() {
+  data() {
     return {
       toDisplay: collarPropsToDisplay
     }
@@ -51,32 +52,29 @@ export default Vue.extend({
   methods: {
     getHeader: (s:string) => Collar.getTitle(s),
     saveCollar() {
+      const cb = (data: ICollarLinkResult, err?: Error | string) => {
+        if (err) {
+          this.$vs.notify(getNotifyProps(err, true));
+        } else {
+          console.log(`result of collar link: ${JSON.stringify(data)}`);
+          this.$vs.notify(getNotifyProps(`collar assigned to ${data.animal_id}!`));
+          // emit to parent
+          this.$emit('collar:assigned', data);
+        }
+      }
       const payload = {
         body: {
           link: true,
           data: {
-            animal_id: (this.critter as Animal).animal_id,
+            animal_id: (this.critter as Animal).id,
             device_id: +this.selected.device_id,
-            start_date: Date.now(),
+            start_date: formattedNow(),
           },
         },
-        callback: this.cbAssignCollar
+        callback: cb
       };
       this.$store.dispatch('linkOrUnlinkCritterCollar', payload);
     },
-    handleClose() {
-      this.$emit('update:innerModal')
-    },
-    cbAssignCollar(data: ICollarLinkResult, err?: Error | string) {
-      if (err) {
-        this.$vs.notify(getNotifyProps(err, true));
-      } else {
-        console.log(`result of collar link: ${JSON.stringify(data)}`);
-        this.$vs.notify(getNotifyProps(`collar assigned to ${data.animal_id}!`));
-        // emit to parent
-        this.$emit('collar:assigned', data);
-      }
-    }
   },
   mounted() {
     if (!this.collars.length) {

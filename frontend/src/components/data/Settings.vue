@@ -8,11 +8,12 @@
     <div class='testform'>
       <input-select header="region" label="Region"></input-select>
       <input-select header="species" label="Species"></input-select>
+      <input-select header="animal_status" label="Animal Status"></input-select>
     </div>
     <vs-divider></vs-divider>
     <h4>sample component for adding a new code header</h4><br/>
     <vs-button type="border" @click="handleAddClick">Add Code Type</vs-button>
-    <add-code :active="showAddCodeHeader" v-on:update:modal="handleAddClick"></add-code>
+    <add-code :active="showAddCodeHeader" v-on:update:close="handleAddClick"></add-code>
     <vs-divider></vs-divider>
     <h4>click a button to view its codes</h4><br/>
     <div v-if="headers.length" style="margin-top: 20px">

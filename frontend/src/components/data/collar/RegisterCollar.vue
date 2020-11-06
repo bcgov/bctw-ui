@@ -2,7 +2,7 @@
   <modal
     :title="title"
     :active="active"
-    :handleClose="handleClose"
+    v-on:update:modal="$emit('update:close')"
   >
     <input 
       type="file"

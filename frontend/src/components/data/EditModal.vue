@@ -2,13 +2,13 @@
   <modal
     :title="title"
     :active="active"
-    :handleClose="handleClose"
+    v-on:update:modal="$emit('update:close')"
   >
     <div v-if="editObject" class="inRow">
       <div v-for="(val, prop) in editObject" :key="prop">
         <!-- <p>{{prop}}:{{val}} -->
         <input-type 
-          :label="formatHeader(prop)" 
+          :label="getHeader(prop)" 
           v-model="editObject[prop]"
           :propId="prop"
           :initialValue="editObject[prop]"
@@ -35,7 +35,7 @@ export default {
   props: {
     title: String,
     active: Boolean,
-    formatHeader: Function
+    getHeader: Function
   },
   data() {
     return {

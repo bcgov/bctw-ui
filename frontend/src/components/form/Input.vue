@@ -6,7 +6,6 @@
     :label="label"
     :disabled="isDisabled"
     label-placeholder=""
-    :type="type"
   ></vs-input>
 </template>
 <script>
@@ -24,7 +23,7 @@ export default {
     isVisible: Boolean,
     label: String,
     propId: String, // the non header version ex. device_id
-    type: String
+    // type: String
   },
   data(){
     return {

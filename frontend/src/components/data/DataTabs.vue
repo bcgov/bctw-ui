@@ -33,6 +33,7 @@ import FileInput from '../form/FileInput';
 import Modal from '../Modal';
 import EditModal from '../data/EditModal'
 import StateTable from '../Table';
+import YesNoDialog from '../YesNoDialog';
 import Vue from 'vue';
 
 Vue.component('add-animal', AddAnimal, );
@@ -45,6 +46,7 @@ Vue.component('input-type', Input);
 Vue.component('input-select', Select);
 Vue.component('state-table', StateTable);
 Vue.component('modal', Modal);
+Vue.component('yes-no', YesNoDialog);
 
 export default {
   name: 'dataTabs',

@@ -2,7 +2,7 @@
   <modal
     title="Add New Code Type"
     :active="active"
-    :handleClose="handleClose">
+    v-on:update:modal="$emit('update:close')">
     <div class="grp">
       <input-type label="Name" propId="code_header_name" v-model="header_name" v-on:input="canSave" ></input-type>
       <input-type label="Title" propId="code_header_title" v-model="header_title" v-on:input="canSave"></input-type>
@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { FetchPayload } from 'frontend/src/types/api';
+import { FetchPayload } from '../../../types/api';
 import { getNotifyProps} from '../../notify';
 import Vue from 'vue';
 export default Vue.extend({
@@ -33,9 +33,6 @@ export default Vue.extend({
     canSave() {
       this.saveable = !!(this.header_name && this.header_title && this.header_description);
     },
-    handleClose() {
-      this.$emit('update:modal');
-    },
     save() {
       const body = {
         code_header_name: this.header_name,
@@ -44,7 +41,7 @@ export default Vue.extend({
       };
       const payload:FetchPayload = { body, callback: this.callback };
       this.$store.dispatch('upsertCodeHeader', payload);
-      this.handleClose();
+      // this.handleClose();
     },
     reset() {
       this.header_name = '';

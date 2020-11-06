@@ -29,9 +29,9 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'Select',
   props: {
-    label: String,
-    header: String, // required 
-    autocomplete: String,
+    label: { type: String, required: false },
+    header: { type: String, required: true },
+    autocomplete: { type: String, required: false },
     val : [String, Number]
   },
   data(){
@@ -53,9 +53,6 @@ export default Vue.extend({
     })
   },
   methods:{
-    onChange(v) {
-      console.log(`changed to: ${v}`);
-    },
     fetchData() {
       this.error = null;
       this.loading = true;
@@ -65,19 +62,18 @@ export default Vue.extend({
     }
   },
   created() {
-    console.log(this.val);
     this.fetchData();
   },
+  watch: {
+    // set selected to val when changed
+    val(v) {
+      this.selected = v || '';
+    }
+  }
 })
-
-const cb = () => {
-}
 </script>
 
 <style lang="css">
-.selectExample {
-  /* margin: 10px; */
-}
 .con-select-example {
   display: flex;
   align-items: center;
