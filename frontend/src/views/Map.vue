@@ -22,6 +22,8 @@
 
 ``import PingPopup from '../components/PingPopup.vue'``
 
+``import {bus} from '../main'``
+
 map = {}
 
 makeMarkers = ->
@@ -80,7 +82,10 @@ drawPingLayer = ->
 
   chooseToToggleCluster!
 
+  #// XXX: This is firing on first draw AND when the slider is adjusted
+  #//      However it's not refreshing the layer on slider completion
   refreshCritters = ~>
+    console.log 'refreshCritters'
     clusterLayer.clearLayers!
     map.removeLayer markers
     markers := makeMarkers.call @ #// Parent function wide 
@@ -90,7 +95,8 @@ drawPingLayer = ->
   /*
     Refresh all critter layers.
    */
-  @$root.$on 'refreshCritterLayers', refreshCritters
+
+  bus.$on 'refreshCritterLayers', refreshCritters
   
   /*
     Toggle the critter clustering
@@ -110,10 +116,7 @@ draw = ->
     maxZoom: 18
   }).addTo(map);
 
-  if @$store.getters.hasPings #// If terrain data exists
-    drawPingLayer.call @ #// Draw terrain layer
-  else #// If not.. request data then draw terrain layer
-    @$store.dispatch 'requestPings', drawPingLayer.bind(@)
+  drawPingLayer.call @ #// Draw terrain layer
 
   drawnItems = new L.FeatureGroup!
   map.addLayer drawnItems

@@ -22,6 +22,8 @@ Vue.use(Vuesax);
 // Vue.use(vsNotifications);
 // Vue.use(vsIcon);
 
+export const bus = new Vue();
+
 new Vue({
   router,
   store,

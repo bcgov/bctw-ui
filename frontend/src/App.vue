@@ -88,6 +88,7 @@
 ``
 import download from 'downloadjs'
 import TemporalSlider from './components/TemporalSlider.vue'
+import {bus} from './main'
 ``
 
 #//view3D = (mutation) ->
@@ -146,9 +147,20 @@ connect = ->
     switch mutation.type
     | 'writePings'  => pingsHaveChanged.call @,state
     | 'filterPings' => this.$root.$emit 'refreshCritterLayers'
-  #//  #//| 'terrainCentroidActive' => view3D.call @,mutation
+  #//| 'terrainCentroidActive' => view3D.call @,mutation
 
-  @$store.dispatch 'requestPingExtent'
+  @$vs.loading do
+    container: '#critter-list'
+    type: 'sound'
+
+  callback = ~>
+    @$vs.loading.close '#critter-list > .con-vs-loading'
+    bus.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
+
+  #// Request
+  @$store.dispatch 'requestPingExtent', ~>
+    @$store.dispatch 'requestPings', callback
+
 
 
 toggleLatestCritters = (checked) ->
