@@ -36,7 +36,7 @@ const rootModule = {
     pingActive(state, properties) {
       state.pingActive = properties;
     },
-    timeWindow(state, time) {
+    writeTimeWindow(state, time) {
       state.timeWindow = time;
     },
     toggleClusterCritters(state, checked) {
@@ -124,6 +124,9 @@ const rootModule = {
     pingExtent (state) {
       return state.pingExtent;
     },
+    timeWindow (state) {
+      return state.timeWindow;
+    },
     clusterCritters (state) {
       return state.clusterCritters;
     },
@@ -149,12 +152,17 @@ const rootModule = {
   actions: {
     requestPings(context,callback) {
       const t = context.state.timeWindow;
-      const url = createUrl(context, `get-critters?start=${t[0]}&end=${t[1]}`);
+      const e = context.getters.pingExtent;
+      const start = moment(e.min).add(t[0], 'days').format('YYYY-MM-DD');
+      const end = moment(e.min).add(t[1], 'days').format('YYYY-MM-DD');
+
+      const url = createUrl(context, `get-critters?start=${start}&end=${end}`);
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {
           return console.error('Failed to fetch collars: ', err);
         }
+        console.log('pings sent: ', body.features.length);
         context.commit('writePings', body);
         context.commit('filterPings');
         callback(); // run the callback
@@ -171,18 +179,22 @@ const rootModule = {
         callback();
       });
     },
-    requestPingExtent(context) {
+    requestPingExtent(context, callback) {
+      console.log('callback:', callback);
       const url = createUrl(context, 'get-ping-extent');
       const options = createOptions({accept: 'application/vnd.github.full+json'});
       needle.get(url, options, (err,_,body) => {
         if (err) {return console.error('Failed to fetch collars: ', err); }
+        /* Calculate the temporal extent of all pings */
         const a = moment(body.min);
         const b = moment(body.max);
         body.days =  b.diff(a, 'days');
-        console.log(body);
-        // TODO: Should also commit to the timeWindow array
-
         context.commit('writePingExtent', body);
+        /* Calculate the temporal window of downloaded pings */
+        const end = body.days - 1;
+        const start = body.days - 50;
+        context.commit('writeTimeWindow',[start,end]);
+        callback();
       });
     },
     async requestCollars(context, callback) {
