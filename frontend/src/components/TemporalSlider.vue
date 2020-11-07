@@ -12,12 +12,33 @@
   margin 2rem 0rem
   width 10rem
   padding 0.5rem 0.8rem 0.5rem 0.5rem !important
+
+.timeline
+  display grid
+  grid-template-columns 3.5rem 1fr 3.5rem
+
+  .start
+    font-size 12px
+    cursor pointer
+  .end
+    font-size 12px
+    cursor pointer
+  .between
+    font-size 11px
+    color rgba(0,0,0,0.5)
+    margin-top -0.4rem
 </style>
 
 
 <template lang="pug">
 
 .temporal-slider
+  .timeline
+    .start {{tooltip($store.getters.timeWindow[0])}}
+    .between
+      vs-divider {{$store.getters.timeWindow[1] - $store.getters.timeWindow[0]}} days
+    .end {{tooltip($store.getters.timeWindow[1])}}
+
   VueSlider(
     v-model="timeWindow"
     :min=0
@@ -25,7 +46,7 @@
     :max-range="1000"
     :marks="marks"
     :interval="1"
-    :tooltip-formatter="tooltip"
+    :tooltip="'none'"
     @drag-start="countDownStop"
     @drag-end="countDownStart"
   )
@@ -119,6 +140,7 @@ marks = (date) ->
   @return {string} Formatted date string
  */
 tooltip = (date) ->
+  console.log date
   extent = @$store.getters.pingExtent
   d = date
   if date == extent.days then d++
