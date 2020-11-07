@@ -20,6 +20,9 @@
   .start
     font-size 12px
     cursor pointer
+  .start:hover,.end:hover
+    color #037ffc
+    font-font-weight bolder
   .end
     font-size 12px
     cursor pointer
@@ -38,6 +41,10 @@
     .between
       vs-divider {{$store.getters.timeWindow[1] - $store.getters.timeWindow[0]}} days
     .end {{tooltip($store.getters.timeWindow[1])}}
+
+  //- v-date-picker(
+  //-   v-model="$store.getters.timeWindow[0]"
+  //- )
 
   VueSlider(
     v-model="timeWindow"
