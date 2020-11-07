@@ -9,6 +9,8 @@ import { ICollar } from './types/collar';
 import { ActionPayload } from './types/store';
 import { FetchPayload } from './types/api';
 
+import {bus} from './main';
+
 Vue.use(Vuex);
 
 const rootModule = {
@@ -73,6 +75,7 @@ const rootModule = {
 
       state.pingsActive = {...state.pings};
       state.pingsActive.features = filteredHerds;
+      bus.$emit('refreshCritterLayers');// Signal map to refresh collar layer
     },
     writeAvailableCollars(state, collars) {
       state.collars.availableCollars = collars;
@@ -176,6 +179,7 @@ const rootModule = {
           return console.error('Failed to fetch collars: ', err);
         }
         context.commit('writePings', body);
+        context.commit('filterPings');
         callback();
       });
     },

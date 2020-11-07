@@ -85,7 +85,6 @@ drawPingLayer = ->
   #// XXX: This is firing on first draw AND when the slider is adjusted
   #//      However it's not refreshing the layer on slider completion
   refreshCritters = ~>
-    console.log 'refreshCritters'
     clusterLayer.clearLayers!
     map.removeLayer markers
     markers := makeMarkers.call @ #// Parent function wide 

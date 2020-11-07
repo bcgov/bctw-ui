@@ -171,7 +171,7 @@ toggleLatestCritters = (checked) ->
 
   callback = ~>
     @$vs.loading.close '#critter-list > .con-vs-loading'
-    @$root.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
+    bus.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
 
   if checked
     @$store.dispatch 'requestMostRecentPings', callback
