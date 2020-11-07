@@ -13,16 +13,15 @@ import Vuesax from 'vuesax';
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css';
 
+import VCalendar from 'v-calendar';
+
 Vue.config.productionTip = false;
 
 Vue.use(Vuesax);
-// Vue.use(vsButton);
-// Vue.use(vsDivider);
-// Vue.use(vsSideBar);
-// Vue.use(vsNotifications);
-// Vue.use(vsIcon);
 
 export const bus = new Vue();
+
+Vue.use(VCalendar);
 
 new Vue({
   router,

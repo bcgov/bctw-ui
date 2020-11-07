@@ -66,7 +66,7 @@
 import VueSlider from 'vue-slider-component';
 import moment from 'moment';
 import 'vue-slider-component/theme/default.css';
-import {bus} from '../main'
+import {bus} from '../main';
 ``
 
 
