@@ -126,13 +126,13 @@ draw = ->
       circlemarker: false
     edit:
       featureGroup: drawnItems
-      remove: false
-      edit: false
+      remove: true
+      edit: true
 
   map.addControl drawControl
 
   #// Not sure if we should add the shape to the map
-  #// map.on 'draw:created', -> map.addLayer it.layer
+  map.on 'draw:created', -> drawnItems.addLayer it.layer
 ``
 export default {
   name: 'Map',
