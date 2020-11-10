@@ -3,11 +3,10 @@ import Vuex from 'vuex';
 import needle, { NeedleResponse } from 'needle';
 import {createOptions, createUrl, createUrl2} from './api/api_helpers';
 import { codeModule } from './api/code_module';
+import { animalModule } from './api/animal_module';
 import moment from 'moment';
-import { Animal } from './types/animal';
-import { ICollar } from './types/collar';
-import { ActionPayload } from './types/store';
-import { FetchPayload } from './types/api';
+import { Collar, ICollar, decodeCollar } from './types/collar';
+import { ActionGetPayload, ActionPostPayload } from './types/store';
 
 Vue.use(Vuex);
 
@@ -29,7 +28,6 @@ const rootModule = {
       availableCollars: [],
       assignedCollars: [],
     },
-    animals: [],
     editObject: {},
   },
   mutations: {
@@ -75,30 +73,18 @@ const rootModule = {
       state.pingsActive.features = filteredHerds;
     },
     writeAvailableCollars(state, collars) {
-      state.collars.availableCollars = collars;
+      const newIds = collars.map((c: Collar) => c.device_id);
+      const filtered = state.collars.availableCollars.filter((c: Collar) => !newIds.includes(c.device_id));
+      state.collars.availableCollars = [...filtered, ...collars];
     },
     writeAssignedCollars(state, collars) {
-      state.collars.assignedCollars = collars;
-    },
-    writeAnimals(state, animals) {
-      const newIds = animals.map((a: Animal) => a.id);
-      const filtered = state.animals.filter((a: Animal) => !newIds.includes(a.id));
-      state.animals = [...filtered, ...animals];
+      const newIds = collars.map((c: Collar) => c.device_id);
+      const filtered = state.collars.assignedCollars.filter((c: Collar) => !newIds.includes(c.device_id));
+      state.collars.assignedCollars = [...filtered, ...collars];
     },
     updateEditObject(state, obj) {
-      // console.log(`current obj ${JSON.stringify(state.editObject)}, newObj: ${JSON.stringify(obj)}`);
-      state.editObject = obj;
-    },
-    updateAnimals(state, newAnimal: Animal) {
-      const foundIndex = state.animals.findIndex((animal: Animal) => animal.animal_id === newAnimal.animal_id);
-      if (foundIndex !== -1) {
-        state.animals[foundIndex] = newAnimal;
-      } else {
-        state.animals.unshift(newAnimal);
-      }
-    },
-    upsertCodeHeader(state, payload) {
-      console.log('im not working');
+      state.editObject = Object.assign({}, obj);
+      // console.log(JSON.stringify(state.editObject));
     },
     updateCollars(state, payload) {
       const type = payload.type;
@@ -198,18 +184,20 @@ const rootModule = {
       });
     },
     async requestCollars(context, callback) {
-      await context.dispatch('getAvailableCollars');
-      await context.dispatch('getAssignedCollars');
+      await context.dispatch('getAvailableCollars', {callback});
+      await context.dispatch('getAssignedCollars', {callback});
       callback();
     },
-    async getAvailableCollars(context, callback) {
-      const urlAvail = createUrl(context, 'get-available-collars');
+    async getAvailableCollars(context, payload: ActionGetPayload) {
+      const {callback, page} = payload;
+      const urlAvail = createUrl2({context, apiString: 'get-available-collars', page});
       const errMsg = `error fetching available collars:`;
       try {
         const response: NeedleResponse = await needle('get', urlAvail, createOptions({}));
         const body = response.body;
         if (response && response.statusCode === 200) {
-          context.commit('writeAvailableCollars', body);
+          const collars: Collar[] = body.map((c: any) => decodeCollar(c));
+          context.commit('writeAvailableCollars', collars);
         } else {
           callback(null, `${errMsg} ${body}`);
         }
@@ -217,34 +205,21 @@ const rootModule = {
           callback(null, `${errMsg} ${e}`);
       }
     },
-    async getAssignedCollars(context, callback) {
-      const urlAssign = createUrl(context, 'get-assigned-collars');
+    async getAssignedCollars(context, payload) {
+      const {callback, page} = payload;
+      const urlAssign = createUrl2({context, apiString: 'get-assigned-collars', page});
       const errMsg = `error fetching assigned collars:`;
       try {
         const response: NeedleResponse = await needle('get', urlAssign, createOptions({}));
         const body = response.body;
         if (response && response.statusCode === 200) {
-          context.commit('writeAssignedCollars', body);
+          const collars: Collar[] = body.map((c: any) => decodeCollar(c));
+          context.commit('writeAssignedCollars', collars);
         } else {
           callback(null, `${errMsg} ${body}`);
         }
       } catch (e) {
           callback(null, `${errMsg} ${e}`);
-      }
-    },
-    async getAnimals(context, payload) {
-      const urlAvail = createUrl2({context, apiString: 'get-animals', page: payload.page});
-      try {
-        const response: NeedleResponse = await needle('get', urlAvail, createOptions({}));
-        const body = response.body;
-        if (response && response.statusCode === 200) {
-          context.commit('writeAnimals', body);
-          payload.callback(body);
-        } else {
-          payload.callback(null, `error fetching animals: ${body}`);
-        }
-      } catch (e) {
-          payload.callback(null, `error fetching critters ${e}`);
       }
     },
     upsertCollar(context, payload) {
@@ -259,41 +234,12 @@ const rootModule = {
       });
       payload.callback();
     },
-    async upsertAnimal(context, payload: ActionPayload) {
-      const url = createUrl(context, 'add-animal');
-      try {
-        const response = await needle('post', url, payload.body, createOptions({}));
-        const body: Animal[] = response.body;
-        if (response && response.statusCode === 200) {
-          context.commit('updateAnimals', payload.body); // change to body?
-          payload.callback(body);
-        } else {
-          payload.callback(null, `error adding animal: ${body}`);
-        }
-      } catch (e) {
-          payload.callback(null, `caught exception adding animal: ${e}`);
-      }
-    },
-    async linkOrUnlinkCritterCollar(context, payload: FetchPayload) {
-      const link = (payload.body as any).link;
-      const url = createUrl(context, link ? 'link-animal-collar' : 'unlink-animal-collar');
-      try {
-        const response = await needle('post', url, { data: (payload.body as any).data });
-        const body = response.body;
-        if (response && response.statusCode === 200) {
-          payload.callback(link ? body.link_collar_to_animal : body.unlink_collar_to_animal);
-        } else {
-          payload.callback(null, `status ${response.statusCode} returned while linking collar: ${response.body}`);
-        }
-      } catch (e) {
-          payload.callback(null, `caught exception linking collar ${e}`);
-      }
-    },
   },
 };
 
 export default new Vuex.Store({
   modules: {
+    animalModule,
     codeModule,
     rootModule,
   },

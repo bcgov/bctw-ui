@@ -65,7 +65,7 @@ export default Vue.extend({
     },
     handleSelectHeaderselected(header: ICode) {
       this.selected = header;
-      let codes = this.$store.getters.codes[header.type]; //codeModule.codes;
+      let codes = this.$store.getters.codes[header.type];
       // console.log(`header selected: codes are ${JSON.stringify(codes)}`);
       if (!codes) {
         this.$store.dispatch('requestCodes', {body: header.type, callback: this.loadCodeCb})

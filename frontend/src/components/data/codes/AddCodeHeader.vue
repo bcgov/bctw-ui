@@ -13,9 +13,9 @@
 </template>
 
 <script lang="ts">
-import { FetchPayload } from '../../../types/api';
 import { getNotifyProps} from '../../notify';
 import Vue from 'vue';
+import { ActionPostPayload } from 'frontend/src/types/store';
 export default Vue.extend({
   name: 'AddCodeHeader',
   props: {
@@ -39,7 +39,7 @@ export default Vue.extend({
         code_header_title: this.header_title,
         code_header_description: this.header_description
       };
-      const payload:FetchPayload = { body, callback: this.callback };
+      const payload:ActionPostPayload = { body, callback: this.callback };
       this.$store.dispatch('upsertCodeHeader', payload);
       // this.handleClose();
     },
@@ -51,7 +51,7 @@ export default Vue.extend({
       console.log('hi')
       console.log('hi')
     },
-    callback(data: any, err: Error) {
+    callback(data: any, err?: Error | string) {
       let msg; 
       if (err) {
         msg = `error adding code header ${err}`;

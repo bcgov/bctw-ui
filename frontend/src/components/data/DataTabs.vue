@@ -32,6 +32,7 @@ import Select from '../form/Select';
 import FileInput from '../form/FileInput';
 import Modal from '../Modal';
 import EditModal from '../data/EditModal'
+import RegisterCollarModal from './collar/RegisterCollar';
 import StateTable from '../Table';
 import YesNoDialog from '../YesNoDialog';
 import Vue from 'vue';
@@ -46,6 +47,7 @@ Vue.component('input-type', Input);
 Vue.component('input-select', Select);
 Vue.component('state-table', StateTable);
 Vue.component('modal', Modal);
+Vue.component('register-modal', RegisterCollarModal);
 Vue.component('yes-no', YesNoDialog);
 
 export default {

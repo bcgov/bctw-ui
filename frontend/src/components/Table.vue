@@ -2,26 +2,27 @@
   <div v-if="value">
     <!-- bound object passed in from v-model should be array of objects -->
     <vs-table 
-      :data="displayed"
+      :data="value"
       v-model="selected"
       @selected="handleSelect"
       >
       <template slot="header"><h3>{{title}}</h3></template> 
-      <template slot="thead">
-        <vs-th v-for="(v, p) in displayed[displayed.length - 1]" :key="p">
-          {{propsToDisplay.includes(p) ? getHeader(p) : null}}
+      <template slot="thead" v-if="value && value.length">
+        <vs-th v-for="p in Object.keys(value[value.length - 1]).filter((prop) => propsToDisplay.includes(prop))" :key="p">
+          {{getHeader(p)}}
         </vs-th>
       </template>
       <template slot-scope="">
-        <!-- each object in array is a row -->
+        <!-- each object in array is a table row -->
         <vs-tr v-for="(obj, prop) in displayed" :key="prop" :data="obj">
-          <vs-td :key="v" v-for="(k, v) in obj" :data="k">
-            {{propsToDisplay.includes(v) ? k : null}}
+          <!-- iterate the properties to display, retrieving the object value at each-->
+          <vs-td v-for="(p, i) in propsToDisplay" :key="i" :data="p">
+            {{formatTableData(obj[p])}}
           </vs-td>
         </vs-tr> 
       </template>
     </vs-table>
-    <vs-pagination 
+    <vs-pagination v-if="paginate"
       class="mt-4"
       :total="value.length / limitPerPage + 1"
       v-model="current_page"
@@ -29,6 +30,7 @@
   </div>
 </template>
 <script lang="ts">
+import moment from 'moment';
 import Vue from 'vue'
 import { mapGetters } from 'vuex';
 
@@ -36,15 +38,32 @@ export default Vue.extend({
   name: 'StateTable',
   props: {
     getHeader: { type: Function, required: true },
-    propsToDisplay: { type: Array, required: true },
+    propsToDisplay: { required: true },
     title: { type: String, required: false },
     value: { type: Array, required: true, },
+    paginate: {type: Boolean, required: false, default: true },
   },
   data: function() {
     return {
       selected: {},
       current_page: 1,
-      limitPerPage: 10
+      limitPerPage: 10,
+    }
+  },
+  methods: {
+    formatTableData(td: any) {
+      if (moment.isMoment(td)) {
+        return td.isValid() ? td.format('DD-MM-YYYY HH:mm:ss') : '';
+      } return td;
+    },
+    handlePageChange(v: number){
+      this.current_page = v;
+      if (this.value.length < (10 * v)) {
+        this.$emit('page:change', v)
+      }
+    },
+    handleSelect(tr: any) {
+      this.$store.commit('updateEditObject', tr);
     }
   },
   computed: {
@@ -58,17 +77,5 @@ export default Vue.extend({
       return resultsToDisplay;
     }
   },
-  methods: {
-    handlePageChange(v: number){
-      this.current_page = v;
-      if (this.value.length < (10 * v)) {
-        // console.log('requesting to load more items');
-        this.$emit('page:change', v)
-      }
-    },
-    handleSelect(tr: any) {
-      this.$store.commit('updateEditObject', tr);
-    }
-  }
 })
 </script>

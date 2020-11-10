@@ -1,11 +1,15 @@
 <template>
-<!-- todo:
-  - add limit option to backend query to only request page max size
-  - make inputs type specific
--->
   <div>
-    <state-table v-if="availableCollars" title="Available Collars" v-model="availableCollars" :getHeader="getHeader" :propsToDisplay="toDisplay"></state-table>
-    <state-table v-if="assignedCollars" title="Assigned Collars" v-model="assignedCollars" :getHeader="getHeader" :propsToDisplay="toDisplay"></state-table>
+    <state-table 
+      v-if="availableCollars" title="Available Collars"
+      v-model="availableCollars" :getHeader="getHeader"
+      :propsToDisplay="availableCollarProps"
+      v-on:page:change="(p)=>loadNewCollars('avail', p)"></state-table>
+    <state-table
+      v-if="assignedCollars" title="Assigned Collars"
+      v-model="assignedCollars" :getHeader="getHeader"
+      :propsToDisplay="assignedCollarProps"
+      v-on:page:change="(p)=>loadNewCollars('assign', p)"></state-table>
     <vs-divider></vs-divider>
     <div>  
       <vs-button type="border" @click="handleRegisterClick">Register New Collar</vs-button>
@@ -29,13 +33,12 @@
   </div>
 </template>
 
-<script>
-import { Collar, collarPropsToDisplay } from '../../../types/collar'
+<script lang="ts">
+import { Collar, availableCollarProps, assignedCollarProps} from '../../../types/collar'
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
-import RegisterCollarModal from './RegisterCollar';
-
-Vue.component('register-modal', RegisterCollarModal);
+import { ActionGetPayload } from 'frontend/src/types/store';
+import { getNotifyProps } from '../../notify';
 
 export default Vue.extend({
   props: {
@@ -48,22 +51,23 @@ export default Vue.extend({
       showEditModal: false,
       showRegisterModal: false,
       selected: {},
-      toDisplay: collarPropsToDisplay
+      assignedCollarProps: assignedCollarProps,
+      availableCollarProps: availableCollarProps
     }
   },
   methods: {
-    getHeader: (s) => Collar.getTitle(s),
+    getHeader: (s: string) => Collar.getTitle(s),
     close() {
       this.showEditModal = false;
       this.showRegisterModal = false;
     },
-    handleEditClick(v) {
+    handleEditClick() {
       this.showEditModal = !this.showEditModal;
     },
-    handleRegisterClick(v) {
+    handleRegisterClick() {
       this.showRegisterModal = !this.showRegisterModal;
     },
-    async save(collar) {
+    async save(collar: Collar) {
       this.$vs.notify({ title: `saving collar ID ${collar.device_id}`})
       const payload = {
         callback: cbCollarSaved,
@@ -72,20 +76,25 @@ export default Vue.extend({
       }
       this.$store.dispatch('upsertCollar', payload)
     },
+    cBCollarsLoaded(body: any, err?: Error | string) {
+      if (err) {
+        this.$vs.notify(getNotifyProps(err, true));
+      }
+    },
+    loadNewCollars(type: 'assign' | 'avail', page: number = 1) {
+      const payload:ActionGetPayload = {
+        callback: this.cBCollarsLoaded,
+        page
+      };
+      const actionString = type === 'assign' ? 'getAssignedCollars' : 'getAvailableCollars';
+      this.$store.dispatch(actionString, payload);
+    }
   },
-  mounted() {
-    this.$store.dispatch('requestCollars', callback);
-  }
 })
-
-const callback = () => {
-  console.log('loading collars completed' )
-}
 
 const cbCollarSaved = (payload) => {
   console.log(`add_collar success`);
 }
-
 </script>
 
 <style scoped>

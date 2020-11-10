@@ -1,3 +1,5 @@
+import moment from "moment";
+
 const urlContainsQuery = (url: string): boolean => url.includes('?');
 
 interface CreateUrlParams {
@@ -16,12 +18,12 @@ const createUrl = (context, apiString: string, queryString?: string, page?: numb
   const h3 = context.state.prod ? location.port : 3000;
   const h4 = context.state.prod ? '/api' : '';
   let url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
+  if (queryString) {
+    url += urlContainsQuery(url) ? `&${queryString}` : `?${queryString}`;
+  }
   if (isDev) {
     const q = `idir=${process.env.IDIR}`;
     url += urlContainsQuery(url) ? `&${q}` : `?${q}`;
-  }
-  if (queryString) {
-    url += queryString;
   }
   if (page) {
     url += urlContainsQuery(url) ? `&page=${page}` : `?page=${page}`;
@@ -51,7 +53,17 @@ const handleFetchResult = (response: Response, callback) => {
   }
 };
 
-const formattedNow = () => new Date(Date.now()).toISOString().replace('T', ' ').replace('Z', '');
+// const formattedNow = () => new Date(Date.now()).toISOString().replace('T', ' ').replace('Z', '');
+const formattedNow = () => moment().format('YYYY-MM-DD HH:mm:ss');
+
+const filterObj = (o: object, propsAllowed: string[]) => {
+  return Object.keys(o)
+  .filter((key) => propsAllowed.includes(key))
+  .reduce((obj, key) => {
+    obj[key] = o[key];
+    return obj;
+  }, {});
+};
 
 export {
   createUrl,

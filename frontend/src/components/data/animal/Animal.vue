@@ -1,12 +1,19 @@
 <template>
   <div >
     <state-table
-      v-model="animals"
+      title="Animals with Collars"
+      v-model="assignedAnimals"
       :getHeader="getHeader"
       :propsToDisplay="toDisplay"
-      v-on:page:change="loadNewAnimals">
-    </state-table>
-    <br/>
+      v-on:page:change="(p) => loadNewAnimals(p, 1)">
+    </state-table><br/>
+    <state-table
+      title="Animals without Collars"
+      v-model="unassignedAnimals"
+      :getHeader="getHeader"
+      :propsToDisplay="toDisplay"
+      v-on:page:change="(p) => loadNewAnimals(p, 0)">
+    </state-table><br/>
     <vs-divider></vs-divider>
     <vs-button @click="() => handleEditClick(false)" type="border">Add Individual</vs-button>
     <vs-button @click="() => handleEditClick(true)" :disabled="Object.keys(editObject).length === 0" type="border">Edit Individual</vs-button>
@@ -17,21 +24,20 @@
       v-on:save:animal="save"
       :isEdit="isEditMode">
     </add-animal>
-    <!-- <pre>{{selected}}</pre> -->
+    <!-- <pre>{{editObject}}</pre> -->
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { DispatchOptions, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
+import { ActionCallback, ActionGetPayload, ActionPostPayload } from '../../../types/store';
 import { Animal } from '../../../types/animal'
 import { getNotifyProps } from '../../notify';
 
 export default Vue.extend({
   name: 'animals',
-  computed: {
-    ...mapGetters(['animals','editObject'])
-  },
+  computed: mapGetters(['assignedAnimals', 'unassignedAnimals', 'editObject']),
   props: {
     title: String,
   },
@@ -52,26 +58,28 @@ export default Vue.extend({
       this.showAddModal = !this.showAddModal;
     },
     save() {
-      console.log('Animal: an animal was saved!')
+      // console.log('Animal: an animal was saved!')
     },
     getHeader: (str: string) => Animal.getTitle(str),
-    cbLoadCritters (data: any, err: Error) {
+    cbLoadCritters: (body: any, err?: Error | string): void => {
       if (err) {
         this.$vs.notify(getNotifyProps(err, true));
       }
     },
-    loadNewAnimals(page: number = 1) {
-      // console.log('Animal: new animals called: page', page);
-      const payload = {
-        page: page,
-        callback: this.cbLoadCritters
+    loadNewAnimals(page: number = 1, isAssign: number) {
+      const payload: ActionGetPayload = {
+        callback: this.cbLoadCritters,
+        page,
       }
-      this.$store.dispatch('getAnimals', payload);
-
+      if (isAssign) {
+        this.$store.dispatch('getAssignedAnimals', payload);
+      } else {
+        this.$store.dispatch('getUnassignedAnimals', payload);
+      }
     }
   },
-  created() {
-    this.$store.commit('updateEditObject', {});
+  mounted() {
+    // this.$store.dispatch('getAnimals', {callback: this.cbLoadCritters});
   }
 });
 </script>

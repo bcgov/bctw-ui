@@ -1,8 +1,7 @@
 import needle, { NeedleResponse } from 'needle';
-import { FetchPayload } from '../types/api';
-import { createOptions, createUrl, handleFetchResult} from './api_helpers';
+import { createOptions, createUrl, createUrl2, handleFetchResult} from './api_helpers';
 import { ICodeHeader } from '../types/code';
-import { ActionPayload } from '../types/store';
+import { ActionGetPayload, ActionPostPayload } from '../types/store';
 
 const codeModule = {
   state: () => ({
@@ -33,7 +32,7 @@ const codeModule = {
     },
   },
   actions: {
-    async requestCodes(context, payload: ActionPayload) {
+    async requestCodes(context, payload: ActionPostPayload) {
       const header = payload.body;
       if (!header) {
         return;
@@ -43,7 +42,7 @@ const codeModule = {
       if (context.state.codes[header] && context.state.codes[header].length) {
         return;
       }
-      const url = createUrl(context, 'get-code', `&codeHeader=${header}`);
+      const url = createUrl2({context, apiString: 'get-code', queryString: `codeHeader=${header}`});
       try {
         const response = await needle('get', url, createOptions({}));
         if (response && response.statusCode === 200) {
@@ -54,7 +53,7 @@ const codeModule = {
         console.log(`err fetching ${header} codes: ${err}`);
       }
     },
-    async requestHeaders(context, payload: FetchPayload) {
+    async requestHeaders(context, payload: ActionGetPayload) {
       const url = createUrl(context, 'get-code-headers');
       try {
         const response: NeedleResponse = await needle('get', url, createOptions({}));
@@ -67,7 +66,7 @@ const codeModule = {
           payload.callback({}, err);
         }
       },
-    async upsertCodeHeader(context, payload: FetchPayload) {
+    async upsertCodeHeader(context, payload: ActionPostPayload) {
       const url = createUrl(context, 'add-code-header');
       try {
         const response = await needle('post', url, payload.body);

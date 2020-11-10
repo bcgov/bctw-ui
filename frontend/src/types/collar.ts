@@ -1,7 +1,6 @@
-interface IBCTWType {
-  // getTitle: (prop: string) => string;
-}
-interface ICollar /*extends IBCTWType */ {
+import moment from 'moment';
+
+interface ICollar {
     device_id: number;
     make: string;
     model: string;
@@ -17,15 +16,8 @@ interface ICollar /*extends IBCTWType */ {
     satellite_network: string;
 }
 
-const collarPropsToDisplay = [
-  'animal_id',
-  'device_id',
-  'collar_status',
-  'max_transmission_date',
-  'make',
-  'model',
-  'interval',
-];
+const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', ];
+const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model'];
 
 class Collar implements ICollar {
     public static getTitle(str: string): string {
@@ -61,7 +53,16 @@ class Collar implements ICollar {
     public satellite_network: string;
 }
 
+function decodeCollar(json: ICollar): Collar {
+  const collar = Object.create(Collar.prototype);
+  return Object.assign(collar, json, {
+    malfunction_date: moment(json.malfunction_date),
+    max_transmission_date: moment(json.max_transmission_date),
+    retreival_date: moment(json.retreival_date),
+  });
+}
 
+// todo: merge these two types?
 interface ICollarLinkResult {
   assignment_id: number;
   animal_id: string;
@@ -71,8 +72,10 @@ interface ICollarLinkResult {
 }
 
 export {
+  decodeCollar,
   ICollarLinkResult,
   ICollar,
   Collar,
-  collarPropsToDisplay,
+  assignedCollarProps,
+  availableCollarProps,
 };

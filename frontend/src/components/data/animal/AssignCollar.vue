@@ -5,7 +5,12 @@
     v-on:update:modal="$emit('update:close')"
   >
   <div v-if="collars">
-    <state-table :getHeader="getHeader" v-model="collars" :propsToDisplay="toDisplay"></state-table><br/>
+    <state-table
+      :getHeader="getHeader"
+      v-model="collars"
+      :propsToDisplay="toDisplay"
+      v-on:page:change="loadNewCollars"
+    ></state-table><br/>
     <vs-button type="filled" @click="saveCollar">Assign Collar</vs-button>
     <!-- <pre>{{selected}}</pre> -->
     <!-- <pre>{{critter}}</pre> -->
@@ -20,8 +25,9 @@ import { Animal } from '../../../types/animal';
 import Vue from 'vue';
 import { mapGetters, mapState } from 'vuex';
 import { getNotifyProps } from '../../notify';
-import { Collar, ICollarLinkResult, collarPropsToDisplay } from '../../../types/collar';
+import { Collar, ICollarLinkResult, availableCollarProps} from '../../../types/collar';
 import { formattedNow } from '../../../api/api_helpers';
+import { ActionGetPayload, ActionPostPayload } from 'frontend/src/types/store';
 
 export default Vue.extend({
   name: 'AssignCollar',
@@ -37,7 +43,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      toDisplay: collarPropsToDisplay
+      toDisplay: availableCollarProps
     }
   },
   computed: {
@@ -62,11 +68,11 @@ export default Vue.extend({
           this.$emit('collar:assigned', data);
         }
       }
-      const payload = {
+      const payload: ActionPostPayload = {
         body: {
           link: true,
           data: {
-            animal_id: (this.critter as Animal).id,
+            animal_id: +this.critter.id,
             device_id: +this.selected.device_id,
             start_date: formattedNow(),
           },
@@ -75,11 +81,22 @@ export default Vue.extend({
       };
       this.$store.dispatch('linkOrUnlinkCritterCollar', payload);
     },
+    cbLoadCollars: (body: any, err?: Error | string): void => {
+      if (err) {
+        this.$vs.notify(getNotifyProps(err, true));
+      }
+    },
+    loadNewCollars(page: number = 1) {
+      const payload: ActionGetPayload = {
+        callback: this.cbLoadCollars,
+        page
+      }
+      this.$store.dispatch('getAvailableCollars', payload);
+    },
   },
   mounted() {
     if (!this.collars.length) {
-      console.log('AssignCollar: requesting collars')
-      this.$store.dispatch('getAvailableCollars', () => console.log('done loading collars'));
+      this.loadNewCollars(1);
     }
   }
 })

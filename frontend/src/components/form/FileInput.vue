@@ -31,8 +31,8 @@
 </template>
 
 <script lang="ts">
+import { ActionPostPayload } from 'frontend/src/types/store';
 import { getNotifyProps } from '../notify';
-import { FetchPayload } from '../../types/api';
 
 enum LoadStatus {
   INITIAL = 0,
@@ -79,7 +79,7 @@ export default {
       },
       save(formData) {
         this.currentStatus = LoadStatus.SAVING;
-        const payload:FetchPayload = {body: formData, callback: this.onResultsCallback}
+        const payload:ActionPostPayload = {body: formData, callback: this.onResultsCallback}
         this.$store.dispatch('uploadCsv', payload)
       },
       filesChange(fieldName: string, fileList) {
@@ -92,7 +92,7 @@ export default {
           });
         this.save(formData);
       },
-      onResultsCallback(data, err) {
+      onResultsCallback(data: any, err?: Error | string) {
         let msg;
         if (err) {
           msg = `error uploading csv ${err}`;
