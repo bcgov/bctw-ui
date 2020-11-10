@@ -131,7 +131,7 @@ draw = ->
 
   map.addControl drawControl
 
-  #// Not sure if we should add the shape to the map
+  #// Add new shape to map
   map.on 'draw:created', -> drawnItems.addLayer it.layer
 ``
 export default {
