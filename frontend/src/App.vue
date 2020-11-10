@@ -35,22 +35,11 @@
         ) Cluster critters
         
 
-        vs-divider(position='center') Temporal Filters
-
         vs-checkbox(
           class='latest-pings'
           v-model='latestPings'
           @change="toggleLatestCritters(latestPings)"
         ) most recent locations
-
-        vs-button(
-          class='download'
-          color='primary'
-          type='line'
-          size='small'
-          icon="cloud_download"
-          @click="downloadData"
-          ) Download
 
         TemporalSlider
 
@@ -76,6 +65,15 @@
             v-for='item,index in $store.getters.speciesActive'
             @change="$store.commit('filterPings',item)"
           ) {{item.name}}
+
+        vs-button(
+          class='download'
+          color='primary'
+          type='line'
+          size='small'
+          icon="cloud_download"
+          @click="downloadData"
+          ) Download
 
 
     #page
@@ -171,7 +169,7 @@ toggleLatestCritters = (checked) ->
 
   callback = ~>
     @$vs.loading.close '#critter-list > .con-vs-loading'
-    @$root.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
+    bus.$emit 'refreshCritterLayers' #// Signal map to refresh collar layer
 
   if checked
     @$store.dispatch 'requestMostRecentPings', callback

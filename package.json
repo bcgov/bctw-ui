@@ -47,6 +47,7 @@
     "pug": "^2.0.4",
     "stylus": "^0.54.5",
     "topojson": "^3.0.2",
+    "v-calendar": "^2.0.2",
     "vue": "^2.6.10",
     "vue-cesium": "^2.1.5",
     "vue-class-component": "^7.2.3",

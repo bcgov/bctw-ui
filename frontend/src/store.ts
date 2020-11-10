@@ -8,6 +8,8 @@ import moment from 'moment';
 import { Collar, ICollar, decodeCollar } from './types/collar';
 import { ActionGetPayload, ActionPostPayload } from './types/store';
 
+import {bus} from './main';
+
 Vue.use(Vuex);
 
 const rootModule = {
@@ -71,6 +73,7 @@ const rootModule = {
 
       state.pingsActive = {...state.pings};
       state.pingsActive.features = filteredHerds;
+      bus.$emit('refreshCritterLayers');// Signal map to refresh collar layer
     },
     writeAvailableCollars(state, collars) {
       const newIds = collars.map((c: Collar) => c.device_id);
@@ -162,6 +165,7 @@ const rootModule = {
           return console.error('Failed to fetch collars: ', err);
         }
         context.commit('writePings', body);
+        context.commit('filterPings');
         callback();
       });
     },

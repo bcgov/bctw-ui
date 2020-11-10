@@ -82,10 +82,7 @@ drawPingLayer = ->
 
   chooseToToggleCluster!
 
-  #// XXX: This is firing on first draw AND when the slider is adjusted
-  #//      However it's not refreshing the layer on slider completion
   refreshCritters = ~>
-    console.log 'refreshCritters'
     clusterLayer.clearLayers!
     map.removeLayer markers
     markers := makeMarkers.call @ #// Parent function wide 
@@ -122,13 +119,20 @@ draw = ->
   map.addLayer drawnItems
   drawControl = new L.Control.Draw do
     position: 'topright'
+    draw:
+      marker: false
+      polyline: false
+      circle: true
+      circlemarker: false
     edit:
       featureGroup: drawnItems
+      remove: true
+      edit: true
 
+  map.addControl drawControl
 
-  #//map.addControl drawControl #These don't do anything yet.
-
-  map.on 'draw:created', -> map.addLayer it.layer
+  #// Add new shape to map
+  map.on 'draw:created', -> drawnItems.addLayer it.layer
 ``
 export default {
   name: 'Map',
