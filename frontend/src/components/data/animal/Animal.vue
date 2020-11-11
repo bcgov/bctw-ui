@@ -15,11 +15,15 @@
       v-on:page:change="(p) => loadNewAnimals(p, 0)">
     </state-table><br/>
     <vs-divider></vs-divider>
+    <vs-button @click="handleExportClick" class="btn-export" type="filled">Export</vs-button>
     <vs-button @click="() => handleEditClick(false)" type="border">Add Individual</vs-button>
     <vs-button @click="() => handleEditClick(true)" :disabled="Object.keys(editObject).length === 0" type="border">Edit Individual</vs-button>
+    <export
+      :active="showExportModal"
+      v-on:update:close="close"
+    ></export>
     <add-animal
       :active="showAddModal"
-      v-on:update:modal="handleEditClick"
       v-on:update:close="close"
       v-on:save:animal="save"
       :isEdit="isEditMode">
@@ -45,17 +49,22 @@ export default Vue.extend({
     return {
       isEditMode: false,
       showAddModal: false,
+      showExportModal: false,
       selected: {},
       toDisplay: ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id']
     }
   },
   methods: {
     close() {
-      this.showAddModal = false
+      this.showAddModal = false;
+      this.showExportModal = false;
     },
     handleEditClick(isEdit: boolean) {
       this.isEditMode = isEdit;
       this.showAddModal = !this.showAddModal;
+    },
+    handleExportClick() {
+      this.showExportModal = !this.showAddModal;
     },
     save() {
       // console.log('Animal: an animal was saved!')
@@ -89,5 +98,8 @@ export default Vue.extend({
   position absolute 
   width 100%
   height 100%
+.btn-export {
+  float: left;
+}
 </style>
 

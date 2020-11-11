@@ -30,6 +30,9 @@ const codeModule = {
     codes(state) {
       return state.codes;
     },
+    code: (state) => (headerId): string => {
+      return state.codes[headerId];
+    },
   },
   actions: {
     async requestCodes(context, payload: ActionPostPayload) {

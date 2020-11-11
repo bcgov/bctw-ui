@@ -12,23 +12,16 @@
       v-on:page:change="(p)=>loadNewCollars('assign', p)"></state-table>
     <vs-divider></vs-divider>
     <div>  
-      <vs-button type="border" @click="handleRegisterClick">Register New Collar</vs-button>
-      <vs-button disabled type="border">Retire Collar</vs-button>
-      <vs-button :disabled="Object.keys(editObject).length === 0" @click="handleEditClick" type="border">See Collar Details</vs-button>
+      <vs-button @click="() => handleEditClick(false)" type="border" >Register New Collar</vs-button>
+      <vs-button @click="() => handleEditClick(true)" :disabled="Object.keys(editObject).length === 0"  type="border">See Collar Details</vs-button>
+      <!-- <vs-button disabled type="border">Retire Collar</vs-button> -->
     </div>
-    <edit-modal 
-      v-on:update:close="close"
-      v-on:update:save="save"
+    <collar-modal 
       :active="showEditModal"
-      title="Edit Collar"
-      :editing="selected"
-      :getHeader="getHeader"
-    ></edit-modal>
-    <register-modal 
-      v-on:update:close="close" 
-      :active="showRegisterModal"
-      title="Register A New Vectronics Collar"
-    ></register-modal>
+      v-on:update:close="close"
+      v-on:save:collar="save"
+      :isEdit="isEditMode">
+    </collar-modal>
   <!-- <pre>{{editObject}}</pre> -->
   </div>
 </template>
@@ -48,8 +41,8 @@ export default Vue.extend({
   computed: mapGetters(['assignedCollars', 'availableCollars', 'editObject']),
   data: function() {
     return {
+      isEditMode: false,
       showEditModal: false,
-      showRegisterModal: false,
       selected: {},
       assignedCollarProps: assignedCollarProps,
       availableCollarProps: availableCollarProps
@@ -59,22 +52,13 @@ export default Vue.extend({
     getHeader: (s: string) => Collar.getTitle(s),
     close() {
       this.showEditModal = false;
-      this.showRegisterModal = false;
     },
-    handleEditClick() {
+    handleEditClick(isEdit: boolean) {
+      this.isEditMode = isEdit;
       this.showEditModal = !this.showEditModal;
     },
-    handleRegisterClick() {
-      this.showRegisterModal = !this.showRegisterModal;
-    },
-    async save(collar: Collar) {
-      this.$vs.notify({ title: `saving collar ID ${collar.device_id}`})
-      const payload = {
-        callback: cbCollarSaved,
-        collar,
-        type: collar.hasOwnProperty('animal_id') ? 'assignedCollars' : 'availableCollars'
-      }
-      this.$store.dispatch('upsertCollar', payload)
+    save() {
+      this.close();
     },
     cBCollarsLoaded(body: any, err?: Error | string) {
       if (err) {

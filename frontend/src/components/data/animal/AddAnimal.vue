@@ -76,8 +76,8 @@ import { CollarAssignment } from '../../../types/collar_assignment';
 
 import { formattedNow } from '../../../api/api_helpers';
 import { ActionGetPayload, ActionPostPayload } from 'frontend/src/types/store';
-import {onSaveAnimal} from './animal_callback_handlers';
 import moment from 'moment';
+import { canSaveObject } from '../../component_helpers';
 
 export default Vue.extend({
   name: 'AddAnimal',
@@ -191,13 +191,7 @@ export default Vue.extend({
   watch: {
     // todo: handle required fields better?
     animal() {
-      let r = true;
-      this.requiredFields.forEach((field) => {
-        if (!this.animal[field]) {
-          r = false;
-        }
-      });
-      this.canSave = r;
+      this.canSave = canSaveObject(this.requiredFields, this.animal);
     },
     active(show) {
       if (show && this.isEdit) {

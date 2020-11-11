@@ -26,6 +26,8 @@ class Collar implements ICollar {
           return 'Device ID';
         case 'make':
           return 'GPS Vendor';
+        case 'model':
+          return 'Collar Model';
         case 'collar_status':
           return 'Collar Status';
         case 'satellite_network':
@@ -53,12 +55,22 @@ class Collar implements ICollar {
     public satellite_network: string;
 }
 
+const _momentFormat = 'DD-MM-YYYY HH:mm:ss';
+
 function decodeCollar(json: ICollar): Collar {
   const collar = Object.create(Collar.prototype);
   return Object.assign(collar, json, {
     malfunction_date: moment(json.malfunction_date),
     max_transmission_date: moment(json.max_transmission_date),
     retreival_date: moment(json.retreival_date),
+  });
+}
+
+function encodeCollar(c: Collar) {
+  return Object.assign(c, {
+    malfunction_date: moment(c.malfunction_date).format(_momentFormat),
+    max_transmission_date: moment(c.max_transmission_date).format(_momentFormat),
+    retreival_date: moment(c.retreival_date).format(_momentFormat),
   });
 }
 
@@ -73,6 +85,7 @@ interface ICollarLinkResult {
 
 export {
   decodeCollar,
+  encodeCollar,
   ICollarLinkResult,
   ICollar,
   Collar,

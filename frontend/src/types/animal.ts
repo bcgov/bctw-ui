@@ -1,10 +1,11 @@
 interface IAnimal {
-  id: string;
+  id: number;
   animal_id: string;
   animal_status: string;
   calf_at_heel: string;
   capture_date: Date;
   capture_date_year: number;
+  capture_date_month: number;
   capture_utm_zone: number;
   capture_utm_easting: number;
   capture_utm_northing: number;
@@ -57,12 +58,13 @@ class Animal implements IAnimal {
         return 'Release Date';
     }
   }
-  id: string;
+  id: number;
   animal_id: string;
   animal_status: string;
   calf_at_heel: string;
   capture_date: Date;
   capture_date_year: number;
+  capture_date_month: number;
   capture_utm_zone: number;
   capture_utm_easting: number;
   capture_utm_northing: number;
@@ -87,7 +89,6 @@ class Animal implements IAnimal {
   wlh_id: string;
   nickname: string;
 }
-
 export {
   Animal,
   IAnimal,

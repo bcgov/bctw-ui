@@ -11,7 +11,7 @@
       <input-select header="animal_status" label="Animal Status"></input-select>
     </div>
     <vs-divider></vs-divider>
-    <h4>sample component for adding a new code header</h4><br/>
+    <h4>add a new code type</h4><br/>
     <vs-button type="border" @click="handleAddClick">Add Code Type</vs-button>
     <add-code :active="showAddCodeHeader" v-on:update:close="handleAddClick"></add-code>
     <vs-divider></vs-divider>

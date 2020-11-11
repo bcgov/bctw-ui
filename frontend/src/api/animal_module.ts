@@ -1,6 +1,6 @@
 import needle, { NeedleResponse } from 'needle';
 import { createOptions, createUrl, createUrl2, handleFetchResult} from './api_helpers';
-import { ActionGetPayload, ActionPostPayload } from '../types/store';
+import { ActionPostPayload } from '../types/store';
 import { Animal } from '../types/animal';
 import { decodeCollarAssignment } from '../types/collar_assignment';
 

@@ -9,6 +9,7 @@ import { Collar, ICollar, decodeCollar } from './types/collar';
 import { ActionGetPayload, ActionPostPayload } from './types/store';
 
 import {bus} from './main';
+import { filter } from 'vue/types/umd';
 
 Vue.use(Vuex);
 
@@ -87,14 +88,11 @@ const rootModule = {
     },
     updateEditObject(state, obj) {
       state.editObject = Object.assign({}, obj);
-      // console.log(JSON.stringify(state.editObject));
     },
-    updateCollars(state, payload) {
-      const type = payload.type;
-      const collar = payload.collar;
-      const collars = state.collars[type];
-      const foundIndex = collars.findIndex((c: ICollar) => c.device_id === collar.device_id);
-      state.collars[type][foundIndex] = collar;
+    updateCollars(state, collars) {
+      const newIds = collars.map((c: Collar) => c.device_id);
+      const filtered = state.collars.availableCollars.filter((c: Collar) => !newIds.includes(c.device_id));
+      state.collars.availableCollars = [...collars, ...filtered];
     },
   },
   getters: {
@@ -226,17 +224,22 @@ const rootModule = {
           callback(null, `${errMsg} ${e}`);
       }
     },
-    upsertCollar(context, payload) {
+    async upsertCollar(context, payload) {
+      const {callback, body} = payload;
       const url = createUrl(context, 'add-collar');
-      const options = createOptions({});
-      needle.post(url, payload.collar, options, (err, resp) => {
-        if (err) {
-          return console.error('unable to upsert collar', err);
+      const errMsg = 'unable to save collar:';
+      try {
+        const response: NeedleResponse = await needle('post', url, body);
+        const responseBody = response.body;
+        if (response && response.statusCode === 200) {
+          const collars: Collar[] = responseBody.map((c: Collar) => decodeCollar(c));
+          context.commit('updateCollars', collars);
+        } else {
+          callback(null, `${errMsg} ${body}`);
         }
-        const body = resp.body?.add_collar;
-        context.commit('updateCollars', payload);
-      });
-      payload.callback();
+      } catch (e) {
+          callback(null, `${errMsg} ${e}`);
+      }
     },
   },
 };
