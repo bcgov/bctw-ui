@@ -56,6 +56,7 @@ const handleFetchResult = (response: Response, callback) => {
 // const formattedNow = () => new Date(Date.now()).toISOString().replace('T', ' ').replace('Z', '');
 const formattedNow = () => moment().format('YYYY-MM-DD HH:mm:ss');
 
+/// filters object key/values to only include those in the propsAllowed array
 const filterObj = (o: object, propsAllowed: string[]) => {
   return Object.keys(o)
   .filter((key) => propsAllowed.includes(key))
@@ -70,6 +71,7 @@ export {
   createUrl2,
   createOptions,
   isDev,
+  filterObj,
   formattedNow,
   handleFetchResult,
 };

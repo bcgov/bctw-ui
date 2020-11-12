@@ -4,14 +4,14 @@
       title="Animals with Collars"
       v-model="assignedAnimals"
       :getHeader="getHeader"
-      :propsToDisplay="toDisplay"
+      :propsToDisplay="toDisplayAssigned"
       v-on:page:change="(p) => loadNewAnimals(p, 1)">
     </state-table><br/>
     <state-table
       title="Animals without Collars"
       v-model="unassignedAnimals"
       :getHeader="getHeader"
-      :propsToDisplay="toDisplay"
+      :propsToDisplay="toDisplayUnassigned"
       v-on:page:change="(p) => loadNewAnimals(p, 0)">
     </state-table><br/>
     <vs-divider></vs-divider>
@@ -19,8 +19,10 @@
     <vs-button @click="() => handleEditClick(false)" type="border">Add Individual</vs-button>
     <vs-button @click="() => handleEditClick(true)" :disabled="Object.keys(editObject).length === 0" type="border">Edit Individual</vs-button>
     <export
+      title="Export Animals"
       :active="showExportModal"
       v-on:update:close="close"
+      v-bind:value="assignedAnimals"
     ></export>
     <add-animal
       :active="showAddModal"
@@ -36,7 +38,7 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import { ActionCallback, ActionGetPayload, ActionPostPayload } from '../../../types/store';
-import { Animal } from '../../../types/animal'
+import { Animal, assignedCritterProps, unassignedCritterProps } from '../../../types/animal'
 import { getNotifyProps } from '../../notify';
 
 export default Vue.extend({
@@ -51,7 +53,8 @@ export default Vue.extend({
       showAddModal: false,
       showExportModal: false,
       selected: {},
-      toDisplay: ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id']
+      toDisplayAssigned: assignedCritterProps,
+      toDisplayUnassigned: unassignedCritterProps,
     }
   },
   methods: {

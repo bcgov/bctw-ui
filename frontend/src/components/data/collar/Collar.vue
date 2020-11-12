@@ -12,10 +12,17 @@
       v-on:page:change="(p)=>loadNewCollars('assign', p)"></state-table>
     <vs-divider></vs-divider>
     <div>  
+      <vs-button @click="handleExportClick" class="btn-export" type="filled">Export</vs-button>
       <vs-button @click="() => handleEditClick(false)" type="border" >Register New Collar</vs-button>
       <vs-button @click="() => handleEditClick(true)" :disabled="Object.keys(editObject).length === 0"  type="border">See Collar Details</vs-button>
       <!-- <vs-button disabled type="border">Retire Collar</vs-button> -->
     </div>
+    <export
+      title="Export Collars"
+      :active="showExportModal"
+      v-on:update:close="close"
+      v-bind:value="allCollars"
+    ></export>
     <collar-modal 
       :active="showEditModal"
       v-on:update:close="close"
@@ -27,22 +34,23 @@
 </template>
 
 <script lang="ts">
-import { Collar, availableCollarProps, assignedCollarProps} from '../../../types/collar'
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
+import { Collar, availableCollarProps, assignedCollarProps} from '../../../types/collar'
 import { ActionGetPayload } from 'frontend/src/types/store';
 import { getNotifyProps } from '../../notify';
+import { assignedCritterProps } from 'frontend/src/types/animal';
 
 export default Vue.extend({
+  name: 'collars',
   props: {
     title: String,
   },
-  name: 'collars',
-  computed: mapGetters(['assignedCollars', 'availableCollars', 'editObject']),
   data: function() {
     return {
       isEditMode: false,
       showEditModal: false,
+      showExportModal: false,
       selected: {},
       assignedCollarProps: assignedCollarProps,
       availableCollarProps: availableCollarProps
@@ -52,10 +60,14 @@ export default Vue.extend({
     getHeader: (s: string) => Collar.getTitle(s),
     close() {
       this.showEditModal = false;
+      this.showExportModal = false;
     },
     handleEditClick(isEdit: boolean) {
       this.isEditMode = isEdit;
       this.showEditModal = !this.showEditModal;
+    },
+    handleExportClick() {
+      this.showExportModal = !this.showAddModal;
     },
     save() {
       this.close();
@@ -74,6 +86,12 @@ export default Vue.extend({
       this.$store.dispatch(actionString, payload);
     }
   },
+  computed: {
+    allCollars() {
+      return [...this.assignedCollars, ...this.availableCollars ]
+    },
+    ...mapGetters(['assignedCollars', 'availableCollars', 'editObject']),
+  },
 })
 
 const cbCollarSaved = (payload) => {
@@ -82,10 +100,10 @@ const cbCollarSaved = (payload) => {
 </script>
 
 <style scoped>
-  h3 {
+  /* h3 {
     margin-bottom: 10px;
-  }
-  button {
-    padding: 3px 15px;
+  } */
+  .btn-export {
+    float: left;
   }
 </style>

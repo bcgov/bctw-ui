@@ -1,3 +1,7 @@
+import { columnToHeader } from '../components/component_helpers';
+
+const assignedCritterProps = ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
+const unassignedCritterProps = ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status'];
 interface IAnimal {
   id: number;
   animal_id: string;
@@ -31,31 +35,16 @@ interface IAnimal {
   nickname: string;
 }
 
+
 class Animal implements IAnimal {
   public static getTitle(str: string): string {
     switch (str) {
       case 'id':
         return 'ID';
-      case 'animal_id':
-        return 'Animal ID';
-      case 'nickname':
-        return 'Nickname';
       case 'wlh_id':
         return 'WLH ID';
-      case 'animal_status':
-        return 'Status';
-      case 'device_id':
-        return 'Device ID';
-      case 'calf_at_heel':
-        return 'Calf at Heel';
-      case 'capture_date':
-        return 'Capture Date';
-      case 'sex':
-        return 'Sex';
-      case 'species':
-        return 'Species';
-      case 'release_date':
-        return 'Release Date';
+      default:
+        return columnToHeader(str);
     }
   }
   id: number;
@@ -92,4 +81,6 @@ class Animal implements IAnimal {
 export {
   Animal,
   IAnimal,
+  assignedCritterProps,
+  unassignedCritterProps,
 };

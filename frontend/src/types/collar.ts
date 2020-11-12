@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { columnToHeader } from '../components/component_helpers';
 
 interface ICollar {
     device_id: number;
@@ -28,16 +29,12 @@ class Collar implements ICollar {
           return 'GPS Vendor';
         case 'model':
           return 'Collar Model';
-        case 'collar_status':
-          return 'Collar Status';
-        case 'satellite_network':
-          return 'Satellite Network';
-        case 'max_transmission_date':
-          return 'Last Update';
-        case 'interval':
-          return 'Next Update';
         case 'animal_id':
           return 'Individual ID';
+        case 'max_transmission_date':
+          return 'Last Update';
+        default:
+          return columnToHeader(str);
       }
     }
     public device_id: number;
@@ -74,7 +71,6 @@ function encodeCollar(c: Collar) {
   });
 }
 
-// todo: merge these two types?
 interface ICollarLinkResult {
   assignment_id: number;
   animal_id: string;
