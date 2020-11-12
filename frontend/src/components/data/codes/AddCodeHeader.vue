@@ -47,9 +47,6 @@ export default Vue.extend({
       this.header_name = '';
       this.header_title = '';
       this.header_description = '';
-      console.log('hi')
-      console.log('hi')
-      console.log('hi')
     },
     callback(data: any, err?: Error | string) {
       let msg; 
