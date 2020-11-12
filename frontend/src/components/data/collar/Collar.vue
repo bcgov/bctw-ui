@@ -17,12 +17,12 @@
       <vs-button @click="() => handleEditClick(true)" :disabled="Object.keys(editObject).length === 0"  type="border">See Collar Details</vs-button>
       <!-- <vs-button disabled type="border">Retire Collar</vs-button> -->
     </div>
-    <export
+    <export-modal
       title="Export Collars"
       :active="showExportModal"
       v-on:update:close="close"
       v-bind:value="allCollars"
-    ></export>
+    ></export-modal>
     <collar-modal 
       :active="showEditModal"
       v-on:update:close="close"

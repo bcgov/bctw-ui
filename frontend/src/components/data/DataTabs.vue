@@ -42,7 +42,7 @@ Vue.component('add-animal', AddAnimal, );
 Vue.component('add-code', AddCodeHeader);
 Vue.component('assign-collar', AssignCollar);
 Vue.component('collar-modal', CollarModal);
-Vue.component('export', Export);
+Vue.component('export-modal', Export);
 Vue.component('file-input', FileInput);
 Vue.component('input-check', Checkbox);
 Vue.component('input-type', Input);

@@ -18,12 +18,12 @@
     <vs-button @click="handleExportClick" class="btn-export" type="filled">Export</vs-button>
     <vs-button @click="() => handleEditClick(false)" type="border">Add Individual</vs-button>
     <vs-button @click="() => handleEditClick(true)" :disabled="Object.keys(editObject).length === 0" type="border">Edit Individual</vs-button>
-    <export
+    <export-modal
       title="Export Animals"
       :active="showExportModal"
       v-on:update:close="close"
       v-bind:value="assignedAnimals"
-    ></export>
+    ></export-modal>
     <add-animal
       :active="showAddModal"
       v-on:update:close="close"
