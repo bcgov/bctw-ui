@@ -73,7 +73,7 @@ const codeModule = {
         }
       },
     async upsertCodeHeader(context, payload: ActionPostPayload) {
-      const url = createUrl2({context: context.getters.rootState, apiString: 'add-code-header'});
+      const url = createUrl2({context: context.getters.rootState, apiString: 'add-code-header', isPost: true});
       try {
         const response = await needle('post', url, payload.body);
         if (response && response.statusCode === 200) {

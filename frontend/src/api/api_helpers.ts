@@ -7,16 +7,17 @@ interface CreateUrlParams {
   apiString: string;
   queryString?: string;
   page?: number;
+  isPost?: boolean;
 }
-const createUrl2 = ({context, apiString, queryString, page}: CreateUrlParams) => {
-  return createUrl(context, apiString, queryString, page);
+const createUrl2 = ({context, apiString, queryString, page, isPost}: CreateUrlParams) => {
+  return createUrl(context, apiString, queryString, page, isPost);
 };
 
-const createUrl = (context, apiString: string, queryString?: string, page?: number) => {
+const createUrl = (context, apiString: string, queryString?: string, page?: number, isPost: boolean = false) => {
   const h1 = location.protocol;
   const h2 = location.hostname;
   const h3 = context.state.prod ? location.port : 3000;
-  const h4 = context.state.prod ? '/api' : '';
+  const h4 = isPost ? '' : context.state.prod ? '/api' : '';
   let url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
   if (queryString) {
     url += urlContainsQuery(url) ? `&${queryString}` : `?${queryString}`;
