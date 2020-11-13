@@ -38,7 +38,7 @@ import { filterObj } from '../../api/api_helpers';
 import moment from 'moment';
 
 export default Vue.extend({
-  name: 'export type',
+  name: 'export',
   props: {
     title: {type: String, required: true},
     active: { type: Boolean, required: true },

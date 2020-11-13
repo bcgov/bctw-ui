@@ -5,11 +5,10 @@ import {createOptions, createUrl, createUrl2} from './api/api_helpers';
 import { codeModule } from './api/code_module';
 import { animalModule } from './api/animal_module';
 import moment from 'moment';
-import { Collar, ICollar, decodeCollar } from './types/collar';
-import { ActionGetPayload, ActionPostPayload } from './types/store';
+import { Collar, decodeCollar } from './types/collar';
+import { ActionGetPayload } from './types/store';
 
 import {bus} from './main';
-import { filter } from 'vue/types/umd';
 
 Vue.use(Vuex);
 

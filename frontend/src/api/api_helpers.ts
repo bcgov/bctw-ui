@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from 'moment';
 
 const urlContainsQuery = (url: string): boolean => url.includes('?');
 
@@ -16,6 +16,7 @@ const createUrl = (context, apiString: string, queryString?: string, page?: numb
   const h1 = location.protocol;
   const h2 = location.hostname;
   const h3 = context.state.prod ? location.port : 3000;
+  console.log(`context state is ${context.state.prod}`);
   const h4 = context.state.prod ? '/api' : '';
   let url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
   if (queryString) {

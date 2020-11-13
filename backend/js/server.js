@@ -70,9 +70,7 @@ const proxyApi = function (req, res, next) {
     const cred = req.kauth.grant.access_token.content.preferred_username; 
     const domain = cred.split('@')[1];
     const user = cred.split('@')[0];
-    console.log(`user: ${JSON.stringify(user)}`)
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&${domain}=${user}`;
-    console.log(`url: ${JSON.stringify(url)}`)
   } else {
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&idir=user`;
   }

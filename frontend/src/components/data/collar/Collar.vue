@@ -51,6 +51,7 @@ export default Vue.extend({
       isEditMode: false,
       showEditModal: false,
       showExportModal: false,
+      isError: false,
       selected: {},
       assignedCollarProps: assignedCollarProps,
       availableCollarProps: availableCollarProps
@@ -74,8 +75,10 @@ export default Vue.extend({
     },
     cBCollarsLoaded(body: any, err?: Error | string) {
       if (err) {
+        this.isError = true;
         this.$vs.notify(getNotifyProps(err, true));
       }
+      console.log(this.isError)
     },
     loadNewCollars(type: 'assign' | 'avail', page: number = 1) {
       const payload:ActionGetPayload = {
