@@ -57,18 +57,25 @@ const _momentFormat = 'DD-MM-YYYY HH:mm:ss';
 function decodeCollar(json: ICollar): Collar {
   const collar = Object.create(Collar.prototype);
   return Object.assign(collar, json, {
-    malfunction_date: moment(json.malfunction_date),
-    max_transmission_date: moment(json.max_transmission_date),
-    retreival_date: moment(json.retreival_date),
+    malfunction_date: json.malfunction_date ? moment(json.malfunction_date) : null,
+    max_transmission_date: json.max_transmission_date ? moment(json.max_transmission_date) : null,
+    retreival_date: json.retreival_date ? moment(json.retreival_date) : null,
   });
 }
 
+const datetimeFields = ['malfunction_date', 'max_transmission_date', 'retreival_date'];
+
+// dont upsert null date / timestamp fields
 function encodeCollar(c: Collar) {
-  return Object.assign(c, {
-    malfunction_date: moment(c.malfunction_date).format(_momentFormat),
-    max_transmission_date: moment(c.max_transmission_date).format(_momentFormat),
-    retreival_date: moment(c.retreival_date).format(_momentFormat),
+  const dateFields = {};
+  datetimeFields.forEach((s: string) => {
+    if (c[s]) {
+      dateFields[s] = moment(c[s]).format(_momentFormat);
+    } else {
+      delete c[s];
+    }
   });
+  return Object.assign(c, dateFields);
 }
 
 interface ICollarLinkResult {

@@ -8,7 +8,8 @@
       >
       <template slot="header"><h3>{{title}}</h3></template> 
       <template slot="thead" v-if="value && value.length">
-        <vs-th v-for="p in Object.keys(value[value.length - 1]).filter((prop) => propsToDisplay.includes(prop))" :key="p">
+        <vs-th v-for="p in propsToDisplay" :key="p">
+        <!-- <vs-th v-for="p in Object.keys(value[value.length - 1]).filter((prop) => propsToDisplay.includes(prop))" :key="p"> -->
           {{getHeader(p)}}
         </vs-th>
       </template>
@@ -16,8 +17,9 @@
         <!-- each object in array is a table row -->
         <vs-tr v-for="(obj, prop) in displayed" :key="prop" :data="obj">
           <!-- iterate the properties to display, retrieving the object value at each-->
-          <vs-td v-for="(p, i) in propsToDisplay" :key="i" :data="p">
-            {{formatTableData(obj[p])}}
+          <vs-td v-for="(k, i) in propsToDisplay" :key="i" :data="k">
+            <!-- <pre>{{obj}} {{k}} {{prop}}</pre> -->
+            {{formatTableData(obj[k])}}
           </vs-td>
         </vs-tr> 
       </template>
