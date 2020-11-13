@@ -8,7 +8,7 @@ interface CreateUrlParams {
   queryString?: string;
   page?: number;
 }
-const createUrl2 = ({context, apiString, queryString, page}: CreateUrlParams) {
+const createUrl2 = ({context, apiString, queryString, page}: CreateUrlParams) => {
   return createUrl(context, apiString, queryString, page);
 };
 

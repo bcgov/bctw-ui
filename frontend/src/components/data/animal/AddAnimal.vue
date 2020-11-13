@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import { Animal } from '../../../types/animal';
+import { Animal, encodeCritter } from '../../../types/animal';
 import { mapGetters } from 'vuex';
 import Vue from 'vue';
 import { getNotifyProps } from '../../notify';
@@ -151,7 +151,7 @@ export default Vue.extend({
     },
     save() {
       const payload: ActionPostPayload = {
-        body: this.animal,
+        body: encodeCritter(this.animal),
         callback: (data: Animal[], err?: Error | string): void => {
           if (err) {
             this.$vs.notify(getNotifyProps(err, true));
@@ -164,6 +164,7 @@ export default Vue.extend({
           }
         },
       }
+      console.log(JSON.stringify(payload.body));
       this.$store.dispatch('upsertAnimal', payload);
       this.$emit('save:animal');
     },

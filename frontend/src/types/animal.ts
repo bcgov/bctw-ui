@@ -35,6 +35,14 @@ interface IAnimal {
   nickname: string;
 }
 
+function encodeCritter(obj: Animal) {
+  for (const [key, value] of Object.entries(obj)) {
+    if (value === '' || value === null) {
+      delete obj[key];
+    }
+  }
+  return obj;
+}
 
 class Animal implements IAnimal {
   public static getTitle(str: string): string {
@@ -47,6 +55,7 @@ class Animal implements IAnimal {
         return columnToHeader(str);
     }
   }
+
   id: number;
   animal_id: string;
   animal_status: string;
@@ -83,4 +92,5 @@ export {
   IAnimal,
   assignedCritterProps,
   unassignedCritterProps,
+  encodeCritter,
 };
