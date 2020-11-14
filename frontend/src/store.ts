@@ -18,7 +18,7 @@ const rootModule = {
     pings: null,
     pingActive: {},
     pingsActive: [],
-    pingsFocused: [],
+    pingsSelected: [],
     pingExtent: {}, // Amount of data available in the database
     filters: {
       herdsActive: [],
@@ -35,6 +35,12 @@ const rootModule = {
   mutations: {
     pingActive(state, properties) {
       state.pingActive = properties;
+    },
+    pingsActive(state, properties) {
+      state.pingsActive = properties;
+    },
+    pingsSelected(state, properties) {
+      state.pingsSelected = properties;
     },
     writeTimeWindow(state, time) {
       state.timeWindow = time;
@@ -106,6 +112,9 @@ const rootModule = {
     },
     pingActive (state) {
       return state.pingActive;
+    },
+    pingsSelected (state) {
+      return state.pingsSelected;
     },
     pingExtent (state) {
       return state.pingExtent;

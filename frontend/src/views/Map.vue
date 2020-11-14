@@ -20,6 +20,9 @@
 ``import 'leaflet.markercluster/dist/leaflet.markercluster.js'``
 ``import 'leaflet-draw/dist/leaflet.draw.js'``
 
+``import {pointsWithinPolygon} from '@turf/turf'``
+#//``import * as turf from '@turf/turf'``
+
 ``import PingPopup from '../components/PingPopup.vue'``
 
 ``import {bus} from '../main'``
@@ -47,7 +50,7 @@ makeMarkers = ->
 
 drawPingLayer = (map) ->
   clusterLayer = L.markerClusterGroup do
-    disableClusteringAtZoom: 14
+    disableClusteringAtZoom: 11
     iconCreateFunction: (cluster) ->
       count = cluster.getChildCount!
       points = cluster.getAllChildMarkers!
@@ -103,15 +106,40 @@ drawPingLayer = (map) ->
 /* ## drawSelectedLayer
   Draw the layer that holds all the selected pings
   @param map {object} Leaflet map object
+  @param drawnItems {object} Leaflet layer object
+    for storing and displaying selected points
  */
-drawSelectedLayer = (map) ->
-  console.log map
+drawSelectedLayer = (map, drawnItems) !->
+  #// Remove previous selection
+  map.eachLayer -> if it.options.class === 'selected-ping' then map.removeLayer it
+
+  clipper = drawnItems.toGeoJSON! #// The drawn polygons to cut by
+  pings = @$store.getters.pingsActive #// The active pings
+
+  selected = pointsWithinPolygon pings, clipper
+  @$store.commit 'pingsSelected', selected
+
+  L.geoJson(@$store.getters.pingsSelected, do
+    pointToLayer: (feature,latlng) ->
+      pointStyle = do
+        class: 'selected-ping'
+        radius: 8
+        fillColor: '#00fbff'
+        color: "#000"
+        weight: 1
+        opacity: 1
+        fillOpacity: 0.9
+      L.circleMarker latlng, pointStyle
+  ).addTo map
+
 
 
 /* ## draw
   Draw the map
  */
 draw = ->
+  V = @
+
   map = L.map 'map', zoomControl: no
     .setView [55,-128], 6
 
@@ -125,8 +153,6 @@ draw = ->
 
   drawPingLayer.call @, map #// Draw cluster layer
 
-  drawSelectedLayer.call @, map #// Draw selected layer
-
   drawnItems = new L.FeatureGroup!
   map.addLayer drawnItems
   drawControl = new L.Control.Draw do
@@ -134,7 +160,7 @@ draw = ->
     draw:
       marker: false
       polyline: false
-      circle: true
+      circle: false
       circlemarker: false
     edit:
       featureGroup: drawnItems
@@ -144,13 +170,17 @@ draw = ->
   map.addControl drawControl
 
 
+
   #// Add new shape to map
   map.on 'draw:created', ->
-    console.log 'created'
     drawnItems.addLayer it.layer
+    drawSelectedLayer.call V, map, drawnItems
 
-  map.on 'draw:edited', -> console.log 'edited'
-  map.on 'draw:deletestop', -> console.log 'deletestop'
+  map.on 'draw:edited', ->
+    drawSelectedLayer.call V, map, drawnItems
+
+  map.on 'draw:deletestop', ->
+    drawSelectedLayer.call V, map, drawnItems
 
 ``
 export default {
