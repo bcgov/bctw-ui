@@ -50,7 +50,7 @@ makeMarkers = ->
 
 drawPingLayer = (map) ->
   clusterLayer = L.markerClusterGroup do
-    disableClusteringAtZoom: 11
+    disableClusteringAtZoom: 12
     iconCreateFunction: (cluster) ->
       count = cluster.getChildCount!
       points = cluster.getAllChildMarkers!
