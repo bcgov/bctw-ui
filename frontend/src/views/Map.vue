@@ -24,7 +24,6 @@
 
 ``import {bus} from '../main'``
 
-map = {}
 
 makeMarkers = ->
   markers = L.geoJson @$store.getters.pingsActive, do
@@ -46,7 +45,7 @@ makeMarkers = ->
   markers.on 'click',storeData
 
 
-drawPingLayer = ->
+drawPingLayer = (map) ->
   clusterLayer = L.markerClusterGroup do
     disableClusteringAtZoom: 14
     iconCreateFunction: (cluster) ->
@@ -101,8 +100,19 @@ drawPingLayer = ->
   @$root.$on 'toggleClusterCritters', chooseToToggleCluster
 
 
+/* ## drawSelectedLayer
+  Draw the layer that holds all the selected pings
+  @param map {object} Leaflet map object
+ */
+drawSelectedLayer = (map) ->
+  console.log map
+
+
+/* ## draw
+  Draw the map
+ */
 draw = ->
-  map := L.map 'map', zoomControl: no
+  map = L.map 'map', zoomControl: no
     .setView [55,-128], 6
 
   L.control.zoom position: 'bottomright'
@@ -113,7 +123,9 @@ draw = ->
     maxZoom: 18
   }).addTo(map);
 
-  drawPingLayer.call @ #// Draw terrain layer
+  drawPingLayer.call @, map #// Draw cluster layer
+
+  drawSelectedLayer.call @, map #// Draw selected layer
 
   drawnItems = new L.FeatureGroup!
   map.addLayer drawnItems
@@ -131,8 +143,15 @@ draw = ->
 
   map.addControl drawControl
 
+
   #// Add new shape to map
-  map.on 'draw:created', -> drawnItems.addLayer it.layer
+  map.on 'draw:created', ->
+    console.log 'created'
+    drawnItems.addLayer it.layer
+
+  map.on 'draw:edited', -> console.log 'edited'
+  map.on 'draw:deletestop', -> console.log 'deletestop'
+
 ``
 export default {
   name: 'Map',
