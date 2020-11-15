@@ -31,8 +31,10 @@
 makeMarkers = ->
   markers = L.geoJson @$store.getters.pingsActive, do
     pointToLayer: (feature,latlng) ->
+      #// Mortality is red
       s = feature.properties.animal_status
       colour = if s is 'Mortality' then '#ff0000' else '#00ff44'
+
       pointStyle = do
         radius: 8
         fillColor: colour
