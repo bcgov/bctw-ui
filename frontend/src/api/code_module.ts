@@ -33,9 +33,6 @@ const codeModule = {
     code: (state) => (headerId): string => {
       return state.codes[headerId];
     },
-    // fake the rootModules prod state to pass to createurl
-    rootState: (state, getters, rootState) => {
-      return { state: { prod: rootState.rootModule.prod } }; },
   },
   actions: {
     async requestCodes(context, payload: ActionPostPayload) {
@@ -48,7 +45,7 @@ const codeModule = {
       if (context.state.codes[header] && context.state.codes[header].length) {
         return;
       }
-      const url = createUrl2({ context: context.getters.rootState, apiString: 'get-code', queryString: `codeHeader=${header}` });
+      const url = createUrl2({ context, apiString: 'get-code', queryString: `codeHeader=${header}` });
       try {
         const response = await needle('get', url, createOptions({}));
         if (response && response.statusCode === 200) {
@@ -60,7 +57,7 @@ const codeModule = {
       }
     },
     async requestHeaders(context, payload: ActionGetPayload) {
-      const url = createUrl2({context: context.getters.rootState, apiString: 'get-code-headers'});
+      const url = createUrl2({context, apiString: 'get-code-headers'});
       try {
         const response: NeedleResponse = await needle('get', url, createOptions({}));
         if (response && response.statusCode === 200) {
@@ -73,7 +70,7 @@ const codeModule = {
         }
       },
     async upsertCodeHeader(context, payload: ActionPostPayload) {
-      const url = createUrl2({context: context.getters.rootState, apiString: 'add-code-header', isPost: true});
+      const url = createUrl2({context, apiString: 'add-code-header'});
       try {
         const response = await needle('post', url, payload.body);
         if (response && response.statusCode === 200) {
@@ -86,7 +83,7 @@ const codeModule = {
       }
     },
     async uploadCsv(context, payload) {
-      const url = createUrl2({context: context.getters.rootState, apiString: 'import'});
+      const url = createUrl2({context, apiString: 'import'});
       // fixme: some kind of issue with needle/multer.
       // figure out how to send this with needle so that multer can properly grab the file?
       try {

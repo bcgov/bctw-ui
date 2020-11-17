@@ -59,6 +59,10 @@ export default Vue.extend({
       } return td;
     },
     handlePageChange(v: number){
+      if (this.value.length && this.value.length < this.limitPerPage) {
+        // dont need to query for more
+        return;
+      }
       this.current_page = v;
       if (this.value.length < (10 * v)) {
         this.$emit('page:change', v)

@@ -1,6 +1,6 @@
 import needle, { NeedleResponse } from 'needle';
 import { createOptions, createUrl2 } from './api_helpers';
-import { ActionPostPayload } from '../types/store';
+import { ActionGetPayload, ActionPostPayload } from '../types/store';
 import { Animal } from '../types/animal';
 import { decodeCollarAssignment } from '../types/collar_assignment';
 
@@ -51,14 +51,12 @@ const animalModule = {
     critterCollarHistory(state) {
       return state.critterCollarHistory;
     },
-    rootState: (state, getters, rootState) => {
-      return { state: { prod: rootState.rootModule.prod } }; },
   },
   actions: {
-    async getAssignedAnimals(context, payload) {
+    async getAssignedAnimals(context, payload: ActionGetPayload) {
       const { callback, page } = payload;
       const url = createUrl2({
-        context: context.getters.rootState,
+        context,
         apiString: 'get-animals',
         queryString: 'assigned=true', page,
       });
@@ -75,9 +73,9 @@ const animalModule = {
           callback(null, `error fetching critters ${e}`);
       }
     },
-    async getUnassignedAnimals(context, payload) {
+    async getUnassignedAnimals(context, payload: ActionGetPayload) {
       const { callback, page } = payload;
-      const url = createUrl2({context: context.getters.rootState, apiString: 'get-animals', queryString: 'assigned=false', page});
+      const url = createUrl2({context, apiString: 'get-animals', queryString: 'assigned=false', page });
       try {
         const response: NeedleResponse = await needle('get', url, createOptions({}));
         const body = response.body;

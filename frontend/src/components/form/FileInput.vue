@@ -99,7 +99,11 @@ export default {
           this.currentStatus = LoadStatus.FAILED;
           this.uploadError = err;
         } else {
-          msg = `added ${data[0].length} items successfully`;
+          if (Array.isArray(data)) {
+            msg = `added ${data[0].length} items successfully`;
+          } else {
+            msg = data;
+          }
           this.currentStatus = LoadStatus.SUCCESS;
         }
         this.$vs.notify(getNotifyProps(msg, !!err))

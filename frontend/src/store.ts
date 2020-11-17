@@ -15,6 +15,7 @@ Vue.use(Vuex);
 const rootModule = {
   state: {
     prod: +(location.port) === 1111 ? false : true,
+    isUserTestMode: process.env.TESTING_USERS,
     pings: null,
     pingActive: {},
     pingsActive: [],
@@ -31,6 +32,8 @@ const rootModule = {
       assignedCollars: [],
     },
     editObject: {},
+    testUser: '',
+    testUsers: ['test1', 'test2', 'test3'],
   },
   mutations: {
     pingActive(state, properties) {
@@ -93,6 +96,11 @@ const rootModule = {
       const filtered = state.collars.availableCollars.filter((c: Collar) => !newIds.includes(c.device_id));
       state.collars.availableCollars = [...collars, ...filtered];
     },
+    updateTestUser(state, user) {
+      state.testUser = user;
+      state.collars.availableCollars = [];
+      state.collars.assignedCollars = [];
+    },
   },
   getters: {
     hasPings (state) {
@@ -133,6 +141,12 @@ const rootModule = {
     },
     animals(state) {
       return state.animals;
+    },
+    testUsers(state) {
+      return state.testUsers;
+    },
+    testUser(state) {
+      return state.testUser;
     },
   },
   actions: {
@@ -206,7 +220,7 @@ const rootModule = {
           callback(null, `${errMsg} ${e}`);
       }
     },
-    async getAssignedCollars(context, payload) {
+    async getAssignedCollars(context, payload: ActionGetPayload) {
       const {callback, page} = payload;
       const urlAssign = createUrl2({context, apiString: 'get-assigned-collars', page});
       const errMsg = `error fetching assigned collars:`;

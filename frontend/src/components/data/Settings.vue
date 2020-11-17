@@ -1,15 +1,24 @@
 <template>
   <div>
-    <h3>Code Management</h3>
+    <h3>Settings</h3>
     <vs-divider></vs-divider>
-    <file-input name="csv" title="Bulk upload codes"></file-input>
+    <h4>Select sample test user</h4><br/>
+    <div>
+      <vs-select label="User" v-model="user" v-on:change="(v) => $store.commit('updateTestUser', v)">
+        <vs-select-item
+          :key="idx" :value="user" :text="user"
+          v-for="(user, idx) in $store.getters.testUsers"></vs-select-item>
+      </vs-select>
+    </div>
     <vs-divider></vs-divider>
-    <h4>sample code select component</h4><br/>
+    <file-input name="csv" title="Bulk upload codes or critters"></file-input>
+    <vs-divider></vs-divider>
+    <!-- <h4>sample code select component</h4><br/>
     <div class='testform'>
       <input-select header="region" label="Region"></input-select>
       <input-select header="species" label="Species"></input-select>
       <input-select header="animal_status" label="Animal Status"></input-select>
-    </div>
+    </div> -->
     <vs-divider></vs-divider>
     <h4>add a new code type</h4><br/>
     <vs-button type="border" @click="handleAddClick">Add Code Type</vs-button>
@@ -46,6 +55,7 @@ export default Vue.extend({
   data () {
     return {
       headers: [],
+      user: this.$store.getters.testUser,
       selected: {},
       showAddCodeHeader: false,
     }

@@ -7,29 +7,50 @@ interface CreateUrlParams {
   apiString: string;
   queryString?: string;
   page?: number;
-  isPost?: boolean;
 }
-const createUrl2 = ({context, apiString, queryString, page, isPost}: CreateUrlParams) => {
-  return createUrl(context, apiString, queryString, page, isPost);
+const createUrl2 = ({context, apiString, queryString, page}: CreateUrlParams) => {
+  return createUrl(context, apiString, queryString, page);
 };
 
-const createUrl = (context, apiString: string, queryString?: string, page?: number, isPost: boolean = false) => {
-  const h1 = location.protocol;
-  const h2 = location.hostname;
-  const h3 = context.state.prod ? location.port : 3000;
-  const h4 = isPost ? '' : context.state.prod ? '/api' : '';
-  let url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
-  if (queryString) {
-    url += urlContainsQuery(url) ? `&${queryString}` : `?${queryString}`;
+const retrieveRootState = (context) => {
+  if (context.rootState) {
+    return {
+      state: context.rootState.rootModule,
+    };
   }
-  if (isDev) {
-    const q = `idir=${process.env.IDIR}`;
-    url += urlContainsQuery(url) ? `&${q}` : `?${q}`;
-  }
-  if (page) {
-    url += urlContainsQuery(url) ? `&page=${page}` : `?page=${page}`;
-  }
-  return url;
+  return context;
+};
+
+const createUrl = (
+    context,
+    apiString: string,
+    queryString?: string,
+    page?: number,
+  ): string => {
+    const rootState = retrieveRootState(context);
+    const isUserTestMode = rootState.state.isUserTestMode;
+    const h1 = location.protocol;
+    const h2 = location.hostname;
+    const h3 = rootState.state.prod ? location.port : 3000;
+    const h4 = rootState.state.prod ? '/api' : '';
+    let url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
+    if (queryString) {
+      url += urlContainsQuery(url) ? `&${queryString}` : `?${queryString}`;
+    }
+    if (isDev) {
+      const q = `idir=${process.env.IDIR}`;
+      url += urlContainsQuery(url) ? `&${q}` : `?${q}`;
+    }
+    if (page) {
+      url += urlContainsQuery(url) ? `&page=${page}` : `?page=${page}`;
+    }
+    if (isUserTestMode) {
+      const u = context.getters.testUser;
+      if (u) {
+        url += urlContainsQuery(url) ? `&testUser=${u}` : `?testUser=${u}`;
+      }
+    }
+    return url;
 };
 
 const createOptions = (obj) => {
@@ -46,8 +67,13 @@ const isDev = process.env.ENV === 'DEV';
 // response: resolved fetch response
 // payload: object containing a function called callback
 const handleFetchResult = (response: Response, callback) => {
-  if (response.ok) {
-    response.json().then((d) => callback(d));
+  if (response.ok && response.headers.get('content-type')) {
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.indexOf('application/json') !== -1) {
+      response.json().then((d) => callback(d));
+    } else {
+      response.text().then((d) => callback(d));
+    }
   } else {
     // bad status returned, probably can't parse as json.
     response.text().then((e) => callback(null, e));
