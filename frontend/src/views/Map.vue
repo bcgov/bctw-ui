@@ -20,18 +20,24 @@
 ``import 'leaflet.markercluster/dist/leaflet.markercluster.js'``
 ``import 'leaflet-draw/dist/leaflet.draw.js'``
 
+``import {pointsWithinPolygon} from '@turf/turf'``
+#//``import * as turf from '@turf/turf'``
+
 ``import PingPopup from '../components/PingPopup.vue'``
 
 ``import {bus} from '../main'``
 
-map = {}
 
 makeMarkers = ->
   markers = L.geoJson @$store.getters.pingsActive, do
     pointToLayer: (feature,latlng) ->
+      #// Mortality is red
+      s = feature.properties.animal_status
+      colour = if s is 'Mortality' then '#ff0000' else '#00ff44'
+
       pointStyle = do
         radius: 8
-        fillColor: 'yellow'
+        fillColor: colour
         color: "#000"
         weight: 1
         opacity: 1
@@ -46,9 +52,9 @@ makeMarkers = ->
   markers.on 'click',storeData
 
 
-drawPingLayer = ->
+drawPingLayer = (map) ->
   clusterLayer = L.markerClusterGroup do
-    disableClusteringAtZoom: 14
+    disableClusteringAtZoom: 12
     iconCreateFunction: (cluster) ->
       count = cluster.getChildCount!
       points = cluster.getAllChildMarkers!
@@ -101,8 +107,44 @@ drawPingLayer = ->
   @$root.$on 'toggleClusterCritters', chooseToToggleCluster
 
 
+/* ## drawSelectedLayer
+  Draw the layer that holds all the selected pings
+  @param map {object} Leaflet map object
+  @param drawnItems {object} Leaflet layer object
+    for storing and displaying selected points
+ */
+drawSelectedLayer = (map, drawnItems) !->
+  #// Remove previous selection
+  map.eachLayer -> if it.options.class === 'selected-ping' then map.removeLayer it
+
+  clipper = drawnItems.toGeoJSON! #// The drawn polygons to cut by
+  pings = @$store.getters.pingsActive #// The active pings
+
+  selected = pointsWithinPolygon pings, clipper
+  @$store.commit 'pingsSelected', selected
+
+  L.geoJson(@$store.getters.pingsSelected, do
+    pointToLayer: (feature,latlng) ->
+      pointStyle = do
+        class: 'selected-ping'
+        radius: 8
+        fillColor: '#00fbff'
+        color: "#000"
+        weight: 1
+        opacity: 1
+        fillOpacity: 0.9
+      L.circleMarker latlng, pointStyle
+  ).addTo map
+
+
+
+/* ## draw
+  Draw the map
+ */
 draw = ->
-  map := L.map 'map', zoomControl: no
+  V = @
+
+  map = L.map 'map', zoomControl: no
     .setView [55,-128], 6
 
   L.control.zoom position: 'bottomright'
@@ -113,7 +155,7 @@ draw = ->
     maxZoom: 18
   }).addTo(map);
 
-  drawPingLayer.call @ #// Draw terrain layer
+  drawPingLayer.call @, map #// Draw cluster layer
 
   drawnItems = new L.FeatureGroup!
   map.addLayer drawnItems
@@ -122,7 +164,7 @@ draw = ->
     draw:
       marker: false
       polyline: false
-      circle: true
+      circle: false
       circlemarker: false
     edit:
       featureGroup: drawnItems
@@ -131,8 +173,19 @@ draw = ->
 
   map.addControl drawControl
 
+
+
   #// Add new shape to map
-  map.on 'draw:created', -> drawnItems.addLayer it.layer
+  map.on 'draw:created', ->
+    drawnItems.addLayer it.layer
+    drawSelectedLayer.call V, map, drawnItems
+
+  map.on 'draw:edited', ->
+    drawSelectedLayer.call V, map, drawnItems
+
+  map.on 'draw:deletestop', ->
+    drawSelectedLayer.call V, map, drawnItems
+
 ``
 export default {
   name: 'Map',

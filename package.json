@@ -12,6 +12,8 @@
     "start": "npx pm2@4.4.0 --no-daemon start backend/js/server.js"
   },
   "dependencies": {
+    "@turf/points-within-polygon": "^5.1.5",
+    "@turf/turf": "^5.1.6",
     "@vue/component-compiler-utils": "^3.0.0",
     "autoprefixer": "^9.6.1",
     "babel-core": "^6.26.3",
