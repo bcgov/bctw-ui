@@ -24,7 +24,7 @@ const animalModule = {
     },
     // from upsert/edit critter
     // todo: currently always writing to assigned
-    updateAnimals(state, newAnimals: Animal[]) {
+    upsertAnimals(state, newAnimals: Animal[]) {
       newAnimals.forEach((critter: Animal) => {
         const foundIndex = state.assignedAnimals.findIndex((animal: Animal) => animal.id === critter.id);
         if (foundIndex !== -1) {
@@ -92,7 +92,7 @@ const animalModule = {
     },
     async getCollarAssignmentDetails(context, payload) {
       const {callback, id} = payload;
-      const url = createUrl2({context: context.getters.rootState, apiString: `get-assignment-history/${id}`});
+      const url = createUrl2({context, apiString: `get-assignment-history/${id}`});
       const msg = 'error fetching collar history: ';
       try {
         const response: NeedleResponse = await needle('get', url, createOptions({}));
@@ -109,12 +109,12 @@ const animalModule = {
       }
     },
     async upsertAnimal(context, payload: ActionPostPayload) {
-      const url = createUrl2({context: context.getters.rootState, apiString: 'add-animal'});
+      const url = createUrl2({context, apiString: 'add-animal'});
       try {
         const response = await needle('post', url, payload.body, createOptions({}));
         const body: Animal[] = response.body;
         if (response && response.statusCode === 200) {
-          context.commit('updateAnimals', response.body[0]);
+          context.commit('upsertAnimals', response.body[0]);
           payload.callback(body);
         } else {
           payload.callback(null, `error adding animal: ${body}`);
@@ -125,7 +125,7 @@ const animalModule = {
     },
     async linkOrUnlinkCritterCollar(context, payload: ActionPostPayload) {
       const link = (payload.body as any).link;
-      const url = createUrl2({context: context.getters.rootState, apiString: link ? 'link-animal-collar' : 'unlink-animal-collar'});
+      const url = createUrl2({context, apiString: link ? 'link-animal-collar' : 'unlink-animal-collar'});
       try {
         const response = await needle('post', url, { data: (payload.body as any).data });
         const body = response.body;
@@ -137,6 +137,15 @@ const animalModule = {
       } catch (e) {
           payload.callback(null, `caught exception linking collar ${e}`);
       }
+    },
+    async resetCritters({dispatch, state}) {
+      state.assignedAnimals = [];
+      state.unassignedAnimals = [];
+      const payload = {
+        callback: (d) => console.log(`${d?.length} critters loaded`),
+      };
+      await dispatch('getAssignedAnimals', payload);
+      await dispatch('getUnassignedAnimals', payload);
     },
   },
 };

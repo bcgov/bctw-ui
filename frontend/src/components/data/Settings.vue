@@ -2,14 +2,6 @@
   <div>
     <h3>Settings</h3>
     <vs-divider></vs-divider>
-    <h4>Select sample test user</h4><br/>
-    <div>
-      <vs-select label="User" v-model="user" v-on:change="(v) => $store.commit('updateTestUser', v)">
-        <vs-select-item
-          :key="idx" :value="user" :text="user"
-          v-for="(user, idx) in $store.getters.testUsers"></vs-select-item>
-      </vs-select>
-    </div>
     <vs-divider></vs-divider>
     <file-input name="csv" title="Bulk upload codes or critters"></file-input>
     <vs-divider></vs-divider>

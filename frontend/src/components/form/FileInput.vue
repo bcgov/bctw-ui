@@ -100,7 +100,7 @@ export default {
           this.uploadError = err;
         } else {
           if (Array.isArray(data)) {
-            msg = `added ${data[0].length} items successfully`;
+            msg = `added ${data.length} items successfully`;
           } else {
             msg = data;
           }

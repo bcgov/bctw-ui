@@ -1,19 +1,22 @@
 <template>
-<!--
-  todo:
-  - move tabs to left side of page stacked vertically
--->
   <div class="ss">
+    <div class="r">
+      <vs-select 
+        label="Select Test User"
+        v-model="user"
+        v-on:change="(v) => $store.dispatch('changeTestUser', v)"
+      ><vs-select-item
+        :key="idx" :value="user" :text="user"
+        v-for="(user, idx) in $store.getters.testUsers"></vs-select-item>
+      </vs-select>
+    </div>
     <vs-tabs>
       <vs-tab
         v-for="item in items"
         :key="item.key"
         :label="item.title"
-        :disabled="item.disabled"
-      >
-        <div class="con-tab-ejemplo">
-          <component :is="item.component"></component>
-        </div>
+        :disabled="item.disabled">
+        <component :is="item.component"></component>
       </vs-tab>
     </vs-tabs>
   </div>
@@ -55,7 +58,9 @@ Vue.component('yes-no', YesNoDialog);
 export default {
   name: 'dataTabs',
   data: function() {
-    return { }
+    return {
+      user: this.$store.getters.testUser
+    }
   },
   computed: {
     items() {
@@ -70,10 +75,14 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
-#ss
-  position absolute 
-  width 100%
-  height 100%
+<style scoped>
+.r {
+  float: right;
+}
+#ss {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
 </style>
 

@@ -1,12 +1,12 @@
 import needle, { NeedleResponse } from 'needle';
-import { createOptions, createUrl, createUrl2, handleFetchResult} from './api_helpers';
+import { createOptions, createUrl2, handleFetchResult} from './api_helpers';
 import { ICodeHeader } from '../types/code';
 import { ActionGetPayload, ActionPostPayload } from '../types/store';
 
 const codeModule = {
   state: () => ({
     codes: {
-      // must define known code headers here to make it reactive
+      // must define known code headers here to make them reactive
       region: [], species: [], population_unit: [], animal_status: [],
     },
     headers: [] as ICodeHeader[],
@@ -41,7 +41,6 @@ const codeModule = {
         return;
       }
       //  if already loaded dont need to again
-      // fixme: on insert of new codes?
       if (context.state.codes[header] && context.state.codes[header].length) {
         return;
       }

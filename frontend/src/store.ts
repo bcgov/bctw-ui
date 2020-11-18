@@ -1,12 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import needle, { NeedleResponse } from 'needle';
-import {createOptions, createUrl, createUrl2} from './api/api_helpers';
-import { codeModule } from './api/code_module';
+import needle from 'needle';
+import {createOptions, createUrl} from './api/api_helpers';
 import { animalModule } from './api/animal_module';
+import { codeModule } from './api/code_module';
+import { collarModule } from './api/collar_module';
 import moment from 'moment';
-import { Collar, decodeCollar } from './types/collar';
-import { ActionGetPayload } from './types/store';
 
 import {bus} from './main';
 
@@ -27,13 +26,9 @@ const rootModule = {
     },
     timeWindow: [], // TODO: to be calculated on getPingExtent
     clusterCritters: true,
-    collars: {
-      availableCollars: [],
-      assignedCollars: [],
-    },
     editObject: {},
-    testUser: '',
-    testUsers: ['test1', 'test2', 'test3'],
+    testUser: 'default',
+    testUsers: ['default', 'Bill', 'Kelly', 'Robin'],
   },
   mutations: {
     pingActive(state, properties) {
@@ -82,30 +77,13 @@ const rootModule = {
 
       state.pingsActive = {...state.pings};
       state.pingsActive.features = filteredHerds;
-      bus.$emit('refreshCritterLayers');// Signal map to refresh collar layer
-    },
-    writeAvailableCollars(state, collars) {
-      const newIds = collars.map((c: Collar) => c.device_id);
-      const filtered = state.collars.availableCollars.filter((c: Collar) => !newIds.includes(c.device_id));
-      state.collars.availableCollars = [...filtered, ...collars];
-    },
-    writeAssignedCollars(state, collars) {
-      const newIds = collars.map((c: Collar) => c.device_id);
-      const filtered = state.collars.assignedCollars.filter((c: Collar) => !newIds.includes(c.device_id));
-      state.collars.assignedCollars = [...filtered, ...collars];
+      bus.$emit('refreshCritterLayers'); // Signal map to refresh collar layer
     },
     updateEditObject(state, obj) {
       state.editObject = Object.assign({}, obj);
     },
-    updateCollars(state, collars) {
-      const newIds = collars.map((c: Collar) => c.device_id);
-      const filtered = state.collars.availableCollars.filter((c: Collar) => !newIds.includes(c.device_id));
-      state.collars.availableCollars = [...collars, ...filtered];
-    },
     updateTestUser(state, user) {
       state.testUser = user;
-      state.collars.availableCollars = [];
-      state.collars.assignedCollars = [];
     },
   },
   getters: {
@@ -139,17 +117,8 @@ const rootModule = {
     speciesActive (state) {
       return state.filters.speciesActive;
     },
-    assignedCollars(state) {
-      return state.collars.assignedCollars;
-    },
-    availableCollars(state) {
-      return state.collars.availableCollars;
-    },
     editObject(state) {
       return state.editObject;
-    },
-    animals(state) {
-      return state.animals;
     },
     testUsers(state) {
       return state.testUsers;
@@ -207,61 +176,10 @@ const rootModule = {
         callback();
       });
     },
-    async requestCollars(context, callback) {
-      await context.dispatch('getAvailableCollars', {callback});
-      await context.dispatch('getAssignedCollars', {callback});
-      callback();
-    },
-    async getAvailableCollars(context, payload: ActionGetPayload) {
-      const {callback, page} = payload;
-      const urlAvail = createUrl2({context, apiString: 'get-available-collars', page});
-      const errMsg = `error fetching available collars:`;
-      try {
-        const response: NeedleResponse = await needle('get', urlAvail, createOptions({}));
-        const body = response.body;
-        if (response && response.statusCode === 200) {
-          const collars: Collar[] = body.map((c: any) => decodeCollar(c));
-          context.commit('writeAvailableCollars', collars);
-        } else {
-          callback(null, `${errMsg} ${body}`);
-        }
-      } catch (e) {
-          callback(null, `${errMsg} ${e}`);
-      }
-    },
-    async getAssignedCollars(context, payload: ActionGetPayload) {
-      const {callback, page} = payload;
-      const urlAssign = createUrl2({context, apiString: 'get-assigned-collars', page});
-      const errMsg = `error fetching assigned collars:`;
-      try {
-        const response: NeedleResponse = await needle('get', urlAssign, createOptions({}));
-        const body = response.body;
-        if (response && response.statusCode === 200) {
-          const collars: Collar[] = body.map((c: any) => decodeCollar(c));
-          context.commit('writeAssignedCollars', collars);
-        } else {
-          callback(null, `${errMsg} ${body}`);
-        }
-      } catch (e) {
-          callback(null, `${errMsg} ${e}`);
-      }
-    },
-    async upsertCollar(context, payload) {
-      const {callback, body} = payload;
-      const url = createUrl(context, 'add-collar');
-      const errMsg = 'unable to save collar:';
-      try {
-        const response: NeedleResponse = await needle('post', url, body);
-        const responseBody = response.body;
-        if (response && response.statusCode === 200) {
-          const collars: Collar[] = responseBody.map((c: Collar) => decodeCollar(c));
-          context.commit('updateCollars', collars);
-        } else {
-          callback(null, `${errMsg} ${body}`);
-        }
-      } catch (e) {
-          callback(null, `${errMsg} ${e}`);
-      }
+    async changeTestUser(context, user: string) {
+      context.commit('updateTestUser', user);
+      await context.dispatch('resetCollars', () => console.log('collars reset'));
+      await context.dispatch('resetCritters', () => console.log('critters reset'));
     },
   },
 };
@@ -270,6 +188,7 @@ export default new Vuex.Store({
   modules: {
     animalModule,
     codeModule,
+    collarModule,
     rootModule,
   },
 });

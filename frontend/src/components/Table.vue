@@ -3,6 +3,7 @@
     <!-- bound object passed in from v-model should be array of objects -->
     <vs-table 
       :data="value"
+      :noDataText="noDataMsg || 'no data available'"
       v-model="selected"
       @selected="handleSelect"
       >
@@ -41,6 +42,7 @@ export default Vue.extend({
   props: {
     getHeader: { type: Function, required: true },
     propsToDisplay: { required: true },
+    noDataMsg: {type: String, required: false},
     title: { type: String, required: false },
     value: { type: Array, required: true, },
     paginate: {type: Boolean, required: false, default: true },

@@ -1,7 +1,11 @@
 import moment from 'moment';
+import { request } from 'needle';
 
-const urlContainsQuery = (url: string): boolean => url.includes('?');
-
+const appendQueryToUrl = (url: string, query: string): string => {
+  return url.includes('?') ?
+    url += `&${query}` :
+    url += `?${query}`;
+};
 interface CreateUrlParams {
   context: any;
   apiString: string;
@@ -35,19 +39,19 @@ const createUrl = (
     const h4 = rootState.state.prod ? '/api' : '';
     let url = `${h1}//${h2}:${h3}${h4}/${apiString}`;
     if (queryString) {
-      url += urlContainsQuery(url) ? `&${queryString}` : `?${queryString}`;
+      url = appendQueryToUrl(url, queryString);
     }
     if (isDev) {
-      const q = `idir=${process.env.IDIR}`;
-      url += urlContainsQuery(url) ? `&${q}` : `?${q}`;
+      url = appendQueryToUrl(url, `idir=${process.env.IDIR}`);
     }
     if (page) {
-      url += urlContainsQuery(url) ? `&page=${page}` : `?page=${page}`;
+      appendQueryToUrl(url, `page=${page}`);
     }
     if (isUserTestMode) {
+      const requestsToIgnore = ['get-code', 'get-code-headers', 'add-code-headers'];
       const u = context.getters.testUser;
-      if (u) {
-        url += urlContainsQuery(url) ? `&testUser=${u}` : `?testUser=${u}`;
+      if (u && u.indexOf('default') === -1 && !requestsToIgnore.includes(apiString)) {
+        url = appendQueryToUrl(url, `testUser=${u}`);
       }
     }
     return url;
@@ -62,7 +66,6 @@ const createOptions = (obj) => {
 };
 
 const isDev = process.env.ENV === 'DEV';
-
 
 // response: resolved fetch response
 // payload: object containing a function called callback
