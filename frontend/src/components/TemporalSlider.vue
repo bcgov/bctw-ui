@@ -36,6 +36,16 @@
 <template lang="pug">
 
 .temporal-slider
+  .testing
+    v-date-picker(
+      v-model="$store.getters.timeWindow[0]"
+      ref="startCalendar"
+      @dayclick="dayClicked"
+    )
+      template(v-slot="{inputValue, togglePopover}")
+        button(@click="togglePopover({placement: 'auto-start'})") click me
+
+
   .timeline
     .start {{tooltip($store.getters.timeWindow[0])}}
     .between
@@ -114,8 +124,6 @@ requestCollars = ->
   @counter = null
   @$store.dispatch 'requestPings', callback
 
-console.log 'reqestCollars'
-
 
 /* ## marks
   Custom mark formatting function
@@ -147,12 +155,17 @@ marks = (date) ->
   @return {string} Formatted date string
  */
 tooltip = (date) ->
-  console.log date
   extent = @$store.getters.pingExtent
   d = date
   if date == extent.days then d++
   now = moment(extent.min).add d, 'days'
   now.format 'll'
+
+/* ## dayClicked
+  A day has been selected on a date picker
+ */
+dayClicked = -> console.log('day has been clicked')
+
 
 ``
 export default {
@@ -165,9 +178,11 @@ export default {
     tooltip,
     countDownStart,
     countDownStop,
-    requestCollars
+    requestCollars,
+    dayClicked
   },
   data: () => ({
+    myDate: {},
     counter: null,
     count: 0
   }),
