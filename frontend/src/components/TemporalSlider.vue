@@ -38,8 +38,7 @@
 .temporal-slider
   .testing
     v-date-picker(
-      v-model="$store.getters.timeWindow[0]"
-      ref="startCalendar"
+      v-model="startDatePicked"
       @dayclick="dayClicked"
     )
       template(v-slot="{inputValue, togglePopover}")
@@ -190,6 +189,13 @@ export default {
     timeWindow:{
       get(){return this.$store.getters.timeWindow;},
       set(value){this.$store.commit('writeTimeWindow',value);}
+    },
+    startDatePicked: {
+      get(){return this.$store.getters.timeWindow[0];},
+      set(value){
+        console.log("here is the time window",this.$store.getters.timeWindow);
+        console.log("here is the value",value);
+      }
     }
   }
 }
