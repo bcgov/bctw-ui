@@ -36,6 +36,15 @@
 <template lang="pug">
 
 .temporal-slider
+  .testing
+    v-date-picker(
+      v-model="myDate"
+      @dayclick="dayClicked"
+    )
+      template(v-slot="{inputValue, togglePopover}")
+        button(@click="togglePopover({placement: 'auto-start'})") click me
+
+
   .timeline
     .start {{tooltip($store.getters.timeWindow[0])}}
     .between
@@ -114,8 +123,6 @@ requestCollars = ->
   @counter = null
   @$store.dispatch 'requestPings', callback
 
-console.log 'reqestCollars'
-
 
 /* ## marks
   Custom mark formatting function
@@ -147,12 +154,17 @@ marks = (date) ->
   @return {string} Formatted date string
  */
 tooltip = (date) ->
-  console.log date
   extent = @$store.getters.pingExtent
   d = date
   if date == extent.days then d++
   now = moment(extent.min).add d, 'days'
   now.format 'll'
+
+/* ## dayClicked
+  A day has been selected on a date picker
+ */
+dayClicked = -> console.log('day has been clicked')
+
 
 ``
 export default {
@@ -165,9 +177,11 @@ export default {
     tooltip,
     countDownStart,
     countDownStop,
-    requestCollars
+    requestCollars,
+    dayClicked
   },
   data: () => ({
+    myDate: {},
     counter: null,
     count: 0
   }),
@@ -175,6 +189,16 @@ export default {
     timeWindow:{
       get(){return this.$store.getters.timeWindow;},
       set(value){this.$store.commit('writeTimeWindow',value);}
+    },
+    // TODO: Create a computed function that
+    // Takes the data from the date picker and converts to
+    // the store timeWindow array.
+    startDatePicked: {
+      get(){return this.$store.getters.timeWindow[0];},
+      set(value){
+        console.log("here is the time window",this.$store.getters.timeWindow);
+        console.log("here is the value",value);
+      }
     }
   }
 }
