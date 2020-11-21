@@ -1,10 +1,8 @@
 <template>
   <div>
     <h3>Settings</h3>
-    <vs-divider></vs-divider>
-    <vs-divider></vs-divider>
-    <file-input name="csv" title="Bulk upload codes or critters"></file-input>
-    <vs-divider></vs-divider>
+    <!-- <file-input name="csv" title="Bulk upload codes or critters"></file-input>
+    <vs-divider></vs-divider> -->
     <!-- <h4>sample code select component</h4><br/>
     <div class='testform'>
       <input-select header="region" label="Region"></input-select>

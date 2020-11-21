@@ -65,6 +65,10 @@ function decodeCollar(json: ICollar): Collar {
 
 const datetimeFields = ['malfunction_date', 'max_transmission_date', 'retreival_date'];
 
+function isCollar(collar: any): collar is Collar {
+  return (collar as Collar).device_id !== undefined;
+}
+
 // dont upsert null date / timestamp fields
 function encodeCollar(c: Collar) {
   const dateFields = {};
@@ -94,4 +98,5 @@ export {
   Collar,
   assignedCollarProps,
   availableCollarProps,
+  isCollar,
 };

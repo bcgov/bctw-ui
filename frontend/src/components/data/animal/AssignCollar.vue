@@ -11,7 +11,7 @@
       :propsToDisplay="toDisplay"
       v-on:page:change="loadNewCollars"
     ></state-table><br/>
-    <vs-button type="filled" @click="saveCollar">Assign Collar</vs-button>
+    <vs-button type="filled" @click="saveCollar" :disabled="disableAssignBtn">Assign Collar </vs-button>
     <!-- <pre>{{selected}}</pre> -->
     <!-- <pre>{{critter}}</pre> -->
   </div>
@@ -49,6 +49,9 @@ export default Vue.extend({
   computed: {
     title() {
       return `Assign collar to critter ${(this.critter as Animal)?.animal_id ?? ''}`;
+    },
+    disableAssignBtn () {
+      return !this.selected.hasOwnProperty('device_id');
     },
     ...mapGetters({ 
       collars: 'availableCollars',
@@ -95,6 +98,7 @@ export default Vue.extend({
     },
   },
   mounted() {
+    this.$store.commit('updateEditObject', {});
     if (!this.collars.length) {
       this.loadNewCollars(1);
     }

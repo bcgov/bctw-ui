@@ -60,6 +60,7 @@
       title="Confirm Unassignment"
       :active="bShowYesNoModal"
       v-on:update:yesno="showYesNo"
+      v-on:update:close="close"
       v-on:clicked:yes="unassignCollar"
     ></yes-no>
     <!-- <pre>{{assignment}}</pre> -->
@@ -124,6 +125,10 @@ export default Vue.extend({
       this.bShowYesNoModal= !this.bShowYesNoModal;
     },
     unassignCollar() {
+      const collarId = this.critterCollarHistory[0].device_id;
+      if (!collarId) {
+        this.$vs.notify(getNotifyProps('cant locate collar id!', true));
+      }
       const cb = (data: ICollarLinkResult, err?: Error | string) => {
         console.log(`results of unassign: ${JSON.stringify(data)}`);
         if (err) {
@@ -131,7 +136,6 @@ export default Vue.extend({
         } else {
           this.$vs.notify(getNotifyProps(`collar ${data.device_id} successfully unassigned from ${data.animal_id}`));
           this.close();
-          this.animal.device_id = null;
           this.canAssignCollar = true;
           this.loadAssignments();
         }
@@ -141,7 +145,7 @@ export default Vue.extend({
           link: false,
           data: {
             animal_id: this.animal.id,
-            device_id: +this.animal.device_id,
+            device_id: collarId,
             end_date: formattedNow(),
           },
         },

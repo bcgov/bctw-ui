@@ -4,7 +4,11 @@
     :active="active"
     v-on:update:modal="$emit('update:close')"
   >
-    <div v-if="!isEdit">
+  <!-- new collar -->
+    <div v-if="!isEdit && newCollarType === ''">
+      <h4>What type of collar is it?</h4>
+    </div>
+    <div v-else-if="!isEdit">
       <h4>Choose File to Parse Vectronics .keyx</h4>
       <div class="grp">
         <register-modal v-on:keyx:parsed="handleParse"></register-modal>
@@ -51,6 +55,7 @@ export default Vue.extend({
       collar: {} as Collar,
       requiredFields: ['device_id', 'make', 'collar_status'],
       canSave: false as boolean,
+      newCollarType: '' as 'vhf' | 'vect'
     }
   },
   computed: {

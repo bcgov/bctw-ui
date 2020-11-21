@@ -2,13 +2,13 @@
   <modal
     :title="title"
     :active="active"
-    :handleClose="noHandler"
+    v-on:update:modal="$emit('update:close')"
   >
   <div>
     {{msg}}
   </div>
   <vs-button @click="yesHandler">Yes</vs-button>
-  <vs-button @click="noHandler">No</vs-button>
+  <vs-button @click="$emit('update:close')">No</vs-button>
 </modal>
 </template>
 
@@ -33,9 +33,6 @@ export default Vue.extend({
   methods: {
     yesHandler() {
       this.$emit('clicked:yes');
-    },
-    noHandler() {
-      this.$emit('update:yesno')
     },
   },
 })

@@ -5,10 +5,12 @@
       v-model="availableCollars" :getHeader="getHeader"
       noDataMsg="no unassigned collars available"
       :propsToDisplay="availableCollarProps"
+      rowIdentifier="device_id"
       v-on:page:change="(p)=>loadNewCollars('avail', p)"></state-table>
     <state-table
       v-if="assignedCollars" title="Assigned Collars"
       v-model="assignedCollars" :getHeader="getHeader"
+      rowIdentifier="device_id"
       noDataMsg="no assigned collars available"
       :propsToDisplay="assignedCollarProps"
       v-on:page:change="(p)=>loadNewCollars('assign', p)"></state-table>

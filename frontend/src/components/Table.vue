@@ -10,7 +10,6 @@
       <template slot="header"><h3>{{title}}</h3></template> 
       <template slot="thead" v-if="value && value.length">
         <vs-th v-for="p in propsToDisplay" :key="p">
-        <!-- <vs-th v-for="p in Object.keys(value[value.length - 1]).filter((prop) => propsToDisplay.includes(prop))" :key="p"> -->
           {{getHeader(p)}}
         </vs-th>
       </template>
@@ -46,6 +45,8 @@ export default Vue.extend({
     title: { type: String, required: false },
     value: { type: Array, required: true, },
     paginate: {type: Boolean, required: false, default: true },
+    // what uniquely identifies a row. needs to be supplied when there are multiple tables in the view!
+    rowIdentifier: {type: String, required: false } 
   },
   data: function() {
     return {
@@ -62,7 +63,6 @@ export default Vue.extend({
     },
     handlePageChange(v: number){
       if (this.value.length && this.value.length < this.limitPerPage) {
-        // dont need to query for more
         return;
       }
       this.current_page = v;
@@ -83,7 +83,17 @@ export default Vue.extend({
         return idx >= start && idx <= end;
       })
       return resultsToDisplay;
-    }
+    },
+    ...mapGetters(['editObject'])
   },
+  watch: {
+    // for views that display multiple pages, if this row isnt in the same table, wipe the selected value
+    editObject(v) {
+      const inThisTable = this.displayed.find((row: any) => row[this.rowIdentifier] === v[this.rowIdentifier]);
+      if (!inThisTable) {
+        this.selected = {};
+      }
+    }
+  }
 })
 </script>

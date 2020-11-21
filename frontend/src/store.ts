@@ -27,8 +27,8 @@ const rootModule = {
     timeWindow: [], // TODO: to be calculated on getPingExtent
     clusterCritters: true,
     editObject: {},
-    testUser: 'default',
-    testUsers: ['default', 'Bill', 'Kelly', 'Robin'],
+    testUser: 'My IDIR',
+    testUsers: ['My IDIR', 'Biologist1', 'Biologist2', 'Admin'],
   },
   mutations: {
     pingActive(state, properties) {
