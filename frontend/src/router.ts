@@ -1,5 +1,10 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import Home from './views/Home.vue';
+import Map from './views/Map.vue';
+import Data from './views/Data.vue';
+import Terrain from './views/Terrain.vue';
+
 
 Vue.use(Router);
 
@@ -13,43 +18,43 @@ Vue.use(Router);
  */
 
 
-var router = new Router({
+const router = new Router({
   mode: 'hash',
   base: process.env.BASE_URL,
   routes: [
     {
       path: '/',
       name: 'home',
-      component: () => import('./views/Home.vue')
+      component: Home,
     },
     {
       path: '/protected/map',
       name: 'map',
-      component: () => import('./views/Map.vue')
+      component: Map,
     },
     {
       path: '/protected/terrain',
       name: 'terrain',
-      component: () => import('./views/Terrain.vue')
+      component: Terrain,
     },
     {
       path: '/protected/data',
       name: 'data',
-      component: () => import('./views/Data.vue')
-    }
-  ]
+      component: Data,
+    },
+  ],
 });
 
-router.afterEach((to,from) => {
+router.afterEach((to, from) => {
 
   // Clear all buttons
   const btns = document.querySelectorAll('.vs-sidebar-item-active');
-  btns.forEach( el => {
-    el.classList.remove('vs-sidebar-item-active')
+  btns.forEach( (el) => {
+    el.classList.remove('vs-sidebar-item-active');
   });
 
   // Highlight correct button
-  var item = document.querySelector("div.page-" + to.name);
+  const item = document.querySelector('div.page-' + to.name);
   if (item) {
     item.classList.add('vs-sidebar-item-active');
   }

@@ -40,7 +40,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
-import { Collar, availableCollarProps, assignedCollarProps} from '../../../types/collar'
+import { Collar, availableCollarProps, assignedCollarProps, getCollarTitle} from '../../../types/collar'
 import { ActionGetPayload } from 'frontend/src/types/store';
 import { getNotifyProps } from '../../notify';
 import { assignedCritterProps } from 'frontend/src/types/animal';
@@ -62,12 +62,12 @@ export default Vue.extend({
     }
   },
   methods: {
-    getHeader: (s: string) => Collar.getTitle(s),
+    getHeader: (s: string) => getCollarTitle(s),
     close() {
       this.showEditModal = false;
       this.showExportModal = false;
     },
-    handleEditClick(isEdit: boolean) {
+    handleEditClick(isEdit: boolean): void {
       this.isEditMode = isEdit;
       this.showEditModal = !this.showEditModal;
     },
@@ -107,9 +107,6 @@ const cbCollarSaved = (payload) => {
 </script>
 
 <style scoped>
-  /* h3 {
-    margin-bottom: 10px;
-  } */
   .btn-export {
     float: left;
   }

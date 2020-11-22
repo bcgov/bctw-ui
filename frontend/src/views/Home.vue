@@ -27,20 +27,19 @@
             span 3D map for viewing point locations within a topographical context.
 </template>
   
-<script lang='ls'>
-#// Livescript doesn't support import or export yet
-#// Version 2.0 will apparently. This allows it to pass
-#// through to Babel.
+<script lang='ts'>
+import Vue from 'vue';
+// Livescript doesn't support import or export yet
+// Version 2.0 will apparently. This allows it to pass
+// through to Babel.
 
-'Home view' |> console.log
+// 'Home view' |> console.log
 
-``
-export default {
+export default Vue.extend({
   name: 'home',
-  components: {
-  }
-};
-``
+  // components: {
+  // }
+});
 </script>
 
 <style lang="stylus">

@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { ICollar } from './collar';
 
 interface ICollarAssignment {
   assignment_id: number;
@@ -24,6 +23,7 @@ class CollarAssignment implements ICollarAssignment {
       case 'radio_frequency':
         return 'Radio Frequency';
     }
+    return '';
   }
   public assignment_id: number;
   public device_id: number;
@@ -31,6 +31,15 @@ class CollarAssignment implements ICollarAssignment {
   public radio_frequency: number;
   public start_time: Date;
   public end_time: Date;
+
+  constructor(assignmentId: number, deviceId: number, make: string, radioFreq: number, start: Date, end: Date) {
+    this.assignment_id = assignmentId;
+    this.device_id = deviceId;
+    this.make = make;
+    this.radio_frequency = radioFreq;
+    this.start_time = start;
+    this.end_time = end;
+  }
 }
 
 function decodeCollarAssignment(json: ICollarAssignment): CollarAssignment {
