@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "es5",
     "strict": true,
-    "importHelpers": true,
+    "module": "es2015",
     "moduleResolution": "node",
+    "outDir": "./frontend/dist/",
+    "importHelpers": true,
     "experimentalDecorators": true,
+    "noImplicitAny": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -27,11 +29,11 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.vue",
-    // "tests/**/*.ts",
+    "**/*.ts",
+    "**/*.vue",
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "files": ["./frontend/src/vue-shims.d.ts"]
 }

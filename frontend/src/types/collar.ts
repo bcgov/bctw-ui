@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { columnToHeader } from '../components/component_helpers';
 
-interface ICollar {
+interface Collar {
     device_id: number;
     make: string;
     model: string;
@@ -20,8 +20,7 @@ interface ICollar {
 const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', ];
 const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model'];
 
-class Collar implements ICollar {
-    public static getTitle(str: string): string {
+const getCollarTitle = (str: string): string => {
       switch (str) {
         case 'device_id':
           return 'Device ID';
@@ -37,25 +36,48 @@ class Collar implements ICollar {
           return columnToHeader(str);
       }
     }
-    public device_id: number;
-    public make: string;
-    public model: string;
-    public deployment_status: string;
-    public collar_status: string;
-    public collar_type: string;
-    public deactivated: boolean;
-    public radio_frequency: number;
-    public malfunction_date: Date;
-    public max_transmission_date: Date;
-    public reg_key: string;
-    public retreival_date: Date;
-    public satellite_network: string;
-}
+// class Collar implements ICollar {
+//     public static getTitle(str: string): string {
+//       switch (str) {
+//         case 'device_id':
+//           return 'Device ID';
+//         case 'make':
+//           return 'GPS Vendor';
+//         case 'model':
+//           return 'Collar Model';
+//         case 'animal_id':
+//           return 'Individual ID';
+//         case 'max_transmission_date':
+//           return 'Last Update';
+//         default:
+//           return columnToHeader(str);
+//       }
+//     }
+
+//     public device_id: number;
+//     public make: string;
+//     public model: string;
+//     public deployment_status: string;
+//     public collar_status: string;
+//     public collar_type: string;
+//     public deactivated: boolean;
+//     public radio_frequency: number;
+//     public malfunction_date: Date;
+//     public max_transmission_date: Date;
+//     public reg_key: string;
+//     public retreival_date: Date;
+//     public satellite_network: string;
+//     constructor(deviceId: number, make: string, model: string ) {
+//       this.device_id = deviceId;
+//       this.make = make;
+//       this.model = model;
+//     }
+// }
 
 const _momentFormat = 'DD-MM-YYYY HH:mm:ss';
 
-function decodeCollar(json: ICollar): Collar {
-  const collar = Object.create(Collar.prototype);
+function decodeCollar(json: Collar): Collar {
+  const collar = Object.create({});
   return Object.assign(collar, json, {
     malfunction_date: json.malfunction_date ? moment(json.malfunction_date) : null,
     max_transmission_date: json.max_transmission_date ? moment(json.max_transmission_date) : null,
@@ -90,8 +112,9 @@ export {
   decodeCollar,
   encodeCollar,
   ICollarLinkResult,
-  ICollar,
+  // ICollar,
   Collar,
   assignedCollarProps,
   availableCollarProps,
+  getCollarTitle,
 };

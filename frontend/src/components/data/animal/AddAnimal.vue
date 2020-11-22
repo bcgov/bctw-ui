@@ -71,8 +71,10 @@ import { Animal, encodeCritter } from '../../../types/animal';
 import { mapGetters } from 'vuex';
 import Vue from 'vue';
 import { getNotifyProps } from '../../notify';
-import { ICollar, ICollarLinkResult } from '../../../types/collar';
+import { Collar, ICollarLinkResult } from '../../../types/collar';
 import { CollarAssignment } from '../../../types/collar_assignment';
+
+import vuesax from 'vue/types/vue';
 
 import { formattedNow } from '../../../api/api_helpers';
 import { ActionGetPayload, ActionPostPayload } from 'frontend/src/types/store';

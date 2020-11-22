@@ -38,7 +38,7 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import { ActionCallback, ActionGetPayload, ActionPostPayload } from '../../../types/store';
-import { Animal, assignedCritterProps, unassignedCritterProps } from '../../../types/animal'
+import { Animal, assignedCritterProps, getCritterTitle, unassignedCritterProps } from '../../../types/animal'
 import { getNotifyProps } from '../../notify';
 
 export default Vue.extend({
@@ -72,7 +72,7 @@ export default Vue.extend({
     save() {
       // console.log('Animal: an animal was saved!')
     },
-    getHeader: (str: string) => Animal.getTitle(str),
+    getHeader: (str: string) => getCritterTitle(str),
     cbLoadCritters: (body: any, err?: Error | string): void => {
       if (err) {
         this.$vs.notify(getNotifyProps(err, true));

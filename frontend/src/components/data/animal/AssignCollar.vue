@@ -25,9 +25,10 @@ import { Animal } from '../../../types/animal';
 import Vue from 'vue';
 import { mapGetters, mapState } from 'vuex';
 import { getNotifyProps } from '../../notify';
-import { Collar, ICollarLinkResult, availableCollarProps} from '../../../types/collar';
+import { Collar, ICollarLinkResult, availableCollarProps, getCollarTitle} from '../../../types/collar';
 import { formattedNow } from '../../../api/api_helpers';
 import { ActionGetPayload, ActionPostPayload } from 'frontend/src/types/store';
+import Vusax from '../../../types/vuesax_types';
 
 export default Vue.extend({
   name: 'AssignCollar',
@@ -56,7 +57,7 @@ export default Vue.extend({
     }),
   },
   methods: {
-    getHeader: (s:string) => Collar.getTitle(s),
+    getHeader: (s:string) => getCollarTitle(s),
     saveCollar() {
       const cb = (data: ICollarLinkResult, err?: Error | string) => {
         if (err) {
