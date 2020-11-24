@@ -33,6 +33,10 @@ const createUrl = (
   ): string => {
     const rootState = retrieveRootState(context);
     const isUserTestMode = rootState.state.isUserTestMode;
+    console.log(`user test mode from state: ${isUserTestMode}`);
+    console.log(`user test mode direct from .env: ${isTestUserDirectFromEnv}`);
+    console.log(`is production?: ${rootState.state.prod}`);
+
     const h1 = location.protocol;
     const h2 = location.hostname;
     const h3 = rootState.state.prod ? location.port : 3000;
@@ -48,9 +52,11 @@ const createUrl = (
       appendQueryToUrl(url, `page=${page}`);
     }
     if (isUserTestMode) {
+      console.log(`createUrl: isUserTestMode is true`);
       const requestsToIgnore = ['get-code', 'get-code-headers', 'add-code-headers'];
       const u = context.getters.testUser;
       if (u && u.indexOf('default') === -1 && !requestsToIgnore.includes(apiString)) {
+        console.log(`createUrl: test user is: ${u}`);
         url = appendQueryToUrl(url, `testUser=${u}`);
       }
     }
@@ -66,6 +72,7 @@ const createOptions = (obj) => {
 };
 
 const isDev = process.env.ENV === 'DEV';
+const isTestUserDirectFromEnv = process.env.TESTING_USERS;
 
 // response: resolved fetch response
 // payload: object containing a function called callback
