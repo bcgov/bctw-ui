@@ -59,9 +59,8 @@
     <yes-no msg="Are you sure you want to unassign this collar?"
       title="Confirm Unassignment"
       :active="bShowYesNoModal"
-      v-on:update:yesno="showYesNo"
       v-on:update:close="close"
-      v-on:clicked:yes="unassignCollar"
+      v-on:update:selected="unassignCollar"
     ></yes-no>
     <!-- <pre>{{assignment}}</pre> -->
   </modal>
@@ -126,7 +125,11 @@ export default Vue.extend({
     showYesNo() {
       this.bShowYesNoModal= !this.bShowYesNoModal;
     },
-    unassignCollar() {
+    unassignCollar(b: boolean) {
+      if (!b) {
+        this.showYesNo();
+        return;
+      }
       const collarId = this.critterCollarHistory[0].device_id;
       if (!collarId) {
         this.$vs.notify(getNotifyProps('cant locate collar id!', true));

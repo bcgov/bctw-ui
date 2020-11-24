@@ -36,7 +36,7 @@ import Checkbox from '../form/Checkbox';
 import Select from '../form/Select';
 import Modal from '../Modal';
 import CollarModal from '../data/collar/CollarModal';
-import RegisterCollarModal from './collar/RegisterCollar';
+import KeyxInputParse from './collar/KeyxInputParse';
 import StateTable from '../Table';
 import YesNoDialog from '../YesNoDialog';
 import Vue from 'vue';
@@ -52,7 +52,7 @@ Vue.component('input-type', Input);
 Vue.component('input-select', Select);
 Vue.component('state-table', StateTable);
 Vue.component('modal', Modal);
-Vue.component('register-modal', RegisterCollarModal);
+Vue.component('keyx-modal', KeyxInputParse);
 Vue.component('yes-no', YesNoDialog);
 
 export default {

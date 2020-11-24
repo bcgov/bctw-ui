@@ -17,6 +17,13 @@ interface Collar {
     satellite_network: string;
 }
 
+// used when creating new collars manually
+enum NewCollarType {
+  VHF,
+  Vect,
+  Other,
+}
+
 const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', ];
 const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model'];
 
@@ -84,4 +91,5 @@ export {
   availableCollarProps,
   getCollarTitle,
   isCollar,
+  NewCollarType,
 };

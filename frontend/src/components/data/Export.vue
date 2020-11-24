@@ -25,6 +25,7 @@
     <vs-button color="success" type="gradient" size="small" icon="refresh" class='btn-left' @click="reset">Reset</vs-button>
     <vs-button :disabled="this.chips.length === 0" color="success" type="gradient" size="small" icon="redo" class='btn-left' @click="uncheckAll">Remove All</vs-button>
   </div>
+  <!-- <pre>{{value}}</pre> -->
   </modal>
 </template>
 

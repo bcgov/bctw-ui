@@ -4,24 +4,21 @@
     :active="active"
     v-on:update:modal="$emit('update:close')"
   >
-  <!-- new collar -->
-    <div v-if="!isEdit && newCollarType === ''">
-      <h4>What type of collar is it?</h4>
-    </div>
-    <div v-else-if="!isEdit">
+    <div v-if="!isNewVHFCollar">
       <h4>Choose File to Parse Vectronics .keyx</h4>
       <div class="grp">
-        <register-modal v-on:keyx:parsed="handleParse"></register-modal>
+        <keyx-modal v-on:keyx:parsed="handleParse"></keyx-modal>
       </div>
     </div>
+
     <div class="grp">
-      <vs-input label="Device ID*" :disabled="true" v-model="collar.device_id"></vs-input>
+      <vs-input label="Device ID*" :disabled="!isNewVHFCollar" v-model="collar.device_id"></vs-input>
       <input-select header="collar_make" label="Collar Make*" v-on:change:select="handleSelect" :val="collar.make"></input-select>
       <vs-input label="Collar Model" v-model="collar.model"></vs-input>
     </div>
     <div class="grp">
       <input-select header="satellite_network" label="GPS Vendor" v-on:change:select="handleSelect" :val="collar.satellite_network"></input-select>
-      <input-select header="collar_status" label="Collar Status*" v-on:change:select="handleSelect" :val="collar.collar_status"></input-select>
+      <input-select header="collar_type" label="Collar Type*" v-on:change:select="handleSelect" :val="collar.collar_type"></input-select>
       <vs-input type="number" label="Radio Frequency" v-model="collar.radio_frequency"></vs-input>
     </div>
     <vs-button
@@ -36,7 +33,7 @@
   
 <script lang="ts">
 import { ActionPayload, mapGetters } from 'vuex';
-import { Collar, encodeCollar } from '../../../types/collar';
+import { Collar, encodeCollar, NewCollarType } from '../../../types/collar';
 import Vue from 'vue';
 import { ActionPostPayload } from 'frontend/src/types/store';
 import { getNotifyProps } from '../../notify';
@@ -53,13 +50,15 @@ export default Vue.extend({
   data() {
     return {
       collar: {} as Collar,
-      requiredFields: ['device_id', 'make', 'collar_status'],
+      requiredFields: ['device_id', 'make', /*'collar_status'*/],
       canSave: false as boolean,
-      newCollarType: '' as 'vhf' | 'vect'
     }
   },
   computed: {
-    ...mapGetters(["editObject"])
+    isNewVHFCollar(): boolean {
+      return this.newCollarType === NewCollarType.VHF && !this.isEdit;
+    },
+    ...mapGetters(['editObject', 'newCollarType'])
   },
   methods: {
     save() {

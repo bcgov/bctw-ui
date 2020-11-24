@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'RegisterCollarModal',
+  name: 'KeyxInputParse',
   data() {
     return {
       file: {},

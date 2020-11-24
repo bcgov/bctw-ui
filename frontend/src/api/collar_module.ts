@@ -1,12 +1,13 @@
 import needle, { NeedleResponse } from 'needle';
 import { createOptions, createUrl, createUrl2 } from './api_helpers';
 import { ActionGetPayload } from '../types/store';
-import { Collar, decodeCollar } from '../types/collar';
+import { Collar, decodeCollar, NewCollarType } from '../types/collar';
 
 const collarModule = {
   state: () => ({
     availableCollars: [],
     assignedCollars: [],
+    newCollarType: NewCollarType.Other,
   }),
   mutations: {
     writeAvailableCollars(state, collars) {
@@ -25,6 +26,9 @@ const collarModule = {
       const filtered = state.availableCollars.filter((c: Collar) => !newIds.includes(c.device_id));
       state.availableCollars = [...collars, ...filtered];
     },
+    updateNewCollarType(state, ct) {
+      state.newCollarType = ct;
+    },
   },
   getters: {
     assignedCollars(state) {
@@ -32,6 +36,9 @@ const collarModule = {
     },
     availableCollars(state) {
       return state.availableCollars;
+    },
+    newCollarType(state) {
+      return state.newCollarType;
     },
   },
   actions: {
