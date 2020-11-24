@@ -14,7 +14,6 @@ Vue.use(Vuex);
 const rootModule = {
   state: {
     prod: +(location.port) === 1111 ? false : true,
-    isUserTestMode: process.env.TESTING_USERS,
     pings: null,
     pingActive: {},
     pingsActive: [],
