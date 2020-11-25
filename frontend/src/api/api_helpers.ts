@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { request } from 'needle';
+import { UploadFileCallback } from '../types/store';
 
 const appendQueryToUrl = (url: string, query: string): string => {
   return url.includes('?') ?
@@ -47,10 +47,9 @@ const createUrl = (
       appendQueryToUrl(url, `page=${page}`);
     }
     const u = context.getters.testUser;
-    if (u) {
+    if (u && u !== 'My IDIR') {
       const requestsToIgnore = ['get-code', 'get-code-headers', 'add-code-headers'];
-      if (u && u.indexOf('default') === -1 && !requestsToIgnore.includes(apiString)) {
-        console.log(`createUrl: test user is: ${u}`);
+      if (!requestsToIgnore.includes(apiString)) {
         url = appendQueryToUrl(url, `testUser=${u}`);
       }
     }
@@ -69,17 +68,20 @@ const isDev = process.env.ENV === 'DEV';
 
 // response: resolved fetch response
 // payload: object containing a function called callback
-const handleFetchResult = (response: Response, callback) => {
+const handleFetchResult = (response: Response, callback: UploadFileCallback) => {
   if (response.ok && response.headers.get('content-type')) {
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.indexOf('application/json') !== -1) {
-      response.json().then((d) => callback(d));
+      response.json().then((data) => {
+        const { results, errors } = data;
+        callback(results, errors);
+      });
     } else {
-      response.text().then((d) => callback(d));
+      response.text().then((d) => console.log(`handleFetchResult: fetch result returned as text ${d}`));
     }
   } else {
     // bad status returned, probably can't parse as json.
-    response.text().then((e) => callback(null, e));
+    response.text().then((e) => callback([], [e]));
   }
 };
 

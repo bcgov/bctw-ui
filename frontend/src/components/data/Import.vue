@@ -20,20 +20,22 @@
             </p>
         </div>
       </form>
-      <div v-if="isFailed" class="response error">
-        <p>Import failed: {{uploadError}}</p>
-        <p><a href="javascript:void(0)" @click="reset()">Try again</a></p>
-      </div>
-      <div v-if="isSuccess" class="response success">
+      <div v-if="isSuccess" class="success">
         <p>Import successful: {{uploadSuccess}}</p><br>
         <p><a href="javascript:void(0)" @click="reset()">Import again</a></p>
+      </div>
+      <div v-if="!isSuccess && uploadWarning" class="warning">{{uploadWarning}}</div>
+      <div v-if="isFailed" >
+        <p class="response">Import failed:</p>
+        <ul><li v-for="err in uploadError"><p class="error">{{err}}</p></li></ul>
+        <p><a href="javascript:void(0)" @click="reset()">Try again</a></p>
       </div>
     </div>
   </modal>
 </template>
 
 <script lang="ts">
-import { ActionPostPayload } from '../../types/store';
+import { ActionPostFilePayload, ActionPostPayload } from '../../types/store';
 import Vue from 'vue'
 
 enum LoadStatus {
@@ -53,23 +55,24 @@ export default Vue.extend({
   data() {
     return {
       uploadedFiles: [],
-      uploadError: '',
+      uploadError: [] as string[],
       uploadSuccess: '',
+      uploadWarning: '',
       currentStatus: LoadStatus.INITIAL as LoadStatus, 
       uploadFieldName: 'csv',
     }
   },
   computed: {
-    isInitial() {
+    isInitial(): boolean {
       return this.currentStatus === LoadStatus.INITIAL;
     },
-    isSaving() {
+    isSaving(): boolean {
       return this.currentStatus === LoadStatus.SAVING;
     },
-    isSuccess() {
+    isSuccess(): boolean {
       return this.currentStatus === LoadStatus.SUCCESS;
     },
-    isFailed() {
+    isFailed(): boolean {
       return this.currentStatus === LoadStatus.FAILED;
     }
   },
@@ -86,33 +89,34 @@ export default Vue.extend({
     },
     save(formData: any) {
       this.currentStatus = LoadStatus.SAVING;
-      const payload: ActionPostPayload = {
+      const payload: ActionPostFilePayload = {
         body: formData,
         callback: this.onResultsCallback
       }
       this.$store.dispatch('uploadCsv', payload)
     },
-    onResultsCallback(data: any, err?: Error | string) {
+    onResultsCallback(results: any[], errors: string[]) {
       let msg;
-      if (err) {
-        msg = `error uploading csv ${err}`;
+      if (errors.length) {
         this.currentStatus = LoadStatus.FAILED;
-        this.uploadError = err.toString();
-      } else {
-        if (Array.isArray(data)) {
-          msg = `added ${data.length} item${data.length > 1 ? 's' : ''} successfully`;
-        } else {
-          msg = data;
-        }
+        this.uploadError = errors;
+      }
+      const numSuccessful = results.length
+      let str = `${numSuccessful} line${numSuccessful > 1 ? 's' : ''} ${numSuccessful > 1 ? 'were ' : 'was '}`;
+      if (errors.length && results.length) {
+        this.uploadWarning = `${str}successfully imported, but: `;
+      } 
+      if (errors.length === 0) {
         this.currentStatus = LoadStatus.SUCCESS;
-        this.uploadSuccess = msg;
+        this.uploadSuccess = `${str}successfully imported!`;
       }
     },
     reset() {
       this.currentStatus = LoadStatus.INITIAL;
       this.uploadedFiles = [];
-      this.uploadError   = '';
+      this.uploadError   = [];
       this.uploadSuccess = '';
+      this.uploadWarning = '';
     },
   },
   watch: {
@@ -132,11 +136,13 @@ export default Vue.extend({
   }
   .response {
     font-weight: bold;
-    text-align: center;
-    margin-bottom: 50px;
   }
   .error {
     color: red;
+  }
+  .warning {
+    color: orange;
+    margin-bottom: 5px;
   }
   .success {
     color: green;
@@ -176,5 +182,11 @@ export default Vue.extend({
     font-size: 16px;
     color:midnightblue;
     text-align: center;
+  }
+  ul {
+    margin-bottom: 15px;
+  }
+  ul > li {
+    margin-left: 20px;
   }
 </style>

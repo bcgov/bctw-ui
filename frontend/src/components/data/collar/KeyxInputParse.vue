@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { getNotifyProps } from '../../notify';
 export default {
   name: 'KeyxInputParse',
   data() {
@@ -32,7 +33,7 @@ export default {
           // console.log(`device id ${this.device_id}: obtained from parsing .keyx`);
           this.$emit('keyx:parsed', {device_id, satellite_network});
         } catch(e) {
-          console.log(`error parsing .keyx xml: ${e}`);
+          this.$vs.notify(getNotifyProps(`error parsing your .keyx file: ${e}`, true));
         }
       };
       reader.readAsText(this.file);

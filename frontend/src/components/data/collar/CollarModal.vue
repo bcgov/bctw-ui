@@ -1,6 +1,6 @@
 <template>
   <modal
-    :title="isEdit ? 'Edit Collar' : 'Add Collar'"
+    :title="isEdit ? 'Edit Collar' : isNewVHFCollar ? 'Add New VHF Collar' : 'Add New Vectronics Collar'"
     :active="active"
     v-on:update:modal="$emit('update:close')"
   >
@@ -12,12 +12,13 @@
     </div>
 
     <div class="grp">
-      <vs-input label="Device ID*" :disabled="!isNewVHFCollar" v-model="collar.device_id"></vs-input>
+      <vs-input label="Device ID*" type="number" :disabled="!isNewVHFCollar" v-model="collar.device_id"></vs-input>
       <input-select header="collar_make" label="Collar Make*" v-on:change:select="handleSelect" :val="collar.make"></input-select>
       <vs-input label="Collar Model" v-model="collar.model"></vs-input>
     </div>
+
     <div class="grp">
-      <input-select header="satellite_network" label="GPS Vendor" v-on:change:select="handleSelect" :val="collar.satellite_network"></input-select>
+      <input-select header="satellite_network" label="Satellite Network" v-on:change:select="handleSelect" :val="collar.satellite_network"></input-select>
       <input-select header="collar_type" label="Collar Type*" v-on:change:select="handleSelect" :val="collar.collar_type"></input-select>
       <vs-input type="number" label="Radio Frequency" v-model="collar.radio_frequency"></vs-input>
     </div>
@@ -50,7 +51,7 @@ export default Vue.extend({
   data() {
     return {
       collar: {} as Collar,
-      requiredFields: ['device_id', 'make', /*'collar_status'*/],
+      requiredFields: ['device_id', 'make'],
       canSave: false as boolean,
     }
   },
@@ -98,11 +99,12 @@ export default Vue.extend({
     active(show) {
       if (show && this.isEdit) {
         this.collar = this.editObject;
+      } else if (show && !this.isEdit) {
+        this.collar.collar_type = this.isNewVHFCollar ? 'VHF' : 'Other';
       }
       if (!show) {
         this.reset();
       }
-
     }
   }
 })

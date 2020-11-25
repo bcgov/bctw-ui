@@ -1,3 +1,4 @@
+// used to show notifications on api call returns
 // returns an object
 const getNotifyProps = (
   text: any,
