@@ -1,4 +1,5 @@
 <template>
+    <!-- :class="['con-vs-popup', 'vs-popup']" -->
   <vs-popup 
     class="holamundo" 
     :title="title"
@@ -13,11 +14,6 @@ export default {
   props: {
     title: String,
     active: Boolean,
-    //handleClose: any// Function
-  },
-  data() {
-    return {
-    }
   },
   computed: {
     shouldShow: {
@@ -28,6 +24,16 @@ export default {
         this.$emit('update:modal', newValue)
       }
     }
-  }
+  },
 }
 </script>
+
+<style scoped>
+/* .con-vs-popup .vs-popup { 
+  width: 1200px;
+}
+.con-vs-popup .vs-popup {
+  width: 100% !important;
+  height: auto !important;
+} */
+</style>

@@ -8,6 +8,8 @@ import router from './router';
 import store from './store';
 
 import Vuesax from 'vuesax';
+import VueClipboard from 'vue-clipboard2'
+ 
 // import {vsButton,vsDivider,vsSideBar,vsIcon,vsNotifications} from 'vuesax'
 
 import 'vuesax/dist/vuesax.css';
@@ -18,6 +20,7 @@ import VCalendar from 'v-calendar';
 Vue.config.productionTip = false;
 
 Vue.use(Vuesax);
+Vue.use(VueClipboard);
 
 export const bus = new Vue();
 

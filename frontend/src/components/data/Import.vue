@@ -12,7 +12,8 @@
         novalidate
         v-if="isInitial || isSaving">
         <div class="dropbox">
-          <input type="file" single :name="uploadFieldName" :disabled="isSaving" @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
+          <input type="file" single :name="uploadFieldName" :disabled="isSaving"
+            @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
             accept=".csv" class="input-file">
             <p v-if="isInitial"><b>Drag CSV file here or click to browse</b></p>
             <p v-if="isSaving">
@@ -24,10 +25,13 @@
         <p>Import successful: {{uploadSuccess}}</p><br>
         <p><a href="javascript:void(0)" @click="reset()">Import again</a></p>
       </div>
-      <div v-if="!isSuccess && uploadWarning" class="warning">{{uploadWarning}}</div>
+      <div v-if="!isSuccess && uploadWarning" class="warning"><h4>{{uploadWarning}}</h4></div>
       <div v-if="isFailed" >
-        <p class="response">Import failed:</p>
-        <ul><li v-for="err in uploadError"><p class="error">{{err}}</p></li></ul>
+        <div v-for="e in uploadError">
+          <span class="err-row">{{e.error.slice(0, e.error.indexOf(':') + 1)}}</span>
+          <span class="error">{{e.error.slice(e.error.indexOf(':') + 1)}}</span>
+          <a href="javascript:void(0)" @click="() => copy(e.row)">Copy</a>
+        </div>
         <p><a href="javascript:void(0)" @click="reset()">Try again</a></p>
       </div>
     </div>
@@ -35,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { ActionPostFilePayload, ActionPostPayload } from '../../types/store';
+import { ActionPostFilePayload, ActionPostPayload, IImportError } from '../../types/store';
 import Vue from 'vue'
 
 enum LoadStatus {
@@ -55,7 +59,7 @@ export default Vue.extend({
   data() {
     return {
       uploadedFiles: [],
-      uploadError: [] as string[],
+      uploadError: [] as IImportError[],
       uploadSuccess: '',
       uploadWarning: '',
       currentStatus: LoadStatus.INITIAL as LoadStatus, 
@@ -87,6 +91,11 @@ export default Vue.extend({
         });
       this.save(formData);
     },
+    copy(row) {
+      this.$copyText(row).then(v => {
+        this.$vs.notify({ text:'Row copied to clipboard'});
+      })
+    },
     save(formData: any) {
       this.currentStatus = LoadStatus.SAVING;
       const payload: ActionPostFilePayload = {
@@ -95,7 +104,7 @@ export default Vue.extend({
       }
       this.$store.dispatch('uploadCsv', payload)
     },
-    onResultsCallback(results: any[], errors: string[]) {
+    onResultsCallback(results: any[], errors: IImportError[]) {
       let msg;
       if (errors.length) {
         this.currentStatus = LoadStatus.FAILED;
@@ -104,7 +113,7 @@ export default Vue.extend({
       const numSuccessful = results.length
       let str = `${numSuccessful} line${numSuccessful > 1 ? 's' : ''} ${numSuccessful > 1 ? 'were ' : 'was '}`;
       if (errors.length && results.length) {
-        this.uploadWarning = `${str}successfully imported, but: `;
+        this.uploadWarning = `${str}successfully imported, but there were errors:`;
       } 
       if (errors.length === 0) {
         this.currentStatus = LoadStatus.SUCCESS;
@@ -130,12 +139,19 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+  h4 {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  ul {
+    margin-bottom: 15px;
+  }
+  ul > li {
+    margin-left: 20px;
+  }
   .container {
     display: flex;
     flex-direction: column;
-  }
-  .response {
-    font-weight: bold;
   }
   .error {
     color: red;
@@ -176,17 +192,14 @@ export default Vue.extend({
     text-align: center;
     padding: 25px 0;
   }
-
   .important {
     font-weight: 600;
     font-size: 16px;
     color:midnightblue;
     text-align: center;
   }
-  ul {
-    margin-bottom: 15px;
-  }
-  ul > li {
-    margin-left: 20px;
+  .err-row {
+    font-weight: 600;
+    font-style: italic;
   }
 </style>

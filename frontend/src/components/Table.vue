@@ -19,7 +19,7 @@
           <!-- iterate the properties to display, retrieving the object value at each-->
           <vs-td v-for="(k, i) in propsToDisplay" :key="i" :data="k">
             <!-- <pre>{{obj}} {{k}} {{prop}}</pre> -->
-            {{formatTableData(obj[k])}}
+            <p class="td">{{formatTableData(obj[k])}}</p>
           </vs-td>
         </vs-tr> 
       </template>
@@ -34,7 +34,6 @@
 <script lang="ts">
 import moment from 'moment';
 import Vue from 'vue'
-import { mapGetters } from 'vuex';
 
 export default Vue.extend({
   name: 'StateTable',
@@ -84,7 +83,9 @@ export default Vue.extend({
       })
       return resultsToDisplay;
     },
-    ...mapGetters(['editObject'])
+    editObject() {
+      return this.$store.getters.editObject;
+    }
   },
   watch: {
     // for views that display multiple pages, if this row isnt in the same table, wipe the selected value
@@ -97,3 +98,10 @@ export default Vue.extend({
   }
 })
 </script>
+
+<style scoped>
+  .td {
+    margin: 0px;
+    text-align: left;
+  }
+</style>

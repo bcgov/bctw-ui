@@ -1,6 +1,11 @@
+interface IImportError {
+  error: string;
+  row: string;
+}
+
 type ActionCallback = (body: any, err?: Error | string) => void;
 
-type UploadFileCallback = (results: any[], errors: string[]) => void;
+type UploadFileCallback = (results: any[], errors: IImportError[]) => void;
 interface ActionPayload {
   callback: ActionCallback;
 }
@@ -23,4 +28,5 @@ export {
   ActionPostPayload,
   UploadFileCallback,
   ActionPostFilePayload,
+  IImportError,
 };

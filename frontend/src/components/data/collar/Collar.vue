@@ -47,7 +47,7 @@
       title="Select Collar Type"
       msg="What type of collar would you like to add?"
       :active="showAddCollarTypeModal"
-      btnYesText="VHS Collar"
+      btnYesText="VHF Collar"
       btnNoText="Vectronics Collar"
       v-on:update:close="close"
       v-on:update:selected="handleCollarTypeSelected"

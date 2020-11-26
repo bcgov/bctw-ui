@@ -4,7 +4,7 @@
     :active="active"
     v-on:update:modal="$emit('update:close')"
   >
-    <div v-if="!isNewVHFCollar">
+    <div v-if="!isNewVHFCollar && !isEdit">
       <h4>Choose File to Parse Vectronics .keyx</h4>
       <div class="grp">
         <keyx-modal v-on:keyx:parsed="handleParse"></keyx-modal>
@@ -100,7 +100,7 @@ export default Vue.extend({
       if (show && this.isEdit) {
         this.collar = this.editObject;
       } else if (show && !this.isEdit) {
-        this.collar.collar_type = this.isNewVHFCollar ? 'VHF' : 'Other';
+        this.collar.collar_type = this.isNewVHFCollar ? 'VHF' : 'VHF + GPS';
       }
       if (!show) {
         this.reset();
