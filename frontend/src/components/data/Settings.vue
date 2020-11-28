@@ -1,77 +1,84 @@
 <template>
   <div>
-    <h3>Settings</h3>
-    <!-- <file-input name="csv" title="Bulk upload codes or critters"></file-input>
-    <vs-divider></vs-divider> -->
-    <!-- <h4>sample code select component</h4><br/>
-    <div class='testform'>
-      <input-select header="region" label="Region"></input-select>
-      <input-select header="species" label="Species"></input-select>
-      <input-select header="animal_status" label="Animal Status"></input-select>
-    </div> -->
+    <h2>Code Management</h2>
     <vs-divider></vs-divider>
-    <h4>add a new code type</h4><br/>
-    <vs-button type="border" @click="handleAddClick">Add Code Type</vs-button>
-    <add-code :active="showAddCodeHeader" v-on:update:close="handleAddClick"></add-code>
+    <div class="section">
+      <h3>Code Types</h3>
+      <p>All codes belong to a code type. For example the code "Kootenay" could belong to the code type "Region".</p>
+      <vs-button @click="handleAddHeaderClick">Add New Code Type</vs-button>
+      <vs-button @click="handleImportClick">Bulk Import New Codes</vs-button>
+      <add-code :active="showAddCodeHeader" v-on:update:close="handleAddHeaderClick"></add-code>
+      <import-modal
+        title="Bulk Import Codes"
+        message="Use this feature to add multiple codes. Codes cannot be edited here.
+        The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional."
+        :active="showImport"
+        v-on:update:close="handleImportClick"></import-modal>
+    </div>
     <vs-divider></vs-divider>
-    <h4>click a button to view its codes</h4><br/>
+    <div class="section">
+    <h3>Existing Code Types</h3>
     <div v-if="headers.length" style="margin-top: 20px">
-      <span v-for="header in headers" v-bind:key="header.id">
-        <vs-button 
-          style="margin-right: 10px"
-          type="border"
-          class="btn-setting"
-          @click="() => handleSelectHeaderselected(header)"
-        >{{header.type}}</vs-button>
-      </span>
-      <vs-divider></vs-divider>
-      <div v-if="headers && codes && codes[selected.type]">
-        <p>{{selected.description}}</p>
-        <vs-list v-for="code in codes[selected.type]" :key="code.id">
-          <vs-list-item :title="code.code" :subtitle="code.description"></vs-list>
-      </div>
-      <div v-else><p>no codes found for this code type</p></div>
+      <vs-button v-for="(header, idx) in headers" :key="idx"
+        style="margin-right: 10px"
+        type="border"
+        size="small"
+        class="btn-setting"
+        @click="handleSelectHeaderselected(header)"
+      >{{header.title}}</vs-button>
+    </div>
+    <vs-divider></vs-divider>
+    <div v-if="selected.type">
+      <p><b>When importing new {{selected.title}} codes, use <i>{{selected.type}}</i> as the Code Type</b></p>
+      <p><i>{{`${selected.description || 'no description available'}`}}</i></p>
+    </div>
+    <div class="section" v-if="codes && codes[selected.type]">
+      <state-table
+        :getHeader="(str) => str"
+        :title="`${selected.title} Codes`"
+        :propsToDisplay="['id', 'code', 'description']"
+        v-model="codes[selected.type]"
+      ></state-table>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { ICode } from '../../types/code';
+import { ICode, ICodeHeader } from '../../types/code';
 import { mapState } from 'vuex';
 
 export default Vue.extend({
   name: 'Settings',
   data () {
     return {
-      headers: [],
+      headers: [] as ICodeHeader[],
       user: this.$store.getters.testUser,
       selected: {},
       showAddCodeHeader: false,
+      showImport: false,
     }
   },
   computed: {
-    localComputed () {
-    },
-    ...mapState({
-      codes(state) {
-        return state.codeModule.codes //[this.selected.type]
-      }
-    })
+    codes() {
+      return this.$store.getters.codes;
+    }
   },
   methods: {
-    handleAddClick() {
+    handleAddHeaderClick() {
       this.showAddCodeHeader = !this.showAddCodeHeader;
+    },
+    handleImportClick() {
+      this.showImport = !this.showImport;
     },
     handleSelectHeaderselected(header: ICode) {
       this.selected = header;
       let codes = this.$store.getters.codes[header.type];
-      // console.log(`header selected: codes are ${JSON.stringify(codes)}`);
       if (!codes) {
         this.$store.dispatch('requestCodes', {body: header.type, callback: this.loadCodeCb})
       }
     },
-    loadedHeadersCb(body: ICode[]) {
+    loadedHeadersCb(body: ICodeHeader[]) {
       this.headers = body;
     },
     loadCodeCb(body: ICode[]) {
@@ -85,11 +92,6 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-  .testform {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
   h3 {
     margin-bottom: 10px;
   }

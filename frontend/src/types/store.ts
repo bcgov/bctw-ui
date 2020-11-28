@@ -1,6 +1,7 @@
 interface IImportError {
   error: string;
   row: string;
+  rownum: number;
 }
 
 type ActionCallback = (body: any, err?: Error | string) => void;

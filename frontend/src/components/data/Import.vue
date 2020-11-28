@@ -25,14 +25,17 @@
         <p>Import successful: {{uploadSuccess}}</p><br>
         <p><a href="javascript:void(0)" @click="reset()">Import again</a></p>
       </div>
-      <div v-if="!isSuccess && uploadWarning" class="warning"><h4>{{uploadWarning}}</h4></div>
-      <div v-if="isFailed" >
+      <div v-if="isFailed">
+        <h4 class="warning">There were errors uploading:</h4>
         <div v-for="e in uploadError">
-          <span class="err-row">{{e.error.slice(0, e.error.indexOf(':') + 1)}}</span>
-          <span class="error">{{e.error.slice(e.error.indexOf(':') + 1)}}</span>
-          <a href="javascript:void(0)" @click="() => copy(e.row)">Copy</a>
+          <span class="err-row">Row {{e.rownum}}:</span>
+          <span class="error">{{e.error}}</span>
+          <a href="javascript:void(0)" @click="() => copy(e.row)">Copy Row</a>
         </div>
-        <p><a href="javascript:void(0)" @click="reset()">Try again</a></p>
+        <div class="bottom-btn-row">
+          <vs-button color="dark" @click="reset">Try again</vs-button>
+          <vs-button color="dark" v-if="isFailed && uploadError.length > 1" @click="copyAllErrorRows">Copy all Rows</vs-button>
+        </div>
       </div>
     </div>
   </modal>
@@ -61,7 +64,6 @@ export default Vue.extend({
       uploadedFiles: [],
       uploadError: [] as IImportError[],
       uploadSuccess: '',
-      uploadWarning: '',
       currentStatus: LoadStatus.INITIAL as LoadStatus, 
       uploadFieldName: 'csv',
     }
@@ -92,8 +94,15 @@ export default Vue.extend({
       this.save(formData);
     },
     copy(row) {
-      this.$copyText(row).then(v => {
+      const values = Object.values(row).join();
+      this.$copyText(values).then(v => {
         this.$vs.notify({ text:'Row copied to clipboard'});
+      })
+    },
+    copyAllErrorRows() {
+      const rows = this.uploadError.map((e: IImportError) => Object.values(e.row).join());
+      this.$copyText(rows.join('\n')).then(v => {
+        this.$vs.notify({ text:'All error rows copied to clipboard' });
       })
     },
     save(formData: any) {
@@ -105,27 +114,21 @@ export default Vue.extend({
       this.$store.dispatch('uploadCsv', payload)
     },
     onResultsCallback(results: any[], errors: IImportError[]) {
-      let msg;
       if (errors.length) {
         this.currentStatus = LoadStatus.FAILED;
         this.uploadError = errors;
+        return;
       }
       const numSuccessful = results.length
       let str = `${numSuccessful} line${numSuccessful > 1 ? 's' : ''} ${numSuccessful > 1 ? 'were ' : 'was '}`;
-      if (errors.length && results.length) {
-        this.uploadWarning = `${str}successfully imported, but there were errors:`;
-      } 
-      if (errors.length === 0) {
-        this.currentStatus = LoadStatus.SUCCESS;
-        this.uploadSuccess = `${str}successfully imported!`;
-      }
+      this.currentStatus = LoadStatus.SUCCESS;
+      this.uploadSuccess = `${str}successfully imported!`;
     },
     reset() {
       this.currentStatus = LoadStatus.INITIAL;
       this.uploadedFiles = [];
       this.uploadError   = [];
       this.uploadSuccess = '';
-      this.uploadWarning = '';
     },
   },
   watch: {
@@ -201,5 +204,11 @@ export default Vue.extend({
   .err-row {
     font-weight: 600;
     font-style: italic;
+  }
+  .bottom-btn-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 15px;
   }
 </style>
