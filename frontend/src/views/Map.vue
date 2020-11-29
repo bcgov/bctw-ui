@@ -1,3 +1,20 @@
+
+<style lang="stylus" scoped>
+
+#map
+  position absolute
+  width 100%
+  height 100%
+
+  img 
+    display none
+
+  .leaflet-control-layers,leaflet-control
+    display none !important
+
+</style>
+
+
 <template lang="pug">
 .page-map
   #map
@@ -8,6 +25,7 @@
 <script lang='ls'>
 
 ``import 'leaflet/dist/leaflet.css'``
+``import needle from 'needle'``
 ``import 'leaflet.markercluster/dist/MarkerCluster.css'``
 ``import 'leaflet.markercluster/dist/MarkerCluster.Default.css'``
 ``import 'leaflet-draw/dist/leaflet.draw.css'``
@@ -27,6 +45,7 @@
 
 ``import {bus} from '../main'``
 
+layerPicker = L.control.layers!
 
 makeMarkers = ->
   markers = L.geoJson @$store.getters.pingsActive, do
@@ -77,6 +96,10 @@ drawPingLayer = (map) ->
   #// Define the marker layer
   markers = makeMarkers.call @
   clusterLayer.addLayer markers
+
+  layerPicker.addOverlay clusterLayer, 'Critter point locations'
+
+
 
   chooseToToggleCluster = ~> 
     if @$store.getters.clusterCritters
@@ -137,6 +160,21 @@ drawSelectedLayer = (map, drawnItems) !->
   ).addTo map
 
 
+/* ## drawTracksLayer
+  Draw the layer that holds all tracks
+  @param map {object} Leaflet map object
+  @param drawnItems {object} Leaflet layer object
+    for storing and displaying selected points
+ */
+drawTracksLayer = (map) !->
+  url = 'http://localhost:3000/get-critter-tracks?start=2020-10-18&end=2020-11-26'
+  needle.get url, (err,data) ->
+    tracksLayer = L.geoJson(data.body).addTo map
+    layerPicker.addOverlay tracksLayer, 'Critter Travel Tracks &nbsp;'
+
+
+
+
 
 /* ## draw
   Draw the map
@@ -150,12 +188,16 @@ draw = ->
   L.control.zoom position: 'bottomright'
     .addTo map
 
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  bingOrtho = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">ESRI Basemap</a> ',
     maxZoom: 18
-  }).addTo(map);
+  }).addTo map
+
+  getBCGovBaseLayer = L.tileLayer('https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer/tile/{z}/{y}/{x}', { maxZoom: 24 }).addTo map
 
   drawPingLayer.call @, map #// Draw cluster layer
+
+  drawTracksLayer.call @, map #// Draw tracks layer
 
   drawnItems = new L.FeatureGroup!
   map.addLayer drawnItems
@@ -171,7 +213,11 @@ draw = ->
       remove: true
       edit: true
 
+  layerPicker.addBaseLayer getBCGovBaseLayer, 'BC Gov Basemap &nbsp; &nbsp; &nbsp;'
+  layerPicker.addBaseLayer bingOrtho, 'Bing Satellite Imagery'
+
   map.addControl drawControl
+  map.addControl layerPicker
 
 
 
@@ -196,12 +242,3 @@ export default {
 }
 ``
 </script>
-
-<style lang="stylus" scoped>
-
-#map
-  position absolute
-  width 100%
-  height 100%
-
-</style>
