@@ -12,7 +12,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const expressSession = require('express-session');
 const keycloakConnect = require('keycloak-connect');
-const { json } = require('body-parser');
 
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
@@ -56,6 +55,12 @@ var session = {
   @param res {object} Node/Express response object
   @param next {function} Node/Express function for flow control
  */
+const appendQueryToUrl = (url, query) => {
+  return url.includes('?') ?
+    url += `&${query}` :
+    url += `?${query}`;
+};
+
 const proxyApi = function (req, res, next) {
   const endpoint = req.params.endpoint; // The url
 
@@ -71,13 +76,10 @@ const proxyApi = function (req, res, next) {
     const domain = cred.split('@')[1];
     const user = cred.split('@')[0];
     url = `${apiHost}:${apiPort}/${endpoint}`;
-    console.log(`url initial endpoint: ${url}`);
     if (req.params.endpointId) {
-      console.log(`url endpointId found: ${req.params.endpointId}`);
       url += `/${req.params.endpointId}`;
     }
-    url += `?${query}&${domain}=${user}`;
-    console.log(`final prod url: ${url}`);
+    url = appendQueryToUrl(url, `${query}&${domain}=${user}`);
   } else {
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&idir=user`;
   }
