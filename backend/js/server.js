@@ -58,7 +58,6 @@ var session = {
  */
 const proxyApi = function (req, res, next) {
   const endpoint = req.params.endpoint; // The url
-  const endPointId = req.params.endpointId;
 
   // The parameter string
   const query = Object.keys(req.query).map( (key) => {
@@ -72,10 +71,13 @@ const proxyApi = function (req, res, next) {
     const domain = cred.split('@')[1];
     const user = cred.split('@')[0];
     url = `${apiHost}:${apiPort}/${endpoint}`;
-    if (endpointId) {
-      url += `/${endpointId}`;
+    console.log(`url initial endpoint: ${url}`);
+    if (req.params.endpointId) {
+      console.log(`url endpointId found: ${req.params.endpointId}`);
+      url += `/${req.params.endpointId}`;
     }
     url += `?${query}&${domain}=${user}`;
+    console.log(`final prod url: ${url}`);
   } else {
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&idir=user`;
   }
