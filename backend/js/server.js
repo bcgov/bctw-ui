@@ -58,7 +58,6 @@ var session = {
  */
 const proxyApi = function (req, res, next) {
   const endpoint = req.params.endpoint; // The url
-  console.log(`endpoint: ${endpoint}, endpointParamId: ${req.params.endpointId}`);
 
   // The parameter string
   const query = Object.keys(req.query).map( (key) => {
@@ -71,7 +70,7 @@ const proxyApi = function (req, res, next) {
     const cred = req.kauth.grant.access_token.content.preferred_username; 
     const domain = cred.split('@')[1];
     const user = cred.split('@')[0];
-    url = `${apiHost}:${apiPort}/${endpoint}?${query}&${domain}=${user}`;
+    url = `${apiHost}:${apiPort}/${endpoint}${endpointId ? `/${endpointId}` : ''}?${query}&${domain}=${user}`;
   } else {
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&idir=user`;
   }
