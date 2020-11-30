@@ -58,6 +58,7 @@ var session = {
  */
 const proxyApi = function (req, res, next) {
   const endpoint = req.params.endpoint; // The url
+  console.log(`endpoint: ${endpoint}, endpointParamId: ${req.params.endpointId}`);
 
   // The parameter string
   const query = Object.keys(req.query).map( (key) => {
@@ -189,6 +190,8 @@ if (isProd) {
   app
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
+    .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
+    .post('/api/:endpoint', keycloak.protect(), proxyApi)
 } else {
   app
     .get('/api/:endpoint', proxyApi)
