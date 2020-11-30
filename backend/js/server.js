@@ -56,6 +56,7 @@ var session = {
   @param next {function} Node/Express function for flow control
  */
 const appendQueryToUrl = (url, query) => {
+  if (!query) return url;
   return url.includes('?') ?
     url += `&${query}` :
     url += `?${query}`;
@@ -88,7 +89,8 @@ const proxyApi = function (req, res, next) {
   console.log(`url: ${url}, type: ${req.method}`);
 
   if (req.method === 'POST') {
-    needle.post(url, req.body, (err, _, body) => {
+    console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
+    needle('post', url, req.body, (err, _, body) => {
       if (err) {
         console.log(`error communicating with API on post request: ${err}`);
         return res.status(500).json({error: err});
@@ -210,6 +212,7 @@ if (isProd) {
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
     .post('/api/:endpoint', keycloak.protect(), proxyApi)
+    // .post('/api/:endpoint', proxyApi)
 } else {
   app
     .get('/api/:endpoint', proxyApi)
