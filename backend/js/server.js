@@ -79,19 +79,29 @@ const proxyApi = function (req, res, next) {
     if (req.params.endpointId) {
       url += `/${req.params.endpointId}`;
     }
-    url = appendQueryToUrl(url, `${query}&${domain}=${user}`);
+    url = appendQueryToUrl(url, query);
+    url = appendQueryToUrl(url, `${domain}=${user}`)
   } else {
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&idir=user`;
   }
 
-  console.log(url);
+  console.log(`url: ${url}, type: ${req.method}`);
+
+  if (req.method === 'POST') {
+    needle.post(url, req.body, (err, _, body) => {
+      if (err) {
+        console.log(`error communicating with API on post request: ${err}`);
+        return res.status(500).json({error: err});
+      }
+      res.json(body);
+    });
+  }
   // Right now it's just a get
   needle(url,(err,_,body) => {
     if (err) {
       console.error("Error communicating with the API: ",err);
       return res.status(500).json({error: err});
     }
-
     res.json(body);
   })
 };
