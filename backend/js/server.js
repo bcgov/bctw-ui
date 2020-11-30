@@ -62,7 +62,7 @@ const appendQueryToUrl = (url, query) => {
     url += `?${query}`;
 };
 
-const proxyApi = function (req, res, next) {
+const proxyApi = async function (req, res, next) {
   const endpoint = req.params.endpoint; // The url
 
   // The parameter string
@@ -90,13 +90,21 @@ const proxyApi = function (req, res, next) {
 
   if (req.method === 'POST') {
     console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
-    needle('post', url, req.body, (err, _, body) => {
-      if (err) {
-        console.log(`error communicating with API on post request: ${err}`);
-        return res.status(500).json({error: err});
-      }
-      res.json(body);
-    });
+    const response = await fetch(url, {method: 'POST', body: req.body });
+    if (response.ok) {
+      response.json.then((data) => {
+        res.json(data)
+      });
+    } else {
+      res.status(500).json(response.text())
+    }
+    // needle('post', url, req.body, (err, _, body) => {
+    //   if (err) {
+    //     console.log(`error communicating with API on post request: ${err}`);
+    //     return res.status(500).json({error: err});
+    //   }
+    //   res.json(body);
+    // });
   } else {
     needle(url,(err,_,body) => {
       if (err) {
