@@ -41,6 +41,7 @@
     "moment": "^2.27.0",
     "morgan": "^1.9.1",
     "needle": "^2.5.0",
+    "node-fetch": "^2.6.1",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-livescript": "^1.1.0",
     "passport": "^0.4.0",

@@ -1,8 +1,7 @@
 /* Bare bones static file server */
-//const fs = require('fs');
-//const pg = require('pg');
 const pug = require('pug');
 const cors = require('cors');
+const fetch = require('node-fetch');
 const http = require('http');
 const morgan = require('morgan');
 const helmet = require('helmet');
