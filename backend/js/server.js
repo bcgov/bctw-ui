@@ -97,15 +97,15 @@ const proxyApi = function (req, res, next) {
       }
       res.json(body);
     });
+  } else {
+    needle(url,(err,_,body) => {
+      if (err) {
+        console.error("Error communicating with the API: ",err);
+        return res.status(500).json({error: err});
+      }
+      res.json(body);
+    })
   }
-  // Right now it's just a get
-  needle(url,(err,_,body) => {
-    if (err) {
-      console.error("Error communicating with the API: ",err);
-      return res.status(500).json({error: err});
-    }
-    res.json(body);
-  })
 };
 
 /* ## gardenGate
