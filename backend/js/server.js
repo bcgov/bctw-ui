@@ -1,5 +1,6 @@
 /* Bare bones static file server */
-const pug = require('pug');
+const axios = require('axios');
+// const pug = require('pug');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const FormData = require('form-data');
@@ -7,7 +8,7 @@ const http = require('http');
 const morgan = require('morgan');
 const multer = require ('multer');
 const helmet = require('helmet');
-const needle = require('needle');
+// const needle = require('needle');
 const express = require('express');
 // const compression = require('compression'); This messes with keycloak
 const bodyParser = require('body-parser');
@@ -93,13 +94,6 @@ const proxyApi = function (req, res, next) {
   }
 
   console.log(`url: ${url}, type: ${req.method}`);
-  const needleResponseHandler = (err, _, body) => {
-    if (err) {
-      console.error("Error communicating with the API: ",err);
-      return res.status(500).json({error: err});
-    }
-    res.json(body);
-  }
 
   if (req.method === 'POST') {
     // console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
@@ -107,26 +101,29 @@ const proxyApi = function (req, res, next) {
       const fileReceived = req.file;
       const form = new FormData();
       form.append('csv', fileReceived.buffer, fileReceived.originalname);
-      fetch(`https://${url}`, { method: 'POST', body: form })
-      // fetch(url, { method: 'POST', body })
-        .then(response => {
-          if (response.ok) {
-            response.json().then((data) => {
-              res.json(data)
-            });
-          } else {
-            response.text().then(e => res.json({error: e}));
-          } 
-        }).catch(e => {
-          console.log(`caught exception ${e}`);
-          res.status(500).json({error: e});
-        }); 
+
+      const config = {
+        headers: form.getHeaders()
+      }
+      axios.post(url, form, config).then((response) => {
+        res.json(response.data);
+      }).catch((err)=> {
+        return res.status(500).json({error: err});
+      })
     } else {
-      needle.post(url, req.body, needleResponseHandler);
+      axios.post(url, req.body).then((response) => {
+        res.json(response.data);
+      }).catch((err)=> {
+        return res.status(500).json({error: err});
+      })
     }
   }
   else {
-    needle(url, needleResponseHandler);
+    axios.get(url).then((response) => {
+      res.json(response.data);
+    }).catch((err)=> {
+      return res.status(500).json({error: err});
+    });
   }
 };
 
@@ -232,6 +229,7 @@ if (isProd) {
   app
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
+    // .get('/api/:endpoint', proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
     // .post('/api/import', upload.single('csv'), pageHandler) 
     .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler) 
