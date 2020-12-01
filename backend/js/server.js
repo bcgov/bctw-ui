@@ -93,41 +93,40 @@ const proxyApi = function (req, res, next) {
   }
 
   console.log(`url: ${url}, type: ${req.method}`);
+  const needleResponseHandler = (err, _, body) => {
+    if (err) {
+      console.error("Error communicating with the API: ",err);
+      return res.status(500).json({error: err});
+    }
+    res.json(body);
+  }
 
   if (req.method === 'POST') {
     // console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
-    let body; 
     if (req.file) {
       const fileReceived = req.file;
       const form = new FormData();
       form.append('csv', fileReceived.buffer, fileReceived.originalname);
-      body = form;
+      fetch(`https://${url}`, { method: 'POST', body: form })
+      // fetch(url, { method: 'POST', body })
+        .then(response => {
+          if (response.ok) {
+            response.json().then((data) => {
+              res.json(data)
+            });
+          } else {
+            response.text().then(e => res.json({error: e}));
+          } 
+        }).catch(e => {
+          console.log(`caught exception ${e}`);
+          res.status(500).json({error: e});
+        }); 
     } else {
-      body = req.body;
+      needle.post(url, req.body, needleResponseHandler);
     }
-    // fetch(`http://${url}`, { method: 'POST', body })
-    fetch(url, { method: 'POST', body })
-      .then(response => {
-        if (response.ok) {
-          response.json().then((data) => {
-            res.json(data)
-          });
-        } else {
-          response.text().then(e => res.json({error: e}));
-        } 
-      }).catch(e => {
-        console.log(`caught exception ${e}`);
-        res.status(500).json({error: e});
-      }); 
   }
   else {
-    needle(url,(err,_,body) => {
-      if (err) {
-        console.error("Error communicating with the API: ",err);
-        return res.status(500).json({error: err});
-      }
-      res.json(body);
-    })
+    needle(url, needleResponseHandler);
   }
 };
 
