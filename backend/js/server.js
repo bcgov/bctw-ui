@@ -1,14 +1,11 @@
 /* Bare bones static file server */
 const axios = require('axios');
-// const pug = require('pug');
 const cors = require('cors');
-const fetch = require('node-fetch');
 const FormData = require('form-data');
 const http = require('http');
 const morgan = require('morgan');
 const multer = require ('multer');
 const helmet = require('helmet');
-// const needle = require('needle');
 const express = require('express');
 // const compression = require('compression'); This messes with keycloak
 const bodyParser = require('body-parser');
@@ -27,7 +24,6 @@ var memoryStore = new expressSession.MemoryStore();
 
 const storage = multer.memoryStorage()
 const upload = multer({storage});
-// const upload = multer({dest: '../frontend/dist/upload'});
 
 // Keycloak config object (deprecates use of keycloak.json)
 // see: https://wjw465150.gitbooks.io/keycloak-documentation/content/securing_apps/topics/oidc/nodejs-adapter.html
@@ -80,7 +76,6 @@ const proxyApi = function (req, res, next) {
   let url;
   if (isProd) {
     const cred = req.kauth.grant.access_token.content.preferred_username; 
-    // const cred = 'test@idir';
     const domain = cred.split('@')[1];
     const user = cred.split('@')[0];
     url = `${apiHost}:${apiPort}/${endpoint}`;
@@ -94,6 +89,8 @@ const proxyApi = function (req, res, next) {
   }
 
   console.log(`url: ${url}, type: ${req.method}`);
+  const errHandler = (err) => res.status(500).json({error: err});
+  const successHandler = (response) => res.json(response.data);
 
   if (req.method === 'POST') {
     // console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
@@ -101,29 +98,21 @@ const proxyApi = function (req, res, next) {
       const fileReceived = req.file;
       const form = new FormData();
       form.append('csv', fileReceived.buffer, fileReceived.originalname);
-
-      const config = {
-        headers: form.getHeaders()
-      }
-      axios.post(url, form, config).then((response) => {
-        res.json(response.data);
-      }).catch((err)=> {
-        return res.status(500).json({error: err});
-      })
+      const config = { headers: form.getHeaders() };
+      axios.post(url, form, config)
+        .then(successHandler)
+        .catch(errHandler)
     } else {
-      axios.post(url, req.body).then((response) => {
-        res.json(response.data);
-      }).catch((err)=> {
-        return res.status(500).json({error: err});
-      })
+      axios.post(url, req.body)
+        .then(successHandler)
+        .catch(errHandler)
     }
   }
+  // handle get
   else {
-    axios.get(url).then((response) => {
-      res.json(response.data);
-    }).catch((err)=> {
-      return res.status(500).json({error: err});
-    });
+    axios.get(url)
+      .then(successHandler)
+      .catch(errHandler);
   }
 };
 
@@ -229,11 +218,8 @@ if (isProd) {
   app
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
-    // .get('/api/:endpoint', proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
-    // .post('/api/import', upload.single('csv'), pageHandler) 
     .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler) 
-    // .post('/api/:endpoint', proxyApi)
     .post('/api/:endpoint', keycloak.protect(), proxyApi)
 } else {
   app

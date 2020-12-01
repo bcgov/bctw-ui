@@ -1,0 +1,38 @@
+POST http://localhost:8080/api/add-animal HTTP/1.1
+content-type: application/json
+
+[
+  {
+  "animal_id": "test123",
+  "animal_status": "Alive",
+  "calf_at_heel": true,
+  "sex": "M",
+  "wlh_id": "abc123",
+  "nickname": "shimmer",
+  "id": 2
+},
+{
+  "animal_id": "test123",
+  "animal_status": "Alive",
+  "calf_at_heel": true,
+  "species": "unicorn",
+  "sex": "M",
+  "wlh_id": "abc123",
+  "nickname": "shimmer"
+}
+]
+
+###
+http://localhost:8080/api/get-last-pings
+
+
+###
+POST http://localhost:8080/api/import HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="csv"; filename="data.csv"
+Content-Type: text/csv
+
+<@ {{csv}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
