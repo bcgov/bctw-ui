@@ -2,8 +2,10 @@
 const pug = require('pug');
 const cors = require('cors');
 const fetch = require('node-fetch');
+const FormData = require('form-data');
 const http = require('http');
 const morgan = require('morgan');
+const multer = require ('multer');
 const helmet = require('helmet');
 const needle = require('needle');
 const express = require('express');
@@ -21,6 +23,10 @@ const apiPort = process.env.BCTW_API_PORT;
 const authorizedUsers = JSON.parse(process.env.BCTW_AUTHORIZED_USERS);
 
 var memoryStore = new expressSession.MemoryStore();
+
+const storage = multer.memoryStorage()
+const upload = multer({storage});
+// const upload = multer({dest: '../frontend/dist/upload'});
 
 // Keycloak config object (deprecates use of keycloak.json)
 // see: https://wjw465150.gitbooks.io/keycloak-documentation/content/securing_apps/topics/oidc/nodejs-adapter.html
@@ -73,6 +79,7 @@ const proxyApi = function (req, res, next) {
   let url;
   if (isProd) {
     const cred = req.kauth.grant.access_token.content.preferred_username; 
+    // const cred = 'test@idir';
     const domain = cred.split('@')[1];
     const user = cred.split('@')[0];
     url = `${apiHost}:${apiPort}/${endpoint}`;
@@ -88,18 +95,32 @@ const proxyApi = function (req, res, next) {
   console.log(`url: ${url}, type: ${req.method}`);
 
   if (req.method === 'POST') {
-    console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
-    fetch(url, {method: 'POST', body: req.body })
+    // console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
+    let body; 
+    if (req.file) {
+      const fileReceived = req.file;
+      const form = new FormData();
+      form.append('csv', fileReceived.buffer, fileReceived.originalname);
+      body = form;
+    } else {
+      body = req.body;
+    }
+    // fetch(`http://${url}`, { method: 'POST', body })
+    fetch(url, { method: 'POST', body })
       .then(response => {
         if (response.ok) {
           response.json().then((data) => {
             res.json(data)
           });
         } else {
-          res.status(500).json(response.text())
-        }
-      }).catch(e => res.status(500).json({error: e}));
-  } else {
+          response.text().then(e => res.json({error: e}));
+        } 
+      }).catch(e => {
+        console.log(`caught exception ${e}`);
+        res.status(500).json({error: e});
+      }); 
+  }
+  else {
     needle(url,(err,_,body) => {
       if (err) {
         console.error("Error communicating with the API: ",err);
@@ -213,8 +234,10 @@ if (isProd) {
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
-    .post('/api/:endpoint', keycloak.protect(), proxyApi)
+    // .post('/api/import', upload.single('csv'), pageHandler) 
+    .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler) 
     // .post('/api/:endpoint', proxyApi)
+    .post('/api/:endpoint', keycloak.protect(), proxyApi)
 } else {
   app
     .get('/api/:endpoint', proxyApi)
