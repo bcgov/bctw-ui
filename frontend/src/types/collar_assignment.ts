@@ -9,6 +9,8 @@ interface ICollarAssignment {
   end_time: Date;
 }
 
+const assignmentPropsToDisplay = ['device_id', 'make', 'start_time', 'end_time'];
+
 class CollarAssignment implements ICollarAssignment {
   public static getTitle(str: string): string {
     switch (str) {
@@ -53,4 +55,5 @@ function decodeCollarAssignment(json: ICollarAssignment): CollarAssignment {
 export {
   CollarAssignment,
   decodeCollarAssignment,
+  assignmentPropsToDisplay,
 };

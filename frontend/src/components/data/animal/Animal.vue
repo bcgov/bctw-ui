@@ -106,9 +106,6 @@ export default Vue.extend({
       }
     }
   },
-  mounted() {
-    // this.$store.dispatch('getAnimals', {callback: this.cbLoadCritters});
-  }
 });
 </script>
 

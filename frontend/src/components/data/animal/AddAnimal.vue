@@ -1,5 +1,4 @@
 <template>
-<!-- todo: can only save existing critter when value has changed -->
   <modal 
     class='grp-col'
     :title="isEdit ? 'Edit Animal' : 'Add Animal'"
@@ -8,9 +7,9 @@
   >
     <h3>General Information</h3><vs-divider></vs-divider>
     <div class="grp">
-      <vs-input label="Nickname" class="inputx" v-model="animal.nickname"></vs-input>
-      <vs-input label="Animal ID*" class="inputx" v-model="animal.animal_id"></vs-input>
-      <vs-input label="WLHID*" class="inputx" v-model="animal.wlh_id"></vs-input>
+      <vs-input label="Nickname" v-bind:value="animal.nickname" v-on:input="(v) => handleSelect({nickname: v})" ></vs-input>
+      <vs-input label="Animal ID*" v-bind:value="animal.animal_id"  v-on:input="(v) => handleSelect({animal_id: v})"></vs-input>
+      <vs-input label="WLHID*" v-bind:value="animal.wlh_id"  v-on:input="(v) => handleSelect({wlh_id: v})"></vs-input>
     </div>
 
     <h3>Group Management</h3><vs-divider></vs-divider>
@@ -22,13 +21,13 @@
 
     <h3>Individual Characteristics</h3><vs-divider></vs-divider>
     <div class="grp">
-      <input-check v-model="animal.calf_at_heel" propId="calf_at_heel" label="Calf at heel?"></input-check>
+      <vs-checkbox v-bind:value="animal.calf_at_heel" v-on:input="(v) => handleSelect({calf_at_heel: v})" label="Calf at heel?"></vs-checkbox>
     </div>
 
     <div v-if="critterCollarHistory && critterCollarHistory.length">
       <h3>Assigned GPS Collar</h3><vs-divider></vs-divider>
       <state-table
-        :propsToDisplay="toDisplay"
+        :propsToDisplay="collarHistoryPropsToDisplay"
         :getHeader="getHeader"
         :paginate="false"
         v-model="critterCollarHistory"></state-table>
@@ -72,11 +71,8 @@ import { mapGetters } from 'vuex';
 import Vue from 'vue';
 import { getNotifyProps } from '../../notify';
 import { Collar, ICollarLinkResult } from '../../../types/collar';
-import { CollarAssignment } from '../../../types/collar_assignment';
-
-import vuesax from 'vue/types/vue';
-
-import { formattedNow } from '../../../api/api_helpers';
+import { CollarAssignment, assignmentPropsToDisplay } from '../../../types/collar_assignment';
+import { filterObj, formattedNow } from '../../../api/api_helpers';
 import { ActionGetPayload, ActionPostPayload } from 'frontend/src/types/store';
 import moment from 'moment';
 import { canSaveObject } from '../../component_helpers';
@@ -95,7 +91,8 @@ export default Vue.extend({
       bShowAssignModal: false as boolean,
       bShowYesNoModal: false as boolean,
       requiredFields: ['animal_id', 'wlh_id', 'region', 'species'] as string[],
-      toDisplay: ['device_id', 'make', 'start_time', 'end_time']
+      collarHistoryPropsToDisplay: assignmentPropsToDisplay,
+      editableProperties: ['animal_id', 'wlh_id', 'region', 'species', 'population_unit', 'region', 'calf_at_heel']
     }
   },
   computed: {
@@ -173,7 +170,7 @@ export default Vue.extend({
           }
         },
       }
-      console.log(JSON.stringify(payload.body));
+      console.log(`save payload: ${JSON.stringify(payload.body)}`);
       this.$store.dispatch('upsertAnimal', payload);
       this.$emit('save:animal');
     },
@@ -185,7 +182,6 @@ export default Vue.extend({
     handleAssignment(data: ICollarLinkResult) {
       this.showAssign(); // close the collar modal
       this.loadAssignments()
-      // console.log('AddAnimal: collar assigned')
     },
     loadAssignments() {
       const cb = (data, err?:Error | string) => {
@@ -199,9 +195,19 @@ export default Vue.extend({
     }
   },
   watch: {
-    // todo: handle required fields better?
     animal() {
-      this.canSave = canSaveObject(this.requiredFields, this.animal);
+      if (this.isEdit) {
+        const filteredAnimal = filterObj(this.animal, this.editableProperties);
+        for (const [key, value] of Object.entries(filteredAnimal)) {
+          if (value !== this.editObject[key]) {
+            this.canSave = true;
+            return;
+          }
+        };
+        this.canSave = false;
+      } else {
+        this.canSave = canSaveObject(this.requiredFields, this.animal);
+      }
     },
     active(show) {
       if (show && this.isEdit) {

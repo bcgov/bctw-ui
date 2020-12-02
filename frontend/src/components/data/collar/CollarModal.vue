@@ -12,15 +12,15 @@
     </div>
 
     <div class="grp">
-      <vs-input label="Device ID*" type="number" :disabled="!isNewVHFCollar" v-model="collar.device_id"></vs-input>
+      <vs-input label="Device ID*" type="number" :disabled="!isNewVHFCollar" v-bind:value="collar.device_id" v-on:input="(v) => handleSelect({device_id: v})"></vs-input>
       <input-select header="collar_make" label="Collar Make*" v-on:change:select="handleSelect" :val="collar.make"></input-select>
-      <vs-input label="Collar Model" v-model="collar.model"></vs-input>
+      <vs-input label="Collar Model" v-bind:value="collar.modal" v-on:input="(v) => handleSelect({modal: v})"></vs-input>
     </div>
 
     <div class="grp">
       <input-select header="satellite_network" label="Satellite Network" v-on:change:select="handleSelect" :val="collar.satellite_network"></input-select>
       <input-select header="collar_type" label="Collar Type*" v-on:change:select="handleSelect" :val="collar.collar_type"></input-select>
-      <vs-input type="number" label="Radio Frequency" v-model="collar.radio_frequency"></vs-input>
+      <vs-input type="number" label="Radio Frequency" v-bind:value="collar.radio_frequency" v-on:input="(v) => handleSelect({radio_frequency: v})"></vs-input>
     </div>
     <vs-button
       button="submit"
@@ -33,12 +33,13 @@
 </template>
   
 <script lang="ts">
-import { ActionPayload, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import { Collar, encodeCollar, NewCollarType } from '../../../types/collar';
+import { ActionPostPayload } from '../../../types/store';
 import Vue from 'vue';
-import { ActionPostPayload } from 'frontend/src/types/store';
 import { getNotifyProps } from '../../notify';
 import { canSaveObject } from '../../component_helpers';
+import { filterObj } from '../../../api/api_helpers';
 
 export default Vue.extend({
   name: 'CollarModal',
@@ -52,6 +53,7 @@ export default Vue.extend({
     return {
       collar: {} as Collar,
       requiredFields: ['device_id', 'make'],
+      editableProps: ['model', 'make', 'collar_status', 'collar_type', 'satellite_network', 'radio_frequency'],
       canSave: false as boolean,
     }
   },
@@ -79,9 +81,9 @@ export default Vue.extend({
       this.$emit('save:collar');
     },
     handleSelect(keyVal: any) {
-      // fixme: discrepency between code header name and collar column :[
+      // fixme: discrepency between code header name and collar column
       if (keyVal['collar_make']) {
-        keyVal = {make: keyVal['collar_make']}
+        keyVal = { make: keyVal['collar_make'] }
       }
       this.collar = Object.assign({}, this.collar, keyVal)
     },
@@ -94,7 +96,18 @@ export default Vue.extend({
   },
   watch: {
     collar() {
-      this.canSave = canSaveObject(this.requiredFields, this.collar);
+      if (this.isEdit) {
+        const c = filterObj(this.collar, this.editableProps);
+        for (const [key, value] of Object.entries(c)) {
+          if (value !== this.editObject[key]) {
+            this.canSave = true;
+            return;
+          }
+        };
+        this.canSave = false;
+      } else {
+        this.canSave = canSaveObject(this.requiredFields, this.collar);
+      }
     },
     active(show) {
       if (show && this.isEdit) {
