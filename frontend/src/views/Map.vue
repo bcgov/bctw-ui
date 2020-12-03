@@ -38,8 +38,7 @@
 ``import 'leaflet.markercluster/dist/leaflet.markercluster.js'``
 ``import 'leaflet-draw/dist/leaflet.draw.js'``
 
-``import {pointsWithinPolygon} from '@turf/turf'``
-#//``import * as turf from '@turf/turf'``
+``import pointsWithinPolygon from '@turf/points-within-polygon'``
 
 ``import PingPopup from '../components/PingPopup.vue'``
 
