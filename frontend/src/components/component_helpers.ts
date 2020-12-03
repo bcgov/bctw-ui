@@ -14,8 +14,15 @@ const columnToHeader = (col: string): string => {
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
 
+const sortImportRow = (row: object): string => {
+  const keys = Object.keys(row).sort();
+  const values = keys.map((k: string) => row[k]).join();
+  return values;
+};
+
 export {
   canSaveObject,
   columnToHeader,
   getTypeExportFields,
+  sortImportRow,
 };

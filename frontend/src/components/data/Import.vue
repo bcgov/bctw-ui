@@ -43,6 +43,7 @@
 
 <script lang="ts">
 import { ActionPostFilePayload, ActionPostPayload, IImportError } from '../../types/store';
+import { sortImportRow } from '../component_helpers';
 import Vue from 'vue'
 
 enum LoadStatus {
@@ -94,13 +95,12 @@ export default Vue.extend({
       this.save(formData);
     },
     copy(row) {
-      const values = Object.values(row).join();
-      this.$copyText(values).then(v => {
+      this.$copyText(sortImportRow(row)).then(v => {
         this.$vs.notify({ text:'Row copied to clipboard'});
       })
     },
     copyAllErrorRows() {
-      const rows = this.uploadError.map((e: IImportError) => Object.values(e.row).join());
+      const rows = this.uploadError.map((e: IImportError) => sortImportRow(e.row));
       this.$copyText(rows.join('\n')).then(v => {
         this.$vs.notify({ text:'All error rows copied to clipboard' });
       })

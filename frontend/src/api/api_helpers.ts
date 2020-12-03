@@ -44,7 +44,7 @@ const createUrl = (
       url = appendQueryToUrl(url, `idir=${process.env.IDIR}`);
     }
     if (page) {
-      appendQueryToUrl(url, `page=${page}`);
+      url = appendQueryToUrl(url, `page=${page}`);
     }
     const u = context.getters.testUser;
     if (u && u !== 'My IDIR') {

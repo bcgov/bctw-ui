@@ -1,6 +1,6 @@
 interface IImportError {
   error: string;
-  row: string;
+  row: object;
   rownum: number;
 }
 
