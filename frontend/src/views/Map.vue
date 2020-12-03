@@ -167,7 +167,9 @@ drawSelectedLayer = (map, drawnItems) !->
     for storing and displaying selected points
  */
 drawTracksLayer = (map) !->
-  url = 'http://localhost:3000/get-critter-tracks?start=2020-10-18&end=2020-11-26'
+  api = if @.$store.getters.isProd then '/api' else 'http://localhost:3000'
+
+  url = "#api/get-critter-tracks?start=2020-10-18&end=2020-11-26"
   needle.get url, (err,data) ->
     tracksLayer = L.geoJson(data.body).addTo map
     layerPicker.addOverlay tracksLayer, 'Critter Travel Tracks &nbsp;'
