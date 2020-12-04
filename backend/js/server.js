@@ -1,5 +1,6 @@
 /* Bare bones static file server */
 const axios = require('axios');
+const path = require('path')
 const cors = require('cors');
 const FormData = require('form-data');
 const http = require('http');
@@ -229,8 +230,8 @@ if (isProd) {
 
 // Remaining server configuration
 app
-  .use(express['static']('frontend/www'))
-  .use(express['static']('frontend/dist'))
+  .use(express['static'](path.join(__dirname, '../../vue/frontend/www')))
+  .use(express['static'](path.join(__dirname, '../../vue/frontend/dist')))
   .set('view engine', 'pug')
   .set('views', 'backend/pug')
   .get('*', notFound);
