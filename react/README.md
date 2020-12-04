@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## VSCode development
+Install the extension [JavaScript and TypeScript Nightly](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-next).\
+From the command palette, make sure the TypeScript version is at least the version matching package.json (currently 4.1.2)
+
 ## Available Scripts
 
 In the project directory, you can run:
