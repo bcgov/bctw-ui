@@ -167,8 +167,13 @@ drawSelectedLayer = (map, drawnItems) !->
  */
 drawTracksLayer = (map) !->
   api = if @.$store.getters.isProd then '/api' else 'http://localhost:3000'
+  h1 = location.protocol
+  h2 = location.hostname
+  h3 = if @$store.getters.isProd then location.port else 3000
+  h4 = if @$store.getters.isProd then '/api' else ''
+  url = "#{h1}//#{h2}:#{h3}#{h4}/get-critter-tracks?start=2020-10-18&end=2020-11-26";
+  console.log url
 
-  url = api + "/get-critter-tracks?start=2020-10-18&end=2020-11-26"
   needle.get url, (err,data) ->
     tracksLayer = L.geoJson(data.body).addTo map
     layerPicker.addOverlay tracksLayer, 'Critter Travel Tracks &nbsp;'
