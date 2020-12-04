@@ -1,7 +1,4 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
      {
@@ -10,20 +7,12 @@
       "name": "debug vue",
       "url": "http://localhost:1111",
       "webRoot": "${workspaceFolder}",
-      // "webRoot": "${workspaceFolder}/frontend/src",
       "breakOnLoad": true,
        "sourceMapPathOverrides": {
         "../*": "${webRoot}/vue/frontend/src/*"
       },
       "trace": true,
       "sourceMaps": true,
-      // "runtimeExecutable": "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
-      // "pathMapping": {
-      //   "__parcel_source_root": "${workspaceFolder}/dist"
-      // },
-      //  "env": {
-      //   "PARCEL_WORKERS": "0" // Run workers in same thread for debugging
-      // },
     },
     {
       "name": "launch keycloak server.js",
@@ -34,6 +23,16 @@
       ],
       "type": "pwa-node",
       "envFile": "${workspaceFolder}/backend/.env"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "debug React version",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/react",
+      "sourceMapPathOverrides": {
+        "/*": "/__vscode-remote-uri__/*"
+      }
     }
   ]
 }

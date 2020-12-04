@@ -1,15 +1,18 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
+const testDebug = () => {
+  const p = 25;
+  console.log(p + 1);
+}
+
+type AppProps = { message: string };
+
+const App = ({message}: AppProps) => {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
+        <p>{message}</p>
         <a
           className="App-link"
           href="https://reactjs.org"
@@ -18,6 +21,7 @@ function App() {
         >
           Learn React
         </a>
+      <button onClick={testDebug}>click here</button>
       </header>
     </div>
   );
