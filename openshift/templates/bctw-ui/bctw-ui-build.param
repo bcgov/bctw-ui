@@ -5,7 +5,7 @@
 #=========================================================
 NAME=bctw-ui
 GIT_REPO_URL=https://github.com/bcgov/bctw-ui.git
-GIT_REF=react
+GIT_REF=master
 SOURCE_CONTEXT_DIR=
 SOURCE_IMAGE_KIND=DockerImage
 SOURCE_IMAGE_NAME=centos/nodejs-12-centos7
