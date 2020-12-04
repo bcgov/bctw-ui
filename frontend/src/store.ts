@@ -86,6 +86,9 @@ const rootModule = {
     },
   },
   getters: {
+    isProd (state) {
+      return state.prod;
+    },
     hasPings (state) {
       return state.pings !== null;
     },
