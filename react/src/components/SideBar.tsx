@@ -6,37 +6,10 @@ import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Typography } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 
-import headerImage from 'images/bcgov-header-vert-MD.png';
-
-const headerStyles = makeStyles((theme) => ({
-  header: {
-    background: '#036',
-    textAlign: 'left',
-    color: 'white',
-    backgroundImage: `url(${headerImage})`,
-    backgroundRepeat: 'no-repeat',
-    height: '4.1rem'
-  },
-  headerText: {
-    marginTop: 0,
-    marginLeft: '4rem'
-  }
-}))
-
-const SideBarHeader = () => { 
-  const classes = headerStyles();
-  return (
-    <div className={classes.header}>
-      <div className={classes.headerText}>
-        <Typography variant='h6'>BCTW</Typography>
-        <Typography paragraph>Caribou Recovery Program</Typography>
-      </div>
-    </div>
-  )
-}
+import SideBarHeader from 'components/SideBarHeader';
+import { RouteKey } from 'utils/AppRouter';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
   },
   // necessary for content to be below app bar
-  toolbar: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
@@ -63,22 +35,14 @@ const useStyles = makeStyles((theme) => ({
 })); 
 
 type SideBarProps = {
-  children: React.ReactNode;
+  children: React.ReactNode; // what's displayed as the main content of the page
+  content?: React.ReactNode; // what's displayed below the navigation section
+  routes: RouteKey[];
 }
 
-type RouteKey = { 
-  path: string;
-  title: string;
-}
-const routes: RouteKey[] = [
-  { path: '/', title: 'Home' },
-  { path: '/map', title: 'Location Map' },
-  { path: '/terrain', title: 'Terrain Viewer' },
-  { path: '/data', title: 'Data Management' },
-]
-
-export default function PermanentDrawerLeft({children}: SideBarProps) {
+export default function PermanentDrawerLeft({children, routes, content}: SideBarProps) {
   const classes = useStyles();
+  const routesToShow: RouteKey[] = Object.values(routes.sort((a, b) => a.sort ?? 0 - 1));
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -91,8 +55,8 @@ export default function PermanentDrawerLeft({children}: SideBarProps) {
         <SideBarHeader />
         <Divider />
         <List>
-          {routes.map((route: RouteKey, index: number) => (
-            <Link className={classes.link} to={route.path} key={index}>
+          {routesToShow.map((route: RouteKey, idx: number) => (
+            <Link className={classes.link} to={route.path} key={idx}>
               <ListItem button>
                 <ListItemText primary={route.title} />
               </ListItem>
@@ -100,9 +64,9 @@ export default function PermanentDrawerLeft({children}: SideBarProps) {
           ))}
         </List>
         <Divider />
+        {content}
       </Drawer>
       <main className={classes.content}>
-        <div className={classes.toolbar} />
         {children}
       </main>
     </div>

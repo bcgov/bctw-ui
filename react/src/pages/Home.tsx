@@ -2,6 +2,8 @@ import SideBar from '../components/SideBar';
 import TopBar from '../components/TopBar';
 import Typography from '@material-ui/core/Typography';
 
+import { AppRoutes } from 'utils/AppRouter';
+
 const HomeContent = () => (
   <div>
     <Typography paragraph>
@@ -12,10 +14,12 @@ const HomeContent = () => (
 )
 
 const Home = () => {
+  const routes = AppRoutes
+    .filter(r => [/*'home',*/ 'map', 'terrain', 'data'].includes(r.name))
   return (
     <div>
       <TopBar title='British Columbia Telemetry Warehouse' />
-      <SideBar children={<HomeContent/>}/>
+      <SideBar routes={routes} children={<HomeContent/>} content={<p>content goes here</p>}/>
     </div>
   )
 }
