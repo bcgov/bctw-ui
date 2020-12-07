@@ -1,11 +1,25 @@
 import React from 'react';
-import Home from './pages/Home';
-import './App.css';
+import AppRouter from 'pages/AppRouter';
+import { makeStyles } from '@material-ui/core';
+import { BrowserRouter as Router } from 'react-router-dom'
 
-const App = () => {
+const useStyles = makeStyles(() => ({
+  root: {
+    display: 'flex',
+    // overflow: 'hidden'
+  }
+}));
+
+type IAppProps = {}
+
+const App: React.FC<IAppProps> = (props) => {
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      <Home/>
+    <div className={classes.root}>
+      <Router>
+        <AppRouter />
+      </Router>
     </div>
   );
 }

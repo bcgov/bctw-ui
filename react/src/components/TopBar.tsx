@@ -9,7 +9,11 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
-  }}));
+  },
+  title: {
+    textAlign: 'center',
+  }
+}));
 
 type TopBarProps = {
   title: string;
@@ -20,7 +24,7 @@ const TopBar = ({title}: TopBarProps) => {
   return (
     <AppBar position="fixed" className={classes.appBar}>
       <Toolbar>
-        <Typography variant="h6" noWrap>{title}</Typography>
+        <Typography className={classes.title} noWrap>{title}</Typography>
       </Toolbar>
     </AppBar>
   )

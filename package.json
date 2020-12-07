@@ -4,9 +4,12 @@
   "description": "Front-end (scientist-facing) interface for the BC Telemetry Warehouse.",
   "main": "index.js",
   "scripts": {
+    "postinstall": "(cd react && npm i); (cd backend && npm i);",
     "start": "npm start --prefix backend",
-    "dev-vue": "npm run dev --prefix vue",
-    "build-vue": "npm run build --prefix vue"
+    "vue-dev": "npm run dev --prefix vue",
+    "vue-build": "npm run build --prefix vue",
+    "dev": "yarn --cwd react run start",
+    "build": "yarn --cwd react run build"
   },
   "repository": {
     "type": "git",

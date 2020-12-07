@@ -7,7 +7,9 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Typography } from '@material-ui/core';
-import headerImage from '../images/bcgov-header-vert-MD.png';
+import { Link } from 'react-router-dom';
+
+import headerImage from 'images/bcgov-header-vert-MD.png';
 
 const headerStyles = makeStyles((theme) => ({
   header: {
@@ -55,11 +57,25 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
   },
+  link: {
+    textDecoration: 'none',
+  }
 })); 
 
 type SideBarProps = {
   children: React.ReactNode;
 }
+
+type RouteKey = { 
+  path: string;
+  title: string;
+}
+const routes: RouteKey[] = [
+  { path: '/', title: 'Home' },
+  { path: '/map', title: 'Location Map' },
+  { path: '/terrain', title: 'Terrain Viewer' },
+  { path: '/data', title: 'Data Management' },
+]
 
 export default function PermanentDrawerLeft({children}: SideBarProps) {
   const classes = useStyles();
@@ -75,10 +91,12 @@ export default function PermanentDrawerLeft({children}: SideBarProps) {
         <SideBarHeader />
         <Divider />
         <List>
-          {['Home', 'Location Map', 'Terrain Viewer', 'Data Management'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
-            </ListItem>
+          {routes.map((route: RouteKey, index: number) => (
+            <Link className={classes.link} to={route.path} key={index}>
+              <ListItem button>
+                <ListItemText primary={route.title} />
+              </ListItem>
+            </Link>
           ))}
         </List>
         <Divider />
