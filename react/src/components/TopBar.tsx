@@ -12,7 +12,8 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     textAlign: 'center',
-  }
+  },
+  toolbar: theme.mixins.toolbar,
 }));
 
 type TopBarProps = {
@@ -23,7 +24,7 @@ const TopBar = ({title}: TopBarProps) => {
   const classes = useStyles();
   return (
     <AppBar position="fixed" className={classes.appBar}>
-      <Toolbar>
+      <Toolbar className={classes.toolbar}>
         <Typography className={classes.title} noWrap>{title}</Typography>
       </Toolbar>
     </AppBar>
