@@ -18,7 +18,7 @@ const headerStyles = makeStyles((theme) => ({
   }
 }))
 
-const SideBarHeader = () => { 
+const SideBarHeader = () => {
   const classes = headerStyles();
   return (
     <div className={classes.header}>

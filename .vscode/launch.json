@@ -28,7 +28,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "debug React version",
-      "url": "http://localhost:3000",
+      "url": "http://localhost:1111",
       "webRoot": "${workspaceFolder}/react",
       "sourceMapPathOverrides": {
         "/*": "/__vscode-remote-uri__/*"
