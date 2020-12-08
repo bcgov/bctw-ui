@@ -6,7 +6,7 @@ import './MapPage.css';
 type IMapPageProps = { }
 
 const MapPage: React.FC<IMapPageProps> = (props) => {
-  const mapRef = useRef(null);
+  const mapRef = useRef<L.Map>(null);
 
   const initMap = () => {
     mapRef.current = L.map('map', {zoomControl:false})

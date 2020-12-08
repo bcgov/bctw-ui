@@ -51,13 +51,6 @@ var session = {
   store: memoryStore
 };
 
-/* ## proxyApi
-  The api is not exposed publicly. This service is protected
-  by Keycloak. So forward all authenticated traffic.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
-  @param next {function} Node/Express function for flow control
- */
 const appendQueryToUrl = (url, query) => {
   if (!query) return url;
   return url.includes('?') ?
@@ -65,6 +58,13 @@ const appendQueryToUrl = (url, query) => {
     url += `?${query}`;
 };
 
+/* ## proxyApi
+  The api is not exposed publicly. This service is protected
+  by Keycloak. So forward all authenticated traffic.
+  @param req {object} Node/Express request object
+  @param res {object} Node/Express response object
+  @param next {function} Node/Express function for flow control
+ */
 const proxyApi = function (req, res, next) {
   const endpoint = req.params.endpoint; // The url
 
@@ -94,7 +94,6 @@ const proxyApi = function (req, res, next) {
   const successHandler = (response) => res.json(response.data);
 
   if (req.method === 'POST') {
-    // console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
     if (req.file) {
       const fileReceived = req.file;
       const form = new FormData();

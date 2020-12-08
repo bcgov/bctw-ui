@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppRoutes } from 'utils/AppRouter';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useQueryCache } from 'react-query';
 
 import SideBar from 'components/SideBar';
 
@@ -8,15 +9,26 @@ type IDataPageProps = { }
 
 const Content = () => { 
   const bctwApi = useTelemetryApi();
+  const cache = useQueryCache();
+  const { status, data, error } = bctwApi.usePingExtent();
 
   const clickHandler = async () => {
-    let data = await bctwApi.requestPingExtent();
-    console.log(JSON.stringify(data));
+    cache.getQueryData('post')
   }
+
   return (
     <div>
-      <p>data management goes here</p>
-      <button onClick={clickHandler}>get pings</button>
+      {status === 'loading' ? ('loading...')
+      : status === 'error' ? (<span>Error: {error?.message || ''}</span>)
+      : (
+        <>
+          <p>data management goes here</p>
+          <button onClick={clickHandler}>get pings</button>
+          {
+            Object.entries(data).map((k,v) => <p>{k}: {v}</p>)
+          }
+        </>
+      )}
     </div>
   )
 }
