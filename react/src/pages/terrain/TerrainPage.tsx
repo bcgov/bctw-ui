@@ -11,7 +11,7 @@ import {Viewer, createWorldTerrain, Cartesian3, Math} from 'cesium';
 type ITerrainPageProps = { }
 
 const TerrainPage: React.FC<ITerrainPageProps> = (props) => {
-  const mapRef = useRef(null);
+  const mapRef = useRef<Cesium.Viewer>(null);
 
   const initMap = () => {
 
