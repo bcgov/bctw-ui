@@ -31,18 +31,19 @@ const useStyles = makeStyles((theme) => ({
   },
   link: {
     textDecoration: 'none',
-  }
+  },
+  toolbar: theme.mixins.toolbar,
 })); 
 
 type SideBarProps = {
-  children: React.ReactNode; // what's displayed as the main content of the page
-  content?: React.ReactNode; // what's displayed below the navigation section
+  children: React.ReactNode; // what's displayed as the <main>
+  content?: React.ReactNode; // what's displayed in the drawer below the sidebar's navigation section
   routes: RouteKey[];
 }
 
 export default function PermanentDrawerLeft({children, routes, content}: SideBarProps) {
   const classes = useStyles();
-  const routesToShow: RouteKey[] = Object.values(routes.sort((a, b) => a.sort ?? 0 - 1));
+  const routesToShow: RouteKey[] = Object.values(routes.sort((a, b) => a.sort -b.sort));
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -67,6 +68,7 @@ export default function PermanentDrawerLeft({children, routes, content}: SideBar
         {content}
       </Drawer>
       <main className={classes.content}>
+        <div className={classes.toolbar} />
         {children}
       </main>
     </div>

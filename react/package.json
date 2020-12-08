@@ -12,10 +12,13 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "@types/leaflet": "^1.5.19",
     "axios": "^0.21.0",
+<<<<<<< HEAD
     "cesium": "^1.76.0",
     "craco-cesium": "^1.2.0",
+=======
+    "dayjs": "^1.9.7",
+>>>>>>> cf765f7d0f69475af304c45d0da2133956bae165
     "leaflet": "^1.7.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -32,12 +35,19 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-router": "^5.1.8",
-    "@types/react-router-dom": "^5.1.6"
+    "@types/react-router-dom": "^5.1.6",
+    "@types/leaflet": "^1.5.19"
   },
   "scripts": {
+<<<<<<< HEAD
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
+=======
+    "start": "PORT=1111 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+>>>>>>> cf765f7d0f69475af304c45d0da2133956bae165
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

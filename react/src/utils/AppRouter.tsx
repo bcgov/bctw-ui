@@ -33,7 +33,6 @@ const AppRouter: React.FC<IAppRouterProps> = (props) => {
     <Switch>
       <Redirect exact from="/" to="/home" />
       {AppRoutes.map((route: RouteKey, idx: number) => {
-        console.log(route.name);
         return <Route path={route.path} component={route.component} key={idx} />;
       })}
     </Switch>

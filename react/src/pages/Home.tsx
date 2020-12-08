@@ -13,9 +13,9 @@ const HomeContent = () => (
   </div>
 )
 
+
 const Home = () => {
-  const routes = AppRoutes
-    .filter(r => [/*'home',*/ 'map', 'terrain', 'data'].includes(r.name))
+  const routes = AppRoutes.filter(r => ['map', 'terrain', 'data'].includes(r.name))
   return (
     <div>
       <TopBar title='British Columbia Telemetry Warehouse' />
