@@ -1,7 +1,4 @@
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import { AppBar as MuiAppBar, Toolbar, Typography, makeStyles } from '@material-ui/core';
 
 const drawerWidth = 240;
 
@@ -9,6 +6,7 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
+    marginBottom: '30px'
   },
   title: {
     textAlign: 'center',
@@ -16,18 +14,17 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
 }));
 
-type TopBarProps = {
+type AppBarProps = {
   title: string;
 }
 
-const TopBar = ({title}: TopBarProps) => {
+export default function AppBar ({title}: AppBarProps) {
   const classes = useStyles();
   return (
-    <AppBar position="fixed" className={classes.appBar}>
+    <MuiAppBar position="fixed" className={classes.appBar}>
       <Toolbar className={classes.toolbar}>
         <Typography className={classes.title} noWrap>{title}</Typography>
       </Toolbar>
-    </AppBar>
+    </MuiAppBar>
   )
 }
-export default TopBar;

@@ -1,12 +1,13 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { createStyles, Table as MuiTable, TablePagination, Theme, Toolbar, Typography } from '@material-ui/core';
+import { createStyles, Table as MuiTable, Theme, Toolbar, Typography } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import PaginationActions from 'components/table/Pagination';
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -41,15 +42,11 @@ export default function Table({data, title, headers}: ITableProps) {
   const classes = useStyles();
   const [selected, setSelected] = React.useState<number>(null);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState(1);
 
   const handleChangePage = (event: unknown, newPage: number) => {
+    console.log(newPage);
     setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
   };
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
@@ -95,14 +92,11 @@ export default function Table({data, title, headers}: ITableProps) {
             </TableBody>
           </MuiTable>
         </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 15]}
-          component="div"
+        <PaginationActions
           count={data.length}
-          rowsPerPage={rowsPerPage}
           page={page}
+          rowsPerPage={rowsPerPage}
           onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
     </div> 

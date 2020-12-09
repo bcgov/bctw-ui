@@ -1,11 +1,8 @@
 import React from 'react';
-import DenseTable from 'components/Table';
+import { makeStyles } from '@material-ui/core/styles';
+import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { QueryStatus } from 'react-query';
-
-import { makeStyles, Theme } from '@material-ui/core/styles';
-
-const critterProps = ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
+import { assignedCritterProps, unassignedCritterProps } from 'types/animal';
 
 const useStyles = makeStyles({
     container: {
@@ -20,18 +17,22 @@ const useStyles = makeStyles({
 export default function CritterPage() {
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
-  const { status, data, error } = bctwApi.useCritters();
 
-  if (status === QueryStatus.Loading) {
+  const [page, setPage] = React.useState(1);
+
+  const { isLoading, isError, error, resolvedData, latestData, isFetching } = bctwApi.useCritters(page);
+
+  if (isLoading) {
     return (<div>loading...</div>)
   }
-  if (status === QueryStatus.Error) {
+  if (isError) {
   return <div>Error: {error?.response?.data ?? error.message}</div>
   }
   return (
     <div className={classes.container}>
-      <DenseTable headers={critterProps} data={data.assigned} title='Assigned Animals'  />
-      <DenseTable headers={critterProps} data={data.available} title='Unassigned Animals'  />
+      {/* <button onClick={() => setPage((old) => Math.max(old - 1, 0))}>increment</button> */}
+      <Table headers={assignedCritterProps} data={resolvedData.assigned} title='Assigned Animals'  />
+      <Table headers={unassignedCritterProps} data={resolvedData.available} title='Unassigned Animals'  />
     </div>
   )
 }

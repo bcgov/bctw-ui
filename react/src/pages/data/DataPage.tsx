@@ -3,7 +3,8 @@ import { AppRoutes } from 'utils/AppRouter';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useQueryCache } from 'react-query';
 
-import SideBar from 'components/SideBar';
+import SideBar from 'components/sidebar/SideBar';
+import SelectCode from 'components/form/SelectCode';
 
 type IDataPageProps = { }
 
@@ -29,6 +30,7 @@ const Content = () => {
           }
         </>
       )}
+      <SelectCode label='Region' codeHeader='region' val=''/>
     </div>
   )
 }
@@ -39,7 +41,8 @@ const DataPage: React.FC<IDataPageProps> = (props) => {
     .sort((a,b) => a.sort - b.sort );
   return (
     <div>
-      <SideBar children={<Content/>} routes={routes}/>
+      {/* <SideBar children={<Content/>} routes={routes}/> */}
+      <Content />
     </div>
   )
 }
