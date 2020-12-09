@@ -1,15 +1,19 @@
-interface CreateUrlParams {
-  api: string;
-  query?: string;
-  page?: number;
-}
-
 interface RequestPingParams {
   timeWindow: number[];
   pingExtent: string;
 }
 
+interface ICritterResults {
+  assigned: object[];
+  available: object[];
+}
+
+interface ICollarResults extends ICritterResults {
+
+}
+
 export type {
-  CreateUrlParams,
   RequestPingParams,
+  ICritterResults,
+  ICollarResults
 }

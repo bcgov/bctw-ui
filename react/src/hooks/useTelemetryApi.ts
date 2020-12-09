@@ -1,30 +1,10 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosError } from 'axios';
 import { useMemo } from 'react';
 import { useQuery } from 'react-query';
-import { CreateUrlParams, RequestPingParams } from './api_interfaces';
+import { ICritterResults, RequestPingParams } from './api_interfaces';
 import dayjs from 'dayjs';
-import { appendQueryToUrl } from 'utils/api_helpers';
+import { createUrl, getBaseUrl } from 'utils/api_helpers';
 import { formatDay } from 'constants/time';
-
-const IS_PROD = +(window.location.port) === 1111 ? false : true;
-
-const getBaseUrl = (): string => {
-  const h1 = window.location.protocol;
-  const h2 = window.location.hostname;
-  const h3 = IS_PROD ? window.location.port : 3000;
-  const h4 = IS_PROD ? '/api' : '';
-  let url = `${h1}//${h2}:${h3}${h4}`;
-  return url;
-}
-
-const createUrl = ({api, query, page}: CreateUrlParams): string => {
-  const baseUrl = getBaseUrl();
-  let url = `${baseUrl}/${api}`;
-  if (query && query.length) {
-    url = appendQueryToUrl(url, query);
-  }
-  return url;
-}
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -63,12 +43,28 @@ export const useTelemetryApi = () => {
     const { data } = await api.get(url);
     return data;
   }
+
   const usePings = ({timeWindow, pingExtent}: RequestPingParams) => {
     return useQuery<any, Error>(['pings',{timeWindow, pingExtent}], _requestPings);
   }
 
+  const _getCritters = async(): Promise<ICritterResults> => {
+    const apiStr = 'get-animals';
+    const urlAssigned = createUrl({api: apiStr, query: 'assigned=true'});
+    const urlAvailable = createUrl({api: apiStr, query: 'assigned=false'});
+    console.log('requesting critters');
+    const dataAssigned = await api.get(urlAssigned);
+    const dataAvail = await api.get(urlAvailable);
+    return {
+      assigned: dataAssigned.data,
+      available: dataAvail.data
+    }
+  }
+  const useCritters = () => useQuery<ICritterResults, AxiosError>('critters', _getCritters);
+
   return {
     usePingExtent,
     usePings,
+    useCritters
   }
 }
