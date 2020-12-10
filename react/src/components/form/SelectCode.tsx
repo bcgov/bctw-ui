@@ -22,6 +22,10 @@ type ISelectProps<T> = {
   // handleChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
 }
 
+/*
+  fixme: in react strictmode the material ui component is warning about
+  deprecated findDOMNode usage
+*/
 export default function SelectCode({codeHeader, label, val, /* handleChange */}: ISelectProps<any>) {
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
@@ -47,10 +51,12 @@ export default function SelectCode({codeHeader, label, val, /* handleChange */}:
       >
         {
           data.map((c: ICode) => {
-          return <MenuItem 
-            key={c.id}
-            value={c.description}>{c.description}
-          </MenuItem>
+            return (
+              <MenuItem 
+                key={c.id}
+                value={c.description}
+              >{c.description}</MenuItem>
+            )
           })
         }
       </MuiSelect>

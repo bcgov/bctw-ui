@@ -7,7 +7,6 @@ import TerrainPage from 'pages/terrain/TerrainPage';
 import DataPage from 'pages/data/DataPage';
 import CritterPage from 'pages/data/animals/CritterPage';
 import CollarPage from 'pages/data/collars/CollarPage';
-import HomeIcon from '@material-ui/icons/Home';
 
 type IAppRouterProps = {}
 
@@ -17,17 +16,17 @@ export type RouteKey = {
   name: string;
   component: FunctionComponent;
   sort: number;
-  icon?: React.ReactNode;
+  icon?: string;
 }
 
 const AppRoutes: RouteKey[] = [ 
-  { name: 'animals', path: '/animals', title: 'Animals', component: CritterPage, sort: 1 },
-  { name: 'collars', path: '/collars', title: 'Collars', component: CollarPage, sort: 1 },
-  { name: 'map', path: '/map', title: 'Location Map', component: MapPage, sort: 1},
-  { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1},
-  { name: 'data', path: '/data', title: 'Data Management', component: DataPage, sort: 1},
-  { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: HomeIcon},
-  { name: 'notFound', path: '/*', title: 'Not Found', component: () => (<div>not found :(</div>), sort: 2 },
+  { name: 'animals', path: '/animals', title: 'Animals', component: CritterPage, sort: 1, icon: 'critter'},
+  { name: 'collars', path: '/collars', title: 'Collars', component: CollarPage, sort: 1, icon: 'collar'},
+  { name: 'map', path: '/map', title: 'Location Map', component: MapPage, sort: 1, icon: 'map'},
+  { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain'},
+  { name: 'data', path: '/data', title: 'Data Management', component: DataPage, sort: 1, icon: 'data'},
+  { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home'},
+  { name: 'notFound', path: '/*', title: 'Not Found', component: () => (<div>page not found :(</div>), sort: 2 },
 ]
 
 const AppRouter: React.FC<IAppRouterProps> = (props) => {

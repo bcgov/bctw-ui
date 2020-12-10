@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { makeStyles, Drawer, List, Divider, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import SideBarHeader from 'components/sidebar/SideBarHeader';
 import { RouteKey } from 'utils/AppRouter';
+import Icon from 'components/Icon';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -26,7 +27,27 @@ type SideBarProps = {
 
 export default function SideBar({routes, sidebarContent}: SideBarProps) {
   const classes = useStyles();
-  const routesToShow: RouteKey[] = Object.values(routes.sort((a, b) => a.sort -b.sort));
+  const location = useLocation();
+  const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
+
+  useEffect(() => {
+    switch (location.pathname) {
+      case '/home':
+        setVisibleRoutes(routes.filter(r => ['map', 'terrain', 'data'].includes(r.name)));
+        return;
+      case '/terrain':
+      case '/map': 
+        setVisibleRoutes(routes.filter(r => ['home', 'map', 'terrain', 'data'].includes(r.name)));
+        return;
+      case '/data':
+      case '/animals':
+      case '/collars':
+        setVisibleRoutes(routes.filter(r => ['home', 'animals', 'collars'].includes(r.name)));
+        return;
+    }
+  }, [location]) // only fire this effect when location changes
+
+  const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort -b.sort));
   return (
     <div className={classes.drawerRoot}>
       <Drawer
@@ -43,8 +64,10 @@ export default function SideBar({routes, sidebarContent}: SideBarProps) {
             return (
             <ListItem button={true} key={idx} {...{ component: Link, to: route.path}}
             >
-              {/* fixme: loading an icon from routekey object? */}
-              {/* <ListItemIcon>{route.icon}</ListItemIcon> */}
+              {route.icon 
+                ? <ListItemIcon><Icon icon={route.icon}/></ListItemIcon> 
+                : null
+              }
               <ListItemText primary={route.title} />
             </ListItem>
           )})}

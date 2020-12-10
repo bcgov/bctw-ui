@@ -19,13 +19,12 @@ type IAppProps = {}
 const queryCache = new QueryCache();
 
 const App: React.FC<IAppProps> = (props) => {
-  const routes = AppRoutes.filter(r => ['home', 'map', 'terrain', 'data'].includes(r.name))
   const classes = useStyles();
   return (
     <ReactQueryCacheProvider queryCache={queryCache}>
       <div className={classes.root}>
         <Router>
-          <SideBar routes={routes} />
+          <SideBar routes={AppRoutes} />
           <DefaultLayout>
             <AppRouter />
           </DefaultLayout>
