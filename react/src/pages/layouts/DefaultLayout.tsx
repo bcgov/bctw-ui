@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
     wrapper: {
-      // display: 'flex',
       padding: '20px 15px',
       // background: 'linear-gradient(to bottom, #ffc5c5, #ff4949)'
     },
@@ -16,7 +15,6 @@ type IDefaultLayoutProps = {
 
 export default function DefaultLayout({children}: IDefaultLayoutProps) {
   const classes = useStyles();
-  console.log(window.location.pathname);
   return (
     <div className={classes.wrapper}>
       {children}

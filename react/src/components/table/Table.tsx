@@ -1,18 +1,24 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { createStyles, Table as MuiTable, Theme, Toolbar, Typography } from '@material-ui/core';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-// import PaginationActions from 'components/table/Pagination';
+import React, { useState } from 'react';
+import {
+  makeStyles,
+  createStyles,
+  Table as MuiTable,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Theme,
+  Toolbar,
+  Typography,
+  Paper
+} from '@material-ui/core';
+import { getComparator, Order, stableSort } from 'components/table/table_helpers';
+import TableHead from 'components/table/TableHead';
 
 /* todo: 
-  -selected looking id while only critters have an id
-  -get pagination working
+  - pagination working
   - double table select multiple row issue
+  - should table header be a toolbar?
 */
 
 const useStyles = makeStyles((theme: Theme) => 
@@ -35,6 +41,17 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       flex: '1 1 100%',
     },
+    visuallyHidden: {
+      border: 0,
+      clip: 'rect(0 0 0 0)',
+      height: 1,
+      margin: -1,
+      overflow: 'hidden',
+      padding: 0,
+      position: 'absolute',
+      top: 20,
+      width: 1,
+    },
   })
 );
 
@@ -43,24 +60,26 @@ type ITableProps<T> = {
   headers: string[]; // array of what properties should be displayed
   title?: string;
   onSelect?: (row: T) => void;
-  rowIdentifier?: string; // what uniquely identifies a row (ex device_id for a collar)
+  rowIdentifier?: string; // what uniquely identifies a row (ex device_id for a collar). will default to id
 }
 
 export default function Table<T>({data, title, headers, onSelect, rowIdentifier = 'id'}: ITableProps<T>) {
   const classes = useStyles();
-  const [selected, setSelected] = React.useState<number>(null);
-  // const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  // const [page, setPage] = React.useState(1);
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<keyof T>(rowIdentifier as any);
+  const [selected, setSelected] = useState<number>(null);
 
-  // const handleChangePage = (event: unknown, newPage: number) => {
-  //   console.log(newPage);
-  //   setPage(newPage);
-  // };
+  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof T) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
     setSelected(id);
+    const row = data.find(d => d[rowIdentifier] === id);
     if (typeof onSelect === 'function') {
-      onSelect(data.find(d => d[rowIdentifier] === id));
+      onSelect(row);
     }
   }
   const isSelected = (id: number) => selected === id;
@@ -68,26 +87,24 @@ export default function Table<T>({data, title, headers, onSelect, rowIdentifier 
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        {/* fixme: not really a toolbar, should it be? */}
         <Toolbar className={classes.toolbar}>
           <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
             {title}
           </Typography>
         </Toolbar>
         <TableContainer component={Paper}>
-          <MuiTable className={classes.table} size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-              {
-                headers.map((k, idx) => {
-                  return <TableCell key={idx} align='right'>{k}</TableCell>
-                })
-              }
-              </TableRow>
-            </TableHead>
+          <MuiTable className={classes.table} size="small">
+             <TableHead
+                headersToDisplay={headers}
+                headerData={data[0]}
+                order={order}
+                orderBy={orderBy as string ?? ''}
+                onRequestSort={handleRequestSort}
+            />
             <TableBody>
               {
-                data.map((obj: T, prop: number) => {
+                stableSort(data, getComparator(order, orderBy))
+                .map((obj: T, prop: number) => {
                 const isRowSelected = isSelected(obj[rowIdentifier])
                 return (
                   <TableRow
@@ -106,12 +123,6 @@ export default function Table<T>({data, title, headers, onSelect, rowIdentifier 
             </TableBody>
           </MuiTable>
         </TableContainer>
-        {/* <PaginationActions
-          count={data.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onChangePage={handleChangePage}
-        /> */}
       </Paper>
     </div> 
   );
