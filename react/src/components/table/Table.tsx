@@ -7,7 +7,13 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import PaginationActions from 'components/table/Pagination';
+// import PaginationActions from 'components/table/Pagination';
+
+/* todo: 
+  -selected looking id while only critters have an id
+  -get pagination working
+  - double table select multiple row issue
+*/
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -32,31 +38,37 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type ITableProps = {
-  data: object[];
-  headers: string[];
+type ITableProps<T> = {
+  data: T[];
+  headers: string[]; // array of what properties should be displayed
   title?: string;
+  onSelect?: (row: T) => void;
+  rowIdentifier?: string; // what uniquely identifies a row (ex device_id for a collar)
 }
 
-export default function Table({data, title, headers}: ITableProps) {
+export default function Table<T>({data, title, headers, onSelect, rowIdentifier = 'id'}: ITableProps<T>) {
   const classes = useStyles();
   const [selected, setSelected] = React.useState<number>(null);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [page, setPage] = React.useState(1);
+  // const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  // const [page, setPage] = React.useState(1);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    console.log(newPage);
-    setPage(newPage);
-  };
+  // const handleChangePage = (event: unknown, newPage: number) => {
+  //   console.log(newPage);
+  //   setPage(newPage);
+  // };
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
     setSelected(id);
+    if (typeof onSelect === 'function') {
+      onSelect(data.find(d => d[rowIdentifier] === id));
+    }
   }
   const isSelected = (id: number) => selected === id;
 
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
+        {/* fixme: not really a toolbar, should it be? */}
         <Toolbar className={classes.toolbar}>
           <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
             {title}
@@ -74,13 +86,14 @@ export default function Table({data, title, headers}: ITableProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((obj: object, prop: number) => {
-                const isRowSelected = isSelected((obj as any).id)
+              {
+                data.map((obj: T, prop: number) => {
+                const isRowSelected = isSelected(obj[rowIdentifier])
                 return (
                   <TableRow
                     key={prop}
                     selected={isRowSelected}
-                    onClick={(event) => handleClick(event, (obj as any).id)}
+                    onClick={(event) => handleClick(event, obj[rowIdentifier])}
                   >
                   {
                     headers.map((k: string, i: number) => {
@@ -88,16 +101,17 @@ export default function Table({data, title, headers}: ITableProps) {
                     })
                   }
                   </TableRow>
-              )})}
+                )})
+              }
             </TableBody>
           </MuiTable>
         </TableContainer>
-        <PaginationActions
+        {/* <PaginationActions
           count={data.length}
           page={page}
           rowsPerPage={rowsPerPage}
           onChangePage={handleChangePage}
-        />
+        /> */}
       </Paper>
     </div> 
   );

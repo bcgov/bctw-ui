@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { assignedCritterProps, unassignedCritterProps } from 'types/animal';
+import { assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
+import EditCritter from 'pages/data/animals/EditCritter';
 
 const useStyles = makeStyles({
     container: {
@@ -11,28 +12,43 @@ const useStyles = makeStyles({
       alignItems: 'center',
       justifyContent: 'center',
     },
+    editButtonRow: {
+      '& > button' : {
+        marginRight: '20px'
+      }
+    }   
   },
 );
 
 export default function CritterPage() {
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
+  const { isLoading, isError, error, resolvedData, latestData, isFetching } = bctwApi.useCritters(0);
 
-  const [page, setPage] = React.useState(1);
-
-  const { isLoading, isError, error, resolvedData, latestData, isFetching } = bctwApi.useCritters(page);
+  const [isEditMode, setEditMode] = useState<boolean>(true);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [editing, setEditing] = useState<IAnimal>({} as IAnimal);
+  const handleClick = (v: boolean) => {
+    setEditMode(v);
+    setShowModal(o => !o);
+  }
+  const handleSelect = (row: IAnimal) => setEditing(row);
 
   if (isLoading) {
     return (<div>loading...</div>)
   }
   if (isError) {
-  return <div>Error: {error?.response?.data ?? error.message}</div>
+    return <div>Error: {error?.response?.data ?? error.message}</div>
   }
   return (
     <div className={classes.container}>
-      {/* <button onClick={() => setPage((old) => Math.max(old - 1, 0))}>increment</button> */}
-      <Table headers={assignedCritterProps} data={resolvedData.assigned} title='Assigned Animals'  />
-      <Table headers={unassignedCritterProps} data={resolvedData.available} title='Unassigned Animals'  />
+      <Table onSelect={handleSelect} headers={assignedCritterProps} data={resolvedData.assigned} title='Assigned Animals'  />
+      <Table onSelect={handleSelect} headers={unassignedCritterProps} data={resolvedData.available} title='Unassigned Animals'  />
+      <EditCritter show={showModal} onClose={handleClick} isEdit={isEditMode}></EditCritter>
+      <div className={classes.editButtonRow}>
+        <button onClick={() => handleClick(false)}>add critter</button>
+        <button onClick={() => handleClick(true)} disabled={Object.keys(editing).length === 0}>edit critter</button>
+      </div>
     </div>
   )
 }

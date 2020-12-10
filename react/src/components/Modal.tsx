@@ -27,7 +27,7 @@ type IModalProps  = {
   children: React.ReactNode;
 }
 
-const Modal: React.FC<IModalProps> = ({open, handleClose, children, title}) => {
+export default function Modal ({open, title, handleClose, children}: IModalProps) {
   const classes = useStyles();
   return (
     <div>
@@ -55,4 +55,3 @@ const Modal: React.FC<IModalProps> = ({open, handleClose, children, title}) => {
     </div>
   );
 }
-export default Modal;
