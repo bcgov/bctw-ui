@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { createUrl, getBaseUrl } from 'utils/api_helpers';
 import { formatDay } from 'constants/time';
 import { ICode } from 'types/code';
+import { ICollarHistory }from 'types/collar';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -70,12 +71,22 @@ export const useTelemetryApi = () => {
     return data[0];
   }
 
-  const useCodes = (codeHeader) => useQuery<ICode[], AxiosError>(['codes', codeHeader], _getCodes);
+  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(['codes', codeHeader], _getCodes);
+
+  const _getCollarHistory = async (key: string, critterId: number): Promise<ICollarHistory[]> => {
+    const url = createUrl({api: `get-assignment-history/${critterId}`});
+    console.log(`requesting collar history`);
+    const { data } = await api.get(url);
+    return data;
+  }
+
+  const useCollarHistory = (critterId: number) => useQuery<ICollarHistory[], AxiosError>(['collarHistory', critterId], _getCollarHistory);
   
   return {
     useCodes,
     usePingExtent,
     usePings,
-    useCritters
+    useCritters,
+    useCollarHistory,
   }
 }

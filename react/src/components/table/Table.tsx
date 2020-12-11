@@ -16,9 +16,11 @@ import { getComparator, Order, stableSort } from 'components/table/table_helpers
 import TableHead from 'components/table/TableHead';
 
 /* todo: 
-  - pagination working
+  - pagination
   - double table select multiple row issue
   - should table header be a toolbar?
+  - header labels
+  - format cells (dates)
 */
 
 const useStyles = makeStyles((theme: Theme) => 
@@ -87,11 +89,13 @@ export default function Table<T>({data, title, headers, onSelect, rowIdentifier 
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <Toolbar className={classes.toolbar}>
-          <Typography className={classes.title} variant="h6" component="div">
-            <strong>{title}</strong>
-          </Typography>
-        </Toolbar>
+        { title ? 
+          <Toolbar className={classes.toolbar}>
+            <Typography className={classes.title} variant="h6" component="div">
+              <strong>{title}</strong>
+            </Typography>
+          </Toolbar> : <></>
+        }
         <TableContainer component={Paper}>
           <MuiTable className={classes.table} size="small">
              <TableHead

@@ -1,4 +1,4 @@
-// import dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { columnToHeader } from 'utils/component_helpers';
 
 interface ICollarBase {
@@ -20,11 +20,24 @@ export interface ICollar extends ICollarBase {
     satellite_network: string;
 }
 
-export interface ICollarLinkResult extends ICollarBase {
+/**
+ * 
+ */
+// export interface ICollarLinkResult extends ICollarBase {
+//   assignment_id: number;
+//   animal_id: string;
+//   effective_date: Date;
+//   end_date: Date;
+// }
+/**
+ * 
+ */
+export interface ICollarHistory extends ICollarBase {
   assignment_id: number;
-  animal_id: string;
-  effective_date: Date;
-  end_date: Date;
+  make: string;
+  radio_frequency: number;
+  start_time: Date;
+  end_time: Date;
 }
 
 // used when creating new collars manually
@@ -34,10 +47,20 @@ export enum NewCollarType {
   Other,
 }
 
-export const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
-export const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
+const hasCollarCurrentlyAssigned = (history: ICollarHistory[]): boolean => {
+  const currentlyAssigned = history.filter((h) => {
+    if(!dayjs(h.end_time).isValid()) {
+      return true;
+    }
+    return dayjs().isBefore(h.end_time);
+  });
+  return !!currentlyAssigned.length;
+}
 
-export const getCollarTitle = (str: string): string => {
+const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
+const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
+
+const getCollarTitle = (str: string): string => {
   switch (str) {
     case 'device_id':
       return 'Device ID';
@@ -53,6 +76,12 @@ export const getCollarTitle = (str: string): string => {
       return columnToHeader(str);
   }
 };
+
+export {
+  assignedCollarProps,
+  availableCollarProps,
+  hasCollarCurrentlyAssigned,
+}
 
 // function decodeCollar(json: Collar): Collar {
 //   const collar = Object.create({});

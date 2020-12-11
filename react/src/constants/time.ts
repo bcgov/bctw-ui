@@ -7,5 +7,6 @@ const getToday = () => dayjs().format(formatDay);
 
 export {
   formatDay,
+  formatTime,
   getToday
 }

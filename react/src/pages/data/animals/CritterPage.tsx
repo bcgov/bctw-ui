@@ -27,8 +27,8 @@ export default function CritterPage() {
   const [isEditMode, setEditMode] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [editing, setEditing] = useState<IAnimal>({} as IAnimal);
-  const handleClick = (v: boolean) => {
-    setEditMode(v);
+  const handleClick = (isEdit: boolean) => {
+    setEditMode(isEdit);
     setShowModal((o) => !o);
   };
   const handleSelect = (row: IAnimal) => setEditing(row);
@@ -46,15 +46,15 @@ export default function CritterPage() {
         onSelect={handleSelect}
         headers={assignedCritterProps}
         data={resolvedData.assigned}
-        title="Assigned Animals"
+        title='Assigned Animals'
       />
       <Table
         onSelect={handleSelect}
         headers={unassignedCritterProps}
         data={resolvedData.available}
-        title="Unassigned Animals"
+        title='Unassigned Animals'
       />
-      <EditCritter show={showModal} onClose={handleClick} isEdit={isEditMode} editing={editing}/>
+      <EditCritter show={showModal} onClose={handleClick} isEdit={isEditMode} editing={isEditMode ? editing : {} as IAnimal} />
       <ButtonGroup size='small' variant='contained' color='primary'>
         <Button onClick={() => handleClick(false)}>add critter</Button>
         <Button onClick={() => handleClick(true)} disabled={Object.keys(editing).length === 0}>

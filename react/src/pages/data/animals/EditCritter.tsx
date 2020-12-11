@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { createStyles, makeStyles, TextField, Theme, Typography } from '@material-ui/core';
+import { Button, ButtonGroup, createStyles, makeStyles, TextField, Theme, Typography } from '@material-ui/core';
 import { IAnimal } from 'types/animal';
-import Modal from 'components/Modal';
-import Checkbox from 'components/form/Checkbox';
 import { getInputTypesOfT, InputType, isValidEditObject } from 'components/form/form_helpers';
+import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
+import Checkbox from 'components/form/Checkbox';
+import Modal from 'components/Modal';
 import SelectCode from 'components/form/SelectCode';
+
+/* todo:
+  - how to handle add click
+*/
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,6 +35,10 @@ type ICritterModalProps = {
 export default function CritterModal({ show, onClose, isEdit, editing }: ICritterModalProps) {
   const classes = useStyles();
   const t = isEdit ? `Editing ${editing?.nickname ?? editing?.animal_id ?? ''}` : `Add a new animal`;
+  const [canSave, setCanSave] = useState<boolean>(false);
+
+  const handleSave = () => {};
+
   if (isValidEditObject(editing)) {
     const inputTypes = getInputTypesOfT<IAnimal>(editing, editableProps, selectableProps);
     return (
@@ -38,17 +47,19 @@ export default function CritterModal({ show, onClose, isEdit, editing }: ICritte
           <div>
             <Typography variant='h6'>General Information</Typography>
             {inputTypes
-              .filter((f) => f.type === InputType.select)
+              .filter((f) => f.type === InputType.text || f.type === InputType.number)
               .map((d, i) => {
-                return <SelectCode key={`${d.key}${i}`} codeHeader={d.key} label={d.key} val={d.value} />;
+                return (
+                  <TextField key={`${d.key}${i}`} defaultValue={d.value} type={d.type} label={d.key} disabled={false} />
+                );
               })}
           </div>
           <div>
             <Typography variant='h6'>Group Information</Typography>
             {inputTypes
-              .filter((f) => f.type === InputType.text || f.type === InputType.number)
+              .filter((f) => f.type === InputType.select)
               .map((d, i) => {
-                return <TextField key={`${d.key}${i}`} defaultValue={d.value} type={d.type} label={d.key} disabled={false} />;
+                return <SelectCode key={`${d.key}${i}`} codeHeader={d.key} label={d.key} val={d.value} />;
               })}
           </div>
           <div>
@@ -58,12 +69,18 @@ export default function CritterModal({ show, onClose, isEdit, editing }: ICritte
               .map((d, i) => {
                 let checked = d.value === 'N' || d.value === 'false' ? false : true;
                 // console.log(`checked ${checked}, ${d.value}`);
-                return <Checkbox key={`${d.key}${i}`} initialValue={checked} label={d.key} />
+                return <Checkbox key={`${d.key}${i}`} initialValue={checked} label={d.key} />;
               })}
           </div>
         </form>
+        {isEdit ? <AssignmentHistory animalId={editing.id} isEdit={isEdit} /> : null}
+        <ButtonGroup size='small' variant='contained' color='primary'>
+          <Button onClick={handleSave} disabled={!canSave}>
+            save animal
+          </Button>
+        </ButtonGroup>
       </Modal>
     );
   }
-  return <></>;
+  return null;
 }
