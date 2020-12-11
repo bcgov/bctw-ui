@@ -1,3 +1,5 @@
+import { getProperty } from "utils/common";
+
 export type Order = 'asc' | 'desc';
 
 /**
@@ -68,21 +70,9 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-/** 
- * @param {K} key
- * @param {T} object of type T
- * given a property name of an object T, return its type.
- * let x = { foo: 10, bar: "hello!" };
- * getProperty(x, "foo"); // number
-**/
-function getProperty<T, K extends keyof T>(obj: T, key: K) {
-  return obj[key]; // Inferred type is T[K]
-}
-
 export {
   descendingComparator,
   getComparator,
-  getProperty,
   stableSort,
   typeToHeadCell,
 }

@@ -27,7 +27,6 @@ export default function PaginationActions(props: TablePaginationActionsProps) {
   const classes = useStyles();
   const theme = useTheme();
   const { count, page, rowsPerPage, onChangePage } = props;
-  console.log(count);
 
   const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onChangePage(event, +1);

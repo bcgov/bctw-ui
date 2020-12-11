@@ -1,24 +1,69 @@
 import React, { useState } from 'react';
+import { createStyles, makeStyles, TextField, Theme, Typography } from '@material-ui/core';
 import { IAnimal } from 'types/animal';
 import Modal from 'components/Modal';
+import Checkbox from 'components/form/Checkbox';
+import { getInputTypesOfT, InputType, isValidEditObject } from 'components/form/form_helpers';
+import SelectCode from 'components/form/SelectCode';
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      '& .MuiTextField-root': {
+        margin: theme.spacing(1),
+        width: '25ch'
+      }
+    }
+  })
+);
+
+const editableProps = ['nickname', 'animal_id', 'wlh_id', 'species', 'region', 'population_unit', 'calf_at_heel'];
+const selectableProps = editableProps.slice(3, 6);
 
 type ICritterModalProps = {
   show: boolean;
   onClose: (v: boolean) => void;
   isEdit: boolean;
-  editing?: IAnimal; 
+  editing?: IAnimal;
 };
 
-const editableProps = ['nickname', 'animal_id'];
-
 export default function CritterModal({ show, onClose, isEdit, editing }: ICritterModalProps) {
-  const t = isEdit ? `Editing animal ${editing?.nickname ?? editing?.animal_id ?? ''}` : `Add a new animal`;
-  return (
-    <Modal open={show} handleClose={onClose} title={t}>
-      <h2>{isEdit ? 'EDIT MODE' : 'ADD MODE'}</h2>
-      {editableProps.map((prop: string) => {
-
-      })}
-    </Modal>
-  );
+  const classes = useStyles();
+  const t = isEdit ? `Editing ${editing?.nickname ?? editing?.animal_id ?? ''}` : `Add a new animal`;
+  if (isValidEditObject(editing)) {
+    const inputTypes = getInputTypesOfT<IAnimal>(editing, editableProps, selectableProps);
+    return (
+      <Modal open={show} handleClose={onClose} title={t}>
+        <form className={classes.root} noValidate autoComplete='off'>
+          <div>
+            <Typography variant='h6'>General Information</Typography>
+            {inputTypes
+              .filter((f) => f.type === InputType.select)
+              .map((d, i) => {
+                return <SelectCode key={`${d.key}${i}`} codeHeader={d.key} label={d.key} val={d.value} />;
+              })}
+          </div>
+          <div>
+            <Typography variant='h6'>Group Information</Typography>
+            {inputTypes
+              .filter((f) => f.type === InputType.text || f.type === InputType.number)
+              .map((d, i) => {
+                return <TextField key={`${d.key}${i}`} defaultValue={d.value} type={d.type} label={d.key} disabled={false} />;
+              })}
+          </div>
+          <div>
+            <Typography variant='h6'>Individual Characteristics</Typography>
+            {inputTypes
+              .filter((f) => f.type === InputType.check)
+              .map((d, i) => {
+                let checked = d.value === 'N' || d.value === 'false' ? false : true;
+                // console.log(`checked ${checked}, ${d.value}`);
+                return <Checkbox key={`${d.key}${i}`} initialValue={checked} label={d.key} />
+              })}
+          </div>
+        </form>
+      </Modal>
+    );
+  }
+  return <></>;
 }

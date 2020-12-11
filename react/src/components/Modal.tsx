@@ -17,6 +17,9 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
     },
+    title: {
+      textAlign: 'center'
+    }
   }),
 );
 
@@ -32,8 +35,6 @@ export default function Modal ({open, title, handleClose, children}: IModalProps
   return (
     <div>
       <MuiModal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
         className={classes.modal}
         open={open}
         onClose={handleClose}
@@ -45,8 +46,8 @@ export default function Modal ({open, title, handleClose, children}: IModalProps
       >
         <Fade in={open}>
           <div className={classes.paper}>
-            <h2 id="transition-modal-title">{title ?? ''}</h2>
-            <div id="transition-modal-description">
+            <h2 className={classes.title}>{title ?? ''}</h2>
+            <div id='transition-modal-description'>
               {children}
             </div>
           </div>

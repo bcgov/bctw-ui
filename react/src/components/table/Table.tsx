@@ -88,8 +88,8 @@ export default function Table<T>({data, title, headers, onSelect, rowIdentifier 
     <div className={classes.root}>
       <Paper className={classes.paper}>
         <Toolbar className={classes.toolbar}>
-          <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
-            {title}
+          <Typography className={classes.title} variant="h6" component="div">
+            <strong>{title}</strong>
           </Typography>
         </Toolbar>
         <TableContainer component={Paper}>

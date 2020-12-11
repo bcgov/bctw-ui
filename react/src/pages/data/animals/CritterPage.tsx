@@ -39,6 +39,7 @@ export default function CritterPage() {
   if (isError) {
     return <div>Error: {error?.response?.data ?? error.message}</div>;
   }
+  // resolvedData.assigned.forEach(d => console.log(`${d.id}: ${d.calf_at_heel}`));
   return (
     <div className={classes.container}>
       <Table
@@ -47,12 +48,12 @@ export default function CritterPage() {
         data={resolvedData.assigned}
         title="Assigned Animals"
       />
-      {/* <Table
+      <Table
         onSelect={handleSelect}
         headers={unassignedCritterProps}
         data={resolvedData.available}
         title="Unassigned Animals"
-      /> */}
+      />
       <EditCritter show={showModal} onClose={handleClick} isEdit={isEditMode} editing={editing}/>
       <ButtonGroup size='small' variant='contained' color='primary'>
         <Button onClick={() => handleClick(false)}>add critter</Button>
