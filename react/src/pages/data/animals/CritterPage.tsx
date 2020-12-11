@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles, ButtonGroup, Button } from '@material-ui/core';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -22,18 +22,22 @@ const useStyles = makeStyles({
 export default function CritterPage() {
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
-  const { isLoading, isError, error, resolvedData, latestData, isFetching } = bctwApi.useCritters(0);
+
+  const { isFetching, isLoading, isError, error, resolvedData /*latestData*/ } = bctwApi.useCritters(0);
 
   const [isEditMode, setEditMode] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [editing, setEditing] = useState<IAnimal>({} as IAnimal);
+
   const handleClick = (isEdit: boolean) => {
     setEditMode(isEdit);
     setShowModal((o) => !o);
   };
-  const handleSelect = (row: IAnimal) => setEditing(row);
+  const handleSelect = (row: IAnimal) => {
+    setEditing(row);
+  };
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return <div>loading...</div>;
   }
   if (isError) {
@@ -54,7 +58,12 @@ export default function CritterPage() {
         data={resolvedData.available}
         title='Unassigned Animals'
       />
-      <EditCritter show={showModal} onClose={handleClick} isEdit={isEditMode} editing={isEditMode ? editing : {} as IAnimal} />
+      <EditCritter
+        show={showModal}
+        onClose={handleClick}
+        isEdit={isEditMode}
+        editing={isEditMode ? editing : ({} as IAnimal)}
+      />
       <ButtonGroup size='small' variant='contained' color='primary'>
         <Button onClick={() => handleClick(false)}>add critter</Button>
         <Button onClick={() => handleClick(true)} disabled={Object.keys(editing).length === 0}>
