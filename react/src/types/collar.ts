@@ -48,7 +48,7 @@ export enum NewCollarType {
 }
 
 const hasCollarCurrentlyAssigned = (history: ICollarHistory[]): boolean => {
-  const currentlyAssigned = history.filter((h) => {
+  const currentlyAssigned = history?.filter((h) => {
     if(!dayjs(h.end_time).isValid()) {
       return true;
     }

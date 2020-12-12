@@ -53,7 +53,7 @@ export default function SelectCode({ codeHeader, label, val /* handleChange */ }
     return (
       <FormControl className={classes.formControl}>
         <InputLabel id='select-label'>{label}</InputLabel>
-        <MuiSelect labelId='select-label' value={value} onChange={handleChange}>
+        <MuiSelect labelId='select-label' value={value ?? ''} onChange={handleChange}>
           {data?.map((c: ICode) => {
             return (
               <MenuItem key={c.id} value={c.description ?? ''}>

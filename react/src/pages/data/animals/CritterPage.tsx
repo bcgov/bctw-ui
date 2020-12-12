@@ -1,26 +1,13 @@
 import React, { useState } from 'react';
-import { makeStyles, ButtonGroup, Button } from '@material-ui/core';
+import { ButtonGroup, Button } from '@material-ui/core';
+import { useDataStyles } from 'pages/data/data_styles';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
 import EditCritter from 'pages/data/animals/EditCritter';
 
-const useStyles = makeStyles({
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  editButtonRow: {
-    '& > button': {
-      marginRight: '20px'
-    }
-  }
-});
-
 export default function CritterPage() {
-  const classes = useStyles();
+  const classes = useDataStyles();
   const bctwApi = useTelemetryApi();
 
   const { isFetching, isLoading, isError, error, resolvedData /*latestData*/ } = bctwApi.useCritters(0);
