@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { ButtonGroup, Button } from '@material-ui/core';
+import { ButtonGroup } from '@material-ui/core';
+import Button from 'components/form/Button';
 import { useDataStyles } from 'pages/data/data_styles';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
 import EditCritter from 'pages/data/animals/EditCritter';
+import { Toast } from 'components/common';
 
 export default function CritterPage() {
   const classes = useDataStyles();
@@ -15,6 +17,14 @@ export default function CritterPage() {
   const [isEditMode, setEditMode] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [editing, setEditing] = useState<IAnimal>({} as IAnimal);
+
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [toastMsg, setToastMsg] = useState<string>('');
+
+  const handleToast = (msg: any) => {
+    setToastMsg(msg);
+    setShowToast(true);
+  }
 
   const handleClick = (isEdit: boolean) => {
     setEditMode(isEdit);
@@ -50,6 +60,7 @@ export default function CritterPage() {
         onClose={handleClick}
         isEdit={isEditMode}
         editing={isEditMode ? editing : ({} as IAnimal)}
+        onPost={handleToast}
       />
       <ButtonGroup size='small' variant='contained' color='primary'>
         <Button onClick={() => handleClick(false)}>add critter</Button>
@@ -57,6 +68,7 @@ export default function CritterPage() {
           edit critter
         </Button>
       </ButtonGroup>
+      <Toast show={showToast} message={toastMsg} onClose={() => setShowToast(false)} />
     </div>
   );
 }

@@ -20,24 +20,17 @@ export interface ICollar extends ICollarBase {
     satellite_network: string;
 }
 
-/**
- * 
- */
-// export interface ICollarLinkResult extends ICollarBase {
-//   assignment_id: number;
-//   animal_id: string;
-//   effective_date: Date;
-//   end_date: Date;
-// }
-/**
- * 
- */
 export interface ICollarHistory extends ICollarBase {
   assignment_id: number;
   make: string;
   radio_frequency: number;
   start_time: Date;
   end_time: Date;
+}
+
+export interface ICollarLinkResult extends ICollarHistory {
+  device_id: number;
+  animal_id: string;
 }
 
 // used when creating new collars manually

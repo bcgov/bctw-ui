@@ -1,20 +1,25 @@
-import React, {useState, useEffect} from 'react';
-import { useMutation } from 'react-query';
+import React, { useState, useEffect } from 'react';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { Button, ButtonGroup, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import { hasCollarCurrentlyAssigned } from 'types/collar';
-import { getNow } from 'utils/time';
-import { AxiosError } from 'axios';
+import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
+import { ErrorMessage } from 'components/common';
 
 type IAssignmentHistoryProps = {
   animalId: number;
   deviceId?: number;
-  isEdit: boolean;
+  onPost: (msg: any) => void;
 };
 
+/**
+ *  displays a table with collar history and nests
+ *  all of the collar assign/unassign handling components
+ * @param onPost - bubble this event to {EditCritter} parent
+ * @param animalId - {EditCritter}s animal id
+ */
 export default function AssignmentHistory(props: IAssignmentHistoryProps) {
-  const {animalId, isEdit, deviceId } = props;
+  const { animalId } = props;
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const bctwApi = useTelemetryApi();
   const { isLoading, isError, isFetching, error, data } = bctwApi.useCollarHistory(animalId);
@@ -26,69 +31,33 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps) {
       if (data && data.length) {
         setHasCollar(hasCollarCurrentlyAssigned(data));
       }
-    }
+    };
     u();
-  }, [data])
+  }, [data]);
 
-  if (isLoading || isFetching) {
-    return <div>loading collar assignment details...</div>
-  } else if (isError) {
-    return <div>{`error ${error.response.data}`}</div>
-  } else if (!data?.length) {
-    return null;
-  }
+  // instantiate this component here as we want to display the add collar
+  // option if the critter has no collar history
+  const assignment = <PerformAssignmentAction deviceId={data?.length ? data[0].device_id : 0} hasCollar={hasCollar} {...props} />;
   return (
     <>
-      <Typography variant='h6'>Collar Assignment History</Typography>
-      <Table
-        onSelect={handleSelect}
-        headers={['device_id', 'make', 'start_time', 'end_time']}
-        data={data}
-      />
-      <PerformAssignment hasCollar={hasCollar} {...props} />
+      {isLoading || isFetching ? (
+        <div>loading collar assignment details...</div>
+      ) : isError ? (
+        <ErrorMessage message={`error ${error.response.data}`} />
+      ) : !data.length ? (
+        assignment
+      ) : (
+        <>
+          <Typography variant='h6'>Collar Assignment History</Typography>
+          <Table
+            onSelect={handleSelect}
+            headers={['device_id', 'make', 'start_time', 'end_time']}
+            data={data}
+            rowIdentifier='device_id'
+          />
+          {assignment}
+        </>
+      )}
     </>
-  )
-}
-
-type IPerformAssignmentProps = {
-  hasCollar: boolean;
-  animalId: number;
-  deviceId?: number;
-}
-
-/**
- * component that performs the post request to assign/unassign a collar
- */
-const PerformAssignment: React.FC<IPerformAssignmentProps> = (props) => {
-  const { hasCollar, animalId, deviceId } = props;
-  const bctwApi = useTelemetryApi();
-  const [ mutate, {isError, isLoading, isSuccess, error, data}] = useMutation<any, AxiosError>(bctwApi.linkCollar);
-
-  const handleClick = () => hasCollar ? removeCollar() : assignCollar();
-  const assignCollar = async() => { 
-  }
-  const removeCollar = async() => {
-    const body = {
-      isLink: hasCollar,
-      data: {
-        animal_id: animalId,
-        device_id: deviceId,
-        start_date: getNow()
-      }
-    }
-    await mutate(body as any)
-  };
-
-  return (
-    <>
-      <ButtonGroup size='small' variant='contained' color='primary'>
-        <Button onClick={handleClick}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
-      </ButtonGroup>
-      {
-        isError 
-          ? <p>error {error.response.data}</p>
-          : <p>{JSON.stringify(data)}</p>
-      }
-    </>
-  )
+  );
 }

@@ -3,7 +3,7 @@ import { makeStyles, Drawer, List, Divider, ListItem, ListItemText, ListItemIcon
 import { Link, useLocation } from 'react-router-dom';
 import SideBarHeader from 'components/sidebar/SideBarHeader';
 import { RouteKey } from 'utils/AppRouter';
-import Icon from 'components/Icon';
+import { Icon } from 'components/common';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({

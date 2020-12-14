@@ -10,6 +10,12 @@ interface ICritterResults {
   available: IAnimal[];
 }
 
+export enum eCollarType {
+  Assigned = 'Assigned',
+  Available = 'Available',
+  All = 'All'
+}
+
 interface ICollarResults {
   assigned: ICollar[];
   available: ICollar[]
@@ -29,5 +35,5 @@ export type {
   RequestPingParams,
   ICritterResults,
   ICollarResults,
-  ICollarLinkPayload
+  ICollarLinkPayload,
 }

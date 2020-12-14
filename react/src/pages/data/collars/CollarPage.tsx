@@ -8,6 +8,7 @@ import { assignedCollarProps, availableCollarProps } from 'types/collar';
 export default function CollarPage() {
   const classes = useDataStyles();
   const bctwApi = useTelemetryApi();
+  const rowId = 'device_id';
 
   const { isFetching, isLoading, isError, error, resolvedData /*latestData*/ } = bctwApi.useCollars(0);
 
@@ -27,12 +28,14 @@ export default function CollarPage() {
         headers={assignedCollarProps}
         data={resolvedData.assigned}
         title='Assigned Collars'
+        rowIdentifier={rowId}
       />
       <Table
         onSelect={handleSelect}
         headers={availableCollarProps}
         data={resolvedData.available}
         title='Unassigned Collars'
+        rowIdentifier={rowId}
       />
       </div>
   )

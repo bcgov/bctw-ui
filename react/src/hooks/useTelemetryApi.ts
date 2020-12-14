@@ -1,12 +1,21 @@
-import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosError } from 'axios';
 import { useMemo } from 'react';
 import { useQuery, useMutation, usePaginatedQuery } from 'react-query';
-import { ICollarLinkPayload, ICollarResults, ICritterResults, RequestPingParams } from './api_interfaces';
+import {
+  eCollarType,
+  ICollarLinkPayload,
+  ICollarResults,
+  ICritterResults,
+  RequestPingParams
+} from '../api/api_interfaces';
 import dayjs from 'dayjs';
-import { createUrl, getBaseUrl } from 'hooks/api_helpers';
+import { createUrl, getBaseUrl } from 'api/api_helpers';
 import { formatDay } from 'utils/time';
 import { ICode } from 'types/code';
-import { ICollarHistory } from 'types/collar';
+import { ICollar, ICollarHistory, ICollarLinkResult } from 'types/collar';
+import { collarApi as collar_api } from 'api/collar_api';
+import { critterApi as critter_api } from 'api/critter_api';
+import { codeApi as code_api } from 'api/code_api';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -29,6 +38,9 @@ const useApi = (): AxiosInstance => {
  */
 export const useTelemetryApi = () => {
   const api = useApi();
+  const collarApi = collar_api(api);
+  const critterApi = critter_api(api);
+  const codeApi = code_api(api);
 
   const _requestPingExtent = async (): Promise<any> => {
     const url = createUrl({ api: 'get-ping-extent' });
@@ -49,56 +61,33 @@ export const useTelemetryApi = () => {
     return useQuery<any, Error>(['pings', { timeWindow, pingExtent }], _requestPings);
   };
 
-  const _getCollars = async (key: string, page = 1): Promise<ICollarResults> => {
-    const urlAssigned = createUrl({ api: 'get-assigned-collars', page });
-    const urlAvailable = createUrl({ api:'get-available-collars', page });
-    const results = await Promise.all([api.get(urlAssigned), api.get(urlAvailable)])
-    return {
-      assigned: results[0]?.data,
-      available: results[1]?.data
-    };
-  }
-  const useCollars = (page) => usePaginatedQuery<ICollarResults, AxiosError>(['collars', page], _getCollars);
+  const useCollars = (page: number) =>
+    usePaginatedQuery<ICollarResults, AxiosError>(['collars', page], collarApi.getCollars);
 
-  const _getCritters = async (key: string, page = 1): Promise<ICritterResults> => {
-    const apiStr = 'get-animals';
-    const urlAssigned = createUrl({ api: apiStr, query: 'assigned=true', page });
-    const urlAvailable = createUrl({ api: apiStr, query: 'assigned=false', page });
-    console.log(`requesting critters ${urlAssigned}`);
-    const results = await Promise.all([api.get(urlAssigned), api.get(urlAvailable)])
-    return {
-      assigned: results[0]?.data,
-      available: results[1]?.data
-    };
-  };
-  const useCritters = (page) => usePaginatedQuery<ICritterResults, AxiosError>(['critters', page], _getCritters);
+  const useCollarType = (page: number, type: eCollarType) =>
+    usePaginatedQuery<ICollar[], AxiosError>(
+      ['collartype', page, type],
+      type === eCollarType.Assigned ? collarApi.getAssignedCollars : collarApi.getAvailableCollars
+    );
 
-  const _getCodes = async (key: string, codeHeader: string): Promise<ICode[]> => {
-    const url = createUrl({ api: 'get-code', query: `codeHeader=${codeHeader}` });
-    console.log(`requesting ${codeHeader} codes`);
-    const { data } = await api.get(url);
-    return data[0];
-  };
-  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(['codes', codeHeader], _getCodes);
+  const useCritters = (page) =>
+    usePaginatedQuery<ICritterResults, AxiosError>(['critters', page], critterApi.getCritters);
 
-  const _getCollarHistory = async (key: string, critterId: number): Promise<ICollarHistory[]> => {
-    const url = createUrl({ api: `get-assignment-history/${critterId}` });
-    console.log(`requesting collar history`);
-    const { data } = await api.get(url);
-    return data;
-  };
+  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(['codes', codeHeader], codeApi.getCodes);
+
   const useCollarHistory = (critterId: number) =>
-    useQuery<ICollarHistory[], AxiosError>(['collarHistory', critterId], _getCollarHistory);
+    useQuery<ICollarHistory[], AxiosError>(['collarHistory', critterId], collarApi.getCollarHistory);
 
-  const linkCollar = async (body: ICollarLinkPayload): Promise<string> => {
+  const linkCollar = async (body: ICollarLinkPayload): Promise<ICollarLinkResult> => {
     const link = body.isLink ? 'link-animal-collar' : 'unlink-animal-collar';
     const url = createUrl({ api: link });
     console.log(`posting ${link}: ${JSON.stringify(body.data)}`);
     const { data } = await api.post(url, body);
-    return data;
+    return data[0];
   };
+
   const useMutateCollarLink = (body: ICollarLinkPayload) => {
-    const [mutate] = useMutation<string, AxiosError>(linkCollar);
+    const [mutate] = useMutation<ICollarLinkResult, AxiosError>(linkCollar);
     return mutate;
     // return mutate(body as any); // fixme: why do variables have type undefined?
   };
@@ -109,6 +98,7 @@ export const useTelemetryApi = () => {
     usePingExtent,
     usePings,
     useCollars,
+    useCollarType,
     useCritters,
     useCollarHistory,
     // mutations
