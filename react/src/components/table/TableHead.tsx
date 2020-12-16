@@ -9,6 +9,7 @@ import {
   Theme
 } from '@material-ui/core';
 import { Order, HeadCell, typeToHeadCell } from 'components/table/table_helpers';
+import { columnToHeader } from 'utils/component_helpers';
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -57,7 +58,7 @@ export default function TableHead<T>(props: EnhancedTableProps<T>) {
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
             >
-              {headCell.label}
+              {columnToHeader(headCell.label)}
               {orderBy === headCell.id ? (
                 <span className={classes.visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}

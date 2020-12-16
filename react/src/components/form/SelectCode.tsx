@@ -27,21 +27,24 @@ type ISelectProps<T> = {
   codeHeader: string;
   label: string;
   val: T;
-  // handleChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
+  changeHandler: (o: object) => void;
 };
 
 /*
   fixme: in react strictmode the material ui component is warning about
   deprecated findDOMNode usage
 */
-export default function SelectCode({ codeHeader, label, val /* handleChange */ }: ISelectProps<any>) {
+export default function SelectCode({ codeHeader, label, val, changeHandler }: ISelectProps<any>) {
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState(val);
+  
   const { data, error, isFetching, isError } = bctwApi.useCodes(codeHeader);
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setValue(event.target.value);
+    const v = event.target.value;
+    setValue(v);
+    changeHandler({[label]: v });
   };
 
   if (isError) {
@@ -50,6 +53,7 @@ export default function SelectCode({ codeHeader, label, val /* handleChange */ }
     return <div>loading...</div>;
   }
   if (data?.length) {
+    // queryCache.setQueryData('codes', data);
     return (
       <FormControl className={classes.formControl}>
         <InputLabel id='select-label'>{label}</InputLabel>

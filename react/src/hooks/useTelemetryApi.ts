@@ -73,24 +73,15 @@ export const useTelemetryApi = () => {
   const useCritters = (page) =>
     usePaginatedQuery<ICritterResults, AxiosError>(['critters', page], critterApi.getCritters);
 
-  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(['codes', codeHeader], codeApi.getCodes);
+  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(codeHeader, codeApi.getCodes);
 
   const useCollarHistory = (critterId: number) =>
     useQuery<ICollarHistory[], AxiosError>(['collarHistory', critterId], collarApi.getCollarHistory);
 
-  const linkCollar = async (body: ICollarLinkPayload): Promise<ICollarLinkResult> => {
-    const link = body.isLink ? 'link-animal-collar' : 'unlink-animal-collar';
-    const url = createUrl({ api: link });
-    console.log(`posting ${link}: ${JSON.stringify(body.data)}`);
-    const { data } = await api.post(url, body);
-    return data[0];
-  };
-
-  const useMutateCollarLink = (body: ICollarLinkPayload) => {
-    const [mutate] = useMutation<ICollarLinkResult, AxiosError>(linkCollar);
-    return mutate;
-    // return mutate(body as any); // fixme: why do variables have type undefined?
-  };
+  // const useMutateCollarLink = (body: ICollarLinkPayload) => {
+  //   const [mutate] = useMutation(critterApi.linkCollar, body as any);
+  //   return mutate;
+  // };
 
   return {
     // queries
@@ -102,7 +93,7 @@ export const useTelemetryApi = () => {
     useCritters,
     useCollarHistory,
     // mutations
-    useMutateCollarLink,
-    linkCollar
+    linkCollar: critterApi.linkCollar,
+    upsertCritter: critterApi.upsertCritter,
   };
 };

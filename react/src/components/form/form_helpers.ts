@@ -17,6 +17,7 @@ const stringsThatAreBools = ['Y', 'N', 'true', 'false'];
  * @return {InputType}
  */
 function getInputTypesOfT<T>(obj: T, editableProps: string[], selectableProps: string[]): { key: string, type: InputType, value: any }[] {
+  // console.log(JSON.stringify(obj));
   return editableProps.map((key: string) => {
     if (selectableProps.includes(key)) {
       return { key, type: InputType.select, value: obj[key] };

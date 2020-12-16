@@ -7,7 +7,7 @@ export default function Checkboxes(props) {
   const [checked, setChecked] = useState(props.initialValue);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(`checkbox checked ${event.target.checked}`)
+    // console.log(`checkbox checked ${event.target.checked}`)
     setChecked(event.target.checked);
   };
 

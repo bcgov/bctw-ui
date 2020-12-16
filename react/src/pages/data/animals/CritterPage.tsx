@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { ButtonGroup } from '@material-ui/core';
-import Button from 'components/form/Button';
 import { useDataStyles } from 'pages/data/data_styles';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
-import EditCritter from 'pages/data/animals/EditCritter';
+import { Animal, assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
+import EditModal from 'pages/data/animals/EditCritter';
 import { Toast } from 'components/common';
+import ImportExportViewer from 'pages/data/bulk/ExportImportViewer';
+import AddEditViewer from 'pages/data/AddEditViewer';
+import { useMutation } from 'react-query';
+import { AxiosError } from 'axios';
 
 export default function CritterPage() {
   const classes = useDataStyles();
@@ -14,25 +16,42 @@ export default function CritterPage() {
 
   const { isFetching, isLoading, isError, error, resolvedData /*latestData*/ } = bctwApi.useCritters(0);
 
-  const [isEditMode, setEditMode] = useState<boolean>(true);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [editing, setEditing] = useState<IAnimal>({} as IAnimal);
+  const [mutate] = useMutation<IAnimal[], AxiosError>(bctwApi.upsertCritter);
 
+  const [editObj, setEditObj] = useState<IAnimal>({} as IAnimal);
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMsg, setToastMsg] = useState<string>('');
+
+  const editableProps = [
+    'nickname',
+    'animal_id',
+    'wlh_id',
+    'species',
+    'region',
+    'population_unit',
+    'animal_status',
+    'calf_at_heel'
+  ];
+  const selectableProps = editableProps.slice(3, 7);
 
   const handleToast = (msg: any) => {
     setToastMsg(msg);
     setShowToast(true);
-  }
+  };
 
-  const handleClick = (isEdit: boolean) => {
-    setEditMode(isEdit);
-    setShowModal((o) => !o);
-  };
   const handleSelect = (row: IAnimal) => {
-    setEditing(row);
+    setEditObj(row);
   };
+
+  const handleSave = async (o: any) => {
+    const result: IAnimal[] = await mutate(o);
+    if (Array.isArray(result)) {
+      const critter = result[0];
+      handleToast(`${critter?.animal_id ?? critter?.nickname ?? 'critter'} saved successfully`);
+    }
+  };
+
+  const editProps = { editableProps, selectableProps, onClose: null, editing: new Animal(), show: false, onPost: handleToast };
 
   if (isLoading || isFetching) {
     return <div>loading...</div>;
@@ -40,7 +59,6 @@ export default function CritterPage() {
   if (isError) {
     return <div>Error: {error?.response?.data ?? error.message}</div>;
   }
-  // resolvedData.assigned.forEach(d => console.log(`${d.id}: ${d.calf_at_heel}`));
   return (
     <div className={classes.container}>
       <Table
@@ -55,19 +73,12 @@ export default function CritterPage() {
         data={resolvedData.available}
         title='Unassigned Animals'
       />
-      <EditCritter
-        show={showModal}
-        onClose={handleClick}
-        isEdit={isEditMode}
-        editing={isEditMode ? editing : ({} as IAnimal)}
-        onPost={handleToast}
+      <AddEditViewer<Animal>
+        editing={editObj}
+        empty={new Animal()}
+        childEditComponent={<EditModal onSave={handleSave} {...editProps} />}
       />
-      <ButtonGroup size='small' variant='contained' color='primary'>
-        <Button onClick={() => handleClick(false)}>add critter</Button>
-        <Button onClick={() => handleClick(true)} disabled={Object.keys(editing).length === 0}>
-          edit critter
-        </Button>
-      </ButtonGroup>
+      <ImportExportViewer data={[...resolvedData.assigned, ...resolvedData.available]} />
       <Toast show={showToast} message={toastMsg} onClose={() => setShowToast(false)} />
     </div>
   );
