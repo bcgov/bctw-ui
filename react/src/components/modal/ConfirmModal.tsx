@@ -2,6 +2,7 @@ import { Typography, createStyles, makeStyles, Theme } from "@material-ui/core";
 import React from 'react';
 import Modal from 'components/modal/Modal';
 import Button from 'components/form/Button';
+import { ModalBaseProps } from 'components/component_interfaces';
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -14,22 +15,19 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type IYesNoProps = {
+type ConfirmModalProps = ModalBaseProps & {
   message: string;
-  title?: string;
-  show: boolean;
-  onClose: (close: any) => void; // also the 'no' handler
-  onClickYes: (v: any) => void;
+  handleClickYes: (v: any) => void;
 };
 
-export default function YesNo({ message, title, show, onClose, onClickYes }: IYesNoProps) {
+export default function ConfirmModal({ message, title, open, handleClose, handleClickYes }: ConfirmModalProps) {
   const classes = useStyles();
   return (
-    <Modal open={show} handleClose={onClose} title={title}>
+    <Modal open={open} handleClose={handleClose} title={title}>
       <Typography>{message}</Typography>
       <div className={classes.btns} color='primary'>
-        <Button onClick={onClickYes}>yes</Button>
-        <Button onClick={onClose}>no</Button>
+        <Button onClick={handleClickYes}>yes</Button>
+        <Button onClick={handleClose}>no</Button>
       </div>
     </Modal>
   );

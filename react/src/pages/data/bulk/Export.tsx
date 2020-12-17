@@ -2,24 +2,21 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'components/modal/Modal';
 import { Typography, Chip } from '@material-ui/core';
 import Button from 'components/form/Button';
+import { ExportImportProps } from 'components/component_interfaces';
 
-type IExportProps<T> = {
+type ImportProps<T> = ExportImportProps & {
   data: T[];
-  message?: string;
-  title: string;
-  show: boolean;
-  onClose: (b: boolean) => void;
-};
+}
 
-export default function Export<T>({ data, message, title, show, onClose }: IExportProps<T>) {
+export default function Export<T>({ data, message, title, open, handleClose }: ImportProps<T>) {
   const [included, setIncluded] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
 
   useEffect(() => {
-    if (show === true) {
+    if (open === true) {
       reset();
     }
-  }, [show]);
+  }, [open]);
 
   const getTypeExportFields = (a: T): string[] => Object.keys(a);
 
@@ -42,7 +39,7 @@ export default function Export<T>({ data, message, title, show, onClose }: IExpo
 
   return (
     <>
-      <Modal open={show} handleClose={onClose} title={title}>
+      <Modal open={open} handleClose={handleClose} title={title}>
         <p>{message}</p>
         <Typography variant='h6'>Included in export</Typography>
         {included.map((d, i) => {

@@ -31,8 +31,20 @@ interface ICollarLinkPayload {
   }
 }
 
+interface BulkUploadError {
+  error: string;
+  row: any;
+  rownum: number
+}
+interface IBulkUploadResults<T> {
+  errors: BulkUploadError[];
+  results: T[];
+}
+
+
 export type {
   RequestPingParams,
+  IBulkUploadResults,
   ICritterResults,
   ICollarResults,
   ICollarLinkPayload,

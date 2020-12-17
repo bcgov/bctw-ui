@@ -6,7 +6,7 @@ import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import Checkbox from 'components/form/Checkbox';
 import TextField from 'components/form/Input';
 import SelectCode from 'components/form/SelectCode';
-import EditModal from 'components/modal/EditModal';
+import EditModal from 'pages/data/common/EditModal';
 import ChangeContext from 'contexts/InputChangeContext';
 
 /* todo: 

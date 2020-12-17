@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { useDataStyles } from 'pages/data/data_styles';
+import { AxiosError } from 'axios';
+import { ErrorMessage, Toast } from 'components/common';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { Animal, assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
 import EditModal from 'pages/data/animals/EditCritter';
-import { Toast } from 'components/common';
 import ImportExportViewer from 'pages/data/bulk/ExportImportViewer';
-import AddEditViewer from 'pages/data/AddEditViewer';
+import AddEditViewer from 'pages/data/common/AddEditViewer';
+import { useDataStyles } from 'pages/data/common/data_styles';
+import React, { useState } from 'react';
 import { useMutation } from 'react-query';
-import { AxiosError } from 'axios';
+import { Animal, assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
+import { CritterStrings as CS } from 'constants/strings';
 
 export default function CritterPage() {
   const classes = useDataStyles();
@@ -22,19 +23,9 @@ export default function CritterPage() {
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMsg, setToastMsg] = useState<string>('');
 
-  const editableProps = [
-    'nickname',
-    'animal_id',
-    'wlh_id',
-    'species',
-    'region',
-    'population_unit',
-    'animal_status',
-    'calf_at_heel'
-  ];
-  const selectableProps = editableProps.slice(3, 7);
+  const selectableProps = CS.editableProps.slice(3, 7);
 
-  const handleToast = (msg: any) => {
+  const handleToast = (msg: string) => {
     setToastMsg(msg);
     setShowToast(true);
   };
@@ -51,35 +42,44 @@ export default function CritterPage() {
     }
   };
 
-  const editProps = { editableProps, selectableProps, onClose: null, editing: new Animal(), show: false, onPost: handleToast };
+  // props to be passed to the edit modal component
+  const editProps = { editableProps: CS.editableProps, selectableProps, onClose: null, editing: new Animal(), show: false, onPost: handleToast };
+  const ieProps = { iTitle: CS.importTitle, iMsg: CS.importText, eTitle: CS.exportTitle, eMsg: CS.exportText, handleToast }
 
-  if (isLoading || isFetching) {
-    return <div>loading...</div>;
-  }
-  if (isError) {
-    return <div>Error: {error?.response?.data ?? error.message}</div>;
-  }
   return (
-    <div className={classes.container}>
-      <Table
-        onSelect={handleSelect}
-        headers={assignedCritterProps}
-        data={resolvedData.assigned}
-        title='Assigned Animals'
-      />
-      <Table
-        onSelect={handleSelect}
-        headers={unassignedCritterProps}
-        data={resolvedData.available}
-        title='Unassigned Animals'
-      />
-      <AddEditViewer<Animal>
-        editing={editObj}
-        empty={new Animal()}
-        childEditComponent={<EditModal onSave={handleSave} {...editProps} />}
-      />
-      <ImportExportViewer data={[...resolvedData.assigned, ...resolvedData.available]} />
-      <Toast show={showToast} message={toastMsg} onClose={() => setShowToast(false)} />
-    </div>
-  );
+    <>
+      {
+        isLoading || isFetching ?
+          (<div>loading...</div>) :
+          isError ?
+            (<ErrorMessage message={`error ${error?.response?.data ?? error.message}`} />) :
+            (
+              <div className={classes.container}>
+                <Table
+                  onSelect={handleSelect}
+                  headers={assignedCritterProps}
+                  data={resolvedData.assigned}
+                  title='Assigned Animals'
+                />
+                <Table
+                  onSelect={handleSelect}
+                  headers={unassignedCritterProps}
+                  data={resolvedData.available}
+                  title='Unassigned Animals'
+                />
+                <AddEditViewer<Animal>
+                  editing={editObj}
+                  empty={new Animal()}
+                  childEditComponent={<EditModal onSave={handleSave} {...editProps} />}
+                />
+                {/* enable export component to export all critters */}
+                <ImportExportViewer {...ieProps} data={[[...resolvedData.assigned, ...resolvedData.available]]} />
+                <Toast show={showToast} message={toastMsg} onClose={() => setShowToast(false)} />
+              </div>
+            )
+
+      }
+    </>
+  )
+
 }

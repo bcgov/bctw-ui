@@ -39,7 +39,7 @@ export default function SelectCode({ codeHeader, label, val, changeHandler }: IS
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState(val);
   
-  const { data, error, isFetching, isError } = bctwApi.useCodes(codeHeader);
+  const { data, error, isFetching, isError, isLoading, /*isPreviousData, isStale*/} = bctwApi.useCodes(codeHeader);
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const v = event.target.value;
@@ -47,13 +47,18 @@ export default function SelectCode({ codeHeader, label, val, changeHandler }: IS
     changeHandler({[label]: v });
   };
 
+  // if (isPreviousData) {
+  //   console.log('previous data!')
+  // } 
+  // if (isStale) {
+  //   console.log('stale data!')
+  // }
   if (isError) {
     return <div>error: {error.response.data}</div>;
-  } else if (isFetching) {
+  } else if (isFetching || isLoading) {
     return <div>loading...</div>;
   }
   if (data?.length) {
-    // queryCache.setQueryData('codes', data);
     return (
       <FormControl className={classes.formControl}>
         <InputLabel id='select-label'>{label}</InputLabel>

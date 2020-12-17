@@ -3,16 +3,18 @@ import { ButtonGroup } from '@material-ui/core';
 import Button from 'components/form/Button';
 
 type IAddEditProps<T> = {
-  childEditComponent: React.CElement<any, any>; // component that handles the editing
-  editing: T; // object that is passed to editor when Edit is selected
-  empty: T; // a 'naked' instance of T, passed to editor when Add is selected 
+  childEditComponent: React.CElement<any, any>;
+  editing: T;
+  empty: T;
 };
 
 /**
- * component that handles the modal show/hide functionality
- *  of theedit component passed in
- * @param props see {IAddEditProps}
- */
+ * component that handles the modal show/hide functionality of the childEditComponent
+ * used on main data pages (critter/collar)
+ * @param childEditComponent child component that handles the editing
+ * @param editing object that is passed to editor when Edit is selected
+ * @param empty a 'naked' instance of T, passed to editor when Add is selected 
+**/
 export default function AddEditViewer<T>(props: IAddEditProps<T>) {
   const { editing, childEditComponent, empty } = props;
 
@@ -34,7 +36,7 @@ export default function AddEditViewer<T>(props: IAddEditProps<T>) {
 
   const handleClose = () => setShowModal(false);
 
-  // pass on these additional props to the editor
+  // additional props to pass to editor component
   const editorProps = {
     editing: editObj,
     show: showModal,
@@ -44,6 +46,7 @@ export default function AddEditViewer<T>(props: IAddEditProps<T>) {
   return (
     <>
       {/* todo: is cloneElement the best way to do this? */}
+      {/* clone element to pass additional props to it */}
       {React.cloneElement(childEditComponent, editorProps)}
       <ButtonGroup size='small' variant='contained' color='primary'>
         <Button onClick={handleClickAdd}>add</Button>

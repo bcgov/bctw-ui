@@ -19,11 +19,10 @@ import TableHead from 'components/table/TableHead';
   - pagination
   - double table select multiple row issue
   - should table header be a toolbar?
-  - header labels
   - format cells (dates)
 */
 
-const useStyles = makeStyles((theme: Theme) => 
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: '100%',
@@ -59,13 +58,20 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type ITableProps<T> = {
   data: T[];
-  headers: string[]; // array of what properties should be displayed
+  headers: string[];
   title?: string;
   onSelect?: (row: T) => void;
-  rowIdentifier?: string; // what uniquely identifies a row (ex device_id for a collar). will default to id
+  rowIdentifier?: string;
 }
 
-export default function Table<T>({data, title, headers, onSelect, rowIdentifier = 'id'}: ITableProps<T>) {
+/**
+ * 
+ * @param data array of data that is to be displayed in the table
+ * @param headers assuming not all data properties are displayed in the table. * required
+ * @param onSelect handler from parent component
+ * @param rowIdentifier what uniquely identifies a row (ex device_id for a collar). will default to id
+ */
+export default function Table<T>({ data, title, headers, onSelect, rowIdentifier = 'id' }: ITableProps<T>) {
   const classes = useStyles();
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>(rowIdentifier as any);
@@ -89,7 +95,7 @@ export default function Table<T>({data, title, headers, onSelect, rowIdentifier 
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        { title ? 
+        {title ?
           <Toolbar className={classes.toolbar}>
             <Typography className={classes.title} variant="h6" component="div">
               <strong>{title}</strong>
@@ -98,36 +104,37 @@ export default function Table<T>({data, title, headers, onSelect, rowIdentifier 
         }
         <TableContainer component={Paper}>
           <MuiTable className={classes.table} size="small">
-             <TableHead
-                headersToDisplay={headers}
-                headerData={data[0]}
-                order={order}
-                orderBy={orderBy as string ?? ''}
-                onRequestSort={handleRequestSort}
+            <TableHead
+              headersToDisplay={headers}
+              headerData={data[0]}
+              order={order}
+              orderBy={orderBy as string ?? ''}
+              onRequestSort={handleRequestSort}
             />
             <TableBody>
               {
                 stableSort(data, getComparator(order, orderBy))
-                .map((obj: T, prop: number) => {
-                const isRowSelected = isSelected(obj[rowIdentifier])
-                return (
-                  <TableRow
-                    key={prop}
-                    selected={isRowSelected}
-                    onClick={(event) => handleClick(event, obj[rowIdentifier])}
-                  >
-                  {
-                    headers.map((k: string, i: number) => {
-                      return <TableCell key={`${k}${i}`} align='right'>{obj[k]}</TableCell>
-                    })
-                  }
-                  </TableRow>
-                )})
+                  .map((obj: T, prop: number) => {
+                    const isRowSelected = isSelected(obj[rowIdentifier])
+                    return (
+                      <TableRow
+                        key={prop}
+                        selected={isRowSelected}
+                        onClick={(event) => handleClick(event, obj[rowIdentifier])}
+                      >
+                        {
+                          headers.map((k: string, i: number) => {
+                            return <TableCell key={`${k}${i}`} align='right'>{obj[k]}</TableCell>
+                          })
+                        }
+                      </TableRow>
+                    )
+                  })
               }
             </TableBody>
           </MuiTable>
         </TableContainer>
       </Paper>
-    </div> 
+    </div>
   );
 }

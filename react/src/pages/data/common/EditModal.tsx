@@ -15,12 +15,12 @@ type IEditModalProps<T> = {
 };
 
 /**
- * Acts as a form parent component that handles:
+ * a component that wraps a form and handles:
  * - opening/closing of the modal.
  * - whether the form can be saved 
  * - uses the ChangeContext provider to force the
- * child input compents to pass their changeHandlers to this function,
- * so that the [canSave] can be determined
+ * child input compents pass their changeHandlers to this component,
+ * so that [canSave] can be determined
  */
 export default function EditModal<T>(props: IEditModalProps<T>) {
   const {children, title, show, onClose, editing, newT, onSave } = props;

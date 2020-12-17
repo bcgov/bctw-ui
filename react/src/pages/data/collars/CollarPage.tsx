@@ -1,9 +1,8 @@
 import React from 'react';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useDataStyles } from 'pages/data/data_styles';
+import { useDataStyles } from 'pages/data/common/data_styles';
 import { assignedCollarProps, availableCollarProps } from 'types/collar';
-// import { SampleComponentUsingChangesHook } from 'contexts/sample_pouch';
 
 export default function CollarPage() {
   const classes = useDataStyles();

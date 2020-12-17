@@ -6,7 +6,7 @@ import { AxiosError } from 'axios';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICollarLinkResult } from 'types/collar';
 import ConfirmModal from 'components/modal/ConfirmModal';
-import ErrorMessage from 'components/common/ErrorMessage';
+import { ErrorMessage } from 'components/common';
 import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
 
 type IPerformAssignmentActionProps = {
@@ -73,11 +73,11 @@ export default function PerformAssignmentAction({
   return (
     <>
       <ConfirmModal
-        onClickYes={removeCollar}
-        onClose={closeModals}
-        show={showConfirmModal}
+        handleClickYes={removeCollar}
+        handleClose={closeModals}
+        open={showConfirmModal}
         message='Are you sure you wish to unassign this collar?'
-        title='confirm collar unassignment'
+        title='Confirm collar unassignment'
       />
       {isError ? <ErrorMessage message={error.response.data} /> : null /* <p>{JSON.stringify(data)}</p> */}
       <ShowCollarAssignModal onSave={assignCollar} show={showAvailableModal} onClose={closeModals} />

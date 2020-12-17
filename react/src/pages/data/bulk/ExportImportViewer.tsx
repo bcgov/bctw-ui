@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import Export from 'pages/data/bulk/Export';
+import Import from 'pages/data/bulk/Import';
 import { ButtonGroup } from '@material-ui/core';
 import Button from 'components/form/Button';
 
 type IImportExportProps<T> = {
+  iTitle: string;
+  iMsg: string;
+  eTitle: string;
+  eMsg: string;
   data: T[];
-  title?: string;
+  handleToast?: (msg: string) => void;
 };
 
 export default function ImportExportViewer<T>(props: IImportExportProps<T>) {
-  const { data, title } = props;
+  const { data, iTitle, iMsg, eTitle, eMsg, handleToast } = props;
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
@@ -19,14 +24,18 @@ export default function ImportExportViewer<T>(props: IImportExportProps<T>) {
   const handleClickImport = () => {
     setShowImportModal(o => !o);
   }
-  const handleClose = (b: boolean) => {
+  const handleClose = () => {
     setShowExportModal(false);
     setShowImportModal(false);
   }
 
+  const importProps = { title: iTitle, message: iMsg, handleClose, open: showImportModal, handleToast }
+  const exportProps = { title: eTitle, message: eMsg, data, handleClose, open: showExportModal }
+
   return (
     <>
-      <Export title={title ?? 'Export Animals'} data={data} show={showExportModal} onClose={handleClose} />
+      <Import {...importProps} />
+      <Export {...exportProps} />
       <ButtonGroup size='small' variant='contained' color='primary'>
         <Button onClick={handleClickExport}>export</Button>
         <Button onClick={handleClickImport}>import</Button>

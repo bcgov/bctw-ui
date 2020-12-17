@@ -3,6 +3,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Modal as MuiModal } from '@material-ui/core';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
+import { ModalBaseProps } from 'components/component_interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,15 +24,13 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-type IModalProps  = {
-  open: boolean;
-  handleClose: (v: boolean) => void;
-  title?: string;
+type IModalProps = ModalBaseProps & {
   children: React.ReactNode;
 }
 
 export default function Modal ({open, title, handleClose, children}: IModalProps) {
   const classes = useStyles();
+
   return (
     <div>
       <MuiModal

@@ -5,7 +5,7 @@ import Modal from 'components/modal/Modal';
 import Table from 'components/table/Table';
 import { availableCollarProps, ICollar } from 'types/collar';
 import { eCollarType } from 'api/api_interfaces';
-import ErrorMessage from 'components/common/ErrorMessage';
+import { ErrorMessage } from 'components/common';
 
 type IAssignNewCollarModal = {
   show: boolean;
