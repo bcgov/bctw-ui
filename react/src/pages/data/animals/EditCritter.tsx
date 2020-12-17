@@ -9,10 +9,6 @@ import SelectCode from 'components/form/SelectCode';
 import EditModal from 'pages/data/common/EditModal';
 import ChangeContext from 'contexts/InputChangeContext';
 
-/* todo: 
-  - saving critter wipes collar history
-*/
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -36,19 +32,15 @@ type ICritterModalProps = {
 };
 
 export default function CritterModal(props: ICritterModalProps) {
-  const { isEdit, editing, onSave, editableProps, selectableProps } = props;
+  const { isEdit, editing, editableProps, selectableProps } = props;
   const classes = useStyles();
-
-  const handleSave = (newCritter: Animal) => {
-    const toSave = Object.assign(editing, newCritter);
-    onSave(toSave);
-  };
 
   const title = isEdit ? `Editing ${editing?.nickname ?? editing?.animal_id }` : `Add a new animal`;
   const inputTypes = getInputTypesOfT<IAnimal>(editing, editableProps, selectableProps);
 
+  // console.log(`editing: ${JSON.stringify(editing)}`);
   return (
-    <EditModal onSave={handleSave} title={title} newT={new Animal()} {...props}>
+    <EditModal title={title} newT={new Animal()} {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext) => {
           return (
@@ -84,7 +76,7 @@ export default function CritterModal(props: ICritterModalProps) {
                           key={`${d.key}${i}`}
                           codeHeader={d.key}
                           label={d.key}
-                          val={d.value}
+                          defaultValue={d.value}
                           changeHandler={handlerFromContext}
                         />
                       );
@@ -97,7 +89,7 @@ export default function CritterModal(props: ICritterModalProps) {
                     .filter((f) => f.type === InputType.check)
                     .map((d, i) => {
                       let checked = d.value === false || d.value === 'N' || d.value === 'false' ? false : true;
-                      return <Checkbox key={`${d.key}${i}`} initialValue={checked} label={d.key} />;
+                      return <Checkbox key={`${d.key}${i}`} initialValue={checked} label={d.key} changeHandler={handlerFromContext} />;
                     })}
                 </div>
               </form>

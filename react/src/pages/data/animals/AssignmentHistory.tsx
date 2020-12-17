@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { Typography } from '@material-ui/core';
-import { hasCollarCurrentlyAssigned } from 'types/collar';
+import { hasCollarCurrentlyAssigned } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 import { ErrorMessage } from 'components/common';
 

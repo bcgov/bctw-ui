@@ -11,7 +11,8 @@ import dayjs from 'dayjs';
 import { createUrl, getBaseUrl } from 'api/api_helpers';
 import { formatDay } from 'utils/time';
 import { ICode } from 'types/code';
-import { ICollar, ICollarHistory } from 'types/collar';
+import {  ICollar } from 'types/collar';
+import { CollarHistory } from 'types/collar_history';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
 import { codeApi as code_api } from 'api/code_api';
@@ -77,17 +78,17 @@ export const useTelemetryApi = () => {
     );
 
   const useCritters = (page) =>
-    usePaginatedQuery<ICritterResults, AxiosError>(['critters', page], critterApi.getCritters, {...defaultQueryOptions, refetchOnMount: false});
+    usePaginatedQuery<ICritterResults, AxiosError>(page, critterApi.getCritters, {...defaultQueryOptions, refetchOnMount: false});
 
   /**
    * 
    * @param codeHeader the code header name used to determine which codes to fetch
    * adds enabled = false to not auto refetch codes
    */
-  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(codeHeader, codeApi.getCodes, {...defaultQueryOptions, enabled: false});
+  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(codeHeader, codeApi.getCodes, {...defaultQueryOptions /*, enabled: false*/});
 
   const useCollarHistory = (critterId: number) =>
-    useQuery<ICollarHistory[], AxiosError>(['collarHistory', critterId], collarApi.getCollarHistory);
+    useQuery<CollarHistory[], AxiosError>(['collarHistory', critterId], collarApi.getCollarHistory);
 
   // const useMutateCollarLink = (body: ICollarLinkPayload) => {
   //   const [mutate] = useMutation(critterApi.linkCollar, body as any);

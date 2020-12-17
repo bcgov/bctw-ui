@@ -16,7 +16,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "noImplicitThis": true,
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "experimentalDecorators": true
   },
   "include": [ "src" ],
   "exclude": ["**/node_modules", "**/dist"]

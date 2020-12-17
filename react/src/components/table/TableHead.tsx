@@ -9,7 +9,8 @@ import {
   Theme
 } from '@material-ui/core';
 import { Order, HeadCell, typeToHeadCell } from 'components/table/table_helpers';
-import { columnToHeader } from 'utils/component_helpers';
+import { columnToHeader } from 'utils/common';
+import { T } from 'types/common_types';
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface EnhancedTableProps<T> {
+interface EnhancedTableProps {
   headerData: T;
   headersToDisplay: string[];
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;
@@ -35,13 +36,17 @@ interface EnhancedTableProps<T> {
   orderBy: string;
 }
 
-export default function TableHead<T>(props: EnhancedTableProps<T>) {
+export default function TableHead(props: EnhancedTableProps) {
   const classes = useStyles();
   const { order, orderBy, onRequestSort, headerData, headersToDisplay } = props;
+
   const createSortHandler = (property: keyof T) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
   const headcells: HeadCell<T>[] = typeToHeadCell(headerData, headersToDisplay);
+
+  // any "class" should have a header formatter function, try to use this first 
+  const formatHeader = (cell: string) => typeof headerData.formatPropAsHeader === 'function' ? headerData.formatPropAsHeader(cell) : columnToHeader(cell);
 
   return (
     <MuiTableHead>
@@ -58,7 +63,7 @@ export default function TableHead<T>(props: EnhancedTableProps<T>) {
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
             >
-              {columnToHeader(headCell.label)}
+              {formatHeader(headCell.label)}
               {orderBy === headCell.id ? (
                 <span className={classes.visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}

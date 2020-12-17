@@ -1,30 +1,40 @@
 import React, { useState } from 'react';
-import Checkbox from '@material-ui/core/Checkbox';
+import { Checkbox as MuiCheckbox, CheckboxProps } from '@material-ui/core/';
 import { FormControlLabel } from '@material-ui/core';
+import { IInputProps } from 'components/component_interfaces';
 
-// todo: add props
-export default function Checkboxes(props) {
-  const [checked, setChecked] = useState(props.initialValue);
+interface ICheckboxProps extends IInputProps, CheckboxProps {
+  initialValue: boolean;
+  label: string;
+}
+export default function Checkbox(props: ICheckboxProps) {
+  const { initialValue, label, changeHandler } = props;
+
+  const [checked, setChecked] = useState(initialValue);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log(`checkbox checked ${event.target.checked}`)
-    setChecked(event.target.checked);
+    const checked = event.target.checked;
+    setChecked(checked);
+    changeHandler({ [label]: checked });
   };
+
+  // passing props that dont belong in dom is throwing errors
+  // remove these first
+  const propsToPass = { ...props };
+  delete propsToPass.changeHandler;
+  delete propsToPass.initialValue;
 
   return (
     <>
       <FormControlLabel
         control={
-          <Checkbox
+          <MuiCheckbox
             checked={checked}
             onChange={handleChange}
-            // name="checkedB"
-            color="primary"
-            {...props}
-            // inputProps={{ 'aria-label': 'uncontrolled-checkbox' }}
+            {...propsToPass}
           />
         }
-        label={props.label}
+        label={label}
       />
     </>
   );

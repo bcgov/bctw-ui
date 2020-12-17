@@ -7,7 +7,7 @@ import {
   makeStyles,
   Theme
 } from '@material-ui/core';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode } from 'types/code';
 
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
 type ISelectProps<T> = {
   codeHeader: string;
   label: string;
-  val: T;
+  defaultValue: T;
   changeHandler: (o: object) => void;
 };
 
@@ -34,18 +34,32 @@ type ISelectProps<T> = {
   fixme: in react strictmode the material ui component is warning about
   deprecated findDOMNode usage
 */
-export default function SelectCode({ codeHeader, label, val, changeHandler }: ISelectProps<any>) {
+export default function SelectCode({ codeHeader, label, defaultValue, changeHandler }: ISelectProps<any>) {
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
-  const [value, setValue] = useState(val);
+  const [value, setValue] = useState(defaultValue);
   
   const { data, error, isFetching, isError, isLoading, /*isPreviousData, isStale*/} = bctwApi.useCodes(codeHeader);
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const v = event.target.value;
     setValue(v);
-    changeHandler({[label]: v });
+    pushChange(v);
   };
+
+  const reset = () => {
+    const nv = defaultValue ?? '';
+    setValue(nv)
+    pushChange(nv);
+  }
+
+  const pushChange = (v: any) => {
+    changeHandler({[label]: v});
+  }
+
+  useEffect(() => {
+    reset();
+  }, [defaultValue]);
 
   // if (isPreviousData) {
   //   console.log('previous data!')

@@ -1,4 +1,4 @@
-import { IAnimal } from 'types/animal';
+import { Animal, IAnimal } from 'types/animal';
 import { ICollar } from 'types/collar';
 interface RequestPingParams {
   timeWindow: number[];
@@ -6,8 +6,8 @@ interface RequestPingParams {
 }
 
 interface ICritterResults {
-  assigned: IAnimal[];
-  available: IAnimal[];
+  assigned: Animal[];
+  available: Animal[];
 }
 
 export enum eCollarType {

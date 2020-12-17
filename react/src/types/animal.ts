@@ -1,9 +1,10 @@
-import { columnToHeader } from "utils/component_helpers";
+import { columnToHeader } from 'utils/common';
+import { BCTW } from 'types/common_types';
 
 export const assignedCritterProps = ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
 export const unassignedCritterProps = ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status'];
 
-export interface IAnimal {
+export interface IAnimal extends BCTW {
   id: number;
   animal_id: string;
   animal_status: string;
@@ -78,6 +79,18 @@ export class Animal implements IAnimal {
     this.wlh_id = wlh_id;
     this.nickname = nickname;
   }
+
+  formatPropAsHeader(str: string): string {
+    switch (str) {
+      case 'id':
+        return 'ID';
+      case 'wlh_id':
+        return 'WLH ID';
+      default:
+        return columnToHeader(str);
+    }
+  }
+
 }
 
 // function encodeCritter(obj: Animal) {
@@ -88,14 +101,3 @@ export class Animal implements IAnimal {
 //   }
 //   return obj;
 // }
-
-export const getCritterTitle = (str: string): string => {
-    switch (str) {
-      case 'id':
-        return 'ID';
-      case 'wlh_id':
-        return 'WLH ID';
-      default:
-        return columnToHeader(str);
-    }
-};

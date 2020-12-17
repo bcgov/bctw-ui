@@ -1,16 +1,25 @@
-import { TextField as MuiTextField, StandardTextFieldProps} from '@material-ui/core';
+import { TextField as MuiTextField } from '@material-ui/core';
+import { ITextfieldProps } from 'components/component_interfaces';
+import { useEffect } from 'react';
 
-interface ITextfieldProps extends StandardTextFieldProps {
-  propName: string;
-  changeHandler: (o: object) => void;
-}
 export default function TextField(props: ITextfieldProps) {
-  const { changeHandler, propName } = props;
+  const { changeHandler, propName, defaultValue } = props;
+
+  useEffect(() => {
+    const o = { [propName]: defaultValue };
+    changeHandler(o)
+  }, [defaultValue]);
+
+  const propsToPass = {...props};
+  delete propsToPass.propName;
+  delete propsToPass.changeHandler;
+  
   return (
     <MuiTextField
-      {...props}
+      {...propsToPass}
       onChange={(event) => {
         const o = { [propName]: event.target.value };
+        // console.log(o);
         changeHandler(o);
       }}
     />

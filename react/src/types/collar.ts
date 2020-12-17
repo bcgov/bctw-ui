@@ -1,11 +1,12 @@
 import dayjs from 'dayjs';
-import { columnToHeader } from 'utils/component_helpers';
-
-interface ICollarBase {
+import { columnToHeader } from 'utils/common';
+import { BCTW } from 'types/common_types';
+import { Type } from 'class-transformer';
+export interface ICollarBase {
   device_id: number;
 }
 
-export interface ICollar extends ICollarBase {
+export interface ICollar extends ICollarBase, BCTW {
     make: string;
     model: string;
     deployment_status: string;
@@ -20,18 +21,6 @@ export interface ICollar extends ICollarBase {
     satellite_network: string;
 }
 
-export interface ICollarHistory extends ICollarBase {
-  assignment_id: number;
-  make: string;
-  radio_frequency: number;
-  start_time: Date;
-  end_time: Date;
-}
-
-export interface ICollarLinkResult extends ICollarHistory {
-  device_id: number;
-  animal_id: string;
-}
 
 // used when creating new collars manually
 export enum NewCollarType {
@@ -40,15 +29,6 @@ export enum NewCollarType {
   Other,
 }
 
-const hasCollarCurrentlyAssigned = (history: ICollarHistory[]): boolean => {
-  const currentlyAssigned = history?.filter((h) => {
-    if(!dayjs(h.end_time).isValid()) {
-      return true;
-    }
-    return dayjs().isBefore(h.end_time);
-  });
-  return !!currentlyAssigned.length;
-}
 
 const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
 const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
@@ -73,7 +53,6 @@ const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_d
 export {
   assignedCollarProps,
   availableCollarProps,
-  hasCollarCurrentlyAssigned,
 }
 
 // function decodeCollar(json: Collar): Collar {

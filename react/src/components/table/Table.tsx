@@ -14,6 +14,8 @@ import {
 } from '@material-ui/core';
 import { getComparator, Order, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
+import { T } from 'types/common_types';
+import { dateObjectToTimeStr } from 'utils/time';
 
 /* todo: 
   - pagination
@@ -56,7 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type ITableProps<T> = {
+type ITableProps = {
   data: T[];
   headers: string[];
   title?: string;
@@ -71,7 +73,7 @@ type ITableProps<T> = {
  * @param onSelect handler from parent component
  * @param rowIdentifier what uniquely identifies a row (ex device_id for a collar). will default to id
  */
-export default function Table<T>({ data, title, headers, onSelect, rowIdentifier = 'id' }: ITableProps<T>) {
+export default function Table({ data, title, headers, onSelect, rowIdentifier = 'id' }: ITableProps) {
   const classes = useStyles();
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>(rowIdentifier as any);
@@ -124,7 +126,11 @@ export default function Table<T>({ data, title, headers, onSelect, rowIdentifier
                       >
                         {
                           headers.map((k: string, i: number) => {
-                            return <TableCell key={`${k}${i}`} align='right'>{obj[k]}</TableCell>
+                            let val = obj[k];
+                            if (typeof (val)?.getMonth === 'function') {
+                              val = dateObjectToTimeStr(val);
+                            }
+                            return <TableCell key={`${k}${i}`} align='right'>{val}</TableCell>
                           })
                         }
                       </TableRow>

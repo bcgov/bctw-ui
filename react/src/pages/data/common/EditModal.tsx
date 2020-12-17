@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';
-import { objectCompare } from 'utils/component_helpers';
+import { objectCompare, omitNull } from 'utils/common';
 import ChangeContext from 'contexts/InputChangeContext';
+import { useDataStyles } from 'pages/data/common/data_styles';
 
 type IEditModalProps<T> = {
   editing: T;
@@ -23,20 +24,26 @@ type IEditModalProps<T> = {
  * so that [canSave] can be determined
  */
 export default function EditModal<T>(props: IEditModalProps<T>) {
+  const styles = useDataStyles();
   const {children, title, show, onClose, editing, newT, onSave } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
 
   const handleSave = () => {
-    const toSave = Object.assign(editing, newObj);
+    const toSave = {...omitNull(editing), ...omitNull(newObj)};
+    // console.log(JSON.stringify(toSave))
     onSave(toSave);
   };
 
-  // fixme: reverting a change is not unflagging canSave
-  const handleChange = (newProp) => {
+  // triggered on a form input change, newProp will be an object with a single key and value
+  const handleChange = (newProp: object) => {
     setNewObj(old => Object.assign(old, newProp));
-    const isSame = objectCompare(newObj as any, editing as any);
+    // get the first key
+    const key: string = Object.keys(newProp)[0];
+    // create matching key/val object from the item being edited
+    const og = {[key]: editing[key] ?? ''};
+    const isSame = objectCompare(newProp, og);
     setCanSave(!isSame);
   }
 
@@ -52,7 +59,7 @@ export default function EditModal<T>(props: IEditModalProps<T>) {
       <Modal open={show} handleClose={handleClose} title={title}>
         <ChangeContext.Provider value={handleChange}>
           {children}
-          <Button onClick={handleSave} disabled={!canSave}>save animal</Button>
+          <Button className={styles.editSaveButton} onClick={handleSave} disabled={!canSave}>save</Button>
         </ChangeContext.Provider>
       </Modal>
     </>

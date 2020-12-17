@@ -2,13 +2,13 @@ import { AxiosError } from 'axios';
 import { ErrorMessage, Toast } from 'components/common';
 import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import EditModal from 'pages/data/animals/EditCritter';
+import EditCritter from 'pages/data/animals/EditCritter';
 import ImportExportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import React, { useState } from 'react';
 import { useMutation } from 'react-query';
-import { Animal, assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
+import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import { CritterStrings as CS } from 'constants/strings';
 
 export default function CritterPage() {
@@ -17,9 +17,9 @@ export default function CritterPage() {
 
   const { isFetching, isLoading, isError, error, resolvedData /*latestData*/ } = bctwApi.useCritters(0);
 
-  const [mutate] = useMutation<IAnimal[], AxiosError>(bctwApi.upsertCritter);
+  const [mutate] = useMutation<Animal[], AxiosError>(bctwApi.upsertCritter);
 
-  const [editObj, setEditObj] = useState<IAnimal>({} as IAnimal);
+  const [editObj, setEditObj] = useState<Animal>({} as Animal);
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMsg, setToastMsg] = useState<string>('');
 
@@ -30,12 +30,14 @@ export default function CritterPage() {
     setShowToast(true);
   };
 
-  const handleSelect = (row: IAnimal) => {
+  const handleSelect = (row: Animal) => {
     setEditObj(row);
   };
 
+  const createNewAnimal = () => new Animal();
+
   const handleSave = async (o: any) => {
-    const result: IAnimal[] = await mutate(o);
+    const result: Animal[] = await mutate(o);
     if (Array.isArray(result)) {
       const critter = result[0];
       handleToast(`${critter?.animal_id ?? critter?.nickname ?? 'critter'} saved successfully`);
@@ -69,10 +71,9 @@ export default function CritterPage() {
                 />
                 <AddEditViewer<Animal>
                   editing={editObj}
-                  empty={new Animal()}
-                  childEditComponent={<EditModal onSave={handleSave} {...editProps} />}
-                />
-                {/* enable export component to export all critters */}
+                  empty={createNewAnimal}>
+                  <EditCritter onSave={handleSave} {...editProps} />
+                </AddEditViewer>
                 <ImportExportViewer {...ieProps} data={[[...resolvedData.assigned, ...resolvedData.available]]} />
                 <Toast show={showToast} message={toastMsg} onClose={() => setShowToast(false)} />
               </div>

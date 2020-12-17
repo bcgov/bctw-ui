@@ -4,10 +4,11 @@ import Button from 'components/form/Button';
 import { getNow } from 'utils/time';
 import { AxiosError } from 'axios';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { ICollarLinkResult } from 'types/collar';
+import { ICollarHistory } from 'types/collar_history';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { ErrorMessage } from 'components/common';
 import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
+// import { useDataStyles } from 'pages/data/common/data_styles';
 
 type IPerformAssignmentActionProps = {
   hasCollar: boolean;
@@ -28,6 +29,7 @@ export default function PerformAssignmentAction({
   deviceId,
   onPost
 }: IPerformAssignmentActionProps) {
+  // const styles = useDataStyles();
   const bctwApi = useTelemetryApi();
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
@@ -53,13 +55,13 @@ export default function PerformAssignmentAction({
   };
 
   const assignCollar = async (deviceId: number) => {
-    const result: ICollarLinkResult = await mutate(createPostBody(deviceId, true));
+    const result: ICollarHistory = await mutate(createPostBody(deviceId, true));
     setShowAvailableModal(false);
     notifyParentToast(`collar ${result.device_id} successfully linked to critter ${result.animal_id}`);
   };
 
   const removeCollar = async () => {
-    const result: ICollarLinkResult = await mutate(createPostBody(deviceId, false));
+    const result: ICollarHistory = await mutate(createPostBody(deviceId, false));
     setShowConfirmModal(false);
     notifyParentToast(`collar ${result.device_id} successfully removed from critter ${result.animal_id}`);
   };

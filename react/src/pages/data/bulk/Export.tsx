@@ -3,12 +3,14 @@ import Modal from 'components/modal/Modal';
 import { Typography, Chip } from '@material-ui/core';
 import Button from 'components/form/Button';
 import { ExportImportProps } from 'components/component_interfaces';
+import bulkStyles from './bulk_styles';
 
 type ImportProps<T> = ExportImportProps & {
   data: T[];
 }
 
 export default function Export<T>({ data, message, title, open, handleClose }: ImportProps<T>) {
+  const styles = bulkStyles();
   const [included, setIncluded] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
 
@@ -41,20 +43,20 @@ export default function Export<T>({ data, message, title, open, handleClose }: I
     <>
       <Modal open={open} handleClose={handleClose} title={title}>
         <p>{message}</p>
-        <Typography variant='h6'>Included in export</Typography>
+        <Typography className={styles.header} variant='h5'>Included in export:</Typography>
         {included.map((d, i) => {
           return <Chip key={`${d}-${i}`} onDelete={remove} label={d} />;
         })}
-        <Typography variant='h6'>Excluded in export</Typography>
+        <Typography className={styles.header} variant='h5'>Excluded in export:</Typography>
         {excluded.map((d, i) => {
           return <Chip key={`${d}-${i}`} onDelete={add} label={d} color='secondary' />;
         })}
-        <div>
+        <div className={styles.footer}>
+          <div>
+            <Button disabled={included.length === 0} onClick={uncheckAll}>remove all</Button>
+            <Button onClick={reset}>reset</Button>
+          </div>
           <Button onClick={download}>download</Button>
-          <Button onClick={reset}>reset</Button>
-          <Button disabled={included.length === 0} onClick={uncheckAll}>
-            remove all
-          </Button>
         </div>
       </Modal>
     </>

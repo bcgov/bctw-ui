@@ -1,7 +1,9 @@
-import { AxiosInstance } from "axios";
-import { createUrl } from "api/api_helpers";
-import { ICollarResults } from "api/api_interfaces";
-import { ICollar, ICollarHistory } from "types/collar";
+import { AxiosInstance } from 'axios';
+import { createUrl } from 'api/api_helpers';
+import { ICollarResults } from 'api/api_interfaces';
+import { plainToClass } from 'class-transformer';
+import { ICollar } from 'types/collar';
+import { ICollarHistory, CollarHistory } from 'types/collar_history';
 
 export const collarApi = (api: AxiosInstance) => {
 
@@ -23,11 +25,12 @@ export const collarApi = (api: AxiosInstance) => {
     };
   };
 
-  const getCollarHistory = async (key: string, critterId: number): Promise<ICollarHistory[]> => {
+  const getCollarHistory = async (key: string, critterId: number): Promise<CollarHistory[]> => {
     const url = createUrl({ api: `get-assignment-history/${critterId}` });
-    console.log(`requesting collar history`);
+    // console.log(`requesting collar history`);
     const { data } = await api.get(url);
-    return data;
+    const results = data.map((json: ICollarHistory) => plainToClass(CollarHistory, json));
+    return results;
   };
 
   return {

@@ -19,7 +19,8 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(2, 4, 3),
     },
     title: {
-      textAlign: 'center'
+      textAlign: 'center',
+      marginBottom: '15px'
     }
   }),
 );
