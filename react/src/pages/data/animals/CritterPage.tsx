@@ -80,12 +80,14 @@ export default function CritterPage() {
                   data={resolvedData.available}
                   title='Unassigned Animals'
                 />
-                <AddEditViewer<Animal>
-                  editing={editObj}
-                  empty={createNewAnimal}>
-                  <EditCritter onSave={handleSave} {...editProps} error={isMutateError ? formatAxiosError(mutateError) : ''} />
-                </AddEditViewer>
-                <ImportExportViewer {...ieProps} data={[[...resolvedData.assigned, ...resolvedData.available]]} />
+                <div className={classes.mainButtonRow} >
+                  <ImportExportViewer {...ieProps} data={[...resolvedData.assigned, ...resolvedData.available]} />
+
+                  <AddEditViewer<Animal> editing={editObj} empty={createNewAnimal}>
+                    <EditCritter onSave={handleSave} {...editProps} error={isMutateError ? formatAxiosError(mutateError) : ''} />
+                  </AddEditViewer>
+                </div>
+
                 <Toast show={showToast} message={toastMsg} onClose={() => setShowToast(false)} />
               </div>
             )

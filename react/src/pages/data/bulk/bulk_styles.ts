@@ -19,9 +19,12 @@ const useStyles = makeStyles((theme: Theme) =>
     header: {
       margin: '10px 0',
     },
-    export: {
-      display: 'flex',
-      flexDirection: 'row',
+    exportChipRowParent: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(5, 1fr)',
+    },
+    chip: {
+      margin: '2px 3px'
     }
   })
 );

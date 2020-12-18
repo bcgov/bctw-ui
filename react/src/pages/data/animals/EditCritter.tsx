@@ -47,7 +47,7 @@ export default function CritterModal(props: ICritterModalProps) {
           return (
             <>
               <form className={classes.root} noValidate autoComplete='off'>
-                <div>
+                <>
                   <Typography variant='h6'>General Information</Typography>
                   {/* render props that are text inputs */}
                   {inputTypes
@@ -65,8 +65,8 @@ export default function CritterModal(props: ICritterModalProps) {
                         />
                       );
                     })}
-                </div>
-                <div>
+                </>
+                <>
                   <Typography variant='h6'>Group Information</Typography>
                   {/* render props that are selects */}
                   {inputTypes
@@ -82,8 +82,8 @@ export default function CritterModal(props: ICritterModalProps) {
                         />
                       );
                     })}
-                </div>
-                <div>
+                </>
+                <>
                   <Typography variant='h6'>Individual Characteristics</Typography>
                   {/* render props that are check boxes */}
                   {inputTypes
@@ -92,7 +92,7 @@ export default function CritterModal(props: ICritterModalProps) {
                       let checked = d.value === false || d.value === 'N' || d.value === 'false' ? false : true;
                       return <Checkbox key={`${d.key}${i}`} initialValue={checked} label={d.key} changeHandler={handlerFromContext} />;
                     })}
-                </div>
+                </>
               </form>
               {/* render collar assignment components if this is in edit mode */}
               {isEdit ? <AssignmentHistory animalId={editing.id} isEdit={isEdit} {...props} /> : null}

@@ -12,14 +12,15 @@ const useDataStyles = makeStyles({
       marginRight: '20px'
     }
   },
-  // modalFooter: {
-  //   display: 'flex',
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   margin: '15px 0 0 0'
-  // },
   editSaveButton: {
     float: 'right'
+  },
+  mainButtonRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    padding: '0 5px'
   }
 });
 

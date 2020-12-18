@@ -79,7 +79,7 @@ export default function Import<T>(props: ExportImportProps) {
   }
 
   return (
-    <>
+    // <>
       <Modal {...props} handleClose={onClose}>
         {isLoading ? <div>saving...</div> : null}
         {isError ? <ErrorMessage message={formatAxiosError(error)} /> : null}
@@ -97,6 +97,6 @@ export default function Import<T>(props: ExportImportProps) {
           {isSuccess || isError ? <Button variant='contained' component='span' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
         </div>
       </Modal>
-    </>
+    // </>
   )
 }

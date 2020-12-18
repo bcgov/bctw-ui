@@ -34,12 +34,12 @@ export default function ImportExportViewer<T>(props: IImportExportProps<T>) {
 
   return (
     <>
+      <ButtonGroup size='small' variant='contained' color='primary'>
+        <Button onClick={handleClickImport}>import</Button>
+        <Button onClick={handleClickExport}>export</Button>
+      </ButtonGroup>
       <Import {...importProps} />
       <Export {...exportProps} />
-      <ButtonGroup size='small' variant='contained' color='primary'>
-        <Button onClick={handleClickExport}>export</Button>
-        <Button onClick={handleClickImport}>import</Button>
-      </ButtonGroup>
     </>
   );
 }

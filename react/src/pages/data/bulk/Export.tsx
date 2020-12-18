@@ -44,19 +44,23 @@ export default function Export<T>({ data, message, title, open, handleClose }: I
       <Modal open={open} handleClose={handleClose} title={title}>
         <p>{message}</p>
         <Typography className={styles.header} variant='h5'>Included in export:</Typography>
-        {included.map((d, i) => {
-          return <Chip key={`${d}-${i}`} onDelete={remove} label={d} />;
-        })}
+        <div className={styles.exportChipRowParent}>
+          {included.map((d, i) => {
+            return <Chip className={styles.chip} key={`${d}-${i}`} onDelete={remove} label={d} />;
+          })}
+        </div>
         <Typography className={styles.header} variant='h5'>Excluded in export:</Typography>
-        {excluded.map((d, i) => {
-          return <Chip key={`${d}-${i}`} onDelete={add} label={d} color='secondary' />;
-        })}
+        <div className={styles.exportChipRowParent}>
+          {excluded.map((d, i) => {
+            return <Chip className={styles.chip} key={`${d}-${i}`} onDelete={add} label={d} color='secondary' />;
+          })}
+        </div>
         <div className={styles.footer}>
           <div>
             <Button disabled={included.length === 0} onClick={uncheckAll}>remove all</Button>
-            <Button onClick={reset}>reset</Button>
+            <Button disabled={excluded.length === 0} onClick={reset}>reset</Button>
           </div>
-          <Button onClick={download}>download</Button>
+          <Button disabled={included.length <= 0} onClick={download}>download</Button>
         </div>
       </Modal>
     </>

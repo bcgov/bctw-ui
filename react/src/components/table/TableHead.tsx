@@ -1,18 +1,18 @@
-import React from 'react';
 import {
+  createStyles,
+  makeStyles,
   TableCell,
   TableHead as MuiTableHead,
   TableRow,
   TableSortLabel,
-  makeStyles,
-  createStyles,
-  Theme
+  Theme,
 } from '@material-ui/core';
-import { Order, HeadCell, typeToHeadCell } from 'components/table/table_helpers';
-import { columnToHeader } from 'utils/common';
+import { HeadCell, Order, typeToHeadCell } from 'components/table/table_helpers';
+import React from 'react';
 import { T } from 'types/common_types';
+import { columnToHeader } from 'utils/common';
 
-const useStyles = makeStyles((theme: Theme) => 
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     visuallyHidden: {
       border: 0,
@@ -63,7 +63,7 @@ export default function TableHead(props: EnhancedTableProps) {
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
             >
-              {formatHeader(headCell.label)}
+              <strong>{formatHeader(headCell.label)}</strong>
               {orderBy === headCell.id ? (
                 <span className={classes.visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}

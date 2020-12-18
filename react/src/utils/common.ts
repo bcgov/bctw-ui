@@ -48,6 +48,8 @@ const omitNull = <T,>(obj: T) => {
 
 /**
  * used for removing props that shouldn't be passed on to material ui components 
+ * @param object to remove from
+ * @param propsToRemove string array of properties to delete
  */
 const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
   const copyOfT = {...obj};
