@@ -1,6 +1,7 @@
-import { AxiosInstance } from "axios";
-import { createUrl } from "api/api_helpers";
-import { IBulkUploadResults } from "./api_interfaces";
+import { createUrl } from 'api/api_helpers';
+import { AxiosInstance } from 'axios';
+
+import { IBulkUploadResults } from './api_interfaces';
 
 export const bulkApi = (api: AxiosInstance) => {
 

@@ -1,4 +1,4 @@
-import { Animal, IAnimal } from 'types/animal';
+import { Animal } from 'types/animal';
 import { ICollar } from 'types/collar';
 interface RequestPingParams {
   timeWindow: number[];

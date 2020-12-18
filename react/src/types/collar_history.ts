@@ -1,5 +1,4 @@
-import { ICollarBase } from 'types/collar';
-import { columnToHeader } from 'utils/common';
+import { formatCollarProp, ICollarBase } from 'types/collar';
 import { BCTW } from 'types/common_types';
 import { Type } from 'class-transformer';
 import dayjs from 'dayjs';
@@ -23,14 +22,10 @@ export class CollarHistory implements ICollarHistory {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'device_id':
-        return 'Device ID';
-      case 'make':
-        return 'Collar Make';
       case 'assignment_id':
         return 'Assignment ID';
       default:
-        return columnToHeader(str);
+        return formatCollarProp(str);
     }
   }
 }

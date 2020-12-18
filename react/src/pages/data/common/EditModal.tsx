@@ -4,6 +4,7 @@ import Modal from 'components/modal/Modal';
 import { objectCompare, omitNull } from 'utils/common';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useDataStyles } from 'pages/data/common/data_styles';
+import { ErrorMessage } from 'components/common';
 
 type IEditModalProps<T> = {
   editing: T;
@@ -13,6 +14,7 @@ type IEditModalProps<T> = {
   onSave: (o: T) => void;
   title: string;
   children: React.ReactNode;
+  error: string;
 };
 
 /**
@@ -25,7 +27,7 @@ type IEditModalProps<T> = {
  */
 export default function EditModal<T>(props: IEditModalProps<T>) {
   const styles = useDataStyles();
-  const {children, title, show, onClose, editing, newT, onSave } = props;
+  const {children, title, show, onClose, editing, newT, onSave, error } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
@@ -61,6 +63,7 @@ export default function EditModal<T>(props: IEditModalProps<T>) {
           {children}
           <Button className={styles.editSaveButton} onClick={handleSave} disabled={!canSave}>save</Button>
         </ChangeContext.Provider>
+        {error ? <ErrorMessage message={error}/> : null}
       </Modal>
     </>
   );

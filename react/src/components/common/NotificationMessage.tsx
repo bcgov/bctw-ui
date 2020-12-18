@@ -20,7 +20,7 @@ const ErrorMessage = ({message}: INotificationMessageProps) => {
 const SuccessMessage = ({message}: INotificationMessageProps) => {
   const classes = useStyles();
   return (
-    <Typography color='secondary' className={classes.success}>
+    <Typography color='primary' className={classes.success}>
       <strong>{message}</strong>
     </Typography>
   );

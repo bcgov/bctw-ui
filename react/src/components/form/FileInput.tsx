@@ -7,7 +7,7 @@ interface FileInputProps extends StandardTextFieldProps {
 }
 
 export default function FileInput1(props: FileInputProps) {
-  const { id, buttonText, onFileChosen } = props;
+  const { buttonText, onFileChosen } = props;
 
   const change = (event: React.ChangeEvent<HTMLInputElement>) => {
     const field = event.target.name;

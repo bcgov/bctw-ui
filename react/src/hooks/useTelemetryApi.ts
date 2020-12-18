@@ -1,22 +1,26 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
-import { useMemo } from 'react';
-import { useQuery, usePaginatedQuery, QueryConfig } from 'react-query';
-import {
-  eCollarType,
-  ICollarResults,
-  ICritterResults,
-  RequestPingParams
-} from '../api/api_interfaces';
-import dayjs from 'dayjs';
 import { createUrl, getBaseUrl } from 'api/api_helpers';
-import { formatDay } from 'utils/time';
-import { ICode } from 'types/code';
-import {  ICollar } from 'types/collar';
-import { CollarHistory } from 'types/collar_history';
+import { bulkApi as bulk_api } from 'api/bulk_api';
+import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
-import { codeApi as code_api } from 'api/code_api';
-import { bulkApi as bulk_api } from 'api/bulk_api';
+import axios, { AxiosError, AxiosInstance } from 'axios';
+import dayjs from 'dayjs';
+import { useMemo } from 'react';
+import { MutationConfig, useMutation, usePaginatedQuery, useQuery } from 'react-query';
+import { Animal } from 'types/animal';
+import { ICode } from 'types/code';
+import { ICollar } from 'types/collar';
+import { CollarHistory } from 'types/collar_history';
+import { formatDay } from 'utils/time';
+
+import {
+  eCollarType,
+  IBulkUploadResults,
+  ICollarLinkPayload,
+  ICollarResults,
+  ICritterResults,
+  RequestPingParams,
+} from '../api/api_interfaces';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -67,9 +71,15 @@ export const useTelemetryApi = () => {
     return useQuery<any, Error>(['pings', { timeWindow, pingExtent }], _requestPings, defaultQueryOptions);
   };
 
+  /**
+   *  fetches all collar types
+   */
   const useCollars = (page: number) =>
     usePaginatedQuery<ICollarResults, AxiosError>(['collars', page], collarApi.getCollars, defaultQueryOptions);
 
+  /**
+   * @param type the collar types to be fetched (assigned, unassigned)
+   */
   const useCollarType = (page: number, type: eCollarType) =>
     usePaginatedQuery<ICollar[], AxiosError>(
       ['collartype', page, type],
@@ -77,23 +87,43 @@ export const useTelemetryApi = () => {
       defaultQueryOptions,
     );
 
+  /**
+   *  fetches critters with and without collars
+   */
   const useCritters = (page) =>
-    usePaginatedQuery<ICritterResults, AxiosError>(page, critterApi.getCritters, {...defaultQueryOptions, refetchOnMount: false});
+    usePaginatedQuery<ICritterResults, AxiosError>(['critters', page], critterApi.getCritters, { ...defaultQueryOptions, refetchOnMount: false });
 
   /**
-   * 
    * @param codeHeader the code header name used to determine which codes to fetch
    * adds enabled = false to not auto refetch codes
    */
-  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(codeHeader, codeApi.getCodes, {...defaultQueryOptions /*, enabled: false*/});
+  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(codeHeader, codeApi.getCodes, { ...defaultQueryOptions /*, enabled: false*/ });
 
+  /**
+   * @param critterId serial integer of the critter to be fetched (not animal_id)
+   */
   const useCollarHistory = (critterId: number) =>
     useQuery<CollarHistory[], AxiosError>(['collarHistory', critterId], collarApi.getCollarHistory);
 
-  // const useMutateCollarLink = (body: ICollarLinkPayload) => {
-  //   const [mutate] = useMutation(critterApi.linkCollar, body as any);
-  //   return mutate;
-  // };
+
+  /**     **
+   *  *  * * 
+   *   *   * utations
+   *       *
+   *       *
+  */
+  const useMutateCritter = (config?: MutationConfig<Animal[], AxiosError, Animal[]>) =>
+  useMutation<Animal[], AxiosError, Animal[]>((critter) => critterApi.upsertCritter(critter), config);
+
+
+  const useMutateLinkCollar = (config: MutationConfig<CollarHistory, AxiosError, ICollarLinkPayload>) => 
+  useMutation<CollarHistory, AxiosError, ICollarLinkPayload>((link) => critterApi.linkCollar(link), config);
+ 
+
+  const useMutateBulkCsv = <T,>(config: MutationConfig<IBulkUploadResults<T>, AxiosError, FormData>) => 
+    useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
+ 
+
 
   return {
     // queries
@@ -105,8 +135,8 @@ export const useTelemetryApi = () => {
     useCritters,
     useCollarHistory,
     // mutations
-    linkCollar: critterApi.linkCollar,
-    upsertCritter: critterApi.upsertCritter,
-    uploadCsv: bulkApi.uploadCsv,
+    useMutateLinkCollar,
+    useMutateCritter,
+    useMutateBulkCsv,
   };
 };

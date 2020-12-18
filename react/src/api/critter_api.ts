@@ -1,13 +1,14 @@
-import { AxiosInstance } from 'axios';
 import { createUrl } from 'api/api_helpers';
-import { ICollarLinkPayload, ICritterResults } from './api_interfaces';
+import { AxiosInstance } from 'axios';
 import { plainToClass } from 'class-transformer';
-import { ICollarHistory } from 'types/collar_history';
 import { Animal, IAnimal } from 'types/animal';
+import { CollarHistory } from 'types/collar_history';
+
+import { ICollarLinkPayload, ICritterResults } from './api_interfaces';
 
 export const critterApi = (api: AxiosInstance) => {
 
-  const getCritters = async (page = 1): Promise<ICritterResults> => {
+  const getCritters = async (key: string, page = 1): Promise<ICritterResults> => {
     const apiStr = 'get-animals';
     const urlAssigned = createUrl({ api: apiStr, query: 'assigned=true', page });
     const urlAvailable = createUrl({ api: apiStr, query: 'assigned=false', page });
@@ -19,18 +20,19 @@ export const critterApi = (api: AxiosInstance) => {
     }
   };
 
-  const linkCollar = async (body: ICollarLinkPayload): Promise<ICollarHistory> => {
+  const linkCollar = async (body: ICollarLinkPayload): Promise<CollarHistory> => {
     const link = body.isLink ? 'link-animal-collar' : 'unlink-animal-collar';
     const url = createUrl({ api: link });
     console.log(`posting ${link}: ${JSON.stringify(body.data)}`);
     const { data } = await api.post(url, body);
-    return data[0];
+    return plainToClass(CollarHistory, data[0]);
   };
 
-  const upsertCritter = async (body: IAnimal[]): Promise<any> => {
+  const upsertCritter = async (body: Animal[]): Promise<Animal[]> => {
     const url = createUrl({ api: 'add-animal' });
+    // const critters = body.map(a => serialize(a))
     const { data } = await api.post(url, body);
-    return data[0];
+    return data.map((a: IAnimal) => plainToClass(Animal, a));
   }
 
   return {

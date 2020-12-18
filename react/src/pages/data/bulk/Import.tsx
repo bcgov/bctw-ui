@@ -1,14 +1,14 @@
-import React from 'react';
-import Modal from 'components/modal/Modal';
 import { Typography } from '@material-ui/core';
-import { ExportImportProps } from 'components/component_interfaces';
-import FileInput from 'components/form/FileInput';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { AxiosError } from 'axios';
-import { useMutation } from 'react-query';
-import { ErrorMessage, SuccessMessage } from 'components/common';
 import { IBulkUploadResults } from 'api/api_interfaces';
+import { ErrorMessage, SuccessMessage } from 'components/common';
+import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
+import FileInput from 'components/form/FileInput';
+import Modal from 'components/modal/Modal';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import React from 'react';
+import { formatAxiosError, isValidToast } from 'utils/common';
+
 import bulkStyles from './bulk_styles';
 
 /* todo: 
@@ -26,14 +26,12 @@ export default function Import<T>(props: ExportImportProps) {
   const bctwApi = useTelemetryApi();
 
   const handleSucess = (data: IBulkUploadResults<T>) => {
-    const toast = props.handleToast;
-    if (toast && typeof toast === 'function') {
-      const msg = `a bulk upload was completed ${data.errors.length ? ', but there were errors.' : 'successfully.'}`
-      toast(msg)
+    if (isValidToast(props.handleToast)) {
+      props.handleToast(`a bulk upload was completed ${data.errors.length ? ', but there were errors.' : 'successfully.'}`)
     }
   }
 
-  const [mutate, { isIdle, isLoading, isSuccess, isError, error, data, reset }] = useMutation<IBulkUploadResults<T>, AxiosError>(bctwApi.uploadCsv, { onSuccess: handleSucess },);
+  const [mutate, { isIdle, isLoading, isSuccess, isError, error, data, reset }] = bctwApi.useMutateBulkCsv({ onSuccess: handleSucess })
 
   const handleFileChange = (fieldName: string, files: FileList) => {
     const formData = new FormData();
@@ -44,11 +42,11 @@ export default function Import<T>(props: ExportImportProps) {
     save(formData);
   }
 
-  const save = async (form: FormData) => await mutate(form as any);
+  const save = async (form: FormData) => await mutate(form);
 
   const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: T) => {
+    // todo:
     event.preventDefault();
-    // console.log(row);
   }
 
   const onClose = () => {
@@ -56,9 +54,9 @@ export default function Import<T>(props: ExportImportProps) {
     props.handleClose(false);
   }
 
-  const hasErrors = (): boolean => isSuccess && data.errors.length > 0;
+  const importHadErrors = (): boolean => isSuccess && data.errors.length > 0;
 
-  const handleResults = (data: IBulkUploadResults<T>): React.ReactNode => {
+  const renderResults = (data: IBulkUploadResults<T>): React.ReactNode => {
     const { errors, results } = data;
     if (errors.length) {
       return <>
@@ -76,7 +74,7 @@ export default function Import<T>(props: ExportImportProps) {
       </>
     }
     const numSuccessful = results.length
-    const msg = `${numSuccessful} item${numSuccessful > 1 ? 's' : ''} ${numSuccessful > 1 ? 'were ' : 'was successfully imported'}`;
+    const msg = `${numSuccessful} item${numSuccessful > 1 ? 's' : ''} ${numSuccessful > 1 ? 'were ' : 'was'} successfully imported`;
     return <SuccessMessage message={msg}></SuccessMessage>
   }
 
@@ -84,8 +82,8 @@ export default function Import<T>(props: ExportImportProps) {
     <>
       <Modal {...props} handleClose={onClose}>
         {isLoading ? <div>saving...</div> : null}
-        {isError ? <ErrorMessage message={error?.response?.data ?? error.message} /> : null}
-        {isSuccess ? handleResults(data) : null}
+        {isError ? <ErrorMessage message={formatAxiosError(error)} /> : null}
+        {isSuccess ? renderResults(data) : null}
         {
           isIdle ?
             <>
@@ -96,7 +94,7 @@ export default function Import<T>(props: ExportImportProps) {
         }
         <div className={styles.footer}>
           {isIdle ? <FileInput onFileChosen={handleFileChange} /> : null}
-          {isSuccess || isError ? <Button variant='contained' component='span' onClick={reset}>{`${hasErrors() ? 'try' : 'upload'} again`}</Button> : null}
+          {isSuccess || isError ? <Button variant='contained' component='span' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
         </div>
       </Modal>
     </>

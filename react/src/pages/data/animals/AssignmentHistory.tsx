@@ -24,6 +24,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps) {
   const bctwApi = useTelemetryApi();
   const { isLoading, isError, isFetching, error, data } = bctwApi.useCollarHistory(animalId);
 
+  // nothing for user to interact with by selecting row, so this is a null handler
   const handleSelect = () => {};
 
   useEffect(() => {

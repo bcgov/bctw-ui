@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 /** 
  * @param {K} key
  * @param {T} object of type T
@@ -44,18 +46,33 @@ const omitNull = <T,>(obj: T) => {
   return copy;
 }
 
+/**
+ * used for removing props that shouldn't be passed on to material ui components 
+ */
+const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
+  const copyOfT = {...obj};
+  propsToRemove.forEach(p => delete copyOfT[p]);
+  return copyOfT;
+}
+
 // const sortImportRow = (row: object): string => {
 //   const keys = Object.keys(row).sort();
 //   const values = keys.map((k: string) => row[k]).join();
 //   return values;
 // };
 
+const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? err.message}`;
+
+const isValidToast = (onPost: (msg: string) => void): boolean => {
+  return typeof onPost === 'function';
+}
+
 export {
   columnToHeader,
   getProperty,
+  formatAxiosError,
   objectCompare,
-  omitNull
-  // canSaveObject,
-  // getTypeExportFields,
-  // sortImportRow,
+  omitNull,
+  removeProps,
+  isValidToast,
 };

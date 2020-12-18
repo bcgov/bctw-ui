@@ -29,10 +29,11 @@ type ICritterModalProps = {
   editableProps: string[];
   selectableProps: string[];
   onPost: (s: string) => void; // for passing up collar link response messages
+  error: string;
 };
 
 export default function CritterModal(props: ICritterModalProps) {
-  const { isEdit, editing, editableProps, selectableProps } = props;
+  const { isEdit, editing, editableProps, selectableProps, error } = props;
   const classes = useStyles();
 
   const title = isEdit ? `Editing ${editing?.nickname ?? editing?.animal_id }` : `Add a new animal`;

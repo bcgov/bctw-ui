@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { useMutation } from 'react-query';
 import Button from 'components/form/Button';
 import { getNow } from 'utils/time';
 import { AxiosError } from 'axios';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { ICollarHistory } from 'types/collar_history';
+import { CollarHistory } from 'types/collar_history';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { ErrorMessage } from 'components/common';
 import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
-// import { useDataStyles } from 'pages/data/common/data_styles';
+import { formatAxiosError, isValidToast } from 'utils/common';
+import { useQueryCache } from 'react-query';
 
 type IPerformAssignmentActionProps = {
   hasCollar: boolean;
@@ -29,61 +29,67 @@ export default function PerformAssignmentAction({
   deviceId,
   onPost
 }: IPerformAssignmentActionProps) {
-  // const styles = useDataStyles();
   const bctwApi = useTelemetryApi();
+  const queryCache = useQueryCache()
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
+  //  state to manage if a collar is being linked or removed
+  const [isLink, setIsLink] = useState<boolean>(false);
+  
+  const handleSuccess = (data: CollarHistory) => {
+    updateCollarHistory();
+    if (isValidToast(onPost)) {
+      onPost(`collar ${data.device_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`);
+    }
 
-  const [mutate, { isError, isLoading, isSuccess, error, data }] = useMutation<any, AxiosError>(bctwApi.linkCollar);
+  }
+  const handleError = (error: AxiosError) => {
+    updateCollarHistory();
+    if (isValidToast(onPost)) {
+      onPost(`error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}`);
+    }
+  }
 
-  const handleClick = () => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
+  // force the collar history to refetch
+  const updateCollarHistory = () => queryCache.invalidateQueries('collarHistory');
+
+  const [mutate, { isError, error }] = bctwApi.useMutateLinkCollar({
+    onSuccess: handleSuccess,
+    onError: handleError
+  });
+
+  const handleClickShowModal = () => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
 
   const closeModals = () => {
     setShowConfirmModal(false);
     setShowAvailableModal(false);
   };
 
-  const createPostBody = (device_id: number, isLink: boolean): any => {
-    return {
-      isLink,
+  const callMutation = async(id: number, isAssign: boolean) => {
+    await setIsLink(isAssign);
+    isAssign ? setShowAvailableModal(false) : setShowConfirmModal(false);
+    await mutate({
+      isLink: isAssign,
       data: {
-        device_id,
+        device_id: id,
         animal_id: animalId,
         start_date: getNow()
       }
-    };
-  };
-
-  const assignCollar = async (deviceId: number) => {
-    const result: ICollarHistory = await mutate(createPostBody(deviceId, true));
-    setShowAvailableModal(false);
-    notifyParentToast(`collar ${result.device_id} successfully linked to critter ${result.animal_id}`);
-  };
-
-  const removeCollar = async () => {
-    const result: ICollarHistory = await mutate(createPostBody(deviceId, false));
-    setShowConfirmModal(false);
-    notifyParentToast(`collar ${result.device_id} successfully removed from critter ${result.animal_id}`);
-  };
-
-  const notifyParentToast = (msg: string) => {
-    if (typeof onPost === 'function') {
-      onPost(msg);
-    }
-  };
+    });
+  }
 
   return (
     <>
       <ConfirmModal
-        handleClickYes={removeCollar}
+        handleClickYes={() => callMutation(deviceId, false)}
         handleClose={closeModals}
         open={showConfirmModal}
         message='Are you sure you wish to unassign this collar?'
         title='Confirm collar unassignment'
       />
       {isError ? <ErrorMessage message={error.response.data} /> : null /* <p>{JSON.stringify(data)}</p> */}
-      <ShowCollarAssignModal onSave={assignCollar} show={showAvailableModal} onClose={closeModals} />
-      <Button onClick={handleClick}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
+      <ShowCollarAssignModal onSave={(id) => callMutation(id, true)} show={showAvailableModal} onClose={closeModals} />
+      <Button onClick={handleClickShowModal}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
     </>
   );
 }
