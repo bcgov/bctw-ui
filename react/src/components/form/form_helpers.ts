@@ -40,7 +40,20 @@ function getInputTypesOfT<T>(obj: T, editableProps: string[], selectableProps: s
 
 const isValidEditObject = <T, >(obj: T) => Object.keys(obj).length > 0;
 
+const validateRequiredFields = (o: any, required: string[]): object => {
+  const errors = {};
+  required.forEach(field => {
+    if (!o[field]) {
+      errors[field] = 'Required';
+    } else {
+      delete errors[field];
+    }
+  })
+  return errors;
+}
+
 export {
   getInputTypesOfT,
   isValidEditObject,
+  validateRequiredFields,
 }

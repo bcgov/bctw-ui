@@ -8,7 +8,7 @@ import EditCritter from 'pages/data/animals/EditCritter';
 import ImportExportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import { useDataStyles } from 'pages/data/common/data_styles';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Animal, assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
 import { formatAxiosError } from 'utils/common';
 

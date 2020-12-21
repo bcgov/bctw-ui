@@ -13,6 +13,7 @@ type IEditModalProps<T> = {
   show: boolean;
   onClose: (v: boolean) => void;
   onSave: (o: T) => void;
+  onValidate?: (o: T) => boolean;
   title: string;
   children: React.ReactNode;
   iMsg: INotificationMessage;
@@ -28,12 +29,16 @@ type IEditModalProps<T> = {
  */
 export default function EditModal<T>(props: IEditModalProps<T>) {
   const styles = useDataStyles();
-  const { children, title, show, onClose, editing, newT, onSave, iMsg } = props;
+  const { children, title, show, onClose, editing, newT, onSave, onValidate, iMsg } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
 
   const handleSave = () => {
+    const isValid = onValidate(newObj);
+    if (!isValid) {
+      return;
+    }
     const toSave = { ...omitNull(editing), ...omitNull(newObj) };
     // console.log(JSON.stringify(toSave))
     onSave(toSave);
