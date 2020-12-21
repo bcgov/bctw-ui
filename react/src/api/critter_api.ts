@@ -4,21 +4,26 @@ import { plainToClass } from 'class-transformer';
 import { Animal, IAnimal } from 'types/animal';
 import { CollarHistory } from 'types/collar_history';
 
-import { ICollarLinkPayload, ICritterResults } from './api_interfaces';
+import { ICollarLinkPayload } from './api_interfaces';
 
 export const critterApi = (api: AxiosInstance) => {
 
-  const getCritters = async (key: string, page = 1): Promise<ICritterResults> => {
-    const apiStr = 'get-animals';
-    const urlAssigned = createUrl({ api: apiStr, query: 'assigned=true', page });
-    const urlAvailable = createUrl({ api: apiStr, query: 'assigned=false', page });
-    console.log(`requesting critters ${urlAssigned}`);
-    const results = await Promise.all([api.get(urlAssigned), api.get(urlAvailable)]);
-    return {
-      assigned: results[0].data?.map((json: IAnimal) => plainToClass(Animal, json)),
-      available: results[1].data?.map((json: IAnimal) => plainToClass(Animal, json))
-    }
-  };
+  const _GET_CRITTER_API = 'get-animals';
+  const _handleGetResults = (data: IAnimal[]) => data.map((json: IAnimal) => plainToClass(Animal, json));
+
+  const getAssignedCritters = async (key: string, page = 1): Promise<Animal[]> => {
+    const url = createUrl({ api: _GET_CRITTER_API, query: 'assigned=true', page });
+    // console.log(`requesting assigned critters page: ${page}`);
+    const { data } = await api.get(url);
+    return _handleGetResults(data);
+  }
+
+  const getUnassignedCritters = async (key: string, page = 1): Promise<Animal[]> => {
+    const url = createUrl({ api: _GET_CRITTER_API, query: 'assigned=false', page });
+    // console.log(`requesting unassigned critters page: ${page}`);
+    const { data } = await api.get(url);
+    return _handleGetResults(data);
+  }
 
   const linkCollar = async (body: ICollarLinkPayload): Promise<CollarHistory> => {
     const link = body.isLink ? 'link-animal-collar' : 'unlink-animal-collar';
@@ -36,7 +41,8 @@ export const critterApi = (api: AxiosInstance) => {
   }
 
   return {
-    getCritters,
+    getAssignedCritters,
+    getUnassignedCritters,
     linkCollar,
     upsertCritter,
   }

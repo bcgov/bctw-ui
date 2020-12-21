@@ -1,4 +1,5 @@
 const CritterStrings = {
+
   importTitle: 'Bulk Import Animals',
   importText: 'Use this feature to add multiple new animals. Animals cannot be updated from this feature',
   exportTitle: 'Bulk Export Animals',
@@ -13,10 +14,18 @@ const CritterStrings = {
     'animal_status',
     'calf_at_heel'
   ],
+  collarAssignmentTitle: 'Assign a collar',
+  assignCollarBtnText: 'assign selected collar',
+  assignedTableTitle: 'Assigned Animals',
+  unassignedTableTitle: 'Unassigned Animals',
+  collarRemovalTitle: 'Confirm collar unassignment',
+  collarRemovalText: 'Are you sure you wish to unassign this collar?',
+
 }
 
 const CollarStrings = {
-
+  assignedCollarsTableTitle: 'Assigned Collars',
+  availableCollarsTableTitle: 'Unassigned Collars'
 }
 
 export {

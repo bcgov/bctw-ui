@@ -16,13 +16,11 @@ import { getComparator, Order, stableSort } from 'components/table/table_helpers
 import TableHead from 'components/table/TableHead';
 import { T } from 'types/common_types';
 import { dateObjectToTimeStr } from 'utils/time';
-
-/* todo: 
-  - pagination
-  - double table select multiple row issue
-  - should table header be a toolbar?
-  - format cells (dates)
-*/
+import PaginationActions from './TablePaginate';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { NotificationMessage } from 'components/common';
+import { formatAxiosError } from 'utils/common';
+import { ITableQueryProps } from 'api/api_interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -58,42 +56,69 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type ITableProps = {
-  data: T[];
+type ITableProps<T> = {
   headers: string[];
-  title?: string;
-  onSelect?: (row: T) => void;
   rowIdentifier?: string;
+  title?: string;
+  queryProps: ITableQueryProps<T>;
+  paginate?: boolean;
+  renderIfNoData?: boolean;
+  onSelect?: (row: T) => void;
 }
 
 /**
  * 
- * @param data array of data that is to be displayed in the table
  * @param headers assuming not all data properties are displayed in the table. * required
- * @param onSelect handler from parent component
- * @param rowIdentifier what uniquely identifies a row (ex device_id for a collar). will default to id
+ * @param rowIdentifier what uniquely identifies a row (ex device_id for a collar). defaults to 'id'
+ * @param title table title
+ * @param onSelect handler from parent triggered when a row is clicked
+ * @param renderIfNoData hide the table if no data found?
+ * @param paginate should the pagination actions be displayed?
  */
-export default function Table({ data, title, headers, onSelect, rowIdentifier = 'id' }: ITableProps) {
+export default function Table({ headers, queryProps, title, onSelect, paginate = true, rowIdentifier = 'id', renderIfNoData = true }: ITableProps<T>) {
   const classes = useStyles();
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>(rowIdentifier as any);
   const [selected, setSelected] = useState<number>(null);
+  const [page, setPage] = useState<number>(1);
+  const bctwApi = useTelemetryApi();
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof T) => {
+  const { query, queryParam: queryProp, onNewData } = queryProps;
+  const { isFetching, isLoading, isError, error, resolvedData: data, isPreviousData } =
+    bctwApi[query](page, queryProp, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
+
+  const onSort = (event: React.MouseEvent<unknown>, property: keyof T) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const onClick = (event: React.MouseEvent<unknown>, id: number) => {
     setSelected(id);
-    const row = data.find(d => d[rowIdentifier] === id);
+    const row = data?.find(d => d[rowIdentifier] === id);
     if (typeof onSelect === 'function') {
       onSelect(row);
     }
   }
   const isSelected = (id: number) => selected === id;
 
+  const onPageChange = (event: React.MouseEvent<unknown>, page: number) => {
+    const currentPage = page;
+    if (page > currentPage) {
+      if (!isPreviousData) {
+        setPage(page);
+        return;
+      }
+    }
+    setPage(page);
+  }
+
+  const renderFetch = () => <TableRow><TableCell>loading...</TableCell></TableRow>;
+  const renderError = () => <TableRow><TableCell><NotificationMessage type='error' message={formatAxiosError(error)} /></TableCell></TableRow>;
+
+  if ((data && data.length === 0) && !renderIfNoData) {
+    return null;
+  }
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
@@ -102,43 +127,54 @@ export default function Table({ data, title, headers, onSelect, rowIdentifier = 
             <Typography className={classes.title} variant="h6" component="div">
               <strong>{title}</strong>
             </Typography>
-          </Toolbar> : <></>
+          </Toolbar> : null
         }
         <TableContainer component={Paper}>
           <MuiTable className={classes.table} size="small">
-            <TableHead
-              headersToDisplay={headers}
-              headerData={data[0]}
-              order={order}
-              orderBy={orderBy as string ?? ''}
-              onRequestSort={handleRequestSort}
-            />
+            {
+              isFetching || isLoading || isError ? null
+                :
+                <TableHead
+                  headersToDisplay={headers}
+                  headerData={data && data.length ? data[0] : []}
+                  order={order}
+                  orderBy={orderBy as string ?? ''}
+                  onRequestSort={onSort}
+                />
+            }
             <TableBody>
               {
-                stableSort(data, getComparator(order, orderBy))
-                  .map((obj: T, prop: number) => {
-                    const isRowSelected = isSelected(obj[rowIdentifier])
-                    return (
-                      <TableRow
-                        key={prop}
-                        selected={isRowSelected}
-                        onClick={(event) => handleClick(event, obj[rowIdentifier])}
-                      >
-                        {
-                          headers.map((k: string, i: number) => {
-                            let val = obj[k];
-                            if (typeof (val)?.getMonth === 'function') {
-                              val = dateObjectToTimeStr(val);
+                isFetching || isLoading ? renderFetch()
+                  : isError ? renderError()
+                    :
+                    stableSort(data ?? [], getComparator(order, orderBy))
+                      .map((obj: T, prop: number) => {
+                        const isRowSelected = isSelected(obj[rowIdentifier])
+                        return (
+                          <TableRow
+                            key={prop}
+                            selected={isRowSelected}
+                            onClick={(event) => onClick(event, obj[rowIdentifier])}
+                          >
+                            {
+                              headers.map((k: string, i: number) => {
+                                let val = obj[k];
+                                if (typeof (val)?.getMonth === 'function') {
+                                  val = dateObjectToTimeStr(val);
+                                }
+                                return <TableCell key={`${k}${i}`} align='right'>{val}</TableCell>
+                              })
                             }
-                            return <TableCell key={`${k}${i}`} align='right'>{val}</TableCell>
-                          })
-                        }
-                      </TableRow>
-                    )
-                  })
+                          </TableRow>
+                        )
+                      })
               }
             </TableBody>
           </MuiTable>
+          {
+            !paginate || isLoading || isFetching || isError ? null :
+              <PaginationActions count={data.length} page={page} rowsPerPage={10} onChangePage={onPageChange} />
+          }
         </TableContainer>
       </Paper>
     </div>

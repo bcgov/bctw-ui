@@ -6,6 +6,7 @@ type IAddEditProps<T> = {
   children: React.CElement<any, any>;
   editing: T;
   empty: () => T;
+  onClose?: () => void;
 };
 
 /**
@@ -16,7 +17,7 @@ type IAddEditProps<T> = {
  * @param empty an function that returns a 'naked' instance of T, passed to editor when Add is selected 
 **/
 export default function AddEditViewer<T>(props: IAddEditProps<T>) {
-  const { editing, children: child, empty } = props;
+  const { editing, children: child, empty, onClose } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -34,7 +35,10 @@ export default function AddEditViewer<T>(props: IAddEditProps<T>) {
     setShowModal((o) => !o);
   };
 
-  const handleClose = () => setShowModal(false);
+  const handleClose = () => {
+    setShowModal(false);
+    onClose();
+  }
 
   // additional props to pass to editor component
   const editorProps = {

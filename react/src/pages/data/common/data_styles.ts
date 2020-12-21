@@ -15,6 +15,12 @@ const useDataStyles = makeStyles({
   editSaveButton: {
     float: 'right'
   },
+  editMsgs: {
+    marginTop: '-25px', // fixme:
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
   mainButtonRow: {
     display: 'flex',
     flexDirection: 'row',

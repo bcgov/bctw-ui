@@ -4,7 +4,7 @@ import { CircularProgress, makeStyles, ThemeProvider } from '@material-ui/core';
 import { QueryCache, ReactQueryCacheProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query-devtools';
 
-import { AppRouter, AppRoutes } from 'utils/AppRouter';
+import { AppRouter, AppRoutes } from 'components/common/AppRouter';
 import DefaultLayout from 'pages/layouts/DefaultLayout';
 import SideBar from 'components/sidebar/SideBar';
 import appTheme from 'themes/appTheme';
@@ -20,10 +20,9 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-type IAppProps = {};
 const queryCache = new QueryCache();
 
-export default function App(props: IAppProps) {
+export default function App() {
   const classes = useStyles();
   return (
     <div className={classes.root}>

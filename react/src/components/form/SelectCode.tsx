@@ -10,7 +10,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode } from 'types/code';
-import { ErrorMessage } from 'components/common/NotificationMessage';
+import { NotificationMessage } from 'components/common';
 import { formatAxiosError } from 'utils/common';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -70,7 +70,7 @@ export default function SelectCode({ codeHeader, label, defaultValue, changeHand
   //   console.log('stale data!')
   // }
   if (isError) {
-    return <ErrorMessage message={formatAxiosError(error)} />;
+    return <NotificationMessage type='error' message={formatAxiosError(error)} />;
   } else if (isFetching || isLoading) {
     return <div>loading...</div>;
   }

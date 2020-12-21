@@ -4,7 +4,8 @@ import Modal from 'components/modal/Modal';
 import { objectCompare, omitNull } from 'utils/common';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useDataStyles } from 'pages/data/common/data_styles';
-import { ErrorMessage } from 'components/common';
+import { NotificationMessage } from 'components/common';
+import { INotificationMessage } from 'components/component_interfaces';
 
 type IEditModalProps<T> = {
   editing: T;
@@ -14,7 +15,7 @@ type IEditModalProps<T> = {
   onSave: (o: T) => void;
   title: string;
   children: React.ReactNode;
-  error: string;
+  iMsg: INotificationMessage;
 };
 
 /**
@@ -27,13 +28,13 @@ type IEditModalProps<T> = {
  */
 export default function EditModal<T>(props: IEditModalProps<T>) {
   const styles = useDataStyles();
-  const {children, title, show, onClose, editing, newT, onSave, error } = props;
+  const { children, title, show, onClose, editing, newT, onSave, iMsg } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
 
   const handleSave = () => {
-    const toSave = {...omitNull(editing), ...omitNull(newObj)};
+    const toSave = { ...omitNull(editing), ...omitNull(newObj) };
     // console.log(JSON.stringify(toSave))
     onSave(toSave);
   };
@@ -44,7 +45,7 @@ export default function EditModal<T>(props: IEditModalProps<T>) {
     // get the first key
     const key: string = Object.keys(newProp)[0];
     // create matching key/val object from the item being edited
-    const og = {[key]: editing[key] ?? ''};
+    const og = { [key]: editing[key] ?? '' };
     const isSame = objectCompare(newProp, og);
     setCanSave(!isSame);
   }
@@ -63,7 +64,9 @@ export default function EditModal<T>(props: IEditModalProps<T>) {
           {children}
           <Button className={styles.editSaveButton} onClick={handleSave} disabled={!canSave}>save</Button>
         </ChangeContext.Provider>
-        {error ? <ErrorMessage message={error}/> : null}
+        <div className={styles.editMsgs}>
+          {iMsg ? <NotificationMessage type={iMsg.type} message={iMsg.message} /> : null}
+        </div>
       </Modal>
     </>
   );

@@ -1,4 +1,3 @@
-import React from 'react';
 import { createStyles, makeStyles, Theme, Typography } from '@material-ui/core';
 import { IAnimal, Animal } from 'types/animal';
 import { getInputTypesOfT, InputType } from 'components/form/form_helpers';
@@ -8,6 +7,7 @@ import TextField from 'components/form/Input';
 import SelectCode from 'components/form/SelectCode';
 import EditModal from 'pages/data/common/EditModal';
 import ChangeContext from 'contexts/InputChangeContext';
+import { INotificationMessage } from 'components/component_interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,11 +29,11 @@ type ICritterModalProps = {
   editableProps: string[];
   selectableProps: string[];
   onPost: (s: string) => void; // for passing up collar link response messages
-  error: string;
+  iMsg: INotificationMessage;
 };
 
 export default function CritterModal(props: ICritterModalProps) {
-  const { isEdit, editing, editableProps, selectableProps, error } = props;
+  const { isEdit, editing, editableProps, selectableProps, iMsg } = props;
   const classes = useStyles();
 
   const title = isEdit ? `Editing ${editing?.nickname ?? editing?.animal_id }` : `Add a new animal`;

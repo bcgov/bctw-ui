@@ -18,9 +18,15 @@ interface ITextfieldProps extends IInputProps, StandardTextFieldProps {
   propName: string;
 }
 
+interface INotificationMessage {
+  message: string;
+  type: 'error' | 'success'
+}
+
 export type {
   ModalBaseProps,
   ExportImportProps,
   IInputProps,
   ITextfieldProps,
+  INotificationMessage,
 }

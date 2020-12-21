@@ -30,13 +30,17 @@ const objectCompare = (o1: object, o2: object): boolean => {
   return true;
 }
 
-const columnToHeader = (col: string): string => {
-  const asArr = col.replace('_', ' ').split(' ');
+/**
+ * formats a property name as a table header ex. population_unit -> Population Unit 
+ * @param prop - property name to format
+ */
+const columnToHeader = (prop: string): string => {
+  const asArr = prop.replaceAll('_', ' ').split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
 
 /** 
- * does not modify original obj
+ * returns a copy of the provided object with null / undefined / empty string removed
 */
 const omitNull = <T,>(obj: T) => {
   const copy = Object.assign(obj, {});
@@ -57,14 +61,14 @@ const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
   return copyOfT;
 }
 
-// const sortImportRow = (row: object): string => {
-//   const keys = Object.keys(row).sort();
-//   const values = keys.map((k: string) => row[k]).join();
-//   return values;
-// };
-
+/**
+ * @param err 
+ */
 const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? err.message}`;
 
+/**
+ * @param onPost 
+ */
 const isValidToast = (onPost: (msg: string) => void): boolean => {
   return typeof onPost === 'function';
 }

@@ -1,24 +1,21 @@
-import { Animal } from 'types/animal';
-import { ICollar } from 'types/collar';
+/**
+ * @param query - name of api hook 
+ * @param queryProp - param to pass to hook
+ * @param onNewData handler to call when new data is loaded
+ */
+interface ITableQueryProps<T> {
+  query: string;
+  queryParam?: string | number;
+  onNewData?: (data: T[]) => void;
+}
 interface RequestPingParams {
   timeWindow: number[];
   pingExtent: string;
 }
 
-interface ICritterResults {
-  assigned: Animal[];
-  available: Animal[];
-}
-
 export enum eCollarType {
   Assigned = 'Assigned',
-  Available = 'Available',
-  All = 'All'
-}
-
-interface ICollarResults {
-  assigned: ICollar[];
-  available: ICollar[]
+  Available = 'Available'
 }
 
 interface ICollarLinkPayload {
@@ -44,8 +41,9 @@ interface IBulkUploadResults<T> {
 
 export type {
   RequestPingParams,
+  ITableQueryProps,
   IBulkUploadResults,
-  ICritterResults,
-  ICollarResults,
+  // ICritterResults,
+  // ICollarResults,
   ICollarLinkPayload,
 }

@@ -1,6 +1,6 @@
 import { Typography } from '@material-ui/core';
 import { IBulkUploadResults } from 'api/api_interfaces';
-import { ErrorMessage, SuccessMessage } from 'components/common';
+import { NotificationMessage } from 'components/common';
 import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import FileInput from 'components/form/FileInput';
@@ -75,14 +75,14 @@ export default function Import<T>(props: ExportImportProps) {
     }
     const numSuccessful = results.length
     const msg = `${numSuccessful} item${numSuccessful > 1 ? 's' : ''} ${numSuccessful > 1 ? 'were ' : 'was'} successfully imported`;
-    return <SuccessMessage message={msg}></SuccessMessage>
+    return <NotificationMessage type='success' message={msg}/>
   }
 
   return (
     // <>
       <Modal {...props} handleClose={onClose}>
         {isLoading ? <div>saving...</div> : null}
-        {isError ? <ErrorMessage message={formatAxiosError(error)} /> : null}
+        {isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> : null}
         {isSuccess ? renderResults(data) : null}
         {
           isIdle ?

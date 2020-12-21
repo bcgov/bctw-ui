@@ -1,33 +1,24 @@
 import { Typography, makeStyles } from '@material-ui/core';
+import { INotificationMessage } from 'components/component_interfaces';
 
 const useStyles = makeStyles({
-  err: {},
-  success: {}
+  err: {
+    color: 'red'
+  },
+  success: {
+    color: 'green'
+  }
 });
 
-type INotificationMessageProps = {
-  message: string;
-};
-const ErrorMessage = ({message}: INotificationMessageProps) => {
+
+const ResponseMessage = ({message, type}: INotificationMessage) => {
   const classes = useStyles();
   return (
-    <Typography color='error' className={classes.err}>
+    <Typography 
+      className={type=== 'error' ? classes.err : classes.success}
+    >
       <strong>{message}</strong>
     </Typography>
   );
 }
-
-const SuccessMessage = ({message}: INotificationMessageProps) => {
-  const classes = useStyles();
-  return (
-    <Typography color='primary' className={classes.success}>
-      <strong>{message}</strong>
-    </Typography>
-  );
-}
-
-
-export {
-  ErrorMessage,
-  SuccessMessage,
-}
+export default ResponseMessage;

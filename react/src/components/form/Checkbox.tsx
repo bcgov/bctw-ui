@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Checkbox as MuiCheckbox, CheckboxProps } from '@material-ui/core/';
 import { FormControlLabel } from '@material-ui/core';
 import { IInputProps } from 'components/component_interfaces';
-import { removeProps } from 'utils/common';
+import { columnToHeader, removeProps } from 'utils/common';
 
 interface ICheckboxProps extends IInputProps, CheckboxProps {
   initialValue: boolean;
@@ -32,7 +32,7 @@ export default function Checkbox(props: ICheckboxProps) {
             {...propsToPass}
           />
         }
-        label={label}
+        label={columnToHeader(label)}
       />
     </>
   );

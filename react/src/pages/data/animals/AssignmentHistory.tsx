@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Table from 'components/table/Table';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { Typography } from '@material-ui/core';
-import { hasCollarCurrentlyAssigned } from 'types/collar_history';
+import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
-import { ErrorMessage } from 'components/common';
 
 type IAssignmentHistoryProps = {
   animalId: number;
@@ -16,49 +14,43 @@ type IAssignmentHistoryProps = {
  *  displays a table with collar history and nests
  *  all of the collar assign/unassign handling components
  * @param onPost - bubble this event to {EditCritter} parent
- * @param animalId - {EditCritter}s animal id
  */
 export default function AssignmentHistory(props: IAssignmentHistoryProps) {
   const { animalId } = props;
   const [hasCollar, setHasCollar] = useState<boolean>(false);
-  const bctwApi = useTelemetryApi();
-  const { isLoading, isError, isFetching, error, data } = bctwApi.useCollarHistory(animalId);
+  const [history, setCollarHistory] = useState<CollarHistory[]>([]);
 
   // nothing for user to interact with by selecting row, so this is a null handler
-  const handleSelect = () => {};
+  const handleSelect = () => { };
+
+  const onNewData = (d: CollarHistory[]) => {
+    setCollarHistory(d)
+  }
 
   useEffect(() => {
     const u = () => {
-      if (data && data.length) {
-        setHasCollar(hasCollarCurrentlyAssigned(data));
+      if (history && history.length) {
+        setHasCollar(hasCollarCurrentlyAssigned(history));
       }
     };
     u();
-  }, [data]);
+  }, [history]);
 
   // instantiate this component here as we want to display the add collar
   // option if the critter has no collar history
-  const assignment = <PerformAssignmentAction deviceId={data?.length ? data[0].device_id : 0} hasCollar={hasCollar} {...props} />;
+  const assignment = <PerformAssignmentAction deviceId={history?.length ? history[0].device_id : 0} hasCollar={hasCollar} {...props} />;
   return (
     <>
-      {isLoading || isFetching ? (
-        <div>loading collar assignment details...</div>
-      ) : isError ? (
-        <ErrorMessage message={`error ${error.response.data}`} />
-      ) : !data.length ? (
-        assignment
-      ) : (
-        <>
-          <Typography variant='h6'>Collar Assignment History</Typography>
-          <Table
-            onSelect={handleSelect}
-            headers={['device_id', 'make', 'start_time', 'end_time']}
-            data={data}
-            rowIdentifier='device_id'
-          />
-          {assignment}
-        </>
-      )}
+      {history.length ? <Typography variant='h6'>Collar Assignment History</Typography> : null }
+      <Table
+        headers={['device_id', 'make', 'start_time', 'end_time']}
+        queryProps={{ query: 'useCollarHistory', queryParam: animalId, onNewData: onNewData }}
+        rowIdentifier='device_id'
+        paginate={history?.length >= 10}
+        onSelect={handleSelect}
+        renderIfNoData={false}
+      />
+      {assignment}
     </>
   );
 }

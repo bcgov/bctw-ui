@@ -5,10 +5,11 @@ import { AxiosError } from 'axios';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { CollarHistory } from 'types/collar_history';
 import ConfirmModal from 'components/modal/ConfirmModal';
-import { ErrorMessage } from 'components/common';
+import { NotificationMessage } from 'components/common';
 import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
 import { formatAxiosError, isValidToast } from 'utils/common';
 import { useQueryCache } from 'react-query';
+import { CritterStrings as CS } from 'constants/strings';
 
 type IPerformAssignmentActionProps = {
   hasCollar: boolean;
@@ -35,7 +36,7 @@ export default function PerformAssignmentAction({
   const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
   //  state to manage if a collar is being linked or removed
   const [isLink, setIsLink] = useState<boolean>(false);
-  
+
   const handleSuccess = (data: CollarHistory) => {
     updateCollarHistory();
     if (isValidToast(onPost)) {
@@ -65,7 +66,7 @@ export default function PerformAssignmentAction({
     setShowAvailableModal(false);
   };
 
-  const callMutation = async(id: number, isAssign: boolean) => {
+  const callMutation = async (id: number, isAssign: boolean) => {
     await setIsLink(isAssign);
     isAssign ? setShowAvailableModal(false) : setShowConfirmModal(false);
     await mutate({
@@ -84,10 +85,10 @@ export default function PerformAssignmentAction({
         handleClickYes={() => callMutation(deviceId, false)}
         handleClose={closeModals}
         open={showConfirmModal}
-        message='Are you sure you wish to unassign this collar?'
-        title='Confirm collar unassignment'
+        message={CS.collarRemovalText}
+        title={CS.collarRemovalTitle}
       />
-      {isError ? <ErrorMessage message={error.response.data} /> : null /* <p>{JSON.stringify(data)}</p> */}
+      {isError ? <NotificationMessage type='error' message={error.response.data} /> : null}
       <ShowCollarAssignModal onSave={(id) => callMutation(id, true)} show={showAvailableModal} onClose={closeModals} />
       <Button onClick={handleClickShowModal}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
     </>

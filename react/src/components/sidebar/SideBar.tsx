@@ -2,7 +2,7 @@ import React, {useEffect, useState } from 'react';
 import { makeStyles, Drawer, List, Divider, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import { Link, useLocation } from 'react-router-dom';
 import SideBarHeader from 'components/sidebar/SideBarHeader';
-import { RouteKey } from 'utils/AppRouter';
+import { RouteKey } from 'components/common/AppRouter';
 import { Icon } from 'components/common';
 
 const drawerWidth = 240;
