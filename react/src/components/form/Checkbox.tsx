@@ -8,15 +8,15 @@ interface ICheckboxProps extends IInputProps, CheckboxProps {
   initialValue: boolean;
   label: string;
 }
-export default function Checkbox(props: ICheckboxProps) {
+export default function Checkbox(props: ICheckboxProps): JSX.Element {
   const { initialValue, label, changeHandler } = props;
 
   const [checked, setChecked] = useState(initialValue);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const checked = event.target.checked;
     setChecked(checked);
-    changeHandler({ [label]: checked });
+    changeHandler({[label]: checked });
   };
 
   // passing props that dont belong in dom is throwing errors

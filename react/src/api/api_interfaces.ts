@@ -30,7 +30,7 @@ interface ICollarLinkPayload {
 
 interface BulkUploadError {
   error: string;
-  row: any;
+  row: JSON;
   rownum: number
 }
 interface IBulkUploadResults<T> {
@@ -43,7 +43,5 @@ export type {
   RequestPingParams,
   ITableQueryProps,
   IBulkUploadResults,
-  // ICritterResults,
-  // ICollarResults,
   ICollarLinkPayload,
 }

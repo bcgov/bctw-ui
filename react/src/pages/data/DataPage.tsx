@@ -1,10 +1,7 @@
 import React from 'react';
 import { Typography } from '@material-ui/core';
-// import SelectCode from 'components/form/SelectCode';
 
-type IDataPageProps = { }
-
-const DataPage: React.FC<IDataPageProps> = (props) => {
+const DataPage: React.FC = () => {
   return (
     <>
       <Typography align='center'  variant='h6'>Data Management</Typography>

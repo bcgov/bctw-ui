@@ -31,9 +31,9 @@ export default function Import<T>(props: ExportImportProps) {
     }
   }
 
-  const [mutate, { isIdle, isLoading, isSuccess, isError, error, data, reset }] = bctwApi.useMutateBulkCsv({ onSuccess: handleSucess })
+  const [mutate, { isIdle, isLoading, isSuccess, isError, error, data, reset }] = (bctwApi.useMutateBulkCsv as any)({ onSuccess: handleSucess })
 
-  const handleFileChange = (fieldName: string, files: FileList) => {
+  const handleFileChange = (fieldName: string, files: FileList): void => {
     const formData = new FormData();
     if (!files.length) return;
     Array
@@ -42,14 +42,14 @@ export default function Import<T>(props: ExportImportProps) {
     save(formData);
   }
 
-  const save = async (form: FormData) => await mutate(form);
+  const save = async (form: FormData): Promise<void> => await mutate(form);
 
-  const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: T) => {
+  const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: T): void => {
     // todo:
     event.preventDefault();
   }
 
-  const onClose = () => {
+  const onClose = (): void => {
     reset();
     props.handleClose(false);
   }
@@ -66,7 +66,7 @@ export default function Import<T>(props: ExportImportProps) {
               <div key={e.rownum}>
                 <span className={styles.errRow}>Row {e.rownum}</span>
                 <span className={styles.err}>{e.error}</span>
-                <a className={styles.errRow} href='/#' onClick={(event) => copy(event, e.row)}>Copy Row</a>
+                <a className={styles.errRow} href='/#' onClick={(event): void => copy(event, e.row)}>Copy Row</a>
               </div>
             )
           })
@@ -75,28 +75,26 @@ export default function Import<T>(props: ExportImportProps) {
     }
     const numSuccessful = results.length
     const msg = `${numSuccessful} item${numSuccessful > 1 ? 's' : ''} ${numSuccessful > 1 ? 'were ' : 'was'} successfully imported`;
-    return <NotificationMessage type='success' message={msg}/>
+    return <NotificationMessage type='success' message={msg} />
   }
 
   return (
-    // <>
-      <Modal {...props} handleClose={onClose}>
-        {isLoading ? <div>saving...</div> : null}
-        {isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> : null}
-        {isSuccess ? renderResults(data) : null}
-        {
-          isIdle ?
-            <>
-              <Typography>{props.message ?? ''}</Typography>
-              <Typography>Make sure the first row matches the specified headers exactly.</Typography>
-            </>
-            : null
-        }
-        <div className={styles.footer}>
-          {isIdle ? <FileInput onFileChosen={handleFileChange} /> : null}
-          {isSuccess || isError ? <Button variant='contained' component='span' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
-        </div>
-      </Modal>
-    // </>
+    <Modal {...props} handleClose={onClose}>
+      {isLoading ? <div>saving...</div> : null}
+      {isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> : null}
+      {isSuccess ? renderResults(data) : null}
+      {
+        isIdle ?
+          <>
+            <Typography>{props.message ?? ''}</Typography>
+            <Typography>Make sure the first row matches the specified headers exactly.</Typography>
+          </>
+          : null
+      }
+      <div className={styles.footer}>
+        {isIdle ? <FileInput onFileChosen={handleFileChange} /> : null}
+        {isSuccess || isError ? <Button variant='contained' component='span' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
+      </div>
+    </Modal>
   )
 }

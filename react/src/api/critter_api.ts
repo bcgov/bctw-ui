@@ -9,7 +9,7 @@ import { ICollarLinkPayload } from './api_interfaces';
 export const critterApi = (api: AxiosInstance) => {
 
   const _GET_CRITTER_API = 'get-animals';
-  const _handleGetResults = (data: IAnimal[]) => data.map((json: IAnimal) => plainToClass(Animal, json));
+  const _handleGetResults = (data: IAnimal[]): Animal[] => data.map((json: IAnimal) => plainToClass(Animal, json));
 
   const getAssignedCritters = async (key: string, page = 1): Promise<Animal[]> => {
     const url = createUrl({ api: _GET_CRITTER_API, query: 'assigned=true', page });
@@ -28,7 +28,7 @@ export const critterApi = (api: AxiosInstance) => {
   const linkCollar = async (body: ICollarLinkPayload): Promise<CollarHistory> => {
     const link = body.isLink ? 'link-animal-collar' : 'unlink-animal-collar';
     const url = createUrl({ api: link });
-    console.log(`posting ${link}: ${JSON.stringify(body.data)}`);
+    // console.log(`posting ${link}: ${JSON.stringify(body.data)}`);
     const { data } = await api.post(url, body);
     return plainToClass(CollarHistory, data[0]);
   };

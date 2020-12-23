@@ -1,4 +1,4 @@
-import { getProperty } from "utils/common";
+import { getProperty } from 'utils/common';
 
 export enum InputType { 
   text = 'text',
@@ -40,7 +40,7 @@ function getInputTypesOfT<T>(obj: T, editableProps: string[], selectableProps: s
 
 const isValidEditObject = <T, >(obj: T) => Object.keys(obj).length > 0;
 
-const validateRequiredFields = (o: any, required: string[]): object => {
+const validateRequiredFields = (o: any, required: string[]): Record<string, unknown> => {
   const errors = {};
   required.forEach(field => {
     if (!o[field]) {

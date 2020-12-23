@@ -7,7 +7,7 @@ import { AxiosError } from "axios";
  * let x = { foo: 10, bar: "hello!" };
  * getProperty(x, "foo"); // number
 **/
-function getProperty<T, K extends keyof T>(obj: T, key: K) {
+function getProperty<T, K extends keyof T>(obj: T, key: K): unknown {
   return obj[key]; // Inferred type is T[K]
 }
 
@@ -17,7 +17,7 @@ function getProperty<T, K extends keyof T>(obj: T, key: K) {
  * @param o1 the new object  
  * @param o2 the original object
  */
-const objectCompare = (o1: object, o2: object): boolean => {
+const objectCompare = (o1: Record<string, unknown>, o2: Record<string, unknown>): boolean => {
   for (const key of Object.keys(o1)) {
     // consider emptystring and null 'the same'
     if ((o1[key] === '' && o2[key] === null) || (o1[key] === null && o2[key] === '')) {
@@ -39,10 +39,23 @@ const columnToHeader = (prop: string): string => {
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
 
+/**
+ * some code headers dont match the corresponding table column names
+ * when a dropdown option is chosen, emit the correct prop name
+ */
+const getSelectCodeLabel = (prop: string): string => {
+  switch(prop){
+    case 'collar_make':
+      return 'make';
+    default:
+      return prop;
+  }
+}
+
 /** 
  * returns a copy of the provided object with null / undefined / empty string removed
 */
-const omitNull = <T,>(obj: T) => {
+const omitNull = <T,>(obj: T): T => {
   const copy = Object.assign(obj, {});
   Object.keys(copy)
     .filter(k => obj[k] === null || obj[k] === undefined || obj[k] === '')
@@ -76,6 +89,7 @@ const isValidToast = (onPost: (msg: string) => void): boolean => {
 export {
   columnToHeader,
   getProperty,
+  getSelectCodeLabel,
   formatAxiosError,
   objectCompare,
   omitNull,

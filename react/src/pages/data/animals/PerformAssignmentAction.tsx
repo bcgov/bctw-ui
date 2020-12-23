@@ -24,12 +24,7 @@ type IPerformAssignmentActionProps = {
  *  2. a modal that displays a list of available collars with a save button
  * @param {onPost} - bubbles up post response to parent handler function
  */
-export default function PerformAssignmentAction({
-  hasCollar,
-  animalId,
-  deviceId,
-  onPost
-}: IPerformAssignmentActionProps) {
+export default function PerformAssignmentAction({ hasCollar, animalId, deviceId, onPost }: IPerformAssignmentActionProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const queryCache = useQueryCache()
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
@@ -37,14 +32,14 @@ export default function PerformAssignmentAction({
   //  state to manage if a collar is being linked or removed
   const [isLink, setIsLink] = useState<boolean>(false);
 
-  const handleSuccess = (data: CollarHistory) => {
+  const handleSuccess = (data: CollarHistory): void => {
     updateCollarHistory();
     if (isValidToast(onPost)) {
       onPost(`collar ${data.device_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`);
     }
 
   }
-  const handleError = (error: AxiosError) => {
+  const handleError = (error: AxiosError): void => {
     updateCollarHistory();
     if (isValidToast(onPost)) {
       onPost(`error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}`);
@@ -52,21 +47,21 @@ export default function PerformAssignmentAction({
   }
 
   // force the collar history to refetch
-  const updateCollarHistory = () => queryCache.invalidateQueries('collarHistory');
+  const updateCollarHistory = (): Promise<unknown> => queryCache.invalidateQueries('collarHistory');
 
-  const [mutate, { isError, error }] = bctwApi.useMutateLinkCollar({
+  const [mutate, { isError, error }] = (bctwApi.useMutateLinkCollar as any)({
     onSuccess: handleSuccess,
     onError: handleError
   });
 
-  const handleClickShowModal = () => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
+  const handleClickShowModal = (): void => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
 
-  const closeModals = () => {
+  const closeModals = (): void => {
     setShowConfirmModal(false);
     setShowAvailableModal(false);
   };
 
-  const callMutation = async (id: number, isAssign: boolean) => {
+  const callMutation = async (id: number, isAssign: boolean): Promise<void> => {
     await setIsLink(isAssign);
     isAssign ? setShowAvailableModal(false) : setShowConfirmModal(false);
     await mutate({

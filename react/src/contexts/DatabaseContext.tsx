@@ -10,7 +10,7 @@ export type IDatabaseContext = {
   resetDatabase: () => void;
 };
 
-export const DatabaseContext = React.createContext<IDatabaseContext>({ database: null, resetDatabase: () => {} });
+export const DatabaseContext = React.createContext<IDatabaseContext>({ database: null, resetDatabase: () => { /* do nothing */ } });
 
 /**
  * Provides access to the database and to related functions to manipulate the database instance.
@@ -18,7 +18,7 @@ export const DatabaseContext = React.createContext<IDatabaseContext>({ database:
  * @param {*} props
  */
 export const DatabaseContextProvider: React.FC = (props) => {
-  const [databaseContext, setDatabaseContext] = useState<IDatabaseContext>({ database: null, resetDatabase: () => {} });
+  const [databaseContext, setDatabaseContext] = useState<IDatabaseContext>({ database: null, resetDatabase: () => { /* do nothing */ } });
 
   /**
    * Create the database using standard (non-mobile) plugins/settings.
@@ -31,7 +31,7 @@ export const DatabaseContextProvider: React.FC = (props) => {
   /**
    * Create the database.
    */
-  const setupDatabase = async () => {
+  const setupDatabase = async (): Promise<void> => {
     let db = databaseContext.database;
 
     if (db) {
@@ -49,7 +49,7 @@ export const DatabaseContextProvider: React.FC = (props) => {
   /**
    * Destroy and re-create the database.
    */
-  const resetDatabase = async (db) => {
+  const resetDatabase = async (db): Promise<void> => {
     if (!db) {
       return;
     }
@@ -63,8 +63,8 @@ export const DatabaseContextProvider: React.FC = (props) => {
    *
    * Note: This only closes any active connections/listeners, and does not destory the actual database or its content.
    */
-  const cleanupDatabase = async () => {
-    let db = databaseContext.database;
+  const cleanupDatabase = async (): Promise<() => void> => {
+    const db = databaseContext.database;
 
     if (!db) {
       return;
@@ -76,7 +76,7 @@ export const DatabaseContextProvider: React.FC = (props) => {
   useEffect(() => {
     setupDatabase();
 
-    return async () => {
+    return async (): Promise<void> => {
       await cleanupDatabase();
     };
   }, []);

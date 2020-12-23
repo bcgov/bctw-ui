@@ -3,10 +3,10 @@ import { ButtonGroup } from '@material-ui/core';
 import Button from 'components/form/Button';
 
 type IAddEditProps<T> = {
-  children: React.CElement<any, any>;
+  children: JSX.Element;
   editing: T;
   empty: () => T;
-  onClose?: () => void;
+  handleClose: (v: boolean) => void;
 };
 
 /**
@@ -16,36 +16,38 @@ type IAddEditProps<T> = {
  * @param editing object that is passed to editor when Edit is selected
  * @param empty an function that returns a 'naked' instance of T, passed to editor when Add is selected 
 **/
-export default function AddEditViewer<T>(props: IAddEditProps<T>) {
-  const { editing, children: child, empty, onClose } = props;
+export default function AddEditViewer<T>(props: IAddEditProps<T>): JSX.Element {
+  const { editing, children: child, empty, handleClose } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const handleClickAdd = () => {
+  const handleClickAdd = (): void => {
     setIsEditMode(false);
     setEditObj(empty());
     setShowModal(o => !o);
   };
 
-  const handleClickEdit = () => {
+  const handleClickEdit = (): void => {
     setIsEditMode(true);
     setEditObj(editing);
     setShowModal((o) => !o);
   };
 
-  const handleClose = () => {
+  const onClose = (): void => {
     setShowModal(false);
-    onClose();
+    handleClose(false);
   }
 
-  // additional props to pass to editor component
+  // pass these props to child editer component
+  // to allow this component (AddEditViewer) to deal
+  // wth the properties/handlers
   const editorProps = {
     editing: editObj,
-    show: showModal,
+    open: showModal,
     isEdit: isEditMode,
-    onClose: handleClose
+    handleClose: onClose
   }
   return (
     <>

@@ -15,20 +15,20 @@ type IAssignmentHistoryProps = {
  *  all of the collar assign/unassign handling components
  * @param onPost - bubble this event to {EditCritter} parent
  */
-export default function AssignmentHistory(props: IAssignmentHistoryProps) {
+export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
   const { animalId } = props;
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
 
   // nothing for user to interact with by selecting row, so this is a null handler
-  const handleSelect = () => { };
+  const handleSelect = (): void => { /* do nothing */ };
 
-  const onNewData = (d: CollarHistory[]) => {
+  const onNewData = (d: CollarHistory[]): void => {
     setCollarHistory(d)
   }
 
   useEffect(() => {
-    const u = () => {
+    const u = (): void => {
       if (history && history.length) {
         setHasCollar(hasCollarCurrentlyAssigned(history));
       }

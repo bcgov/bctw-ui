@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { CircularProgress, makeStyles, ThemeProvider } from '@material-ui/core';
 import { QueryCache, ReactQueryCacheProvider } from 'react-query';
@@ -22,7 +21,7 @@ const useStyles = makeStyles(() => ({
 
 const queryCache = new QueryCache();
 
-export default function App() {
+export default function App(): JSX.Element {
   const classes = useStyles();
   return (
     <div className={classes.root}>

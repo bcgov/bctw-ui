@@ -29,4 +29,4 @@ type IconProps = {
 
 export default function Icon ({icon}: IconProps) {
   return mappings[icon];
-};
+}

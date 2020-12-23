@@ -6,10 +6,10 @@ import { critterApi as critter_api } from 'api/critter_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
-import { MutationConfig, QueryConfig, useMutation, usePaginatedQuery, useQuery } from 'react-query';
+import { MutationConfig, PaginatedQueryResult, QueryConfig, QueryResult, useMutation, usePaginatedQuery, useQuery } from 'react-query';
 import { Animal } from 'types/animal';
 import { ICode } from 'types/code';
-import { ICollar } from 'types/collar';
+import { Collar, ICollar } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
 import { formatDay } from 'utils/time';
 
@@ -39,7 +39,7 @@ const useApi = (): AxiosInstance => {
  *
  * @return {object} object whose properties are supported api methods.
  */
-export const useTelemetryApi = () => {
+export const useTelemetryApi = (): Record<string, unknown> => {
   const api = useApi();
   const collarApi = collar_api(api);
   const critterApi = critter_api(api);
@@ -61,7 +61,7 @@ export const useTelemetryApi = () => {
     const start = dayjs(pingExtent).add(timeWindow[0], 'd').format(formatDay);
     const end = dayjs(pingExtent).add(timeWindow[1], 'd').format(formatDay);
     const url = createUrl({ api: 'get-critters', query: `start=${start}&end=${end}` });
-    console.log('requesting pings', start, end);
+    // console.log('requesting pings', start, end);
     const { data } = await api.get(url);
     return data;
   };
@@ -72,28 +72,30 @@ export const useTelemetryApi = () => {
   /**
    * @param type the collar types to be fetched (assigned, unassigned)
    */
-  const useCollarType = (page: number, type: eCollarType, config: object) => {
+  const useCollarType = (page: number, type: eCollarType, config: Record<string, unknown>): PaginatedQueryResult<ICollar[], AxiosError<any>> => {
     const callapi = type === eCollarType.Assigned ? collarApi.getAssignedCollars : collarApi.getAvailableCollars;
     return usePaginatedQuery<ICollar[], AxiosError>(
-      ['collartype', page, type], callapi, {...config, ...defaultQueryOptions });
+      ['collartype', page, type], callapi, { ...config, ...defaultQueryOptions });
   }
 
-  const useAssignedCritters = (page, _, config: object) => {
+  const useAssignedCritters = (page, _, config: Record<string, unknown>) => {
     return usePaginatedQuery<Animal[], AxiosError>(['a_critters', page], critterApi.getAssignedCritters, { ...defaultQueryOptions, ...config, refetchOnMount: false, keepPreviousData: true });
   }
-  const useUnassignedCritters = (page: number, _, config: object) =>
+  const useUnassignedCritters = (page: number, _, config: Record<string, unknown>) =>
     usePaginatedQuery<Animal[], AxiosError>(['u_critters', page], critterApi.getUnassignedCritters, { ...defaultQueryOptions, ...config, refetchOnMount: false, keepPreviousData: true });
 
   /**
    * @param codeHeader the code header name used to determine which codes to fetch
    * adds enabled = false to not auto refetch codes
    */
-  const useCodes = (codeHeader: string) => useQuery<ICode[], AxiosError>(codeHeader, codeApi.getCodes, { ...defaultQueryOptions /*, enabled: false*/ });
+  const useCodes = (codeHeader: string) => {
+    return useQuery<ICode[], AxiosError>(codeHeader, codeApi.getCodes, { ...defaultQueryOptions });
+  }
 
   /**
    * @param critterId serial integer of the critter to be fetched (not animal_id)
    */
-  const useCollarHistory = (page: number, critterId: number, config: object) => {
+  const useCollarHistory = (page: number, critterId: number, config: Record<string, unknown>) => {
     return usePaginatedQuery<CollarHistory[], AxiosError>(['collarHistory', critterId], collarApi.getCollarHistory, { ...config });
   }
 
@@ -104,13 +106,14 @@ export const useTelemetryApi = () => {
    *       *
    *       *
   */
+  const useMutateCollar = (config?: MutationConfig<Collar[], AxiosError, Collar[]>) =>
+    useMutation<Collar[], AxiosError, Collar[]>((collar) => collarApi.upsertCollar(collar), config);
+
   const useMutateCritter = (config?: MutationConfig<Animal[], AxiosError, Animal[]>) =>
     useMutation<Animal[], AxiosError, Animal[]>((critter) => critterApi.upsertCritter(critter), config);
 
-
   const useMutateLinkCollar = (config: MutationConfig<CollarHistory, AxiosError, ICollarLinkPayload>) =>
     useMutation<CollarHistory, AxiosError, ICollarLinkPayload>((link) => critterApi.linkCollar(link), config);
-
 
   const useMutateBulkCsv = <T,>(config: MutationConfig<IBulkUploadResults<T>, AxiosError, FormData>) =>
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
@@ -127,8 +130,9 @@ export const useTelemetryApi = () => {
     useUnassignedCritters,
     useCollarHistory,
     // mutations
-    useMutateLinkCollar,
-    useMutateCritter,
     useMutateBulkCsv,
+    useMutateCollar,
+    useMutateCritter,
+    useMutateLinkCollar,
   };
 };

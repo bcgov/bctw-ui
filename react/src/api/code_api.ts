@@ -1,7 +1,7 @@
 
-import { AxiosInstance } from "axios";
-import { createUrl } from "api/api_helpers";
-import { ICode } from "types/code";
+import { AxiosInstance } from 'axios';
+import { createUrl } from 'api/api_helpers';
+import { ICode } from 'types/code';
 
 export const codeApi = (api: AxiosInstance) => {
   const getCodes = async (codeHeader: string): Promise<ICode[]> => {

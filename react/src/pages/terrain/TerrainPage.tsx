@@ -2,12 +2,11 @@ import React, {useEffect, useRef} from 'react';
 import {Viewer, createWorldTerrain, Cartesian3, Math, Ion} from 'cesium';
 import './TerrainPage.css';
 
-type ITerrainPageProps = { }
 
-const TerrainPage: React.FC<ITerrainPageProps> = (props) => {
+const TerrainPage: React.FC = () => {
   const mapRef = useRef(null);
 
-  const initMap = () => {
+  const initMap = (): void => {
 
     Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNzk1ZDk0My02MjJmLTQ4ZDgtYmJkMy1kY2Y0YTI0MTg3N2YiLCJpZCI6ODA1Niwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU1MTEyOTM2Nn0.UoAFRv2ErXndRVOI1lltlyWFzaSpE__lpGxe4kb4GSM';
 

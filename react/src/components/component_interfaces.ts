@@ -6,13 +6,26 @@ type ModalBaseProps = {
   title?: string;
 }
 
+type EditModalBaseProps<T> = ModalBaseProps & {
+  editing: T;
+  onSave: (c: T) => void;
+  iMsg: INotificationMessage;
+}
+
+type CritterCollarModalProps<T> = EditModalBaseProps<T> & {
+  editableProps: string[];
+  selectableProps: string[];
+  isEdit?: boolean;
+  onPost: (s: string) => void;
+}
+
 type ExportImportProps = ModalBaseProps & {
   handleToast?: (msg: string) => void;
   message?: string;
 }
 
 interface IInputProps {
-  changeHandler: (o: object) => void;
+  changeHandler: (o: Record<string, unknown>) => void;
 }
 interface ITextfieldProps extends IInputProps, StandardTextFieldProps {
   propName: string;
@@ -20,12 +33,14 @@ interface ITextfieldProps extends IInputProps, StandardTextFieldProps {
 
 interface INotificationMessage {
   message: string;
-  type: 'error' | 'success'
+  type: 'error' | 'success' | 'none'
 }
 
 export type {
+  CritterCollarModalProps,
   ModalBaseProps,
   ExportImportProps,
+  EditModalBaseProps,
   IInputProps,
   ITextfieldProps,
   INotificationMessage,

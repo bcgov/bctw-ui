@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core';
 import { getComparator, Order, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
-import { T } from 'types/common_types';
+// import { T } from 'types/common_types';
 import { dateObjectToTimeStr } from 'utils/time';
 import PaginationActions from './TablePaginate';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -75,7 +75,7 @@ type ITableProps<T> = {
  * @param renderIfNoData hide the table if no data found?
  * @param paginate should the pagination actions be displayed?
  */
-export default function Table({ headers, queryProps, title, onSelect, paginate = true, rowIdentifier = 'id', renderIfNoData = true }: ITableProps<T>) {
+export default function Table<T>({ headers, queryProps, title, onSelect, paginate = true, rowIdentifier = 'id', renderIfNoData = true }: ITableProps<T>): JSX.Element {
   const classes = useStyles();
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>(rowIdentifier as any);
@@ -85,24 +85,24 @@ export default function Table({ headers, queryProps, title, onSelect, paginate =
 
   const { query, queryParam: queryProp, onNewData } = queryProps;
   const { isFetching, isLoading, isError, error, resolvedData: data, isPreviousData } =
-    bctwApi[query](page, queryProp, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
+    (bctwApi[query] as any)(page, queryProp, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
 
-  const onSort = (event: React.MouseEvent<unknown>, property: keyof T) => {
+  const onSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  const onClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const onClick = (event: React.MouseEvent<unknown>, id: number): void => {
     setSelected(id);
     const row = data?.find(d => d[rowIdentifier] === id);
     if (typeof onSelect === 'function') {
       onSelect(row);
     }
   }
-  const isSelected = (id: number) => selected === id;
+  const isSelected = (id: number): boolean => selected === id;
 
-  const onPageChange = (event: React.MouseEvent<unknown>, page: number) => {
+  const onPageChange = (event: React.MouseEvent<unknown>, page: number): void => {
     const currentPage = page;
     if (page > currentPage) {
       if (!isPreviousData) {
@@ -113,8 +113,8 @@ export default function Table({ headers, queryProps, title, onSelect, paginate =
     setPage(page);
   }
 
-  const renderFetch = () => <TableRow><TableCell>loading...</TableCell></TableRow>;
-  const renderError = () => <TableRow><TableCell><NotificationMessage type='error' message={formatAxiosError(error)} /></TableCell></TableRow>;
+  const renderFetch = (): JSX.Element => <TableRow><TableCell>loading...</TableCell></TableRow>;
+  const renderError = (): JSX.Element => <TableRow><TableCell><NotificationMessage type='error' message={formatAxiosError(error)} /></TableCell></TableRow>;
 
   if ((data && data.length === 0) && !renderIfNoData) {
     return null;
@@ -154,7 +154,7 @@ export default function Table({ headers, queryProps, title, onSelect, paginate =
                           <TableRow
                             key={prop}
                             selected={isRowSelected}
-                            onClick={(event) => onClick(event, obj[rowIdentifier])}
+                            onClick={(event): void => onClick(event, obj[rowIdentifier])}
                           >
                             {
                               headers.map((k: string, i: number) => {

@@ -1,32 +1,33 @@
-import React, { useState } from 'react';
-import Export from 'pages/data/bulk/Export';
-import Import from 'pages/data/bulk/Import';
 import { ButtonGroup } from '@material-ui/core';
 import Button from 'components/form/Button';
+import Export from 'pages/data/bulk/Export';
+import Import from 'pages/data/bulk/Import';
+import { useState } from 'react';
 
 type IImportExportProps<T> = {
-  iTitle: string;
-  iMsg: string;
-  eTitle: string;
-  eMsg: string;
+  iTitle?: string;
+  iMsg?: string;
+  eTitle?: string;
+  eMsg?: string;
   data: T[];
   handleToast?: (msg: string) => void;
+  handleClose: () => void;
+  iDisabled?: boolean;
+  eDisabled?: boolean;
 };
 
-export default function ImportExportViewer<T>(props: IImportExportProps<T>) {
-  const { data, iTitle, iMsg, eTitle, eMsg, handleToast } = props;
+export default function ImportExportViewer<T>({ data, iTitle, iMsg, eTitle, eMsg, handleToast, handleClose: onClose, iDisabled = false, eDisabled = false }: IImportExportProps<T>): JSX.Element {
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
-  const handleClickExport = () => {
-    setShowExportModal(o => !o);
-  };
-  const handleClickImport = () => {
-    setShowImportModal(o => !o);
-  }
-  const handleClose = () => {
+  const handleClickExport = (): void => setShowExportModal(o => !o);
+
+  const handleClickImport = (): void => setShowImportModal(o => !o);
+
+  const handleClose = (): void => {
     setShowExportModal(false);
     setShowImportModal(false);
+    onClose();
   }
 
   const importProps = { title: iTitle, message: iMsg, handleClose, open: showImportModal, handleToast }
@@ -35,11 +36,11 @@ export default function ImportExportViewer<T>(props: IImportExportProps<T>) {
   return (
     <>
       <ButtonGroup size='small' variant='contained' color='primary'>
-        <Button onClick={handleClickImport}>import</Button>
-        <Button onClick={handleClickExport}>export</Button>
+        {iDisabled ? null : <Button onClick={handleClickImport}>import</Button>}
+        {iDisabled ? null : <Button onClick={handleClickExport}>export</Button>}
       </ButtonGroup>
-      <Import {...importProps} />
-      <Export {...exportProps} />
+      {iDisabled ? null : <Import {...importProps} />}
+      {eDisabled ? null : <Export {...exportProps} />}
     </>
   );
 }

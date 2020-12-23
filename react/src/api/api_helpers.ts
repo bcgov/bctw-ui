@@ -11,7 +11,7 @@ const getBaseUrl = (): string => {
   const h2 = window.location.hostname;
   const h3 = IS_PROD ? window.location.port : 3000;
   const h4 = IS_PROD ? '/api' : '';
-  let url = `${h1}//${h2}:${h3}${h4}`;
+  const url = `${h1}//${h2}:${h3}${h4}`;
   return url;
 }
 

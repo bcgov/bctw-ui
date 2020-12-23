@@ -4,5 +4,5 @@ import { createContext } from 'react';
  * in a form (child of EditModal), the input change handler can be
  * called in the EditModal instead of the form
  */
-const ChangeContext = createContext((o: object) => {console.log(JSON.stringify(o));});
+const ChangeContext = createContext((o: Record<string, unknown>) => {/* do nothing */});
 export default ChangeContext;

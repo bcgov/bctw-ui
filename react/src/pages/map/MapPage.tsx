@@ -3,12 +3,12 @@ import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapPage.css';
 
-type IMapPageProps = { }
+// type IMapPageProps = { }
 
-const MapPage: React.FC<IMapPageProps> = (props) => {
+const MapPage: React.FC = () => {
   const mapRef = useRef<L.Map>(null);
 
-  const initMap = () => {
+  const initMap = (): void => {
     mapRef.current = L.map('map', {zoomControl:false})
       .setView([55, -128], 10);
 

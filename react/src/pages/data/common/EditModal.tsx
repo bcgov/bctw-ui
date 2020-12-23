@@ -5,18 +5,12 @@ import { objectCompare, omitNull } from 'utils/common';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { NotificationMessage } from 'components/common';
-import { INotificationMessage } from 'components/component_interfaces';
+import { EditModalBaseProps } from 'components/component_interfaces';
 
-type IEditModalProps<T> = {
-  editing: T;
+type IEditModalProps<T> = EditModalBaseProps<T> & {
   newT: T; // empty instance of T
-  show: boolean;
-  onClose: (v: boolean) => void;
-  onSave: (o: T) => void;
   onValidate?: (o: T) => boolean;
-  title: string;
   children: React.ReactNode;
-  iMsg: INotificationMessage;
 };
 
 /**
@@ -27,14 +21,14 @@ type IEditModalProps<T> = {
  * child input compents pass their changeHandlers to this component,
  * so that [canSave] can be determined
  */
-export default function EditModal<T>(props: IEditModalProps<T>) {
+export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const styles = useDataStyles();
-  const { children, title, show, onClose, editing, newT, onSave, onValidate, iMsg } = props;
+  const { children, title, open, handleClose, editing, newT, onSave, onValidate, iMsg } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     const isValid = onValidate(newObj);
     if (!isValid) {
       return;
@@ -45,7 +39,7 @@ export default function EditModal<T>(props: IEditModalProps<T>) {
   };
 
   // triggered on a form input change, newProp will be an object with a single key and value
-  const handleChange = (newProp: object) => {
+  const handleChange = (newProp: Record<string, unknown>): void => {
     setNewObj(old => Object.assign(old, newProp));
     // get the first key
     const key: string = Object.keys(newProp)[0];
@@ -55,16 +49,16 @@ export default function EditModal<T>(props: IEditModalProps<T>) {
     setCanSave(!isSame);
   }
 
-  const reset = () => setCanSave(false);
+  const reset = (): void => setCanSave(false);
 
-  const handleClose = () => {
+  const onClose = (): void => {
     reset();
-    onClose(false);
+    handleClose(false);
   }
 
   return (
     <>
-      <Modal open={show} handleClose={handleClose} title={title}>
+      <Modal open={open} handleClose={onClose} title={title}>
         <ChangeContext.Provider value={handleChange}>
           {children}
           <Button className={styles.editSaveButton} onClick={handleSave} disabled={!canSave}>save</Button>

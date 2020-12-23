@@ -8,8 +8,6 @@ import DataPage from 'pages/data/DataPage';
 import CritterPage from 'pages/data/animals/CritterPage';
 import CollarPage from 'pages/data/collars/CollarPage';
 
-type IAppRouterProps = {}
-
 export type RouteKey = {
   path: string;
   title: string;
@@ -26,10 +24,10 @@ const AppRoutes: RouteKey[] = [
   { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain'},
   { name: 'data', path: '/data', title: 'Data Management', component: DataPage, sort: 1, icon: 'data'},
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home'},
-  { name: 'notFound', path: '/*', title: 'Not Found', component: () => (<div>page not found :(</div>), sort: 2 },
+  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => (<div>page not found :(</div>), sort: 2 },
 ]
 
-const AppRouter: React.FC<IAppRouterProps> = (props) => {
+const AppRouter: React.FC = () => {
   return (
     <Switch>
       <Redirect exact from="/" to="/home" />
