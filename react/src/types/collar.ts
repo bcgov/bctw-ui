@@ -52,6 +52,12 @@ export class Collar implements ICollar {
   @Type(() => Date) retreival_date: Date;
   satellite_network: string;
 
+  constructor() {
+    this.radio_frequency = 0;
+    this.device_id = 0;
+    // this.collar_type = collar_type;
+    // this.make = collar_make;
+  }
   formatPropAsHeader(str: string): string {
     return formatCollarProp(str);
   } 
@@ -59,17 +65,39 @@ export class Collar implements ICollar {
 
 // used when creating new collars manually
 export enum NewCollarType {
-  VHF,
-  Vect,
-  Other,
+  Other = '',
+  VHF = 'VHF',
+  Vect = 'Vectronics',
 }
 
 // properties displayed on collar pages
 const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
 const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
+// when creating a new collar, preserve these properties
+const collarPropsToPreserve = ['collar_type', 'collar_make'];
+
+/**
+ * 
+ */
+const newCollarTypeToSelectableCode = (type: NewCollarType): Record<string, string> => {
+  const makeKey = 'collar_make';
+  const typeKey = 'collar_type';
+  const gpsType = {[typeKey]: 'VHF + GPS'}
+  const vhfType = {[typeKey]: 'VHF'}
+  switch (type) {
+    case NewCollarType.VHF:
+      return {[makeKey]: 'Advanced Telemetry Systems', ...vhfType}
+    case NewCollarType.Vect:
+    default:
+      return {[typeKey]: '', ...gpsType}
+  }
+
+}
 
 export {
   assignedCollarProps,
   availableCollarProps,
+  collarPropsToPreserve,
   formatCollarProp,
+  newCollarTypeToSelectableCode,
 }

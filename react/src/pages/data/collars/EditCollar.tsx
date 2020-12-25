@@ -8,14 +8,14 @@ import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { getSelectCodeLabel, removeProps } from 'utils/common';
 import {CollarStrings as CS} from 'constants/strings';
-import { ICollar, Collar } from 'types/collar';
+import { Collar } from 'types/collar';
 import { useDataStyles } from 'pages/data/common/data_styles';
 
 export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.Element {
-  const { isEdit, editing, editableProps, selectableProps, handleClose, iMsg } = props;
+  const { isEdit, editing, editableProps, selectableProps, handleClose, collarType } = props;
   const classes = useDataStyles();
 
-  const title = isEdit ? `Editing device ${editing.device_id}` : `Add a new collar`;
+  const title = isEdit ? `Editing device ${editing.device_id}` : `Add a new ${collarType} collar`;
   const requiredFields = CS.requiredProps;
   const [errors, setErrors] = useState<Record<string, unknown>>({});
 
@@ -31,12 +31,14 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   }
 
   // retrieve input types from the object being edited
-  const inputTypes = getInputTypesOfT<ICollar>(editing, editableProps, selectableProps);
+  const inputTypes = getInputTypesOfT<Collar>(editing, editableProps, selectableProps);
+  // console.log(JSON.stringify(inputTypes.filter(f => f.key==='collar_make')))
+  // console.log(JSON.stringify(inputTypes))//.filter(f => f.key==='collar_make')))
 
   return (
     <EditModal title={title} newT={new Collar()} onValidate={validate} handleClose={close} {...props}>
       <ChangeContext.Consumer>
-        {(handlerFromContext) => {
+        {(handlerFromContext): React.ReactNode => {
 
           // do form validation before passing change handler to EditModal
           const onChange = (v: Record<string, unknown>): void => {
@@ -70,7 +72,6 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                             error={hasError}
                             helperText={hasError && errors[d.key]}
                           />
-                          {/* { i == 1 ? <div></div> : null} */}
                         </>
                       );
                     })}
