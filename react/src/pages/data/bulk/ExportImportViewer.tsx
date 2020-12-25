@@ -10,13 +10,11 @@ type IImportExportProps<T> = {
   eTitle?: string;
   eMsg?: string;
   data: T[];
-  handleToast?: (msg: string) => void;
-  handleClose: () => void;
   iDisabled?: boolean;
   eDisabled?: boolean;
 };
 
-export default function ImportExportViewer<T>({ data, iTitle, iMsg, eTitle, eMsg, handleToast, handleClose: onClose, iDisabled = false, eDisabled = false }: IImportExportProps<T>): JSX.Element {
+export default function ImportExportViewer<T>({ data, iTitle, iMsg, eTitle, eMsg, iDisabled = false, eDisabled = false }: IImportExportProps<T>): JSX.Element {
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
@@ -27,17 +25,16 @@ export default function ImportExportViewer<T>({ data, iTitle, iMsg, eTitle, eMsg
   const handleClose = (): void => {
     setShowExportModal(false);
     setShowImportModal(false);
-    onClose();
   }
 
-  const importProps = { title: iTitle, message: iMsg, handleClose, open: showImportModal, handleToast }
+  const importProps = { title: iTitle, message: iMsg, handleClose, open: showImportModal }
   const exportProps = { title: eTitle, message: eMsg, data, handleClose, open: showExportModal }
 
   return (
     <>
       <ButtonGroup size='small' variant='contained' color='primary'>
-        {iDisabled ? null : <Button onClick={handleClickImport}>import</Button>}
-        {iDisabled ? null : <Button onClick={handleClickExport}>export</Button>}
+        <Button disabled={iDisabled} onClick={handleClickImport}>import</Button>
+        <Button disabled={eDisabled} onClick={handleClickExport}>export</Button>
       </ButtonGroup>
       {iDisabled ? null : <Import {...importProps} />}
       {eDisabled ? null : <Export {...exportProps} />}

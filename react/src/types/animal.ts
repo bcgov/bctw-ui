@@ -70,15 +70,15 @@ export class Animal implements IAnimal {
   wlh_id: string;
   nickname: string;
 
-  constructor(animal_id = '', animal_status = '', calf_at_heel = false, population_unit = '', region = '', species = '', wlh_id = '', nickname = '') {
-    this.animal_id = animal_id;
-    this.animal_status = animal_status;
-    this.calf_at_heel = calf_at_heel;
-    this.population_unit = population_unit;
-    this.region = region;
-    this.species = species;
-    this.wlh_id = wlh_id;
-    this.nickname = nickname;
+  constructor() {
+    this.animal_id = '';
+    this.animal_status = '';
+    this.calf_at_heel = false;
+    this.population_unit = '';
+    this.region = '';
+    this.species = '';
+    this.wlh_id = '';
+    this.nickname = '';
   }
 
   formatPropAsHeader(str: string): string {

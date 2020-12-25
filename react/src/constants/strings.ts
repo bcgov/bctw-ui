@@ -22,6 +22,12 @@ const CollarStrings = {
   requiredProps: ['device_id', 'make', 'radio_frequency'],
   exportTitle: 'Bulk Export Collar Data',
   exportText: '',
+  addCollarTypeTitle: 'Select Collar Type',
+  addCollarTypeText: 'What type of collar would you like to add?',
+  addCollarVect: 'Vectronics Collar',
+  addCollarVHF: 'VHF Collar',
+  importTitle: 'Bulk Import VHF Collars',
+  importText: 'Use this feature to add multiple new collars.'
 }
 
 export {

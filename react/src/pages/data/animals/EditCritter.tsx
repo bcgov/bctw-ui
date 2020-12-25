@@ -14,7 +14,7 @@ import { removeProps } from 'utils/common';
 import { useDataStyles } from 'pages/data/common/data_styles';
 
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
-  const { isEdit, editing, editableProps, selectableProps, handleClose, iMsg } = props;
+  const { isEdit, editing, editableProps, selectableProps, handleClose } = props;
   const classes = useDataStyles();
 
   const title = isEdit ? `Editing ${editing?.nickname ?? editing?.animal_id}` : `Add a new animal`;

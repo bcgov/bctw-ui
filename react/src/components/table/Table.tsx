@@ -14,7 +14,6 @@ import {
 } from '@material-ui/core';
 import { getComparator, Order, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
-// import { T } from 'types/common_types';
 import { dateObjectToTimeStr } from 'utils/time';
 import PaginationActions from './TablePaginate';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';

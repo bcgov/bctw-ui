@@ -1,26 +1,32 @@
 import { StandardTextFieldProps } from "@material-ui/core"
+import { NewCollarType } from "types/collar"
 
 type ModalBaseProps = {
   open: boolean;
-  handleClose: (v: boolean) => void;
+  handleClose?: (v: boolean) => void;
   title?: string;
 }
 
 type EditModalBaseProps<T> = ModalBaseProps & {
   editing: T;
   onSave: (c: T) => void;
-  iMsg: INotificationMessage;
 }
 
 type CritterCollarModalProps<T> = EditModalBaseProps<T> & {
   editableProps: string[];
   selectableProps: string[];
   isEdit?: boolean;
-  onPost: (s: string) => void;
+  collarType?: NewCollarType;
 }
 
+type ConfirmModalProps = ModalBaseProps & {
+  btnNoText?: string;
+  btnYesText?: string;
+  message: string;
+  handleClickYes: (v: any) => void;
+};
+
 type ExportImportProps = ModalBaseProps & {
-  handleToast?: (msg: string) => void;
   message?: string;
 }
 
@@ -44,4 +50,5 @@ export type {
   IInputProps,
   ITextfieldProps,
   INotificationMessage,
+  ConfirmModalProps,
 }

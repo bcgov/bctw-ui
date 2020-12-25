@@ -79,13 +79,6 @@ const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
  */
 const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? err.message}`;
 
-/**
- * @param onPost 
- */
-const isValidToast = (onPost: (msg: string) => void): boolean => {
-  return typeof onPost === 'function';
-}
-
 export {
   columnToHeader,
   getProperty,
@@ -93,6 +86,5 @@ export {
   formatAxiosError,
   objectCompare,
   omitNull,
-  removeProps,
-  isValidToast,
+  removeProps
 };

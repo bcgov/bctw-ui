@@ -7,7 +7,8 @@ import FileInput from 'components/form/FileInput';
 import Modal from 'components/modal/Modal';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import React from 'react';
-import { formatAxiosError, isValidToast } from 'utils/common';
+import { formatAxiosError } from 'utils/common';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
 
 import bulkStyles from './bulk_styles';
 
@@ -21,17 +22,15 @@ import bulkStyles from './bulk_styles';
  * @param message whats displayed as body of import modal
  * @param handleToast handler from parent, called when mutation is complete
  */
-export default function Import<T>(props: ExportImportProps) {
+export default function Import<T>(props: ExportImportProps): JSX.Element {
   const styles = bulkStyles();
   const bctwApi = useTelemetryApi();
+  const responseDispatch = useResponseDispatch();
 
-  const handleSucess = (data: IBulkUploadResults<T>) => {
-    if (isValidToast(props.handleToast)) {
-      props.handleToast(`a bulk upload was completed ${data.errors.length ? ', but there were errors.' : 'successfully.'}`)
-    }
-  }
+  const onSuccess = (data: IBulkUploadResults<T>): void => 
+    responseDispatch({type: 'success', message: `a bulk upload was completed ${data.errors.length ? ', but there were errors.' : 'successfully.'}`})
 
-  const [mutate, { isIdle, isLoading, isSuccess, isError, error, data, reset }] = (bctwApi.useMutateBulkCsv as any)({ onSuccess: handleSucess })
+  const [mutate, { isIdle, isLoading, isSuccess, isError, error, data, reset }] = (bctwApi.useMutateBulkCsv as any)({ onSuccess })
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
     const formData = new FormData();
@@ -44,9 +43,10 @@ export default function Import<T>(props: ExportImportProps) {
 
   const save = async (form: FormData): Promise<void> => await mutate(form);
 
-  const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: T): void => {
+  const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: JSON): void => {
     // todo:
     event.preventDefault();
+    // console.log(row);
   }
 
   const onClose = (): void => {

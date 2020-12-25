@@ -9,6 +9,7 @@ import SideBar from 'components/sidebar/SideBar';
 import appTheme from 'themes/appTheme';
 import { DatabaseContext, DatabaseContextProvider, IDatabaseContext } from './contexts/DatabaseContext';
 import { DatabaseChangesContextProvider } from 'contexts/DatabaseChangesContext';
+import { ResponseProvider } from 'contexts/ApiResponseContext';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -29,7 +30,7 @@ export default function App(): JSX.Element {
         <ThemeProvider theme={appTheme}>
           <DatabaseContextProvider>
             <DatabaseContext.Consumer>
-              {(databaseContext: IDatabaseContext) => {
+              {(databaseContext: IDatabaseContext): React.ReactNode => {
                 if (!databaseContext.database) {
                   return <CircularProgress />;
                 }
@@ -38,7 +39,9 @@ export default function App(): JSX.Element {
                     <Router>
                       <SideBar routes={AppRoutes} />
                       <DefaultLayout>
-                        <AppRouter />
+                        <ResponseProvider>
+                          <AppRouter />
+                        </ResponseProvider>
                       </DefaultLayout>
                     </Router>
                   </DatabaseChangesContextProvider>

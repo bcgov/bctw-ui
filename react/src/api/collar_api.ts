@@ -31,7 +31,7 @@ export const collarApi = (api: AxiosInstance) => {
   const upsertCollar = async (body: Collar[]): Promise<Collar[]> => {
     const url = createUrl({api: 'add-collar'});
     const { data } = await api.post(url, body);
-    return data.map((c: ICollar) => plainToClass(Collar, c[0]));
+    return data.map((c: ICollar) => plainToClass(Collar, c));
   }
 
   return {

@@ -1,27 +1,28 @@
 import { Toast } from "components/common";
-import { INotificationMessage } from "components/component_interfaces";
+import { useResponseState } from "contexts/ApiResponseContext";
 import { useState, useEffect } from "react";
 
 type SnackbarWrapperProps = {
-  notif: INotificationMessage;
   children: JSX.Element;
 }
 export default function SnackbarWrapper(props: SnackbarWrapperProps): JSX.Element {
-  const { notif } = props;
-  const [toastMsg, setToastMsg] = useState<string>('');
+  const responseState = useResponseState();
   const [showToast, setShowToast] = useState<boolean>(false);
 
   useEffect(() => {
     (() => {
-      setToastMsg(notif.message)
-      setShowToast(true);
+      if (responseState?.message?.length) {
+        setShowToast(true);
+      } else {
+        setShowToast(false);
+      }
     })()
-  }, [notif])
+  }, [responseState])
 
   return (
     <>
       {props.children}
-      <Toast show={showToast} message={toastMsg} onClose={(): void => setShowToast(false)} />
+      <Toast show={showToast} message={responseState?.message} onClose={(): void => setShowToast(false)} />
     </>
   )
 }

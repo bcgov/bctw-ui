@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import { HeadCell, Order, typeToHeadCell } from 'components/table/table_helpers';
 import React from 'react';
-import { T } from 'types/common_types';
+import { BCTW } from 'types/common_types';
 import { columnToHeader } from 'utils/common';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface EnhancedTableProps {
+interface EnhancedTableProps<T> {
   headerData: T;
   headersToDisplay: string[];
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;
@@ -36,7 +36,7 @@ interface EnhancedTableProps {
   orderBy: string;
 }
 
-export default function TableHead(props: EnhancedTableProps) {
+export default function TableHead<T>(props: EnhancedTableProps<T>) {
   const classes = useStyles();
   const { order, orderBy, onRequestSort, headerData, headersToDisplay } = props;
 
@@ -46,7 +46,7 @@ export default function TableHead(props: EnhancedTableProps) {
   const headcells: HeadCell<T>[] = typeToHeadCell(headerData, headersToDisplay);
 
   // any "class" should have a header formatter function, try to use this first 
-  const formatHeader = (cell: string) => typeof headerData.formatPropAsHeader === 'function' ? headerData.formatPropAsHeader(cell) : columnToHeader(cell);
+  const formatHeader = (cell: string) => typeof (headerData as BCTW).formatPropAsHeader === 'function' ? (headerData as BCTW).formatPropAsHeader(cell) : columnToHeader(cell);
 
   return (
     <MuiTableHead>

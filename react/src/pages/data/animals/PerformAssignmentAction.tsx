@@ -1,58 +1,52 @@
-import React, { useState } from 'react';
-import Button from 'components/form/Button';
-import { getNow } from 'utils/time';
 import { AxiosError } from 'axios';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { CollarHistory } from 'types/collar_history';
+import { INotificationMessage } from 'components/component_interfaces';
+import Button from 'components/form/Button';
 import ConfirmModal from 'components/modal/ConfirmModal';
-import { NotificationMessage } from 'components/common';
-import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
-import { formatAxiosError, isValidToast } from 'utils/common';
-import { useQueryCache } from 'react-query';
 import { CritterStrings as CS } from 'constants/strings';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
+import { useState } from 'react';
+import { useQueryCache } from 'react-query';
+import { CollarHistory } from 'types/collar_history';
+import { formatAxiosError } from 'utils/common';
+import { getNow } from 'utils/time';
 
 type IPerformAssignmentActionProps = {
   hasCollar: boolean;
   animalId: number;
   deviceId: number;
-  onPost?: (msg: any) => void;
 };
 /**
  * component that performs post requests to assign/unassign a collar
  * consists of:
  *  1. a confirmation dialog if user chooses to unassign the collar
  *  2. a modal that displays a list of available collars with a save button
- * @param {onPost} - bubbles up post response to parent handler function
  */
-export default function PerformAssignmentAction({ hasCollar, animalId, deviceId, onPost }: IPerformAssignmentActionProps): JSX.Element {
+export default function PerformAssignmentAction({ hasCollar, animalId, deviceId }: IPerformAssignmentActionProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const queryCache = useQueryCache()
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
   //  state to manage if a collar is being linked or removed
   const [isLink, setIsLink] = useState<boolean>(false);
+  const responseDispatch = useResponseDispatch();
 
-  const handleSuccess = (data: CollarHistory): void => {
-    updateCollarHistory();
-    if (isValidToast(onPost)) {
-      onPost(`collar ${data.device_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`);
-    }
+  const onSuccess = (data: CollarHistory): void =>
+    updateStatus({ type: 'success', message: `collar ${data.device_id} successfully ${isLink ? 'linked to' : 'removed from'} critter` });
 
-  }
-  const handleError = (error: AxiosError): void => {
+  const onError = (error: AxiosError): void =>
+    updateStatus({ type: 'error', message: `error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}` })
+
+  const updateStatus = (notif: INotificationMessage): void => {
+    responseDispatch(notif)
     updateCollarHistory();
-    if (isValidToast(onPost)) {
-      onPost(`error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}`);
-    }
   }
 
   // force the collar history to refetch
   const updateCollarHistory = (): Promise<unknown> => queryCache.invalidateQueries('collarHistory');
 
-  const [mutate, { isError, error }] = (bctwApi.useMutateLinkCollar as any)({
-    onSuccess: handleSuccess,
-    onError: handleError
-  });
+  const [mutate] = (bctwApi.useMutateLinkCollar as any)({ onSuccess, onError });
 
   const handleClickShowModal = (): void => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
 
@@ -77,13 +71,12 @@ export default function PerformAssignmentAction({ hasCollar, animalId, deviceId,
   return (
     <>
       <ConfirmModal
-        handleClickYes={() => callMutation(deviceId, false)}
+        handleClickYes={(): Promise<void> => callMutation(deviceId, false)}
         handleClose={closeModals}
         open={showConfirmModal}
         message={CS.collarRemovalText}
         title={CS.collarRemovalTitle}
       />
-      {isError ? <NotificationMessage type='error' message={error.response.data} /> : null}
       <ShowCollarAssignModal onSave={(id) => callMutation(id, true)} show={showAvailableModal} onClose={closeModals} />
       <Button onClick={handleClickShowModal}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
     </>

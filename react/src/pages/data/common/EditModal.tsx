@@ -6,6 +6,7 @@ import ChangeContext from 'contexts/InputChangeContext';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { NotificationMessage } from 'components/common';
 import { EditModalBaseProps } from 'components/component_interfaces';
+import { useResponseDispatch, useResponseState } from 'contexts/ApiResponseContext';
 
 type IEditModalProps<T> = EditModalBaseProps<T> & {
   newT: T; // empty instance of T
@@ -23,10 +24,13 @@ type IEditModalProps<T> = EditModalBaseProps<T> & {
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const styles = useDataStyles();
-  const { children, title, open, handleClose, editing, newT, onSave, onValidate, iMsg } = props;
+  const { children, title, open, handleClose, editing, newT, onSave, onValidate } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
+
+  const responseState = useResponseState();
+  const responseDispatch = useResponseDispatch();
 
   const handleSave = (): void => {
     const isValid = onValidate(newObj);
@@ -49,7 +53,10 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     setCanSave(!isSame);
   }
 
-  const reset = (): void => setCanSave(false);
+  const reset = (): void => {
+    setCanSave(false);
+    responseDispatch(null); // reset the context so the current status messaged is shown again
+  }
 
   const onClose = (): void => {
     reset();
@@ -64,9 +71,9 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
           <Button className={styles.editSaveButton} onClick={handleSave} disabled={!canSave}>save</Button>
         </ChangeContext.Provider>
         <div className={styles.editMsgs}>
-          {iMsg ? <NotificationMessage type={iMsg.type} message={iMsg.message} /> : null}
+          {responseState ? <NotificationMessage type={responseState.type} message={responseState.message} /> : null}
         </div>
       </Modal>
     </>
-  );
+  )
 }

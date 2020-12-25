@@ -8,7 +8,7 @@ type IToastProps = {
   action?: React.ReactNode;
   onClose: () => void;
 }
-export default function Toast({message, show, action, onClose}: IToastProps) {
+export default function Toast({message, show, action, onClose}: IToastProps): JSX.Element {
   return (
     <>
       <Portal>

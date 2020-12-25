@@ -1,6 +1,6 @@
 import Typography from '@material-ui/core/Typography';
 
-const Home = () => {
+const Home = (): JSX.Element => {
   return (
     <>
       {/* <AppBar title='British Columbia Telemetry Warehouse' /> */}

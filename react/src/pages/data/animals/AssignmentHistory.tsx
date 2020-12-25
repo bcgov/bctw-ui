@@ -7,13 +7,11 @@ import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction'
 type IAssignmentHistoryProps = {
   animalId: number;
   deviceId?: number;
-  onPost: (msg: any) => void;
 };
 
 /**
  *  displays a table with collar history and nests
  *  all of the collar assign/unassign handling components
- * @param onPost - bubble this event to {EditCritter} parent
  */
 export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
   const { animalId } = props;

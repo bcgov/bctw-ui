@@ -17,7 +17,7 @@ export const DatabaseChangesContextProvider: React.FC = (props) => {
   const [databaseChanges, setDatabaseChanges] = useState<IDatabaseChanges>(null);
   const [changesListener, setChangesListener] = useState<PouchDB.Core.Changes<any>>(null);
 
-  const setupDatabase = async () => {
+  const setupDatabase = async (): Promise<void> => {
     if (!changesListener || changesListener['isCancelled']) {
       const listener = databaseContext.database
         .changes({ live: true, since: 'now' })
@@ -25,14 +25,14 @@ export const DatabaseChangesContextProvider: React.FC = (props) => {
           // console.log(`db change ${JSON.stringify(change)}`);
           setDatabaseChanges(change);
         })
-        .on('complete', (final) => () => setDatabaseChanges(final))
-        .on('error', (error) => () => setDatabaseChanges(error));
+        .on('complete', (final) => (): void => setDatabaseChanges(final))
+        .on('error', (error) => (): void => setDatabaseChanges(error));
 
       setChangesListener(listener);
     }
   };
 
-  const cleanupDatabase = () => {
+  const cleanupDatabase = (): void=> {
     if (changesListener) {
       changesListener.cancel();
     }
@@ -42,7 +42,7 @@ export const DatabaseChangesContextProvider: React.FC = (props) => {
   useEffect(() => {
     setupDatabase();
 
-    return () => {
+    return (): void => {
       cleanupDatabase();
     };
   }, [databaseContext]);
