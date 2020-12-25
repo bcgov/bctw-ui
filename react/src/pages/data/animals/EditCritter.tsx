@@ -27,16 +27,11 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
     return Object.keys(errors).length === 0;
   }
 
-  const close = (v: boolean): void => {
-    setErrors({});
-    handleClose(v);
-  }
-
   // retrieve input types from the object being edited
   const inputTypes = getInputTypesOfT<IAnimal>(editing, editableProps, selectableProps);
 
   return (
-    <EditModal title={title} newT={new Animal()} onValidate={validate} handleClose={close} {...props}>
+    <EditModal title={title} newT={new Animal()} onValidate={validate} {...props}>
       <ChangeContext.Consumer>
         {
           (handlerFromContext): JSX.Element => {

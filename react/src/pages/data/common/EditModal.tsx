@@ -12,6 +12,7 @@ type IEditModalProps<T> = EditModalBaseProps<T> & {
   newT: T; // empty instance of T
   onValidate?: (o: T) => boolean;
   children: React.ReactNode;
+  onReset?: () => void;
 };
 
 /**
@@ -24,7 +25,7 @@ type IEditModalProps<T> = EditModalBaseProps<T> & {
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const styles = useDataStyles();
-  const { children, title, open, handleClose, editing, newT, onSave, onValidate } = props;
+  const { children, title, open, handleClose, editing, newT, onSave, onValidate, onReset } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
@@ -56,6 +57,11 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const reset = (): void => {
     setCanSave(false);
     responseDispatch(null); // reset the context so the current status messaged is shown again
+    // a close handler for the editCritter/Collar pages, 
+    // since the default handler is overwritten in AddEditViewer to close the modal
+    if (typeof onReset === 'function') {
+      onReset();
+    }
   }
 
   const onClose = (): void => {
