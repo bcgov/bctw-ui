@@ -30,7 +30,13 @@ const CollarStrings = {
   importText: 'Use this feature to add multiple new collars.'
 }
 
+const CodeStrings = {
+  importTitle: 'Bulk Import Codes',
+  importText: 'Use this feature to add multiple codes. Codes cannot be edited here. The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional.',
+}
+
 export {
-  CritterStrings,
+  CodeStrings,
   CollarStrings,
+  CritterStrings,
 }

@@ -7,8 +7,21 @@ import { ButtonGroup } from '@material-ui/core';
 import Button from 'components/form/Button';
 import { formatAxiosError } from 'utils/common';
 import { NotificationMessage } from 'components/common';
+import ImportExportViewer from './bulk/ExportImportViewer';
+import { CodeStrings as S } from 'constants/strings';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+  empty: {
+    display: 'block',
+    minHeight: '50vh',
+    width: '100vh',
+  },
+},
+);
 
 const CodePage: React.FC = () => {
+  const classes = useStyles();
   const bctwApi = useTelemetryApi();
   const [codeName, setCodeName] = useState<string>('');
   const [title, setTitle] = useState<string>('');
@@ -23,8 +36,13 @@ const CodePage: React.FC = () => {
     setTitle(c.title)
   }
   
-  const { isFetching, isLoading, isError, error, data } =
-    (bctwApi.useCodeHeaders as any)({ onSuccess });
+  const { isFetching, isLoading, isError, error, data } = (bctwApi.useCodeHeaders as any)({ onSuccess });
+
+  const importProps = {
+    iMsg: S.importText,
+    iTitle: S.importTitle,
+  }
+
   return (
     <>
       {isFetching | isLoading ? <div>loading...</div>
@@ -45,8 +63,9 @@ const CodePage: React.FC = () => {
                   queryProps={{ query: 'useCodes', queryParam: codeName }}
                   onSelect={null}
                   paginate={false}
-                /> : null
+                /> : <div className={classes.empty}></div>
             }
+            <ImportExportViewer {...importProps} data={[]} eDisabled={true} />
           </>
       }
     </>
