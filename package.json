@@ -9,7 +9,7 @@
     "vue-dev": "npm run dev --prefix vue",
     "vue-build": "npm run build --prefix vue",
     "dev": "yarn --cwd react run start",
-    "build": "yarn --cwd react run build"
+    "build": "npm --prefix react run build"
   },
   "repository": {
     "type": "git",
