@@ -4,7 +4,7 @@
   "description": "Front-end (scientist-facing) interface for the BC Telemetry Warehouse.",
   "main": "index.js",
   "scripts": {
-    "postinstall": "(cp node_modules/reflect-metadata/Reflect.js public); (cd react && npm i); (cd backend && npm i);",
+    "postinstall": "(cd react && npm i); (cd react && cp node_modules/reflect-metadata/Reflect.js public); (cd backend && npm i);",
     "start": "npm start --prefix backend",
     "vue-dev": "npm run dev --prefix vue",
     "vue-build": "npm run build --prefix vue",
