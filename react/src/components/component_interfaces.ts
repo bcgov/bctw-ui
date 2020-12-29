@@ -1,5 +1,4 @@
 import { StandardTextFieldProps } from "@material-ui/core"
-import { NewCollarType } from "types/collar"
 
 type ModalBaseProps = {
   open: boolean;
@@ -16,7 +15,6 @@ type CritterCollarModalProps<T> = EditModalBaseProps<T> & {
   editableProps: string[];
   selectableProps: string[];
   isEdit?: boolean;
-  collarType?: NewCollarType;
 }
 
 type ConfirmModalProps = ModalBaseProps & {

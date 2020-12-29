@@ -73,11 +73,10 @@ export enum NewCollarType {
 // properties displayed on collar pages
 const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
 const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
-// when creating a new collar, preserve these properties
-const collarPropsToPreserve = ['collar_type', 'collar_make'];
 
 /**
- * 
+ * instantiating some properties by default on a new collar
+ * fixme: hardcoded?
  */
 const newCollarTypeToSelectableCode = (type: NewCollarType): Record<string, string> => {
   const makeKey = 'collar_make';
@@ -97,7 +96,6 @@ const newCollarTypeToSelectableCode = (type: NewCollarType): Record<string, stri
 export {
   assignedCollarProps,
   availableCollarProps,
-  collarPropsToPreserve,
   formatCollarProp,
   newCollarTypeToSelectableCode,
 }
