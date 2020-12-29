@@ -1,10 +1,11 @@
 /* Bare bones static file server */
 const axios = require('axios');
+const path = require('path')
 const cors = require('cors');
 const FormData = require('form-data');
 const http = require('http');
 const morgan = require('morgan');
-const multer = require ('multer');
+const multer = require('multer');
 const helmet = require('helmet');
 const express = require('express');
 // const compression = require('compression'); This messes with keycloak
@@ -23,7 +24,7 @@ const authorizedUsers = JSON.parse(process.env.BCTW_AUTHORIZED_USERS);
 var memoryStore = new expressSession.MemoryStore();
 
 const storage = multer.memoryStorage()
-const upload = multer({storage});
+const upload = multer({ storage });
 
 // Keycloak config object (deprecates use of keycloak.json)
 // see: https://wjw465150.gitbooks.io/keycloak-documentation/content/securing_apps/topics/oidc/nodejs-adapter.html
@@ -50,13 +51,6 @@ var session = {
   store: memoryStore
 };
 
-/* ## proxyApi
-  The api is not exposed publicly. This service is protected
-  by Keycloak. So forward all authenticated traffic.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
-  @param next {function} Node/Express function for flow control
- */
 const appendQueryToUrl = (url, query) => {
   if (!query) return url;
   return url.includes('?') ?
@@ -64,18 +58,25 @@ const appendQueryToUrl = (url, query) => {
     url += `?${query}`;
 };
 
+/* ## proxyApi
+  The api is not exposed publicly. This service is protected
+  by Keycloak. So forward all authenticated traffic.
+  @param req {object} Node/Express request object
+  @param res {object} Node/Express response object
+  @param next {function} Node/Express function for flow control
+ */
 const proxyApi = function (req, res, next) {
   const endpoint = req.params.endpoint; // The url
 
   // The parameter string
-  const query = Object.keys(req.query).map( (key) => {
+  const query = Object.keys(req.query).map((key) => {
     return `${key}=${req.query[key]}`
   }).join('&');
 
   // The domain and username
   let url;
   if (isProd) {
-    const cred = req.kauth.grant.access_token.content.preferred_username; 
+    const cred = req.kauth.grant.access_token.content.preferred_username;
     const domain = cred.split('@')[1];
     const user = cred.split('@')[0];
     url = `${apiHost}:${apiPort}/${endpoint}`;
@@ -89,11 +90,10 @@ const proxyApi = function (req, res, next) {
   }
 
   console.log(`url: ${url}, type: ${req.method}`);
-  const errHandler = (err) => res.status(500).json({error: err});
+  const errHandler = (err) => res.status(500).json({ error: err });
   const successHandler = (response) => res.json(response.data);
 
   if (req.method === 'POST') {
-    // console.log(`post request detected: body: ${JSON.stringify(req.body)}`);
     if (req.file) {
       const fileReceived = req.file;
       const form = new FormData();
@@ -158,7 +158,7 @@ const pageHandler = function (req, res, next) {
   @param res {object} Node/Express response object
   @param next {function} Node/Express function for flow control
  */
-const authenticate = function (req,res,next) {
+const authenticate = function (req, res, next) {
   // Pass through if in dev or keycloak isn't configured yet
   if (!isProd || !req.kauth.grant) {
     return next();
@@ -169,16 +169,16 @@ const authenticate = function (req,res,next) {
     If something's wrong with the keycloak info... Don't crash the server.
    */
   try {
-    const domain = req.kauth.grant.access_token.content.preferred_username; 
+    const domain = req.kauth.grant.access_token.content.preferred_username;
     const user = domain.split('@')[0];
     if (authorizedUsers.includes(user)) {
       next(); // Authorized... pass through
     } else {
-      res.render('denied',req); // Nope... Denied
+      res.render('denied', req); // Nope... Denied
     }
   } catch (err) { // Something's wrong with keycloak
-    console.error("Failed to authenticate:",err)
-    res.render('denied',req); // Denied
+    console.error("Failed to authenticate:", err)
+    res.render('denied', req); // Denied
   }
 };
 
@@ -188,8 +188,8 @@ const authenticate = function (req,res,next) {
   @param req {object} Node/Express request object
   @param res {object} Node/Express response object
 */
-const denied = function (req,res) {
-  res.render('denied',req);
+const denied = function (req, res) {
+  res.render('denied', req);
 }
 
 // use enhanced logging in non-production environments
@@ -211,7 +211,7 @@ var app = express()
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
   .use(authenticate) // BCTW Gate
-  .get('/denied',denied);
+  .get('/denied', denied);
 
 // Use keycloak authentication only in Production
 if (isProd) {
@@ -219,7 +219,7 @@ if (isProd) {
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
-    .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler) 
+    .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler)
     .post('/api/:endpoint', keycloak.protect(), proxyApi)
 } else {
   app
@@ -229,10 +229,7 @@ if (isProd) {
 
 // Remaining server configuration
 app
-  .use(express['static']('frontend/www'))
-  .use(express['static']('frontend/dist'))
-  .set('view engine', 'pug')
-  .set('views', 'backend/pug')
+  .use(express['static'](path.join(__dirname, '../../react/build')))
   .get('*', notFound);
 
 // Start server

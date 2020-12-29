@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx pm2@4.4.0 --no-daemon start js/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "form-data": "^3.0.0",
+    "helmet": "^3.21.2",
+    "keycloak-connect": "^9.0.3",
+    "morgan": "^1.9.1",
+    "multer": "^1.4.2"
+  }
+}

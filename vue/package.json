@@ -1,0 +1,73 @@
+{
+  "name": "bctelemetrywarehouse",
+  "version": "0.0.1",
+  "description": "Application for viewing telemetry data from GPS-equipped collars.",
+  "main": "index.js",
+  "scripts": {
+    "build": "parcel build ./frontend/src/index.html NODE_ENV=production --no-source-maps --public-url ./ --out-dir ./frontend/dist",
+    "lint": "eslint --ext .js,.vue src",
+    "dev": "cp ./frontend/data/*.json ./frontend/dist/ && parcel ./frontend/src/index.html --out-dir ./frontend/dist --open --port 1111",
+    "postbuild": "cp ./frontend/data/*.json ./frontend/dist/",
+    "prestart": "cp ./frontend/data/*.json ./frontend/dist/"
+  },
+  "dependencies": {
+    "@turf/points-within-polygon": "^5.1.5",
+    "@vue/component-compiler-utils": "^3.0.0",
+    "autoprefixer": "^9.6.1",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-vue": "^2.0.2",
+    "components": "^0.1.0",
+    "connect-sqlite3": "^0.9.11",
+    "downloadjs": "^1.4.7",
+    "leaflet": "^1.5.1",
+    "leaflet-draw": "^1.0.4",
+    "leaflet.markercluster": "^1.4.1",
+    "livescript": "^1.6.0",
+    "material-icons": "^0.3.1",
+    "moment": "^2.27.0",
+    "needle": "^2.5.0",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-livescript": "^1.1.0",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "postcss-modules": "^1.4.1",
+    "pug": "^2.0.4",
+    "stylus": "^0.54.5",
+    "topojson": "^3.0.2",
+    "v-calendar": "^2.0.2",
+    "vue": "^2.6.12",
+    "vue-cesium": "^2.1.5",
+    "vue-class-component": "^7.2.3",
+    "vue-clipboard2": "^0.3.1",
+    "vue-hot-reload-api": "^2.3.3",
+    "vue-property-decorator": "^8.4.2",
+    "vue-router": "^3.1.2",
+    "vue-slider-component": "^3.2.9",
+    "vue-template-compiler": "^2.6.12",
+    "vuesax": "^3.12.0",
+    "vuex": "^3.1.1"
+  },
+  "devDependencies": {
+    "@types/needle": "^2.5.1",
+    "@vue/cli-plugin-typescript": "^4.5.8",
+    "@vue/cli-service": "^4.5.8",
+    "eslint": "^7.14.0",
+    "eslint-plugin-vue": "^7.1.0",
+    "typescript": "~3.9.3"
+  },
+  "vue": {
+    "presets": [
+      "env",
+      "vue"
+    ]
+  },
+  "keywords": [
+    "Vue",
+    "Livescript",
+    "Parcel"
+  ],
+  "license": "UNLICENSED"
+}
