@@ -44,7 +44,7 @@ export default function SelectCode(props: ISelectProps<any>): JSX.Element {
 
   // load this codeHeaders codes from db
 
-  const { data, error, isFetching, isError, isLoading } = (bctwApi.useCodes as any)(codeHeader);
+  const { data, error, isFetching, isError, isLoading } = (bctwApi.useCodes as any)(0, codeHeader);
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>): void => {
     const v = event.target.value;

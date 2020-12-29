@@ -5,11 +5,14 @@ interface ICode {
   description: string;
 }
 
-// interface ICodeHeader extends ICode {
-//   title: string;
-// }
+interface ICodeHeader extends ICode {
+  id: number;
+  type: string
+  title: string;
+  description: string;
+}
 
 export type {
   ICode,
-  // ICodeHeader,
+  ICodeHeader,
 };

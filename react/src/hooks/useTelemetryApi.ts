@@ -6,9 +6,9 @@ import { critterApi as critter_api } from 'api/critter_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
-import { MutationConfig, PaginatedQueryResult, QueryConfig, QueryResult, useMutation, usePaginatedQuery, useQuery } from 'react-query';
+import { MutationConfig, PaginatedQueryResult, useMutation, usePaginatedQuery, useQuery } from 'react-query';
 import { Animal } from 'types/animal';
-import { ICode } from 'types/code';
+import { ICode, ICodeHeader } from 'types/code';
 import { Collar, ICollar } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
 import { formatDay } from 'utils/time';
@@ -88,8 +88,13 @@ export const useTelemetryApi = (): Record<string, unknown> => {
    * @param codeHeader the code header name used to determine which codes to fetch
    * adds enabled = false to not auto refetch codes
    */
-  const useCodes = (codeHeader: string) => {
-    return useQuery<ICode[], AxiosError>(codeHeader, codeApi.getCodes, { ...defaultQueryOptions });
+  const useCodes = (page: number, codeHeader: string) => {
+    const props = {page, codeHeader}
+    return useQuery<ICode[], AxiosError>([props], codeApi.getCodes, { ...defaultQueryOptions });
+  }
+
+  const useCodeHeaders = (config: Record<string, unknown>) => {
+    return useQuery<ICodeHeader[], AxiosError>('', codeApi.getCodeHeaders, { ...defaultQueryOptions });
   }
 
   /**
@@ -123,6 +128,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
   return {
     // queries
     useCodes,
+    useCodeHeaders,
     usePingExtent,
     usePings,
     useCollarType,

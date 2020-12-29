@@ -7,6 +7,7 @@ import TerrainPage from 'pages/terrain/TerrainPage';
 import DataPage from 'pages/data/DataPage';
 import CritterPage from 'pages/data/animals/CritterPage';
 import CollarPage from 'pages/data/collars/CollarPage';
+import CodePage from 'pages/data/CodePage';
 
 export type RouteKey = {
   path: string;
@@ -19,6 +20,7 @@ export type RouteKey = {
 
 const AppRoutes: RouteKey[] = [ 
   { name: 'animals', path: '/animals', title: 'Animals', component: CritterPage, sort: 1, icon: 'critter'},
+  { name: 'codes', path: '/codes', title: 'Codes', component: CodePage, sort: 1, icon: 'code'},
   { name: 'collars', path: '/collars', title: 'Collars', component: CollarPage, sort: 1, icon: 'collar'},
   { name: 'map', path: '/map', title: 'Location Map', component: MapPage, sort: 1, icon: 'map'},
   { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain'},
@@ -30,7 +32,8 @@ const AppRoutes: RouteKey[] = [
 const AppRouter: React.FC = () => {
   return (
     <Switch>
-      <Redirect exact from="/" to="/home" />
+      <Redirect exact from='/' to='/home' />
+      <Redirect exact from='/data' to='/animals' />
       {AppRoutes.map((route: RouteKey, idx: number) => {
         return <Route path={route.path} component={route.component} key={idx} />;
       })}

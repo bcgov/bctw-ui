@@ -83,8 +83,10 @@ export default function Table<T>({ headers, queryProps, title, onSelect, paginat
   const bctwApi = useTelemetryApi();
 
   const { query, queryParam: queryProp, onNewData } = queryProps;
-  const { isFetching, isLoading, isError, error, resolvedData: data, isPreviousData } =
+  const { isFetching, isLoading, isError, error, data: unpaginatedData, resolvedData: pageData, isPreviousData } =
     (bctwApi[query] as any)(page, queryProp, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
+
+  const data = pageData ?? unpaginatedData;
 
   const onSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';

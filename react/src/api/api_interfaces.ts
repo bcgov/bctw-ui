@@ -27,7 +27,6 @@ interface ICollarLinkPayload {
     end_date?: Date | string
   }
 }
-
 interface BulkUploadError {
   error: string;
   row: JSON;
@@ -38,10 +37,19 @@ interface IBulkUploadResults<T> {
   results: T[];
 }
 
+interface IBaseGetProps {
+  page: number;
+}
+
+interface IGetCodeProps extends IBaseGetProps {
+  codeHeader: string;
+}
 
 export type {
   RequestPingParams,
   ITableQueryProps,
   IBulkUploadResults,
   ICollarLinkPayload,
+  IBaseGetProps,
+  IGetCodeProps,
 }
