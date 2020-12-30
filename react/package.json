@@ -7,6 +7,7 @@
     "url": "https://github.com/bcgov/bctw-ui.git"
   },
   "dependencies": {
+    "@bcgov/bc-sans": "^1.0.1",
     "@craco/craco": "^5.9.0",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
@@ -19,6 +20,7 @@
     "craco-cesium": "^1.2.0",
     "dayjs": "^1.9.7",
     "leaflet": "^1.7.1",
+    "node-sass": "^4.14.1",
     "pouchdb-browser": "^7.2.2",
     "pouchdb-find": "^7.2.2",
     "pouchdb-upsert": "^2.2.0",

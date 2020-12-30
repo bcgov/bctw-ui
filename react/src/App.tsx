@@ -3,7 +3,7 @@ import { CircularProgress, makeStyles, ThemeProvider } from '@material-ui/core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
-import { AppRouter, AppRoutes } from 'components/common/AppRouter';
+import { AppRouter, AppRoutes } from './AppRouter';
 import DefaultLayout from 'pages/layouts/DefaultLayout';
 import SideBar from 'components/sidebar/SideBar';
 import appTheme from 'themes/appTheme';

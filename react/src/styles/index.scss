@@ -4,6 +4,7 @@
     outline: 0; 
     border: 0;
     box-sizing: border-box;
+    font-family: 'BCSans', 'Noto Sans', Verdana, Arial, sans-serif;
   }
   *:focus {
     outline: 0;
@@ -16,8 +17,11 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
   }
-  body, input, button {
-    font: 14px 'Roboto', sans-serif;
+  p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 36px;
+    color: #313132;
   }
   a {
     text-decoration: none;
