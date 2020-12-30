@@ -7,7 +7,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
 import { useState } from 'react';
-import { useQueryCache } from 'react-query';
+import { useQueryClient } from 'react-query';
 import { CollarHistory } from 'types/collar_history';
 import { formatAxiosError } from 'utils/common';
 import { getNow } from 'utils/time';
@@ -25,15 +25,16 @@ type IPerformAssignmentActionProps = {
  */
 export default function PerformAssignmentAction({ hasCollar, animalId, deviceId }: IPerformAssignmentActionProps): JSX.Element {
   const bctwApi = useTelemetryApi();
-  const queryCache = useQueryCache()
+  const queryClient = useQueryClient();
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
   //  state to manage if a collar is being linked or removed
   const [isLink, setIsLink] = useState<boolean>(false);
   const responseDispatch = useResponseDispatch();
 
-  const onSuccess = (data: CollarHistory): void =>
+  const onSuccess = (data: CollarHistory): void => {
     updateStatus({ type: 'success', message: `collar ${data.device_id} successfully ${isLink ? 'linked to' : 'removed from'} critter` });
+  }
 
   const onError = (error: AxiosError): void =>
     updateStatus({ type: 'error', message: `error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}` })
@@ -44,9 +45,9 @@ export default function PerformAssignmentAction({ hasCollar, animalId, deviceId 
   }
 
   // force the collar history to refetch
-  const updateCollarHistory = (): Promise<unknown> => queryCache.invalidateQueries('collarHistory');
+  const updateCollarHistory = (): Promise<unknown> => queryClient.invalidateQueries('collarHistory');
 
-  const [mutate] = (bctwApi.useMutateLinkCollar as any)({ onSuccess, onError });
+  const { mutateAsync } = (bctwApi.useMutateLinkCollar as any)({ onSuccess, onError });
 
   const handleClickShowModal = (): void => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
 
@@ -58,7 +59,7 @@ export default function PerformAssignmentAction({ hasCollar, animalId, deviceId 
   const callMutation = async (id: number, isAssign: boolean): Promise<void> => {
     await setIsLink(isAssign);
     isAssign ? setShowAvailableModal(false) : setShowConfirmModal(false);
-    await mutate({
+    await mutateAsync({
       isLink: isAssign,
       data: {
         device_id: id,

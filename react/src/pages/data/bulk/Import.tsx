@@ -5,10 +5,10 @@ import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import FileInput from 'components/form/FileInput';
 import Modal from 'components/modal/Modal';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import React from 'react';
 import { formatAxiosError } from 'utils/common';
-import { useResponseDispatch } from 'contexts/ApiResponseContext';
 
 import bulkStyles from './bulk_styles';
 
@@ -30,7 +30,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
   const onSuccess = (data: IBulkUploadResults<T>): void => 
     responseDispatch({type: 'success', message: `a bulk upload was completed ${data.errors.length ? ', but there were errors.' : 'successfully.'}`})
 
-  const [mutate, { isIdle, isLoading, isSuccess, isError, error, data, reset }] = (bctwApi.useMutateBulkCsv as any)({ onSuccess })
+  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = (bctwApi.useMutateBulkCsv as any)({onSuccess});
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
     const formData = new FormData();
@@ -41,7 +41,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
     save(formData);
   }
 
-  const save = async (form: FormData): Promise<void> => await mutate(form);
+  const save = async (form: FormData) => await mutateAsync(form);
 
   const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: JSON): void => {
     // todo:
@@ -51,6 +51,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
 
   const onClose = (): void => {
     reset();
+    responseDispatch(null);
     props.handleClose(false);
   }
 

@@ -38,9 +38,9 @@ export default function CollarPage(): JSX.Element {
   };
 
   // setup the mutation for saving collars
-  const [mutate] = (useTelemetryApi().useMutateCollar as any)({ onSuccess, onError });
+  const { mutateAsync } = (useTelemetryApi().useMutateCollar as any)({ onSuccess, onError });
 
-  const save = async (c: Collar): Promise<void> => await mutate([c]);
+  const save = async (c: Collar): Promise<void> => await mutateAsync(c);
 
   const editProps = {
     editableProps: S.editableProps,

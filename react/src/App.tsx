@@ -1,7 +1,7 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 import { CircularProgress, makeStyles, ThemeProvider } from '@material-ui/core';
-import { QueryCache, ReactQueryCacheProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query-devtools';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 import { AppRouter, AppRoutes } from 'components/common/AppRouter';
 import DefaultLayout from 'pages/layouts/DefaultLayout';
@@ -20,13 +20,13 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const queryCache = new QueryCache();
+const queryClient = new QueryClient();
 
 export default function App(): JSX.Element {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <ReactQueryCacheProvider queryCache={queryCache}>
+      <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={appTheme}>
           <DatabaseContextProvider>
             <DatabaseContext.Consumer>
@@ -51,7 +51,7 @@ export default function App(): JSX.Element {
           </DatabaseContextProvider>
         </ThemeProvider>
         <ReactQueryDevtools initialIsOpen />
-      </ReactQueryCacheProvider>
+      </QueryClientProvider>
     </div>
   );
 }

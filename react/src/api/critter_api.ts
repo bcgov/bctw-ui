@@ -11,14 +11,14 @@ export const critterApi = (api: AxiosInstance) => {
   const _GET_CRITTER_API = 'get-animals';
   const _handleGetResults = (data: IAnimal[]): Animal[] => data.map((json: IAnimal) => plainToClass(Animal, json));
 
-  const getAssignedCritters = async (key: string, page = 1): Promise<Animal[]> => {
+  const getAssignedCritters = async (page = 1): Promise<Animal[]> => {
     const url = createUrl({ api: _GET_CRITTER_API, query: 'assigned=true', page });
     // console.log(`requesting assigned critters page: ${page}`);
     const { data } = await api.get(url);
     return _handleGetResults(data);
   }
 
-  const getUnassignedCritters = async (key: string, page = 1): Promise<Animal[]> => {
+  const getUnassignedCritters = async (page = 1): Promise<Animal[]> => {
     const url = createUrl({ api: _GET_CRITTER_API, query: 'assigned=false', page });
     // console.log(`requesting unassigned critters page: ${page}`);
     const { data } = await api.get(url);

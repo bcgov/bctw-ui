@@ -35,14 +35,14 @@ export default function CritterPage(): JSX.Element {
   }
 
   // setup the post mutation
-  const [mutate] = (bctwApi.useMutateCritter as any)({ onSuccess, onError});
+  const { mutateAsync } = (bctwApi.useMutateCritter as any)({onSuccess, onError});
 
   // critter properties that are displayed as select inputs
   const selectableProps = CS.editableProps.slice(3, 7);
 
   const handleSelect = (row: Animal): void => setEditObj(row);
 
-  const save = async (a: Animal): Promise<void> => await mutate([a]);
+  const save = async (a: Animal): Promise<Animal[]> => await mutateAsync(a);
 
   // props to be passed to the edit modal component
   const editProps = {
@@ -61,7 +61,6 @@ export default function CritterPage(): JSX.Element {
   }
 
   return (
-    // <SnackbarWrapper notif={msg}>
     <SnackbarWrapper>
       <div className={classes.container}>
         <Table
