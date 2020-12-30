@@ -13,10 +13,12 @@ import { useState } from 'react';
 import { assignedCollarProps, availableCollarProps, Collar } from 'types/collar';
 import { formatAxiosError } from 'utils/common';
 import AddEditViewer from '../common/AddEditViewer';
+import { useQueryClient } from 'react-query';
 
 export default function CollarPage(): JSX.Element {
   const classes = useDataStyles();
   const responseDispatch = useResponseDispatch();
+  const queryClient = useQueryClient();
 
   const [editObj, setEditObj] = useState<Collar>(new Collar());
 
@@ -27,8 +29,31 @@ export default function CollarPage(): JSX.Element {
   const handleSelect = (row: Collar): void => setEditObj(row);
 
   // handlers for save mutation response
-  const onSuccess = (data: Collar[]): void =>
-    updateStatus({ type: 'success', message: `collar ${data[0].device_id} saved` });
+  const onSuccess = (data: Collar[]): void => {
+    const collar = data[0];
+    updateStatus({ type: 'success', message: `collar ${collar.device_id} saved` });
+
+    let availableQueryKey;
+    let isCollarMatch = false;
+    queryClient.invalidateQueries({
+      predicate: query => {
+        // save this query key if a new collar was added
+        if (query.queryKey[2] === 'Available') {
+          availableQueryKey = query.queryKey;
+        }
+        const staleData = query.state.data as Collar[];
+        const found = staleData.find(c => c.device_id === collar.device_id)
+        if (found) {
+          isCollarMatch = true;
+          return true;
+        }
+        return false;
+      }
+    })
+    if (!isCollarMatch && availableQueryKey) {
+      queryClient.invalidateQueries(availableQueryKey);
+    }
+  }
 
   const onError = (error: AxiosError): void =>
     updateStatus({ type: 'error', message: `error saving collar: ${formatAxiosError(error)}` });

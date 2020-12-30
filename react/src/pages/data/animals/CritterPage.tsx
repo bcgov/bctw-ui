@@ -1,22 +1,24 @@
 import { AxiosError } from 'axios';
+import { SnackbarWrapper } from 'components/common';
 import { INotificationMessage } from 'components/component_interfaces';
 import Table from 'components/table/Table';
-import { SnackbarWrapper } from 'components/common';
 import { CritterStrings as CS } from 'constants/strings';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ImportExportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { useState } from 'react';
-import { Animal, assignedCritterProps, IAnimal, unassignedCritterProps } from 'types/animal';
+import { useQueryClient } from 'react-query';
+import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import { formatAxiosError } from 'utils/common';
-import { useResponseDispatch } from 'contexts/ApiResponseContext';
 
 export default function CritterPage(): JSX.Element {
   const classes = useDataStyles();
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
+  const queryClient = useQueryClient();
 
   const [editObj, setEditObj] = useState<Animal>({} as Animal);
 
@@ -24,18 +26,44 @@ export default function CritterPage(): JSX.Element {
   const [critterU, setCrittersU] = useState<Animal[]>([]);
 
   // must be defined before mutation declaration
-  const onSuccess = (data: IAnimal[]): void => 
-    updateStatus({ type: 'success', message: `${data[0].animal_id ?? data[0].nickname ?? 'critter'} saved!`});
- 
-  const onError = (error: AxiosError): void => 
-    updateStatus({ type: 'error', message: `error saving animal: ${formatAxiosError(error)}`});
+  const onSuccess = async (data: Animal[]): Promise<void> => {
+    const critter = data[0];
+    updateStatus({ type: 'success', message: `${critter.animal_id ?? critter.nickname ?? 'critter'} saved!` });
+
+    let unassignedQueryKey;
+    let isCritterMatch = false;
+    queryClient.invalidateQueries({
+      predicate: query => {
+        // save this query in case we cant find a matching critter to update
+        if (query.queryKey[0] === 'u_critters') {
+          unassignedQueryKey = query.queryKey;
+        }
+        const staleData = query.state.data as Animal[];
+        const found = staleData.find(a => a.id === critter.id);
+        // invalidate the list of critters containing the updated one
+        if (found) {
+          isCritterMatch = true;
+          return true;
+        }
+        return false;
+      }
+    })
+    // if a new critter was added, invalidate unassigned critters data
+    if (!isCritterMatch && unassignedQueryKey) {
+      queryClient.invalidateQueries(unassignedQueryKey);
+    }
+  }
+
+
+  const onError = (error: AxiosError): void =>
+    updateStatus({ type: 'error', message: `error saving animal: ${formatAxiosError(error)}` });
 
   const updateStatus = (notif: INotificationMessage): void => {
     responseDispatch(notif)
   }
 
   // setup the post mutation
-  const { mutateAsync } = (bctwApi.useMutateCritter as any)({onSuccess, onError});
+  const { mutateAsync } = (bctwApi.useMutateCritter as any)({ onSuccess, onError });
 
   // critter properties that are displayed as select inputs
   const selectableProps = CS.editableProps.slice(3, 7);

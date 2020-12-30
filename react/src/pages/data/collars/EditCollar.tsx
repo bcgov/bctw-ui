@@ -82,23 +82,21 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                     {/* render text inputs */}
                     {inputTypes
                       .filter((f) => f.type === InputType.text || f.type === InputType.number)
-                      .map((d, i) => {
+                      .map((d) => {
                         const hasError = !!errors[d.key];
                         return (
-                          <>
-                            <TextField
-                              key={`${d.key}${i}`}
-                              propName={d.key}
-                              defaultValue={d.value}
-                              type={d.type}
-                              label={d.key}
-                              disabled={false}
-                              changeHandler={onChange}
-                              required={requiredFields.includes(d.key)}
-                              error={hasError}
-                              helperText={hasError && errors[d.key]}
-                            />
-                          </>
+                          <TextField
+                            key={d.key}
+                            propName={d.key}
+                            defaultValue={d.value}
+                            type={d.type}
+                            label={d.key}
+                            disabled={false}
+                            changeHandler={onChange}
+                            required={requiredFields.includes(d.key)}
+                            error={hasError}
+                            helperText={hasError && errors[d.key]}
+                          />
                         );
                       })}
                   </>
@@ -107,10 +105,10 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                     {/* render props that are selects */}
                     {inputTypes
                       .filter((f) => f.type === InputType.select)
-                      .map((d, i) => {
+                      .map((d) => {
                         return (
                           <SelectCode
-                            key={`${d.key}${i}`}
+                            key={d.key}
                             codeHeader={d.key}
                             label={d.key}
                             defaultValue={d.value}
