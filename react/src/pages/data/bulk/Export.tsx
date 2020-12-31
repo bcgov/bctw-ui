@@ -2,7 +2,7 @@ import { Chip, Typography } from '@material-ui/core';
 import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import bulkStyles from './bulk_styles';
 
@@ -10,7 +10,7 @@ type ImportProps<T> = ExportImportProps & {
   data: T[];
 }
 
-export default function Export<T>({ data, message, title, open, handleClose }: ImportProps<T>) {
+export default function Export<T>({ data, message, title, open, handleClose }: ImportProps<T>): JSX.Element {
   const styles = bulkStyles();
   const [included, setIncluded] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
@@ -23,19 +23,19 @@ export default function Export<T>({ data, message, title, open, handleClose }: I
 
   const getTypeExportFields = (a: T): string[] => Object.keys(a);
 
-  const add = (item) => {
+  const add = (item): void => {
     const removed = excluded.splice(excluded.indexOf(item), 1)[0];
     setIncluded((old) => [...old, ...[removed]]);
   };
-  const remove = (item) => {
+  const remove = (item): void => {
     const added = included.splice(included.indexOf(item), 1)[0];
     setExcluded((old) => [...old, ...[added]]);
   };
-  const download = () => {
-    console.log('download me');
+  const download = (): void => {
+    // todo:
   };
-  const uncheckAll = () => setExcluded([...excluded, ...included.splice(0)]);
-  const reset = () => {
+  const uncheckAll = (): void => setExcluded([...excluded, ...included.splice(0)]);
+  const reset = (): void => {
     if (data && data.length) {
       setIncluded([...getTypeExportFields(data[0])]);
     }

@@ -3,7 +3,7 @@ import { ITextfieldProps } from 'components/component_interfaces';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common';
 
-export default function TextField(props: ITextfieldProps) {
+export default function TextField(props: ITextfieldProps): JSX.Element {
   const { changeHandler, propName, defaultValue } = props;
 
   useEffect(() => {
@@ -16,9 +16,8 @@ export default function TextField(props: ITextfieldProps) {
   return (
     <MuiTextField
       {...propsToPass}
-      onChange={(event) => {
+      onChange={(event): void => {
         const o = { [propName]: event.target.value };
-        // console.log(o);
         changeHandler(o);
       }}
     />

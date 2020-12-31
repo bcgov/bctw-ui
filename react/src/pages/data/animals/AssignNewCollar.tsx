@@ -8,7 +8,7 @@ import { CritterStrings as CS } from 'constants/strings';
 
 type IAssignNewCollarModal = {
   show: boolean;
-  onClose: (close: any) => void;
+  onClose: (close: boolean) => void;
   onSave: (device: number) => void;
 };
 
@@ -17,9 +17,9 @@ type IAssignNewCollarModal = {
  * @param {onSave} - parent component {PerformAssignment} handles this
  * collar row must be selected in order to enable the save button
  */
-export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignNewCollarModal) {
+export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignNewCollarModal): JSX.Element {
   const [deviceId, setDeviceId] = useState<number>(0);
-  const handleSelect = (row: ICollar) => setDeviceId(row.device_id);
+  const handleSelect = (row: ICollar): void => setDeviceId(row.device_id);
 
   return (
     <>
@@ -31,7 +31,7 @@ export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignN
           queryProps={{ query: 'useCollarType', queryParam: eCollarType.Available }}
           onSelect={handleSelect}
         />
-        <Button disabled={deviceId === 0} onClick={() => onSave(deviceId)}>{CS.assignCollarBtnText}</Button>
+        <Button disabled={deviceId === 0} onClick={(): void => onSave(deviceId)}>{CS.assignCollarBtnText}</Button>
       </Modal>
     </>
   );

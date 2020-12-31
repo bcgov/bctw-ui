@@ -78,7 +78,7 @@ export default function PerformAssignmentAction({ hasCollar, animalId, deviceId 
         message={CS.collarRemovalText}
         title={CS.collarRemovalTitle}
       />
-      <ShowCollarAssignModal onSave={(id) => callMutation(id, true)} show={showAvailableModal} onClose={closeModals} />
+      <ShowCollarAssignModal onSave={(id): Promise<void> => callMutation(id, true)} show={showAvailableModal} onClose={closeModals} />
       <Button onClick={handleClickShowModal}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
     </>
   );

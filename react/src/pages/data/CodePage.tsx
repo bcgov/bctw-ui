@@ -15,7 +15,6 @@ const useStyles = makeStyles({
   empty: {
     display: 'block',
     minHeight: '50vh',
-    width: '100vh',
   },
 },
 );
@@ -49,7 +48,7 @@ const CodePage: React.FC = () => {
         : isError ? <NotificationMessage type='error' message={formatAxiosError(error)} />
           :
           <>
-            <Typography align='center' variant='h6'>Code Management</Typography>
+            <Typography align='center' variant='h6'><strong>Code Management</strong></Typography>
             <ButtonGroup>
               {data.map((c: ICodeHeader) => {
                 return <Button key={c.id} onClick={(): void => handleClick(c)}>{c.title}</Button>

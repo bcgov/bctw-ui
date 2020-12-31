@@ -11,7 +11,7 @@ const useStyles = makeStyles({
 });
 
 
-const ResponseMessage = ({message, type}: INotificationMessage) => {
+const ResponseMessage = ({message, type}: INotificationMessage): JSX.Element => {
   const classes = useStyles();
   return (
     <Typography 

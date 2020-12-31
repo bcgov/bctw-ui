@@ -16,8 +16,7 @@ const stringsThatAreBools = ['Y', 'N', 'true', 'false'];
  * @param selectableProps which properties will be used in select inputs
  * @return {InputType}
  */
-function getInputTypesOfT<T>(obj: T, editableProps: string[], selectableProps: string[]): { key: string, type: InputType, value: any }[] {
-  // console.log(JSON.stringify(obj));
+function getInputTypesOfT<T>(obj: T, editableProps: string[], selectableProps: string[]): { key: string, type: InputType, value: unknown }[] {
   return editableProps.map((key: string) => {
     if (selectableProps.includes(key)) {
       return { key, type: InputType.select, value: obj[key] };
@@ -38,9 +37,9 @@ function getInputTypesOfT<T>(obj: T, editableProps: string[], selectableProps: s
   });
 }
 
-const isValidEditObject = <T, >(obj: T) => Object.keys(obj).length > 0;
+const isValidEditObject = <T, >(obj: T): boolean => Object.keys(obj).length > 0;
 
-const validateRequiredFields = (o: any, required: string[]): Record<string, unknown> => {
+const validateRequiredFields = <T, >(o: T, required: string[]): Record<string, unknown> => {
   const errors = {};
   required.forEach(field => {
     if (!o[field]) {

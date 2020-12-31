@@ -57,7 +57,7 @@ export default function SelectCode(props: ISelectProps<any>): JSX.Element {
     pushChange(nv);
   }
 
-  const pushChange = (v: any): void => {
+  const pushChange = (v: unknown): void => {
     const ret = { [getSelectCodeLabel(label)]: v };
     changeHandler(ret);
   }

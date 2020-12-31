@@ -10,7 +10,7 @@ export default function SnackbarWrapper(props: SnackbarWrapperProps): JSX.Elemen
   const [showToast, setShowToast] = useState<boolean>(false);
 
   useEffect(() => {
-    (() => {
+    ((): void => {
       if (responseState?.message?.length) {
         setShowToast(true);
       } else {

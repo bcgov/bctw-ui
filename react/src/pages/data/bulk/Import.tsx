@@ -41,12 +41,11 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
     save(formData);
   }
 
-  const save = async (form: FormData) => await mutateAsync(form);
+  const save = async (form: FormData): Promise<void> => await mutateAsync(form);
 
   const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: JSON): void => {
     // todo:
     event.preventDefault();
-    // console.log(row);
   }
 
   const onClose = (): void => {
@@ -94,7 +93,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
       }
       <div className={styles.footer}>
         {isIdle ? <FileInput onFileChosen={handleFileChange} /> : null}
-        {isSuccess || isError ? <Button variant='contained' component='span' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
+        {isSuccess || isError ? <Button variant='contained' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
       </div>
     </Modal>
   )

@@ -11,7 +11,7 @@ export default function ConfirmModal({ message, title, open, handleClose, handle
       <Typography>{message}</Typography>
       <div className={classes.btns} color='primary'>
         <Button onClick={handleClickYes}>{btnYesText}</Button>
-        <Button onClick={handleClose}>{btnNoText}</Button>
+        <Button onClick={():void => handleClose(false)}>{btnNoText}</Button>
       </div>
     </Modal>
   );

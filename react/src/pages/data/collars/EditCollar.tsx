@@ -58,9 +58,10 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
 
   // retrieve input types from the object being edited
   const inputTypes = getInputTypesOfT<Collar>(isEdit ? editing : newCollar, editableProps, selectableProps);
+  const isAddNewCollar = !isEdit && collarType === NewCollarType.Other;
 
   return (
-    <EditModal title={title} newT={new Collar()} onValidate={validate} onReset={close} {...props}>
+    <EditModal title={title} newT={new Collar()} onValidate={validate} onReset={close} hideSave={isAddNewCollar} {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
           // do form validation before passing change handler to EditModal
@@ -73,7 +74,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
 
           return (
             <>
-              {!isEdit && collarType === NewCollarType.Other ? (
+              {isAddNewCollar ? (
                 chooseCollarType()
               ) : (
                 <form className={classes.rootEditInput} autoComplete='off'>

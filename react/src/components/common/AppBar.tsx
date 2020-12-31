@@ -18,7 +18,7 @@ type AppBarProps = {
   title: string;
 }
 
-export default function AppBar ({title}: AppBarProps) {
+export default function AppBar ({title}: AppBarProps): JSX.Element {
   const classes = useStyles();
   return (
     <MuiAppBar position="fixed" className={classes.appBar}>

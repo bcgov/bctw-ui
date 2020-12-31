@@ -3,7 +3,7 @@ import { Typography } from '@material-ui/core';
 
 import headerImage from 'images/bcgov-header-vert-MD.png';
 
-const headerStyles = makeStyles((theme) => ({
+const headerStyles = makeStyles(() => ({
   header: {
     background: '#036',
     textAlign: 'left',
@@ -18,7 +18,7 @@ const headerStyles = makeStyles((theme) => ({
   }
 }))
 
-const SideBarHeader = () => {
+const SideBarHeader = (): JSX.Element => {
   const classes = headerStyles();
   return (
     <div className={classes.header}>

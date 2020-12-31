@@ -33,7 +33,7 @@ function typeToHeadCell<T>(obj: T, propsToDisplay: string[]): HeadCell<T>[] {
  * comparator for a type. properties must be of primitive types 
  * string or number to sort successfully
  */
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -53,14 +53,14 @@ function getComparator<Key extends keyof any>(
   orderBy: Key,
 ): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
   return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    ? (a, b): number => descendingComparator(a, b, orderBy)
+    : (a, b): number => -descendingComparator(a, b, orderBy);
 }
 
 /*
   sorts an array of T with the provided comparator
 */
-function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
+function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
