@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import 'leaflet-draw';
 
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
 import './MapPage.css';
 
 // type IMapPageProps = { }
@@ -43,13 +44,13 @@ const MapPage: React.FC = () => {
         circlemarker: false
       },
       edit: {
+        featureGroup: drawnItems
+        // remove: true,
+        // edit: true
+      }
+    });
 
-        featureGroup: drawnItems,
-        remove: true,
-        edit: true
-      }
-      }
-    );
+    mapRef.current.addControl(drawControl);
 
   };
 
