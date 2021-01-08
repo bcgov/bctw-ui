@@ -23,7 +23,11 @@ type IPerformAssignmentActionProps = {
  *  1. a confirmation dialog if user chooses to unassign the collar
  *  2. a modal that displays a list of available collars with a save button
  */
-export default function PerformAssignmentAction({ hasCollar, animalId, deviceId }: IPerformAssignmentActionProps): JSX.Element {
+export default function PerformAssignmentAction({
+  hasCollar,
+  animalId,
+  deviceId
+}: IPerformAssignmentActionProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const queryClient = useQueryClient();
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
@@ -33,19 +37,32 @@ export default function PerformAssignmentAction({ hasCollar, animalId, deviceId 
   const responseDispatch = useResponseDispatch();
 
   const onSuccess = (data: CollarHistory): void => {
-    updateStatus({ type: 'success', message: `collar ${data.device_id} successfully ${isLink ? 'linked to' : 'removed from'} critter` });
-  }
+    updateStatus({
+      type: 'success',
+      message: `collar ${data.device_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`
+    });
+  };
 
   const onError = (error: AxiosError): void =>
-    updateStatus({ type: 'error', message: `error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}` })
+    updateStatus({
+      type: 'error',
+      message: `error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}`
+    });
 
   const updateStatus = (notif: INotificationMessage): void => {
-    responseDispatch(notif)
+    responseDispatch(notif);
     updateCollarHistory();
-  }
+  };
 
-  // force the collar history to refetch
-  const updateCollarHistory = (): Promise<unknown> => queryClient.invalidateQueries('collarHistory');
+  // force the collar history, current assigned/unassigned critter pages to refetch
+  const updateCollarHistory = (): Promise<unknown> =>
+    queryClient.invalidateQueries({
+      predicate: (query) => {
+        const key = query.queryKey[0] as string;
+        const includes = ['collarHistory', 'u_critters', 'a_critters'].includes(key);
+        return includes;
+      }
+    });
 
   const { mutateAsync } = (bctwApi.useMutateLinkCollar as any)({ onSuccess, onError });
 
@@ -67,7 +84,7 @@ export default function PerformAssignmentAction({ hasCollar, animalId, deviceId 
         start_date: getNow()
       }
     });
-  }
+  };
 
   return (
     <>
@@ -78,7 +95,11 @@ export default function PerformAssignmentAction({ hasCollar, animalId, deviceId 
         message={CS.collarRemovalText}
         title={CS.collarRemovalTitle}
       />
-      <ShowCollarAssignModal onSave={(id): Promise<void> => callMutation(id, true)} show={showAvailableModal} onClose={closeModals} />
+      <ShowCollarAssignModal
+        onSave={(id): Promise<void> => callMutation(id, true)}
+        show={showAvailableModal}
+        onClose={closeModals}
+      />
       <Button onClick={handleClickShowModal}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
     </>
   );
