@@ -5,6 +5,7 @@ import 'leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import './MapPage.css';
+import { request } from 'https';
 
 // type IMapPageProps = { }
 
@@ -45,12 +46,24 @@ const MapPage: React.FC = () => {
       },
       edit: {
         featureGroup: drawnItems
-        // remove: true,
-        // edit: true
       }
     });
 
     mapRef.current.addControl(drawControl);
+
+
+    const prod = +(location.port) === 1111 ? false : true;
+    const h1 = location.protocol
+    const h2 = location.hostname
+    const h3 = prod ? location.port : 3000
+    const h4 = prod ? '/api' : ''
+    const url = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-10-18&end=2020-11-26`;
+    console.log(url);
+
+    // const url = `${host}get-cirtters?start=2020-12-01&end=2020-12-31`;
+    fetch(url)
+      .then(data=>{console.log(data)})
+      .catch(error=>{console.error('collar request failed',error)});
 
   };
 
