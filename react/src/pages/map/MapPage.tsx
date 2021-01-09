@@ -1,16 +1,17 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import * as L from 'leaflet';
 import 'leaflet-draw';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import './MapPage.css';
-import { request } from 'https';
 
 // type IMapPageProps = { }
 
 const MapPage: React.FC = () => {
   const mapRef = useRef<L.Map>(null);
+
+  const [tracks,setTracks] = useState(new L.GeoJSON());
 
   const initMap = (): void => {
     mapRef.current = L.map('map', {zoomControl:false})
@@ -58,11 +59,10 @@ const MapPage: React.FC = () => {
     const h3 = prod ? location.port : 3000
     const h4 = prod ? '/api' : ''
     const url = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-10-18&end=2020-11-26`;
-    console.log(url);
 
-    // const url = `${host}get-cirtters?start=2020-12-01&end=2020-12-31`;
     fetch(url)
-      .then(data=>{console.log(data)})
+      .then(res => res.json())
+      .then(geojson => tracks.addData(geojson))
       .catch(error=>{console.error('collar request failed',error)});
 
   };
@@ -71,6 +71,11 @@ const MapPage: React.FC = () => {
   useEffect(() => {
     initMap();
   });
+
+  // Add the tracks layer
+  useEffect(() => {
+    tracks.addTo(mapRef.current);
+  },[tracks]);
 
   return (
     <div id='map'></div>
