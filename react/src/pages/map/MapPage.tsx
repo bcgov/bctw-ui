@@ -68,6 +68,7 @@ const MapPage: React.FC = () => {
   };
 
 
+  // When the dom is ready... Add map.
   useEffect(() => {
     initMap();
   });
