@@ -14,6 +14,7 @@ const headerStyles = makeStyles(() => ({
   },
   headerText: {
     marginTop: 0,
+    color: 'white !important',
     marginLeft: '4rem'
   }
 }))

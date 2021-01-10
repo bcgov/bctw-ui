@@ -1,5 +1,12 @@
-import React, {useEffect, useRef} from 'react';
-import {Viewer, createWorldTerrain, Cartesian3, Math, Ion} from 'cesium';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  Viewer,
+  createWorldTerrain,
+  Cartesian3,
+  Math,
+  Ion,
+  GeoJsonDataSource
+} from 'cesium';
 import './TerrainPage.css';
 
 
@@ -11,7 +18,7 @@ const TerrainPage: React.FC = () => {
     Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNzk1ZDk0My02MjJmLTQ4ZDgtYmJkMy1kY2Y0YTI0MTg3N2YiLCJpZCI6ODA1Niwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU1MTEyOTM2Nn0.UoAFRv2ErXndRVOI1lltlyWFzaSpE__lpGxe4kb4GSM';
 
     mapRef.current = new Viewer('terrain', {
-      timeline: false,
+      timeline: true,
       geocoder: false,
       baseLayerPicker: true,
       fullscreenButton: false,
@@ -33,6 +40,32 @@ const TerrainPage: React.FC = () => {
         roll: 0.0
       }
     });
+
+    const prod = +(location.port) === 1111 ? false : true;
+    const h1 = location.protocol
+    const h2 = location.hostname
+    const h3 = prod ? location.port : 3000
+    const h4 = prod ? '/api' : ''
+    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-21&end=2020-12-31`;
+    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-21&end=2020-12-31`;
+
+    fetch(urlPings)
+      .then(res => res.json())
+      .then(geojson => {
+        const layer = new GeoJsonDataSource('pings')
+          .load(geojson,{clampToGround: true});
+        mapRef.current.dataSources.add(layer);
+      })
+      .catch(error=>{console.error('Collar request failed',error)});
+
+    fetch(urlTracks)
+      .then(res => res.json())
+      .then(geojson => {
+        const layer = new GeoJsonDataSource('pings')
+          .load(geojson,{clampToGround: true});
+        mapRef.current.dataSources.add(layer);
+      })
+      .catch(error=>{console.error('Track request failed',error)});
   };
 
   useEffect(() => {
@@ -42,6 +75,6 @@ const TerrainPage: React.FC = () => {
   return (
     <div id='terrain'></div>
   )
-}
+};
 
 export default TerrainPage;
