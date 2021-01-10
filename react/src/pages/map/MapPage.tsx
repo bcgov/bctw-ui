@@ -13,6 +13,10 @@ const MapPage: React.FC = () => {
 
   const [tracks,setTracks] = useState(new L.GeoJSON());
 
+
+
+  const [pings,setPings] = useState(new L.GeoJSON());
+
   const initMap = (): void => {
     mapRef.current = L.map('map', {zoomControl:false})
       .setView([55, -128], 10);
@@ -31,6 +35,8 @@ const MapPage: React.FC = () => {
 
     layerPicker.addBaseLayer(bingOrtho, 'Bing Satellite');
     layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
+
+    layerPicker.addOverlay(tracks,'Critter Tracks')
 
     mapRef.current.addControl(layerPicker);
 
@@ -58,11 +64,52 @@ const MapPage: React.FC = () => {
     const h2 = location.hostname
     const h3 = prod ? location.port : 3000
     const h4 = prod ? '/api' : ''
-    const url = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-10-18&end=2020-11-26`;
+    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-10-18&end=2020-11-26`;
+    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-10-18&end=2020-11-26`;
 
-    fetch(url)
+    // Fetch the tracks data
+    fetch(urlTracks)
       .then(res => res.json())
       .then(geojson => tracks.addData(geojson))
+      .catch(error=>{console.error('collar request failed',error)});
+
+    // Fetch the ping data
+    // TODO: Clean this up.
+    fetch(urlPings)
+      .then(res => res.json())
+      .then(geojson => {
+        const options = {pointToLayer: (feature,latlng) => {
+
+          // Mortality is red
+          const s = feature.properties.animal_status;
+          const colour = (s === 'Mortality') ? '#ff0000' : '#00ff44';
+
+          const pointStyle = {
+            radius: 8,
+            fillColor: colour,
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.9
+          }
+
+          return L.circleMarker(latlng, pointStyle);
+        },
+        onEachFeature: (feature,layer) => {
+          const p = feature.properties;
+          const text = `
+            Animal ID: ${p.animal_id} <br>
+            Species: ${p.species} <br>
+            Population Unit: ${p.population_unit} <br>
+            Date Recorded: ${p.date_recorded}
+          `
+          layer.bindPopup(text);
+        }
+      };
+        const layer = L.geoJSON(geojson,options);
+        layerPicker.addOverlay(layer,'Critter Locations')
+        layer.addTo(mapRef.current)
+      })
       .catch(error=>{console.error('collar request failed',error)});
 
   };
