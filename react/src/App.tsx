@@ -16,7 +16,7 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     height: '100vh',
     width: '100vw',
-    // overflow: 'hidden'
+    overflow: 'hidden'
   }
 }));
 
