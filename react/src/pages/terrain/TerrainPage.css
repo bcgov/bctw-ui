@@ -10,3 +10,12 @@
   height: 100%;
   width: 100%;
 }
+
+.cesium-viewer-bottom {
+  display: none;
+}
+
+.cesium-viewer {
+  margin-left:255px;
+  width: calc(100% - 255px);
+}

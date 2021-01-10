@@ -13,8 +13,6 @@ const MapPage: React.FC = () => {
 
   const [tracks,setTracks] = useState(new L.GeoJSON());
 
-
-
   const [pings,setPings] = useState(new L.GeoJSON());
 
   const initMap = (): void => {
@@ -64,8 +62,8 @@ const MapPage: React.FC = () => {
     const h2 = location.hostname
     const h3 = prod ? location.port : 3000
     const h4 = prod ? '/api' : ''
-    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-10-18&end=2020-11-26`;
-    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-10-18&end=2020-11-26`;
+    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-21&end=2020-12-31`;
+    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-21&end=2020-12-31`;
 
     // Fetch the tracks data
     fetch(urlTracks)

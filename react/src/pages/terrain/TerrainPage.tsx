@@ -13,10 +13,6 @@ import './TerrainPage.css';
 const TerrainPage: React.FC = () => {
   const mapRef = useRef(null);
 
-  // const [tracks,setTracks] = useState(new L.GeoJSON());
-
-  const [pings,setPings] = useState(new GeoJsonDataSource('pings'));
-
   const initMap = (): void => {
 
     Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNzk1ZDk0My02MjJmLTQ4ZDgtYmJkMy1kY2Y0YTI0MTg3N2YiLCJpZCI6ODA1Niwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU1MTEyOTM2Nn0.UoAFRv2ErXndRVOI1lltlyWFzaSpE__lpGxe4kb4GSM';
@@ -44,19 +40,37 @@ const TerrainPage: React.FC = () => {
         roll: 0.0
       }
     });
-  };
 
-  const createPingLayer = (pings) => {
-    console.log(pings)
+    const prod = +(location.port) === 1111 ? false : true;
+    const h1 = location.protocol
+    const h2 = location.hostname
+    const h3 = prod ? location.port : 3000
+    const h4 = prod ? '/api' : ''
+    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-21&end=2020-12-31`;
+    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-21&end=2020-12-31`;
+
+    fetch(urlPings)
+      .then(res => res.json())
+      .then(geojson => {
+        const layer = new GeoJsonDataSource('pings')
+          .load(geojson,{clampToGround: true});
+        mapRef.current.dataSources.add(layer);
+      })
+      .catch(error=>{console.error('Collar request failed',error)});
+
+    fetch(urlTracks)
+      .then(res => res.json())
+      .then(geojson => {
+        const layer = new GeoJsonDataSource('pings')
+          .load(geojson,{clampToGround: true});
+        mapRef.current.dataSources.add(layer);
+      })
+      .catch(error=>{console.error('Track request failed',error)});
   };
 
   useEffect(() => {
     initMap();
   });
-
-  useEffect(() => {
-    createPingLayer(pings);
-  },[pings]);
 
   return (
     <div id='terrain'></div>
