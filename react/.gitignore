@@ -24,3 +24,6 @@ yarn-error.log*
 
 # lint
 .eslintcache
+
+# used in class-transformer but copied at build-time
+public/Reflect.js
