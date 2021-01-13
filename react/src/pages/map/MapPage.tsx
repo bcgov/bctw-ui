@@ -17,7 +17,7 @@ const MapPage: React.FC = () => {
 
   const initMap = (): void => {
     mapRef.current = L.map('map', {zoomControl:false})
-      .setView([55, -128], 10);
+      .setView([55, -128], 6);
 
     const layerPicker = L.control.layers();
 
@@ -99,6 +99,7 @@ const MapPage: React.FC = () => {
             Animal ID: ${p.animal_id} <br>
             Species: ${p.species} <br>
             Population Unit: ${p.population_unit} <br>
+            GPS Vendor: ${p.device_vendor} <br>
             Date Recorded: ${p.date_recorded}
           `
           layer.bindPopup(text);
