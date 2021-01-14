@@ -3,6 +3,7 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollar, Collar } from 'types/collar';
 import { ICollarHistory, CollarHistory } from 'types/collar_history';
+import { IBulkUploadResults } from './api_interfaces';
 
 export const collarApi = (api: AxiosInstance) => {
 
@@ -28,10 +29,10 @@ export const collarApi = (api: AxiosInstance) => {
     return results;
   };
 
-  const upsertCollar = async (body: Collar[]): Promise<Collar[]> => {
+  const upsertCollar = async (body: Collar[]): Promise<IBulkUploadResults<Collar>> => {
     const url = createUrl({api: 'add-collar'});
     const { data } = await api.post(url, body);
-    return data.map((c: ICollar) => plainToClass(Collar, c));
+    return data;
   }
 
   return {

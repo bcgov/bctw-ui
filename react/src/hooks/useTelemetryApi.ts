@@ -3,6 +3,7 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
+import { userApi as user_api } from 'api/user_api';
 import { mapApi as map_api } from 'api/map_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
@@ -18,6 +19,7 @@ import {
   ICollarLinkPayload,
   RequestPingParams,
 } from '../api/api_interfaces';
+import { eUserRole } from 'types/user';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -45,6 +47,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
   const codeApi = code_api(api);
   const bulkApi = bulk_api(api);
   const mapApi = map_api(api);
+  const userApi = user_api(api);
 
   const defaultQueryOptions = {
     refetchOnWindowFocus: false,
@@ -107,13 +110,18 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     return useQuery<CollarHistory[], AxiosError>(['collarHistory', critterId], () => collarApi.getCollarHistory(critterId), { ...config });
   }
 
+  /**
+   * @param config 
+   * @returns
+   */
+  const useUserRole = (): UseQueryResult => useQuery<eUserRole, AxiosError>('userRole', () => userApi.requestUserRole())
 
   /**
    * 
    * mutations
    */
-  const useMutateCollar = (config: UseMutationOptions<Collar[], AxiosError, Collar[]>): UseMutationResult => 
-    useMutation<Collar[], AxiosError, Collar[]>((collar) => collarApi.upsertCollar(collar), config);
+  const useMutateCollar = (config: UseMutationOptions<IBulkUploadResults<Collar>, AxiosError, Collar[]>): UseMutationResult => 
+    useMutation<IBulkUploadResults<Collar>, AxiosError, Collar[]>((collar) => collarApi.upsertCollar(collar), config);
 
   const useMutateCritter = (config: UseMutationOptions<Animal[], AxiosError, Animal[]>): UseMutationResult => 
     useMutation<Animal[], AxiosError, Animal[]>((critter) => critterApi.upsertCritter(critter), config);
@@ -136,6 +144,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     useAssignedCritters,
     useUnassignedCritters,
     useCollarHistory,
+    useUserRole,
     // mutations
     useMutateBulkCsv,
     useMutateCollar,

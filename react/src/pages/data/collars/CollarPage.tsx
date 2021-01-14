@@ -1,5 +1,4 @@
-import { eCollarType } from 'api/api_interfaces';
-import { AxiosError } from 'axios';
+import { eCollarType, IBulkUploadResults } from 'api/api_interfaces';
 import { SnackbarWrapper } from 'components/common';
 import { INotificationMessage } from 'components/component_interfaces';
 import Table from 'components/table/Table';
@@ -11,7 +10,6 @@ import EditCollar from 'pages/data/collars/EditCollar';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { useState } from 'react';
 import { assignedCollarProps, availableCollarProps, Collar } from 'types/collar';
-import { formatAxiosError } from 'utils/common';
 import AddEditViewer from '../common/AddEditViewer';
 import { useQueryClient } from 'react-query';
 
@@ -29,41 +27,41 @@ export default function CollarPage(): JSX.Element {
   const handleSelect = (row: Collar): void => setEditObj(row);
 
   // handlers for save mutation response
-  const onSuccess = (data: Collar[]): void => {
-    const collar = data[0];
+  const onSuccess = (data: IBulkUploadResults<Collar>): void => {
+    if (data.errors.length) {
+      updateStatus({ type: 'error', message: `${data.errors[0].error}` });
+      return;
+    }
+    const collar = data.results[0];
     updateStatus({ type: 'success', message: `collar ${collar.device_id} saved` });
-
     let availableQueryKey;
     let isCollarMatch = false;
     queryClient.invalidateQueries({
-      predicate: query => {
+      predicate: (query) => {
         // save this query key if a new collar was added
         if (query.queryKey[2] === 'Available') {
           availableQueryKey = query.queryKey;
         }
         const staleData = query.state.data as Collar[];
-        const found = staleData.find(c => c.device_id === collar.device_id)
+        const found = staleData.find((c) => c.device_id === collar.device_id);
         if (found) {
           isCollarMatch = true;
           return true;
         }
         return false;
       }
-    })
+    });
     if (!isCollarMatch && availableQueryKey) {
       queryClient.invalidateQueries(availableQueryKey);
     }
-  }
-
-  const onError = (error: AxiosError): void =>
-    updateStatus({ type: 'error', message: `error saving collar: ${formatAxiosError(error)}` });
+  };
 
   const updateStatus = (notif: INotificationMessage): void => {
     responseDispatch(notif); // update api response context
   };
 
   // setup the mutation for saving collars
-  const { mutateAsync } = (useTelemetryApi().useMutateCollar as any)({ onSuccess, onError });
+  const { mutateAsync } = (useTelemetryApi().useMutateCollar as any)({ onSuccess });
 
   const save = async (c: Collar): Promise<void> => await mutateAsync(c);
 
@@ -110,7 +108,7 @@ export default function CollarPage(): JSX.Element {
         />
 
         <div className={classes.mainButtonRow}>
-          <ImportExportViewer {...exportProps} data={[...collarsA, ...collarsU]} iDisabled={true} />
+          <ImportExportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
 
           <AddEditViewer<Collar> editing={editObj} empty={(): Collar => new Collar()}>
             <EditCollar {...editProps} />
