@@ -26,8 +26,7 @@ export const critterApi = (api: AxiosInstance) => {
   }
 
   const linkCollar = async (body: ICollarLinkPayload): Promise<CollarHistory> => {
-    const link = body.isLink ? 'link-animal-collar' : 'unlink-animal-collar';
-    const url = createUrl({ api: link });
+    const url = createUrl({ api: 'change-animal-collar'});
     // console.log(`posting ${link}: ${JSON.stringify(body.data)}`);
     const { data } = await api.post(url, body);
     return plainToClass(CollarHistory, data[0]);
