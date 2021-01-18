@@ -24,7 +24,7 @@ const TerrainPage: React.FC = () => {
       fullscreenButton: false,
       vrButton: false,
       homeButton: false,
-      animation: false,
+      animation: true,
       scene3DOnly: true,
       terrainProvider: createWorldTerrain({
         requestWaterMask: true,
