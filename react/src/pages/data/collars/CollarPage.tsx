@@ -80,7 +80,7 @@ export default function CollarPage(): JSX.Element {
     eTitle: S.exportTitle
   };
 
-  const rowId = 'device_id';
+  const rowId = 'collar_id';
   return (
     <SnackbarWrapper>
       <div className={classes.container}>

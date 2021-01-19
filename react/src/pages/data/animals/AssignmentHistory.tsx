@@ -6,7 +6,7 @@ import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction'
 
 type IAssignmentHistoryProps = {
   animalId: number;
-  deviceId?: number;
+  collarId?: number;
 };
 
 /**
@@ -36,14 +36,14 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
 
   // instantiate this component here as we want to display the add collar
   // option if the critter has no collar history
-  const assignment = <PerformAssignmentAction deviceId={history?.length ? history[0].device_id : 0} hasCollar={hasCollar} {...props} />;
+  const assignment = <PerformAssignmentAction collarId={history?.length ? history[0].collar_id : 0} hasCollar={hasCollar} {...props} />;
   return (
     <>
       {history.length ? <Typography variant='h6'>Collar Assignment History</Typography> : null }
       <Table
         headers={['device_id', 'make', 'start_time', 'end_time']}
         queryProps={{ query: 'useCollarHistory', queryParam: animalId, onNewData: onNewData }}
-        rowIdentifier='device_id'
+        rowIdentifier='collar_id'
         paginate={history?.length >= 10}
         onSelect={handleSelect}
         renderIfNoData={false}

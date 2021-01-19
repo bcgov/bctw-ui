@@ -13,7 +13,7 @@ export interface ICollarHistory extends ICollarBase, BCTW {
 }
 
 export class CollarHistory implements ICollarHistory {
-  device_id: number;
+  collar_id: number;
   assignment_id: number;
   make: string;
   radio_frequency: number;

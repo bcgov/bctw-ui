@@ -1,11 +1,11 @@
 import { createUrl } from 'api/api_helpers';
 import { AxiosInstance } from 'axios';
-import { eUserRole, IUser } from 'types/user';
+import { UserRole, IUser } from 'types/user';
 
 
 export const userApi = (api: AxiosInstance) => {
 
-  const requestUserRole = async(): Promise<eUserRole> => {
+  const requestUserRole = async(): Promise<UserRole> => {
     const url = createUrl({ api: 'role' });
     const { data } = await api.get(url);
     return data;

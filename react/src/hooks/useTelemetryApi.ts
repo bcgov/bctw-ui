@@ -19,7 +19,7 @@ import {
   ICollarLinkPayload,
   RequestPingParams,
 } from '../api/api_interfaces';
-import { eUserRole } from 'types/user';
+import { UserRole } from 'types/user';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -114,7 +114,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
    * @param config 
    * @returns
    */
-  const useUserRole = (): UseQueryResult => useQuery<eUserRole, AxiosError>('userRole', () => userApi.requestUserRole())
+  const useUserRole = (): UseQueryResult => useQuery<UserRole, AxiosError>('userRole', () => userApi.requestUserRole())
 
   /**
    * 

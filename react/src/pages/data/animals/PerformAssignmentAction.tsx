@@ -1,3 +1,4 @@
+import { ICollarLinkPayload } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { INotificationMessage } from 'components/component_interfaces';
 import Button from 'components/form/Button';
@@ -15,7 +16,7 @@ import { getNow } from 'utils/time';
 type IPerformAssignmentActionProps = {
   hasCollar: boolean;
   animalId: number;
-  deviceId: number;
+  collarId: number;
 };
 /**
  * component that performs post requests to assign/unassign a collar
@@ -26,7 +27,7 @@ type IPerformAssignmentActionProps = {
 export default function PerformAssignmentAction({
   hasCollar,
   animalId,
-  deviceId
+  collarId
 }: IPerformAssignmentActionProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const queryClient = useQueryClient();
@@ -39,7 +40,7 @@ export default function PerformAssignmentAction({
   const onSuccess = (data: CollarHistory): void => {
     updateStatus({
       type: 'success',
-      message: `collar ${data.device_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`
+      message: `collar ${data.collar_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`
     });
   };
 
@@ -76,20 +77,21 @@ export default function PerformAssignmentAction({
   const callMutation = async (id: number, isAssign: boolean): Promise<void> => {
     await setIsLink(isAssign);
     isAssign ? setShowAvailableModal(false) : setShowConfirmModal(false);
-    await mutateAsync({
+    const payload: ICollarLinkPayload = {
       isLink: isAssign,
       data: {
-        device_id: id,
+        collar_id: id,
         animal_id: animalId,
         start_date: getNow()
       }
-    });
+    };
+    await mutateAsync(payload);
   };
 
   return (
     <>
       <ConfirmModal
-        handleClickYes={(): Promise<void> => callMutation(deviceId, false)}
+        handleClickYes={(): Promise<void> => callMutation(collarId, false)}
         handleClose={closeModals}
         open={showConfirmModal}
         message={CS.collarRemovalText}

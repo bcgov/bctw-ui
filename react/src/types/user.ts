@@ -1,6 +1,8 @@
-import { BctwBaseType } from "./common_types";
+import { BctwBaseType } from './common_types';
 
-enum eUserRole { Administrator }
+enum UserRole {
+  Administrator
+}
 
 export interface IUser extends BctwBaseType {
   id: number;
@@ -9,7 +11,4 @@ export interface IUser extends BctwBaseType {
   email: string;
 }
 
-export {
-  eUserRole,
-} 
-
+export { UserRole };

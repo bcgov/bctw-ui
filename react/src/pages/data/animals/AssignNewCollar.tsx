@@ -18,8 +18,8 @@ type IAssignNewCollarModal = {
  * collar row must be selected in order to enable the save button
  */
 export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignNewCollarModal): JSX.Element {
-  const [deviceId, setDeviceId] = useState<number>(0);
-  const handleSelect = (row: ICollar): void => setDeviceId(row.device_id);
+  const [collarId, setCollarId] = useState<number>(0);
+  const handleSelect = (row: ICollar): void => setCollarId(row.collar_id);
 
   return (
     <>
@@ -27,11 +27,11 @@ export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignN
         <Table
           headers={availableCollarProps}
           title={CS.collarAssignmentTitle}
-          rowIdentifier='device_id'
+          rowIdentifier='collar_id'
           queryProps={{ query: 'useCollarType', queryParam: eCollarType.Available }}
           onSelect={handleSelect}
         />
-        <Button disabled={deviceId === 0} onClick={(): void => onSave(deviceId)}>{CS.assignCollarBtnText}</Button>
+        <Button disabled={collarId === 0} onClick={(): void => onSave(collarId)}>{CS.assignCollarBtnText}</Button>
       </Modal>
     </>
   );

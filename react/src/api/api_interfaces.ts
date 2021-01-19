@@ -22,7 +22,7 @@ interface ICollarLinkPayload {
   isLink: boolean;
   data: {
     animal_id: number,
-    device_id: number,
+    collar_id: number,
     start_date: Date | string,
     end_date?: Date | string
   }

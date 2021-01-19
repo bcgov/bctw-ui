@@ -2,7 +2,7 @@ import { columnToHeader } from 'utils/common';
 import { BCTW } from 'types/common_types';
 import { Type } from 'class-transformer';
 export interface ICollarBase {
-  device_id: number;
+  collar_id: number;
 }
 
 const formatCollarProp = (prop: string): string => {
@@ -23,6 +23,7 @@ const formatCollarProp = (prop: string): string => {
 }
 
 export interface ICollar extends ICollarBase, BCTW {
+  device_id: number;
   make: string;
   model: string;
   deployment_status: string;
@@ -38,6 +39,7 @@ export interface ICollar extends ICollarBase, BCTW {
 }
 
 export class Collar implements ICollar {
+  collar_id: number;
   device_id: number;
   make: string;
   model: string;
