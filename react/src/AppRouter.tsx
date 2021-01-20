@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
 import Home from 'pages/Home';
@@ -13,35 +13,58 @@ export type RouteKey = {
   path: string;
   title: string;
   name: string;
-  component: FunctionComponent;
+  component: FunctionComponent<{ setSidebarContent: (component: JSX.Element) => void }>;
   sort: number;
   icon?: string;
-}
+};
 
-const AppRoutes: RouteKey[] = [ 
-  { name: 'animals', path: '/animals', title: 'Animals', component: CritterPage, sort: 1, icon: 'critter'},
-  { name: 'codes', path: '/codes', title: 'Codes', component: CodePage, sort: 1, icon: 'code'},
-  { name: 'collars', path: '/collars', title: 'Collars', component: CollarPage, sort: 1, icon: 'collar'},
-  { name: 'map', path: '/map', title: 'Location Map', component: MapPage, sort: 1, icon: 'map'},
-  { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain'},
-  { name: 'data', path: '/data', title: 'Data Management', component: DataPage, sort: 1, icon: 'data'},
-  { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home'},
-  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => (<div>page not found :(</div>), sort: 2 },
-]
+const AppRoutes: RouteKey[] = [
+  {
+    name: 'animals',
+    path: '/animals',
+    title: 'Animals',
+    component: CritterPage,
+    sort: 1,
+    icon: 'critter'
+  },
+  { name: 'codes', path: '/codes', title: 'Codes', component: CodePage, sort: 1, icon: 'code' },
+  { name: 'collars', path: '/collars', title: 'Collars', component: CollarPage, sort: 1, icon: 'collar' },
+  { name: 'map', path: '/map', title: 'Location Map', component: MapPage, sort: 1, icon: 'map' },
+  { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain' },
+  { name: 'data', path: '/data', title: 'Data Management', component: DataPage, sort: 1, icon: 'data' },
+  { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
+  {
+    name: 'notFound',
+    path: '/*',
+    title: 'Not Found',
+    component: (): JSX.Element => <div>page not found :(</div>,
+    sort: 2
+  }
+];
 
-const AppRouter: React.FC = () => {
+type AppRouterProps = {
+  onContentChange: (component: JSX.Element) => void;
+};
+const AppRouter = ({ onContentChange }: AppRouterProps): JSX.Element => {
+  const routeProps = { setSidebarContent: onContentChange };
   return (
     <Switch>
       <Redirect exact from='/' to='/home' />
       <Redirect exact from='/data' to='/animals' />
       {AppRoutes.map((route: RouteKey, idx: number) => {
-        return <Route path={route.path} component={route.component} key={idx} />;
+        return (
+          <Route
+            key={idx}
+            path={route.path}
+            render={(): JSX.Element => {
+              const RouteComponent = route.component;
+              return <RouteComponent {...routeProps} />;
+            }}
+          />
+        );
       })}
     </Switch>
-  )
-}
+  );
+};
 
-export {
-  AppRouter,
-  AppRoutes
-}
+export { AppRouter, AppRoutes };

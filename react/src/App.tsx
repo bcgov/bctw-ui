@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { CircularProgress, makeStyles, ThemeProvider } from '@material-ui/core';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -24,6 +25,8 @@ const queryClient = new QueryClient();
 
 export default function App(): JSX.Element {
   const classes = useStyles();
+  const [sidebar, setSidebar] = useState<JSX.Element>();
+
   return (
     <div className={classes.root}>
       <QueryClientProvider client={queryClient}>
@@ -37,10 +40,10 @@ export default function App(): JSX.Element {
                 return (
                   <DatabaseChangesContextProvider>
                     <Router>
-                      <SideBar routes={AppRoutes} />
+                      <SideBar routes={AppRoutes} sidebarContent={sidebar} />
                       <DefaultLayout>
                         <ResponseProvider>
-                          <AppRouter />
+                          <AppRouter onContentChange={setSidebar} />
                         </ResponseProvider>
                       </DefaultLayout>
                     </Router>

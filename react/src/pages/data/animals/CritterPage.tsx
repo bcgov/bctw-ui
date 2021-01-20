@@ -14,7 +14,10 @@ import { useQueryClient } from 'react-query';
 import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import { formatAxiosError } from 'utils/common';
 
-export default function CritterPage(): JSX.Element {
+type CritterPageProps = {
+  setSidebarContent?: (component: JSX.Element) => void;
+}
+export default function CritterPage(props : CritterPageProps): JSX.Element {
   const classes = useDataStyles();
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
@@ -68,7 +71,10 @@ export default function CritterPage(): JSX.Element {
   // critter properties that are displayed as select inputs
   const selectableProps = CS.editableProps.slice(3, 7);
 
-  const handleSelect = (row: Animal): void => setEditObj(row);
+  const handleSelect = (row: Animal): void => {
+    setEditObj(row);
+    props.setSidebarContent(<p>WLHID: {row.wlh_id}</p>);
+  } 
 
   const save = async (a: Animal): Promise<Animal[]> => await mutateAsync(a);
 
