@@ -7,6 +7,7 @@ import { useDataStyles } from 'pages/data/common/data_styles';
 import { NotificationMessage } from 'components/common';
 import { EditModalBaseProps } from 'components/component_interfaces';
 import { useResponseDispatch, useResponseState } from 'contexts/ApiResponseContext';
+import { IUpsertPayload } from 'api/api_interfaces';
 
 type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ type IEditModalProps<T> = EditModalBaseProps<T> & {
   hideSave?: boolean; 
   onReset?: () => void;
   onValidate?: (o: T) => boolean;
+  isEdit: boolean;
 };
 
 /**
@@ -29,7 +31,7 @@ type IEditModalProps<T> = EditModalBaseProps<T> & {
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const styles = useDataStyles();
-  const { children, title, open, handleClose, editing, newT, onSave, onValidate, onReset, hideSave = false } = props;
+  const { children, title, open, handleClose, editing, newT, onSave, onValidate, onReset, isEdit, hideSave = false } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
@@ -42,7 +44,10 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     if (!isValid) {
       return;
     }
-    const toSave = { ...omitNull(editing), ...omitNull(newObj) };
+    const toSave: IUpsertPayload<T> = {
+      isEdit,
+      body: { ...omitNull(editing), ...omitNull(newObj) }
+    };
     // console.log(JSON.stringify(toSave))
     onSave(toSave);
   };

@@ -15,8 +15,8 @@ import { getNow } from 'utils/time';
 
 type IPerformAssignmentActionProps = {
   hasCollar: boolean;
-  animalId: number;
-  collarId: number;
+  animalId: string;
+  collarId: string;
 };
 /**
  * component that performs post requests to assign/unassign a collar
@@ -40,7 +40,7 @@ export default function PerformAssignmentAction({
   const onSuccess = (data: CollarHistory): void => {
     updateStatus({
       type: 'success',
-      message: `collar ${data.collar_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`
+      message: `device ${data.collar_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`
     });
   };
 
@@ -74,7 +74,7 @@ export default function PerformAssignmentAction({
     setShowAvailableModal(false);
   };
 
-  const callMutation = async (id: number, isAssign: boolean): Promise<void> => {
+  const callMutation = async (id: string, isAssign: boolean): Promise<void> => {
     await setIsLink(isAssign);
     isAssign ? setShowAvailableModal(false) : setShowConfirmModal(false);
     const payload: ICollarLinkPayload = {
@@ -82,7 +82,7 @@ export default function PerformAssignmentAction({
       data: {
         collar_id: id,
         animal_id: animalId,
-        start_date: getNow()
+        valid_from: getNow()
       }
     };
     await mutateAsync(payload);

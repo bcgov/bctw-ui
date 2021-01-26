@@ -1,4 +1,4 @@
-import { eCollarType, IBulkUploadResults } from 'api/api_interfaces';
+import { eCollarType, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { SnackbarWrapper } from 'components/common';
 import { INotificationMessage } from 'components/component_interfaces';
 import Table from 'components/table/Table';
@@ -63,7 +63,7 @@ export default function CollarPage(): JSX.Element {
   // setup the mutation for saving collars
   const { mutateAsync } = (useTelemetryApi().useMutateCollar as any)({ onSuccess });
 
-  const save = async (c: Collar): Promise<void> => await mutateAsync(c);
+  const save = async (c: IUpsertPayload<Collar>): Promise<void> => await mutateAsync(c);
 
   const editProps = {
     editableProps: S.editableProps,

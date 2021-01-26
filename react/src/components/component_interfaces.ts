@@ -1,4 +1,5 @@
 import { StandardTextFieldProps } from "@material-ui/core"
+import { IUpsertPayload } from "api/api_interfaces";
 
 type ModalBaseProps = {
   open: boolean;
@@ -8,7 +9,7 @@ type ModalBaseProps = {
 
 type EditModalBaseProps<T> = ModalBaseProps & {
   editing: T;
-  onSave: (c: T) => void;
+  onSave: (c: IUpsertPayload<T>) => void;
 }
 
 type CritterCollarModalProps<T> = EditModalBaseProps<T> & {

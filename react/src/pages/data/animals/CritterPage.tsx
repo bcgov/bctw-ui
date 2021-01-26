@@ -1,3 +1,4 @@
+import { IUpsertPayload } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { SnackbarWrapper } from 'components/common';
 import { INotificationMessage } from 'components/component_interfaces';
@@ -73,10 +74,10 @@ export default function CritterPage(props : CritterPageProps): JSX.Element {
 
   const handleSelect = (row: Animal): void => {
     setEditObj(row);
-    props.setSidebarContent(<p>WLHID: {row.wlh_id}</p>);
+    props.setSidebarContent(<p>id: {row.id}</p>);
   } 
 
-  const save = async (a: Animal): Promise<Animal[]> => await mutateAsync(a);
+  const save = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await mutateAsync(a);
 
   // props to be passed to the edit modal component
   const editProps = {

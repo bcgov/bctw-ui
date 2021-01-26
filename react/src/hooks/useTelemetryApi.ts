@@ -17,6 +17,7 @@ import {
   eCollarType,
   IBulkUploadResults,
   ICollarLinkPayload,
+  IUpsertPayload,
   RequestPingParams,
 } from '../api/api_interfaces';
 import { UserRole } from 'types/user';
@@ -120,11 +121,11 @@ export const useTelemetryApi = (): Record<string, unknown> => {
    * 
    * mutations
    */
-  const useMutateCollar = (config: UseMutationOptions<IBulkUploadResults<Collar>, AxiosError, Collar[]>): UseMutationResult => 
-    useMutation<IBulkUploadResults<Collar>, AxiosError, Collar[]>((collar) => collarApi.upsertCollar(collar), config);
+  const useMutateCollar = (config: UseMutationOptions<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>): UseMutationResult => 
+    useMutation<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>((collar) => collarApi.upsertCollar(collar), config);
 
-  const useMutateCritter = (config: UseMutationOptions<Animal[], AxiosError, Animal[]>): UseMutationResult => 
-    useMutation<Animal[], AxiosError, Animal[]>((critter) => critterApi.upsertCritter(critter), config);
+  const useMutateCritter = (config: UseMutationOptions<Animal[], AxiosError, IUpsertPayload<Animal>>): UseMutationResult => 
+    useMutation<Animal[], AxiosError, IUpsertPayload<Animal>>((critter) => critterApi.upsertCritter(critter), config);
  
   const useMutateLinkCollar = (config: UseMutationOptions<CollarHistory, AxiosError, ICollarLinkPayload>): UseMutationResult => 
     useMutation<CollarHistory, AxiosError, ICollarLinkPayload>((link) => critterApi.linkCollar(link), config);

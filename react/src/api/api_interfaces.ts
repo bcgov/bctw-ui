@@ -1,3 +1,6 @@
+import { Animal } from "types/animal";
+import { Collar } from "types/collar";
+
 /**
  * @param query - name of api hook 
  * @param queryProp - param to pass to hook
@@ -18,13 +21,18 @@ export enum eCollarType {
   Available = 'Available'
 }
 
+interface IUpsertPayload<T> {
+  isEdit: boolean;
+  body: T;
+}
+
 interface ICollarLinkPayload {
   isLink: boolean;
   data: {
-    animal_id: number,
-    collar_id: number,
-    start_date: Date | string,
-    end_date?: Date | string
+    animal_id: string,
+    collar_id: string,
+    valid_from: Date | string,
+    valid_to?: Date | string
   }
 }
 interface BulkUploadError {
@@ -52,4 +60,5 @@ export type {
   ICollarLinkPayload,
   IBaseGetProps,
   IGetCodeProps,
+  IUpsertPayload,
 }

@@ -2,17 +2,13 @@ import { columnToHeader } from 'utils/common';
 import { BCTW } from 'types/common_types';
 import { Type } from 'class-transformer';
 export interface ICollarBase {
-  collar_id: number;
+  collar_id: string;
 }
 
 const formatCollarProp = (prop: string): string => {
   switch (prop) {
     case 'device_id':
       return 'Device ID';
-    case 'make':
-      return 'Collar Make';
-    case 'model':
-      return 'Collar Model';
     case 'animal_id':
       return 'Individual ID';
     case 'max_transmission_date':
@@ -24,8 +20,8 @@ const formatCollarProp = (prop: string): string => {
 
 export interface ICollar extends ICollarBase, BCTW {
   device_id: number;
-  make: string;
-  model: string;
+  collar_make: string;
+  collar_model: string;
   deployment_status: string;
   collar_status: string;
   collar_type: string;
@@ -39,10 +35,10 @@ export interface ICollar extends ICollarBase, BCTW {
 }
 
 export class Collar implements ICollar {
-  collar_id: number;
+  collar_id: string;
   device_id: number;
-  make: string;
-  model: string;
+  collar_make: string;
+  collar_model: string;
   deployment_status: string;
   collar_status: string;
   collar_type: string;
@@ -73,8 +69,8 @@ export enum NewCollarType {
 }
 
 // properties displayed on collar pages
-const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
-const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
+const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'collar_make', 'collar_model', 'collar_type'];
+const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'collar_make', 'collar_model', 'collar_type'];
 
 /**
  * instantiating some properties by default on a new collar

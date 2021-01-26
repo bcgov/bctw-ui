@@ -61,7 +61,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const isAddNewCollar = !isEdit && collarType === NewCollarType.Other;
 
   return (
-    <EditModal title={title} newT={new Collar()} onValidate={validate} onReset={close} hideSave={isAddNewCollar} {...props}>
+    <EditModal title={title} newT={new Collar()} onValidate={validate} onReset={close} isEdit={isEdit} hideSave={isAddNewCollar} {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
           // do form validation before passing change handler to EditModal

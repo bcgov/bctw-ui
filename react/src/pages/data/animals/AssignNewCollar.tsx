@@ -9,7 +9,7 @@ import { CritterStrings as CS } from 'constants/strings';
 type IAssignNewCollarModal = {
   show: boolean;
   onClose: (close: boolean) => void;
-  onSave: (device: number) => void;
+  onSave: (collar_id: string) => void;
 };
 
 /**
@@ -18,7 +18,7 @@ type IAssignNewCollarModal = {
  * collar row must be selected in order to enable the save button
  */
 export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignNewCollarModal): JSX.Element {
-  const [collarId, setCollarId] = useState<number>(0);
+  const [collarId, setCollarId] = useState<string>('');
   const handleSelect = (row: ICollar): void => setCollarId(row.collar_id);
 
   return (
@@ -31,7 +31,7 @@ export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignN
           queryProps={{ query: 'useCollarType', queryParam: eCollarType.Available }}
           onSelect={handleSelect}
         />
-        <Button disabled={collarId === 0} onClick={(): void => onSave(collarId)}>{CS.assignCollarBtnText}</Button>
+        <Button disabled={collarId === ''} onClick={(): void => onSave(collarId)}>{CS.assignCollarBtnText}</Button>
       </Modal>
     </>
   );

@@ -5,8 +5,8 @@ import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history'
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 
 type IAssignmentHistoryProps = {
-  animalId: number;
-  collarId?: number;
+  animalId: string;
+  collarId?: string;
 };
 
 /**
@@ -19,11 +19,13 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
 
   // nothing for user to interact with by selecting row, so this is a null handler
-  const handleSelect = (): void => { /* do nothing */ };
+  const handleSelect = (): void => {
+    /* do nothing */
+  };
 
   const onNewData = (d: CollarHistory[]): void => {
-    setCollarHistory(d)
-  }
+    setCollarHistory(d);
+  };
 
   useEffect(() => {
     const u = (): void => {
@@ -36,12 +38,14 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
 
   // instantiate this component here as we want to display the add collar
   // option if the critter has no collar history
-  const assignment = <PerformAssignmentAction collarId={history?.length ? history[0].collar_id : 0} hasCollar={hasCollar} {...props} />;
+  const assignment = (
+    <PerformAssignmentAction collarId={history?.length ? history[0].collar_id : ''} hasCollar={hasCollar} {...props} />
+  );
   return (
     <>
-      {history.length ? <Typography variant='h6'>Collar Assignment History</Typography> : null }
+      {history.length ? <Typography variant='h6'>Collar Assignment History</Typography> : null}
       <Table
-        headers={['device_id', 'make', 'start_time', 'end_time']}
+        headers={['device_id', 'collar_make', 'valid_from', 'valid_to']}
         queryProps={{ query: 'useCollarHistory', queryParam: animalId, onNewData: onNewData }}
         rowIdentifier='collar_id'
         paginate={history?.length >= 10}

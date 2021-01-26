@@ -2,11 +2,12 @@ import { columnToHeader } from 'utils/common';
 import { BCTW } from 'types/common_types';
 import { Type } from 'class-transformer';
 
-export const assignedCritterProps = ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
-export const unassignedCritterProps = ['id', 'nickname', 'animal_id', 'wlh_id', 'animal_status'];
+export const assignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
+export const unassignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status'];
 
 export interface IAnimal extends BCTW {
-  id: number;
+  id: string;
+  transaction_id: string;
   animal_id: string;
   animal_status: string;
   calf_at_heel: boolean;
@@ -39,7 +40,8 @@ export interface IAnimal extends BCTW {
 }
 
 export class Animal implements IAnimal {
-  id: number;
+  id: string;
+  transaction_id: string;
   animal_id: string;
   animal_status: string;
   calf_at_heel: boolean;

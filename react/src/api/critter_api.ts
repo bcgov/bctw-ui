@@ -4,7 +4,7 @@ import { plainToClass } from 'class-transformer';
 import { Animal, IAnimal } from 'types/animal';
 import { CollarHistory } from 'types/collar_history';
 
-import { ICollarLinkPayload } from './api_interfaces';
+import { ICollarLinkPayload, IUpsertPayload } from './api_interfaces';
 
 export const critterApi = (api: AxiosInstance) => {
 
@@ -32,11 +32,13 @@ export const critterApi = (api: AxiosInstance) => {
     return plainToClass(CollarHistory, data[0]);
   };
 
-  const upsertCritter = async (body: Animal[]): Promise<Animal[]> => {
-    const url = createUrl({ api: 'add-animal' });
+  const upsertCritter = async (payload: IUpsertPayload<Animal>): Promise<Animal[]> => {
+    const { isEdit, body } = payload;
+    const url = createUrl({ api: isEdit ? 'update-animal' : 'add-animal' });
     // const critters = body.map(a => serialize(a))
     const { data } = await api.post(url, body);
-    return data.map((a: IAnimal) => plainToClass(Animal, a));
+    const results = data.map((a: IAnimal) => plainToClass(Animal, a));
+    return Array.isArray(results) && results.length > 1 ? results : results[0];
   }
 
   return {
