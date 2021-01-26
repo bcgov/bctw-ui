@@ -5,6 +5,7 @@ import 'leaflet-draw';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import './MapPage.css';
+import moment from 'moment';
 
 // type IMapPageProps = { }
 
@@ -96,12 +97,16 @@ const MapPage: React.FC = () => {
         },
         onEachFeature: (feature,layer) => {
           const p = feature.properties;
+          const x = layer.feature.geometry.coordinates[0]?.toFixed(5);
+          const y = layer.feature.geometry.coordinates[1]?.toFixed(5);
           const text = `
-            Animal ID: ${p.animal_id} <br>
-            Species: ${p.species} <br>
-            Population Unit: ${p.population_unit} <br>
-            GPS Vendor: ${p.device_vendor} <br>
-            Date Recorded: ${p.date_recorded}
+            ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
+            <hr>
+            Device ID ${p.device_id} (${p.device_vendor}) <br>
+            ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
+            ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
+            ${moment(p.date_recorded).format("dddd, MMMM Do YYYY, h:mm:ss a")} <br>
+            ${x}, ${y}
           `
           layer.bindPopup(text);
         }
