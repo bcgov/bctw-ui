@@ -46,7 +46,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
       {history.length ? <Typography variant='h6'>Collar Assignment History</Typography> : null}
       <Table
         headers={['device_id', 'collar_make', 'valid_from', 'valid_to']}
-        queryProps={{ query: 'useCollarHistory', queryParam: animalId, onNewData: onNewData }}
+        queryProps={{ query: 'useCollarAssignmentHistory', queryParam: animalId, onNewData: onNewData }}
         rowIdentifier='collar_id'
         paginate={history?.length >= 10}
         onSelect={handleSelect}

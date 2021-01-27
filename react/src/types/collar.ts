@@ -1,5 +1,5 @@
 import { columnToHeader } from 'utils/common';
-import { BCTW } from 'types/common_types';
+import { BCTW, BctwBaseType } from 'types/common_types';
 import { Type } from 'class-transformer';
 export interface ICollarBase {
   collar_id: string;
@@ -18,7 +18,7 @@ const formatCollarProp = (prop: string): string => {
   }
 }
 
-export interface ICollar extends ICollarBase, BCTW {
+export interface ICollar extends ICollarBase, BCTW, BctwBaseType {
   device_id: number;
   collar_make: string;
   collar_model: string;
@@ -49,12 +49,12 @@ export class Collar implements ICollar {
   reg_key: string;
   @Type(() => Date) retreival_date: Date;
   satellite_network: string;
+  @Type(() => Date)valid_from: Date;
+  @Type(() => Date)valid_to: Date;
 
   constructor() {
     this.radio_frequency = 0;
     this.device_id = 0;
-    // this.collar_type = collar_type;
-    // this.make = collar_make;
   }
   formatPropAsHeader(str: string): string {
     return formatCollarProp(str);
@@ -71,6 +71,7 @@ export enum NewCollarType {
 // properties displayed on collar pages
 const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'collar_make', 'collar_model', 'collar_type'];
 const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'collar_make', 'collar_model', 'collar_type'];
+const collarHistoryProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'radio_frequency', 'valid_from', 'valid_to'];
 
 /**
  * instantiating some properties by default on a new collar
@@ -91,9 +92,16 @@ const newCollarTypeToSelectableCode = (type: NewCollarType): Record<string, stri
 
 }
 
+const isCollar = (c: unknown): c is Collar => {
+  const collar = c as Collar;
+  return !!(collar.collar_id && collar.device_id);
+}
+
 export {
   assignedCollarProps,
   availableCollarProps,
+  collarHistoryProps,
   formatCollarProp,
   newCollarTypeToSelectableCode,
+  isCollar
 }

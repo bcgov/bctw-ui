@@ -41,8 +41,15 @@ export const critterApi = (api: AxiosInstance) => {
     return Array.isArray(results) && results.length > 1 ? results : results[0];
   }
 
+  const getCritterHistory = async (id: string, page = 1): Promise<Animal[]> => {
+    const url = createUrl({ api: `get-animal-history/${id}`});
+    const { data } = await api.get(url);
+    return data.map((json: IAnimal[]) => plainToClass(Animal, json));
+  }
+
   return {
     getAssignedCritters,
+    getCritterHistory,
     getUnassignedCritters,
     linkCollar,
     upsertCritter,

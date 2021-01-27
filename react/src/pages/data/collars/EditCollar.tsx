@@ -6,7 +6,7 @@ import SelectCode from 'components/form/SelectCode';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
-import { getSelectCodeLabel, removeProps } from 'utils/common';
+import { removeProps } from 'utils/common';
 import { CollarStrings as CS } from 'constants/strings';
 import { Collar, NewCollarType, newCollarTypeToSelectableCode } from 'types/collar';
 import { useDataStyles } from 'pages/data/common/data_styles';
@@ -115,7 +115,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                             defaultValue={d.value}
                             changeHandler={onChange}
                             required={requiredFields.includes(d.key)}
-                            error={!!errors[getSelectCodeLabel(d.key)]}
+                            error={!!errors[d.key]}
                           />
                         );
                       })}

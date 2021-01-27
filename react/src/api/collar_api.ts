@@ -21,13 +21,21 @@ export const collarApi = (api: AxiosInstance) => {
     return _handleGetResults(data);
   };
 
-  const getCollarHistory = async (critterId: number, page = 1): Promise<CollarHistory[]> => {
+  const getCollarAssignmentHistory = async (critterId: number, page = 1): Promise<CollarHistory[]> => {
     const url = createUrl({ api: `get-assignment-history/${critterId}`, page });
-    // console.log(`requesting collar history`);
+    // console.log(`requesting collar/critter assignment history`);
     const { data } = await api.get(url);
     const results = data.map((json: ICollarHistory) => plainToClass(CollarHistory, json));
     return results;
   };
+
+  // a list of changes made to a collar, vs collar/critter attachment history above
+  const getCollarHistory = async (collarId: string, page = 1): Promise<Collar[]> => {
+    const url = createUrl({ api: `get-collar-history/${collarId}`, page });
+    // console.log(`requesting collar history`);
+    const { data } = await api.get(url);
+    return data.map((json: ICollar[]) => plainToClass(Collar, json));
+  }
 
   const upsertCollar = async (payload: IUpsertPayload<Collar>): Promise<IBulkUploadResults<Collar>> => {
     const { isEdit, body } = payload;
@@ -40,6 +48,7 @@ export const collarApi = (api: AxiosInstance) => {
     getAvailableCollars,
     getAssignedCollars,
     getCollarHistory,
+    getCollarAssignmentHistory,
     upsertCollar,
   }
 }

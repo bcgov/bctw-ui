@@ -60,7 +60,7 @@ export default function PerformAssignmentAction({
     queryClient.invalidateQueries({
       predicate: (query) => {
         const key = query.queryKey[0] as string;
-        const includes = ['collarHistory', 'u_critters', 'a_critters'].includes(key);
+        const includes = ['collarAssignmentHistory', 'u_critters', 'a_critters'].includes(key);
         return includes;
       }
     });

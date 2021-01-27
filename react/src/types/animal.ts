@@ -1,11 +1,12 @@
 import { columnToHeader } from 'utils/common';
-import { BCTW } from 'types/common_types';
+import { BCTW, BctwBaseType } from 'types/common_types';
 import { Type } from 'class-transformer';
 
 export const assignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
 export const unassignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status'];
+export const critterHistoryProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'calf_at_heel', 'region', 'population_unit', 'valid_from', 'valid_to'];
 
-export interface IAnimal extends BCTW {
+export interface IAnimal extends BCTW, BctwBaseType {
   id: string;
   transaction_id: string;
   animal_id: string;
@@ -71,6 +72,8 @@ export class Animal implements IAnimal {
   trans_location: boolean;
   wlh_id: string;
   nickname: string;
+  @Type(() => Date)valid_from: Date;
+  @Type(() => Date)valid_to: Date;
 
   constructor() {
     this.animal_id = '';
@@ -93,4 +96,9 @@ export class Animal implements IAnimal {
         return columnToHeader(str);
     }
   }
+}
+
+export const isAnimal = (a: unknown): a is Animal => {
+  const critter = a as Animal;
+  return !!(critter.id && critter.animal_id);
 }

@@ -17,8 +17,8 @@ import { formatAxiosError } from 'utils/common';
 
 type CritterPageProps = {
   setSidebarContent?: (component: JSX.Element) => void;
-}
-export default function CritterPage(props : CritterPageProps): JSX.Element {
+};
+export default function CritterPage(props: CritterPageProps): JSX.Element {
   const classes = useDataStyles();
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
@@ -37,13 +37,13 @@ export default function CritterPage(props : CritterPageProps): JSX.Element {
     let unassignedQueryKey;
     let isCritterMatch = false;
     queryClient.invalidateQueries({
-      predicate: query => {
+      predicate: (query) => {
         // save this query in case we cant find a matching critter to update
         if (query.queryKey[0] === 'u_critters') {
           unassignedQueryKey = query.queryKey;
         }
         const staleData = query.state.data as Animal[];
-        const found = staleData.find(a => a.id === critter.id);
+        const found = staleData.find((a) => a.id === critter.id);
         // invalidate the list of critters containing the updated one
         if (found) {
           isCritterMatch = true;
@@ -51,20 +51,19 @@ export default function CritterPage(props : CritterPageProps): JSX.Element {
         }
         return false;
       }
-    })
+    });
     // if a new critter was added, invalidate unassigned critters data
     if (!isCritterMatch && unassignedQueryKey) {
       queryClient.invalidateQueries(unassignedQueryKey);
     }
-  }
-
+  };
 
   const onError = (error: AxiosError): void =>
     updateStatus({ type: 'error', message: `error saving animal: ${formatAxiosError(error)}` });
 
   const updateStatus = (notif: INotificationMessage): void => {
-    responseDispatch(notif)
-  }
+    responseDispatch(notif);
+  };
 
   // setup the post mutation
   const { mutateAsync } = (bctwApi.useMutateCritter as any)({ onSuccess, onError });
@@ -75,7 +74,7 @@ export default function CritterPage(props : CritterPageProps): JSX.Element {
   const handleSelect = (row: Animal): void => {
     setEditObj(row);
     props.setSidebarContent(<p>id: {row.id}</p>);
-  } 
+  };
 
   const save = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await mutateAsync(a);
 
@@ -85,15 +84,15 @@ export default function CritterPage(props : CritterPageProps): JSX.Element {
     editing: new Animal(),
     open: false,
     onSave: save,
-    selectableProps,
+    selectableProps
   };
 
   const ieProps = {
     eMsg: CS.exportText,
     eTitle: CS.exportTitle,
     iTitle: CS.importTitle,
-    iMsg: CS.importText,
-  }
+    iMsg: CS.importText
+  };
 
   return (
     <SnackbarWrapper>
@@ -111,7 +110,7 @@ export default function CritterPage(props : CritterPageProps): JSX.Element {
           onSelect={handleSelect}
         />
 
-        <div className={classes.mainButtonRow} >
+        <div className={classes.mainButtonRow}>
           <ImportExportViewer {...ieProps} data={[...critterA, ...critterU]} />
 
           <AddEditViewer<Animal> editing={editObj} empty={(): Animal => new Animal()}>
@@ -120,6 +119,5 @@ export default function CritterPage(props : CritterPageProps): JSX.Element {
         </div>
       </div>
     </SnackbarWrapper>
-  )
-
+  );
 }

@@ -12,7 +12,7 @@ import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode } from 'types/code';
 import { NotificationMessage } from 'components/common';
-import { formatAxiosError, getSelectCodeLabel, removeProps } from 'utils/common';
+import { formatAxiosError, removeProps } from 'utils/common';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -58,7 +58,7 @@ export default function SelectCode(props: ISelectProps<any>): JSX.Element {
   }
 
   const pushChange = (v: unknown): void => {
-    const ret = { [getSelectCodeLabel(label)]: v };
+    const ret = { [label]: v };
     changeHandler(ret);
   }
 

@@ -89,6 +89,13 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     useQuery<Animal[], AxiosError>(['u_critters', page], () => critterApi.getUnassignedCritters(page), { ...defaultQueryOptions, ...config, refetchOnMount: false, keepPreviousData: true });
 
   /**
+   * @returns a list of critters representing the audist history of @param critterId
+   */
+  const useCritterHistory = (page: number, critterId: string, config: Record<string, unknown>): UseQueryResult => {
+    return useQuery<Animal[], AxiosError>(['critterHistory', critterId], () => critterApi.getCritterHistory(critterId), { ...config });
+  }
+
+  /**
    * @param codeHeader the code header name used to determine which codes to fetch
    * @param page not currently used
    */
@@ -107,8 +114,15 @@ export const useTelemetryApi = (): Record<string, unknown> => {
   /**
    * @param critterId serial integer of the critter to be fetched (not animal_id)
    */
-  const useCollarHistory = (page: number, critterId: number, config: Record<string, unknown>): UseQueryResult => {
-    return useQuery<CollarHistory[], AxiosError>(['collarHistory', critterId], () => collarApi.getCollarHistory(critterId), { ...config });
+  const useCollarAssignmentHistory = (page: number, critterId: number, config: Record<string, unknown>): UseQueryResult => {
+    return useQuery<CollarHistory[], AxiosError>(['collarAssignmentHistory', critterId], () => collarApi.getCollarAssignmentHistory(critterId), { ...config });
+  }
+
+  /**
+   * @returns a list of collars represnting the audit history of @param collarId
+   */
+  const useCollarHistory = (page: number, collarId: string, config: Record<string, unknown>): UseQueryResult => {
+    return useQuery<Collar[], AxiosError>(['collarHistory', collarId], () => collarApi.getCollarHistory(collarId), { ...config });
   }
 
   /**
@@ -144,6 +158,8 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     useCollarType,
     useAssignedCritters,
     useUnassignedCritters,
+    useCritterHistory,
+    useCollarAssignmentHistory,
     useCollarHistory,
     useUserRole,
     // mutations

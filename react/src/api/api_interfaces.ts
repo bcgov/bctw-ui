@@ -1,6 +1,3 @@
-import { Animal } from "types/animal";
-import { Collar } from "types/collar";
-
 /**
  * @param query - name of api hook 
  * @param queryProp - param to pass to hook

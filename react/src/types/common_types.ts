@@ -1,14 +1,13 @@
 
-type BCTW = {
+export type BCTW = {
   formatPropAsHeader?: (str: string) => string;
 }
 
-export type {
-  BCTW,
-}
 export interface BctwBaseType {
-  created: Date;
-  expire_date: Date;
-  deleted: boolean;
-  deleted_at: Date;
+  valid_from: Date;
+  valid_to: Date;
+  // created: Date;
+  // expire_date: Date;
+  // deleted: boolean;
+  // deleted_at: Date;
 }

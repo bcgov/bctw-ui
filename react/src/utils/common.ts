@@ -43,14 +43,14 @@ const columnToHeader = (prop: string): string => {
  * some code headers dont match the corresponding table column names
  * when a dropdown option is chosen, emit the correct prop name
  */
-const getSelectCodeLabel = (prop: string): string => {
-  switch(prop){
-    case 'collar_make':
-      return 'make';
-    default:
-      return prop;
-  }
-}
+// const getSelectCodeLabel = (prop: string): string => {
+//   switch(prop){
+//     case 'collar_make':
+//       return 'make';
+//     default:
+//       return prop;
+//   }
+// }
 
 /** 
  * returns a copy of the provided object with null / undefined / empty string removed
@@ -82,7 +82,6 @@ const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? e
 export {
   columnToHeader,
   getProperty,
-  getSelectCodeLabel,
   formatAxiosError,
   objectCompare,
   omitNull,
