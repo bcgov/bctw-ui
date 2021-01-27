@@ -23,6 +23,18 @@ interface IUpsertPayload<T> {
   body: T;
 }
 
+interface IGrantCritterAccessParams {
+  user: string;
+  critterIds: string[];
+}
+
+interface IGrantCritterAccessResults {
+  assignment_id: string;
+  user_id: number;
+  animal_id: string;
+  valid_from: Date;
+}
+
 interface ICollarLinkPayload {
   isLink: boolean;
   data: {
@@ -58,4 +70,6 @@ export type {
   IBaseGetProps,
   IGetCodeProps,
   IUpsertPayload,
+  IGrantCritterAccessParams,
+  IGrantCritterAccessResults,
 }

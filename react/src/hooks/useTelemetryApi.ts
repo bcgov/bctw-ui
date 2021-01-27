@@ -17,10 +17,12 @@ import {
   eCollarType,
   IBulkUploadResults,
   ICollarLinkPayload,
+  IGrantCritterAccessParams,
+  IGrantCritterAccessResults,
   IUpsertPayload,
   RequestPingParams,
 } from '../api/api_interfaces';
-import { UserRole } from 'types/user';
+import { User, UserRole } from 'types/user';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -126,10 +128,20 @@ export const useTelemetryApi = (): Record<string, unknown> => {
   }
 
   /**
-   * @param config 
-   * @returns
+   * @returns a role type string 
    */
-  const useUserRole = (): UseQueryResult => useQuery<UserRole, AxiosError>('userRole', () => userApi.requestUserRole())
+  const useUserRole = (): UseQueryResult => useQuery<UserRole, AxiosError>('userRole', () => userApi.getUserRole())
+
+  /**
+   * @returns a user object 
+   */
+  const useUser = (): UseQueryResult => useQuery<User, AxiosError>('user', () => userApi.getUser())
+
+  /**
+   * @param user idir of the user to receive critter access to
+   * @returns A simplified list of Animals that only has id, animal_id, and nickname
+   */
+  const useCritterAccess = (user: string): UseQueryResult => useQuery<Animal[], AxiosError>('critterAccess', () => userApi.getUserCritterAccess(user));
 
   /**
    * 
@@ -147,7 +159,8 @@ export const useTelemetryApi = (): Record<string, unknown> => {
   const useMutateBulkCsv = <T,>(config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, FormData>): UseMutationResult => 
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
-
+  const useMutateGrantCritterAccess = (config: UseMutationOptions<[], AxiosError, IGrantCritterAccessParams>): UseMutationResult => 
+    useMutation<IGrantCritterAccessResults[], AxiosError, IGrantCritterAccessParams>((body) => userApi.grantCritterAccessToUser(body), config);
 
   return {
     // queries
@@ -161,11 +174,14 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     useCritterHistory,
     useCollarAssignmentHistory,
     useCollarHistory,
+    useUser,
     useUserRole,
+    useCritterAccess,
     // mutations
     useMutateBulkCsv,
     useMutateCollar,
     useMutateCritter,
     useMutateLinkCollar,
+    useMutateGrantCritterAccess,
   };
 };

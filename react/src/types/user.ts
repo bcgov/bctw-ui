@@ -1,7 +1,10 @@
+import { Type } from 'class-transformer';
 import { BctwBaseType } from './common_types';
 
-enum UserRole {
-  Administrator
+export enum UserRole {
+  administrator,
+  owner,
+  observer
 }
 
 export interface IUser extends BctwBaseType {
@@ -11,4 +14,12 @@ export interface IUser extends BctwBaseType {
   email: string;
 }
 
-export { UserRole };
+export class User implements IUser {
+  role: UserRole;
+  id: number;
+  idir: string;
+  bceid: string;
+  email: string;
+  @Type(() => Date)valid_from: Date;
+  @Type(() => Date)valid_to: Date;
+}
