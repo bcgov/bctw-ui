@@ -7,14 +7,47 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import './MapPage.css';
 import moment from 'moment';
 
-// type IMapPageProps = { }
-
 const MapPage: React.FC = () => {
   const mapRef = useRef<L.Map>(null);
 
   const [tracks,setTracks] = useState(new L.GeoJSON());
 
   const [pings,setPings] = useState(new L.GeoJSON());
+
+  pings.options = {pointToLayer: (feature,latlng) => {
+      // Mortality is red
+      const s = feature.properties.animal_status;
+      const colour = (s === 'Mortality') ? '#ff0000' : '#00ff44';
+
+      const pointStyle = {
+        radius: 8,
+        fillColor: colour,
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.9
+      }
+
+      return L.circleMarker(latlng, pointStyle);
+    },
+    onEachFeature: (feature,layer) => {
+      const p = feature.properties;
+      const g = (feature.geometry as any); // Yes... this exists!
+      const x = g.coordinates[0]?.toFixed(5);
+      const y = g.coordinates[1]?.toFixed(5);
+      const text = `
+        ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
+        <hr>
+        Device ID ${p.device_id} (${p.device_vendor}) <br>
+        ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
+        ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
+        ${moment(p.date_recorded).format("dddd, MMMM Do YYYY, h:mm:ss a")} <br>
+        ${x}, ${y}
+      `
+      layer.bindPopup(text);
+    }
+  };
+
 
   const initMap = (): void => {
     mapRef.current = L.map('map', {zoomControl:false})
@@ -37,6 +70,7 @@ const MapPage: React.FC = () => {
     layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
 
     layerPicker.addOverlay(tracks,'Critter Tracks')
+    layerPicker.addOverlay(pings,'Critter Locations')
 
     mapRef.current.addControl(layerPicker);
 
@@ -73,51 +107,25 @@ const MapPage: React.FC = () => {
       .then(geojson => tracks.addData(geojson))
       .catch(error=>{console.error('collar request failed',error)});
 
+    // Configure ping layer
+
     // Fetch the ping data
-    // TODO: Clean this up.
     fetch(urlPings)
       .then(res => res.json())
-      .then(geojson => {
-        const options = {pointToLayer: (feature,latlng) => {
-
-          // Mortality is red
-          const s = feature.properties.animal_status;
-          const colour = (s === 'Mortality') ? '#ff0000' : '#00ff44';
-
-          const pointStyle = {
-            radius: 8,
-            fillColor: colour,
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.9
-          }
-
-          return L.circleMarker(latlng, pointStyle);
-        },
-        onEachFeature: (feature,layer) => {
-          const p = feature.properties;
-          const x = layer.feature.geometry.coordinates[0]?.toFixed(5);
-          const y = layer.feature.geometry.coordinates[1]?.toFixed(5);
-          const text = `
-            ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
-            <hr>
-            Device ID ${p.device_id} (${p.device_vendor}) <br>
-            ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
-            ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
-            ${moment(p.date_recorded).format("dddd, MMMM Do YYYY, h:mm:ss a")} <br>
-            ${x}, ${y}
-          `
-          layer.bindPopup(text);
-        }
-      };
-        const layer = L.geoJSON(geojson,options);
-        layerPicker.addOverlay(layer,'Critter Locations')
-        layer.addTo(mapRef.current)
-      })
+      .then(geojson => {pings.addData(geojson)})
       .catch(error=>{console.error('collar request failed',error)});
 
+    // Set up the drawing events
+    mapRef.current.on('draw:created', (e) => {
+      drawnItems.addLayer((e as any).layer);
+      // TODO: Draw selected layer
+    }).on('draw:edited', () => {
+      // TODO: Draw selected layer
+    }).on('draw:deletestop', () => {
+      // TODO: Draw selected layer
+    });
   };
+
 
 
   // When the dom is ready... Add map.
@@ -129,6 +137,11 @@ const MapPage: React.FC = () => {
   useEffect(() => {
     tracks.addTo(mapRef.current);
   },[tracks]);
+
+  // Add the ping layer
+  useEffect(() => {
+    pings.addTo(mapRef.current);
+  },[pings]);
 
   return (
     <div id='map'></div>
