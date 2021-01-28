@@ -8,6 +8,10 @@ import '@turf/points-within-polygon';
 import './MapPage.css';
 import moment from 'moment';
 import pointsWithinPolygon from '@turf/points-within-polygon';
+import tokml from 'tokml';
+import download from 'downloadjs';
+import { ContactsOutlined } from '@material-ui/icons';
+import { Console } from 'console';
 
 const MapPage: React.FC = () => {
   const mapRef = useRef<L.Map>(null);
@@ -182,11 +186,23 @@ const MapPage: React.FC = () => {
   },[pings]);
 
   const handleKeyPress = (e) => {
-    console.log(e);
+    if (!(e.ctrlKey && e.keyCode == 83)) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    let kml;
+    if ((selectedPings as any).toGeoJSON().features.length > 0) {
+      kml = tokml((selectedPings as any).toGeoJSON());
+
+    } else {
+      kml = tokml((pings as any).toGeoJSON());
+    }
+    download(kml,'collars.kml','application/xml');
   };
 
   return (
-    <div id='map' onKeyUp={handleKeyPress}></div>
+    <div id='map' onKeyDown={handleKeyPress}></div>
   )
 }
 
