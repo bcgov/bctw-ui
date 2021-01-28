@@ -10,9 +10,11 @@ import moment from 'moment';
 const MapPage: React.FC = () => {
   const mapRef = useRef<L.Map>(null);
 
-  const [tracks,setTracks] = useState(new L.GeoJSON());
+  const [tracks,setTracks] = useState(new L.GeoJSON()); // Store Tracks
 
-  const [pings,setPings] = useState(new L.GeoJSON());
+  const [pings,setPings] = useState(new L.GeoJSON()); // Store Pings
+
+  const drawnItems = new L.FeatureGroup(); // Store the selection shapes
 
   pings.options = {pointToLayer: (feature,latlng) => {
       // Mortality is red
@@ -48,6 +50,11 @@ const MapPage: React.FC = () => {
     }
   };
 
+  const drawSelectedLayer = () => {
+    console.log('drawnItems',drawnItems);
+    console.log('pings',pings);
+  };
+
 
   const initMap = (): void => {
     mapRef.current = L.map('map', {zoomControl:false})
@@ -74,7 +81,6 @@ const MapPage: React.FC = () => {
 
     mapRef.current.addControl(layerPicker);
 
-    const drawnItems = new L.FeatureGroup();
     mapRef.current.addLayer(drawnItems);
 
     const drawControl = new L.Control.Draw({
@@ -118,11 +124,11 @@ const MapPage: React.FC = () => {
     // Set up the drawing events
     mapRef.current.on('draw:created', (e) => {
       drawnItems.addLayer((e as any).layer);
-      // TODO: Draw selected layer
-    }).on('draw:edited', () => {
-      // TODO: Draw selected layer
-    }).on('draw:deletestop', () => {
-      // TODO: Draw selected layer
+      drawSelectedLayer();
+    }).on('draw:edited', (e) => {
+      drawSelectedLayer();
+    }).on('draw:deletestop', (e) => {
+      drawSelectedLayer();
     });
   };
 
