@@ -113,7 +113,6 @@ const MapPage: React.FC = () => {
     layerPicker.addOverlay(tracks,'Critter Tracks')
     layerPicker.addOverlay(pings,'Critter Locations')
 
-    mapRef.current.addControl(layerPicker);
 
     mapRef.current.addLayer(drawnItems);
 
@@ -134,6 +133,7 @@ const MapPage: React.FC = () => {
 
     mapRef.current.addControl(drawControl);
 
+    mapRef.current.addControl(layerPicker);
 
     const prod = +(location.port) === 1111 ? false : true;
     const h1 = location.protocol
