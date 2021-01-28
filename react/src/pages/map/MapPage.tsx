@@ -4,17 +4,91 @@ import 'leaflet-draw';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import '@turf/points-within-polygon';
 import './MapPage.css';
 import moment from 'moment';
-
-// type IMapPageProps = { }
+import pointsWithinPolygon from '@turf/points-within-polygon';
+import tokml from 'tokml';
+import download from 'downloadjs';
+import { ContactsOutlined } from '@material-ui/icons';
+import { Console } from 'console';
 
 const MapPage: React.FC = () => {
   const mapRef = useRef<L.Map>(null);
 
-  const [tracks,setTracks] = useState(new L.GeoJSON());
+  const [tracks,setTracks] = useState(new L.GeoJSON()); // Store Tracks
 
-  const [pings,setPings] = useState(new L.GeoJSON());
+  const [pings,setPings] = useState(new L.GeoJSON()); // Store Pings
+
+  const drawnItems = new L.FeatureGroup(); // Store the selection shapes
+
+  pings.options = {pointToLayer: (feature,latlng) => {
+      // Mortality is red
+      const s = feature.properties.animal_status;
+      const colour = (s === 'Mortality') ? '#ff0000' : '#00ff44';
+
+      const pointStyle = {
+        radius: 8,
+        fillColor: colour,
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.9
+      }
+
+      return L.circleMarker(latlng, pointStyle);
+    },
+    onEachFeature: (feature,layer) => {
+      const p = feature.properties;
+      const g = (feature.geometry as any); // Yes... this exists!
+      const x = g.coordinates[0]?.toFixed(5);
+      const y = g.coordinates[1]?.toFixed(5);
+      const text = `
+        ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
+        <hr>
+        Device ID ${p.device_id} (${p.device_vendor}) <br>
+        ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
+        ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
+        ${moment(p.date_recorded).format("dddd, MMMM Do YYYY, h:mm:ss a")} <br>
+        ${x}, ${y}
+      `
+      layer.bindPopup(text);
+    }
+  };
+
+  const selectedPings = new L.GeoJSON(); // Store the selected pings
+
+  (selectedPings as any).options = { pointToLayer: (feature,latlng) => {
+      const pointStyle = {
+        class: 'selected-ping',
+        radius: 10,
+        fillColor: '#ffff00',
+        color: '#000',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 1
+      };
+      return L.circleMarker(latlng,pointStyle);
+    }
+  };  
+
+  const drawSelectedLayer = () => {
+    const clipper = drawnItems.toGeoJSON();
+    const allPings = pings.toGeoJSON();
+    // More typescript type definition bugs... These are the right features!!!
+    const overlay = pointsWithinPolygon((allPings as any),(clipper as any));
+
+    // Clear any previous selections
+    mapRef.current.eachLayer((layer) => {
+      if ((layer as any).options.class === 'selected-ping') {
+        mapRef.current.removeLayer(layer);
+      }
+    })
+
+    selectedPings.addData(overlay);
+
+  };
+
 
   const initMap = (): void => {
     mapRef.current = L.map('map', {zoomControl:false})
@@ -37,11 +111,12 @@ const MapPage: React.FC = () => {
     layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
 
     layerPicker.addOverlay(tracks,'Critter Tracks')
+    layerPicker.addOverlay(pings,'Critter Locations')
 
-    mapRef.current.addControl(layerPicker);
 
-    const drawnItems = new L.FeatureGroup();
     mapRef.current.addLayer(drawnItems);
+
+    mapRef.current.addLayer(selectedPings);
 
     const drawControl = new L.Control.Draw({
       position: 'topright',
@@ -58,6 +133,7 @@ const MapPage: React.FC = () => {
 
     mapRef.current.addControl(drawControl);
 
+    mapRef.current.addControl(layerPicker);
 
     const prod = +(location.port) === 1111 ? false : true;
     const h1 = location.protocol
@@ -73,51 +149,25 @@ const MapPage: React.FC = () => {
       .then(geojson => tracks.addData(geojson))
       .catch(error=>{console.error('collar request failed',error)});
 
+    // Configure ping layer
+
     // Fetch the ping data
-    // TODO: Clean this up.
     fetch(urlPings)
       .then(res => res.json())
-      .then(geojson => {
-        const options = {pointToLayer: (feature,latlng) => {
-
-          // Mortality is red
-          const s = feature.properties.animal_status;
-          const colour = (s === 'Mortality') ? '#ff0000' : '#00ff44';
-
-          const pointStyle = {
-            radius: 8,
-            fillColor: colour,
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.9
-          }
-
-          return L.circleMarker(latlng, pointStyle);
-        },
-        onEachFeature: (feature,layer) => {
-          const p = feature.properties;
-          const x = layer.feature.geometry.coordinates[0]?.toFixed(5);
-          const y = layer.feature.geometry.coordinates[1]?.toFixed(5);
-          const text = `
-            ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
-            <hr>
-            Device ID ${p.device_id} (${p.device_vendor}) <br>
-            ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
-            ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
-            ${moment(p.date_recorded).format("dddd, MMMM Do YYYY, h:mm:ss a")} <br>
-            ${x}, ${y}
-          `
-          layer.bindPopup(text);
-        }
-      };
-        const layer = L.geoJSON(geojson,options);
-        layerPicker.addOverlay(layer,'Critter Locations')
-        layer.addTo(mapRef.current)
-      })
+      .then(geojson => {pings.addData(geojson)})
       .catch(error=>{console.error('collar request failed',error)});
 
+    // Set up the drawing events
+    mapRef.current.on('draw:created', (e) => {
+      drawnItems.addLayer((e as any).layer);
+      drawSelectedLayer();
+    }).on('draw:edited', (e) => {
+      drawSelectedLayer();
+    }).on('draw:deletestop', (e) => {
+      drawSelectedLayer();
+    });
   };
+
 
 
   // When the dom is ready... Add map.
@@ -130,8 +180,29 @@ const MapPage: React.FC = () => {
     tracks.addTo(mapRef.current);
   },[tracks]);
 
+  // Add the ping layer
+  useEffect(() => {
+    pings.addTo(mapRef.current);
+  },[pings]);
+
+  const handleKeyPress = (e) => {
+    if (!(e.ctrlKey && e.keyCode == 83)) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    let kml;
+    if ((selectedPings as any).toGeoJSON().features.length > 0) {
+      kml = tokml((selectedPings as any).toGeoJSON());
+
+    } else {
+      kml = tokml((pings as any).toGeoJSON());
+    }
+    download(kml,'collars.kml','application/xml');
+  };
+
   return (
-    <div id='map'></div>
+    <div id='map' onKeyDown={handleKeyPress}></div>
   )
 }
 

@@ -22,6 +22,8 @@
   },
   "homepage": "https://github.com/bcgov/bctw-ui#readme",
   "dependencies": {
-    "moment": "^2.29.1"
+    "downloadjs": "^1.4.7",
+    "moment": "^2.29.1",
+    "tokml": "^0.4.0"
   }
 }
