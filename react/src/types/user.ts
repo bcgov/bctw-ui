@@ -15,7 +15,7 @@ export interface IUser extends BctwBaseType {
 }
 
 export class User implements IUser {
-  role: UserRole;
+  role_type: UserRole;
   id: number;
   idir: string;
   bceid: string;

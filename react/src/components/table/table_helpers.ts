@@ -1,4 +1,4 @@
-import { getProperty } from "utils/common";
+import { getProperty } from 'utils/common';
 
 export type Order = 'asc' | 'desc';
 
@@ -13,24 +13,25 @@ export interface HeadCell<T> {
 }
 
 /**
+ * converts an object to a list of HeadCells
  * @param obj 
- * @param propsToDisplay 
- * @return {HeadCell<T>[]}
+ * @param propsToDisplay the object's properties that should be displayed in the table
+ * @return {HeadCell<T>[]} 
  */
 function typeToHeadCell<T>(obj: T, propsToDisplay: string[]): HeadCell<T>[] {
-  return propsToDisplay.map((k: string) => {
-    const isNumber = typeof getProperty(obj, (k as any)) === 'number';
+  return propsToDisplay.map((k) => {
+    const isNumber = typeof getProperty(obj, k as keyof T) === 'number';
     return {
       disablePadding: false,
-      id: k as any,
+      id: k as keyof T,
       label: k,
       numeric: isNumber
-    }
-  })
+    };
+  });
 }
 
 /**
- * comparator for a type. properties must be of primitive types 
+ * comparator for a type. properties must be of primitive types
  * string or number to sort successfully
  */
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
@@ -47,10 +48,10 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
  * @param {Order} order
  * @param {Key} orderBy
   calls the descendingComparator with provided order
-**/ 
+**/
 function getComparator<Key extends keyof any>(
   order: Order,
-  orderBy: Key,
+  orderBy: Key
 ): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
   return order === 'desc'
     ? (a, b): number => descendingComparator(a, b, orderBy)
@@ -70,9 +71,4 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export {
-  descendingComparator,
-  getComparator,
-  stableSort,
-  typeToHeadCell,
-}
+export { descendingComparator, getComparator, stableSort, typeToHeadCell };

@@ -24,14 +24,14 @@ enum NewCollarType {
   Other,
 }
 
-const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
-const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'make', 'model', 'collar_type'];
+const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'collar_make', 'model', 'collar_type'];
+const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'collar_make', 'model', 'collar_type'];
 
 const getCollarTitle = (str: string): string => {
   switch (str) {
     case 'device_id':
       return 'Device ID';
-    case 'make':
+    case 'collar_make':
       return 'GPS Vendor';
     case 'model':
       return 'Collar Model';

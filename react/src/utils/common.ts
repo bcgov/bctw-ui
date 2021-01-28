@@ -11,6 +11,13 @@ function getProperty<T, K extends keyof T>(obj: T, key: K): unknown {
   return obj[key]; // Inferred type is T[K]
 }
 
+function getKey<T, K extends keyof T>(obj: T, key: string): keyof T {
+  if (Object.prototype.hasOwnProperty.call(obj, key)) {
+    return key as keyof T;
+  }
+  return null;
+}
+
 /**
  * shallow compare of objects for use in forms
  * values can only be primitive types
@@ -38,19 +45,6 @@ const columnToHeader = (prop: string): string => {
   const asArr = prop.replaceAll('_', ' ').split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
-
-/**
- * some code headers dont match the corresponding table column names
- * when a dropdown option is chosen, emit the correct prop name
- */
-// const getSelectCodeLabel = (prop: string): string => {
-//   switch(prop){
-//     case 'collar_make':
-//       return 'make';
-//     default:
-//       return prop;
-//   }
-// }
 
 /** 
  * returns a copy of the provided object with null / undefined / empty string removed
@@ -81,9 +75,10 @@ const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? e
 
 export {
   columnToHeader,
+  getKey,
   getProperty,
   formatAxiosError,
   objectCompare,
   omitNull,
-  removeProps
+  removeProps,
 };

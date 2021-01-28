@@ -9,14 +9,14 @@ interface ICollarAssignment {
   end_time: Date;
 }
 
-const assignmentPropsToDisplay = ['device_id', 'make', 'start_time', 'end_time'];
+const assignmentPropsToDisplay = ['device_id', 'collar_make', 'start_time', 'end_time'];
 
 class CollarAssignment implements ICollarAssignment {
   public static getTitle(str: string): string {
     switch (str) {
       case 'device_id':
         return 'Device ID';
-      case 'make':
+      case 'collar_make':
         return 'GPS Vendor';
       case 'start_time':
         return 'Assignment Start';

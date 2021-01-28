@@ -18,7 +18,7 @@ import { dateObjectToTimeStr } from 'utils/time';
 import PaginationActions from './TablePaginate';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { NotificationMessage } from 'components/common';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError, getProperty } from 'utils/common';
 import { ITableQueryProps } from 'api/api_interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type ITableProps<T> = {
   headers: string[];
-  rowIdentifier?: string;
+  rowIdentifier?: keyof T;
   title?: string;
   queryProps: ITableQueryProps<T>;
   paginate?: boolean;
@@ -74,15 +74,16 @@ type ITableProps<T> = {
  * @param renderIfNoData hide the table if no data found?
  * @param paginate should the pagination actions be displayed?
  */
-export default function Table<T>({ headers, queryProps, title, onSelect, paginate = true, rowIdentifier = 'id', renderIfNoData = true }: ITableProps<T>): JSX.Element {
+export default function Table<T>({ headers, queryProps, title, onSelect, paginate = true, rowIdentifier = 'id' as any, renderIfNoData = true }: ITableProps<T>): JSX.Element {
   const classes = useStyles();
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof T>(rowIdentifier as any);
+  const { query, queryParam: queryProp, onNewData, defaultSort } = queryProps;
+
+  const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
+  const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property ?? (rowIdentifier as any));
   const [selected, setSelected] = useState<number>(null);
   const [page, setPage] = useState<number>(1);
   const bctwApi = useTelemetryApi();
 
-  const { query, queryParam: queryProp, onNewData } = queryProps;
   const { isFetching, isLoading, isError, error, data: unpaginatedData, resolvedData: pageData, isPreviousData } =
     (bctwApi[query] as any)(page, queryProp, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
 
@@ -150,12 +151,12 @@ export default function Table<T>({ headers, queryProps, title, onSelect, paginat
                     :
                     stableSort(data ?? [], getComparator(order, orderBy))
                       .map((obj: T, prop: number) => {
-                        const isRowSelected = isSelected(obj[rowIdentifier])
+                        const isRowSelected = isSelected(getProperty(obj, rowIdentifier) as number)
                         return (
                           <TableRow
                             key={prop}
                             selected={isRowSelected}
-                            onClick={(event): void => onClick(event, obj[rowIdentifier])}
+                            onClick={(event): void => onClick(event, getProperty(obj, rowIdentifier) as number)}
                           >
                             {
                               headers.map((k: string, i: number) => {

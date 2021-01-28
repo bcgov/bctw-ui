@@ -19,7 +19,7 @@ const CollarStrings = {
   availableCollarsTableTitle: 'Unassigned Collars',
   editableProps: ['device_id', 'radio_frequency', 'collar_make', 'model', 'satellite_network', 'collar_status', 'collar_type'],
   selectableProps: ['collar_make', 'satellite_network', 'collar_status', 'collar_type'],
-  requiredProps: ['device_id', 'make', 'radio_frequency'],
+  requiredProps: ['device_id', 'collar_make', 'radio_frequency'],
   exportTitle: 'Bulk Export Collar Data',
   exportText: '',
   addCollarTypeTitle: 'Select Collar Type',

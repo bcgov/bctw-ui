@@ -84,7 +84,7 @@ const newCollarTypeToSelectableCode = (type: NewCollarType): Record<string, stri
   const vhfType = {[typeKey]: 'VHF'}
   switch (type) {
     case NewCollarType.VHF:
-      return {[makeKey]: 'Advanced Telemetry Systems', ...vhfType}
+      return {[makeKey]: 'ATS', ...vhfType}
     case NewCollarType.Vect:
     default:
       return {[typeKey]: '', ...gpsType}

@@ -1,13 +1,21 @@
+import { Order } from "components/table/table_helpers";
+
 /**
  * @param query - name of api hook 
  * @param queryProp - param to pass to hook
  * @param onNewData handler to call when new data is loaded
  */
+interface ITableSortProp<T> {
+  property: keyof T;
+  order: Order;
+}
 interface ITableQueryProps<T> {
   query: string;
   queryParam?: string | number;
   onNewData?: (data: T[]) => void;
+  defaultSort?: ITableSortProp<T>;
 }
+
 interface RequestPingParams {
   timeWindow: number[];
   pingExtent: string;

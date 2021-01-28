@@ -1,13 +1,13 @@
-import { FunctionComponent } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
-
+import CritterPage from 'pages/data/animals/CritterPage';
+import CodePage from 'pages/data/CodePage';
+import CollarPage from 'pages/data/collars/CollarPage';
+import DataPage from 'pages/data/DataPage';
 import Home from 'pages/Home';
 import MapPage from 'pages/map/MapPage';
 import TerrainPage from 'pages/terrain/TerrainPage';
-import DataPage from 'pages/data/DataPage';
-import CritterPage from 'pages/data/animals/CritterPage';
-import CollarPage from 'pages/data/collars/CollarPage';
-import CodePage from 'pages/data/CodePage';
+import UserProfile from 'pages/user/UserProfile';
+import { FunctionComponent } from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
 
 export type RouteKey = {
   path: string;
@@ -33,6 +33,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain' },
   { name: 'data', path: '/data', title: 'Data Management', component: DataPage, sort: 1, icon: 'data' },
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
+  { name: 'profile', path: '/profile', title: 'Profile', component: UserProfile, sort: 2, icon: 'profile' },
   {
     name: 'notFound',
     path: '/*',

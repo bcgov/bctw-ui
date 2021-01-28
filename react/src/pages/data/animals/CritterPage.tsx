@@ -38,6 +38,9 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
     let isCritterMatch = false;
     queryClient.invalidateQueries({
       predicate: (query) => {
+        if ((query.queryKey[0] as string).indexOf('critter') === -1) {
+          return false;
+        }
         // save this query in case we cant find a matching critter to update
         if (query.queryKey[0] === 'u_critters') {
           unassignedQueryKey = query.queryKey;

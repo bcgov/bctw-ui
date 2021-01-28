@@ -38,6 +38,9 @@ export default function CollarPage(): JSX.Element {
     let isCollarMatch = false;
     queryClient.invalidateQueries({
       predicate: (query) => {
+        if ((query.queryKey[0] as string).indexOf('collartype') === -1) {
+          return false;
+        }
         // save this query key if a new collar was added
         if (query.queryKey[2] === 'Available') {
           availableQueryKey = query.queryKey;

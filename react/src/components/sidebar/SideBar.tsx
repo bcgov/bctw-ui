@@ -33,7 +33,7 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
   useEffect(() => {
     switch (location.pathname) {
       case '/home':
-        setVisibleRoutes(routes.filter(r => ['map', 'terrain', 'data'].includes(r.name)));
+        setVisibleRoutes(routes.filter(r => ['map', 'terrain', 'data', 'profile'].includes(r.name)));
         return;
       case '/terrain':
       case '/map':

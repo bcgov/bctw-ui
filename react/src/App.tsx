@@ -11,6 +11,7 @@ import appTheme from 'themes/appTheme';
 import { DatabaseContext, DatabaseContextProvider, IDatabaseContext } from './contexts/DatabaseContext';
 import { DatabaseChangesContextProvider } from 'contexts/DatabaseChangesContext';
 import { ResponseProvider } from 'contexts/ApiResponseContext';
+import { UserStateContextProvider } from 'contexts/UserContext';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -39,14 +40,16 @@ export default function App(): JSX.Element {
                 }
                 return (
                   <DatabaseChangesContextProvider>
-                    <Router>
-                      <SideBar routes={AppRoutes} sidebarContent={sidebar} />
-                      <DefaultLayout>
-                        <ResponseProvider>
-                          <AppRouter onContentChange={setSidebar} />
-                        </ResponseProvider>
-                      </DefaultLayout>
-                    </Router>
+                    <UserStateContextProvider>
+                      <Router>
+                        <SideBar routes={AppRoutes} sidebarContent={sidebar} />
+                        <DefaultLayout>
+                          <ResponseProvider>
+                            <AppRouter onContentChange={setSidebar} />
+                          </ResponseProvider>
+                        </DefaultLayout>
+                      </Router>
+                    </UserStateContextProvider>
                   </DatabaseChangesContextProvider>
                 );
               }}

@@ -17,22 +17,15 @@ export default function HistoryPage<T>(props: IHistoryPageProps<T>): JSX.Element
   const tableProps: ITableQueryProps<T> = {
     query: historyQuery,
     queryParam: itemId,
-    onNewData: (): void => {
-      /* do nothing */
-    }
+    defaultSort: { property: 'valid_to' as keyof T, order: 'desc' }
   };
 
   if (historyQuery === '') {
-    return <div>no history to display.</div>
+    return <div>no history to display.</div>;
   }
   return (
     <>
-      <Table
-        headers={propsToDisplay}
-        queryProps={tableProps}
-        onSelect={handleSelect}
-        rowIdentifier='transaction_id'
-      />
+      <Table headers={propsToDisplay} queryProps={tableProps} onSelect={handleSelect} rowIdentifier='transaction_id' />
     </>
   );
 }
