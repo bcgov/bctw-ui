@@ -4,8 +4,10 @@ import 'leaflet-draw';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import '@turf/points-within-polygon';
 import './MapPage.css';
 import moment from 'moment';
+import pointsWithinPolygon from '@turf/points-within-polygon';
 
 const MapPage: React.FC = () => {
   const mapRef = useRef<L.Map>(null);
@@ -50,9 +52,37 @@ const MapPage: React.FC = () => {
     }
   };
 
+  const selectedPings = new L.GeoJSON(); // Store the selected pings
+
+  (selectedPings as any).options = { pointToLayer: (feature,latlng) => {
+      const pointStyle = {
+        class: 'selected-ping',
+        radius: 10,
+        fillColor: '#ffff00',
+        color: '#000',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 1
+      };
+      return L.circleMarker(latlng,pointStyle);
+    }
+  };  
+
   const drawSelectedLayer = () => {
-    console.log('drawnItems',drawnItems);
-    console.log('pings',pings);
+    const clipper = drawnItems.toGeoJSON();
+    const allPings = pings.toGeoJSON();
+    // More typescript type definition bugs... These are the right features!!!
+    const overlay = pointsWithinPolygon((allPings as any),(clipper as any));
+
+    // Clear any previous selections
+    mapRef.current.eachLayer((layer) => {
+      if ((layer as any).options.class === 'selected-ping') {
+        mapRef.current.removeLayer(layer);
+      }
+    })
+
+    selectedPings.addData(overlay);
+
   };
 
 
@@ -82,6 +112,8 @@ const MapPage: React.FC = () => {
     mapRef.current.addControl(layerPicker);
 
     mapRef.current.addLayer(drawnItems);
+
+    mapRef.current.addLayer(selectedPings);
 
     const drawControl = new L.Control.Draw({
       position: 'topright',
@@ -149,8 +181,12 @@ const MapPage: React.FC = () => {
     pings.addTo(mapRef.current);
   },[pings]);
 
+  const handleKeyPress = (e) => {
+    console.log(e);
+  };
+
   return (
-    <div id='map'></div>
+    <div id='map' onKeyUp={handleKeyPress}></div>
   )
 }
 
