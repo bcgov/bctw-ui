@@ -11,3 +11,11 @@
   opacity: 0.5;
   margin: 2px 0 10px 0;
 }
+
+#map .leaflet-draw.leaflet-control {
+  transform: translate(-6px,40px) scale(1.5);
+}
+
+#map .leaflet-control-layers.leaflet-control {
+  transform: translate(0px,85px);
+}
