@@ -20,10 +20,5 @@
   "bugs": {
     "url": "https://github.com/bcgov/bctw-ui/issues"
   },
-  "homepage": "https://github.com/bcgov/bctw-ui#readme",
-  "dependencies": {
-    "downloadjs": "^1.4.7",
-    "moment": "^2.29.1",
-    "tokml": "^0.4.0"
-  }
+  "homepage": "https://github.com/bcgov/bctw-ui#readme"
 }
