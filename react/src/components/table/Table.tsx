@@ -24,22 +24,22 @@ import { ITableQueryProps } from 'api/api_interfaces';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
+      width: '100%'
     },
     table: {
-      minWidth: 650,
+      minWidth: 650
     },
     paper: {
       width: '100%',
-      marginBottom: theme.spacing(2),
+      marginBottom: theme.spacing(2)
     },
     toolbar: {
       paddingLeft: theme.spacing(2),
       paddingRight: theme.spacing(1),
-      color: theme.palette.text.primary,
+      color: theme.palette.text.primary
     },
     title: {
-      flex: '1 1 100%',
+      flex: '1 1 100%'
     },
     visuallyHidden: {
       border: 0,
@@ -50,23 +50,23 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 0,
       position: 'absolute',
       top: 20,
-      width: 1,
-    },
+      width: 1
+    }
   })
 );
 
 type ITableProps<T> = {
-  headers: string[];
+  headers?: string[];
   rowIdentifier?: keyof T;
   title?: string;
   queryProps: ITableQueryProps<T>;
   paginate?: boolean;
   renderIfNoData?: boolean;
   onSelect?: (row: T) => void;
-}
+};
 
 /**
- * 
+ *
  * @param headers assuming not all data properties are displayed in the table. * required
  * @param rowIdentifier what uniquely identifies a row (ex device_id for a collar). defaults to 'id'
  * @param title table title
@@ -74,7 +74,15 @@ type ITableProps<T> = {
  * @param renderIfNoData hide the table if no data found?
  * @param paginate should the pagination actions be displayed?
  */
-export default function Table<T>({ headers, queryProps, title, onSelect, paginate = true, rowIdentifier = 'id' as any, renderIfNoData = true }: ITableProps<T>): JSX.Element {
+export default function Table<T>({
+  headers,
+  queryProps,
+  title,
+  onSelect,
+  paginate = true,
+  rowIdentifier = 'id' as any,
+  renderIfNoData = true
+}: ITableProps<T>): JSX.Element {
   const classes = useStyles();
   const { query, queryParam: queryProp, onNewData, defaultSort } = queryProps;
 
@@ -84,8 +92,15 @@ export default function Table<T>({ headers, queryProps, title, onSelect, paginat
   const [page, setPage] = useState<number>(1);
   const bctwApi = useTelemetryApi();
 
-  const { isFetching, isLoading, isError, error, data: unpaginatedData, resolvedData: pageData, isPreviousData } =
-    (bctwApi[query] as any)(page, queryProp, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
+  const {
+    isFetching,
+    isLoading,
+    isError,
+    error,
+    data: unpaginatedData,
+    resolvedData: pageData,
+    isPreviousData
+  } = (bctwApi[query] as any)(page, queryProp, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
 
   const data = pageData ?? unpaginatedData;
 
@@ -97,11 +112,11 @@ export default function Table<T>({ headers, queryProps, title, onSelect, paginat
 
   const onClick = (event: React.MouseEvent<unknown>, id: number): void => {
     setSelected(id);
-    const row = data?.find(d => d[rowIdentifier] === id);
+    const row = data?.find((d) => d[rowIdentifier] === id);
     if (typeof onSelect === 'function') {
       onSelect(row);
     }
-  }
+  };
   const isSelected = (id: number): boolean => selected === id;
 
   const onPageChange = (event: React.MouseEvent<unknown>, page: number): void => {
@@ -113,70 +128,77 @@ export default function Table<T>({ headers, queryProps, title, onSelect, paginat
       }
     }
     setPage(page);
-  }
+  };
 
-  const renderFetch = (): JSX.Element => <TableRow><TableCell>loading...</TableCell></TableRow>;
-  const renderError = (): JSX.Element => <TableRow><TableCell><NotificationMessage type='error' message={formatAxiosError(error)} /></TableCell></TableRow>;
+  const renderFetch = (): JSX.Element => (
+    <TableRow>
+      <TableCell>loading...</TableCell>
+    </TableRow>
+  );
+  const renderError = (): JSX.Element => (
+    <TableRow>
+      <TableCell>
+        <NotificationMessage type='error' message={formatAxiosError(error)} />
+      </TableCell>
+    </TableRow>
+  );
 
-  if ((data && data.length === 0) && !renderIfNoData) {
+  if (data && data.length === 0 && !renderIfNoData) {
     return null;
   }
+  const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        {title ?
+        {title ? (
           <Toolbar className={classes.toolbar}>
-            <Typography className={classes.title} variant="h6" component="div">
+            <Typography className={classes.title} variant='h6' component='div'>
               <strong>{title}</strong>
             </Typography>
-          </Toolbar> : null
-        }
+          </Toolbar>
+        ) : null}
         <TableContainer component={Paper}>
-          <MuiTable className={classes.table} size="small">
-            {
-              isFetching || isLoading || isError ? null
-                :
-                <TableHead
-                  headersToDisplay={headers}
-                  headerData={data && data.length ? data[0] : []}
-                  order={order}
-                  orderBy={orderBy as string ?? ''}
-                  onRequestSort={onSort}
-                />
-            }
+          <MuiTable className={classes.table} size='small'>
+            {isFetching || isLoading || isError ? null : (
+              <TableHead
+                headersToDisplay={headerProps}
+                headerData={data && data.length ? data[0] : []}
+                order={order}
+                orderBy={(orderBy as string) ?? ''}
+                onRequestSort={onSort}
+              />
+            )}
             <TableBody>
-              {
-                isFetching || isLoading ? renderFetch()
-                  : isError ? renderError()
-                    :
-                    stableSort(data ?? [], getComparator(order, orderBy))
-                      .map((obj: T, prop: number) => {
-                        const isRowSelected = isSelected(getProperty(obj, rowIdentifier) as number)
-                        return (
-                          <TableRow
-                            key={prop}
-                            selected={isRowSelected}
-                            onClick={(event): void => onClick(event, getProperty(obj, rowIdentifier) as number)}
-                          >
-                            {
-                              headers.map((k: string, i: number) => {
-                                let val = obj[k];
-                                if (typeof (val)?.getMonth === 'function') {
-                                  val = dateObjectToTimeStr(val);
-                                }
-                                return <TableCell key={`${k}${i}`} align='right'>{val}</TableCell>
-                              })
-                            }
-                          </TableRow>
-                        )
-                      })
-              }
+              {isFetching || isLoading
+                ? renderFetch()
+                : isError
+                  ? renderError()
+                  : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: T, prop: number) => {
+                    const isRowSelected = isSelected(getProperty(obj, rowIdentifier) as number);
+                    return (
+                      <TableRow
+                        key={prop}
+                        selected={isRowSelected}
+                        onClick={(event): void => onClick(event, getProperty(obj, rowIdentifier) as number)}>
+                        {headerProps.map((k: string, i: number) => {
+                          let val = obj[k];
+                          if (typeof val?.getMonth === 'function') {
+                            val = dateObjectToTimeStr(val);
+                          }
+                          return (
+                            <TableCell key={`${k}${i}`} align='right'>
+                              {val}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })}
             </TableBody>
           </MuiTable>
-          {
-            !paginate || isLoading || isFetching || isError ? null :
-              <PaginationActions count={data.length} page={page} rowsPerPage={10} onChangePage={onPageChange} />
-          }
+          {!paginate || isLoading || isFetching || isError ? null : (
+            <PaginationActions count={data.length} page={page} rowsPerPage={10} onChangePage={onPageChange} />
+          )}
         </TableContainer>
       </Paper>
     </div>

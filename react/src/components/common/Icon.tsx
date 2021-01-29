@@ -10,6 +10,7 @@ import Pets from '@material-ui/icons/Pets'
 import GpsFixed from '@material-ui/icons/GpsFixed';
 import BarChart from '@material-ui/icons/BarChart';
 import PersonIcon from '@material-ui/icons/Person';
+import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -23,7 +24,8 @@ const mappings: Record<string, JSX.Element> = {
   code: <BarChart/>,
   'arrow-up': <ArrowUpward />,
   'arrow-down': <ArrowDownward />,
-  profile: <PersonIcon />
+  profile: <PersonIcon />,
+  admin: <SupervisorAccountIcon />,
 };
 
 type IconProps = {

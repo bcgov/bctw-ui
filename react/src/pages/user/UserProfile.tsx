@@ -41,10 +41,10 @@ export default function UserProfile(): JSX.Element {
       }
     };
     update();
-  }, [useUser.ready]);
+  }, [useUser]);
 
   const onChange = (v: Record<string, unknown>) => {
-    console.log(v);
+    // console.log(v);
   };
 
   if (!user) {
@@ -82,7 +82,7 @@ export default function UserProfile(): JSX.Element {
         Animals you have access to:
       </Typography>
       <Table
-        headers={['animal_id', 'nickname']}
+        // headers={['animal_id', 'nickname', 'wlh_id', 'permission_type', 'valid_from', 'valid_to']}
         queryProps={tableProps}
         onSelect={() => {}}
         rowIdentifier='id'

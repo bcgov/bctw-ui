@@ -1,5 +1,5 @@
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { User } from 'types/user';
 
 export interface IUserState {
@@ -15,12 +15,19 @@ export const UserStateContextProvider: React.FC = (props) => {
   const bctwApi = useTelemetryApi();
   const context = useContext(UserContext);
 
-  const { isFetching, isLoading, isError, error, data } = (bctwApi.useUser as any)();
+  const { isFetching, isLoading, isError, data, status } = (bctwApi.useUser as any)();
 
-  if (data) {
-    context.user = data;
-    context.ready = true;
-  }
+  useEffect(() => {
+    const update = (): void => {
+      if (data) {
+        context.user = data;
+        context.ready = true;
+      } else if (isLoading || isFetching || isError) {
+        context.ready = false;
+      }
+    };
+    update();
+  }, [status]);
 
   return <UserContext.Provider value={context}>{props.children}</UserContext.Provider>;
 };

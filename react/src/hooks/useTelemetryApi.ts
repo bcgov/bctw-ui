@@ -22,7 +22,7 @@ import {
   IUpsertPayload,
   RequestPingParams
 } from '../api/api_interfaces';
-import { User, UserRole } from 'types/user';
+import { User, UserCritterAccess } from 'types/user';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -157,21 +157,28 @@ export const useTelemetryApi = (): Record<string, unknown> => {
   };
 
   /**
-   * @returns a role type string
+   * @returns a user object, no parameters because it uses the keycloak object to pass idir
    */
-  const useUserRole = (): UseQueryResult => useQuery<UserRole, AxiosError>('userRole', () => userApi.getUserRole());
+  const useUser = (): UseQueryResult => {
+    return useQuery<User, AxiosError>('user', () => userApi.getUser(), defaultQueryOptions);
+  }
 
   /**
-   * @returns a user object
+   * requires admin role
+   * @returns a list of all users
    */
-  const useUser = (): UseQueryResult => useQuery<User, AxiosError>('user', () => userApi.getUser());
+  const useUsers = (page: number): UseQueryResult => {
+    return useQuery<User[], AxiosError>('all_users', () => userApi.getUsers(page), {
+      ...defaultQueryOptions
+    });
+  }
 
   /**
    * @param user idir of the user to receive critter access to
    * @returns A simplified list of Animals that only has id, animal_id, and nickname
    */
   const useCritterAccess = (page: number, user: string, config: Record<string, unknown>): UseQueryResult =>
-    useQuery<Animal[], AxiosError>(['critterAccess', page], () => userApi.getUserCritterAccess(page, user), {
+    useQuery<UserCritterAccess[], AxiosError>(['critterAccess', page], () => userApi.getUserCritterAccess(page, user), {
       ...config,
       ...defaultQueryOptions
     });
@@ -224,7 +231,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     useCollarAssignmentHistory,
     useCollarHistory,
     useUser,
-    useUserRole,
+    useUsers,
     useCritterAccess,
     // mutations
     useMutateBulkCsv,

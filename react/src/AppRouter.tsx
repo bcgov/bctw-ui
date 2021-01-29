@@ -5,6 +5,7 @@ import DataPage from 'pages/data/DataPage';
 import Home from 'pages/Home';
 import MapPage from 'pages/map/MapPage';
 import TerrainPage from 'pages/terrain/TerrainPage';
+import AdminPage from 'pages/user/AdminPage';
 import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
@@ -16,6 +17,7 @@ export type RouteKey = {
   component: FunctionComponent<{ setSidebarContent: (component: JSX.Element) => void }>;
   sort: number;
   icon?: string;
+  requiresAdmin?: boolean;
 };
 
 const AppRoutes: RouteKey[] = [
@@ -34,11 +36,13 @@ const AppRoutes: RouteKey[] = [
   { name: 'data', path: '/data', title: 'Data Management', component: DataPage, sort: 1, icon: 'data' },
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
   { name: 'profile', path: '/profile', title: 'Profile', component: UserProfile, sort: 2, icon: 'profile' },
+  { name: 'admin', path: '/admin', title: 'Admin', component: AdminPage, sort: 2, icon: 'admin' },
+
   {
     name: 'notFound',
     path: '/*',
     title: 'Not Found',
-    component: (): JSX.Element => <div>page not found :(</div>,
+    component: (): JSX.Element => <div>page not found!</div>,
     sort: 2
   }
 ];
