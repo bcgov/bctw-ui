@@ -78,11 +78,13 @@ export default function UserProfile(): JSX.Element {
           changeHandler={onChange}
         />
       </div>
-      <Typography className={classes.role} variant='h6'>
-        Animals you have access to:
-      </Typography>
+      {/* <Typography className={classes.role} variant='h6'>
+        
+      </Typography> */}
       <Table
         // headers={['animal_id', 'nickname', 'wlh_id', 'permission_type', 'valid_from', 'valid_to']}
+        title='Animals you have access to:'
+        isMultiSelect={true}
         queryProps={tableProps}
         onSelect={() => {}}
         rowIdentifier='id'

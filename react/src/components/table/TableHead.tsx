@@ -1,5 +1,6 @@
 import {
   createStyles,
+  Checkbox,
   makeStyles,
   TableCell,
   TableHead as MuiTableHead,
@@ -7,7 +8,6 @@ import {
   TableSortLabel
 } from '@material-ui/core';
 import { HeadCell, Order, typeToHeadCell } from 'components/table/table_helpers';
-import React from 'react';
 import { BCTW } from 'types/common_types';
 import { columnToHeader } from 'utils/common';
 
@@ -22,46 +22,71 @@ const useStyles = makeStyles(() =>
       padding: 0,
       position: 'absolute',
       top: 20,
-      width: 1,
-    },
+      width: 1
+    }
   })
 );
 
-interface EnhancedTableProps<T> {
+interface TableHeadProps<T> {
   headerData: T;
   headersToDisplay: string[];
+  isMultiSelect: boolean;
+  numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;
   order: Order;
   orderBy: string;
+  rowCount: number;
+  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function TableHead<T>(props: EnhancedTableProps<T>): JSX.Element {
+export default function TableHead<T>(props: TableHeadProps<T>): JSX.Element {
   const classes = useStyles();
-  const { order, orderBy, onRequestSort, headerData, headersToDisplay } = props;
+  const {
+    order,
+    orderBy,
+    onRequestSort,
+    headerData,
+    headersToDisplay,
+    numSelected,
+    onSelectAllClick,
+    rowCount,
+    isMultiSelect
+  } = props;
 
   const createSortHandler = (property: keyof T) => (event: React.MouseEvent<unknown>): void => {
     onRequestSort(event, property);
   };
   const headcells: HeadCell<T>[] = typeToHeadCell(headerData, headersToDisplay);
 
-  // any "class" should have a header formatter function, try to use this first 
-  const formatHeader = (cell: string): string => typeof (headerData as BCTW).formatPropAsHeader === 'function' ? (headerData as BCTW).formatPropAsHeader(cell) : columnToHeader(cell);
+  // any "class" should have a header formatter function, try to use this first
+  const formatHeader = (cell: string): string =>
+    typeof (headerData as BCTW).formatPropAsHeader === 'function'
+      ? (headerData as BCTW).formatPropAsHeader(cell)
+      : columnToHeader(cell);
 
   return (
     <MuiTableHead>
       <TableRow>
+        {isMultiSelect ? (
+          <TableCell padding='checkbox'>
+            <Checkbox
+              indeterminate={numSelected > 0 && numSelected < rowCount}
+              checked={rowCount > 0 && numSelected === rowCount}
+              onChange={onSelectAllClick}
+              inputProps={{ 'aria-label': 'select all' }}
+            />
+          </TableCell>
+        ) : null}
         {headcells.map((headCell) => (
           <TableCell
-            key={(headCell.id) as string}
+            key={headCell.id as string}
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'default'}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
+            sortDirection={orderBy === headCell.id ? order : false}>
             <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
+              onClick={createSortHandler(headCell.id)}>
               <strong>{formatHeader(headCell.label)}</strong>
               {orderBy === headCell.id ? (
                 <span className={classes.visuallyHidden}>
