@@ -65,6 +65,7 @@ type ITableProps<T> = {
   paginate?: boolean;
   renderIfNoData?: boolean;
   onSelect?: (row: T) => void;
+  onSelectMultiple?: (rows: T[]) => void;
   isMultiSelect?: boolean;
 };
 
@@ -83,6 +84,7 @@ export default function Table<T>({
   queryProps,
   title,
   onSelect,
+  onSelectMultiple,
   paginate = true,
   rowIdentifier = 'id' as any,
   renderIfNoData = true,
@@ -144,6 +146,11 @@ export default function Table<T>({
     const row = data?.find((d) => d[rowIdentifier] === id);
     if (typeof onSelect === 'function') {
       onSelect(row);
+    } else if (typeof onSelectMultiple === 'function') {
+      const filtered = data.filter(d => {
+        return newSelected.includes(d[rowIdentifier]);
+      })
+      onSelectMultiple(filtered);
     }
   };
 
@@ -187,10 +194,6 @@ export default function Table<T>({
     return null;
   }
   const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
-  // insert an empty row for the checkbox row
-  if (isMultiSelect) {
-    headerProps.unshift('');
-  }
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>

@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { makeStyles, Drawer, List, Divider, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
-import { Link, useLocation } from 'react-router-dom';
-import SideBarHeader from 'components/sidebar/SideBarHeader';
+import { Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, makeStyles } from '@material-ui/core';
 import { RouteKey } from 'AppRouter';
 import { Icon } from 'components/common';
-// import { User, UserRole } from 'types/user';
-// import { UserContext } from 'contexts/UserContext';
+import SideBarHeader from 'components/sidebar/SideBarHeader';
+import { UserContext } from 'contexts/UserContext';
+import React, { useContext, useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -31,24 +30,21 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
   const classes = useStyles();
   const location = useLocation();
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
-  // const useUser = useContext(UserContext);
-  // const [user, setUser] = useState<User>(null);
+  const userChanges = useContext(UserContext);
 
-  // useEffect(() => {
-  //   const update = (): void => {
-  //     if (useUser.ready) {
-  //       setUser(useUser.user);
-  //     }
-  //   };
-  //   update();
-  // }, [useUser]);
+  useEffect(() => {
+    const updateComponent = (): void => {
+      if (userChanges?.ready) {
+        const user = userChanges.user;
+        if (user.role_type === 'administrator') {
+          setVisibleRoutes([...visibleRoutes, ...routes.filter((r) => r.name === 'admin')]);
+        }
+      }
+    };
+    updateComponent();
+  }, [userChanges]);
 
   const handleSetVisible = (routeNames: string[]): void => {
-    // if (useUser.ready) {
-    // if (user?.role_type === UserRole.administrator) {
-    //   routeNames.push('admin');
-    // }
-    // }
     setVisibleRoutes(routes.filter((r) => routeNames.includes(r.name)));
   };
 
@@ -68,7 +64,7 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
         handleSetVisible(['home', 'animals', 'codes', 'collars']);
         return;
       case '/profile':
-        handleSetVisible(['home', 'admin']);
+        handleSetVisible(['home']);
         return;
     }
   }, [location]); // only fire this effect when location changes
