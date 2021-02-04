@@ -6,8 +6,8 @@ import { Typography } from '@material-ui/core';
 import TextField from 'components/form/Input';
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
 import Table from 'components/table/Table';
-import { ITableQueryProps } from 'api/api_interfaces';
 import { Animal } from 'types/animal';
+import { ITableQueryProps } from 'components/table/table_interfaces';
 
 const useDataStyles = makeStyles((theme: Theme) =>
   createStyles({

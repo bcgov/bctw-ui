@@ -1,16 +1,5 @@
 import { getProperty } from 'utils/common';
-
-export type Order = 'asc' | 'desc';
-
-/**
- * interface used to generate headers in TableHead
- */
-export interface HeadCell<T> {
-  disablePadding: boolean;
-  id: keyof T;
-  label: string;
-  numeric: boolean;
-}
+import { Order, HeadCell } from 'components/table/table_interfaces';
 
 /**
  * converts an object to a list of HeadCells

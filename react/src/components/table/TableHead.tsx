@@ -7,9 +7,10 @@ import {
   TableRow,
   TableSortLabel
 } from '@material-ui/core';
-import { HeadCell, Order, typeToHeadCell } from 'components/table/table_helpers';
+import { typeToHeadCell } from 'components/table/table_helpers';
 import { BCTW } from 'types/common_types';
 import { columnToHeader } from 'utils/common';
+import { HeadCell, Order } from './table_interfaces';
 
 const useStyles = makeStyles(() =>
   createStyles({

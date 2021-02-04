@@ -2,7 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { AxiosInstance } from 'axios';
 import { plainToClass } from 'class-transformer';
 import { IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
-import { IGrantCritterAccessParams, IGrantCritterAccessResults } from './api_interfaces';
+import { IUserCritterPermissionInput, IGrantCritterAccessResults } from './api_interfaces';
 
 export const userApi = (api: AxiosInstance) => {
   // const getUserRole = async (): Promise<UserRole> => {
@@ -25,9 +25,9 @@ export const userApi = (api: AxiosInstance) => {
     return data.map((json: IUser[]) => plainToClass(User, json));
   };
 
-  const grantCritterAccessToUser = async (props: IGrantCritterAccessParams): Promise<IGrantCritterAccessResults[]> => {
+  const grantCritterAccessToUser = async (body: IUserCritterPermissionInput): Promise<IGrantCritterAccessResults[]> => {
     const url = createUrl({ api: 'assign-critter-to-user' });
-    const { data } = await api.post(url, props);
+    const { data } = await api.post(url, body);
     return data;
   };
 

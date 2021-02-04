@@ -13,7 +13,7 @@ import {
   Paper,
   Checkbox
 } from '@material-ui/core';
-import { getComparator, Order, stableSort } from 'components/table/table_helpers';
+import { getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import { dateObjectToTimeStr } from 'utils/time';
@@ -21,7 +21,7 @@ import PaginationActions from './TablePaginate';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError, getProperty } from 'utils/common';
-import { ITableQueryProps } from 'api/api_interfaces';
+import { ITableProps, Order } from './table_interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,29 +57,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type ITableProps<T> = {
-  headers?: string[];
-  rowIdentifier?: keyof T;
-  title?: string;
-  queryProps: ITableQueryProps<T>;
-  paginate?: boolean;
-  renderIfNoData?: boolean;
-  onSelect?: (row: T) => void;
-  onSelectMultiple?: (rows: T[]) => void;
-  isMultiSelect?: boolean;
-};
-
-/**
- *
- * @param headers assuming not all data properties are displayed in the table. * required
- * @param rowIdentifier what uniquely identifies a row (ex device_id for a collar). defaults to 'id'
- * @param title table title
- * @param onSelect handler from parent triggered when a row is clicked
- * @param renderIfNoData hide the table if no data found?
- * @param paginate should the pagination actions be displayed?
- * @param isMultiSelect render row of checkboxes and different toolbar - default to false
- */
 export default function Table<T>({
+  columns,
   headers,
   queryProps,
   title,
@@ -87,15 +66,14 @@ export default function Table<T>({
   onSelectMultiple,
   paginate = true,
   rowIdentifier = 'id' as any,
-  renderIfNoData = true,
   isMultiSelect = false
 }: ITableProps<T>): JSX.Element {
   const classes = useStyles();
-  const { query, queryParam: queryProp, onNewData, defaultSort } = queryProps;
+  const { query, queryParam, onNewData, defaultSort } = queryProps;
 
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property ?? (rowIdentifier as any));
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState<number>(1);
   const bctwApi = useTelemetryApi();
 
@@ -107,7 +85,7 @@ export default function Table<T>({
     data: unpaginatedData,
     resolvedData: pageData,
     isPreviousData
-  } = (bctwApi[query] as any)(page, queryProp, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
+  } = (bctwApi[query] as any)(page, queryParam, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
 
   const data = pageData ?? unpaginatedData;
 
@@ -119,15 +97,26 @@ export default function Table<T>({
 
   const handleSelectAll = (event): void => {
     if (event.target.checked) {
-      const newIds = data.map(r => r[rowIdentifier]);
+      const newIds = data.map((r) => r[rowIdentifier]);
       setSelected(newIds);
+      if (typeof onSelectMultiple === 'function') {
+        onSelectMultiple(newIds);
+      }
       return;
     }
     setSelected([]);
-  }
+  };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number): void => {
+  const handleClick = (event: React.MouseEvent<unknown>, id: string): void => {
     const selectedIndex = selected.indexOf(id);
+    if (!isMultiSelect) {
+      setSelected([id]);
+      if (typeof onSelect === 'function') {
+        const row = data?.find((d) => d[rowIdentifier] === id);
+        onSelect(row);
+      }
+      return;
+    }
     let newSelected = [];
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
@@ -136,25 +125,18 @@ export default function Table<T>({
     } else if (selectedIndex === selected.length - 1) {
       newSelected = newSelected.concat(selected.slice(0, -1));
     } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
+      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
     setSelected(newSelected);
-
-    const row = data?.find((d) => d[rowIdentifier] === id);
-    if (typeof onSelect === 'function') {
-      onSelect(row);
-    } else if (typeof onSelectMultiple === 'function') {
-      const filtered = data.filter(d => {
-        return newSelected.includes(d[rowIdentifier]);
-      })
-      onSelectMultiple(filtered);
+    if (typeof onSelectMultiple === 'function') {
+      // currently sending T[] not just ids
+      onSelectMultiple(data.filter((d) => newSelected.includes(d[rowIdentifier])));
     }
   };
 
-  const isSelected = (id: number): boolean => selected.indexOf(id) !== -1;
+  const isSelected = (id: string): boolean => {
+    return selected.indexOf(id) !== -1;
+  };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, page: number): void => {
     const currentPage = page;
@@ -168,7 +150,9 @@ export default function Table<T>({
   };
 
   const renderFetching = (): JSX.Element => (
-    <TableRow><TableCell>loading...</TableCell></TableRow>
+    <TableRow>
+      <TableCell>loading...</TableCell>
+    </TableRow>
   );
   const renderError = (): JSX.Element => (
     <TableRow>
@@ -178,7 +162,7 @@ export default function Table<T>({
     </TableRow>
   );
 
-  const renderToolbar = (): JSX.Element => (
+  const renderToolbar = (): JSX.Element =>
     isMultiSelect ? (
       <TableToolbar numSelected={selected.length} title={title} />
     ) : (
@@ -187,10 +171,9 @@ export default function Table<T>({
           <strong>{title}</strong>
         </Typography>
       </Toolbar>
-    )
-  )
+    );
 
-  if (data && data.length === 0 && !renderIfNoData) {
+  if (data && data.length === 0) {
     return null;
   }
   const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
@@ -219,26 +202,24 @@ export default function Table<T>({
                 : isError
                   ? renderError()
                   : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: T, prop: number) => {
-                    const isRowSelected = isSelected(getProperty(obj, rowIdentifier) as number);
+                    const isRowSelected = isSelected(getProperty(obj, rowIdentifier) as string);
                     const labelId = `enhanced-table-checkbox-${prop}`;
                     return (
                       <TableRow
                         hover
-                        onClick={(event): void => handleClick(event, getProperty(obj, rowIdentifier) as number)}
+                        onClick={(event): void => handleClick(event, getProperty(obj, rowIdentifier) as string)}
                         role='checkbox'
                         aria-checked={isRowSelected}
                         tabIndex={-1}
                         key={prop}
-                        selected={isRowSelected}
-                      >
-                        { isMultiSelect ? (
+                        selected={isRowSelected}>
+                        {/* render checkbox column if multiselect is enabled */}
+                        {isMultiSelect ? (
                           <TableCell padding='checkbox'>
-                            <Checkbox
-                              checked={isRowSelected}
-                              inputProps={{ 'aria-labelledby': labelId }}
-                            />
+                            <Checkbox checked={isRowSelected} inputProps={{ 'aria-labelledby': labelId }} />
                           </TableCell>
                         ) : null}
+                        {/* render main columns from data fetched from api */}
                         {headerProps.map((k: string, i: number) => {
                           if (!k) {
                             return null;
@@ -253,6 +234,8 @@ export default function Table<T>({
                             </TableCell>
                           );
                         })}
+                        {/* render additional columns */}
+                        {columns ? columns.map((c) => <TableCell>{c}</TableCell>) : null}
                       </TableRow>
                     );
                   })}

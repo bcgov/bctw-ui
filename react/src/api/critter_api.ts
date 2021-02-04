@@ -4,23 +4,16 @@ import { plainToClass } from 'class-transformer';
 import { Animal, IAnimal } from 'types/animal';
 import { CollarHistory } from 'types/collar_history';
 
-import { ICollarLinkPayload, IUpsertPayload } from './api_interfaces';
+import { eCritterFetchType, ICollarLinkPayload, IUpsertPayload } from './api_interfaces';
 
 export const critterApi = (api: AxiosInstance) => {
 
   const _GET_CRITTER_API = 'get-animals';
   const _handleGetResults = (data: IAnimal[]): Animal[] => data.map((json: IAnimal) => plainToClass(Animal, json));
 
-  const getAssignedCritters = async (page = 1): Promise<Animal[]> => {
-    const url = createUrl({ api: _GET_CRITTER_API, query: 'assigned=true', page });
+  const getCritters = async (page = 1, critterType: eCritterFetchType): Promise<Animal[]> => {
+    const url = createUrl({ api: _GET_CRITTER_API, query: `critterType=${critterType}`, page });
     // console.log(`requesting assigned critters page: ${page}`);
-    const { data } = await api.get(url);
-    return _handleGetResults(data);
-  }
-
-  const getUnassignedCritters = async (page = 1): Promise<Animal[]> => {
-    const url = createUrl({ api: _GET_CRITTER_API, query: 'assigned=false', page });
-    // console.log(`requesting unassigned critters page: ${page}`);
     const { data } = await api.get(url);
     return _handleGetResults(data);
   }
@@ -42,15 +35,14 @@ export const critterApi = (api: AxiosInstance) => {
   }
 
   const getCritterHistory = async (id: string, page = 1): Promise<Animal[]> => {
-    const url = createUrl({ api: `get-animal-history/${id}`});
+    const url = createUrl({ api: `get-animal-history/${id}`, page});
     const { data } = await api.get(url);
     return data.map((json: IAnimal[]) => plainToClass(Animal, json));
   }
 
   return {
-    getAssignedCritters,
+    getCritters,
     getCritterHistory,
-    getUnassignedCritters,
     linkCollar,
     upsertCritter,
   }

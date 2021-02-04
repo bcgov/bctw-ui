@@ -1,29 +1,20 @@
-import { Order } from "components/table/table_helpers";
-
-/**
- * @param query - name of api hook 
- * @param queryProp - param to pass to hook
- * @param onNewData handler to call when new data is loaded
- */
-interface ITableSortProp<T> {
-  property: keyof T;
-  order: Order;
-}
-interface ITableQueryProps<T> {
-  query: string;
-  queryParam?: string | number;
-  onNewData?: (data: T[]) => void;
-  defaultSort?: ITableSortProp<T>;
-}
+import { IUserCritterAccess, eCritterPermission } from 'types/user'
 
 interface RequestPingParams {
   timeWindow: number[];
   pingExtent: string;
 }
 
-export enum eCollarType {
+enum eCollarType {
   Assigned = 'Assigned',
   Available = 'Available'
+}
+
+// used in critter getters to specify collar attachment status
+enum eCritterFetchType {
+  assigned = 'assigned',
+  unassigned= 'unassigned',
+  all = 'all'
 }
 
 interface IUpsertPayload<T> {
@@ -31,10 +22,18 @@ interface IUpsertPayload<T> {
   body: T;
 }
 
-interface IGrantCritterAccessParams {
-  user: string;
-  critterIds: string[];
+interface ICritterAccess {
+  animal_id: string;
+  permission_type: eCritterPermission;
 }
+interface IUserCritterPermissionInput {
+  userId: number;
+  access: ICritterAccess[]
+}
+
+// interface IGrantCritterAccessInput {
+//   data: IUserCritterPermission[];
+// }
 
 interface IGrantCritterAccessResults {
   assignment_id: string;
@@ -72,12 +71,18 @@ interface IGetCodeProps extends IBaseGetProps {
 
 export type {
   RequestPingParams,
-  ITableQueryProps,
   IBulkUploadResults,
   ICollarLinkPayload,
   IBaseGetProps,
   IGetCodeProps,
   IUpsertPayload,
-  IGrantCritterAccessParams,
+  IUserCritterPermissionInput,
+  // IGrantCritterAccessInput,
   IGrantCritterAccessResults,
+  ICritterAccess
+}
+
+export {
+  eCollarType,
+  eCritterFetchType
 }

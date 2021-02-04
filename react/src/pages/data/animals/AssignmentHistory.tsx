@@ -50,7 +50,6 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
         rowIdentifier='collar_id'
         paginate={history?.length >= 10}
         onSelect={handleSelect}
-        renderIfNoData={false}
       />
       {assignment}
     </>

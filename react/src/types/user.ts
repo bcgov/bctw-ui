@@ -7,7 +7,7 @@ export enum UserRole {
   observer = 'observer'
 }
 
-enum CritterPermission {
+export enum eCritterPermission {
   view = 'view',
   change = 'change'
 }
@@ -35,7 +35,7 @@ export interface IUserCritterAccess {
   nickname: string;
   valid_from: Date
   valid_to: Date;
-  permission_type: CritterPermission;
+  permission_type: eCritterPermission;
 }
 
 export class UserCritterAccess implements IUserCritterAccess {
@@ -44,5 +44,5 @@ export class UserCritterAccess implements IUserCritterAccess {
   nickname: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
-  permission_type: CritterPermission;
+  permission_type: eCritterPermission;
 }

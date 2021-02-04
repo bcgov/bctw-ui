@@ -1,5 +1,5 @@
-import { ITableQueryProps } from 'api/api_interfaces';
 import Table from 'components/table/Table';
+import { ITableQueryProps } from 'components/table/table_interfaces';
 
 type IHistoryPageProps<T> = {
   historyQuery: 'useCollarHistory' | 'useCritterHistory' | ''; // query used to retrieve table data

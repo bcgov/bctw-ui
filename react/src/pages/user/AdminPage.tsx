@@ -1,21 +1,30 @@
-import { useState } from 'react';
-import { ITableQueryProps } from 'api/api_interfaces';
+import { useState, useEffect } from 'react';
 import Table from 'components/table/Table';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import AddEditViewer from 'pages/data/common/AddEditViewer';
+import Button from 'components/form/Button';
 import { User } from 'types/user';
+import GrantCritterModal from 'pages/user/GrantCritterAccess';
+import { ITableQueryProps } from 'components/table/table_interfaces';
 
 export default function AdminPage(): JSX.Element {
-  const [editing, setEditing] = useState<User[]>([]);
-  const bctwApi = useTelemetryApi();
+  const [ids, setIds] = useState<User[]>([]);
+  const [isGrant, setIsGrant] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const tableProps: ITableQueryProps<User> = {
-    query: 'useUsers',
+    query: 'useUsers'
   };
 
-  const handleTableSelect  = (n) => {
-    console.log(n);
+  const handleTableSelect = (users: User[]): void =>  {
+    setIds(users);
   }
+
+  const onClickShowModal = (b: boolean): void => {
+    setIsGrant(b);
+    setShowModal((o) => !o);
+  } 
+  const onSave = () => {
+    // do nothing
+  };
 
   return (
     <>
@@ -25,12 +34,20 @@ export default function AdminPage(): JSX.Element {
         isMultiSelect={true}
         queryProps={tableProps}
         onSelectMultiple={handleTableSelect}
-        rowIdentifier='id'
       />
-      {/* <AddEditViewer editing={editing} empty={() => []} >
-        <div>hi</div>
-      </AddEditViewer> */}
-
+      <Button disabled={!ids.length} onClick={(): void => onClickShowModal(true)}>
+        Grant Animal(s)
+      </Button>
+      <Button disabled={ids.length !== 1} onClick={(): void => onClickShowModal(false)}>
+        Remove Access
+      </Button>
+      <GrantCritterModal
+        show={showModal}
+        isGrantingAccess={isGrant}
+        onClose={(): void => setShowModal(false)}
+        onSave={onSave}
+        users={ids}
+      />
     </>
   );
 }

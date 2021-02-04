@@ -15,9 +15,10 @@ import { CollarHistory } from 'types/collar_history';
 
 import {
   eCollarType,
+  eCritterFetchType,
   IBulkUploadResults,
   ICollarLinkPayload,
-  IGrantCritterAccessParams,
+  IUserCritterPermissionInput,
   IGrantCritterAccessResults,
   IUpsertPayload,
   RequestPingParams
@@ -80,28 +81,37 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     });
   };
 
+  const critterOptions = { ...defaultQueryOptions, refetchOnMount: false, keepPreviousData: true };
   /**
    *  retrieves critters that have a collar assigned
    */
-  const useAssignedCritters = (page: number, config: Record<string, unknown>): UseQueryResult => {
-    return useQuery<Animal[], AxiosError>(['a_critters', page], () => critterApi.getAssignedCritters(page), {
-      ...defaultQueryOptions,
-      ...config,
-      refetchOnMount: false,
-      keepPreviousData: true
-    });
+  const useAssignedCritters = (page: number): UseQueryResult => {
+    return useQuery<Animal[], AxiosError>(
+      ['a_critters', page],
+      () => critterApi.getCritters(page, eCritterFetchType.assigned),
+      critterOptions
+    );
   };
 
   /**
    * retrieves critters not assigned to a collar
    */
-  const useUnassignedCritters = (page: number, config: Record<string, unknown>): UseQueryResult =>
-    useQuery<Animal[], AxiosError>(['u_critters', page], () => critterApi.getUnassignedCritters(page), {
-      ...defaultQueryOptions,
-      ...config,
-      refetchOnMount: false,
-      keepPreviousData: true
-    });
+  const useUnassignedCritters = (page: number): UseQueryResult =>
+    useQuery<Animal[], AxiosError>(
+      ['u_critters', page],
+      () => critterApi.getCritters(page, eCritterFetchType.unassigned),
+      critterOptions
+    );
+
+  /**
+   * retrieves all critters, must be admin
+   */
+  const useAllCritters = (page: number): UseQueryResult =>
+    useQuery<Animal[], AxiosError>(
+      ['critters', page],
+      () => critterApi.getCritters(page, eCritterFetchType.all),
+      critterOptions
+    );
 
   /**
    * @returns a list of critters representing the audist history of @param critterId
@@ -161,7 +171,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
    */
   const useUser = (): UseQueryResult => {
     return useQuery<User, AxiosError>('user', () => userApi.getUser(), defaultQueryOptions);
-  }
+  };
 
   /**
    * requires admin role
@@ -171,7 +181,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     return useQuery<User[], AxiosError>('all_users', () => userApi.getUsers(page), {
       ...defaultQueryOptions
     });
-  }
+  };
 
   /**
    * @param user idir of the user to receive critter access to
@@ -211,9 +221,9 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
   const useMutateGrantCritterAccess = (
-    config: UseMutationOptions<[], AxiosError, IGrantCritterAccessParams>
+    config: UseMutationOptions<[], AxiosError, IUserCritterPermissionInput>
   ): UseMutationResult =>
-    useMutation<IGrantCritterAccessResults[], AxiosError, IGrantCritterAccessParams>(
+    useMutation<IGrantCritterAccessResults[], AxiosError, IUserCritterPermissionInput>(
       (body) => userApi.grantCritterAccessToUser(body),
       config
     );
@@ -225,6 +235,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     usePingExtent,
     usePings,
     useCollarType,
+    useAllCritters,
     useAssignedCritters,
     useUnassignedCritters,
     useCritterHistory,

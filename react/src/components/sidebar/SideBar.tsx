@@ -29,6 +29,7 @@ type SideBarProps = {
 export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.Element {
   const classes = useStyles();
   const location = useLocation();
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
   const userChanges = useContext(UserContext);
 
@@ -36,16 +37,18 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
     const updateComponent = (): void => {
       if (userChanges?.ready) {
         const user = userChanges.user;
-        if (user.role_type === 'administrator') {
-          setVisibleRoutes([...visibleRoutes, ...routes.filter((r) => r.name === 'admin')]);
-        }
+        setIsAdmin(user.role_type === 'administrator')
       }
     };
     updateComponent();
   }, [userChanges]);
 
   const handleSetVisible = (routeNames: string[]): void => {
-    setVisibleRoutes(routes.filter((r) => routeNames.includes(r.name)));
+    const curRoutes = routes.filter((r) => routeNames.includes(r.name));
+    if (isAdmin) {
+      curRoutes.push(routes.find(r => r.name === 'admin'));
+    }
+    setVisibleRoutes(curRoutes);
   };
 
   useEffect(() => {
@@ -64,10 +67,11 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
         handleSetVisible(['home', 'animals', 'codes', 'collars']);
         return;
       case '/profile':
+      case '/admin':
         handleSetVisible(['home']);
         return;
     }
-  }, [location]); // only fire this effect when location changes
+  }, [location, isAdmin]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
