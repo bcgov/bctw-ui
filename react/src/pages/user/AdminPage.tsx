@@ -14,19 +14,16 @@ export default function AdminPage(): JSX.Element {
   const [isGrant, setIsGrant] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
+  const tableProps: ITableQueryProps<User> = { query: 'useUsers' };
 
-  const tableProps: ITableQueryProps<User> = {
-    query: 'useUsers'
-  };
-
-  const handleTableSelect = (users: User[]): void =>  {
+  const handleTableSelect = (users: User[]): void => {
     setIds(users);
-  }
+  };
 
   const onClickShowModal = (b: boolean): void => {
     setIsGrant(b);
     setShowModal((o) => !o);
-  } 
+  };
   const onSave = () => {
     // do nothing
   };

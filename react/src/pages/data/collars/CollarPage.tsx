@@ -1,4 +1,4 @@
-import { eCollarType, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
+import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { SnackbarWrapper } from 'components/common';
 import { INotificationMessage } from 'components/component_interfaces';
 import Table from 'components/table/Table';
@@ -9,9 +9,9 @@ import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import EditCollar from 'pages/data/collars/EditCollar';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { useState } from 'react';
-import { assignedCollarProps, availableCollarProps, Collar } from 'types/collar';
+import { assignedCollarProps, availableCollarProps, Collar, eCollarAssignedStatus } from 'types/collar';
 import AddEditViewer from '../common/AddEditViewer';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from 'react-query'; // to invalidate queries
 
 export default function CollarPage(): JSX.Element {
   const classes = useDataStyles();
@@ -92,7 +92,7 @@ export default function CollarPage(): JSX.Element {
           title={S.assignedCollarsTableTitle}
           queryProps={{
             query: 'useCollarType',
-            queryParam: eCollarType.Assigned,
+            queryParam: eCollarAssignedStatus.Assigned,
             onNewData: (d: Collar[]): void => setCollarsA(d)
           }}
           onSelect={handleSelect}
@@ -103,7 +103,7 @@ export default function CollarPage(): JSX.Element {
           title={S.availableCollarsTableTitle}
           queryProps={{
             query: 'useCollarType',
-            queryParam: eCollarType.Available,
+            queryParam: eCollarAssignedStatus.Available,
             onNewData: (d: Collar[]): void => setCollarsU(d)
           }}
           onSelect={handleSelect}

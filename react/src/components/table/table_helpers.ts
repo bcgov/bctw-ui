@@ -1,11 +1,12 @@
 import { getProperty } from 'utils/common';
 import { Order, HeadCell } from 'components/table/table_interfaces';
+import { dateObjectToTimeStr } from 'utils/time';
 
 /**
  * converts an object to a list of HeadCells
- * @param obj 
+ * @param obj
  * @param propsToDisplay the object's properties that should be displayed in the table
- * @return {HeadCell<T>[]} 
+ * @return {HeadCell<T>[]}
  */
 function typeToHeadCell<T>(obj: T, propsToDisplay: string[]): HeadCell<T>[] {
   return propsToDisplay.map((k) => {
@@ -60,4 +61,20 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export { descendingComparator, getComparator, stableSort, typeToHeadCell };
+interface ICellFormat {
+  align: 'inherit' | 'left' | 'center' | 'right' | 'justify';
+  value: string | number;
+}
+function formatTableCell<T>(obj: T, key: string): ICellFormat {
+  const value = obj[key];
+  if (typeof value?.getMonth === 'function') {
+    return { align: 'right', value: dateObjectToTimeStr(value) };
+  } else if (typeof value === 'number') {
+    return { align: 'right', value };
+  } else if (typeof value === 'string') {
+    return { align: 'center', value };
+  }
+  return {align: 'left', value};
+}
+
+export { descendingComparator, getComparator, stableSort, typeToHeadCell, formatTableCell };

@@ -17,6 +17,9 @@ const ResponseProvider = ({children}: ResponseProviderProps): JSX.Element => {
   )
 }
 
+/**
+ * a component can "listen" to updates to the response context using this hook 
+ */
 const useResponseState = (): INotificationMessage => {
   const context = useContext(ApiResponseContext);
   if (context === undefined) {
@@ -25,6 +28,9 @@ const useResponseState = (): INotificationMessage => {
   return context;
 }
 
+/**
+ * dispatch a notification to the response context
+ */
 const useResponseDispatch = () => {
   const context = useContext(ApiResponseDispatch);
   if (context === undefined) {

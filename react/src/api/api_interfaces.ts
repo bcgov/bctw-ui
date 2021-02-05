@@ -1,13 +1,8 @@
-import { IUserCritterAccess, eCritterPermission } from 'types/user'
+import { eCritterPermission } from 'types/user'
 
 interface RequestPingParams {
   timeWindow: number[];
   pingExtent: string;
-}
-
-enum eCollarType {
-  Assigned = 'Assigned',
-  Available = 'Available'
 }
 
 // used in critter getters to specify collar attachment status
@@ -17,6 +12,11 @@ enum eCritterFetchType {
   all = 'all'
 }
 
+/**
+ * the EditModal passes this object to parent components when the save button is clicked
+ * @param isEdit adding or editing
+ * @param body object of T being added
+ */
 interface IUpsertPayload<T> {
   isEdit: boolean;
   body: T;
@@ -73,12 +73,10 @@ export type {
   IGetCodeProps,
   IUpsertPayload,
   IUserCritterPermissionInput,
-  // IGrantCritterAccessInput,
   IGrantCritterAccessResults,
   ICritterAccess
 }
 
 export {
-  eCollarType,
   eCritterFetchType
 }

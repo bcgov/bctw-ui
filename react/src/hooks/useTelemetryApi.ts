@@ -10,12 +10,11 @@ import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
 import { Animal } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
-import { Collar, ICollar } from 'types/collar';
+import { Collar, eCollarAssignedStatus, ICollar } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
 import { User, UserCritterAccess } from 'types/user';
 
 import {
-  eCollarType,
   eCritterFetchType,
   IBulkUploadResults,
   ICollarLinkPayload,
@@ -73,8 +72,8 @@ export const useTelemetryApi = (): Record<string, unknown> => {
   /**
    * @param type the collar types to be fetched (assigned, unassigned)
    */
-  const useCollarType = (page: number, type: eCollarType, config: Record<string, unknown>): UseQueryResult => {
-    const callapi = type === eCollarType.Assigned ? collarApi.getAssignedCollars : collarApi.getAvailableCollars;
+  const useCollarType = (page: number, type: eCollarAssignedStatus, config: Record<string, unknown>): UseQueryResult => {
+    const callapi = type === eCollarAssignedStatus.Assigned ? collarApi.getAssignedCollars : collarApi.getAvailableCollars;
     return useQuery<ICollar[], AxiosError>(['collartype', page, type], () => callapi(page), {
       ...config,
       ...defaultQueryOptions

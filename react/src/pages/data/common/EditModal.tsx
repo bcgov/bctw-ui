@@ -10,7 +10,8 @@ import { useResponseDispatch, useResponseState } from 'contexts/ApiResponseConte
 import { IUpsertPayload } from 'api/api_interfaces';
 import HistoryPage from './HistoryPage';
 import { critterHistoryProps, isAnimal } from 'types/animal';
-import { collarHistoryProps, isCollar } from 'types/collar';
+import { isCollar } from 'types/collar';
+import { collarHistoryProps } from 'types/collar_history';
 
 type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -53,6 +54,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const [showHistory, setShowHistory] = useState<boolean>(false);
 
   const editType = isAnimal(editing) ? 'critter' : isCollar(editing) ? 'collar' : '';
+  // fixme: document
   const historyQuery = editType === 'critter' ? 'useCritterHistory' : editType === 'collar' ? 'useCollarHistory' : '';
   const getHistoryId = (): string => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

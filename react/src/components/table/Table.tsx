@@ -13,10 +13,9 @@ import {
   Paper,
   Checkbox
 } from '@material-ui/core';
-import { getComparator, stableSort } from 'components/table/table_helpers';
+import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
-import { dateObjectToTimeStr } from 'utils/time';
 import PaginationActions from './TablePaginate';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { NotificationMessage } from 'components/common';
@@ -224,17 +223,14 @@ export default function Table<T>({
                           if (!k) {
                             return null;
                           }
-                          let val = obj[k];
-                          if (typeof val?.getMonth === 'function') {
-                            val = dateObjectToTimeStr(val);
-                          }
+                          const { align, value } = formatTableCell(obj, k);
                           return (
-                            <TableCell key={`${k}${i}`} align='right'>
-                              {val}
+                            <TableCell key={`${k}${i}`} align={align}>
+                              {value}
                             </TableCell>
                           );
                         })}
-                        {/* render additional columns */}
+                        {/* fixme: render additional columns */}
                         {columns ? columns.map((c) => <TableCell>{c}</TableCell>) : null}
                       </TableRow>
                     );

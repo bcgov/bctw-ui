@@ -6,6 +6,7 @@ type IAddEditProps<T> = {
   children: JSX.Element;
   editing: T;
   empty: () => T;
+  disableEdit?: boolean;
 };
 
 /**
@@ -14,6 +15,7 @@ type IAddEditProps<T> = {
  * @param children child component that handles the editing, {EditModal} ** must be only one child
  * @param editing object that is passed to editor when Edit is selected
  * @param empty an function that returns a 'naked' instance of T, passed to editor when Add is selected 
+ * @param disableEdit defaults to false
 **/
 export default function AddEditViewer<T>(props: IAddEditProps<T>): JSX.Element {
   const { editing, children: child, empty } = props;
@@ -49,13 +51,14 @@ export default function AddEditViewer<T>(props: IAddEditProps<T>): JSX.Element {
     handleClose: onClose
   }
 
+  const disableEdit = props.disableEdit ? true : Object.keys(editing ?? {}).length === 0;
   return (
     <>
       {/* clone element to pass additional props to it */}
       {React.cloneElement(child, editorProps)}
       <ButtonGroup size='small' variant='contained' color='primary'>
         <Button onClick={handleClickAdd}>add</Button>
-        <Button disabled={Object.keys(editing ?? {}).length === 0} onClick={handleClickEdit}>edit</Button>
+        <Button disabled={disableEdit} onClick={handleClickEdit}>edit</Button>
       </ButtonGroup>
     </>
   );

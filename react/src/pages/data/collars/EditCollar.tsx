@@ -1,17 +1,17 @@
 import { Typography } from '@material-ui/core';
 import { CritterCollarModalProps } from 'components/component_interfaces';
+import Button from 'components/form/Button';
 import { getInputTypesOfT, InputType, validateRequiredFields } from 'components/form/form_helpers';
 import TextField from 'components/form/Input';
 import SelectCode from 'components/form/SelectCode';
+import useModalStyles from 'components/modal/modal_styles';
+import { CollarStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
+import { useDataStyles } from 'pages/data/common/data_styles';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
+import { Collar, eNewCollarType } from 'types/collar';
 import { removeProps } from 'utils/common';
-import { CollarStrings as CS } from 'constants/strings';
-import { Collar, NewCollarType, newCollarTypeToSelectableCode } from 'types/collar';
-import { useDataStyles } from 'pages/data/common/data_styles';
-import useModalStyles from 'components/modal/modal_styles';
-import Button from 'components/form/Button';
 
 export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.Element {
   const { isEdit, editing, editableProps, selectableProps } = props;
@@ -19,7 +19,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const modalClasses = useModalStyles();
 
   // set the collar type when add collar is selected
-  const [collarType, setCollarType] = useState<NewCollarType>(NewCollarType.Other);
+  const [collarType, setCollarType] = useState<eNewCollarType>(eNewCollarType.Other);
   const [newCollar, setNewCollar] = useState<Collar>(editing);
 
   const title = isEdit ? `Editing device ${editing.device_id}` : `Add a new ${collarType} collar`;
@@ -33,13 +33,13 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   };
 
   const close = (): void => {
-    setCollarType(NewCollarType.Other);
+    setCollarType(eNewCollarType.Other);
     setErrors({});
   };
 
-  const handleChooseCollarType = (type: NewCollarType): void => {
+  const handleChooseCollarType = (type: eNewCollarType): void => {
     setCollarType(type);
-    setNewCollar({ ...new Collar(), ...newCollarTypeToSelectableCode(type) } as Collar);
+    setNewCollar(new Collar(type));
   }
 
   // render the choose collar type form if the add button was clicked
@@ -49,8 +49,8 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
       <>
         <Typography>{CS.addCollarTypeText}</Typography>
         <div color='primary' className={modalClasses.btns}>
-          <Button onClick={(): void => handleChooseCollarType(NewCollarType.VHF)}>{NewCollarType.VHF}</Button>
-          <Button onClick={(): void => handleChooseCollarType(NewCollarType.Vect)}>{NewCollarType.Vect}</Button>
+          <Button onClick={(): void => handleChooseCollarType(eNewCollarType.VHF)}>{eNewCollarType.VHF}</Button>
+          <Button onClick={(): void => handleChooseCollarType(eNewCollarType.Vect)}>{eNewCollarType.Vect}</Button>
         </div>
       </>
     );
@@ -58,7 +58,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
 
   // retrieve input types from the object being edited
   const inputTypes = getInputTypesOfT<Collar>(isEdit ? editing : newCollar, editableProps, selectableProps);
-  const isAddNewCollar = !isEdit && collarType === NewCollarType.Other;
+  const isAddNewCollar = !isEdit && collarType === eNewCollarType.Other;
 
   return (
     <EditModal title={title} newT={new Collar()} onValidate={validate} onReset={close} isEdit={isEdit} hideSave={isAddNewCollar} {...props}>

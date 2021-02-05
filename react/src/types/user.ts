@@ -36,6 +36,8 @@ export interface IUserCritterAccess {
   valid_from: Date
   valid_to: Date;
   permission_type: eCritterPermission;
+  device_id: number;
+  collar_make: string;
 }
 
 export class UserCritterAccess implements IUserCritterAccess {
@@ -45,4 +47,6 @@ export class UserCritterAccess implements IUserCritterAccess {
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   permission_type: eCritterPermission;
+  device_id: number;
+  collar_make: string;
 }

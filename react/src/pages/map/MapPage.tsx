@@ -12,6 +12,7 @@ import tokml from 'tokml';
 import download from 'downloadjs';
 import { ContactsOutlined } from '@material-ui/icons';
 import { Console } from 'console';
+import { createUrl } from 'api/api_helpers';
 
 const MapPage: React.FC = () => {
   const mapRef = useRef<L.Map>(null);
@@ -135,13 +136,8 @@ const MapPage: React.FC = () => {
 
     mapRef.current.addControl(layerPicker);
 
-    const prod = +(location.port) === 1111 ? false : true;
-    const h1 = location.protocol
-    const h2 = location.hostname
-    const h3 = prod ? location.port : 3000
-    const h4 = prod ? '/api' : ''
-    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-21&end=2020-12-31`;
-    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-21&end=2020-12-31`;
+    const urlTracks = createUrl({api: 'get-critter-tracks', query: 'start=2021-01-01&end=now()' });
+    const urlPings = createUrl({api: 'get-critters', query: 'start=2021-01-01&end=now()'});
 
     // Fetch the tracks data
     fetch(urlTracks)

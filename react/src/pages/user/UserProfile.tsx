@@ -82,7 +82,7 @@ export default function UserProfile(): JSX.Element {
         
       </Typography> */}
       <Table
-        headers={['animal_id', 'wlh_id', 'nickname', 'permission_type', 'valid_from', 'valid_to']}
+        headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'collar_make', 'permission_type']}
         title='Animals you have access to:'
         isMultiSelect={true}
         queryProps={tableProps}

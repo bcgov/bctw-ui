@@ -2,8 +2,7 @@ import { useState } from 'react';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';
 import Table from 'components/table/Table';
-import { availableCollarProps, ICollar } from 'types/collar';
-import { eCollarType } from 'api/api_interfaces';
+import { availableCollarProps, eCollarAssignedStatus, ICollar } from 'types/collar';
 import { CritterStrings as CS } from 'constants/strings';
 
 type IAssignNewCollarModal = {
@@ -28,7 +27,7 @@ export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignN
           headers={availableCollarProps}
           title={CS.collarAssignmentTitle}
           rowIdentifier='collar_id'
-          queryProps={{ query: 'useCollarType', queryParam: eCollarType.Available }}
+          queryProps={{ query: 'useCollarType', queryParam: eCollarAssignedStatus.Available }}
           onSelect={handleSelect}
         />
         <Button disabled={collarId === ''} onClick={(): void => onSave(collarId)}>{CS.assignCollarBtnText}</Button>

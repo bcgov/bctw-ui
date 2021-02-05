@@ -33,6 +33,7 @@ const CollarStrings = {
 const CodeStrings = {
   importTitle: 'Bulk Import Codes',
   importText: 'Use this feature to add multiple codes. Codes cannot be edited here. The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional.',
+  editableProps: ['code_header_name', 'code_header_title', 'code_header_description']
 }
 
 export {

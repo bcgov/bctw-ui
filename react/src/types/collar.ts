@@ -1,21 +1,21 @@
 import { columnToHeader } from 'utils/common';
 import { BCTW, BctwBaseType } from 'types/common_types';
 import { Type } from 'class-transformer';
-export interface ICollarBase {
-  collar_id: string;
+
+// fetchable api collar types
+export enum eCollarAssignedStatus {
+  Assigned = 'Assigned', // currently attached to a critter
+  Available = 'Available'
 }
 
-const formatCollarProp = (prop: string): string => {
-  switch (prop) {
-    case 'device_id':
-      return 'Device ID';
-    case 'animal_id':
-      return 'Individual ID';
-    case 'max_transmission_date':
-      return 'Last Update';
-    default:
-      return columnToHeader(prop);
-  }
+// used when creating new collars manually
+export enum eNewCollarType {
+  Other = '',
+  VHF = 'VHF',
+  Vect = 'Vectronics'
+}
+export interface ICollarBase {
+  collar_id: string;
 }
 
 export interface ICollar extends ICollarBase, BCTW, BctwBaseType {
@@ -49,59 +49,59 @@ export class Collar implements ICollar {
   reg_key: string;
   @Type(() => Date) retreival_date: Date;
   satellite_network: string;
-  @Type(() => Date)valid_from: Date;
-  @Type(() => Date)valid_to: Date;
+  @Type(() => Date) valid_from: Date;
+  @Type(() => Date) valid_to: Date;
 
-  constructor() {
+  constructor(collar_type?: eNewCollarType) {
+    if (collar_type) {
+      switch(collar_type) {
+        case eNewCollarType.VHF:
+          this.collar_make = 'ATS';
+          this.collar_type = 'VHF';
+          return;
+        case eNewCollarType.Vect:
+          this.collar_type = 'VHF + GPS';
+          return;
+      }
+    }
     this.radio_frequency = 0;
     this.device_id = 0;
   }
-  formatPropAsHeader(str: string): string {
-    return formatCollarProp(str);
-  } 
-}
 
-// used when creating new collars manually
-export enum NewCollarType {
-  Other = '',
-  VHF = 'VHF',
-  Vect = 'Vectronics',
+  formatPropAsHeader(str: string): string {
+    switch (str) {
+      case 'device_id':
+        return 'Device ID';
+      case 'animal_id':
+        return 'Individual ID';
+      case 'max_transmission_date':
+        return 'Last Update';
+      default:
+        return columnToHeader(str);
+    }
+  }
 }
 
 // properties displayed on collar pages
-const assignedCollarProps = [ 'animal_id', 'device_id', 'collar_status', 'max_transmission_date', 'collar_make', 'collar_model', 'collar_type'];
-const availableCollarProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'collar_make', 'collar_model', 'collar_type'];
-const collarHistoryProps = [ 'device_id', 'collar_status', 'max_transmission_date', 'radio_frequency', 'valid_from', 'valid_to'];
+const availableCollarProps = [
+  'device_id',
+  'collar_status',
+  // fixme: should retrieve this from last_pings?
+  'max_transmission_date', 
+  'collar_type',
+  'collar_make',
+  'collar_model',
+];
 
-/**
- * instantiating some properties by default on a new collar
- * fixme: hardcoded?
- */
-const newCollarTypeToSelectableCode = (type: NewCollarType): Record<string, string> => {
-  const makeKey = 'collar_make';
-  const typeKey = 'collar_type';
-  const gpsType = {[typeKey]: 'VHF + GPS'}
-  const vhfType = {[typeKey]: 'VHF'}
-  switch (type) {
-    case NewCollarType.VHF:
-      return {[makeKey]: 'ATS', ...vhfType}
-    case NewCollarType.Vect:
-    default:
-      return {[typeKey]: '', ...gpsType}
-  }
-
-}
+const assignedCollarProps = ['animal_id', ...availableCollarProps];
 
 const isCollar = (c: unknown): c is Collar => {
   const collar = c as Collar;
   return !!(collar.collar_id && collar.device_id);
-}
+};
 
 export {
   assignedCollarProps,
   availableCollarProps,
-  collarHistoryProps,
-  formatCollarProp,
-  newCollarTypeToSelectableCode,
-  isCollar
-}
+  isCollar,
+};
