@@ -1,5 +1,5 @@
 import CritterPage from 'pages/data/animals/CritterPage';
-import CodePage from 'pages/data/CodePage';
+import CodePage from 'pages/data/codes/CodePage';
 import CollarPage from 'pages/data/collars/CollarPage';
 import DataPage from 'pages/data/DataPage';
 import Home from 'pages/Home';

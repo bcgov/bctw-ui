@@ -31,10 +31,6 @@ interface IUserCritterPermissionInput {
   access: ICritterAccess[]
 }
 
-// interface IGrantCritterAccessInput {
-//   data: IUserCritterPermission[];
-// }
-
 interface IGrantCritterAccessResults {
   assignment_id: string;
   user_id: number;

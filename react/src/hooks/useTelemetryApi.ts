@@ -3,27 +3,27 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
-import { userApi as user_api } from 'api/user_api';
 import { mapApi as map_api } from 'api/map_api';
+import { userApi as user_api } from 'api/user_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
-import { useMutation, useQuery, UseMutationOptions, UseMutationResult, UseQueryResult } from 'react-query';
+import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
 import { Animal } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, ICollar } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
+import { User, UserCritterAccess } from 'types/user';
 
 import {
   eCollarType,
   eCritterFetchType,
   IBulkUploadResults,
   ICollarLinkPayload,
-  IUserCritterPermissionInput,
   IGrantCritterAccessResults,
   IUpsertPayload,
+  IUserCritterPermissionInput,
   RequestPingParams
 } from '../api/api_interfaces';
-import { User, UserCritterAccess } from 'types/user';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -197,6 +197,14 @@ export const useTelemetryApi = (): Record<string, unknown> => {
    *
    * mutations
    */
+  const useMutateCodeHeader = (
+    config: UseMutationOptions<IBulkUploadResults<ICodeHeader>, AxiosError, ICodeHeader[]>
+  ): UseMutationResult =>
+    useMutation<IBulkUploadResults<ICodeHeader>, AxiosError, ICodeHeader[]>(
+      (headers) => codeApi.addCodeHeader(headers),
+      config
+    );
+
   const useMutateCollar = (
     config: UseMutationOptions<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>
   ): UseMutationResult =>
@@ -221,9 +229,9 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
   const useMutateGrantCritterAccess = (
-    config: UseMutationOptions<[], AxiosError, IUserCritterPermissionInput>
+    config: UseMutationOptions<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>
   ): UseMutationResult =>
-    useMutation<IGrantCritterAccessResults[], AxiosError, IUserCritterPermissionInput>(
+    useMutation<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>(
       (body) => userApi.grantCritterAccessToUser(body),
       config
     );
@@ -245,6 +253,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     useUsers,
     useCritterAccess,
     // mutations
+    useMutateCodeHeader,
     useMutateBulkCsv,
     useMutateCollar,
     useMutateCritter,

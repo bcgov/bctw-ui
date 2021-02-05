@@ -7,7 +7,7 @@ import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
-import ImportExportViewer from 'pages/data/bulk/ExportImportViewer';
+import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { useState } from 'react';
@@ -114,7 +114,7 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
         />
 
         <div className={classes.mainButtonRow}>
-          <ImportExportViewer {...ieProps} data={[...critterA, ...critterU]} />
+          <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
 
           <AddEditViewer<Animal> editing={editObj} empty={(): Animal => new Animal()}>
             <EditCritter {...editProps} />

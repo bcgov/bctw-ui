@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { BctwBaseType } from './common_types';
 
-export enum UserRole {
+export enum eUserRole {
   administrator = 'administrator',
   owner = 'owner',
   observer = 'observer'
@@ -20,7 +20,7 @@ export interface IUser extends BctwBaseType {
 }
 
 export class User implements IUser {
-  role_type: UserRole;
+  role_type: eUserRole;
   id: number;
   idir: string;
   bceid: string;

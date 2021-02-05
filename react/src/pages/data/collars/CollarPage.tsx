@@ -5,7 +5,7 @@ import Table from 'components/table/Table';
 import { CollarStrings as S } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import ImportExportViewer from 'pages/data/bulk/ExportImportViewer';
+import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import EditCollar from 'pages/data/collars/EditCollar';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { useState } from 'react';
@@ -111,7 +111,7 @@ export default function CollarPage(): JSX.Element {
         />
 
         <div className={classes.mainButtonRow}>
-          <ImportExportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
+          <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
 
           <AddEditViewer<Collar> editing={editObj} empty={(): Collar => new Collar()}>
             <EditCollar {...editProps} />

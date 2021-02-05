@@ -5,12 +5,16 @@ interface ICode {
   description: string;
 }
 
-interface ICodeHeader extends ICode {
+// interface ICodeInput { }
+
+interface ICodeHeader {
   id: number;
   type: string
   title: string;
   description: string;
 }
+
+// interface ICodeHeaderInput { }
 
 export type {
   ICode,

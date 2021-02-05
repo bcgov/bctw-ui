@@ -5,13 +5,13 @@ import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
-import { INotificationMessage } from 'components/component_interfaces';
 import { eCritterPermission, User } from 'types/user';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import { ICritterAccess } from 'api/api_interfaces';
+import { IBulkUploadResults, ICritterAccess, IGrantCritterAccessResults, IUserCritterPermissionInput } from 'api/api_interfaces';
 import { Animal } from 'types/animal';
+import { formatAxiosError } from 'utils/common';
 
 type IGrantCritterModalProps = {
   isGrantingAccess: boolean;
@@ -32,18 +32,17 @@ export default function GrantCritterModal({
   const [critterIds, setCritterIds] = useState<Animal[]>([]);
   const responseDispatch = useResponseDispatch();
 
-  const onSuccess = (): void => {};
-
-  const onError = (error: AxiosError): void => {
-    // updateStatus({
-    //   type: 'error',
-    //   message: `error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}`
-    // });
+  const onSuccess = (ret: IBulkUploadResults<IGrantCritterAccessResults>): void => {
+    const { errors, results } = ret;
+    if (ret.errors.length) {
+      responseDispatch({ type: 'error', message: `${errors.join()}`});
+    } else {
+      responseDispatch({ type: 'success', message: `animal access granted for users: ${users.map((u) => u.idir).join(', ')}`});
+    }
   };
 
-  const updateStatus = (notif: INotificationMessage): void => {
-    responseDispatch(notif);
-  };
+  const onError = (error: AxiosError): void => 
+    responseDispatch({ type: 'error', message: formatAxiosError(error)});
 
   const { mutateAsync } = (bctwApi.useMutateGrantCritterAccess as any)({ onSuccess, onError });
 
@@ -58,14 +57,15 @@ export default function GrantCritterModal({
         permission_type: eCritterPermission.view
       };
     });
-    const data = users.map((i) => {
+    const data: IUserCritterPermissionInput[] = users.map((i) => {
       return {
         userId: i.id,
         access
       };
     });
-    console.log(JSON.stringify(data, null, 2));
+    // console.log(JSON.stringify(data, null, 2));
     await mutateAsync(data);
+    onClose(false);
   };
 
   const tableQueryProps: ITableQueryProps<any> = {

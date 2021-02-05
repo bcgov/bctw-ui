@@ -43,11 +43,11 @@ export default function App(): JSX.Element {
                     <UserStateContextProvider>
                       <Router>
                         <SideBar routes={AppRoutes} sidebarContent={sidebar} />
-                        <DefaultLayout>
-                          <ResponseProvider>
+                        <ResponseProvider>
+                          <DefaultLayout>
                             <AppRouter onContentChange={setSidebar} />
-                          </ResponseProvider>
-                        </DefaultLayout>
+                          </DefaultLayout>
+                        </ResponseProvider>
                       </Router>
                     </UserStateContextProvider>
                   </DatabaseChangesContextProvider>
