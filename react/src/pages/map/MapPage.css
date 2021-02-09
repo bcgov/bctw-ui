@@ -19,3 +19,13 @@
 #map .leaflet-control-layers.leaflet-control {
   transform: translate(0px,85px);
 }
+
+#collar-list {
+  position: absolute;
+  z-index: 1000;
+  bottom: 2rem;
+  right: 1rem;
+  font-weight: 800;
+  font-size: 2rem;
+  color:yellow;
+}

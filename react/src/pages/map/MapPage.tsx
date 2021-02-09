@@ -25,6 +25,9 @@ const MapPage: React.FC = () => {
 
   const drawnItems = new L.FeatureGroup(); // Store the selection shapes
 
+  // const selectedCollars = useRef([]);
+  const [selectedCollars, setSelectedCollars] = useState([]);
+
   // fixme: hardcoded start/end 
   const start = '2021-01-01';
   const end = 'now()';
@@ -96,11 +99,27 @@ const MapPage: React.FC = () => {
     }
   };
 
+  const displaySelectedUnits = (overlay) => {
+    const selectedCollars = overlay.features
+      .map(f => f.properties.device_id)
+      .reduce((total,f) => {
+        if (total.indexOf(f) >= 0) {
+          return total;
+        } else{ 
+          return total.concat(f);
+        }
+      },[]);
+    setSelectedCollars(selectedCollars)
+    console.log('selection',selectedCollars);
+  }
+
   const drawSelectedLayer = () => {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
     // More typescript type definition bugs... These are the right features!!!
     const overlay = pointsWithinPolygon(allPings as any, clipper as any);
+
+    displaySelectedUnits(overlay);
 
     // Clear any previous selections
     mapRef.current.eachLayer((layer) => {
@@ -206,7 +225,16 @@ const MapPage: React.FC = () => {
     download(kml, 'collars.kml', 'application/xml');
   };
 
-  return <div id='map' onKeyDown={handleKeyPress}></div>;
+  return (
+    <div>
+      <div id='map' onKeyDown={handleKeyPress}></div>
+      <div id='collar-list'>
+        <ul>
+          {selectedCollars.map(collar => (<li key={collar}>{collar}</li>))}
+        </ul>
+      </div>
+    </div>
+  );
 };
 
 export default MapPage;
