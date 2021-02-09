@@ -37,7 +37,13 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
     const updateComponent = (): void => {
       if (userChanges?.ready) {
         const user = userChanges.user;
-        setIsAdmin(user.role_type === 'administrator')
+        // only show admin page if user idir also matches the test user
+        if (user.idir === userChanges.testUser) {
+          setIsAdmin(user.role_type === 'administrator')
+        } else {
+          setIsAdmin(false);
+        }
+
       }
     };
     updateComponent();
@@ -58,17 +64,19 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
         return;
       case '/terrain':
       case '/map':
-        handleSetVisible(['home', 'map', 'terrain', 'data']);
+        handleSetVisible(['home', 'map', 'terrain', 'data', 'profile']);
         return;
       case '/data':
       case '/animals':
       case '/collars':
       case '/codes':
-        handleSetVisible(['home', 'animals', 'codes', 'collars']);
+        handleSetVisible(['home', 'animals', 'codes', 'collars', 'profile']);
+        return;
+      case '/admin':
+        handleSetVisible(['home', 'profile']);
         return;
       case '/profile':
-      case '/admin':
-        handleSetVisible(['home']);
+        handleSetVisible(['home', 'map', 'terrain', 'data']);
         return;
     }
   }, [location, isAdmin]); // only fire when these states change

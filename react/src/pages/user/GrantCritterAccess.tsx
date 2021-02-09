@@ -7,11 +7,15 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
 import { eCritterPermission, User } from 'types/user';
 import { ITableQueryProps } from 'components/table/table_interfaces';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import { IBulkUploadResults, ICritterAccess, IGrantCritterAccessResults, IUserCritterPermissionInput } from 'api/api_interfaces';
+import {
+  IBulkUploadResults,
+  ICritterAccess,
+  IGrantCritterAccessResults,
+  IUserCritterPermissionInput
+} from 'api/api_interfaces';
 import { Animal } from 'types/animal';
 import { formatAxiosError } from 'utils/common';
+import { MenuItem, FormControl, Select, InputLabel } from '@material-ui/core';
 
 type IGrantCritterModalProps = {
   isGrantingAccess: boolean;
@@ -30,23 +34,27 @@ export default function GrantCritterModal({
 }: IGrantCritterModalProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const [critterIds, setCritterIds] = useState<Animal[]>([]);
+  const [accessType, setAccessType] = useState<eCritterPermission>(eCritterPermission.view);
   const responseDispatch = useResponseDispatch();
 
   const onSuccess = (ret: IBulkUploadResults<IGrantCritterAccessResults>): void => {
     const { errors, results } = ret;
     if (ret.errors.length) {
-      responseDispatch({ type: 'error', message: `${errors.join()}`});
+      responseDispatch({ type: 'error', message: `${errors.join()}` });
     } else {
-      responseDispatch({ type: 'success', message: `animal access granted for users: ${users.map((u) => u.idir).join(', ')}`});
+      responseDispatch({
+        type: 'success',
+        message: `animal access granted for users: ${users.map((u) => u.idir).join(', ')}`
+      });
     }
   };
 
-  const onError = (error: AxiosError): void => 
-    responseDispatch({ type: 'error', message: formatAxiosError(error)});
+  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
 
   const { mutateAsync } = (bctwApi.useMutateGrantCritterAccess as any)({ onSuccess, onError });
 
   const handleSelect = (rows: Animal[]): void => {
+    console.log(rows);
     setCritterIds(rows);
   };
 
@@ -81,17 +89,19 @@ export default function GrantCritterModal({
   };
 
   const newColumn = () => (
-    <Select
-      labelId='demo-simple-select-label'
-      id='demo-simple-select'
-      value={'ad'}
-      onChange={(v) => {
-        console.log(v);
-      }}>
-      <MenuItem value={10}>Ten</MenuItem>
-      <MenuItem value={20}>Twenty</MenuItem>
-      <MenuItem value={30}>Thirty</MenuItem>
-    </Select>
+    <FormControl>
+      <InputLabel>Permission</InputLabel>
+      <Select
+        value={accessType}
+        // labelId='demo-simple-select-label'
+        // id='demo-simple-select'
+        onChange={(v) => {
+          console.log(v);
+        }}>
+        <MenuItem value={eCritterPermission.view}>View</MenuItem>
+        <MenuItem value={eCritterPermission.change}>Change</MenuItem>
+      </Select>
+    </FormControl>
   );
 
   return (

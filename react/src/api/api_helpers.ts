@@ -4,6 +4,7 @@ interface CreateUrlParams {
   api: string;
   query?: string;
   page?: number;
+  testUser?: string;
 }
 
 const getBaseUrl = (): string => {
@@ -22,7 +23,7 @@ const appendQueryToUrl = (url: string, query: string): string => {
     url += `?${query}`;
 };
 
-const createUrl = ({api, query, page}: CreateUrlParams): string => {
+const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
   const baseUrl = getBaseUrl();
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
@@ -33,6 +34,10 @@ const createUrl = ({api, query, page}: CreateUrlParams): string => {
   }
   if (page) {
     url = appendQueryToUrl(url, `page=${page}`)
+  }
+  if (testUser) {
+    url = appendQueryToUrl(url, `testUser=${testUser}`)
+    console.log(`retrieving url with testuser ${testUser}`);
   }
   return url;
 }

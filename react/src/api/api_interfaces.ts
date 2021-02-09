@@ -1,8 +1,9 @@
+import { AxiosInstance } from 'axios'
 import { eCritterPermission } from 'types/user'
 
-interface RequestPingParams {
-  timeWindow: number[];
-  pingExtent: string;
+type ApiProps = {
+  api: AxiosInstance;
+  testUser?: string
 }
 
 // used in critter getters to specify collar attachment status
@@ -66,7 +67,7 @@ interface IGetCodeProps extends IBaseGetProps {
 }
 
 export type {
-  RequestPingParams,
+  ApiProps,
   IBulkUploadResults,
   ICollarLinkPayload,
   IBaseGetProps,

@@ -20,9 +20,10 @@ import {
   ICollarLinkPayload,
   IGrantCritterAccessResults,
   IUpsertPayload,
-  IUserCritterPermissionInput,
-  RequestPingParams
+  IUserCritterPermissionInput
 } from '../api/api_interfaces';
+import { UserContext } from 'contexts/UserContext';
+import { useContext } from 'react';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -43,14 +44,18 @@ const useApi = (): AxiosInstance => {
  *
  * @return {object} object whose properties are supported api methods.
  */
-export const useTelemetryApi = (): Record<string, unknown> => {
+export const useTelemetryApi = () => {
   const api = useApi();
-  const collarApi = collar_api(api);
-  const critterApi = critter_api(api);
-  const codeApi = code_api(api);
+
+  const userContext = useContext(UserContext);
+  const testUser = userContext.testUser;
+
+  const collarApi = collar_api({api, testUser});
+  const critterApi = critter_api({api, testUser});
+  const codeApi = code_api({api, testUser});
   const bulkApi = bulk_api(api);
-  const mapApi = map_api(api);
-  const userApi = user_api(api);
+  const mapApi = map_api({api, testUser});
+  const userApi = user_api({api, testUser});
 
   const defaultQueryOptions = {
     refetchOnWindowFocus: false
@@ -59,14 +64,15 @@ export const useTelemetryApi = (): Record<string, unknown> => {
   /**
    *
    */
-  const usePingExtent = (): UseQueryResult =>
-    useQuery<any, Error>('pingExtent', mapApi.requestPingExtent, defaultQueryOptions);
+  const useTracks = (start: string, end: string): UseQueryResult =>{ 
+    return useQuery<any, AxiosError>(['tracks', start, end], () => mapApi.getTracks(start, end));
+  }
 
   /**
    *
    */
-  const usePings = ({ timeWindow, pingExtent }: RequestPingParams): UseQueryResult => {
-    return useQuery<any, Error>(['pings', { timeWindow, pingExtent }], () => mapApi.requestPings, defaultQueryOptions);
+  const usePings = (start: string, end: string ): UseQueryResult => {
+    return useQuery<any, Error>(['pings', { start, end }], () => mapApi.getPings(start, end), defaultQueryOptions);
   };
 
   /**
@@ -80,7 +86,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     });
   };
 
-  const critterOptions = { ...defaultQueryOptions, refetchOnMount: false, keepPreviousData: true };
+  const critterOptions = { ...defaultQueryOptions, /*refetchOnMount: false, keepPreviousData: true */};
   /**
    *  retrieves critters that have a collar assigned
    */
@@ -239,7 +245,7 @@ export const useTelemetryApi = (): Record<string, unknown> => {
     // queries
     useCodes,
     useCodeHeaders,
-    usePingExtent,
+    useTracks,
     usePings,
     useCollarType,
     useAllCritters,

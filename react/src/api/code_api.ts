@@ -1,9 +1,10 @@
-import { AxiosInstance } from 'axios';
 import { createUrl } from 'api/api_helpers';
 import { ICode, ICodeHeader } from 'types/code';
-import { IBulkUploadResults, IGetCodeProps } from './api_interfaces';
+import { ApiProps, IBulkUploadResults, IGetCodeProps } from './api_interfaces';
 
-export const codeApi = (api: AxiosInstance) => {
+export const codeApi = (props: ApiProps) => {
+  const { api, testUser } = props;
+
   const getCodes = async (props: IGetCodeProps): Promise<ICode[]> => {
     const { page, codeHeader } = props;
     const url = createUrl({ api: 'get-code', query: `codeHeader=${codeHeader}`, page });
