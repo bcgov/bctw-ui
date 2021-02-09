@@ -25,6 +25,9 @@ const MapPage: React.FC = () => {
 
   const drawnItems = new L.FeatureGroup(); // Store the selection shapes
 
+  // const selectedCollars = useRef([]);
+  const [selectedCollars, setSelectedCollars] = useState([]);
+
   // fixme: hardcoded start/end 
   const start = '2021-01-01';
   const end = 'now()';
@@ -97,8 +100,7 @@ const MapPage: React.FC = () => {
   };
 
   const displaySelectedUnits = (overlay) => {
-    console.log(overlay);
-    const selection = overlay.features
+    const selectedCollars = overlay.features
       .map(f => f.properties.device_id)
       .reduce((total,f) => {
         if (total.indexOf(f) >= 0) {
@@ -107,7 +109,8 @@ const MapPage: React.FC = () => {
           return total.concat(f);
         }
       },[]);
-    console.log('selection',selection);
+    setSelectedCollars(selectedCollars)
+    console.log('selection',selectedCollars);
   }
 
   const drawSelectedLayer = () => {
@@ -222,7 +225,15 @@ const MapPage: React.FC = () => {
     download(kml, 'collars.kml', 'application/xml');
   };
 
-  return <div id='map' onKeyDown={handleKeyPress}></div>;
+  return (
+    <div>
+      <div id='map' onKeyDown={handleKeyPress}></div>
+      <div id='count'>{selectedCollars.length}</div>
+      <ul id='collar-list'>
+        {selectedCollars.map(collar => ( <li key={collar}>{collar}</li>))}
+      </ul>
+    </div>
+  );
 };
 
 export default MapPage;
