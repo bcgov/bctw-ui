@@ -96,11 +96,27 @@ const MapPage: React.FC = () => {
     }
   };
 
+  const displaySelectedUnits = (overlay) => {
+    console.log(overlay);
+    const selection = overlay.features
+      .map(f => f.properties.device_id)
+      .reduce((total,f) => {
+        if (total.indexOf(f) >= 0) {
+          return total;
+        } else{ 
+          return total.concat(f);
+        }
+      },[]);
+    console.log('selection',selection);
+  }
+
   const drawSelectedLayer = () => {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
     // More typescript type definition bugs... These are the right features!!!
     const overlay = pointsWithinPolygon(allPings as any, clipper as any);
+
+    displaySelectedUnits(overlay);
 
     // Clear any previous selections
     mapRef.current.eachLayer((layer) => {
