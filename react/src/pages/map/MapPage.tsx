@@ -228,9 +228,11 @@ const MapPage: React.FC = () => {
   return (
     <div>
       <div id='map' onKeyDown={handleKeyPress}></div>
-      <ul id='collar-list'>
-        {selectedCollars.map(collar => ( <li key={collar}>{collar}</li>))}
-      </ul>
+      <div id='collar-list'>
+        <ul>
+          {selectedCollars.map(collar => ( <li key={collar}>{collar}</li>))}
+        </ul>
+      </div>
     </div>
   );
 };
