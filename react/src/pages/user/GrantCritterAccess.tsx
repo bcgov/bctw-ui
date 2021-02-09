@@ -109,7 +109,7 @@ export default function GrantCritterModal({
       <Modal open={show} handleClose={onClose}>
         <Table
           columns={[newColumn()]}
-          headers={['animal_id', 'wlh_id', 'nickname', 'population_unit']}
+          headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'collar_make', 'population_unit']}
           title={createTitle()}
           queryProps={tableQueryProps}
           onSelectMultiple={handleSelect}
