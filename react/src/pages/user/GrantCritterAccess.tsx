@@ -15,7 +15,7 @@ import {
 } from 'api/api_interfaces';
 import { Animal } from 'types/animal';
 import { formatAxiosError } from 'utils/common';
-import { MenuItem, FormControl, Select, InputLabel } from '@material-ui/core';
+import { MenuItem, Select } from '@material-ui/core';
 
 type IGrantCritterModalProps = {
   isGrantingAccess: boolean;
@@ -34,7 +34,7 @@ export default function GrantCritterModal({
 }: IGrantCritterModalProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const [critterIds, setCritterIds] = useState<Animal[]>([]);
-  const [accessType, setAccessType] = useState<eCritterPermission>(eCritterPermission.view);
+  const [accessTypes, setAccessTypes] = useState<Record<string, 'view' | 'change'>[]>([]);
   const responseDispatch = useResponseDispatch();
 
   const onSuccess = (ret: IBulkUploadResults<IGrantCritterAccessResults>): void => {
@@ -53,9 +53,8 @@ export default function GrantCritterModal({
 
   const { mutateAsync } = (bctwApi.useMutateGrantCritterAccess as any)({ onSuccess, onError });
 
-  const handleSelect = (rows: Animal[]): void => {
-    console.log(rows);
-    setCritterIds(rows);
+  const handleSelect = (critters: Animal[]): void => {
+    setCritterIds(critters);
   };
 
   const handleSave = async (): Promise<void> => {
@@ -88,27 +87,33 @@ export default function GrantCritterModal({
     return `${start} ${end}`;
   };
 
-  const newColumn = () => (
-    <FormControl>
-      <InputLabel>Permission</InputLabel>
+  const newColumn = (row: any, idx: number): JSX.Element =>{
+    const v = accessTypes[row.id] ?? 'view';
+    return (
       <Select
-        value={accessType}
-        // labelId='demo-simple-select-label'
-        // id='demo-simple-select'
+        value={v}
         onChange={(v) => {
-          console.log(v);
+          console.log(row, idx);
+          const permission = v.target.value;
+          // console.log(permission);
+          setAccessTypes(prevState => {
+            const rowid: string = row.id;
+            const r = Object.assign({}, prevState);
+            r[rowid] = permission;
+            return r;
+          });
         }}>
         <MenuItem value={eCritterPermission.view}>View</MenuItem>
         <MenuItem value={eCritterPermission.change}>Change</MenuItem>
       </Select>
-    </FormControl>
-  );
+    )
+  }
 
   return (
     <>
       <Modal open={show} handleClose={onClose}>
         <Table
-          columns={[newColumn()]}
+          // columns={[newColumn]}
           headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'collar_make', 'population_unit']}
           title={createTitle()}
           queryProps={tableQueryProps}

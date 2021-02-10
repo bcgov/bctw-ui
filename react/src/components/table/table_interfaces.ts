@@ -18,7 +18,7 @@ interface ITableQueryProps<T> {
 }
 
 /**
- * @param columns components to add as additional columns
+ * @param columns array of functions that return components to add as additional columns
  * @param headers assuming not all data properties are displayed in the table. * required
  * @param isMultiSelect render row of checkboxes and different toolbar - default to false
  * @param paginate should the pagination actions be displayed?
@@ -29,7 +29,7 @@ interface ITableQueryProps<T> {
  * @param onSelectMultiple isMultiSelect must be true
  */
 type ITableProps<T> = {
-  columns?: JSX.Element[];
+  columns?: ((row: T, idx: number) => JSX.Element)[];
   headers?: string[];
   isMultiSelect?: boolean;
   paginate?: boolean;

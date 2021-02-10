@@ -38,7 +38,7 @@ export default function UserProfile(): JSX.Element {
   const [user, setUser] = useState<User>(null);
 
   // select dropdown options
-  const [testUserOptions, setTestUserOptions] = useState<string[]>([null, 'Biologist1', 'Biologist2', 'Admin', 'jrpopkin']);
+  const [testUserOptions, setTestUserOptions] = useState<string[]>([null, 'Biologist1', 'Biologist2']);
 
   // sets UserContext when select changes
   const [testUser, setTestUser] = useState<string>(testUserOptions[1]);

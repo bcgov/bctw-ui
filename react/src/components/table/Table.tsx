@@ -99,7 +99,8 @@ export default function Table<T>({
       const newIds = data.map((r) => r[rowIdentifier]);
       setSelected(newIds);
       if (typeof onSelectMultiple === 'function') {
-        onSelectMultiple(newIds);
+        // onSelectMultiple(newIds);
+        onSelectMultiple(data.filter((d) => newIds.includes(d[rowIdentifier])));
       }
       return;
     }
@@ -172,9 +173,6 @@ export default function Table<T>({
       </Toolbar>
     );
 
-  if (data && data.length === 0) {
-    return null;
-  }
   const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
   return (
     <div className={classes.root}>
@@ -196,45 +194,53 @@ export default function Table<T>({
               />
             )}
             <TableBody>
-              {isFetching || isLoading
-                ? renderFetching()
-                : isError
-                  ? renderError()
-                  : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: T, prop: number) => {
-                    const isRowSelected = isSelected(getProperty(obj, rowIdentifier) as string);
-                    const labelId = `enhanced-table-checkbox-${prop}`;
-                    return (
-                      <TableRow
-                        hover
-                        onClick={(event): void => handleClick(event, getProperty(obj, rowIdentifier) as string)}
-                        role='checkbox'
-                        aria-checked={isRowSelected}
-                        tabIndex={-1}
-                        key={prop}
-                        selected={isRowSelected}>
-                        {/* render checkbox column if multiselect is enabled */}
-                        {isMultiSelect ? (
-                          <TableCell padding='checkbox'>
-                            <Checkbox checked={isRowSelected} inputProps={{ 'aria-labelledby': labelId }} />
+              {data && data.length === 0 ? (
+                <TableRow>no data available</TableRow>
+              ) : isFetching || isLoading ? (
+                renderFetching()
+              ) : isError ? (
+                renderError()
+              ) : (
+                stableSort(data ?? [], getComparator(order, orderBy)).map((obj: T, prop: number) => {
+                  const isRowSelected = isSelected(getProperty(obj, rowIdentifier) as string);
+                  const labelId = `enhanced-table-checkbox-${prop}`;
+                  return (
+                    <TableRow
+                      hover
+                      onClick={(event): void => handleClick(event, getProperty(obj, rowIdentifier) as string)}
+                      role='checkbox'
+                      aria-checked={isRowSelected}
+                      tabIndex={-1}
+                      key={prop}
+                      selected={isRowSelected}>
+                      {/* render checkbox column if multiselect is enabled */}
+                      {isMultiSelect ? (
+                        <TableCell padding='checkbox'>
+                          <Checkbox checked={isRowSelected} inputProps={{ 'aria-labelledby': labelId }} />
+                        </TableCell>
+                      ) : null}
+                      {/* render main columns from data fetched from api */}
+                      {headerProps.map((k: string, i: number) => {
+                        if (!k) {
+                          return null;
+                        }
+                        const { align, value } = formatTableCell(obj, k);
+                        return (
+                          <TableCell key={`${k}${i}`} align={align}>
+                            {value}
                           </TableCell>
-                        ) : null}
-                        {/* render main columns from data fetched from api */}
-                        {headerProps.map((k: string, i: number) => {
-                          if (!k) {
-                            return null;
-                          }
-                          const { align, value } = formatTableCell(obj, k);
-                          return (
-                            <TableCell key={`${k}${i}`} align={align}>
-                              {value}
-                            </TableCell>
-                          );
-                        })}
-                        {/* fixme: render additional columns */}
-                        {columns ? columns.map((c) => <TableCell>{c}</TableCell>) : null}
-                      </TableRow>
-                    );
-                  })}
+                        );
+                      })}
+                      {columns
+                        ? columns.map((c) => {
+                          const comp = c(obj, prop);
+                          return <TableCell id={`${prop}-i`}>{comp}</TableCell>;
+                        })
+                        : null}
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </MuiTable>
           {!paginate || isLoading || isFetching || isError ? null : (
