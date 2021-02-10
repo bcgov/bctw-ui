@@ -6,7 +6,7 @@ import ChangeContext from 'contexts/InputChangeContext';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { NotificationMessage } from 'components/common';
 import { EditModalBaseProps } from 'components/component_interfaces';
-import { useResponseDispatch, useResponseState } from 'contexts/ApiResponseContext';
+import { useResponseState } from 'contexts/ApiResponseContext';
 import { IUpsertPayload } from 'api/api_interfaces';
 import HistoryPage from './HistoryPage';
 import { critterHistoryProps, isAnimal } from 'types/animal';
@@ -65,7 +65,6 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     editType === 'collar' ? collarHistoryProps : editType === 'critter' ? critterHistoryProps : [];
 
   const responseState = useResponseState();
-  const responseDispatch = useResponseDispatch();
 
   const displayHistory = (): void => {
     setShowHistory((o) => !o);
@@ -98,8 +97,6 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const reset = (): void => {
     setShowHistory(false);
     setCanSave(false);
-    // reset the context so the current status messaged is shown again
-    responseDispatch(null);
     if (typeof onReset === 'function') {
       onReset();
     }

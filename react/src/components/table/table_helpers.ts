@@ -8,7 +8,7 @@ import { dateObjectToTimeStr } from 'utils/time';
  * @param propsToDisplay the object's properties that should be displayed in the table
  * @return {HeadCell<T>[]}
  */
-function typeToHeadCell<T>(obj: T, propsToDisplay: string[]): HeadCell<T>[] {
+function createHeadCell<T>(obj: T, propsToDisplay: string[]): HeadCell<T>[] {
   return propsToDisplay.map((k) => {
     const isNumber = typeof getProperty(obj, k as keyof T) === 'number';
     return {
@@ -77,4 +77,4 @@ function formatTableCell<T>(obj: T, key: string): ICellFormat {
   return {align: 'left', value};
 }
 
-export { descendingComparator, getComparator, stableSort, typeToHeadCell, formatTableCell };
+export { descendingComparator, getComparator, stableSort, createHeadCell, formatTableCell };

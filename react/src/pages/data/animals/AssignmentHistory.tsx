@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Table from 'components/table/Table';
-import { Typography } from '@material-ui/core';
+// import { Typography } from '@material-ui/core';
 import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 
@@ -43,8 +43,9 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
   );
   return (
     <>
-      {history.length ? <Typography variant='h6'>Collar Assignment History</Typography> : null}
+      {/* {history.length ? <Typography variant='h6'>Collar Assignment History</Typography> : null} */}
       <Table
+        title='Collar Assignment History'
         headers={['device_id', 'collar_make', 'valid_from', 'valid_to']}
         queryProps={{ query: 'useCollarAssignmentHistory', queryParam: animalId, onNewData: onNewData }}
         rowIdentifier='collar_id'

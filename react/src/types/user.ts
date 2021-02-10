@@ -9,7 +9,8 @@ export enum eUserRole {
 
 export enum eCritterPermission {
   view = 'view',
-  change = 'change'
+  change = 'change',
+  none = 'none',
 }
 
 export interface IUser extends BctwBaseType {
@@ -29,15 +30,21 @@ export class User implements IUser {
   @Type(() => Date)valid_to: Date;
 }
 
-export interface IUserCritterAccess {
+// fixme: 
+export interface IUserCritterAccessInput {
   id: string;
+  // animal_id: string;
+  permission_type: eCritterPermission;
+}
+export interface IUserCritterAccess {
+  id: string
   wlh_id: string;
   nickname: string;
   valid_from: Date
   valid_to: Date;
-  permission_type: eCritterPermission;
   device_id: number;
   collar_make: string;
+  permission_type: eCritterPermission;
 }
 
 export class UserCritterAccess implements IUserCritterAccess {
@@ -46,7 +53,7 @@ export class UserCritterAccess implements IUserCritterAccess {
   nickname: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
-  permission_type: eCritterPermission;
   device_id: number;
   collar_make: string;
+  permission_type: eCritterPermission;
 }

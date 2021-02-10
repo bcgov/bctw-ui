@@ -7,10 +7,10 @@ import {
   TableRow,
   TableSortLabel
 } from '@material-ui/core';
-import { typeToHeadCell } from 'components/table/table_helpers';
+import { createHeadCell } from 'components/table/table_helpers';
 import { BCTW } from 'types/common_types';
 import { columnToHeader } from 'utils/common';
-import { HeadCell, Order } from './table_interfaces';
+import { HeadCell, ITableHeadProps } from './table_interfaces';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -28,21 +28,10 @@ const useStyles = makeStyles(() =>
   })
 );
 
-interface TableHeadProps<T> {
-  headerData: T;
-  headersToDisplay: string[];
-  isMultiSelect: boolean;
-  numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-export default function TableHead<T>(props: TableHeadProps<T>): JSX.Element {
+export default function TableHead<T>(props: ITableHeadProps<T>): JSX.Element {
   const classes = useStyles();
   const {
+    customHeaders,
     order,
     orderBy,
     onRequestSort,
@@ -57,9 +46,9 @@ export default function TableHead<T>(props: TableHeadProps<T>): JSX.Element {
   const createSortHandler = (property: keyof T) => (event: React.MouseEvent<unknown>): void => {
     onRequestSort(event, property);
   };
-  const headcells: HeadCell<T>[] = typeToHeadCell(headerData, headersToDisplay);
+  const headcells: HeadCell<T>[] = createHeadCell(headerData, headersToDisplay);
 
-  // any "class" should have a header formatter function, try to use this first
+  // all BCTW classes should have a header formatter method
   const formatHeader = (cell: string): string =>
     typeof (headerData as BCTW).formatPropAsHeader === 'function'
       ? (headerData as BCTW).formatPropAsHeader(cell)
@@ -68,6 +57,7 @@ export default function TableHead<T>(props: TableHeadProps<T>): JSX.Element {
   return (
     <MuiTableHead>
       <TableRow>
+        {/* render the select all checkbox if the table is multi-select mode */}
         {isMultiSelect ? (
           <TableCell padding='checkbox'>
             <Checkbox
@@ -78,6 +68,7 @@ export default function TableHead<T>(props: TableHeadProps<T>): JSX.Element {
             />
           </TableCell>
         ) : null}
+        {/* render the rest of the header row */}
         {headcells.map((headCell) => (
           <TableCell
             key={headCell.id as string}
@@ -97,6 +88,16 @@ export default function TableHead<T>(props: TableHeadProps<T>): JSX.Element {
             </TableSortLabel>
           </TableCell>
         ))}
+        {/* if any custom columns were supplied to the table, render their headers */}
+        {/* fixme: add key */}
+        {customHeaders
+          ? customHeaders.map(
+            (header): JSX.Element => {
+              const component = header(headerData,0);
+              return <TableCell>{component}</TableCell>;
+            }
+          )
+          : null}
       </TableRow>
     </MuiTableHead>
   );

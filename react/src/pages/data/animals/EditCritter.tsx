@@ -10,7 +10,7 @@ import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
-import { Animal, IAnimal } from 'types/animal';
+import { Animal } from 'types/animal';
 import { removeProps } from 'utils/common';
 
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
@@ -28,7 +28,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   };
 
   // retrieve input types from the object being edited
-  const inputTypes = getInputTypesOfT<IAnimal>(editing, editableProps, selectableProps);
+  const inputTypes = getInputTypesOfT<Animal>(editing, editableProps, selectableProps);
 
   return (
     <EditModal title={title} newT={new Animal()} onValidate={validate} isEdit={isEdit} {...props}>
@@ -92,7 +92,8 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                   {inputTypes
                     .filter((f) => f.type === InputType.check)
                     .map((d, i) => {
-                      const checked = d.value === false || d.value === 'N' || d.value === 'false' ? false : true;
+                      const checked =
+                        d.value === null || d.value === false || d.value === 'N' || d.value === 'false' ? false : true;
                       return (
                         <Checkbox
                           key={`${d.key}${i}`}

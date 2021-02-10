@@ -37,7 +37,7 @@ const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
   }
   if (testUser) {
     url = appendQueryToUrl(url, `testUser=${testUser}`)
-    console.log(`retrieving url with testuser ${testUser}`);
+    // console.log(`retrieving url with testuser ${testUser}`);
   }
   return url;
 }

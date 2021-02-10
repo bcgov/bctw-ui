@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios'
-import { eCritterPermission } from 'types/user'
+import { IUserCritterAccessInput } from 'types/user'
 
 type ApiProps = {
   api: AxiosInstance;
@@ -23,13 +23,9 @@ interface IUpsertPayload<T> {
   body: T;
 }
 
-interface ICritterAccess {
-  animal_id: string;
-  permission_type: eCritterPermission;
-}
 interface IUserCritterPermissionInput {
   userId: number;
-  access: ICritterAccess[]
+  access: IUserCritterAccessInput[]
 }
 
 interface IGrantCritterAccessResults {
@@ -75,7 +71,6 @@ export type {
   IUpsertPayload,
   IUserCritterPermissionInput,
   IGrantCritterAccessResults,
-  ICritterAccess
 }
 
 export {

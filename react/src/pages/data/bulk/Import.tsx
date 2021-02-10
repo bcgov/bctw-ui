@@ -50,7 +50,6 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
 
   const onClose = (): void => {
     reset();
-    responseDispatch(null);
     props.handleClose(false);
   }
 

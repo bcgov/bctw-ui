@@ -20,7 +20,7 @@ import PaginationActions from './TablePaginate';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError, getProperty } from 'utils/common';
-import { ITableProps, Order } from './table_interfaces';
+import { ICustomTableColumn, ITableProps, Order } from './table_interfaces';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function Table<T>({
-  columns,
+  customColumns,
   headers,
   queryProps,
   title,
@@ -162,6 +162,12 @@ export default function Table<T>({
     </TableRow>
   );
 
+  const renderNoData = (): JSX.Element => (
+    <TableRow>
+      <TableCell>no data available</TableCell>
+    </TableRow>
+  )
+
   const renderToolbar = (): JSX.Element =>
     isMultiSelect ? (
       <TableToolbar numSelected={selected.length} title={title} />
@@ -191,11 +197,12 @@ export default function Table<T>({
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAll}
                 rowCount={data?.length ?? 0}
+                customHeaders={customColumns?.map(c => c.header) ?? []}
               />
             )}
             <TableBody>
               {data && data.length === 0 ? (
-                <TableRow>no data available</TableRow>
+                renderNoData()
               ) : isFetching || isLoading ? (
                 renderFetching()
               ) : isError ? (
@@ -211,7 +218,7 @@ export default function Table<T>({
                       role='checkbox'
                       aria-checked={isRowSelected}
                       tabIndex={-1}
-                      key={prop}
+                      key={`row${prop}`}
                       selected={isRowSelected}>
                       {/* render checkbox column if multiselect is enabled */}
                       {isMultiSelect ? (
@@ -231,10 +238,11 @@ export default function Table<T>({
                           </TableCell>
                         );
                       })}
-                      {columns
-                        ? columns.map((c) => {
-                          const comp = c(obj, prop);
-                          return <TableCell id={`${prop}-i`}>{comp}</TableCell>;
+                      {/* render additional columns from props */}
+                      {customColumns
+                        ? customColumns.map((c: ICustomTableColumn<T>) => {
+                          const colComponent = c.column(obj, prop);
+                          return <TableCell key={`add-col-${prop}`}>{colComponent}</TableCell>;
                         })
                         : null}
                     </TableRow>

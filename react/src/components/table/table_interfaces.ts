@@ -6,7 +6,7 @@ interface ITableSortProp<T> {
 }
 
 /**
- * @param query - name of api hook 
+ * @param query - name of api hook
  * @param queryProp - param to pass to hook
  * @param onNewData handler to call when new data is loaded
  */
@@ -15,6 +15,11 @@ interface ITableQueryProps<T> {
   queryParam?: string | number;
   onNewData?: (data: T[]) => void;
   defaultSort?: ITableSortProp<T>;
+}
+
+interface ICustomTableColumn<T> {
+  header: (row: T, idx: number) => JSX.Element;
+  column: (row: T, idx: number) => JSX.Element;
 }
 
 /**
@@ -28,8 +33,9 @@ interface ITableQueryProps<T> {
  * @param onSelect parent handler triggered when a row is clicked
  * @param onSelectMultiple isMultiSelect must be true
  */
+
 type ITableProps<T> = {
-  columns?: ((row: T, idx: number) => JSX.Element)[];
+  customColumns?: ICustomTableColumn<T>[];
   headers?: string[];
   isMultiSelect?: boolean;
   paginate?: boolean;
@@ -50,10 +56,27 @@ interface HeadCell<T> {
   numeric: boolean;
 }
 
-export type {
-  HeadCell,
-  Order,
-  ITableProps,
-  ITableQueryProps,
-  ITableSortProp,
+/**
+ * @param customHeaders passed from the main tables customColumns
+ * @param headerData an instance of a BCTW class passed from the table query to API
+ * @param headersToDisplay string array of what should be displayed as a header
+ * @param isMultiSelect passed from parent table
+ * @param numSelected used in multiselect tables to determine if all rows are selected
+ * @param onRequestSort sort handler
+ * @param onSelectAllClick passed from the table prop
+ * 
+ */
+interface ITableHeadProps<T> {
+  customHeaders: ((row: T, idx: number) => JSX.Element)[];
+  headerData: T;
+  headersToDisplay: string[];
+  isMultiSelect: boolean;
+  numSelected: number;
+  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;
+  order: Order;
+  orderBy: string;
+  rowCount: number;
+  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
+export type { HeadCell, Order, ICustomTableColumn, ITableHeadProps, ITableProps, ITableQueryProps, ITableSortProp };
