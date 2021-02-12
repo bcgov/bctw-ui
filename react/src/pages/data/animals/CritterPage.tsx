@@ -30,8 +30,8 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
   const [critterU, setCrittersU] = useState<Animal[]>([]);
 
   // must be defined before mutation declaration
-  const onSuccess = async (data: Animal[]): Promise<void> => {
-    const critter = data[0];
+  const onSuccess = async (data: Animal[] | Animal): Promise<void> => {
+    const critter = Array.isArray(data) ? data[0] : data;
     updateStatus({ type: 'success', message: `${critter.animal_id ?? critter.nickname ?? 'critter'} saved!` });
 
     let unassignedQueryKey;
@@ -115,7 +115,6 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
 
         <div className={classes.mainButtonRow}>
           <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
-
           <AddEditViewer<Animal> editing={editObj} empty={(): Animal => new Animal()}>
             <EditCritter {...editProps} />
           </AddEditViewer>

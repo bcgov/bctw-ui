@@ -7,6 +7,7 @@ interface ICode {
   id: number;
   code: string;
   description: string;
+  code_header_title?: string;
 }
 
 // interface ICodeInput { }
@@ -27,7 +28,7 @@ export class CodeHeader implements BCTW, BctwBaseType {
   @Type(() => Date)valid_to: Date;
 
   constructor() {
-    this.code_category_id = 1; // default to bctw code category
+    this.code_category_id = 1; // the bctw code category
     this.code_header_name = '';
     this.code_header_title = '';
     this.code_header_description = '';

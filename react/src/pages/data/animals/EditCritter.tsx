@@ -9,29 +9,36 @@ import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import EditModal from 'pages/data/common/EditModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Animal } from 'types/animal';
+import { eCritterPermission } from 'types/user';
 import { removeProps } from 'utils/common';
 
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
   const { isEdit, editing, editableProps, selectableProps } = props;
   const classes = useDataStyles();
 
-  const title = isEdit ? `Editing ${editing.animal_id}` : `Add a new animal`;
+  const canEdit = !isEdit ? true : editing.permission_type === eCritterPermission.change;
   const requiredFields = CS.requiredProps;
-  const [errors, setErrors] = useState<Record<string, unknown>>({});
 
-  const validate = (o: Animal): boolean => {
+  const [errors, setErrors] = useState<Record<string, unknown>>({});
+  const [inputTypes, setInputTypes] = useState<{ key: string; type: InputType; value: unknown }[]>([]);
+
+  useEffect(() => {
+    setInputTypes(getInputTypesOfT<Animal>(editing, editableProps, selectableProps));
+  }, [editing]);
+
+  const validateForm = (o: Animal): boolean => {
     const errors = validateRequiredFields(o, requiredFields);
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // retrieve input types from the object being edited
-  const inputTypes = getInputTypesOfT<Animal>(editing, editableProps, selectableProps);
+  const createTitle = (): string =>
+    !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.animal_id ?? 'animal'}`;
 
   return (
-    <EditModal title={title} newT={new Animal()} onValidate={validate} isEdit={isEdit} {...props}>
+    <EditModal title={createTitle()} newT={new Animal()} onValidate={validateForm} isEdit={isEdit} {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // validate form before passing change handler to EditModal
@@ -49,16 +56,16 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                   {/* render props that are text inputs */}
                   {inputTypes
                     .filter((f) => f.type === InputType.text || f.type === InputType.number)
-                    .map((d, i) => {
+                    .map((d) => {
                       const hasError = !!errors[d.key];
                       return (
                         <TextField
-                          key={`${d.key}${i}`}
+                          key={d.key}
                           propName={d.key}
                           defaultValue={d.value}
                           type={d.type}
-                          label={d.key}
-                          disabled={false}
+                          label={editing.formatPropAsHeader(d.key)}
+                          disabled={!canEdit}
                           changeHandler={onChange}
                           required={requiredFields.includes(d.key)}
                           error={hasError}
@@ -72,12 +79,12 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                   {/* render props that are selects */}
                   {inputTypes
                     .filter((f) => f.type === InputType.select)
-                    .map((d, i) => {
+                    .map((d) => {
                       return (
                         <SelectCode
-                          key={`${d.key}${i}`}
+                          disabled={!canEdit}
+                          key={d.key}
                           codeHeader={d.key}
-                          label={d.key}
                           defaultValue={d.value}
                           changeHandler={onChange}
                           required={requiredFields.includes(d.key)}
@@ -100,13 +107,14 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                           initialValue={checked}
                           label={d.key}
                           changeHandler={handlerFromContext}
+                          disabled={!canEdit}
                         />
                       );
                     })}
                 </>
               </form>
-              {/* render collar assignment components if this is in edit mode */}
-              {isEdit ? <AssignmentHistory animalId={editing.id} isEdit={isEdit} {...props} /> : null}
+              {/* dont show assignment history for new critters */}
+              {isEdit ? <AssignmentHistory animalId={editing.id} canEdit={canEdit} {...props} /> : null}
             </>
           );
         }}

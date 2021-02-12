@@ -4,9 +4,9 @@ import Button from 'components/form/Button';
 
 type IAddEditProps<T> = {
   children: JSX.Element;
+  disableEdit?: boolean;
   editing: T;
   empty: () => T;
-  disableEdit?: boolean;
 };
 
 /**

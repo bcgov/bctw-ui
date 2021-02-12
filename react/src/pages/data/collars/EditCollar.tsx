@@ -9,7 +9,7 @@ import { CollarStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import EditModal from 'pages/data/common/EditModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Collar, eNewCollarType } from 'types/collar';
 import { removeProps } from 'utils/common';
 
@@ -25,6 +25,11 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const title = isEdit ? `Editing device ${editing.device_id}` : `Add a new ${collarType} collar`;
   const requiredFields = CS.requiredProps;
   const [errors, setErrors] = useState<Record<string, unknown>>({});
+  const [inputTypes, setInputTypes] = useState<{key: string, type: InputType, value: unknown}[]>([]);
+
+  useEffect(() => {
+    setInputTypes(getInputTypesOfT<Collar>(isEdit ? editing : newCollar, editableProps, selectableProps));
+  }, [editing, newCollar]);
 
   const validate = (o: Collar): boolean => {
     const errors = validateRequiredFields(o, requiredFields);
@@ -43,7 +48,6 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   }
 
   // render the choose collar type form if the add button was clicked
-  // fixme: disabled save button is still visible
   const chooseCollarType = ():JSX.Element => {
     return (
       <>
@@ -56,10 +60,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     );
   };
 
-  // retrieve input types from the object being edited
-  const inputTypes = getInputTypesOfT<Collar>(isEdit ? editing : newCollar, editableProps, selectableProps);
   const isAddNewCollar = !isEdit && collarType === eNewCollarType.Other;
-
   return (
     <EditModal title={title} newT={new Collar()} onValidate={validate} onReset={close} isEdit={isEdit} hideSave={isAddNewCollar} {...props}>
       <ChangeContext.Consumer>
@@ -91,7 +92,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                             propName={d.key}
                             defaultValue={d.value}
                             type={d.type}
-                            label={d.key}
+                            label={editing.formatPropAsHeader(d.key)}
                             disabled={false}
                             changeHandler={onChange}
                             required={requiredFields.includes(d.key)}
@@ -111,7 +112,6 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                           <SelectCode
                             key={d.key}
                             codeHeader={d.key}
-                            label={d.key}
                             defaultValue={d.value}
                             changeHandler={onChange}
                             required={requiredFields.includes(d.key)}
@@ -129,3 +129,4 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     </EditModal>
   );
 }
+

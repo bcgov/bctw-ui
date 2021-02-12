@@ -50,12 +50,12 @@ export const useTelemetryApi = () => {
   const userContext = useContext(UserContext);
   const testUser = userContext.testUser;
 
-  const collarApi = collar_api({api, testUser});
-  const critterApi = critter_api({api, testUser});
-  const codeApi = code_api({api, testUser});
+  const collarApi = collar_api({ api, testUser });
+  const critterApi = critter_api({ api, testUser });
+  const codeApi = code_api({ api, testUser });
   const bulkApi = bulk_api(api);
-  const mapApi = map_api({api, testUser});
-  const userApi = user_api({api, testUser});
+  const mapApi = map_api({ api, testUser });
+  const userApi = user_api({ api, testUser });
 
   const defaultQueryOptions = {
     refetchOnWindowFocus: false
@@ -64,29 +64,34 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const useTracks = (start: string, end: string): UseQueryResult =>{ 
+  const useTracks = (start: string, end: string): UseQueryResult => {
     return useQuery<any, AxiosError>(['tracks', start, end], () => mapApi.getTracks(start, end));
-  }
+  };
 
   /**
    *
    */
-  const usePings = (start: string, end: string ): UseQueryResult => {
+  const usePings = (start: string, end: string): UseQueryResult => {
     return useQuery<any, Error>(['pings', { start, end }], () => mapApi.getPings(start, end), defaultQueryOptions);
   };
 
   /**
    * @param type the collar types to be fetched (assigned, unassigned)
    */
-  const useCollarType = (page: number, type: eCollarAssignedStatus, config: Record<string, unknown>): UseQueryResult => {
-    const callapi = type === eCollarAssignedStatus.Assigned ? collarApi.getAssignedCollars : collarApi.getAvailableCollars;
+  const useCollarType = (
+    page: number,
+    type: eCollarAssignedStatus,
+    config: Record<string, unknown>
+  ): UseQueryResult => {
+    const callapi =
+      type === eCollarAssignedStatus.Assigned ? collarApi.getAssignedCollars : collarApi.getAvailableCollars;
     return useQuery<ICollar[], AxiosError>(['collartype', page, type], () => callapi(page), {
       ...config,
       ...defaultQueryOptions
     });
   };
 
-  const critterOptions = { ...defaultQueryOptions, /*refetchOnMount: false, keepPreviousData: true */};
+  const critterOptions = { ...defaultQueryOptions /*refetchOnMount: false, keepPreviousData: true */ };
   /**
    *  retrieves critters that have a collar assigned
    */
@@ -135,7 +140,10 @@ export const useTelemetryApi = () => {
    */
   const useCodes = (page: number, codeHeader: string): UseQueryResult => {
     const props = { page, codeHeader };
-    return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), { ...defaultQueryOptions });
+    return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), {
+      ...defaultQueryOptions,
+      refetchOnMount: false,
+    });
   };
 
   /**

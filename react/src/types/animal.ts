@@ -1,6 +1,7 @@
 import { columnToHeader } from 'utils/common';
 import { BCTW, BctwBaseType } from 'types/common_types';
 import { Type } from 'class-transformer';
+import { eCritterPermission } from './user';
 
 export const assignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
 export const unassignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status'];
@@ -38,6 +39,8 @@ export interface IAnimal extends BCTW, BctwBaseType {
   trans_location: boolean;
   wlh_id: string;
   nickname: string;
+  // fetched critters should contain this
+  permission_type?: eCritterPermission;
 }
 
 export class Animal implements IAnimal {
@@ -74,6 +77,7 @@ export class Animal implements IAnimal {
   nickname: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
+  permission_type: eCritterPermission;
 
   constructor() {
     this.animal_id = '';
@@ -100,5 +104,5 @@ export class Animal implements IAnimal {
 
 export const isAnimal = (a: unknown): a is Animal => {
   const critter = a as Animal;
-  return !!(critter.id && critter.animal_id);
+  return !!(critter.id);
 }

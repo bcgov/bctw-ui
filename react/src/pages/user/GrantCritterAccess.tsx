@@ -83,10 +83,8 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
         access
       };
     });
-    // fixme: db function takes animal id as param because
-    // its json casting a into user animal record
-    console.log(JSON.stringify(data, null, 2));
-    // await mutateAsync(data);
+    // console.log(JSON.stringify(data, null, 2));
+    await mutateAsync(data);
     handleClose();
   };
 
@@ -157,7 +155,7 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
       <Modal open={show} handleClose={handleClose}>
         <Table
           customColumns={[{ column: newColumn, header: newHeader }]}
-          headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'collar_make', 'population_unit']}
+          headers={['animal_id', 'wlh_id', 'device_id', 'collar_make', 'population_unit']}
           title={`Modifying ${users?.idir ?? 'user'}'s Animal Access`}
           queryProps={tableQueryProps}
           onSelectMultiple={handleTableRowSelect}

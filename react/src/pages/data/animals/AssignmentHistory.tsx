@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import Table from 'components/table/Table';
-// import { Typography } from '@material-ui/core';
 import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 
 type IAssignmentHistoryProps = {
   animalId: string;
-  collarId?: string;
+  canEdit: boolean; // passed to child PerformAssignmentAction component
 };
 
 /**
@@ -14,13 +13,12 @@ type IAssignmentHistoryProps = {
  *  all of the collar assign/unassign handling components
  */
 export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
-  const { animalId } = props;
+  const { animalId, canEdit } = props;
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
 
-  // nothing for user to interact with by selecting row, so this is a null handler
   const handleSelect = (): void => {
-    /* do nothing */
+    // no current interactions with selecting assignment history rows
   };
 
   const onNewData = (d: CollarHistory[]): void => {
@@ -28,22 +26,16 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
   };
 
   useEffect(() => {
-    const u = (): void => {
+    const updateComponent = (): void => {
       if (history && history.length) {
         setHasCollar(hasCollarCurrentlyAssigned(history));
       }
     };
-    u();
+    updateComponent();
   }, [history]);
 
-  // instantiate this component here as we want to display the add collar
-  // option if the critter has no collar history
-  const assignment = (
-    <PerformAssignmentAction collarId={history?.length ? history[0].collar_id : ''} hasCollar={hasCollar} {...props} />
-  );
   return (
     <>
-      {/* {history.length ? <Typography variant='h6'>Collar Assignment History</Typography> : null} */}
       <Table
         title='Collar Assignment History'
         headers={['device_id', 'collar_make', 'valid_from', 'valid_to']}
@@ -52,7 +44,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
         paginate={history?.length >= 10}
         onSelect={handleSelect}
       />
-      {assignment}
+      <PerformAssignmentAction collarId={history.length ? history[0].collar_id : ''} hasCollar={hasCollar} {...props} />
     </>
   );
 }

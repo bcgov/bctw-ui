@@ -14,9 +14,10 @@ import { formatAxiosError } from 'utils/common';
 import { getNow } from 'utils/time';
 
 type IPerformAssignmentActionProps = {
-  hasCollar: boolean;
   animalId: string;
-  collarId: string;
+  collarId: string; // uuid of the attached collar
+  canEdit: boolean; // does user have change permission?
+  hasCollar: boolean; // does the critter currently have a collar attached
 };
 /**
  * component that performs post requests to assign/unassign a collar
@@ -27,7 +28,8 @@ type IPerformAssignmentActionProps = {
 export default function PerformAssignmentAction({
   hasCollar,
   animalId,
-  collarId
+  collarId,
+  canEdit
 }: IPerformAssignmentActionProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const queryClient = useQueryClient();
@@ -74,7 +76,7 @@ export default function PerformAssignmentAction({
     setShowAvailableModal(false);
   };
 
-  const callMutation = async (id: string, isAssign: boolean): Promise<void> => {
+  const save = async (id: string, isAssign: boolean): Promise<void> => {
     await setIsLink(isAssign);
     isAssign ? setShowAvailableModal(false) : setShowConfirmModal(false);
     const payload: ICollarLinkPayload = {
@@ -91,18 +93,18 @@ export default function PerformAssignmentAction({
   return (
     <>
       <ConfirmModal
-        handleClickYes={(): Promise<void> => callMutation(collarId, false)}
+        handleClickYes={(): Promise<void> => save(collarId, false)}
         handleClose={closeModals}
         open={showConfirmModal}
         message={CS.collarRemovalText}
         title={CS.collarRemovalTitle}
       />
       <ShowCollarAssignModal
-        onSave={(id): Promise<void> => callMutation(id, true)}
+        onSave={(id): Promise<void> => save(id, true)}
         show={showAvailableModal}
         onClose={closeModals}
       />
-      <Button onClick={handleClickShowModal}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
+      <Button disabled={!canEdit} onClick={handleClickShowModal}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
     </>
   );
 }

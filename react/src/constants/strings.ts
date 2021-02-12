@@ -17,7 +17,7 @@ const CritterStrings = {
 const CollarStrings = {
   assignedCollarsTableTitle: 'Assigned Collars',
   availableCollarsTableTitle: 'Unassigned Collars',
-  editableProps: ['device_id', 'radio_frequency', 'collar_make', 'model', 'satellite_network', 'collar_status', 'collar_type'],
+  editableProps: ['device_id', 'radio_frequency', 'collar_make', 'collar_model', 'satellite_network', 'collar_status', 'collar_type'],
   selectableProps: ['collar_make', 'satellite_network', 'collar_status', 'collar_type'],
   requiredProps: ['device_id', 'collar_make', 'radio_frequency'],
   exportTitle: 'Bulk Export Collar Data',

@@ -27,15 +27,14 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 type ISelectProps<T> = SelectProps & {
-  codeHeader: string;
-  label: string;
+  codeHeader: string; // code header type to retrieve
   defaultValue: T;
   changeHandler: (o: Record<string, unknown>) => void;
 };
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectCode(props: ISelectProps<any>): JSX.Element {
-  const { codeHeader, label, defaultValue, changeHandler } = props;
+  const { codeHeader, defaultValue, changeHandler } = props;
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState(defaultValue);
@@ -58,7 +57,7 @@ export default function SelectCode(props: ISelectProps<any>): JSX.Element {
   }
 
   const pushChange = (v: unknown): void => {
-    const ret = { [label]: v };
+    const ret = { [codeHeader]: v };
     changeHandler(ret);
   }
 
@@ -72,7 +71,7 @@ export default function SelectCode(props: ISelectProps<any>): JSX.Element {
         isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> :
           isLoading || isFetching ? <div>loading...</div> :
             <FormControl className={classes.formControl}>
-              <InputLabel id='select-label'>{label}</InputLabel>
+              <InputLabel id='select-label'>{data[0].code_header_title}</InputLabel>
               <MuiSelect
                 labelId='select-label'
                 value={value ?? ''}
