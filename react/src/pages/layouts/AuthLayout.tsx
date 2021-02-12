@@ -25,5 +25,9 @@ export default function AuthLayout({ children }: IDefaultLayoutProps): JSX.Eleme
     };
     updateComponent();
   }, [userChanges]);
-  return <div className={classes.wrapper}>{children}</div>;
+  return (
+    <div>
+      <div className={classes.wrapper}>{children}</div>
+    </div>
+  )
 }

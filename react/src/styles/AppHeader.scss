@@ -1,0 +1,35 @@
+@import 'colours.scss';
+@import 'fonts.scss';
+
+.app-header {
+  border-bottom: 2px solid $BCgovGold;
+  color: $appHeaderColor;
+  background-color: $BCgovBlue;
+
+  .container {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+    padding: 0 1rem;
+  }
+}
+
+.brand {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+
+  img {
+    margin-right: 1.25rem;
+    margin-bottom: 4px;
+  }
+}
+
+.app-header .brand:hover {
+  text-decoration: none;
+}

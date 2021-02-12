@@ -83,11 +83,26 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
-    <div className={classes.drawerRoot}>
-      <Drawer className={classes.drawer} variant='permanent' classes={{ paper: classes.drawerPaper }} anchor='left'>
-        <SideBarHeader />
-        <Divider />
-        <List>
+    <div className={'sidebar'}>
+      <List>
+        {routesToShow.map((route: RouteKey, idx: number) => {
+          return (
+            <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
+              {route.icon ? (
+                <ListItemIcon className={'test'}>
+                  <Icon icon={route.icon} />
+                </ListItemIcon>
+              ) : null}
+              <ListItemText primary={route.title} />
+            </ListItem>
+          );
+        })}
+      </List>
+
+      <Drawer className={classes.drawer} classes={{ paper: classes.drawerPaper }}>
+        {/* <SideBarHeader /> */}
+        {/* <Divider /> */}
+        {/* <List>
           {routesToShow.map((route: RouteKey, idx: number) => {
             return (
               <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
@@ -100,7 +115,7 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
               </ListItem>
             );
           })}
-        </List>
+        </List> */}
         <Divider />
         {sidebarContent}
       </Drawer>

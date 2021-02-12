@@ -1,34 +1,25 @@
+
+
 * {
-    margin: 0;
-    padding: 0;
-    outline: 0; 
-    border: 0;
-    box-sizing: border-box;
-    font-family: 'BCSans', 'Noto Sans', Verdana, Arial, sans-serif;
-  }
-  *:focus {
-    outline: 0;
-  }
-  html, body, #root {
-    height: 100%;
-  }
-  body {
-    margin: 0;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-  }
-  p {
-    font-size: 16px;
-    line-height: 1.6;
-    margin-bottom: 36px;
-    color: #313132;
-  }
-  a {
-    text-decoration: none;
-  }
-  ul {
-    list-style: none;
-  }
-  button {
-    cursor: pointer;
-  }
+  box-sizing: border-box;
+  font-family: 'BCSans', 'Noto Sans', Verdana, Arial, sans-serif;
+}
+
+html {
+  font-size: 16px;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+// TODO: Refactor Overrides w/o using !important
+.MuiTableCell-root {
+  font-family: 'BCSans', 'Noto Sans', Verdana, Arial, sans-serif !important;
+}

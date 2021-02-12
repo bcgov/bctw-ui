@@ -1,7 +1,32 @@
+.map-view {
+  display: flex;
+  flex-direction: row;
+}
+
+.map-container {
+  flex: 1 1 auto;
+  position: relative;
+}
+
+.side-panel {
+  width: 30rem;
+  padding: 1.5rem;
+}
+
+.side-panel-title {
+  margin: 0;
+  padding: 0;
+  font-size: 1.375rem;
+}
+
+.results-title {
+  margin-top: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eeeeee;
+}
+
 #map {
   position: absolute;
-  margin-left: -255px;
-  margin-top: -20px;
   width: 100%;
   height: 100%;
 }
@@ -18,14 +43,4 @@
 
 #map .leaflet-control-layers.leaflet-control {
   transform: translate(0px,85px);
-}
-
-#collar-list {
-  position: absolute;
-  z-index: 1000;
-  bottom: 2rem;
-  right: 1rem;
-  font-weight: 800;
-  font-size: 2rem;
-  color:yellow;
 }
