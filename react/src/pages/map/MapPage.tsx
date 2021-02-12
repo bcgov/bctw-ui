@@ -4,7 +4,6 @@ import 'leaflet-draw';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import '@turf/points-within-polygon';
 import './MapPage.css';
 import moment from 'moment';
 import pointsWithinPolygon from '@turf/points-within-polygon';
@@ -34,6 +33,7 @@ const MapPage: React.FC = () => {
 
   const { isError: isErrorTracks, data: tracksData } = (bctwApi.useTracks as any)(start, end);
   const { isError: isErrorPings, data: pingsData } = (bctwApi.usePings as any)(start, end);
+  // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
 
   useEffect(() => {
     if (tracksData && !isErrorTracks) {
@@ -131,6 +131,10 @@ const MapPage: React.FC = () => {
     selectedPings.addData(overlay);
   };
 
+  const drawLatestPings = () => {
+    console.log('yo mama')
+  };
+
   const initMap = (): void => {
     mapRef.current = L.map('map', { zoomControl: false }).setView([55, -128], 6);
 
@@ -192,6 +196,8 @@ const MapPage: React.FC = () => {
       .on('draw:deletestop', (e) => {
         drawSelectedLayer();
       });
+
+    drawLatestPings() // TODO: Refactor ala React
   };
 
   useEffect(() => {
