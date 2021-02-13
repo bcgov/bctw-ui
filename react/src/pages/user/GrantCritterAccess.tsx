@@ -83,8 +83,8 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
         access
       };
     });
-    // console.log(JSON.stringify(data, null, 2));
-    await mutateAsync(data);
+    console.log(JSON.stringify(data, null, 2));
+    // await mutateAsync(data);
     handleClose();
   };
 
@@ -96,10 +96,20 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
   // callback for when the table query finishes
   // update the accesTypes state
   const handleDataLoaded = (rows: UserCritterAccess[]): void => {
-    const m = rows.map((r) => {
-      return { id: r.id, permission_type: r.permission_type as eCritterPermission }
+    const m = rows.map((r) => ({ id: r.id, permission_type: r.permission_type as eCritterPermission}));
+    setAccessTypes(o => {
+      // preserve permission selections across pages. 
+      const copy = [...o];
+      m.forEach(item => {
+        const idx = copy.findIndex(c => c.id === item.id);
+        if (idx === -1) {
+          copy.push(item);
+          return
+        }
+        copy[idx].permission_type = item.permission_type;
+      })
+      return copy;
     });
-    setAccessTypes(m);
   };
 
   const tableQueryProps: ITableQueryProps<any> = {
