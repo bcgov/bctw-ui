@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Table from 'components/table/Table';
 import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 type IAssignmentHistoryProps = {
   animalId: string;
@@ -14,6 +15,7 @@ type IAssignmentHistoryProps = {
  */
 export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
   const { animalId, canEdit } = props;
+  const bctwApi = useTelemetryApi();
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
 
@@ -39,7 +41,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
       <Table
         title='Collar Assignment History'
         headers={['device_id', 'collar_make', 'valid_from', 'valid_to']}
-        queryProps={{ query: 'useCollarAssignmentHistory', queryParam: animalId, onNewData: onNewData }}
+        queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
         rowIdentifier='collar_id'
         paginate={history?.length >= 10}
         onSelect={handleSelect}

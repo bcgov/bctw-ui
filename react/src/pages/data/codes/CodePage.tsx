@@ -80,7 +80,7 @@ const CodePage: React.FC = () => {
             <Table
               headers={props}
               title={`${title} Codes`}
-              queryProps={{ query: 'useCodes', queryParam: codeHeader?.type ?? 'region' }}
+              queryProps={{ query: bctwApi.useCodes, param: codeHeader?.type ?? 'region' }}
               onSelect={null}
             />
           ) : (

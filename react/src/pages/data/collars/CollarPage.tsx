@@ -17,6 +17,7 @@ export default function CollarPage(): JSX.Element {
   const classes = useDataStyles();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
+  const bctwApi = useTelemetryApi();
 
   const [editObj, setEditObj] = useState<Collar>(new Collar());
 
@@ -64,7 +65,7 @@ export default function CollarPage(): JSX.Element {
   };
 
   // setup the mutation for saving collars
-  const { mutateAsync } = (useTelemetryApi().useMutateCollar as any)({ onSuccess });
+  const { mutateAsync } = (bctwApi.useMutateCollar as any)({ onSuccess });
 
   const save = async (c: IUpsertPayload<Collar>): Promise<void> => await mutateAsync(c);
 
@@ -91,8 +92,8 @@ export default function CollarPage(): JSX.Element {
           headers={assignedCollarProps}
           title={S.assignedCollarsTableTitle}
           queryProps={{
-            query: 'useCollarType',
-            queryParam: eCollarAssignedStatus.Assigned,
+            query: bctwApi.useCollarType,
+            param: eCollarAssignedStatus.Assigned,
             onNewData: (d: Collar[]): void => setCollarsA(d)
           }}
           onSelect={handleSelect}
@@ -102,8 +103,8 @@ export default function CollarPage(): JSX.Element {
           headers={availableCollarProps}
           title={S.availableCollarsTableTitle}
           queryProps={{
-            query: 'useCollarType',
-            queryParam: eCollarAssignedStatus.Available,
+            query: bctwApi.useCollarType,
+            param: eCollarAssignedStatus.Available,
             onNewData: (d: Collar[]): void => setCollarsU(d)
           }}
           onSelect={handleSelect}

@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
-import Button from 'components/form/Button';
-import Modal from 'components/modal/Modal';
-import { objectCompare, omitNull } from 'utils/common';
-import ChangeContext from 'contexts/InputChangeContext';
-import { useDataStyles } from 'pages/data/common/data_styles';
+import { IUpsertPayload } from 'api/api_interfaces';
 import { NotificationMessage } from 'components/common';
 import { EditModalBaseProps } from 'components/component_interfaces';
+import Button from 'components/form/Button';
+import Modal from 'components/modal/Modal';
 import { useResponseState } from 'contexts/ApiResponseContext';
-import { IUpsertPayload } from 'api/api_interfaces';
-import HistoryPage from './HistoryPage';
-import { critterHistoryProps, isAnimal } from 'types/animal';
-import { isCollar } from 'types/collar';
+import ChangeContext from 'contexts/InputChangeContext';
+import { useDataStyles } from 'pages/data/common/data_styles';
+import React, { useEffect, useState } from 'react';
+import { Animal, critterHistoryProps } from 'types/animal';
+import { Collar } from 'types/collar';
 import { collarHistoryProps } from 'types/collar_history';
+import { objectCompare, omitNull } from 'utils/common';
+import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
+
+import HistoryPage from './HistoryPage';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
-  newT: T;
+  isEdit: boolean;
   hideSave?: boolean;
+  newT: T;
   onReset?: () => void;
   onValidate?: (o: T) => boolean;
-  isEdit: boolean;
 };
 
 /**
@@ -35,6 +38,8 @@ type IEditModalProps<T> = EditModalBaseProps<T> & {
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const styles = useDataStyles();
+  const responseState = useResponseState();
+  const bctwApi = useTelemetryApi();
   const {
     children,
     title,
@@ -52,19 +57,18 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(newT);
   const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>(null);
 
-  const editType = isAnimal(editing) ? 'critter' : isCollar(editing) ? 'collar' : '';
-  // fixme: document
-  const historyQuery = editType === 'critter' ? 'useCritterHistory' : editType === 'collar' ? 'useCollarHistory' : '';
-  const getHistoryId = (): string => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const u = editing as any;
-    return editType === 'collar' ? u.collar_id : u.id;
-  };
-  const getHistoryProps = (): string[] =>
-    editType === 'collar' ? collarHistoryProps : editType === 'critter' ? critterHistoryProps : [];
-
-  const responseState = useResponseState();
+  useEffect(() => {
+    const updateParams = (): void => {
+      if (editing instanceof Animal) {
+        setHistoryParams({ query: bctwApi.useCritterHistory, param: editing.id, propsToDisplay: critterHistoryProps });
+      } else if (editing instanceof Collar) {
+        setHistoryParams({ query: bctwApi.useCollarHistory, param: editing.collar_id, propsToDisplay: collarHistoryProps });
+      }
+    };
+    updateParams();
+  }, [editing]);
 
   const displayHistory = (): void => {
     setShowHistory((o) => !o);
@@ -111,7 +115,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     <>
       <Modal open={open} handleClose={onClose} title={title}>
         {showHistory ? (
-          <HistoryPage historyQuery={historyQuery} itemId={getHistoryId()} propsToDisplay={getHistoryProps()} />
+          <HistoryPage {...historyParams} />
         ) : (
           <ChangeContext.Provider value={handleChange}>
             {children}

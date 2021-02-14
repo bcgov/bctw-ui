@@ -103,13 +103,13 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
         <Table
           headers={assignedCritterProps}
           title={CS.assignedTableTitle}
-          queryProps={{ query: 'useAssignedCritters', onNewData: (d: Animal[]): void => setCrittersA(d) }}
+          queryProps={{ query: bctwApi.useAssignedCritters, onNewData: (d: Animal[]): void => setCrittersA(d) }}
           onSelect={handleSelect}
         />
         <Table
           headers={unassignedCritterProps}
           title={CS.unassignedTableTitle}
-          queryProps={{ query: 'useUnassignedCritters', onNewData: (d: Animal[]): void => setCrittersU(d) }}
+          queryProps={{ query: bctwApi.useUnassignedCritters, onNewData: (d: Animal[]): void => setCrittersU(d) }}
           onSelect={handleSelect}
         />
 

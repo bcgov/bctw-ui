@@ -4,6 +4,7 @@ import Modal from 'components/modal/Modal';
 import Table from 'components/table/Table';
 import { availableCollarProps, eCollarAssignedStatus, ICollar } from 'types/collar';
 import { CritterStrings as CS } from 'constants/strings';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 type IAssignNewCollarModal = {
   show: boolean;
@@ -18,6 +19,7 @@ type IAssignNewCollarModal = {
  */
 export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignNewCollarModal): JSX.Element {
   const [collarId, setCollarId] = useState<string>('');
+  const bctwApi = useTelemetryApi();
   const handleSelect = (row: ICollar): void => setCollarId(row.collar_id);
 
   return (
@@ -27,7 +29,7 @@ export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignN
           headers={availableCollarProps}
           title={CS.collarAssignmentTitle}
           rowIdentifier='collar_id'
-          queryProps={{ query: 'useCollarType', queryParam: eCollarAssignedStatus.Available }}
+          queryProps={{ query: bctwApi.useCollarType, param: eCollarAssignedStatus.Available }}
           onSelect={handleSelect}
         />
         <Button disabled={collarId === ''} onClick={(): void => onSave(collarId)}>{CS.assignCollarBtnText}</Button>

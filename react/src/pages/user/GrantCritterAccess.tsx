@@ -83,8 +83,8 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
         access
       };
     });
-    console.log(JSON.stringify(data, null, 2));
-    // await mutateAsync(data);
+    // console.log(JSON.stringify(data, null, 2));
+    await mutateAsync(data);
     handleClose();
   };
 
@@ -113,8 +113,8 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
   };
 
   const tableQueryProps: ITableQueryProps<any> = {
-    query: 'useCritterAccess',
-    queryParam: users?.idir,
+    query: bctwApi.useCritterAccess,
+    param: users?.idir,
     onNewData: handleDataLoaded
   };
 

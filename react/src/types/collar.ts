@@ -1,6 +1,6 @@
 import { columnToHeader } from 'utils/common';
 import { BCTW, BctwBaseType } from 'types/common_types';
-import { Type } from 'class-transformer';
+import { Type, Expose } from 'class-transformer';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -51,6 +51,7 @@ export class Collar implements ICollar {
   satellite_network: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
+  @Expose() get identifier(): string { return 'collar_id' }
 
   constructor(collar_type?: eNewCollarType) {
     if (collar_type) {

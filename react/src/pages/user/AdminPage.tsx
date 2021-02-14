@@ -8,13 +8,15 @@ import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useResponseState } from 'contexts/ApiResponseContext';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { Typography } from '@material-ui/core';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 export default function AdminPage(): JSX.Element {
   const responseState = useResponseState();
+  const bctwApi = useTelemetryApi();
   const [ids, setIds] = useState<User>();
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const tableProps: ITableQueryProps<User> = { query: 'useUsers' };
+  const tableProps: ITableQueryProps<User> = { query: bctwApi.useUsers };
 
   const handleTableSelect = (users: User): void => {
     setIds(users);

@@ -9,6 +9,7 @@ import Table from 'components/table/Table';
 import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { MenuItem, FormControl, Select, InputLabel } from '@material-ui/core';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 const useDataStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +34,7 @@ const useDataStyles = makeStyles((theme: Theme) =>
 export default function UserProfile(): JSX.Element {
   const classes = useDataStyles();
   const useUser = useContext(UserContext);
+  const bctwApi = useTelemetryApi();
 
   // the actual user object from context
   const [user, setUser] = useState<User>(null);
@@ -80,8 +82,8 @@ export default function UserProfile(): JSX.Element {
   }
 
   const tableProps: ITableQueryProps<Animal> = {
-    query: 'useCritterAccess',
-    queryParam: testUser
+    query: bctwApi.useCritterAccess,
+    param: testUser
   };
 
   return (
