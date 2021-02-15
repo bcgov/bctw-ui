@@ -35,7 +35,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   };
 
   const createTitle = (): string =>
-    !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.animal_id ?? 'animal'}`;
+    !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
 
   return (
     <EditModal title={createTitle()} newT={new Animal()} onValidate={validateForm} isEdit={isEdit} {...props}>

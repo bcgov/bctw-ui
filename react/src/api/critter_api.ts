@@ -3,7 +3,7 @@ import { plainToClass } from 'class-transformer';
 import { Animal, IAnimal } from 'types/animal';
 import { CollarHistory } from 'types/collar_history';
 
-import { ApiProps, eCritterFetchType, ICollarLinkPayload, IUpsertPayload } from './api_interfaces';
+import { ApiProps, eCritterFetchType, ICollarLinkPayload, IDeleteType, IUpsertPayload } from './api_interfaces';
 
 export const critterApi = (props: ApiProps) => {
   const { api, testUser } = props;
@@ -34,6 +34,16 @@ export const critterApi = (props: ApiProps) => {
     return Array.isArray(results) && results.length > 1 ? results : results[0];
   }
 
+  // also handles deletes for collars
+  const deleteType = async ({objType, id}: IDeleteType): Promise<boolean> => {
+    const url = createUrl({ api: `${objType}/${id}` });
+    const { status, data } = await api.delete(url);
+    if (status === 200) {
+      return true;
+    }
+    return data;
+  }
+
   const getCritterHistory = async (id: string, page = 1): Promise<Animal[]> => {
     const url = createUrl({ api: `get-animal-history/${id}`, page, testUser});
     const { data } = await api.get(url);
@@ -41,6 +51,7 @@ export const critterApi = (props: ApiProps) => {
   }
 
   return {
+    deleteType,
     getCritters,
     getCritterHistory,
     linkCollar,

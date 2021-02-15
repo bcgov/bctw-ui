@@ -1,6 +1,6 @@
 import { columnToHeader } from 'utils/common';
 import { BCTW, BctwBaseType } from 'types/common_types';
-import { Type } from 'class-transformer';
+import { Type, Expose } from 'class-transformer';
 import { eCritterPermission } from './user';
 
 export const assignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
@@ -41,6 +41,7 @@ export interface IAnimal extends BCTW, BctwBaseType {
   nickname: string;
   // fetched critters should contain this
   permission_type?: eCritterPermission;
+  device_id?: number;
 }
 
 export class Animal implements IAnimal {
@@ -78,6 +79,8 @@ export class Animal implements IAnimal {
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   permission_type: eCritterPermission;
+  device_id?: number;
+  @Expose() get name(): string { return this.nickname ?? this.wlh_id ?? this.animal_id }
 
   constructor() {
     this.animal_id = '';

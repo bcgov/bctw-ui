@@ -2,22 +2,22 @@ import { CritterCollarModalProps } from 'components/component_interfaces';
 import { getInputTypesOfT, InputType } from 'components/form/form_helpers';
 import { useState } from 'react';
 import ChangeContext from 'contexts/InputChangeContext';
-import { CodeHeader } from 'types/code';
+import { CodeHeaderInput } from 'types/code';
 import EditModal from 'pages/data/common/EditModal';
 import TextField from 'components/form/Input';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { removeProps } from 'utils/common';
 
-export default function EditCodeHeader(props: CritterCollarModalProps<CodeHeader>): JSX.Element {
+export default function EditCodeHeader(props: CritterCollarModalProps<CodeHeaderInput>): JSX.Element {
   const { isEdit, editing, editableProps, selectableProps } = props;
   const [errors, setErrors] = useState<Record<string, unknown>>({});
   const classes = useDataStyles();
 
-  const inputTypes = getInputTypesOfT<CodeHeader>(editing, editableProps, selectableProps);
+  const inputTypes = getInputTypesOfT<CodeHeaderInput>(editing, editableProps, selectableProps);
   return (
     <EditModal
       title=''
-      newT={new CodeHeader()}
+      newT={new CodeHeaderInput()}
       onValidate={(): boolean => true}
       onReset={close}
       isEdit={isEdit}

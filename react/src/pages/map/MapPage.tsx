@@ -31,8 +31,8 @@ const MapPage: React.FC = () => {
   const start = '2021-01-01';
   const end = 'now()';
 
-  const { isError: isErrorTracks, data: tracksData } = (bctwApi.useTracks as any)(start, end);
-  const { isError: isErrorPings, data: pingsData } = (bctwApi.usePings as any)(start, end);
+  const { isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
+  const { isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
   // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
 
   useEffect(() => {
@@ -132,7 +132,7 @@ const MapPage: React.FC = () => {
   };
 
   const drawLatestPings = () => {
-    console.log('yo mama')
+    console.log('drawing pings')
   };
 
   const initMap = (): void => {
@@ -232,14 +232,14 @@ const MapPage: React.FC = () => {
   };
 
   return (
-    <div>
+    <> 
       <div id='map' onKeyDown={handleKeyPress}></div>
       <div id='collar-list'>
         <ul>
           {selectedCollars.map(collar => (<li key={collar}>{collar}</li>))}
         </ul>
       </div>
-    </div>
+    </>
   );
 };
 

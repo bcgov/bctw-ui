@@ -23,7 +23,6 @@ import { ICustomTableColumn, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
 import { BCTW } from 'types/common_types';
-import { isComputedPropertyName } from 'typescript';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -88,7 +87,7 @@ export default function Table<T extends BCTW>({
     }
   };
 
-  const { isFetching, isLoading, isError, error, data, isPreviousData, isSuccess, status}: UseQueryResult<T[], AxiosError> = query(
+  const { isFetching, isLoading, isError, error, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
     page,
     param,
     // { onSuccess } 
