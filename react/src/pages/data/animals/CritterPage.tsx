@@ -1,6 +1,6 @@
 import { IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
-import { SnackbarWrapper } from 'components/common';
+import { PageProp } from 'components/component_interfaces';
 import Table from 'components/table/Table';
 import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
@@ -15,10 +15,7 @@ import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/anim
 import { formatAxiosError } from 'utils/common';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 
-type CritterPageProps = {
-  setSidebarContent?: (component: JSX.Element) => void;
-};
-export default function CritterPage(props: CritterPageProps): JSX.Element {
+export default function CritterPage(props: PageProp): JSX.Element {
   const classes = useDataStyles();
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
@@ -58,8 +55,7 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
 
   const handleSelect = (row: Animal): void => {
     setEditObj(row);
-    // todo: remove when navigating away from page
-    props.setSidebarContent(<p>id: {row.id}</p>);
+    props.setSidebarContent(<p>critter id: {row.id}</p>);
   };
 
   const saveCritter = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await saveMutation(a);
@@ -104,7 +100,7 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
       <div className={classes.mainButtonRow}>
         <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
         <ModifyCritterWrapper editing={editObj} onDelete={deleteCritter}>
-          <AddEditViewer<Animal> editing={editObj} empty={(): Animal => new Animal()}>
+          <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
             <EditCritter {...editProps} />
           </AddEditViewer>
         </ModifyCritterWrapper>

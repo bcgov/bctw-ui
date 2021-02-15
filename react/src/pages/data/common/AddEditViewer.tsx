@@ -8,17 +8,17 @@ export type IAddEditProps<T> = {
   children: JSX.Element;
   disableEdit?: boolean;
   editing: T;
-  empty: () => T;
-  onDelete?: (id: string) => void;
+  empty: T; onDelete?: (id: string) => void;
 };
 
 /**
  * component that handles the modal show/hide functionality of the childEditComponent
  * used on main data pages (critter/collar)
+ * @param cannotEdit permission to edit?
  * @param children child component that handles the editing, {EditModal} ** must be only one child
- * @param editing object that is passed to editor when Edit is selected
- * @param empty an function that returns a 'naked' instance of T, passed to editor when Add is selected
  * @param disableEdit defaults to false
+ * @param editing isntance of T passed to editor when edit button is clicked
+ * @param empty 'new' instance of T passed to editor when add button is clicked
  **/
 export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): JSX.Element {
   const { cannotEdit, editing, children, empty, onDelete } = props;
@@ -29,7 +29,7 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
 
   const handleClickAdd = (): void => {
     setIsEditMode(false);
-    setEditObj(empty());
+    setEditObj(empty);
     setShowModal((o) => !o);
   };
 
@@ -65,12 +65,12 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
       {/* clone element to pass additional props to it */}
       {React.cloneElement(children, editorProps)}
       <ButtonGroup size='small' variant='contained' color='primary'>
+        <Button color='secondary' disabled={cannotEdit} onClick={handleClickDelete}>
+          delete
+        </Button>
         <Button onClick={handleClickAdd}>add</Button>
         <Button disabled={disableEdit} onClick={handleClickEdit}>
           {cannotEdit ? 'view' : 'edit'}
-        </Button>
-        <Button color='secondary' disabled={cannotEdit} onClick={handleClickDelete}>
-          delete
         </Button>
       </ButtonGroup>
     </>

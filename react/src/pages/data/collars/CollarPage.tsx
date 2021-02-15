@@ -1,4 +1,7 @@
-import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
+import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
+import { AxiosError } from 'axios';
+import { PageProp } from 'components/component_interfaces';
+import ConfirmModal from 'components/modal/ConfirmModal';
 import Table from 'components/table/Table';
 import { CollarStrings as S } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
@@ -7,25 +10,23 @@ import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import EditCollar from 'pages/data/collars/EditCollar';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import { useState } from 'react';
+import { useQueryClient } from 'react-query';
 import { assignedCollarProps, availableCollarProps, Collar, eCollarAssignedStatus } from 'types/collar';
+import { formatAxiosError } from 'utils/common';
 import AddEditViewer from '../common/AddEditViewer';
-import { useQueryClient } from 'react-query'; // to invalidate queries
 
-export default function CollarPage(): JSX.Element {
+export default function CollarPage(props: PageProp): JSX.Element {
   const classes = useDataStyles();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
   const bctwApi = useTelemetryApi();
 
+  const [showConfirmDelete, setShowConfirmDelete] = useState<boolean>(false);
   const [editObj, setEditObj] = useState<Collar>(new Collar());
-
   const [collarsA, setCollarsA] = useState<Collar[]>([]);
   const [collarsU, setCollarsU] = useState<Collar[]>([]);
 
-  // set editing object when table row is selected
-  const handleSelect = (row: Collar): void => setEditObj(row);
-
-  // handlers for save mutation response
+  // handlers for mutation response
   const onSuccess = (data: IBulkUploadResults<Collar>): void => {
     if (data.errors.length) {
       responseDispatch({ type: 'error', message: `${data.errors[0].error}` });
@@ -36,16 +37,47 @@ export default function CollarPage(): JSX.Element {
     queryClient.invalidateQueries('collartype');
   };
 
-  // setup the mutation for saving collars
-  const { mutateAsync } = (bctwApi.useMutateCollar as any)({ onSuccess });
+  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
 
-  const save = async (c: IUpsertPayload<Collar>): Promise<void> => await mutateAsync(c);
+  const onDelete = async (): Promise<void> => {
+    responseDispatch({ type: 'success', message: `collar deleted successfully` });
+    queryClient.invalidateQueries('collartype');
+  };
+
+  // set editing object when table row is selected
+  const handleSelect = (row: Collar): void => {
+    setEditObj(row);
+    props.setSidebarContent(<p>collar id: {row.collar_id}</p>);
+  }
+  const handleShowDeleteModal = (): void => {
+    setShowConfirmDelete((o) => !o);
+  };
+
+  // setup the mutation collar mutations
+  const { mutateAsync: saveMutation } = bctwApi.useMutateCollar({ onSuccess });
+  const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDelete, onError });
+
+  const saveCollar = async (c: IUpsertPayload<Collar>): Promise<IBulkUploadResults<Collar>> => await saveMutation(c);
+  const deleteCollar = async (): Promise<void> => {
+    const payload: IDeleteType = {
+      id: editObj.collar_id,
+      objType: 'collar'
+    };
+    await deleteMutation(payload);
+  };
+
+  const createDeleteMessage = (): string => {
+    const base = editObj.animal_id
+      ? `CAREFUL! An animal with ID ${editObj.animal_id} is attached to this collar. `
+      : '';
+    return `${base}Deleting this collar will prevent other users from accessing it. Are you sure you want to delete it?`;
+  };
 
   const editProps = {
     editableProps: S.editableProps,
     editing: editObj,
     open: false,
-    onSave: save,
+    onSave: saveCollar,
     selectableProps: S.selectableProps
   };
 
@@ -58,6 +90,13 @@ export default function CollarPage(): JSX.Element {
 
   return (
     <div className={classes.container}>
+      <ConfirmModal
+        handleClickYes={deleteCollar}
+        handleClose={(): void => setShowConfirmDelete(false)}
+        open={showConfirmDelete}
+        message={createDeleteMessage()}
+        title={`Deleting ${editObj.collar_make} collar ${editObj.device_id}`}
+      />
       <Table
         headers={assignedCollarProps}
         title={S.assignedCollarsTableTitle}
@@ -81,8 +120,7 @@ export default function CollarPage(): JSX.Element {
 
       <div className={classes.mainButtonRow}>
         <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
-
-        <AddEditViewer<Collar> editing={editObj} empty={(): Collar => new Collar()}>
+        <AddEditViewer<Collar> editing={editObj} empty={new Collar()} onDelete={handleShowDeleteModal}>
           <EditCollar {...editProps} />
         </AddEditViewer>
       </div>

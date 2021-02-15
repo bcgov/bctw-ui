@@ -32,6 +32,7 @@ export interface ICollar extends ICollarBase, BCTW, BctwBaseType {
   reg_key: string;
   retreival_date: Date;
   satellite_network: string;
+  animal_id?: string; // get collars includes this if collar attached
 }
 
 export class Collar implements ICollar {
@@ -49,6 +50,7 @@ export class Collar implements ICollar {
   reg_key: string;
   @Type(() => Date) retreival_date: Date;
   satellite_network: string;
+  animal_id?: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
   @Expose() get identifier(): string { return 'collar_id' }

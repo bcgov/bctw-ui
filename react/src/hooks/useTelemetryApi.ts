@@ -225,7 +225,7 @@ export const useTelemetryApi = () => {
 
   const useMutateCollar = (
     config: UseMutationOptions<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>
-  ): UseMutationResult =>
+  ): UseMutationResult<IBulkUploadResults<Collar>> =>
     useMutation<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>(
       (collar) => collarApi.upsertCollar(collar),
       config

@@ -7,8 +7,9 @@ import MapPage from 'pages/map/MapPage';
 import TerrainPage from 'pages/terrain/TerrainPage';
 import AdminPage from 'pages/user/AdminPage';
 import UserProfile from 'pages/user/UserProfile';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 export type RouteKey = {
   path: string;
@@ -37,7 +38,6 @@ const AppRoutes: RouteKey[] = [
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
   { name: 'profile', path: '/profile', title: 'Profile', component: UserProfile, sort: 2, icon: 'profile' },
   { name: 'admin', path: '/admin', title: 'Admin', component: AdminPage, sort: 2, icon: 'admin' },
-
   {
     name: 'notFound',
     path: '/*',
@@ -50,8 +50,19 @@ const AppRoutes: RouteKey[] = [
 type AppRouterProps = {
   onContentChange: (component: JSX.Element) => void;
 };
+
 const AppRouter = ({ onContentChange }: AppRouterProps): JSX.Element => {
   const routeProps = { setSidebarContent: onContentChange };
+  const history = useHistory();
+
+  useEffect(() => {
+    return history.listen((location) => {
+      // console.log(`You changed the page to: ${location.pathname}`)
+      // wipe the sidebar content when navigation to new page
+      onContentChange(null);
+    });
+  }, [history]);
+
   return (
     <Switch>
       <Redirect exact from='/' to='/home' />
