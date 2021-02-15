@@ -11,7 +11,7 @@ export default function SnackbarWrapper(props: SnackbarWrapperProps): JSX.Elemen
 
   useEffect(() => {
     ((): void => {
-      if (responseState?.message?.length) {
+      if (responseState?.message?.length || responseState?.type === 'error') {
         setShowToast(true);
       } else {
         setShowToast(false);

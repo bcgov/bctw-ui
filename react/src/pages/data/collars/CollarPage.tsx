@@ -1,6 +1,4 @@
 import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
-import { SnackbarWrapper } from 'components/common';
-import { INotificationMessage } from 'components/component_interfaces';
 import Table from 'components/table/Table';
 import { CollarStrings as S } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
@@ -30,38 +28,12 @@ export default function CollarPage(): JSX.Element {
   // handlers for save mutation response
   const onSuccess = (data: IBulkUploadResults<Collar>): void => {
     if (data.errors.length) {
-      updateStatus({ type: 'error', message: `${data.errors[0].error}` });
+      responseDispatch({ type: 'error', message: `${data.errors[0].error}` });
       return;
     }
     const collar = data.results[0];
-    updateStatus({ type: 'success', message: `collar ${collar.device_id} saved` });
-    let availableQueryKey;
-    let isCollarMatch = false;
-    queryClient.invalidateQueries({
-      predicate: (query) => {
-        if ((query.queryKey[0] as string).indexOf('collartype') === -1) {
-          return false;
-        }
-        // save this query key if a new collar was added
-        if (query.queryKey[2] === 'Available') {
-          availableQueryKey = query.queryKey;
-        }
-        const staleData = query.state.data as Collar[];
-        const found = staleData.find((c) => c.device_id === collar.device_id);
-        if (found) {
-          isCollarMatch = true;
-          return true;
-        }
-        return false;
-      }
-    });
-    if (!isCollarMatch && availableQueryKey) {
-      queryClient.invalidateQueries(availableQueryKey);
-    }
-  };
-
-  const updateStatus = (notif: INotificationMessage): void => {
-    responseDispatch(notif); // update api response context
+    responseDispatch({ type: 'success', message: `collar ${collar.device_id} saved` });
+    queryClient.invalidateQueries('collartype');
   };
 
   // setup the mutation for saving collars
@@ -84,41 +56,36 @@ export default function CollarPage(): JSX.Element {
     eTitle: S.exportTitle
   };
 
-  const rowId = 'collar_id';
   return (
-    <SnackbarWrapper>
-      <div className={classes.container}>
-        <Table
-          headers={assignedCollarProps}
-          title={S.assignedCollarsTableTitle}
-          queryProps={{
-            query: bctwApi.useCollarType,
-            param: eCollarAssignedStatus.Assigned,
-            onNewData: (d: Collar[]): void => setCollarsA(d)
-          }}
-          onSelect={handleSelect}
-          rowIdentifier={rowId}
-        />
-        <Table
-          headers={availableCollarProps}
-          title={S.availableCollarsTableTitle}
-          queryProps={{
-            query: bctwApi.useCollarType,
-            param: eCollarAssignedStatus.Available,
-            onNewData: (d: Collar[]): void => setCollarsU(d)
-          }}
-          onSelect={handleSelect}
-          rowIdentifier={rowId}
-        />
+    <div className={classes.container}>
+      <Table
+        headers={assignedCollarProps}
+        title={S.assignedCollarsTableTitle}
+        queryProps={{
+          query: bctwApi.useCollarType,
+          param: eCollarAssignedStatus.Assigned,
+          onNewData: (d: Collar[]): void => setCollarsA(d)
+        }}
+        onSelect={handleSelect}
+      />
+      <Table
+        headers={availableCollarProps}
+        title={S.availableCollarsTableTitle}
+        queryProps={{
+          query: bctwApi.useCollarType,
+          param: eCollarAssignedStatus.Available,
+          onNewData: (d: Collar[]): void => setCollarsU(d)
+        }}
+        onSelect={handleSelect}
+      />
 
-        <div className={classes.mainButtonRow}>
-          <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
+      <div className={classes.mainButtonRow}>
+        <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
 
-          <AddEditViewer<Collar> editing={editObj} empty={(): Collar => new Collar()}>
-            <EditCollar {...editProps} />
-          </AddEditViewer>
-        </div>
+        <AddEditViewer<Collar> editing={editObj} empty={(): Collar => new Collar()}>
+          <EditCollar {...editProps} />
+        </AddEditViewer>
       </div>
-    </SnackbarWrapper>
+    </div>
   );
 }

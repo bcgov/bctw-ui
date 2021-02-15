@@ -42,7 +42,6 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
         title='Collar Assignment History'
         headers={['device_id', 'collar_make', 'valid_from', 'valid_to']}
         queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
-        rowIdentifier='collar_id'
         paginate={history?.length >= 10}
         onSelect={handleSelect}
       />

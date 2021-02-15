@@ -134,7 +134,7 @@ export const useTelemetryApi = () => {
   const useCritterHistory = (page: number, critterId: string, config: Record<string, unknown>): UseQueryResult => {
     return useQuery<Animal[], AxiosError>(
       ['critter_history', critterId],
-      () => critterApi.getCritterHistory(critterId),
+      () => critterApi.getCritterHistory(page, critterId),
       { ...config }
     );
   };

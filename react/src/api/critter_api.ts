@@ -44,7 +44,7 @@ export const critterApi = (props: ApiProps) => {
     return data;
   }
 
-  const getCritterHistory = async (id: string, page = 1): Promise<Animal[]> => {
+  const getCritterHistory = async (page: number, id: string): Promise<Animal[]> => {
     const url = createUrl({ api: `get-animal-history/${id}`, page, testUser});
     const { data } = await api.get(url);
     return data.map((json: IAnimal[]) => plainToClass(Animal, json));

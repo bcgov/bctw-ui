@@ -36,16 +36,18 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
     invalidateCritterQueries();
   };
 
-  const onDelete = async(): Promise<void> => {
-    responseDispatch({ type: 'success', message:  `critter deleted successfully`});
+  const onDelete = async (): Promise<void> => {
+    responseDispatch({ type: 'success', message: `critter deleted successfully` });
     invalidateCritterQueries();
-  }
+  };
 
-  const onError = (error: AxiosError): void =>
-    responseDispatch({ type: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
 
   // force refetch on critter queries
-  const invalidateCritterQueries = (): Promise<void> => queryClient.invalidateQueries('critters');
+  const invalidateCritterQueries = async (): Promise<void> => {
+    queryClient.invalidateQueries('critters_assigned');
+    queryClient.invalidateQueries('critters_unassigned');
+  };
 
   // setup the mutations
   const { mutateAsync: saveMutation } = bctwApi.useMutateCritter({ onSuccess, onError });
@@ -65,8 +67,8 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
     const payload: IDeleteType = {
       id: critterId,
       objType: 'animal'
-    }
-    await deleteMutation(payload)
+    };
+    await deleteMutation(payload);
   };
 
   // props to be passed to the edit modal component
@@ -86,29 +88,27 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
   };
 
   return (
-    <SnackbarWrapper>
-      <div className={classes.container}>
-        <Table
-          headers={assignedCritterProps}
-          title={CS.assignedTableTitle}
-          queryProps={{ query: bctwApi.useAssignedCritters, onNewData: (d: Animal[]): void => setCrittersA(d) }}
-          onSelect={handleSelect}
-        />
-        <Table
-          headers={unassignedCritterProps}
-          title={CS.unassignedTableTitle}
-          queryProps={{ query: bctwApi.useUnassignedCritters, onNewData: (d: Animal[]): void => setCrittersU(d) }}
-          onSelect={handleSelect}
-        />
-        <div className={classes.mainButtonRow}>
-          <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
-          <ModifyCritterWrapper editing={editObj} onDelete={deleteCritter}>
-            <AddEditViewer<Animal> editing={editObj} empty={(): Animal => new Animal()}>
-              <EditCritter {...editProps} />
-            </AddEditViewer>
-          </ModifyCritterWrapper>
-        </div>
+    <div className={classes.container}>
+      <Table
+        headers={assignedCritterProps}
+        title={CS.assignedTableTitle}
+        queryProps={{ query: bctwApi.useAssignedCritters, onNewData: (d: Animal[]): void => setCrittersA(d) }}
+        onSelect={handleSelect}
+      />
+      <Table
+        headers={unassignedCritterProps}
+        title={CS.unassignedTableTitle}
+        queryProps={{ query: bctwApi.useUnassignedCritters, onNewData: (d: Animal[]): void => setCrittersU(d) }}
+        onSelect={handleSelect}
+      />
+      <div className={classes.mainButtonRow}>
+        <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
+        <ModifyCritterWrapper editing={editObj} onDelete={deleteCritter}>
+          <AddEditViewer<Animal> editing={editObj} empty={(): Animal => new Animal()}>
+            <EditCritter {...editProps} />
+          </AddEditViewer>
+        </ModifyCritterWrapper>
       </div>
-    </SnackbarWrapper>
+    </div>
   );
 }

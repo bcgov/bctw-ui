@@ -88,13 +88,16 @@ const availableCollarProps = [
   'device_id',
   'collar_status',
   // fixme: should retrieve this from last_pings?
-  'max_transmission_date', 
+  // 'max_transmission_date', 
+  'radio_frequency',
   'collar_type',
   'collar_make',
   'collar_model',
 ];
 
-const assignedCollarProps = ['animal_id', ...availableCollarProps];
+// fixme: hide this for now as uuid not useful to user
+// const assignedCollarProps = ['animal_id', ...availableCollarProps];
+const assignedCollarProps = availableCollarProps;
 
 const isCollar = (c: unknown): c is Collar => {
   const collar = c as Collar;

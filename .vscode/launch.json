@@ -1,38 +1,24 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "configurations": [
-     {
+    {
       "type": "chrome",
       "request": "launch",
-      "name": "debug vue",
+      "name": "debug React",
       "url": "http://localhost:1111",
-      "webRoot": "${workspaceFolder}",
-      "breakOnLoad": true,
-       "sourceMapPathOverrides": {
-        "../*": "${webRoot}/vue/frontend/src/*"
-      },
-      "trace": true,
-      "sourceMaps": true,
+      "webRoot": "${workspaceFolder}/react",
+      // WSL-specific source map
+      "sourceMapPathOverrides": {
+        "/*": "/__vscode-remote-uri__/*"
+      }
     },
     {
       "name": "launch keycloak server.js",
       "program": "${workspaceFolder}/backend/js/server.js",
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": [ "<node_internals>/**" ],
       "type": "pwa-node",
       "envFile": "${workspaceFolder}/backend/.env"
-    },
-    {
-      "type": "chrome",
-      "request": "launch",
-      "name": "debug React version",
-      "url": "http://localhost:1111",
-      "webRoot": "${workspaceFolder}/react",
-      "sourceMapPathOverrides": {
-        "/*": "/__vscode-remote-uri__/*"
-      }
     }
   ]
 }

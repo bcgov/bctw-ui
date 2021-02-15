@@ -9,9 +9,8 @@ import moment from 'moment';
 import pointsWithinPolygon from '@turf/points-within-polygon';
 import tokml from 'tokml';
 import download from 'downloadjs';
-import { ContactsOutlined } from '@material-ui/icons';
-import { Console } from 'console';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { CircularProgress } from '@material-ui/core';
 
 const MapPage: React.FC = () => {
   const bctwApi = useTelemetryApi();
@@ -31,8 +30,8 @@ const MapPage: React.FC = () => {
   const start = '2021-01-01';
   const end = 'now()';
 
-  const { isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
-  const { isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
+  const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
+  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
   // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
 
   useEffect(() => {
@@ -235,6 +234,11 @@ const MapPage: React.FC = () => {
     <> 
       <div id='map' onKeyDown={handleKeyPress}></div>
       <div id='collar-list'>
+        {
+          fetchingPings || fetchingTracks 
+            ? <CircularProgress color="secondary"/> 
+            : null
+        }
         <ul>
           {selectedCollars.map(collar => (<li key={collar}>{collar}</li>))}
         </ul>

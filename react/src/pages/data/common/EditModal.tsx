@@ -1,9 +1,7 @@
 import { IUpsertPayload } from 'api/api_interfaces';
-import { NotificationMessage } from 'components/common';
 import { EditModalBaseProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';
-import { useResponseState } from 'contexts/ApiResponseContext';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useDataStyles } from 'pages/data/common/data_styles';
 import React, { useEffect, useState } from 'react';
@@ -38,7 +36,6 @@ type IEditModalProps<T> = EditModalBaseProps<T> & {
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const styles = useDataStyles();
-  const responseState = useResponseState();
   const bctwApi = useTelemetryApi();
   const {
     children,
@@ -126,9 +123,9 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
             )}
           </ChangeContext.Provider>
         )}
-        <div className={styles.editMsgs}>
+        {/* <div className={styles.editMsgs}>
           {responseState ? <NotificationMessage type={responseState.type} message={responseState.message} /> : null}
-        </div>
+        </div> */}
         {isEdit ? <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button> : null}
       </Modal>
     </>

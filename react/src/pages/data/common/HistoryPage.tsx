@@ -23,6 +23,7 @@ export default function HistoryPage<T>(props: IHistoryPageProps<T>): JSX.Element
   }
 
   return (
-    <Table headers={propsToDisplay} queryProps={tblProps} onSelect={handleSelect} rowIdentifier='transaction_id' />
+    // fixme: need history table row identifier
+    <Table headers={propsToDisplay} queryProps={tblProps} onSelect={handleSelect} /*rowIdentifier='transaction_id' *//>
   );
 }

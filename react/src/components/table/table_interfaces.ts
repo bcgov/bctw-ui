@@ -55,7 +55,7 @@ type ITableProps<T> = {
   isMultiSelect?: boolean;
   paginate?: boolean;
   queryProps: ITableQueryProps<T>;
-  rowIdentifier?: keyof T;
+  // rowIdentifier?: keyof T;
   title?: string;
   onSelect?: (row: T) => void;
   onSelectMultiple?: (rowIds: T[]) => void;
