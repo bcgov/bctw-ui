@@ -52,7 +52,7 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
   };
 
   const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
-  const { mutateAsync } = (bctwApi.useMutateGrantCritterAccess as any)({ onSuccess, onError });
+  const { mutateAsync } = bctwApi.useMutateGrantCritterAccess({ onSuccess, onError });
 
   // when the custom table header select is changed, 
   // update all of the custom column selects

@@ -43,7 +43,7 @@ type ConfirmModalProps = ModalBaseProps & {
   btnNoText?: string;
   btnYesText?: string;
   message: string;
-  handleClickYes: (v: any) => void;
+  handleClickYes: (v) => void;
 };
 
 type ExportImportProps = ModalBaseProps & {

@@ -6,12 +6,12 @@ import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import React, { useState } from 'react';
-import { CodeHeader, CodeHeaderInput } from 'types/code';
+import { CodeHeader, CodeHeaderInput, ICodeHeader } from 'types/code';
 import { formatAxiosError } from 'utils/common';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditCodeHeader from 'pages/data/codes/EditCodeHeader';
 import { useDataStyles } from 'pages/data/common/data_styles';
-import { IUpsertPayload } from 'api/api_interfaces';
+import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 
 const CodePage: React.FC = () => {
@@ -37,11 +37,12 @@ const CodePage: React.FC = () => {
     setTitle(c.title);
   };
 
-  const { mutateAsync } = (bctwApi.useMutateCodeHeader as any)({ onSuccess });
+  const { mutateAsync } = bctwApi.useMutateCodeHeader({ onSuccess });
 
-  const handleSave = async (p: IUpsertPayload<CodeHeaderInput>): Promise<void> => await mutateAsync(p.body);
+  const handleSave = async (p: IUpsertPayload<CodeHeaderInput>): Promise<IBulkUploadResults<ICodeHeader>> =>
+    await mutateAsync(p.body);
 
-  const { isFetching, isLoading, isError, error, data } = (bctwApi.useCodeHeaders as any)({ onSuccess });
+  const { isFetching, isLoading, isError, error, data } = bctwApi.useCodeHeaders();
 
   const importProps = {
     iMsg: S.importText,
@@ -58,7 +59,7 @@ const CodePage: React.FC = () => {
 
   return (
     <>
-      {isFetching | isLoading ? (
+      {isFetching || isLoading ? (
         <div>loading...</div>
       ) : isError ? (
         <NotificationMessage type='error' message={formatAxiosError(error)} />
@@ -88,7 +89,10 @@ const CodePage: React.FC = () => {
           )}
           <div className={classes.mainButtonRow}>
             <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
-            <AddEditViewer<CodeHeaderInput> editing={new CodeHeaderInput()} empty={Object.create({})} disableEdit={true}>
+            <AddEditViewer<CodeHeaderInput>
+              editing={new CodeHeaderInput()}
+              empty={Object.create({})}
+              disableEdit={true}>
               <EditCodeHeader {...editProps} />
             </AddEditViewer>
           </div>

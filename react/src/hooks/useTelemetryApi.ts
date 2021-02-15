@@ -143,7 +143,7 @@ export const useTelemetryApi = () => {
    * @param codeHeader the code header name used to determine which codes to fetch
    * @param page not currently used
    */
-  const useCodes = (page: number, codeHeader: string): UseQueryResult => {
+  const useCodes = (page: number, codeHeader: string): UseQueryResult<ICode[], AxiosError> => {
     const props = { page, codeHeader };
     return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), {
       ...defaultQueryOptions,
@@ -154,7 +154,7 @@ export const useTelemetryApi = () => {
   /**
    * retrieves list of code headers, no parameters
    */
-  const useCodeHeaders = (): UseQueryResult => {
+  const useCodeHeaders = (): UseQueryResult<ICodeHeader[], AxiosError> => {
     return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), {
       ...defaultQueryOptions
     });
@@ -187,7 +187,7 @@ export const useTelemetryApi = () => {
   /**
    * @returns a user object, no parameters because it uses the keycloak object to pass idir
    */
-  const useUser = (): UseQueryResult => {
+  const useUser = (): UseQueryResult<User, AxiosError> => {
     return useQuery<User, AxiosError>('user', () => userApi.getUser(), defaultQueryOptions);
   };
 
@@ -217,7 +217,7 @@ export const useTelemetryApi = () => {
    */
   const useMutateCodeHeader = (
     config: UseMutationOptions<IBulkUploadResults<ICodeHeader>, AxiosError, ICodeHeader[]>
-  ): UseMutationResult =>
+  ): UseMutationResult<IBulkUploadResults<ICodeHeader>> =>
     useMutation<IBulkUploadResults<ICodeHeader>, AxiosError, ICodeHeader[]>(
       (headers) => codeApi.addCodeHeader(headers),
       config
@@ -243,7 +243,7 @@ export const useTelemetryApi = () => {
 
   const useMutateBulkCsv = <T>(
     config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, FormData>
-  ): UseMutationResult =>
+  ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
   const useMutateGrantCritterAccess = (

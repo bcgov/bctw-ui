@@ -67,7 +67,7 @@ export default function PerformAssignmentAction({
       }
     });
 
-  const { mutateAsync } = (bctwApi.useMutateLinkCollar as any)({ onSuccess, onError });
+  const { mutateAsync } = bctwApi.useMutateLinkCollar({ onSuccess, onError });
 
   const handleClickShowModal = (): void => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
 

@@ -14,7 +14,7 @@ type IAssignmentHistoryProps = {
  *  all of the collar assign/unassign handling components
  */
 export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
-  const { animalId, canEdit } = props;
+  const { animalId } = props;
   const bctwApi = useTelemetryApi();
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);

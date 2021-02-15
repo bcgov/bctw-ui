@@ -80,6 +80,7 @@ export class Animal implements IAnimal {
   @Type(() => Date)valid_to: Date;
   permission_type: eCritterPermission;
   device_id?: number;
+  @Expose() get identifier(): string { return 'id' }
   @Expose() get name(): string { return this.nickname ?? this.wlh_id ?? this.animal_id }
 
   constructor() {

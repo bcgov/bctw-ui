@@ -8,7 +8,8 @@ export type IAddEditProps<T> = {
   children: JSX.Element;
   disableEdit?: boolean;
   editing: T;
-  empty: T; onDelete?: (id: string) => void;
+  empty: T;
+  onDelete?: (id: string) => void;
 };
 
 /**
@@ -39,8 +40,13 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
     setShowModal((o) => !o);
   };
 
+  const enableDelete = (): boolean => {
+    const isFn = typeof onDelete === 'function'
+    return !!isFn;
+  }
+
   const handleClickDelete = (): void => {
-    if (typeof onDelete === 'function') {
+    if (enableDelete()) {
       onDelete(editing[editing.identifier ?? 'id']);
     }
   };
@@ -65,9 +71,11 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
       {/* clone element to pass additional props to it */}
       {React.cloneElement(children, editorProps)}
       <ButtonGroup size='small' variant='contained' color='primary'>
-        <Button color='secondary' disabled={cannotEdit} onClick={handleClickDelete}>
-          delete
-        </Button>
+        {enableDelete() ? (
+          <Button color='secondary' disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
+            delete
+          </Button>
+        ) : null}
         <Button onClick={handleClickAdd}>add</Button>
         <Button disabled={disableEdit} onClick={handleClickEdit}>
           {cannotEdit ? 'view' : 'edit'}

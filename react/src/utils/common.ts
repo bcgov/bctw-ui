@@ -11,12 +11,12 @@ function getProperty<T, K extends keyof T>(obj: T, key: K): unknown {
   return obj[key]; // Inferred type is T[K]
 }
 
-function getKey<T, K extends keyof T>(obj: T, key: string): keyof T {
-  if (Object.prototype.hasOwnProperty.call(obj, key)) {
-    return key as keyof T;
-  }
-  return null;
-}
+// function getKey<T, K extends keyof T>(obj: T, key: string): keyof T {
+//   if (Object.prototype.hasOwnProperty.call(obj, key)) {
+//     return key as keyof T;
+//   }
+//   return null;
+// }
 
 /**
  * shallow compare of objects for use in forms
@@ -75,7 +75,6 @@ const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? e
 
 export {
   columnToHeader,
-  getKey,
   getProperty,
   formatAxiosError,
   objectCompare,

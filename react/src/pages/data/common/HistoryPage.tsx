@@ -7,7 +7,7 @@ export type IHistoryPageProps<T> = ITableQueryProps<T> & {
 
 export default function HistoryPage<T>(props: IHistoryPageProps<T>): JSX.Element {
   const { query, param, propsToDisplay } = props;
-  const handleSelect = (row) => {
+  const handleSelect = (): void => {
     // do nothing
   };
 
