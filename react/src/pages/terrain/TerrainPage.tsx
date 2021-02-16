@@ -46,8 +46,8 @@ const TerrainPage: React.FC = () => {
     const h2 = location.hostname
     const h3 = prod ? location.port : 3000
     const h4 = prod ? '/api' : ''
-    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-21&end=2020-12-31`;
-    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-21&end=2020-12-31`;
+    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-31&end=2021-02-15`;
+    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-31&end=2021-02-15`;
 
     fetch(urlPings)
       .then(res => res.json())
