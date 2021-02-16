@@ -71,7 +71,7 @@ export default function App(): JSX.Element {
           {/* <ReactQueryDevtools initialIsOpen /> */}
         </QueryClientProvider>
       </div>
-      {/* <AppFooter></AppFooter> */}
+      <AppFooter></AppFooter>
     </div>
   );
 }

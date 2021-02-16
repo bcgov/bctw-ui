@@ -3,7 +3,6 @@ import Typography from '@material-ui/core/Typography';
 const Home = (): JSX.Element => {
   return (
     <>
-      {/* <AppBar title='British Columbia Telemetry Warehouse' /> */}
       <Typography align='center' variant='h5' gutterBottom={true}>
         British Columbia Telemetry Warehouse
       </Typography>
