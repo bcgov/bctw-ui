@@ -1,4 +1,4 @@
-
+@import 'fonts.scss';
 
 * {
   box-sizing: border-box;
@@ -20,6 +20,26 @@ body {
 }
 
 // TODO: Refactor Overrides w/o using !important
-.MuiTableCell-root {
-  font-family: 'BCSans', 'Noto Sans', Verdana, Arial, sans-serif !important;
+.MuiTableCell-root,
+.MuiButton-label {
+  font-family: $fontFamily;
+}
+
+.MuiButton-label {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:focus {
+  outline: 3px solid cornflowerblue;
+}
+
+[class^="MuiButton"] {
+  &:focus {
+    outline: 3px solid cornflowerblue;
+  }
+}
+
+.MuiTouchRipple-root {
+  display: none;
 }

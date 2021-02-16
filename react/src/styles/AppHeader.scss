@@ -1,5 +1,4 @@
 @import 'colours.scss';
-@import 'fonts.scss';
 
 .app-header {
   border-bottom: 2px solid $BCgovGold;
@@ -9,6 +8,7 @@
   .container {
     display: flex;
     flex: 1 1 auto;
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
     height: 70px;
@@ -33,3 +33,37 @@
 .app-header .brand:hover {
   text-decoration: none;
 }
+
+button.logout {
+  color: $appHeaderColor;
+  font-size: 1rem;
+}
+
+.profile-nav {
+  color: $appHeaderColor;
+
+  ul {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+
+  li {
+    display: inline-block;
+  }
+
+  .username {
+    display: flex;
+    align-items: center;
+    margin-right: 0.75rem;
+    padding-right: 1rem;
+    border-right: 1px solid $appHeaderColor;
+
+    span {
+      margin-left: 0.5rem;
+    }
+  }
+}
+
