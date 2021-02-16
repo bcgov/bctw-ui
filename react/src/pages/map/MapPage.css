@@ -29,3 +29,11 @@
   font-size: 2rem;
   color:yellow;
 }
+
+#date-picker-grp {
+  padding: 10px 5px 10px 20px;
+}
+
+.date-div {
+  margin-bottom: 15px;
+}

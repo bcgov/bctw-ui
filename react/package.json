@@ -24,7 +24,6 @@
     "downloadjs": "^1.4.7",
     "leaflet": "^1.7.1",
     "leaflet-draw": "^1.0.4",
-    "moment": "^2.29.1",
     "node-sass": "^4.14.1",
     "pouchdb-browser": "^7.2.2",
     "pouchdb-find": "^7.2.2",

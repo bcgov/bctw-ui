@@ -1,38 +1,41 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as L from 'leaflet';
-import 'leaflet-draw';
-
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-draw/dist/leaflet.draw.css';
 import './MapPage.css';
-import moment from 'moment';
+import 'leaflet-draw';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet/dist/leaflet.css';
+
+import { CircularProgress, InputLabel } from '@material-ui/core';
 import pointsWithinPolygon from '@turf/points-within-polygon';
-import tokml from 'tokml';
+import { PageProp } from 'components/component_interfaces';
+import TextField from 'components/form/Input';
+import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { CircularProgress } from '@material-ui/core';
+import * as L from 'leaflet';
+import { useEffect, useRef, useState } from 'react';
+import tokml from 'tokml';
+import { formatDay, formatLocal, getToday } from 'utils/time';
 
-const MapPage: React.FC = () => {
+export default function MapPage(props: PageProp): JSX.Element {
   const bctwApi = useTelemetryApi();
 
   const mapRef = useRef<L.Map>(null);
 
   const [tracks, setTracks] = useState(new L.GeoJSON()); // Store Tracks
-
   const [pings, setPings] = useState(new L.GeoJSON()); // Store Pings
 
-  const drawnItems = new L.FeatureGroup(); // Store the selection shapes
-
-  // const selectedCollars = useRef([]);
+  const [start, setStart] = useState<string>(dayjs().subtract(14, 'day').format(formatDay));
+  const [end, setEnd] = useState<string>(getToday());
   const [selectedCollars, setSelectedCollars] = useState([]);
 
-  // fixme: hardcoded start/end 
-  const start = '2021-01-01';
-  const end = 'now()';
+  const drawnItems = new L.FeatureGroup(); // Store the selection shapes
 
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
   const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
   // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
+
+  useEffect(() => {
+    drawLatestPings();
+  }, [start, end]);
 
   useEffect(() => {
     if (tracksData && !isErrorTracks) {
@@ -68,13 +71,14 @@ const MapPage: React.FC = () => {
       const g = feature.geometry as any; // Yes... this exists!
       const x = g.coordinates[0]?.toFixed(5);
       const y = g.coordinates[1]?.toFixed(5);
+      const t = dayjs(p.date_recorded).format(formatLocal);
       const text = `
         ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
         <hr>
         Device ID ${p.device_id} (${p.device_vendor}) <br>
         ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
         ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
-        ${moment(p.date_recorded).format('dddd, MMMM Do YYYY, h:mm:ss a')} <br>
+        ${t} <br>
         ${x}, ${y}
       `;
       layer.bindPopup(text);
@@ -100,17 +104,17 @@ const MapPage: React.FC = () => {
 
   const displaySelectedUnits = (overlay) => {
     const selectedCollars = overlay.features
-      .map(f => f.properties.device_id)
-      .reduce((total,f) => {
+      .map((f) => f.properties.device_id)
+      .reduce((total, f) => {
         if (total.indexOf(f) >= 0) {
           return total;
-        } else{ 
+        } else {
           return total.concat(f);
         }
-      },[]);
-    setSelectedCollars(selectedCollars)
-    console.log('selection',selectedCollars);
-  }
+      }, []);
+    setSelectedCollars(selectedCollars);
+    console.log('selection', selectedCollars);
+  };
 
   const drawSelectedLayer = () => {
     const clipper = drawnItems.toGeoJSON();
@@ -130,8 +134,13 @@ const MapPage: React.FC = () => {
     selectedPings.addData(overlay);
   };
 
-  const drawLatestPings = () => {
-    console.log('drawing pings')
+  const drawLatestPings = (): void => {
+    console.log('drawing pings');
+    const layerPicker = L.control.layers();
+    layerPicker.removeLayer(pings);
+    layerPicker.removeLayer(tracks);
+    pings.clearLayers();
+    tracks.clearLayers();
   };
 
   const initMap = (): void => {
@@ -196,13 +205,43 @@ const MapPage: React.FC = () => {
         drawSelectedLayer();
       });
 
-    drawLatestPings() // TODO: Refactor ala React
+    // drawLatestPings() // TODO: Refactor ala React
+  };
+
+  const handlePickDate = (event): void => {
+    const key = Object.keys(event)[0];
+    if (key === 'tstart') {
+      setStart(event[key]);
+      return;
+    }
+    if (key == 'tend') {
+      setEnd(event[key]);
+    }
+  };
+
+  const initSidebar = (): void => {
+    props.setSidebarContent(
+      <div id='date-picker-grp'>
+        <div className='date-div'>
+          <InputLabel>Start</InputLabel>
+          <TextField type='date' defaultValue={start} propName='tstart' changeHandler={handlePickDate} />
+        </div>
+        <div className='date-div'>
+          <InputLabel>End</InputLabel>
+          <TextField type='date' defaultValue={end} propName='tend' changeHandler={handlePickDate} />
+        </div>
+      </div>
+    );
   };
 
   useEffect(() => {
-    if (!mapRef.current) {
-      initMap();
-    }
+    const updateComponent = (): void => {
+      if (!mapRef.current) {
+        initMap();
+        initSidebar();
+      }
+    };
+    updateComponent();
   });
 
   // Add the tracks layer
@@ -231,20 +270,16 @@ const MapPage: React.FC = () => {
   };
 
   return (
-    <> 
+    <>
       <div id='map' onKeyDown={handleKeyPress}></div>
       <div id='collar-list'>
-        {
-          fetchingPings || fetchingTracks 
-            ? <CircularProgress color="secondary"/> 
-            : null
-        }
+        {fetchingPings || fetchingTracks ? <CircularProgress color='secondary' /> : null}
         <ul>
-          {selectedCollars.map(collar => (<li key={collar}>{collar}</li>))}
+          {selectedCollars.map((collar) => (
+            <li key={collar}>{collar}</li>
+          ))}
         </ul>
       </div>
     </>
   );
-};
-
-export default MapPage;
+}
