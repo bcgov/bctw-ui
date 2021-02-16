@@ -27,7 +27,7 @@ export default function Modal ({open, title, handleClose, children}: IModalProps
         <Fade in={open}>
           <div className={classes.paper}>
             <h2 className={classes.title}>{title ?? ''}</h2>
-            <div id='transition-modal-description'>
+            <div>
               {children}
             </div>
           </div>

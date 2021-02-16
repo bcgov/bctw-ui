@@ -10,7 +10,7 @@ import {
 import { createHeadCell } from 'components/table/table_helpers';
 import { BCTW } from 'types/common_types';
 import { columnToHeader } from 'utils/common';
-import { HeadCell, ITableHeadProps } from './table_interfaces';
+import { ITableHeadProps } from './table_interfaces';
 
 const useStyles = makeStyles(() =>
   createStyles({

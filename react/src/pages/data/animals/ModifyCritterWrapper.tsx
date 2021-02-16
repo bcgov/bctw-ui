@@ -30,11 +30,11 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     return `${base}This will prevent other users from seeing this critter. Are you sure you want to delete ${editing.name}?`
   }
 
-  const handleDeleteButtonClicked = (id: string) => {
+  const handleDeleteButtonClicked = (): void => {
     setShow(o=> !o);
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = (): void => {
     onDelete(editing.id);
     setShow(false);
   }

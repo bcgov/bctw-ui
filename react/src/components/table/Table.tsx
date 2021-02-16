@@ -11,7 +11,8 @@ import {
   Toolbar,
   Typography,
   Paper,
-  Checkbox
+  Checkbox,
+  CircularProgress
 } from '@material-ui/core';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
@@ -87,11 +88,19 @@ export default function Table<T extends BCTW>({
     }
   };
 
-  const { isFetching, isLoading, isError, error, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
+  const {
+    isFetching,
+    isLoading,
+    isError,
+    error,
+    data,
+    isPreviousData,
+    isSuccess
+  }: UseQueryResult<T[], AxiosError> = query(
     page,
-    param,
-    // { onSuccess } 
-    // fixme: doesnt work anymore? using useEffect on isSuccess 
+    param
+    // { onSuccess }
+    // fixme: doesnt work anymore? using useEffect on isSuccess
     // isn't triggered on new page load??
   );
 
@@ -99,7 +108,7 @@ export default function Table<T extends BCTW>({
     if (isSuccess) {
       onSuccess(data);
     }
-  },[isSuccess]);
+  }, [isSuccess]);
 
   const handleSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -161,22 +170,17 @@ export default function Table<T extends BCTW>({
     setPage(page);
   };
 
-  const renderFetching = (): JSX.Element => (
-    <TableRow>
-      <TableCell>loading...</TableCell>
-    </TableRow>
-  );
-  const renderError = (): JSX.Element => (
-    <TableRow>
-      <TableCell>
-        <NotificationMessage type='error' message={formatAxiosError(error)} />
-      </TableCell>
-    </TableRow>
-  );
-
   const renderNoData = (): JSX.Element => (
     <TableRow>
-      <TableCell>no data available</TableCell>
+      <TableCell>
+        {isFetching || isLoading ? (
+          <CircularProgress />
+        ) : isError ? (
+          <NotificationMessage type='error' message={formatAxiosError(error)} />
+        ) : (
+          'no data available'
+        )}
+      </TableCell>
     </TableRow>
   );
 
@@ -198,7 +202,7 @@ export default function Table<T extends BCTW>({
         {renderToolbar()}
         <TableContainer component={Paper}>
           <MuiTable className={classes.table} size='small'>
-            {data === undefined ? renderNoData() : (
+            {data === undefined ? null : (
               <TableHead
                 headersToDisplay={headerProps}
                 headerData={data && data[0]}
@@ -213,54 +217,50 @@ export default function Table<T extends BCTW>({
               />
             )}
             <TableBody>
-              {data && data.length === 0
+              {(data && data.length === 0) || isFetching || isLoading || isError
                 ? renderNoData()
-                : isFetching || isLoading
-                  ? renderFetching()
-                  : isError
-                    ? renderError()
-                    : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: BCTW, prop: number) => {
-                      const isRowSelected = isSelected(obj[rowIdentifier]);
-                      const labelId = `enhanced-table-checkbox-${prop}`;
-                      return (
-                        <TableRow
-                          hover
-                          onClick={(event): void => {
-                            handleClick(event, obj[rowIdentifier]);
-                          }}
-                          role='checkbox'
-                          aria-checked={isRowSelected}
-                          tabIndex={-1}
-                          key={`row${prop}`}
-                          selected={isRowSelected}>
-                          {/* render checkbox column if multiselect is enabled */}
-                          {isMultiSelect ? (
-                            <TableCell padding='checkbox'>
-                              <Checkbox checked={isRowSelected} inputProps={{ 'aria-labelledby': labelId }} />
-                            </TableCell>
-                          ) : null}
-                          {/* render main columns from data fetched from api */}
-                          {headerProps.map((k: string, i: number) => {
-                            if (!k) {
-                              return null;
-                            }
-                            const { align, value } = formatTableCell(obj, k);
-                            return (
-                              <TableCell key={`${k}${i}`} align={align}>
-                                {value}
-                              </TableCell>
-                            );
-                          })}
-                          {/* render additional columns from props */}
-                          {customColumns
-                            ? customColumns.map((c: ICustomTableColumn<BCTW>) => {
-                              const colComponent = c.column(obj, prop);
-                              return <TableCell key={`add-col-${prop}`}>{colComponent}</TableCell>;
-                            })
-                            : null}
-                        </TableRow>
-                      );
-                    })}
+                : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: BCTW, prop: number) => {
+                  const isRowSelected = isSelected(obj[rowIdentifier]);
+                  const labelId = `enhanced-table-checkbox-${prop}`;
+                  return (
+                    <TableRow
+                      hover
+                      onClick={(event): void => {
+                        handleClick(event, obj[rowIdentifier]);
+                      }}
+                      role='checkbox'
+                      aria-checked={isRowSelected}
+                      tabIndex={-1}
+                      key={`row${prop}`}
+                      selected={isRowSelected}>
+                      {/* render checkbox column if multiselect is enabled */}
+                      {isMultiSelect ? (
+                        <TableCell padding='checkbox'>
+                          <Checkbox checked={isRowSelected} inputProps={{ 'aria-labelledby': labelId }} />
+                        </TableCell>
+                      ) : null}
+                      {/* render main columns from data fetched from api */}
+                      {headerProps.map((k: string, i: number) => {
+                        if (!k) {
+                          return null;
+                        }
+                        const { align, value } = formatTableCell(obj, k);
+                        return (
+                          <TableCell key={`${k}${i}`} align={align}>
+                            {value}
+                          </TableCell>
+                        );
+                      })}
+                      {/* render additional columns from props */}
+                      {customColumns
+                        ? customColumns.map((c: ICustomTableColumn<BCTW>) => {
+                          const colComponent = c.column(obj, prop);
+                          return <TableCell key={`add-col-${prop}`}>{colComponent}</TableCell>;
+                        })
+                        : null}
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </MuiTable>
           {!paginate || isLoading || isFetching || isError ? null : (

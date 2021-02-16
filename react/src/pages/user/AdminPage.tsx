@@ -23,9 +23,9 @@ export default function AdminPage(): JSX.Element {
   };
 
   const onClickShowModal = (b: boolean): void => {
-    setShowModal((o) => !o);
+    setShowModal(b);
   };
-  const onSave = () => {
+  const onSave = (): void => {
     // do nothing
   };
 

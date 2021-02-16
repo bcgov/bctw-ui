@@ -2,7 +2,7 @@ import { StandardTextFieldProps } from '@material-ui/core';
 import { IUpsertPayload } from 'api/api_interfaces';
 
 /**
- * so components can set the sidebar content
+ * enable components to set the sidebar content
  */
 type PageProp = {
   setSidebarContent?: (component: JSX.Element) => void;
