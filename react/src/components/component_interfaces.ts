@@ -2,6 +2,13 @@ import { StandardTextFieldProps } from '@material-ui/core';
 import { IUpsertPayload } from 'api/api_interfaces';
 
 /**
+ * enable components to set the sidebar content
+ */
+type PageProp = {
+  setSidebarContent?: (component: JSX.Element) => void;
+}
+
+/**
  * @param open displays or hides the modal
  * @param handleClose parent handler when modal is closed
  * @param title modal title string
@@ -67,5 +74,6 @@ export type {
   IInputProps,
   ITextfieldProps,
   INotificationMessage,
-  ConfirmModalProps
+  ConfirmModalProps,
+  PageProp
 };

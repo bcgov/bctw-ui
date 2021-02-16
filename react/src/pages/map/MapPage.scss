@@ -44,3 +44,25 @@
 #map .leaflet-control-layers.leaflet-control {
   transform: translate(0px,85px);
 }
+
+.date-picker-grp {
+  padding: 10px 5px 10px 20px;
+
+  div {
+    margin-bottom: 10px;
+  }
+  .MuiInputLabel-root, .MuiInput-root, .MuiInputBase-input, .MuiInput-input {
+    color: #ffffff;
+  }
+}
+
+.loading-data {
+  position: absolute;
+  z-index: 1000;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 800;
+  font-size: 2rem;
+}
