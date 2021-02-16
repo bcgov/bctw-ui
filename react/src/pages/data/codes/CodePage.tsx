@@ -10,12 +10,11 @@ import { ICodeHeader, CodeHeader } from 'types/code';
 import { formatAxiosError } from 'utils/common';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditCodeHeader from 'pages/data/codes/EditCodeHeader';
-import { useDataStyles } from 'pages/data/common/data_styles';
 import { IUpsertPayload } from 'api/api_interfaces';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import 'styles/Data.scss';
 
 const CodePage: React.FC = () => {
-  const classes = useDataStyles();
   const [codeHeader, setCodeHeader] = useState<ICodeHeader>({} as ICodeHeader);
   const [title, setTitle] = useState<string>('');
   const props = ['id', 'code', 'description'];
@@ -57,7 +56,7 @@ const CodePage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className='container'>
       {isFetching | isLoading ? (
         <div>loading...</div>
       ) : isError ? (
@@ -86,7 +85,7 @@ const CodePage: React.FC = () => {
           ) : (
             <div></div>
           )}
-          <div className={classes.mainButtonRow}>
+          <div className='button-row'>
             <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
             <AddEditViewer<ICodeHeader> editing={codeHeader} empty={() => Object.create({})} disableEdit={true}>
               <EditCodeHeader {...editProps} />
@@ -94,7 +93,7 @@ const CodePage: React.FC = () => {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 };
 

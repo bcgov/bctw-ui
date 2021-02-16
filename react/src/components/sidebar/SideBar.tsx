@@ -1,25 +1,9 @@
-import { Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, makeStyles } from '@material-ui/core';
+import { Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { RouteKey } from 'AppRouter';
 import { Icon } from 'components/common';
-import SideBarHeader from 'components/sidebar/SideBarHeader';
 import { UserContext } from 'contexts/UserContext';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
-const drawerWidth = 240;
-const useStyles = makeStyles((theme) => ({
-  drawerRoot: {
-    display: 'flex'
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0
-  },
-  drawerPaper: {
-    width: drawerWidth
-  },
-  toolbar: theme.mixins.toolbar
-}));
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
@@ -27,7 +11,6 @@ type SideBarProps = {
 };
 
 export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.Element {
-  const classes = useStyles();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
@@ -39,11 +22,10 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
         const user = userChanges.user;
         // only show admin page if user idir also matches the test user
         if (user.idir === userChanges.testUser) {
-          setIsAdmin(user.role_type === 'administrator')
+          setIsAdmin(user.role_type === 'administrator');
         } else {
           setIsAdmin(false);
         }
-
       }
     };
     updateComponent();
@@ -52,7 +34,7 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
-      curRoutes.push(routes.find(r => r.name === 'admin'));
+      curRoutes.push(routes.find((r) => r.name === 'admin'));
     }
     setVisibleRoutes(curRoutes);
   };
@@ -98,27 +80,8 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
           );
         })}
       </List>
-
-      <Drawer className={classes.drawer} classes={{ paper: classes.drawerPaper }}>
-        {/* <SideBarHeader /> */}
-        {/* <Divider /> */}
-        {/* <List>
-          {routesToShow.map((route: RouteKey, idx: number) => {
-            return (
-              <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
-                {route.icon ? (
-                  <ListItemIcon>
-                    <Icon icon={route.icon} />
-                  </ListItemIcon>
-                ) : null}
-                <ListItemText primary={route.title} />
-              </ListItem>
-            );
-          })}
-        </List> */}
-        <Divider />
-        {sidebarContent}
-      </Drawer>
+      <Divider />
+      <div> {sidebarContent} </div>
     </div>
   );
 }

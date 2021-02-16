@@ -4,34 +4,11 @@ import { User } from 'types/user';
 import { CircularProgress } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
 import TextField from 'components/form/Input';
-import { createStyles, makeStyles, Theme } from '@material-ui/core';
-import Table from 'components/table/Table';
 import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { MenuItem, FormControl, Select, InputLabel } from '@material-ui/core';
 
-const useDataStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center'
-    },
-    role: {
-      marginBottom: '20px'
-    },
-    fields: {
-      display: 'flex',
-      flexDirection: 'column',
-      '& > input': {
-        padding: '5px 5px'
-      }
-    }
-  })
-);
-
 export default function UserProfile(): JSX.Element {
-  const classes = useDataStyles();
   const useUser = useContext(UserContext);
 
   // the actual user object from context
@@ -85,11 +62,11 @@ export default function UserProfile(): JSX.Element {
   };
 
   return (
-    <div className={classes.container}>
-      <Typography className={classes.role} variant='h6'>
+    <div>
+      <Typography variant='h6'>
         Your Role Type: <strong>{user.role_type}</strong>
       </Typography>
-      <div className={classes.fields}>
+      <div>
         <TextField
           propName='idir'
           defaultValue={user.idir}
@@ -116,8 +93,8 @@ export default function UserProfile(): JSX.Element {
         onSelect={() => {}}
         rowIdentifier='id'
       /> */}
-      <Typography className={classes.role} variant='h6'>Swap User</Typography>
-      <Typography className={classes.role} variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography>
+      <Typography variant='h6'>Swap User</Typography>
+      <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography>
       <FormControl>
         <InputLabel>Test User Account</InputLabel>
         <Select value={testUser} onChange={onSelectTestUser}>

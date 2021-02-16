@@ -7,7 +7,6 @@ import SelectCode from 'components/form/SelectCode';
 import useModalStyles from 'components/modal/modal_styles';
 import { CollarStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
-import { useDataStyles } from 'pages/data/common/data_styles';
 import EditModal from 'pages/data/common/EditModal';
 import { useEffect, useState } from 'react';
 import { Collar, eNewCollarType } from 'types/collar';
@@ -15,7 +14,6 @@ import { removeProps } from 'utils/common';
 
 export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.Element {
   const { isEdit, editing, editableProps, selectableProps } = props;
-  const classes = useDataStyles();
   const modalClasses = useModalStyles();
 
   // set the collar type when add collar is selected
@@ -78,7 +76,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
               {isAddNewCollar ? (
                 chooseCollarType()
               ) : (
-                <form className={classes.rootEditInput} autoComplete='off'>
+                <form className='rootEditInput' autoComplete='off'>
                   <>
                     <Typography variant='h6'>Collar Information</Typography>
                     {/* render text inputs */}

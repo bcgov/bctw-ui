@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import Button from 'components/form/Button';
-import Modal from 'components/modal/Modal';
-import { objectCompare, omitNull } from 'utils/common';
-import ChangeContext from 'contexts/InputChangeContext';
-import { useDataStyles } from 'pages/data/common/data_styles';
+import 'styles/Data.scss';
+
+import { IUpsertPayload } from 'api/api_interfaces';
 import { NotificationMessage } from 'components/common';
 import { EditModalBaseProps } from 'components/component_interfaces';
+import Button from 'components/form/Button';
+import Modal from 'components/modal/Modal';
 import { useResponseState } from 'contexts/ApiResponseContext';
-import { IUpsertPayload } from 'api/api_interfaces';
-import HistoryPage from './HistoryPage';
+import ChangeContext from 'contexts/InputChangeContext';
+import React, { useState } from 'react';
 import { critterHistoryProps, isAnimal } from 'types/animal';
 import { isCollar } from 'types/collar';
 import { collarHistoryProps } from 'types/collar_history';
+import { objectCompare, omitNull } from 'utils/common';
+
+import HistoryPage from './HistoryPage';
 
 type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -34,7 +36,6 @@ type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param onReset a close handler for the editCritter/collar pages - since default handler is overwritten in AddEditViewer
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
-  const styles = useDataStyles();
   const {
     children,
     title,
@@ -108,25 +109,23 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   };
 
   return (
-    <>
-      <Modal open={open} handleClose={onClose} title={title}>
-        {showHistory ? (
-          <HistoryPage historyQuery={historyQuery} itemId={getHistoryId()} propsToDisplay={getHistoryProps()} />
-        ) : (
-          <ChangeContext.Provider value={handleChange}>
-            {children}
-            {hideSave ? null : (
-              <Button className={styles.editSaveButton} onClick={handleSave} disabled={!canSave}>
-                save
-              </Button>
-            )}
-          </ChangeContext.Provider>
-        )}
-        <div className={styles.editMsgs}>
-          {responseState ? <NotificationMessage type={responseState.type} message={responseState.message} /> : null}
-        </div>
-        {isEdit ? <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button> : null}
-      </Modal>
-    </>
+    <Modal open={open} handleClose={onClose} title={title}>
+      {showHistory ? (
+        <HistoryPage historyQuery={historyQuery} itemId={getHistoryId()} propsToDisplay={getHistoryProps()} />
+      ) : (
+        <ChangeContext.Provider value={handleChange}>
+          {children}
+          {hideSave ? null : (
+            <Button className='editSaveBtn' onClick={handleSave} disabled={!canSave}>
+              save
+            </Button>
+          )}
+        </ChangeContext.Provider>
+      )}
+      <div className='editMsgs'>
+        {responseState ? <NotificationMessage type={responseState.type} message={responseState.message} /> : null}
+      </div>
+      {isEdit ? <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button> : null}
+    </Modal>
   );
 }

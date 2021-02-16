@@ -7,16 +7,15 @@ import SelectCode from 'components/form/SelectCode';
 import { CritterStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
-import { useDataStyles } from 'pages/data/common/data_styles';
 import EditModal from 'pages/data/common/EditModal';
 import { useEffect, useState } from 'react';
 import { Animal } from 'types/animal';
 import { eCritterPermission } from 'types/user';
 import { removeProps } from 'utils/common';
+import 'styles/Data.scss';
 
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
   const { isEdit, editing, editableProps, selectableProps } = props;
-  const classes = useDataStyles();
 
   const canEdit = !isEdit ? true : editing.permission_type === eCritterPermission.change;
   const requiredFields = CS.requiredProps;
@@ -50,7 +49,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
           };
           return (
             <>
-              <form className={classes.rootEditInput} autoComplete='off'>
+              <form className='rootEditInput' autoComplete='off'>
                 <>
                   <Typography variant='h6'>General Information</Typography>
                   {/* render props that are text inputs */}

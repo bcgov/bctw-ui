@@ -7,14 +7,13 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import EditCollar from 'pages/data/collars/EditCollar';
-import { useDataStyles } from 'pages/data/common/data_styles';
 import { useState } from 'react';
 import { assignedCollarProps, availableCollarProps, Collar, eCollarAssignedStatus } from 'types/collar';
 import AddEditViewer from '../common/AddEditViewer';
 import { useQueryClient } from 'react-query'; // to invalidate queries
+import 'styles/Data.scss';
 
 export default function CollarPage(): JSX.Element {
-  const classes = useDataStyles();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
 
@@ -86,7 +85,7 @@ export default function CollarPage(): JSX.Element {
   const rowId = 'collar_id';
   return (
     <SnackbarWrapper>
-      <div className={classes.container}>
+      <div className='container'>
         <Table
           headers={assignedCollarProps}
           title={S.assignedCollarsTableTitle}
@@ -109,10 +108,8 @@ export default function CollarPage(): JSX.Element {
           onSelect={handleSelect}
           rowIdentifier={rowId}
         />
-
-        <div className={classes.mainButtonRow}>
+        <div className='button-row'>
           <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
-
           <AddEditViewer<Collar> editing={editObj} empty={(): Collar => new Collar()}>
             <EditCollar {...editProps} />
           </AddEditViewer>

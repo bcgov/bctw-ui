@@ -1,4 +1,4 @@
-import React from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 
@@ -9,10 +9,19 @@ import { mdiAccountCircle  } from '@mdi/js'
 // Assets
 import 'styles/AppHeader.scss';
 import headerImage from 'assets/images/gov3_bc_logo.png';
+import { UserContext } from 'contexts/UserContext';
+import { User } from 'types/user';
 
 const AppHeader = (): JSX.Element => {
+  const useUser = useContext(UserContext);
+  const [user, setUser] = useState<User>(null);
+  // const preventDefault = (event) => event.preventDefault();
 
-  const preventDefault = (event) => event.preventDefault();
+  useEffect(() => {
+    if (useUser.ready) {
+      setUser(useUser.user);
+    }
+  }, [useUser])
 
   return (
     <header className={'app-header'}>
@@ -31,7 +40,7 @@ const AppHeader = (): JSX.Element => {
                   size={1}>
                 </Icon>
                 <span>
-                  User Name
+                  {user?.idir ?? 'user name'}
                 </span>
               </div>
             </li>

@@ -9,17 +9,16 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
-import { useDataStyles } from 'pages/data/common/data_styles';
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import { formatAxiosError } from 'utils/common';
+import 'styles/Data.scss';
 
 type CritterPageProps = {
   setSidebarContent?: (component: JSX.Element) => void;
 };
 export default function CritterPage(props: CritterPageProps): JSX.Element {
-  const classes = useDataStyles();
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
@@ -99,7 +98,7 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
 
   return (
     <SnackbarWrapper>
-      <div className={classes.container}>
+      <div className='container'>
         <Table
           headers={assignedCritterProps}
           title={CS.assignedTableTitle}
@@ -112,8 +111,7 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
           queryProps={{ query: 'useUnassignedCritters', onNewData: (d: Animal[]): void => setCrittersU(d) }}
           onSelect={handleSelect}
         />
-
-        <div className={classes.mainButtonRow}>
+        <div className='button-row'>
           <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
           <AddEditViewer<Animal> editing={editObj} empty={(): Animal => new Animal()}>
             <EditCritter {...editProps} />
