@@ -108,8 +108,6 @@ const proxyApi = function (req, res, next) {
         .catch(errHandler)
     }
   } else if (req.method === 'DELETE') {
-    console.log('original url', req.originalUrl);
-    console.log('final url', url);
     axios.delete(url)
       .then(successHandler)
       .catch(url)
@@ -227,7 +225,6 @@ if (isProd) {
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
     .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler)
     .post('/api/:endpoint', proxyApi)
-    .delete('/api/:type/:id', proxyApi)
     .delete('/api/:endpoint/:endpointId', proxyApi)
 } else {
   app
