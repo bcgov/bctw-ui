@@ -221,6 +221,8 @@ if (isProd) {
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
     .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler)
     .post('/api/:endpoint', keycloak.protect(), proxyApi)
+    .delete('/api/:endpoint', keycloak.protect(), proxyApi)
+    .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
 } else {
   app
     .get('/api/:endpoint', proxyApi)

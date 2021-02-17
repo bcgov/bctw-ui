@@ -1,3 +1,4 @@
+import * as L from 'leaflet';
 import './MapPage.css';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -10,7 +11,6 @@ import TextField from 'components/form/Input';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import * as L from 'leaflet';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { formatDay, formatLocal, getToday } from 'utils/time';
