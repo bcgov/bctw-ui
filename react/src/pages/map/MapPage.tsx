@@ -9,17 +9,7 @@ import moment from 'moment';
 import pointsWithinPolygon from '@turf/points-within-polygon';
 import tokml from 'tokml';
 import download from 'downloadjs';
-import { ContactsOutlined } from '@material-ui/icons';
-import { Console } from 'console';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableFooter from '@material-ui/core/TableFooter';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
 
 const MapPage: React.FC = () => {
   const bctwApi = useTelemetryApi();
@@ -239,51 +229,8 @@ const MapPage: React.FC = () => {
     download(kml, 'collars.kml', 'application/xml');
   };
 
-  // Prototype Results List
-  function createData(name, status) {
-    return { name, status };
-  }
-
-  const rows = [
-    createData('Caribou', 'Status'),
-    createData('Wolf', 'Status'),
-    createData('Caribou', 'Status')
-  ];
-  
-
   return (
     <div className={'map-view'}>
-      <div className={'side-panel'}>
-        <h1 className={'side-panel-title'}>Selected Telemetry</h1>
-        <div className={'results-container'} id='collar-list'>
-          <div className={'results-title'}>
-            Results <span>(0)</span>
-          </div>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Animal</TableCell>
-                <TableCell align="right">Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.name}>
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{row.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <ul>
-            {selectedCollars.map(collar => (<li key={collar}>{collar}</li>))}
-          </ul>
-
-        </div>
-      </div>
       <div className={'map-container'}>
         <div id='map' onKeyDown={handleKeyPress}></div>
       </div>
