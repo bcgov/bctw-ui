@@ -65,7 +65,7 @@ export const useTelemetryApi = () => {
    *
    */
   const useTracks = (start: string, end: string): UseQueryResult => {
-    return useQuery<any, AxiosError>(['tracks', start, end], () => mapApi.getTracks(start, end));
+    return useQuery<any, AxiosError>(['tracks', start, end], () => mapApi.getTracks(start, end), defaultQueryOptions);
   };
 
   /**

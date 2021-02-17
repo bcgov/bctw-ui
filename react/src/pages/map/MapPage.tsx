@@ -1,33 +1,36 @@
-import * as L from 'leaflet';
+import * as L from 'leaflet'; // needs to be imported first?
 import './MapPage.scss';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet/dist/leaflet.css';
 
-import { CircularProgress, InputLabel } from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 import pointsWithinPolygon from '@turf/points-within-polygon';
 import { PageProp } from 'components/component_interfaces';
-import TextField from 'components/form/Input';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import CreateMapSidebar from 'pages/map/CreateMapSidebar';
+import { addTileLayers, setupPingOptions, setupSelectedPings } from 'pages/map/map_helpers';
+import MapDetails from 'pages/map/MapDetails';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
-import { formatDay, formatLocal, getToday } from 'utils/time';
-
-import MapDetails from 'pages/map/MapDetails';
+import { formatDay, getToday } from 'utils/time';
+import { ITelemetryFeature } from 'types/map';
 
 export default function MapPage(props: PageProp): JSX.Element {
+  const {setSidebarContent} = props;
   const bctwApi = useTelemetryApi();
 
   const mapRef = useRef<L.Map>(null);
 
-  const [tracks, setTracks] = useState(new L.GeoJSON()); // Store Tracks
-  const [pings, setPings] = useState(new L.GeoJSON()); // Store Pings
+  const [tracks] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Tracks
+  const [pings] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Pings
 
   const [start, setStart] = useState<string>(dayjs().subtract(14, 'day').format(formatDay));
   const [end, setEnd] = useState<string>(getToday());
-  const [selectedCollars, setSelectedCollars] = useState([]);
+
+  const [selectedCollars, setSelectedCollars] = useState<ITelemetryFeature[]>([]);
 
   const drawnItems = new L.FeatureGroup(); // Store the selection shapes
 
@@ -51,60 +54,18 @@ export default function MapPage(props: PageProp): JSX.Element {
     }
   }, [pingsData]);
 
-  pings.options = {
-    pointToLayer: (feature, latlng) => {
-      // Mortality is red
-      const s = feature.properties.animal_status;
-      const colour = s === 'Mortality' ? '#ff0000' : '#00ff44';
-
-      const pointStyle = {
-        radius: 8,
-        fillColor: colour,
-        color: '#000',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.9
-      };
-
-      return L.circleMarker(latlng, pointStyle);
-    },
-    onEachFeature: (feature, layer) => {
-      const p = feature.properties;
-      const g = feature.geometry as any; // Yes... this exists!
-      const x = g.coordinates[0]?.toFixed(5);
-      const y = g.coordinates[1]?.toFixed(5);
-      const t = dayjs(p.date_recorded).format(formatLocal);
-      const text = `
-        ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
-        <hr>
-        Device ID ${p.device_id} (${p.device_vendor}) <br>
-        ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
-        ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
-        ${t} <br>
-        ${x}, ${y}
-      `;
-      layer.bindPopup(text);
-    }
+  const handleMapPointClick = (event): void => {
+    const feature: ITelemetryFeature = event?.target?.feature;
+    setSelectedCollars([feature]);
   };
+
+  setupPingOptions(pings, handleMapPointClick);
 
   const selectedPings = new L.GeoJSON(); // Store the selected pings
+  selectedPings.options = setupSelectedPings();
 
-  (selectedPings as any).options = {
-    pointToLayer: (feature, latlng) => {
-      const pointStyle = {
-        class: 'selected-ping',
-        radius: 10,
-        fillColor: '#ffff00',
-        color: '#000',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 1
-      };
-      return L.circleMarker(latlng, pointStyle);
-    }
-  };
-
-  const displaySelectedUnits = (overlay) => {
+  //
+  const displaySelectedUnits = (overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: any }>): void => {
     const selectedCollars = overlay.features
       .map((f) => f.properties.device_id)
       .reduce((total, f) => {
@@ -115,10 +76,10 @@ export default function MapPage(props: PageProp): JSX.Element {
         }
       }, []);
     setSelectedCollars(selectedCollars);
-    console.log('selection', selectedCollars);
   };
 
-  const drawSelectedLayer = () => {
+  //
+  const drawSelectedLayer = (): void => {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
     // More typescript type definition bugs... These are the right features!!!
@@ -136,6 +97,7 @@ export default function MapPage(props: PageProp): JSX.Element {
     selectedPings.addData(overlay);
   };
 
+  // redraw on updated start/end params
   const drawLatestPings = (): void => {
     console.log('drawing pings');
     const layerPicker = L.control.layers();
@@ -147,34 +109,13 @@ export default function MapPage(props: PageProp): JSX.Element {
 
   const initMap = (): void => {
     mapRef.current = L.map('map', { zoomControl: false }).setView([55, -128], 6);
-
     const layerPicker = L.control.layers();
-
-    const bingOrtho = L.tileLayer(
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      {
-        attribution: '&copy; <a href="https://esri.com">ESRI Basemap</a> ',
-        maxZoom: 24,
-        maxNativeZoom: 17
-      }
-    ).addTo(mapRef.current);
-
-    const bcGovBaseLayer = L.tileLayer(
-      'https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer/tile/{z}/{y}/{x}',
-      {
-        maxZoom: 24,
-        attribution: '&copy; <a href="https://www2.gov.bc.ca/gov/content/home">BC Government</a> '
-      }
-    );
-
-    layerPicker.addBaseLayer(bingOrtho, 'Bing Satellite');
-    layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
+    addTileLayers(mapRef, layerPicker);
 
     layerPicker.addOverlay(tracks, 'Critter Tracks');
     layerPicker.addOverlay(pings, 'Critter Locations');
 
     mapRef.current.addLayer(drawnItems);
-
     mapRef.current.addLayer(selectedPings);
 
     const drawControl = new L.Control.Draw({
@@ -191,7 +132,6 @@ export default function MapPage(props: PageProp): JSX.Element {
     });
 
     mapRef.current.addControl(drawControl);
-
     mapRef.current.addControl(layerPicker);
 
     // Set up the drawing events
@@ -206,8 +146,6 @@ export default function MapPage(props: PageProp): JSX.Element {
       .on('draw:deletestop', (e) => {
         drawSelectedLayer();
       });
-
-    // drawLatestPings() // TODO: Refactor ala React
   };
 
   const handlePickDate = (event): void => {
@@ -221,26 +159,11 @@ export default function MapPage(props: PageProp): JSX.Element {
     }
   };
 
-  const initSidebar = (): void => {
-    props.setSidebarContent(
-      <div className='date-picker-grp'>
-        <div>
-          <InputLabel>Start</InputLabel>
-          <TextField type='date' defaultValue={start} propName='tstart' changeHandler={handlePickDate} />
-        </div>
-        <div>
-          <InputLabel>End</InputLabel>
-          <TextField type='date' defaultValue={end} propName='tend' changeHandler={handlePickDate} />
-        </div>
-      </div>
-    );
-  };
-
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
         initMap();
-        initSidebar();
+        CreateMapSidebar({ start, end, onChange: handlePickDate, setSidebarContent });
       }
     };
     updateComponent();
@@ -273,7 +196,7 @@ export default function MapPage(props: PageProp): JSX.Element {
 
   return (
     <div className={'map-view'}>
-      <MapDetails selectedCollars={selectedCollars} />
+      <MapDetails selected={selectedCollars} />
       {fetchingPings || fetchingTracks ? <CircularProgress className='loading-data' color='secondary' /> : null}
       <div className={'map-container'}>
         <div id='map' onKeyDown={handleKeyPress}></div>

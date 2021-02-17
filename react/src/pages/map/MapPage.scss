@@ -1,3 +1,5 @@
+@import 'styles/colours.scss';
+
 .map-view {
   display: flex;
   flex-direction: row;
@@ -63,6 +65,19 @@
   right: 0;
   margin-left: auto;
   margin-right: auto;
-  font-weight: 800;
-  font-size: 2rem;
+}
+
+.tab-header {
+  .MuiTabs-flexContainer {
+    justify-content: space-around;
+  }
+  
+  .MuiTab-textColorInherit {
+    opacity: 1;
+  }
+
+  button {
+    background-color: $BCgovBlue;
+    color: white;
+  }
 }

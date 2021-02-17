@@ -7,7 +7,6 @@
     "url": "https://github.com/bcgov/bctw-ui.git"
   },
   "dependencies": {
-    "@bcgov/bc-sans": "^1.0.1",
     "@craco/craco": "^5.9.0",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
