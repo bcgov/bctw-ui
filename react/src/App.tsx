@@ -38,22 +38,22 @@ export default function App(): JSX.Element {
           <UserContext.Consumer>
             {(): React.ReactNode => {
               return (
-                <div className={classes.root}>
-                  <AppHeader />
-                  <div className={'app-body'}>
-                    <div className='app-body__inner'>
-                      <Router>
+                <Router>
+                  <div className={classes.root}>
+                    <AppHeader />
+                    <div className={'app-body'}>
+                      <div className='app-body__inner'>
                         <SideBar routes={AppRoutes} sidebarContent={sidebar} />
                         <ResponseProvider>
                           <SnackbarWrapper>
                             <AppRouter onContentChange={setSidebar} />
                           </SnackbarWrapper>
                         </ResponseProvider>
-                      </Router>
+                      </div>
                     </div>
+                    {/* <AppFooter/> */}
                   </div>
-                  {/* <AppFooter/> */}
-                </div>
+                </Router>
               );
             }}
           </UserContext.Consumer>

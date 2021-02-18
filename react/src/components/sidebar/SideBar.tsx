@@ -42,20 +42,20 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
   useEffect(() => {
     switch (location.pathname) {
       case '/home':
-        handleSetVisible(['map', 'terrain', 'data', 'profile']);
+        handleSetVisible(['map', 'terrain', 'data']);
         return;
       case '/terrain':
       case '/map':
-        handleSetVisible(['home', 'map', 'terrain', 'data', 'profile']);
+        handleSetVisible(['home', 'map', 'terrain', 'data']);
         return;
       case '/data':
       case '/animals':
       case '/collars':
       case '/codes':
-        handleSetVisible(['home', 'animals', 'codes', 'collars', 'profile']);
+        handleSetVisible(['home', 'animals', 'codes', 'collars']);
         return;
       case '/admin':
-        handleSetVisible(['home', 'profile']);
+        handleSetVisible(['home']);
         return;
       case '/profile':
         handleSetVisible(['home', 'map', 'terrain', 'data']);

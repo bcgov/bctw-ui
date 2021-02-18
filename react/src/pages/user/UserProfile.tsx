@@ -3,11 +3,11 @@ import { UserContext, useUserContextDispatch } from 'contexts/UserContext';
 import { User } from 'types/user';
 import { CircularProgress } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
-// import Table from 'components/table/Table';
+import Table from 'components/table/Table';
 import TextField from 'components/form/Input';
 import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
-import { MenuItem, FormControl, Select, InputLabel } from '@material-ui/core';
+import { MenuItem, Select, InputLabel } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useQueryClient } from 'react-query';
 
@@ -55,7 +55,6 @@ export default function UserProfile(): JSX.Element {
     // set the user context's testUser property
     const updatedUser = { ...useUser, ...{ testUser: v } };
     userDispatch(updatedUser);
-    // setTblProps({query: queryStr, queryParam: v});
   };
 
   if (!user) {
@@ -66,7 +65,6 @@ export default function UserProfile(): JSX.Element {
     query: bctwApi.useCritterAccess,
     param: { user: testUser, filterOutNone: true }
   };
-  // console.log('tableprop user', tableProps.param)
 
   return (
     <div className='user-profile'>
@@ -84,16 +82,17 @@ export default function UserProfile(): JSX.Element {
           changeHandler={onChange}
         />
       </div>
-      {/* fixme: still not refreshing properly on test user change */}
-      {/* <Table
+      <Table
         headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'collar_make', 'permission_type']}
         title='Animals you have access to:'
         queryProps={tableProps}
-        onSelect={null}/> */}
-      <Typography variant='h6'>Swap User</Typography>
+        onSelect={null}
+      />
+      <Typography variant='h5'>Swap User</Typography>
       <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography>
-      <FormControl>
-        <InputLabel>Test User Account</InputLabel>
+
+      <div className='user-test-swap'>
+        <InputLabel>Test Account</InputLabel>
         <Select value={testUser} onChange={onSelectTestUser}>
           {testUserOptions.map((s, i) => {
             return (
@@ -103,8 +102,7 @@ export default function UserProfile(): JSX.Element {
             );
           })}
         </Select>
-      </FormControl>
-      {/* <pre>{testUser}</pre>{} */}
+      </div>
     </div>
   );
 }

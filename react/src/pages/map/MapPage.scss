@@ -8,6 +8,15 @@
 .map-container {
   flex: 1 1 auto;
   position: relative;
+
+  .progress {
+    position: absolute;
+    z-index: 1000;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .side-panel {
@@ -56,15 +65,6 @@
   .MuiInputLabel-root, .MuiInput-root, .MuiInputBase-input, .MuiInput-input {
     color: #ffffff;
   }
-}
-
-.loading-data {
-  position: absolute;
-  z-index: 1000;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .tab-header {

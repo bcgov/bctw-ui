@@ -197,8 +197,8 @@ export default function MapPage(props: PageProp): JSX.Element {
   return (
     <div className={'map-view'}>
       <MapDetails selected={selectedCollars} />
-      {fetchingPings || fetchingTracks ? <CircularProgress className='loading-data' color='secondary' /> : null}
       <div className={'map-container'}>
+        {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='map' onKeyDown={handleKeyPress}></div>
       </div>
     </div>

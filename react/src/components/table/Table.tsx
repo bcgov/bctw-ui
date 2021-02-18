@@ -128,7 +128,7 @@ export default function Table<T extends BCTW>({
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: string): void => {
+  const handleClickRow = (event: React.MouseEvent<unknown>, id: string): void => {
     const selectedIndex = selected.indexOf(id);
     if (!isMultiSelect) {
       setSelected([id]);
@@ -226,7 +226,7 @@ export default function Table<T extends BCTW>({
                     <TableRow
                       hover
                       onClick={(event): void => {
-                        handleClick(event, obj[rowIdentifier]);
+                        handleClickRow(event, obj[rowIdentifier]);
                       }}
                       role='checkbox'
                       aria-checked={isRowSelected}

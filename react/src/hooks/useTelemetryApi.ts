@@ -135,11 +135,11 @@ export const useTelemetryApi = () => {
   /**
    * @returns a list of critters representing the audist history of @param critterId
    */
-  const useCritterHistory = (page: number, critterId: string, config: Record<string, unknown>): UseQueryResult => {
+  const useCritterHistory = (page: number, critterId: string): UseQueryResult<Animal[]> => {
     return useQuery<Animal[], AxiosError>(
-      ['critter_history', critterId],
+      ['critter_history', critterId, page],
       () => critterApi.getCritterHistory(page, critterId),
-      { ...config }
+      critterOptions
     );
   };
 
@@ -208,10 +208,11 @@ export const useTelemetryApi = () => {
   /**
    * @param user idir of the user to receive critter access to
    * @returns A simplified list of Animals that only has id, animal_id, and nickname
+   * note: query keys are important! make sure to include params in the key
    */
   const useCritterAccess = (page: number, param: {user: string, filterOutNone: boolean}): UseQueryResult => {
     const {user, filterOutNone} = param;
-    return useQuery<UserCritterAccess[], AxiosError>(['critterAccess', page], () => userApi.getUserCritterAccess(page, user, filterOutNone), {
+    return useQuery<UserCritterAccess[], AxiosError>(['critterAccess', page, user], () => userApi.getUserCritterAccess(page, user, filterOutNone), {
       ...defaultQueryOptions
     });
   }
