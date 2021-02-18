@@ -65,6 +65,8 @@ export default function CritterPage(props: PageProp): JSX.Element {
     await deleteMutation(payload);
   };
 
+  const onNewData = (d: Animal[]): void => (d.length && d[0].device_id ? setCrittersA(d) : setCrittersU(d));
+
   // props to be passed to the edit modal component
   const editProps = {
     editableProps: CS.editableProps,
@@ -86,13 +88,13 @@ export default function CritterPage(props: PageProp): JSX.Element {
       <Table
         headers={assignedCritterProps}
         title={CS.assignedTableTitle}
-        queryProps={{ query: bctwApi.useAssignedCritters, onNewData: (d: Animal[]): void => setCrittersA(d) }}
+        queryProps={{ query: bctwApi.useAssignedCritters, onNewData }}
         onSelect={handleSelect}
       />
       <Table
         headers={unassignedCritterProps}
         title={CS.unassignedTableTitle}
-        queryProps={{ query: bctwApi.useUnassignedCritters, onNewData: (d: Animal[]): void => setCrittersU(d) }}
+        queryProps={{ query: bctwApi.useUnassignedCritters, onNewData }}
         onSelect={handleSelect}
       />
       <div className='button-row'>

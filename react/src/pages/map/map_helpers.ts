@@ -1,8 +1,8 @@
 import * as L from 'leaflet';
-import dayjs from 'dayjs';
-import { formatLocal } from 'utils/time';
+// import dayjs from 'dayjs';
+// import { formatLocal } from 'utils/time';
 
-const setupPingOptions = (pings: L.GeoJSON, onPopupClickHandler: (event: any) => void): void => {
+const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventHandlerFn): void => {
   pings.options = {
     pointToLayer: (feature, latlng): L.Layer => {
       // Mortality is red
@@ -18,25 +18,28 @@ const setupPingOptions = (pings: L.GeoJSON, onPopupClickHandler: (event: any) =>
         fillOpacity: 0.9
       };
 
-      return L.circleMarker(latlng, pointStyle);
-    },
-    onEachFeature: (feature, layer): void => {
-      const p = feature.properties;
-      const g = feature.geometry as any; // Yes... this exists!
-      const x = g.coordinates[0]?.toFixed(5);
-      const y = g.coordinates[1]?.toFixed(5);
-      const t = dayjs(p.date_recorded).format(formatLocal);
-      const text = `
-        ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
-        <hr>
-        Device ID ${p.device_id} (${p.device_vendor}) <br>
-        ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
-        ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
-        ${t} <br>
-        ${x}, ${y}
-      `;
-      layer.bindPopup(text).addEventListener('popupopen', onPopupClickHandler);
+      const marker = L.circleMarker(latlng, pointStyle);
+      // add the event listener
+      marker.on('click', onClickPointHandler );
+      return marker;
     }
+    // ,onEachFeature: (feature, layer): void => {
+    //   const p = feature.properties;
+    //   const g = feature.geometry as any; // Yes... this exists!
+    //   const x = g.coordinates[0]?.toFixed(5);
+    //   const y = g.coordinates[1]?.toFixed(5);
+    //   const t = dayjs(p.date_recorded).format(formatLocal);
+    //   const text = `
+    //     ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
+    //     <hr>
+    //     Device ID ${p.device_id} (${p.device_vendor}) <br>
+    //     ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
+    //     ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
+    //     ${t} <br>
+    //     ${x}, ${y}
+    //   `;
+    //   layer.bindPopup(text).addEventListener('popupopen', onClickPointHandler);
+    // }
   };
 };
 

@@ -263,9 +263,21 @@ export default function Table<T extends BCTW>({
                 })}
             </TableBody>
           </MuiTable>
-          {!paginate || isLoading || isFetching || isError ? null : (
-            <PaginationActions count={data.length} page={page} rowsPerPage={10} onChangePage={handlePageChange} />
-          )}
+          {
+            !paginate ||
+            isLoading ||
+            isFetching ||
+            isError ||
+            // hide pagination when total results are under page limit (10)
+            (isSuccess && data?.length < 10 && paginate && page === 1)
+              ? null : 
+              <PaginationActions
+                count={data.length}
+                page={page}
+                rowsPerPage={10}
+                onChangePage={handlePageChange}
+              />
+          }
         </TableContainer>
       </Paper>
     </div>

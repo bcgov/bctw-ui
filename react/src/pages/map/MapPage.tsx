@@ -12,14 +12,14 @@ import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import CreateMapSidebar from 'pages/map/CreateMapSidebar';
 import { addTileLayers, setupPingOptions, setupSelectedPings } from 'pages/map/map_helpers';
-import MapDetails from 'pages/map/MapDetails';
+import MapDetails from 'pages/map/details/MapDetails';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { formatDay, getToday } from 'utils/time';
 import { ITelemetryFeature } from 'types/map';
 
 export default function MapPage(props: PageProp): JSX.Element {
-  const {setSidebarContent} = props;
+  const { setSidebarContent } = props;
   const bctwApi = useTelemetryApi();
 
   const mapRef = useRef<L.Map>(null);
@@ -54,7 +54,8 @@ export default function MapPage(props: PageProp): JSX.Element {
     }
   }, [pingsData]);
 
-  const handleMapPointClick = (event): void => {
+  const handleMapPointClick = (event: L.LeafletEvent): void => {
+    // console.log(event);
     const feature: ITelemetryFeature = event?.target?.feature;
     setSelectedCollars([feature]);
   };
@@ -65,20 +66,20 @@ export default function MapPage(props: PageProp): JSX.Element {
   selectedPings.options = setupSelectedPings();
 
   //
-  const displaySelectedUnits = (overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: any }>): void => {
-    const selectedCollars = overlay.features
-      .map((f) => f.properties.device_id)
-      .reduce((total, f) => {
-        if (total.indexOf(f) >= 0) {
-          return total;
-        } else {
-          return total.concat(f);
-        }
-      }, []);
-    setSelectedCollars(selectedCollars);
+  const displaySelectedUnits = (overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>): void => {
+    const features = overlay.features;
+    // const selectedDeviceIds = features
+    //   .map((f) => f.properties.device_id)
+    //   .reduce((total, f) => {
+    //     if (total.indexOf(f) >= 0) {
+    //       return total;
+    //     } else {
+    //       return total.concat(f);
+    //     }
+    //   }, []);
+    setSelectedCollars(features as any[]);
   };
 
-  //
   const drawSelectedLayer = (): void => {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
@@ -99,7 +100,7 @@ export default function MapPage(props: PageProp): JSX.Element {
 
   // redraw on updated start/end params
   const drawLatestPings = (): void => {
-    console.log('drawing pings');
+    // console.log('drawing pings');
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(pings);
     layerPicker.removeLayer(tracks);

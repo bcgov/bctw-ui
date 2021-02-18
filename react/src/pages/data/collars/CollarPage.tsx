@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import { PageProp } from 'components/component_interfaces';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import Table from 'components/table/Table';
+import { ITableQueryProps } from 'components/table/table_interfaces';
 import { CollarStrings as S } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -46,10 +47,19 @@ export default function CollarPage(props: PageProp): JSX.Element {
   const handleSelect = (row: Collar): void => {
     setEditObj(row);
     props.setSidebarContent(<p>collar id: {row.collar_id}</p>);
-  }
+  };
   const handleShowDeleteModal = (): void => {
     setShowConfirmDelete((o) => !o);
   };
+
+  // pass as callback to table component to set export data when api returns collar data
+  const onNewData = (d: Collar[]): void => {
+    if (d.length && d[0].animal_id) {
+      setCollarsA(d)
+    } else {
+      setCollarsU(d);
+    }
+  }
 
   // setup the mutation collar mutations
   const { mutateAsync: saveMutation } = bctwApi.useMutateCollar({ onSuccess });
@@ -86,6 +96,12 @@ export default function CollarPage(props: PageProp): JSX.Element {
     eTitle: S.exportTitle
   };
 
+  const tableProps: ITableQueryProps<Collar> = {
+    query: bctwApi.useCollarType,
+    defaultSort: { property: 'device_id', order: 'desc' },
+    onNewData
+  }
+
   return (
     <div className='container'>
       <ConfirmModal
@@ -98,21 +114,13 @@ export default function CollarPage(props: PageProp): JSX.Element {
       <Table
         headers={assignedCollarProps}
         title={S.assignedCollarsTableTitle}
-        queryProps={{
-          query: bctwApi.useCollarType,
-          param: eCollarAssignedStatus.Assigned,
-          onNewData: (d: Collar[]): void => setCollarsA(d)
-        }}
+        queryProps={{...tableProps, param: eCollarAssignedStatus.Assigned}}
         onSelect={handleSelect}
       />
       <Table
         headers={availableCollarProps}
         title={S.availableCollarsTableTitle}
-        queryProps={{
-          query: bctwApi.useCollarType,
-          param: eCollarAssignedStatus.Available,
-          onNewData: (d: Collar[]): void => setCollarsU(d)
-        }}
+        queryProps={{...tableProps, param: eCollarAssignedStatus.Available}}
         onSelect={handleSelect}
       />
 

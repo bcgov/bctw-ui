@@ -68,6 +68,8 @@
 }
 
 .tab-header {
+  margin-top: 15px;
+
   .MuiTabs-flexContainer {
     justify-content: space-around;
   }
@@ -78,6 +80,20 @@
 
   button {
     background-color: $BCgovBlue;
-    color: white;
+    color: #ffffff;
+  }
+  button:hover {
+    background-color: royalblue;
+    font-weight: bolder;
+  }
+}
+
+.details-single {
+  .geo-single {
+    .MuiTableRow-root {
+      td {
+        border: none;
+      }
+    }
   }
 }
