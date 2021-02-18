@@ -1,5 +1,6 @@
 export type BCTW = {
   formatPropAsHeader?: (str: string) => string;
+  identifier?: string; // used in tables to identify unique rows
 }
 
 export interface BctwBaseType {

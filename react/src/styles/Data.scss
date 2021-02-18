@@ -4,8 +4,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 20px 20px;
   // justify-content: center;
-
 }
 
 .button-row {
@@ -31,4 +31,26 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+.user-profile {
+  padding: 20px 20px;
+}
+
+.user-input-grp {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0px;
+
+  .MuiInputBase-input {
+    margin-bottom: 15px;
+  }
+}
+
+.admin-btn-row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding: 0 5px;
+  justify-content: flex-end;
 }

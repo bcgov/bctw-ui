@@ -1,4 +1,5 @@
 import 'styles/AppLayout.scss';
+import 'styles/Data.scss';
 
 import { makeStyles, ThemeProvider } from '@material-ui/core';
 // import AppFooter from 'components/common/AppFooter';
@@ -12,6 +13,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import appTheme from 'themes/appTheme';
 
 import { AppRouter, AppRoutes } from './AppRouter';
+import { SnackbarWrapper } from 'components/common';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -37,13 +39,15 @@ export default function App(): JSX.Element {
             {(): React.ReactNode => {
               return (
                 <div className={classes.root}>
-                  <AppHeader/>
+                  <AppHeader />
                   <div className={'app-body'}>
                     <div className='app-body__inner'>
                       <Router>
                         <SideBar routes={AppRoutes} sidebarContent={sidebar} />
                         <ResponseProvider>
-                          <AppRouter onContentChange={setSidebar} />
+                          <SnackbarWrapper>
+                            <AppRouter onContentChange={setSidebar} />
+                          </SnackbarWrapper>
                         </ResponseProvider>
                       </Router>
                     </div>

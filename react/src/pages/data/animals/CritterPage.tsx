@@ -1,7 +1,6 @@
-import { IUpsertPayload } from 'api/api_interfaces';
+import { IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
-import { SnackbarWrapper } from 'components/common';
-import { INotificationMessage } from 'components/component_interfaces';
+import { PageProp } from 'components/component_interfaces';
 import Table from 'components/table/Table';
 import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
@@ -13,12 +12,9 @@ import { useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import { formatAxiosError } from 'utils/common';
-import 'styles/Data.scss';
+import ModifyCritterWrapper from './ModifyCritterWrapper';
 
-type CritterPageProps = {
-  setSidebarContent?: (component: JSX.Element) => void;
-};
-export default function CritterPage(props: CritterPageProps): JSX.Element {
+export default function CritterPage(props: PageProp): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
@@ -28,64 +24,53 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
   const [critterA, setCrittersA] = useState<Animal[]>([]);
   const [critterU, setCrittersU] = useState<Animal[]>([]);
 
-  // must be defined before mutation declaration
+  // must be defined before mutation declarations
   const onSuccess = async (data: Animal[] | Animal): Promise<void> => {
     const critter = Array.isArray(data) ? data[0] : data;
-    updateStatus({ type: 'success', message: `${critter.animal_id ?? critter.nickname ?? 'critter'} saved!` });
-
-    let unassignedQueryKey;
-    let isCritterMatch = false;
-    queryClient.invalidateQueries({
-      predicate: (query) => {
-        if ((query.queryKey[0] as string).indexOf('critter') === -1) {
-          return false;
-        }
-        // save this query in case we cant find a matching critter to update
-        if (query.queryKey[0] === 'u_critters') {
-          unassignedQueryKey = query.queryKey;
-        }
-        const staleData = query.state.data as Animal[];
-        const found = staleData.find((a) => a.id === critter.id);
-        // invalidate the list of critters containing the updated one
-        if (found) {
-          isCritterMatch = true;
-          return true;
-        }
-        return false;
-      }
-    });
-    // if a new critter was added, invalidate unassigned critters data
-    if (!isCritterMatch && unassignedQueryKey) {
-      queryClient.invalidateQueries(unassignedQueryKey);
-    }
+    responseDispatch({ type: 'success', message: `${critter.name} saved!` });
+    invalidateCritterQueries();
   };
 
-  const onError = (error: AxiosError): void =>
-    updateStatus({ type: 'error', message: `error saving animal: ${formatAxiosError(error)}` });
-
-  const updateStatus = (notif: INotificationMessage): void => {
-    responseDispatch(notif);
+  const onDelete = async (): Promise<void> => {
+    responseDispatch({ type: 'success', message: `critter deleted successfully` });
+    invalidateCritterQueries();
   };
 
-  // setup the post mutation
-  const { mutateAsync } = (bctwApi.useMutateCritter as any)({ onSuccess, onError });
+  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
+
+  // force refetch on critter queries
+  const invalidateCritterQueries = async (): Promise<void> => {
+    queryClient.invalidateQueries('critters_assigned');
+    queryClient.invalidateQueries('critters_unassigned');
+  };
+
+  // setup the mutations
+  const { mutateAsync: saveMutation } = bctwApi.useMutateCritter({ onSuccess, onError });
+  const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDelete, onError });
 
   // critter properties that are displayed as select inputs
   const selectableProps = CS.editableProps.slice(3, 7);
 
   const handleSelect = (row: Animal): void => {
     setEditObj(row);
-    props.setSidebarContent(<p>id: {row.id}</p>);
+    props.setSidebarContent(<p>critter id: {row.id}</p>);
   };
 
-  const save = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await mutateAsync(a);
+  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await saveMutation(a);
+  const deleteCritter = async (critterId: string): Promise<void> => {
+    const payload: IDeleteType = {
+      id: critterId,
+      objType: 'animal'
+    };
+    await deleteMutation(payload);
+  };
 
   // props to be passed to the edit modal component
   const editProps = {
     editableProps: CS.editableProps,
     editing: new Animal(),
     open: false,
-    onSave: save,
+    onSave: saveCritter,
     selectableProps
   };
 
@@ -97,27 +82,27 @@ export default function CritterPage(props: CritterPageProps): JSX.Element {
   };
 
   return (
-    <SnackbarWrapper>
-      <div className='container'>
-        <Table
-          headers={assignedCritterProps}
-          title={CS.assignedTableTitle}
-          queryProps={{ query: 'useAssignedCritters', onNewData: (d: Animal[]): void => setCrittersA(d) }}
-          onSelect={handleSelect}
-        />
-        <Table
-          headers={unassignedCritterProps}
-          title={CS.unassignedTableTitle}
-          queryProps={{ query: 'useUnassignedCritters', onNewData: (d: Animal[]): void => setCrittersU(d) }}
-          onSelect={handleSelect}
-        />
-        <div className='button-row'>
-          <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
-          <AddEditViewer<Animal> editing={editObj} empty={(): Animal => new Animal()}>
+    <div className='container'>
+      <Table
+        headers={assignedCritterProps}
+        title={CS.assignedTableTitle}
+        queryProps={{ query: bctwApi.useAssignedCritters, onNewData: (d: Animal[]): void => setCrittersA(d) }}
+        onSelect={handleSelect}
+      />
+      <Table
+        headers={unassignedCritterProps}
+        title={CS.unassignedTableTitle}
+        queryProps={{ query: bctwApi.useUnassignedCritters, onNewData: (d: Animal[]): void => setCrittersU(d) }}
+        onSelect={handleSelect}
+      />
+      <div className='button-row'>
+        <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
+        <ModifyCritterWrapper editing={editObj} onDelete={deleteCritter}>
+          <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
             <EditCritter {...editProps} />
           </AddEditViewer>
-        </div>
+        </ModifyCritterWrapper>
       </div>
-    </SnackbarWrapper>
+    </div>
   );
 }

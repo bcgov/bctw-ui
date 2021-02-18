@@ -1,64 +1,85 @@
 import React, { useState } from 'react';
 import { ButtonGroup } from '@material-ui/core';
 import Button from 'components/form/Button';
+import { BCTW } from 'types/common_types';
 
-type IAddEditProps<T> = {
+export type IAddEditProps<T> = {
+  cannotEdit?: boolean;
   children: JSX.Element;
   disableEdit?: boolean;
   editing: T;
-  empty: () => T;
+  empty: T;
+  onDelete?: (id: string) => void;
 };
 
 /**
  * component that handles the modal show/hide functionality of the childEditComponent
  * used on main data pages (critter/collar)
+ * @param cannotEdit permission to edit?
  * @param children child component that handles the editing, {EditModal} ** must be only one child
- * @param editing object that is passed to editor when Edit is selected
- * @param empty an function that returns a 'naked' instance of T, passed to editor when Add is selected 
  * @param disableEdit defaults to false
-**/
-export default function AddEditViewer<T>(props: IAddEditProps<T>): JSX.Element {
-  const { editing, children: child, empty } = props;
+ * @param editing isntance of T passed to editor when edit button is clicked
+ * @param empty 'new' instance of T passed to editor when add button is clicked
+ **/
+export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): JSX.Element {
+  const { cannotEdit, editing, children, empty, onDelete } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const handleClickAdd = (): void => {
     setIsEditMode(false);
-    setEditObj(empty());
-    setShowModal(o => !o);
-  }
+    setEditObj(empty);
+    setShowModal((o) => !o);
+  };
 
   const handleClickEdit = (): void => {
     setIsEditMode(true);
     setEditObj(editing);
     setShowModal((o) => !o);
+  };
+
+  const enableDelete = (): boolean => {
+    const isFn = typeof onDelete === 'function'
+    return !!isFn;
   }
 
-  const onClose = (): void => {
+  const handleClickDelete = (): void => {
+    if (enableDelete()) {
+      onDelete(editing[editing.identifier ?? 'id']);
+    }
+  };
+
+  const handleClose = (): void => {
     setShowModal(false);
-  }
+  };
 
-  // pass these props to child editer component
-  // to allow this component (AddEditViewer) to deal
-  // wth the properties/handlers
+  // override the open/close handlers and props
+  // of the child EditModal component
   const editorProps = {
     editing: editObj,
     open: showModal,
     isEdit: isEditMode,
-    handleClose: onClose
-  }
+    handleClose
+  };
 
-  const disableEdit = props.disableEdit ? true : Object.keys(editing ?? {}).length === 0;
+  // dont enable the edit button if its a "new" instance of T
+  const disableEdit = props.disableEdit ? true : Object.keys(editing).length === 0;
   return (
     <>
       {/* clone element to pass additional props to it */}
-      {React.cloneElement(child, editorProps)}
+      {React.cloneElement(children, editorProps)}
       <ButtonGroup size='small' variant='contained' color='primary'>
+        {enableDelete() ? (
+          <Button color='secondary' disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
+            delete
+          </Button>
+        ) : null}
         <Button onClick={handleClickAdd}>add</Button>
-        <Button disabled={disableEdit} onClick={handleClickEdit}>edit</Button>
+        <Button disabled={disableEdit} onClick={handleClickEdit}>
+          {cannotEdit ? 'view' : 'edit'}
+        </Button>
       </ButtonGroup>
     </>
   );

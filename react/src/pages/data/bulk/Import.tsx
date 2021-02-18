@@ -30,7 +30,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
   const onSuccess = (data: IBulkUploadResults<T>): void => 
     responseDispatch({type: 'success', message: `a bulk upload was completed ${data.errors.length ? ', but there were errors.' : 'successfully.'}`})
 
-  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = (bctwApi.useMutateBulkCsv as any)({onSuccess});
+  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = bctwApi.useMutateBulkCsv({onSuccess});
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
     const formData = new FormData();
@@ -41,7 +41,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
     save(formData);
   }
 
-  const save = async (form: FormData): Promise<void> => await mutateAsync(form);
+  const save = async (form: FormData): Promise<any> => await mutateAsync(form);
 
   const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: JSON): void => {
     // todo:

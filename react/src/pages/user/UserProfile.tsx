@@ -3,13 +3,18 @@ import { UserContext, useUserContextDispatch } from 'contexts/UserContext';
 import { User } from 'types/user';
 import { CircularProgress } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
+// import Table from 'components/table/Table';
 import TextField from 'components/form/Input';
 import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { MenuItem, FormControl, Select, InputLabel } from '@material-ui/core';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useQueryClient } from 'react-query';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
+  const bctwApi = useTelemetryApi();
+  const queryClient = useQueryClient();
 
   // the actual user object from context
   const [user, setUser] = useState<User>(null);
@@ -31,7 +36,7 @@ export default function UserProfile(): JSX.Element {
         // update the test users list and set to current idir
         const me = useUser.user.idir;
         if (testUserOptions[0] === null) {
-          setTestUserOptions( o => [me, ...o.slice(1)])
+          setTestUserOptions((o) => [me, ...o.slice(1)]);
         }
         setTestUser(useUser.testUser ?? me);
       }
@@ -39,72 +44,67 @@ export default function UserProfile(): JSX.Element {
     update();
   }, [useUser.ready]);
 
-  const onChange = (v: Record<string, unknown>) => {
+  const onChange = (v: Record<string, unknown>): void => {
     // console.log(v);
   };
 
-  const onSelectTestUser = (e) => {
+  const onSelectTestUser = (e): void => {
     const v = e.target.value;
     setTestUser(v);
+    queryClient.invalidateQueries('critterAccess');
     // set the user context's testUser property
-    const updatedUser = { ...useUser, ...{testUser: v}};
+    const updatedUser = { ...useUser, ...{ testUser: v } };
     userDispatch(updatedUser);
     // setTblProps({query: queryStr, queryParam: v});
-  }
+  };
 
   if (!user) {
     return <CircularProgress />;
   }
 
   const tableProps: ITableQueryProps<Animal> = {
-    query: 'useCritterAccess',
-    queryParam: testUser
+    query: bctwApi.useCritterAccess,
+    param: { user: testUser, filterOutNone: true }
   };
+  // console.log('tableprop user', tableProps.param)
 
   return (
-    <div>
+    <div className='user-profile'>
       <Typography variant='h6'>
         Your Role Type: <strong>{user.role_type}</strong>
       </Typography>
-      <div>
-        <TextField
-          propName='idir'
-          defaultValue={user.idir}
-          disabled={true}
-          label='User IDIR'
-          changeHandler={onChange}
-        />
+      <div className='user-input-grp'>
+        <TextField propName='idir' defaultValue={user.idir} disabled={true} label='IDIR' changeHandler={onChange} />
         <TextField
           propName='email'
           type='email'
           defaultValue={user.email}
           disabled={true}
-          label='Email Address'
+          label='EMAIL'
           changeHandler={onChange}
         />
       </div>
-      {/* fixme: hide this for demo as it isn't refetching properly */}
+      {/* fixme: still not refreshing properly on test user change */}
       {/* <Table
         headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'collar_make', 'permission_type']}
         title='Animals you have access to:'
-        isMultiSelect={true}
-        // queryProps={tblProps}
         queryProps={tableProps}
-        onSelect={() => {}}
-        rowIdentifier='id'
-      /> */}
+        onSelect={null}/> */}
       <Typography variant='h6'>Swap User</Typography>
       <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography>
       <FormControl>
         <InputLabel>Test User Account</InputLabel>
         <Select value={testUser} onChange={onSelectTestUser}>
-          {
-            testUserOptions.map((s, i) => {
-              return <MenuItem key={i} value={s}>{s}</MenuItem>
-            })
-          }
+          {testUserOptions.map((s, i) => {
+            return (
+              <MenuItem key={i} value={s}>
+                {s}
+              </MenuItem>
+            );
+          })}
         </Select>
       </FormControl>
+      {/* <pre>{testUser}</pre>{} */}
     </div>
   );
 }

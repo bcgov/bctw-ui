@@ -33,33 +33,33 @@ type ISelectProps<T> = SelectProps & {
 };
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
-export default function SelectCode(props: ISelectProps<any>): JSX.Element {
+export default function SelectCode<T>(props: ISelectProps<T>): JSX.Element {
   const { codeHeader, defaultValue, changeHandler } = props;
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
-  const [value, setValue] = useState(defaultValue);
+  const [value, setValue] = useState<T>(defaultValue);
 
   const propsToPass = removeProps(props, ['codeHeader', 'changeHandler']);
 
   // load this codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading } = (bctwApi.useCodes as any)(0, codeHeader);
+  const { data, error, isFetching, isError, isLoading } = bctwApi.useCodes(0, codeHeader);
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>): void => {
+  const handleChange = (event: React.ChangeEvent<{ value }>): void => {
     const v = event.target.value;
     setValue(v);
     pushChange(v);
   };
 
   const reset = (): void => {
-    const nv = defaultValue ?? value ?? '';
-    setValue(nv)
+    const nv = defaultValue ?? value; // ?? '' as any;
+    setValue(nv);
     pushChange(nv);
-  }
+  };
 
   const pushChange = (v: unknown): void => {
     const ret = { [codeHeader]: v };
     changeHandler(ret);
-  }
+  };
 
   useEffect(() => {
     reset();
@@ -67,26 +67,24 @@ export default function SelectCode(props: ISelectProps<any>): JSX.Element {
 
   return (
     <>
-      {
-        isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> :
-          isLoading || isFetching ? <div>loading...</div> :
-            <FormControl className={classes.formControl}>
-              <InputLabel id='select-label'>{data[0].code_header_title}</InputLabel>
-              <MuiSelect
-                labelId='select-label'
-                value={value ?? ''}
-                onChange={handleChange}
-                {...propsToPass}
-              >
-                {data?.map((c: ICode) => {
-                  return (
-                    <MenuItem key={c.id} value={c.description ?? ''}>
-                      {c.description}
-                    </MenuItem>
-                  );
-                })}
-              </MuiSelect>
-            </FormControl>
-      }
-    </>)
+      {isError ? (
+        <NotificationMessage type='error' message={formatAxiosError(error)} />
+      ) : isLoading || isFetching ? (
+        <div>loading...</div>
+      ) : (
+        <FormControl className={classes.formControl}>
+          <InputLabel id='select-label'>{data[0].code_header_title}</InputLabel>
+          <MuiSelect labelId='select-label' value={value} onChange={handleChange} {...propsToPass}>
+            {data?.map((c: ICode) => {
+              return (
+                <MenuItem key={c.id} value={c.description}>
+                  {c.description}
+                </MenuItem>
+              );
+            })}
+          </MuiSelect>
+        </FormControl>
+      )}
+    </>
+  );
 }

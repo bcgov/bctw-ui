@@ -3,7 +3,7 @@ import { ICode, ICodeHeader } from 'types/code';
 import { ApiProps, IBulkUploadResults, IGetCodeProps } from './api_interfaces';
 
 export const codeApi = (props: ApiProps) => {
-  const { api, testUser } = props;
+  const { api } = props;
 
   const getCodes = async (props: IGetCodeProps): Promise<ICode[]> => {
     const { page, codeHeader } = props;

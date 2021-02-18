@@ -7,21 +7,24 @@ type IToastProps = {
   show: boolean;
   action?: React.ReactNode;
   onClose: () => void;
-}
-export default function Toast({message, show, action, onClose}: IToastProps): JSX.Element {
+  type?: 'error' | 'warning' | 'info' | 'success';
+};
+
+// todo: style snackbar 
+export default function Toast({ message, show, action, onClose, type }: IToastProps): JSX.Element {
   return (
     <>
       <Portal>
         <Snackbar
           anchorOrigin={{
             vertical: 'bottom',
-            horizontal: 'right',
+            horizontal: 'right'
           }}
           open={show}
-          autoHideDuration={5000}
+          autoHideDuration={8000}
           onClose={onClose}
-          message={message}
           action={action}
+          message={message}
         />
       </Portal>
     </>

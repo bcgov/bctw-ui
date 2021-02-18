@@ -1,6 +1,6 @@
 import { ICollarBase } from 'types/collar';
 import { BCTW } from 'types/common_types';
-import { Type } from 'class-transformer';
+import { Type, Expose } from 'class-transformer';
 import dayjs from 'dayjs';
 import { columnToHeader } from 'utils/common';
 
@@ -29,10 +29,11 @@ export class CollarHistory implements ICollarHistory {
   radio_frequency: number;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
+  @Expose() get identifier(): string { return 'assignment_id' }
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'assignment_id':
+      case this.identifier:
         return 'Assignment ID';
       default:
         return columnToHeader(str);

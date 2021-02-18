@@ -1,6 +1,5 @@
 import { useEffect, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import useStyles from 'pages/layouts/layout_styles';
 import { UserContext } from 'contexts/UserContext';
 import { eUserRole } from 'types/user';
 
@@ -12,7 +11,6 @@ type IDefaultLayoutProps = {
  * wrap this component around child components that require administrative rights to access 
  */
 export default function AuthLayout({ children }: IDefaultLayoutProps): JSX.Element {
-  const classes = useStyles();
   const history = useHistory();
   const userChanges = useContext(UserContext);
 
@@ -27,7 +25,7 @@ export default function AuthLayout({ children }: IDefaultLayoutProps): JSX.Eleme
   }, [userChanges]);
   return (
     <div>
-      <div className={classes.wrapper}>{children}</div>
+      <div>{children}</div>
     </div>
   )
 }

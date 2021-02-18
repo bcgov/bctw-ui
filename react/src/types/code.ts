@@ -19,7 +19,20 @@ interface ICodeHeader {
   description: string;
 }
 
-export class CodeHeader implements BCTW, BctwBaseType {
+// represents the objects retrieved from the database
+export class CodeHeader implements BCTW, ICodeHeader {
+  id: number;
+  type: string
+  title: string;
+  description: string;
+
+  formatPropAsHeader(str: string): string {
+    return columnToHeader(str);
+  }
+}
+
+// represents what a code header should look like when sending to api
+export class CodeHeaderInput implements BCTW, BctwBaseType {
   code_category_id: number;
   code_header_name: string;
   code_header_title: string;
@@ -35,10 +48,8 @@ export class CodeHeader implements BCTW, BctwBaseType {
   }
 
   formatPropAsHeader(str: string): string {
-    switch (str) {
-      default:
-        return columnToHeader(str);
-    }
+    const trimCode = str.slice(str.indexOf('_') + 1);
+    return columnToHeader(trimCode);
   }
 }
 

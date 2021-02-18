@@ -1,31 +1,29 @@
 import Table from 'components/table/Table';
-import { ITableQueryProps } from 'components/table/table_interfaces';
+import { ITableQueryProps, ITableSortProp } from 'components/table/table_interfaces';
 
-type IHistoryPageProps<T> = {
-  historyQuery: 'useCollarHistory' | 'useCritterHistory' | ''; // query used to retrieve table data
-  itemId: string; // display this critter's change history
-  propsToDisplay: string[]; // properties to display in history table
+export type IHistoryPageProps<T> = ITableQueryProps<T> & {
+  propsToDisplay: string[];
 };
 
 export default function HistoryPage<T>(props: IHistoryPageProps<T>): JSX.Element {
-  const { historyQuery, itemId, propsToDisplay } = props;
-
-  const handleSelect = (row) => {
+  const { query, param, propsToDisplay } = props;
+  const handleSelect = (): void => {
     // do nothing
   };
 
-  const tableProps: ITableQueryProps<T> = {
-    query: historyQuery,
-    queryParam: itemId,
-    defaultSort: { property: 'valid_to' as keyof T, order: 'desc' }
-  };
+  const defaultSort: ITableSortProp<T> = { property: 'valid_to' as keyof T, order: 'desc' }
+  const tblProps = {
+    query,
+    param,
+    defaultSort
+  }
 
-  if (historyQuery === '') {
+  if (props.query === '') {
     return <div>no history to display.</div>;
   }
+
   return (
-    <>
-      <Table headers={propsToDisplay} queryProps={tableProps} onSelect={handleSelect} rowIdentifier='transaction_id' />
-    </>
+    // fixme: need history table row identifier
+    <Table headers={propsToDisplay} queryProps={tblProps} onSelect={handleSelect} /*rowIdentifier='transaction_id' *//>
   );
 }

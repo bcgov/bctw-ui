@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   makeStyles,
   createStyles,
@@ -11,16 +11,19 @@ import {
   Toolbar,
   Typography,
   Paper,
-  Checkbox
+  Checkbox,
+  CircularProgress
 } from '@material-ui/core';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from './TablePaginate';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { NotificationMessage } from 'components/common';
-import { formatAxiosError, getProperty } from 'utils/common';
+import { formatAxiosError } from 'utils/common';
 import { ICustomTableColumn, ITableProps, Order } from './table_interfaces';
+import { AxiosError } from 'axios';
+import { UseQueryResult } from 'react-query';
+import { BCTW } from 'types/common_types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -56,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function Table<T>({
+export default function Table<T extends BCTW>({
   customColumns,
   headers,
   queryProps,
@@ -64,29 +67,48 @@ export default function Table<T>({
   onSelect,
   onSelectMultiple,
   paginate = true,
-  rowIdentifier = 'id' as any,
   isMultiSelect = false
 }: ITableProps<T>): JSX.Element {
   const classes = useStyles();
-  const { query, queryParam, onNewData, defaultSort } = queryProps;
+  const { query, param, onNewData, defaultSort } = queryProps;
 
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
-  const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property ?? (rowIdentifier as any));
+  const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState<number>(1);
-  const bctwApi = useTelemetryApi();
+  const [rowIdentifier, setRowIdentifier] = useState<string>('id');
+
+  const onSuccess = (results: T[]): void => {
+    const first = results[0];
+    if (first && typeof first.identifier === 'string') {
+      setRowIdentifier(first.identifier);
+    }
+    if (typeof onNewData === 'function') {
+      onNewData(results);
+    }
+  };
 
   const {
     isFetching,
     isLoading,
     isError,
     error,
-    data: unpaginatedData,
-    resolvedData: pageData,
-    isPreviousData
-  } = (bctwApi[query] as any)(page, queryParam, { onSuccess: typeof onNewData === 'function' ? onNewData : null });
+    data,
+    isPreviousData,
+    isSuccess
+  }: UseQueryResult<T[], AxiosError> = query(
+    page,
+    param
+    // { onSuccess }
+    // fixme: doesnt work anymore? using useEffect on isSuccess
+    // isn't triggered on new page load??
+  );
 
-  const data = pageData ?? unpaginatedData;
+  useEffect(() => {
+    if (isSuccess) {
+      onSuccess(data);
+    }
+  }, [isSuccess]);
 
   const handleSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -99,7 +121,6 @@ export default function Table<T>({
       const newIds = data.map((r) => r[rowIdentifier]);
       setSelected(newIds);
       if (typeof onSelectMultiple === 'function') {
-        // onSelectMultiple(newIds);
         onSelectMultiple(data.filter((d) => newIds.includes(d[rowIdentifier])));
       }
       return;
@@ -111,8 +132,8 @@ export default function Table<T>({
     const selectedIndex = selected.indexOf(id);
     if (!isMultiSelect) {
       setSelected([id]);
-      if (typeof onSelect === 'function') {
-        const row = data?.find((d) => d[rowIdentifier] === id);
+      if (typeof onSelect === 'function' && data?.length) {
+        const row = data.find((d) => d[rowIdentifier] === id);
         onSelect(row);
       }
       return;
@@ -149,24 +170,19 @@ export default function Table<T>({
     setPage(page);
   };
 
-  const renderFetching = (): JSX.Element => (
-    <TableRow>
-      <TableCell>loading...</TableCell>
-    </TableRow>
-  );
-  const renderError = (): JSX.Element => (
+  const renderNoData = (): JSX.Element => (
     <TableRow>
       <TableCell>
-        <NotificationMessage type='error' message={formatAxiosError(error)} />
+        {isFetching || isLoading ? (
+          <CircularProgress />
+        ) : isError ? (
+          <NotificationMessage type='error' message={formatAxiosError(error)} />
+        ) : (
+          'no data available'
+        )}
       </TableCell>
     </TableRow>
   );
-
-  const renderNoData = (): JSX.Element => (
-    <TableRow>
-      <TableCell>no data available</TableCell>
-    </TableRow>
-  )
 
   const renderToolbar = (): JSX.Element =>
     isMultiSelect ? (
@@ -186,10 +202,10 @@ export default function Table<T>({
         {renderToolbar()}
         <TableContainer component={Paper}>
           <MuiTable className={classes.table} size='small'>
-            {isFetching || isLoading || isError ? null : (
+            {data === undefined ? null : (
               <TableHead
                 headersToDisplay={headerProps}
-                headerData={data && data.length ? data[0] : []}
+                headerData={data && data[0]}
                 isMultiSelect={isMultiSelect}
                 numSelected={selected.length}
                 order={order}
@@ -197,24 +213,21 @@ export default function Table<T>({
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAll}
                 rowCount={data?.length ?? 0}
-                customHeaders={customColumns?.map(c => c.header) ?? []}
+                customHeaders={customColumns?.map((c) => c.header) ?? []}
               />
             )}
             <TableBody>
-              {data && data.length === 0 ? (
-                renderNoData()
-              ) : isFetching || isLoading ? (
-                renderFetching()
-              ) : isError ? (
-                renderError()
-              ) : (
-                stableSort(data ?? [], getComparator(order, orderBy)).map((obj: T, prop: number) => {
-                  const isRowSelected = isSelected(getProperty(obj, rowIdentifier) as string);
+              {(data && data.length === 0) || isFetching || isLoading || isError
+                ? renderNoData()
+                : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: BCTW, prop: number) => {
+                  const isRowSelected = isSelected(obj[rowIdentifier]);
                   const labelId = `enhanced-table-checkbox-${prop}`;
                   return (
                     <TableRow
                       hover
-                      onClick={(event): void => handleClick(event, getProperty(obj, rowIdentifier) as string)}
+                      onClick={(event): void => {
+                        handleClick(event, obj[rowIdentifier]);
+                      }}
                       role='checkbox'
                       aria-checked={isRowSelected}
                       tabIndex={-1}
@@ -240,15 +253,14 @@ export default function Table<T>({
                       })}
                       {/* render additional columns from props */}
                       {customColumns
-                        ? customColumns.map((c: ICustomTableColumn<T>) => {
+                        ? customColumns.map((c: ICustomTableColumn<BCTW>) => {
                           const colComponent = c.column(obj, prop);
                           return <TableCell key={`add-col-${prop}`}>{colComponent}</TableCell>;
                         })
                         : null}
                     </TableRow>
                   );
-                })
-              )}
+                })}
             </TableBody>
           </MuiTable>
           {!paginate || isLoading || isFetching || isError ? null : (

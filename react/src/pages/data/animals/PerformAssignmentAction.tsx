@@ -58,16 +58,13 @@ export default function PerformAssignmentAction({
   };
 
   // force the collar history, current assigned/unassigned critter pages to refetch
-  const updateCollarHistory = (): Promise<unknown> =>
-    queryClient.invalidateQueries({
-      predicate: (query) => {
-        const key = query.queryKey[0] as string;
-        const includes = ['collarAssignmentHistory', 'u_critters', 'a_critters'].includes(key);
-        return includes;
-      }
-    });
+  const updateCollarHistory = async(): Promise<void> => {
+    queryClient.invalidateQueries('collarAssignmentHistory');
+    queryClient.invalidateQueries('critters_unassigned');
+    queryClient.invalidateQueries('critters_assigned');
+  }
 
-  const { mutateAsync } = (bctwApi.useMutateLinkCollar as any)({ onSuccess, onError });
+  const { mutateAsync } = bctwApi.useMutateLinkCollar({ onSuccess, onError });
 
   const handleClickShowModal = (): void => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
 

@@ -1,3 +1,6 @@
+import { UseQueryResult } from 'react-query';
+import { BCTW } from 'types/common_types';
+
 type Order = 'asc' | 'desc';
 
 interface ITableSortProp<T> {
@@ -6,15 +9,27 @@ interface ITableSortProp<T> {
 }
 
 /**
+ *
+ */
+type ITableQuery<T> = (
+  page: number,
+  param?: string | number | unknown,
+  config?: Record<string, unknown>
+  // ) => UseQueryResult<T[], AxiosError>;
+) => UseQueryResult;
+
+/**
  * @param query - name of api hook
  * @param queryProp - param to pass to hook
  * @param onNewData handler to call when new data is loaded
  */
-interface ITableQueryProps<T> {
-  query: string;
-  queryParam?: string | number;
-  onNewData?: (data: T[]) => void;
+interface ITableQueryProps<T extends BCTW> {
   defaultSort?: ITableSortProp<T>;
+  param?: string | number | unknown;
+  // fixme:
+  query: any;
+  // query: (page: number, param?: number | string | 'unknown') => UseQueryResult<T[], AxiosError>;
+  onNewData?: (data: T[]) => void;
 }
 
 interface ICustomTableColumn<T> {
@@ -40,7 +55,7 @@ type ITableProps<T> = {
   isMultiSelect?: boolean;
   paginate?: boolean;
   queryProps: ITableQueryProps<T>;
-  rowIdentifier?: keyof T;
+  // rowIdentifier?: keyof T;
   title?: string;
   onSelect?: (row: T) => void;
   onSelectMultiple?: (rowIds: T[]) => void;
@@ -64,7 +79,7 @@ interface HeadCell<T> {
  * @param numSelected used in multiselect tables to determine if all rows are selected
  * @param onRequestSort sort handler
  * @param onSelectAllClick passed from the table prop
- * 
+ *
  */
 interface ITableHeadProps<T> {
   customHeaders: ((row: T, idx: number) => JSX.Element)[];
@@ -79,4 +94,13 @@ interface ITableHeadProps<T> {
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export type { HeadCell, Order, ICustomTableColumn, ITableHeadProps, ITableProps, ITableQueryProps, ITableSortProp };
+export type {
+  HeadCell,
+  Order,
+  ICustomTableColumn,
+  ITableQuery,
+  ITableHeadProps,
+  ITableProps,
+  ITableQueryProps,
+  ITableSortProp
+};

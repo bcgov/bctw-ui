@@ -18,6 +18,7 @@ import {
   eCritterFetchType,
   IBulkUploadResults,
   ICollarLinkPayload,
+  IDeleteType,
   IGrantCritterAccessResults,
   IUpsertPayload,
   IUserCritterPermissionInput
@@ -64,15 +65,23 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const useTracks = (start: string, end: string): UseQueryResult => {
-    return useQuery<any, AxiosError>(['tracks', start, end], () => mapApi.getTracks(start, end), defaultQueryOptions);
+  const useTracks = (start: string, end: string): UseQueryResult<GeoJSON.GeoJsonObject, AxiosError> => {
+    return useQuery<GeoJSON.GeoJsonObject, AxiosError>(
+      ['tracks', start, end],
+      () => mapApi.getTracks(start, end),
+      defaultQueryOptions
+    );
   };
 
   /**
    *
    */
-  const usePings = (start: string, end: string): UseQueryResult => {
-    return useQuery<any, Error>(['pings', { start, end }], () => mapApi.getPings(start, end), defaultQueryOptions);
+  const usePings = (start: string, end: string): UseQueryResult<GeoJSON.GeoJsonObject, AxiosError> => {
+    return useQuery<GeoJSON.GeoJsonObject, AxiosError>(
+      ['pings', { start, end }],
+      () => mapApi.getPings(start, end),
+      defaultQueryOptions
+    );
   };
 
   /**
@@ -97,7 +106,7 @@ export const useTelemetryApi = () => {
    */
   const useAssignedCritters = (page: number): UseQueryResult => {
     return useQuery<Animal[], AxiosError>(
-      ['a_critters', page],
+      ['critters_assigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.assigned),
       critterOptions
     );
@@ -108,7 +117,7 @@ export const useTelemetryApi = () => {
    */
   const useUnassignedCritters = (page: number): UseQueryResult =>
     useQuery<Animal[], AxiosError>(
-      ['u_critters', page],
+      ['critters_unassigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned),
       critterOptions
     );
@@ -128,8 +137,8 @@ export const useTelemetryApi = () => {
    */
   const useCritterHistory = (page: number, critterId: string, config: Record<string, unknown>): UseQueryResult => {
     return useQuery<Animal[], AxiosError>(
-      ['critterHistory', critterId],
-      () => critterApi.getCritterHistory(critterId),
+      ['critter_history', critterId],
+      () => critterApi.getCritterHistory(page, critterId),
       { ...config }
     );
   };
@@ -138,18 +147,18 @@ export const useTelemetryApi = () => {
    * @param codeHeader the code header name used to determine which codes to fetch
    * @param page not currently used
    */
-  const useCodes = (page: number, codeHeader: string): UseQueryResult => {
+  const useCodes = (page: number, codeHeader: string): UseQueryResult<ICode[], AxiosError> => {
     const props = { page, codeHeader };
     return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), {
       ...defaultQueryOptions,
-      refetchOnMount: false,
+      refetchOnMount: false
     });
   };
 
   /**
    * retrieves list of code headers, no parameters
    */
-  const useCodeHeaders = (): UseQueryResult => {
+  const useCodeHeaders = (): UseQueryResult<ICodeHeader[], AxiosError> => {
     return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), {
       ...defaultQueryOptions
     });
@@ -182,7 +191,7 @@ export const useTelemetryApi = () => {
   /**
    * @returns a user object, no parameters because it uses the keycloak object to pass idir
    */
-  const useUser = (): UseQueryResult => {
+  const useUser = (): UseQueryResult<User, AxiosError> => {
     return useQuery<User, AxiosError>('user', () => userApi.getUser(), defaultQueryOptions);
   };
 
@@ -200,11 +209,12 @@ export const useTelemetryApi = () => {
    * @param user idir of the user to receive critter access to
    * @returns A simplified list of Animals that only has id, animal_id, and nickname
    */
-  const useCritterAccess = (page: number, user: string, config: Record<string, unknown>): UseQueryResult =>
-    useQuery<UserCritterAccess[], AxiosError>(['critterAccess', page], () => userApi.getUserCritterAccess(page, user), {
-      ...config,
+  const useCritterAccess = (page: number, param: {user: string, filterOutNone: boolean}): UseQueryResult => {
+    const {user, filterOutNone} = param;
+    return useQuery<UserCritterAccess[], AxiosError>(['critterAccess', page], () => userApi.getUserCritterAccess(page, user, filterOutNone), {
       ...defaultQueryOptions
     });
+  }
 
   /**
    *
@@ -212,7 +222,7 @@ export const useTelemetryApi = () => {
    */
   const useMutateCodeHeader = (
     config: UseMutationOptions<IBulkUploadResults<ICodeHeader>, AxiosError, ICodeHeader[]>
-  ): UseMutationResult =>
+  ): UseMutationResult<IBulkUploadResults<ICodeHeader>> =>
     useMutation<IBulkUploadResults<ICodeHeader>, AxiosError, ICodeHeader[]>(
       (headers) => codeApi.addCodeHeader(headers),
       config
@@ -220,7 +230,7 @@ export const useTelemetryApi = () => {
 
   const useMutateCollar = (
     config: UseMutationOptions<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>
-  ): UseMutationResult =>
+  ): UseMutationResult<IBulkUploadResults<Collar>> =>
     useMutation<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>(
       (collar) => collarApi.upsertCollar(collar),
       config
@@ -228,7 +238,7 @@ export const useTelemetryApi = () => {
 
   const useMutateCritter = (
     config: UseMutationOptions<Animal[], AxiosError, IUpsertPayload<Animal>>
-  ): UseMutationResult =>
+  ): UseMutationResult<Animal[]> =>
     useMutation<Animal[], AxiosError, IUpsertPayload<Animal>>((critter) => critterApi.upsertCritter(critter), config);
 
   const useMutateLinkCollar = (
@@ -238,7 +248,7 @@ export const useTelemetryApi = () => {
 
   const useMutateBulkCsv = <T>(
     config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, FormData>
-  ): UseMutationResult =>
+  ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
   const useMutateGrantCritterAccess = (
@@ -248,6 +258,9 @@ export const useTelemetryApi = () => {
       (body) => userApi.grantCritterAccessToUser(body),
       config
     );
+
+  const useDelete = (config: UseMutationOptions<boolean, AxiosError, IDeleteType>): UseMutationResult<boolean> =>
+    useMutation<boolean, AxiosError, IDeleteType>((body) => critterApi.deleteType(body), config);
 
   return {
     // queries
@@ -271,6 +284,7 @@ export const useTelemetryApi = () => {
     useMutateCollar,
     useMutateCritter,
     useMutateLinkCollar,
-    useMutateGrantCritterAccess
+    useMutateGrantCritterAccess,
+    useDelete
   };
 };

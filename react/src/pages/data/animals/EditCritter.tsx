@@ -12,7 +12,6 @@ import { useEffect, useState } from 'react';
 import { Animal } from 'types/animal';
 import { eCritterPermission } from 'types/user';
 import { removeProps } from 'utils/common';
-import 'styles/Data.scss';
 
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
   const { isEdit, editing, editableProps, selectableProps } = props;
@@ -34,7 +33,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   };
 
   const createTitle = (): string =>
-    !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.animal_id ?? 'animal'}`;
+    !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
 
   return (
     <EditModal title={createTitle()} newT={new Animal()} onValidate={validateForm} isEdit={isEdit} {...props}>

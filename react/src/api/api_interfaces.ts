@@ -62,6 +62,11 @@ interface IGetCodeProps extends IBaseGetProps {
   codeHeader: string;
 }
 
+interface IDeleteType {
+  objType: 'animal' | 'collar';
+  id: string;
+}
+
 export type {
   ApiProps,
   IBulkUploadResults,
@@ -71,6 +76,7 @@ export type {
   IUpsertPayload,
   IUserCritterPermissionInput,
   IGrantCritterAccessResults,
+  IDeleteType
 }
 
 export {

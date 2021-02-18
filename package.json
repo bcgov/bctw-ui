@@ -6,8 +6,6 @@
   "scripts": {
     "postinstall": "(cd react && npm i); (cd react && cp node_modules/reflect-metadata/Reflect.js public); (cd backend && npm i);",
     "start": "npm start --prefix backend",
-    "vue-dev": "npm run dev --prefix vue",
-    "vue-build": "npm run build --prefix vue",
     "dev": "yarn --cwd react run start",
     "build": "npm --prefix react run build"
   },

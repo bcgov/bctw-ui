@@ -1,5 +1,4 @@
 import Typography from '@material-ui/core/Typography';
-import 'styles/Data.scss';
 
 const Home = (): JSX.Element => {
   return (

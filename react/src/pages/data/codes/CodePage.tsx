@@ -6,16 +6,15 @@ import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import React, { useState } from 'react';
-import { ICodeHeader, CodeHeader } from 'types/code';
+import { CodeHeader, CodeHeaderInput, ICodeHeader } from 'types/code';
 import { formatAxiosError } from 'utils/common';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditCodeHeader from 'pages/data/codes/EditCodeHeader';
-import { IUpsertPayload } from 'api/api_interfaces';
+import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import 'styles/Data.scss';
 
 const CodePage: React.FC = () => {
-  const [codeHeader, setCodeHeader] = useState<ICodeHeader>({} as ICodeHeader);
+  const [codeHeader, setCodeHeader] = useState<CodeHeader>(new CodeHeader());
   const [title, setTitle] = useState<string>('');
   const props = ['id', 'code', 'description'];
   const bctwApi = useTelemetryApi();
@@ -31,16 +30,17 @@ const CodePage: React.FC = () => {
     // todo: invalidate code_header query?
   };
 
-  const handleClick = (c: ICodeHeader): void => {
+  const handleClick = (c: CodeHeader): void => {
     setCodeHeader(c);
     setTitle(c.title);
   };
 
-  const { mutateAsync } = (bctwApi.useMutateCodeHeader as any)({ onSuccess });
+  const { mutateAsync } = bctwApi.useMutateCodeHeader({ onSuccess });
 
-  const handleSave = async (p: IUpsertPayload<CodeHeader>): Promise<void> => await mutateAsync(p.body);
+  const handleSave = async (p: IUpsertPayload<CodeHeaderInput>): Promise<IBulkUploadResults<ICodeHeader>> =>
+    await mutateAsync(p.body);
 
-  const { isFetching, isLoading, isError, error, data } = (bctwApi.useCodeHeaders as any)({ onSuccess });
+  const { isFetching, isLoading, isError, error, data } = bctwApi.useCodeHeaders();
 
   const importProps = {
     iMsg: S.importText,
@@ -49,7 +49,7 @@ const CodePage: React.FC = () => {
 
   const editProps = {
     editableProps: S.editableProps,
-    editing: new CodeHeader(),
+    editing: new CodeHeaderInput(),
     open: false,
     onSave: handleSave,
     selectableProps: []
@@ -57,7 +57,7 @@ const CodePage: React.FC = () => {
 
   return (
     <div className='container'>
-      {isFetching | isLoading ? (
+      {isFetching || isLoading ? (
         <div>loading...</div>
       ) : isError ? (
         <NotificationMessage type='error' message={formatAxiosError(error)} />
@@ -67,7 +67,7 @@ const CodePage: React.FC = () => {
             <strong>Code Management</strong>
           </Typography>
           <ButtonGroup>
-            {data.map((c: ICodeHeader) => {
+            {data.map((c: CodeHeader) => {
               return (
                 <Button key={c.id} onClick={(): void => handleClick(c)}>
                   {c.title}
@@ -79,7 +79,7 @@ const CodePage: React.FC = () => {
             <Table
               headers={props}
               title={`${title} Codes`}
-              queryProps={{ query: 'useCodes', queryParam: codeHeader?.type ?? 'region' }}
+              queryProps={{ query: bctwApi.useCodes, param: codeHeader?.type ?? 'region' }}
               onSelect={null}
             />
           ) : (
@@ -87,7 +87,10 @@ const CodePage: React.FC = () => {
           )}
           <div className='button-row'>
             <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
-            <AddEditViewer<ICodeHeader> editing={codeHeader} empty={() => Object.create({})} disableEdit={true}>
+            <AddEditViewer<CodeHeaderInput>
+              editing={new CodeHeaderInput()}
+              empty={Object.create({})}
+              disableEdit={true}>
               <EditCodeHeader {...editProps} />
             </AddEditViewer>
           </div>

@@ -1,6 +1,6 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
+import { eCritterPermission, IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 import {
   IUserCritterPermissionInput,
   IGrantCritterAccessResults,
@@ -10,12 +10,6 @@ import {
 
 export const userApi = (props: ApiProps) => {
   const { api, testUser } = props;
-
-  // const getUserRole = async (): Promise<UserRole> => {
-  //   const url = createUrl({ api: 'get-user-role' });
-  //   const { data } = await api.get(url);
-  //   return data;
-  // };
 
   const getUser = async (): Promise<User> => {
     const url = createUrl({ api: 'get-user', testUser });
@@ -40,11 +34,12 @@ export const userApi = (props: ApiProps) => {
     return { results, errors };
   };
 
-  const getUserCritterAccess = async (page, idir: string): Promise<UserCritterAccess[]> => {
-    const url = createUrl({ api: `get-critter-access/${idir}`, page, testUser });
+  const getUserCritterAccess = async (page: number, user: string, filterOutNone = false): Promise<UserCritterAccess[]> => {
+    const url = createUrl({ api: `get-critter-access/${user}`, page });
     // console.log(`retrieving critter access: ${url}`);
     const { data } = await api.get(url);
-    return data.map((json: IUserCritterAccess[]) => plainToClass(UserCritterAccess, json));
+    const converted = data.map((json: IUserCritterAccess[]) => plainToClass(UserCritterAccess, json));
+    return filterOutNone ? converted.filter(d => d.permission_type !== eCritterPermission.none) : converted;
   };
 
   return {

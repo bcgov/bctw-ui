@@ -19,7 +19,7 @@ export const UserStateContextProvider: React.FC = (props) => {
   const queryClient = useQueryClient();
   const [userContext, setUserContext] = useState<IUserContext>({ ready: false, user: null});
 
-  const { isFetching, isLoading, isError, data, status } = (bctwApi.useUser as any)();
+  const { isFetching, isLoading, isError, data, status } = bctwApi.useUser();
 
   useEffect(() => {
     const update = (): void => {

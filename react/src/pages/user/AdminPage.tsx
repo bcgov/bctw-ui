@@ -8,40 +8,50 @@ import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useResponseState } from 'contexts/ApiResponseContext';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { Typography } from '@material-ui/core';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 export default function AdminPage(): JSX.Element {
   const responseState = useResponseState();
+  const bctwApi = useTelemetryApi();
   const [ids, setIds] = useState<User>();
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const tableProps: ITableQueryProps<User> = { query: 'useUsers' };
+  const tableProps: ITableQueryProps<User> = { query: bctwApi.useUsers };
 
   const handleTableSelect = (users: User): void => {
     setIds(users);
   };
 
   const onClickShowModal = (b: boolean): void => {
-    setShowModal((o) => !o);
+    setShowModal(b);
   };
-  const onSave = () => {
+  const onSave = (): void => {
     // do nothing
   };
 
   return (
     <AuthLayout>
-      <Typography variant='h4' component='div'>Modify User Animal Access</Typography>
-      <Typography variant='body2' component='p'>A user has access to collars through the user-animal association.</Typography>
-      <Table
-        headers={['id', 'idir', 'bceid', 'email', 'role_type']}
-        title='Users'
-        queryProps={tableProps}
-        onSelect={handleTableSelect}
-      />
-      {responseState ? <NotificationMessage type={responseState.type} message={responseState.message} /> : null}
-      <Button disabled={!ids} onClick={(): void => onClickShowModal(true)}>
-        Edit
-      </Button>
-      <GrantCritterModal show={showModal} onClose={(): void => setShowModal(false)} onSave={onSave} users={ids} />
+      <div className='container'>
+        <Typography variant='h4' component='div'>
+          Modify User Animal Access
+        </Typography>
+        <Typography variant='body2' component='p'>
+          A user has access to collars through the user-animal association.
+        </Typography>
+        <Table
+          headers={['id', 'idir', 'bceid', 'email', 'role_type']}
+          title='Users'
+          queryProps={tableProps}
+          onSelect={handleTableSelect}
+        />
+        {responseState ? <NotificationMessage type={responseState.type} message={responseState.message} /> : null}
+        <div className='admin-btn-row'>
+          <Button disabled={!ids} onClick={(): void => onClickShowModal(true)}>
+            Edit
+          </Button>
+        </div>
+        <GrantCritterModal show={showModal} onClose={(): void => setShowModal(false)} onSave={onSave} users={ids} />
+      </div>
     </AuthLayout>
   );
 }

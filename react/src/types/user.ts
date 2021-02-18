@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
-import { BctwBaseType } from './common_types';
+import { columnToHeader } from 'utils/common';
+import { BCTW, BctwBaseType } from './common_types';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -13,7 +14,7 @@ export enum eCritterPermission {
   none = 'none',
 }
 
-export interface IUser extends BctwBaseType {
+export interface IUser extends BCTW, BctwBaseType {
   id: number;
   idir: string;
   bceid: string;
@@ -28,12 +29,14 @@ export class User implements IUser {
   email: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
+
+  formatPropAsHeader(str: string): string {
+    return columnToHeader(str);
+  }
 }
 
-// fixme: 
 export interface IUserCritterAccessInput {
   id: string;
-  // animal_id: string;
   permission_type: eCritterPermission;
 }
 export interface IUserCritterAccess {
