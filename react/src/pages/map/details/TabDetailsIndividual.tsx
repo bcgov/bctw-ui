@@ -32,7 +32,6 @@ export default function TabIndividual(props: TabPanelIndividualSelected): JSX.El
         <Box p={3} className={'details-single'}>
           <ShowGeometryIndividual point={geometry as GeoJSON.Point} />
           <Table>
-            {/* <TableHead> </TableHead> */}
             <TableBody>
               {Object.keys(properties)
                 .filter((a) => display.includes(a))

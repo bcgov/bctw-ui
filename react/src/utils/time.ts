@@ -12,6 +12,9 @@ const dateObjectToTimeStr = (d: Date): string => {
   const djs = dayjs(d);
   return djs.isValid() ? djs.format(formatTime) : 'never';
 } 
+const formatDateStr = (s:string): string => {
+  return dayjs(s).format(formatTime);
+}
 
 export {
   asLocalTime,
@@ -22,4 +25,5 @@ export {
   getNow,
   getToday,
   isDayjs,
+  formatDateStr,
 }

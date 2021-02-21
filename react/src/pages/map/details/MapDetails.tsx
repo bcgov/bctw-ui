@@ -22,10 +22,12 @@ export default function MapDetails({ selected }: MapDetailsProps): JSX.Element {
     <div className={'side-panel'}>
       <h1 className={'side-panel-title'}>Selected Telemetry</h1>
       <div className={'results-container'} id='collar-list'>
-        <Tabs className='tab-header' value={false} onChange={handleSelectTab}>
-          <Tab disabled={!selected.length} label='Animal' />
-          <Tab disabled={!selected.length} label='Collar' />
-        </Tabs>
+        {selected.length <= 1 ? (
+          <Tabs className='tab-header' value={false} onChange={handleSelectTab}>
+            <Tab disabled={!selected.length} label='Animal' />
+            <Tab disabled={!selected.length} label='Collar' />
+          </Tabs>
+        ) : null}
         <div className={'results-title'}>
           Points Selected - <span>({selected.length})</span>
         </div>
