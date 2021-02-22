@@ -6,6 +6,7 @@ import Table from 'components/table/Table';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { CollarStrings as S } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import EditCollar from 'pages/data/collars/EditCollar';
@@ -111,19 +112,22 @@ export default function CollarPage(props: PageProp): JSX.Element {
         message={createDeleteMessage()}
         title={`Deleting ${editObj.collar_make} collar ${editObj.device_id}`}
       />
-      <Table
-        headers={assignedCollarProps}
-        title={S.assignedCollarsTableTitle}
-        queryProps={{...tableProps, param: eCollarAssignedStatus.Assigned}}
-        onSelect={handleSelect}
-      />
-      <Table
-        headers={availableCollarProps}
-        title={S.availableCollarsTableTitle}
-        queryProps={{...tableProps, param: eCollarAssignedStatus.Available}}
-        onSelect={handleSelect}
-      />
-
+      <RowSelectedProvider>
+        <>
+          <Table
+            headers={assignedCollarProps}
+            title={S.assignedCollarsTableTitle}
+            queryProps={{...tableProps, param: eCollarAssignedStatus.Assigned}}
+            onSelect={handleSelect}
+          />
+          <Table
+            headers={availableCollarProps}
+            title={S.availableCollarsTableTitle}
+            queryProps={{...tableProps, param: eCollarAssignedStatus.Available}}
+            onSelect={handleSelect}
+          />
+        </>
+      </RowSelectedProvider>
       <div className='button-row'>
         <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
         <AddEditViewer<Collar> editing={editObj} empty={new Collar()} onDelete={handleShowDeleteModal}>

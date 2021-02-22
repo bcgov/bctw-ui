@@ -4,6 +4,7 @@ import { PageProp } from 'components/component_interfaces';
 import Table from 'components/table/Table';
 import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
@@ -85,18 +86,22 @@ export default function CritterPage(props: PageProp): JSX.Element {
 
   return (
     <div className='container'>
-      <Table
-        headers={assignedCritterProps}
-        title={CS.assignedTableTitle}
-        queryProps={{ query: bctwApi.useAssignedCritters, onNewData }}
-        onSelect={handleSelect}
-      />
-      <Table
-        headers={unassignedCritterProps}
-        title={CS.unassignedTableTitle}
-        queryProps={{ query: bctwApi.useUnassignedCritters, onNewData }}
-        onSelect={handleSelect}
-      />
+      <RowSelectedProvider>
+        <>
+          <Table
+            headers={assignedCritterProps}
+            title={CS.assignedTableTitle}
+            queryProps={{ query: bctwApi.useAssignedCritters, onNewData }}
+            onSelect={handleSelect}
+          />
+          <Table
+            headers={unassignedCritterProps}
+            title={CS.unassignedTableTitle}
+            queryProps={{ query: bctwApi.useUnassignedCritters, onNewData }}
+            onSelect={handleSelect}
+          />
+        </>
+      </RowSelectedProvider>
       <div className='button-row'>
         <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
         <ModifyCritterWrapper editing={editObj} onDelete={deleteCritter}>

@@ -4,9 +4,8 @@ import { useContext, createContext, useState, useEffect } from 'react';
 export const ApiResponseContext = createContext<INotificationMessage>(null);
 export const ApiResponseDispatch = createContext(null);
 
-type ResponseProviderProps = { children: React.ReactNode };
-
-const ResponseProvider = ({ children }: ResponseProviderProps): JSX.Element => {
+const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => {
+  const { children } = props;
   const [state, dispatch] = useState<INotificationMessage>(null);
 
   const clearNotif = (): void => dispatch(null);

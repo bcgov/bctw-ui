@@ -24,6 +24,7 @@ import { ICustomTableColumn, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
 import { BCTW } from 'types/common_types';
+import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -69,6 +70,8 @@ export default function Table<T extends BCTW>({
   paginate = true,
   isMultiSelect = false
 }: ITableProps<T>): JSX.Element {
+  const dispatchRowSelected = useTableRowSelectedDispatch();
+  const useRowState = useTableRowSelectedState();
   const classes = useStyles();
   const { query, param, onNewData, defaultSort } = queryProps;
 
@@ -87,6 +90,15 @@ export default function Table<T extends BCTW>({
       onNewData(results);
     }
   };
+
+  useEffect(() => {
+    if (useRowState && data.length) {
+      const found = data.findIndex(p => p[rowIdentifier] === useRowState);
+      if (found === -1) {
+        setSelected([])
+      }
+    }
+  }, [useRowState])
 
   const {
     isFetching,
@@ -132,6 +144,10 @@ export default function Table<T extends BCTW>({
     const selectedIndex = selected.indexOf(id);
     if (!isMultiSelect) {
       setSelected([id]);
+      // will be null unless parent component wraps RowSelectedProvider
+      if (typeof dispatchRowSelected === 'function') {
+        dispatchRowSelected(id);
+      }
       if (typeof onSelect === 'function' && data?.length) {
         const row = data.find((d) => d[rowIdentifier] === id);
         onSelect(row);

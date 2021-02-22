@@ -76,7 +76,7 @@ function Row(props: IRowProps ): JSX.Element {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell>Device <b>{row.device_id}</b></TableCell>
+        <TableCell>Device <b>{row.device_id}</b> frequency: <b>{row.radio_frequency}</b></TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -85,14 +85,16 @@ function Row(props: IRowProps ): JSX.Element {
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>Animal Status</strong></TableCell>
-                    <TableCell><strong>Date Recorded</strong></TableCell>
+                    <TableCell><strong>Animal ID</strong></TableCell>
+                    <TableCell><strong>Status</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow>
+                    <TableCell>{row.animal_id ?? 'unknown'}</TableCell>
                     <TableCell>{row.animal_status ?? 'unknown'}</TableCell>
-                    <TableCell align='right'>{formatDateStr((row as any).date_recorded)}</TableCell>
+                    {/* <TableCell align='right'>{formatDateStr((row as any).radio_frequency)}</TableCell> */}
+                    {/* <TableCell align='right'>{(row as any).radio_frequency}</TableCell> */}
                   </TableRow>
                 </TableBody>
               </Table>
