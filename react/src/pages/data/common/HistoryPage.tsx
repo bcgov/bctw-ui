@@ -7,9 +7,6 @@ export type IHistoryPageProps<T> = ITableQueryProps<T> & {
 
 export default function HistoryPage<T>(props: IHistoryPageProps<T>): JSX.Element {
   const { query, param, propsToDisplay } = props;
-  const handleSelect = (): void => {
-    // do nothing
-  };
 
   const defaultSort: ITableSortProp<T> = { property: 'valid_to' as keyof T, order: 'desc' }
   const tblProps = {
@@ -23,7 +20,6 @@ export default function HistoryPage<T>(props: IHistoryPageProps<T>): JSX.Element
   }
 
   return (
-    // fixme: need history table row identifier
-    <Table headers={propsToDisplay} queryProps={tblProps} onSelect={handleSelect} /*rowIdentifier='transaction_id' *//>
+    <Table headers={propsToDisplay} queryProps={tblProps}/>
   );
 }

@@ -1,7 +1,5 @@
 import {
-  createStyles,
   Checkbox,
-  makeStyles,
   TableCell,
   TableHead as MuiTableHead,
   TableRow,
@@ -12,24 +10,7 @@ import { BCTW } from 'types/common_types';
 import { columnToHeader } from 'utils/common';
 import { ITableHeadProps } from './table_interfaces';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    visuallyHidden: {
-      border: 0,
-      clip: 'rect(0 0 0 0)',
-      height: 1,
-      margin: -1,
-      overflow: 'hidden',
-      padding: 0,
-      position: 'absolute',
-      top: 20,
-      width: 1
-    }
-  })
-);
-
 export default function TableHead<T extends BCTW>(props: ITableHeadProps<T>): JSX.Element {
-  const classes = useStyles();
   const {
     customHeaders,
     order,
@@ -79,7 +60,7 @@ export default function TableHead<T extends BCTW>(props: ITableHeadProps<T>): JS
                 onClick={createSortHandler(headCell.id)}>
                 <strong>{formatHeader(headCell.label)}</strong>
                 {orderBy === headCell.id ? (
-                  <span className={classes.visuallyHidden}>
+                  <span className={'visuallyHidden'}>
                     {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                   </span>
                 ) : null}

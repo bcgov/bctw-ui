@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import {
-  makeStyles,
-  createStyles,
   Table as MuiTable,
   TableBody,
   TableCell,
   TableContainer,
   TableRow,
-  Theme,
   Toolbar,
   Typography,
   Paper,
@@ -25,40 +22,7 @@ import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
 import { BCTW } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%'
-    },
-    table: {
-      minWidth: 650
-    },
-    paper: {
-      width: '100%',
-      marginBottom: theme.spacing(2)
-    },
-    toolbar: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1),
-      color: theme.palette.text.primary
-    },
-    title: {
-      flex: '1 1 100%'
-    },
-    visuallyHidden: {
-      border: 0,
-      clip: 'rect(0 0 0 0)',
-      height: 1,
-      margin: -1,
-      overflow: 'hidden',
-      padding: 0,
-      position: 'absolute',
-      top: 20,
-      width: 1
-    }
-  })
-);
+import './table.scss';
 
 export default function Table<T extends BCTW>({
   customColumns,
@@ -72,7 +36,6 @@ export default function Table<T extends BCTW>({
 }: ITableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
-  const classes = useStyles();
   const { query, param, onNewData, defaultSort } = queryProps;
 
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
@@ -141,19 +104,25 @@ export default function Table<T extends BCTW>({
   };
 
   const handleClickRow = (event: React.MouseEvent<unknown>, id: string): void => {
-    const selectedIndex = selected.indexOf(id);
-    if (!isMultiSelect) {
-      setSelected([id]);
-      // will be null unless parent component wraps RowSelectedProvider
-      if (typeof dispatchRowSelected === 'function') {
-        dispatchRowSelected(id);
-      }
-      if (typeof onSelect === 'function' && data?.length) {
-        const row = data.find((d) => d[rowIdentifier] === id);
-        onSelect(row);
-      }
-      return;
+    if (isMultiSelect && typeof onSelectMultiple === 'function') {
+      handleClickRowMultiEnabled(event, id)
     }
+    if (typeof onSelect === 'function' && data?.length) {
+      setSelected([id]);
+      const row = data.find((d) => d[rowIdentifier] === id);
+      onSelect(row);
+    }
+    // will be null unless parent component wraps RowSelectedProvider
+    if (typeof dispatchRowSelected === 'function') {
+      dispatchRowSelected(id);
+    }
+  };
+
+  const handleClickRowMultiEnabled = (event: React.MouseEvent<unknown>, id: string): void => {
+    if (typeof onSelectMultiple !== 'function') {
+      return
+    }
+    const selectedIndex = selected.indexOf(id);
     let newSelected = [];
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
@@ -165,11 +134,9 @@ export default function Table<T extends BCTW>({
       newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
     setSelected(newSelected);
-    if (typeof onSelectMultiple === 'function') {
-      // currently sending T[] not just ids
-      onSelectMultiple(data.filter((d) => newSelected.includes(d[rowIdentifier])));
-    }
-  };
+    // currently sending T[] not just ids
+    onSelectMultiple(data.filter((d) => newSelected.includes(d[rowIdentifier])));
+  }
 
   const isSelected = (id: string): boolean => {
     return selected.indexOf(id) !== -1;
@@ -204,8 +171,8 @@ export default function Table<T extends BCTW>({
     isMultiSelect ? (
       <TableToolbar numSelected={selected.length} title={title} />
     ) : (
-      <Toolbar className={classes.toolbar}>
-        <Typography className={classes.title} variant='h6' component='div'>
+      <Toolbar className={'toolbar'}>
+        <Typography className={'title'} variant='h6' component='div'>
           <strong>{title}</strong>
         </Typography>
       </Toolbar>
@@ -213,11 +180,11 @@ export default function Table<T extends BCTW>({
 
   const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
   return (
-    <div className={classes.root}>
-      <Paper className={classes.paper}>
+    <div className={'root'}>
+      <Paper className={'paper'}>
         {renderToolbar()}
         <TableContainer component={Paper}>
-          <MuiTable className={classes.table} size='small'>
+          <MuiTable className={'table'} size='small'>
             {data === undefined ? null : (
               <TableHead
                 headersToDisplay={headerProps}

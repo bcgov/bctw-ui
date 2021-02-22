@@ -86,7 +86,6 @@ export default function UserProfile(): JSX.Element {
         headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'collar_make', 'permission_type']}
         title='Animals you have access to:'
         queryProps={tableProps}
-        onSelect={null}
       />
       <Typography variant='h5'>Swap User</Typography>
       <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography>

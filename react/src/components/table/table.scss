@@ -1,0 +1,29 @@
+
+.root {
+  width: 100%;
+}
+.table {
+  min-width: 650px;
+}
+.paper {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.toolbar {
+  padding-left: 2px;
+  padding-right: 1px;
+}
+.title {
+  flex: 1 1 100%;
+}
+.visuallyHidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1;
+  margin: -1;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  top: 20;
+  width: 1;
+}

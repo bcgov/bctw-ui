@@ -19,10 +19,6 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
 
-  const handleSelect = (): void => {
-    // no current interactions with selecting assignment history rows
-  };
-
   const onNewData = (d: CollarHistory[]): void => {
     setCollarHistory(d);
   };
@@ -43,7 +39,6 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
         headers={['device_id', 'collar_make', 'valid_from', 'valid_to']}
         queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
         paginate={history?.length >= 10}
-        onSelect={handleSelect}
       />
       <PerformAssignmentAction collarId={history.length ? history[0].collar_id : ''} hasCollar={hasCollar} {...props} />
     </>
