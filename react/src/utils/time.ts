@@ -16,6 +16,19 @@ const formatDateStr = (s:string): string => {
   return dayjs(s).format(formatTime);
 }
 
+const formatWithUTCOffset = (d: Date):string => {
+  const djs = dayjs(d);
+  const offset = djs.format('ZZ');
+  let tz = '';
+  if (offset.includes('-0800')) {
+    tz = 'PST';
+  }
+  else if (offset.includes('-0700')) {
+    tz = 'PDT';
+  }
+  return `${djs.format('YYYY-MM-DD H:mm:ss')} ${tz}`;
+} 
+
 export {
   asLocalTime,
   dateObjectToTimeStr,
@@ -26,4 +39,5 @@ export {
   getToday,
   isDayjs,
   formatDateStr,
+  formatWithUTCOffset,
 }

@@ -1,70 +1,65 @@
-import { ITelemetryDetails, ITelemetryFeature } from 'types/map';
-import { IconButton, TableRow, TableCell, TableBody, Table, Box, TableHead, Collapse, Typography, TableContainer, Paper } from '@material-ui/core';
-// import { formatTableCell } from 'components/table/table_helpers';
-// import { columnToHeader } from 'utils/common';
+import { ITelemetryDetail, ITelemetryFeature } from 'types/map';
+import {
+  IconButton,
+  TableRow,
+  TableCell,
+  TableBody,
+  Table,
+  Box,
+  TableHead,
+  Collapse,
+  TableContainer,
+  Paper
+} from '@material-ui/core';
 import { useState } from 'react';
-import { TabPanelBaseProps } from './TabDetailsIndividual';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { formatDateStr } from 'utils/time';
 
-type TabPanelMultipleSelected = TabPanelBaseProps & {
-  displayType: 'critter_id' | 'collar_id';
+type MapMultipleSelected = {
   features: ITelemetryFeature[];
 };
 
-export default function TabMultiple(props: TabPanelMultipleSelected): JSX.Element {
-  const { features, value, index, displayType } = props;
+export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Element {
+  const { features } = props;
 
   if (!features && features.length) {
     return null;
   }
-  const uniqueFeatures: ITelemetryDetails[] = [];
+  const uniqueFeatures: ITelemetryDetail[] = [];
   features.forEach((f) => {
-    const detail: ITelemetryDetails = f.properties;
-    const found = uniqueFeatures.find((c) => c[displayType] === detail[displayType]);
+    const detail: ITelemetryDetail = f.properties;
+    const found = uniqueFeatures.find((c) => c.critter_id === detail.critter_id);
     if (!found) {
       uniqueFeatures.push(detail);
     }
   });
   return (
-    <div
-      role='tabpanel'
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}>
-      {value === index && (
-        <Box p={3}>
-          {/* <ShowGeometryIndividual point={geometry as GeoJSON.Point} /> */}
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell />
-                  <TableCell><b>Device Details</b></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {
-                  uniqueFeatures.map((v) =>{
-                    return (
-                      <Row row={v} />
-                    )
-                  })
-                }
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      )}
-    </div>
+    <Box p={3}>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell />
+              <TableCell>
+                <b>Device Details</b>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {uniqueFeatures.map((v) => {
+              return <Row row={v} />;
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 }
 
 type IRowProps = {
-  row: ITelemetryDetails;
-}
-function Row(props: IRowProps ): JSX.Element {
+  row: ITelemetryDetail;
+};
+function Row(props: IRowProps): JSX.Element {
   const { row } = props;
   const [open, setOpen] = useState(false);
 
@@ -76,7 +71,9 @@ function Row(props: IRowProps ): JSX.Element {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell>Device <b>{row.device_id}</b> frequency: <b>{row.radio_frequency}</b></TableCell>
+        <TableCell>
+          Device <b>{row.device_id}</b> frequency: <b>{row.radio_frequency}</b>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -85,8 +82,12 @@ function Row(props: IRowProps ): JSX.Element {
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>Animal ID</strong></TableCell>
-                    <TableCell><strong>Status</strong></TableCell>
+                    <TableCell>
+                      <strong>Animal ID</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Status</strong>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -105,7 +106,6 @@ function Row(props: IRowProps ): JSX.Element {
     </>
   );
 }
-
 
 /* previous version with property in column 1 and value column 2 */
 // <Table>

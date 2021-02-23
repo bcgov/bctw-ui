@@ -17,21 +17,23 @@ export enum eNewCollarType {
 export interface ICollarBase {
   collar_id: string;
 }
-
-export interface ICollar extends ICollarBase, BCTW, BctwBaseType {
+export interface ICollarTelemetryBase extends ICollarBase {
+  radio_frequency: number;
+  satellite_network: string;
   device_id: number;
+}
+
+export interface ICollar extends ICollarTelemetryBase, BCTW, BctwBaseType {
   collar_make: string;
   collar_model: string;
   deployment_status: string;
   collar_status: string;
   collar_type: string;
   deactivated: boolean;
-  radio_frequency: number;
   malfunction_date: Date;
   max_transmission_date: Date;
   reg_key: string;
   retreival_date: Date;
-  satellite_network: string;
   animal_id?: string; // get collars includes this if collar attached
 }
 
