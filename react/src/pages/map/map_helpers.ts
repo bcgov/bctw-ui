@@ -1,14 +1,21 @@
 import * as L from 'leaflet';
+import { ITelemetryFeature } from 'types/map';
 // import dayjs from 'dayjs';
 // import { formatLocal } from 'utils/time';
+
+const isMortality = (feature: ITelemetryFeature): boolean => feature?.properties?.animal_status === 'Mortality';
+
+const COLORS = {
+  dead: '#ff0000',
+  normal: '#00ff44',
+  selected: '#6495ED'
+}
 
 const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventHandlerFn): void => {
   pings.options = {
     pointToLayer: (feature, latlng): L.Layer => {
       // Mortality is red
-      const s = feature.properties.animal_status;
-      const colour = s === 'Mortality' ? '#ff0000' : '#00ff44';
-
+      const colour = isMortality(feature) ? COLORS.dead : COLORS.normal;
       const pointStyle = {
         radius: 8,
         fillColor: colour,
@@ -23,23 +30,6 @@ const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventH
       marker.on('click', onClickPointHandler );
       return marker;
     }
-    // ,onEachFeature: (feature, layer): void => {
-    //   const p = feature.properties;
-    //   const g = feature.geometry as any; // Yes... this exists!
-    //   const x = g.coordinates[0]?.toFixed(5);
-    //   const y = g.coordinates[1]?.toFixed(5);
-    //   const t = dayjs(p.date_recorded).format(formatLocal);
-    //   const text = `
-    //     ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
-    //     <hr>
-    //     Device ID ${p.device_id} (${p.device_vendor}) <br>
-    //     ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
-    //     ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
-    //     ${t} <br>
-    //     ${x}, ${y}
-    //   `;
-    //   layer.bindPopup(text).addEventListener('popupopen', onClickPointHandler);
-    // }
   };
 };
 
@@ -81,4 +71,4 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
 };
 
-export { setupPingOptions, setupSelectedPings, addTileLayers };
+export { setupPingOptions, setupSelectedPings, addTileLayers, isMortality, COLORS };

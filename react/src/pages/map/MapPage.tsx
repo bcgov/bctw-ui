@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import CreateMapSidebar from 'pages/map/CreateMapSidebar';
-import { addTileLayers, setupPingOptions, setupSelectedPings } from 'pages/map/map_helpers';
+import { addTileLayers, COLORS, isMortality, setupPingOptions, setupSelectedPings } from 'pages/map/map_helpers';
 import MapDetails from 'pages/map/details/MapDetails';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
@@ -31,6 +31,8 @@ export default function MapPage(props: PageProp): JSX.Element {
   const [end, setEnd] = useState<string>(getToday());
 
   const [selectedCollars, setSelectedCollars] = useState<ITelemetryFeature[]>([]);
+  // fixme: ^ selectedCollars state not available in click handler??
+  let previousLayer = null;
 
   const drawnItems = new L.FeatureGroup(); // Store the selection shapes
 
@@ -55,8 +57,17 @@ export default function MapPage(props: PageProp): JSX.Element {
   }, [pingsData]);
 
   const handleMapPointClick = (event: L.LeafletEvent): void => {
-    // console.log(event);
-    const feature: ITelemetryFeature = event?.target?.feature;
+    const layer = event.target;
+    const feature: ITelemetryFeature = layer?.feature;
+    // remove the highlight from the previous layer
+    if (previousLayer && previousLayer.feature?.id !== feature.id) {
+      previousLayer.setStyle({
+        weight: 1.0,
+        fillColor: isMortality(previousLayer.feature) ? COLORS.dead : COLORS.normal
+      });
+    }
+    layer.setStyle({ weight: 3.0, fillColor: COLORS.selected });
+    previousLayer = layer;
     setSelectedCollars([feature]);
   };
 
@@ -68,15 +79,6 @@ export default function MapPage(props: PageProp): JSX.Element {
   //
   const displaySelectedUnits = (overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>): void => {
     const features = overlay.features;
-    // const selectedDeviceIds = features
-    //   .map((f) => f.properties.device_id)
-    //   .reduce((total, f) => {
-    //     if (total.indexOf(f) >= 0) {
-    //       return total;
-    //     } else {
-    //       return total.concat(f);
-    //     }
-    //   }, []);
     setSelectedCollars(features as any[]);
   };
 
