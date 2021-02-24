@@ -40,7 +40,7 @@ interface ICollarLinkPayload {
   data: {
     animal_id: string,
     collar_id: string,
-    valid_from: Date | string,
+    valid_from?: Date | string,
     valid_to?: Date | string
   }
 }
