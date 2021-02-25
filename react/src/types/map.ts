@@ -8,8 +8,8 @@ import { BCTW } from './common_types';
 
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   critter_id: string;
-  critter_transaction_id: string;
-  collar_transaction_id: string;
+  // critter_transaction_id: string;
+  // collar_transaction_id: string;
   date_recorded: Date;
   device_vendor: string;
 }
@@ -29,23 +29,21 @@ interface ITelemetryFeatureCollection extends GeoJSON.FeatureCollection {
   features: ITelemetryFeature[];
 }
 
-// todo: collar status, wlh_id, management_unit
+// represents the jsonb built object in the database get_telemetry call
 export class TelemetryDetail implements BCTW, ITelemetryDetail {
-  critter_id: string;
-  critter_transaction_id: string;
   collar_id: string;
-  collar_transaction_id: string;
-  device_id: number;
-  @Type(() => Date) date_recorded: Date;
-  device_vendor: string;
-  radio_frequency: number;
-  satellite_network: string;
+  critter_id: string;
   species: string;
   wlh_id: string;
   animal_id: string;
+  device_id: number;
+  device_vendor: string;
+  radio_frequency: number;
   animal_status: string;
+  collar_status: string;
   population_unit: string;
   management_area: string;
+  @Type(() => Date) date_recorded: Date;
   @Expose() get formattedDevice(): string { return `${this.device_id} (${this.device_vendor}) `}
   @Expose() get formattedDate(): string { return formatWithUTCOffset(this.date_recorded)}
 

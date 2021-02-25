@@ -47,7 +47,7 @@ export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Elem
           </TableHead>
           <TableBody>
             {uniqueFeatures.map((v) => {
-              return <Row row={v} />;
+              return <Row key={v.collar_id} row={v} />;
             })}
           </TableBody>
         </Table>

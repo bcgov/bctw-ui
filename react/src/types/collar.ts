@@ -19,7 +19,8 @@ export interface ICollarBase {
 }
 export interface ICollarTelemetryBase extends ICollarBase {
   radio_frequency: number;
-  satellite_network: string;
+  // satellite_network: string;
+  collar_status;
   device_id: number;
 }
 
