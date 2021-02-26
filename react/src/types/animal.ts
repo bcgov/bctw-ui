@@ -1,11 +1,20 @@
 import { columnToHeader } from 'utils/common';
 import { BCTW, BctwBaseType } from 'types/common_types';
-import { Type, Expose } from 'class-transformer';
+import { Type, Expose, Transform } from 'class-transformer';
 import { eCritterPermission } from './user';
+import { evaluateBoolean } from './common_helpers';
 
-export const assignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
-export const unassignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status'];
-export const critterHistoryProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'calf_at_heel', 'region', 'population_unit', 'valid_from', 'valid_to'];
+const _baseProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status'];
+export const assignedCritterProps = [..._baseProps, 'device_id'];
+export const unassignedCritterProps = [..._baseProps, 'population_unit'];
+export const critterHistoryProps = [
+  ..._baseProps,
+  'calf_at_heel',
+  'region',
+  'population_unit',
+  'valid_from',
+  'valid_to'
+];
 
 // properties re-used in Telemetry
 export interface IAnimalTelemetryBase {
@@ -53,6 +62,17 @@ export class Animal implements IAnimal {
   transaction_id: string;
   animal_id: string;
   animal_status: string;
+  /* 
+    fixme: not sure this is working properly,
+    destructuring obj like in the example leads to undefined??
+  */
+  @Type(() => Boolean)
+  @Transform(
+    (value, obj) => {
+      return evaluateBoolean(obj.calf_at_heel);
+    },
+    { toClassOnly: true }
+  )
   calf_at_heel: boolean;
   capture_date_day: number;
   capture_date_year: number;
@@ -74,18 +94,22 @@ export class Animal implements IAnimal {
   re_capture: boolean;
   region: string;
   regional_contact: string;
-  @Type(() => Date)release_date: Date;
+  @Type(() => Date) release_date: Date;
   sex: string;
   species: string;
   trans_location: boolean;
   wlh_id: string;
   nickname: string;
-  @Type(() => Date)valid_from: Date;
-  @Type(() => Date)valid_to: Date;
+  @Type(() => Date) valid_from: Date;
+  @Type(() => Date) valid_to: Date;
   permission_type: eCritterPermission;
   device_id?: number;
-  @Expose() get identifier(): string { return 'id' }
-  @Expose() get name(): string { return this.nickname ?? this.wlh_id ?? this.animal_id }
+  @Expose() get identifier(): string {
+    return 'id';
+  }
+  @Expose() get name(): string {
+    return this.nickname ?? this.wlh_id ?? this.animal_id;
+  }
 
   constructor() {
     this.animal_id = '';
@@ -112,5 +136,5 @@ export class Animal implements IAnimal {
 
 export const isAnimal = (a: unknown): a is Animal => {
   const critter = a as Animal;
-  return !!(critter.id);
-}
+  return !!critter.id;
+};

@@ -46,7 +46,7 @@ export class Collar implements ICollar {
   deployment_status: string;
   collar_status: string;
   collar_type: string;
-  deactivated: boolean;
+  @Type(() => Boolean) deactivated: boolean;
   radio_frequency: number;
   @Type(() => Date) malfunction_date: Date;
   @Type(() => Date) max_transmission_date: Date;
@@ -89,20 +89,15 @@ export class Collar implements ICollar {
 }
 
 // properties displayed on collar pages
-const availableCollarProps = [
+const collarPropsToDisplay = [
   'device_id',
-  'collar_status',
-  // fixme: should retrieve this from last_pings?
-  // 'max_transmission_date', 
-  'radio_frequency',
-  'collar_type',
   'collar_make',
-  'collar_model',
+  'collar_status',
+  'radio_frequency',
+  'max_transmission_date', 
 ];
 
-// fixme: hide this for now as uuid not useful to user
-// const assignedCollarProps = ['animal_id', ...availableCollarProps];
-const assignedCollarProps = availableCollarProps;
+const attachedCollarProps = ['(WLH_ID/Animal ID)', ...collarPropsToDisplay];
 
 const isCollar = (c: unknown): c is Collar => {
   const collar = c as Collar;
@@ -110,7 +105,7 @@ const isCollar = (c: unknown): c is Collar => {
 };
 
 export {
-  assignedCollarProps,
-  availableCollarProps,
+  attachedCollarProps,
+  collarPropsToDisplay,
   isCollar,
 };

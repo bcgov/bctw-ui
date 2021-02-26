@@ -11,6 +11,8 @@ import GpsFixed from '@material-ui/icons/GpsFixed';
 import BarChart from '@material-ui/icons/BarChart';
 import PersonIcon from '@material-ui/icons/Person';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import DoneIcon from '@material-ui/icons/Done';
+import CloseIcon from '@material-ui/icons/Close';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -26,6 +28,8 @@ const mappings: Record<string, JSX.Element> = {
   'arrow-down': <ArrowDownward />,
   profile: <PersonIcon />,
   admin: <SupervisorAccountIcon />,
+  done: <DoneIcon />,
+  close: <CloseIcon />
 };
 
 type IconProps = {

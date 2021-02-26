@@ -9,7 +9,10 @@ export const critterApi = (props: ApiProps) => {
   const { api, testUser } = props;
 
   const _GET_CRITTER_API = 'get-animals';
-  const _handleGetResults = (data: IAnimal[]): Animal[] => data.map((json: IAnimal) => plainToClass(Animal, json));
+  const _handleGetResults = (data: IAnimal[]): Animal[] => {
+    const results = data.map((json: IAnimal) => plainToClass(Animal, json));
+    return results;
+  }
 
   const getCritters = async (page = 1, critterType: eCritterFetchType): Promise<Animal[]> => {
     const url = createUrl({ api: _GET_CRITTER_API, query: `critterType=${critterType}`, page, testUser });

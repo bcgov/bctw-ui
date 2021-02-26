@@ -7,16 +7,16 @@ const CritterStrings = {
   requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
   collarAssignmentTitle: 'Assign a collar',
   assignCollarBtnText: 'assign selected collar',
-  assignedTableTitle: 'Assigned Animals',
-  unassignedTableTitle: 'Unassigned Animals',
+  assignedTableTitle: 'Animals Attached To A Collar',
+  unassignedTableTitle: 'Animals Without A Collar',
   collarRemovalTitle: 'Confirm collar unassignment',
   collarRemovalText: 'Are you sure you wish to unassign this collar?',
 
 }
 
 const CollarStrings = {
-  assignedCollarsTableTitle: 'Assigned Collars',
-  availableCollarsTableTitle: 'Unassigned Collars',
+  assignedCollarsTableTitle: 'Attached Collars',
+  availableCollarsTableTitle: 'Unattached Collars',
   editableProps: ['device_id', 'radio_frequency', 'collar_make', 'collar_model', 'satellite_network', 'collar_status', 'collar_type'],
   selectableProps: ['collar_make', 'satellite_network', 'collar_status', 'collar_type'],
   requiredProps: ['device_id', 'collar_make', 'radio_frequency'],

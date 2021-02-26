@@ -1,6 +1,8 @@
 import { getProperty } from 'utils/common';
 import { Order, HeadCell } from 'components/table/table_interfaces';
 import { dateObjectToTimeStr } from 'utils/time';
+import { Icon } from 'components/common';
+import { countDecimals } from 'types/common_helpers';
 
 /**
  * converts an object to a list of HeadCells
@@ -63,14 +65,24 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
 
 interface ICellFormat {
   align: 'inherit' | 'left' | 'center' | 'right' | 'justify';
-  value: string | number;
+  value: string | number | any;
 }
+/**
+ * 
+ * @param obj object being displayed
+ * @param key the property to render in this table cell
+ */
+
 function formatTableCell<T>(obj: T, key: string): ICellFormat {
   const value = obj[key];
+  if (typeof value === 'boolean') {
+    return {align: 'center', value: <Icon icon={value ? 'done' : 'close'}/> }
+  }
   if (typeof value?.getMonth === 'function') {
     return { align: 'right', value: dateObjectToTimeStr(value) };
   } else if (typeof value === 'number') {
-    return { align: 'right', value };
+    const formatted = countDecimals(value) > 2 ? value.toFixed(2) : value;
+    return { align: 'right', value: formatted };
   } else if (typeof value === 'string') {
     return { align: 'center', value };
   }
