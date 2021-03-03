@@ -112,7 +112,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                 </>
               </form>
               {/* dont show assignment history for new critters */}
-              {isEdit ? <AssignmentHistory animalId={editing.id} canEdit={canEdit} {...props} /> : null}
+              {isEdit ? <AssignmentHistory animalId={editing.critter_id} canEdit={canEdit} {...props} /> : null}
             </>
           );
         }}

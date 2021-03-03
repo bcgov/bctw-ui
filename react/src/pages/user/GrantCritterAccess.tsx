@@ -56,7 +56,7 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
     const updateRows = (): void => {
       setAccessTypes((prevState) => {
         return prevState.map((c) => {
-          return { id: c.id, permission_type: tableHeaderCritterSelectOption as eCritterPermission };
+          return { critter_id: c.critter_id, permission_type: tableHeaderCritterSelectOption as eCritterPermission };
         });
       });
     };
@@ -70,8 +70,8 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
   const handleSave = async (): Promise<void> => {
     // get the permission type state for each selected
     const access: IUserCritterAccessInput[] = critters.map((c) => {
-      const permission_type = accessTypes.find((a) => a.id === c.id).permission_type;
-      return { id: c.id, permission_type };
+      const permission_type = accessTypes.find((a) => a.critter_id === c.critter_id).permission_type;
+      return { critter_id: c.critter_id, permission_type };
     });
     const data: IUserCritterPermissionInput[] = [users].map((i) => {
       return {
@@ -92,12 +92,12 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
   // callback for when the table query finishes
   // update the accesTypes state
   const handleDataLoaded = (rows: UserCritterAccess[]): void => {
-    const m = rows.map((r) => ({ id: r.id, permission_type: r.permission_type as eCritterPermission }));
+    const m = rows.map((r) => ({ critter_id: r.critter_id, permission_type: r.permission_type as eCritterPermission }));
     setAccessTypes((o) => {
       // preserve permission selections across pages.
       const copy = [...o];
       m.forEach((item) => {
-        const idx = copy.findIndex((c) => c.id === item.id);
+        const idx = copy.findIndex((c) => c.critter_id === item.critter_id);
         if (idx === -1) {
           copy.push(item);
           return;
@@ -117,14 +117,16 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
   // a custom table body component rendered for each data row
   const newColumn = (row: UserCritterAccess, idx: number): JSX.Element => {
     const perm =
-      accessTypes.find((cp) => cp.id === row.id)?.permission_type ?? row?.permission_type ?? eCritterPermission.view;
+      accessTypes.find((cp) => cp.critter_id === row.critter_id)?.permission_type ??
+      row?.permission_type ??
+      eCritterPermission.view;
     return (
       <Select
         value={perm}
         onChange={(v: React.ChangeEvent<{ value: unknown }>): void => {
           const permission = v.target.value as eCritterPermission;
           setAccessTypes((prevState) => {
-            const idx = prevState.findIndex((c) => c.id === row.id);
+            const idx = prevState.findIndex((c) => c.critter_id === row.critter_id);
             const cp = Object.assign([], prevState);
             cp[idx].permission_type = permission;
             return cp;

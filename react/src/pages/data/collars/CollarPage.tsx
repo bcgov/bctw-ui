@@ -110,7 +110,7 @@ export default function CollarPage(props: PageProp): JSX.Element {
         handleClose={(): void => setShowConfirmDelete(false)}
         open={showConfirmDelete}
         message={createDeleteMessage()}
-        title={`Deleting ${editObj.collar_make} collar ${editObj.device_id}`}
+        title={`Deleting ${editObj.device_make} collar ${editObj.device_id}`}
       />
       <RowSelectedProvider>
         <>

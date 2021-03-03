@@ -50,11 +50,11 @@ export default function CritterPage(props: PageProp): JSX.Element {
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDelete, onError });
 
   // critter properties that are displayed as select inputs
-  const selectableProps = CS.editableProps.slice(3, 7);
+  const selectableProps = CS.editableProps.slice(3);
 
   const handleSelect = (row: Animal): void => {
     setEditObj(row);
-    props.setSidebarContent(<p>critter id: {row.id}</p>);
+    props.setSidebarContent(<p>critter id: {row.critter_id}</p>);
   };
 
   const saveCritter = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await saveMutation(a);

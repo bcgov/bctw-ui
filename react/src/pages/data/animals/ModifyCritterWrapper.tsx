@@ -35,7 +35,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   }
 
   const handleConfirmDelete = (): void => {
-    onDelete(editing.id);
+    onDelete(editing.critter_id);
     setShow(false);
   }
 

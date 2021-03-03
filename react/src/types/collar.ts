@@ -18,41 +18,57 @@ export interface ICollarBase {
   collar_id: string;
 }
 export interface ICollarTelemetryBase extends ICollarBase {
-  radio_frequency: number;
+  frequency: number;
   // satellite_network: string;
-  collar_status;
+  device_status;
   device_id: number;
 }
 
 export interface ICollar extends ICollarTelemetryBase, BCTW, BctwBaseType {
-  collar_make: string;
-  collar_model: string;
-  deployment_status: string;
-  collar_status: string;
-  collar_type: string;
-  deactivated: boolean;
+  collar_transaction_id: string;
+  device_deployment_status: string;
+  device_make: string;
+  device_malfunction_type: Date;
+  device_model: string;
+  device_status: string;
+  device_type: string;
+  fix_rate: number;
+  fix_success_rate: number;
+  frequency: number;
+  frequency_unit_code: string;
   malfunction_date: Date;
-  max_transmission_date: Date;
-  reg_key: string;
-  retreival_date: Date;
+  retrieval_date: Date;
+  retrieved: boolean;
+  satellite_network: string;
+  vendor_activation_status: boolean;
+  sensor_mortality?: boolean;
+  sensor_battery?: boolean;
+  // max_transmission_date: Date;
   animal_id?: string; // get collars includes this if collar attached
 }
 
 export class Collar implements ICollar {
   collar_id: string;
+  collar_transaction_id: string;
   device_id: number;
-  collar_make: string;
-  collar_model: string;
-  deployment_status: string;
-  collar_status: string;
-  collar_type: string;
-  deactivated: boolean;
-  radio_frequency: number;
+  device_deployment_status: string;
+  device_make: string;
+  device_malfunction_type: Date;
+  device_model: string;
+  device_status: string;
+  device_type: string;
+  fix_rate: number;
+  fix_success_rate: number;
+  frequency: number;
+  frequency_unit_code: string;
   @Type(() => Date) malfunction_date: Date;
-  @Type(() => Date) max_transmission_date: Date;
-  reg_key: string;
-  @Type(() => Date) retreival_date: Date;
+  @Type(() => Date) retrieval_date: Date;
+  retrieved: boolean;
   satellite_network: string;
+  vendor_activation_status: boolean;
+  sensor_mortality?: boolean;
+  sensor_battery?: boolean;
+  // @Type(() => Date) max_transmission_date: Date;
   animal_id?: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
@@ -62,15 +78,15 @@ export class Collar implements ICollar {
     if (collar_type) {
       switch(collar_type) {
         case eNewCollarType.VHF:
-          this.collar_make = 'ATS';
-          this.collar_type = 'VHF';
+          this.device_make = 'ATS';
+          this.device_type = 'VHF';
           return;
         case eNewCollarType.Vect:
-          this.collar_type = 'VHF + GPS';
+          this.device_type = 'VHF + GPS';
           return;
       }
     }
-    this.radio_frequency = 0;
+    this.frequency = 0;
     this.device_id = 0;
   }
 
@@ -82,6 +98,11 @@ export class Collar implements ICollar {
         return 'Individual ID';
       case 'max_transmission_date':
         return 'Last Update';
+      case 'device_deployment_status':
+      case 'device_type':
+      case 'device_make':
+      case 'device_model':
+        return columnToHeader(str.replace('device_', ''));
       default:
         return columnToHeader(str);
     }
@@ -91,13 +112,12 @@ export class Collar implements ICollar {
 // properties displayed on collar pages
 const availableCollarProps = [
   'device_id',
-  'collar_status',
-  // fixme: should retrieve this from last_pings?
+  'device_status',
   // 'max_transmission_date', 
-  'radio_frequency',
-  'collar_type',
-  'collar_make',
-  'collar_model',
+  'frequency',
+  'device_type',
+  'device_make',
+  'device_model',
 ];
 
 // fixme: hide this for now as uuid not useful to user

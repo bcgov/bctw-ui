@@ -83,7 +83,7 @@ export default function UserProfile(): JSX.Element {
         />
       </div>
       <Table
-        headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'collar_make', 'permission_type']}
+        headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'device_make', 'permission_type']}
         title='Animals you have access to:'
         queryProps={tableProps}
       />

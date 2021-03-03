@@ -13,15 +13,6 @@ export interface ICollarHistory extends ICollarBase, BCTW {
   valid_to: Date;
 }
 
-export const collarHistoryProps = [
-  'device_id',
-  'collar_status',
-  'max_transmission_date',
-  'radio_frequency',
-  'valid_from',
-  'valid_to'
-];
-
 export class CollarHistory implements ICollarHistory {
   collar_id: string;
   assignment_id: string;

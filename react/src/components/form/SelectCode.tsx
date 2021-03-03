@@ -38,11 +38,21 @@ export default function SelectCode<T>(props: ISelectProps<T>): JSX.Element {
   const classes = useStyles();
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<T>(defaultValue);
+  const [codes, setCodes] = useState<ICode[]>([]);
 
   const propsToPass = removeProps(props, ['codeHeader', 'changeHandler']);
 
   // load this codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading } = bctwApi.useCodes(0, codeHeader);
+  const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useCodes(0, codeHeader);
+
+  useEffect(() => {
+    const updateOptions = (): void => {
+      if (data && data.length) {
+        setCodes(data);
+      }
+    };
+    updateOptions();
+  }, [isSuccess]);
 
   const handleChange = (event: React.ChangeEvent<{ value }>): void => {
     const v = event.target.value;
@@ -51,13 +61,15 @@ export default function SelectCode<T>(props: ISelectProps<T>): JSX.Element {
   };
 
   const reset = (): void => {
-    const nv = defaultValue ?? value; // ?? '' as any;
+    const nv = defaultValue ?? value;
     setValue(nv);
     pushChange(nv);
   };
 
+  // call the parent changeHandler
   const pushChange = (v: unknown): void => {
-    const ret = { [codeHeader]: v };
+    const code = codes.find(c => c.description === v)?.code ?? v;
+    const ret = { [codeHeader]: code };
     changeHandler(ret);
   };
 
@@ -71,11 +83,11 @@ export default function SelectCode<T>(props: ISelectProps<T>): JSX.Element {
         <NotificationMessage type='error' message={formatAxiosError(error)} />
       ) : isLoading || isFetching ? (
         <div>loading...</div>
-      ) : (
+      ) : codes && codes.length ? (
         <FormControl className={classes.formControl}>
-          <InputLabel id='select-label'>{data[0].code_header_title}</InputLabel>
+          <InputLabel id='select-label'>{codes[0]?.code_header_title}</InputLabel>
           <MuiSelect labelId='select-label' value={value} onChange={handleChange} {...propsToPass}>
-            {data?.map((c: ICode) => {
+            {codes.map((c: ICode) => {
               return (
                 <MenuItem key={c.id} value={c.description}>
                   {c.description}
@@ -84,7 +96,7 @@ export default function SelectCode<T>(props: ISelectProps<T>): JSX.Element {
             })}
           </MuiSelect>
         </FormControl>
-      )}
+      ): <div>unable to load dropdown</div>}
     </>
   );
 }

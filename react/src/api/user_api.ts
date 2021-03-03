@@ -34,12 +34,16 @@ export const userApi = (props: ApiProps) => {
     return { results, errors };
   };
 
-  const getUserCritterAccess = async (page: number, user: string, filterOutNone = false): Promise<UserCritterAccess[]> => {
+  const getUserCritterAccess = async (
+    page: number,
+    user: string,
+    filterOutNone = false
+  ): Promise<UserCritterAccess[]> => {
     const url = createUrl({ api: `get-critter-access/${user}`, page });
     // console.log(`retrieving critter access: ${url}`);
     const { data } = await api.get(url);
     const converted = data.map((json: IUserCritterAccess[]) => plainToClass(UserCritterAccess, json));
-    return filterOutNone ? converted.filter(d => d.permission_type !== eCritterPermission.none) : converted;
+    return filterOutNone ? converted.filter((d) => d.permission_type !== eCritterPermission.none) : converted;
   };
 
   return {

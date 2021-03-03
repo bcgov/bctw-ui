@@ -72,7 +72,7 @@ function Row(props: IRowProps): JSX.Element {
           </IconButton>
         </TableCell>
         <TableCell>
-          Device <b>{row.device_id}</b> frequency: <b>{row.radio_frequency}</b>
+          Device <b>{row.device_id}</b> frequency: <b>{row.frequency}</b>
         </TableCell>
       </TableRow>
       <TableRow>
@@ -106,28 +106,3 @@ function Row(props: IRowProps): JSX.Element {
     </>
   );
 }
-
-/* previous version with property in column 1 and value column 2 */
-// <Table>
-//   <TableHead>
-//     <TableRow>
-//       <TableCell><b>MetaData</b></TableCell>
-//       <TableCell><b>Individual</b></TableCell>
-//     </TableRow>
-//   </TableHead>
-//   <TableBody>
-//     {display.map((prop, idx) => {
-//       return (
-//         <TableRow key={`header-${prop}-${idx}`}>
-//           <TableCell>
-//             <strong>{columnToHeader(prop)}</strong>
-//           </TableCell>
-//           {uniqueFeatures.map((feature) => {
-//             const { value } = formatTableCell(feature, prop);
-//             return <TableCell key={`body-${prop}-${idx}`}>{value}</TableCell>;
-//           })}
-//         </TableRow>
-//       );
-//     })}
-//   </TableBody>
-// </Table>

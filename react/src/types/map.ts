@@ -38,11 +38,11 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   animal_id: string;
   device_id: number;
   device_vendor: string;
-  radio_frequency: number;
+  frequency: number;
   animal_status: string;
-  collar_status: string;
+  device_status: string;
   population_unit: string;
-  management_area: string;
+  location: string;
   @Type(() => Date) date_recorded: Date;
   @Expose() get formattedDevice(): string { return `${this.device_id} (${this.device_vendor}) `}
   @Expose() get formattedDate(): string { return formatWithUTCOffset(this.date_recorded)}

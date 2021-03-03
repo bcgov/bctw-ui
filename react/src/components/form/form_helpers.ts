@@ -8,9 +8,9 @@ export enum InputType {
   unknown = 'unknown'
 }
 
-const stringsThatAreBools = ['Y', 'N', 'true', 'false'];
+const stringsThatAreBools = ['true', 'false'];
 // some properties that should be stored as booleans in the db arent.
-const propsToRenderAsCheckbox = ['calf_at_heel'];
+const propsToRenderAsCheckbox = [];
 /**
  * @param obj the object being edited
  * @param editableProps object properties to be added as form inputs

@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Type, Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
 import { BCTW, BctwBaseType } from './common_types';
 
@@ -36,27 +36,28 @@ export class User implements IUser {
 }
 
 export interface IUserCritterAccessInput {
-  id: string;
+  critter_id: string;
   permission_type: eCritterPermission;
 }
 export interface IUserCritterAccess {
-  id: string
+  critter_id: string
   wlh_id: string;
   nickname: string;
   valid_from: Date
   valid_to: Date;
   device_id: number;
-  collar_make: string;
+  device_make: string;
   permission_type: eCritterPermission;
 }
 
 export class UserCritterAccess implements IUserCritterAccess {
-  id: string;
+  critter_id: string;
   wlh_id: string;
   nickname: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   device_id: number;
-  collar_make: string;
+  device_make: string;
   permission_type: eCritterPermission;
+  @Expose() get identifier(): string { return 'critter_id' }
 }

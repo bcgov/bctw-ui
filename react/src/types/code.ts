@@ -7,6 +7,7 @@ interface ICode {
   id: number;
   code: string;
   description: string;
+  long_description: string;
   code_header_title?: string;
 }
 

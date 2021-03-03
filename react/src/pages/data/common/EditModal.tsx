@@ -6,9 +6,9 @@ import ChangeContext from 'contexts/InputChangeContext';
 import React, { useEffect, useState } from 'react';
 import { Animal, critterHistoryProps } from 'types/animal';
 import { Collar } from 'types/collar';
-import { collarHistoryProps } from 'types/collar_history';
 import { objectCompare, omitNull } from 'utils/common';
 import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
+import { CollarStrings } from 'constants/strings';
 
 import HistoryPage from './HistoryPage';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -57,9 +57,17 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   useEffect(() => {
     const updateParams = (): void => {
       if (editing instanceof Animal) {
-        setHistoryParams({ query: bctwApi.useCritterHistory, param: editing.id, propsToDisplay: critterHistoryProps });
+        setHistoryParams({
+          query: bctwApi.useCritterHistory,
+          param: editing.critter_id,
+          propsToDisplay: critterHistoryProps
+        });
       } else if (editing instanceof Collar) {
-        setHistoryParams({ query: bctwApi.useCollarHistory, param: editing.collar_id, propsToDisplay: collarHistoryProps });
+        setHistoryParams({
+          query: bctwApi.useCollarHistory,
+          param: editing.collar_id,
+          propsToDisplay: [...CollarStrings.editableProps, ...['valid_from', 'valid_to']]
+        });
       }
     };
     updateParams();
@@ -121,9 +129,6 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
             )}
           </ChangeContext.Provider>
         )}
-        {/* <div className={styles.editMsgs}>
-          {responseState ? <NotificationMessage type={responseState.type} message={responseState.message} /> : null}
-        </div> */}
         {isEdit ? <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button> : null}
       </Modal>
     </>
