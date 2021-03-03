@@ -12,7 +12,7 @@ import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import EditCollar from 'pages/data/collars/EditCollar';
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { assignedCollarProps, availableCollarProps, Collar, eCollarAssignedStatus } from 'types/collar';
+import { collarPropsToDisplay, Collar, eCollarAssignedStatus, attachedCollarProps } from 'types/collar';
 import { formatAxiosError } from 'utils/common';
 import AddEditViewer from '../common/AddEditViewer';
 
@@ -99,7 +99,8 @@ export default function CollarPage(props: PageProp): JSX.Element {
 
   const tableProps: ITableQueryProps<Collar> = {
     query: bctwApi.useCollarType,
-    defaultSort: { property: 'device_id', order: 'desc' },
+    // fixme: 
+    // defaultSort: { property: 'max_transmission_date', order: 'desc' },
     onNewData
   }
 
@@ -115,13 +116,13 @@ export default function CollarPage(props: PageProp): JSX.Element {
       <RowSelectedProvider>
         <>
           <Table
-            headers={assignedCollarProps}
+            headers={attachedCollarProps}
             title={S.assignedCollarsTableTitle}
             queryProps={{...tableProps, param: eCollarAssignedStatus.Assigned}}
             onSelect={handleSelect}
           />
           <Table
-            headers={availableCollarProps}
+            headers={collarPropsToDisplay}
             title={S.availableCollarsTableTitle}
             queryProps={{...tableProps, param: eCollarAssignedStatus.Available}}
             onSelect={handleSelect}

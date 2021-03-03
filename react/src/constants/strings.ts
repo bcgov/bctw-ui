@@ -7,8 +7,8 @@ const CritterStrings = {
   requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
   collarAssignmentTitle: 'Assign a collar',
   assignCollarBtnText: 'assign selected collar',
-  assignedTableTitle: 'Assigned Animals',
-  unassignedTableTitle: 'Unassigned Animals',
+  assignedTableTitle: 'Animals Attached To A Collar',
+  unassignedTableTitle: 'Animals Without A Collar',
   collarRemovalTitle: 'Confirm collar unassignment',
   collarRemovalText: 'Are you sure you wish to unassign this collar?',
 

@@ -110,7 +110,7 @@ export class Collar implements ICollar {
 }
 
 // properties displayed on collar pages
-const availableCollarProps = [
+const collarPropsToDisplay = [
   'device_id',
   'device_status',
   // 'max_transmission_date', 
@@ -120,9 +120,7 @@ const availableCollarProps = [
   'device_model',
 ];
 
-// fixme: hide this for now as uuid not useful to user
-// const assignedCollarProps = ['animal_id', ...availableCollarProps];
-const assignedCollarProps = availableCollarProps;
+const attachedCollarProps = ['(WLH_ID/Animal ID)', ...collarPropsToDisplay];
 
 const isCollar = (c: unknown): c is Collar => {
   const collar = c as Collar;
@@ -130,7 +128,7 @@ const isCollar = (c: unknown): c is Collar => {
 };
 
 export {
-  assignedCollarProps,
-  availableCollarProps,
+  attachedCollarProps,
+  collarPropsToDisplay,
   isCollar,
 };
