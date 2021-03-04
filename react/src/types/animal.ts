@@ -111,6 +111,10 @@ export class Animal implements IAnimal {
         return 'ID';
       case 'wlh_id':
         return 'WLH ID';
+      case 'juvenile_at_heel':
+        return 'Calf Status';
+      case 'population_unit':
+        return 'Population'
       default:
         return columnToHeader(str);
     }

@@ -9,7 +9,7 @@ import { ResponseProvider } from 'contexts/ApiResponseContext';
 import { UserContext, UserStateContextProvider } from 'contexts/UserContext';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { HashRouter, BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { } from 'react-router-dom'
 
 import appTheme from 'themes/appTheme';

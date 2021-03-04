@@ -98,11 +98,12 @@ export class Collar implements ICollar {
         return 'Individual ID';
       case 'max_transmission_date':
         return 'Last Update';
-      case 'device_deployment_status':
       case 'device_type':
       case 'device_make':
       case 'device_model':
         return columnToHeader(str.replace('device_', ''));
+      case 'device_deployment_status':
+        return 'Deployed';
       default:
         return columnToHeader(str);
     }

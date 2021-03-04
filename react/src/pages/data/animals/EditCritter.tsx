@@ -39,12 +39,12 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
     <EditModal title={createTitle()} newT={new Animal()} onValidate={validateForm} isEdit={isEdit} {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
-          // validate form before passing change handler to EditModal
-          const onChange = (v: Record<string, unknown>): void => {
+          // override the modal's onChange function
+          const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
             if (v) {
               setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
             }
-            handlerFromContext(v);
+            handlerFromContext(v, modifyCanSave);
           };
           return (
             <>
@@ -80,10 +80,11 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                     .map((d) => {
                       return (
                         <SelectCode
+                          labelTitle={editing.formatPropAsHeader(d.key)}
                           disabled={!canEdit}
                           key={d.key}
                           codeHeader={d.key}
-                          defaultValue={d.value}
+                          defaultValue={d.value as string}
                           changeHandler={onChange}
                           required={requiredFields.includes(d.key)}
                           error={!!errors[d.key]}
