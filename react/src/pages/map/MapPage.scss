@@ -21,7 +21,14 @@
 
 .side-panel {
   width: 30rem;
-  padding: 1.5rem;
+  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+  overflow-y: auto;
+}
+
+.side-panel-export {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .side-panel-title {
@@ -67,27 +74,6 @@
   }
 }
 
-.tab-header {
-  margin-top: 15px;
-
-  .MuiTabs-flexContainer {
-    justify-content: space-around;
-  }
-  
-  .MuiTab-textColorInherit {
-    opacity: 1;
-  }
-
-  button {
-    background-color: $BCgovBlue;
-    color: #ffffff;
-  }
-  button:hover {
-    background-color: royalblue;
-    font-weight: bolder;
-  }
-}
-
 .details-single {
   .geo-single {
     .MuiTableRow-root {
@@ -101,4 +87,48 @@
 .details-individual-prominent {
   font-weight: bolder !important;
   color: #a62700 !important;
+}
+
+.details-mult {
+  width: 100%;
+  td > .MuiTableCell-root, .MuiTableCell-body {
+    border: none;
+    font-family: inherit;
+  }
+}
+
+.details-mult-btn {
+  width: 100%;
+  border: 1px solid;
+}
+
+.details-multiple-row-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.details-multiple-row-body {
+  display: flex;
+  flex-direction: column;
+
+  td > .MuiTableCell-root, .MuiTableCell-body {
+    margin: auto;
+    padding: 0px;
+  }
+}
+
+.details-multiple-row-cell {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: red;
+}
+
+.details-multiple-cell-span {
+  margin-right: 20px;
+}
+
+.details-warning-icon {
+  margin-right: 10px;
 }

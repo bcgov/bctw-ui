@@ -53,6 +53,7 @@ export default function MapPage(props: PageProp): JSX.Element {
   useEffect(() => {
     if (pingsData && !isErrorPings) {
       pings.addData(pingsData as any);
+      setSelectedCollars(pingsData as any);
     }
   }, [pingsData]);
 
@@ -79,6 +80,11 @@ export default function MapPage(props: PageProp): JSX.Element {
   //
   const displaySelectedUnits = (overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>): void => {
     const features = overlay.features;
+    // when selection is cleared, restore all telemetry in the details pane
+    if (features.length === 0 && pingsData) {
+      setSelectedCollars(pingsData as any);
+      return;
+    }
     setSelectedCollars(features as any[]);
   };
 

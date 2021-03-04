@@ -1,5 +1,5 @@
 import * as L from 'leaflet';
-import { ITelemetryFeature } from 'types/map';
+import { ITelemetryDetail, ITelemetryFeature } from 'types/map';
 // import dayjs from 'dayjs';
 // import { formatLocal } from 'utils/time';
 
@@ -71,4 +71,29 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
 };
 
-export { setupPingOptions, setupSelectedPings, addTileLayers, isMortality, COLORS };
+export interface IUniqueFeature {
+  critter_id: string;
+  count: number;
+  features: ITelemetryFeature[];
+}
+
+const groupFeaturesByCritters = (features: ITelemetryFeature[]): IUniqueFeature[] => {
+  const uniques: IUniqueFeature[] = [];
+  features.forEach((f) => {
+    const detail: ITelemetryDetail = f.properties;
+    const found = uniques.find((c) => c.critter_id === detail.critter_id);
+    if (!found) {
+      uniques.push({
+        critter_id: detail.critter_id,
+        count: 1,
+        features: [f]
+      });
+    } else {
+      found.count++;
+      found.features.push(f);
+    }
+  });
+  return uniques;
+}
+
+export { setupPingOptions, setupSelectedPings, addTileLayers, isMortality, COLORS, groupFeaturesByCritters };
