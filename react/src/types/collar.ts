@@ -28,7 +28,7 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BctwBaseType {
   collar_transaction_id: string;
   device_deployment_status: string;
   device_make: string;
-  device_malfunction_type: Date;
+  device_malfunction_type: string;
   device_model: string;
   device_status: string;
   device_type: string;
@@ -53,7 +53,7 @@ export class Collar implements ICollar {
   device_id: number;
   device_deployment_status: string;
   device_make: string;
-  device_malfunction_type: Date;
+  device_malfunction_type: string;
   device_model: string;
   device_status: string;
   device_type: string;

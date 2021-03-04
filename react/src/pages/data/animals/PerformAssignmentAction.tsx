@@ -73,14 +73,14 @@ export default function PerformAssignmentAction({
     setShowAvailableModal(false);
   };
 
-  const save = async (id: string, isAssign: boolean): Promise<void> => {
+  const save = async (collar_id: string, isAssign: boolean): Promise<void> => {
     await setIsLink(isAssign);
     isAssign ? setShowAvailableModal(false) : setShowConfirmModal(false);
     const now = getNow();
     const payload: ICollarLinkPayload = {
       isLink: isAssign,
       data: {
-        collar_id: id,
+        collar_id,
         animal_id: animalId,
       }
     };

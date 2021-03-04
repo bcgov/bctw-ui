@@ -32,12 +32,13 @@ export class CollarHistory implements ICollarHistory {
   }
 }
 
-export const hasCollarCurrentlyAssigned = (history: ICollarHistory[]): boolean => {
+export const hasCollarCurrentlyAssigned = (history: ICollarHistory[]): ICollarHistory | undefined => {
   const currentlyAssigned = history?.filter((h) => {
+    // a null valid_to is considered valid - as in it has no expiry
     if(!dayjs(h.valid_to).isValid()) {
       return true;
     }
     return dayjs().isBefore(h.valid_to);
   });
-  return !!currentlyAssigned.length;
+  return currentlyAssigned.length ? currentlyAssigned[0] : undefined;
 }
