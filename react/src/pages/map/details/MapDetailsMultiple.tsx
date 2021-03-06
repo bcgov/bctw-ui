@@ -4,7 +4,7 @@ import ErrorIcon from '@material-ui/icons/Error';
 import { IUniqueFeature } from '../map_helpers';
 
 export type MapMultipleSelected = {
-  handleCritterClick: () => void;
+  handleCritterClick: (critter_id: string) => void;
   features: IUniqueFeature[];
 };
 
@@ -35,12 +35,12 @@ export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Elem
 type IRowProps = {
   row: ITelemetryDetail;
   count: number;
-  handleCritterClick: () => void;
+  handleCritterClick: (critter_id: string) => void;
 };
 function Row(props: IRowProps): JSX.Element {
   const { row, count, handleCritterClick } = props;
   return (
-    <Button className='details-mult-btn' onClick={handleCritterClick}>
+    <Button className='details-mult-btn' onClick={(): void => handleCritterClick(row.critter_id)}>
       <TableRow className={'details-mult'}>
         <div className={'details-multiple-row-header'}>
           <TableCell>
@@ -63,63 +63,8 @@ function Row(props: IRowProps): JSX.Element {
             {row.frequency}
           </TableCell>
         </div>
-        {/* <TableCell style={{ width: 40 }}>
-          <IconButton size='small' onClick={(): void => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell>
-          Device <b>{row.device_id}</b> frequency: <b>{row.frequency}</b>
-        </TableCell> */}
+        
       </TableRow>
     </Button>
   );
 }
-// function Row(props: IRowProps): JSX.Element {
-//   const { row } = props;
-//   const [open, setOpen] = useState(false);
-//   if (row){
-//     console.log(row)
-//   }
-
-//   return (
-//     <>
-//       <TableRow>
-//         <TableCell style={{ width: 40 }}>
-//           <IconButton size='small' onClick={(): void => setOpen(!open)}>
-//             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-//           </IconButton>
-//         </TableCell>
-//         <TableCell>
-//           Device <b>{row.device_id}</b> frequency: <b>{row.frequency}</b>
-//         </TableCell>
-//       </TableRow>
-//       <TableRow>
-//         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-//           <Collapse in={open} timeout='auto' unmountOnExit>
-//             <Box margin={1}>
-//               <Table size='small'>
-//                 <TableHead>
-//                   <TableRow>
-//                     <TableCell>
-//                       <strong>Animal ID</strong>
-//                     </TableCell>
-//                     <TableCell>
-//                       <strong>Status</strong>
-//                     </TableCell>
-//                   </TableRow>
-//                 </TableHead>
-//                 <TableBody>
-//                   <TableRow>
-//                     <TableCell>{row.animal_id ?? 'unknown'}</TableCell>
-//                     <TableCell>{row.animal_status ?? 'unknown'}</TableCell>
-//                   </TableRow>
-//                 </TableBody>
-//               </Table>
-//             </Box>
-//           </Collapse>
-//         </TableCell>
-//       </TableRow>
-//     </>
-//   );
-// }

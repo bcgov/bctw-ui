@@ -30,8 +30,9 @@ export default function MapPage(props: PageProp): JSX.Element {
   const [start, setStart] = useState<string>(dayjs().subtract(14, 'day').format(formatDay));
   const [end, setEnd] = useState<string>(getToday());
 
-  const [selectedCollars, setSelectedCollars] = useState<ITelemetryFeature[]>([]);
-  // fixme: ^ selectedCollars state not available in click handler??
+  const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
+  const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
+
   let previousLayer = null;
 
   const drawnItems = new L.FeatureGroup(); // Store the selection shapes
@@ -53,7 +54,7 @@ export default function MapPage(props: PageProp): JSX.Element {
   useEffect(() => {
     if (pingsData && !isErrorPings) {
       pings.addData(pingsData as any);
-      setSelectedCollars(pingsData as any);
+      setFeatures(pingsData as any);
     }
   }, [pingsData]);
 
@@ -69,7 +70,7 @@ export default function MapPage(props: PageProp): JSX.Element {
     }
     layer.setStyle({ weight: 3.0, fillColor: COLORS.selected });
     previousLayer = layer;
-    setSelectedCollars([feature]);
+    setSelectedFeatureIDs([feature.id as number]);
   };
 
   setupPingOptions(pings, handleMapPointClick);
@@ -79,13 +80,13 @@ export default function MapPage(props: PageProp): JSX.Element {
 
   //
   const displaySelectedUnits = (overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>): void => {
-    const features = overlay.features;
+    const features = overlay.features.map(f => f.id);
     // when selection is cleared, restore all telemetry in the details pane
     if (features.length === 0 && pingsData) {
-      setSelectedCollars(pingsData as any);
+      setSelectedFeatureIDs([])
       return;
     }
-    setSelectedCollars(features as any[]);
+    setSelectedFeatureIDs(features as number[]);
   };
 
   const drawSelectedLayer = (): void => {
@@ -205,7 +206,7 @@ export default function MapPage(props: PageProp): JSX.Element {
 
   return (
     <div className={'map-view'}>
-      <MapDetails selected={selectedCollars} />
+      <MapDetails features={features} selectedFeatureIDs={selectedFeatureIDs} />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='map' onKeyDown={handleKeyPress}></div>

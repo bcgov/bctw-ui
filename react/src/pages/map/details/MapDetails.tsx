@@ -1,14 +1,12 @@
 import { ITelemetryFeature, TelemetryDetail, TelemetryFeature } from 'types/map';
 import { useEffect, useState } from 'react';
-import MapDetailsMultiple, { MapMultipleSelected } from 'pages/map/details/MapDetailsMultiple';
+import MapDetailsMultiple from 'pages/map/details/MapDetailsMultiple';
 import MapDetailsIndividual from 'pages/map/details/MapDetailsIndividual';
 import Button from 'components/form/Button';
 import { groupFeaturesByCritters, IUniqueFeature } from '../map_helpers';
-import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableRow, TableHead } from '@material-ui/core';
 import { plainToClass } from 'class-transformer';
 import { formatTableCell } from 'components/table/table_helpers';
-
-// todo: on clear selected points, restore all
 
 enum eViewState {
   all = 'all',
@@ -16,83 +14,123 @@ enum eViewState {
   single = 'single'
 }
 type MapDetailsProps = {
-  selected: ITelemetryFeature[];
+  features: ITelemetryFeature[];
+  selectedFeatureIDs: number[];
 };
-export default function MapDetails({ selected }: MapDetailsProps): JSX.Element {
+
+export default function MapDetails({ features, selectedFeatureIDs }: MapDetailsProps): JSX.Element {
   const [view, setView] = useState<eViewState>(eViewState.all);
-  const [previousView, setPreviousView] = useState<eViewState>(null);
+  const [idxGroupSelected, setIdxGroupSelected] = useState<number>(null);
+  const [idxSingleSelected, setIdxSingleSelected] = useState<number>(null);
+  const [groupedFeatures, setGroupedFeatures] = useState<IUniqueFeature[]>([]);
+
+  useEffect(() => {
+    setGroupedFeatures(groupFeaturesByCritters(features));
+  },[features] );
 
   useEffect(() => {
     const update = (): void => {
-      if (selected.length === 1) {
+      const grped = groupFeaturesByCritters(selectedFeatureIDs.length ? features.filter(f => selectedFeatureIDs.includes(f.id as number)) : features);
+      setGroupedFeatures(grped);
+
+      if (selectedFeatureIDs.length === 1) {
         setView(eViewState.single);
       } else {
         setView(eViewState.all);
       }
     };
     update();
-  }, [selected]);
+  }, [selectedFeatureIDs]);
 
   const handleBackClick = (): void => {
-    setView(previousView);
+    switch (view) {
+      case eViewState.all:
+        return;
+      case eViewState.points:
+        setView(eViewState.all);
+        return;
+      case eViewState.single:
+        setView(eViewState.points);
+        return;
+    }
   };
 
-  const changeView = (): void => {
-    setPreviousView(view);
+  const handleGroupClick = (critter_id: string): void => {
+    const idx = groupedFeatures.findIndex((grp) => grp.critter_id === critter_id);
+    setIdxGroupSelected(idx);
     setView(eViewState.points);
   };
 
-  const grouped: IUniqueFeature[] = groupFeaturesByCritters(selected);
+  const handlePointClick = (f: ITelemetryFeature): void => {
+    const grp = groupedFeatures[idxGroupSelected];
+    const idx = grp.features.findIndex(d => d.id === f.id);
+    setIdxSingleSelected(idx);
+    setView(eViewState.single);
+  };
 
   return (
     <div className={'side-panel'}>
       <div className={'side-panel-export'}>
         {view !== eViewState.all ? <Button onClick={handleBackClick}>back</Button> : <p></p>}
-        <p>Export ({selected.length})</p>
+        <p>Export ({selectedFeatureIDs.length})</p>
       </div>
-      { view === eViewState.all ? <h1 className={'side-panel-title'}>Critters</h1> : null }
+      {view === eViewState.all ? <h1 className={'side-panel-title'}>All Animals</h1> : null}
       <div className={'results-container'} id='collar-list'>
         {view === eViewState.all ? (
-          <MapDetailsMultiple handleCritterClick={changeView} features={grouped} />
+          <MapDetailsMultiple handleCritterClick={handleGroupClick} features={groupedFeatures} />
         ) : view === eViewState.single ? (
-          <MapDetailsIndividual feature={selected[0]} />
+          <MapDetailsIndividual feature={groupedFeatures[idxGroupSelected].features[idxSingleSelected]} />
         ) : view === eViewState.points ? (
-          <MapDetailsPoints features={grouped} handleCritterClick={changeView}/>
+          <MapDetailsPoints features={groupedFeatures[idxGroupSelected]} onClickPoint={handlePointClick}/>
         ) : null}
       </div>
     </div>
   );
 }
 
-const MapDetailsPoints = (props: MapMultipleSelected): JSX.Element => {
-  const { features } = props;
-  if (!features.length) {
+type MapDetailsPointsProps = {
+  features: IUniqueFeature;
+  onClickPoint: (f: ITelemetryFeature) => void;
+};
+
+const MapDetailsPoints = (props: MapDetailsPointsProps): JSX.Element => {
+  const { features, onClickPoint } = props;
+  const fList = features.features;
+  if (!fList.length) {
     return null;
   }
-  const first = features[0];
-  const firstFeatures = first.features;
-  const firstDetail = firstFeatures[0].properties;
+  // console.log(`numpoints `,fList.length)
+  const first = fList[0];
+  const firstDetail = first.properties;
   return (
     <>
-      <h3>{firstDetail.animal_id}</h3>
-      <h4>Device ID {firstDetail.device_id}</h4>
-      <p>Results ({first.features.length})</p>
+      <p>Animal ID: {firstDetail.animal_id}</p>
+      <p>Device ID: {firstDetail.device_id}</p>
+      <p>Results ({fList.length})</p>
       <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <strong>Timestamp</strong>
+            </TableCell>
+            <TableCell align='right'>
+              <strong>Location</strong>
+            </TableCell>
+          </TableRow>
+        </TableHead>
         <TableBody>
-          {
-            firstFeatures.map((f: ITelemetryFeature) => {
-              const featureInstance = plainToClass(TelemetryFeature, f);
-              const detailInstance = plainToClass(TelemetryDetail, f.properties);
-              return (
-                <TableRow>
-                  <TableCell><b>{formatTableCell(detailInstance, 'date_recorded')?.value}</b></TableCell>
-                  <TableCell align='right'>{featureInstance.location}</TableCell>
-                </TableRow>
-              )
-            })
-          }
+          {fList.map((f: ITelemetryFeature) => {
+            const featureInstance = plainToClass(TelemetryFeature, f);
+            const detailInstance = plainToClass(TelemetryDetail, f.properties);
+            return (
+              <TableRow key={f.id} hover onClick={(): void => onClickPoint(f)}>
+                <TableCell>{formatTableCell(detailInstance, 'date_recorded')?.value}</TableCell>
+                <TableCell align='right'>{featureInstance.location}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </>
-  )
+  );
 };

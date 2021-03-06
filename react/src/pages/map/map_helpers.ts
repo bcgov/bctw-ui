@@ -15,7 +15,7 @@ const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventH
   pings.options = {
     pointToLayer: (feature, latlng): L.Layer => {
       // Mortality is red
-      const colour = isMortality(feature) ? COLORS.dead : COLORS.normal;
+      const colour = isMortality(feature as any) ? COLORS.dead : COLORS.normal;
       const pointStyle = {
         radius: 8,
         fillColor: colour,
@@ -79,7 +79,12 @@ export interface IUniqueFeature {
 
 const groupFeaturesByCritters = (features: ITelemetryFeature[]): IUniqueFeature[] => {
   const uniques: IUniqueFeature[] = [];
-  features.forEach((f) => {
+  // remove (0,0) points
+  const filtered = features.filter(f => {
+    const coords = f.geometry.coordinates;
+    return coords[0] !== 0 && coords[1] !== 0;
+  })
+  filtered.forEach((f) => {
     const detail: ITelemetryDetail = f.properties;
     const found = uniques.find((c) => c.critter_id === detail.critter_id);
     if (!found) {

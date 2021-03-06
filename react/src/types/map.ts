@@ -15,11 +15,11 @@ interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
 }
 interface ITelemetryFeature extends GeoJSON.Feature {
   //  type: 'Feature';
-  // geometry {
-  // type: "Point";
-  // coordinates: Position;
-  // }
-  // id: number
+  geometry: {
+    type: "Point";
+    coordinates: number[];
+  }
+  id: number
   properties: ITelemetryDetail;
 }
 
