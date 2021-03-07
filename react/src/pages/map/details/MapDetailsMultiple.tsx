@@ -1,7 +1,6 @@
-import { ITelemetryDetail } from 'types/map';
-import { Button, TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@material-ui/core';
+import { ITelemetryDetail, IUniqueFeature } from 'types/map';
+import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper, InputLabel } from '@material-ui/core';
 import ErrorIcon from '@material-ui/icons/Error';
-import { IUniqueFeature } from '../map_helpers';
 
 export type MapMultipleSelected = {
   handleCritterClick: (critter_id: string) => void;
@@ -40,31 +39,28 @@ type IRowProps = {
 function Row(props: IRowProps): JSX.Element {
   const { row, count, handleCritterClick } = props;
   return (
-    <Button className='details-mult-btn' onClick={(): void => handleCritterClick(row.critter_id)}>
-      <TableRow className={'details-mult'}>
-        <div className={'details-multiple-row-header'}>
-          <TableCell>
-            <ErrorIcon className={'details-warning-icon'} htmlColor='orange' />
-            <strong>{row.animal_id}</strong>
-          </TableCell>
-          <TableCell>{count} Points</TableCell>
-        </div>
-        <div className={'details-multiple-row-body'}>
-          <TableCell>
-            <span className='details-multiple-cell-span'>WLH ID</span>
-            {row.wlh_id}
-          </TableCell>
-          <TableCell>
-            <span className='details-multiple-cell-span'>Device ID</span>
-            {row.device_id}
-          </TableCell>
-          <TableCell>
-            <span className='details-multiple-cell-span'>Frequency</span>
-            {row.frequency}
-          </TableCell>
-        </div>
-        
-      </TableRow>
-    </Button>
+    <TableRow hover className={'details-multiple'} onClick={(): void => handleCritterClick(row.critter_id)}>
+      <div className={'details-multiple-row-header'}>
+        <TableCell>
+          <ErrorIcon className={'details-warning-icon'} htmlColor='orange' />
+          <strong>{row.animal_id}</strong>
+        </TableCell>
+        <TableCell>{count} Points</TableCell>
+      </div>
+      <div className={'details-multiple-row-body'}>
+        <TableCell>
+          <span className={'details-multiple-cell-span'}>WLH ID:</span>
+          <span className='details-multiple-cell-right'>{row.wlh_id}</span>
+        </TableCell>
+        <TableCell>
+          <span className={'details-multiple-cell-span'}>Device ID:</span>
+          <span className='details-multiple-cell-right'>{row.device_id}</span>
+        </TableCell>
+        <TableCell>
+          <span className={'details-multiple-cell-span'}>Frequency:</span>
+          <span className='details-multiple-cell-right'>{row.frequency}</span>
+        </TableCell>
+      </div>
+    </TableRow>
   );
 }

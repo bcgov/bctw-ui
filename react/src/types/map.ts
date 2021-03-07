@@ -29,6 +29,12 @@ interface ITelemetryFeatureCollection extends GeoJSON.FeatureCollection {
   features: ITelemetryFeature[];
 }
 
+interface IUniqueFeature {
+  critter_id: string;
+  count: number;
+  features: ITelemetryFeature[];
+}
+
 // represents the jsonb built object in the database get_telemetry call
 export class TelemetryDetail implements BCTW, ITelemetryDetail {
   collar_id: string;
@@ -71,4 +77,4 @@ export class TelemetryFeature implements ITelemetryFeature {
   }
 }
 
-export type { ITelemetryFeature, ITelemetryFeatureCollection, ITelemetryDetail };
+export type { ITelemetryFeature, ITelemetryFeatureCollection, ITelemetryDetail, IUniqueFeature };

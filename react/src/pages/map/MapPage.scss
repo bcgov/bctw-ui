@@ -89,17 +89,12 @@
   color: #a62700 !important;
 }
 
-.details-mult {
+.details-multiple {
   width: 100%;
   td > .MuiTableCell-root, .MuiTableCell-body {
     border: none;
     font-family: inherit;
   }
-}
-
-.details-mult-btn {
-  width: 100%;
-  border: 1px solid;
 }
 
 .details-multiple-row-header {
@@ -111,22 +106,24 @@
 .details-multiple-row-body {
   display: flex;
   flex-direction: column;
+  margin-bottom: 10px;
 
   td > .MuiTableCell-root, .MuiTableCell-body {
+    width: 50%;
     margin: auto;
     padding: 0px;
   }
 }
 
-.details-multiple-row-cell {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  color: red;
+.details-multiple-cell-span {
+  margin: 0px 20px;
+  color: darkslategrey;
+  font-weight: bolder;
+  width: 100%;
 }
 
-.details-multiple-cell-span {
-  margin-right: 20px;
+.details-multiple-cell-right {
+  margin-left: 10px;
 }
 
 .details-warning-icon {

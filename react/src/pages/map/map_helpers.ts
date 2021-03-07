@@ -1,5 +1,5 @@
 import * as L from 'leaflet';
-import { ITelemetryDetail, ITelemetryFeature } from 'types/map';
+import { ITelemetryDetail, ITelemetryFeature, IUniqueFeature } from 'types/map';
 // import dayjs from 'dayjs';
 // import { formatLocal } from 'utils/time';
 
@@ -9,7 +9,7 @@ const COLORS = {
   dead: '#ff0000',
   normal: '#00ff44',
   selected: '#6495ED'
-}
+};
 
 const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventHandlerFn): void => {
   pings.options = {
@@ -27,7 +27,7 @@ const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventH
 
       const marker = L.circleMarker(latlng, pointStyle);
       // add the event listener
-      marker.on('click', onClickPointHandler );
+      marker.on('click', onClickPointHandler);
       return marker;
     }
   };
@@ -71,19 +71,14 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
 };
 
-export interface IUniqueFeature {
-  critter_id: string;
-  count: number;
-  features: ITelemetryFeature[];
-}
 
 const groupFeaturesByCritters = (features: ITelemetryFeature[]): IUniqueFeature[] => {
   const uniques: IUniqueFeature[] = [];
   // remove (0,0) points
-  const filtered = features.filter(f => {
+  const filtered = features.filter((f) => {
     const coords = f.geometry.coordinates;
     return coords[0] !== 0 && coords[1] !== 0;
-  })
+  });
   filtered.forEach((f) => {
     const detail: ITelemetryDetail = f.properties;
     const found = uniques.find((c) => c.critter_id === detail.critter_id);
@@ -99,6 +94,18 @@ const groupFeaturesByCritters = (features: ITelemetryFeature[]): IUniqueFeature[
     }
   });
   return uniques;
-}
+};
 
-export { setupPingOptions, setupSelectedPings, addTileLayers, isMortality, COLORS, groupFeaturesByCritters };
+const getGroupFeatureCount = (features: IUniqueFeature[]): number => {
+  return features.reduce((accum, cur) => accum + cur.count, 0);
+};
+
+export {
+  setupPingOptions,
+  setupSelectedPings,
+  addTileLayers,
+  isMortality,
+  COLORS,
+  groupFeaturesByCritters,
+  getGroupFeatureCount
+};
