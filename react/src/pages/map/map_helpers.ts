@@ -1,5 +1,6 @@
 import * as L from 'leaflet';
 import { ITelemetryDetail, ITelemetryFeature, IUniqueFeature } from 'types/map';
+import { DetailsSortOption } from './details/MapDetails';
 // import dayjs from 'dayjs';
 // import { formatLocal } from 'utils/time';
 
@@ -72,9 +73,9 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
 };
 
 
-const groupFeaturesByCritters = (features: ITelemetryFeature[]): IUniqueFeature[] => {
+const groupFeaturesByCritters = (features: ITelemetryFeature[], sortOption: DetailsSortOption): IUniqueFeature[] => {
   const uniques: IUniqueFeature[] = [];
-  // remove (0,0) points
+  // filter out the (0,0) points
   const filtered = features.filter((f) => {
     const coords = f.geometry.coordinates;
     return coords[0] !== 0 && coords[1] !== 0;
@@ -85,6 +86,8 @@ const groupFeaturesByCritters = (features: ITelemetryFeature[]): IUniqueFeature[
     if (!found) {
       uniques.push({
         critter_id: detail.critter_id,
+        device_id: detail.device_id,
+        frequency: detail.frequency,
         count: 1,
         features: [f]
       });
@@ -93,7 +96,9 @@ const groupFeaturesByCritters = (features: ITelemetryFeature[]): IUniqueFeature[
       found.features.push(f);
     }
   });
-  return uniques;
+  const sorted = uniques.sort((a, b) => a[sortOption] - b[sortOption]);
+  // sorted.forEach(d => console.log(`critter ${d.critter_id} device ${d.device_id}`));
+  return sorted;
 };
 
 const getGroupFeatureCount = (features: IUniqueFeature[]): number => {

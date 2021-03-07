@@ -9,14 +9,16 @@ export type MapMultipleSelected = {
 
 export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Element {
   const { features, handleCritterClick } = props;
+
   return (
     <Box p={3}>
       <TableContainer component={Paper}>
         <Table>
           <TableBody>
-            {features.map((u) => {
+            {features.map((u, idx) => {
               return (
                 <Row
+                  rowIndex={idx}
                   key={u.critter_id}
                   count={u.count}
                   row={u.features[0].properties}
@@ -32,17 +34,18 @@ export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Elem
 }
 
 type IRowProps = {
+  rowIndex: number;
   row: ITelemetryDetail;
   count: number;
   handleCritterClick: (critter_id: string) => void;
 };
 function Row(props: IRowProps): JSX.Element {
-  const { row, count, handleCritterClick } = props;
+  const { row, rowIndex, count, handleCritterClick } = props;
   return (
     <TableRow hover className={'details-multiple'} onClick={(): void => handleCritterClick(row.critter_id)}>
       <div className={'details-multiple-row-header'}>
         <TableCell>
-          <ErrorIcon className={'details-warning-icon'} htmlColor='orange' />
+          {rowIndex % 2 === 0 ? <ErrorIcon className={'details-warning-icon'} htmlColor='orange' /> : null}
           <strong>{row.animal_id}</strong>
         </TableCell>
         <TableCell>{count} Points</TableCell>

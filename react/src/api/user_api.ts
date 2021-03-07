@@ -11,6 +11,13 @@ import {
 export const userApi = (props: ApiProps) => {
   const { api, testUser } = props;
 
+  const addUser = async (body: User): Promise<User> => {
+    const url = createUrl({ api: 'add-user'});
+    const { data } = await api.post(url, body);
+    const user = plainToClass(User, data);
+    return user;
+  }
+
   const getUser = async (): Promise<User> => {
     const url = createUrl({ api: 'get-user', testUser });
     // console.log('fetching user info');
@@ -47,6 +54,7 @@ export const userApi = (props: ApiProps) => {
   };
 
   return {
+    addUser,
     getUserCritterAccess,
     grantCritterAccessToUser,
     getUser,

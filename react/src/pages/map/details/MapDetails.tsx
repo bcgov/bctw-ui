@@ -5,6 +5,10 @@ import MapDetailsIndividual from 'pages/map/details/MapDetailsIndividual';
 import Button from 'components/form/Button';
 import { getGroupFeatureCount, groupFeaturesByCritters } from '../map_helpers';
 import MapDetailsPoints from './MapDetailsPoints';
+import { Select, FormControl, MenuItem } from '@material-ui/core';
+import { columnToHeader } from 'utils/common';
+
+export type DetailsSortOption = 'animal_id' | 'device_id' | 'frequency';
 
 enum eViewState {
   all = 'all',
@@ -23,10 +27,11 @@ export default function MapDetails({ features, selectedFeatureIDs }: MapDetailsP
   const [idSingleSelected, setIdSingleSelected] = useState<number>(null);
   const [groupedFeatures, setGroupedFeatures] = useState<IUniqueFeature[]>([]);
   const [numFeaturesExported, setNumFeaturesExported] = useState<number>(features.length);
+  const [sort, setSort] = useState<DetailsSortOption>('animal_id');
 
   // upon load, display all groups in details pane
   useEffect(() => {
-    const grouped = groupFeaturesByCritters(features);
+    const grouped = groupFeaturesByCritters(features, sort);
     setGroupedFeatures(grouped);
     setNumFeaturesExported(getGroupFeatureCount(grouped));
   }, [features]);
@@ -35,7 +40,8 @@ export default function MapDetails({ features, selectedFeatureIDs }: MapDetailsP
   useEffect(() => {
     const update = (): void => {
       const grouped = groupFeaturesByCritters(
-        selectedFeatureIDs.length ? features.filter((f) => selectedFeatureIDs.includes(f.id)) : features
+        selectedFeatureIDs.length ? features.filter((f) => selectedFeatureIDs.includes(f.id)) : features,
+        sort
       );
       setGroupedFeatures(grouped);
       setNumFeaturesExported(getGroupFeatureCount(grouped));
@@ -52,6 +58,11 @@ export default function MapDetails({ features, selectedFeatureIDs }: MapDetailsP
     };
     update();
   }, [selectedFeatureIDs]);
+
+  useEffect(() => {
+    // console.log('sort changed ', sort);
+    setGroupedFeatures(groupFeaturesByCritters(features, sort));
+  }, [sort]);
 
   const handleBackClick = (): void => {
     switch (view) {
@@ -86,6 +97,7 @@ export default function MapDetails({ features, selectedFeatureIDs }: MapDetailsP
         <p>Export ({numFeaturesExported})</p>
       </div>
       {view === eViewState.all ? <h1 className={'side-panel-title'}>All Animals</h1> : null}
+      {view === eViewState.all ? <MapDetailsSort onChange={setSort} /> : null}
       <div className={'results-container'} id='collar-list'>
         {view === eViewState.all ? (
           <MapDetailsMultiple handleCritterClick={handleGroupClick} features={groupedFeatures} />
@@ -99,3 +111,32 @@ export default function MapDetails({ features, selectedFeatureIDs }: MapDetailsP
   );
 }
 
+type MapSortProps = {
+  onChange: (v: DetailsSortOption) => void;
+};
+const sortOptions = ['animal_id', 'device_id', 'frequency'];
+
+const MapDetailsSort = (props: MapSortProps): JSX.Element => {
+  const { onChange } = props;
+  const [option, setOption] = useState<DetailsSortOption>('animal_id');
+
+  const handleChange = (e: React.ChangeEvent<{ value: DetailsSortOption }>): void => {
+    const newVal = e.target.value;
+    setOption(newVal);
+    onChange(newVal);
+  };
+
+  return (
+    <FormControl className={'details-sort'}>
+      <Select value={option} onChange={handleChange}>
+        {sortOptions.map((o, idx) => {
+          return (
+            <MenuItem key={`${o}-${idx}`} value={o}>
+              {`Sort by ${columnToHeader(o)}`}
+            </MenuItem>
+          );
+        })}
+      </Select>
+    </FormControl>
+  );
+};

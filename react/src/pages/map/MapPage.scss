@@ -95,6 +95,7 @@
     border: none;
     font-family: inherit;
   }
+  border: 1px solid rgba(71, 77, 75, 0.1);
 }
 
 .details-multiple-row-header {
@@ -128,4 +129,13 @@
 
 .details-warning-icon {
   margin-right: 10px;
+}
+
+.details-sort {
+  text-align: center;
+  width: 100%;
+
+  .MuiSelect-root, .MuiSelect-select, .MuiSelect-selectMenu, .MuiInputBase-input, .MuiInput-input {
+    margin: 10px 0px;
+  }
 }

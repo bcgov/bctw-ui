@@ -31,6 +31,8 @@ interface ITelemetryFeatureCollection extends GeoJSON.FeatureCollection {
 
 interface IUniqueFeature {
   critter_id: string;
+  device_id: number;
+  frequency: number;
   count: number;
   features: ITelemetryFeature[];
 }
