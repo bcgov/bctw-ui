@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
 import { useQueryClient } from 'react-query';
@@ -7,10 +8,12 @@ export interface IUserContext {
   ready?: boolean;
   user: User;
   testUser?: string;
+  error?: AxiosError;
 }
 export const UserContext = createContext<IUserContext>({
   ready: false,
   user: null,
+  error: null
 });
 export const UserContextDispatch = createContext(null);
 
@@ -19,15 +22,17 @@ export const UserStateContextProvider: React.FC = (props) => {
   const queryClient = useQueryClient();
   const [userContext, setUserContext] = useState<IUserContext>({ ready: false, user: null});
 
-  const { isFetching, isLoading, isError, data, status } = bctwApi.useUser();
+  const { isFetching, isLoading, isError, data, status, error } = bctwApi.useUser();
 
   useEffect(() => {
     const update = (): void => {
       if (status === 'success') {
         const user = data;
         setUserContext({ ready: true, user });
-      } else if (isLoading || isFetching || isError) {
+      } else if (isLoading || isFetching) {
         setUserContext({ ready: false, user: null });
+      } else if (isError) {
+        setUserContext({ ready: false, user: null, error });
       }
     };
     update();

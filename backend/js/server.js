@@ -19,7 +19,7 @@ const isProd = process.env.NODE_ENV === 'production' ? true : false;
 const apiHost = process.env.BCTW_API_HOST;
 const apiPort = process.env.BCTW_API_PORT;
 
-const authorizedUsers = JSON.parse(process.env.BCTW_AUTHORIZED_USERS);
+// const authorizedUsers = JSON.parse(process.env.BCTW_AUTHORIZED_USERS);
 
 var memoryStore = new expressSession.MemoryStore();
 
@@ -214,7 +214,8 @@ var app = express()
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
-  .use(authenticate) // BCTW Gate
+  // BCTW Gate - deprecated, handled in app
+  // .use(authenticate) 
   .get('/denied', denied);
 
 // Use keycloak authentication only in Production
@@ -224,8 +225,8 @@ if (isProd) {
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
     .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler)
-    .post('/api/:endpoint', proxyApi)
-    .delete('/api/:endpoint/:endpointId', proxyApi)
+    .post('/api/:endpoint', keycloak.protect(), proxyApi)
+    .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
 } else {
   app
     .get('/api/:endpoint', proxyApi)

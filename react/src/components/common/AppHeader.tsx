@@ -6,7 +6,7 @@ import { Link as MuiLink } from '@material-ui/core';
 
 // Icons
 import Icon from '@mdi/react';
-import { mdiAccountCircle } from '@mdi/js';
+import { mdiAccountCircle, mdiAccountRemove, mdiProgressClock } from '@mdi/js';
 
 // Assets
 import 'styles/AppHeader.scss';
@@ -38,7 +38,12 @@ const AppHeader = (): JSX.Element => {
             <li>
               <div className={'username'}>
                 <IconButton component={Link} to='/profile'>
-                  <Icon path={mdiAccountCircle} className={'icon'} title='User Profile' size={1}></Icon>
+                  <Icon
+                    path={useUser.ready ? mdiAccountCircle : useUser.error ? mdiAccountRemove : mdiProgressClock}
+                    className={'icon'}
+                    title='User Profile'
+                    size={1}
+                  />
                 </IconButton>
                 <span>{user?.idir ?? 'user name'}</span>
               </div>
