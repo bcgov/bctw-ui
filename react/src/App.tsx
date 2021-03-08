@@ -16,6 +16,7 @@ import appTheme from 'themes/appTheme';
 
 import { AppRouter, AppRoutes } from './AppRouter';
 import { SnackbarWrapper } from 'components/common';
+import DefaultLayout from 'pages/layouts/DefaultLayout';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -48,7 +49,9 @@ export default function App(): JSX.Element {
                         <SideBar routes={AppRoutes} sidebarContent={sidebar} />
                         <ResponseProvider>
                           <SnackbarWrapper>
-                            <AppRouter onContentChange={setSidebar} />
+                            <DefaultLayout>
+                              <AppRouter onContentChange={setSidebar} />
+                            </DefaultLayout>
                           </SnackbarWrapper>
                         </ResponseProvider>
                       </div>

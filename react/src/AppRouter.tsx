@@ -10,7 +10,6 @@ import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent, useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
-import DefaultLayout from 'pages/layouts/DefaultLayout';
 
 export type RouteKey = {
   path: string;
@@ -69,15 +68,14 @@ const AppRouter = ({ onContentChange }: AppRouterProps): JSX.Element => {
       <Redirect exact from='/data' to='/animals' />
       {AppRoutes.map((route: RouteKey, idx: number) => {
         return (
-          <DefaultLayout key={idx}>
-            <Route
-              path={route.path}
-              render={(): JSX.Element => {
-                const RouteComponent = route.component;
-                return <RouteComponent {...routeProps} />;
-              }}
-            />
-          </DefaultLayout>
+          <Route
+            key={idx}
+            path={route.path}
+            render={(): JSX.Element => {
+              const RouteComponent = route.component;
+              return <RouteComponent {...routeProps} />;
+            }}
+          />
         );
       })}
     </Switch>
