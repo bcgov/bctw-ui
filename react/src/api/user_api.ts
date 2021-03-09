@@ -1,5 +1,7 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
+import { TelemetryAlert } from 'types/alert';
+import { ITelemetryDetail } from 'types/map';
 import { eCritterPermission, IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 import {
   IUserCritterPermissionInput,
@@ -53,11 +55,20 @@ export const userApi = (props: ApiProps) => {
     return filterOutNone ? converted.filter((d) => d.permission_type !== eCritterPermission.none) : converted;
   };
 
+  const getUserAlerts = async (
+  ): Promise<TelemetryAlert[]> => {
+    const url = createUrl({api: 'get-user-alerts'});
+    const { data } = await api.get(url);
+    const converted = data.map((json: ITelemetryDetail[]) => plainToClass(TelemetryAlert, json));
+    return converted;
+  }
+
   return {
     addUser,
     getUserCritterAccess,
     grantCritterAccessToUser,
     getUser,
-    getUsers
+    getUsers,
+    getUserAlerts,
   };
 };

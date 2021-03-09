@@ -25,6 +25,7 @@ import {
 } from '../api/api_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useContext } from 'react';
+import { TelemetryAlert } from 'types/alert';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -218,6 +219,15 @@ export const useTelemetryApi = () => {
   }
 
   /**
+   * @returns 
+   */
+  const useAlert = (): UseQueryResult<TelemetryAlert[]> => {
+    return useQuery<TelemetryAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), {
+      ...defaultQueryOptions
+    });
+  }
+
+  /**
    *
    * mutations
    */
@@ -265,6 +275,7 @@ export const useTelemetryApi = () => {
 
   return {
     // queries
+    useAlert,
     useCodes,
     useCodeHeaders,
     useTracks,

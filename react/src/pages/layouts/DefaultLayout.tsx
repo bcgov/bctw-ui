@@ -26,9 +26,9 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   if (err) {
     // unauthorized
     if (err.response?.status === 401) {
-      return <div>{err.response.data}</div>;
+      return <div>{err?.response?.data}</div>;
     }
-    return <div>ERROR {err.response.data}</div>;
+    return <div>ERROR {err?.response?.data}</div>;
   }
   return <>{children}</>;
 }
