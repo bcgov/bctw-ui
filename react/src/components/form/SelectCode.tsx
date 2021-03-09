@@ -1,47 +1,22 @@
-import {
-  FormControl,
-  Select as MuiSelect,
-  InputLabel,
-  MenuItem,
-  createStyles,
-  makeStyles,
-  Theme,
-  SelectProps
-} from '@material-ui/core';
+import 'styles/form.scss';
+import { FormControl, Select as MuiSelect, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
 import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode } from 'types/code';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError, removeProps } from 'utils/common';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    formControl: {
-      margin: theme.spacing(1),
-      minWidth: 120
-    },
-    selectEmpty: {
-      marginTop: theme.spacing(2)
-    }
-  })
-);
-
-type ISelectProps = SelectProps & {
-  codeHeader: string; // code header type to retrieve
-  defaultValue: string;
-  labelTitle: string;
-  changeHandler: (o: Record<string, unknown>, isChange: boolean ) => void;
-};
+import { ISelectProps } from './form_types';
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectCode(props: ISelectProps): JSX.Element {
-  const { codeHeader, defaultValue, changeHandler, labelTitle } = props;
-  const classes = useStyles();
+  const { codeHeader, defaultValue, changeHandler, changeHanderMultiple, labelTitle, multiple } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
+  const [values, setValues] = useState<string[]>([defaultValue]);
   const [codes, setCodes] = useState<ICode[]>([]);
 
-  const propsToPass = removeProps(props, ['codeHeader', 'changeHandler']);
+  // remove these properties
+  const propsToPass = removeProps(props, ['codeHeader', 'changeHandler', 'labelTitle']);
 
   // load this codeHeaders codes from db
   const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useCodes(0, codeHeader);
@@ -54,9 +29,9 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       setCodes(data);
       // if a default was set (a code description, update the value to its actual value)
       // pass false as second param to not update the modals 'is saveable property'
-      const found = data.find(d => d.description === defaultValue);
+      const found = data.find((d) => d.description === defaultValue);
       if (found) {
-        pushChange(found.code, false)
+        pushChange(found.code, false);
       }
     };
     updateOptions();
@@ -68,17 +43,40 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     pushChange(v, true);
   };
 
+  const handleChangeMultiple = (event: React.ChangeEvent<{ value }>): void => {
+    const selected = event.target.value as string[];
+    setValues(selected);
+    pushChangeMultiple(selected);
+  } 
+
   // triggered when the default value is changed - ex. different editing object selected
   const reset = (): void => {
-    setValue(defaultValue ?? '');
+    const v = defaultValue ?? '';
+    if (multiple) {
+      setValues([v]);
+    } else {
+      setValue(v);
+    }
   };
 
   // call the parent changeHandler
   const pushChange = (v: unknown, isChange: boolean): void => {
-    const code = codes.find(c => c.description === v)?.code ?? v;
+    const code = codes.find((c) => c.description === v)?.code ?? v;
     const ret = { [codeHeader]: code };
     changeHandler(ret, isChange);
   };
+
+  const pushChangeMultiple = (selected: string[]): void => {
+    const filtered = codes.filter(c => selected.indexOf(c.description) !== -1);
+    const ret = filtered.map(c => {
+      /// return a combination of the original code and the value
+      /// why? these are most likely to be used in client side filtering 
+      /// where we dont need the code value but the description
+      return {...c, ...{[codeHeader] : c.code }}  
+    })
+    console.log(ret);
+    // changeHanderMultiple(ret)
+  }
 
   useEffect(() => {
     reset();
@@ -91,19 +89,36 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       ) : isLoading || isFetching ? (
         <div>loading...</div>
       ) : codes && codes.length ? (
-        <FormControl className={classes.formControl}>
+        <FormControl className={'formControl'}>
           <InputLabel id='select-label'>{labelTitle}</InputLabel>
-          <MuiSelect labelId='select-label' value={value} onChange={handleChange} {...propsToPass}>
+          <MuiSelect
+            labelId='select-label'
+            value={multiple ? values : value}
+            onChange={multiple ? handleChangeMultiple : handleChange}
+            renderValue={(selected: unknown): string =>
+              multiple ? (selected as string[]).join(',') : (selected as string)
+            }
+            {...propsToPass}>
             {codes.map((c: ICode) => {
+              if (!multiple) {
+                return (
+                  <MenuItem key={c.id} value={c.description}>
+                    {c.description}
+                  </MenuItem>
+                );
+              }
               return (
                 <MenuItem key={c.id} value={c.description}>
+                  <Checkbox checked={values.indexOf(c.description) !== -1} />
                   {c.description}
                 </MenuItem>
               );
             })}
           </MuiSelect>
         </FormControl>
-      ): <div>unable to load dropdown</div>}
+      ) : (
+        <div>unable to load dropdown</div>
+      )}
     </>
   );
 }
