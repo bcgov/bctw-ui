@@ -9,6 +9,7 @@
   flex: 1 1 auto;
   position: relative;
 
+  // loading indicator
   .progress {
     position: absolute;
     z-index: 1000;
@@ -19,28 +20,45 @@
   }
 }
 
+.bottom-panel {
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  background-color: #ffffff;
+  height: 30rem;
+  overflow-y: auto;
+  border-left: 1px solid darkslategrey;
+
+  .MuiPaper-elevation1 {
+    box-shadow: none;
+  }
+}
+
+.appear-above-map {
+  z-index: 314159;
+}
+
 .side-panel {
-  width: 30rem;
+  width: 20rem;
   padding: 0.5rem 1.5rem 1.5rem 1.5rem;
   overflow-y: auto;
+  div {
+    margin-bottom: 0.5rem;
+  }
 }
 
 .side-panel-export {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .side-panel-title {
-  margin: 0;
-  padding: 0;
-  font-size: 1.375rem;
-}
-
-.results-title {
-  margin-top: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eeeeee;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  font: inherit;
 }
 
 #map {
@@ -63,26 +81,8 @@
   transform: translate(0px,85px);
 }
 
-.date-picker-grp {
-  padding: 10px 5px 10px 20px;
-
-  div {
-    margin-bottom: 10px;
-  }
-  .MuiInputLabel-root, .MuiInput-root, .MuiInputBase-input, .MuiInput-input {
-    color: #ffffff;
-  }
-}
-
-.details-single {
-  .geo-single {
-    .MuiTableRow-root {
-      td {
-        border: none;
-      }
-    }
-  }
-}
+// 
+// 
 
 .details-individual-prominent {
   font-weight: bolder !important;
@@ -127,15 +127,18 @@
   margin-left: 10px;
 }
 
-.details-warning-icon {
-  margin-right: 10px;
+// map details parent table box
+.MuiBox-root-21 {
+  padding: 5px !important;
 }
 
-.details-sort {
-  text-align: center;
-  width: 100%;
-
-  .MuiSelect-root, .MuiSelect-select, .MuiSelect-selectMenu, .MuiInputBase-input, .MuiInput-input {
-    margin: 10px 0px;
+.details-bottom {
+  .MuiTableContainer-root {
+    overflow-x: hidden;
   }
+}
+
+.critter-select {
+  color: rgba(0, 47, 255, 0.78) !important;
+  cursor: pointer;
 }

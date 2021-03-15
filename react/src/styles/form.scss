@@ -1,4 +1,5 @@
-.formControl {
-  min-width: 120px;
-  margin: 10px;
+.select-control {
+  .MuiSelect-select.MuiSelect-select {
+    min-width: 120px;
+  }
 }

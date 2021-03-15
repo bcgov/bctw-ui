@@ -2,6 +2,15 @@ import { BCTW, BctwBaseType } from "./common_types";
 import { Type } from 'class-transformer';
 import { columnToHeader } from "utils/common";
 
+// used in select multiple component 
+interface ICodeFilter {
+  code_header: string;
+  code_header_title: string;
+  description: string;
+  code: string;
+  id: number;
+}
+
 /// represents a code and code header coming from backend
 interface ICode {
   id: number;
@@ -56,5 +65,6 @@ export class CodeHeaderInput implements BCTW, BctwBaseType {
 
 export type {
   ICode,
+  ICodeFilter,
   ICodeHeader,
 };

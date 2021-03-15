@@ -20,7 +20,7 @@ export default function MapDetailsIndividual(props: TabPanelIndividualSelected):
   const id = featureInstance.id;
 
   return (
-    <Box p={3} className={'details-single'}>
+    <Box p={3}>
       <Table>
         <TableBody>
           {mapFeature(detailInstance, id, [{ field: 'species' }, { field: 'wlh_id' }, { field: 'animal_id' }])}

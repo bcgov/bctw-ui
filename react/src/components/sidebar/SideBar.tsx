@@ -1,9 +1,12 @@
-import { Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import clsx from 'clsx';
 import { RouteKey } from 'AppRouter';
 import { Icon } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { ChevronRight, ChevronLeft } from '@material-ui/icons';
+import drawerStyles from './drawer_classes';
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
@@ -11,10 +14,14 @@ type SideBarProps = {
 };
 
 export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.Element {
+  const classes = drawerStyles();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
+  const [open, setOpen] = React.useState(false);
   const userChanges = useContext(UserContext);
+
+  const handleDrawerOpen = (): void => setOpen((o) => !o);
 
   useEffect(() => {
     const updateComponent = (): void => {
@@ -67,20 +74,43 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
     <div className={'sidebar'}>
-      <List>
-        {routesToShow.map((route: RouteKey, idx: number) => {
-          return (
-            <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
-              {route.icon ? (
-                <ListItemIcon className={'test'}>
-                  <Icon icon={route.icon} />
-                </ListItemIcon>
-              ) : null}
-              <ListItemText primary={route.title} />
-            </ListItem>
-          );
+      <Drawer
+        variant='permanent'
+        className={clsx(classes.drawer, {
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open
         })}
-      </List>
+        classes={{
+          paper: clsx({
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open
+          })
+        }}>
+        <div className={classes.toolbar}>
+          <IconButton onClick={handleDrawerOpen}>
+            {open ? (
+              <ChevronLeft className={'open-close'} htmlColor='white' />
+            ) : (
+              <ChevronRight className={'open-close'} htmlColor='white' />
+            )}
+          </IconButton>
+        </div>
+        <Divider />
+        <List>
+          {routesToShow.map((route: RouteKey, idx: number) => {
+            return (
+              <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
+                {route.icon ? (
+                  <ListItemIcon className={'sidebar-icon'}>
+                    <Icon icon={route.icon} />
+                  </ListItemIcon>
+                ) : null}
+                <ListItemText className={'list-item-txt'} primary={route.title} />
+              </ListItem>
+            );
+          })}
+        </List>
+      </Drawer>
       <Divider />
       <div> {sidebarContent} </div>
     </div>

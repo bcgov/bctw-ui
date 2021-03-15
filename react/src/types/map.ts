@@ -6,6 +6,12 @@ import { columnToHeader } from 'utils/common';
 import { formatWithUTCOffset } from 'utils/time';
 import { BCTW } from './common_types';
 
+
+interface MapRange {
+  start: string,
+  end: string
+}
+
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   critter_id: string;
   // critter_transaction_id: string;
@@ -79,4 +85,4 @@ export class TelemetryFeature implements ITelemetryFeature {
   }
 }
 
-export type { ITelemetryFeature, ITelemetryFeatureCollection, ITelemetryDetail, IUniqueFeature };
+export type { ITelemetryFeature, ITelemetryFeatureCollection, ITelemetryDetail, IUniqueFeature, MapRange };

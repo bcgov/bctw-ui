@@ -1,10 +1,10 @@
-import { ITelemetryFeature, IUniqueFeature } from 'types/map';
+import { ITelemetryDetail, ITelemetryFeature, IUniqueFeature } from 'types/map';
 import { useEffect, useState } from 'react';
 import MapDetailsMultiple from 'pages/map/details/MapDetailsMultiple';
-import MapDetailsIndividual from 'pages/map/details/MapDetailsIndividual';
-import Button from 'components/form/Button';
+// import MapDetailsIndividual from 'pages/map/details/MapDetailsIndividual';
+// import Button from 'components/form/Button';
 import { getGroupFeatureCount, groupFeaturesByCritters } from '../map_helpers';
-import MapDetailsPoints from './MapDetailsPoints';
+// import MapDetailsPoints from './MapDetailsPoints';
 import { Select, FormControl, MenuItem } from '@material-ui/core';
 import { columnToHeader } from 'utils/common';
 
@@ -12,16 +12,18 @@ export type DetailsSortOption = 'animal_id' | 'device_id' | 'frequency';
 
 enum eViewState {
   all = 'all',
-  points = 'points',
+  // points = 'points',
   single = 'single'
 }
 type MapDetailsProps = {
   features: ITelemetryFeature[];
   // features IDs selected via the map interface
   selectedFeatureIDs: number[];
+  handleSelectCritter: (v: ITelemetryDetail) => void;
+  // children: React.ReactChild;
 };
 
-export default function MapDetails({ features, selectedFeatureIDs }: MapDetailsProps): JSX.Element {
+export default function MapDetails({ features, selectedFeatureIDs, handleSelectCritter }: MapDetailsProps): JSX.Element {
   const [view, setView] = useState<eViewState>(eViewState.all);
   const [idxGroupSelected, setIdxGroupSelected] = useState<number>(null);
   const [idSingleSelected, setIdSingleSelected] = useState<number>(null);
@@ -64,79 +66,82 @@ export default function MapDetails({ features, selectedFeatureIDs }: MapDetailsP
     setGroupedFeatures(groupFeaturesByCritters(features, sort));
   }, [sort]);
 
-  const handleBackClick = (): void => {
-    switch (view) {
-      case eViewState.points:
-        setNumFeaturesExported(getGroupFeatureCount(groupedFeatures));
-        setView(eViewState.all);
-        return;
-      case eViewState.single:
-        setNumFeaturesExported(groupedFeatures[idxGroupSelected].count);
-        setView(eViewState.points);
-        return;
-    }
-  };
+  // const handleBackClick = (): void => {
+  //   switch (view) {
+  //     case eViewState.points:
+  //       setNumFeaturesExported(getGroupFeatureCount(groupedFeatures));
+  //       setView(eViewState.all);
+  //       return;
+  //     case eViewState.single:
+  //       setNumFeaturesExported(groupedFeatures[idxGroupSelected].count);
+  //       setView(eViewState.points);
+  //       return;
+  //   }
+  // };
 
-  const handleGroupClick = (critter_id: string): void => {
-    const idx = groupedFeatures.findIndex((grp) => grp.critter_id === critter_id);
-    setIdxGroupSelected(idx);
-    setNumFeaturesExported(groupedFeatures[idx].count);
-    setView(eViewState.points);
-  };
+  // const handleGroupClick = (critter_id: string): void => {
+  //   const idx = groupedFeatures.findIndex((grp) => grp.critter_id === critter_id);
+  //   setIdxGroupSelected(idx);
+  //   setNumFeaturesExported(groupedFeatures[idx].count);
+  //   setView(eViewState.points);
+  // };
 
-  const handlePointClick = (f: ITelemetryFeature): void => {
-    setIdSingleSelected(f.id);
-    setNumFeaturesExported(1);
-    setView(eViewState.single);
-  };
+  // const handlePointClick = (f: ITelemetryFeature): void => {
+  //   setIdSingleSelected(f.id);
+  //   setNumFeaturesExported(1);
+  //   setView(eViewState.single);
+  // };
+
+  // const handleSelectCritter = (row: ITelemetryDetail) => {
+  //   console.log('row clicked: ', row);
+  // };
 
   return (
-    <div className={'side-panel'}>
-      <div className={'side-panel-export'}>
-        {view !== eViewState.all ? <Button onClick={handleBackClick}>back</Button> : <p></p>}
-        <p>Export ({numFeaturesExported})</p>
+    <>
+      <div className={'side-panel-title'}>
+        {view === eViewState.all ? <h3>Default Animal Set</h3> : null}
+        <h3>Export</h3>
       </div>
-      {view === eViewState.all ? <h1 className={'side-panel-title'}>All Animals</h1> : null}
-      {view === eViewState.all ? <MapDetailsSort onChange={setSort} /> : null}
-      <div className={'results-container'} id='collar-list'>
-        {view === eViewState.all ? (
-          <MapDetailsMultiple handleCritterClick={handleGroupClick} features={groupedFeatures} />
-        ) : view === eViewState.points ? (
-          <MapDetailsPoints features={groupedFeatures[idxGroupSelected]} onClickPoint={handlePointClick} />
-        ) : view === eViewState.single ? (
-          <MapDetailsIndividual feature={features.find((f) => f.id === idSingleSelected)} />
-        ) : null}
-      </div>
-    </div>
+      {/* <div className={'results-container'} id='collar-list'> */}
+      {view === eViewState.all ? (
+        <MapDetailsMultiple handleCritterClick={handleSelectCritter} features={groupedFeatures} />
+      ) : null}
+      {/* view === eViewState.points ? (
+           <MapDetailsPoints features={groupedFeatures[idxGroupSelected]} onClickPoint={handlePointClick} />
+         ) : view === eViewState.single ? (
+           <MapDetailsIndividual feature={features.find((f) => f.id === idSingleSelected)} />
+         ) : null} */}
+      {/* </div> */}
+    </>
   );
 }
 
-type MapSortProps = {
-  onChange: (v: DetailsSortOption) => void;
-};
-const sortOptions = ['animal_id', 'device_id', 'frequency'];
+// type MapSortProps = {
+//   onChange: (v: DetailsSortOption) => void;
+// };
+// const sortOptions = ['animal_id', 'device_id', 'frequency'];
 
-const MapDetailsSort = (props: MapSortProps): JSX.Element => {
-  const { onChange } = props;
-  const [option, setOption] = useState<DetailsSortOption>('animal_id');
+// const MapDetailsSort = (props: MapSortProps): JSX.Element => {
+//   const { onChange } = props;
+//   const [option, setOption] = useState<DetailsSortOption>('animal_id');
 
-  const handleChange = (e: React.ChangeEvent<{ value: DetailsSortOption }>): void => {
-    const newVal = e.target.value;
-    setOption(newVal);
-    onChange(newVal);
-  };
+//   const handleChange = (e: React.ChangeEvent<{ value: DetailsSortOption }>): void => {
+//     const newVal = e.target.value;
+//     setOption(newVal);
+//     onChange(newVal);
+//   };
 
-  return (
-    <FormControl className={'details-sort'}>
-      <Select value={option} onChange={handleChange}>
-        {sortOptions.map((o, idx) => {
-          return (
-            <MenuItem key={`${o}-${idx}`} value={o}>
-              {`Sort by ${columnToHeader(o)}`}
-            </MenuItem>
-          );
-        })}
-      </Select>
-    </FormControl>
-  );
-};
+//   return (
+//     <FormControl className={'details-sort'}>
+//       <Select value={option} onChange={handleChange}>
+//         {sortOptions.map((o, idx) => {
+//           return (
+//             <MenuItem key={`${o}-${idx}`} value={o}>
+//               {`Sort by ${columnToHeader(o)}`}
+//             </MenuItem>
+//           );
+//         })}
+//       </Select>
+//     </FormControl>
+//   );
+// };

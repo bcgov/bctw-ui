@@ -31,11 +31,25 @@
 
 .sidebar {
   flex: 0 0 auto;
-  width: 15rem;
   color: #ffffff;
   background-color: $BCgovBlue;
 
-  .test svg {
+  .MuiDrawer-paper {
+    top: inherit;
+  }
+  .MuiPaper-root {
+    background-color: inherit;
+  }
+
+  .sidebar-icon svg {
     fill: #ffffff;
+  }
+
+  .open-close {
+    margin-right: 5px;
+  }
+
+  .list-item-txt { 
+    color: #ffffff;
   }
 }

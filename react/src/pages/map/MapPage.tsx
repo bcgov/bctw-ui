@@ -6,20 +6,20 @@ import 'leaflet/dist/leaflet.css';
 
 import { CircularProgress } from '@material-ui/core';
 import pointsWithinPolygon from '@turf/points-within-polygon';
-import { PageProp } from 'components/component_interfaces';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import CreateMapSidebar from 'pages/map/CreateMapSidebar';
 import { addTileLayers, COLORS, isMortality, setupPingOptions, setupSelectedPings } from 'pages/map/map_helpers';
 import MapDetails from 'pages/map/details/MapDetails';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { formatDay, getToday } from 'utils/time';
-import { ITelemetryFeature } from 'types/map';
+import { ITelemetryFeature, MapRange } from 'types/map';
+import MapSidebarFilters from './MapSidebarFilters';
+import DialogFullScreen from 'components/modal/DialogFullScreen';
+import { ICodeFilter } from 'types/code';
 
-export default function MapPage(props: PageProp): JSX.Element {
-  const { setSidebarContent } = props;
+export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
 
   const mapRef = useRef<L.Map>(null);
@@ -27,23 +27,24 @@ export default function MapPage(props: PageProp): JSX.Element {
   const [tracks] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Tracks
   const [pings] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Pings
 
-  const [start, setStart] = useState<string>(dayjs().subtract(14, 'day').format(formatDay));
-  const [end, setEnd] = useState<string>(getToday());
+  const [range, setRange] = useState<MapRange>({ start: dayjs().subtract(14, 'day').format(formatDay), end: getToday()});
 
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
+
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   let previousLayer = null;
 
   const drawnItems = new L.FeatureGroup(); // Store the selection shapes
 
-  const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
-  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
+  const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(range.start, range.end);
+  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(range.start, range.end);
   // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
 
   useEffect(() => {
     drawLatestPings();
-  }, [start, end]);
+  }, [range]);
 
   useEffect(() => {
     if (tracksData && !isErrorTracks) {
@@ -70,7 +71,7 @@ export default function MapPage(props: PageProp): JSX.Element {
     }
     layer.setStyle({ weight: 3.0, fillColor: COLORS.selected });
     previousLayer = layer;
-    setSelectedFeatureIDs([feature.id as number]);
+    // setSelectedFeatureIDs([feature.id as number]);
   };
 
   setupPingOptions(pings, handleMapPointClick);
@@ -158,22 +159,23 @@ export default function MapPage(props: PageProp): JSX.Element {
       });
   };
 
-  const handlePickDate = (event): void => {
-    const key = Object.keys(event)[0];
-    if (key === 'tstart') {
-      setStart(event[key]);
-      return;
+  const handleChangeFilters = (newRange: MapRange, filters: ICodeFilter[]) => {
+    if (newRange.start !== range.start || newRange.end !== range.end) {
+      setRange(newRange);
     }
-    if (key == 'tend') {
-      setEnd(event[key]);
+    if (filters.length) {
+      console.log('new filters !');
     }
-  };
+  }
+
+  const handleSelectCritter = () => {
+    setShowModal(o => !o);
+  }
 
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
         initMap();
-        CreateMapSidebar({ start, end, onChange: handlePickDate, setSidebarContent });
       }
     };
     updateComponent();
@@ -206,10 +208,16 @@ export default function MapPage(props: PageProp): JSX.Element {
 
   return (
     <div className={'map-view'}>
-      <MapDetails features={features} selectedFeatureIDs={selectedFeatureIDs} />
+      <MapSidebarFilters start={range.start} end={range.end} onChange={handleChangeFilters} />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='map' onKeyDown={handleKeyPress}></div>
+        <div className={`bottom-panel ${showModal ? '' : 'appear-above-map'}`}>
+          <MapDetails features={features} selectedFeatureIDs={selectedFeatureIDs} handleSelectCritter={handleSelectCritter}/>
+        </div>
+        <DialogFullScreen open={showModal} handleClose={setShowModal}>
+          <div>hi</div>
+        </DialogFullScreen>
       </div>
     </div>
   );

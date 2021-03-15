@@ -1,17 +1,11 @@
-import React from 'react';
 import { Modal as MuiModal } from '@material-ui/core';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
-import { ModalBaseProps } from 'components/component_interfaces';
 import modalStyles from 'components/modal/modal_styles';
+import { ModalProps } from 'components/component_interfaces';
 
-type IModalProps = ModalBaseProps & {
-  children: React.ReactNode;
-}
-
-export default function Modal ({open, title, handleClose, children}: IModalProps): JSX.Element {
+export default function Modal ({open, title, handleClose, children}: ModalProps): JSX.Element {
   const classes = modalStyles();
-
   return (
     <div>
       <MuiModal

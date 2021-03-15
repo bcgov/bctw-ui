@@ -20,6 +20,13 @@ type ModalBaseProps = {
 };
 
 /**
+ * 
+ */
+type ModalProps = ModalBaseProps & {
+  children: React.ReactNode;
+}
+
+/**
  * @param editing an instance of T
  * @param onSave parent save handler
  */
@@ -68,6 +75,7 @@ interface INotificationMessage {
 
 export type {
   CritterCollarModalProps,
+  ModalProps,
   ModalBaseProps,
   ExportImportProps,
   EditModalBaseProps,
