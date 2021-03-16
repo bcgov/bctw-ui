@@ -1,0 +1,68 @@
+@import 'styles/colours.scss';
+
+.MuiDialog-paperFullScreen {
+  background-color: #ced4da !important;
+}
+
+.dlg-full-title {
+  padding: 1rem 5rem;
+
+  h1 {
+    display: inline;
+    margin-right: 1rem;
+  }
+  button {
+    margin-bottom: 1rem;
+  }
+  h4 {
+    color: #495057;
+    text-decoration: none solid rgb(73, 80, 87);
+  }
+}
+
+.dlg-full-body {
+  background-color: #ced4da !important;
+  padding: 2rem;
+  // border-bottom: none;
+}
+
+.dlg-full-body-subtitle {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+
+  .MuiButton-outlinedPrimary {
+    background-color: #ffffff;
+    border: 0.15rem solid $BCgovBlue;
+    color: $BCgovBlue;
+    height: 2.5rem;
+  }
+}
+
+.dlg-full-body-details {
+  padding: 1.5rem 3rem;
+  background-color: #fff !important;
+  margin-bottom: 2rem;
+}
+
+.dlg-details-section {
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.MuiAppBar-positionFixed {
+  position: relative !important;
+}
+
+// on overview pages, make disabled fields normal font color
+.Mui-disabled {
+  color: inherit;
+}

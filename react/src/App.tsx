@@ -46,7 +46,7 @@ export default function App(): JSX.Element {
                     <AppHeader />
                     <div className={'app-body'}>
                       <div className='app-body__inner'>
-                        <SideBar routes={AppRoutes} sidebarContent={sidebar} />
+                        {/* <SideBar routes={AppRoutes} sidebarContent={sidebar} /> */}
                         <ResponseProvider>
                           <SnackbarWrapper>
                             <DefaultLayout>

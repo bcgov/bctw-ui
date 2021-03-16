@@ -112,7 +112,7 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
         </List>
       </Drawer>
       <Divider />
-      <div> {sidebarContent} </div>
+      <div>{sidebarContent}</div>
     </div>
   );
 }

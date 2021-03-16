@@ -1,6 +1,5 @@
 import { IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
-import { PageProp } from 'components/component_interfaces';
 import Table from 'components/table/Table';
 import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
@@ -15,7 +14,7 @@ import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/anim
 import { formatAxiosError } from 'utils/common';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 
-export default function CritterPage(props: PageProp): JSX.Element {
+export default function CritterPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
@@ -54,7 +53,7 @@ export default function CritterPage(props: PageProp): JSX.Element {
 
   const handleSelect = (row: Animal): void => {
     setEditObj(row);
-    props.setSidebarContent(<p>critter id: {row.critter_id}</p>);
+    // props.setSidebarContent(<p>critter id: {row.critter_id}</p>);
   };
 
   const saveCritter = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await saveMutation(a);
@@ -110,6 +109,7 @@ export default function CritterPage(props: PageProp): JSX.Element {
           </AddEditViewer>
         </ModifyCritterWrapper>
       </div>
+      <p>{editObj.critter_id}</p>
     </div>
   );
 }

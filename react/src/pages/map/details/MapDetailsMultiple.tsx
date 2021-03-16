@@ -1,13 +1,15 @@
-import { ITelemetryDetail, IUniqueFeature } from 'types/map';
+import { ITelemetryDetail, IUniqueFeature, OnCritterRowClick, OnPanelRowHover } from 'types/map';
 import { TableRow, TableCell, TableBody, Table, TableContainer, Paper, TableHead } from '@material-ui/core';
 
 export type MapMultipleSelected = {
-  handleCritterClick: (row: ITelemetryDetail) => void;
+  handleCritterHover: OnPanelRowHover;
+  handleCritterClick: OnCritterRowClick;
   features: IUniqueFeature[];
+  crittersSelected: string[];
 };
 
 export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Element {
-  const { features, handleCritterClick } = props;
+  const { features, crittersSelected, handleCritterClick, handleCritterHover } = props;
 
   return (
     <TableContainer component={Paper}>
@@ -18,17 +20,20 @@ export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Elem
             <TableCell><b>WLH ID</b></TableCell>
             <TableCell><b>Device ID</b></TableCell>
             <TableCell><b>Frequency</b></TableCell>
+            <TableCell><b>Total Points</b></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {features.map((u, idx) => {
+          {features.map((u) => {
             return (
               <Row
-                rowIndex={idx}
                 key={u.critter_id}
-                count={u.count}
+                pointIDs={u.features.map(f => f.id)}
+                isSelectedInMap={crittersSelected.indexOf(u.critter_id) !== -1}
+                // fixme: why only the details of the first feature when this can be different?
                 row={u.features[0].properties}
                 handleCritterClick={handleCritterClick}
+                handleCritterHover={handleCritterHover}
               />
             );
           })}
@@ -39,21 +44,28 @@ export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Elem
 }
 
 type IRowProps = {
-  rowIndex: number;
+  pointIDs: number[];
+  isSelectedInMap: boolean;
   row: ITelemetryDetail;
-  count: number;
-  handleCritterClick: (critter_id: ITelemetryDetail) => void;
+  handleCritterClick: OnCritterRowClick;
+  handleCritterHover: OnPanelRowHover;
 };
 function Row(props: IRowProps): JSX.Element {
-  const { row, handleCritterClick } = props;
+  const { row, handleCritterClick, isSelectedInMap, pointIDs, handleCritterHover } = props;
   return (
-    <TableRow hover className={'details-multiple'}>
+    <TableRow
+      hover
+      className={`map-bottom-panel-row ${isSelectedInMap ? 'bottom-panel-row-is-map-selected' : ''}`}
+      onMouseEnter={(): void => handleCritterHover(pointIDs)}
+      onMouseLeave={(): void => handleCritterHover([])}
+    >
       <TableCell className={'critter-select'} onClick={(): void => handleCritterClick(row)}>
         {row.animal_id ?? 'unknown'}
       </TableCell>
       <TableCell>{row.wlh_id}</TableCell>
       <TableCell>{row.device_id}</TableCell>
       <TableCell>{row.frequency}</TableCell>
+      <TableCell>{pointIDs.length}</TableCell>
     </TableRow>
   );
 }

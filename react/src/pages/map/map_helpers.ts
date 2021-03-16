@@ -1,8 +1,8 @@
 import * as L from 'leaflet';
 import { ITelemetryDetail, ITelemetryFeature, IUniqueFeature } from 'types/map';
+import { formatLocal } from 'utils/time';
 import { DetailsSortOption } from './details/MapDetails';
-// import dayjs from 'dayjs';
-// import { formatLocal } from 'utils/time';
+import dayjs from 'dayjs';
 
 const isMortality = (feature: ITelemetryFeature): boolean => feature?.properties?.animal_status === 'Mortality';
 
@@ -12,7 +12,14 @@ const COLORS = {
   selected: '#6495ED'
 };
 
-const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventHandlerFn): void => {
+const fillPoint = (layer: any, selected = false): void => {
+  layer.setStyle({
+    weight: 1.0,
+    fillColor: selected ? COLORS.selected : isMortality(layer) ? COLORS.dead : COLORS.normal
+  });
+}
+
+const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventHandlerFn, onClosePopupHandler: L.LeafletEventHandlerFn): void => {
   pings.options = {
     pointToLayer: (feature, latlng): L.Layer => {
       // Mortality is red
@@ -30,6 +37,24 @@ const setupPingOptions = (pings: L.GeoJSON, onClickPointHandler: L.LeafletEventH
       // add the event listener
       marker.on('click', onClickPointHandler);
       return marker;
+    },
+    onEachFeature: (feature, layer): void => {
+      const p = feature.properties;
+      const g = feature.geometry as any; // Yes... this exists!
+      const x = g.coordinates[0]?.toFixed(5);
+      const y = g.coordinates[1]?.toFixed(5);
+      const t = dayjs(p.date_recorded).format(formatLocal);
+      const text = `
+        ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
+        <hr>
+        Device ID ${p.device_id} (${p.device_vendor}) <br>
+        ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
+        ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
+        ${t} <br>
+        ${x}, ${y}
+      `;
+      layer.bindPopup(text).addEventListener('popupopen', onClickPointHandler);
+      layer.bindPopup(text).addEventListener('popupclose', onClosePopupHandler);
     }
   };
 };
@@ -72,7 +97,6 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
 };
 
-
 const groupFeaturesByCritters = (features: ITelemetryFeature[], sortOption: DetailsSortOption): IUniqueFeature[] => {
   const uniques: IUniqueFeature[] = [];
   // filter out the (0,0) points
@@ -101,10 +125,6 @@ const groupFeaturesByCritters = (features: ITelemetryFeature[], sortOption: Deta
   return sorted;
 };
 
-const getGroupFeatureCount = (features: IUniqueFeature[]): number => {
-  return features.reduce((accum, cur) => accum + cur.count, 0);
-};
-
 export {
   setupPingOptions,
   setupSelectedPings,
@@ -112,5 +132,5 @@ export {
   isMortality,
   COLORS,
   groupFeaturesByCritters,
-  getGroupFeatureCount
+  fillPoint
 };

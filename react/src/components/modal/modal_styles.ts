@@ -23,11 +23,6 @@ const modalStyles = makeStyles((theme: Theme) =>
       textAlign: 'center',
       marginBottom: '15px'
     },
-    toolbar: {
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'flex-end'
-    }
   })
 );
 export default modalStyles;

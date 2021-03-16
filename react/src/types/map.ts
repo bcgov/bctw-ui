@@ -6,11 +6,13 @@ import { columnToHeader } from 'utils/common';
 import { formatWithUTCOffset } from 'utils/time';
 import { BCTW } from './common_types';
 
-
 interface MapRange {
-  start: string,
-  end: string
+  start: string;
+  end: string;
 }
+
+type OnPanelRowHover = (ids: number[]) => void;
+type OnCritterRowClick = (row: ITelemetryDetail) => void;
 
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   critter_id: string;
@@ -22,10 +24,10 @@ interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
 interface ITelemetryFeature extends GeoJSON.Feature {
   //  type: 'Feature';
   geometry: {
-    type: "Point";
+    type: 'Point';
     coordinates: number[];
-  }
-  id: number
+  };
+  id: number;
   properties: ITelemetryDetail;
 }
 
@@ -58,8 +60,12 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   population_unit: string;
   location: string;
   @Type(() => Date) date_recorded: Date;
-  @Expose() get formattedDevice(): string { return `${this.device_id} (${this.device_vendor}) `}
-  @Expose() get formattedDate(): string { return formatWithUTCOffset(this.date_recorded)}
+  @Expose() get formattedDevice(): string {
+    return `${this.device_id} (${this.device_vendor}) `;
+  }
+  @Expose() get formattedDate(): string {
+    return formatWithUTCOffset(this.date_recorded);
+  }
 
   formatPropAsHeader(str: string): string {
     switch (str) {
@@ -79,10 +85,18 @@ export class TelemetryFeature implements ITelemetryFeature {
   geometry: GeoJSON.Point;
   properties: TelemetryDetail;
   @Expose() get location(): string {
-    const lat = `+${+(this.geometry.coordinates[1]).toFixed(2)}\xb0`;
-    const long = `${+(this.geometry.coordinates[0]).toFixed(2)}\xb0`;
-    return `${lat} ${long}`
+    const lat = `+${+this.geometry.coordinates[1].toFixed(2)}\xb0`;
+    const long = `${+this.geometry.coordinates[0].toFixed(2)}\xb0`;
+    return `${lat} ${long}`;
   }
 }
 
-export type { ITelemetryFeature, ITelemetryFeatureCollection, ITelemetryDetail, IUniqueFeature, MapRange };
+export type {
+  ITelemetryFeature,
+  ITelemetryFeatureCollection,
+  ITelemetryDetail,
+  IUniqueFeature,
+  MapRange,
+  OnCritterRowClick,
+  OnPanelRowHover
+};

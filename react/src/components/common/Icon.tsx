@@ -14,6 +14,7 @@ import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
+import FilterListIcon from '@material-ui/icons/FilterList';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -31,6 +32,7 @@ const mappings: Record<string, JSX.Element> = {
   admin: <SupervisorAccountIcon />,
   done: <DoneIcon />,
   close: <CloseIcon />,
+  filter: <FilterListIcon />,
   error: <ErrorIcon htmlColor='orange'/>,
 };
 

@@ -20,47 +20,6 @@
   }
 }
 
-.bottom-panel {
-  bottom: 0;
-  position: absolute;
-  width: 100%;
-  background-color: #ffffff;
-  height: 30rem;
-  overflow-y: auto;
-  border-left: 1px solid darkslategrey;
-
-  .MuiPaper-elevation1 {
-    box-shadow: none;
-  }
-}
-
-.appear-above-map {
-  z-index: 314159;
-}
-
-.side-panel {
-  width: 20rem;
-  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
-  overflow-y: auto;
-  div {
-    margin-bottom: 0.5rem;
-  }
-}
-
-.side-panel-export {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-}
-
-.side-panel-title {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  font: inherit;
-}
-
 #map {
   position: absolute;
   width: 100%;
@@ -81,15 +40,67 @@
   transform: translate(0px,85px);
 }
 
-// 
-// 
+//
+// side panel
+//
 
-.details-individual-prominent {
-  font-weight: bolder !important;
-  color: #a62700 !important;
+.side-panel {
+  overflow-y: auto;
+  div {
+    margin-bottom: 0.5rem;
+  }
+  // defaults to 0, cuts off header
+  .MuiDrawer-paper {
+    top:inherit;
+  }
 }
 
-.details-multiple {
+.side-panel-title {
+  font: inherit;
+  margin: 0 auto;
+}
+
+.side-panel-body {
+  display: flex;
+  flex-direction: column;
+  // padding: 0 2rem;
+  margin: 0 auto;
+}
+
+// 
+//  bottom panel
+// 
+
+.bottom-panel {
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  background-color: #ffffff;
+  height: 30rem;
+  overflow-y: auto;
+  border-left: 1px solid darkslategrey;
+
+  .MuiPaper-elevation1 {
+    box-shadow: none;
+  }
+  .MuiTableContainer-root {
+    overflow-x: hidden;
+  }
+}
+
+// must be at least this index to appear for full-screen dialog
+.appear-above-map {
+  z-index: 314159;
+}
+
+.map-bottom-panel-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+}
+
+.map-bottom-panel-row {
   width: 100%;
   td > .MuiTableCell-root, .MuiTableCell-body {
     border: none;
@@ -98,47 +109,17 @@
   border: 1px solid rgba(71, 77, 75, 0.1);
 }
 
-.details-multiple-row-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.details-multiple-row-body {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-
-  td > .MuiTableCell-root, .MuiTableCell-body {
-    width: 50%;
-    margin: auto;
-    padding: 0px;
-  }
-}
-
-.details-multiple-cell-span {
-  margin: 0px 20px;
-  color: darkslategrey;
-  font-weight: bolder;
-  width: 100%;
-}
-
-.details-multiple-cell-right {
-  margin-left: 10px;
-}
-
 // map details parent table box
 .MuiBox-root-21 {
   padding: 5px !important;
 }
 
-.details-bottom {
-  .MuiTableContainer-root {
-    overflow-x: hidden;
-  }
-}
-
+// the bottom panel critter row "link"
 .critter-select {
   color: rgba(0, 47, 255, 0.78) !important;
   cursor: pointer;
+}
+
+.bottom-panel-row-is-map-selected {
+  background-color: lavender;
 }

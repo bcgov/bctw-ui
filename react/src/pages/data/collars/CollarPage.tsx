@@ -1,6 +1,5 @@
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
-import { PageProp } from 'components/component_interfaces';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import Table from 'components/table/Table';
 import { ITableQueryProps } from 'components/table/table_interfaces';
@@ -16,7 +15,7 @@ import { collarPropsToDisplay, Collar, eCollarAssignedStatus, attachedCollarProp
 import { formatAxiosError } from 'utils/common';
 import AddEditViewer from '../common/AddEditViewer';
 
-export default function CollarPage(props: PageProp): JSX.Element {
+export default function CollarPage(): JSX.Element {
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
   const bctwApi = useTelemetryApi();
@@ -47,7 +46,6 @@ export default function CollarPage(props: PageProp): JSX.Element {
   // set editing object when table row is selected
   const handleSelect = (row: Collar): void => {
     setEditObj(row);
-    props.setSidebarContent(<p>collar id: {row.collar_id}</p>);
   };
   const handleShowDeleteModal = (): void => {
     setShowConfirmDelete((o) => !o);
@@ -135,6 +133,7 @@ export default function CollarPage(props: PageProp): JSX.Element {
           <EditCollar {...editProps} />
         </AddEditViewer>
       </div>
+      <p>{editObj.collar_id}</p>
     </div>
   );
 }

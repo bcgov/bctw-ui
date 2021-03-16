@@ -1,4 +1,4 @@
-import * as L from 'leaflet'; // needs to be imported first?
+import * as L from 'leaflet';
 import './MapPage.scss';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -9,15 +9,16 @@ import pointsWithinPolygon from '@turf/points-within-polygon';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { addTileLayers, COLORS, isMortality, setupPingOptions, setupSelectedPings } from 'pages/map/map_helpers';
+import { addTileLayers, COLORS, fillPoint, isMortality, setupPingOptions, setupSelectedPings } from 'pages/map/map_helpers';
 import MapDetails from 'pages/map/details/MapDetails';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { formatDay, getToday } from 'utils/time';
-import { ITelemetryFeature, MapRange } from 'types/map';
+import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
 import MapSidebarFilters from './MapSidebarFilters';
 import DialogFullScreen from 'components/modal/DialogFullScreen';
 import { ICodeFilter } from 'types/code';
+import CritterOverView from 'pages/data/animals/CritterOverview';
 
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -27,19 +28,34 @@ export default function MapPage(): JSX.Element {
   const [tracks] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Tracks
   const [pings] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Pings
 
-  const [range, setRange] = useState<MapRange>({ start: dayjs().subtract(14, 'day').format(formatDay), end: getToday()});
+  const [range, setRange] = useState<MapRange>({
+    start: dayjs().subtract(14, 'day').format(formatDay),
+    end: getToday()
+  });
 
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
 
   const [showModal, setShowModal] = useState<boolean>(false);
 
+  // critter overview state
+  const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
+  const [filters, setFilters] = useState<ICodeFilter[]>([]);
+
+  // previously selected point
   let previousLayer = null;
 
-  const drawnItems = new L.FeatureGroup(); // Store the selection shapes
+  // Store the selection shapes
+  const drawnItems = new L.FeatureGroup();
 
-  const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(range.start, range.end);
-  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(range.start, range.end);
+  const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(
+    range.start,
+    range.end
+  );
+  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(
+    range.start,
+    range.end
+  );
   // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
 
   useEffect(() => {
@@ -64,27 +80,46 @@ export default function MapPage(): JSX.Element {
     const feature: ITelemetryFeature = layer?.feature;
     // remove the highlight from the previous layer
     if (previousLayer && previousLayer.feature?.id !== feature.id) {
-      previousLayer.setStyle({
-        weight: 1.0,
-        fillColor: isMortality(previousLayer.feature) ? COLORS.dead : COLORS.normal
-      });
+      fillPoint(previousLayer);
     }
-    layer.setStyle({ weight: 3.0, fillColor: COLORS.selected });
+    fillPoint(layer, true);
     previousLayer = layer;
-    // setSelectedFeatureIDs([feature.id as number]);
+    setSelectedFeatureIDs([feature.id]);
   };
 
-  setupPingOptions(pings, handleMapPointClick);
+  const handleMapClosePopup = (event: L.LeafletEvent): void => {
+    fillPoint(event.target);
+    setSelectedFeatureIDs([]);
+  }
+
+  // highlights the selected rows in bottom panel
+  const handleBottomPanelRowHover = (ids: number[]): void => {
+    mapRef.current.eachLayer((layer) => {
+      const l = layer as any;
+      const id = l.feature?.id;
+      if (ids.includes(id)) {
+        fillPoint(l, true);
+      } else {
+        if (typeof l.setStyle === 'function') {
+          l.setStyle({ fillColor: isMortality(l.feature) ? COLORS.dead : COLORS.normal });
+        }
+      }
+    });
+  };
+
+  setupPingOptions(pings, handleMapPointClick, handleMapClosePopup);
 
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
 
   //
-  const displaySelectedUnits = (overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>): void => {
-    const features = overlay.features.map(f => f.id);
+  const displaySelectedUnits = (
+    overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
+  ): void => {
+    const features = overlay.features.map((f) => f.id);
     // when selection is cleared, restore all telemetry in the details pane
     if (features.length === 0 && pingsData) {
-      setSelectedFeatureIDs([])
+      setSelectedFeatureIDs([]);
       return;
     }
     setSelectedFeatureIDs(features as number[]);
@@ -159,19 +194,21 @@ export default function MapPage(): JSX.Element {
       });
   };
 
-  const handleChangeFilters = (newRange: MapRange, filters: ICodeFilter[]) => {
+  const handleChangeFilters = (newRange: MapRange, filters: ICodeFilter[]): void => {
     if (newRange.start !== range.start || newRange.end !== range.end) {
       setRange(newRange);
     }
-    if (filters.length) {
-      console.log('new filters !');
-    }
-  }
+    // console.log('MapPage: filters changed', filters)
+    setFilters((o) => filters);
+  };
 
-  const handleSelectCritter = () => {
-    setShowModal(o => !o);
-  }
+  // show the critter overview modal when a row is clicked in bottom panel
+  const handleSelectCritter = (row: ITelemetryDetail): void => {
+    setSelectedDetail(row);
+    setShowModal((o) => !o);
+  };
 
+  // initialize the map
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
@@ -191,7 +228,7 @@ export default function MapPage(): JSX.Element {
     pings.addTo(mapRef.current);
   }, [pings]);
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e): void => {
     if (!(e.ctrlKey && e.keyCode == 83)) {
       return;
     }
@@ -213,10 +250,16 @@ export default function MapPage(): JSX.Element {
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='map' onKeyDown={handleKeyPress}></div>
         <div className={`bottom-panel ${showModal ? '' : 'appear-above-map'}`}>
-          <MapDetails features={features} selectedFeatureIDs={selectedFeatureIDs} handleSelectCritter={handleSelectCritter}/>
+          <MapDetails
+            features={features}
+            filters={filters}
+            selectedFeatureIDs={selectedFeatureIDs}
+            handleSelectCritter={handleSelectCritter}
+            handleHoverCritter={handleBottomPanelRowHover}
+          />
         </div>
         <DialogFullScreen open={showModal} handleClose={setShowModal}>
-          <div>hi</div>
+          <CritterOverView detail={selectedDetail} />
         </DialogFullScreen>
       </div>
     </div>

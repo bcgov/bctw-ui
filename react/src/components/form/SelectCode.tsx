@@ -5,26 +5,27 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError, removeProps } from 'utils/common';
-import { SelectProps } from "@material-ui/core";
+import { SelectProps } from '@material-ui/core';
 
 type ISelectProps = SelectProps & {
   codeHeader: string; // code header type to retrieve
-  defaultValue: string;
+  defaultValue?: string;
   labelTitle: string;
-  changeHandler: (o: Record<string, unknown>, isChange: boolean ) => void;
+  changeHandler: (o: Record<string, unknown>, isChange: boolean) => void;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
+  triggerReset?: boolean; // force components that are 'multiple' to unselect all values
 };
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectCode(props: ISelectProps): JSX.Element {
-  const { codeHeader, defaultValue, changeHandler, changeHandlerMultiple, labelTitle, multiple } = props;
+  const { codeHeader, defaultValue, changeHandler, changeHandlerMultiple, labelTitle, multiple, triggerReset } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
   const [values, setValues] = useState<string[]>([defaultValue]);
   const [codes, setCodes] = useState<ICode[]>([]);
 
-  // remove these properties
-  const propsToPass = removeProps(props, ['codeHeader', 'changeHandler', 'labelTitle']);
+  // to handle React warning about not recognizing the prop on a DOM element
+  const propsToPass = removeProps(props, ['codeHeader', 'changeHandler', 'labelTitle', 'changeHandlerMultiple', 'triggerReset']);
 
   // load this codeHeaders codes from db
   const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useCodes(0, codeHeader);
@@ -44,6 +45,13 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     };
     updateOptions();
   }, [isSuccess]);
+
+  useEffect(() => {
+    if (triggerReset && multiple) {
+      // console.log('reset triggered from parent component!');
+      setValues([]);
+    }
+  }, [triggerReset])
 
   const handleChange = (event: React.ChangeEvent<{ value }>): void => {
     const v = event.target.value;
@@ -111,7 +119,9 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
             renderValue={(selected: string | string[]): string => {
               if (multiple) {
                 // remove empty string values
-                return (selected as string[]).filter(a => a).join(selected.length > 1 ? ', ' : '');
+                // return (selected as string[]).filter((a) => a).join(selected.length > 1 ? ', ' : '');
+                const l = (selected as string[]).filter((a) => a);
+                return l.length > 1 ? `${l.length} selected` : l[0];
               }
               return selected as string;
             }}
