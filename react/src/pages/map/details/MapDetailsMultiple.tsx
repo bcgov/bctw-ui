@@ -1,53 +1,30 @@
-import { ITelemetryDetail, ITelemetryFeature } from 'types/map';
-import {
-  IconButton,
-  TableRow,
-  TableCell,
-  TableBody,
-  Table,
-  Box,
-  TableHead,
-  Collapse,
-  TableContainer,
-  Paper
-} from '@material-ui/core';
-import { useState } from 'react';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import { ITelemetryDetail, IUniqueFeature } from 'types/map';
+import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper, InputLabel } from '@material-ui/core';
+import ErrorIcon from '@material-ui/icons/Error';
 
-type MapMultipleSelected = {
-  features: ITelemetryFeature[];
+export type MapMultipleSelected = {
+  handleCritterClick: (critter_id: string) => void;
+  features: IUniqueFeature[];
 };
 
 export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Element {
-  const { features } = props;
+  const { features, handleCritterClick } = props;
 
-  if (!features && features.length) {
-    return null;
-  }
-  const uniqueFeatures: ITelemetryDetail[] = [];
-  features.forEach((f) => {
-    const detail: ITelemetryDetail = f.properties;
-    const found = uniqueFeatures.find((c) => c.critter_id === detail.critter_id);
-    if (!found) {
-      uniqueFeatures.push(detail);
-    }
-  });
   return (
     <Box p={3}>
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCell>
-                <b>Device Details</b>
-              </TableCell>
-            </TableRow>
-          </TableHead>
           <TableBody>
-            {uniqueFeatures.map((v) => {
-              return <Row key={v.collar_id} row={v} />;
+            {features.map((u, idx) => {
+              return (
+                <Row
+                  rowIndex={idx}
+                  key={u.critter_id}
+                  count={u.count}
+                  row={u.features[0].properties}
+                  handleCritterClick={handleCritterClick}
+                />
+              );
             })}
           </TableBody>
         </Table>
@@ -57,52 +34,36 @@ export default function MapDetailsMultiple(props: MapMultipleSelected): JSX.Elem
 }
 
 type IRowProps = {
+  rowIndex: number;
   row: ITelemetryDetail;
+  count: number;
+  handleCritterClick: (critter_id: string) => void;
 };
 function Row(props: IRowProps): JSX.Element {
-  const { row } = props;
-  const [open, setOpen] = useState(false);
-
+  const { row, rowIndex, count, handleCritterClick } = props;
   return (
-    <>
-      <TableRow>
-        <TableCell style={{ width: 40 }}>
-          <IconButton size='small' onClick={(): void => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+    <TableRow hover className={'details-multiple'} onClick={(): void => handleCritterClick(row.critter_id)}>
+      <div className={'details-multiple-row-header'}>
+        <TableCell>
+          {rowIndex % 2 === 0 ? <ErrorIcon className={'details-warning-icon'} htmlColor='orange' /> : null}
+          <strong>{row.animal_id}</strong>
+        </TableCell>
+        <TableCell>{count} Points</TableCell>
+      </div>
+      <div className={'details-multiple-row-body'}>
+        <TableCell>
+          <span className={'details-multiple-cell-span'}>WLH ID:</span>
+          <span className='details-multiple-cell-right'>{row.wlh_id}</span>
         </TableCell>
         <TableCell>
-          Device <b>{row.device_id}</b> frequency: <b>{row.frequency}</b>
+          <span className={'details-multiple-cell-span'}>Device ID:</span>
+          <span className='details-multiple-cell-right'>{row.device_id}</span>
         </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout='auto' unmountOnExit>
-            <Box margin={1}>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <strong>Animal ID</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Status</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>{row.animal_id ?? 'unknown'}</TableCell>
-                    <TableCell>{row.animal_status ?? 'unknown'}</TableCell>
-                    {/* <TableCell align='right'>{formatDateStr((row as any).radio_frequency)}</TableCell> */}
-                    {/* <TableCell align='right'>{(row as any).radio_frequency}</TableCell> */}
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
+        <TableCell>
+          <span className={'details-multiple-cell-span'}>Frequency:</span>
+          <span className='details-multiple-cell-right'>{row.frequency}</span>
         </TableCell>
-      </TableRow>
-    </>
+      </div>
+    </TableRow>
   );
 }

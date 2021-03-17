@@ -64,11 +64,11 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
           // do form validation before passing change handler to EditModal
-          const onChange = (v: Record<string, unknown>): void => {
+          const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
             if (v) {
               setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
             }
-            handlerFromContext(v);
+            handlerFromContext(v, modifyCanSave);
           };
 
           return (
@@ -110,7 +110,8 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                           <SelectCode
                             key={d.key}
                             codeHeader={d.key}
-                            defaultValue={d.value}
+                            labelTitle={editing.formatPropAsHeader(d.key)}
+                            defaultValue={d.value as string}
                             changeHandler={onChange}
                             required={requiredFields.includes(d.key)}
                             error={!!errors[d.key]}

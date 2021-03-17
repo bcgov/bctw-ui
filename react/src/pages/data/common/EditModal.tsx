@@ -91,14 +91,14 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   };
 
   // triggered on a form input change, newProp will be an object with a single key and value
-  const handleChange = (newProp: Record<string, unknown>): void => {
+  const handleChange = (newProp: Record<string, unknown>, isChange = true): void => {
     setNewObj((old) => Object.assign(old, newProp));
     // get the first key
     const key: string = Object.keys(newProp)[0];
     // create matching key/val object from the item being edited
     const og = { [key]: editing[key] ?? '' };
     const isSame = objectCompare(newProp, og);
-    setCanSave(!isSame);
+    setCanSave(isChange && !isSame);
   };
 
   const reset = (): void => {

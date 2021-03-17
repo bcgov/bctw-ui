@@ -15,17 +15,25 @@ interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
 }
 interface ITelemetryFeature extends GeoJSON.Feature {
   //  type: 'Feature';
-  // geometry {
-  // type: "Point";
-  // coordinates: Position;
-  // }
-  // id: number
+  geometry: {
+    type: "Point";
+    coordinates: number[];
+  }
+  id: number
   properties: ITelemetryDetail;
 }
 
 interface ITelemetryFeatureCollection extends GeoJSON.FeatureCollection {
   // type: "FeatureCollection";
   // features: Array<Feature<G, P>>;
+  features: ITelemetryFeature[];
+}
+
+interface IUniqueFeature {
+  critter_id: string;
+  device_id: number;
+  frequency: number;
+  count: number;
   features: ITelemetryFeature[];
 }
 
@@ -71,4 +79,4 @@ export class TelemetryFeature implements ITelemetryFeature {
   }
 }
 
-export type { ITelemetryFeature, ITelemetryFeatureCollection, ITelemetryDetail };
+export type { ITelemetryFeature, ITelemetryFeatureCollection, ITelemetryDetail, IUniqueFeature };

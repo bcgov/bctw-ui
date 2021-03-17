@@ -28,7 +28,7 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BctwBaseType {
   collar_transaction_id: string;
   device_deployment_status: string;
   device_make: string;
-  device_malfunction_type: Date;
+  device_malfunction_type: string;
   device_model: string;
   device_status: string;
   device_type: string;
@@ -53,7 +53,7 @@ export class Collar implements ICollar {
   device_id: number;
   device_deployment_status: string;
   device_make: string;
-  device_malfunction_type: Date;
+  device_malfunction_type: string;
   device_model: string;
   device_status: string;
   device_type: string;
@@ -98,11 +98,12 @@ export class Collar implements ICollar {
         return 'Individual ID';
       case 'max_transmission_date':
         return 'Last Update';
-      case 'device_deployment_status':
       case 'device_type':
       case 'device_make':
       case 'device_model':
         return columnToHeader(str.replace('device_', ''));
+      case 'device_deployment_status':
+        return 'Deployed';
       default:
         return columnToHeader(str);
     }

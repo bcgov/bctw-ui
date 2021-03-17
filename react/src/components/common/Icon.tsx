@@ -13,6 +13,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
+import ErrorIcon from '@material-ui/icons/Error';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -29,7 +30,8 @@ const mappings: Record<string, JSX.Element> = {
   profile: <PersonIcon />,
   admin: <SupervisorAccountIcon />,
   done: <DoneIcon />,
-  close: <CloseIcon />
+  close: <CloseIcon />,
+  error: <ErrorIcon htmlColor='orange'/>,
 };
 
 type IconProps = {
