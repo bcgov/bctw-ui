@@ -1,0 +1,43 @@
+{
+    "name": "bctw-ui",
+    "namespaceSuffix": "0dff19",
+    "namespace": {
+        "tools": "tools",
+        "dev": "dev",
+        "test": "test"
+    },
+    "version": "1.0.0",
+    "previousVersion": "NA",
+    "olderVersions": [],
+    "module": {
+        "api": "bctw-api",
+        "data-collector": "data-collector"
+    },
+    "domain": {
+        "dev": "moe-bctw-dev.apps.silver.devops.gov.bc.ca",
+        "test": "moe-bctw-test.apps.silver.devops.gov.bc.ca"
+    },
+    "certificateURL": {
+        "dev": "https://dev.oidc.gov.bc.ca/auth/realms/0jjhl1lc/protocol/openid-connect/certs",
+        "test": "https://test.oidc.gov.bc.ca/auth/realms/0jjhl1lc/protocol/openid-connect/certs",
+        "prod": "https://oidc.gov.bc.ca/auth/realms/0jjhl1lc/protocol/openid-connect/certs"
+    },
+    "sso": {
+        "dev": {
+            "url": "https://dev.oidc.gov.bc.ca",
+            "clientId": "bctw-ui",
+            "realm": "0jjhl1lc"
+        },
+        "test": {
+            "url": "https://test.oidc.gov.bc.ca",
+            "clientId": "bctw-ui",
+            "realm": "0jjhl1lc"
+        },
+        "prod": {
+            "url": "https://oidc.gov.bc.ca",
+            "clientId": "bctw-ui",
+            "realm": "0jjhl1lc"
+        }
+    }
+}
+
