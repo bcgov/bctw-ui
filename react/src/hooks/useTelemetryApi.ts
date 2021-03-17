@@ -66,8 +66,8 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const useTracks = (start: string, end: string): UseQueryResult<GeoJSON.GeoJsonObject, AxiosError> => {
-    return useQuery<GeoJSON.GeoJsonObject, AxiosError>(
+  const useTracks = (start: string, end: string): UseQueryResult<GeoJSON.GeoJsonObject[], AxiosError> => {
+    return useQuery<GeoJSON.GeoJsonObject[], AxiosError>(
       ['tracks', start, end],
       () => mapApi.getTracks(start, end),
       defaultQueryOptions

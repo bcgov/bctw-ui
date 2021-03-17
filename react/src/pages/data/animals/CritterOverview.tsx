@@ -1,15 +1,7 @@
-import { Button, Paper, Typography } from '@material-ui/core';
-import { CritterCollarModalProps } from 'components/component_interfaces';
-import { getInputTypesOfT, InputType, validateRequiredFields } from 'components/form/form_helpers';
+import { Button, Paper } from '@material-ui/core';
 import TextField from 'components/form/Input';
-import { CritterStrings as CS } from 'constants/strings';
-import ChangeContext from 'contexts/InputChangeContext';
-import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
-import { useEffect, useState } from 'react';
 import { Animal } from 'types/animal';
 import { ITelemetryDetail } from 'types/map';
-import { eCritterPermission } from 'types/user';
-import { columnToHeader, removeProps } from 'utils/common';
 
 type CritterOverViewProps = {
   detail: ITelemetryDetail;
@@ -18,14 +10,16 @@ type CritterOverViewProps = {
 const critterGeneral = ['animal_status', 'species', 'sex', 'life_stage', 'estimated_age', 'juvenile_at_heel'];
 const critterIds = ['wlh_id', 'animal_id', 'nickname', 'ear_tag_left', 'ear_tag_right', 'population_unit'];
 const critterLoc = ['region'];
+
 export default function CritterOverView(props: CritterOverViewProps): JSX.Element {
   // const { isEdit, editing, editableProps, selectableProps } = props;
   const { detail } = props;
 
-  const createFields = (props: string[], detail: ITelemetryDetail) => {
+  const createFields = (props: string[], detail: ITelemetryDetail): React.ReactNode => {
     return props.map((p, idx) => {
       return (
         <TextField
+          className={'text-disabled'}
           key={idx}
           propName={p}
           defaultValue={detail[p] ?? 'unknown'}
@@ -36,18 +30,13 @@ export default function CritterOverView(props: CritterOverViewProps): JSX.Elemen
       )
     })
   }
-
   // const canEdit = !isEdit ? true : editing.permission_type === eCritterPermission.change;
-
-  // const [errors, setErrors] = useState<Record<string, unknown>>({});
-  // const [inputTypes, setInputTypes] = useState<{ key: string; type: InputType; value: unknown }[]>([]);
-
   return (
     <>
       <Paper elevation={3} className={'dlg-full-title'}>
         <div>
           <h1>WLH ID: {detail.wlh_id ?? 'No assigned ID'}</h1>
-          <Button color='primary' variant='contained'>Active</Button>
+          <Button onClick={null} color='primary' variant='contained'>Active</Button>
         </div>
         <h4>{detail.species} | {detail.animal_status}</h4>
       </Paper>

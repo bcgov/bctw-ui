@@ -11,6 +11,7 @@ interface MapRange {
   end: string;
 }
 
+type DetailsSortOption = 'animal_id' | 'device_id' | 'frequency';
 type OnPanelRowHover = (ids: number[]) => void;
 type OnCritterRowClick = (row: ITelemetryDetail) => void;
 
@@ -73,6 +74,8 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
         return 'WLH ID';
       case 'animal_id':
         return 'Animal ID';
+      case 'device_id':
+        return 'Device ID';
       default:
         return columnToHeader(str);
     }
@@ -98,5 +101,6 @@ export type {
   IUniqueFeature,
   MapRange,
   OnCritterRowClick,
-  OnPanelRowHover
+  OnPanelRowHover,
+  DetailsSortOption,
 };

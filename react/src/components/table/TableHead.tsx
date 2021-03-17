@@ -51,7 +51,8 @@ export default function TableHead<T extends BCTW>(props: ITableHeadProps<T>): JS
           {createHeadCell(headerData, headersToDisplay).map((headCell) => (
             <TableCell
               key={headCell.id as string}
-              align={headCell.numeric ? 'right' : 'left'}
+              // align={headCell.numeric ? 'right' : 'left'}
+              align={'left'}
               padding={headCell.disablePadding ? 'none' : 'default'}
               sortDirection={orderBy === headCell.id ? order : false}>
               <TableSortLabel

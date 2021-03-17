@@ -1,35 +1,38 @@
-import { Divider, Drawer, IconButton, InputLabelProps } from '@material-ui/core';
+import { Drawer, IconButton, InputLabelProps } from '@material-ui/core';
 import { FilterList, Close } from '@material-ui/icons';
 import { PageProp } from 'components/component_interfaces';
 import clsx from 'clsx';
 import Button from 'components/form/Button';
 import TextField from 'components/form/Input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SelectCode from 'components/form/SelectCode';
 import { ICodeFilter } from 'types/code';
 import { MapRange } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
+import Checkbox from 'components/form/Checkbox';
 
-type SidebarFiltersProps = PageProp & {
+type MapFiltersProps = PageProp & {
   start: string;
   end: string;
-  onChange: (r: MapRange, filters: ICodeFilter[]) => void;
+  onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
+  onShowLatestPings: (b: boolean) => void;
 };
 
-/**
- *
- * @param props
- */
-export default function MapSidebarFilters(props: SidebarFiltersProps): JSX.Element {
+export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const labelProps: InputLabelProps = { shrink: true };
   const [open, setOpen] = useState<boolean>(true);
   const classes = drawerStyles();
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
+  const [numFiltersSelected, setNumFiltersSelected] = useState<number>(0);
   const [start, setStart] = useState<string>(props.start);
   const [end, setEnd] = useState<string>(props.end);
   const [reset, setReset] = useState<boolean>(false);
-
   const [applyButtonDisabledStatus, setApplyButtonDisabledStatus] = useState<boolean>(true);
+  const [isLatestPing, setIsLatestPing] = useState<boolean>(false);
+
+  useEffect(() => {
+    setNumFiltersSelected(filters.length);
+  }, [filters]);
 
   const changeDate = (event): void => {
     const key = Object.keys(event)[0];
@@ -39,18 +42,19 @@ export default function MapSidebarFilters(props: SidebarFiltersProps): JSX.Eleme
     } else {
       setEnd(val);
     }
+    setApplyButtonDisabledStatus(false);
   };
 
   /**
    * handler for when a select component is changed
-   * @param v value passed from select component
-   * @param ch the code header
+   * @param filters array passed from multi-select component
+   * @param code_header the code header
    */
-  const changeFilter = (v: ICodeFilter[], ch: string): void => {
+  const changeFilter = (filters: ICodeFilter[], code_header: string): void => {
     setApplyButtonDisabledStatus(false);
     setFilters((o) => {
-      const notThisFilter = o.filter((prev) => prev.code_header !== ch);
-      const ret = [...notThisFilter, ...v];
+      const notThisFilter = o.filter((prev) => prev.code_header !== code_header);
+      const ret = [...notThisFilter, ...filters];
       return ret;
     });
   };
@@ -61,15 +65,14 @@ export default function MapSidebarFilters(props: SidebarFiltersProps): JSX.Eleme
    * @param reset force calling the parent handler with empty array
    */
   const handleApplyFilters = (event: React.MouseEvent<HTMLInputElement>, reset = false): void => {
-    props.onChange({ start, end }, reset ? [] : filters);
+    props.onApplyFilters({ start, end }, reset ? [] : filters);
   };
 
   /**
-   * 1) resets the filters state
-   * 2) triggers selects to unselect all menu items
-   * 3) updates apply button enabled status
+    1) resets the filters state
+    2) triggers selects to unselect all menu items
+    3) updates apply button enabled status
    */
-  //
   const resetFilters = (): void => {
     setApplyButtonDisabledStatus(true);
     // fixme: ugly
@@ -102,10 +105,15 @@ export default function MapSidebarFilters(props: SidebarFiltersProps): JSX.Eleme
     ));
   };
 
-  const handleDrawerOpen = () => {
-    setOpen((o) => !o);
+  const handleChangeLatestPings = (v: Record<string, boolean>): void => {
+    const val = v['Show Latest Pings'];
+    if (isLatestPing != val) {
+      setIsLatestPing(val);
+      props.onShowLatestPings(val);
+    }
   };
 
+  const handleDrawerOpen = (): void => setOpen((o) => !o);
   return (
     <div className={'side-panel'}>
       <Drawer
@@ -121,7 +129,7 @@ export default function MapSidebarFilters(props: SidebarFiltersProps): JSX.Eleme
           })
         }}>
         <div className={classes.toolbar}>
-          <IconButton onClick={handleDrawerOpen}>{open ? <Close /> : <FilterList />}</IconButton>
+          <IconButton onClick={handleDrawerOpen}>{open ? <Close /> : <FilterList htmlColor={'#ffffff'} />}</IconButton>
         </div>
         {open ? (
           <>
@@ -129,6 +137,13 @@ export default function MapSidebarFilters(props: SidebarFiltersProps): JSX.Eleme
               <h3>Filters</h3>
             </div>
             <div className='side-panel-body'>
+              <div>
+                <Checkbox
+                  label='Show Latest Pings'
+                  initialValue={isLatestPing}
+                  changeHandler={handleChangeLatestPings}
+                />
+              </div>
               <div>
                 <TextField
                   label='Select Start Date'
@@ -150,22 +165,15 @@ export default function MapSidebarFilters(props: SidebarFiltersProps): JSX.Eleme
                 />
               </div>
               {createMultiSelects()}
-              <div>
+              <div className={'side-btns'}>
                 <Button disabled={applyButtonDisabledStatus} onClick={handleApplyFilters}>
                   Apply
                 </Button>
-                <Button onClick={resetFilters}>Reset</Button>
+                <Button disabled={numFiltersSelected === 0} onClick={resetFilters}>
+                  Reset
+                </Button>
               </div>
-              <p>{filters.length} filters</p>
-              {/* <ul>
-                {filters.map((f) => {
-                  return (
-                    <li key={f.id}>
-                      {f.code_header}: {f.description}
-                    </li>
-                  );
-                })}
-              </ul> */}
+              <p>{numFiltersSelected} filters selected</p>
             </div>
           </>
         ) : (

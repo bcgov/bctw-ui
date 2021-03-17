@@ -55,6 +55,12 @@
   }
 }
 
+.side-btns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .side-panel-title {
   font: inherit;
   margin: 0 auto;

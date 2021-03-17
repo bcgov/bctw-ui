@@ -3,3 +3,13 @@
     min-width: 120px;
   }
 }
+
+// for use in overview pages to display disabled text fields
+.text-disabled {
+  .MuiInput-underline.Mui-disabled:before {
+    border-bottom-style: none;
+  }
+  .MuiInputBase-input {
+    color: #000;
+  }
+}

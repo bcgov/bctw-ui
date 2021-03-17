@@ -11,6 +11,15 @@ interface ICodeFilter {
   id: number;
 }
 
+// used in MapDetails to "group" filters
+// only uses description right now since map data is from views
+interface IGroupedCodeFilter {
+  code_header: string;
+  descriptions: string[];
+  // codes: string[];
+  // ids: number[];
+}
+
 /// represents a code and code header coming from backend
 interface ICode {
   id: number;
@@ -66,5 +75,6 @@ export class CodeHeaderInput implements BCTW, BctwBaseType {
 export type {
   ICode,
   ICodeFilter,
+  IGroupedCodeFilter,
   ICodeHeader,
 };

@@ -1,4 +1,4 @@
-import * as L from 'leaflet';
+import * as L from 'leaflet'; // must be imported first
 import './MapPage.scss';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -6,19 +6,20 @@ import 'leaflet/dist/leaflet.css';
 
 import { CircularProgress } from '@material-ui/core';
 import pointsWithinPolygon from '@turf/points-within-polygon';
+import DialogFullScreen from 'components/modal/DialogFullScreen';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { addTileLayers, COLORS, fillPoint, isMortality, setupPingOptions, setupSelectedPings } from 'pages/map/map_helpers';
+import CritterOverView from 'pages/data/animals/CritterOverview';
 import MapDetails from 'pages/map/details/MapDetails';
+import { setupPingOptions, setupSelectedPings, initMap } from 'pages/map/map_init';
+import { fillPoint, filterFeatures, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
+import MapFilters from 'pages/map/MapFilters';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
-import { formatDay, getToday } from 'utils/time';
-import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
-import MapSidebarFilters from './MapSidebarFilters';
-import DialogFullScreen from 'components/modal/DialogFullScreen';
 import { ICodeFilter } from 'types/code';
-import CritterOverView from 'pages/data/animals/CritterOverview';
+import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
+import { formatDay, getToday } from 'utils/time';
 
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -33,33 +34,25 @@ export default function MapPage(): JSX.Element {
     end: getToday()
   });
 
+  // for map bottom panel state
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
 
-  const [showModal, setShowModal] = useState<boolean>(false);
-
   // critter overview state
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
 
-  // previously selected point
-  let previousLayer = null;
-
-  // Store the selection shapes
+  // store the selection shapes
   const drawnItems = new L.FeatureGroup();
 
-  const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(
-    range.start,
-    range.end
-  );
-  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(
-    range.start,
-    range.end
-  );
+  const { start, end } = range;
+  const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
+  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
   // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
 
   useEffect(() => {
-    drawLatestPings();
+    clearLatestPings();
   }, [range]);
 
   useEffect(() => {
@@ -75,25 +68,30 @@ export default function MapPage(): JSX.Element {
     }
   }, [pingsData]);
 
-  const handleMapPointClick = (event: L.LeafletEvent): void => {
+  // initialize the map
+  useEffect(() => {
+    const updateComponent = (): void => {
+      if (!mapRef.current) {
+        initMap(mapRef, drawnItems, selectedPings, tracks, pings, drawSelectedLayer);
+      }
+    };
+    updateComponent();
+  });
+
+  const handlePointClick = (event: L.LeafletEvent): void => {
     const layer = event.target;
     const feature: ITelemetryFeature = layer?.feature;
-    // remove the highlight from the previous layer
-    if (previousLayer && previousLayer.feature?.id !== feature.id) {
-      fillPoint(previousLayer);
-    }
     fillPoint(layer, true);
-    previousLayer = layer;
     setSelectedFeatureIDs([feature.id]);
   };
 
-  const handleMapClosePopup = (event: L.LeafletEvent): void => {
+  const handlePointClosePopup = (event: L.LeafletEvent): void => {
     fillPoint(event.target);
     setSelectedFeatureIDs([]);
-  }
+  };
 
-  // highlights the selected rows in bottom panel
-  const handleBottomPanelRowHover = (ids: number[]): void => {
+  // highlights the selected rows in bottom panel when mouse is hovered over a point
+  const handlePointHover = (ids: number[]): void => {
     mapRef.current.eachLayer((layer) => {
       const l = layer as any;
       const id = l.feature?.id;
@@ -101,18 +99,18 @@ export default function MapPage(): JSX.Element {
         fillPoint(l, true);
       } else {
         if (typeof l.setStyle === 'function') {
-          l.setStyle({ fillColor: isMortality(l.feature) ? COLORS.dead : COLORS.normal });
+          fillPoint(l);
         }
       }
     });
   };
 
-  setupPingOptions(pings, handleMapPointClick, handleMapClosePopup);
+  setupPingOptions(pings, handlePointClick, handlePointClosePopup);
 
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
 
-  //
+  // on map drawing selection
   const displaySelectedUnits = (
     overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
   ): void => {
@@ -143,9 +141,8 @@ export default function MapPage(): JSX.Element {
     selectedPings.addData(overlay);
   };
 
-  // redraw on updated start/end params
-  const drawLatestPings = (): void => {
-    // console.log('drawing pings');
+  // clears existing pings/tracks layers
+  const clearLatestPings = (): void => {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(pings);
     layerPicker.removeLayer(tracks);
@@ -153,53 +150,26 @@ export default function MapPage(): JSX.Element {
     tracks.clearLayers();
   };
 
-  const initMap = (): void => {
-    mapRef.current = L.map('map', { zoomControl: false }).setView([55, -128], 6);
-    const layerPicker = L.control.layers();
-    addTileLayers(mapRef, layerPicker);
-
-    layerPicker.addOverlay(tracks, 'Critter Tracks');
-    layerPicker.addOverlay(pings, 'Critter Locations');
-
-    mapRef.current.addLayer(drawnItems);
-    mapRef.current.addLayer(selectedPings);
-
-    const drawControl = new L.Control.Draw({
-      position: 'topright',
-      draw: {
-        marker: false,
-        polyline: false,
-        circle: false,
-        circlemarker: false
-      },
-      edit: {
-        featureGroup: drawnItems
-      }
-    });
-
-    mapRef.current.addControl(drawControl);
-    mapRef.current.addControl(layerPicker);
-
-    // Set up the drawing events
-    mapRef.current
-      .on('draw:created', (e) => {
-        drawnItems.addLayer((e as any).layer);
-        drawSelectedLayer();
-      })
-      .on('draw:edited', (e) => {
-        drawSelectedLayer();
-      })
-      .on('draw:deletestop', (e) => {
-        drawSelectedLayer();
-      });
+  /**
+   * clears existing pings/tracks layers, draws the new ones
+   * @param data defaults to pingsData if not provided
+   */
+  const drawLatestPings = (newPings = pingsData, newTracks = tracksData): void => {
+    clearLatestPings();
+    pings.addData(newPings);
+    tracks.addData(newTracks as any);
   };
 
+  // triggered when side-panel filters are applied
   const handleChangeFilters = (newRange: MapRange, filters: ICodeFilter[]): void => {
     if (newRange.start !== range.start || newRange.end !== range.end) {
       setRange(newRange);
     }
-    // console.log('MapPage: filters changed', filters)
     setFilters((o) => filters);
+    const filteredPings = filterFeatures(groupFilters(filters), features) as any;
+    const uniqueCritters = groupFeaturesByCritters(filteredPings).map((c) => c.critter_id);
+    const filteredTracks = (tracksData as any[]).filter((td) => uniqueCritters.includes(td.properties.critter_id));
+    drawLatestPings(filteredPings, filteredTracks);
   };
 
   // show the critter overview modal when a row is clicked in bottom panel
@@ -208,15 +178,26 @@ export default function MapPage(): JSX.Element {
     setShowModal((o) => !o);
   };
 
-  // initialize the map
-  useEffect(() => {
-    const updateComponent = (): void => {
-      if (!mapRef.current) {
-        initMap();
-      }
-    };
-    updateComponent();
-  });
+  // triggered when user clicks checkbox in filter panel
+  const handleShowLatestPings = (b: boolean): void => {
+    if (!b) {
+      // restore default pings & tracks
+      drawLatestPings();
+      return;
+    }
+    const newFeatures = [];
+    // to make sure we only get one result per group, group all features by critter id
+    const grouped = groupFeaturesByCritters(features);
+    for (let i = 0; i < grouped.length; i++) {
+      // iterate groups, getting the most recent date
+      const features = grouped[i].features;
+      const latestFeature = features.reduce((accum, current) =>
+        dayjs(current.properties.date_recorded).isAfter(dayjs(accum.properties.date_recorded)) ? current : accum
+      );
+      newFeatures.push(latestFeature);
+    }
+    drawLatestPings(newFeatures as any, []);
+  };
 
   // Add the tracks layer
   useEffect(() => {
@@ -228,6 +209,7 @@ export default function MapPage(): JSX.Element {
     pings.addTo(mapRef.current);
   }, [pings]);
 
+  // trigger download on ctrl+s keyboard input
   const handleKeyPress = (e): void => {
     if (!(e.ctrlKey && e.keyCode == 83)) {
       return;
@@ -245,7 +227,12 @@ export default function MapPage(): JSX.Element {
 
   return (
     <div className={'map-view'}>
-      <MapSidebarFilters start={range.start} end={range.end} onChange={handleChangeFilters} />
+      <MapFilters
+        start={range.start}
+        end={range.end}
+        onApplyFilters={handleChangeFilters}
+        onShowLatestPings={handleShowLatestPings}
+      />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='map' onKeyDown={handleKeyPress}></div>
@@ -255,7 +242,7 @@ export default function MapPage(): JSX.Element {
             filters={filters}
             selectedFeatureIDs={selectedFeatureIDs}
             handleSelectCritter={handleSelectCritter}
-            handleHoverCritter={handleBottomPanelRowHover}
+            handleHoverCritter={handlePointHover}
           />
         </div>
         <DialogFullScreen open={showModal} handleClose={setShowModal}>
