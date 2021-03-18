@@ -19,15 +19,15 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
 
   useEffect(() => {
     const upd = (): void => {
-      setHasCollar(!!editing.device_id)
-      setPerm(editing.permission_type)
+      setHasCollar(!!editing?.device_id)
+      setPerm(editing?.permission_type)
     }
     upd();
   }, [editing]);
 
   const deleteMessage = ():string => {
-    const base = hasCollar ? `CAREFUL! Performing this action will remove the collar ${editing.device_id} from this animal. ` : '';
-    return `${base}This will prevent other users from seeing this critter. Are you sure you want to delete ${editing.name}?`
+    const base = hasCollar ? `CAREFUL! Performing this action will remove the collar ${editing?.device_id} from this animal. ` : '';
+    return `${base}This will prevent other users from seeing this critter. Are you sure you want to delete ${editing?.name}?`
   }
 
   const handleDeleteButtonClicked = (): void => {
@@ -35,23 +35,23 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   }
 
   const handleConfirmDelete = (): void => {
-    onDelete(editing.critter_id);
+    onDelete(editing?.critter_id);
     setShow(false);
   }
 
   const passTheseProps: Pick<IAddEditProps<Animal>, 'cannotEdit' | 'onDelete'> = {
     cannotEdit: perm !== eCritterPermission.change,
-    onDelete: handleDeleteButtonClicked
+    onDelete: typeof onDelete === 'function' ? handleConfirmDelete : null
   }
 
   return (
     <>
       <ConfirmModal
-        handleClickYes={handleConfirmDelete}
+        handleClickYes={handleDeleteButtonClicked}
         handleClose={(): void => setShow(false)}
         open={show}
         message={deleteMessage()}
-        title={`Deleting ${editing.name}`}
+        title={`Deleting ${editing?.name}`}
       />
       {cloneElement(children, passTheseProps)}
     </>

@@ -6,7 +6,9 @@ import { BCTW } from 'types/common_types';
 export type IAddEditProps<T> = {
   cannotEdit?: boolean;
   children: JSX.Element;
+  disableAdd?: boolean;
   disableEdit?: boolean;
+  editBtn?: JSX.Element;
   editing: T;
   empty: T;
   onDelete?: (id: string) => void;
@@ -17,12 +19,15 @@ export type IAddEditProps<T> = {
  * used on main data pages (critter/collar)
  * @param cannotEdit permission to edit?
  * @param children child component that handles the editing, {EditModal} ** must be only one child
+ * @param disableAdd optional - hide add button
  * @param disableEdit defaults to false
  * @param editing isntance of T passed to editor when edit button is clicked
  * @param empty 'new' instance of T passed to editor when add button is clicked
+ * @param onDelete
+ * @param editButton optional - used in map overview screens
  **/
 export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): JSX.Element {
-  const { cannotEdit, editing, children, empty, onDelete } = props;
+  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -41,9 +46,9 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
   };
 
   const enableDelete = (): boolean => {
-    const isFn = typeof onDelete === 'function'
+    const isFn = typeof onDelete === 'function';
     return !!isFn;
-  }
+  };
 
   const handleClickDelete = (): void => {
     if (enableDelete()) {
@@ -64,8 +69,22 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
     handleClose
   };
 
-  // dont enable the edit button if its a "new" instance of T
-  const disableEdit = props.disableEdit ? true : Object.keys(editing).length === 0;
+  // do the same for the edit btn props
+  const editBtnProps = {
+    disabled: disableEdit ? true : Object.keys(editing).length === 0,
+    onClick: handleClickEdit
+  };
+
+  // override for Critter/Collar map overview pages
+  if (editBtn) {
+    return (
+      <>
+        {React.cloneElement(children, editorProps)}
+        {React.cloneElement(editBtn, editBtnProps)}
+      </>
+    );
+  }
+
   return (
     <>
       {/* clone element to pass additional props to it */}
@@ -76,10 +95,8 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
             delete
           </Button>
         ) : null}
-        <Button onClick={handleClickAdd}>add</Button>
-        <Button disabled={disableEdit} onClick={handleClickEdit}>
-          {cannotEdit ? 'view' : 'edit'}
-        </Button>
+        {disableAdd ? null : <Button onClick={handleClickAdd}>add</Button>}
+        <Button {...editBtnProps}>{cannotEdit ? 'view' : 'edit'}</Button>
       </ButtonGroup>
     </>
   );

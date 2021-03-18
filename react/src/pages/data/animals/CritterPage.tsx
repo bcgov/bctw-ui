@@ -76,7 +76,7 @@ export default function CritterPage(): JSX.Element {
     selectableProps
   };
 
-  const ieProps = {
+  const exportProps = {
     eMsg: CS.exportText,
     eTitle: CS.exportTitle,
     iTitle: CS.importTitle,
@@ -102,7 +102,7 @@ export default function CritterPage(): JSX.Element {
         </>
       </RowSelectedProvider>
       <div className='button-row'>
-        <ExportImportViewer {...ieProps} data={[...critterA, ...critterU]} />
+        <ExportImportViewer {...exportProps} data={[...critterA, ...critterU]} />
         <ModifyCritterWrapper editing={editObj} onDelete={deleteCritter}>
           <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
             <EditCritter {...editProps} />

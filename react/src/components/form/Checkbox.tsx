@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Checkbox as MuiCheckbox, CheckboxProps } from '@material-ui/core/';
 import { FormControlLabel } from '@material-ui/core';
 import { IInputProps } from 'components/component_interfaces';
@@ -18,6 +18,11 @@ export default function Checkbox(props: ICheckboxProps): JSX.Element {
     setChecked(checked);
     changeHandler({[label]: checked });
   };
+
+  // rerender if the default was changed
+  useEffect(() => {
+    setChecked(initialValue);
+  }, [initialValue]);
 
   // passing props that dont belong in dom is throwing errors
   const propsToPass = removeProps(props, ['changeHandler', 'initialValue']);

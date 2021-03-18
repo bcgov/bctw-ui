@@ -78,6 +78,7 @@ export default function MapPage(): JSX.Element {
     updateComponent();
   });
 
+  // when an individual map point is clicked, highlight it
   const handlePointClick = (event: L.LeafletEvent): void => {
     const layer = event.target;
     const feature: ITelemetryFeature = layer?.feature;
@@ -85,6 +86,7 @@ export default function MapPage(): JSX.Element {
     setSelectedFeatureIDs([feature.id]);
   };
 
+  // revert highlight when popup is closed
   const handlePointClosePopup = (event: L.LeafletEvent): void => {
     fillPoint(event.target);
     setSelectedFeatureIDs([]);
@@ -106,7 +108,6 @@ export default function MapPage(): JSX.Element {
   };
 
   setupPingOptions(pings, handlePointClick, handlePointClosePopup);
-
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
 
@@ -152,7 +153,7 @@ export default function MapPage(): JSX.Element {
 
   /**
    * clears existing pings/tracks layers, draws the new ones
-   * @param data defaults to pingsData if not provided
+   * @param newPings @param newTracks defaults to existing if not supplied
    */
   const drawLatestPings = (newPings = pingsData, newTracks = tracksData): void => {
     clearLatestPings();

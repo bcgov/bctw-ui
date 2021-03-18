@@ -1,4 +1,4 @@
-import { Drawer, IconButton, InputLabelProps } from '@material-ui/core';
+import { Drawer, IconButton } from '@material-ui/core';
 import { FilterList, Close } from '@material-ui/icons';
 import { PageProp } from 'components/component_interfaces';
 import clsx from 'clsx';
@@ -19,31 +19,30 @@ type MapFiltersProps = PageProp & {
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
-  const labelProps: InputLabelProps = { shrink: true };
-  const [open, setOpen] = useState<boolean>(true);
   const classes = drawerStyles();
-  const [filters, setFilters] = useState<ICodeFilter[]>([]);
-  const [numFiltersSelected, setNumFiltersSelected] = useState<number>(0);
-  const [start, setStart] = useState<string>(props.start);
-  const [end, setEnd] = useState<string>(props.end);
-  const [reset, setReset] = useState<boolean>(false);
-  const [applyButtonDisabledStatus, setApplyButtonDisabledStatus] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(true); // controls filter panel visibility
+  const [filters, setFilters] = useState<ICodeFilter[]>([]); // the filters applied
+  const [numFiltersSelected, setNumFiltersSelected] = useState<number>(0); // how many filters are set (dev?)
+  const [start, setStart] = useState<string>(props.start); // time range start
+  const [end, setEnd] = useState<string>(props.end); // time range end
+  const [reset, setReset] = useState<boolean>(false); // reset filter button status
+  const [applyButtonStatus, setApplyButtonStatus] = useState<boolean>(true); // controls apply button disabled status
   const [isLatestPing, setIsLatestPing] = useState<boolean>(false);
+  const [wasDatesChanged, setWasDatesChanged] = useState<boolean>(false);
 
   useEffect(() => {
     setNumFiltersSelected(filters.length);
   }, [filters]);
 
-  const changeDate = (event): void => {
-    const key = Object.keys(event)[0];
-    const val = event[key];
-    if (key === 'tstart') {
-      setStart(val);
-    } else {
-      setEnd(val);
-    }
-    setApplyButtonDisabledStatus(false);
-  };
+  useEffect(() => {
+    const onChangeDate = (): void => {
+      if (end !== props.end || start !== props.start) {
+        setApplyButtonStatus(false);
+        setWasDatesChanged(true);
+      }
+    };
+    onChangeDate();
+  }, [start, end]);
 
   /**
    * handler for when a select component is changed
@@ -51,7 +50,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
    * @param code_header the code header
    */
   const changeFilter = (filters: ICodeFilter[], code_header: string): void => {
-    setApplyButtonDisabledStatus(false);
+    setApplyButtonStatus(false);
     setFilters((o) => {
       const notThisFilter = o.filter((prev) => prev.code_header !== code_header);
       const ret = [...notThisFilter, ...filters];
@@ -66,6 +65,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
    */
   const handleApplyFilters = (event: React.MouseEvent<HTMLInputElement>, reset = false): void => {
     props.onApplyFilters({ start, end }, reset ? [] : filters);
+    // if dates were changed, it will draw all the new points, so 
+    // set the status of the show latest pings checkbox to false
+    if (wasDatesChanged) {
+      setIsLatestPing(false);
+    }
   };
 
   /**
@@ -74,13 +78,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     3) updates apply button enabled status
    */
   const resetFilters = (): void => {
-    setApplyButtonDisabledStatus(true);
+    setApplyButtonStatus(true);
     // fixme: ugly
     setReset(true);
     setTimeout(() => setReset(false), 1000);
 
     setFilters([]);
-    // since setFilters is async, call handleApplyFilters with an empty filter array
+    // since setFilters is async,
+    // call handleApplyFilters with an empty filter array
     handleApplyFilters(null, true);
   };
 
@@ -89,6 +94,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     { header: 'species', label: 'Species' },
     { header: 'sex', label: 'Gender' }
   ];
+  const latestPingLabel = 'Show Latest Location';
 
   const createMultiSelects = (): React.ReactNode => {
     return codeFilters.map((cf, idx) => (
@@ -106,7 +112,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const handleChangeLatestPings = (v: Record<string, boolean>): void => {
-    const val = v['Show Latest Pings'];
+    const val = v[latestPingLabel];
     if (isLatestPing != val) {
       setIsLatestPing(val);
       props.onShowLatestPings(val);
@@ -114,6 +120,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const handleDrawerOpen = (): void => setOpen((o) => !o);
+
   return (
     <div className={'side-panel'}>
       <Drawer
@@ -138,40 +145,30 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             </div>
             <div className='side-panel-body'>
               <div>
-                <Checkbox
-                  label='Show Latest Pings'
-                  initialValue={isLatestPing}
-                  changeHandler={handleChangeLatestPings}
-                />
+                <Checkbox label={latestPingLabel} initialValue={isLatestPing} changeHandler={handleChangeLatestPings} />
               </div>
               <div>
                 <TextField
                   label='Select Start Date'
-                  InputLabelProps={labelProps}
                   type='date'
                   defaultValue={start}
                   propName='tstart'
-                  changeHandler={changeDate}
+                  changeHandler={(e): void => setStart(e['tstart'] as string)}
                 />
               </div>
               <div>
                 <TextField
                   label='Select End Date'
-                  InputLabelProps={labelProps}
                   type='date'
                   defaultValue={end}
                   propName='tend'
-                  changeHandler={changeDate}
+                  changeHandler={(e): void => setEnd(e['tend'] as string)}
                 />
               </div>
               {createMultiSelects()}
               <div className={'side-btns'}>
-                <Button disabled={applyButtonDisabledStatus} onClick={handleApplyFilters}>
-                  Apply
-                </Button>
-                <Button disabled={numFiltersSelected === 0} onClick={resetFilters}>
-                  Reset
-                </Button>
+                <Button disabled={applyButtonStatus} onClick={handleApplyFilters}>Apply</Button>
+                <Button disabled={numFiltersSelected === 0} onClick={resetFilters}>Reset</Button>
               </div>
               <p>{numFiltersSelected} filters selected</p>
             </div>

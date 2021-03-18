@@ -17,6 +17,7 @@ type ISelectProps = SelectProps & {
 };
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
+// todo: filterable
 export default function SelectCode(props: ISelectProps): JSX.Element {
   const { codeHeader, defaultValue, changeHandler, changeHandlerMultiple, labelTitle, multiple, triggerReset } = props;
   const bctwApi = useTelemetryApi();
