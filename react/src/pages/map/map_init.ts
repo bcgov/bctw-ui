@@ -62,6 +62,35 @@ const setupSelectedPings = (): L.GeoJSONOptions => {
   };
 };
 
+// The BCGW URL
+const bcgw = 'http://openmaps.gov.bc.ca/geo/pub/ows';
+
+// Ungulate Winter Ranges
+const getUWR = () => {
+  return L.tileLayer.wms(
+    bcgw,
+    {
+      layers: 'WHSE_WILDLIFE_MANAGEMENT.WCP_UNGULATE_WINTER_RANGE_SP',
+      format: 'image/png',
+      transparent: true,
+      opacity: 0.6
+    }
+  );
+};
+
+// Cariboo Herd Locations
+const getCHL = () => {
+  return L.tileLayer.wms(
+    bcgw,
+    {
+      layers: 'WHSE_WILDLIFE_INVENTORY.GCPB_CARIBOU_POPULATION_SP',
+      format: 'image/png',
+      transparent: true,
+      opacity: 0.6
+    }
+  );
+};
+
 const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Control.Layers): void => {
   const bingOrtho = L.tileLayer(MapTileLayers.bing, {
     attribution: '&copy; <a href="https://esri.com">ESRI Basemap</a> ',
@@ -75,6 +104,10 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   });
   layerPicker.addBaseLayer(bingOrtho, 'Bing Satellite');
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
+
+  // Some BCGW Overlays
+  layerPicker.addOverlay(getUWR(), 'Ungulate Winter Ranges');
+  layerPicker.addOverlay(getCHL(), 'Cariboo Herd Locations');
 };
 
 // const initMap = (): void => {
