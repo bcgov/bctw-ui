@@ -72,7 +72,7 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
-        initMap(mapRef, drawnItems, selectedPings, tracks, pings, drawSelectedLayer);
+        initMap(mapRef, drawnItems, selectedPings, tracks, pings, handleDrawShape);
       }
     };
     updateComponent();
@@ -97,12 +97,11 @@ export default function MapPage(): JSX.Element {
     mapRef.current.eachLayer((layer) => {
       const l = layer as any;
       const id = l.feature?.id;
+    
       if (ids.includes(id)) {
         fillPoint(l, true);
-      } else {
-        if (typeof l.setStyle === 'function') {
-          fillPoint(l);
-        }
+      } else if (typeof l.setStyle === 'function') {
+        fillPoint(l, selectedFeatureIDs.includes(id));
       }
     });
   };
@@ -111,35 +110,39 @@ export default function MapPage(): JSX.Element {
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
 
-  // on map drawing selection
-  const displaySelectedUnits = (
-    overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
-  ): void => {
-    const features = overlay.features.map((f) => f.id);
-    // when selection is cleared, restore all telemetry in the details pane
-    if (features.length === 0 && pingsData) {
-      setSelectedFeatureIDs([]);
-      return;
-    }
-    setSelectedFeatureIDs(features as number[]);
-  };
-
-  const drawSelectedLayer = (): void => {
+  // handles the drawing, called in map_init 
+  const handleDrawShape = (): void => {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
     // More typescript type definition bugs... These are the right features!!!
     const overlay = pointsWithinPolygon(allPings as any, clipper as any);
 
-    displaySelectedUnits(overlay);
+    setFeatureIDsOnDraw(overlay);
 
     // Clear any previous selections
     mapRef.current.eachLayer((layer) => {
       if ((layer as any).options.class === 'selected-ping') {
-        mapRef.current.removeLayer(layer);
+        // fixme: when rows are hovered after a shape is drawn,
+        // the result is the points are removed completely
+        // mapRef.current.removeLayer(layer);
+        fillPoint(layer);
       }
     });
-
     selectedPings.addData(overlay);
+  };
+
+  // when shapes are drawn in {drawSelectedLayer}, set the selectedFeatureIDs 
+  // status to the ids of the points in the shape
+  const setFeatureIDsOnDraw = (
+    overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
+  ): void => {
+    const featureIds = overlay.features.map((f) => f.id);
+    // when selection is cleared, restore all telemetry in the details pane
+    if (featureIds.length === 0 && pingsData) {
+      setSelectedFeatureIDs([]);
+      return;
+    }
+    setSelectedFeatureIDs(featureIds as number[]);
   };
 
   // clears existing pings/tracks layers

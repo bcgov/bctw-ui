@@ -2,7 +2,17 @@ import * as L from 'leaflet';
 import dayjs from 'dayjs';
 import { formatLocal } from 'utils/time';
 import { COLORS, getFillColorByStatus } from 'pages/map/map_helpers';
-import React, { createRef, MutableRefObject } from 'react';
+import React, { MutableRefObject } from 'react';
+import { MapTileLayers } from 'constants/strings';
+
+const defaultPointStyle: L.CircleMarkerOptions = {
+  // add fillColor
+  radius: 8,
+  color: '#000',
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.9
+};
 
 const setupPingOptions = (
   pings: L.GeoJSON,
@@ -12,15 +22,7 @@ const setupPingOptions = (
   pings.options = {
     pointToLayer: (feature, latlng): L.Layer => {
       const colour = getFillColorByStatus(feature as any);
-      const pointStyle = {
-        radius: 8,
-        fillColor: colour,
-        color: '#000',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.9
-      };
-
+      const pointStyle = { fillColor: colour, ...defaultPointStyle}
       const marker = L.circleMarker(latlng, pointStyle);
       // add the event listener
       marker.on('click', onClickPointHandler);
@@ -52,12 +54,8 @@ const setupSelectedPings = (): L.GeoJSONOptions => {
     pointToLayer: (feature, latlng) => {
       const pointStyle = {
         class: 'selected-ping',
-        radius: 10,
         fillColor: COLORS.selected,
-        color: '#000',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 1
+        ...defaultPointStyle
       };
       return L.circleMarker(latlng, pointStyle);
     }
@@ -65,22 +63,16 @@ const setupSelectedPings = (): L.GeoJSONOptions => {
 };
 
 const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Control.Layers): void => {
-  const bingOrtho = L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {
-      attribution: '&copy; <a href="https://esri.com">ESRI Basemap</a> ',
-      maxZoom: 24,
-      maxNativeZoom: 17
-    }
-  ).addTo(mapRef.current);
+  const bingOrtho = L.tileLayer(MapTileLayers.bing, {
+    attribution: '&copy; <a href="https://esri.com">ESRI Basemap</a> ',
+    maxZoom: 24,
+    maxNativeZoom: 17
+  }).addTo(mapRef.current);
 
-  const bcGovBaseLayer = L.tileLayer(
-    'https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer/tile/{z}/{y}/{x}',
-    {
-      maxZoom: 24,
-      attribution: '&copy; <a href="https://www2.gov.bc.ca/gov/content/home">BC Government</a> '
-    }
-  );
+  const bcGovBaseLayer = L.tileLayer(MapTileLayers.govBase, {
+    maxZoom: 24,
+    attribution: '&copy; <a href="https://www2.gov.bc.ca/gov/content/home">BC Government</a> '
+  });
   layerPicker.addBaseLayer(bingOrtho, 'Bing Satellite');
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
 };

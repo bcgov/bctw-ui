@@ -38,6 +38,10 @@ interface ITelemetryFeatureCollection extends GeoJSON.FeatureCollection {
   features: ITelemetryFeature[];
 }
 
+
+/**
+ * a grouped by critter_id version of @type {TelemetryFeature} 
+ */
 interface IUniqueFeature {
   critter_id: string;
   device_id: number;
