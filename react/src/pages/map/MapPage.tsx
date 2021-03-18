@@ -10,16 +10,17 @@ import DialogFullScreen from 'components/modal/DialogFullScreen';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import CritterOverView from 'pages/data/animals/CritterOverview';
 import MapDetails from 'pages/map/details/MapDetails';
 import { setupPingOptions, setupSelectedPings, initMap } from 'pages/map/map_init';
 import { fillPoint, filterFeatures, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
+import MapOverView from 'pages/map/MapOverview';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { ICodeFilter } from 'types/code';
 import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
+import { TypeWithData } from 'types/common_types';
 
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -38,10 +39,11 @@ export default function MapPage(): JSX.Element {
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
 
-  // critter overview state
+  // for overview state
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
+  const [overviewType, setOverviewType] = useState<TypeWithData>();
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
@@ -177,7 +179,8 @@ export default function MapPage(): JSX.Element {
   };
 
   // show the critter overview modal when a row is clicked in bottom panel
-  const handleSelectCritter = (row: ITelemetryDetail): void => {
+  const handleShowOverview = (type: TypeWithData, row: ITelemetryDetail): void => {
+    setOverviewType(type);
     setSelectedDetail(row);
     setShowModal((o) => !o);
   };
@@ -245,12 +248,12 @@ export default function MapPage(): JSX.Element {
             features={features}
             filters={filters}
             selectedFeatureIDs={selectedFeatureIDs}
-            handleSelectCritter={handleSelectCritter}
+            handleShowOverview={handleShowOverview}
             handleHoverCritter={handlePointHover}
           />
         </div>
         <DialogFullScreen open={showModal} handleClose={setShowModal}>
-          <CritterOverView detail={selectedDetail} />
+          <MapOverView type={overviewType} detail={selectedDetail} />
         </DialogFullScreen>
       </div>
     </div>

@@ -1,15 +1,18 @@
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { ICodeFilter } from 'types/code';
-import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnCritterRowClick, OnPanelRowHover } from 'types/map';
+import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowHover, OnMapRowCellClick } from 'types/map';
 import { filterFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
 
-type MapDetailsProps = {
+export type MapDetailsBaseProps = {
+  handleHoverCritter: OnPanelRowHover;
+  handleShowOverview: OnMapRowCellClick;
+}
+
+type MapDetailsProps = MapDetailsBaseProps & {
   features: ITelemetryFeature[];
   // features IDs selected via the map interface
   selectedFeatureIDs: number[];
-  handleSelectCritter: OnCritterRowClick;
-  handleHoverCritter: OnPanelRowHover;
   // list of filters applied from map side panel
   filters: ICodeFilter[];
 };
@@ -18,7 +21,7 @@ export default function MapDetails({
   features,
   filters,
   selectedFeatureIDs,
-  handleSelectCritter,
+  handleShowOverview,
   handleHoverCritter
 }: MapDetailsProps): JSX.Element {
   const [groupedFeatures, setGroupedFeatures] = useState<IUniqueFeature[]>([]);
@@ -67,8 +70,8 @@ export default function MapDetails({
       <MapDetailsGrouped
         crittersSelected={crittersSelectedInMap}
         features={groupedFeatures}
-        handleCritterClick={handleSelectCritter}
-        handleCritterHover={handleHoverCritter}
+        handleShowOverview={handleShowOverview}
+        handleHoverCritter={handleHoverCritter}
       />
     </>
   );

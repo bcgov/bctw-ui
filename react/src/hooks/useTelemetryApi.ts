@@ -26,7 +26,7 @@ import {
 import { UserContext } from 'contexts/UserContext';
 import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
-import { BCTW } from 'types/common_types';
+import { BCTW, TypeWithData } from 'types/common_types';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -231,7 +231,7 @@ export const useTelemetryApi = () => {
   /**
    * @returns 
    */
-  const useType = <T extends BCTW>(type: 'critter' | 'collar', id: string): UseQueryResult<T> => {
+  const useType = <T extends BCTW>(type: TypeWithData, id: string): UseQueryResult<T> => {
     return useQuery<T, AxiosError>(['getType', type], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions
     });

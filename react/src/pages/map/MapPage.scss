@@ -120,12 +120,20 @@
   padding: 5px !important;
 }
 
-// the bottom panel critter row "link"
+// the bottom panel table cell critter "link"
 .critter-select {
-  color: rgba(0, 47, 255, 0.78) !important;
+  width: 30%; // so the cursor doesn't appear on the whole cell
+  color: rgb(58, 164, 255) !important;
   cursor: pointer;
+  font-weight: 500;
+
 }
 
+.critter-select:hover {
+  color: $BCgovBlue !important;
+}
+
+// hover effect when selecting a point / drawing a shape in map
 .bottom-panel-row-is-map-selected {
   background-color: lavender;
 }

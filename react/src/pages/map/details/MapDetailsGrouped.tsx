@@ -1,4 +1,4 @@
-import { ITelemetryDetail, IUniqueFeature, OnCritterRowClick, OnPanelRowHover, TelemetryDetail } from 'types/map';
+import { ITelemetryDetail, IUniqueFeature, TelemetryDetail } from 'types/map';
 import { Checkbox, TableRow, TableCell, TableBody, Table, TableContainer, Paper } from '@material-ui/core';
 import { getComparator } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
@@ -6,24 +6,22 @@ import { useState } from 'react';
 import { Order } from 'components/table/table_interfaces';
 import { plainToClass } from 'class-transformer';
 import { flattenUniqueFeatureIDs, sortGroupedFeatures } from 'pages/map/map_helpers';
+import { MapDetailsBaseProps } from './MapDetails';
 
-export type MapDetailsGroupedProps = {
-  handleCritterHover: OnPanelRowHover;
-  handleCritterClick: OnCritterRowClick;
+export type MapDetailsGroupedProps = MapDetailsBaseProps & {
   features: IUniqueFeature[];
   crittersSelected: string[];
 };
 
 type GroupedCheckedStatus = {
-  critter_id: string,
-  animal_id: string,
-  checked: boolean
-}
+  critter_id: string;
+  checked: boolean;
+};
 
 const rows_to_render = ['animal_id', 'wlh_id', 'device_id', 'frequency', 'Map Points'];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
-  const { features, crittersSelected, handleCritterClick, handleCritterHover } = props;
+  const { features, crittersSelected, handleShowOverview, handleHoverCritter } = props;
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<string>('Critter Name');
   const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
@@ -36,16 +34,16 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
-    const newChecked =val ? features.map(f => f.critter_id) : [];
+    const newChecked = val ? features.map((f) => f.critter_id) : [];
     pushRowCheck(newChecked);
-  }
+  };
 
   const handleRowCheck = (v: GroupedCheckedStatus): void => {
     // todo: cleanup
     let newChecked = null;
     const idxFound = checkedGroups.indexOf(v.critter_id);
     if (idxFound === -1) {
-      newChecked = [ ...checkedGroups, v.critter_id ];
+      newChecked = [...checkedGroups, v.critter_id];
     } else {
       const cp = [...checkedGroups];
       cp.splice(idxFound, idxFound + 1);
@@ -55,13 +53,13 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
       newChecked = cp;
     }
     pushRowCheck(newChecked);
-  }
+  };
 
   const pushRowCheck = (ids: string[]): void => {
     setCheckedGroups(ids);
-    const pointIDs = flattenUniqueFeatureIDs(features.filter(f => ids.includes(f.critter_id)));
-    handleCritterHover(pointIDs);
-  }
+    const pointIDs = flattenUniqueFeatureIDs(features.filter((f) => ids.includes(f.critter_id)));
+    handleHoverCritter(pointIDs);
+  };
 
   return (
     <TableContainer component={Paper}>
@@ -89,9 +87,9 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 isChecked={checkedGroups.includes(u.critter_id)}
                 isSelectedInMap={crittersSelected.indexOf(u.critter_id) !== -1}
                 row={u.features[0].properties}
-                handleCritterClick={handleCritterClick}
+                handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
-                handleCritterHover={handleCritterHover}
+                handleHoverCritter={handleHoverCritter}
               />
             );
           })}
@@ -101,40 +99,45 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   );
 }
 
-type IRowProps = {
+type IRowProps = MapDetailsBaseProps & {
   pointIDs: number[];
   isSelectedInMap: boolean;
   isChecked: boolean;
   row: ITelemetryDetail;
-  handleCritterClick: OnCritterRowClick;
-  handleCritterHover: OnPanelRowHover;
   handleRowCheck: (v: GroupedCheckedStatus) => void;
 };
+
 function Row(props: IRowProps): JSX.Element {
-  const { row, handleRowCheck, handleCritterClick, isSelectedInMap, pointIDs, isChecked, handleCritterHover } = props;
+  const { row, handleRowCheck, handleShowOverview, isSelectedInMap, pointIDs, isChecked, handleHoverCritter } = props;
 
   const onCheck = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
-    handleRowCheck({critter_id: row.critter_id, checked: val, animal_id: row.animal_id});
+    handleRowCheck({ critter_id: row.critter_id, checked: val });
   };
 
   return (
     <TableRow
       hover
       className={`map-bottom-panel-row ${isSelectedInMap ? 'bottom-panel-row-is-map-selected' : ''}`}
-      // fixme: weird competing interactions with hover/ check
+      // fixme: competing behavior with hover/ check row?
       // onMouseEnter={(): void => handleCritterHover(pointIDs)}
       // onMouseLeave={(): void => handleCritterHover([])}
     >
       <TableCell padding='checkbox'>
         <Checkbox onChange={onCheck} checked={isSelectedInMap || isChecked} />
       </TableCell>
-      <TableCell className={'critter-select'} onClick={(): void => handleCritterClick(row)}>
-        {row.animal_id ?? 'unknown'}
+      <TableCell>
+        <div onClick={(): void => handleShowOverview('critter', row)} className={'critter-select'}>
+          {row.animal_id ?? 'unknown'}
+        </div>
       </TableCell>
-      {rows_to_render.slice(1, 4).map((s, idx) => (
-        <TableCell key={`${idx}-${s}`}>{row[s]}</TableCell>
-      ))}
+      <TableCell>{row.wlh_id}</TableCell>
+      <TableCell>
+        <div onClick={(): void => handleShowOverview('collar', row)} className={'critter-select'}>
+          {row.device_id}
+        </div>
+      </TableCell>
+      <TableCell>{row.frequency}</TableCell>
       <TableCell>{pointIDs.length}</TableCell>
     </TableRow>
   );
