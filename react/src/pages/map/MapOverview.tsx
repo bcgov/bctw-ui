@@ -1,6 +1,5 @@
 import { Button, Paper } from '@material-ui/core';
 import TextField from 'components/form/Input';
-import { CollarStrings, CritterStrings } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ModifyCritterWrapper from 'pages/data/animals/ModifyCritterWrapper';
@@ -24,6 +23,7 @@ const critterLoc = ['region'];
 
 const collarGeneral = [
   'device_make',
+  'device_type',
   'device_model',
   'device_id',
   'frequency',
@@ -88,7 +88,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
         <Paper elevation={0} className={'dlg-full-body'}>
           <div className={'dlg-full-body-subtitle'}>
             <h2>Animal Details</h2>
-            <ModifyCritterWrapper editing={critter} onDelete={null}>
+            <ModifyCritterWrapper editing={critter}>
               <AddEditViewer<Animal>
                 editing={critter ?? new Animal()}
                 empty={new Animal()}
@@ -98,13 +98,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
                     Edit
                   </Button>
                 }>
-                <EditCritter
-                  editableProps={CritterStrings.editableProps}
-                  editing={new Animal()}
-                  open={false}
-                  onSave={() => {}}
-                  selectableProps={critterGeneral.slice(0, 3)}
-                />
+                <EditCritter editing={new Animal()} open={false} onSave={null} />
               </AddEditViewer>
             </ModifyCritterWrapper>
           </div>
@@ -161,13 +155,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
                 Edit
               </Button>
             }>
-            <EditCollar
-              editableProps={CollarStrings.editableProps}
-              editing={new Collar()}
-              open={false}
-              onSave={() => {}}
-              selectableProps={CollarStrings.selectableProps}
-            />
+            <EditCollar editing={new Collar()} open={false} onSave={() => {}} />
           </AddEditViewer>
         </div>
 

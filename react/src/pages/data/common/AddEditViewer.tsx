@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ButtonGroup } from '@material-ui/core';
 import Button from 'components/form/Button';
 import { BCTW } from 'types/common_types';
+import { IUpsertPayload } from 'api/api_interfaces';
+import { IEditModalProps } from 'pages/data/common/EditModal';
 
 export type IAddEditProps<T> = {
   cannotEdit?: boolean;
@@ -12,6 +14,7 @@ export type IAddEditProps<T> = {
   editing: T;
   empty: T;
   onDelete?: (id: string) => void;
+  onSave?: (a: IUpsertPayload<T>) => void;
 };
 
 /**
@@ -27,7 +30,7 @@ export type IAddEditProps<T> = {
  * @param editButton optional - used in map overview screens
  **/
 export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): JSX.Element {
-  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete } = props;
+  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -56,17 +59,24 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
     }
   };
 
+  const handleClickSave = (p): void => {
+    if (typeof onSave === 'function') {
+      onSave(p)
+    }
+  }
+  
   const handleClose = (): void => {
     setShowModal(false);
   };
 
   // override the open/close handlers and props
   // of the child EditModal component
-  const editorProps = {
+  const editorProps: Pick<IEditModalProps<T>, 'editing' |'open' | 'isEdit' | 'onSave' | 'handleClose'> = {
     editing: editObj,
     open: showModal,
     isEdit: isEditMode,
-    handleClose
+    handleClose,
+    onSave: handleClickSave
   };
 
   // do the same for the edit btn props

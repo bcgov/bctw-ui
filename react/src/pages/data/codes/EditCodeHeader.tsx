@@ -1,5 +1,5 @@
 import { CritterCollarModalProps } from 'components/component_interfaces';
-import { getInputTypesOfT, InputType } from 'components/form/form_helpers';
+import { getInputTypesOfT, eInputType } from 'components/form/form_helpers';
 import TextField from 'components/form/Input';
 import ChangeContext from 'contexts/InputChangeContext';
 import { CodeHeaderInput } from 'types/code';
@@ -8,7 +8,13 @@ import { useState } from 'react';
 import { CodeStrings as S } from 'constants/strings';
 import { removeProps } from 'utils/common';
 
-export default function EditCodeHeader(props: CritterCollarModalProps<CodeHeaderInput>): JSX.Element {
+// todo: remove these
+type EditCodeModalProps = CritterCollarModalProps<CodeHeaderInput> & {
+  editableProps: string[];
+  selectableProps: string[];
+}
+
+export default function EditCodeHeader(props: EditCodeModalProps): JSX.Element {
   const { isEdit, editing, editableProps, selectableProps } = props;
   const [errors, setErrors] = useState<Record<string, unknown>>({});
 
@@ -35,7 +41,7 @@ export default function EditCodeHeader(props: CritterCollarModalProps<CodeHeader
             <div className='container'>
               <form className='rootEditInput' autoComplete='off'>
                 {inputTypes
-                  .filter((f) => f.type === InputType.text || f.type === InputType.number)
+                  .filter((f) => f.type === eInputType.text || f.type === eInputType.number)
                   .map((d) => {
                     const hasError = !!errors[d.key];
                     return (

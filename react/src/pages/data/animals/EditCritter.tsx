@@ -1,9 +1,7 @@
-import { Typography } from '@material-ui/core';
+import { Paper, Typography } from '@material-ui/core';
 import { CritterCollarModalProps } from 'components/component_interfaces';
-import Checkbox from 'components/form/Checkbox';
-import { getInputTypesOfT, InputType, validateRequiredFields } from 'components/form/form_helpers';
-import TextField from 'components/form/Input';
-import SelectCode from 'components/form/SelectCode';
+import { MakeEditFields } from 'components/form/create_form_components';
+import { getInputTypesOfT, validateRequiredFields, FormInputType } from 'components/form/form_helpers';
 import { CritterStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
@@ -13,17 +11,25 @@ import { Animal } from 'types/animal';
 import { eCritterPermission } from 'types/user';
 import { removeProps } from 'utils/common';
 
+// fixme: title pushed to top
+
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
-  const { isEdit, editing, editableProps, selectableProps } = props;
+  const { isEdit, editing } = props;
 
   const canEdit = !isEdit ? true : editing.permission_type === eCritterPermission.change;
   const requiredFields = CS.requiredProps;
 
   const [errors, setErrors] = useState<Record<string, unknown>>({});
-  const [inputTypes, setInputTypes] = useState<{ key: string; type: InputType; value: unknown }[]>([]);
+  const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
 
   useEffect(() => {
-    setInputTypes(getInputTypesOfT<Animal>(editing, editableProps, selectableProps));
+    setInputTypes(
+      getInputTypesOfT<Animal>(
+        editing,
+        allFields.map((a) => a.prop),
+        allFields.filter((f) => f.isCode).map((a) => a.prop)
+      )
+    );
   }, [editing]);
 
   const validateForm = (o: Animal): boolean => {
@@ -34,6 +40,35 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
 
   const createTitle = (): string =>
     !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
+
+  const generalFields = [
+    { prop: 'animal_status', isCode: true },
+    { prop: 'species', isCode: true },
+    { prop: 'life_stage', isCode: true },
+    { prop: 'estimated_age' },
+    { prop: 'sex', isCode: true },
+    { prop: 'juvenile_at_heel', isCode: true }
+  ];
+  const identifierFields = [
+    { prop: 'wlh_id' },
+    { prop: 'animal_id' },
+    { prop: 'nickname' },
+    { prop: 'ear_tag_left' },
+    { prop: 'ear_tag_right' },
+    { prop: 'population_unit', isCode: true }
+  ];
+  const locationFields = [{ prop: 'region', isCode: true }, { prop: 'location' }];
+  const allFields = [...locationFields, ...identifierFields, ...generalFields];
+
+  const makeField = (
+    iType: FormInputType,
+    changeHandler: (v: Record<string, unknown>) => void,
+    hasError: boolean
+  ): React.ReactNode => {
+    const isRequired = requiredFields.includes(iType.key);
+    const errorText = hasError && (errors[iType.key] as string);
+    return MakeEditFields(iType, changeHandler, hasError, editing, canEdit, isRequired, errorText);
+  };
 
   return (
     <EditModal title={createTitle()} newT={new Animal()} onValidate={validateForm} isEdit={isEdit} {...props}>
@@ -49,68 +84,36 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
           return (
             <>
               <form className='rootEditInput' autoComplete='off'>
-                <>
-                  <Typography variant='h6'>General Information</Typography>
-                  {/* render props that are text inputs */}
-                  {inputTypes
-                    .filter((f) => f.type === InputType.text || f.type === InputType.number)
-                    .map((d) => {
-                      const hasError = !!errors[d.key];
-                      return (
-                        <TextField
-                          key={d.key}
-                          propName={d.key}
-                          defaultValue={d.value}
-                          type={d.type}
-                          label={editing.formatPropAsHeader(d.key)}
-                          disabled={!canEdit}
-                          changeHandler={onChange}
-                          required={requiredFields.includes(d.key)}
-                          error={hasError}
-                          helperText={hasError && errors[d.key]}
-                        />
-                      );
-                    })}
-                </>
-                <>
-                  <Typography variant='h6'>Group Information</Typography>
-                  {/* render props that are selects */}
-                  {inputTypes
-                    .filter((f) => f.type === InputType.select)
-                    .map((d) => {
-                      return (
-                        <SelectCode
-                          labelTitle={editing.formatPropAsHeader(d.key)}
-                          disabled={!canEdit}
-                          key={d.key}
-                          codeHeader={d.key}
-                          defaultValue={d.value as string}
-                          changeHandler={onChange}
-                          required={requiredFields.includes(d.key)}
-                          error={!!errors[d.key]}
-                        />
-                      );
-                    })}
-                </>
-                <>
-                  <Typography variant='h6'>Individual Characteristics</Typography>
-                  {/* render props that are check boxes */}
-                  {inputTypes
-                    .filter((f) => f.type === InputType.check)
-                    .map((d, i) => {
-                      const checked =
-                        d.value === null || d.value === false || d.value === 'N' || d.value === 'false' ? false : true;
-                      return (
-                        <Checkbox
-                          key={`${d.key}${i}`}
-                          initialValue={checked}
-                          label={d.key}
-                          changeHandler={handlerFromContext}
-                          disabled={!canEdit}
-                        />
-                      );
-                    })}
-                </>
+                <Paper className={'paper-edit'} elevation={3}>
+                  <>
+                    <Typography className={'edit-form-header'} variant='h5'>
+                      General Information
+                    </Typography>
+                    {inputTypes
+                      .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
+                      .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                  </>
+                </Paper>
+                <Paper className={'paper-edit'} elevation={3}>
+                  <>
+                    <Typography className={'edit-form-header'} variant='h5'>
+                      Identifiers
+                    </Typography>
+                    {inputTypes
+                      .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
+                      .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                  </>
+                </Paper>
+                <Paper className={'paper-edit'} elevation={3}>
+                  <>
+                    <Typography className={'edit-form-header'} variant='h5'>
+                      Location
+                    </Typography>
+                    {inputTypes
+                      .filter((f) => locationFields.map((x) => x.prop).includes(f.key))
+                      .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                  </>
+                </Paper>
               </form>
               {/* dont show assignment history for new critters */}
               {isEdit ? <AssignmentHistory animalId={editing.critter_id} canEdit={canEdit} {...props} /> : null}

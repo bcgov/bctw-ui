@@ -11,7 +11,9 @@ const modalStyles = makeStyles((theme: Theme) =>
     modal: {
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      overflowY: 'scroll',
+      height: '100%',
     },
     paper: {
       backgroundColor: theme.palette.background.paper,
@@ -21,7 +23,6 @@ const modalStyles = makeStyles((theme: Theme) =>
     },
     title: {
       textAlign: 'center',
-      marginBottom: '15px'
     },
   })
 );

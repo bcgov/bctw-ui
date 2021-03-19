@@ -1,9 +1,8 @@
-import { Typography } from '@material-ui/core';
+import { Paper, Typography } from '@material-ui/core';
 import { CritterCollarModalProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
-import { getInputTypesOfT, InputType, validateRequiredFields } from 'components/form/form_helpers';
-import TextField from 'components/form/Input';
-import SelectCode from 'components/form/SelectCode';
+import { MakeEditFields } from 'components/form/create_form_components';
+import { getInputTypesOfT, validateRequiredFields, FormInputType } from 'components/form/form_helpers';
 import useModalStyles from 'components/modal/modal_styles';
 import { CollarStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
@@ -13,7 +12,7 @@ import { Collar, eNewCollarType } from 'types/collar';
 import { removeProps } from 'utils/common';
 
 export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.Element {
-  const { isEdit, editing, editableProps, selectableProps } = props;
+  const { isEdit, editing } = props;
   const modalClasses = useModalStyles();
 
   // set the collar type when add collar is selected
@@ -23,10 +22,16 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const title = isEdit ? `Editing device ${editing.device_id}` : `Add a new ${collarType} collar`;
   const requiredFields = CS.requiredProps;
   const [errors, setErrors] = useState<Record<string, unknown>>({});
-  const [inputTypes, setInputTypes] = useState<{key: string, type: InputType, value: unknown}[]>([]);
+  const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
 
   useEffect(() => {
-    setInputTypes(getInputTypesOfT<Collar>(isEdit ? editing : newCollar, editableProps, selectableProps));
+    setInputTypes(
+      getInputTypesOfT<Collar>(
+        isEdit ? editing : newCollar,
+        allFields.map((a) => a.prop),
+        allFields.filter((f) => f.isCode).map((r) => r.prop)
+      )
+    );
   }, [editing, newCollar]);
 
   const validate = (o: Collar): boolean => {
@@ -43,10 +48,38 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const handleChooseCollarType = (type: eNewCollarType): void => {
     setCollarType(type);
     setNewCollar(new Collar(type));
-  }
+  };
+
+  const generalFields = [
+    { prop: 'device_id' },
+    { prop: 'device_type', isCode: true },
+    { prop: 'device_make', isCode: true },
+    { prop: 'device_model' }
+  ];
+
+  const networkFields = [{ prop: 'frequency' }, { prop: 'frequency_unit_code' }, { prop: 'satellite_network', isCode: true }];
+
+  const statusFields = [
+    { prop: 'device_status', isCode: true },
+    { prop: 'vendor_activation_status' },
+    { prop: 'device_deployment_status', isCode: true },
+    { prop: 'retrieval_date' }
+  ];
+
+  const allFields: { prop: string; isCode?: boolean }[] = [...generalFields, ...networkFields, ...statusFields];
+
+  const makeField = (
+    iType: FormInputType,
+    changeHandler: (v: Record<string, unknown>) => void,
+    hasError: boolean
+  ): React.ReactNode => {
+    const isRequired = requiredFields.includes(iType.key);
+    const errorText = hasError && (errors[iType.key] as string);
+    return MakeEditFields(iType, changeHandler, hasError, editing, true, isRequired, errorText);
+  };
 
   // render the choose collar type form if the add button was clicked
-  const chooseCollarType = ():JSX.Element => {
+  const chooseCollarType = (): JSX.Element => {
     return (
       <>
         <Typography>{CS.addCollarTypeText}</Typography>
@@ -60,7 +93,14 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
 
   const isAddNewCollar = !isEdit && collarType === eNewCollarType.Other;
   return (
-    <EditModal title={title} newT={new Collar()} onValidate={validate} onReset={close} isEdit={isEdit} hideSave={isAddNewCollar} {...props}>
+    <EditModal
+      title={title}
+      newT={new Collar()}
+      onValidate={validate}
+      onReset={close}
+      isEdit={isEdit}
+      hideSave={isAddNewCollar}
+      {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
           // do form validation before passing change handler to EditModal
@@ -70,56 +110,39 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
             }
             handlerFromContext(v, modifyCanSave);
           };
-
           return (
             <>
               {isAddNewCollar ? (
                 chooseCollarType()
               ) : (
-                <form className='rootEditInput' autoComplete='off'>
-                  <>
-                    <Typography variant='h6'>Collar Information</Typography>
-                    {/* render text inputs */}
-                    {inputTypes
-                      .filter((f) => f.type === InputType.text || f.type === InputType.number)
-                      .map((d) => {
-                        const hasError = !!errors[d.key];
-                        return (
-                          <TextField
-                            key={d.key}
-                            propName={d.key}
-                            defaultValue={d.value}
-                            type={d.type}
-                            label={editing.formatPropAsHeader(d.key)}
-                            disabled={false}
-                            changeHandler={onChange}
-                            required={requiredFields.includes(d.key)}
-                            error={hasError}
-                            helperText={hasError && errors[d.key]}
-                          />
-                        );
-                      })}
-                  </>
-                  <>
-                    <Typography variant='h6'>Other Information</Typography>
-                    {/* render props that are selects */}
-                    {inputTypes
-                      .filter((f) => f.type === InputType.select)
-                      .map((d) => {
-                        return (
-                          <SelectCode
-                            key={d.key}
-                            codeHeader={d.key}
-                            labelTitle={editing.formatPropAsHeader(d.key)}
-                            defaultValue={d.value as string}
-                            changeHandler={onChange}
-                            required={requiredFields.includes(d.key)}
-                            error={!!errors[d.key]}
-                          />
-                        );
-                      })}
-                  </>
-                </form>
+                <>
+                  <form className='rootEditInput' autoComplete='off'>
+                    <Paper className={'paper-edit'} elevation={3}>
+                      <>
+                        <Typography className={'edit-form-header'} variant='h5'>General Information</Typography>
+                        {inputTypes
+                          .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </>
+                    </Paper>
+                    <Paper className={'paper-edit'} elevation={3}>
+                      <>
+                        <Typography className={'edit-form-header'} variant='h5'>Frequency and Network</Typography>
+                        {inputTypes
+                          .filter((f) => networkFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </>
+                    </Paper>
+                    <Paper className={'paper-edit'} elevation={3}>
+                      <>
+                        <Typography className={'edit-form-header'} variant='h5'>Status Information</Typography>
+                        {inputTypes
+                          .filter((f) => statusFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </>
+                    </Paper>
+                  </form>
+                </>
               )}
             </>
           );
@@ -128,4 +151,3 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     </EditModal>
   );
 }
-

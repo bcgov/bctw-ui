@@ -36,13 +36,9 @@ type EditModalBaseProps<T> = ModalBaseProps & {
 };
 
 /**
- * @param editableProps props of T that will be displayed in the form
- * @param selectableProps props of T that will be displayed as select inputs
  * @param isEdit boolean representing whether the modal is adding a new T or editing
  */
 type CritterCollarModalProps<T> = EditModalBaseProps<T> & {
-  editableProps: string[];
-  selectableProps: string[];
   isEdit?: boolean;
 };
 
