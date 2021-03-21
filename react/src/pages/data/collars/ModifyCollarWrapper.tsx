@@ -1,5 +1,4 @@
-import { cloneElement, useState, useEffect } from 'react';
-import { eCritterPermission } from 'types/user';
+import { cloneElement, useState } from 'react';
 import { IAddEditProps } from 'pages/data/common/AddEditViewer';
 import { useQueryClient } from 'react-query';
 import ConfirmModal from 'components/modal/ConfirmModal';
@@ -40,6 +39,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   const onDeleteSuccess = async (): Promise<void> => {
     responseDispatch({ type: 'success', message: `collar deleted successfully` });
     queryClient.invalidateQueries('collartype');
+    queryClient.invalidateQueries('getType');
   };
 
   // setup the mutation collar mutations

@@ -45,13 +45,18 @@
 //
 
 .side-panel {
+  border-right: 2px solid $BCgovGold;
   overflow-y: auto;
+
   div {
     margin-bottom: 0.5rem;
   }
   // defaults to 0, cuts off header
   .MuiDrawer-paper {
     top:inherit;
+  }
+  .MuiDrawer-paperAnchorDockedLeft {
+    border: none;
   }
 }
 
@@ -78,13 +83,13 @@
 // 
 
 .bottom-panel {
+  border-top: 2px solid $BCgovGold;
   bottom: 0;
   position: absolute;
   width: 100%;
   background-color: #ffffff;
   height: 30rem;
   overflow-y: auto;
-  border-left: 1px solid darkslategrey;
 
   .MuiPaper-elevation1 {
     box-shadow: none;
@@ -112,7 +117,6 @@
     border: none;
     font-family: inherit;
   }
-  border: 1px solid rgba(71, 77, 75, 0.1);
 }
 
 // map details parent table box

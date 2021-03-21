@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
-// import Link from '@material-ui/core/Link';
 import { Link } from 'react-router-dom';
 import { Link as MuiLink } from '@material-ui/core';
 
@@ -33,8 +32,14 @@ const AppHeader = (): JSX.Element => {
           <img src={headerImage} width={155} height={52} alt={'Government of British Columbia'} />
           BCTW
         </MuiLink>
-        <nav className='profile-nav'>
+        <nav className={'app-nav'}>
           <ul>
+            <li><Link to='/map' color={'inherit'}>My Telemetry</Link></li>
+            <li><Link to='/data' color={'inherit'}>Manage</Link></li>
+          </ul>
+        </nav>
+        <nav className='profile-nav'>
+          <ul className={'header-ul'}>
             <li>
               <div className={'username'}>
                 <IconButton component={Link} to='/profile'>

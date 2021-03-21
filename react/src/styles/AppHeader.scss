@@ -71,3 +71,28 @@ button.logout {
   }
 }
 
+.app-nav {
+  margin-right: auto;
+  margin-left: 3rem;
+
+  a {
+    color: $appHeaderColor;
+    text-decoration: none;
+    font-weight: 400;
+  }
+
+  ul {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+
+  li {
+    display: inline-block;
+    margin-right: 2rem;
+  }
+}
+
+

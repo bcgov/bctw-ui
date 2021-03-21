@@ -18,18 +18,11 @@ type CritterOverViewProps = {
 };
 
 const critterGeneral = ['animal_status', 'species', 'sex', 'life_stage', 'estimated_age', 'juvenile_at_heel'];
+const critterMortality = ['mortality_date', 'mortalityCoords', 'mortalityUTM'];
 const critterIds = ['wlh_id', 'animal_id', 'nickname', 'ear_tag_left', 'ear_tag_right', 'population_unit'];
 const critterLoc = ['region'];
-
-const collarGeneral = [
-  'device_make',
-  'device_type',
-  'device_model',
-  'device_id',
-  'frequency',
-  'frequency_unit_code',
-  'satellite_network'
-];
+//
+const collarGeneral = ['device_make', 'device_type', 'device_model', 'device_id', 'frequency', 'frequency_unit_code', 'satellite_network'];
 const collarStatusFields = ['device_status', 'device_deployment_status', 'vendor_activation_status'];
 
 export default function MapOverView({ type, detail }: CritterOverViewProps): JSX.Element {
@@ -70,6 +63,12 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
     });
   };
 
+  if (isError) {
+    return (
+      <div>{error}</div>
+    )
+  }
+
   if (type === 'critter') {
     // CRITTER DETAILS
     return (
@@ -108,6 +107,10 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
               <h3>General Information</h3>
               {critter ? createDisabledFields(critterGeneral, critter) : null}
             </Paper>
+            {critter?.animal_status === 'Mortality' ? <Paper elevation={2} className={'dlg-details-section'}>
+              <h3>Mortality Details</h3>
+              {critter ? createDisabledFields(critterMortality, critter) : null}
+            </Paper> : null}
             <Paper elevation={2} className={'dlg-details-section'}>
               <h3>Identifiers</h3>
               {critter ? createDisabledFields(critterIds, critter) : null}

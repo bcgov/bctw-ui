@@ -44,6 +44,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const invalidateCritterQueries = async (): Promise<void> => {
     queryClient.invalidateQueries('critters_assigned');
     queryClient.invalidateQueries('critters_unassigned');
+    queryClient.invalidateQueries('getType');
   };
 
   // setup the mutations
