@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import MapDetails from 'pages/map/details/MapDetails';
-import { setupPingOptions, setupSelectedPings, initMap } from 'pages/map/map_init';
+import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import { fillPoint, filterFeatures, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
@@ -34,6 +34,8 @@ export default function MapPage(): JSX.Element {
     start: dayjs().subtract(14, 'day').format(formatDay),
     end: getToday()
   });
+
+  let lastPointClicked = null;
 
   // for map bottom panel state
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
@@ -83,16 +85,26 @@ export default function MapPage(): JSX.Element {
   // when an individual map point is clicked, highlight it
   const handlePointClick = (event: L.LeafletEvent): void => {
     const layer = event.target;
+    if (lastPointClicked && lastPointClicked !== layer) {
+      fillPoint(lastPointClicked);
+      setPopupInnerHTML(null, true);
+    }
+    lastPointClicked = layer;
     const feature: ITelemetryFeature = layer?.feature;
     fillPoint(layer, true);
+    setPopupInnerHTML(feature as any);
     setSelectedFeatureIDs([feature.id]);
   };
 
   // revert highlight when popup is closed
-  const handlePointClosePopup = (event: L.LeafletEvent): void => {
-    fillPoint(event.target);
-    setSelectedFeatureIDs([]);
-  };
+  // const handlePointClosePopup = (event: L.LeafletEvent): void => {
+  //   const layer = event.target;
+  //   const feature: ITelemetryFeature = layer?.feature;
+  //   setPopupInnerHTML(feature as any, true);
+  //   setSelectedFeatureIDs([feature.id]);
+  //   fillPoint(event.target);
+  //   setSelectedFeatureIDs([]);
+  // };
 
   // highlights the selected rows in bottom panel when mouse is hovered over a point
   const handlePointHover = (ids: number[]): void => {
@@ -108,7 +120,8 @@ export default function MapPage(): JSX.Element {
     });
   };
 
-  setupPingOptions(pings, handlePointClick, handlePointClosePopup);
+  // setupPingOptions(pings, handlePointClick, handlePointClosePopup);
+  setupPingOptions(pings, handlePointClick);
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
 
@@ -243,6 +256,7 @@ export default function MapPage(): JSX.Element {
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='map' onKeyDown={handleKeyPress}></div>
+        <div id='popup'></div>
         <div className={`bottom-panel ${showModal ? '' : 'appear-above-map'}`}>
           <MapDetails
             features={features}

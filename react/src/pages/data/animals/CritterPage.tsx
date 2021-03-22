@@ -5,6 +5,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
+import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
 import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
@@ -23,14 +24,14 @@ export default function CritterPage(): JSX.Element {
     // props.setSidebarContent(<p>critter id: {row.critter_id}</p>);
   };
 
-  // set the export state when table loads 
+  // set the export state when table loads
   const onNewData = (d: Animal[]): void => (d.length && d[0].device_id ? setCrittersA(d) : setCrittersU(d));
 
   // props to be passed to the edit modal component
   const editProps = {
     editing: new Animal(),
     open: false, // overwritten in {AddEditViewer}
-    onSave: null, // save handler is overwritten in {ModifyCritterWrappper}
+    onSave: null // save handler is overwritten in {ModifyCritterWrappper}
   };
 
   const exportProps = {
@@ -41,32 +42,34 @@ export default function CritterPage(): JSX.Element {
   };
 
   return (
-    <div className='container'>
-      <RowSelectedProvider>
-        <>
-          <Table
-            headers={assignedCritterProps}
-            title={CS.assignedTableTitle}
-            queryProps={{ query: bctwApi.useAssignedCritters, onNewData }}
-            onSelect={handleSelect}
-          />
-          <Table
-            headers={unassignedCritterProps}
-            title={CS.unassignedTableTitle}
-            queryProps={{ query: bctwApi.useUnassignedCritters, onNewData }}
-            onSelect={handleSelect}
-          />
-        </>
-      </RowSelectedProvider>
-      <div className='button-row'>
-        <ExportImportViewer {...exportProps} data={[...critterA, ...critterU]} />
-        <ModifyCritterWrapper editing={editObj}>
-          <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
-            <EditCritter {...editProps} />
-          </AddEditViewer>
-        </ModifyCritterWrapper>
+    <ManageLayout>
+      <div className='container'>
+        <RowSelectedProvider>
+          <>
+            <Table
+              headers={assignedCritterProps}
+              title={CS.assignedTableTitle}
+              queryProps={{ query: bctwApi.useAssignedCritters, onNewData }}
+              onSelect={handleSelect}
+            />
+            <Table
+              headers={unassignedCritterProps}
+              title={CS.unassignedTableTitle}
+              queryProps={{ query: bctwApi.useUnassignedCritters, onNewData }}
+              onSelect={handleSelect}
+            />
+          </>
+        </RowSelectedProvider>
+        <div className='button-row'>
+          <ExportImportViewer {...exportProps} data={[...critterA, ...critterU]} />
+          <ModifyCritterWrapper editing={editObj}>
+            <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
+              <EditCritter {...editProps} />
+            </AddEditViewer>
+          </ModifyCritterWrapper>
+        </div>
+        <p>{editObj.critter_id}</p>
       </div>
-      <p>{editObj.critter_id}</p>
-    </div>
+    </ManageLayout>
   );
 }

@@ -4,6 +4,7 @@ import { formatLocal } from 'utils/time';
 import { COLORS, getFillColorByStatus } from 'pages/map/map_helpers';
 import React, { MutableRefObject } from 'react';
 import { MapTileLayers } from 'constants/strings';
+import { TelemetryFeature } from 'types/map';
 
 const defaultPointStyle: L.CircleMarkerOptions = {
   // add fillColor
@@ -17,7 +18,7 @@ const defaultPointStyle: L.CircleMarkerOptions = {
 const setupPingOptions = (
   pings: L.GeoJSON,
   onClickPointHandler: L.LeafletEventHandlerFn,
-  onClosePopupHandler: L.LeafletEventHandlerFn
+  // onClosePopupHandler: L.LeafletEventHandlerFn
 ): void => {
   pings.options = {
     pointToLayer: (feature, latlng): L.Layer => {
@@ -29,25 +30,40 @@ const setupPingOptions = (
       return marker;
     },
     onEachFeature: (feature, layer): void => {
-      const p = feature.properties;
-      const g = feature.geometry as any; // Yes... this exists!
-      const x = g.coordinates[0]?.toFixed(5);
-      const y = g.coordinates[1]?.toFixed(5);
-      const t = dayjs(p.date_recorded).format(formatLocal);
-      const text = `
-        ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
-        <hr>
-        Device ID ${p.device_id} (${p.device_vendor}) <br>
-        ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
-        ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
-        ${t} <br>
-        ${x}, ${y}
-      `;
-      layer.bindPopup(text).addEventListener('popupopen', onClickPointHandler);
-      layer.bindPopup(text).addEventListener('popupclose', onClosePopupHandler);
+      // layer.bindPopup(text).addEventListener('popupopen', onClickPointHandler);
+      // layer.bindPopup(text).addEventListener('popupclose', onClosePopupHandler);
+      layer.addEventListener('popupopen', onClickPointHandler);
+      // layer.addEventListener('popupclose', onClosePopupHandler);
     }
   };
 };
+
+const setPopupInnerHTML = (feature: TelemetryFeature, isClosingPopup = false): void => {
+  const doc = document.getElementById('popup');
+  if (isClosingPopup) {
+    doc.innerHTML = '';
+    doc.classList.remove('can-see');
+    return;
+  }
+  const p = feature.properties;
+  const g = feature.geometry;
+  const x = `${g.coordinates[0]?.toFixed(5)}\xb0`;
+  const y = `${g.coordinates[1]?.toFixed(5)}\xb0`;
+  const t = dayjs(p.date_recorded).format(formatLocal);
+  const text = `
+    ${p.species ? 'Species: ' + p.species : ''} ${p.animal_id ? 'ID: ' + p.animal_id + '<br>' : ''} 
+    ${p.wlh_id ? 'WLHID: ' +  p.wlh_id + '<br>' : ''}
+    Device ID: ${p.device_id} (${p.device_vendor}) <br>
+    ${p.frequency ? 'Frequency: ' + p.frequency + '<br>' : ''}
+    ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
+    ${p.device_status ? 'Collar Status: ' + '<b>' +  p.device_status + '</b><br>' : ''}
+    ${p.population_unit ? 'Population Unit: ' + p.population_unit + '<br>' : ''}
+    ${t} <br>
+    Location: ${x}, ${y}
+  `;
+  doc.innerHTML = text;
+  doc.classList.add('can-see')
+}
 
 const setupSelectedPings = (): L.GeoJSONOptions => {
   return {
@@ -159,4 +175,4 @@ const initMap = (
     });
 };
 
-export { initMap, setupPingOptions, setupSelectedPings, addTileLayers };
+export { initMap, setupPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };

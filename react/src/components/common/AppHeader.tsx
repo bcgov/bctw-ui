@@ -34,7 +34,7 @@ const AppHeader = (): JSX.Element => {
         </MuiLink>
         <nav className={'app-nav'}>
           <ul>
-            <li><Link to='/map' color={'inherit'}>My Telemetry</Link></li>
+            <li><Link to='/map' color={'inherit'}>Telemetry</Link></li>
             <li><Link to='/data' color={'inherit'}>Manage</Link></li>
           </ul>
         </nav>

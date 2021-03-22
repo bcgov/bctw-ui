@@ -5,6 +5,7 @@ import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import EditCollar from 'pages/data/collars/EditCollar';
+import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
 import { collarPropsToDisplay, Collar, eCollarAssignedStatus, attachedCollarProps } from 'types/collar';
 import AddEditViewer from '../common/AddEditViewer';
@@ -50,32 +51,34 @@ export default function CollarPage(): JSX.Element {
   };
 
   return (
-    <div className='container'>
-      <RowSelectedProvider>
-        <>
-          <Table
-            headers={attachedCollarProps}
-            title={S.assignedCollarsTableTitle}
-            queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
-            onSelect={handleSelect}
-          />
-          <Table
-            headers={collarPropsToDisplay}
-            title={S.availableCollarsTableTitle}
-            queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}
-            onSelect={handleSelect}
-          />
-        </>
-      </RowSelectedProvider>
-      <div className='button-row'>
-        <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
-        <ModifyCollarWrapper editing={editObj}>
-          <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
-            <EditCollar {...editProps} />
-          </AddEditViewer>
-        </ModifyCollarWrapper>
+    <ManageLayout>
+      <div className='container'>
+        <RowSelectedProvider>
+          <>
+            <Table
+              headers={attachedCollarProps}
+              title={S.assignedCollarsTableTitle}
+              queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
+              onSelect={handleSelect}
+            />
+            <Table
+              headers={collarPropsToDisplay}
+              title={S.availableCollarsTableTitle}
+              queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}
+              onSelect={handleSelect}
+            />
+          </>
+        </RowSelectedProvider>
+        <div className='button-row'>
+          <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
+          <ModifyCollarWrapper editing={editObj}>
+            <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
+              <EditCollar {...editProps} />
+            </AddEditViewer>
+          </ModifyCollarWrapper>
+        </div>
+        <p>{editObj.collar_id}</p>
       </div>
-      <p>{editObj.collar_id}</p>
-    </div>
+    </ManageLayout>
   );
 }
