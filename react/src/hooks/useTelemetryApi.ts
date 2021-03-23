@@ -27,6 +27,7 @@ import { UserContext } from 'contexts/UserContext';
 import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { BCTW, TypeWithData } from 'types/common_types';
+import { exportQueryParams } from 'types/export';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -212,30 +213,41 @@ export const useTelemetryApi = () => {
    * @returns A simplified list of Animals that only has id, animal_id, and nickname
    * note: query keys are important! make sure to include params in the key
    */
-  const useCritterAccess = (page: number, param: {user: string, filterOutNone: boolean}): UseQueryResult => {
-    const {user, filterOutNone} = param;
-    return useQuery<UserCritterAccess[], AxiosError>(['critterAccess', page, user], () => userApi.getUserCritterAccess(page, user, filterOutNone), {
-      ...defaultQueryOptions
-    });
-  }
+  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }): UseQueryResult => {
+    const { user, filterOutNone } = param;
+    return useQuery<UserCritterAccess[], AxiosError>(
+      ['critterAccess', page, user],
+      () => userApi.getUserCritterAccess(page, user, filterOutNone),
+      {
+        ...defaultQueryOptions
+      }
+    );
+  };
 
   /**
-   * @returns 
+   * @returns
    */
   const useAlert = (): UseQueryResult<TelemetryAlert[]> => {
     return useQuery<TelemetryAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), {
       ...defaultQueryOptions
     });
-  }
+  };
 
-  /**
-   * @returns 
+  /** default type getter for animals or collars
+   * @returns
    */
   const useType = <T extends BCTW>(type: TypeWithData, id: string): UseQueryResult<T> => {
     return useQuery<T, AxiosError>(['getType', type], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions
     });
-  }
+  };
+
+  /**
+   * 
+  */
+  const useExport = (config: UseMutationOptions<string[], AxiosError, exportQueryParams>): UseMutationResult<string[]> => {
+    return useMutation<string[], AxiosError, exportQueryParams>((body) => bulkApi.getExportData(body), config);
+  };
 
   /**
    *
@@ -301,6 +313,7 @@ export const useTelemetryApi = () => {
     useUser,
     useUsers,
     useCritterAccess,
+    useExport,
     // mutations
     useMutateCodeHeader,
     useMutateBulkCsv,

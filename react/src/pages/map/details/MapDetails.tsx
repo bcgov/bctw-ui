@@ -3,11 +3,12 @@ import { useEffect, useState } from 'react';
 import { ICodeFilter } from 'types/code';
 import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowHover, OnMapRowCellClick } from 'types/map';
 import { filterFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
+import MapExport from 'pages/map/MapExport';
 
 export type MapDetailsBaseProps = {
   handleHoverCritter: OnPanelRowHover;
   handleShowOverview: OnMapRowCellClick;
-}
+};
 
 type MapDetailsProps = MapDetailsBaseProps & {
   features: ITelemetryFeature[];
@@ -15,6 +16,8 @@ type MapDetailsProps = MapDetailsBaseProps & {
   selectedFeatureIDs: number[];
   // list of filters applied from map side panel
   filters: ICodeFilter[];
+  showExportModal: boolean;
+  setShowExportModal: (b: boolean) => void;
 };
 
 export default function MapDetails({
@@ -22,7 +25,9 @@ export default function MapDetails({
   filters,
   selectedFeatureIDs,
   handleShowOverview,
-  handleHoverCritter
+  handleHoverCritter,
+  showExportModal,
+  setShowExportModal
 }: MapDetailsProps): JSX.Element {
   const [groupedFeatures, setGroupedFeatures] = useState<IUniqueFeature[]>([]);
   const [crittersSelectedInMap, setCrittersSelectedInMap] = useState<string[]>([]);
@@ -65,13 +70,21 @@ export default function MapDetails({
     <>
       <div className={'map-bottom-panel-title'}>
         <h3>{filters.length ? 'Selected' : 'Default'} Animal Set</h3>
-        <h3>Export</h3>
+        <h3 onClick={(): void => setShowExportModal(true)} className={'critter-select'}>
+          Export
+        </h3>
       </div>
       <MapDetailsGrouped
         crittersSelected={crittersSelectedInMap}
         features={groupedFeatures}
         handleShowOverview={handleShowOverview}
         handleHoverCritter={handleHoverCritter}
+      />
+      <MapExport
+        critter_ids={groupedFeatures.map((f) => f.critter_id)}
+        collar_ids={groupedFeatures.map(f => f.features[0].properties.collar_id)}
+        open={showExportModal}
+        handleClose={(): void => setShowExportModal(false)}
       />
     </>
   );

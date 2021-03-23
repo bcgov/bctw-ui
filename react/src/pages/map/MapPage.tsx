@@ -42,10 +42,13 @@ export default function MapPage(): JSX.Element {
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
 
   // for overview state
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showOverviewModal, setShowModal] = useState<boolean>(false);
   const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
   const [overviewType, setOverviewType] = useState<TypeWithData>();
+
+  // export state
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
@@ -111,7 +114,7 @@ export default function MapPage(): JSX.Element {
     mapRef.current.eachLayer((layer) => {
       const l = layer as any;
       const id = l.feature?.id;
-    
+
       if (ids.includes(id)) {
         fillPoint(l, true);
       } else if (typeof l.setStyle === 'function') {
@@ -125,7 +128,7 @@ export default function MapPage(): JSX.Element {
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
 
-  // handles the drawing, called in map_init 
+  // handles the drawing, called in map_init
   const handleDrawShape = (): void => {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
@@ -146,7 +149,7 @@ export default function MapPage(): JSX.Element {
     selectedPings.addData(overlay);
   };
 
-  // when shapes are drawn in {drawSelectedLayer}, set the selectedFeatureIDs 
+  // when shapes are drawn in {drawSelectedLayer}, set the selectedFeatureIDs
   // status to the ids of the points in the shape
   const setFeatureIDsOnDraw = (
     overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
@@ -255,18 +258,20 @@ export default function MapPage(): JSX.Element {
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
-        <div id='map' onKeyDown={handleKeyPress}></div>
-        <div id='popup'></div>
-        <div className={`bottom-panel ${showModal ? '' : 'appear-above-map'}`}>
+        <div id='map' onKeyDown={handleKeyPress}/>
+        <div id='popup'/>
+        <div className={`bottom-panel ${showOverviewModal || showExportModal ? '' : 'appear-above-map'}`}>
           <MapDetails
             features={features}
             filters={filters}
             selectedFeatureIDs={selectedFeatureIDs}
             handleShowOverview={handleShowOverview}
             handleHoverCritter={handlePointHover}
+            showExportModal={showExportModal}
+            setShowExportModal={setShowExportModal}
           />
         </div>
-        <DialogFullScreen open={showModal} handleClose={setShowModal}>
+        <DialogFullScreen open={showOverviewModal} handleClose={setShowModal}>
           <MapOverView type={overviewType} detail={selectedDetail} />
         </DialogFullScreen>
       </div>

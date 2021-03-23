@@ -1,4 +1,4 @@
-import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@material-ui/core';
 import clsx from 'clsx';
 import { RouteKey } from 'AppRouter';
 import { Icon } from 'components/common';
@@ -98,9 +98,11 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
             return (
               <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
                 {route.icon ? (
-                  <ListItemIcon className={'sidebar-icon'}>
-                    <Icon icon={route.icon} />
-                  </ListItemIcon>
+                  <Tooltip title={route.title}>
+                    <ListItemIcon className={'sidebar-icon'}>
+                      <Icon icon={route.icon} />
+                    </ListItemIcon>
+                  </Tooltip>
                 ) : null}
                 <ListItemText className={'list-item-txt'} primary={route.title} />
               </ListItem>

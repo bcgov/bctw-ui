@@ -4,6 +4,7 @@ import { plainToClass } from 'class-transformer';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTW, TypeWithData } from 'types/common_types';
+import { exportQueryParams } from 'types/export';
 
 import { IBulkUploadResults } from './api_interfaces';
 
@@ -21,7 +22,17 @@ export const bulkApi = (api: AxiosInstance) => {
     return data.map(json => type === 'critter' ? plainToClass(Animal, json) : plainToClass(Collar, json))[0];
   }
 
+  const getExportData = async (body: exportQueryParams): Promise<string[]> => {
+    const { type, id }  = body;
+    let url = createUrl({ api: `export/${type}`})
+    id.forEach(i => url += `&id=${i}`);
+    // console.log(url);
+    const { data } = await api.get(url);
+    return data;
+  }
+
   return {
+    getExportData,
     getType,
     uploadCsv,
   }

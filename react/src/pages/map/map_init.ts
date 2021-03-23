@@ -42,7 +42,7 @@ const setPopupInnerHTML = (feature: TelemetryFeature, isClosingPopup = false): v
   const doc = document.getElementById('popup');
   if (isClosingPopup) {
     doc.innerHTML = '';
-    doc.classList.remove('can-see');
+    doc.classList.remove('appear-above-map');
     return;
   }
   const p = feature.properties;
@@ -62,7 +62,7 @@ const setPopupInnerHTML = (feature: TelemetryFeature, isClosingPopup = false): v
     Location: ${x}, ${y}
   `;
   doc.innerHTML = text;
-  doc.classList.add('can-see')
+  doc.classList.add('appear-above-map')
 }
 
 const setupSelectedPings = (): L.GeoJSONOptions => {

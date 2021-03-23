@@ -9,7 +9,8 @@ import { SelectProps } from '@material-ui/core';
 
 type ISelectProps = SelectProps & {
   codeHeader: string; // code header type to retrieve
-  defaultValue?: string;
+  defaultValue?: string; // will otherwise default to empty string
+  filterCodes?: string[];
   labelTitle: string;
   changeHandler: (o: Record<string, unknown>, isChange: boolean) => void;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
@@ -17,9 +18,8 @@ type ISelectProps = SelectProps & {
 };
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
-// todo: filterable
 export default function SelectCode(props: ISelectProps): JSX.Element {
-  const { codeHeader, defaultValue, changeHandler, changeHandlerMultiple, labelTitle, multiple, triggerReset } = props;
+  const { codeHeader, defaultValue, filterCodes, changeHandler, changeHandlerMultiple, labelTitle, multiple, triggerReset } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
   const [values, setValues] = useState<string[]>([defaultValue]);
@@ -91,10 +91,8 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       /// return a combination of the original code and the value
       /// why? these are most likely to be used in client side filtering
       /// where we dont need the code value but the description
-      // return c
       return { ...c, ...{ code_header: codeHeader } };
     });
-    // console.log(ret);
     if (typeof changeHandlerMultiple === 'function') {
       changeHandlerMultiple(ret as ICodeFilter[]);
     }
@@ -120,7 +118,6 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
             renderValue={(selected: string | string[]): string => {
               if (multiple) {
                 // remove empty string values
-                // return (selected as string[]).filter((a) => a).join(selected.length > 1 ? ', ' : '');
                 const l = (selected as string[]).filter((a) => a);
                 return l.length > 1 ? `${l.length} selected` : l[0];
               }
