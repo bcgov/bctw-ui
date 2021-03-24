@@ -1,4 +1,4 @@
-import { Button, Paper } from '@material-ui/core';
+import { Button, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import TextField from 'components/form/Input';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
@@ -64,9 +64,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
   };
 
   if (isError) {
-    return (
-      <div>{error}</div>
-    )
+    return <div>{error}</div>;
   }
 
   if (type === 'critter') {
@@ -80,6 +78,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
               Active
             </Button>
           </div>
+          c
           <h4>
             {detail.species} | {detail.animal_status} | <i>{detail.critter_id}</i>
           </h4>
@@ -107,10 +106,12 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
               <h3>General Information</h3>
               {critter ? createDisabledFields(critterGeneral, critter) : null}
             </Paper>
-            {critter?.animal_status === 'Mortality' ? <Paper elevation={2} className={'dlg-details-section'}>
-              <h3>Mortality Details</h3>
-              {critter ? createDisabledFields(critterMortality, critter) : null}
-            </Paper> : null}
+            {critter?.animal_status === 'Mortality' ? (
+              <Paper elevation={2} className={'dlg-details-section'}>
+                <h3>Mortality Details</h3>
+                {critter ? createDisabledFields(critterMortality, critter) : null}
+              </Paper>
+            ) : null}
             <Paper elevation={2} className={'dlg-details-section'}>
               <h3>Identifiers</h3>
               {critter ? createDisabledFields(critterIds, critter) : null}
@@ -129,7 +130,9 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
           </div>
 
           <Paper elevation={3} className={'dlg-full-body-details'}>
-            <div className={'dlg-details-section'}></div>
+            <Paper elevation={2} className={'dlg-details-section'}>
+              <SpecialEvent critter_id={detail.critter_id} collar_id={null} type={'capture'} />
+            </Paper>
           </Paper>
         </Paper>
       </>
@@ -181,9 +184,76 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
         </div>
 
         <Paper elevation={3} className={'dlg-full-body-details'}>
-          <div className={'dlg-details-section'}></div>
+          <Paper elevation={2} className={'dlg-details-section'}>
+            <SpecialEvent critter_id={null} collar_id={detail.collar_id} type={'malfunction'} />
+          </Paper>
         </Paper>
       </Paper>
     </>
+  );
+}
+
+type ISpecialEventProps = {
+  type: 'malfunction' | 'capture';
+  collar_id: string;
+  critter_id: string;
+};
+function SpecialEvent({ critter_id, collar_id, type }: ISpecialEventProps): JSX.Element {
+  const bctwApi = useTelemetryApi();
+  const { data, status, error } =
+    type === 'capture' ? bctwApi.useCritterHistory(1, critter_id) : bctwApi.useCollarHistory(1, collar_id);
+
+  switch (status) {
+    case 'loading':
+      return <div>loading...</div>;
+    case 'error':
+      return (
+        <div>
+          unable to load {type === 'capture' ? 'capture' : 'malfunction'} history: {error}
+        </div>
+      );
+    default:
+      break;
+  }
+  const filtered =
+    type === 'capture'
+      ? (data as Animal[]).filter((a) => a.capture_date)
+      : (data as Collar[]).filter((c) => c.malfunction_date);
+  if (!filtered.length) {
+    return <div>history contains no events</div>;
+  }
+  return (
+    <Table>
+      <TableHead>
+        {type === 'capture' ? (
+          <TableRow>
+            <TableCell>Date</TableCell>
+            <TableCell>Location</TableCell>
+            <TableCell>UTM</TableCell>
+          </TableRow>
+        ) : (
+          <TableRow>
+            <TableCell>Date</TableCell>
+            <TableCell>Type</TableCell>
+          </TableRow>
+        )}
+      </TableHead>
+      <TableBody>
+        {type === 'capture'
+          ? (filtered as Animal[]).map((f) => (
+            <TableRow key={f.critter_id}>
+              <TableCell>{f.capture_date}</TableCell>
+              <TableCell>{f.captureCoords}</TableCell>
+              <TableCell>{f.captureUTM}</TableCell>
+            </TableRow>
+          ))
+          : (filtered as Collar[]).map((c) => (
+            <TableRow key={c.collar_id}>
+              <TableCell>{c.malfunction_date}</TableCell>
+              <TableCell>{c.device_malfunction_type}</TableCell>
+            </TableRow>
+          ))}
+      </TableBody>
+    </Table>
   );
 }

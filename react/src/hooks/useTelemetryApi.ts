@@ -185,7 +185,7 @@ export const useTelemetryApi = () => {
   /**
    * @returns a list of collars represnting the audit history of @param collarId
    */
-  const useCollarHistory = (page: number, collarId: string, config: Record<string, unknown>): UseQueryResult => {
+  const useCollarHistory = (page: number, collarId: string, config?: Record<string, unknown>): UseQueryResult => {
     return useQuery<Collar[], AxiosError>(['collarHistory', collarId], () => collarApi.getCollarHistory(collarId), {
       ...config
     });

@@ -2,7 +2,7 @@ import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { ICodeFilter } from 'types/code';
 import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowHover, OnMapRowCellClick } from 'types/map';
-import { filterFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
+import { filterFeatures, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
 
 export type MapDetailsBaseProps = {
@@ -31,6 +31,7 @@ export default function MapDetails({
 }: MapDetailsProps): JSX.Element {
   const [groupedFeatures, setGroupedFeatures] = useState<IUniqueFeature[]>([]);
   const [crittersSelectedInMap, setCrittersSelectedInMap] = useState<string[]>([]);
+  const [groupedFeaturesChecked, setGroupedFeaturesChecked] = useState<IUniqueFeature[]>([]);
   const [sort] = useState<DetailsSortOption>('animal_id');
 
   // upon initial load, display all critters in bottom panel
@@ -43,11 +44,7 @@ export default function MapDetails({
   // highlight them in child details component
   useEffect(() => {
     const update = (): void => {
-      const critterIds = groupFeaturesByCritters(
-        features.filter((f) => selectedFeatureIDs.includes(f.id)),
-        sort
-      ).map((g) => g.critter_id);
-      // todo: sort selected in map critters to the top?
+      const critterIds = getUniqueCritterIDsFromFeatures(features, selectedFeatureIDs);
       setCrittersSelectedInMap(critterIds);
     };
     update();
@@ -66,6 +63,13 @@ export default function MapDetails({
     update();
   }, [filters]);
 
+  // upon rows checked in each row
+  const onRowsChecked = (ids: number[]): void => {
+    const grouped = groupFeaturesByCritters(features.filter((f) => ids.includes(f.id)));
+    setGroupedFeaturesChecked(grouped);
+    handleHoverCritter(ids);
+  };
+
   return (
     <>
       <div className={'map-bottom-panel-title'}>
@@ -78,11 +82,19 @@ export default function MapDetails({
         crittersSelected={crittersSelectedInMap}
         features={groupedFeatures}
         handleShowOverview={handleShowOverview}
-        handleHoverCritter={handleHoverCritter}
+        handleHoverCritter={onRowsChecked}
       />
       <MapExport
-        critter_ids={groupedFeatures.map((f) => f.critter_id)}
-        collar_ids={groupedFeatures.map(f => f.features[0].properties.collar_id)}
+        critter_ids={
+          groupedFeaturesChecked.length
+            ? groupedFeaturesChecked.map((g) => g.critter_id)
+            : groupedFeatures.map((f) => f.critter_id)
+        }
+        collar_ids={
+          groupedFeaturesChecked.length
+            ? groupedFeaturesChecked.map((f) => f.features[0].properties.collar_id)
+            : groupedFeatures.map((f) => f.features[0].properties.collar_id)
+        }
         open={showExportModal}
         handleClose={(): void => setShowExportModal(false)}
       />

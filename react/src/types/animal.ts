@@ -119,6 +119,15 @@ export class Animal implements IAnimal {
     }
     return 'unknown';
   }
+  @Expose() get captureCoords(): string {
+    return this.capture_latitude && this.capture_longitude
+      ? formatLatLong(this.capture_latitude, this.capture_longitude)
+      : '';
+  }
+  @Expose() get captureUTM(): string {
+    return this.capture_utm_zone && this.capture_utm_easting && this.capture_utm_northing
+      ? `${this.capture_utm_zone}/${this.capture_utm_easting}/${this.capture_utm_northing}`: '';
+  }
 
   constructor() {
     this.animal_id = '';

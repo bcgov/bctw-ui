@@ -8,7 +8,6 @@ const morgan = require('morgan');
 const multer = require('multer');
 const helmet = require('helmet');
 const express = require('express');
-// const compression = require('compression'); This messes with keycloak
 const bodyParser = require('body-parser');
 const expressSession = require('express-session');
 const keycloakConnect = require('keycloak-connect');
@@ -16,7 +15,7 @@ const keycloakConnect = require('keycloak-connect');
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
 const isProd = process.env.NODE_ENV === 'production' ? true : false;
-const apiHost = process.env.BCTW_API_HOST;
+const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
 
 // const authorizedUsers = JSON.parse(process.env.BCTW_AUTHORIZED_USERS);

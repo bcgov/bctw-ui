@@ -33,7 +33,7 @@ export default function Export<T>({ open, handleClose, critter_ids, collar_ids }
           filename = 'critter_movement_history.json';
           break;
       }
-      download(JSON.stringify(data), filename, 'application/json');
+      download(JSON.stringify(data, null, 2), filename, 'application/json');
     }
     reset();
   };

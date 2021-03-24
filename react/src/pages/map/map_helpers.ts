@@ -138,12 +138,18 @@ const flattenUniqueFeatureIDs = (u: IUniqueFeature[]): number[] => {
   return u.map(uf => uf.features.map(f => f.id)).flatMap(x => x);
 }
 
+const getUniqueCritterIDsFromFeatures = (features: ITelemetryFeature[], selectedIDs: number[]): string[] => {
+  const grped = groupFeaturesByCritters(features.filter(f => selectedIDs.includes(f.id)));
+  return grped.map(g => g.critter_id);
+}
+
 export {
   COLORS,
   fillPoint,
   filterFeatures,
   flattenUniqueFeatureIDs,
   getFillColorByStatus,
+  getUniqueCritterIDsFromFeatures,
   groupFeaturesByCritters,
   groupFilters,
   sortGroupedFeatures

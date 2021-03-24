@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import MapDetails from 'pages/map/details/MapDetails';
-import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML } from 'pages/map/map_init';
+import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML, hidePopup } from 'pages/map/map_init';
 import { fillPoint, filterFeatures, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
@@ -84,6 +84,12 @@ export default function MapPage(): JSX.Element {
     };
     updateComponent();
   });
+
+  useEffect(() => {
+    if (showExportModal || showOverviewModal) {
+      hidePopup();
+    }
+  }, [showExportModal, showOverviewModal])
 
   // when an individual map point is clicked, highlight it
   const handlePointClick = (event: L.LeafletEvent): void => {

@@ -38,11 +38,16 @@ const setupPingOptions = (
   };
 };
 
+const hidePopup = (): void => {
+  const doc = document.getElementById('popup');
+  doc.innerHTML = '';
+  doc.classList.remove('appear-above-map');
+}
+
 const setPopupInnerHTML = (feature: TelemetryFeature, isClosingPopup = false): void => {
   const doc = document.getElementById('popup');
   if (isClosingPopup) {
-    doc.innerHTML = '';
-    doc.classList.remove('appear-above-map');
+    hidePopup();
     return;
   }
   const p = feature.properties;
@@ -175,4 +180,4 @@ const initMap = (
     });
 };
 
-export { initMap, setupPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };
+export { initMap, hidePopup, setupPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };
