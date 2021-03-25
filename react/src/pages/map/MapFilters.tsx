@@ -1,8 +1,7 @@
-import { Drawer, IconButton } from '@material-ui/core';
+import { Button, Drawer, IconButton } from '@material-ui/core';
 import { FilterList, Close } from '@material-ui/icons';
 import { PageProp } from 'components/component_interfaces';
 import clsx from 'clsx';
-import Button from 'components/form/Button';
 import TextField from 'components/form/Input';
 import { useEffect, useState } from 'react';
 import SelectCode from 'components/form/SelectCode';
@@ -94,7 +93,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     { header: 'species', label: 'Species' },
     { header: 'sex', label: 'Gender' }
   ];
-  const latestPingLabel = 'Show Latest Location';
+  const latestPingLabel = 'Only show last location';
 
   const createMultiSelects = (): React.ReactNode => {
     return codeFilters.map((cf, idx) => (
@@ -135,42 +134,39 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             [classes.drawerClose]: !open
           })
         }}>
-        <div className={classes.toolbar}>
+        <div className={open ? 'side-panel-toolbar' : 'side-panel-toolbar-closed'}>
+          {open ? <h3>Filters</h3> : null}
           <IconButton onClick={handleDrawerOpen}>{open ? <Close /> : <FilterList htmlColor={'#ffffff'} />}</IconButton>
         </div>
         {open ? (
           <>
-            <div className={'side-panel-title'}>
-              <h3>Filters</h3>
-            </div>
             <div className='side-panel-body'>
-              <div>
-                <Checkbox label={latestPingLabel} initialValue={isLatestPing} changeHandler={handleChangeLatestPings} />
-              </div>
-              <div>
+              <div className={'side-panel-dates'}>
                 <TextField
-                  label='Select Start Date'
+                  outline={true}
+                  label='Start Date'
                   type='date'
                   defaultValue={start}
                   propName='tstart'
                   changeHandler={(e): void => setStart(e['tstart'] as string)}
                 />
-              </div>
-              <div>
                 <TextField
-                  label='Select End Date'
+                  outline={true}
+                  label='End Date'
                   type='date'
                   defaultValue={end}
                   propName='tend'
                   changeHandler={(e): void => setEnd(e['tend'] as string)}
                 />
               </div>
+              <div><Checkbox label={latestPingLabel} initialValue={isLatestPing} changeHandler={handleChangeLatestPings}/></div>
               {createMultiSelects()}
+              <hr/>
               <div className={'side-btns'}>
-                <Button disabled={applyButtonStatus} onClick={handleApplyFilters}>Apply</Button>
-                <Button disabled={numFiltersSelected === 0} onClick={resetFilters}>Reset</Button>
+                <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>Apply Filters</Button>
+                <Button variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>Clear</Button>
               </div>
-              <p>{numFiltersSelected} filters selected</p>
+              {/* <p>{numFiltersSelected} filters selected</p> */}
             </div>
           </>
         ) : (

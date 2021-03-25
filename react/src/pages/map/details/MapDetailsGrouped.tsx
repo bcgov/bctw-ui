@@ -1,5 +1,5 @@
 import { ITelemetryDetail, IUniqueFeature, TelemetryDetail } from 'types/map';
-import { Checkbox, TableRow, TableCell, TableBody, Table, TableContainer, Paper } from '@material-ui/core';
+import { TableRow, TableCell, TableBody, Table, TableContainer, Paper, Checkbox } from '@material-ui/core';
 import { getComparator } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
@@ -62,8 +62,8 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
+    <TableContainer component={Paper} className={'bottom-tbl'}>
+      <Table stickyHeader size='small'>
         {features && features.length ? (
           <TableHead
             headersToDisplay={rows_to_render}
@@ -78,8 +78,8 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
             customHeaders={[]}
           />
         ) : null}
-        <TableBody>
-          {sortGroupedFeatures(features, getComparator(order, orderBy)).map((u) => {
+        <TableBody >
+          {sortGroupedFeatures(features, getComparator(order, orderBy)).map((u, idx) => {
             return (
               <Row
                 key={u.critter_id}
@@ -124,7 +124,7 @@ function Row(props: IRowProps): JSX.Element {
       // onMouseLeave={(): void => handleCritterHover([])}
     >
       <TableCell padding='checkbox'>
-        <Checkbox onChange={onCheck} checked={isSelectedInMap || isChecked} />
+        <Checkbox color='primary' onChange={onCheck} checked={isSelectedInMap || isChecked} />
       </TableCell>
       <TableCell>
         <div onClick={(): void => handleShowOverview('critter', row)} className={'critter-select'}>

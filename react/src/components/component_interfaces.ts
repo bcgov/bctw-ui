@@ -62,6 +62,7 @@ interface IInputProps {
  */
 interface ITextfieldProps extends IInputProps, StandardTextFieldProps {
   propName: string;
+  outline?: boolean;
 }
 
 interface INotificationMessage {

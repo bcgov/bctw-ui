@@ -78,7 +78,6 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
               Active
             </Button>
           </div>
-          c
           <h4>
             {detail.species} | {detail.animal_status} | <i>{detail.critter_id}</i>
           </h4>

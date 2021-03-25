@@ -82,7 +82,7 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
           })
         }}>
         {collapseAble ? (
-          <div className={classes.toolbar}>
+          <div className={'side-panel-toolbar'}>
             <IconButton onClick={handleDrawerOpen}>
               {open ? (
                 <ChevronLeft className={'open-close'} htmlColor='white' />

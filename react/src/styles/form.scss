@@ -1,8 +1,6 @@
-.select-control {
-  .MuiSelect-select.MuiSelect-select {
-    min-width: 120px;
+  .MuiFormControl-root.select-control {
+    width: 100%;
   }
-}
 
 // for use in overview pages to display disabled text fields
 .text-disabled {

@@ -10,7 +10,6 @@ import { SelectProps } from '@material-ui/core';
 type ISelectProps = SelectProps & {
   codeHeader: string; // code header type to retrieve
   defaultValue?: string; // will otherwise default to empty string
-  filterCodes?: string[];
   labelTitle: string;
   changeHandler: (o: Record<string, unknown>, isChange: boolean) => void;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
@@ -19,14 +18,20 @@ type ISelectProps = SelectProps & {
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectCode(props: ISelectProps): JSX.Element {
-  const { codeHeader, defaultValue, filterCodes, changeHandler, changeHandlerMultiple, labelTitle, multiple, triggerReset } = props;
+  const { codeHeader, defaultValue, changeHandler, changeHandlerMultiple, labelTitle, multiple, triggerReset } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
   const [values, setValues] = useState<string[]>([defaultValue]);
   const [codes, setCodes] = useState<ICode[]>([]);
 
   // to handle React warning about not recognizing the prop on a DOM element
-  const propsToPass = removeProps(props, ['codeHeader', 'changeHandler', 'labelTitle', 'changeHandlerMultiple', 'triggerReset']);
+  const propsToPass = removeProps(props, [
+    'codeHeader',
+    'changeHandler',
+    'labelTitle',
+    'changeHandlerMultiple',
+    'triggerReset'
+  ]);
 
   // load this codeHeaders codes from db
   const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useCodes(0, codeHeader);
@@ -52,7 +57,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       // console.log('reset triggered from parent component!');
       setValues([]);
     }
-  }, [triggerReset])
+  }, [triggerReset]);
 
   const handleChange = (event: React.ChangeEvent<{ value }>): void => {
     const v = event.target.value;
@@ -109,17 +114,19 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       ) : isLoading || isFetching ? (
         <div>loading...</div>
       ) : codes && codes.length ? (
-        <FormControl className={'select-control'}>
+        <FormControl size='small' variant={'outlined'} className={'select-control'}>
           <InputLabel id='select-label'>{labelTitle}</InputLabel>
           <MuiSelect
+            label={labelTitle}
             labelId='select-label'
+            variant='outlined'
             value={multiple ? values : value}
             onChange={multiple ? handleChangeMultiple : handleChange}
             renderValue={(selected: string | string[]): string => {
               if (multiple) {
                 // remove empty string values
                 const l = (selected as string[]).filter((a) => a);
-                return l.length > 1 ? `${l.length} selected` : l[0];
+                return l.length > 4 ? `${l.length} selected` : l.join(', ');
               }
               return selected as string;
             }}
@@ -134,7 +141,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
               }
               return (
                 <MenuItem key={c.id} value={c.description}>
-                  <Checkbox checked={values.indexOf(c.description) !== -1} />
+                  <Checkbox size='small' color='primary' checked={values.indexOf(c.description) !== -1} />
                   {c.description}
                 </MenuItem>
               );

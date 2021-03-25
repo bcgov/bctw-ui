@@ -46,6 +46,17 @@ $bottomPanelHeight: 30rem;
 // side panel
 //
 
+.side-panel-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3rem;
+}
+
+.side-panel-toolbar-closed {
+  margin: 0 auto;
+}
+
 .side-panel {
   border-right: 2px solid $BCgovGold;
   overflow-y: auto;
@@ -62,15 +73,20 @@ $bottomPanelHeight: 30rem;
   }
 }
 
+.side-panel-dates {
+  .MuiFormControl-root.MuiTextField-root {
+    margin-right: 0.5rem;
+  }
+}
+
 .side-btns {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-}
+  justify-content: flex-end;
 
-.side-panel-title {
-  font: inherit;
-  margin: 0 auto;
+  button {
+    margin-right: 10px;
+  }
 }
 
 .side-panel-body {
@@ -101,7 +117,7 @@ $bottomPanelHeight: 30rem;
   width: 100%;
   background-color: #ffffff;
   height: $bottomPanelHeight;
-  overflow-y: auto;
+  // overflow-y: auto;
 
   .MuiPaper-elevation1 {
     box-shadow: none;
@@ -109,6 +125,10 @@ $bottomPanelHeight: 30rem;
   .MuiTableContainer-root {
     overflow-x: hidden;
   }
+}
+
+.bottom-tbl {
+  max-height: 24rem;
 }
 
 // must be at least this index to appear for full-screen dialog
@@ -121,14 +141,20 @@ $bottomPanelHeight: 30rem;
   flex-direction: row;
   justify-content: space-between;
   padding: 0.5rem 1rem;
+  align-items: center;
+
+  button {
+    height: 50%;
+  }
 }
 
 .map-bottom-panel-row {
   width: 100%;
   td > .MuiTableCell-root, .MuiTableCell-body {
-    border: none;
+    border-bottom: 1px solid #000;
     font-family: inherit;
   }
+  // .map-bottom-panel-row td > .MuiTableCell-root, .map-bottom-panel-row .MuiTableCell-body
 }
 
 // map details parent table box
@@ -143,10 +169,6 @@ $bottomPanelHeight: 30rem;
   cursor: pointer;
   font-weight: 500;
 
-}
-
-.critter-select:hover {
-  color: $BCgovBlue !important;
 }
 
 // hover effect when selecting a point / drawing a shape in map

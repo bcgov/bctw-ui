@@ -4,6 +4,7 @@ import { ICodeFilter } from 'types/code';
 import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowHover, OnMapRowCellClick } from 'types/map';
 import { filterFeatures, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
+import { Button } from '@material-ui/core';
 
 export type MapDetailsBaseProps = {
   handleHoverCritter: OnPanelRowHover;
@@ -74,9 +75,7 @@ export default function MapDetails({
     <>
       <div className={'map-bottom-panel-title'}>
         <h3>{filters.length ? 'Selected' : 'Default'} Animal Set</h3>
-        <h3 onClick={(): void => setShowExportModal(true)} className={'critter-select'}>
-          Export
-        </h3>
+        <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
       </div>
       <MapDetailsGrouped
         crittersSelected={crittersSelectedInMap}
