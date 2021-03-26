@@ -37,8 +37,14 @@ const CodeStrings = {
   editableProps: ['code_header_name', 'code_header_title', 'code_header_description']
 }
 
+const MapTileLayers = {
+  bing: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  govBase: 'https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer/tile/{z}/{y}/{x}'
+}
+
 export {
   CodeStrings,
   CollarStrings,
   CritterStrings,
+  MapTileLayers,
 }

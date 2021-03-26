@@ -11,3 +11,8 @@ export interface BctwBaseType {
   valid_from: Date;
   valid_to: Date;
 }
+
+/**
+ * defines the main object types that have metadata in BCTW
+ */
+export type TypeWithData = 'critter' | 'collar'

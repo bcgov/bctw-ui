@@ -40,6 +40,7 @@ export default function TableHead<T extends BCTW>(props: ITableHeadProps<T>): JS
           {isMultiSelect ? (
             <TableCell padding='checkbox'>
               <Checkbox
+                color='primary'
                 indeterminate={numSelected > 0 && numSelected < rowCount}
                 checked={rowCount > 0 && numSelected === rowCount}
                 onChange={onSelectAllClick}

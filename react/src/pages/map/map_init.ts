@@ -2,62 +2,81 @@ import * as L from 'leaflet';
 import dayjs from 'dayjs';
 import { formatLocal } from 'utils/time';
 import { COLORS, getFillColorByStatus } from 'pages/map/map_helpers';
-import React, { createRef, MutableRefObject } from 'react';
+import React, { MutableRefObject } from 'react';
+import { MapTileLayers } from 'constants/strings';
+import { TelemetryFeature } from 'types/map';
+
+const defaultPointStyle: L.CircleMarkerOptions = {
+  // add fillColor
+  radius: 8,
+  color: '#000',
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.9
+};
 
 const setupPingOptions = (
   pings: L.GeoJSON,
   onClickPointHandler: L.LeafletEventHandlerFn,
-  onClosePopupHandler: L.LeafletEventHandlerFn
+  // onClosePopupHandler: L.LeafletEventHandlerFn
 ): void => {
   pings.options = {
     pointToLayer: (feature, latlng): L.Layer => {
       const colour = getFillColorByStatus(feature as any);
-      const pointStyle = {
-        radius: 8,
-        fillColor: colour,
-        color: '#000',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.9
-      };
-
+      const pointStyle = { fillColor: colour, ...defaultPointStyle}
       const marker = L.circleMarker(latlng, pointStyle);
       // add the event listener
       marker.on('click', onClickPointHandler);
       return marker;
     },
     onEachFeature: (feature, layer): void => {
-      const p = feature.properties;
-      const g = feature.geometry as any; // Yes... this exists!
-      const x = g.coordinates[0]?.toFixed(5);
-      const y = g.coordinates[1]?.toFixed(5);
-      const t = dayjs(p.date_recorded).format(formatLocal);
-      const text = `
-        ${p.species || ''} ${p.animal_id || 'No WLHID'} <br>
-        <hr>
-        Device ID ${p.device_id} (${p.device_vendor}) <br>
-        ${p.radio_frequency ? 'Frequency of ' + p.radio_frequency + '<br>' : ''}
-        ${p.population_unit ? 'Unit ' + p.population_unit + '<br>' : ''}
-        ${t} <br>
-        ${x}, ${y}
-      `;
-      layer.bindPopup(text).addEventListener('popupopen', onClickPointHandler);
-      layer.bindPopup(text).addEventListener('popupclose', onClosePopupHandler);
+      // layer.bindPopup(text).addEventListener('popupopen', onClickPointHandler);
+      // layer.bindPopup(text).addEventListener('popupclose', onClosePopupHandler);
+      layer.addEventListener('popupopen', onClickPointHandler);
+      // layer.addEventListener('popupclose', onClosePopupHandler);
     }
   };
 };
+
+const hidePopup = (): void => {
+  const doc = document.getElementById('popup');
+  doc.innerHTML = '';
+  doc.classList.remove('appear-above-map');
+}
+
+const setPopupInnerHTML = (feature: TelemetryFeature, isClosingPopup = false): void => {
+  const doc = document.getElementById('popup');
+  if (isClosingPopup) {
+    hidePopup();
+    return;
+  }
+  const p = feature.properties;
+  const g = feature.geometry;
+  const x = `${g.coordinates[0]?.toFixed(5)}\xb0`;
+  const y = `${g.coordinates[1]?.toFixed(5)}\xb0`;
+  const t = dayjs(p.date_recorded).format(formatLocal);
+  const text = `
+    ${p.species ? 'Species: ' + p.species : ''} ${p.animal_id ? 'ID: ' + p.animal_id + '<br>' : ''} 
+    ${p.wlh_id ? 'WLHID: ' +  p.wlh_id + '<br>' : ''}
+    Device ID: ${p.device_id} (${p.device_vendor}) <br>
+    ${p.frequency ? 'Frequency: ' + p.frequency + '<br>' : ''}
+    ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
+    ${p.device_status ? 'Collar Status: ' + '<b>' +  p.device_status + '</b><br>' : ''}
+    ${p.population_unit ? 'Population Unit: ' + p.population_unit + '<br>' : ''}
+    ${t} <br>
+    Location: ${x}, ${y}
+  `;
+  doc.innerHTML = text;
+  doc.classList.add('appear-above-map')
+}
 
 const setupSelectedPings = (): L.GeoJSONOptions => {
   return {
     pointToLayer: (feature, latlng) => {
       const pointStyle = {
         class: 'selected-ping',
-        radius: 10,
         fillColor: COLORS.selected,
-        color: '#000',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 1
+        ...defaultPointStyle
       };
       return L.circleMarker(latlng, pointStyle);
     }
@@ -94,22 +113,16 @@ const getCHL = () => {
 };
 
 const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Control.Layers): void => {
-  const bingOrtho = L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {
-      attribution: '&copy; <a href="https://esri.com">ESRI Basemap</a> ',
-      maxZoom: 24,
-      maxNativeZoom: 17
-    }
-  ).addTo(mapRef.current);
+  const bingOrtho = L.tileLayer(MapTileLayers.bing, {
+    attribution: '&copy; <a href="https://esri.com">ESRI Basemap</a> ',
+    maxZoom: 24,
+    maxNativeZoom: 17
+  }).addTo(mapRef.current);
 
-  const bcGovBaseLayer = L.tileLayer(
-    'https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer/tile/{z}/{y}/{x}',
-    {
-      maxZoom: 24,
-      attribution: '&copy; <a href="https://www2.gov.bc.ca/gov/content/home">BC Government</a> '
-    }
-  );
+  const bcGovBaseLayer = L.tileLayer(MapTileLayers.govBase, {
+    maxZoom: 24,
+    attribution: '&copy; <a href="https://www2.gov.bc.ca/gov/content/home">BC Government</a> '
+  });
   layerPicker.addBaseLayer(bingOrtho, 'Bing Satellite');
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
 
@@ -167,4 +180,4 @@ const initMap = (
     });
 };
 
-export { initMap, setupPingOptions, setupSelectedPings, addTileLayers };
+export { initMap, hidePopup, setupPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };

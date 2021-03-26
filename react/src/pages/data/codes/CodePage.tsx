@@ -12,6 +12,7 @@ import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditCodeHeader from 'pages/data/codes/EditCodeHeader';
 import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import ManageLayout from 'pages/layouts/ManageLayout';
 
 const CodePage: React.FC = () => {
   const [codeHeader, setCodeHeader] = useState<CodeHeader>(new CodeHeader());
@@ -56,47 +57,49 @@ const CodePage: React.FC = () => {
   };
 
   return (
-    <div className='container'>
-      {isFetching || isLoading ? (
-        <div>loading...</div>
-      ) : isError ? (
-        <NotificationMessage type='error' message={formatAxiosError(error)} />
-      ) : (
-        <>
-          <Typography align='center' variant='h6'>
-            <strong>Code Management</strong>
-          </Typography>
-          <ButtonGroup>
-            {data.map((c: CodeHeader) => {
-              return (
-                <Button key={c.id} onClick={(): void => handleClick(c)}>
-                  {c.title}
-                </Button>
-              );
-            })}
-          </ButtonGroup>
-          {codeHeader ? (
-            <Table
-              headers={props}
-              title={`${title} Codes`}
-              queryProps={{ query: bctwApi.useCodes, param: codeHeader?.type ?? 'region' }}
-              onSelect={null}
-            />
-          ) : (
-            <div></div>
-          )}
-          <div className='button-row'>
-            <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
-            <AddEditViewer<CodeHeaderInput>
-              editing={new CodeHeaderInput()}
-              empty={Object.create({})}
-              disableEdit={true}>
-              <EditCodeHeader {...editProps} />
-            </AddEditViewer>
-          </div>
-        </>
-      )}
-    </div>
+    <ManageLayout>
+      <div className='container'>
+        {isFetching || isLoading ? (
+          <div>loading...</div>
+        ) : isError ? (
+          <NotificationMessage type='error' message={formatAxiosError(error)} />
+        ) : (
+          <>
+            <Typography align='center' variant='h6'>
+              <strong>Code Management</strong>
+            </Typography>
+            <ButtonGroup>
+              {data.map((c: CodeHeader) => {
+                return (
+                  <Button key={c.id} onClick={(): void => handleClick(c)}>
+                    {c.title}
+                  </Button>
+                );
+              })}
+            </ButtonGroup>
+            {codeHeader ? (
+              <Table
+                headers={props}
+                title={`${title} Codes`}
+                queryProps={{ query: bctwApi.useCodes, param: codeHeader?.type ?? 'region' }}
+                onSelect={null}
+              />
+            ) : (
+              <div></div>
+            )}
+            <div className='button-row'>
+              <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
+              <AddEditViewer<CodeHeaderInput>
+                editing={new CodeHeaderInput()}
+                empty={Object.create({})}
+                disableEdit={true}>
+                <EditCodeHeader {...editProps} />
+              </AddEditViewer>
+            </div>
+          </>
+        )}
+      </div>
+    </ManageLayout>
   );
 };
 

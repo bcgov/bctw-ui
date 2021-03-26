@@ -10,16 +10,17 @@ import DialogFullScreen from 'components/modal/DialogFullScreen';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import CritterOverView from 'pages/data/animals/CritterOverview';
 import MapDetails from 'pages/map/details/MapDetails';
-import { setupPingOptions, setupSelectedPings, initMap } from 'pages/map/map_init';
+import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML, hidePopup } from 'pages/map/map_init';
 import { fillPoint, filterFeatures, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
+import MapOverView from 'pages/map/MapOverview';
 import { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { ICodeFilter } from 'types/code';
 import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
+import { TypeWithData } from 'types/common_types';
 
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -34,14 +35,20 @@ export default function MapPage(): JSX.Element {
     end: getToday()
   });
 
+  let lastPointClicked = null;
+
   // for map bottom panel state
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
 
-  // critter overview state
-  const [showModal, setShowModal] = useState<boolean>(false);
+  // for overview state
+  const [showOverviewModal, setShowModal] = useState<boolean>(false);
   const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
+  const [overviewType, setOverviewType] = useState<TypeWithData>();
+
+  // export state
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
@@ -72,74 +79,94 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
-        initMap(mapRef, drawnItems, selectedPings, tracks, pings, drawSelectedLayer);
+        initMap(mapRef, drawnItems, selectedPings, tracks, pings, handleDrawShape);
       }
     };
     updateComponent();
   });
 
+  useEffect(() => {
+    if (showExportModal || showOverviewModal) {
+      hidePopup();
+    }
+  }, [showExportModal, showOverviewModal])
+
   // when an individual map point is clicked, highlight it
   const handlePointClick = (event: L.LeafletEvent): void => {
     const layer = event.target;
+    if (lastPointClicked && lastPointClicked !== layer) {
+      fillPoint(lastPointClicked);
+      setPopupInnerHTML(null, true);
+    }
+    lastPointClicked = layer;
     const feature: ITelemetryFeature = layer?.feature;
     fillPoint(layer, true);
+    setPopupInnerHTML(feature as any);
     setSelectedFeatureIDs([feature.id]);
   };
 
   // revert highlight when popup is closed
-  const handlePointClosePopup = (event: L.LeafletEvent): void => {
-    fillPoint(event.target);
-    setSelectedFeatureIDs([]);
-  };
+  // const handlePointClosePopup = (event: L.LeafletEvent): void => {
+  //   const layer = event.target;
+  //   const feature: ITelemetryFeature = layer?.feature;
+  //   setPopupInnerHTML(feature as any, true);
+  //   setSelectedFeatureIDs([feature.id]);
+  //   fillPoint(event.target);
+  //   setSelectedFeatureIDs([]);
+  // };
 
   // highlights the selected rows in bottom panel when mouse is hovered over a point
   const handlePointHover = (ids: number[]): void => {
     mapRef.current.eachLayer((layer) => {
       const l = layer as any;
       const id = l.feature?.id;
+
       if (ids.includes(id)) {
         fillPoint(l, true);
-      } else {
-        if (typeof l.setStyle === 'function') {
-          fillPoint(l);
-        }
+      } else if (typeof l.setStyle === 'function') {
+        fillPoint(l, selectedFeatureIDs.includes(id));
       }
     });
   };
 
-  setupPingOptions(pings, handlePointClick, handlePointClosePopup);
+  // setupPingOptions(pings, handlePointClick, handlePointClosePopup);
+  setupPingOptions(pings, handlePointClick);
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
 
-  // on map drawing selection
-  const displaySelectedUnits = (
-    overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
-  ): void => {
-    const features = overlay.features.map((f) => f.id);
-    // when selection is cleared, restore all telemetry in the details pane
-    if (features.length === 0 && pingsData) {
-      setSelectedFeatureIDs([]);
-      return;
-    }
-    setSelectedFeatureIDs(features as number[]);
-  };
-
-  const drawSelectedLayer = (): void => {
+  // handles the drawing, called in map_init
+  const handleDrawShape = (): void => {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
     // More typescript type definition bugs... These are the right features!!!
     const overlay = pointsWithinPolygon(allPings as any, clipper as any);
 
-    displaySelectedUnits(overlay);
+    setFeatureIDsOnDraw(overlay);
 
     // Clear any previous selections
     mapRef.current.eachLayer((layer) => {
       if ((layer as any).options.class === 'selected-ping') {
-        mapRef.current.removeLayer(layer);
+        // fixme: when rows are hovered after a shape is drawn,
+        // the result is the points are removed completely
+        // mapRef.current.removeLayer(layer);
+        fillPoint(layer);
       }
     });
-
     selectedPings.addData(overlay);
+  };
+
+  // when shapes are drawn in {drawSelectedLayer}, set the selectedFeatureIDs
+  // status to the ids of the points in the shape
+  const setFeatureIDsOnDraw = (
+    overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
+  ): void => {
+    const featureIds = overlay.features.map((f) => f.id);
+    // when selection is cleared, restore all telemetry in the details pane
+    if (featureIds.length === 0 && pingsData) {
+      setSelectedFeatureIDs([]);
+      return;
+    }
+    setSelectedFeatureIDs(featureIds as number[]);
   };
 
   // clears existing pings/tracks layers
@@ -174,7 +201,8 @@ export default function MapPage(): JSX.Element {
   };
 
   // show the critter overview modal when a row is clicked in bottom panel
-  const handleSelectCritter = (row: ITelemetryDetail): void => {
+  const handleShowOverview = (type: TypeWithData, row: ITelemetryDetail): void => {
+    setOverviewType(type);
     setSelectedDetail(row);
     setShowModal((o) => !o);
   };
@@ -236,18 +264,21 @@ export default function MapPage(): JSX.Element {
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
-        <div id='map' onKeyDown={handleKeyPress}></div>
-        <div className={`bottom-panel ${showModal ? '' : 'appear-above-map'}`}>
+        <div id='map' onKeyDown={handleKeyPress}/>
+        <div id='popup'/>
+        <div className={`bottom-panel ${showOverviewModal || showExportModal ? '' : 'appear-above-map'}`}>
           <MapDetails
             features={features}
             filters={filters}
             selectedFeatureIDs={selectedFeatureIDs}
-            handleSelectCritter={handleSelectCritter}
+            handleShowOverview={handleShowOverview}
             handleHoverCritter={handlePointHover}
+            showExportModal={showExportModal}
+            setShowExportModal={setShowExportModal}
           />
         </div>
-        <DialogFullScreen open={showModal} handleClose={setShowModal}>
-          <CritterOverView detail={selectedDetail} />
+        <DialogFullScreen open={showOverviewModal} handleClose={setShowModal}>
+          <MapOverView type={overviewType} detail={selectedDetail} />
         </DialogFullScreen>
       </div>
     </div>

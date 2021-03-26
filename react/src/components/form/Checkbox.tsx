@@ -32,6 +32,8 @@ export default function Checkbox(props: ICheckboxProps): JSX.Element {
       <FormControlLabel
         control={
           <MuiCheckbox
+            size='small'
+            color='primary'
             checked={checked}
             onChange={handleChange}
             {...propsToPass}

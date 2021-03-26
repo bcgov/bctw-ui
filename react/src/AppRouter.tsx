@@ -1,7 +1,6 @@
 import CritterPage from 'pages/data/animals/CritterPage';
 import CodePage from 'pages/data/codes/CodePage';
 import CollarPage from 'pages/data/collars/CollarPage';
-import DataPage from 'pages/data/DataPage';
 import Home from 'pages/Home';
 import MapPage from 'pages/map/MapPage';
 import TerrainPage from 'pages/terrain/TerrainPage';
@@ -34,7 +33,6 @@ const AppRoutes: RouteKey[] = [
   { name: 'collars', path: '/collars', title: 'Collars', component: CollarPage, sort: 1, icon: 'collar' },
   { name: 'map', path: '/map', title: 'Location Map', component: MapPage, sort: 1, icon: 'map' },
   { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain' },
-  { name: 'data', path: '/data', title: 'Data Management', component: DataPage, sort: 1, icon: 'data' },
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
   { name: 'profile', path: '/profile', title: 'Profile', component: UserProfile, sort: 2, icon: 'profile' },
   { name: 'admin', path: '/admin', title: 'Admin', component: AdminPage, sort: 2, icon: 'admin' },

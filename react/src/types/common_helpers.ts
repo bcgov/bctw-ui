@@ -9,7 +9,15 @@ const evaluateBoolean = (str: string): boolean => {
   return str === 'true';
 }
 
+const formatLatLong = (lat: number, long: number): string => {
+  return `${lat.toFixed(2)}\xb0 ${long.toFixed(2)}\xb0`;
+}
+
+const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
+
 export {
   countDecimals,
   evaluateBoolean,
+  formatLatLong,
+  formatUTM,
 }

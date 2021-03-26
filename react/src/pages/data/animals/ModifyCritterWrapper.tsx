@@ -2,20 +2,63 @@ import { Animal } from 'types/animal';
 import { cloneElement, useState, useEffect } from 'react';
 import { eCritterPermission } from 'types/user';
 import { IAddEditProps } from 'pages/data/common/AddEditViewer';
+import { useQueryClient } from 'react-query';
 import ConfirmModal from 'components/modal/ConfirmModal';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { AxiosError } from 'axios';
+import { formatAxiosError } from 'utils/common';
+import { IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 
 type IModifyWrapperProps = {
   editing: Animal;
   children: JSX.Element;
-  onDelete: (id: string) => void;
 };
 
 // wraps the AddEditViewer to provide additional critter/user-specific functionality
 export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.Element {
-  const { editing, children, onDelete } = props;
+  const bctwApi = useTelemetryApi();
+  const responseDispatch = useResponseDispatch();
+  const queryClient = useQueryClient();
+
+  const { editing, children } = props;
   const [perm, setPerm] = useState<eCritterPermission>(eCritterPermission.none);
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
+
+  // must be defined before mutation declarations
+  const onSaveSuccess = async (data: Animal[] | Animal): Promise<void> => {
+    const critter = Array.isArray(data) ? data[0] : data;
+    responseDispatch({ type: 'success', message: `${critter.name} saved!` });
+    invalidateCritterQueries();
+  };
+
+  const onDeleteSuccess = async (): Promise<void> => {
+    responseDispatch({ type: 'success', message: `critter deleted successfully` });
+    invalidateCritterQueries();
+  };
+
+  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
+
+  // force refetch on critter queries
+  const invalidateCritterQueries = async (): Promise<void> => {
+    queryClient.invalidateQueries('critters_assigned');
+    queryClient.invalidateQueries('critters_unassigned');
+    queryClient.invalidateQueries('getType');
+  };
+
+  // setup the mutations
+  const { mutateAsync: saveMutation } = bctwApi.useMutateCritter({ onSuccess: onSaveSuccess, onError });
+  const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
+
+  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await saveMutation(a);
+  const deleteCritter = async (critterId: string): Promise<void> => {
+    const payload: IDeleteType = {
+      id: critterId,
+      objType: 'animal'
+    };
+    await deleteMutation(payload);
+  };
 
   useEffect(() => {
     const upd = (): void => {
@@ -35,19 +78,20 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   }
 
   const handleConfirmDelete = (): void => {
-    onDelete(editing?.critter_id);
+    deleteCritter(editing?.critter_id)
     setShow(false);
   }
 
-  const passTheseProps: Pick<IAddEditProps<Animal>, 'cannotEdit' | 'onDelete'> = {
+  const passTheseProps: Pick<IAddEditProps<Animal>, 'cannotEdit' | 'onDelete' | 'onSave'> = {
     cannotEdit: perm !== eCritterPermission.change,
-    onDelete: typeof onDelete === 'function' ? handleConfirmDelete : null
+    onDelete: handleDeleteButtonClicked,
+    onSave: saveCritter,
   }
 
   return (
     <>
       <ConfirmModal
-        handleClickYes={handleDeleteButtonClicked}
+        handleClickYes={handleConfirmDelete}
         handleClose={(): void => setShow(false)}
         open={show}
         message={deleteMessage()}

@@ -9,9 +9,9 @@ const COLORS = {
 };
 
 /**
- * 
- * @param feature 
- * @returns 
+ *
+ * @param feature
+ * @returns
  */
 const getFillColorByStatus = (feature: ITelemetryFeature): string => {
   const a = feature?.properties?.animal_status;
@@ -25,22 +25,23 @@ const getFillColorByStatus = (feature: ITelemetryFeature): string => {
 };
 
 /**
- * 
- * @param layer 
- * @param selected 
+ *
+ * @param layer
+ * @param selected
  */
 const fillPoint = (layer: any, selected = false): void => {
   layer.setStyle({
+    class: selected ? 'selected-ping' : '',
     weight: 1.0,
     fillColor: selected ? COLORS.selected : getFillColorByStatus(layer.feature)
   });
 };
 
 /**
- * 
- * @param features 
- * @param sortOption 
- * @returns 
+ *
+ * @param features
+ * @param sortOption
+ * @returns
  */
 const groupFeaturesByCritters = (features: ITelemetryFeature[], sortOption?: DetailsSortOption): IUniqueFeature[] => {
   const uniques: IUniqueFeature[] = [];
@@ -71,9 +72,9 @@ const groupFeaturesByCritters = (features: ITelemetryFeature[], sortOption?: Det
 };
 
 /**
- * 
- * @param filters 
- * @returns 
+ *
+ * @param filters
+ * @returns
  */
 const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
   const groupObj = {};
@@ -90,10 +91,10 @@ const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
 };
 
 /**
- * 
- * @param groupedFilters 
- * @param features 
- * @returns 
+ *
+ * @param groupedFilters
+ * @param features
+ * @returns
  */
 const filterFeatures = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryFeature[]): ITelemetryFeature[] => {
   return features.filter((f) => {
@@ -108,4 +109,48 @@ const filterFeatures = (groupedFilters: IGroupedCodeFilter[], features: ITelemet
   });
 };
 
-export { COLORS, fillPoint, filterFeatures, getFillColorByStatus, groupFeaturesByCritters, groupFilters };
+/**
+ * @param array features to sort
+ * @param comparator the comparator function
+ * @returns the sorted @type {IUniqueFeature}
+ */
+function sortGroupedFeatures(array: IUniqueFeature[], comparator: (a, b) => number): IUniqueFeature[] {
+  const stabilizedThis = array.map((el, idx) => [el.features[0].properties, idx] as [ITelemetryDetail, number]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) return order;
+    return a[1] - b[1];
+  });
+  const critterIds = stabilizedThis.map((a) => a[0].critter_id);
+  const ret = [];
+  for (let i = 0; i < critterIds.length; i++) {
+    const foundIndex = array.findIndex((a) => a.critter_id === critterIds[i]);
+    ret.push(array[foundIndex]);
+  }
+  return ret;
+}
+
+/**
+ * @param u list of grouped features
+ * @returns flattened list of feature IDs 
+ */
+const flattenUniqueFeatureIDs = (u: IUniqueFeature[]): number[] => {
+  return u.map(uf => uf.features.map(f => f.id)).flatMap(x => x);
+}
+
+const getUniqueCritterIDsFromFeatures = (features: ITelemetryFeature[], selectedIDs: number[]): string[] => {
+  const grped = groupFeaturesByCritters(features.filter(f => selectedIDs.includes(f.id)));
+  return grped.map(g => g.critter_id);
+}
+
+export {
+  COLORS,
+  fillPoint,
+  filterFeatures,
+  flattenUniqueFeatureIDs,
+  getFillColorByStatus,
+  getUniqueCritterIDsFromFeatures,
+  groupFeaturesByCritters,
+  groupFilters,
+  sortGroupedFeatures
+};

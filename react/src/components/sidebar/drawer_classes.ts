@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core";
 
-const drawerWidth = '18rem';
+const drawerWidth = '28rem'; // 448px 
 const useStyles = makeStyles((theme) => ({
   drawer: {
     width: drawerWidth,
@@ -26,12 +26,6 @@ const useStyles = makeStyles((theme) => ({
       width: theme.spacing(9) + 1
     },
     backgroundColor: '#003366'
-  },
-  toolbar: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: theme.spacing(0, 1)
   }
 }));
 

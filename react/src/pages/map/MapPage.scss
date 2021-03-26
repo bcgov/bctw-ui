@@ -1,4 +1,6 @@
 @import 'styles/colours.scss';
+$appearAboveMap: 314159;
+$bottomPanelHeight: 30rem;
 
 .map-view {
   display: flex;
@@ -44,8 +46,21 @@
 // side panel
 //
 
+.side-panel-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3rem;
+}
+
+.side-panel-toolbar-closed {
+  margin: 0 auto;
+}
+
 .side-panel {
+  border-right: 2px solid $BCgovGold;
   overflow-y: auto;
+
   div {
     margin-bottom: 0.5rem;
   }
@@ -53,17 +68,25 @@
   .MuiDrawer-paper {
     top:inherit;
   }
+  .MuiDrawer-paperAnchorDockedLeft {
+    border: none;
+  }
+}
+
+.side-panel-dates {
+  .MuiFormControl-root.MuiTextField-root {
+    margin-right: 0.5rem;
+  }
 }
 
 .side-btns {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-}
+  justify-content: flex-end;
 
-.side-panel-title {
-  font: inherit;
-  margin: 0 auto;
+  button {
+    margin-right: 10px;
+  }
 }
 
 .side-panel-body {
@@ -73,18 +96,28 @@
   margin: 0 auto;
 }
 
+/// fixed popup
+#popup {
+  position: absolute;
+  background-color: $BCgovGold;
+  bottom: $bottomPanelHeight;
+  right: 0;
+  padding: 0.5rem;
+  font-size: 14px;
+}
+
 // 
 //  bottom panel
 // 
 
 .bottom-panel {
+  border-top: 2px solid $BCgovGold;
   bottom: 0;
   position: absolute;
   width: 100%;
   background-color: #ffffff;
-  height: 30rem;
-  overflow-y: auto;
-  border-left: 1px solid darkslategrey;
+  height: $bottomPanelHeight;
+  // overflow-y: auto;
 
   .MuiPaper-elevation1 {
     box-shadow: none;
@@ -94,9 +127,13 @@
   }
 }
 
+.bottom-tbl {
+  max-height: 24rem;
+}
+
 // must be at least this index to appear for full-screen dialog
 .appear-above-map {
-  z-index: 314159;
+  z-index: $appearAboveMap;
 }
 
 .map-bottom-panel-title {
@@ -104,15 +141,20 @@
   flex-direction: row;
   justify-content: space-between;
   padding: 0.5rem 1rem;
+  align-items: center;
+
+  button {
+    height: 50%;
+  }
 }
 
 .map-bottom-panel-row {
   width: 100%;
   td > .MuiTableCell-root, .MuiTableCell-body {
-    border: none;
+    border-bottom: 1px solid #000;
     font-family: inherit;
   }
-  border: 1px solid rgba(71, 77, 75, 0.1);
+  // .map-bottom-panel-row td > .MuiTableCell-root, .map-bottom-panel-row .MuiTableCell-body
 }
 
 // map details parent table box
@@ -120,12 +162,16 @@
   padding: 5px !important;
 }
 
-// the bottom panel critter row "link"
+// the bottom panel table cell critter "link"
 .critter-select {
-  color: rgba(0, 47, 255, 0.78) !important;
+  width: 30%; // so the cursor doesn't appear on the whole cell
+  color: rgb(58, 164, 255) !important;
   cursor: pointer;
+  font-weight: 500;
+
 }
 
+// hover effect when selecting a point / drawing a shape in map
 .bottom-panel-row-is-map-selected {
   background-color: lavender;
 }

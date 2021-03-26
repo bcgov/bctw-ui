@@ -4,7 +4,7 @@ import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common';
 // import { GeoJSON } from 'geojson';
 import { formatWithUTCOffset } from 'utils/time';
-import { BCTW } from './common_types';
+import { BCTW, TypeWithData } from './common_types';
 
 interface MapRange {
   start: string;
@@ -13,7 +13,7 @@ interface MapRange {
 
 type DetailsSortOption = 'animal_id' | 'device_id' | 'frequency';
 type OnPanelRowHover = (ids: number[]) => void;
-type OnCritterRowClick = (row: ITelemetryDetail) => void;
+type OnMapRowCellClick = (type: TypeWithData, row: ITelemetryDetail) => void;
 
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   critter_id: string;
@@ -38,6 +38,10 @@ interface ITelemetryFeatureCollection extends GeoJSON.FeatureCollection {
   features: ITelemetryFeature[];
 }
 
+
+/**
+ * a grouped by critter_id version of @type {TelemetryFeature} 
+ */
 interface IUniqueFeature {
   critter_id: string;
   device_id: number;
@@ -100,7 +104,7 @@ export type {
   ITelemetryDetail,
   IUniqueFeature,
   MapRange,
-  OnCritterRowClick,
+  OnMapRowCellClick,
   OnPanelRowHover,
   DetailsSortOption,
 };

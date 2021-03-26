@@ -219,7 +219,7 @@ export default function Table<T extends BCTW>({
                       {/* render checkbox column if multiselect is enabled */}
                       {isMultiSelect ? (
                         <TableCell padding='checkbox'>
-                          <Checkbox checked={isRowSelected} inputProps={{ 'aria-labelledby': labelId }} />
+                          <Checkbox color='primary' checked={isRowSelected} inputProps={{ 'aria-labelledby': labelId }} />
                         </TableCell>
                       ) : null}
                       {/* render main columns from data fetched from api */}

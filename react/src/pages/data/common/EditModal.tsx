@@ -13,7 +13,7 @@ import { CollarStrings } from 'constants/strings';
 import HistoryPage from './HistoryPage';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
-type IEditModalProps<T> = EditModalBaseProps<T> & {
+export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
   isEdit: boolean;
   hideSave?: boolean;

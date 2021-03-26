@@ -1,4 +1,4 @@
-import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@material-ui/core';
 import clsx from 'clsx';
 import { RouteKey } from 'AppRouter';
 import { Icon } from 'components/common';
@@ -11,9 +11,10 @@ import drawerStyles from './drawer_classes';
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
   sidebarContent?: React.ReactNode; // what's displayed in the drawer below the sidebar's navigation section
+  collapseAble: boolean;
 };
 
-export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.Element {
+export default function SideBar({ routes, sidebarContent, collapseAble }: SideBarProps): JSX.Element {
   const classes = drawerStyles();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -49,18 +50,12 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
 
   useEffect(() => {
     switch (location.pathname) {
-      case '/home':
-        handleSetVisible(['map', 'terrain', 'data']);
-        return;
-      case '/terrain':
-      case '/map':
-        handleSetVisible(['home', 'map', 'terrain', 'data']);
-        return;
       case '/data':
       case '/animals':
       case '/collars':
       case '/codes':
-        handleSetVisible(['home', 'animals', 'codes', 'collars']);
+        // handleSetVisible(['home', 'animals', 'codes', 'collars']);
+        handleSetVisible(['animals', 'codes', 'collars']);
         return;
       case '/admin':
         handleSetVisible(['home']);
@@ -86,24 +81,28 @@ export default function SideBar({ routes, sidebarContent }: SideBarProps): JSX.E
             [classes.drawerClose]: !open
           })
         }}>
-        <div className={classes.toolbar}>
-          <IconButton onClick={handleDrawerOpen}>
-            {open ? (
-              <ChevronLeft className={'open-close'} htmlColor='white' />
-            ) : (
-              <ChevronRight className={'open-close'} htmlColor='white' />
-            )}
-          </IconButton>
-        </div>
+        {collapseAble ? (
+          <div className={'side-panel-toolbar'}>
+            <IconButton onClick={handleDrawerOpen}>
+              {open ? (
+                <ChevronLeft className={'open-close'} htmlColor='white' />
+              ) : (
+                <ChevronRight className={'open-close'} htmlColor='white' />
+              )}
+            </IconButton>
+          </div>
+        ) : null}
         <Divider />
         <List>
           {routesToShow.map((route: RouteKey, idx: number) => {
             return (
               <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
                 {route.icon ? (
-                  <ListItemIcon className={'sidebar-icon'}>
-                    <Icon icon={route.icon} />
-                  </ListItemIcon>
+                  <Tooltip title={route.title}>
+                    <ListItemIcon className={'sidebar-icon'}>
+                      <Icon icon={route.icon} />
+                    </ListItemIcon>
+                  </Tooltip>
                 ) : null}
                 <ListItemText className={'list-item-txt'} primary={route.title} />
               </ListItem>
