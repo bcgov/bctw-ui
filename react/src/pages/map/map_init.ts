@@ -1,4 +1,5 @@
 import * as L from 'leaflet';
+import length from '@turf/length';
 import LabeledMarker from 'leaflet-labeled-circle';
 import dayjs from 'dayjs';
 import { formatLocal } from 'utils/time';
@@ -167,9 +168,38 @@ const initMap = (
   mapRef.current.addControl(layerPicker);
 
   const drawLabel = (e) => {
-    console.log(e);
-    console.log(L);
-    console.log(LabeledMarker);
+    // Get the feature
+    const lineString = e.layer.toGeoJSON();
+    const distance = Math.round(length(lineString) * 10) / 10; // kms
+    const geos = e.layer.editing.latlngs;
+    const {lat,lng} = geos[0][geos[0].length - 1];
+    const feature = {
+      "type": "Feature",
+      "properties": {
+        "text": `${distance}`,
+        "labelPosition": [
+          lng,
+          lat
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [ lng, lat]
+      }
+    };
+
+    new LabeledMarker(
+      feature.geometry.coordinates.slice().reverse(),
+      feature, {
+        markerOpions: {
+          color: '#52baff',
+          textStyle: {
+            color: "#fff",
+            fontSize: 3
+          }
+        }
+      }
+    ).addTo(mapRef.current);
   }
 
   // Set up the drawing events
