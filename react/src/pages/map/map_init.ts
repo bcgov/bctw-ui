@@ -1,4 +1,5 @@
 import * as L from 'leaflet';
+import LabeledMarker from 'leaflet-labeled-circle';
 import dayjs from 'dayjs';
 import { formatLocal } from 'utils/time';
 import { COLORS, getFillColorByStatus } from 'pages/map/map_helpers';
@@ -154,7 +155,6 @@ const initMap = (
     position: 'topright',
     draw: {
       marker: false,
-      polyline: false,
       circle: false,
       circlemarker: false
     },
@@ -166,10 +166,17 @@ const initMap = (
   mapRef.current.addControl(drawControl);
   mapRef.current.addControl(layerPicker);
 
+  const drawLabel = (e) => {
+    console.log(e);
+    console.log(L);
+    console.log(LabeledMarker);
+  }
+
   // Set up the drawing events
   mapRef.current
     .on('draw:created', (e) => {
       drawnItems.addLayer((e as any).layer);
+      if ((e as any).layerType === 'polyline') return(drawLabel(e));
       drawSelectedLayer();
     })
     .on('draw:edited', (e) => {
