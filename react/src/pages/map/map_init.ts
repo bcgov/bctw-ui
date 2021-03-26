@@ -127,7 +127,7 @@ const initMap = (
   pings: L.GeoJSON,
   drawSelectedLayer: () => void
 ): void => {
-  mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
+  mapRef.current = L.map('map', { zoomControl: false }).setView([55, -128], 6);
   const layerPicker = L.control.layers();
   addTileLayers(mapRef, layerPicker);
 
