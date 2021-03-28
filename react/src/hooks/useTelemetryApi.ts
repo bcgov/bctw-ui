@@ -28,6 +28,7 @@ import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { BCTW, TypeWithData } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
+import { eUDFType, IUDF } from 'types/udf';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -245,6 +246,15 @@ export const useTelemetryApi = () => {
   /**
    * 
   */
+  const useUDF = (type: eUDFType): UseQueryResult<IUDF[]> => {
+    return useQuery<IUDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), {
+      ...defaultQueryOptions
+    });
+  }
+
+  /**
+   * 
+  */
   const useExport = (config: UseMutationOptions<string[], AxiosError, exportQueryParams>): UseMutationResult<string[]> => {
     return useMutation<string[], AxiosError, exportQueryParams>((body) => bulkApi.getExportData(body), config);
   };
@@ -295,6 +305,9 @@ export const useTelemetryApi = () => {
   const useDelete = (config: UseMutationOptions<boolean, AxiosError, IDeleteType>): UseMutationResult<boolean> =>
     useMutation<boolean, AxiosError, IDeleteType>((body) => critterApi.deleteType(body), config);
 
+  const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDF>): UseMutationResult<IUDF[]> =>
+    useMutation<IUDF[], AxiosError, IUDF>((body) => userApi.upsertUDF(body), config);
+
   return {
     // queries
     useAlert,
@@ -314,6 +327,7 @@ export const useTelemetryApi = () => {
     useUsers,
     useCritterAccess,
     useExport,
+    useUDF,
     // mutations
     useMutateCodeHeader,
     useMutateBulkCsv,
@@ -321,6 +335,7 @@ export const useTelemetryApi = () => {
     useMutateCritter,
     useMutateLinkCollar,
     useMutateGrantCritterAccess,
+    useMutateUDF,
     useDelete
   };
 };

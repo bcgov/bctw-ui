@@ -2,6 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { TelemetryAlert } from 'types/alert';
 import { ITelemetryDetail } from 'types/map';
+import { eUDFType, IUDF } from 'types/udf';
 import { eCritterPermission, IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 import {
   IUserCritterPermissionInput,
@@ -63,12 +64,30 @@ export const userApi = (props: ApiProps) => {
     return converted;
   }
 
+  const getUDF = async (
+    udf_type: eUDFType
+  ): Promise<IUDF[]> => {
+    const url = createUrl({api: 'get-udf', query: `type=${udf_type}`});
+    const { data } = await api.get(url);
+    return data;
+  }
+
+  const upsertUDF = async (
+    body: IUDF
+  ): Promise<IUDF[]> => {
+    const url = createUrl({api: 'add-udf'});
+    const { data } = await api.post(url, body);
+    return data;
+  }
+
   return {
     addUser,
+    getUDF,
     getUserCritterAccess,
     grantCritterAccessToUser,
     getUser,
     getUsers,
     getUserAlerts,
+    upsertUDF,
   };
 };

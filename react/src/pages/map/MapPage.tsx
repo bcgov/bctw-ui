@@ -31,7 +31,7 @@ export default function MapPage(): JSX.Element {
   const [pings] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Pings
 
   const [range, setRange] = useState<MapRange>({
-    start: dayjs().subtract(14, 'day').format(formatDay),
+    start: dayjs().subtract(7, 'day').format(formatDay),
     end: getToday()
   });
 
@@ -115,7 +115,7 @@ export default function MapPage(): JSX.Element {
   //   setSelectedFeatureIDs([]);
   // };
 
-  // highlights the selected rows in bottom panel when mouse is hovered over a point
+  // highlights the selected rows in bottom panel
   const handlePointHover = (ids: number[]): void => {
     mapRef.current.eachLayer((layer) => {
       const l = layer as any;
@@ -134,25 +134,33 @@ export default function MapPage(): JSX.Element {
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
 
-  // handles the drawing, called in map_init
+  // handles the drawing, setup in map_init
   const handleDrawShape = (): void => {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
     // More typescript type definition bugs... These are the right features!!!
     const overlay = pointsWithinPolygon(allPings as any, clipper as any);
+    // console.log('points in shape ', overlay.features.length)
 
     setFeatureIDsOnDraw(overlay);
 
     // Clear any previous selections
     mapRef.current.eachLayer((layer) => {
       if ((layer as any).options.class === 'selected-ping') {
-        // fixme: when rows are hovered after a shape is drawn,
-        // the result is the points are removed completely
-        // mapRef.current.removeLayer(layer);
         fillPoint(layer);
       }
     });
     selectedPings.addData(overlay);
+  };
+  
+  // clear points within shape
+  // todo: restore the selected color to points within shape
+  const handleDrawShapeLatest = (): void => {
+    mapRef.current.eachLayer((layer) => {
+      if ((layer as any).options.class === 'selected-ping') {
+        mapRef.current.removeLayer(layer);
+      }
+    });
   };
 
   // when shapes are drawn in {drawSelectedLayer}, set the selectedFeatureIDs
@@ -174,8 +182,11 @@ export default function MapPage(): JSX.Element {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(pings);
     layerPicker.removeLayer(tracks);
+
+    // layerPicker.removeLayer(selectedPings);
     pings.clearLayers();
     tracks.clearLayers();
+    selectedPings.clearLayers();
   };
 
   /**
@@ -184,6 +195,7 @@ export default function MapPage(): JSX.Element {
    */
   const drawLatestPings = (newPings = pingsData, newTracks = tracksData): void => {
     clearLatestPings();
+    handleDrawShapeLatest();
     pings.addData(newPings);
     tracks.addData(newTracks as any);
   };
