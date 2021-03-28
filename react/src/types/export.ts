@@ -6,7 +6,7 @@ export enum eExportType {
 }
 
 interface exportQueryParams {
-  id: string[];
+  ids: string[];
   type: eExportType
 }
 

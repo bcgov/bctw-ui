@@ -23,10 +23,9 @@ export const bulkApi = (api: AxiosInstance) => {
   }
 
   const getExportData = async (body: exportQueryParams): Promise<string[]> => {
-    const { type, id }  = body;
-    const url = createUrl({ api: `export/${type}`})
+    const url = createUrl({ api: `export`})
     // console.log(url);
-    const { data } = await api.post(url, id);
+    const { data } = await api.post(url, body);
     return data;
   }
 

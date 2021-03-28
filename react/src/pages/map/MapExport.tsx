@@ -51,7 +51,7 @@ export default function Export<T>({ open, handleClose, critter_ids, collar_ids }
     const fetchExportData = async (): Promise<void> => {
       if (exportType) {
         const body: exportQueryParams = {
-          id: exportType === eExportType.collar ? collar_ids : critter_ids,
+          ids: exportType === eExportType.collar ? collar_ids : critter_ids,
           type: exportType
         };
         mutateAsync(body);
