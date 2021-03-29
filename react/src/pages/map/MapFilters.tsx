@@ -9,10 +9,14 @@ import { ICodeFilter } from 'types/code';
 import { MapRange } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
 import Checkbox from 'components/form/Checkbox';
+import SelectUDF from 'components/form/SelectUDF';
+import { eUDFType } from 'types/udf';
+import { Icon } from 'components/common';
 
 type MapFiltersProps = PageProp & {
   start: string;
   end: string;
+  onClickEditUdf: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onShowLatestPings: (b: boolean) => void;
 };
@@ -110,6 +114,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     ));
   };
 
+  const handleChangeUDF = (v) => {
+    console.log(v);
+  }
+
   const handleChangeLatestPings = (v: Record<string, boolean>): void => {
     const val = v[latestPingLabel];
     if (isLatestPing != val) {
@@ -161,6 +169,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               </div>
               <div><Checkbox label={latestPingLabel} initialValue={isLatestPing} changeHandler={handleChangeLatestPings}/></div>
               {createMultiSelects()}
+              <div className={'side-panel-udf'}>
+                <SelectUDF udfType={eUDFType.critter_group} labelTitle={'User Animal Group'} changeHandler={handleChangeUDF} />
+                <IconButton onClick={props.onClickEditUdf}><Icon icon='edit'/></IconButton>
+              </div>
               <hr/>
               <div className={'side-btns'}>
                 <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>Apply Filters</Button>

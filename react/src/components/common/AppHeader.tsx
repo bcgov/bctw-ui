@@ -14,7 +14,11 @@ import { UserContext } from 'contexts/UserContext';
 import { User } from 'types/user';
 import { IconButton } from '@material-ui/core';
 
-const AppHeader = (): JSX.Element => {
+type AppheaderProps = {
+  children?: JSX.Element;
+}
+
+const AppHeader = ({children}: AppheaderProps): JSX.Element => {
   const useUser = useContext(UserContext);
   const [user, setUser] = useState<User>(null);
   // const preventDefault = (event) => event.preventDefault();
@@ -57,6 +61,9 @@ const AppHeader = (): JSX.Element => {
               <Button className={'logout'} color='primary'>
                 Log out
               </Button>
+            </li>
+            <li>
+              {children}
             </li>
           </ul>
         </nav>

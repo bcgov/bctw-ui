@@ -56,8 +56,8 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   };
 
   const createDeleteMessage = (): string => {
-    const base = editing.animal_id
-      ? `CAREFUL! An animal with ID ${editing.animal_id} is attached to this collar. `
+    const base = editing?.animal_id
+      ? `CAREFUL! An animal is attached to this collar. `
       : '';
     return `${base}Deleting this collar will prevent other users from accessing it. Are you sure you want to delete it?`;
   };

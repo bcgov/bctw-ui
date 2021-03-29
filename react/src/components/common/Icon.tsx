@@ -15,6 +15,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import EditIcon from '@material-ui/icons/Edit';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -34,6 +35,7 @@ const mappings: Record<string, JSX.Element> = {
   close: <CloseIcon />,
   filter: <FilterListIcon />,
   error: <ErrorIcon htmlColor='orange'/>,
+  edit: <EditIcon />,
 };
 
 type IconProps = {

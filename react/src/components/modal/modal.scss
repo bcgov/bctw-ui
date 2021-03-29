@@ -1,7 +1,7 @@
 @import 'styles/colours.scss';
 
 .MuiDialog-paperFullScreen {
-  background-color: #ced4da !important;
+  background-color: #f1f3f5 !important;
 }
 
 .dlg-full-title {
@@ -15,15 +15,28 @@
     margin-bottom: 1rem;
   }
   h4 {
-    color: #495057;
     text-decoration: none solid rgb(73, 80, 87);
+  }
+  .dlg-nav {
+    color: $BCgovBlue;
+  }
+}
+
+.dlg-full-sub {
+  span {
+    margin-right: 1rem;
+    font-size: larger;
+    color: #495057;
   }
 }
 
 .dlg-full-body {
-  background-color: #ced4da !important;
-  padding: 2rem;
-  // border-bottom: none;
+  background-color: #f1f3f5 !important;
+  padding: 1.5rem 4rem;
+}
+
+.dlg-title-btn {
+  background-color: #1976d2 !important;
 }
 
 .dlg-full-body-subtitle {
@@ -37,25 +50,23 @@
     border: 0.15rem solid $BCgovBlue;
     color: $BCgovBlue;
     height: 2.5rem;
+    margin-top: 1rem;
   }
 }
 
 .dlg-full-body-details {
-  padding: 1.5rem 3rem;
   background-color: #fff !important;
   margin-bottom: 2rem;
 }
 
 .dlg-details-section {
-  padding: 1rem;
-  margin-bottom: 1rem;
-
+  border-bottom: 1px solid #ced4da;
 }
 
-.toolbar {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+.dlg-details-content {
+
+  padding: 0.5rem 1.5rem;
+  margin-bottom: 1px solid;
 }
 
 .MuiAppBar-positionFixed {

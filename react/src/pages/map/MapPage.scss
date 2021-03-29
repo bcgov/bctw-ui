@@ -96,6 +96,13 @@ $bottomPanelHeight: 30rem;
   margin: 0 auto;
 }
 
+.side-panel-udf {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 /// fixed popup
 #popup {
   position: absolute;

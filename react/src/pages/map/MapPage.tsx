@@ -21,6 +21,7 @@ import { ICodeFilter } from 'types/code';
 import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { TypeWithData } from 'types/common_types';
+import AddUDF from 'pages/udf/AddUDF';
 
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -49,6 +50,9 @@ export default function MapPage(): JSX.Element {
 
   // export state
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
+
+  // udf editing state
+  const [showUdfEdit, setShowUdfEdit] = useState<boolean>(false);
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
@@ -272,13 +276,14 @@ export default function MapPage(): JSX.Element {
         start={range.start}
         end={range.end}
         onApplyFilters={handleChangeFilters}
+        onClickEditUdf={(): void => setShowUdfEdit(o => !o)}
         onShowLatestPings={handleShowLatestPings}
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='map' onKeyDown={handleKeyPress}/>
         <div id='popup'/>
-        <div className={`bottom-panel ${showOverviewModal || showExportModal ? '' : 'appear-above-map'}`}>
+        <div className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
           <MapDetails
             features={features}
             filters={filters}
@@ -292,6 +297,7 @@ export default function MapPage(): JSX.Element {
         <DialogFullScreen open={showOverviewModal} handleClose={setShowModal}>
           <MapOverView type={overviewType} detail={selectedDetail} />
         </DialogFullScreen>
+        <AddUDF show={showUdfEdit} onClose={(): void => setShowUdfEdit(false)} onSave={null}/>
       </div>
     </div>
   );
