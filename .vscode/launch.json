@@ -4,13 +4,20 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "debug React",
+      "name": "debug *nix",
       "url": "http://localhost:1111",
       "webRoot": "${workspaceFolder}/react",
       // WSL-specific source map
       "sourceMapPathOverrides": {
         "/*": "/__vscode-remote-uri__/*"
       }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "debug windows",
+      "url": "http://localhost:1111",
+      "webRoot": "${workspaceFolder}/react",
     },
     {
       "name": "launch keycloak server.js",

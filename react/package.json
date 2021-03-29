@@ -61,7 +61,7 @@
   },
   "scripts": {
     "start": "PORT=1111 craco start",
-    "start_windows": "craco start",
+    "start_windows": "set PORT=1111 && craco start",
     "build": "cp node_modules/reflect-metadata/Reflect.js public && craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
