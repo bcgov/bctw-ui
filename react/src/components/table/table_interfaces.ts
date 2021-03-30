@@ -53,6 +53,7 @@ type ITableProps<T> = {
   customColumns?: ICustomTableColumn<T>[];
   headers?: string[];
   isMultiSelect?: boolean;
+  alreadySelected?: string[]
   paginate?: boolean;
   queryProps: ITableQueryProps<T>;
   // rowIdentifier?: string;

@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import Add from '@material-ui/icons/Add';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -40,8 +41,9 @@ const mappings: Record<string, JSX.Element> = {
 
 type IconProps = {
   icon: string;
+  color?: string;
 };
 
-export default function Icon ({icon}: IconProps): JSX.Element {
+export default function Icon ({icon, color}: IconProps): JSX.Element {
   return mappings[icon];
 }

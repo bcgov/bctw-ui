@@ -49,7 +49,7 @@ export default function PerformAssignmentAction({
   const onError = (error: AxiosError): void =>
     updateStatus({
       type: 'error',
-      message: `error ${isLink ? 'linking' : 'removing'} collar: ${formatAxiosError(error)}`
+      message: `error ${isLink ? 'linking' : 'removing'} device: ${formatAxiosError(error)}`
     });
 
   const updateStatus = (notif: INotificationMessage): void => {
@@ -106,7 +106,7 @@ export default function PerformAssignmentAction({
         show={showAvailableModal}
         onClose={closeModals}
       />
-      <Button disabled={!canEdit} onClick={handleClickShowModal}>{hasCollar ? 'unassign collar' : 'assign collar'}</Button>
+      <Button disabled={!canEdit} onClick={handleClickShowModal}>{hasCollar ? 'unassign device' : 'assign device'}</Button>
     </>
   );
 }

@@ -91,6 +91,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
             <span>Species: {detail.species}</span>
             <span>|</span>
             <span>Device: {detail.device_id ?? 'Unassigned'}</span>
+            {/* <span>ID: {detail.critter_id}</span> */}
           </div>
         </Paper>
         <Paper elevation={0} className={'dlg-full-body'}>
@@ -160,7 +161,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
     <>
       <Paper elevation={3} className={'dlg-full-title'}>
         <div>
-          <h1>Collar ID: {detail.device_id}</h1>
+          <h1>Device ID: {detail.device_id}</h1>
         </div>
         <div className={'dlg-full-sub'}>
           <span>Frequency: {detail.frequency}</span>

@@ -28,7 +28,7 @@ import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { BCTW, TypeWithData } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
-import { eUDFType, IUDF } from 'types/udf';
+import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -214,13 +214,14 @@ export const useTelemetryApi = () => {
    * @returns A simplified list of Animals that only has id, animal_id, and nickname
    * note: query keys are important! make sure to include params in the key
    */
-  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }): UseQueryResult => {
+  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }): UseQueryResult<UserCritterAccess[], AxiosError> => {
     const { user, filterOutNone } = param;
     return useQuery<UserCritterAccess[], AxiosError>(
       ['critterAccess', page, user],
       () => userApi.getUserCritterAccess(page, user, filterOutNone),
       {
         ...defaultQueryOptions
+        // ...defaultQueryOptions, ...{refetchOnMount: false}
       }
     );
   };
@@ -247,7 +248,7 @@ export const useTelemetryApi = () => {
    * 
   */
   const useUDF = (type: eUDFType): UseQueryResult<IUDF[]> => {
-    return useQuery<IUDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), {
+    return useQuery<IUDF[], AxiosError>(['getUDF'], () => userApi.getUDF(type), {
       ...defaultQueryOptions
     });
   }
@@ -305,8 +306,8 @@ export const useTelemetryApi = () => {
   const useDelete = (config: UseMutationOptions<boolean, AxiosError, IDeleteType>): UseMutationResult<boolean> =>
     useMutation<boolean, AxiosError, IDeleteType>((body) => critterApi.deleteType(body), config);
 
-  const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDF>): UseMutationResult<IUDF[]> =>
-    useMutation<IUDF[], AxiosError, IUDF>((body) => userApi.upsertUDF(body), config);
+  const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDFInput[]>): UseMutationResult<IUDF[]> =>
+    useMutation<IUDF[], AxiosError, IUDFInput[]>((body) => userApi.upsertUDF(body), config);
 
   return {
     // queries

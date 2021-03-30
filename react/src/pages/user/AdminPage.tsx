@@ -36,7 +36,7 @@ export default function AdminPage(): JSX.Element {
           Modify User Animal Access
         </Typography>
         <Typography variant='body2' component='p'>
-          A user has access to collars through the user-animal association.
+          A user has access to devices through the user-animal association.
         </Typography>
         <Table
           headers={['id', 'idir', 'bceid', 'email', 'role_type']}

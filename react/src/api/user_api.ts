@@ -2,7 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { TelemetryAlert } from 'types/alert';
 import { ITelemetryDetail } from 'types/map';
-import { eUDFType, IUDF } from 'types/udf';
+import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { eCritterPermission, IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 import {
   IUserCritterPermissionInput,
@@ -49,8 +49,7 @@ export const userApi = (props: ApiProps) => {
     user: string,
     filterOutNone = false
   ): Promise<UserCritterAccess[]> => {
-    const url = createUrl({ api: `get-critter-access/${user}`, page });
-    // console.log(`retrieving critter access: ${url}`);
+    const url = createUrl({ api: `get-critter-access/${user}`, query: `filterOutNone=${filterOutNone}`, page });
     const { data } = await api.get(url);
     const converted = data.map((json: IUserCritterAccess[]) => plainToClass(UserCritterAccess, json));
     return filterOutNone ? converted.filter((d) => d.permission_type !== eCritterPermission.none) : converted;
@@ -73,10 +72,10 @@ export const userApi = (props: ApiProps) => {
   }
 
   const upsertUDF = async (
-    body: IUDF
+    udfs: IUDFInput[]
   ): Promise<IUDF[]> => {
     const url = createUrl({api: 'add-udf'});
-    const { data } = await api.post(url, body);
+    const { data } = await api.post(url, udfs);
     return data;
   }
 

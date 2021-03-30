@@ -2,6 +2,7 @@ import { useEffect, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { UserContext } from 'contexts/UserContext';
 import { eUserRole } from 'types/user';
+import ManageLayout from 'pages/layouts/ManageLayout';
 
 type IDefaultLayoutProps = {
   children: React.ReactNode;
@@ -24,8 +25,8 @@ export default function AuthLayout({ children }: IDefaultLayoutProps): JSX.Eleme
     updateComponent();
   }, [userChanges]);
   return (
-    <div>
+    <ManageLayout>
       <div>{children}</div>
-    </div>
+    </ManageLayout>
   )
 }

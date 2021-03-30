@@ -40,10 +40,11 @@ export interface IUserCritterAccessInput {
   permission_type: eCritterPermission;
 }
 export interface IUserCritterAccess {
-  critter_id: string
+  critter_id: string;
+  animal_id: string;
   wlh_id: string;
   nickname: string;
-  valid_from: Date
+  valid_from: Date;
   valid_to: Date;
   device_id: number;
   device_make: string;
@@ -52,6 +53,7 @@ export interface IUserCritterAccess {
 
 export class UserCritterAccess implements IUserCritterAccess {
   critter_id: string;
+  animal_id: string;
   wlh_id: string;
   nickname: string;
   @Type(() => Date)valid_from: Date;
@@ -60,4 +62,7 @@ export class UserCritterAccess implements IUserCritterAccess {
   device_make: string;
   permission_type: eCritterPermission;
   @Expose() get identifier(): string { return 'critter_id' }
+  @Expose() get name(): string {
+    return this.wlh_id ?? this.animal_id ?? this.nickname;
+  }
 }

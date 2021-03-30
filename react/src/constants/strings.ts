@@ -5,29 +5,30 @@ const CritterStrings = {
   exportText: '',
   editableProps: ['nickname', 'animal_id', 'wlh_id', 'species', 'region', 'population_unit', 'animal_status', 'juvenile_at_heel'],
   requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
-  collarAssignmentTitle: 'Assign a collar',
-  assignCollarBtnText: 'assign selected collar',
-  assignedTableTitle: 'Animals Attached To A Collar',
-  unassignedTableTitle: 'Animals Without A Collar',
-  collarRemovalTitle: 'Confirm collar unassignment',
-  collarRemovalText: 'Are you sure you wish to unassign this collar?',
+  collarAssignmentTitle: 'Assign a device',
+  assignCollarBtnText: 'assign selected device',
+  assignedTableTitle: 'Animals Attached To A Device',
+  unassignedTableTitle: 'Animals Without A Device',
+  collarRemovalTitle: 'Confirm device unassignment',
+  collarRemovalText: 'Are you sure you wish to unassign this device?',
 
 }
 
 const CollarStrings = {
-  assignedCollarsTableTitle: 'Assigned Collars',
-  availableCollarsTableTitle: 'Unassigned Collars',
+  assignedCollarsTableTitle: 'Assigned Devices',
+  availableCollarsTableTitle: 'Unassigned Devices',
   editableProps: ['device_id', 'frequency', 'device_make', 'device_model', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
   selectableProps: ['device_make', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
   requiredProps: ['device_id', 'device_make', 'frequency'],
-  exportTitle: 'Bulk Export Collar Data',
+  exportTitle: 'Bulk Export Device Data',
   exportText: '',
-  addCollarTypeTitle: 'Select Collar Type',
-  addCollarTypeText: 'What type of collar would you like to add?',
-  addCollarVect: 'Vectronics Collar',
-  addCollarVHF: 'VHF Collar',
-  importTitle: 'Bulk Import VHF Collars',
-  importText: 'Use this feature to add multiple new collars.'
+  addCollarTypeTitle: 'Select Device Type',
+  addCollarTypeText: 'What type of device would you like to add?',
+  addCollarVect: 'Vectronics Device',
+  addCollarVHF: 'VHF Device',
+  importTitle: 'Bulk Import VHF Devices',
+  importText: 'Use this feature to add multiple new devices.',
+  assignmentHistoryTitle: 'Device Assignment History'
 }
 
 const CodeStrings = {

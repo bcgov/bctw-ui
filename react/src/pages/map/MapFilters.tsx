@@ -10,14 +10,14 @@ import { MapRange } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
 import Checkbox from 'components/form/Checkbox';
 import SelectUDF from 'components/form/SelectUDF';
-import { eUDFType } from 'types/udf';
+import { eUDFType, IUDF } from 'types/udf';
 import { Icon } from 'components/common';
 
 type MapFiltersProps = PageProp & {
   start: string;
   end: string;
   onClickEditUdf: () => void;
-  onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
+  onApplyFilters: (r: MapRange, filters: ICodeFilter[], udfs: IUDF[]) => void;
   onShowLatestPings: (b: boolean) => void;
 };
 
@@ -25,6 +25,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const classes = drawerStyles();
   const [open, setOpen] = useState<boolean>(true); // controls filter panel visibility
   const [filters, setFilters] = useState<ICodeFilter[]>([]); // the filters applied
+  const [udfFilters, setUdfFilters] = useState<IUDF[]>([]);
   const [numFiltersSelected, setNumFiltersSelected] = useState<number>(0); // how many filters are set (dev?)
   const [start, setStart] = useState<string>(props.start); // time range start
   const [end, setEnd] = useState<string>(props.end); // time range end
@@ -36,6 +37,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   useEffect(() => {
     setNumFiltersSelected(filters.length);
   }, [filters]);
+
+  useEffect(() => {
+    setNumFiltersSelected((o) => o + udfFilters.length);
+  }, [udfFilters]);
 
   useEffect(() => {
     const onChangeDate = (): void => {
@@ -67,8 +72,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
    * @param reset force calling the parent handler with empty array
    */
   const handleApplyFilters = (event: React.MouseEvent<HTMLInputElement>, reset = false): void => {
-    props.onApplyFilters({ start, end }, reset ? [] : filters);
-    // if dates were changed, it will draw all the new points, so 
+    props.onApplyFilters({ start, end }, reset ? [] : filters, reset ? [] : udfFilters);
+    // if dates were changed, it will draw all the new points, so
     // set the status of the show latest pings checkbox to false
     if (wasDatesChanged) {
       setIsLatestPing(false);
@@ -87,6 +92,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     setTimeout(() => setReset(false), 1000);
 
     setFilters([]);
+    setUdfFilters([]);
     // since setFilters is async,
     // call handleApplyFilters with an empty filter array
     handleApplyFilters(null, true);
@@ -114,9 +120,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     ));
   };
 
-  const handleChangeUDF = (v) => {
-    console.log(v);
-  }
+  const handleChangeUDF = (v: IUDF[]): void => {
+    setApplyButtonStatus(false);
+    setUdfFilters(v);
+  };
 
   const handleChangeLatestPings = (v: Record<string, boolean>): void => {
     const val = v[latestPingLabel];
@@ -167,16 +174,29 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   changeHandler={(e): void => setEnd(e['tend'] as string)}
                 />
               </div>
-              <div><Checkbox label={latestPingLabel} initialValue={isLatestPing} changeHandler={handleChangeLatestPings}/></div>
+              <div>
+                <Checkbox label={latestPingLabel} initialValue={isLatestPing} changeHandler={handleChangeLatestPings} />
+              </div>
               {createMultiSelects()}
               <div className={'side-panel-udf'}>
-                <SelectUDF udfType={eUDFType.critter_group} labelTitle={'User Animal Group'} changeHandler={handleChangeUDF} />
-                <IconButton onClick={props.onClickEditUdf}><Icon icon='edit'/></IconButton>
+                <SelectUDF
+                  triggerReset={reset}
+                  udfType={eUDFType.critter_group}
+                  label={'User Animal Group'}
+                  changeHandler={handleChangeUDF}
+                />
+                <IconButton onClick={props.onClickEditUdf}>
+                  <Icon icon='edit' />
+                </IconButton>
               </div>
-              <hr/>
+              <hr />
               <div className={'side-btns'}>
-                <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>Apply Filters</Button>
-                <Button variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>Clear</Button>
+                <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>
+                  Apply Filters
+                </Button>
+                <Button variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
+                  Clear
+                </Button>
               </div>
               {/* <p>{numFiltersSelected} filters selected</p> */}
             </div>

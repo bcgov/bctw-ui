@@ -73,6 +73,10 @@ const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
  */
 const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? err.message}`;
 
+const onlyUniqueArray = (value, index, self) => {
+  return self.indexOf(value) === index;
+}
+
 export {
   columnToHeader,
   getProperty,
@@ -80,4 +84,5 @@ export {
   objectCompare,
   omitNull,
   removeProps,
+  onlyUniqueArray,
 };

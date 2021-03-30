@@ -7,7 +7,7 @@ import { columnToHeader } from 'utils/common';
 export interface ICollarHistory extends ICollarBase, BCTW {
   animal_id?: string; // the animal id (uuid key of animal table)
   assignment_id: string; // uuid
-  collar_make: string;
+  device_make: string;
   radio_frequency: number;
   valid_from: Date;
   valid_to: Date;
@@ -16,7 +16,7 @@ export interface ICollarHistory extends ICollarBase, BCTW {
 export class CollarHistory implements ICollarHistory {
   collar_id: string;
   assignment_id: string;
-  collar_make: string;
+  device_make: string;
   radio_frequency: number;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;

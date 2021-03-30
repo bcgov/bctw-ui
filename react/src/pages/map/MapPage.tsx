@@ -22,6 +22,7 @@ import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { TypeWithData } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
+import { IUDF } from 'types/udf';
 
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -90,10 +91,10 @@ export default function MapPage(): JSX.Element {
   });
 
   useEffect(() => {
-    if (showExportModal || showOverviewModal) {
+    if (showExportModal || showOverviewModal || showUdfEdit) {
       hidePopup();
     }
-  }, [showExportModal, showOverviewModal])
+  }, [showExportModal, showOverviewModal, showUdfEdit])
 
   // when an individual map point is clicked, highlight it
   const handlePointClick = (event: L.LeafletEvent): void => {
@@ -205,7 +206,9 @@ export default function MapPage(): JSX.Element {
   };
 
   // triggered when side-panel filters are applied
-  const handleChangeFilters = (newRange: MapRange, filters: ICodeFilter[]): void => {
+  const handleChangeFilters = (newRange: MapRange, filters: ICodeFilter[], udfFilters: IUDF[]): void => {
+    // todo: does changing date and applying filters work at same time?
+    // todo: apply udf filters
     if (newRange.start !== range.start || newRange.end !== range.end) {
       setRange(newRange);
     }
@@ -267,7 +270,7 @@ export default function MapPage(): JSX.Element {
     } else {
       kml = tokml((pings as any).toGeoJSON());
     }
-    download(kml, 'collars.kml', 'application/xml');
+    download(kml, 'devices.kml', 'application/xml');
   };
 
   return (
@@ -297,7 +300,7 @@ export default function MapPage(): JSX.Element {
         <DialogFullScreen open={showOverviewModal} handleClose={setShowModal}>
           <MapOverView type={overviewType} detail={selectedDetail} />
         </DialogFullScreen>
-        <AddUDF show={showUdfEdit} onClose={(): void => setShowUdfEdit(false)} onSave={null}/>
+        <AddUDF open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)}/>
       </div>
     </div>
   );

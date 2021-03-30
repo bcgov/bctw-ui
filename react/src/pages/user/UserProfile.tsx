@@ -10,6 +10,7 @@ import { ITableQueryProps } from 'components/table/table_interfaces';
 import { MenuItem, Select, InputLabel } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useQueryClient } from 'react-query';
+import ManageLayout from 'pages/layouts/ManageLayout';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
@@ -67,41 +68,43 @@ export default function UserProfile(): JSX.Element {
   };
 
   return (
-    <div className='user-profile'>
-      <Typography variant='h6'>
-        Your Role Type: <strong>{user.role_type}</strong>
-      </Typography>
-      <div className='user-input-grp'>
-        <TextField propName='idir' defaultValue={user.idir} disabled={true} label='IDIR' changeHandler={onChange} />
-        <TextField
-          propName='email'
-          type='email'
-          defaultValue={user.email}
-          disabled={true}
-          label='EMAIL'
-          changeHandler={onChange}
+    <ManageLayout>
+      <div className='user-profile'>
+        <Typography variant='h6'>
+          Your Role Type: <strong>{user.role_type}</strong>
+        </Typography>
+        <div className='user-input-grp'>
+          <TextField propName='idir' defaultValue={user.idir} disabled={true} label='IDIR' changeHandler={onChange} />
+          <TextField
+            propName='email'
+            type='email'
+            defaultValue={user.email}
+            disabled={true}
+            label='EMAIL'
+            changeHandler={onChange}
+          />
+        </div>
+        <Table
+          headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'device_make', 'permission_type']}
+          title='Animals you have access to:'
+          queryProps={tableProps}
         />
-      </div>
-      <Table
-        headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'device_make', 'permission_type']}
-        title='Animals you have access to:'
-        queryProps={tableProps}
-      />
-      <Typography variant='h5'>Swap User</Typography>
-      <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography>
+        <Typography variant='h5'>Swap User</Typography>
+        <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography>
 
-      <div className='user-test-swap'>
-        <InputLabel>Test Account</InputLabel>
-        <Select value={testUser} onChange={onSelectTestUser}>
-          {testUserOptions.map((s, i) => {
-            return (
-              <MenuItem key={i} value={s}>
-                {s}
-              </MenuItem>
-            );
-          })}
-        </Select>
+        <div className='user-test-swap'>
+          <InputLabel>Test Account</InputLabel>
+          <Select value={testUser} onChange={onSelectTestUser}>
+            {testUserOptions.map((s, i) => {
+              return (
+                <MenuItem key={i} value={s}>
+                  {s}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </div>
       </div>
-    </div>
+    </ManageLayout>
   );
 }

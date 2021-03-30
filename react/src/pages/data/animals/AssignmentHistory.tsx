@@ -3,6 +3,7 @@ import Table from 'components/table/Table';
 import { CollarHistory, hasCollarCurrentlyAssigned, ICollarHistory } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { CollarStrings } from 'constants/strings';
 
 type IAssignmentHistoryProps = {
   animalId: string;
@@ -35,8 +36,8 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
   return (
     <>
       <Table
-        title='Collar Assignment History'
-        headers={['device_id', 'collar_make', 'valid_from', 'valid_to']}
+        title={CollarStrings.assignmentHistoryTitle}
+        headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
         queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
         paginate={history?.length >= 10}
       />

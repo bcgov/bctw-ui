@@ -1,37 +1,29 @@
 import 'styles/form.scss';
-import { FormControl, Select as MuiSelect, InputLabel, MenuItem } from '@material-ui/core';
+import { FormControl, Select as MuiSelect, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
 import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { ICodeFilter } from 'types/code';
 import { removeProps } from 'utils/common';
 import { SelectProps } from '@material-ui/core';
 import { eUDFType, IUDF } from 'types/udf';
 
 type ISelectProps = SelectProps & {
   udfType: eUDFType;
-  defaultValue?: string; // will otherwise default to empty string
-  labelTitle: string;
-  changeHandler: (o: ICodeFilter[]) => void;
+  changeHandler: (o: IUDF[]) => void;
   triggerReset?: boolean; // force components that are 'multiple' to unselect all values
 };
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectUDF(props: ISelectProps): JSX.Element {
-  const { udfType, defaultValue, changeHandler, labelTitle, triggerReset } = props;
+  const { label, udfType, changeHandler, triggerReset } = props;
   const bctwApi = useTelemetryApi();
-  const [value, setValue] = useState<string[]>([defaultValue]);
+  const [values, setValues] = useState<string[]>([]);
   const [udfs, setUdfs] = useState<IUDF[]>([]);
 
   // to handle React warning about not recognizing the prop on a DOM element
-  const propsToPass = removeProps(props, [
-    'udfType',
-    'changeHandler',
-    'labelTitle',
-    'triggerReset'
-  ]);
+  const propsToPass = removeProps(props, ['udfType', 'changeHandler', 'triggerReset']);
 
   // load this codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useUDF(udfType);
+  const { data, isSuccess } = bctwApi.useUDF(udfType);
 
   useEffect(() => {
     const updateOptions = (): void => {
@@ -39,55 +31,38 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
         return;
       }
       setUdfs(data);
-      // const found = data.find((d) => d.description === defaultValue);
-      // if (found) {
-      //   pushChange(found.code, false);
-      // }
     };
     updateOptions();
   }, [isSuccess]);
 
   useEffect(() => {
     if (triggerReset) {
-      // console.log('reset triggered from parent component!');
-      setValue([]);
+      setValues([]);
     }
   }, [triggerReset]);
 
   const handleChange = (event: React.ChangeEvent<{ value }>): void => {
-    const v = event.target.value;
-    // setValue(v);
-    pushChange(v, true);
+    const selected = event.target.value as string[];
+    setValues(selected);
+    pushChange(selected);
   };
 
-  // triggered when the default value is changed - ex. different editing object selected
-  const reset = (): void => {
-    const v = defaultValue ?? '';
-    // setValue(v);
+  const pushChange = (selected: string[]): void => {
+    const filtered = udfs.filter(u => selected.includes(u.key));
+    if (typeof changeHandler === 'function') {
+      changeHandler(filtered);
+    }
   };
-
-  const pushChange = (selected: string[], b: boolean): void => {
-    // const filtered = codes.filter((c) => selected.indexOf(c.description) !== -1);
-    // const ret = filtered.map((c) => {
-    // });
-    // if (typeof changeHandlerMultiple === 'function') {
-    //   changeHandlerMultiple(ret as ICodeFilter[]);
-    // }
-  };
-
-  useEffect(() => {
-    reset();
-  }, [defaultValue]);
 
   return (
     <>
       <FormControl size='small' variant={'outlined'} className={'udf-select-control'}>
-        <InputLabel id='select-label'>{labelTitle}</InputLabel>
+        <InputLabel id='select-label'>{label}</InputLabel>
         <MuiSelect
-          label={labelTitle}
+          label={label}
           labelId='select-label'
           variant='outlined'
-          value={value}
+          value={values}
           onChange={handleChange}
           renderValue={(selected: string | string[]): string => {
             return selected as string;
@@ -95,9 +70,9 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
           {...propsToPass}>
           {udfs.map((u: IUDF) => {
             return (
-              <MenuItem key={u.udf_id} value={u.udf_id}>
-                {/* <Checkbox size='small' color='primary' checked={values.indexOf(c.description) !== -1} /> */}
-                {u.value}
+              <MenuItem key={u.key} value={u.key}>
+                <Checkbox size='small' color='primary' checked={values.indexOf(u.key) !== -1} />
+                {u.key}
               </MenuItem>
             );
           })}

@@ -24,17 +24,12 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
 
   const handleDrawerOpen = (): void => setOpen((o) => !o);
 
+  // enable user to see admin page if they have the role
   useEffect(() => {
     const updateComponent = (): void => {
       if (userChanges?.ready) {
         const user = userChanges.user;
         setIsAdmin(user.role_type === 'administrator');
-        // only show admin page if user idir also matches the test user
-        // if (user.idir === userChanges.testUser) {
-        //   setIsAdmin(user.role_type === 'administrator');
-        // } else {
-        //   setIsAdmin(false);
-        // }
       }
     };
     updateComponent();
@@ -52,16 +47,11 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
     switch (location.pathname) {
       case '/data':
       case '/animals':
-      case '/collars':
+      case '/devices':
       case '/codes':
-        // handleSetVisible(['home', 'animals', 'codes', 'collars']);
-        handleSetVisible(['animals', 'codes', 'collars']);
-        return;
-      case '/admin':
-        handleSetVisible(['home']);
-        return;
       case '/profile':
-        handleSetVisible(['home', 'map', 'terrain', 'data']);
+      case '/admin':
+        handleSetVisible(['animals', 'codes', 'devices']);
         return;
     }
   }, [location, isAdmin]); // only fire when these states change

@@ -16,7 +16,7 @@ import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from './TablePaginate';
 import { NotificationMessage } from 'components/common';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError, onlyUniqueArray } from 'utils/common';
 import { ICustomTableColumn, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
@@ -32,7 +32,8 @@ export default function Table<T extends BCTW>({
   onSelect,
   onSelectMultiple,
   paginate = true,
-  isMultiSelect = false
+  isMultiSelect = false,
+  alreadySelected = [],
 }: ITableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
@@ -43,6 +44,7 @@ export default function Table<T extends BCTW>({
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState<number>(1);
   const [rowIdentifier, setRowIdentifier] = useState<string>('id');
+  const [selectedByDefault, setSelectedByDefault] = useState<string[]>(alreadySelected);
 
   const onSuccess = (results: T[]): void => {
     const first = results[0];
@@ -74,9 +76,6 @@ export default function Table<T extends BCTW>({
   }: UseQueryResult<T[], AxiosError> = query(
     page,
     param
-    // { onSuccess }
-    // fixme: doesnt work anymore? using useEffect on isSuccess
-    // isn't triggered on new page load??
   );
 
   useEffect(() => {
@@ -96,7 +95,7 @@ export default function Table<T extends BCTW>({
       const newIds = data.map((r) => r[rowIdentifier]);
       setSelected(newIds);
       if (typeof onSelectMultiple === 'function') {
-        onSelectMultiple(data.filter((d) => newIds.includes(d[rowIdentifier])));
+        onSelectMultiple(data.filter((d) => [newIds, ...selectedByDefault].includes(d[rowIdentifier])));
       }
       return;
     }
@@ -133,13 +132,20 @@ export default function Table<T extends BCTW>({
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
-    setSelected(newSelected);
-    // currently sending T[] not just ids
-    onSelectMultiple(data.filter((d) => newSelected.includes(d[rowIdentifier])));
+    const merged = [...newSelected, ...selectedByDefault].filter(onlyUniqueArray);
+    setSelected(merged);
+    // fixme: data only has the current pages contents, when there could be items selected
+    // by default on another page.
+    if (selectedByDefault.length) {
+      onSelectMultiple(merged);
+    } else {
+      // send T[] not just the identifiers
+      onSelectMultiple(data.filter((d) => merged.includes(d[rowIdentifier])));
+    }
   }
 
   const isSelected = (id: string): boolean => {
-    return selected.indexOf(id) !== -1;
+    return selected.indexOf(id) !== -1 || selectedByDefault.includes(id);
   };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, page: number): void => {
@@ -152,6 +158,20 @@ export default function Table<T extends BCTW>({
     }
     setPage(page);
   };
+
+  /*
+    fixme: since updating selectedByDefault is async,
+    when the checkbox is unchecked the first time the value is still considered checked
+  */
+  const handleCheckMultiple = (v: React.ChangeEvent<HTMLInputElement>, identifier: string): void => {
+    const isChecked = v.target.checked;
+    setSelectedByDefault(o => {
+      if (!isChecked && selectedByDefault.includes(identifier)) {
+        return selectedByDefault.filter(s => s !== identifier);
+      }
+      return selectedByDefault;
+    })
+  }
 
   const renderNoData = (): JSX.Element => (
     <TableRow>
@@ -204,7 +224,7 @@ export default function Table<T extends BCTW>({
                 ? renderNoData()
                 : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: BCTW, prop: number) => {
                   const isRowSelected = isSelected(obj[rowIdentifier]);
-                  const labelId = `enhanced-table-checkbox-${prop}`;
+                  // const labelId = `enhanced-table-checkbox-${prop}`;
                   return (
                     <TableRow
                       hover
@@ -219,7 +239,12 @@ export default function Table<T extends BCTW>({
                       {/* render checkbox column if multiselect is enabled */}
                       {isMultiSelect ? (
                         <TableCell padding='checkbox'>
-                          <Checkbox color='primary' checked={isRowSelected} inputProps={{ 'aria-labelledby': labelId }} />
+                          <Checkbox
+                            onChange={(v): void => handleCheckMultiple(v, obj[rowIdentifier])}
+                            color='primary'
+                            checked={isRowSelected}
+                            // inputProps={{ 'aria-labelledby': labelId }}
+                          />
                         </TableCell>
                       ) : null}
                       {/* render main columns from data fetched from api */}

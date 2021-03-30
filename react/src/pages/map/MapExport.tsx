@@ -69,10 +69,10 @@ export default function Export<T>({ open, handleClose, critter_ids, collar_ids }
           Animal History
         </Button>
         <Button onClick={(): void => setExportType(eExportType.collar)} color='primary' variant='outlined'>
-          Collar History
+          Device History
         </Button>
         <Button onClick={(): void => setExportType(eExportType.movement)} color='primary' variant='outlined'>
-          Movement History
+          Point/Location History
         </Button>
         <div>
           <ul>
