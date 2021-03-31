@@ -111,13 +111,13 @@ export class Animal implements IAnimal {
   @Expose() get mortalityCoords(): string {
     return this.mortality_latitude && this.mortality_longitude
       ? formatLatLong(this.mortality_latitude, this.mortality_longitude)
-      : 'unknown';
+      : '';
   }
   @Expose() get mortalityUTM(): string {
     if (this.mortality_utm_zone && this.mortality_utm_easting && this.mortality_utm_northing) {
       return `${this.mortality_utm_zone}/${this.mortality_utm_easting}/${this.mortality_utm_northing}`;
     }
-    return 'unknown';
+    return '';
   }
   @Expose() get captureCoords(): string {
     return this.capture_latitude && this.capture_longitude

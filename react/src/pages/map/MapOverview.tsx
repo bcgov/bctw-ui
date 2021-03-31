@@ -63,7 +63,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
           className={'text-disabled'}
           key={idx}
           propName={p}
-          defaultValue={obj[p] ?? 'unknown'}
+          defaultValue={obj[p] ?? ''}
           disabled={true}
           label={new Animal().formatPropAsHeader(p)}
           changeHandler={(): void => {}}
@@ -182,7 +182,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
                   Edit
                 </Button>
               }>
-              <EditCollar editing={new Collar()} open={false} onSave={() => {}} />
+              <EditCollar editing={new Collar()} open={false} onSave={(): void => { /* do nothing */}} />
             </AddEditViewer>
           </ModifyCollarWrapper>
         </div>

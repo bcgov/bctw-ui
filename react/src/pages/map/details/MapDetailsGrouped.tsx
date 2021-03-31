@@ -78,7 +78,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
             customHeaders={[]}
           />
         ) : null}
-        <TableBody >
+        <TableBody>
           {sortGroupedFeatures(features, getComparator(order, orderBy)).map((u, idx) => {
             return (
               <Row
@@ -116,19 +116,18 @@ function Row(props: IRowProps): JSX.Element {
   };
 
   return (
-    <TableRow
-      hover
-      className={`map-bottom-panel-row ${isSelectedInMap ? 'bottom-panel-row-is-map-selected' : ''}`}
-      // fixme: competing behavior with hover/ check row?
-      // onMouseEnter={(): void => handleCritterHover(pointIDs)}
-      // onMouseLeave={(): void => handleCritterHover([])}
-    >
+    <TableRow hover className={`map-bottom-panel-row ${isSelectedInMap ? 'bottom-panel-row-is-map-selected' : ''}`}>
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isSelectedInMap || isChecked} />
       </TableCell>
-      <TableCell>
-        <div onClick={(): void => handleShowOverview('critter', row)} className={'critter-select'}>
-          {row.animal_id ?? 'unknown'}
+      {/* if the row has no animal id, clicking the cell will open the overview panel */}
+      <TableCell
+        className={row.animal_id ? '' : 'critter-hover'}
+        onClick={row.animal_id ? null : (): void => handleShowOverview('critter', row)}>
+        <div
+          onClick={row.animal_id ? (): void => handleShowOverview('critter', row) : null}
+          className={'critter-select critter-hover'}>
+          {row.animal_id ?? ''}
         </div>
       </TableCell>
       <TableCell>{row.wlh_id}</TableCell>

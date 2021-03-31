@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { CircularProgress, IconButton, Table as MuiTable, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import { CircularProgress, FormControl, IconButton, InputLabel, MenuItem, Select, Table as MuiTable, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { eUDFType, IUDF } from 'types/udf';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
@@ -117,10 +117,21 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
 
   // critters are currently fetched only to display something useful (wlh_id)
   // instead of critter_id
-  const getCritterNamesFromIDs = (ids: string[]): string => {
+  const getCritterNamesFromIDs = (ids: string[]): string[] => {
     const f = critters.filter((c) => ids.includes(c.critter_id));
-    return f.map((c) => c.name).join(', ');
+    return f.map((c) => c.name);
   };
+
+  const renderCrittersAsDropdown = (critters: string[]): JSX.Element => {
+    return (
+      <FormControl size='small' variant='outlined' className={'select-small'}>
+        <InputLabel>Show</InputLabel>
+        <Select>
+          {critters.map(c => <MenuItem key={c}>{c}</MenuItem>)}
+        </Select>
+      </FormControl>
+    )
+  }
 
   const headers = ['Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate'];
   return (
@@ -144,7 +155,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
                     propName={'group'}
                     value={u.key}></TextField>
                 </TableCell>
-                <TableCell>{getCritterNamesFromIDs(u.value)}</TableCell>
+                <TableCell>{renderCrittersAsDropdown(getCritterNamesFromIDs(u.value))}</TableCell>
                 <TableCell>{u.value.length}</TableCell>
                 <TableCell>
                   <IconButton onClick={(): void => handleEditCritters(u)}><Icon icon='edit'/></IconButton>
@@ -230,7 +241,7 @@ function PickCritters({ open, handleClose, onSave, udf }: PickCritterProps): JSX
   return (
     <Modal open={open} handleClose={beforeClose}>
       <Table
-        headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'critter_id']}
+        headers={['animal_id', 'wlh_id', 'device_id', 'frequency']}
         title={`Select Animals For Group ${udf.key}`}
         queryProps={tableProps}
         onSelectMultiple={handleSelect}

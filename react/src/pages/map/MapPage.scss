@@ -173,9 +173,11 @@ $bottomPanelHeight: 30rem;
 .critter-select {
   width: 30%; // so the cursor doesn't appear on the whole cell
   color: rgb(58, 164, 255) !important;
-  cursor: pointer;
   font-weight: 500;
+}
 
+.critter-hover {
+  cursor: pointer;
 }
 
 // hover effect when selecting a point / drawing a shape in map
