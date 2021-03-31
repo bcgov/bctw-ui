@@ -248,8 +248,8 @@ export const useTelemetryApi = () => {
    * 
   */
   const useUDF = (type: eUDFType): UseQueryResult<IUDF[]> => {
-    return useQuery<IUDF[], AxiosError>(['getUDF'], () => userApi.getUDF(type), {
-      ...defaultQueryOptions
+    return useQuery<IUDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), {
+      ...defaultQueryOptions /*, ...{refetchOnMount: true} */
     });
   }
 

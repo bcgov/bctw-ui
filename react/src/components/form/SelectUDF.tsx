@@ -9,10 +9,10 @@ import { eUDFType, IUDF } from 'types/udf';
 type ISelectProps = SelectProps & {
   udfType: eUDFType;
   changeHandler: (o: IUDF[]) => void;
-  triggerReset?: boolean; // force components that are 'multiple' to unselect all values
+  // force components that are 'multiple' to unselect all values
+  triggerReset?: boolean; 
 };
 
-// fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectUDF(props: ISelectProps): JSX.Element {
   const { label, udfType, changeHandler, triggerReset } = props;
   const bctwApi = useTelemetryApi();
@@ -25,15 +25,12 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
   // load this codeHeaders codes from db
   const { data, isSuccess } = bctwApi.useUDF(udfType);
 
+  // note: watching 'isSuccess' will not trigger rerenders when new data is fetched
   useEffect(() => {
-    const updateOptions = (): void => {
-      if (!data?.length) {
-        return;
-      }
+    if (isSuccess) {
       setUdfs(data);
-    };
-    updateOptions();
-  }, [isSuccess]);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (triggerReset) {
@@ -41,17 +38,11 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
     }
   }, [triggerReset]);
 
+  // when values are selected, set selected and call the parent handler
   const handleChange = (event: React.ChangeEvent<{ value }>): void => {
     const selected = event.target.value as string[];
     setValues(selected);
-    pushChange(selected);
-  };
-
-  const pushChange = (selected: string[]): void => {
-    const filtered = udfs.filter(u => selected.includes(u.key));
-    if (typeof changeHandler === 'function') {
-      changeHandler(filtered);
-    }
+    changeHandler(udfs.filter(u => selected.includes(u.key)));
   };
 
   return (
@@ -72,7 +63,7 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
             return (
               <MenuItem key={u.key} value={u.key}>
                 <Checkbox size='small' color='primary' checked={values.indexOf(u.key) !== -1} />
-                {u.key}
+                {u.key} ({u.value.length})
               </MenuItem>
             );
           })}

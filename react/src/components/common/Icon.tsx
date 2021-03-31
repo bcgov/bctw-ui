@@ -1,4 +1,3 @@
-import { createElement } from 'react';
 import Add from '@material-ui/icons/Add';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -17,6 +16,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import EditIcon from '@material-ui/icons/Edit';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -37,6 +37,7 @@ const mappings: Record<string, JSX.Element> = {
   filter: <FilterListIcon />,
   error: <ErrorIcon htmlColor='orange'/>,
   edit: <EditIcon />,
+  copy: <FileCopyIcon />,
 };
 
 type IconProps = {

@@ -10,38 +10,40 @@ import { MapRange } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
 import Checkbox from 'components/form/Checkbox';
 import SelectUDF from 'components/form/SelectUDF';
-import { eUDFType, IUDF } from 'types/udf';
+import { eUDFType, IUDF, transformUdfToCodeFilter } from 'types/udf';
 import { Icon } from 'components/common';
+import { MapStrings } from 'constants/strings';
 
 type MapFiltersProps = PageProp & {
   start: string;
   end: string;
   onClickEditUdf: () => void;
-  onApplyFilters: (r: MapRange, filters: ICodeFilter[], udfs: IUDF[]) => void;
+  onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onShowLatestPings: (b: boolean) => void;
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const classes = drawerStyles();
-  const [open, setOpen] = useState<boolean>(true); // controls filter panel visibility
-  const [filters, setFilters] = useState<ICodeFilter[]>([]); // the filters applied
-  const [udfFilters, setUdfFilters] = useState<IUDF[]>([]);
-  const [numFiltersSelected, setNumFiltersSelected] = useState<number>(0); // how many filters are set (dev?)
-  const [start, setStart] = useState<string>(props.start); // time range start
-  const [end, setEnd] = useState<string>(props.end); // time range end
-  const [reset, setReset] = useState<boolean>(false); // reset filter button status
-  const [applyButtonStatus, setApplyButtonStatus] = useState<boolean>(true); // controls apply button disabled status
-  const [isLatestPing, setIsLatestPing] = useState<boolean>(false);
+  // controls filter panel visibility
+  const [open, setOpen] = useState<boolean>(true); 
+  const [filters, setFilters] = useState<ICodeFilter[]>([]);
+  const [numFiltersSelected, setNumFiltersSelected] = useState<number>(0);
+  // state for start and end ranges (date pickers)
+  const [start, setStart] = useState<string>(props.start);
+  const [end, setEnd] = useState<string>(props.end);
   const [wasDatesChanged, setWasDatesChanged] = useState<boolean>(false);
+  // reset filter button status
+  const [reset, setReset] = useState<boolean>(false); 
+  // controls apply button disabled status
+  const [applyButtonStatus, setApplyButtonStatus] = useState<boolean>(true);
+  const [isLatestPing, setIsLatestPing] = useState<boolean>(false);
 
+  // keep track of how many filters are currently set
   useEffect(() => {
     setNumFiltersSelected(filters.length);
   }, [filters]);
 
-  useEffect(() => {
-    setNumFiltersSelected((o) => o + udfFilters.length);
-  }, [udfFilters]);
-
+  // handler for when a date is changed
   useEffect(() => {
     const onChangeDate = (): void => {
       if (end !== props.end || start !== props.start) {
@@ -72,7 +74,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
    * @param reset force calling the parent handler with empty array
    */
   const handleApplyFilters = (event: React.MouseEvent<HTMLInputElement>, reset = false): void => {
-    props.onApplyFilters({ start, end }, reset ? [] : filters, reset ? [] : udfFilters);
+    props.onApplyFilters({ start, end }, reset ? [] : filters);
     // if dates were changed, it will draw all the new points, so
     // set the status of the show latest pings checkbox to false
     if (wasDatesChanged) {
@@ -81,20 +83,18 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   /**
-    1) resets the filters state
-    2) triggers selects to unselect all menu items
-    3) updates apply button enabled status
-   */
+    1) uses a timeout to temporarily set reset status to true,
+      the select components are listening for these changes, which 
+      trigger them to unselect all menu items
+    2) also resets the apply button enabled state
+  */
   const resetFilters = (): void => {
     setApplyButtonStatus(true);
-    // fixme: ugly
     setReset(true);
     setTimeout(() => setReset(false), 1000);
 
     setFilters([]);
-    setUdfFilters([]);
-    // since setFilters is async,
-    // call handleApplyFilters with an empty filter array
+    // since setFilters is async, call handleApplyFilters manually with an empty array
     handleApplyFilters(null, true);
   };
 
@@ -103,8 +103,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     { header: 'species', label: 'Species' },
     { header: 'sex', label: 'Gender' }
   ];
-  const latestPingLabel = 'Only show last location';
 
+  // creates select elements
   const createMultiSelects = (): React.ReactNode => {
     return codeFilters.map((cf, idx) => (
       <div key={`${cf.header}-${idx}`}>
@@ -120,13 +120,16 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     ));
   };
 
+  // udfs are treated as any other filter, use this function to convert them
+  // and then 'push' them to the normal filter change handler
   const handleChangeUDF = (v: IUDF[]): void => {
-    setApplyButtonStatus(false);
-    setUdfFilters(v);
+    const asNormalFilters = transformUdfToCodeFilter(v, eUDFType.critter_group);
+    changeFilter(asNormalFilters, 'critter_id');
   };
 
+  // when the last ping state changes, call the parent handler 
   const handleChangeLatestPings = (v: Record<string, boolean>): void => {
-    const val = v[latestPingLabel];
+    const val = v[MapStrings.lastPingLabel];
     if (isLatestPing != val) {
       setIsLatestPing(val);
       props.onShowLatestPings(val);
@@ -159,7 +162,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <div className={'side-panel-dates'}>
                 <TextField
                   outline={true}
-                  label='Start Date'
+                  label={MapStrings.filterRangeStart}
                   type='date'
                   defaultValue={start}
                   propName='tstart'
@@ -167,7 +170,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 />
                 <TextField
                   outline={true}
-                  label='End Date'
+                  label={MapStrings.filterRangeEnd}
                   type='date'
                   defaultValue={end}
                   propName='tend'
@@ -175,14 +178,18 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 />
               </div>
               <div>
-                <Checkbox label={latestPingLabel} initialValue={isLatestPing} changeHandler={handleChangeLatestPings} />
+                <Checkbox
+                  label={MapStrings.lastPingLabel}
+                  initialValue={isLatestPing}
+                  changeHandler={handleChangeLatestPings}
+                />
               </div>
               {createMultiSelects()}
               <div className={'side-panel-udf'}>
                 <SelectUDF
                   triggerReset={reset}
                   udfType={eUDFType.critter_group}
-                  label={'User Animal Group'}
+                  label={MapStrings.filterUserCritterGroup}
                   changeHandler={handleChangeUDF}
                 />
                 <IconButton onClick={props.onClickEditUdf}>

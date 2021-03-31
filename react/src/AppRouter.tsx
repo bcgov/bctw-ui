@@ -56,7 +56,7 @@ const AppRouter = ({ onContentChange }: AppRouterProps): JSX.Element => {
   useEffect(() => {
     return history.listen((location) => {
       // wipe the sidebar content when navigation to new page
-      onContentChange(null);
+      // onContentChange(null);
     });
   }, [history]);
 

@@ -64,7 +64,6 @@
 }
 
 .dlg-details-content {
-
   padding: 0.5rem 1.5rem;
   margin-bottom: 1px solid;
 }
@@ -76,4 +75,9 @@
 // on overview pages, make disabled fields normal font color
 .Mui-disabled {
   color: inherit;
+}
+
+// udf modal
+.udf-table {
+  margin-bottom: 0.5rem;
 }

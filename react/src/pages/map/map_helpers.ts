@@ -96,7 +96,7 @@ const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
  * @param features
  * @returns
  */
-const filterFeatures = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryFeature[]): ITelemetryFeature[] => {
+const applyFilter = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryFeature[]): ITelemetryFeature[] => {
   return features.filter((f) => {
     const { properties } = f;
     for (let i = 0; i < groupedFilters.length; i++) {
@@ -146,7 +146,7 @@ const getUniqueCritterIDsFromFeatures = (features: ITelemetryFeature[], selected
 export {
   COLORS,
   fillPoint,
-  filterFeatures,
+  applyFilter,
   flattenUniqueFeatureIDs,
   getFillColorByStatus,
   getUniqueCritterIDsFromFeatures,

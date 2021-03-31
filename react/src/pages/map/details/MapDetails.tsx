@@ -2,7 +2,7 @@ import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { ICodeFilter } from 'types/code';
 import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowHover, OnMapRowCellClick } from 'types/map';
-import { filterFeatures, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
+import { applyFilter, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
 import { Button } from '@material-ui/core';
 
@@ -59,7 +59,7 @@ export default function MapDetails({
         setGroupedFeatures(groupFeaturesByCritters(features, sort));
         return;
       }
-      setGroupedFeatures(groupFeaturesByCritters(filterFeatures(groupFilters(filters), features), sort));
+      setGroupedFeatures(groupFeaturesByCritters(applyFilter(groupFilters(filters), features), sort));
     };
     update();
   }, [filters]);

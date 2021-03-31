@@ -12,7 +12,7 @@ import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import MapDetails from 'pages/map/details/MapDetails';
 import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML, hidePopup } from 'pages/map/map_init';
-import { fillPoint, filterFeatures, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
+import { applyFilter, fillPoint, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
 import { useEffect, useRef, useState } from 'react';
@@ -22,7 +22,6 @@ import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { TypeWithData } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
-import { IUDF } from 'types/udf';
 
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -206,14 +205,13 @@ export default function MapPage(): JSX.Element {
   };
 
   // triggered when side-panel filters are applied
-  const handleChangeFilters = (newRange: MapRange, filters: ICodeFilter[], udfFilters: IUDF[]): void => {
+  const handleChangeFilters = (newRange: MapRange, filters: ICodeFilter[]): void => {
     // todo: does changing date and applying filters work at same time?
-    // todo: apply udf filters
     if (newRange.start !== range.start || newRange.end !== range.end) {
       setRange(newRange);
     }
     setFilters((o) => filters);
-    const filteredPings = filterFeatures(groupFilters(filters), features) as any;
+    const filteredPings = applyFilter(groupFilters(filters), features) as any;
     const uniqueCritters = groupFeaturesByCritters(filteredPings).map((c) => c.critter_id);
     const filteredTracks = (tracksData as any[]).filter((td) => uniqueCritters.includes(td.properties.critter_id));
     drawLatestPings(filteredPings, filteredTracks);

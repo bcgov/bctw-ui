@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { IconButton, Table as MuiTable, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import { CircularProgress, IconButton, Table as MuiTable, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { eUDFType, IUDF } from 'types/udf';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
@@ -15,7 +15,6 @@ import { useQueryClient } from 'react-query';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 
 /**
- * fixme: when table default selected is [], it wont pass ids 
  */
 export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -28,11 +27,14 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   const [currentUdf, setCurrentUdf] = useState<IUDF>(null);
 
   const { data: udfResults, status: udfStatus } = bctwApi.useUDF(eUDFType.critter_group);
+  // page of 0 is passed to indicate we want to load all values
+  // fixme: delay this when waiting on useUser context?
   const { data: critterResults, status: critterStatus } = bctwApi.useCritterAccess(0, {
     user: useUser.user?.idir ?? '',
     filterOutNone: true
   });
 
+  // when the udfs are fetched
   useEffect(() => {
     if (udfStatus === 'success') {
       setUdfs(udfResults);
@@ -42,6 +44,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     }
   }, [udfStatus]);
 
+  // when critters are fetched
   useEffect(() => {
     if (critterStatus === 'success') {
       setCritters(critterResults);
@@ -57,7 +60,8 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     responseDispatch({type: 'error', message: `failed to save user defined group: ${e}`})
   }
 
-  const { mutateAsync } = bctwApi.useMutateUDF({ onSuccess, onError });
+  // setup the save mutation
+  const { mutateAsync, isLoading } = bctwApi.useMutateUDF({ onSuccess, onError });
 
   const addRow = (): void => {
     const curUdfs = [...udfs];
@@ -69,11 +73,13 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     setUdfs(udfs.filter((udf) => udf.key !== u.key));
   };
 
-  const beforeCloseModal = (): void => {
-    handleClose(false);
+  const duplicateRow = (u: IUDF): void => {
+    const dup = Object.assign({}, u);
+    dup.key = '';
+    setUdfs([...udfs, dup]);
   }
 
-  // when user changes the group textfield
+  // when user changes the group name textfield
   const handleChangeName = (v: Record<string, unknown>, udf: IUDF): void => {
     const newKey = v['group'] as string;
     if (!newKey) {
@@ -86,19 +92,15 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     setUdfs(cp);
   };
 
-  /**
-   * when the user clicks the edit button for a udf in the table
-   * */
+  // when the user clicks the edit button for a udf in the table
   const handleEditCritters = (udf: IUDF): void => {
     setCurrentUdf(udf);
     setShowCritterSelection(true);
   };
 
-  // when user clicks save button in critter selection modal
+  // when user clicks save button in critter selection modal, update the current udfs value
   const handleCrittersSelected = (u: IUDF): void => {
-    // console.log(u.value)
     u.changed = true;
-    // setWasChanged(true);
     setShowCritterSelection(false);
     const idx = udfs.findIndex((udf) => udf.key === u.key);
     const cp = [...udfs];
@@ -107,28 +109,28 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   };
 
   const handleSave = (): void => {
-    // fixme: ? currently replacing all, so dont filter out only changed
-    // const toSave = udfs.filter(u => u.changed);
-    const prep = udfs.map(u => {
+    const udfInput = udfs.map(u => {
       return {key: u.key, value: u.value, type: u.type}
     });
-    // console.log(prep);
-    mutateAsync(prep);
+    mutateAsync(udfInput);
   }
 
+  // critters are currently fetched only to display something useful (wlh_id)
+  // instead of critter_id
   const getCritterNamesFromIDs = (ids: string[]): string => {
     const f = critters.filter((c) => ids.includes(c.critter_id));
     return f.map((c) => c.name).join(', ');
   };
 
-  const headers = ['Group Name', 'Animals', '# Animals', 'Edit', 'Delete'];
+  const headers = ['Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate'];
   return (
-    <Modal open={open} handleClose={beforeCloseModal}>
-      <MuiTable>
+    <Modal open={open} handleClose={handleClose}>
+      {isLoading ? <CircularProgress /> : null}
+      <MuiTable className={'udf-table'}>
         <TableHead>
           <TableRow>
             {headers.map((h, idx) => (
-              <TableCell key={idx}>{h}</TableCell>
+              <TableCell align='center' key={idx}><strong>{h}</strong></TableCell>
             ))}
           </TableRow>
         </TableHead>
@@ -145,14 +147,13 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
                 <TableCell>{getCritterNamesFromIDs(u.value)}</TableCell>
                 <TableCell>{u.value.length}</TableCell>
                 <TableCell>
-                  <IconButton onClick={(): void => handleEditCritters(u)}>
-                    <Icon icon='edit' />
-                  </IconButton>
+                  <IconButton onClick={(): void => handleEditCritters(u)}><Icon icon='edit'/></IconButton>
                 </TableCell>
                 <TableCell>
-                  <IconButton onClick={(): void => deleteRow(u)}>
-                    <Icon icon='close' />
-                  </IconButton>
+                  <IconButton onClick={(): void => deleteRow(u)}><Icon icon='close'/></IconButton>
+                </TableCell>
+                <TableCell>
+                  <IconButton disabled={u.value.length === 0 || u.key.length === 0} onClick={(): void => duplicateRow(u)}><Icon icon='copy'/></IconButton>
                 </TableCell>
               </TableRow>
             );
@@ -180,7 +181,9 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
 }
 
 /**
- *
+ * the critter selection modal that appears when the user clicks the edit icon
+ * displays a list of critters the user has access to
+ * fixme: takes two clicks to unselect default selected values
  */
 
 type PickCritterProps = ModalBaseProps & {
@@ -199,30 +202,45 @@ function PickCritters({ open, handleClose, onSave, udf }: PickCritterProps): JSX
     param: { user: useUser.user?.idir, filterOutNone: true }
   };
 
-  const handleSelect = (values): void => {
-    // console.log('selected in table', values);
+  /**
+    * fixme: when udf.value is empty, table handler for multiselection is
+    * not passing ids to {handleSelect}
+    * so @param values can be string[] | UserCritterAccess[]
+   */
+  const handleSelect = (values: unknown): void => {
     setWasChanged(true);
-    setIds(values);
+    if (udf.value.length === 0) {
+      setIds((values as UserCritterAccess[]).map((v) => v.critter_id))
+    } else {
+      setIds(values as string[]);
+    }
   };
 
   const handleSave = (): void => {
     const n = { ...udf, ...{ value: ids } };
     onSave(n);
+    beforeClose();
   };
 
+  const beforeClose = (): void => {
+    setWasChanged(false);
+    handleClose(false);
+  }
+
   return (
-    <Modal open={open} handleClose={handleClose}>
+    <Modal open={open} handleClose={beforeClose}>
       <Table
         headers={['animal_id', 'wlh_id', 'nickname', 'device_id', 'critter_id']}
         title={`Select Animals For Group ${udf.key}`}
         queryProps={tableProps}
         onSelectMultiple={handleSelect}
         isMultiSelect={true}
+        // fixme: see handleSelect issue
         alreadySelected={udf.value}
       />
-      <Button disabled={!wasChanged} onClick={handleSave}>
-        save
-      </Button>
+      <div className={'admin-btn-row'}>
+        <Button disabled={!wasChanged} onClick={handleSave}>save</Button>
+      </div>
     </Modal>
   );
 }
