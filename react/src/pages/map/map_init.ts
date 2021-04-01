@@ -46,12 +46,8 @@ const hidePopup = (): void => {
   doc.classList.remove('appear-above-map');
 }
 
-const setPopupInnerHTML = (feature: TelemetryFeature, isClosingPopup = false): void => {
+const setPopupInnerHTML = (feature: TelemetryFeature): void => {
   const doc = document.getElementById('popup');
-  if (isClosingPopup) {
-    hidePopup();
-    return;
-  }
   const p = feature.properties;
   const g = feature.geometry;
   const x = `${g.coordinates[0]?.toFixed(5)}\xb0`;
@@ -140,7 +136,8 @@ const initMap = (
   selectedPings: L.GeoJSON,
   tracks: L.GeoJSON,
   pings: L.GeoJSON,
-  drawSelectedLayer: () => void
+  drawSelectedLayer: () => void,
+  handleMapClick: () => void
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
   const layerPicker = L.control.layers();
@@ -214,7 +211,12 @@ const initMap = (
     })
     .on('draw:deletestop', (e) => {
       drawSelectedLayer();
-    });
+    })
+    .on('preclick', (e) => {
+      // this is fired before other handlers are called,
+      // so if the user did not click a layer point, it will hide the popup
+      handleMapClick();
+    } )
 };
 
 export { initMap, hidePopup, setupPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };

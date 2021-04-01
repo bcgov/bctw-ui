@@ -5,7 +5,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import download from 'downloadjs';
 import { eExportType, exportQueryParams } from 'types/export';
-import { CircularProgress } from '@material-ui/core';
+import { ButtonGroup, CircularProgress } from '@material-ui/core';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { formatAxiosError } from 'utils/common';
 
@@ -64,24 +64,26 @@ export default function Export<T>({ open, handleClose, critter_ids, collar_ids }
     <Modal open={open} handleClose={handleClose} title={'Export'}>
       <>
         {isLoading ? <CircularProgress /> : null}
-        <p>What would you like to export?</p>
-        <Button onClick={(): void => setExportType(eExportType.animal)} color='primary' variant='outlined'>
-          Animal History
-        </Button>
-        <Button onClick={(): void => setExportType(eExportType.collar)} color='primary' variant='outlined'>
-          Device History
-        </Button>
-        <Button onClick={(): void => setExportType(eExportType.movement)} color='primary' variant='outlined'>
-          Point/Location History
-        </Button>
+        <p>What would you like to export? {critter_ids.length} selected</p>
+        <ButtonGroup >
+          <Button onClick={(): void => setExportType(eExportType.animal)} color='primary' variant='outlined'>
+            Animal History
+          </Button>
+          <Button onClick={(): void => setExportType(eExportType.collar)} color='primary' variant='outlined'>
+            Device History
+          </Button>
+          <Button onClick={(): void => setExportType(eExportType.movement)} color='primary' variant='outlined'>
+            Point/Location History
+          </Button>
+        </ButtonGroup>
         <div>
-          <ul>
+          {/* <ul>
             {critter_ids.map((i, idx) => (
               <li key={idx}>
                 critter: {i} collar: {collar_ids[idx]}
               </li>
             ))}
-          </ul>
+          </ul> */}
         </div>
       </>
     </Modal>

@@ -203,7 +203,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
         </Paper>
 
         <div className={'dlg-full-body-subtitle'}>
-          <h2>Malfunction Events</h2>
+          <h2>Device Events</h2>
           <Button disabled={!canEdit} className={'overview-btn'} color='primary' variant='outlined'>
             Add Event
           </Button>

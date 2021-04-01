@@ -118,7 +118,7 @@ function Row(props: IRowProps): JSX.Element {
   return (
     <TableRow hover className={`map-bottom-panel-row ${isSelectedInMap ? 'bottom-panel-row-is-map-selected' : ''}`}>
       <TableCell padding='checkbox'>
-        <Checkbox color='primary' onChange={onCheck} checked={isSelectedInMap || isChecked} />
+        <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
       {/* if the row has no animal id, clicking the cell will open the overview panel */}
       <TableCell

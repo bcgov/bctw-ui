@@ -83,7 +83,7 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
-        initMap(mapRef, drawnItems, selectedPings, tracks, pings, handleDrawShape);
+        initMap(mapRef, drawnItems, selectedPings, tracks, pings, handleDrawShape, handleClosePopup);
       }
     };
     updateComponent();
@@ -100,7 +100,7 @@ export default function MapPage(): JSX.Element {
     const layer = event.target;
     if (lastPointClicked && lastPointClicked !== layer) {
       fillPoint(lastPointClicked);
-      setPopupInnerHTML(null, true);
+      hidePopup();
     }
     lastPointClicked = layer;
     const feature: ITelemetryFeature = layer?.feature;
@@ -109,18 +109,19 @@ export default function MapPage(): JSX.Element {
     setSelectedFeatureIDs([feature.id]);
   };
 
-  // revert highlight when popup is closed
-  // const handlePointClosePopup = (event: L.LeafletEvent): void => {
-  //   const layer = event.target;
-  //   const feature: ITelemetryFeature = layer?.feature;
-  //   setPopupInnerHTML(feature as any, true);
-  //   setSelectedFeatureIDs([feature.id]);
-  //   fillPoint(event.target);
-  //   setSelectedFeatureIDs([]);
-  // };
+  // when a map point is clicked that isn't a marker, close the popup
+  const handleClosePopup = (): void => {
+    if (lastPointClicked) {
+      fillPoint(lastPointClicked);
+    }
+    hidePopup();
+    setSelectedFeatureIDs([]);
+  }
 
-  // highlights the selected rows in bottom panel
-  const handlePointHover = (ids: number[]): void => {
+  // when rows are selected in the bottom details panel
+  const handleDetailPaneRowSelect = (ids: number[]): void => {
+    // assume we're going into 'multiple point selection mode' and hide the popup first
+    handleClosePopup();
     mapRef.current.eachLayer((layer) => {
       const l = layer as any;
       const id = l.feature?.id;
@@ -133,7 +134,6 @@ export default function MapPage(): JSX.Element {
     });
   };
 
-  // setupPingOptions(pings, handlePointClick, handlePointClosePopup);
   setupPingOptions(pings, handlePointClick);
   const selectedPings = new L.GeoJSON(); // Store the selected pings
   selectedPings.options = setupSelectedPings();
@@ -158,7 +158,7 @@ export default function MapPage(): JSX.Element {
   };
   
   // clear points within shape
-  // todo: restore the selected color to points within shape
+  // fixme: restore the selected color to points within shape
   const handleDrawShapeLatest = (): void => {
     mapRef.current.eachLayer((layer) => {
       if ((layer as any).options.class === 'selected-ping') {
@@ -290,7 +290,7 @@ export default function MapPage(): JSX.Element {
             filters={filters}
             selectedFeatureIDs={selectedFeatureIDs}
             handleShowOverview={handleShowOverview}
-            handleHoverCritter={handlePointHover}
+            handleHoverCritter={handleDetailPaneRowSelect}
             showExportModal={showExportModal}
             setShowExportModal={setShowExportModal}
           />
