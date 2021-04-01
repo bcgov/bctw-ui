@@ -16,7 +16,7 @@ import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from './TablePaginate';
 import { NotificationMessage } from 'components/common';
-import { formatAxiosError, onlyUniqueArray } from 'utils/common';
+import { formatAxiosError } from 'utils/common';
 import { ICustomTableColumn, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
@@ -41,10 +41,9 @@ export default function Table<T extends BCTW>({
 
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState<number>(1);
   const [rowIdentifier, setRowIdentifier] = useState<string>('id');
-  const [selectedByDefault, setSelectedByDefault] = useState<string[]>(alreadySelected);
 
   const onSuccess = (results: T[]): void => {
     const first = results[0];
@@ -95,7 +94,7 @@ export default function Table<T extends BCTW>({
       const newIds = data.map((r) => r[rowIdentifier]);
       setSelected(newIds);
       if (typeof onSelectMultiple === 'function') {
-        onSelectMultiple(data.filter((d) => [newIds, ...selectedByDefault].includes(d[rowIdentifier])));
+        onSelectMultiple(data.filter((d) => newIds.includes(d[rowIdentifier])));
       }
       return;
     }
@@ -132,20 +131,19 @@ export default function Table<T extends BCTW>({
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
-    const merged = [...newSelected, ...selectedByDefault].filter(onlyUniqueArray);
-    setSelected(merged);
+    setSelected(newSelected);
     // fixme: data only has the current pages contents, when there could be items selected
     // by default on another page.
-    if (selectedByDefault.length) {
-      onSelectMultiple(merged);
+    if (alreadySelected.length) {
+      onSelectMultiple(newSelected);
     } else {
       // send T[] not just the identifiers
-      onSelectMultiple(data.filter((d) => merged.includes(d[rowIdentifier])));
+      onSelectMultiple(data.filter((d) => newSelected.includes(d[rowIdentifier])));
     }
   }
 
   const isSelected = (id: string): boolean => {
-    return selected.indexOf(id) !== -1 || selectedByDefault.includes(id);
+    return selected.indexOf(id) !== -1;
   };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, page: number): void => {
@@ -158,20 +156,6 @@ export default function Table<T extends BCTW>({
     }
     setPage(page);
   };
-
-  /*
-    fixme: since updating selectedByDefault is async,
-    when the checkbox is unchecked the first time the value is still considered checked
-  */
-  const handleCheckMultiple = (v: React.ChangeEvent<HTMLInputElement>, identifier: string): void => {
-    const isChecked = v.target.checked;
-    setSelectedByDefault(o => {
-      if (!isChecked && selectedByDefault.includes(identifier)) {
-        return selectedByDefault.filter(s => s !== identifier);
-      }
-      return selectedByDefault;
-    })
-  }
 
   const renderNoData = (): JSX.Element => (
     <TableRow>
@@ -240,7 +224,6 @@ export default function Table<T extends BCTW>({
                       {isMultiSelect ? (
                         <TableCell padding='checkbox'>
                           <Checkbox
-                            onChange={(v): void => handleCheckMultiple(v, obj[rowIdentifier])}
                             color='primary'
                             checked={isRowSelected}
                             // inputProps={{ 'aria-labelledby': labelId }}

@@ -65,7 +65,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
 
   const addRow = (): void => {
     const curUdfs = [...udfs];
-    curUdfs.push({ udf_id: 0, user_id: 0, type: eUDFType.critter_group, key: '', value: [], changed: true });
+    curUdfs.push({ udf_id: 0, user_id: 0, type: eUDFType.critter_group, key: '', value: [], changed: false });
     setUdfs(curUdfs);
   };
 
