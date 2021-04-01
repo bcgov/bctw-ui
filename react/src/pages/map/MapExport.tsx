@@ -1,6 +1,7 @@
 import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';
+import tokml from 'tokml';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import download from 'downloadjs';
@@ -22,21 +23,45 @@ export default function Export<T>({ open, handleClose, critter_ids, collar_ids }
   const onSuccess = (data): void => {
     if (data && data.length) {
       let filename = '';
+      let result = '';
       switch (exportType) {
         case eExportType.animal:
-          filename = 'critter_history.json';
+          filename = 'animal_history.csv';
+          result = formatAsCSV(data);
           break;
         case eExportType.collar:
-          filename = 'collar_history.json';
+          filename = 'collar_history.csv';
+          result = formatAsCSV(data);
           break;
         case eExportType.movement:
-          filename = 'critter_movement_history.json';
+          filename = 'movement_history.kml';
+          result = formatAsKML(data);
           break;
       }
-      download(JSON.stringify(data, null, 2), filename, 'application/json');
+      download(result, filename, '');
     }
     reset();
   };
+
+  const formatAsCSV = (data: unknown[]): string => {
+    const headers = Object.keys(data[0]).join();
+    const values = data.map(d => Object.values(d).join()).join('\n')
+    const ret = `${headers}\n${values}`;
+    return ret;
+  }
+
+  const formatAsKML = (data: unknown[]): string => {
+    const asGeoJSON = data.map((d, i) => {
+      return { 
+        type: 'Feature',
+        id: i,
+        geometry: (d as any).geom,
+        properties: { device_id: (d as any).device_id, date_recorded: (d as any).date_recorded, vendor: (d as any).device_vendor }
+      }
+    })
+    const ret = tokml({type: 'FeatureCollection', features: asGeoJSON})
+    return ret;
+  }
 
   const onError = (err): void => {
     responseDispatch({

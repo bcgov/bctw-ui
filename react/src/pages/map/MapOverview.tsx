@@ -99,14 +99,11 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
             <h2>Animal Details</h2>
             <ModifyCritterWrapper editing={critter}>
               <AddEditViewer<Animal>
+                disableEdit={!canEdit}
                 editing={critter ?? new Animal()}
                 empty={new Animal()}
                 disableAdd={true}
-                editBtn={
-                  <Button disabled={!canEdit} className={'overview-btn'} color='primary' variant='outlined'>
-                    Edit
-                  </Button>
-                }>
+                editBtn={<Button className={'overview-btn'} color='primary' variant='outlined'>Edit</Button>}>
                 <EditCritter editing={new Animal()} open={false} onSave={null} />
               </AddEditViewer>
             </ModifyCritterWrapper>
