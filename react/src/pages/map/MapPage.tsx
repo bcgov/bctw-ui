@@ -31,12 +31,13 @@ export default function MapPage(): JSX.Element {
   const [tracks] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Tracks
   const [pings] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Pings
 
+  const selectedPings = new L.GeoJSON();
+  selectedPings.options = setupSelectedPings();
+
   const [range, setRange] = useState<MapRange>({
     start: dayjs().subtract(7, 'day').format(formatDay),
     end: getToday()
   });
-
-  let lastPointClicked = null;
 
   // for map bottom panel state
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
@@ -62,6 +63,7 @@ export default function MapPage(): JSX.Element {
   const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
   // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
 
+  // refresh when start/end times are changed
   useEffect(() => {
     clearLatestPings();
   }, [range]);
@@ -74,10 +76,15 @@ export default function MapPage(): JSX.Element {
 
   useEffect(() => {
     if (pingsData && !isErrorPings) {
+      // must be called before adding data to pings
+      setupPingOptions(pings, handlePointClick);
       pings.addData(pingsData as any);
       setFeatures(pingsData as any);
+      rebindListeners();
     }
   }, [pingsData]);
+
+  let lastPoint = null;
 
   // initialize the map
   useEffect(() => {
@@ -89,20 +96,41 @@ export default function MapPage(): JSX.Element {
     updateComponent();
   });
 
+  // hide popup when various modals are opened
   useEffect(() => {
     if (showExportModal || showOverviewModal || showUdfEdit) {
       hidePopup();
     }
   }, [showExportModal, showOverviewModal, showUdfEdit])
 
-  // when an individual map point is clicked, highlight it
+  /**
+   * for some reason adding new data breaks the preclick handler
+   * as @param {lastPoint} is always null. rebind this handler 
+   * when new data is fetched
+   */
+  const rebindListeners = (): void => {
+    if (!mapRef?.current) {
+      return;
+    }
+    mapRef.current
+      .off('preclick')
+      .on('preclick', handleClosePopup);
+  }
+
+  /**
+   * when a map point is clicked, 
+   * a) populate the popup with metadata
+   * b) show or hide the point
+   * c) style the point
+   */
   const handlePointClick = (event: L.LeafletEvent): void => {
     const layer = event.target;
-    if (lastPointClicked && lastPointClicked !== layer) {
-      fillPoint(lastPointClicked);
+    if (lastPoint && lastPoint !== layer) {
+      fillPoint(lastPoint);
       hidePopup();
     }
-    lastPointClicked = layer;
+    lastPoint = layer;
+    // console.log('setting last point to ', lastPoint.feature.id)
     const feature: ITelemetryFeature = layer?.feature;
     fillPoint(layer, true);
     setPopupInnerHTML(feature as any);
@@ -111,17 +139,23 @@ export default function MapPage(): JSX.Element {
 
   // when a map point is clicked that isn't a marker, close the popup
   const handleClosePopup = (): void => {
-    if (lastPointClicked) {
-      fillPoint(lastPointClicked);
+    // console.log('close popup called');
+    if (lastPoint) {
+      fillPoint(lastPoint, false);
+      lastPoint = null;
+      setSelectedFeatureIDs([]);
     }
     hidePopup();
-    setSelectedFeatureIDs([]);
   }
 
-  // when rows are selected in the bottom details panel
+  /**
+   * when rows are checked in the details panel
+   * a) hide the popup
+   * b) style the selected points
+   * @param ids the feature IDs for the critter(s) selected
+   */
   const handleDetailPaneRowSelect = (ids: number[]): void => {
-    // assume we're going into 'multiple point selection mode' and hide the popup first
-    handleClosePopup();
+    hidePopup();
     mapRef.current.eachLayer((layer) => {
       const l = layer as any;
       const id = l.feature?.id;
@@ -134,41 +168,32 @@ export default function MapPage(): JSX.Element {
     });
   };
 
-  setupPingOptions(pings, handlePointClick);
-  const selectedPings = new L.GeoJSON(); // Store the selected pings
-  selectedPings.options = setupSelectedPings();
-
-  // handles the drawing, setup in map_init
+  // handles the drawing and deletion of shapes, setup in map_init
   const handleDrawShape = (): void => {
+    hidePopup();
     const clipper = drawnItems.toGeoJSON();
     const allPings = pings.toGeoJSON();
-    // More typescript type definition bugs... These are the right features!!!
     const overlay = pointsWithinPolygon(allPings as any, clipper as any);
-    // console.log('points in shape ', overlay.features.length)
-
     setFeatureIDsOnDraw(overlay);
 
-    // Clear any previous selections
+    // Clear previous selections
     mapRef.current.eachLayer((layer) => {
       if ((layer as any).options.class === 'selected-ping') {
         fillPoint(layer);
       }
     });
+
     selectedPings.addData(overlay);
+
+    if (!overlay.features.length) {
+      selectedPings.clearLayers();
+    } 
   };
   
-  // clear points within shape
-  // fixme: restore the selected color to points within shape
-  const handleDrawShapeLatest = (): void => {
-    mapRef.current.eachLayer((layer) => {
-      if ((layer as any).options.class === 'selected-ping') {
-        mapRef.current.removeLayer(layer);
-      }
-    });
-  };
-
-  // when shapes are drawn in {drawSelectedLayer}, set the selectedFeatureIDs
-  // status to the ids of the points in the shape
+  /**
+   * when shapes are drawn in {drawSelectedLayer}, 
+   * set the selectedFeatureIDs state
+  */
   const setFeatureIDsOnDraw = (
     overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
   ): void => {
@@ -199,9 +224,13 @@ export default function MapPage(): JSX.Element {
    */
   const drawLatestPings = (newPings = pingsData, newTracks = tracksData): void => {
     clearLatestPings();
-    handleDrawShapeLatest();
-    pings.addData(newPings);
+    mapRef.current.eachLayer((layer) => {
+      if ((layer as any).options.class === 'selected-ping') {
+        mapRef.current.removeLayer(layer);
+      }
+    });
     tracks.addData(newTracks as any);
+    pings.addData(newPings as any);
   };
 
   // triggered when side-panel filters are applied
@@ -290,7 +319,7 @@ export default function MapPage(): JSX.Element {
             filters={filters}
             selectedFeatureIDs={selectedFeatureIDs}
             handleShowOverview={handleShowOverview}
-            handleHoverCritter={handleDetailPaneRowSelect}
+            handleRowSelected={handleDetailPaneRowSelect}
             showExportModal={showExportModal}
             setShowExportModal={setShowExportModal}
           />

@@ -1,4 +1,4 @@
-import { ITelemetryDetail, IUniqueFeature, TelemetryDetail } from 'types/map';
+import { ITelemetryDetail, IUniqueFeature, OnMapRowCellClick, TelemetryDetail } from 'types/map';
 import { TableRow, TableCell, TableBody, Table, TableContainer, Paper, Checkbox } from '@material-ui/core';
 import { getComparator } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
@@ -21,7 +21,7 @@ type GroupedCheckedStatus = {
 const rows_to_render = ['animal_id', 'wlh_id', 'device_id', 'frequency', 'Map Points'];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
-  const { features, crittersSelected, handleShowOverview, handleHoverCritter } = props;
+  const { features, crittersSelected, handleShowOverview, handleRowSelected } = props;
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<string>('Critter Name');
   const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
@@ -58,7 +58,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const pushRowCheck = (ids: string[]): void => {
     setCheckedGroups(ids);
     const pointIDs = flattenUniqueFeatureIDs(features.filter((f) => ids.includes(f.critter_id)));
-    handleHoverCritter(pointIDs);
+    handleRowSelected(pointIDs);
   };
 
   return (
@@ -89,7 +89,6 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 row={u.features[0].properties}
                 handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
-                handleHoverCritter={handleHoverCritter}
               />
             );
           })}
@@ -99,16 +98,17 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   );
 }
 
-type IRowProps = MapDetailsBaseProps & {
+type IRowProps = {
   pointIDs: number[];
   isSelectedInMap: boolean;
   isChecked: boolean;
   row: ITelemetryDetail;
   handleRowCheck: (v: GroupedCheckedStatus) => void;
+  handleShowOverview: OnMapRowCellClick;
 };
 
 function Row(props: IRowProps): JSX.Element {
-  const { row, handleRowCheck, handleShowOverview, isSelectedInMap, pointIDs, isChecked, handleHoverCritter } = props;
+  const { row, handleRowCheck, handleShowOverview, isSelectedInMap, pointIDs, isChecked } = props;
 
   const onCheck = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;

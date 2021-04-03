@@ -7,7 +7,7 @@ import MapExport from 'pages/map/MapExport';
 import { Button } from '@material-ui/core';
 
 export type MapDetailsBaseProps = {
-  handleHoverCritter: OnPanelRowHover;
+  handleRowSelected: OnPanelRowHover;
   handleShowOverview: OnMapRowCellClick;
 };
 
@@ -26,7 +26,7 @@ export default function MapDetails({
   filters,
   selectedFeatureIDs,
   handleShowOverview,
-  handleHoverCritter,
+  handleRowSelected,
   showExportModal,
   setShowExportModal
 }: MapDetailsProps): JSX.Element {
@@ -68,7 +68,7 @@ export default function MapDetails({
   const onRowsChecked = (ids: number[]): void => {
     const grouped = groupFeaturesByCritters(features.filter((f) => ids.includes(f.id)));
     setGroupedFeaturesChecked(grouped);
-    handleHoverCritter(ids);
+    handleRowSelected(ids);
   };
 
   return (
@@ -81,7 +81,7 @@ export default function MapDetails({
         crittersSelected={crittersSelectedInMap}
         features={groupedFeatures}
         handleShowOverview={handleShowOverview}
-        handleHoverCritter={onRowsChecked}
+        handleRowSelected={onRowsChecked}
       />
       <MapExport
         critter_ids={

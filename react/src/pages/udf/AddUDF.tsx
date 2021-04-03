@@ -25,6 +25,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   const [udfs, setUdfs] = useState<IUDF[]>([]);
   const [showCritterSelection, setShowCritterSelection] = useState<boolean>(false);
   const [currentUdf, setCurrentUdf] = useState<IUDF>(null);
+  const [canSave, setCanSave] = useState<boolean>(false);
 
   const { data: udfResults, status: udfStatus } = bctwApi.useUDF(eUDFType.critter_group);
   // page of 0 is passed to indicate we want to load all values
@@ -71,6 +72,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
 
   const deleteRow = (u: IUDF): void => {
     setUdfs(udfs.filter((udf) => udf.key !== u.key));
+    setCanSave(true);
   };
 
   const duplicateRow = (u: IUDF): void => {
@@ -90,6 +92,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     cp[idx].key = newKey;
     cp[idx].changed = true;
     setUdfs(cp);
+    setCanSave(true);
   };
 
   // when the user clicks the edit button for a udf in the table
@@ -106,6 +109,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     const cp = [...udfs];
     cp[idx] = u;
     setUdfs(cp);
+    setCanSave(true);
   };
 
   const handleSave = (): void => {
@@ -113,6 +117,11 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
       return {key: u.key, value: u.value, type: u.type}
     });
     mutateAsync(udfInput);
+  }
+
+  const onClose = (): void => {
+    setCanSave(false);
+    handleClose(false);
   }
 
   // critters are currently fetched only to display something useful (wlh_id)
@@ -135,7 +144,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
 
   const headers = ['Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate'];
   return (
-    <Modal open={open} handleClose={handleClose}>
+    <Modal open={open} handleClose={onClose}>
       {isLoading ? <CircularProgress /> : null}
       <MuiTable className={'udf-table'}>
         <TableHead>
@@ -183,7 +192,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
         <Button onClick={addRow} color='primary' variant='outlined'>
           Add Row
         </Button>
-        <Button disabled={udfs.filter(u => u.changed).length === 0} onClick={handleSave} color='primary' variant='contained'>
+        <Button disabled={!canSave} onClick={handleSave} color='primary' variant='contained'>
           Save
         </Button>
       </div>

@@ -29,6 +29,7 @@ import { TelemetryAlert } from 'types/alert';
 import { BCTW, TypeWithData } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
+import { ITelemetryFeature } from 'types/map';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -80,8 +81,8 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const usePings = (start: string, end: string): UseQueryResult<GeoJSON.GeoJsonObject, AxiosError> => {
-    return useQuery<GeoJSON.GeoJsonObject, AxiosError>(
+  const usePings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
+    return useQuery<ITelemetryFeature[], AxiosError>(
       ['pings', { start, end }],
       () => mapApi.getPings(start, end),
       defaultQueryOptions

@@ -1,4 +1,5 @@
 import { createUrl } from 'api/api_helpers';
+import { ITelemetryFeature } from 'types/map';
 import { ApiProps } from './api_interfaces';
 // import {GeoJSON} from 'leaflet';
 
@@ -16,7 +17,7 @@ export const mapApi = (props: ApiProps) => {
     return data;
   };
 
-  const getPings = async (start: string, end: string): Promise<GeoJSON.GeoJsonObject> => {
+  const getPings = async (start: string, end: string): Promise<ITelemetryFeature[]> => {
     const url = createUrl({ api: 'get-critters', query: `start=${start}&end=${end}`, testUser });
     const { data } = await api.get(url);
     return data?.features;

@@ -125,6 +125,8 @@ $bottomPanelHeight: 30rem;
   background-color: #ffffff;
   height: $bottomPanelHeight;
   // overflow-y: auto;
+  // resize: vertical;
+  // overflow: scroll;
 
   .MuiPaper-elevation1 {
     box-shadow: none;
