@@ -39,7 +39,8 @@ export default function MapPage(): JSX.Element {
     end: getToday()
   });
 
-  // for map bottom panel state
+  // for map bottom panel state, since the layers in pings gets overwritten
+  // when filters are applied, use features to store the global fetched data
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
 
@@ -61,7 +62,6 @@ export default function MapPage(): JSX.Element {
   const { start, end } = range;
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
   const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
-  // const { isError: isErrorLatestPings, data: latestPingsData } = (bctwApi.usePings as any)(start, end);
 
   // refresh when start/end times are changed
   useEffect(() => {
@@ -79,8 +79,8 @@ export default function MapPage(): JSX.Element {
       // must be called before adding data to pings
       setupPingOptions(pings, handlePointClick);
       pings.addData(pingsData as any);
-      setFeatures(pingsData as any);
-      rebindListeners();
+      setFeatures(pingsData);
+      rebindMapListeners();
     }
   }, [pingsData]);
 
@@ -104,17 +104,15 @@ export default function MapPage(): JSX.Element {
   }, [showExportModal, showOverviewModal, showUdfEdit])
 
   /**
-   * for some reason adding new data breaks the preclick handler
-   * as @param {lastPoint} is always null. rebind this handler 
-   * when new data is fetched
+   * adding new data breaks the preclick handler, @var {lastPoint} is not in context. 
+   * this function rebinds click handlers when new data is fetched
    */
-  const rebindListeners = (): void => {
-    if (!mapRef?.current) {
-      return;
+  const rebindMapListeners = (): void => {
+    if (mapRef.current) {
+      mapRef.current
+        .off('preclick')
+        .on('preclick', handleClosePopup);
     }
-    mapRef.current
-      .off('preclick')
-      .on('preclick', handleClosePopup);
   }
 
   /**
@@ -139,7 +137,6 @@ export default function MapPage(): JSX.Element {
 
   // when a map point is clicked that isn't a marker, close the popup
   const handleClosePopup = (): void => {
-    // console.log('close popup called');
     if (lastPoint) {
       fillPoint(lastPoint, false);
       lastPoint = null;
@@ -176,7 +173,7 @@ export default function MapPage(): JSX.Element {
     const overlay = pointsWithinPolygon(allPings as any, clipper as any);
     setFeatureIDsOnDraw(overlay);
 
-    // Clear previous selections
+    // clear previous selections
     mapRef.current.eachLayer((layer) => {
       if ((layer as any).options.class === 'selected-ping') {
         fillPoint(layer);
@@ -239,7 +236,7 @@ export default function MapPage(): JSX.Element {
     if (newRange.start !== range.start || newRange.end !== range.end) {
       setRange(newRange);
     }
-    setFilters((o) => filters);
+    setFilters(filters);
     const filteredPings = applyFilter(groupFilters(filters), features) as any;
     const uniqueCritters = groupFeaturesByCritters(filteredPings).map((c) => c.critter_id);
     const filteredTracks = (tracksData as any[]).filter((td) => uniqueCritters.includes(td.properties.critter_id));

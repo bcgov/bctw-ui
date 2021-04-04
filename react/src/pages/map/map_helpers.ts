@@ -143,6 +143,12 @@ const getUniqueCritterIDsFromFeatures = (features: ITelemetryFeature[], selected
   return grped.map(g => g.critter_id);
 }
 
+const getFeaturesFromGeoJSON = (obj: L.GeoJSON): ITelemetryFeature[] => {
+  // fixme: why isn't feature a property of Layer??
+  const features = obj.getLayers().map(d => (d as any)?.feature as ITelemetryFeature);
+  return features;
+}
+
 export {
   COLORS,
   fillPoint,
@@ -152,5 +158,6 @@ export {
   getUniqueCritterIDsFromFeatures,
   groupFeaturesByCritters,
   groupFilters,
-  sortGroupedFeatures
+  sortGroupedFeatures,
+  getFeaturesFromGeoJSON
 };

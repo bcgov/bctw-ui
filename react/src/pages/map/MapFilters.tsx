@@ -101,7 +101,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const codeFilters = [
     { header: 'population_unit', label: 'Population' },
     { header: 'species', label: 'Species' },
-    { header: 'sex', label: 'Gender' }
+    { header: 'sex', label: 'Sex' }
   ];
 
   // creates select elements
