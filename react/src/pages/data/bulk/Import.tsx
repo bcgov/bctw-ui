@@ -1,4 +1,5 @@
 import { Typography } from '@material-ui/core';
+import { createFormData } from 'api/api_helpers';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { NotificationMessage } from 'components/common';
 import { ExportImportProps } from 'components/component_interfaces';
@@ -33,12 +34,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
   const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = bctwApi.useMutateBulkCsv({onSuccess});
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
-    const formData = new FormData();
-    if (!files.length) return;
-    Array
-      .from(Array(files.length).keys())
-      .map(i => formData.append(fieldName, files[i], files[i].name))
-    save(formData);
+    save(createFormData(fieldName, files));
   }
 
   const save = async (form: FormData): Promise<any> => await mutateAsync(form);

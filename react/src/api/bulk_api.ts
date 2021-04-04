@@ -16,6 +16,13 @@ export const bulkApi = (api: AxiosInstance) => {
     return data;
   };
 
+  const uploadFiles = async(form: FormData): Promise<IBulkUploadResults<any>> => {
+    // todo: add multi-file support to server.js
+    const url = createUrl({api: 'import2'});
+    const { data } = await api.post(url, form);
+    return data;
+  }
+
   const getType = async <T extends BCTW, >(type: TypeWithData, id: string): Promise<T> => {
     const url = createUrl({ api: `${type}/${id}`});
     const { data } = await api.get(url);
@@ -33,6 +40,7 @@ export const bulkApi = (api: AxiosInstance) => {
     getExportData,
     getType,
     uploadCsv,
+    uploadFiles,
   }
 
 }

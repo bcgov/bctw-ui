@@ -3,11 +3,13 @@ import { Button, StandardTextFieldProps } from '@material-ui/core';
 
 interface FileInputProps extends StandardTextFieldProps {
   buttonText?: string
+  multiple?: boolean;
+  fileName?: string;
   onFileChosen: (fieldName: string, files: FileList) => void;
 }
 
 export default function FileInput(props: FileInputProps):JSX.Element {
-  const { buttonText, onFileChosen } = props;
+  const { buttonText, onFileChosen, multiple, fileName } = props;
 
   const change = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const field = event.target.name;
@@ -19,9 +21,9 @@ export default function FileInput(props: FileInputProps):JSX.Element {
     <label >
       <input
         accept='*.csv'
-        multiple={false}
+        multiple={multiple ?? false}
         style={{ display: 'none' }}
-        name='csv' // note file name, server will look for this file
+        name={fileName ?? 'csv'} // note file name, server will look for this file
         type='file'
         onChange={change}
       />

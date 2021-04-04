@@ -296,6 +296,11 @@ export const useTelemetryApi = () => {
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
+  const useMutateBulkFiles = (
+    config: UseMutationOptions<IBulkUploadResults<any>, AxiosError, FormData>
+  ): UseMutationResult<IBulkUploadResults<any>, AxiosError> =>
+    useMutation<IBulkUploadResults<any>, AxiosError, FormData>((formData) => bulkApi.uploadFiles(formData), config);
+
   const useMutateGrantCritterAccess = (
     config: UseMutationOptions<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>
   ): UseMutationResult =>
@@ -333,6 +338,7 @@ export const useTelemetryApi = () => {
     // mutations
     useMutateCodeHeader,
     useMutateBulkCsv,
+    useMutateBulkFiles,
     useMutateCollar,
     useMutateCritter,
     useMutateLinkCollar,

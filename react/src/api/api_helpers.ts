@@ -42,7 +42,16 @@ const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
   return url;
 }
 
+const createFormData = (name: string, files: FileList): FormData => {
+  const formData = new FormData();
+  Array
+    .from(Array(files.length).keys())
+    .map(i => formData.append('xml', files[i], files[i].name))
+  return formData;
+}
+
 export {
   getBaseUrl,
   createUrl,
+  createFormData,
 }

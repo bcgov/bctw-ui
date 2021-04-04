@@ -1,3 +1,5 @@
+import { createFormData } from 'api/api_helpers';
+import FileInput from 'components/form/FileInput';
 import Table from 'components/table/Table';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { CollarStrings as S } from 'constants/strings';
@@ -49,6 +51,22 @@ export default function CollarPage(): JSX.Element {
     query: bctwApi.useCollarType,
     onNewData
   };
+  
+  const onSuccess = (e) => {
+    console.log(e);
+  }
+  const onError = (e) => {
+    console.log(e);
+  }
+  const onMutate = (e) => {
+    console.log(e);
+  }
+
+  const { mutateAsync, isSuccess, isError, error, data, reset } = bctwApi.useMutateBulkFiles({onSuccess, onError, onMutate});
+
+  const onFiles = (name: string, files: FileList): void => {
+    mutateAsync(createFormData('xml', files));
+  }
 
   return (
     <ManageLayout>
@@ -78,6 +96,7 @@ export default function CollarPage(): JSX.Element {
           </ModifyCollarWrapper>
         </div>
         <p>{editObj.collar_id}</p>
+        <FileInput fileName={''} multiple={true} onFileChosen={onFiles} buttonText='upload keyx files' />
       </div>
     </ManageLayout>
   );
