@@ -47,6 +47,24 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BctwBaseType {
   animal_id?: string; // get collars includes this if collar attached
 }
 
+const editableCollarProperties = [
+  'device_id',
+  'device_deployment_status',
+  'device_make',
+  'device_malfunction_type',
+  'device_model',
+  'device_status',
+  'device_type',
+  'fix_rate',
+  'fix_success_rate',
+  'frequency',
+  'frequency_unit_code',
+  'malfunction_date',
+  'retrieval_date',
+  'retrieved',
+  'satellite_network',
+  'vendor_activation_status',
+]
 export class Collar implements ICollar {
   collar_id: string;
   collar_transaction_id: string;
@@ -132,4 +150,5 @@ export {
   attachedCollarProps,
   collarPropsToDisplay,
   isCollar,
+  editableCollarProperties,
 };

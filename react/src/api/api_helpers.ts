@@ -46,7 +46,7 @@ const createFormData = (name: string, files: FileList): FormData => {
   const formData = new FormData();
   Array
     .from(Array(files.length).keys())
-    .map(i => formData.append('xml', files[i], files[i].name))
+    .map(i => formData.append(name, files[i], files[i].name))
   return formData;
 }
 

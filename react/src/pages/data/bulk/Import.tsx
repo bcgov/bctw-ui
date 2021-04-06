@@ -87,7 +87,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
           : null
       }
       <div className={styles.footer}>
-        {isIdle ? <FileInput onFileChosen={handleFileChange} /> : null}
+        {isIdle ? <FileInput accept='.csv' onFileChosen={handleFileChange} /> : null}
         {isSuccess || isError ? <Button variant='contained' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
       </div>
     </Modal>

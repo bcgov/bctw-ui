@@ -53,7 +53,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const generalFields = [
     { prop: 'device_id' },
     { prop: 'device_type', isCode: true },
-    { prop: 'device_make', isCode: true },
+    { prop: 'device_make', isCode: true, span: true },
     { prop: 'device_model' }
   ];
 
@@ -71,11 +71,12 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const makeField = (
     iType: FormInputType,
     changeHandler: (v: Record<string, unknown>) => void,
-    hasError: boolean
+    hasError: boolean,
+    span?: boolean
   ): React.ReactNode => {
     const isRequired = requiredFields.includes(iType.key);
     const errorText = hasError && (errors[iType.key] as string);
-    return MakeEditFields(iType, changeHandler, hasError, editing, true, isRequired, errorText);
+    return MakeEditFields(iType, changeHandler, hasError, editing, true, isRequired, errorText, span);
   };
 
   // render the choose collar type form if the add button was clicked

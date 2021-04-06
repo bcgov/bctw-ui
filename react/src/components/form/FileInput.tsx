@@ -5,11 +5,12 @@ interface FileInputProps extends StandardTextFieldProps {
   buttonText?: string
   multiple?: boolean;
   fileName?: string;
+  accept: '.keyx' | '.csv';
   onFileChosen: (fieldName: string, files: FileList) => void;
 }
 
 export default function FileInput(props: FileInputProps):JSX.Element {
-  const { buttonText, onFileChosen, multiple, fileName } = props;
+  const { buttonText, onFileChosen, multiple, fileName, accept } = props;
 
   const change = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const field = event.target.name;
@@ -20,7 +21,7 @@ export default function FileInput(props: FileInputProps):JSX.Element {
   return (
     <label >
       <input
-        accept='*.csv'
+        accept={accept}
         multiple={multiple ?? false}
         style={{ display: 'none' }}
         name={fileName ?? 'csv'} // note file name, server will look for this file

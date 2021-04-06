@@ -38,8 +38,8 @@ export const collarApi = (props: ApiProps) => {
   }
 
   const upsertCollar = async (payload: IUpsertPayload<Collar>): Promise<IBulkUploadResults<Collar>> => {
-    const { isEdit, body } = payload;
-    const url = createUrl({api: isEdit ? 'update-collar' : 'add-collar', testUser});
+    const { body } = payload;
+    const url = createUrl({api: 'upsert-collar', testUser});
     const { data } = await api.post(url, body);
     return data;
   }

@@ -2,12 +2,8 @@ import { eInputType, FormInputType } from 'components/form/form_helpers';
 import TextField from 'components/form/Input';
 import { BCTW } from 'types/common_types';
 import SelectCode from './SelectCode';
-/*
-  todo: boolean, date
-*/
 
 /**
- * 
  * @param iType 
  * @param changeHandler 
  * @param hasError 
@@ -28,6 +24,7 @@ function CreateEditTextField<T extends BCTW>(
 ): JSX.Element {
   return (
     <TextField
+      outline={true}
       key={iType.key}
       propName={iType.key}
       defaultValue={iType.value}
@@ -71,17 +68,27 @@ function MakeEditFields<T extends BCTW>(
   editing: T,
   canEdit: boolean,
   required: boolean,
-  errText: string
+  errText: string,
+  span?: boolean
 ): React.ReactNode {
-  return iType.type === eInputType.select ? (
-    <div key={iType.key} className={'edit-form-field'}>
-      {CreateEditSelectField(iType, changeHandler, hasError, editing, canEdit, required)}
-    </div>
-  ) : (
-    <div key={iType.key} className={'edit-form-field'}>
-      {CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText)}
-    </div>
-  );
+  if (iType.type === eInputType.select) {
+    return (
+      <div key={iType.key} className={'edit-form-field'}>
+        {CreateEditSelectField(iType, changeHandler, hasError, editing, canEdit, required)}
+      </div>
+    )
+    // fixme: allow spanning elements
+  } else if (iType.type === eInputType.text) {
+    if (span) {
+      return CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText)
+    } else {
+      return (
+        <div key={iType.key} className={'edit-form-field'}>
+          {CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText)}
+        </div>
+      )
+    }
+  }
 }
 
 export { CreateEditTextField, CreateEditSelectField, MakeEditFields };

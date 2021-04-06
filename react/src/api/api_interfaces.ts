@@ -44,13 +44,13 @@ interface ICollarLinkPayload {
     valid_to?: Date | string
   }
 }
-interface BulkUploadError {
+interface IBulkUploadError {
   error: string;
   row: JSON;
   rownum: number
 }
 interface IBulkUploadResults<T> {
-  errors: BulkUploadError[];
+  errors: IBulkUploadError[];
   results: T[];
 }
 
@@ -69,6 +69,7 @@ interface IDeleteType {
 
 export type {
   ApiProps,
+  IBulkUploadError,
   IBulkUploadResults,
   ICollarLinkPayload,
   IBaseGetProps,

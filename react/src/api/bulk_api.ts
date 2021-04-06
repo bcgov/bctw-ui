@@ -11,14 +11,14 @@ import { IBulkUploadResults } from './api_interfaces';
 export const bulkApi = (api: AxiosInstance) => {
 
   const uploadCsv = async <T,>(form: FormData): Promise<IBulkUploadResults<T>> => {
-    const url = createUrl({ api: 'import' });
+    const url = createUrl({ api: 'import-csv' });
     const { data } = await api.post(url, form);
     return data;
   };
 
   const uploadFiles = async(form: FormData): Promise<IBulkUploadResults<any>> => {
     // todo: add multi-file support to server.js
-    const url = createUrl({api: 'import2'});
+    const url = createUrl({api: 'import-xml'});
     const { data } = await api.post(url, form);
     return data;
   }
