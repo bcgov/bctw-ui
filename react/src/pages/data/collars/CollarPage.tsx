@@ -1,17 +1,16 @@
-import { createFormData } from 'api/api_helpers';
-import FileInput from 'components/form/FileInput';
+import Button from 'components/form/Button';
 import Table from 'components/table/Table';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { CollarStrings as S } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import EditCollar from 'pages/data/collars/EditCollar';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
 import { collarPropsToDisplay, Collar, eCollarAssignedStatus, attachedCollarProps } from 'types/collar';
 import AddEditViewer from '../common/AddEditViewer';
-import ModifyCollarWrapper from './ModifyCollarWrapper';
+import CollarImport from 'pages/data/collars/CollarImport';
+import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
 
 export default function CollarPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -19,6 +18,7 @@ export default function CollarPage(): JSX.Element {
   const [editObj, setEditObj] = useState<Collar>(new Collar());
   const [collarsA, setCollarsA] = useState<Collar[]>([]);
   const [collarsU, setCollarsU] = useState<Collar[]>([]);
+  const [showImport, setShowImport] = useState<boolean>(false);
 
   // set editing object when table row is selected
   const handleSelect = (row: Collar): void => {
@@ -40,34 +40,11 @@ export default function CollarPage(): JSX.Element {
     onSave: null
   };
 
-  const exportProps = {
-    iMsg: '',
-    iTitle: '',
-    eMsg: S.exportText,
-    eTitle: S.exportTitle
-  };
-
   const tableProps: ITableQueryProps<Collar> = {
     query: bctwApi.useCollarType,
     onNewData
   };
   
-  const onSuccess = (e) => {
-    console.log(e);
-  }
-  const onError = (e) => {
-    console.log(e);
-  }
-  const onMutate = (e) => {
-    console.log(e);
-  }
-
-  const { mutateAsync, isSuccess, isError, error, data, reset } = bctwApi.useMutateBulkFiles({onSuccess, onError, onMutate});
-
-  const onFiles = (name: string, files: FileList): void => {
-    mutateAsync(createFormData('xml', files));
-  }
-
   return (
     <ManageLayout>
       <div className='container'>
@@ -87,8 +64,11 @@ export default function CollarPage(): JSX.Element {
             />
           </>
         </RowSelectedProvider>
+        <CollarImport open={showImport} handleClose={(): void => setShowImport(false)} />
         <div className='button-row'>
-          <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} />
+          {/* <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} /> */}
+          {/* <ConfirmModal {...confirmProps} /> */}
+          <Button onClick={(): void => setShowImport(o => !o)}>Import</Button>
           <ModifyCollarWrapper editing={editObj}>
             <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
               <EditCollar {...editProps} />
@@ -96,7 +76,6 @@ export default function CollarPage(): JSX.Element {
           </ModifyCollarWrapper>
         </div>
         <p>{editObj.collar_id}</p>
-        <FileInput fileName={''} multiple={true} onFileChosen={onFiles} buttonText='upload keyx files' />
       </div>
     </ManageLayout>
   );

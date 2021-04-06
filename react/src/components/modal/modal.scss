@@ -81,3 +81,19 @@
 .udf-table {
   margin-bottom: 0.5rem;
 }
+
+// collar import modal
+.link {
+  color: rgb(58, 164, 255) !important;
+  margin: 1rem 0 !important;
+}
+
+.link-hover {
+  cursor: pointer;
+}
+
+.import-btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}

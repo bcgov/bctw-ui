@@ -28,7 +28,11 @@ const CollarStrings = {
   addCollarVHF: 'VHF Device',
   importTitle: 'Bulk Import VHF Devices',
   importText: 'Use this feature to add multiple new devices.',
-  assignmentHistoryTitle: 'Device Assignment History'
+  assignmentHistoryTitle: 'Device Assignment History',
+  collarImportStartMsg: 'What do you want to do?',
+  collarImportKeyX: 'Create new Vectronic devices using .keyx file(s)',
+  collarImportDowloadTemplate: 'Download a CSV template for importing device metadata',
+  collarImportMetadata: 'Import metadata for existing devices using a .CSV file',
 }
 
 const CodeStrings = {
