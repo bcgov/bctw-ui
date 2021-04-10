@@ -24,6 +24,7 @@
     "craco-cesium": "^1.2.0",
     "dayjs": "^1.9.7",
     "downloadjs": "^1.4.7",
+    "geojson2czml": "^1.1.0",
     "leaflet": "^1.7.1",
     "leaflet-draw": "^1.0.4",
     "leaflet-labeled-circle": "^1.0.3",
