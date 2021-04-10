@@ -8,6 +8,10 @@ import {
   GeoJsonDataSource
 } from 'cesium';
 import './TerrainPage.css';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
+import dayjs from 'dayjs';
+import { formatDay, getToday } from 'utils/time';
 
 
 const TerrainPage: React.FC = () => {
@@ -49,24 +53,42 @@ const TerrainPage: React.FC = () => {
     const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-31&end=2021-02-15`;
     const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-31&end=2021-02-15`;
 
-    fetch(urlPings)
-      .then(res => res.json())
-      .then(geojson => {
-        const layer = new GeoJsonDataSource('pings')
-          .load(geojson,{clampToGround: true});
-        mapRef.current.dataSources.add(layer);
-      })
-      .catch(error=>{console.error('Collar request failed',error)});
+    // fetch(urlPings)
+    //   .then(res => res.json())
+    //   .then(geojson => {
+    //     const layer = new GeoJsonDataSource('pings')
+    //       .load(geojson,{clampToGround: true});
+    //     mapRef.current.dataSources.add(layer);
+    //   })
+    //   .catch(error=>{console.error('Collar request failed',error)});
 
-    fetch(urlTracks)
-      .then(res => res.json())
-      .then(geojson => {
-        const layer = new GeoJsonDataSource('pings')
-          .load(geojson,{clampToGround: true});
-        mapRef.current.dataSources.add(layer);
-      })
-      .catch(error=>{console.error('Track request failed',error)});
+    // fetch(urlTracks)
+    //   .then(res => res.json())
+    //   .then(geojson => {
+    //     const layer = new GeoJsonDataSource('pings')
+    //       .load(geojson,{clampToGround: true});
+    //     mapRef.current.dataSources.add(layer);
+    //   })
+    //   .catch(error=>{console.error('Track request failed',error)});
   };
+
+  const bctwApi = useTelemetryApi();
+
+  const [range, setRange] = useState<MapRange>({
+    start: dayjs().subtract(7, 'day').format(formatDay),
+    end: getToday()
+  });
+
+  const { start, end } = range;
+  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
+
+  const loadSlider = (pingsData) => {
+    console.log(pingsData);
+  }
+
+  useEffect(() => {
+    loadSlider(pingsData);
+  }, [pingsData]);
 
   useEffect(() => {
     initMap();
