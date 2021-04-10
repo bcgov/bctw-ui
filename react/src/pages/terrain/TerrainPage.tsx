@@ -9,9 +9,11 @@ import {
 } from 'cesium';
 import './TerrainPage.css';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { ITelemetryDetail, ITelemetryFeature, MapRange } from 'types/map';
+import { MapRange } from 'types/map';
 import dayjs from 'dayjs';
 import { formatDay, getToday } from 'utils/time';
+import { convert } from 'geojson2czml';
+
 
 
 const TerrainPage: React.FC = () => {
@@ -45,13 +47,13 @@ const TerrainPage: React.FC = () => {
       }
     });
 
-    const prod = +(location.port) === 1111 ? false : true;
-    const h1 = location.protocol
-    const h2 = location.hostname
-    const h3 = prod ? location.port : 3000
-    const h4 = prod ? '/api' : ''
-    const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-31&end=2021-02-15`;
-    const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-31&end=2021-02-15`;
+    // const prod = +(location.port) === 1111 ? false : true;
+    // const h1 = location.protocol
+    // const h2 = location.hostname
+    // const h3 = prod ? location.port : 3000
+    // const h4 = prod ? '/api' : ''
+    // const urlTracks = `${h1}//${h2}:${h3}${h4}/get-critter-tracks?start=2020-12-31&end=2021-02-15`;
+    // const urlPings = `${h1}//${h2}:${h3}${h4}/get-critters?start=2020-12-31&end=2021-02-15`;
 
     // fetch(urlPings)
     //   .then(res => res.json())
@@ -83,7 +85,12 @@ const TerrainPage: React.FC = () => {
   const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
 
   const loadSlider = (pingsData) => {
-    console.log(pingsData);
+    const collection = {
+      type: 'FeatureCollection',
+      features: [...pingsData]
+    };
+    const czml = convert(collection)
+    console.log(czml);
   }
 
   useEffect(() => {
