@@ -33,11 +33,11 @@ const TerrainPage: React.FC = () => {
       vrButton: false,
       homeButton: false,
       animation: true,
-      scene3DOnly: false,
-      terrainProvider: createWorldTerrain({
-        requestWaterMask: true,
-        requestVertexNormals: true
-      })
+      scene3DOnly: true,
+      // terrainProvider: createWorldTerrain({
+      //   requestWaterMask: true,
+      //   requestVertexNormals: true
+      // })
     });
 
     mapRef.current.camera.setView({
