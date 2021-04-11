@@ -5,7 +5,8 @@ import {
   Cartesian3,
   Math,
   Ion,
-  GeoJsonDataSource
+  GeoJsonDataSource,
+  CzmlDataSource
 } from 'cesium';
 import './TerrainPage.css';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -13,6 +14,7 @@ import { MapRange } from 'types/map';
 import dayjs from 'dayjs';
 import { formatDay, getToday } from 'utils/time';
 import { convert } from 'geojson2czml';
+import { map } from 'leaflet';
 
 
 
@@ -31,7 +33,7 @@ const TerrainPage: React.FC = () => {
       vrButton: false,
       homeButton: false,
       animation: true,
-      scene3DOnly: true,
+      scene3DOnly: false,
       terrainProvider: createWorldTerrain({
         requestWaterMask: true,
         requestVertexNormals: true
@@ -85,17 +87,29 @@ const TerrainPage: React.FC = () => {
   const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
 
   const loadSlider = (pingsData) => {
+    if (!pingsData) return;
+    if (!mapRef.current) return;
     const collection = {
       type: 'FeatureCollection',
       features: [...pingsData]
     };
-    const czml = convert(collection)
-    console.log(czml);
+    const options = {
+      date: 'date_recorded',
+      id: 'critter_id',
+      label: 'wlh_id'
+    };
+    const czml = convert(collection,options);
+    mapRef.current.dataSources
+      .add(CzmlDataSource.load(czml))
+      .then((ds) => {
+        console.log('czml',czml);
+        mapRef.current.trackedEntity = ds.entities.getById('path');
+      })
   }
 
   useEffect(() => {
     loadSlider(pingsData);
-  }, [pingsData]);
+  }, [pingsData,mapRef.current]);
 
   useEffect(() => {
     initMap();
