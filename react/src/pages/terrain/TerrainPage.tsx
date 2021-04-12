@@ -102,7 +102,6 @@ const TerrainPage: React.FC = () => {
     mapRef.current.dataSources
       .add(CzmlDataSource.load(czml))
       .then((ds) => {
-        console.log('czml',czml);
         mapRef.current.trackedEntity = ds.entities.getById('path');
       })
   }
