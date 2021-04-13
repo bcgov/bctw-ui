@@ -34,10 +34,10 @@ const TerrainPage: React.FC = () => {
       homeButton: false,
       animation: true,
       scene3DOnly: true,
-      // terrainProvider: createWorldTerrain({
-      //   requestWaterMask: true,
-      //   requestVertexNormals: true
-      // })
+      terrainProvider: createWorldTerrain({
+        requestWaterMask: true,
+        requestVertexNormals: true
+      })
     });
 
     mapRef.current.camera.setView({
@@ -87,6 +87,9 @@ const TerrainPage: React.FC = () => {
   const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
 
   const loadSlider = (pingsData) => {
+    let entities;
+    // let positionProperty;
+
     if (!pingsData) return;
     if (!mapRef.current) return;
     const collection = {
@@ -99,11 +102,43 @@ const TerrainPage: React.FC = () => {
       label: 'wlh_id'
     };
     const czml = convert(collection,options);
+    const dataSourcePromise = CzmlDataSource.load(czml)
+
     mapRef.current.dataSources
-      .add(CzmlDataSource.load(czml))
+      .add(dataSourcePromise)
       .then((ds) => {
-        mapRef.current.trackedEntity = ds.entities.getById('path');
+        entities = ds.entities.values
+        // console.log(ds.entities.values.length);
+        // ds.entities.values.foreach((f,i) => {
+        //   console.log('yo',f)
+        // })
+      });
+
+    // mapRef.current.dataSources
+    //   .add(
+    //     CzmlDataSource.load(czml)
+    //     )
+    //   .then((ds) => {
+    //     // mapRef.current.trackedEntity = ds.entities.getById('path');
+    //     entity = ds.entities.getById('path');
+    //     positionProperty = entity.position;
+    //     console.log('entity',entity);
+    //   });
+
+    const clock = mapRef.current.clock;
+    const scene = mapRef.current.scene;
+
+    // Trying to clamp to height
+    scene.postRender.addEventListener(() => {
+      console.log(entities);
+      entities.forEach((f,i) => {
+        console.log(f);
       })
+      // if (!positionProperty) return;
+      // console.log('pp',positionProperty);
+      // const position = positionProperty.getValue(clock.currentTime);
+      // entity.position = scene.clampToHeight(position);
+    });
   }
 
   useEffect(() => {
