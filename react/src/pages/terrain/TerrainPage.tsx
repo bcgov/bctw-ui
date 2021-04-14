@@ -88,7 +88,7 @@ const TerrainPage: React.FC = () => {
 
   const loadSlider = (pingsData) => {
     let entities;
-    // let positionProperty;
+    let positionProperty;
 
     if (!pingsData) return;
     if (!mapRef.current) return;
@@ -107,7 +107,11 @@ const TerrainPage: React.FC = () => {
     mapRef.current.dataSources
       .add(dataSourcePromise)
       .then((ds) => {
-        entities = ds.entities.values
+        const id1 = '80fb06b4-707e-4fd6-a03a-a2b07cf035b8';
+        const id2 = 'a3ef724b-6707-444f-a11b-25294a0017e3';
+        entities = ds.entities.getById(id1);
+        positionProperty = entities.position;
+
         // console.log(ds.entities.values.length);
         // ds.entities.values.foreach((f,i) => {
         //   console.log('yo',f)
@@ -130,14 +134,24 @@ const TerrainPage: React.FC = () => {
 
     // Trying to clamp to height
     scene.postRender.addEventListener(() => {
-      console.log(entities);
-      entities.forEach((f,i) => {
-        console.log(f);
-      })
-      // if (!positionProperty) return;
-      // console.log('pp',positionProperty);
-      // const position = positionProperty.getValue(clock.currentTime);
-      // entity.position = scene.clampToHeight(position);
+      const position = positionProperty.getValue(clock.currentTime);
+      if (!position) return;
+      entities.position = scene.clampToHeight(position);
+      // console.log('position',position);
+      // console.log(position);
+      // const test = scene.clampToHeight(position);
+      // console.log(test);
+      // return
+      // console.log('test',test);
+      // if (!test) return;
+      // entities.position = test;
+      // entities.forEach((f) => {
+        // Cycle through and reset the position with a clampToHeight
+        // const position = f.position?.getValue(clock.currentTime);
+        // if (!position) return;
+        // f.position = scene.clampToHeight(position); // This does not
+        // f.position = position; // This maintains the points
+      // })
     });
   }
 
