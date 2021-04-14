@@ -1,6 +1,6 @@
 const CritterStrings = {
   importTitle: 'Bulk Import Animals',
-  importText: 'Use this feature to add multiple new animals. Animals cannot be updated from this feature',
+  importText: 'Use this feature to add or update animals. The field critter_id MUST be present if you want to update an animal.',
   exportTitle: 'Bulk Export Animal Data',
   exportText: '',
   editableProps: ['nickname', 'animal_id', 'wlh_id', 'species', 'region', 'population_unit', 'animal_status', 'juvenile_at_heel'],
@@ -11,7 +11,11 @@ const CritterStrings = {
   unassignedTableTitle: 'Animals Without A Device',
   collarRemovalTitle: 'Confirm device unassignment',
   collarRemovalText: 'Are you sure you wish to unassign this device?',
+}
 
+const FileStrings = {
+  collarTemplateName: 'BCTW_bulk_import_device_template.csv',
+  animalTemplateName: 'BCTW_bulk_import_animal_template.csv',
 }
 
 const CollarStrings = {
@@ -60,4 +64,5 @@ export {
   CritterStrings,
   MapStrings,
   MapTileLayers,
+  FileStrings,
 }

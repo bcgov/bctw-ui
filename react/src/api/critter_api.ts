@@ -3,7 +3,7 @@ import { plainToClass } from 'class-transformer';
 import { Animal, IAnimal } from 'types/animal';
 import { CollarHistory } from 'types/collar_history';
 
-import { ApiProps, eCritterFetchType, ICollarLinkPayload, IDeleteType, IUpsertPayload } from './api_interfaces';
+import { ApiProps, eCritterFetchType, IBulkUploadResults, ICollarLinkPayload, IDeleteType, IUpsertPayload } from './api_interfaces';
 
 export const critterApi = (props: ApiProps) => {
   const { api, testUser } = props;
@@ -28,13 +28,12 @@ export const critterApi = (props: ApiProps) => {
     return plainToClass(CollarHistory, data[0]);
   };
 
-  const upsertCritter = async (payload: IUpsertPayload<Animal>): Promise<Animal[]> => {
-    const { isEdit, body } = payload;
-    const url = createUrl({ api: isEdit ? 'update-animal' : 'add-animal', testUser });
+  const upsertCritter = async (payload: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
+    const { body } = payload;
+    const url = createUrl({ api: 'upsert-animal', testUser });
     // const critters = body.map(a => serialize(a))
     const { data } = await api.post(url, body);
-    const results = data.map((a: IAnimal) => plainToClass(Animal, a));
-    return Array.isArray(results) && results.length > 1 ? results : results[0];
+    return data;
   }
 
   // also handles deletes for collars

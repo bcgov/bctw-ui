@@ -282,9 +282,9 @@ export const useTelemetryApi = () => {
     );
 
   const useMutateCritter = (
-    config: UseMutationOptions<Animal[], AxiosError, IUpsertPayload<Animal>>
-  ): UseMutationResult<Animal[]> =>
-    useMutation<Animal[], AxiosError, IUpsertPayload<Animal>>((critter) => critterApi.upsertCritter(critter), config);
+    config: UseMutationOptions<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>
+  ): UseMutationResult<IBulkUploadResults<Animal>> =>
+    useMutation<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>((critter) => critterApi.upsertCritter(critter), config);
 
   const useMutateLinkCollar = (
     config: UseMutationOptions<CollarHistory, AxiosError, ICollarLinkPayload>

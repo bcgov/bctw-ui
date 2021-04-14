@@ -1,5 +1,5 @@
 import Table from 'components/table/Table';
-import { CritterStrings as CS } from 'constants/strings';
+import { CritterStrings as CS, FileStrings } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
@@ -7,8 +7,9 @@ import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
+import { Animal, assignedCritterProps, editableAnimalProperties, unassignedCritterProps } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
+import download from 'downloadjs';
 
 export default function CritterPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -27,6 +28,11 @@ export default function CritterPage(): JSX.Element {
   // set the export state when table loads
   const onNewData = (d: Animal[]): void => (d.length && d[0].device_id ? setCrittersA(d) : setCrittersU(d));
 
+  // pass this function to the import modal to allow user to download animal csv bulk import
+  const handleDownloadTemplate = (): void => {
+    download(editableAnimalProperties.join(), FileStrings.animalTemplateName, '');
+  }
+
   // props to be passed to the edit modal component
   const editProps = {
     editing: new Animal(),
@@ -38,7 +44,8 @@ export default function CritterPage(): JSX.Element {
     eMsg: CS.exportText,
     eTitle: CS.exportTitle,
     iTitle: CS.importTitle,
-    iMsg: CS.importText
+    iMsg: CS.importText,
+    downloadTemplate: handleDownloadTemplate,
   };
 
   return (

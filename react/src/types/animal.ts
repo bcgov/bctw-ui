@@ -4,9 +4,9 @@ import { Type, Expose } from 'class-transformer';
 import { eCritterPermission } from './user';
 import { formatLatLong } from './common_helpers';
 
-export const assignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
-export const unassignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status'];
-export const critterHistoryProps = [
+const assignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
+const unassignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status'];
+const critterHistoryProps = [
   'nickname',
   'animal_id',
   'wlh_id',
@@ -17,6 +17,40 @@ export const critterHistoryProps = [
   'valid_from',
   'valid_to'
 ];
+
+// export/import properties
+const editableAnimalProperties = [
+  'critter_id',
+  'animal_id',
+  'animal_status',
+  'capture_date',
+  'capture_latitude',
+  'capture_longitude',
+  'capture_utm_easting',
+  'capture_utm_northing',
+  'capture_utm_zone',
+  'ear_tag_left',
+  'ear_tag_right',
+  'estimated_age',
+  'juvenile_at_heel',
+  'life_stage',
+  'location',
+  'mortality_date',
+  'mortality_latitude',
+  'mortality_longitude',
+  'mortality_utm_zone',
+  'mortality_utm_easting',
+  'mortality_utm_northing',
+  'nickname',
+  'population_unit',
+  're_capture',
+  'region',
+  'release_date',
+  'sex',
+  'species',
+  'translocation',
+  'wlh_id',
+]
 
 // properties re-used in Telemetry
 export interface IAnimalTelemetryBase {
@@ -161,7 +195,9 @@ export class Animal implements IAnimal {
   }
 }
 
-export const isAnimal = (a: unknown): a is Animal => {
-  const critter = a as Animal;
-  return !!critter.critter_id;
-};
+export {
+  editableAnimalProperties,
+  critterHistoryProps,
+  unassignedCritterProps,
+  assignedCritterProps,
+}

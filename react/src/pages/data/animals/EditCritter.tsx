@@ -85,34 +85,28 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
             <>
               <form className='rootEditInput' autoComplete='off'>
                 <Paper className={'paper-edit'} elevation={3}>
-                  <>
-                    <Typography className={'edit-form-header'} variant='h5'>
-                      General Information
-                    </Typography>
-                    {inputTypes
-                      .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
-                      .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                  </>
+                  <Typography className={'edit-form-header'} variant='h5'>
+                    General Information
+                  </Typography>
+                  {inputTypes
+                    .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
+                    .map((d) => makeField(d, onChange, !!errors[d.key]))}
                 </Paper>
                 <Paper className={'paper-edit'} elevation={3}>
-                  <>
-                    <Typography className={'edit-form-header'} variant='h5'>
-                      Identifiers
-                    </Typography>
-                    {inputTypes
-                      .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
-                      .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                  </>
+                  <Typography className={'edit-form-header'} variant='h5'>
+                    Identifiers
+                  </Typography>
+                  {inputTypes
+                    .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
+                    .map((d) => makeField(d, onChange, !!errors[d.key]))}
                 </Paper>
                 <Paper className={'paper-edit'} elevation={3}>
-                  <>
-                    <Typography className={'edit-form-header'} variant='h5'>
-                      Location
-                    </Typography>
-                    {inputTypes
-                      .filter((f) => locationFields.map((x) => x.prop).includes(f.key))
-                      .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                  </>
+                  <Typography className={'edit-form-header'} variant='h5'>
+                    Location
+                  </Typography>
+                  {inputTypes
+                    .filter((f) => locationFields.map((x) => x.prop).includes(f.key))
+                    .map((d) => makeField(d, onChange, !!errors[d.key]))}
                 </Paper>
               </form>
               {/* dont show assignment history for new critters */}

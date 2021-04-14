@@ -87,6 +87,7 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
           : null
       }
       <div className={styles.footer}>
+        {props.downloadTemplate? <Button variant='contained' color='primary' onClick={props.downloadTemplate}>Download template</Button> : null }
         {isIdle ? <FileInput accept='.csv' onFileChosen={handleFileChange} /> : null}
         {isSuccess || isError ? <Button variant='contained' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
       </div>

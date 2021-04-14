@@ -8,7 +8,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/common';
-import { IDeleteType, IUpsertPayload } from 'api/api_interfaces';
+import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 
 type IModifyWrapperProps = {
   editing: Animal;
@@ -27,10 +27,15 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const [show, setShow] = useState<boolean>(false);
 
   // must be defined before mutation declarations
-  const onSaveSuccess = async (data: Animal[] | Animal): Promise<void> => {
-    const critter = Array.isArray(data) ? data[0] : data;
-    responseDispatch({ type: 'success', message: `${critter.name} saved!` });
-    invalidateCritterQueries();
+  const onSaveSuccess = async (data: IBulkUploadResults<Animal>): Promise<void> => {
+    const { errors, results } = data;
+    if (errors.length) {
+      responseDispatch({ type: 'error', message: `${errors.map(e => e.error)}` });
+    } else {
+      const critter = results[0];
+      responseDispatch({ type: 'success', message: `${critter.animal_id} saved!` });
+      invalidateCritterQueries();
+    }
   };
 
   const onDeleteSuccess = async (): Promise<void> => {
@@ -51,7 +56,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const { mutateAsync: saveMutation } = bctwApi.useMutateCritter({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
-  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<Animal[]> => await saveMutation(a);
+  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => await saveMutation(a);
   const deleteCritter = async (critterId: string): Promise<void> => {
     const payload: IDeleteType = {
       id: critterId,

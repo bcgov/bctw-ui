@@ -27,7 +27,7 @@ http://localhost:8080/api/get-last-pings
 
 
 ###
-POST http://localhost:8080/api/import HTTP/1.1
+POST http://localhost:8080/api/import-csv HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW

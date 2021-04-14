@@ -1,5 +1,5 @@
 import { Typography } from '@material-ui/core';
-import { CollarStrings as S } from 'constants/strings';
+import { CollarStrings as S, FileStrings } from 'constants/strings';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, useEffect } from 'react';
@@ -92,8 +92,7 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   };
 
   const onDownloadTemplate = (): void => {
-    const headers = editableCollarProperties.join(', ');
-    download(headers, 'BCTW_device_bulk_import_template.csv', '');
+    download(editableCollarProperties.join(), FileStrings.collarTemplateName, '');
   }
 
   return (

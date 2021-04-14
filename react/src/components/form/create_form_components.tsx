@@ -71,24 +71,17 @@ function MakeEditFields<T extends BCTW>(
   errText: string,
   span?: boolean
 ): React.ReactNode {
+  let Comp;
   if (iType.type === eInputType.select) {
-    return (
-      <div key={iType.key} className={'edit-form-field'}>
-        {CreateEditSelectField(iType, changeHandler, hasError, editing, canEdit, required)}
-      </div>
-    )
-    // fixme: allow spanning elements
-  } else if (iType.type === eInputType.text) {
-    if (span) {
-      return CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText)
-    } else {
-      return (
-        <div key={iType.key} className={'edit-form-field'}>
-          {CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText)}
-        </div>
-      )
-    }
+    Comp = CreateEditSelectField(iType, changeHandler, hasError, editing, canEdit, required) 
+  } else if (iType.type === eInputType.text || iType.type === eInputType.number) {
+    Comp = CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText)
   }
+  return span ? {Comp} : (
+    <div key={iType.key} className={'edit-form-field'}>
+      {Comp}
+    </div>
+  )
 }
 
 export { CreateEditTextField, CreateEditSelectField, MakeEditFields };

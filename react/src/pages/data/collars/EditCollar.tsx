@@ -57,7 +57,11 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     { prop: 'device_model' }
   ];
 
-  const networkFields = [{ prop: 'frequency' }, { prop: 'frequency_unit_code' }, { prop: 'satellite_network', isCode: true }];
+  const networkFields = [
+    { prop: 'frequency' },
+    { prop: 'frequency_unit_code' },
+    { prop: 'satellite_network', isCode: true }
+  ];
 
   const statusFields = [
     { prop: 'device_status', isCode: true },
@@ -119,28 +123,22 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                 <>
                   <form className='rootEditInput' autoComplete='off'>
                     <Paper className={'paper-edit'} elevation={3}>
-                      <>
-                        <Typography className={'edit-form-header'} variant='h5'>General Information</Typography>
-                        {inputTypes
-                          .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
-                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                      </>
+                      <Typography className={'edit-form-header'} variant='h5'>General Information</Typography>
+                      {inputTypes
+                        .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
+                        .map((d) => makeField(d, onChange, !!errors[d.key]))}
                     </Paper>
                     <Paper className={'paper-edit'} elevation={3}>
-                      <>
-                        <Typography className={'edit-form-header'} variant='h5'>Frequency and Network</Typography>
-                        {inputTypes
-                          .filter((f) => networkFields.map((x) => x.prop).includes(f.key))
-                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                      </>
+                      <Typography className={'edit-form-header'} variant='h5'>Frequency and Network</Typography>
+                      {inputTypes
+                        .filter((f) => networkFields.map((x) => x.prop).includes(f.key))
+                        .map((d) => makeField(d, onChange, !!errors[d.key]))}
                     </Paper>
                     <Paper className={'paper-edit'} elevation={3}>
-                      <>
-                        <Typography className={'edit-form-header'} variant='h5'>Status Information</Typography>
-                        {inputTypes
-                          .filter((f) => statusFields.map((x) => x.prop).includes(f.key))
-                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                      </>
+                      <Typography className={'edit-form-header'} variant='h5'>Status Information</Typography>
+                      {inputTypes
+                        .filter((f) => statusFields.map((x) => x.prop).includes(f.key))
+                        .map((d) => makeField(d, onChange, !!errors[d.key]))}
                     </Paper>
                   </form>
                 </>

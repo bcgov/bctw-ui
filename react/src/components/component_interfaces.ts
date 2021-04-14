@@ -51,6 +51,7 @@ type ConfirmModalProps = ModalBaseProps & {
 
 type ExportImportProps = ModalBaseProps & {
   message?: string;
+  downloadTemplate?: () => void;
 };
 
 interface IInputProps {

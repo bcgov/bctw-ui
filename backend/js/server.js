@@ -93,10 +93,8 @@ const proxyApi = function (req, res, next) {
   const successHandler = (response) => res.json(response.data);
 
   if (req.method === 'POST') {
-    if (req.file) {
-      const fileReceived = req.file;
-      const form = new FormData();
-      form.append('csv', fileReceived.buffer, fileReceived.originalname);
+    if (req.file || req.files) {
+      const form = handleFiles(req);
       const config = { headers: form.getHeaders() };
       axios.post(url, form, config)
         .then(successHandler)
@@ -118,6 +116,19 @@ const proxyApi = function (req, res, next) {
       .catch(errHandler);
   }
 };
+
+const handleFiles = function (req) {
+  const { file, files } = req;
+  const form = new FormData();
+  if (file) {
+    form.append('csv', file.buffer, file.originalname);
+  } else if (files && files.length) {
+    Array
+      .from(Array(files.length).keys())
+      .map(i => form.append('xml', files[i], files[i].name))
+  }
+  return form;
+}
 
 /* ## gardenGate
   Check that the user is authenticated before continuing.
@@ -223,7 +234,9 @@ if (isProd) {
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
-    .post('/api/import', upload.single('csv'), keycloak.protect(), pageHandler)
+    // bulk file import handlers
+    .post('/api/import-csv', upload.single('csv'), keycloak.protect(), pageHandler)
+    .post('/api/import-xml', upload.array('xml'), keycloak.protect(), pageHandler)
     .post('/api/:endpoint', keycloak.protect(), proxyApi)
     .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
 } else {
