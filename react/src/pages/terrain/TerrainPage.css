@@ -6,7 +6,7 @@
 #terrain {
   position: absolute;
   margin-left: -255px;
-  margin-top: -20px;
+  /* margin-top: -20px; */
   height: 100%;
   width: 100%;
 }
@@ -17,5 +17,5 @@
 
 .cesium-viewer {
   margin-left:255px;
-  width: calc(100% - 255px);
+  /* width: calc(100% - 255px); */
 }
