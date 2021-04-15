@@ -111,47 +111,16 @@ const TerrainPage: React.FC = () => {
         const id2 = 'a3ef724b-6707-444f-a11b-25294a0017e3';
         entities = ds.entities.getById(id1);
         positionProperty = entities.position;
-
-        // console.log(ds.entities.values.length);
-        // ds.entities.values.foreach((f,i) => {
-        //   console.log('yo',f)
-        // })
       });
 
-    // mapRef.current.dataSources
-    //   .add(
-    //     CzmlDataSource.load(czml)
-    //     )
-    //   .then((ds) => {
-    //     // mapRef.current.trackedEntity = ds.entities.getById('path');
-    //     entity = ds.entities.getById('path');
-    //     positionProperty = entity.position;
-    //     console.log('entity',entity);
-    //   });
 
     const clock = mapRef.current.clock;
     const scene = mapRef.current.scene;
 
-    // Trying to clamp to height
     scene.postRender.addEventListener(() => {
       const position = positionProperty.getValue(clock.currentTime);
       if (!position) return;
       entities.position = scene.clampToHeight(position);
-      // console.log('position',position);
-      // console.log(position);
-      // const test = scene.clampToHeight(position);
-      // console.log(test);
-      // return
-      // console.log('test',test);
-      // if (!test) return;
-      // entities.position = test;
-      // entities.forEach((f) => {
-        // Cycle through and reset the position with a clampToHeight
-        // const position = f.position?.getValue(clock.currentTime);
-        // if (!position) return;
-        // f.position = scene.clampToHeight(position); // This does not
-        // f.position = position; // This maintains the points
-      // })
     });
   }
 
