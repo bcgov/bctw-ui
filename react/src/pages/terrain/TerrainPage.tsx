@@ -86,31 +86,40 @@ const TerrainPage: React.FC = () => {
   const { start, end } = range;
   const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
 
+  /**
+   * ## loadSlider 
+   * Load the Cesium temporal slider with location data.
+   * @param pingsData {object} The critter GeoJSON locations object.
+   */
   const loadSlider = (pingsData) => {
-    let entities;
-    let positionProperty;
     let critters = [];
 
+    // If the webhook fires even though dependencies are empty
     if (!pingsData) return;
     if (!mapRef.current) return;
+
+    // Convert the geojson into a feature collection
     const collection = {
       type: 'FeatureCollection',
       features: [...pingsData]
     };
+    // Options for the GeoJSON2CZML conversion
     const options = {
       date: 'date_recorded',
       id: 'critter_id',
       label: 'wlh_id'
     };
-    const czml = convert(collection,options);
-    const dataSourcePromise = CzmlDataSource.load(czml)
+    const czml = convert(collection,options); // Convert to CZML
+    const dataSourcePromise = CzmlDataSource.load(czml); // Load CZML
 
+    /**
+     * Add the Temporal layer to the map
+     * Save all the features to the _entity_ object to be
+     * later referenced in the Post Render Cesium event.
+     */
     mapRef.current.dataSources
       .add(dataSourcePromise)
       .then((ds) => {
-        // XXX: Testing these id's
-        // const id1 = '80fb06b4-707e-4fd6-a03a-a2b07cf035b8';
-        // const id2 = 'a3ef724b-6707-444f-a11b-25294a0017e3';
         critters = ds.entities.values.map((f) => {
           const entity = ds.entities?.getById(f._id);
           return [
@@ -118,25 +127,28 @@ const TerrainPage: React.FC = () => {
             entity?.position
           ]
         });
-        // entities = ds.entities.getById(id1);
-        // positionProperty = entities.position;
       });
 
 
+    // These are needed to find the true elevation of points.
     const clock = mapRef.current.clock;
     const scene = mapRef.current.scene;
 
+    /**
+     * If the points don't contain an accurate elevation
+     * they get projected onto the ellipsoid at an elevation of zero.
+     * As an ellipsiod is not a true representation of the globe's 
+     * surface, quite often the points will land under ground.
+     * Fix that here by looking up the elevation from the terrain 
+     * service and insert into each point.
+     */
     scene.postRender.addEventListener(() => {
-      // console.log(critters);
       critters.forEach((critter) => {
         const [entity,pos] = critter;
         const pos2 = pos?.getValue(clock.currentTime);
         if (!pos2) return;
         entity.position = scene.clampToHeight(pos2)
       });
-      // const position = positionProperty.getValue(clock.currentTime);
-      // if (!position) return;
-      // entities.position = scene.clampToHeight(position);
     });
   }
 
