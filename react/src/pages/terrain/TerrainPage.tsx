@@ -107,8 +107,19 @@ const TerrainPage: React.FC = () => {
     mapRef.current.dataSources
       .add(dataSourcePromise)
       .then((ds) => {
+        // XXX: Testing these id's
         const id1 = '80fb06b4-707e-4fd6-a03a-a2b07cf035b8';
         const id2 = 'a3ef724b-6707-444f-a11b-25294a0017e3';
+        const ids = ds.entities.values.map((f) => {
+          const entity = ds.entities?.getById(f._id);
+          return [
+            f._id,
+            entity?.position,
+            entity
+          ]
+        });
+        console.log(ids);
+
         entities = ds.entities.getById(id1);
         positionProperty = entities.position;
       });
