@@ -89,6 +89,7 @@ const TerrainPage: React.FC = () => {
   const loadSlider = (pingsData) => {
     let entities;
     let positionProperty;
+    let critters = [];
 
     if (!pingsData) return;
     if (!mapRef.current) return;
@@ -108,20 +109,17 @@ const TerrainPage: React.FC = () => {
       .add(dataSourcePromise)
       .then((ds) => {
         // XXX: Testing these id's
-        const id1 = '80fb06b4-707e-4fd6-a03a-a2b07cf035b8';
-        const id2 = 'a3ef724b-6707-444f-a11b-25294a0017e3';
-        const ids = ds.entities.values.map((f) => {
+        // const id1 = '80fb06b4-707e-4fd6-a03a-a2b07cf035b8';
+        // const id2 = 'a3ef724b-6707-444f-a11b-25294a0017e3';
+        critters = ds.entities.values.map((f) => {
           const entity = ds.entities?.getById(f._id);
           return [
-            f._id,
-            entity?.position,
-            entity
+            entity,
+            entity?.position
           ]
         });
-        console.log(ids);
-
-        entities = ds.entities.getById(id1);
-        positionProperty = entities.position;
+        // entities = ds.entities.getById(id1);
+        // positionProperty = entities.position;
       });
 
 
@@ -129,9 +127,16 @@ const TerrainPage: React.FC = () => {
     const scene = mapRef.current.scene;
 
     scene.postRender.addEventListener(() => {
-      const position = positionProperty.getValue(clock.currentTime);
-      if (!position) return;
-      entities.position = scene.clampToHeight(position);
+      // console.log(critters);
+      critters.forEach((critter) => {
+        const [entity,pos] = critter;
+        const pos2 = pos?.getValue(clock.currentTime);
+        if (!pos2) return;
+        entity.position = scene.clampToHeight(pos2)
+      });
+      // const position = positionProperty.getValue(clock.currentTime);
+      // if (!position) return;
+      // entities.position = scene.clampToHeight(position);
     });
   }
 
