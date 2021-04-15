@@ -81,7 +81,7 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const usePings = (start: string, end: string, unassigned: boolean): UseQueryResult<ITelemetryFeature[], AxiosError> => {
+  const usePings = (start: string, end: string, unassigned?: boolean): UseQueryResult<ITelemetryFeature[], AxiosError> => {
     return useQuery<ITelemetryFeature[], AxiosError>(
       ['pings', { start, end, unassigned }],
       () => mapApi.getPings(start, end, unassigned),
