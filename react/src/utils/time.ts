@@ -12,6 +12,11 @@ const dateObjectToTimeStr = (d: Date): string => {
   const djs = dayjs(d);
   return djs.isValid() ? djs.format(formatTime) : 'never';
 } 
+const dateObjectToDateStr = (d: Date): string => {
+  const djs = dayjs(d);
+  return djs.isValid() ? djs.format(formatDay) : '';
+}
+
 const formatDateStr = (s:string): string => {
   return dayjs(s).format(formatTime);
 }
@@ -32,6 +37,7 @@ const formatWithUTCOffset = (d: Date):string => {
 export {
   asLocalTime,
   dateObjectToTimeStr,
+  dateObjectToDateStr,
   formatDay,
   formatLocal,
   formatTime,

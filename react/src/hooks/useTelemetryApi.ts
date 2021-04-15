@@ -81,10 +81,10 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const usePings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
+  const usePings = (start: string, end: string, unassigned: boolean): UseQueryResult<ITelemetryFeature[], AxiosError> => {
     return useQuery<ITelemetryFeature[], AxiosError>(
-      ['pings', { start, end }],
-      () => mapApi.getPings(start, end),
+      ['pings', { start, end, unassigned }],
+      () => mapApi.getPings(start, end, unassigned),
       defaultQueryOptions
     );
   };
@@ -212,7 +212,7 @@ export const useTelemetryApi = () => {
 
   /**
    * @param user idir of the user to receive critter access to
-   * @returns A simplified list of Animals that only has id, animal_id, and nickname
+   * @returns A simplified list of Animals that only has id, animal_id,
    * note: query keys are important! make sure to include params in the key
    */
   const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }): UseQueryResult<UserCritterAccess[], AxiosError> => {

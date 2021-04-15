@@ -4,10 +4,9 @@ import { Type, Expose } from 'class-transformer';
 import { eCritterPermission } from './user';
 import { formatLatLong } from './common_helpers';
 
-const assignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status', 'device_id'];
-const unassignedCritterProps = ['nickname', 'animal_id', 'wlh_id', 'animal_status'];
+const assignedCritterProps = ['animal_id', 'wlh_id', 'animal_status', 'device_id'];
+const unassignedCritterProps = ['animal_id', 'wlh_id', 'animal_status'];
 const critterHistoryProps = [
-  'nickname',
   'animal_id',
   'wlh_id',
   'animal_status',
@@ -41,7 +40,6 @@ const editableAnimalProperties = [
   'mortality_utm_zone',
   'mortality_utm_easting',
   'mortality_utm_northing',
-  'nickname',
   'population_unit',
   're_capture',
   'region',
@@ -56,10 +54,12 @@ const editableAnimalProperties = [
 export interface IAnimalTelemetryBase {
   species: string;
   wlh_id: string;
+  animal_colour: string;
   animal_id: string;
   animal_status: string;
   population_unit: string;
   location: string;
+  capture_date: Date;
 }
 
 export interface IAnimal extends BCTW, BctwBaseType, IAnimalTelemetryBase {
@@ -67,7 +67,7 @@ export interface IAnimal extends BCTW, BctwBaseType, IAnimalTelemetryBase {
   critter_transaction_id: string;
   animal_id: string;
   animal_status: string;
-  capture_date: Date;
+  // capture_date: Date;
   capture_latitude: number;
   capture_longitude: number;
   capture_utm_easting: number;
@@ -85,7 +85,7 @@ export interface IAnimal extends BCTW, BctwBaseType, IAnimalTelemetryBase {
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
-  nickname: string;
+  // nickname: string;
   population_unit: string;
   re_capture: boolean;
   region: string;
@@ -98,6 +98,7 @@ export interface IAnimal extends BCTW, BctwBaseType, IAnimalTelemetryBase {
   device_id?: number;
   // fetched critters should contain this
   permission_type?: eCritterPermission;
+  animal_colour: string;
 }
 
 export class Animal implements IAnimal {
@@ -123,7 +124,7 @@ export class Animal implements IAnimal {
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
-  nickname: string;
+  // nickname: string;
   population_unit: string;
   re_capture: boolean;
   region: string;
@@ -136,11 +137,12 @@ export class Animal implements IAnimal {
   @Type(() => Date) valid_to: Date;
   permission_type: eCritterPermission;
   device_id?: number;
+  animal_colour: string;
   @Expose() get identifier(): string {
     return 'critter_id';
   }
   @Expose() get name(): string {
-    return this.nickname ?? this.wlh_id ?? this.animal_id;
+    return this.wlh_id ?? this.animal_id;
   }
   @Expose() get mortalityCoords(): string {
     return this.mortality_latitude && this.mortality_longitude
@@ -170,7 +172,6 @@ export class Animal implements IAnimal {
     this.region = '';
     this.species = '';
     this.wlh_id = '';
-    this.nickname = '';
   }
 
   formatPropAsHeader(str: string): string {
@@ -189,6 +190,8 @@ export class Animal implements IAnimal {
       case 'mortalityUTM':
       case 'captureUTM':
         return 'UTM'
+      case 'animal_colour':
+        return 'Colour';
       default:
         return columnToHeader(str);
     }

@@ -90,6 +90,7 @@ const CodePage: React.FC = () => {
             <div className='button-row'>
               <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
               <AddEditViewer<CodeHeaderInput>
+                onSave={handleSave}
                 editing={new CodeHeaderInput()}
                 empty={Object.create({})}
                 disableEdit={true}>

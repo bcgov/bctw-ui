@@ -2,9 +2,11 @@ import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { ICodeFilter } from 'types/code';
 import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowHover, OnMapRowCellClick } from 'types/map';
+import Checkbox from 'components/form/Checkbox';
 import { applyFilter, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
 import { Button } from '@material-ui/core';
+import { MapStrings } from 'constants/strings';
 
 export type MapDetailsBaseProps = {
   handleRowSelected: OnPanelRowHover;
@@ -65,23 +67,36 @@ export default function MapDetails({
   }, [filters]);
 
   // upon rows checked in each row
-  const onRowsChecked = (ids: number[]): void => {
+  const handleRowsChecked = (ids: number[]): void => {
     const grouped = groupFeaturesByCritters(features.filter((f) => ids.includes(f.id)));
     setGroupedFeaturesChecked(grouped);
     handleRowSelected(ids);
   };
 
+  const handleOnlyShowSelected = (val: Record<string, boolean>): void => {
+    // todo:
+    console.log(val)
+  }
+
   return (
     <>
       <div className={'map-bottom-panel-title'}>
         <h3>{filters.length ? 'Selected' : 'Default'} Animal Set</h3>
-        <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
+        <div>
+          <Checkbox
+            label={MapStrings.onlySelectedLabel}
+            initialValue={false}
+            changeHandler={handleOnlyShowSelected}
+            disabled={true}
+          />
+          <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
+        </div>
       </div>
       <MapDetailsGrouped
         crittersSelected={crittersSelectedInMap}
         features={groupedFeatures}
         handleShowOverview={handleShowOverview}
-        handleRowSelected={onRowsChecked}
+        handleRowSelected={handleRowsChecked}
       />
       <MapExport
         critter_ids={

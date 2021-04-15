@@ -59,7 +59,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
 
   const networkFields = [
     { prop: 'frequency' },
-    { prop: 'frequency_unit_code' },
+    { prop: 'frequency_unit_code', isCode: true },
     { prop: 'satellite_network', isCode: true }
   ];
 

@@ -5,8 +5,9 @@ import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { Order } from 'components/table/table_interfaces';
 import { plainToClass } from 'class-transformer';
-import { flattenUniqueFeatureIDs, sortGroupedFeatures } from 'pages/map/map_helpers';
+import { flattenUniqueFeatureIDs, getLatestTelemetryFeature, sortGroupedFeatures } from 'pages/map/map_helpers';
 import { MapDetailsBaseProps } from './MapDetails';
+import { dateObjectToDateStr } from 'utils/time';
 
 export type MapDetailsGroupedProps = MapDetailsBaseProps & {
   features: IUniqueFeature[];
@@ -18,7 +19,7 @@ type GroupedCheckedStatus = {
   checked: boolean;
 };
 
-const rows_to_render = ['animal_id', 'wlh_id', 'device_id', 'frequency', 'Map Points'];
+const rows_to_render = ['Colour', 'wlh_id', 'device_id', 'frequency', 'capture_date', 'Last Transmission Date', 'Map Points'];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
   const { features, crittersSelected, handleShowOverview, handleRowSelected } = props;
@@ -86,7 +87,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 pointIDs={u.features.map((f) => f.id)}
                 isChecked={checkedGroups.includes(u.critter_id)}
                 isSelectedInMap={crittersSelected.indexOf(u.critter_id) !== -1}
-                row={u.features[0].properties}
+                row={getLatestTelemetryFeature(u.features)?.properties}
                 handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
               />
@@ -120,23 +121,25 @@ function Row(props: IRowProps): JSX.Element {
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
+      <TableCell style={{backgroundColor: row.animal_colour}}> </TableCell>
       {/* if the row has no animal id, clicking the cell will open the overview panel */}
       <TableCell
-        className={row.animal_id ? '' : 'critter-hover'}
-        onClick={row.animal_id ? null : (): void => handleShowOverview('critter', row)}>
+        className={row.wlh_id ? '' : 'critter-hover'}
+        onClick={row.wlh_id ? null : (): void => handleShowOverview('critter', row)}>
         <div
-          onClick={row.animal_id ? (): void => handleShowOverview('critter', row) : null}
+          onClick={row.wlh_id ? (): void => handleShowOverview('critter', row) : null}
           className={'critter-select critter-hover'}>
-          {row.animal_id ?? ''}
+          {row.wlh_id ?? ''}
         </div>
       </TableCell>
-      <TableCell>{row.wlh_id}</TableCell>
       <TableCell>
         <div onClick={(): void => handleShowOverview('collar', row)} className={'critter-select'}>
           {row.device_id}
         </div>
       </TableCell>
       <TableCell>{row.frequency}</TableCell>
+      <TableCell>{dateObjectToDateStr(row.capture_date)}</TableCell>
+      <TableCell>{dateObjectToDateStr(row.date_recorded)}</TableCell>
       <TableCell>{pointIDs.length}</TableCell>
     </TableRow>
   );

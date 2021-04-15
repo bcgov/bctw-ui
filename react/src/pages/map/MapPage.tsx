@@ -12,7 +12,7 @@ import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import MapDetails from 'pages/map/details/MapDetails';
 import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML, hidePopup } from 'pages/map/map_init';
-import { applyFilter, fillPoint, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
+import { applyFilter, createColoursConst, fillPoint, groupFeaturesByCritters, groupFilters, RESERVED_COLOUR_MAP } from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
 import { useEffect, useRef, useState } from 'react';
@@ -30,9 +30,14 @@ export default function MapPage(): JSX.Element {
 
   const [tracks] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Tracks
   const [pings] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Pings
+  // todo: unassigned collars
+  // const [unassigned, setUnassigned] = useState<boolean>(false);
+
+  // colour state
+  const [colours, setColours] = useState<Record<string, string>>(RESERVED_COLOUR_MAP);
 
   const selectedPings = new L.GeoJSON();
-  selectedPings.options = setupSelectedPings();
+  selectedPings.options = setupSelectedPings(colours);
 
   const [range, setRange] = useState<MapRange>({
     start: dayjs().subtract(7, 'day').format(formatDay),
@@ -44,11 +49,13 @@ export default function MapPage(): JSX.Element {
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
 
-  // for overview state
+  // the (initially hidden) overview modal state
   const [showOverviewModal, setShowModal] = useState<boolean>(false);
   const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
-  const [filters, setFilters] = useState<ICodeFilter[]>([]);
   const [overviewType, setOverviewType] = useState<TypeWithData>();
+
+  // filter state
+  const [filters, setFilters] = useState<ICodeFilter[]>([]);
 
   // export state
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
@@ -56,12 +63,15 @@ export default function MapPage(): JSX.Element {
   // udf editing state
   const [showUdfEdit, setShowUdfEdit] = useState<boolean>(false);
 
+
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
 
   const { start, end } = range;
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
-  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
+  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end, /* fixme: */ false);
+  // todo: only fetch reserved colors
+  const { isError: isErrorColours, data: coloursData } = bctwApi.useCodes(0, 'colour');
 
   // refresh when start/end times are changed
   useEffect(() => {
@@ -75,9 +85,16 @@ export default function MapPage(): JSX.Element {
   }, [tracksData]);
 
   useEffect(() => {
+    // todo: only fetch reserved colours
+    if (!isErrorColours && coloursData?.length) {
+      setColours(createColoursConst(coloursData))
+    }
+  }, [coloursData]);
+
+  useEffect(() => {
     if (pingsData && !isErrorPings) {
       // must be called before adding data to pings
-      setupPingOptions(pings, handlePointClick);
+      setupPingOptions(pings, handlePointClick, colours);
       pings.addData(pingsData as any);
       setFeatures(pingsData);
       rebindMapListeners();
@@ -90,7 +107,7 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
-        initMap(mapRef, drawnItems, selectedPings, tracks, pings, handleDrawShape, handleClosePopup);
+        initMap(mapRef, colours, drawnItems, selectedPings, tracks, pings, handleDrawShape, handleClosePopup);
       }
     };
     updateComponent();
@@ -124,13 +141,13 @@ export default function MapPage(): JSX.Element {
   const handlePointClick = (event: L.LeafletEvent): void => {
     const layer = event.target;
     if (lastPoint && lastPoint !== layer) {
-      fillPoint(lastPoint);
+      fillPoint(lastPoint, colours);
       hidePopup();
     }
     lastPoint = layer;
     // console.log('setting last point to ', lastPoint.feature.id)
     const feature: ITelemetryFeature = layer?.feature;
-    fillPoint(layer, true);
+    fillPoint(layer, colours, true);
     setPopupInnerHTML(feature as any);
     setSelectedFeatureIDs([feature.id]);
   };
@@ -138,7 +155,7 @@ export default function MapPage(): JSX.Element {
   // when a map point is clicked that isn't a marker, close the popup
   const handleClosePopup = (): void => {
     if (lastPoint) {
-      fillPoint(lastPoint, false);
+      fillPoint(lastPoint, colours, false);
       lastPoint = null;
       setSelectedFeatureIDs([]);
     }
@@ -158,9 +175,9 @@ export default function MapPage(): JSX.Element {
       const id = l.feature?.id;
 
       if (ids.includes(id)) {
-        fillPoint(l, true);
+        fillPoint(l, colours, true);
       } else if (typeof l.setStyle === 'function') {
-        fillPoint(l, selectedFeatureIDs.includes(id));
+        fillPoint(l, colours, selectedFeatureIDs.includes(id));
       }
     });
   };
@@ -176,7 +193,7 @@ export default function MapPage(): JSX.Element {
     // clear previous selections
     mapRef.current.eachLayer((layer) => {
       if ((layer as any).options.class === 'selected-ping') {
-        fillPoint(layer);
+        fillPoint(layer, colours);
       }
     });
 
@@ -305,6 +322,9 @@ export default function MapPage(): JSX.Element {
         onApplyFilters={handleChangeFilters}
         onClickEditUdf={(): void => setShowUdfEdit(o => !o)}
         onShowLatestPings={handleShowLatestPings}
+        uniqueDevices={[]}
+        onApplySelectDevices={null}
+        // onShowUnassignedDevices={setUnassigned}
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}

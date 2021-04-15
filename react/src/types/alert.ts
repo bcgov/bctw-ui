@@ -19,7 +19,6 @@ interface ITelemetryAlert {
   critter_id: string;
   animal_id: string;
   wlh_id: string;
-  nickname: string;
   animal_status: string;
   valid_from: Date;
   valid_to: Date;
@@ -38,7 +37,6 @@ export class TelemetryAlert implements ITelemetryAlert {
   critter_id: string;
   animal_id: string;
   wlh_id: string;
-  nickname: string;
   animal_status: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;

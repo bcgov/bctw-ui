@@ -20,7 +20,7 @@ type CritterOverViewProps = {
 
 const critterGeneral = ['animal_status', 'species', 'sex', 'life_stage', 'estimated_age', 'juvenile_at_heel'];
 const critterMortality = ['mortality_date', 'mortalityCoords', 'mortalityUTM'];
-const critterIds = ['wlh_id', 'animal_id', 'nickname', 'ear_tag_left', 'ear_tag_right', 'population_unit'];
+const critterIds = ['wlh_id', 'animal_id', 'ear_tag_left', 'ear_tag_right', 'population_unit'];
 const critterLoc = ['region'];
 //
 const collarGeneral = [

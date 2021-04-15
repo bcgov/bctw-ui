@@ -52,7 +52,6 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   const identifierFields = [
     { prop: 'wlh_id' },
     { prop: 'animal_id' },
-    { prop: 'nickname' },
     { prop: 'ear_tag_left' },
     { prop: 'ear_tag_right' },
     { prop: 'population_unit', isCode: true }

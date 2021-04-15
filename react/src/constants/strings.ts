@@ -3,7 +3,6 @@ const CritterStrings = {
   importText: 'Use this feature to add or update animals. The field critter_id MUST be present if you want to update an animal.',
   exportTitle: 'Bulk Export Animal Data',
   exportText: '',
-  editableProps: ['nickname', 'animal_id', 'wlh_id', 'species', 'region', 'population_unit', 'animal_status', 'juvenile_at_heel'],
   requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
   collarAssignmentTitle: 'Assign a device',
   assignCollarBtnText: 'assign selected device',
@@ -47,7 +46,8 @@ const CodeStrings = {
 }
 
 const MapStrings = {
-  lastPingLabel: 'Only show last location',
+  lastPingLabel: 'Last Known Location',
+  onlySelectedLabel: 'Show Only Selected',
   filterRangeStart: 'Start Date',
   filterRangeEnd: 'End Date',
   filterUserCritterGroup: 'User Animal Group',

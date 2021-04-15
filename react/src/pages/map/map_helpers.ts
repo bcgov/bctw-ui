@@ -1,27 +1,52 @@
-import { ICodeFilter, IGroupedCodeFilter } from 'types/code';
+import dayjs from 'dayjs';
+import { ICode, ICodeFilter, IGroupedCodeFilter } from 'types/code';
 import { DetailsSortOption, ITelemetryDetail, ITelemetryFeature, IUniqueFeature } from 'types/map';
 
-const COLORS = {
-  potential: '#FF8C00',
-  dead: '#ff0000',
-  normal: '#00ff44',
-  selected: '#ffff00'
-};
+// todo: swap to "colour ID"?
+const RESERVED_COLOUR_MAP = {
+  'default point': '#00ff44',
+  'default track': '#52baff',
+  'selected point': '#ffff00',
+  'selected polygon': '#ffff00',
+  'unassigned point': '',
+  'unassigned line segment': '',
+  'potential malfunction': '#FF8C00',
+  'potential mortality': '#ff0000',
+  'outline': '#fff',
+}
+
+/**
+ * @param codes the colour values retrieved from the code table
+ * @returns an object with the reserved colour hex values
+ */
+const createColoursConst = (codes: ICode[]): Record<string, string>  => {
+  const keys = Object.keys(RESERVED_COLOUR_MAP);
+  keys.forEach(k => {
+    const found = codes.find(c => c.long_description === k);
+    RESERVED_COLOUR_MAP[k] = found?.code;
+  })
+  return RESERVED_COLOUR_MAP;
+}
 
 /**
  *
  * @param feature
  * @returns
  */
-const getFillColorByStatus = (feature: ITelemetryFeature): string => {
-  const a = feature?.properties?.animal_status;
-  const d = feature?.properties?.device_status;
-  if (a === 'Mortality') {
-    return COLORS.dead;
-  } else if (d === 'Potential Mortality') {
-    return COLORS.potential;
+const getFillColorByStatus = (feature: ITelemetryFeature, colors: Record<string, string>, selected = false): string => {
+  if (selected) {
+    return colors['selected point'];
   }
-  return COLORS.normal;
+  if (!feature) {
+    return colors['default point']
+  }
+  const { properties } = feature;
+  if (properties?.animal_status === 'Mortality') {
+    return colors['potential mortality'];
+  } else if (properties?.device_status === 'Potential Mortality') {
+    return colors['potential malfunction'];
+  }
+  return properties?.animal_colour ?? colors['default point'];
 };
 
 /**
@@ -29,11 +54,11 @@ const getFillColorByStatus = (feature: ITelemetryFeature): string => {
  * @param layer
  * @param selected
  */
-const fillPoint = (layer: any, selected = false): void => {
+const fillPoint = (layer: any, colors: Record<string, string>, selected = false): void => {
   layer.setStyle({
     class: selected ? 'selected-ping' : '',
     weight: 1.0,
-    fillColor: selected ? COLORS.selected : getFillColorByStatus(layer.feature)
+    fillColor: getFillColorByStatus(layer.feature, colors, selected)
   });
 };
 
@@ -149,8 +174,14 @@ const getFeaturesFromGeoJSON = (obj: L.GeoJSON): ITelemetryFeature[] => {
   return features;
 }
 
+const getLatestTelemetryFeature = (details: ITelemetryFeature[]): ITelemetryFeature => {
+  return details.reduce((accum, current) => {
+    return dayjs(current.properties.date_recorded).isAfter(dayjs(accum.properties.date_recorded)) ? current : accum
+  });
+}
+
 export {
-  COLORS,
+  RESERVED_COLOUR_MAP,
   fillPoint,
   applyFilter,
   flattenUniqueFeatureIDs,
@@ -159,5 +190,7 @@ export {
   groupFeaturesByCritters,
   groupFilters,
   sortGroupedFeatures,
-  getFeaturesFromGeoJSON
+  getFeaturesFromGeoJSON,
+  getLatestTelemetryFeature,
+  createColoursConst,
 };

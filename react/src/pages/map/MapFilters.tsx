@@ -13,6 +13,7 @@ import SelectUDF from 'components/form/SelectUDF';
 import { eUDFType, IUDF, transformUdfToCodeFilter } from 'types/udf';
 import { Icon } from 'components/common';
 import { MapStrings } from 'constants/strings';
+import { columnToHeader } from 'utils/common';
 
 type MapFiltersProps = PageProp & {
   start: string;
@@ -20,6 +21,10 @@ type MapFiltersProps = PageProp & {
   onClickEditUdf: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onShowLatestPings: (b: boolean) => void;
+  uniqueDevices: number[];
+  onApplySelectDevices: (device_ids: number[]) => void;
+  // todo:
+  // onShowUnassignedDevices: (b: boolean) => void;
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
@@ -98,10 +103,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     handleApplyFilters(null, true);
   };
 
-  const codeFilters = [
-    { header: 'population_unit', label: 'Population' },
-    { header: 'species', label: 'Species' },
-    { header: 'sex', label: 'Sex' }
+  const codeFilters: { header: string, label?: string }[] = [
+    { header: 'species' },
+    { header: 'sex' },
+    { header: 'device_status' },
+    { header: 'animal_status' },
   ];
 
   // creates select elements
@@ -110,7 +116,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       <div key={`${cf.header}-${idx}`}>
         <SelectCode
           multiple
-          labelTitle={cf.label}
+          labelTitle={cf.label ?? columnToHeader(cf.header)}
           codeHeader={cf.header}
           changeHandler={null}
           changeHandlerMultiple={(codes): void => changeFilter(codes, cf.header)}

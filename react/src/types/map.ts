@@ -52,17 +52,19 @@ interface IUniqueFeature {
 
 // represents the jsonb built object in the database get_telemetry call
 export class TelemetryDetail implements BCTW, ITelemetryDetail {
-  collar_id: string;
   critter_id: string;
   species: string;
   wlh_id: string;
   animal_id: string;
+  animal_status: string;
+  @Type(() => Date) capture_date: Date;
+  sex: string;
+  population_unit: string;
+  collar_id: string;
   device_id: number;
   device_vendor: string;
   frequency: number;
-  animal_status: string;
   device_status: string;
-  population_unit: string;
   location: string;
   @Type(() => Date) date_recorded: Date;
   @Expose() get formattedDevice(): string {
@@ -71,6 +73,7 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   @Expose() get formattedDate(): string {
     return formatWithUTCOffset(this.date_recorded);
   }
+  animal_colour: string;
 
   formatPropAsHeader(str: string): string {
     switch (str) {

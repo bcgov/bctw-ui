@@ -101,7 +101,6 @@ export class Collar implements ICollar {
   vendor_activation_status: boolean;
   sensor_mortality?: boolean;
   sensor_battery?: boolean;
-  // @Type(() => Date) max_transmission_date: Date;
   animal_id?: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;

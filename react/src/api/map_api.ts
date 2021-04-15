@@ -17,8 +17,8 @@ export const mapApi = (props: ApiProps) => {
     return data;
   };
 
-  const getPings = async (start: string, end: string): Promise<ITelemetryFeature[]> => {
-    const url = createUrl({ api: 'get-critters', query: `start=${start}&end=${end}`, testUser });
+  const getPings = async (start: string, end: string, unassigned = false): Promise<ITelemetryFeature[]> => {
+    const url = createUrl({ api: 'get-critters', query: `start=${start}&end=${end}&unassigned=${unassigned}`, testUser });
     const { data } = await api.get(url);
     return data?.features;
   };
