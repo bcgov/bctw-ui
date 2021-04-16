@@ -59,7 +59,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const pushRowCheck = (ids: string[]): void => {
     setCheckedGroups(ids);
     const pointIDs = flattenUniqueFeatureIDs(features.filter((f) => ids.includes(f.critter_id)));
-    handleRowSelected(pointIDs);
+    handleRowSelected(pointIDs, false);
   };
 
   return (
@@ -133,7 +133,7 @@ function Row(props: IRowProps): JSX.Element {
         </div>
       </TableCell>
       <TableCell>
-        <div onClick={(): void => handleShowOverview('collar', row)} className={'critter-select'}>
+        <div onClick={(): void => handleShowOverview('collar', row)} className={'critter-select critter-hover'}>
           {row.device_id}
         </div>
       </TableCell>

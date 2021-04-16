@@ -1,31 +1,18 @@
+import { FormStrings } from 'constants/strings';
 import dayjs from 'dayjs';
-import { ICode, ICodeFilter, IGroupedCodeFilter } from 'types/code';
+import { ICodeFilter, IGroupedCodeFilter } from 'types/code';
 import { DetailsSortOption, ITelemetryDetail, ITelemetryFeature, IUniqueFeature } from 'types/map';
 
-// todo: swap to "colour ID"?
-const RESERVED_COLOUR_MAP = {
-  'default point': '#00ff44',
-  'default track': '#52baff',
-  'selected point': '#ffff00',
-  'selected polygon': '#ffff00',
+const MAP_COLOURS = {
+  'point': '#00ff44',
+  'track': '#52baff',
+  'selected': '#ffff00',
+  // 'selected polygon': '#ffff00',
   'unassigned point': '',
   'unassigned line segment': '',
-  'potential malfunction': '#FF8C00',
-  'potential mortality': '#ff0000',
+  'malfunction': '#FF8C00',
+  'mortality': '#ff0000',
   'outline': '#fff',
-}
-
-/**
- * @param codes the colour values retrieved from the code table
- * @returns an object with the reserved colour hex values
- */
-const createColoursConst = (codes: ICode[]): Record<string, string>  => {
-  const keys = Object.keys(RESERVED_COLOUR_MAP);
-  keys.forEach(k => {
-    const found = codes.find(c => c.long_description === k);
-    RESERVED_COLOUR_MAP[k] = found?.code;
-  })
-  return RESERVED_COLOUR_MAP;
 }
 
 /**
@@ -33,40 +20,37 @@ const createColoursConst = (codes: ICode[]): Record<string, string>  => {
  * @param feature
  * @returns
  */
-const getFillColorByStatus = (feature: ITelemetryFeature, colors: Record<string, string>, selected = false): string => {
+const getFillColorByStatus = (feature: ITelemetryFeature, selected = false): string => {
   if (selected) {
-    return colors['selected point'];
+    return MAP_COLOURS['selected'];
   }
   if (!feature) {
-    return colors['default point']
+    return MAP_COLOURS['point']
   }
   const { properties } = feature;
   if (properties?.animal_status === 'Mortality') {
-    return colors['potential mortality'];
+    return MAP_COLOURS['mortality'];
   } else if (properties?.device_status === 'Potential Mortality') {
-    return colors['potential malfunction'];
+    return MAP_COLOURS['malfunction'];
   }
-  return properties?.animal_colour ?? colors['default point'];
+  return properties?.animal_colour ?? MAP_COLOURS['point'];
 };
 
 /**
- *
- * @param layer
- * @param selected
+ * sets the l@param layer {setStyle} function
  */
-const fillPoint = (layer: any, colors: Record<string, string>, selected = false): void => {
+const fillPoint = (layer: any, selected = false): void => {
   layer.setStyle({
     class: selected ? 'selected-ping' : '',
     weight: 1.0,
-    fillColor: getFillColorByStatus(layer.feature, colors, selected)
+    fillColor: getFillColorByStatus(layer.feature, selected)
   });
 };
 
 /**
- *
- * @param features
- * @param sortOption
- * @returns
+ * @param features list of telemetry features to group
+ * @param sortOption applied after the features are gruped by critter_id
+ * @returns @type {IUniqueFeature}
  */
 const groupFeaturesByCritters = (features: ITelemetryFeature[], sortOption?: DetailsSortOption): IUniqueFeature[] => {
   const uniques: IUniqueFeature[] = [];
@@ -92,14 +76,15 @@ const groupFeaturesByCritters = (features: ITelemetryFeature[], sortOption?: Det
     }
   });
   const sorted = uniques.sort((a, b) => a[sortOption] - b[sortOption]);
-  // sorted.forEach(d => console.log(`critter ${d.critter_id} device ${d.device_id}`));
   return sorted;
 };
 
 /**
- *
- * @param filters
- * @returns
+ * accepts a list of filters, a list of objects that contain:
+ * a) the code header
+ * b) a string array of descriptions.
+ * @param filters the ungrouped filters
+ * @returns @type {IGroupedCodeFilter} array
  */
 const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
   const groupObj = {};
@@ -116,17 +101,21 @@ const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
 };
 
 /**
- *
- * @param groupedFilters
- * @param features
- * @returns
+ * @param groupedFilters a list of filters that have been grouped into @type {IGroupedCodeFilter}
+ * @param features the feature list to apply the filters to 
+ * @returns a filtered list of features that have one or more of the filters applied
  */
 const applyFilter = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryFeature[]): ITelemetryFeature[] => {
   return features.filter((f) => {
     const { properties } = f;
     for (let i = 0; i < groupedFilters.length; i++) {
       const { code_header, descriptions } = groupedFilters[i];
-      if (!descriptions.includes(properties[code_header])) {
+      const featureValue = properties[code_header];
+      // when the 'empty' value is checked in a filter, and a feature value is not set
+      if (descriptions.includes(FormStrings.emptySelectValue) && (featureValue === '' || featureValue === null)) {
+        return true;
+      }
+      if (!descriptions.includes(featureValue)) {
         return false;
       }
     }
@@ -156,41 +145,63 @@ function sortGroupedFeatures(array: IUniqueFeature[], comparator: (a, b) => numb
 }
 
 /**
- * @param u list of grouped features
- * @returns flattened list of feature IDs 
+ * @param u list of grouped features @type {IUniqueFeature}
+ * @returns unique feature IDs within the group
  */
 const flattenUniqueFeatureIDs = (u: IUniqueFeature[]): number[] => {
   return u.map(uf => uf.features.map(f => f.id)).flatMap(x => x);
 }
 
+/**
+ * groups features by @property {critter_id}, and returns an array of unique critter_ids
+ */
 const getUniqueCritterIDsFromFeatures = (features: ITelemetryFeature[], selectedIDs: number[]): string[] => {
   const grped = groupFeaturesByCritters(features.filter(f => selectedIDs.includes(f.id)));
   return grped.map(g => g.critter_id);
 }
 
+const getUniqueDevicesFromFeatures = (features: ITelemetryFeature[]): number[] => {
+  const ids = [];
+  features.forEach(f => {
+    const did = f.properties.device_id;
+    if (!ids.includes(did)) {
+      ids.push(did);
+    }
+  });
+  return ids; 
+}
+
+/**
+ * casts @param obj to @type {ITelemetryFeature}  
+ */
 const getFeaturesFromGeoJSON = (obj: L.GeoJSON): ITelemetryFeature[] => {
   // fixme: why isn't feature a property of Layer??
   const features = obj.getLayers().map(d => (d as any)?.feature as ITelemetryFeature);
   return features;
 }
 
-const getLatestTelemetryFeature = (details: ITelemetryFeature[]): ITelemetryFeature => {
-  return details.reduce((accum, current) => {
+/**
+ * @param features 
+ * @returns a single feature that contains the most recent date_recorded
+ */
+const getLatestTelemetryFeature = (features: ITelemetryFeature[]): ITelemetryFeature => {
+  return features.reduce((accum, current) => {
     return dayjs(current.properties.date_recorded).isAfter(dayjs(accum.properties.date_recorded)) ? current : accum
   });
 }
 
 export {
-  RESERVED_COLOUR_MAP,
+  MAP_COLOURS,
   fillPoint,
   applyFilter,
   flattenUniqueFeatureIDs,
   getFillColorByStatus,
   getUniqueCritterIDsFromFeatures,
+  getUniqueDevicesFromFeatures,
   groupFeaturesByCritters,
   groupFilters,
   sortGroupedFeatures,
   getFeaturesFromGeoJSON,
   getLatestTelemetryFeature,
-  createColoursConst,
+  // createColoursConst,
 };

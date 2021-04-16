@@ -14,17 +14,19 @@ import { eUDFType, IUDF, transformUdfToCodeFilter } from 'types/udf';
 import { Icon } from 'components/common';
 import { MapStrings } from 'constants/strings';
 import { columnToHeader } from 'utils/common';
+import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type MapFiltersProps = PageProp & {
   start: string;
   end: string;
-  onClickEditUdf: () => void;
-  onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
-  onShowLatestPings: (b: boolean) => void;
   uniqueDevices: number[];
+  onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onApplySelectDevices: (device_ids: number[]) => void;
-  // todo:
-  // onShowUnassignedDevices: (b: boolean) => void;
+  onClickEditUdf: () => void;
+  onShowLatestPings: (b: boolean) => void;
+  onShowLastFixes: (b: boolean) => void;
+  // todo: onShowUnassignedDevices: (b: boolean) => void;
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
@@ -42,6 +44,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // controls apply button disabled status
   const [applyButtonStatus, setApplyButtonStatus] = useState<boolean>(true);
   const [isLatestPing, setIsLatestPing] = useState<boolean>(false);
+  const [isLastFixes, setIsLastFixes] = useState<boolean>(false);
 
   // keep track of how many filters are currently set
   useEffect(() => {
@@ -59,6 +62,15 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     onChangeDate();
   }, [start, end]);
 
+  // call parent handler when latest ping changes
+  useDidMountEffect(() => {
+    props.onShowLatestPings(isLatestPing);
+  }, [isLatestPing])
+
+  useDidMountEffect(() => {
+    props.onShowLastFixes(isLastFixes);
+  }, [isLastFixes])
+
   /**
    * handler for when a select component is changed
    * @param filters array passed from multi-select component
@@ -74,7 +86,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   /**
-   *
    * @param event the button click event
    * @param reset force calling the parent handler with empty array
    */
@@ -105,9 +116,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   const codeFilters: { header: string, label?: string }[] = [
     { header: 'species' },
-    { header: 'sex' },
-    { header: 'device_status' },
     { header: 'animal_status' },
+    { header: 'device_status' },
+    { header: 'sex' },
   ];
 
   // creates select elements
@@ -116,11 +127,12 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       <div key={`${cf.header}-${idx}`}>
         <SelectCode
           multiple
-          labelTitle={cf.label ?? columnToHeader(cf.header)}
+          label={cf.label ?? columnToHeader(cf.header)}
           codeHeader={cf.header}
           changeHandler={null}
           changeHandlerMultiple={(codes): void => changeFilter(codes, cf.header)}
           triggerReset={reset}
+          addEmptyOption={true}
         />
       </div>
     ));
@@ -133,14 +145,12 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     changeFilter(asNormalFilters, 'critter_id');
   };
 
-  // when the last ping state changes, call the parent handler 
-  const handleChangeLatestPings = (v: Record<string, boolean>): void => {
-    const val = v[MapStrings.lastPingLabel];
-    if (isLatestPing != val) {
-      setIsLatestPing(val);
-      props.onShowLatestPings(val);
-    }
-  };
+  const handleChangeDeviceList = (values: ISelectMultipleData[]): void => {
+    const asFilters: ICodeFilter[] = values.map(v => {
+      return {code_header: 'device_id', description: v.value as number, code: '', code_header_title: '', id: 0}
+    }) 
+    changeFilter(asFilters, 'device_id');
+  }
 
   const handleDrawerOpen = (): void => setOpen((o) => !o);
 
@@ -166,6 +176,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           <>
             <div className='side-panel-body'>
               <div className={'side-panel-dates'}>
+                {/* render the date pickers */}
                 <TextField
                   outline={true}
                   label={MapStrings.filterRangeStart}
@@ -184,13 +195,31 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 />
               </div>
               <div>
+                {/* render the last pings/ last 10 fixes checkboxes */}
                 <Checkbox
                   label={MapStrings.lastPingLabel}
                   initialValue={isLatestPing}
-                  changeHandler={handleChangeLatestPings}
+                  changeHandler={(): void => setIsLatestPing(o => !o)}
+                />
+                <Checkbox
+                  label={MapStrings.lastFixesLabel}
+                  initialValue={isLastFixes}
+                  changeHandler={(): void => setIsLastFixes(o => !o)}
                 />
               </div>
+              <div>
+                {/* render the device list selector */}
+                <MultiSelect
+                  renderTypeLabel='devices'
+                  label={'Device List'}
+                  data={props.uniqueDevices.map(d => {return {id: d, value: d}})}
+                  changeHandler={handleChangeDeviceList}
+                  triggerReset={reset}
+                />
+              </div>
+              {/* render the other select filter components */}
               {createMultiSelects()}
+              {/* render the custom animal set component */}
               <div className={'side-panel-udf'}>
                 <SelectUDF
                   triggerReset={reset}
@@ -211,7 +240,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   Clear
                 </Button>
               </div>
-              {/* <p>{numFiltersSelected} filters selected</p> */}
             </div>
           </>
         ) : (

@@ -49,7 +49,7 @@ function CreateEditSelectField<T extends BCTW>(
 ): JSX.Element {
   return (
     <SelectCode
-      labelTitle={editing.formatPropAsHeader(iType.key)}
+      label={editing.formatPropAsHeader(iType.key)}
       disabled={!canEdit}
       key={iType.key}
       codeHeader={iType.key}

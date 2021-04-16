@@ -11,8 +11,8 @@ interface MapRange {
   end: string;
 }
 
-type DetailsSortOption = 'animal_id' | 'device_id' | 'frequency';
-type OnPanelRowHover = (ids: number[]) => void;
+type DetailsSortOption = 'wlh_id' | 'device_id' | 'frequency';
+type OnPanelRowSelect = (ids: number[], filterMapSelection: boolean) => void;
 type OnMapRowCellClick = (type: TypeWithData, row: ITelemetryDetail) => void;
 
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
@@ -32,12 +32,10 @@ interface ITelemetryFeature extends GeoJSON.Feature {
   properties: ITelemetryDetail;
 }
 
-interface ITelemetryFeatureCollection extends GeoJSON.FeatureCollection {
-  // type: "FeatureCollection";
-  // features: Array<Feature<G, P>>;
-  features: ITelemetryFeature[];
+interface ITracksFeature extends GeoJSON.GeoJsonObject {
+  // type: 'Feature';
+  properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'species'>
 }
-
 
 /**
  * a grouped by critter_id version of @type {TelemetryFeature} 
@@ -103,11 +101,11 @@ export class TelemetryFeature implements ITelemetryFeature {
 
 export type {
   ITelemetryFeature,
-  ITelemetryFeatureCollection,
+  ITracksFeature,
   ITelemetryDetail,
   IUniqueFeature,
   MapRange,
   OnMapRowCellClick,
-  OnPanelRowHover,
+  OnPanelRowSelect,
   DetailsSortOption,
 };

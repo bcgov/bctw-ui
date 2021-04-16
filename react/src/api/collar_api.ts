@@ -15,7 +15,7 @@ export const collarApi = (props: ApiProps) => {
     return _handleGetResults(data);
   };
 
-  const getAssignedCollars = async (page = 1): Promise<ICollar[]> => {
+  const getAssignedCollars = async (page = 1): Promise<Collar[]> => {
     // console.log('get assigned collars')
     const { data } = await api.get(createUrl({ api: 'get-assigned-collars', page, testUser}));
     return _handleGetResults(data);

@@ -47,10 +47,11 @@ const CodeStrings = {
 
 const MapStrings = {
   lastPingLabel: 'Last Known Location',
+  lastFixesLabel: 'Last 10 Fixes',
   onlySelectedLabel: 'Show Only Selected',
   filterRangeStart: 'Start Date',
   filterRangeEnd: 'End Date',
-  filterUserCritterGroup: 'User Animal Group',
+  filterUserCritterGroup: 'Custom Animal Group',
 }
 
 const MapTileLayers = {
@@ -58,10 +59,15 @@ const MapTileLayers = {
   govBase: 'https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer/tile/{z}/{y}/{x}'
 }
 
+const FormStrings = {
+  emptySelectValue: 'Blank',
+}
+
 export {
   CodeStrings,
   CollarStrings,
   CritterStrings,
+  FormStrings,
   MapStrings,
   MapTileLayers,
   FileStrings,

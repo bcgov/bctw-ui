@@ -12,6 +12,7 @@ import { Collar } from 'types/collar';
 import { TypeWithData } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
 import { eCritterPermission } from 'types/user';
+import { dateObjectToDateStr } from 'utils/time';
 
 type CritterOverViewProps = {
   type: TypeWithData;
@@ -265,7 +266,7 @@ function SpecialEvent({ critter_id, collar_id, type }: ISpecialEventProps): JSX.
         {type === 'capture'
           ? (filtered as Animal[]).map((f) => (
               <TableRow key={f.critter_id}>
-                <TableCell>{f.capture_date}</TableCell>
+                <TableCell>{dateObjectToDateStr(f.capture_date)}</TableCell>
                 <TableCell>{f.captureCoords}</TableCell>
                 <TableCell>{f.captureUTM}</TableCell>
               </TableRow>

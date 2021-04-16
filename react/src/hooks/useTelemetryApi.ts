@@ -29,7 +29,7 @@ import { TelemetryAlert } from 'types/alert';
 import { BCTW, TypeWithData } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
-import { ITelemetryFeature } from 'types/map';
+import { ITelemetryFeature, ITracksFeature } from 'types/map';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -70,8 +70,8 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const useTracks = (start: string, end: string): UseQueryResult<GeoJSON.GeoJsonObject[], AxiosError> => {
-    return useQuery<GeoJSON.GeoJsonObject[], AxiosError>(
+  const useTracks = (start: string, end: string): UseQueryResult<ITracksFeature[], AxiosError> => {
+    return useQuery<ITracksFeature[], AxiosError>(
       ['tracks', start, end],
       () => mapApi.getTracks(start, end),
       defaultQueryOptions
@@ -96,10 +96,10 @@ export const useTelemetryApi = () => {
     page: number,
     type: eCollarAssignedStatus,
     config: Record<string, unknown>
-  ): UseQueryResult => {
+  ): UseQueryResult<Collar[]> => {
     const callapi =
       type === eCollarAssignedStatus.Assigned ? collarApi.getAssignedCollars : collarApi.getAvailableCollars;
-    return useQuery<ICollar[], AxiosError>(['collartype', page, type], () => callapi(page), {
+    return useQuery<Collar[], AxiosError>(['collartype', page, type], () => callapi(page), {
       ...config,
       ...defaultQueryOptions
     });
@@ -109,7 +109,7 @@ export const useTelemetryApi = () => {
   /**
    *  retrieves critters that have a collar assigned
    */
-  const useAssignedCritters = (page: number): UseQueryResult => {
+  const useAssignedCritters = (page: number): UseQueryResult<Animal[]> => {
     return useQuery<Animal[], AxiosError>(
       ['critters_assigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.assigned),
@@ -120,7 +120,7 @@ export const useTelemetryApi = () => {
   /**
    * retrieves critters not assigned to a collar
    */
-  const useUnassignedCritters = (page: number): UseQueryResult =>
+  const useUnassignedCritters = (page: number): UseQueryResult<Animal[]> =>
     useQuery<Animal[], AxiosError>(
       ['critters_unassigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned),
@@ -130,7 +130,7 @@ export const useTelemetryApi = () => {
   /**
    * retrieves all critters, must be admin
    */
-  const useAllCritters = (page: number): UseQueryResult =>
+  const useAllCritters = (page: number): UseQueryResult<Animal[]> =>
     useQuery<Animal[], AxiosError>(
       ['critters', page],
       () => critterApi.getCritters(page, eCritterFetchType.all),
@@ -176,7 +176,7 @@ export const useTelemetryApi = () => {
     page: number,
     critterId: number,
     config: Record<string, unknown>
-  ): UseQueryResult => {
+  ): UseQueryResult<CollarHistory[]> => {
     return useQuery<CollarHistory[], AxiosError>(
       ['collarAssignmentHistory', critterId],
       () => collarApi.getCollarAssignmentHistory(critterId),

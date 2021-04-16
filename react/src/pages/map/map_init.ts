@@ -3,7 +3,7 @@ import length from '@turf/length';
 import LabeledMarker from 'leaflet-labeled-circle';
 import dayjs from 'dayjs';
 import { formatLocal } from 'utils/time';
-import { getFillColorByStatus } from 'pages/map/map_helpers';
+import { getFillColorByStatus, MAP_COLOURS } from 'pages/map/map_helpers';
 import React, { MutableRefObject } from 'react';
 import { MapTileLayers } from 'constants/strings';
 import { TelemetryFeature } from 'types/map';
@@ -11,17 +11,16 @@ import { TelemetryFeature } from 'types/map';
 const defaultPointStyle: L.CircleMarkerOptions = {
   // fillColor added later
   radius: 8,
-  color: '#000',
+  color: MAP_COLOURS['outline'],
   weight: 1,
-  opacity: 1,
+  opacity: 0.8,
   fillOpacity: 0.9
 };
 
 
 const setupPingOptions = (
   pings: L.GeoJSON,
-  onClickPointHandler: L.LeafletEventHandlerFn,
-  colours: Record<string, string>
+  onClickPointHandler: L.LeafletEventHandlerFn
 ): void => {
 
   const LatestPingIcon = L.icon({
@@ -36,7 +35,7 @@ const setupPingOptions = (
 
   pings.options = {
     pointToLayer: (feature, latlng: L.LatLngExpression ): L.Layer => {
-      const colour = getFillColorByStatus(feature as any, colours);
+      const colour = getFillColorByStatus(feature as any);
       const pointStyle = { fillColor: colour, ...defaultPointStyle };
       const marker = L.circleMarker(latlng, pointStyle);
       // const marker = new L.Marker(latlng, {icon: LatestPingIcon});
@@ -79,12 +78,12 @@ const setPopupInnerHTML = (feature: TelemetryFeature): void => {
   doc.classList.add('appear-above-map');
 };
 
-const setupSelectedPings = (colors: Record<string, string>): L.GeoJSONOptions => {
+const setupSelectedPings = (): L.GeoJSONOptions => {
   return {
     pointToLayer: (feature, latlng) => {
       const pointStyle = {
         class: 'selected-ping',
-        fillColor: colors['selected point'],
+        fillColor: MAP_COLOURS['selected'],
         ...defaultPointStyle
       };
       return L.circleMarker(latlng, pointStyle);
@@ -137,7 +136,6 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
 // const initMap = (): void => {
 const initMap = (
   mapRef: MutableRefObject<L.Map>,
-  colours: Record<string, string>,
   drawnItems: L.FeatureGroup,
   selectedPings: L.GeoJSON,
   tracks: L.GeoJSON,
@@ -190,9 +188,9 @@ const initMap = (
 
     new LabeledMarker(feature.geometry.coordinates.slice().reverse(), feature, {
       markerOpions: {
-        color: colours['default track'],
+        color: MAP_COLOURS['track'],
         textStyle: {
-          color: colours['outline'],
+          color: MAP_COLOURS['outline'],
           fontSize: 3
         }
       }

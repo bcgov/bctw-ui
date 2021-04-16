@@ -6,32 +6,28 @@ import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError, removeProps } from 'utils/common';
 import { SelectProps } from '@material-ui/core';
+import { FormStrings } from 'constants/strings';
 
 type ISelectProps = SelectProps & {
   codeHeader: string; // code header type to retrieve
   defaultValue?: string; // will otherwise default to empty string
-  labelTitle: string;
+  label: string;
   changeHandler: (o: Record<string, unknown>, isChange: boolean) => void;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
   triggerReset?: boolean; // force components that are 'multiple' to unselect all values
+  addEmptyOption?: boolean; // optionally add a 'blank' entry to bottom of select menu
 };
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectCode(props: ISelectProps): JSX.Element {
-  const { codeHeader, defaultValue, changeHandler, changeHandlerMultiple, labelTitle, multiple, triggerReset } = props;
+  const { addEmptyOption, codeHeader, defaultValue, changeHandler, changeHandlerMultiple, label: labelTitle, multiple, triggerReset } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
-  const [values, setValues] = useState<string[]>([defaultValue]);
+  const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
 
   // to handle React warning about not recognizing the prop on a DOM element
-  const propsToPass = removeProps(props, [
-    'codeHeader',
-    'changeHandler',
-    'labelTitle',
-    'changeHandlerMultiple',
-    'triggerReset'
-  ]);
+  const propsToPass = removeProps(props, [ 'addEmptyOption', 'codeHeader', 'changeHandler', 'labelTitle', 'changeHandlerMultiple', 'triggerReset' ]);
 
   // load this codeHeaders codes from db
   const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useCodes(0, codeHeader);
@@ -40,6 +36,10 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     const updateOptions = (): void => {
       if (!data?.length) {
         return;
+      }
+      // add an empty option to beginning, use ' ' as sometimes the value is defaulted to ''
+      if (addEmptyOption && data.findIndex(d => d.id === 0) === -1) {
+        data.push({id: 0, code: '', description: FormStrings.emptySelectValue})
       }
       setCodes(data);
       // if a default was set (a code description, update the value to its actual value)
@@ -71,10 +71,11 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     pushChangeMultiple(selected);
   };
 
-  // triggered when the default value is changed - ex. different editing object selected
+  // triggered when the default value is changed 
+  // ex. different editing object selected
   const reset = (): void => {
-    const v = defaultValue ?? '';
-    if (multiple) {
+    const v = defaultValue;
+    if (multiple && defaultValue !== undefined) {
       setValues([v]);
     } else {
       setValue(v);
@@ -115,11 +116,10 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
         <div>loading...</div>
       ) : codes && codes.length ? (
         <FormControl size='small' variant={'outlined'} className={'select-control'}>
-          <InputLabel id='select-label'>{labelTitle}</InputLabel>
+          <InputLabel>{labelTitle}</InputLabel>
           <MuiSelect
             label={labelTitle}
-            labelId='select-label'
-            variant='outlined'
+            variant={'outlined'}
             value={multiple ? values : value}
             onChange={multiple ? handleChangeMultiple : handleChange}
             renderValue={(selected: string | string[]): string => {

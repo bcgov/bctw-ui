@@ -54,12 +54,11 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
         <div>loading...</div>
       ) : (
         <FormControl size='small' variant={'outlined'} className={'udf-select-control'}>
-          <InputLabel id='select-label'>{label}</InputLabel>
+          <InputLabel>{label}</InputLabel>
           <MuiSelect
             multiple={true}
             label={label}
-            labelId='select-label'
-            variant='outlined'
+            variant={'outlined'}
             value={values}
             onChange={handleChange}
             renderValue={(selected: string[]): string => selected.join(', ')}

@@ -1,12 +1,12 @@
-import { BCTW, BctwBaseType } from "./common_types";
+import { BCTW, BctwBaseType } from './common_types';
 import { Type } from 'class-transformer';
-import { columnToHeader } from "utils/common";
+import { columnToHeader } from 'utils/common';
 
 // used in select multiple component 
 interface ICodeFilter {
   code_header: string;
   code_header_title: string;
-  description: string;
+  description: string | number;
   code: string;
   id: number;
 }
@@ -25,7 +25,7 @@ interface ICode {
   id: number;
   code: string;
   description: string;
-  long_description: string;
+  long_description?: string;
   code_header_title?: string;
 }
 

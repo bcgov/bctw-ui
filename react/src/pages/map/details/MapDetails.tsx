@@ -1,15 +1,16 @@
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { ICodeFilter } from 'types/code';
-import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowHover, OnMapRowCellClick } from 'types/map';
+import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowSelect, OnMapRowCellClick } from 'types/map';
 import Checkbox from 'components/form/Checkbox';
-import { applyFilter, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
+import { applyFilter, flattenUniqueFeatureIDs, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
 import { Button } from '@material-ui/core';
 import { MapStrings } from 'constants/strings';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 export type MapDetailsBaseProps = {
-  handleRowSelected: OnPanelRowHover;
+  handleRowSelected: OnPanelRowSelect;
   handleShowOverview: OnMapRowCellClick;
 };
 
@@ -34,8 +35,10 @@ export default function MapDetails({
 }: MapDetailsProps): JSX.Element {
   const [groupedFeatures, setGroupedFeatures] = useState<IUniqueFeature[]>([]);
   const [crittersSelectedInMap, setCrittersSelectedInMap] = useState<string[]>([]);
+  // for export state
   const [groupedFeaturesChecked, setGroupedFeaturesChecked] = useState<IUniqueFeature[]>([]);
-  const [sort] = useState<DetailsSortOption>('animal_id');
+  const [showOnlySelected, setShowOnlySelected] = useState<boolean>(false);
+  const [sort] = useState<DetailsSortOption>('wlh_id');
 
   // upon initial load, display all critters in bottom panel
   useEffect(() => {
@@ -66,17 +69,19 @@ export default function MapDetails({
     update();
   }, [filters]);
 
+  // when the 'show only selected' checkbox is changed, update parent map state
+  useDidMountEffect(() => {
+    if (features) {
+      handleRowsChecked(flattenUniqueFeatureIDs(groupedFeaturesChecked))
+    }
+  }, [showOnlySelected])
+
   // upon rows checked in each row
   const handleRowsChecked = (ids: number[]): void => {
     const grouped = groupFeaturesByCritters(features.filter((f) => ids.includes(f.id)));
     setGroupedFeaturesChecked(grouped);
-    handleRowSelected(ids);
+    handleRowSelected(ids, showOnlySelected);
   };
-
-  const handleOnlyShowSelected = (val: Record<string, boolean>): void => {
-    // todo:
-    console.log(val)
-  }
 
   return (
     <>
@@ -86,8 +91,7 @@ export default function MapDetails({
           <Checkbox
             label={MapStrings.onlySelectedLabel}
             initialValue={false}
-            changeHandler={handleOnlyShowSelected}
-            disabled={true}
+            changeHandler={(): void => setShowOnlySelected(o => !o)}
           />
           <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
         </div>
