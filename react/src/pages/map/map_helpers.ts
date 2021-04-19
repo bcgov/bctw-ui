@@ -40,6 +40,9 @@ const getFillColorByStatus = (feature: ITelemetryFeature, selected = false): str
  * sets the l@param layer {setStyle} function
  */
 const fillPoint = (layer: any, selected = false): void => {
+  if (typeof layer.setStyle !== 'function') {
+    return;
+  }
   layer.setStyle({
     class: selected ? 'selected-ping' : '',
     weight: 1.0,
@@ -54,6 +57,9 @@ const fillPoint = (layer: any, selected = false): void => {
  */
 const groupFeaturesByCritters = (features: ITelemetryFeature[], sortOption?: DetailsSortOption): IUniqueFeature[] => {
   const uniques: IUniqueFeature[] = [];
+  if (!features.length) {
+    return uniques;
+  }
   // filter out the (0,0) points
   const filtered = features.filter((f) => {
     const coords = f.geometry.coordinates;
@@ -190,6 +196,14 @@ const getLatestTelemetryFeature = (features: ITelemetryFeature[]): ITelemetryFea
   });
 }
 
+const getGroupedLatestFeatures = (grouped: IUniqueFeature[]): ITelemetryFeature[] => {
+  const latestPings = [];
+  grouped.forEach(g => {
+    latestPings.push(getLatestTelemetryFeature(g.features));
+  })
+  return latestPings;
+}
+
 export {
   MAP_COLOURS,
   fillPoint,
@@ -203,5 +217,5 @@ export {
   sortGroupedFeatures,
   getFeaturesFromGeoJSON,
   getLatestTelemetryFeature,
-  // createColoursConst,
+  getGroupedLatestFeatures,
 };

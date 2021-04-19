@@ -22,7 +22,6 @@ type MapFiltersProps = PageProp & {
   end: string;
   uniqueDevices: number[];
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
-  onApplySelectDevices: (device_ids: number[]) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;

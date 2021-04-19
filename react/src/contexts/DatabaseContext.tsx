@@ -1,3 +1,6 @@
+// not in use
+export { }
+/*
 import PouchDB from 'pouchdb-browser';
 import PouchDBFind from 'pouchdb-find';
 import PouchDBUpsert from 'pouchdb-upsert';
@@ -10,27 +13,25 @@ export type IDatabaseContext = {
   resetDatabase: () => void;
 };
 
-export const DatabaseContext = React.createContext<IDatabaseContext>({ database: null, resetDatabase: () => { /* do nothing */ } });
+export const DatabaseContext = React.createContext<IDatabaseContext>({ database: null, resetDatabase: () => {} });
 
 /**
  * Provides access to the database and to related functions to manipulate the database instance.
  *
  * @param {*} props
  */
-export const DatabaseContextProvider: React.FC = (props) => {
-  const [databaseContext, setDatabaseContext] = useState<IDatabaseContext>({ database: null, resetDatabase: () => { /* do nothing */ } });
 
-  /**
-   * Create the database using standard (non-mobile) plugins/settings.
-   */
+/*
+export const DatabaseContextProvider: React.FC = (props) => {
+  const [databaseContext, setDatabaseContext] = useState<IDatabaseContext>({ database: null, resetDatabase: () => {} });
+
+  // Create the database using standard (non-mobile) plugins/settings.
   const createDatabase = (): PouchDB.Database<any> => {
     const db = new PouchDB(DB_SCHEMA);
     return db;
   };
 
-  /**
-   * Create the database.
-   */
+  // Create the database.
   const setupDatabase = async (): Promise<void> => {
     let db = databaseContext.database;
 
@@ -46,9 +47,7 @@ export const DatabaseContextProvider: React.FC = (props) => {
     setDatabaseContext({ database: db, resetDatabase: () => resetDatabase(db) });
   };
 
-  /**
-   * Destroy and re-create the database.
-   */
+  // Destroy and re-create the database.
   const resetDatabase = async (db): Promise<void> => {
     if (!db) {
       return;
@@ -58,11 +57,8 @@ export const DatabaseContextProvider: React.FC = (props) => {
     await setupDatabase();
   };
 
-  /**
-   * Close the database.
-   *
-   * Note: This only closes any active connections/listeners, and does not destory the actual database or its content.
-   */
+  // Close the database.
+  // Note: This only closes any active connections/listeners, and does not destory the actual database or its content.
   const cleanupDatabase = async (): Promise<() => void> => {
     const db = databaseContext.database;
 
@@ -83,3 +79,5 @@ export const DatabaseContextProvider: React.FC = (props) => {
 
   return <DatabaseContext.Provider value={databaseContext}>{props.children}</DatabaseContext.Provider>;
 };
+
+*/

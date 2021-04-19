@@ -11,11 +11,11 @@ import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import MapDetails from 'pages/map/details/MapDetails';
-import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML, hidePopup } from 'pages/map/map_init';
-import { applyFilter, fillPoint, getUniqueCritterIDsFromFeatures, getUniqueDevicesFromFeatures, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
+import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML, hidePopup, setupLatestPingOptions } from 'pages/map/map_init';
+import { applyFilter, fillPoint, getGroupedLatestFeatures, getUniqueCritterIDsFromFeatures, getUniqueDevicesFromFeatures, groupFeaturesByCritters, groupFilters } from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { ICodeFilter } from 'types/code';
 import { ITelemetryDetail, ITelemetryFeature, IUniqueFeature, MapRange } from 'types/map';
@@ -30,10 +30,10 @@ export default function MapPage(): JSX.Element {
 
   const [tracks] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Tracks
   const [pings] = useState<L.GeoJSON>(new L.GeoJSON()); // Store Pings
-  // todo: unassigned collars
-  // const [unassigned, setUnassigned] = useState<boolean>(false);
+  const [latestPingsByCritter] = useState<L.GeoJSON>(new L.GeoJSON());
 
-  const selectedPings = new L.GeoJSON();
+
+  const selectedPings = new L.GeoJSON(); // the drawn shapes
   selectedPings.options = setupSelectedPings();
 
   const [range, setRange] = useState<MapRange>({
@@ -43,6 +43,7 @@ export default function MapPage(): JSX.Element {
 
   // for map bottom panel state, since the layers in pings gets overwritten
   // when filters are applied, use features to store the global fetched data
+  const [latestFeatures, setLatestFeatures] = useState<ITelemetryFeature[]>([]);
   const [features, setFeatures] = useState<ITelemetryFeature[]>([]);
   const [selectedFeatureIDs, setSelectedFeatureIDs] = useState<number[]>([]);
 
@@ -63,13 +64,14 @@ export default function MapPage(): JSX.Element {
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
 
+  // fetch the map data
   const { start, end } = range;
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: tracksData } = bctwApi.useTracks(start, end);
   const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end, /* fixme: */ false);
 
   // refresh when start/end times are changed
   useEffect(() => {
-    clearLatestPings();
+    clearLayers();
   }, [range]);
 
   useEffect(() => {
@@ -82,8 +84,18 @@ export default function MapPage(): JSX.Element {
     if (pingsData && !isErrorPings) {
       // must be called before adding data to pings
       setupPingOptions(pings, handlePointClick);
-      pings.addData(pingsData as any);
-      setFeatures(pingsData);
+      setupLatestPingOptions(latestPingsByCritter, handleLatestPointClick);
+
+      const latestPings = getGroupedLatestFeatures(groupFeaturesByCritters(pingsData));
+      const latestIds = latestPings.map(l => l.id);
+      const otherPings = pingsData.filter(p => !latestIds.includes(p.id));
+
+      pings.addData(otherPings as any);
+      latestPingsByCritter.addData(latestPings as any);
+
+      setLatestFeatures(latestPings);
+      setFeatures(otherPings);
+
       rebindMapListeners();
     }
   }, [pingsData]);
@@ -100,7 +112,7 @@ export default function MapPage(): JSX.Element {
     updateComponent();
   });
 
-  // hide popup when various modals are opened
+  // hide popup when modals are displayed
   useEffect(() => {
     if (showExportModal || showOverviewModal || showUdfEdit) {
       hidePopup();
@@ -132,12 +144,26 @@ export default function MapPage(): JSX.Element {
       hidePopup();
     }
     lastPoint = layer;
-    // console.log('setting last point to ', lastPoint.feature.id)
     const feature: ITelemetryFeature = layer?.feature;
     fillPoint(layer, true);
     setPopupInnerHTML(feature as any);
+    // set the feature id state so bottom panel will highlight the row
     setSelectedFeatureIDs([feature.id]);
   };
+
+  /**
+   * same as the point handler above, but leaflet icons don't have the setStyle function
+   */
+  const handleLatestPointClick = (event: L.LeafletEvent): void => {
+    const layer = event.target;
+    if (lastPoint && lastPoint !== layer) {
+      hidePopup();
+    }
+    lastPoint = layer;
+    const feature: ITelemetryFeature = layer?.feature;
+    setPopupInnerHTML(feature as any);
+    setSelectedFeatureIDs([feature.id]);
+  }
 
   // when a map point is clicked that isn't a marker, close the popup
   const handleClosePopup = (): void => {
@@ -154,16 +180,21 @@ export default function MapPage(): JSX.Element {
    * a) hide the popup
    * b) style the selected points
    * @param ids the feature IDs for the critter(s) selected
+   * @param shouldFilterMapPoints is 'Show Only Selected' checked?
    */
   const handleDetailPaneRowSelect = (ids: number[], shouldFilterMapPoints: boolean): void => {
     hidePopup();
 
     if (shouldFilterMapPoints) {
       const p = features.filter(f => ids.includes(f.id));
-      const t = (tracksData as any).filter(f => getUniqueCritterIDsFromFeatures(features, ids).includes(f.critter_id)) ;
-      drawLatestPings(p, t);
+      const lp = latestFeatures.filter(f => ids.includes(f.id));
+      const t = tracksData.filter(f => {
+        const uniqueCritters = getUniqueCritterIDsFromFeatures(features, ids);
+        return uniqueCritters.includes(f.properties.critter_id);
+      });
+      redrawLayers(p, lp, t);
     } else {
-      drawLatestPings();
+      redrawLayers();
     }
 
     mapRef.current.eachLayer((layer) => {
@@ -217,14 +248,16 @@ export default function MapPage(): JSX.Element {
   };
 
   // clears existing pings/tracks layers
-  const clearLatestPings = (): void => {
+  const clearLayers = (): void => {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(pings);
     layerPicker.removeLayer(tracks);
+    layerPicker.removeLayer(latestPingsByCritter);
 
     // layerPicker.removeLayer(selectedPings);
     pings.clearLayers();
     tracks.clearLayers();
+    latestPingsByCritter.clearLayers();
     selectedPings.clearLayers();
   };
 
@@ -232,8 +265,8 @@ export default function MapPage(): JSX.Element {
    * clears existing pings/tracks layers, draws the new ones
    * @param newPings @param newTracks defaults to existing if not supplied
    */
-  const drawLatestPings = (newPings = pingsData, newTracks = tracksData): void => {
-    clearLatestPings();
+  const redrawLayers = (newPings = features, newLatestPings = latestFeatures, newTracks = tracksData): void => {
+    clearLayers();
     mapRef.current.eachLayer((layer) => {
       if ((layer as any).options.class === 'selected-ping') {
         mapRef.current.removeLayer(layer);
@@ -241,6 +274,7 @@ export default function MapPage(): JSX.Element {
     });
     tracks.addData(newTracks as any);
     pings.addData(newPings as any);
+    latestPingsByCritter.addData(newLatestPings as any);
   };
 
   // triggered when side-panel filters are applied
@@ -249,11 +283,17 @@ export default function MapPage(): JSX.Element {
     if (newRange.start !== range.start || newRange.end !== range.end) {
       setRange(newRange);
     }
+
     setFilters(filters);
-    const filteredPings = applyFilter(groupFilters(filters), features) as any;
-    const uniqueCritters = groupFeaturesByCritters(filteredPings).map((c) => c.critter_id);
-    const filteredTracks = (tracksData as any[]).filter((td) => uniqueCritters.includes(td.properties.critter_id));
-    drawLatestPings(filteredPings, filteredTracks);
+    const groupedFilters = groupFilters(filters);
+
+    const p = applyFilter(groupedFilters, features);
+    const lp = applyFilter(groupedFilters, latestFeatures);
+
+    const critters = groupFeaturesByCritters(p).map((c) => c.critter_id);
+    const newTracks = tracksData.filter((td) => critters.includes(td.properties.critter_id));
+
+    redrawLayers(p, lp, newTracks);
   };
 
   // show the critter overview modal when a row is clicked in bottom panel
@@ -263,34 +303,28 @@ export default function MapPage(): JSX.Element {
     setShowModal((o) => !o);
   };
 
-  // triggered when user clicks checkbox in filter panel
-  const handleShowLatestPings = (b: boolean): void => {
-    if (!b) {
-      // restore default pings & tracks
-      drawLatestPings();
-      return;
+  /**
+   * triggered when user clicks checkbox in filter panel
+   * since latest pings are a separate layer, this toggles the pings/tracks layers
+   * @param show should only the latest pings be shown?
+   */
+  const handleShowLatestPings = (show: boolean): void => {
+    if (show) {
+      mapRef.current.removeLayer(pings);
+      mapRef.current.removeLayer(tracks);
+    } else {
+      mapRef.current.addLayer(pings);
+      mapRef.current.addLayer(tracks);
     }
-    const newFeatures = [];
-    // to make sure we only get one result per group, group all features by critter id
-    const grouped = groupFeaturesByCritters(features);
-    for (let i = 0; i < grouped.length; i++) {
-      // iterate groups, getting the most recent date
-      const features = grouped[i].features;
-      const latestFeature = features.reduce((accum, current) =>
-        dayjs(current.properties.date_recorded).isAfter(dayjs(accum.properties.date_recorded)) ? current : accum
-      );
-      newFeatures.push(latestFeature);
-    }
-    drawLatestPings(newFeatures as any, []);
   };
 
   const handleShowLast10Fixes = (b: boolean): void => {
     if (!b) {
-      drawLatestPings();
+      redrawLayers();
       return;
     }
-    const newFeatures = [];
-    const grouped: IUniqueFeature[] = groupFeaturesByCritters(features);
+    const p = [];
+    const grouped: IUniqueFeature[] = groupFeaturesByCritters(pingsData);
     for (let i = 0; i < grouped.length; i++) {
       const features = grouped[i].features;
       const sorted = features.sort((a, b) => {
@@ -298,10 +332,10 @@ export default function MapPage(): JSX.Element {
       });
       const last10 = sorted.filter((s, idx) => idx <= 9);
       // console.log(last10.map(d => d.properties.date_recorded))
-      newFeatures.push(...last10);
+      p.push(...last10);
     }
     // todo: update tracks??
-    drawLatestPings(newFeatures);
+    redrawLayers(p);
   }
 
   // Add the tracks layer
@@ -309,10 +343,14 @@ export default function MapPage(): JSX.Element {
     tracks.addTo(mapRef.current);
   }, [tracks]);
 
-  // Add the ping layer
+  // Add the ping layers
   useEffect(() => {
     pings.addTo(mapRef.current);
   }, [pings]);
+
+  useEffect(() => {
+    latestPingsByCritter.addTo(mapRef.current);
+  })
 
   // trigger download on ctrl+s keyboard input
   const handleKeyPress = (e): void => {
@@ -330,25 +368,46 @@ export default function MapPage(): JSX.Element {
     download(kml, 'devices.kml', 'application/xml');
   };
 
+  const [bottomHeight, setBottomHeight] = useState<number>(400);
+  const [dragging, setDragging] = useState(false);
+
+  const onMove = (e: React.MouseEvent): void => {
+    if (dragging) {
+      const mpv = document.getElementById('map-view');
+      const offset = mpv.offsetHeight-e.clientY;
+      setBottomHeight(offset);
+    }
+  }
+
+  const onDown = (): void => {
+    setDragging(true);
+  }
+
+  const onUp = (): void => {
+    if (dragging) {
+      setDragging(false);
+    }
+  }
+
   return (
-    <div className={'map-view'}>
+    <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
       <MapFilters
         start={range.start}
         end={range.end}
         uniqueDevices={getUniqueDevicesFromFeatures(features)}
         onApplyFilters={handleChangeFilters}
         onClickEditUdf={(): void => setShowUdfEdit(o => !o)}
-        onApplySelectDevices={null}
         onShowLatestPings={handleShowLatestPings}
         onShowLastFixes={handleShowLast10Fixes}
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
-        <div id='map' onKeyDown={handleKeyPress}/>
         <div id='popup'/>
-        <div className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
-          <MapDetails
-            features={features}
+        <div id='map' onKeyDown={handleKeyPress} />
+        <div style={{height: bottomHeight}} className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
+          <div onMouseDown={onDown} id='drag'></div>
+          <MapDetails 
+            features={[...features, ...latestFeatures]}
             filters={filters}
             selectedFeatureIDs={selectedFeatureIDs}
             handleShowOverview={handleShowOverview}

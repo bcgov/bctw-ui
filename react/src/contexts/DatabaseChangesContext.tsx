@@ -1,9 +1,13 @@
+// not in use
+export {}
+/*
 import React, { useContext, useEffect, useState } from 'react';
 import { DatabaseContext } from './DatabaseContext';
 
 export type IDatabaseChanges = PouchDB.Core.ChangesResponseChange<any> | PouchDB.Core.ChangesResponse<any> | any;
 
 export const DatabaseChangesContext = React.createContext<IDatabaseChanges>(null);
+*/
 
 /**
  * Provides access to a database changes object, which contains information about the most recent database updates.
@@ -11,6 +15,8 @@ export const DatabaseChangesContext = React.createContext<IDatabaseChanges>(null
  * @param {*} props
  * @return {*}
  */
+
+/* 
 export const DatabaseChangesContextProvider: React.FC = (props) => {
   const databaseContext = useContext(DatabaseContext);
 
@@ -49,3 +55,5 @@ export const DatabaseChangesContextProvider: React.FC = (props) => {
 
   return <DatabaseChangesContext.Provider value={databaseChanges}>{props.children}</DatabaseChangesContext.Provider>;
 };
+
+*/

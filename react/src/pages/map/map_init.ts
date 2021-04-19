@@ -7,6 +7,7 @@ import { getFillColorByStatus, MAP_COLOURS } from 'pages/map/map_helpers';
 import React, { MutableRefObject } from 'react';
 import { MapTileLayers } from 'constants/strings';
 import { TelemetryFeature } from 'types/map';
+import StarSVG from 'assets/images/star.svg';
 
 const defaultPointStyle: L.CircleMarkerOptions = {
   // fillColor added later
@@ -17,35 +18,48 @@ const defaultPointStyle: L.CircleMarkerOptions = {
   fillOpacity: 0.9
 };
 
+const LatestPingSVG = L.icon({
+  iconUrl: StarSVG,
+  iconSize: [25, 25],
+});
+
+const setupLatestPingOptions = (
+  pings: L.GeoJSON,
+  clickHandler: L.LeafletEventHandlerFn
+): void => {
+  pings.options = {
+    pointToLayer: (feature, latlng: L.LatLngExpression ): L.Layer => {
+      const marker = new L.Marker(latlng, {icon: LatestPingSVG });
+      marker.on('click', clickHandler);
+      return marker;
+    },
+  };
+}
 
 const setupPingOptions = (
   pings: L.GeoJSON,
-  onClickPointHandler: L.LeafletEventHandlerFn
+  clickHandler: L.LeafletEventHandlerFn
 ): void => {
-
-  const LatestPingIcon = L.icon({
-    iconUrl: '',
-    iconSize: [5, 5],
-    // iconAnchor: [22, 94],
-    // popupAnchor: [-3, -76],
-    // shadowUrl: './star.png',
-    // shadowSize: [68, 95],
-    // shadowAnchor: [22, 94]
-  });
-
   pings.options = {
     pointToLayer: (feature, latlng: L.LatLngExpression ): L.Layer => {
       const colour = getFillColorByStatus(feature as any);
       const pointStyle = { fillColor: colour, ...defaultPointStyle };
       const marker = L.circleMarker(latlng, pointStyle);
-      // const marker = new L.Marker(latlng, {icon: LatestPingIcon});
-      // add the event listener
-      marker.on('click', onClickPointHandler);
+      marker.on('click', clickHandler);
       return marker;
-
     },
-    onEachFeature: (feature, layer): void => {
-      layer.addEventListener('popupopen', onClickPointHandler);
+  };
+};
+
+const setupSelectedPings = (): L.GeoJSONOptions => {
+  return {
+    pointToLayer: (feature, latlng) => {
+      const pointStyle = {
+        class: 'selected-ping',
+        fillColor: MAP_COLOURS['selected'],
+        ...defaultPointStyle
+      };
+      return L.circleMarker(latlng, pointStyle);
     }
   };
 };
@@ -76,19 +90,6 @@ const setPopupInnerHTML = (feature: TelemetryFeature): void => {
   `;
   doc.innerHTML = text;
   doc.classList.add('appear-above-map');
-};
-
-const setupSelectedPings = (): L.GeoJSONOptions => {
-  return {
-    pointToLayer: (feature, latlng) => {
-      const pointStyle = {
-        class: 'selected-ping',
-        fillColor: MAP_COLOURS['selected'],
-        ...defaultPointStyle
-      };
-      return L.circleMarker(latlng, pointStyle);
-    }
-  };
 };
 
 // The BCGW URL
@@ -217,4 +218,4 @@ const initMap = (
     });
 };
 
-export { initMap, hidePopup, setupPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };
+export { initMap, hidePopup, setupPingOptions, setupLatestPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };

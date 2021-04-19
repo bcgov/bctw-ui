@@ -2,11 +2,6 @@
 $appearAboveMap: 314159;
 $bottomPanelHeight: 30rem;
 
-.map-view {
-  display: flex;
-  flex-direction: row;
-}
-
 .map-container {
   flex: 1 1 auto;
   position: relative;
@@ -118,12 +113,10 @@ $bottomPanelHeight: 30rem;
 // 
 
 .bottom-panel {
-  border-top: 2px solid $BCgovGold;
   bottom: 0;
   position: absolute;
   width: 100%;
   background-color: #ffffff;
-  height: $bottomPanelHeight;
   // overflow-y: auto;
   // resize: vertical;
   // overflow: scroll;
@@ -134,7 +127,13 @@ $bottomPanelHeight: 30rem;
   .MuiTableContainer-root {
     overflow-x: hidden;
   }
+  #drag {
+    height: 4px;
+    background-color: $BCgovGold;
+    cursor: n-resize;
+  }
 }
+
 
 .bottom-tbl {
   max-height: 24rem;

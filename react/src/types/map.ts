@@ -11,7 +11,7 @@ interface MapRange {
   end: string;
 }
 
-type DetailsSortOption = 'wlh_id' | 'device_id' | 'frequency';
+type DetailsSortOption = 'wlh_id' | 'device_id' | 'frequency' | 'date_recorded';
 type OnPanelRowSelect = (ids: number[], filterMapSelection: boolean) => void;
 type OnMapRowCellClick = (type: TypeWithData, row: ITelemetryDetail) => void;
 
@@ -22,6 +22,7 @@ interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   date_recorded: Date;
   device_vendor: string;
 }
+
 interface ITelemetryFeature extends GeoJSON.Feature {
   //  type: 'Feature';
   geometry: {

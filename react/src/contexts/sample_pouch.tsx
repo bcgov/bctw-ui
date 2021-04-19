@@ -1,10 +1,10 @@
+export {}
+/*
 import React, { useContext, useEffect, useState } from 'react';
 import { DatabaseContext } from 'contexts/DatabaseContext';
 import { DatabaseChangesContext } from 'contexts/DatabaseChangesContext';
 
-/**
- * test pouch upsert and find
- */
+// test pouch upsert and find
 const SamplePouchCall = async () => {
   const db = useContext(DatabaseContext);
   const critter = { id: 2, nickname: 'sparky' };
@@ -61,3 +61,5 @@ export {
   SamplePouchCall,
   SampleComponentUsingChangesHook
 };
+
+*/
