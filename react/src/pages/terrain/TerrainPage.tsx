@@ -6,7 +6,8 @@ import {
   Math,
   Ion,
   GeoJsonDataSource,
-  CzmlDataSource
+  CzmlDataSource,
+  Color
 } from 'cesium';
 import './TerrainPage.css';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -84,7 +85,36 @@ const TerrainPage: React.FC = () => {
   });
 
   const { start, end } = range;
-  const { isFetching: fetchingPings, isError: isErrorPings, data: pingsData } = bctwApi.usePings(start, end);
+  const {
+    isFetching: fetchingPings,
+    isError: isErrorPings,
+    data: pingsData
+  } = bctwApi.usePings(start, end);
+
+  const {
+    isFetching: fetchingTracks,
+    isError: isErrorTracks,
+    data: tracksData
+  } = bctwApi.useTracks(start, end);
+
+  const  loadTracks = (tracksData) => {
+    // If the webhook fires even though dependencies are empty
+    if (!tracksData) return;
+    if (!mapRef.current) return;
+
+    // Wrap in a feature collection
+    const collection = {
+      type: 'FeatureCollection',
+      features: [...tracksData]
+    };
+
+    // Add layer
+    const layer = new GeoJsonDataSource('pings')
+      .load(collection,{
+        clampToGround: true
+      });
+    mapRef.current.dataSources.add(layer);
+  };
 
   /**
    * ## loadSlider 
@@ -155,6 +185,10 @@ const TerrainPage: React.FC = () => {
   useEffect(() => {
     loadSlider(pingsData);
   }, [pingsData,mapRef.current]);
+
+  useEffect(() => {
+    loadTracks(tracksData);
+  }, [tracksData,mapRef.current])
 
   useEffect(() => {
     initMap();
