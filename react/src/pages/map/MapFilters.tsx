@@ -199,11 +199,13 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   label={MapStrings.lastPingLabel}
                   initialValue={isLatestPing}
                   changeHandler={(): void => setIsLatestPing(o => !o)}
+                  disabled={isLastFixes}
                 />
                 <Checkbox
                   label={MapStrings.lastFixesLabel}
                   initialValue={isLastFixes}
                   changeHandler={(): void => setIsLastFixes(o => !o)}
+                  disabled={isLatestPing}
                 />
               </div>
               <div>
@@ -236,7 +238,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   Apply Filters
                 </Button>
                 <Button variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
-                  Clear
+                  Reset
                 </Button>
               </div>
             </div>

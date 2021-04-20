@@ -59,7 +59,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const pushRowCheck = (ids: string[]): void => {
     setCheckedGroups(ids);
     const pointIDs = flattenUniqueFeatureIDs(features.filter((f) => ids.includes(f.critter_id)));
-    handleRowSelected(pointIDs, false);
+    handleRowSelected(pointIDs);
   };
 
   return (

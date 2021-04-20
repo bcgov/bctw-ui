@@ -1,4 +1,5 @@
 import { Type, Expose } from 'class-transformer';
+import { GeoJsonObject } from 'geojson';
 import { IAnimalTelemetryBase } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common';
@@ -11,8 +12,13 @@ interface MapRange {
   end: string;
 }
 
+type OnlySelectedCritters = {
+  show: boolean;
+  critter_ids: string[];
+}
+
 type DetailsSortOption = 'wlh_id' | 'device_id' | 'frequency' | 'date_recorded';
-type OnPanelRowSelect = (ids: number[], filterMapSelection: boolean) => void;
+type OnPanelRowSelect = (ids: number[]) => void;
 type OnMapRowCellClick = (type: TypeWithData, row: ITelemetryDetail) => void;
 
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
@@ -23,8 +29,8 @@ interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   device_vendor: string;
 }
 
-interface ITelemetryFeature extends GeoJSON.Feature {
-  //  type: 'Feature';
+interface ITelemetryFeature extends GeoJsonObject {
+  type: 'Feature';
   geometry: {
     type: 'Point';
     coordinates: number[];
@@ -33,8 +39,8 @@ interface ITelemetryFeature extends GeoJSON.Feature {
   properties: ITelemetryDetail;
 }
 
-interface ITracksFeature extends GeoJSON.GeoJsonObject {
-  // type: 'Feature';
+interface ITracksFeature extends GeoJsonObject {
+  type: 'LineString';
   properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'species'>
 }
 
@@ -109,4 +115,5 @@ export type {
   OnMapRowCellClick,
   OnPanelRowSelect,
   DetailsSortOption,
+  OnlySelectedCritters,
 };

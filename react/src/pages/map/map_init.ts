@@ -6,18 +6,19 @@ import { formatLocal } from 'utils/time';
 import { getFillColorByStatus, MAP_COLOURS } from 'pages/map/map_helpers';
 import React, { MutableRefObject } from 'react';
 import { MapTileLayers } from 'constants/strings';
-import { TelemetryFeature } from 'types/map';
+import { ITelemetryFeature } from 'types/map';
 import StarSVG from 'assets/images/star.svg';
 
 const defaultPointStyle: L.CircleMarkerOptions = {
   // fillColor added later
   radius: 8,
-  color: MAP_COLOURS['outline'],
+  color: MAP_COLOURS.track,
   weight: 1,
   opacity: 0.8,
   fillOpacity: 0.9
 };
 
+// todo: fill colour by critter
 const LatestPingSVG = L.icon({
   iconUrl: StarSVG,
   iconSize: [25, 25],
@@ -51,12 +52,21 @@ const setupPingOptions = (
   };
 };
 
+// todo: use for unassigned devices?
+const setupTracksOptions = (tracks: L.GeoJSON): void => {
+  tracks.options = {
+    style: (): Record<string, string> => {
+      return { color: MAP_COLOURS.track}
+    }
+  }
+}
+
 const setupSelectedPings = (): L.GeoJSONOptions => {
   return {
     pointToLayer: (feature, latlng) => {
       const pointStyle = {
         class: 'selected-ping',
-        fillColor: MAP_COLOURS['selected'],
+        fillColor: MAP_COLOURS.selected,
         ...defaultPointStyle
       };
       return L.circleMarker(latlng, pointStyle);
@@ -70,7 +80,7 @@ const hidePopup = (): void => {
   doc.classList.remove('appear-above-map');
 };
 
-const setPopupInnerHTML = (feature: TelemetryFeature): void => {
+const setPopupInnerHTML = (feature: ITelemetryFeature): void => {
   const doc = document.getElementById('popup');
   const p = feature.properties;
   const g = feature.geometry;
@@ -83,7 +93,7 @@ const setPopupInnerHTML = (feature: TelemetryFeature): void => {
     Device ID: ${p.device_id} (${p.device_vendor}) <br>
     ${p.frequency ? 'Frequency: ' + p.frequency + '<br>' : ''}
     ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
-    ${p.device_status ? 'Collar Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
+    ${p.device_status ? 'Device Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
     ${p.population_unit ? 'Population Unit: ' + p.population_unit + '<br>' : ''}
     ${t} <br>
     Location: ${x}, ${y}
@@ -169,7 +179,8 @@ const initMap = (
   mapRef.current.addControl(drawControl);
   mapRef.current.addControl(layerPicker);
 
-  const drawLabel = (e) => {
+  // line drawing control
+  const drawLabel = (e): void => {
     // Get the feature
     const lineString = e.layer.toGeoJSON();
     const distance = Math.round(length(lineString) * 10) / 10; // kms
@@ -218,4 +229,4 @@ const initMap = (
     });
 };
 
-export { initMap, hidePopup, setupPingOptions, setupLatestPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };
+export { setupTracksOptions, initMap, hidePopup, setupPingOptions, setupLatestPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };

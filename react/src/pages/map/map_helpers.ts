@@ -4,16 +4,16 @@ import { ICodeFilter, IGroupedCodeFilter } from 'types/code';
 import { DetailsSortOption, ITelemetryDetail, ITelemetryFeature, IUniqueFeature } from 'types/map';
 
 const MAP_COLOURS = {
-  'point': '#00ff44',
-  'track': '#52baff',
-  'selected': '#ffff00',
+  point: '#00ff44',
+  track: '#52baff',
+  selected: '#ffff00',
   // 'selected polygon': '#ffff00',
   'unassigned point': '',
   'unassigned line segment': '',
-  'malfunction': '#FF8C00',
-  'mortality': '#ff0000',
-  'outline': '#fff',
-}
+  malfunction: '#FF8C00',
+  mortality: '#ff0000',
+  outline: '#fff'
+};
 
 /**
  *
@@ -22,22 +22,22 @@ const MAP_COLOURS = {
  */
 const getFillColorByStatus = (feature: ITelemetryFeature, selected = false): string => {
   if (selected) {
-    return MAP_COLOURS['selected'];
+    return MAP_COLOURS.selected;
   }
   if (!feature) {
-    return MAP_COLOURS['point']
+    return MAP_COLOURS.point;
   }
   const { properties } = feature;
   if (properties?.animal_status === 'Mortality') {
-    return MAP_COLOURS['mortality'];
+    return MAP_COLOURS.mortality;
   } else if (properties?.device_status === 'Potential Mortality') {
-    return MAP_COLOURS['malfunction'];
+    return MAP_COLOURS.malfunction;
   }
-  return properties?.animal_colour ?? MAP_COLOURS['point'];
+  return properties?.animal_colour ?? MAP_COLOURS.point;
 };
 
 /**
- * sets the l@param layer {setStyle} function
+ * sets the @param layer {setStyle} function
  */
 const fillPoint = (layer: any, selected = false): void => {
   if (typeof layer.setStyle !== 'function') {
@@ -108,7 +108,7 @@ const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
 
 /**
  * @param groupedFilters a list of filters that have been grouped into @type {IGroupedCodeFilter}
- * @param features the feature list to apply the filters to 
+ * @param features the feature list to apply the filters to
  * @returns a filtered list of features that have one or more of the filters applied
  */
 const applyFilter = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryFeature[]): ITelemetryFeature[] => {
@@ -155,53 +155,87 @@ function sortGroupedFeatures(array: IUniqueFeature[], comparator: (a, b) => numb
  * @returns unique feature IDs within the group
  */
 const flattenUniqueFeatureIDs = (u: IUniqueFeature[]): number[] => {
-  return u.map(uf => uf.features.map(f => f.id)).flatMap(x => x);
-}
+  return u.map((uf) => uf.features.map((f) => f.id)).flatMap((x) => x);
+};
 
 /**
  * groups features by @property {critter_id}, and returns an array of unique critter_ids
  */
 const getUniqueCritterIDsFromFeatures = (features: ITelemetryFeature[], selectedIDs: number[]): string[] => {
-  const grped = groupFeaturesByCritters(features.filter(f => selectedIDs.includes(f.id)));
-  return grped.map(g => g.critter_id);
-}
+  const grped = groupFeaturesByCritters(features.filter((f) => selectedIDs.includes(f.id)));
+  return grped.map((g) => g.critter_id);
+};
 
 const getUniqueDevicesFromFeatures = (features: ITelemetryFeature[]): number[] => {
   const ids = [];
-  features.forEach(f => {
+  features.forEach((f) => {
     const did = f.properties.device_id;
     if (!ids.includes(did)) {
       ids.push(did);
     }
   });
-  return ids; 
-}
+  return ids;
+};
 
 /**
- * casts @param obj to @type {ITelemetryFeature}  
+ * casts @param obj to @type {ITelemetryFeature}
  */
 const getFeaturesFromGeoJSON = (obj: L.GeoJSON): ITelemetryFeature[] => {
   // fixme: why isn't feature a property of Layer??
-  const features = obj.getLayers().map(d => (d as any)?.feature as ITelemetryFeature);
+  const features = obj.getLayers().map((d) => (d as any)?.feature as ITelemetryFeature);
   return features;
-}
+};
 
 /**
- * @param features 
+ * @param features
  * @returns a single feature that contains the most recent date_recorded
  */
 const getLatestTelemetryFeature = (features: ITelemetryFeature[]): ITelemetryFeature => {
   return features.reduce((accum, current) => {
-    return dayjs(current.properties.date_recorded).isAfter(dayjs(accum.properties.date_recorded)) ? current : accum
+    return dayjs(current.properties.date_recorded).isAfter(dayjs(accum.properties.date_recorded)) ? current : accum;
+  });
+};
+
+const getEarliestTelemetryFeature = (features: ITelemetryFeature[]): ITelemetryFeature => {
+  return features.reduce((accum, current) => {
+    return dayjs(current.properties.date_recorded).isBefore(dayjs(accum.properties.date_recorded)) ? current : accum;
   });
 }
 
+// groups the param features by critter, returning an object containing:
+// an array of the most recent pings
+// an arrya of all other pings
+const splitPings = (features: ITelemetryFeature[]): {latest: ITelemetryFeature[], other: ITelemetryFeature[]} => {
+  const groupedByCritter = groupFeaturesByCritters(features);
+  const latest = getGroupedLatestFeatures(groupedByCritter);
+  const latestIds = latest.map(l => l.id);
+  const other = features.filter(p => !latestIds.includes(p.id));
+  return { latest, other }
+}
+
+// returns an array of the latest ping for each critter in the group
 const getGroupedLatestFeatures = (grouped: IUniqueFeature[]): ITelemetryFeature[] => {
   const latestPings = [];
-  grouped.forEach(g => {
+  grouped.forEach((g) => {
     latestPings.push(getLatestTelemetryFeature(g.features));
-  })
+  });
   return latestPings;
+};
+
+// groups features by critter, returning the most recent 9 telemetry points
+// returns 9 instead of 10 as the latest ping is stored in a separate layer
+const getLast10Fixes = (pings: ITelemetryFeature[]): ITelemetryFeature[] => {
+  const p = [];
+  const grouped: IUniqueFeature[] = groupFeaturesByCritters(pings);
+  for (let i = 0; i < grouped.length; i++) {
+    const features = grouped[i].features;
+    const sorted = features.sort((a, b) => {
+      return new Date(b.properties.date_recorded).getTime() - new Date(a.properties.date_recorded).getTime();
+    });
+    const last10 = sorted.filter((s, idx) => idx > 0 && idx <= 9);
+    p.push(...last10);
+  }
+  return p;
 }
 
 export {
@@ -215,7 +249,10 @@ export {
   groupFeaturesByCritters,
   groupFilters,
   sortGroupedFeatures,
+  getLast10Fixes,
   getFeaturesFromGeoJSON,
+  getEarliestTelemetryFeature,
   getLatestTelemetryFeature,
   getGroupedLatestFeatures,
+  splitPings,
 };

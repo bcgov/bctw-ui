@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
 import { Animal } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
-import { Collar, eCollarAssignedStatus, ICollar } from 'types/collar';
+import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
 import { User, UserCritterAccess } from 'types/user';
 
