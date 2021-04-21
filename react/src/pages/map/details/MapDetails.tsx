@@ -83,9 +83,12 @@ export default function MapDetails({
     const grouped = groupFeaturesByCritters(features.filter((f) => ids.includes(f.id)));
     setGroupedFeaturesChecked(grouped);
     handleRowSelected(ids);
+    if (showOnlySelected) {
+      handleShowOnlySelected({show: true, critter_ids: grouped.map(g => g.critter_id)});
+    }
   };
 
-  const handleShowSelectedChecked = (val): void => {
+  const handleShowSelectedChecked = (val: Record<string, boolean>): void => {
     const isChecked = val[MapStrings.onlySelectedLabel];
     setShowOnlySelected(isChecked);
     // call the parent handler

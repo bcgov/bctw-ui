@@ -11,6 +11,7 @@ export const mapApi = (props: ApiProps) => {
     const { data } = await api.get(url);
     return data?.features;
   };
+
   const getPingExtent = async (): Promise<any> => {
     const url = createUrl({ api: 'get-ping-extent', testUser });
     const { data } = await api.get(url);

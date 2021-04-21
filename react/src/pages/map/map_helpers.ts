@@ -64,7 +64,8 @@ const getOutlineColor = (feature: ITelemetryFeature): string => {
  * sets the @param layer {setStyle} function
  */
 const fillPoint = (layer: any, selected = false): void => {
-  if (typeof layer.setStyle !== 'function') {
+  // dont style tracks or invalid points
+  if (!layer.feature || layer.feature?.geometry?.type === 'LineString' || typeof layer.setStyle !== 'function') {
     return;
   }
   layer.setStyle({

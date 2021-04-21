@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import MapDetails from 'pages/map/details/MapDetails';
-import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML, hidePopup, setupLatestPingOptions } from 'pages/map/map_init';
+import { setupPingOptions, setupSelectedPings, initMap, setPopupInnerHTML, hidePopup, setupLatestPingOptions, setupTracksOptions } from 'pages/map/map_init';
 import { applyFilter, fillPoint, getLast10Fixes, getUniqueDevicesFromFeatures, groupFeaturesByCritters, groupFilters, splitPings } from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
@@ -93,47 +93,52 @@ export default function MapPage(): JSX.Element {
   }, [range]);
 
   useEffect(() => {
-    if (fetchedPings && !isErrorPings) {
-      // must be called before adding data to pings layer
-      setupPingOptions(pingsLayer, handlePointClick);
-      setupLatestPingOptions(latestPingsLayer, handleLatestPointClick);
+    const update = (): void => {
+      if (fetchedPings && !isErrorPings) {
+        // must be called before adding data to pings layer
+        setupPingOptions(pingsLayer, handlePointClick);
+        setupLatestPingOptions(latestPingsLayer, handleLatestPointClick);
 
-      setCritterIDsDisplayed(groupFeaturesByCritters(fetchedPings).map(c => c.critter_id));
+        setCritterIDsDisplayed(groupFeaturesByCritters(fetchedPings).map(c => c.critter_id));
 
-      rebindMapListeners();
+        rebindMapListeners();
 
-      const { latest, other } = splitPings(fetchedPings);
+        const { latest, other } = splitPings(fetchedPings);
 
-      // re-apply filters
-      if (filters.length) {
-        applyFiltersToPings(filters, other, latest);
-      } else {
-        setPings(other);
-        setLatestPings(latest);
+        // re-apply filters
+        if (filters.length) {
+          applyFiltersToPings(filters, other, latest);
+        } else {
+          setPings(other);
+          setLatestPings(latest);
+        }
+
+        //fixme: what if map-only filters and normal filters are applied!?
+
+        if (isMapOnlyFilterApplied) {
+          // filter what's shown on the map, but not the bottom panel
+          if (onlySelected.show) {
+            const predicate = (l: ITelemetryFeature): boolean => onlySelected.critter_ids.includes(l.properties.critter_id);
+            redrawLayers(fetchedPings.filter(predicate));
+          } else if (onlyLast10) {
+            redrawLayers(getLast10Fixes(fetchedPings));
+          } else if (onlyLastKnown) {
+            mapRef.current.removeLayer(pingsLayer);
+            mapRef.current.removeLayer(tracksLayer);
+          } 
+        } else if (!filters.length) {
+          pingsLayer.addData(other as any);
+          latestPingsLayer.addData(latest as any);
+        }
+
       }
-
-      if (isMapOnlyFilterApplied) {
-        // filter what's shown on the map, but not the bottom panel
-        if (onlySelected.show) {
-          const predicate = (l: ITelemetryFeature): boolean => onlySelected.critter_ids.includes(l.properties.critter_id);
-          redrawLayers(fetchedPings.filter(predicate));
-        } else if (onlyLast10) {
-          redrawLayers(getLast10Fixes(fetchedPings));
-        } else if (onlyLastKnown) {
-          mapRef.current.removeLayer(pingsLayer);
-          mapRef.current.removeLayer(tracksLayer);
-        } 
-      } else {
-        pingsLayer.addData(other as any);
-        latestPingsLayer.addData(latest as any);
-      }
-
     }
+    update();
   }, [fetchedPings]);
 
   useEffect(() => {
     if (fetchedTracks && !isErrorTracks) {
-      // setupTracksOptions(tracks);
+      setupTracksOptions(tracksLayer);
       tracksLayer.addData(fetchedTracks as any);
       if (filters.length) {
         applyFiltersToTracks(fetchedTracks);
@@ -141,9 +146,13 @@ export default function MapPage(): JSX.Element {
     }
   }, [fetchedTracks]);
 
+  // update tracks
+  useEffect(() => {
+    applyFiltersToTracks();
+  }, [critterIDsDisplayed]);
+
   useEffect(() => {
     const b = onlyLast10 || onlyLastKnown || (onlySelected && onlySelected.show);
-    // console.log('IsMapOnlyFilterApplied: ', b);
     setIsMapOnlyFilterApplied(b);
   }, [onlyLast10, onlyLastKnown, onlySelected])
 
@@ -220,8 +229,8 @@ export default function MapPage(): JSX.Element {
     hidePopup();
   }
 
-  // when rows are checked in the details panel
-  // fixme: not working when new data fetched
+  // when rows are checked in the details panel, highlight them
+  // fixme: the highlight fill color is reset when new data is fetched
   const handleDetailPaneRowSelect = (pingIds: number[]): void => {
     hidePopup();
     mapRef.current.eachLayer((layer: L.Polygon) => {
@@ -316,8 +325,8 @@ export default function MapPage(): JSX.Element {
   // outside of the context of the {applyChangesFromFilterPanel}
   const applyFiltersToPings = (filters: ICodeFilter[], newFeatures = pings, newLatestFeatures = latestPings): void => {
     if (!filters.length) {
-      // reset the map state by calling {redrawLayers} with no parameters.
-      // and reset the bottom panel state by calling {splitPings} with the global 'fetched' state
+      // * reset the map state by calling {redrawLayers} with no parameters.
+      // * reset the bottom panel state by calling {splitPings} with the global 'fetched' state
       const { latest, other } = splitPings(fetchedPings);
       setPings(other)
       setLatestPings(latest);
@@ -332,13 +341,18 @@ export default function MapPage(): JSX.Element {
     setLatestPings(filteredLPings);
     redrawPings(filteredPings, filteredLPings);
 
-    // todo:
-    // updating critter ids will trigger redraw of tracks
-    // setCritterIDsDisplayed(groupFeaturesByCritters(filteredPings).map((c) => c.critter_id));
+    // trigger the redraw of tracks
+    setCritterIDsDisplayed(groupFeaturesByCritters(filteredPings).map((c) => c.critter_id));
   }
 
-  // 
+  /**
+   * in order to know what tracks need to be updated, the filters need to be applied to pings first,
+   * because that will determine which critters are displayed
+   * this function will be triggered when @var {critterIDsDisplayed} is changed
+   */
   const applyFiltersToTracks = (newTracks = fetchedTracks): void => {
+    // fetchedTracks may be actually be undefined!
+    if (!newTracks) { return }
     const filtered = newTracks.filter(t => critterIDsDisplayed.includes(t.properties.critter_id));
     redrawTracks(filtered);
   }
@@ -355,12 +369,12 @@ export default function MapPage(): JSX.Element {
    * since latest pings are a separate layer, this toggles the pings/tracks layers
    * @param show should only the latest pings be shown?
    */
+  // fixme: points within drawn polygons are still displayed
   const handleShowLastKnownLocation = (show: boolean): void => {
     setOnlyLastKnown(show);
     if (show) {
       mapRef.current.removeLayer(pingsLayer);
       mapRef.current.removeLayer(tracksLayer);
-      // fixme: hide non-latest points within polygon?
     } else {
       mapRef.current.addLayer(pingsLayer);
       mapRef.current.addLayer(tracksLayer);
@@ -370,6 +384,7 @@ export default function MapPage(): JSX.Element {
   /**
    * @param b boolean on whether the map should be filtered to each critter's last 10 pings
    */
+  // fixme: tracks are not hidden
   const handleShowLast10Fixes = (b: boolean): void => {
     setOnlyLast10(b);
     if (!b) {
@@ -378,7 +393,6 @@ export default function MapPage(): JSX.Element {
     }
     const last10FixesCombined = getLast10Fixes(fetchedPings);
     redrawPings(last10FixesCombined);
-    // todo: get new earliest start/end to update tracks
   }
 
   const handleShowOnlySelected = (o: OnlySelectedCritters): void => {
@@ -386,7 +400,6 @@ export default function MapPage(): JSX.Element {
     const { show, critter_ids } = o;
     if (show) {
       const p = fetchedPings.filter(f => critter_ids.includes(f.properties.critter_id));
-      console.log(p.length, fetchedPings.length)
       const t = fetchedTracks.filter(f => critter_ids.includes(f.properties.critter_id));
       redrawLayers(p, t);
     } else {

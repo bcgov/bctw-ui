@@ -264,7 +264,10 @@ export const useTelemetryApi = () => {
   /**
    *
    * mutations
+   * 
    */
+
+  /** save a code header */
   const useMutateCodeHeader = (
     config: UseMutationOptions<IBulkUploadResults<ICodeHeader>, AxiosError, ICodeHeader[]>
   ): UseMutationResult<IBulkUploadResults<ICodeHeader>> =>
@@ -273,6 +276,7 @@ export const useTelemetryApi = () => {
       config
     );
 
+  /** upsert a collar */
   const useMutateCollar = (
     config: UseMutationOptions<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>
   ): UseMutationResult<IBulkUploadResults<Collar>> =>
@@ -281,26 +285,31 @@ export const useTelemetryApi = () => {
       config
     );
 
+  /** upsert an animal */
   const useMutateCritter = (
     config: UseMutationOptions<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>
   ): UseMutationResult<IBulkUploadResults<Animal>> =>
     useMutation<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>((critter) => critterApi.upsertCritter(critter), config);
 
+  /** attach or remove a device from an animal */
   const useMutateLinkCollar = (
     config: UseMutationOptions<CollarHistory, AxiosError, ICollarLinkPayload>
   ): UseMutationResult =>
     useMutation<CollarHistory, AxiosError, ICollarLinkPayload>((link) => critterApi.linkCollar(link), config);
 
+  /** upload a single .csv file to add or update codes/code headers, critters, or collars */
   const useMutateBulkCsv = <T>(
     config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, FormData>
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
+  /** upload one or more .keyx files to create new Vectronic devices */
   const useMutateBulkXml = (
     config: UseMutationOptions<IBulkUploadResults<any>, AxiosError, FormData>
   ): UseMutationResult<IBulkUploadResults<any>, AxiosError> =>
     useMutation<IBulkUploadResults<any>, AxiosError, FormData>((formData) => bulkApi.uploadFiles(formData), config);
 
+  /** grant or remove permissions to a user to animals */
   const useMutateGrantCritterAccess = (
     config: UseMutationOptions<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>
   ): UseMutationResult =>
@@ -309,9 +318,11 @@ export const useTelemetryApi = () => {
       config
     );
 
+  /** delete a critter or device */
   const useDelete = (config: UseMutationOptions<boolean, AxiosError, IDeleteType>): UseMutationResult<boolean> =>
     useMutation<boolean, AxiosError, IDeleteType>((body) => critterApi.deleteType(body), config);
 
+  /** save user defined animal groups */
   const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDFInput[]>): UseMutationResult<IUDF[]> =>
     useMutation<IUDF[], AxiosError, IUDFInput[]>((body) => userApi.upsertUDF(body), config);
 
