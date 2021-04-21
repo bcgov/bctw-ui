@@ -3,16 +3,15 @@ import length from '@turf/length';
 import LabeledMarker from 'leaflet-labeled-circle';
 import dayjs from 'dayjs';
 import { formatLocal } from 'utils/time';
-import { getFillColorByStatus, MAP_COLOURS } from 'pages/map/map_helpers';
+import { getFillColorByStatus, getOutlineColor, MAP_COLOURS } from 'pages/map/map_helpers';
 import React, { MutableRefObject } from 'react';
 import { MapTileLayers } from 'constants/strings';
 import { ITelemetryFeature } from 'types/map';
 import StarSVG from 'assets/images/star.svg';
 
 const defaultPointStyle: L.CircleMarkerOptions = {
-  // fillColor added later
+  // color & fillColor added later
   radius: 8,
-  color: MAP_COLOURS.track,
   weight: 1,
   opacity: 0.8,
   fillOpacity: 0.9
@@ -42,9 +41,10 @@ const setupPingOptions = (
   clickHandler: L.LeafletEventHandlerFn
 ): void => {
   pings.options = {
-    pointToLayer: (feature, latlng: L.LatLngExpression ): L.Layer => {
-      const colour = getFillColorByStatus(feature as any);
-      const pointStyle = { fillColor: colour, ...defaultPointStyle };
+    pointToLayer: (feature: ITelemetryFeature, latlng: L.LatLngExpression ): L.Layer => {
+      const color = getOutlineColor(feature);
+      const fillColor = getFillColorByStatus(feature);
+      const pointStyle = { fillColor, color, ...defaultPointStyle };
       const marker = L.circleMarker(latlng, pointStyle);
       marker.on('click', clickHandler);
       return marker;

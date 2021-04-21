@@ -17,7 +17,7 @@ import ManageLayout from 'pages/layouts/ManageLayout';
 const CodePage: React.FC = () => {
   const [codeHeader, setCodeHeader] = useState<CodeHeader>(new CodeHeader());
   const [title, setTitle] = useState<string>('');
-  const props = ['id', 'code', 'description'];
+  const props = ['id', 'code', 'description', 'long_description'];
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 

@@ -5,36 +5,60 @@ import { DetailsSortOption, ITelemetryDetail, ITelemetryFeature, IUniqueFeature 
 
 const MAP_COLOURS = {
   point: '#00ff44',
-  track: '#52baff',
+  track: '#00a9e6',
   selected: '#ffff00',
-  // 'selected polygon': '#ffff00',
-  'unassigned point': '',
-  'unassigned line segment': '',
-  malfunction: '#FF8C00',
-  mortality: '#ff0000',
+  'selected polygon': '#00a9e6',
+  'unassigned point': '#b2b2b2',
+  'unassigned line segment': '#828282',
+  malfunction: '#ffaa00',
+  mortality: '#e60000',
   outline: '#fff'
 };
 
+const MAP_COLOURS_OUTLINE = {
+  point: '#686868',
+  selected: '#000000',
+  'unassigned point': '#686868',
+  malfunction: '#000000',
+  mortality: '#ffaa00',
+}
+
 /**
- *
- * @param feature
- * @returns
+ * @param colourString the @type {Animal} animal_colour string
+ * which in the @file {map_api.ts} -> @function {getPings} is returned 
+ * in a concatted format of `${fill_collour},${border_colour}`
+ * @returns an object with point border and fill colours
  */
-const getFillColorByStatus = (feature: ITelemetryFeature, selected = false): string => {
+const parseAnimalColour = (colourString: string): {fillColor: string, color: string} => {
+  const s = colourString.split(',');
+  return { fillColor: s[0], color: s[1] };
+}
+
+/**
+ * @returns the hex colour value to show as the fill colour
+ */
+const getFillColorByStatus = (point: ITelemetryFeature, selected = false): string => {
   if (selected) {
     return MAP_COLOURS.selected;
   }
-  if (!feature) {
+  if (!point) {
     return MAP_COLOURS.point;
   }
-  const { properties } = feature;
+  const { properties } = point;
   if (properties?.animal_status === 'Mortality') {
     return MAP_COLOURS.mortality;
   } else if (properties?.device_status === 'Potential Mortality') {
     return MAP_COLOURS.malfunction;
   }
-  return properties?.animal_colour ?? MAP_COLOURS.point;
+  return parseAnimalColour(properties.animal_colour)?.fillColor ?? MAP_COLOURS.point;
 };
+
+
+// same as getFillColorByStatus - but for the point border/outline color
+const getOutlineColor = (feature: ITelemetryFeature): string => {
+  const colour = feature?.properties?.animal_colour;
+  return colour ? parseAnimalColour(colour)?.color : MAP_COLOURS.outline;
+}
 
 /**
  * sets the @param layer {setStyle} function
@@ -46,6 +70,7 @@ const fillPoint = (layer: any, selected = false): void => {
   layer.setStyle({
     class: selected ? 'selected-ping' : '',
     weight: 1.0,
+    color: getOutlineColor(layer.feature),
     fillColor: getFillColorByStatus(layer.feature, selected)
   });
 };
@@ -178,15 +203,6 @@ const getUniqueDevicesFromFeatures = (features: ITelemetryFeature[]): number[] =
 };
 
 /**
- * casts @param obj to @type {ITelemetryFeature}
- */
-const getFeaturesFromGeoJSON = (obj: L.GeoJSON): ITelemetryFeature[] => {
-  // fixme: why isn't feature a property of Layer??
-  const features = obj.getLayers().map((d) => (d as any)?.feature as ITelemetryFeature);
-  return features;
-};
-
-/**
  * @param features
  * @returns a single feature that contains the most recent date_recorded
  */
@@ -239,20 +255,22 @@ const getLast10Fixes = (pings: ITelemetryFeature[]): ITelemetryFeature[] => {
 }
 
 export {
-  MAP_COLOURS,
-  fillPoint,
   applyFilter,
+  fillPoint,
   flattenUniqueFeatureIDs,
+  getEarliestTelemetryFeature,
+  getOutlineColor,
   getFillColorByStatus,
+  getGroupedLatestFeatures,
+  getLast10Fixes,
+  getLatestTelemetryFeature,
   getUniqueCritterIDsFromFeatures,
   getUniqueDevicesFromFeatures,
   groupFeaturesByCritters,
   groupFilters,
+  MAP_COLOURS,
+  MAP_COLOURS_OUTLINE,
+  parseAnimalColour,
   sortGroupedFeatures,
-  getLast10Fixes,
-  getFeaturesFromGeoJSON,
-  getEarliestTelemetryFeature,
-  getLatestTelemetryFeature,
-  getGroupedLatestFeatures,
   splitPings,
 };
