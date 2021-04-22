@@ -11,7 +11,7 @@ export default function TextField(props: ITextfieldProps): JSX.Element {
     changeHandler(o)
   }, [defaultValue]);
 
-  const propsToPass = removeProps(props ,['propName', 'changeHandler']);
+  const propsToPass = removeProps(props ,['propName', 'changeHandler', 'outline']);
   
   return (
     <MuiTextField

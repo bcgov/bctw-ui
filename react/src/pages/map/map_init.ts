@@ -3,80 +3,10 @@ import length from '@turf/length';
 import LabeledMarker from 'leaflet-labeled-circle';
 import dayjs from 'dayjs';
 import { formatLocal } from 'utils/time';
-import { getFillColorByStatus, getOutlineColor, MAP_COLOURS, parseAnimalColour } from 'pages/map/map_helpers';
+import { MAP_COLOURS } from 'pages/map/map_helpers';
 import React, { MutableRefObject } from 'react';
 import { MapTileLayers } from 'constants/strings';
 import { ITelemetryFeature } from 'types/map';
-
-const defaultPointStyle: L.CircleMarkerOptions = {
-  // color & fillColor added later
-  radius: 8,
-  weight: 1,
-  opacity: 0.8,
-  fillOpacity: 0.9
-};
-
-const createLatestPing = (fillColour: string, color='#000', size='25px'): L.DivIcon => {
-  return L.divIcon({
-    html: `<svg width="24px" height="24px" viewBox="0 0 24 24" id="star_filled" data-name="star filled" xmlns="http://www.w3.org/2000/svg"><path id="Star" d="M10,15,4.122,18.09l1.123-6.545L.489,6.91l6.572-.955L10,0l2.939,5.955,6.572.955-4.755,4.635,1.123,6.545Z" transform="translate(2 3)" stroke="${color}" fill="${fillColour}" stroke-miterlimit="10" stroke-width="1.5"/></svg>`,
-    className: 'latest-ping',
-  })
-}
-
-const setupLatestPingOptions = (
-  pings: L.GeoJSON,
-  clickHandler: L.LeafletEventHandlerFn
-): void => {
-  pings.options = {
-    pointToLayer: (feature: ITelemetryFeature, latlng: L.LatLngExpression ): L.Layer => {
-      const marker = new L.Marker(latlng, {icon: createLatestPing(getFillColorByStatus(feature), MAP_COLOURS.malfunction)});
-      marker.on('click', clickHandler);
-      return marker;
-    },
-  };
-}
-
-const setupPingOptions = (
-  pings: L.GeoJSON,
-  clickHandler: L.LeafletEventHandlerFn
-): void => {
-  pings.options = {
-    pointToLayer: (feature: ITelemetryFeature, latlng: L.LatLngExpression ): L.Layer => {
-      const color = getOutlineColor(feature);
-      const fillColor = getFillColorByStatus(feature);
-      const pointStyle = { fillColor, color, ...defaultPointStyle };
-      const marker = L.circleMarker(latlng, pointStyle);
-      marker.on('click', clickHandler);
-      return marker;
-    },
-  };
-};
-
-// todo: use for unassigned devices?
-const setupTracksOptions = (tracks: L.GeoJSON): void => {
-  tracks.options = {
-    style: (): Record<string, string> => {
-      return {
-        weight: '1.0',
-        color: MAP_COLOURS.track
-
-      }
-    }
-  }
-}
-
-const setupSelectedPings = (): L.GeoJSONOptions => {
-  return {
-    pointToLayer: (feature, latlng) => {
-      const pointStyle = {
-        class: 'selected-ping',
-        fillColor: MAP_COLOURS.selected,
-        ...defaultPointStyle
-      };
-      return L.circleMarker(latlng, pointStyle);
-    }
-  };
-};
 
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
@@ -148,7 +78,6 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addOverlay(getCHL(), 'Cariboo Herd Locations');
 };
 
-// const initMap = (): void => {
 const initMap = (
   mapRef: MutableRefObject<L.Map>,
   drawnItems: L.FeatureGroup,
@@ -233,4 +162,4 @@ const initMap = (
     });
 };
 
-export { setupTracksOptions, initMap, hidePopup, setupPingOptions, setupLatestPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };
+export { initMap, hidePopup, setPopupInnerHTML, addTileLayers };

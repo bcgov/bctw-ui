@@ -6,8 +6,8 @@ import { ApiProps } from './api_interfaces';
 export const mapApi = (props: ApiProps) => {
   const { api, testUser } = props;
 
-  const getTracks = async (start: string, end: string): Promise<ITracksFeature[]> => {
-    const url = createUrl({ api: 'get-critter-tracks', query: `start=${start}&end=${end}`, testUser });
+  const getTracks = async (start: string, end: string, unassigned = false): Promise<ITracksFeature[]> => {
+    const url = createUrl({ api: 'get-critter-tracks', query: `start=${start}&end=${end}&unassigned=${unassigned}`, testUser });
     const { data } = await api.get(url);
     return data?.features;
   };

@@ -5,7 +5,7 @@ import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { Order } from 'components/table/table_interfaces';
 import { plainToClass } from 'class-transformer';
-import { flattenUniqueFeatureIDs, getFillColorByStatus, getLatestTelemetryFeature, sortGroupedFeatures } from 'pages/map/map_helpers';
+import { flattenUniqueFeatureIDs, getFillColorByStatus, getLatestTelemetryFeature, MAP_COLOURS, sortGroupedFeatures } from 'pages/map/map_helpers';
 import { MapDetailsBaseProps } from './MapDetails';
 import { dateObjectToDateStr } from 'utils/time';
 
@@ -122,7 +122,7 @@ function Row(props: IRowProps): JSX.Element {
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
       {/* cast the detail to a feature in order to determine the swatch colour */}
-      <TableCell style={{backgroundColor: getFillColorByStatus({properties: row, id: null, type: 'Feature', geometry: null})}}> </TableCell>
+      <TableCell style={{backgroundColor: row.animal_colour ? getFillColorByStatus({properties: row, id: null, type: 'Feature', geometry: null}) : MAP_COLOURS['unassigned point']}}> </TableCell>
       {/* if the row has no animal id, clicking the cell will open the overview panel */}
       <TableCell
         className={row.wlh_id ? '' : 'critter-hover'}

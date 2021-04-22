@@ -1,5 +1,5 @@
 import 'styles/form.scss';
-import { FormControl, Select as MuiSelect, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
+import { FormControl, Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
 import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { formatAxiosError, removeProps } from 'utils/common';
@@ -55,7 +55,7 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
       ) : (
         <FormControl size='small' variant={'outlined'} className={'udf-select-control'}>
           <InputLabel>{label}</InputLabel>
-          <MuiSelect
+          <Select
             multiple={true}
             label={label}
             variant={'outlined'}
@@ -71,7 +71,7 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
                 </MenuItem>
               );
             })}
-          </MuiSelect>
+          </Select>
         </FormControl>
       )}
     </>

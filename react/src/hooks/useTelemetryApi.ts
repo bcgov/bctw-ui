@@ -78,16 +78,33 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const useUnassignedTracks = (start: string, end: string): UseQueryResult<ITracksFeature[], AxiosError> => {
+    return useQuery<ITracksFeature[], AxiosError>(
+      ['unassigned_tracks', start, end],
+      () => mapApi.getTracks(start, end, true),
+      {...defaultQueryOptions, refetchOnMount: false, }
+    );
+  };
+
   /**
    *
    */
-  const usePings = (start: string, end: string, unassigned?: boolean): UseQueryResult<ITelemetryFeature[], AxiosError> => {
+  const usePings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
     return useQuery<ITelemetryFeature[], AxiosError>(
-      ['pings', { start, end, unassigned }],
-      () => mapApi.getPings(start, end, unassigned),
+      ['pings', { start, end }],
+      () => mapApi.getPings(start, end),
       defaultQueryOptions
     );
   };
+
+  // the same as usePings, but doesn't auto fetch due to enabled: false setting
+  const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
+    return useQuery<ITelemetryFeature[], AxiosError>(
+      ['unassigned_pings', { start, end}],
+      () => mapApi.getPings(start, end, true),
+      {...defaultQueryOptions, refetchOnMount: false, }
+    );
+  }
 
   /**
    * @param type the collar types to be fetched (assigned, unassigned)
@@ -332,7 +349,9 @@ export const useTelemetryApi = () => {
     useCodes,
     useCodeHeaders,
     useTracks,
+    useUnassignedTracks,
     usePings,
+    useUnassignedPings,
     useCollarType,
     useAllCritters,
     useAssignedCritters,

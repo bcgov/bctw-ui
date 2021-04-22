@@ -52,6 +52,10 @@ const MapStrings = {
   filterRangeStart: 'Start Date',
   filterRangeEnd: 'End Date',
   filterUserCritterGroup: 'Custom Animal Group',
+  deviceSelectedLabel: 'Device List',
+  assignmentStatusLabel: 'Device Assignment Status',
+  assignmentStatusOptionA: 'Show Assigned Devices',
+  assignmentStatusOptionU: 'Show Unassigned Devices',
 }
 
 const MapTileLayers = {

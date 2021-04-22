@@ -30,6 +30,9 @@ const MAP_COLOURS_OUTLINE = {
  * @returns an object with point border and fill colours
  */
 const parseAnimalColour = (colourString: string): {fillColor: string, color: string} => {
+  if (!colourString) {
+    return { fillColor: MAP_COLOURS['unassigned point'], color: MAP_COLOURS['unassigned point']};
+  }
   const s = colourString.split(',');
   return { fillColor: s[0], color: s[1] };
 }
@@ -204,7 +207,6 @@ const getUniqueDevicesFromFeatures = (features: ITelemetryFeature[]): number[] =
 };
 
 /**
- * @param features
  * @returns a single feature that contains the most recent date_recorded
  */
 const getLatestTelemetryFeature = (features: ITelemetryFeature[]): ITelemetryFeature => {
@@ -213,6 +215,9 @@ const getLatestTelemetryFeature = (features: ITelemetryFeature[]): ITelemetryFea
   });
 };
 
+/**
+ * @returns a single feature that contains the oldest date_recorded
+ */
 const getEarliestTelemetryFeature = (features: ITelemetryFeature[]): ITelemetryFeature => {
   return features.reduce((accum, current) => {
     return dayjs(current.properties.date_recorded).isBefore(dayjs(accum.properties.date_recorded)) ? current : accum;
