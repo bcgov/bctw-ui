@@ -558,6 +558,39 @@ export default function MapPage(): JSX.Element {
       setDragging(false);
     }
   }
+  // Style the map switching button
+  const switchMapStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    backgroundColor: 'white',
+    color: '#464646',
+    width: '2.85rem',
+    height: '2.85rem',
+    top: '183px',
+    left: '10px',
+    zIndex: 1000,
+    borderRadius: '4px',
+    cursor: 'pointer'
+  } as React.CSSProperties;
+
+  // Style the image inside the map switching button
+  const iconStyle = {
+    transform: 'scale(0.7)',
+    opacity: '0.7'
+  };
+
+  // The flag for which map is showing
+  let map3D = false;
+  
+  /**
+   * ##toggleMap3D
+   * Toggle value of _map3D_ for displaying 2D and 3D maps.
+   * @returns Boolean
+   */
+  const toggleMap3D = () => map3D = !map3D;
+
 
   return (
     <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
@@ -575,7 +608,14 @@ export default function MapPage(): JSX.Element {
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='popup'/>
         
+        {/* The 2D map container */}
         <div id='map' onKeyDown={handleKeyPress} />
+
+        {/* The layer switching button*/}
+        <div style={switchMapStyle} onClick={toggleMap3D}>
+          <img style={iconStyle}/>
+        </div>
+
         <div style={{height: bottomPanelHeight}} className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
           <div onMouseDown={onDown} id='drag'></div>
           <MapDetails 
