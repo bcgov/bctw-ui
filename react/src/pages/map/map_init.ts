@@ -3,66 +3,10 @@ import length from '@turf/length';
 import LabeledMarker from 'leaflet-labeled-circle';
 import dayjs from 'dayjs';
 import { formatLocal } from 'utils/time';
-import { getFillColorByStatus, MAP_COLOURS } from 'pages/map/map_helpers';
+import { MAP_COLOURS } from 'pages/map/map_helpers';
 import React, { MutableRefObject } from 'react';
 import { MapTileLayers } from 'constants/strings';
-import { TelemetryFeature } from 'types/map';
-import StarSVG from 'assets/images/star.svg';
-
-const defaultPointStyle: L.CircleMarkerOptions = {
-  // fillColor added later
-  radius: 8,
-  color: MAP_COLOURS['outline'],
-  weight: 1,
-  opacity: 0.8,
-  fillOpacity: 0.9
-};
-
-const LatestPingSVG = L.icon({
-  iconUrl: StarSVG,
-  iconSize: [25, 25],
-});
-
-const setupLatestPingOptions = (
-  pings: L.GeoJSON,
-  clickHandler: L.LeafletEventHandlerFn
-): void => {
-  pings.options = {
-    pointToLayer: (feature, latlng: L.LatLngExpression ): L.Layer => {
-      const marker = new L.Marker(latlng, {icon: LatestPingSVG });
-      marker.on('click', clickHandler);
-      return marker;
-    },
-  };
-}
-
-const setupPingOptions = (
-  pings: L.GeoJSON,
-  clickHandler: L.LeafletEventHandlerFn
-): void => {
-  pings.options = {
-    pointToLayer: (feature, latlng: L.LatLngExpression ): L.Layer => {
-      const colour = getFillColorByStatus(feature as any);
-      const pointStyle = { fillColor: colour, ...defaultPointStyle };
-      const marker = L.circleMarker(latlng, pointStyle);
-      marker.on('click', clickHandler);
-      return marker;
-    },
-  };
-};
-
-const setupSelectedPings = (): L.GeoJSONOptions => {
-  return {
-    pointToLayer: (feature, latlng) => {
-      const pointStyle = {
-        class: 'selected-ping',
-        fillColor: MAP_COLOURS['selected'],
-        ...defaultPointStyle
-      };
-      return L.circleMarker(latlng, pointStyle);
-    }
-  };
-};
+import { ITelemetryFeature } from 'types/map';
 
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
@@ -70,7 +14,7 @@ const hidePopup = (): void => {
   doc.classList.remove('appear-above-map');
 };
 
-const setPopupInnerHTML = (feature: TelemetryFeature): void => {
+const setPopupInnerHTML = (feature: ITelemetryFeature): void => {
   const doc = document.getElementById('popup');
   const p = feature.properties;
   const g = feature.geometry;
@@ -83,7 +27,7 @@ const setPopupInnerHTML = (feature: TelemetryFeature): void => {
     Device ID: ${p.device_id} (${p.device_vendor}) <br>
     ${p.frequency ? 'Frequency: ' + p.frequency + '<br>' : ''}
     ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
-    ${p.device_status ? 'Collar Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
+    ${p.device_status ? 'Device Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
     ${p.population_unit ? 'Population Unit: ' + p.population_unit + '<br>' : ''}
     ${t} <br>
     Location: ${x}, ${y}
@@ -134,7 +78,6 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addOverlay(getCHL(), 'Cariboo Herd Locations');
 };
 
-// const initMap = (): void => {
 const initMap = (
   mapRef: MutableRefObject<L.Map>,
   drawnItems: L.FeatureGroup,
@@ -170,7 +113,8 @@ const initMap = (
   mapRef.current.addControl(drawControl);
   mapRef.current.addControl(layerPicker);
 
-  const drawLabel = (e) => {
+  // line drawing control
+  const drawLabel = (e): void => {
     // Get the feature
     const lineString = e.layer.toGeoJSON();
     const distance = Math.round(length(lineString) * 10) / 10; // kms
@@ -219,4 +163,4 @@ const initMap = (
     });
 };
 
-export { initMap, hidePopup, setupPingOptions, setupLatestPingOptions, setupSelectedPings, setPopupInnerHTML, addTileLayers };
+export { initMap, hidePopup, setPopupInnerHTML, addTileLayers };

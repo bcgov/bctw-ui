@@ -124,9 +124,6 @@ $bottomPanelHeight: 30rem;
   position: absolute;
   width: 100%;
   background-color: #ffffff;
-  // overflow-y: auto;
-  // resize: vertical;
-  // overflow: scroll;
 
   .MuiPaper-elevation1 {
     box-shadow: none;
@@ -143,7 +140,8 @@ $bottomPanelHeight: 30rem;
 
 
 .bottom-tbl {
-  max-height: 24rem;
+  height: 70%;
+  // max-height: 24rem;
 }
 
 // must be at least this index to appear for full-screen dialog

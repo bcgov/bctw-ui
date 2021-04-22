@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
 import { Animal } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
-import { Collar, eCollarAssignedStatus, ICollar } from 'types/collar';
+import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
 import { User, UserCritterAccess } from 'types/user';
 
@@ -78,16 +78,33 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const useUnassignedTracks = (start: string, end: string): UseQueryResult<ITracksFeature[], AxiosError> => {
+    return useQuery<ITracksFeature[], AxiosError>(
+      ['unassigned_tracks', start, end],
+      () => mapApi.getTracks(start, end, true),
+      {...defaultQueryOptions, refetchOnMount: false, }
+    );
+  };
+
   /**
    *
    */
-  const usePings = (start: string, end: string, unassigned?: boolean): UseQueryResult<ITelemetryFeature[], AxiosError> => {
+  const usePings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
     return useQuery<ITelemetryFeature[], AxiosError>(
-      ['pings', { start, end, unassigned }],
-      () => mapApi.getPings(start, end, unassigned),
+      ['pings', { start, end }],
+      () => mapApi.getPings(start, end),
       defaultQueryOptions
     );
   };
+
+  // the same as usePings, but doesn't auto fetch due to enabled: false setting
+  const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
+    return useQuery<ITelemetryFeature[], AxiosError>(
+      ['unassigned_pings', { start, end}],
+      () => mapApi.getPings(start, end, true),
+      {...defaultQueryOptions, refetchOnMount: false, }
+    );
+  }
 
   /**
    * @param type the collar types to be fetched (assigned, unassigned)
@@ -264,7 +281,10 @@ export const useTelemetryApi = () => {
   /**
    *
    * mutations
+   * 
    */
+
+  /** save a code header */
   const useMutateCodeHeader = (
     config: UseMutationOptions<IBulkUploadResults<ICodeHeader>, AxiosError, ICodeHeader[]>
   ): UseMutationResult<IBulkUploadResults<ICodeHeader>> =>
@@ -273,6 +293,7 @@ export const useTelemetryApi = () => {
       config
     );
 
+  /** upsert a collar */
   const useMutateCollar = (
     config: UseMutationOptions<IBulkUploadResults<Collar>, AxiosError, IUpsertPayload<Collar>>
   ): UseMutationResult<IBulkUploadResults<Collar>> =>
@@ -281,26 +302,31 @@ export const useTelemetryApi = () => {
       config
     );
 
+  /** upsert an animal */
   const useMutateCritter = (
     config: UseMutationOptions<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>
   ): UseMutationResult<IBulkUploadResults<Animal>> =>
     useMutation<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>((critter) => critterApi.upsertCritter(critter), config);
 
+  /** attach or remove a device from an animal */
   const useMutateLinkCollar = (
     config: UseMutationOptions<CollarHistory, AxiosError, ICollarLinkPayload>
   ): UseMutationResult =>
     useMutation<CollarHistory, AxiosError, ICollarLinkPayload>((link) => critterApi.linkCollar(link), config);
 
+  /** upload a single .csv file to add or update codes/code headers, critters, or collars */
   const useMutateBulkCsv = <T>(
     config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, FormData>
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
+  /** upload one or more .keyx files to create new Vectronic devices */
   const useMutateBulkXml = (
     config: UseMutationOptions<IBulkUploadResults<any>, AxiosError, FormData>
   ): UseMutationResult<IBulkUploadResults<any>, AxiosError> =>
     useMutation<IBulkUploadResults<any>, AxiosError, FormData>((formData) => bulkApi.uploadFiles(formData), config);
 
+  /** grant or remove permissions to a user to animals */
   const useMutateGrantCritterAccess = (
     config: UseMutationOptions<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>
   ): UseMutationResult =>
@@ -309,9 +335,11 @@ export const useTelemetryApi = () => {
       config
     );
 
+  /** delete a critter or device */
   const useDelete = (config: UseMutationOptions<boolean, AxiosError, IDeleteType>): UseMutationResult<boolean> =>
     useMutation<boolean, AxiosError, IDeleteType>((body) => critterApi.deleteType(body), config);
 
+  /** save user defined animal groups */
   const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDFInput[]>): UseMutationResult<IUDF[]> =>
     useMutation<IUDF[], AxiosError, IUDFInput[]>((body) => userApi.upsertUDF(body), config);
 
@@ -321,7 +349,9 @@ export const useTelemetryApi = () => {
     useCodes,
     useCodeHeaders,
     useTracks,
+    useUnassignedTracks,
     usePings,
+    useUnassignedPings,
     useCollarType,
     useAllCritters,
     useAssignedCritters,

@@ -1,7 +1,7 @@
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { ICodeFilter } from 'types/code';
-import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowSelect, OnMapRowCellClick } from 'types/map';
+import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowSelect, OnMapRowCellClick, OnlySelectedCritters } from 'types/map';
 import Checkbox from 'components/form/Checkbox';
 import { applyFilter, flattenUniqueFeatureIDs, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
@@ -22,6 +22,7 @@ type MapDetailsProps = MapDetailsBaseProps & {
   filters: ICodeFilter[];
   showExportModal: boolean;
   setShowExportModal: (b: boolean) => void;
+  handleShowOnlySelected: (o: OnlySelectedCritters) => void;
 };
 
 export default function MapDetails({
@@ -29,6 +30,7 @@ export default function MapDetails({
   filters,
   selectedFeatureIDs,
   handleShowOverview,
+  handleShowOnlySelected,
   handleRowSelected,
   showExportModal,
   setShowExportModal
@@ -80,8 +82,18 @@ export default function MapDetails({
   const handleRowsChecked = (ids: number[]): void => {
     const grouped = groupFeaturesByCritters(features.filter((f) => ids.includes(f.id)));
     setGroupedFeaturesChecked(grouped);
-    handleRowSelected(ids, showOnlySelected);
+    handleRowSelected(ids);
+    if (showOnlySelected) {
+      handleShowOnlySelected({show: true, critter_ids: grouped.map(g => g.critter_id)});
+    }
   };
+
+  const handleShowSelectedChecked = (val: Record<string, boolean>): void => {
+    const isChecked = val[MapStrings.onlySelectedLabel];
+    setShowOnlySelected(isChecked);
+    // call the parent handler
+    handleShowOnlySelected({show: isChecked, critter_ids: groupedFeaturesChecked.map(g => g.critter_id)});
+  }
 
   return (
     <>
@@ -91,7 +103,7 @@ export default function MapDetails({
           <Checkbox
             label={MapStrings.onlySelectedLabel}
             initialValue={false}
-            changeHandler={(): void => setShowOnlySelected(o => !o)}
+            changeHandler={handleShowSelectedChecked}
           />
           <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
         </div>

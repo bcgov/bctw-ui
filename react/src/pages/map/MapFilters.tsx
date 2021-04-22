@@ -16,6 +16,7 @@ import { MapStrings } from 'constants/strings';
 import { columnToHeader } from 'utils/common';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { CODE_FILTERS, DEVICE_STATUS_OPTIONS } from 'pages/map/map_constants';
 
 type MapFiltersProps = PageProp & {
   start: string;
@@ -25,7 +26,7 @@ type MapFiltersProps = PageProp & {
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;
-  // todo: onShowUnassignedDevices: (b: boolean) => void;
+  onShowUnassignedDevices: (o: ISelectMultipleData[]) => void;
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
@@ -113,16 +114,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     handleApplyFilters(null, true);
   };
 
-  const codeFilters: { header: string, label?: string }[] = [
-    { header: 'species' },
-    { header: 'animal_status' },
-    { header: 'device_status' },
-    { header: 'sex' },
-  ];
-
   // creates select elements
   const createMultiSelects = (): React.ReactNode => {
-    return codeFilters.map((cf, idx) => (
+    return CODE_FILTERS.map((cf, idx) => (
       <div key={`${cf.header}-${idx}`}>
         <SelectCode
           multiple
@@ -194,23 +188,33 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 />
               </div>
               <div>
+                {/* render the unassigned/assigned data points selector */}
+                <MultiSelect
+                  label={MapStrings.assignmentStatusLabel}
+                  data={DEVICE_STATUS_OPTIONS}
+                  changeHandler={props.onShowUnassignedDevices}
+                />
+              </div>
+              <div>
                 {/* render the last pings/ last 10 fixes checkboxes */}
                 <Checkbox
                   label={MapStrings.lastPingLabel}
                   initialValue={isLatestPing}
                   changeHandler={(): void => setIsLatestPing(o => !o)}
+                  disabled={isLastFixes}
                 />
                 <Checkbox
                   label={MapStrings.lastFixesLabel}
                   initialValue={isLastFixes}
                   changeHandler={(): void => setIsLastFixes(o => !o)}
+                  disabled={isLatestPing}
                 />
               </div>
               <div>
                 {/* render the device list selector */}
                 <MultiSelect
                   renderTypeLabel='devices'
-                  label={'Device List'}
+                  label={MapStrings.deviceSelectedLabel}
                   data={props.uniqueDevices.map(d => {return {id: d, value: d}})}
                   changeHandler={handleChangeDeviceList}
                   triggerReset={reset}
@@ -236,7 +240,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   Apply Filters
                 </Button>
                 <Button variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
-                  Clear
+                  Reset
                 </Button>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import 'styles/form.scss';
-import { FormControl, Select as MuiSelect, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
+import { FormControl, Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
 import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
@@ -117,7 +117,12 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       ) : codes && codes.length ? (
         <FormControl size='small' variant={'outlined'} className={'select-control'}>
           <InputLabel>{labelTitle}</InputLabel>
-          <MuiSelect
+          <Select
+            MenuProps={{
+              anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+              transformOrigin: { vertical: 'top', horizontal: 'left' },
+              getContentAnchorEl: null,
+            }}
             label={labelTitle}
             variant={'outlined'}
             value={multiple ? values : value}
@@ -146,7 +151,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
                 </MenuItem>
               );
             })}
-          </MuiSelect>
+          </Select>
         </FormControl>
       ) : (
         <div>unable to load dropdown</div>
