@@ -27,6 +27,9 @@ import { setupLatestPingOptions, setupPingOptions, setupSelectedPings, setupTrac
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
 
+import MapIcon from '@material-ui/icons/Map';
+import LanguageIcon from '@material-ui/icons/Language';
+
 /**
   there are several forms of state in this page:
     a) the fetched pings/tracks state from the API 
@@ -582,14 +585,18 @@ export default function MapPage(): JSX.Element {
   };
 
   // The flag for which map is showing
+  // TODO must wrap this in a useState
   let map3D = false;
   
   /**
    * ##toggleMap3D
    * Toggle value of _map3D_ for displaying 2D and 3D maps.
+   * TODO: wrap this as well in useState
    * @returns Boolean
    */
-  const toggleMap3D = () => map3D = !map3D;
+  const toggleMap3D = () => {
+    map3D = !map3D;
+  }
 
 
   return (
@@ -613,7 +620,7 @@ export default function MapPage(): JSX.Element {
 
         {/* The layer switching button*/}
         <div style={switchMapStyle} onClick={toggleMap3D}>
-          <img style={iconStyle}/>
+          {map3D ? <MapIcon/>  : <LanguageIcon/>}
         </div>
 
         <div style={{height: bottomPanelHeight}} className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
