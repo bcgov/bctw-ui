@@ -403,7 +403,9 @@ export default function MapPage(): JSX.Element {
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='popup'/>
+        
         <div id='map' onKeyDown={handleKeyPress} />
+
         <div style={{height: bottomHeight}} className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
           <div onMouseDown={onDown} id='drag'></div>
           <MapDetails 
