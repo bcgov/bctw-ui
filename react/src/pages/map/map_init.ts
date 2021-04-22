@@ -145,7 +145,8 @@ const initMap = (
   handleMapClick: () => void
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
-  const layerPicker = L.control.layers();
+  // const layerPicker = L.control.layers();
+  const layerPicker = L.control.layers(null ,null,{position: 'topleft'});
   addTileLayers(mapRef, layerPicker);
 
   layerPicker.addOverlay(tracks, 'Animal Tracks');
