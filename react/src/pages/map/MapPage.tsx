@@ -130,7 +130,6 @@ export default function MapPage(): JSX.Element {
         }
 
         //fixme: what if map-only filters and normal filters are applied!?
-
         if (isMapOnlyFilterApplied) {
           // filter what's shown on the map, but not the bottom panel
           if (onlySelected.show) {
@@ -155,12 +154,13 @@ export default function MapPage(): JSX.Element {
   // unassigned pings
   useEffect(() => {
     if (fetchedUnassignedPings && !isErrorUPings) {
-      setupUnassignedPings(unassignedPingsLayer, handlePointClick);
+      // fixme: issue with null last point :(
+      setupUnassignedPings(unassignedPingsLayer, (e) => setPopupInnerHTML(e.target.feature));
       unassignedPingsLayer.addData(fetchedUnassignedPings as any);
       // initially hide unassigned points
-      // if (!showUnassignedLayers) {
-      //   mapRef?.current?.removeLayer(unassignedPingsLayer);
-      // }
+      if (!showUnassignedLayers) {
+        mapRef?.current?.removeLayer(unassignedPingsLayer);
+      }
     }
   }, [fetchedUnassignedPings]);
 
@@ -181,9 +181,9 @@ export default function MapPage(): JSX.Element {
       setupTracksOptions(unassignedTracksLayer, true);
       unassignedTracksLayer.addData(fetchedUnassignedTracks as any);
       // initially hide unassigned points
-      // if (!showUnassignedLayers) {
-      //   mapRef.current?.removeLayer(unassignedTracksLayer);
-      // }
+      if (!showUnassignedLayers) {
+        mapRef.current?.removeLayer(unassignedTracksLayer);
+      }
     }
   }, [fetchedTracks]);
 
@@ -192,6 +192,7 @@ export default function MapPage(): JSX.Element {
     applyFiltersToTracks();
   }, [critterIDsDisplayed]);
 
+  // todo: document this
   useEffect(() => {
     const b = onlyLast10 || onlyLastKnown || (onlySelected && onlySelected.show);
     setIsMapOnlyFilterApplied(b);
@@ -215,8 +216,7 @@ export default function MapPage(): JSX.Element {
     }
   }, [showExportModal, showOverviewModal, showUdfEdit])
 
-
-  // hide or show unattached layers
+  // hide or show unattached device layers
   useEffect(() => {
     const ref = mapRef.current;
     if (!ref) {
@@ -334,12 +334,16 @@ export default function MapPage(): JSX.Element {
     layerPicker.removeLayer(pingsLayer);
     layerPicker.removeLayer(tracksLayer);
     layerPicker.removeLayer(latestPingsLayer);
+    layerPicker.removeLayer(unassignedPingsLayer);
+    layerPicker.removeLayer(unassignedTracksLayer);
 
     // layerPicker.removeLayer(selectedPings);
     pingsLayer.clearLayers();
     tracksLayer.clearLayers();
     latestPingsLayer.clearLayers();
     selectedPingsLayer.clearLayers();
+    unassignedPingsLayer.clearLayers()
+    unassignedTracksLayer.clearLayers();
   };
 
   /**
@@ -352,8 +356,13 @@ export default function MapPage(): JSX.Element {
     latestPingsLayer.addData(latest as any);
     pingsLayer.addData(other as any);
     tracksLayer.addData(newTracks as any);
+    if (showUnassignedLayers && fetchedUnassignedPings && fetchedUnassignedTracks) {
+      unassignedTracksLayer.addData(fetchedUnassignedTracks as any);
+      unassignedPingsLayer.addData(fetchedUnassignedPings as any);
+    }
   };
 
+  // todo: document
   const redrawPings = (newPings: ITelemetryFeature[], newLatestPings = latestPings): void => {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(pingsLayer);
@@ -364,6 +373,7 @@ export default function MapPage(): JSX.Element {
     latestPingsLayer.addData(newLatestPings as any);
   }
 
+  // todo: document
   const redrawTracks = (newTracks: ITracksFeature[]): void => {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(tracksLayer);
@@ -455,6 +465,7 @@ export default function MapPage(): JSX.Element {
     redrawPings(last10FixesCombined);
   }
 
+  // only show critters selected in map details in the map?
   const handleShowOnlySelected = (o: OnlySelectedCritters): void => {
     setOnlySelected(o);
     const { show, critter_ids } = o;
@@ -476,6 +487,9 @@ export default function MapPage(): JSX.Element {
    */
   const handleShowUnassignedDevices = (o: ISelectMultipleData[]): void => {
     const values = o.map(s => s.value);
+    // setting this state will trigger visibility of unassigned layers
+    setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
+
     const ref = mapRef.current;
     const layers = [0, 2].includes(values.length) ? getAllLayers() : getAssignedLayers();
 
@@ -488,9 +502,6 @@ export default function MapPage(): JSX.Element {
       }
       return;
     }
-
-    // show layers on the map representing devices that have telemetry but no animal 'attached'
-    setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
 
     if (values.includes(MapStrings.assignmentStatusOptionA)) {
       layers.forEach(l => ref.addLayer(l))
@@ -573,7 +584,7 @@ export default function MapPage(): JSX.Element {
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
-        <div id='popup'/>
+        <div id='popup' style={{bottom: bottomPanelHeight}}/>
         <div id='map' onKeyDown={handleKeyPress} />
         <div style={{height: bottomPanelHeight}} className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
           <div onMouseDown={onDown} id='drag'></div>

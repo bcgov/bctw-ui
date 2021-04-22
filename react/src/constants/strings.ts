@@ -54,8 +54,11 @@ const MapStrings = {
   filterUserCritterGroup: 'Custom Animal Group',
   deviceSelectedLabel: 'Device List',
   assignmentStatusLabel: 'Device Assignment Status',
-  assignmentStatusOptionA: 'Show Assigned Devices',
-  assignmentStatusOptionU: 'Show Unassigned Devices',
+  assignmentStatusOptionA: 'Assigned Devices',
+  assignmentStatusOptionU: 'Unassigned Devices',
+  assignmentStatusTooltip1: ': shows device telemetry that currently has an animal attached.',
+  assignmentStatusTooltip2: ': show device telemetry that does not have an animal attached.',
+  assignmentStatusTooltip3: 'To attach a device, click Manage from the top navigation bar and edit an animal.',
 }
 
 const MapTileLayers = {

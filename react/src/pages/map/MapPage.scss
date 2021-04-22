@@ -1,6 +1,5 @@
 @import 'styles/colours.scss';
 $appearAboveMap: 314159;
-$bottomPanelHeight: 30rem;
 
 .map-container {
   flex: 1 1 auto;
@@ -102,7 +101,6 @@ $bottomPanelHeight: 30rem;
 #popup {
   position: absolute;
   background-color: $BCgovGold;
-  bottom: $bottomPanelHeight;
   right: 0;
   padding: 0.5rem;
   font-size: 14px;

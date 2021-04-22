@@ -17,6 +17,7 @@ import { columnToHeader } from 'utils/common';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { CODE_FILTERS, DEVICE_STATUS_OPTIONS } from 'pages/map/map_constants';
+import { LightTooltip } from 'components/modal/Tooltip';
 
 type MapFiltersProps = PageProp & {
   start: string;
@@ -187,14 +188,22 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   changeHandler={(e): void => setEnd(e['tend'] as string)}
                 />
               </div>
-              <div>
-                {/* render the unassigned/assigned data points selector */}
-                <MultiSelect
-                  label={MapStrings.assignmentStatusLabel}
-                  data={DEVICE_STATUS_OPTIONS}
-                  changeHandler={props.onShowUnassignedDevices}
-                />
-              </div>
+              <LightTooltip title={
+                <>
+                  <p><b><em>{MapStrings.assignmentStatusOptionA}</em></b>{MapStrings.assignmentStatusTooltip1}</p>
+                  <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
+                  <p>{MapStrings.assignmentStatusTooltip3}</p>
+                </>
+              } placement='right-start' enterDelay={400}>
+                <div>
+                  {/* render the unassigned/assigned data points selector */}
+                  <MultiSelect
+                    label={MapStrings.assignmentStatusLabel}
+                    data={DEVICE_STATUS_OPTIONS}
+                    changeHandler={props.onShowUnassignedDevices}
+                  />
+                </div>
+              </LightTooltip>
               <div>
                 {/* render the last pings/ last 10 fixes checkboxes */}
                 <Checkbox
