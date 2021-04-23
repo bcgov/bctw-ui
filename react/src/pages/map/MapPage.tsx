@@ -571,7 +571,7 @@ export default function MapPage(): JSX.Element {
     color: '#464646',
     width: '2.85rem',
     height: '2.85rem',
-    top: '183px',
+    top: '10px',
     left: '10px',
     zIndex: 1000,
     borderRadius: '4px',
@@ -593,9 +593,17 @@ export default function MapPage(): JSX.Element {
    * Toggle value of _map3D_ for displaying 2D and 3D maps.
    * @returns Boolean
    */
-  const toggleMap3D = () => {
-    setMap3D(!map3D);
-  }
+  const toggleMap3D = () => setMap3D(!map3D);
+
+  /**
+   * ## toggleTitle
+   * Toggle the tooltip for the toggleMap3D button
+   */
+  const toggleTitle = () => {
+    return (!map3D) ?
+      "Switch to 3D terrain map" :
+      "Switch to 2D map";
+  };
 
 
   return (
@@ -618,7 +626,11 @@ export default function MapPage(): JSX.Element {
         <div id='map' onKeyDown={handleKeyPress} />
 
         {/* The layer switching button*/}
-        <div style={switchMapStyle} onClick={toggleMap3D}>
+        <div
+          style={switchMapStyle}
+          onClick={toggleMap3D}
+          title={toggleTitle()}
+        >
           {map3D ? <MapIcon/>  : <LanguageIcon/>}
         </div>
 
