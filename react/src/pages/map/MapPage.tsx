@@ -18,7 +18,7 @@ import MapOverView from 'pages/map/MapOverview';
 import React, { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { ICodeFilter } from 'types/code';
-import { ITelemetryDetail, ITelemetryFeature, ITracksFeature, MapRange, OnlySelectedCritters } from 'types/map';
+import { ITelemetryDetail, ITelemetryPoint, ITelemetryLine, MapRange, OnlySelectedCritters } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { TypeWithData } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
@@ -45,7 +45,6 @@ import { MapStrings } from 'constants/strings';
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const mapRef = useRef<L.Map>(null);
-  let lastPointClicked = null;
 
   // pings layer state
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
@@ -68,8 +67,8 @@ export default function MapPage(): JSX.Element {
 
   // pings/tracks state is changed when filters are applied, so use these variables
   // for the 'global' state - used in bottom panel
-  const [latestPings, setLatestPings] = useState<ITelemetryFeature[]>([]);
-  const [pings, setPings] = useState<ITelemetryFeature[]>([]);
+  const [latestPings, setLatestPings] = useState<ITelemetryPoint[]>([]);
+  const [pings, setPings] = useState<ITelemetryPoint[]>([]);
   // const [unassignedPings, setUnassignedPings] = useState<ITelemetryFeature[]>([]);
   const [selectedPingIDs, setSelectedPingIDs] = useState<number[]>([]);
   const [critterIDsDisplayed, setCritterIDsDisplayed] = useState<string[]>([]);
@@ -83,15 +82,39 @@ export default function MapPage(): JSX.Element {
 
   // state tracking whether or not unassigned device layers are shown
   const [showUnassignedLayers, setShowUnassignedLayers] = useState<boolean>(false);
+  let wasDrawning = false;
 
   // filter state
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
 
-  // state for tracking filters that are only applied to map
+  // state for tracking filters that limit map layers
   const [isMapOnlyFilterApplied, setIsMapOnlyFilterApplied] = useState<boolean>(false);
   const [onlySelected, setOnlySelected] = useState<OnlySelectedCritters>({show: false, critter_ids: []});
   const [onlyLastKnown, setOnlyLastKnown] = useState<boolean>(false);
   const [onlyLast10, setOnlyLast10] = useState<boolean>(false);
+
+
+  // when finished drawing a shape, a click event occurs as the mouse is released.
+  // dont want to trigger the basemap click event, which wipes selectedPingIds
+  // doing this with usestate is not fast enough
+  const handleWasDrawing = (): void => {
+    wasDrawning = true;
+  }
+
+  /**
+   * still not a valid solution as @var {selectedPingIDs} is not in a valid context
+   * when this is called, so cant check that its non empty before wiping it. 
+   * fixme: when the basemap is clicked it wipes the selected status 
+   * from drawn shapes and bottom panel selected rows
+   * todo: maybe revert to trying to position the leaflet popup, since it has a proper 
+   * close handler?
+   */
+  const handleBaseMapClick = (): void => {
+    if (!wasDrawning) {
+      setSelectedPingIDs([]);
+    }
+    wasDrawning = false;
+  }
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
@@ -113,14 +136,10 @@ export default function MapPage(): JSX.Element {
       if (fetchedPings && !isErrorPings) {
         // must be called before adding data to pings layer
         setupPingOptions(pingsLayer, handlePointClick);
-        setupLatestPingOptions(latestPingsLayer, handleLatestPointClick);
+        setupLatestPingOptions(latestPingsLayer, handlePointClick);
 
         setCritterIDsDisplayed(groupFeaturesByCritters(fetchedPings).map(c => c.critter_id));
-
-        rebindMapListeners();
-
         const { latest, other } = splitPings(fetchedPings);
-
         // re-apply filters
         if (filters.length) {
           applyFiltersToPings(filters, other, latest);
@@ -129,14 +148,16 @@ export default function MapPage(): JSX.Element {
           setLatestPings(latest);
         }
 
-        //fixme: what if map-only filters and normal filters are applied!?
         if (isMapOnlyFilterApplied) {
           // filter what's shown on the map, but not the bottom panel
           if (onlySelected.show) {
-            const predicate = (l: ITelemetryFeature): boolean => onlySelected.critter_ids.includes(l.properties.critter_id);
+            const predicate = (l: ITelemetryPoint): boolean => onlySelected.critter_ids.includes(l.properties.critter_id);
             redrawLayers(fetchedPings.filter(predicate));
           } else if (onlyLast10) {
-            redrawLayers(getLast10Fixes(fetchedPings));
+            const { pings, tracks } = getLast10Fixes(fetchedPings, fetchedTracks ?? []);
+            const {latest, other} = splitPings(pings);
+            redrawPings(latest, other);
+            redrawTracks(tracks);
           } else if (onlyLastKnown) {
             mapRef.current.removeLayer(pingsLayer);
             mapRef.current.removeLayer(tracksLayer);
@@ -168,6 +189,10 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     if (fetchedTracks && !isErrorTracks) {
       setupTracksOptions(tracksLayer, false);
+      /* 
+        todo: only last 10 fixes is and needs to be handled when pings are updated?
+        since pings are what filter the tracks?
+      */
       tracksLayer.addData(fetchedTracks as any);
       if (filters.length) {
         applyFiltersToTracks(fetchedTracks);
@@ -202,7 +227,7 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
-        initMap(mapRef, drawnItems, selectedPingsLayer, tracksLayer, pingsLayer, handleDrawShape, handleClosePopup);
+        initMap(mapRef, drawnItems, selectedPingsLayer, tracksLayer, pingsLayer, handleDrawShape, handleBaseMapClick, handleWasDrawing);
       }
       tracksLayer.bringToBack();
     };
@@ -231,17 +256,10 @@ export default function MapPage(): JSX.Element {
     }
   }, [showUnassignedLayers])
 
-  /**
-   * adding new data breaks the preclick handler, @var {lastPoint} is not in context. 
-   * this function rebinds click handlers when new data is fetched
-   */
-  const rebindMapListeners = (): void => {
-    if (mapRef.current) {
-      mapRef.current
-        .off('preclick')
-        .on('preclick', handleClosePopup);
-    }
-  }
+  useDidMountEffect(() => {
+    // console.log('selected pings changed', selectedPingIDs);
+    highlightSelected();
+  }, [selectedPingIDs]);
 
   /**
    * when a map point is clicked, 
@@ -250,14 +268,10 @@ export default function MapPage(): JSX.Element {
    * c) style the point
    */
   const handlePointClick = (event: L.LeafletEvent): void => {
+    L.DomEvent.stopPropagation(event);
     const layer = event.target;
-    if (lastPointClicked && lastPointClicked !== layer) {
-      fillPoint(lastPointClicked);
-      hidePopup();
-    }
-    lastPointClicked = layer;
-    const feature: ITelemetryFeature = layer?.feature;
-    fillPoint(layer, true);
+    setSelectedPingIDs([]);
+    const feature: ITelemetryPoint = layer?.feature;
     setPopupInnerHTML(feature);
     if (feature.properties.critter_id) {
       // set the feature id state so bottom panel will highlight the row (if this is an assigned point)
@@ -265,39 +279,30 @@ export default function MapPage(): JSX.Element {
     }
   };
 
-  /**
-   * same as the point handler above, but leaflet icons don't have the setStyle function
-   */
-  const handleLatestPointClick = (event: L.LeafletEvent): void => {
-    const layer = event.target;
-    if (lastPointClicked && lastPointClicked !== layer) {
-      hidePopup();
-    }
-    lastPointClicked = layer;
-    const feature: ITelemetryFeature = layer?.feature;
-    setPopupInnerHTML(feature);
-    setSelectedPingIDs([feature.id]);
-  }
-
-  // when a map point is clicked that isn't a marker, close the popup
-  const handleClosePopup = (): void => {
-    if (lastPointClicked) {
-      fillPoint(lastPointClicked, false);
-      lastPointClicked = null;
-      setSelectedPingIDs([]);
-    }
-    hidePopup();
-  }
-
   // when rows are checked in the details panel, highlight them
   // fixme: the highlight fill color is reset when new data is fetched
   const handleDetailPaneRowSelect = (pingIds: number[]): void => {
     hidePopup();
-    mapRef.current.eachLayer((layer: L.Polygon) => {
-      const id = layer.feature?.id as number;
-      fillPoint(layer, pingIds.includes(id));
-    });
+    setSelectedPingIDs([...pingIds]);
   };
+
+  /**
+   * triggerd when @var {selectedPingIDs} is changed
+   * fills the selected pings with the 'seelcted' colour
+   */
+  const highlightSelected = (): void => {
+    mapRef.current.eachLayer((layer: L.Polygon) => {
+      const feature = layer.feature;
+      if (feature )  {
+        const id = feature.id as number;
+        if (selectedPingIDs.includes(id) && feature.properties?.critter_id) {
+          fillPoint(layer, true);
+        } else {
+          fillPoint(layer);
+        }
+      }
+    });
+  }
 
   // handles the drawing and deletion of shapes, setup in map_init
   const handleDrawShape = (): void => {
@@ -305,29 +310,10 @@ export default function MapPage(): JSX.Element {
     const clipper = drawnItems.toGeoJSON();
     const allPings = pingsLayer.toGeoJSON();
     const overlay = pointsWithinPolygon(allPings as any, clipper as any);
-    setFeatureIDsOnDraw(overlay);
-    selectedPingsLayer.addData(overlay);
-    if (!overlay.features.length) {
-      selectedPingsLayer.clearLayers();
-    } 
+    const ids = [...overlay.features.map(f => f.id) as any]
+    setSelectedPingIDs(ids);
   };
   
-  /**
-   * when shapes are drawn in {drawSelectedLayer}, 
-   * set the selectedFeatureIDs state
-  */
-  const setFeatureIDsOnDraw = (
-    overlay: GeoJSON.FeatureCollection<GeoJSON.Point, { [name: string]: unknown }>
-  ): void => {
-    const featureIds = overlay.features.map((f) => f.id);
-    // when selection is cleared, restore all telemetry in the details pane
-    if (featureIds.length === 0 && fetchedPings) {
-      setSelectedPingIDs([]);
-      return;
-    }
-    setSelectedPingIDs(featureIds as number[]);
-  };
-
   // clears existing pings/tracks layers
   const clearLayers = (): void => {
     const layerPicker = L.control.layers();
@@ -362,8 +348,8 @@ export default function MapPage(): JSX.Element {
     }
   };
 
-  // todo: document
-  const redrawPings = (newPings: ITelemetryFeature[], newLatestPings = latestPings): void => {
+  // redraw only pings, if no params supplied it will default the fetched ones
+  const redrawPings = (newPings: ITelemetryPoint[], newLatestPings = latestPings): void => {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(pingsLayer);
     layerPicker.removeLayer(latestPingsLayer);
@@ -371,10 +357,11 @@ export default function MapPage(): JSX.Element {
     latestPingsLayer.clearLayers();
     pingsLayer.addData(newPings as any);
     latestPingsLayer.addData(newLatestPings as any);
+    selectedPingIDs.forEach(f => fillPoint(f, true));
   }
 
-  // todo: document
-  const redrawTracks = (newTracks: ITracksFeature[]): void => {
+  // redraw only tracks
+  const redrawTracks = (newTracks: ITelemetryLine[]): void => {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(tracksLayer);
     tracksLayer.clearLayers();
@@ -422,7 +409,7 @@ export default function MapPage(): JSX.Element {
    */
   const applyFiltersToTracks = (newTracks = fetchedTracks): void => {
     // fetchedTracks may be actually be undefined!
-    if (!newTracks) { return }
+    if (!newTracks) return;
     const filtered = newTracks.filter(t => critterIDsDisplayed.includes(t.properties.critter_id));
     redrawTracks(filtered);
   }
@@ -453,19 +440,20 @@ export default function MapPage(): JSX.Element {
 
   /**
    * @param b boolean on whether the map should be filtered to each critter's last 10 pings
+   * fixme: line segment to the latest point not appearing
    */
-  // fixme: tracks are not hidden
   const handleShowLast10Fixes = (b: boolean): void => {
     setOnlyLast10(b);
     if (!b) {
       redrawLayers();
       return;
     }
-    const last10FixesCombined = getLast10Fixes(fetchedPings);
-    redrawPings(last10FixesCombined);
+    const { pings, tracks } = getLast10Fixes(fetchedPings, fetchedTracks);
+    redrawPings(pings);
+    redrawTracks(tracks);
   }
 
-  // only show critters selected in map details in the map?
+  // only show critters selected in map details in the map
   const handleShowOnlySelected = (o: OnlySelectedCritters): void => {
     setOnlySelected(o);
     const { show, critter_ids } = o;

@@ -29,7 +29,7 @@ import { TelemetryAlert } from 'types/alert';
 import { BCTW, TypeWithData } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
-import { ITelemetryFeature, ITracksFeature } from 'types/map';
+import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -70,16 +70,16 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const useTracks = (start: string, end: string): UseQueryResult<ITracksFeature[], AxiosError> => {
-    return useQuery<ITracksFeature[], AxiosError>(
+  const useTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
+    return useQuery<ITelemetryLine[], AxiosError>(
       ['tracks', start, end],
       () => mapApi.getTracks(start, end),
       defaultQueryOptions
     );
   };
 
-  const useUnassignedTracks = (start: string, end: string): UseQueryResult<ITracksFeature[], AxiosError> => {
-    return useQuery<ITracksFeature[], AxiosError>(
+  const useUnassignedTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
+    return useQuery<ITelemetryLine[], AxiosError>(
       ['unassigned_tracks', start, end],
       () => mapApi.getTracks(start, end, true),
       {...defaultQueryOptions, refetchOnMount: false, }
@@ -89,8 +89,8 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const usePings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
-    return useQuery<ITelemetryFeature[], AxiosError>(
+  const usePings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+    return useQuery<ITelemetryPoint[], AxiosError>(
       ['pings', { start, end }],
       () => mapApi.getPings(start, end),
       defaultQueryOptions
@@ -98,8 +98,8 @@ export const useTelemetryApi = () => {
   };
 
   // the same as usePings, but doesn't auto fetch due to enabled: false setting
-  const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
-    return useQuery<ITelemetryFeature[], AxiosError>(
+  const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+    return useQuery<ITelemetryPoint[], AxiosError>(
       ['unassigned_pings', { start, end}],
       () => mapApi.getPings(start, end, true),
       {...defaultQueryOptions, refetchOnMount: false, }

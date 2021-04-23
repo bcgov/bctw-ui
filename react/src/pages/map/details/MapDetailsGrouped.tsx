@@ -1,16 +1,22 @@
-import { ITelemetryDetail, IUniqueFeature, OnMapRowCellClick, TelemetryDetail } from 'types/map';
+import { ITelemetryDetail, ITelemetryCritterGroup, OnMapRowCellClick, TelemetryDetail } from 'types/map';
 import { TableRow, TableCell, TableBody, Table, TableContainer, Paper, Checkbox } from '@material-ui/core';
 import { getComparator } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { Order } from 'components/table/table_interfaces';
 import { plainToClass } from 'class-transformer';
-import { flattenUniqueFeatureIDs, getFillColorByStatus, getLatestTelemetryFeature, MAP_COLOURS, sortGroupedFeatures } from 'pages/map/map_helpers';
+import {
+  flattenUniqueFeatureIDs,
+  getFillColorByStatus,
+  getLatestTelemetryFeature,
+  MAP_COLOURS,
+  sortGroupedFeatures
+} from 'pages/map/map_helpers';
 import { MapDetailsBaseProps } from './MapDetails';
 import { dateObjectToDateStr } from 'utils/time';
 
 export type MapDetailsGroupedProps = MapDetailsBaseProps & {
-  features: IUniqueFeature[];
+  features: ITelemetryCritterGroup[];
   crittersSelected: string[];
 };
 
@@ -19,7 +25,16 @@ type GroupedCheckedStatus = {
   checked: boolean;
 };
 
-const rows_to_render = ['Colour', 'wlh_id', 'device_id', 'frequency', 'capture_date', 'Last Transmission Date', 'Map Points'];
+const rows_to_render = [
+  'Colour',
+  'wlh_id',
+  'animal_id',
+  'device_id',
+  'frequency',
+  'capture_date',
+  'Last Transmission Date',
+  'Map Points'
+];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
   const { features, crittersSelected, handleShowOverview, handleRowSelected } = props;
@@ -99,7 +114,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   );
 }
 
-type IRowProps = {
+type MapDetailsTableRowProps = {
   pointIDs: number[];
   isSelectedInMap: boolean;
   isChecked: boolean;
@@ -108,7 +123,7 @@ type IRowProps = {
   handleShowOverview: OnMapRowCellClick;
 };
 
-function Row(props: IRowProps): JSX.Element {
+function Row(props: MapDetailsTableRowProps): JSX.Element {
   const { row, handleRowCheck, handleShowOverview, isSelectedInMap, pointIDs, isChecked } = props;
 
   const onCheck = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -122,26 +137,34 @@ function Row(props: IRowProps): JSX.Element {
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
       {/* cast the detail to a feature in order to determine the swatch colour */}
-      <TableCell style={{backgroundColor: row.animal_colour ? getFillColorByStatus({properties: row, id: null, type: 'Feature', geometry: null}) : MAP_COLOURS['unassigned point']}}> </TableCell>
-      {/* if the row has no animal id, clicking the cell will open the overview panel */}
       <TableCell
-        className={row.wlh_id ? '' : 'critter-hover'}
-        onClick={row.wlh_id ? null : (): void => handleShowOverview('critter', row)}>
-        <div
-          onClick={row.wlh_id ? (): void => handleShowOverview('critter', row) : null}
-          className={'critter-select critter-hover'}>
-          {row.wlh_id ?? ''}
-        </div>
-      </TableCell>
-      <TableCell>
-        <div onClick={(): void => handleShowOverview('collar', row)} className={'critter-select critter-hover'}>
-          {row.device_id}
-        </div>
-      </TableCell>
+        style={{
+          backgroundColor: row.animal_colour
+            ? getFillColorByStatus({ properties: row, id: null, type: 'Feature', geometry: null })
+            : MAP_COLOURS['unassigned point']
+        }}></TableCell>
+      <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('critter', row)} />
+      <CellWithLink row={row} propName={'animal_id'} onClickLink={(): void => handleShowOverview('critter', row)} />
+      <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('collar', row)} />
       <TableCell>{row.frequency}</TableCell>
       <TableCell>{dateObjectToDateStr(row.capture_date)}</TableCell>
       <TableCell>{dateObjectToDateStr(row.date_recorded)}</TableCell>
       <TableCell>{pointIDs.length}</TableCell>
     </TableRow>
+  );
+}
+
+type TableCellLinkProps = {
+  row: ITelemetryDetail;
+  propName: string;
+  onClickLink: () => void;
+};
+function CellWithLink({ row, propName, onClickLink }: TableCellLinkProps): JSX.Element {
+  return (
+    <TableCell className={row[propName] ? '' : 'map-details-cell-hover'} onClick={row[propName] ? null : onClickLink}>
+      <div onClick={row[propName] ? onClickLink : null} className={'map-details-clickable-cell map-details-cell-hover'}>
+        {row[propName] ?? ''}
+      </div>
+    </TableCell>
   );
 }

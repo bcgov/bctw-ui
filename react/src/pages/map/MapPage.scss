@@ -52,7 +52,7 @@ $appearAboveMap: 314159;
 }
 
 .side-panel {
-  border-right: 2px solid $BCgovGold;
+  border-right: 2px solid #000;
   overflow-y: auto;
 
   div {
@@ -123,8 +123,8 @@ $appearAboveMap: 314159;
     overflow-x: hidden;
   }
   #drag {
-    height: 4px;
-    background-color: $BCgovGold;
+    height: 1px;
+    background-color: #000;
     cursor: n-resize;
   }
 }
@@ -166,15 +166,15 @@ $appearAboveMap: 314159;
   padding: 5px !important;
 }
 
-// the bottom panel table cell critter "link"
-.critter-select {
+// the bottom panel table cell that opens the overview modal when clicked
+.map-details-clickable-cell {
   width: 30%; // so the cursor doesn't appear on the whole cell
   color: rgb(58, 164, 255) !important;
   font-weight: 500;
   text-decoration: underline;
 }
 
-.critter-hover {
+.map-details-cell-hover {
   cursor: pointer;
 }
 

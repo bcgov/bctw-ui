@@ -1,7 +1,7 @@
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { ICodeFilter } from 'types/code';
-import { DetailsSortOption, ITelemetryFeature, IUniqueFeature, OnPanelRowSelect, OnMapRowCellClick, OnlySelectedCritters } from 'types/map';
+import { DetailsSortOption, ITelemetryPoint, ITelemetryCritterGroup, OnPanelRowSelect, OnMapRowCellClick, OnlySelectedCritters } from 'types/map';
 import Checkbox from 'components/form/Checkbox';
 import { applyFilter, flattenUniqueFeatureIDs, getUniqueCritterIDsFromFeatures, groupFeaturesByCritters, groupFilters } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
@@ -15,7 +15,7 @@ export type MapDetailsBaseProps = {
 };
 
 type MapDetailsProps = MapDetailsBaseProps & {
-  features: ITelemetryFeature[];
+  features: ITelemetryPoint[];
   // features IDs selected via the map interface
   selectedFeatureIDs: number[];
   // list of filters applied from map side panel
@@ -35,10 +35,10 @@ export default function MapDetails({
   showExportModal,
   setShowExportModal
 }: MapDetailsProps): JSX.Element {
-  const [groupedFeatures, setGroupedFeatures] = useState<IUniqueFeature[]>([]);
+  const [groupedFeatures, setGroupedFeatures] = useState<ITelemetryCritterGroup[]>([]);
   const [crittersSelectedInMap, setCrittersSelectedInMap] = useState<string[]>([]);
   // for export state
-  const [groupedFeaturesChecked, setGroupedFeaturesChecked] = useState<IUniqueFeature[]>([]);
+  const [groupedFeaturesChecked, setGroupedFeaturesChecked] = useState<ITelemetryCritterGroup[]>([]);
   const [showOnlySelected, setShowOnlySelected] = useState<boolean>(false);
   const [sort] = useState<DetailsSortOption>('wlh_id');
 

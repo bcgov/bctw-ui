@@ -1,9 +1,8 @@
 import { Type, Expose } from 'class-transformer';
-import { GeoJsonObject } from 'geojson';
+import { GeoJsonObject, LineString, Point, Position } from 'geojson';
 import { IAnimalTelemetryBase } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common';
-// import { GeoJSON } from 'geojson';
 import { formatWithUTCOffset } from 'utils/time';
 import { BCTW, TypeWithData } from './common_types';
 
@@ -23,36 +22,31 @@ type OnMapRowCellClick = (type: TypeWithData, row: ITelemetryDetail) => void;
 
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   critter_id: string;
-  // critter_transaction_id: string;
-  // collar_transaction_id: string;
   date_recorded: Date;
   device_vendor: string;
 }
 
-interface ITelemetryFeature extends GeoJsonObject {
+interface ITelemetryPoint extends GeoJsonObject {
   type: 'Feature';
-  geometry: {
-    type: 'Point';
-    coordinates: number[];
-  };
+  geometry: Point;
   id: number;
   properties: ITelemetryDetail;
 }
 
-interface ITracksFeature extends GeoJsonObject {
-  type: 'LineString';
+// represents a track
+interface ITelemetryLine extends GeoJsonObject {
+  type: 'Feature';
   properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'species'>
+  geometry: LineString
 }
 
-/**
- * a grouped by critter_id version of @type {TelemetryFeature} 
- */
-interface IUniqueFeature {
+// a grouped by critter_id version of @type {ITelemetryPoint} 
+interface ITelemetryCritterGroup {
   critter_id: string;
   device_id: number;
   frequency: number;
   count: number;
-  features: ITelemetryFeature[];
+  features: ITelemetryPoint[];
 }
 
 // represents the jsonb built object in the database get_telemetry call
@@ -94,7 +88,7 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   }
 }
 
-export class TelemetryFeature implements ITelemetryFeature {
+export class TelemetryFeature implements ITelemetryPoint {
   type: 'Feature';
   id: number;
   geometry: GeoJSON.Point;
@@ -106,14 +100,29 @@ export class TelemetryFeature implements ITelemetryFeature {
   }
 }
 
+// determines if a single coordinate array can be found in a group of coordinates
+const doesPointArrayContainPoint = (pings: Position[], coord: Position): boolean => {
+  for (let i =0; i< pings.length; i++) {
+    const ping = pings[i];
+    if (ping[0] === coord[0] && ping[1] === coord[1]) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export type {
-  ITelemetryFeature,
-  ITracksFeature,
   ITelemetryDetail,
-  IUniqueFeature,
   MapRange,
   OnMapRowCellClick,
   OnPanelRowSelect,
   DetailsSortOption,
   OnlySelectedCritters,
+  ITelemetryLine,
+  ITelemetryPoint,
+  ITelemetryCritterGroup,
 };
+
+export {
+  doesPointArrayContainPoint,
+}

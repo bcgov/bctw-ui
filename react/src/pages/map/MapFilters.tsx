@@ -1,5 +1,5 @@
 import { Button, Drawer, IconButton } from '@material-ui/core';
-import { FilterList, Close } from '@material-ui/icons';
+import { Close, ArrowForward } from '@material-ui/icons';
 import { PageProp } from 'components/component_interfaces';
 import clsx from 'clsx';
 import TextField from 'components/form/Input';
@@ -164,7 +164,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         }}>
         <div className={open ? 'side-panel-toolbar' : 'side-panel-toolbar-closed'}>
           {open ? <h3>Filters</h3> : null}
-          <IconButton onClick={handleDrawerOpen}>{open ? <Close /> : <FilterList htmlColor={'#ffffff'} />}</IconButton>
+          <IconButton onClick={handleDrawerOpen}>{open ? <Close /> : <ArrowForward htmlColor={'#ffffff'} />}</IconButton>
         </div>
         {open ? (
           <>
