@@ -585,17 +585,16 @@ export default function MapPage(): JSX.Element {
   };
 
   // The flag for which map is showing
-  // TODO must wrap this in a useState
-  let map3D = false;
+  const [map3D, setMap3D] = useState(false);
+
   
   /**
    * ##toggleMap3D
    * Toggle value of _map3D_ for displaying 2D and 3D maps.
-   * TODO: wrap this as well in useState
    * @returns Boolean
    */
   const toggleMap3D = () => {
-    map3D = !map3D;
+    setMap3D(!map3D);
   }
 
 
