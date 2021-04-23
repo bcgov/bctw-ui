@@ -623,8 +623,11 @@ export default function MapPage(): JSX.Element {
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
         <div id='popup'/>
         
-        {/* The 2D map container */}
-        <div id='map' onKeyDown={handleKeyPress} />
+        {/* Map container for both 2D and 3D */}
+        {map3D ?
+          <Terrain/>:
+          <div id='map' onKeyDown={handleKeyPress} />
+        }
 
         {/* The layer switching button*/}
         <div
