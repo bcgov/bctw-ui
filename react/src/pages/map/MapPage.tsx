@@ -29,6 +29,7 @@ import { MapStrings } from 'constants/strings';
 
 import MapIcon from '@material-ui/icons/Map';
 import LanguageIcon from '@material-ui/icons/Language';
+import Terrain from '../terrain/TerrainPage';
 
 /**
   there are several forms of state in this page:
