@@ -48,6 +48,7 @@ const editableAnimalProperties = [
   'species',
   'translocation',
   'wlh_id',
+  'device_id',
 ]
 
 // properties re-used in Telemetry
@@ -178,6 +179,8 @@ export class Animal implements IAnimal {
     switch (str) {
       case 'animal_id':
         return 'Animal ID';
+      case 'device_id':
+        return 'Device ID';
       case 'wlh_id':
         return 'WLH ID';
       case 'juvenile_at_heel':

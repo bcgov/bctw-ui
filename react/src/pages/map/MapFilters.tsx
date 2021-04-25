@@ -23,6 +23,7 @@ type MapFiltersProps = PageProp & {
   start: string;
   end: string;
   uniqueDevices: number[];
+  unassignedDevices: number[];
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
@@ -31,6 +32,7 @@ type MapFiltersProps = PageProp & {
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
+  const { uniqueDevices, unassignedDevices } = props;
   const classes = drawerStyles();
   // controls filter panel visibility
   const [open, setOpen] = useState<boolean>(true); 
@@ -224,7 +226,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 <MultiSelect
                   renderTypeLabel='devices'
                   label={MapStrings.deviceSelectedLabel}
-                  data={props.uniqueDevices.map(d => {return {id: d, value: d}})}
+                  data={[...uniqueDevices, ...unassignedDevices].map(d => {return {id: d, value: d, displayLabel: unassignedDevices.includes(d) ? `${d} (unassigned)` : `${d}`}})}
                   changeHandler={handleChangeDeviceList}
                   triggerReset={reset}
                 />

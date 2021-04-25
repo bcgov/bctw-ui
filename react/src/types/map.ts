@@ -4,7 +4,7 @@ import { IAnimalTelemetryBase } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common';
 import { formatWithUTCOffset } from 'utils/time';
-import { BCTW, TypeWithData } from './common_types';
+import { BCTW, BCTWType } from './common_types';
 
 interface MapRange {
   start: string;
@@ -16,9 +16,10 @@ type OnlySelectedCritters = {
   critter_ids: string[];
 }
 
+type PingGroupType = 'critter_id' | 'collar_id';
 type DetailsSortOption = 'wlh_id' | 'device_id' | 'frequency' | 'date_recorded';
 type OnPanelRowSelect = (ids: number[]) => void;
-type OnMapRowCellClick = (type: TypeWithData, row: ITelemetryDetail) => void;
+type OnMapRowCellClick = (type: BCTWType, row: ITelemetryDetail) => void;
 
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   critter_id: string;
@@ -40,8 +41,15 @@ interface ITelemetryLine extends GeoJsonObject {
   geometry: LineString
 }
 
+interface IUnassignedTelemetryLine extends GeoJsonObject {
+  type: 'Feature';
+  properties: Pick<ITelemetryDetail, 'collar_id' | 'device_id'>
+  geometry: LineString
+}
+
 // a grouped by critter_id version of @type {ITelemetryPoint} 
-interface ITelemetryCritterGroup {
+interface ITelemetryGroup {
+  collar_id: string;
   critter_id: string;
   device_id: number;
   frequency: number;
@@ -119,8 +127,10 @@ export type {
   DetailsSortOption,
   OnlySelectedCritters,
   ITelemetryLine,
+  IUnassignedTelemetryLine,
   ITelemetryPoint,
-  ITelemetryCritterGroup,
+  ITelemetryGroup,
+  PingGroupType,
 };
 
 export {

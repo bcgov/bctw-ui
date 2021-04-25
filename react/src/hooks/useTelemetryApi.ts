@@ -26,7 +26,7 @@ import {
 import { UserContext } from 'contexts/UserContext';
 import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
-import { BCTW, TypeWithData } from 'types/common_types';
+import { BCTW, BCTWType } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
@@ -102,7 +102,7 @@ export const useTelemetryApi = () => {
     return useQuery<ITelemetryPoint[], AxiosError>(
       ['unassigned_pings', { start, end}],
       () => mapApi.getPings(start, end, true),
-      {...defaultQueryOptions, refetchOnMount: false, }
+      defaultQueryOptions 
     );
   }
 
@@ -122,7 +122,7 @@ export const useTelemetryApi = () => {
     });
   };
 
-  const critterOptions = { ...defaultQueryOptions /*refetchOnMount: false, keepPreviousData: true */ };
+  const critterOptions = { ...defaultQueryOptions, keepPreviousData: true };
   /**
    *  retrieves critters that have a collar assigned
    */
@@ -155,7 +155,7 @@ export const useTelemetryApi = () => {
     );
 
   /**
-   * @returns a list of critters representing the audist history of @param critterId
+   * @returns a list of critters representing the audit history of @param critterId
    */
   const useCritterHistory = (page: number, critterId: string): UseQueryResult<Animal[]> => {
     return useQuery<Animal[], AxiosError>(
@@ -165,25 +165,22 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const codeOptions = {...defaultQueryOptions, refetchOnMount: false};
+
   /**
    * @param codeHeader the code header name used to determine which codes to fetch
    * @param page not currently used
    */
   const useCodes = (page: number, codeHeader: string): UseQueryResult<ICode[], AxiosError> => {
     const props = { page, codeHeader };
-    return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), {
-      ...defaultQueryOptions,
-      refetchOnMount: false
-    });
+    return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), codeOptions);
   };
 
   /**
    * retrieves list of code headers, no parameters
    */
   const useCodeHeaders = (): UseQueryResult<ICodeHeader[], AxiosError> => {
-    return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), {
-      ...defaultQueryOptions
-    });
+    return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), codeOptions);
   };
 
   /**
@@ -239,7 +236,6 @@ export const useTelemetryApi = () => {
       () => userApi.getUserCritterAccess(page, user, filterOutNone),
       {
         ...defaultQueryOptions
-        // ...defaultQueryOptions, ...{refetchOnMount: false}
       }
     );
   };
@@ -256,7 +252,7 @@ export const useTelemetryApi = () => {
   /** default type getter for animals or collars
    * @returns
    */
-  const useType = <T extends BCTW>(type: TypeWithData, id: string): UseQueryResult<T> => {
+  const useType = <T extends BCTW>(type: BCTWType, id: string): UseQueryResult<T> => {
     return useQuery<T, AxiosError>(['getType', type], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions
     });

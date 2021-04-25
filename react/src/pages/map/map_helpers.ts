@@ -5,9 +5,10 @@ import {
   DetailsSortOption,
   ITelemetryDetail,
   ITelemetryPoint,
-  ITelemetryCritterGroup,
+  ITelemetryGroup,
   ITelemetryLine,
-  doesPointArrayContainPoint
+  doesPointArrayContainPoint,
+  PingGroupType
 } from 'types/map';
 
 const MAP_COLOURS = {
@@ -65,6 +66,9 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
 
 // same as getFillColorByStatus - but for the point border/outline color
 const getOutlineColor = (feature: ITelemetryPoint): string => {
+  if (feature.id < 0) {
+    return MAP_COLOURS_OUTLINE['unassigned point'];
+  }
   const colour = feature?.properties?.animal_colour;
   return colour ? parseAnimalColour(colour)?.color : MAP_COLOURS.outline;
 };
@@ -86,28 +90,30 @@ const fillPoint = (layer: any, selected = false): void => {
 };
 
 /**
- * @param features list of telemetry features to group
+ * @param pings list of telemetry features to group
  * @param sortOption applied after the features are gruped by critter_id
- * @returns @type {ITelemetryCritterGroup}
+ * @returns @type {ITelemetryGroup}
  */
-const groupFeaturesByCritters = (
-  features: ITelemetryPoint[],
-  sortOption?: DetailsSortOption
-): ITelemetryCritterGroup[] => {
-  const uniques: ITelemetryCritterGroup[] = [];
-  if (!features.length) {
+const groupPings = (
+  pings: ITelemetryPoint[],
+  sortOption?: DetailsSortOption,
+  groupBy: PingGroupType = 'critter_id',
+): ITelemetryGroup[] => {
+  const uniques: ITelemetryGroup[] = [];
+  if (!pings.length) {
     return uniques;
   }
   // filter out the (0,0) points
-  const filtered = features.filter((f) => {
+  const filtered = pings.filter((f) => {
     const coords = f.geometry.coordinates;
     return coords[0] !== 0 && coords[1] !== 0;
   });
   filtered.forEach((f) => {
     const detail: ITelemetryDetail = f.properties;
-    const found = uniques.find((c) => c.critter_id === detail.critter_id);
+    const found = uniques.find((c) => c[groupBy] === detail[groupBy]);
     if (!found) {
       uniques.push({
+        collar_id: detail.collar_id,
         critter_id: detail.critter_id,
         device_id: detail.device_id,
         frequency: detail.frequency,
@@ -170,41 +176,41 @@ const applyFilter = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryP
 /**
  * @param array features to sort
  * @param comparator the comparator function
- * @returns the sorted @type {ITelemetryCritterGroup}
+ * @returns the sorted @type {ITelemetryGroup}
  */
-function sortGroupedFeatures(array: ITelemetryCritterGroup[], comparator: (a, b) => number): ITelemetryCritterGroup[] {
+function sortGroupedTelemetry(array: ITelemetryGroup[], comparator: (a, b) => number): ITelemetryGroup[] {
   const stabilizedThis = array.map((el, idx) => [el.features[0].properties, idx] as [ITelemetryDetail, number]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  const critterIds = stabilizedThis.map((a) => a[0].critter_id);
+  const identifiers = stabilizedThis.map((a) => a[0].device_id /* a[0].critter_id ?? a[0].collar_id */);
   const ret = [];
-  for (let i = 0; i < critterIds.length; i++) {
-    const foundIndex = array.findIndex((a) => a.critter_id === critterIds[i]);
+  for (let i = 0; i < identifiers.length; i++) {
+    const foundIndex = array.findIndex((a) => a.device_id /*a.critter_id ?? a.collar_id*/ === identifiers[i]);
     ret.push(array[foundIndex]);
   }
   return ret;
 }
 
 /**
- * @param u list of grouped features @type {ITelemetryCritterGroup}
+ * @param u list of grouped features @type {ITelemetryGroup}
  * @returns unique feature IDs within the group
  */
-const flattenUniqueFeatureIDs = (u: ITelemetryCritterGroup[]): number[] => {
+const getPointIDsFromTelemetryGroup = (u: ITelemetryGroup[]): number[] => {
   return u.map((uf) => uf.features.map((f) => f.id)).flatMap((x) => x);
 };
 
 /**
  * groups features by @property {critter_id}, and returns an array of unique critter_ids
  */
-const getUniqueCritterIDsFromFeatures = (features: ITelemetryPoint[], selectedIDs: number[]): string[] => {
-  const grped = groupFeaturesByCritters(features.filter((f) => selectedIDs.includes(f.id)));
+const getUniqueCritterIDsFromSelectedPings = (features: ITelemetryPoint[], selectedIDs: number[]): string[] => {
+  const grped = groupPings(features.filter((f) => selectedIDs.includes(f.id)));
   return grped.map((g) => g.critter_id);
 };
 
-const getUniqueDevicesFromFeatures = (features: ITelemetryPoint[]): number[] => {
+const getUniqueDevicesFromPings = (features: ITelemetryPoint[]): number[] => {
   const ids = [];
   features.forEach((f) => {
     const did = f.properties.device_id;
@@ -218,7 +224,7 @@ const getUniqueDevicesFromFeatures = (features: ITelemetryPoint[]): number[] => 
 /**
  * @returns a single feature that contains the most recent date_recorded
  */
-const getLatestTelemetryFeature = (features: ITelemetryPoint[]): ITelemetryPoint => {
+const getLatestPing = (features: ITelemetryPoint[]): ITelemetryPoint => {
   return features.reduce((accum, current) => {
     return dayjs(current.properties.date_recorded).isAfter(dayjs(accum.properties.date_recorded)) ? current : accum;
   });
@@ -227,7 +233,7 @@ const getLatestTelemetryFeature = (features: ITelemetryPoint[]): ITelemetryPoint
 /**
  * @returns a single feature that contains the oldest date_recorded
  */
-const getEarliestTelemetryFeature = (features: ITelemetryPoint[]): ITelemetryPoint => {
+const getEarliestPing = (features: ITelemetryPoint[]): ITelemetryPoint => {
   return features.reduce((accum, current) => {
     return dayjs(current.properties.date_recorded).isBefore(dayjs(accum.properties.date_recorded)) ? current : accum;
   });
@@ -236,19 +242,19 @@ const getEarliestTelemetryFeature = (features: ITelemetryPoint[]): ITelemetryPoi
 // groups the param features by critter, returning an object containing:
 // an array of the most recent pings
 // an arrya of all other pings
-const splitPings = (features: ITelemetryPoint[]): { latest: ITelemetryPoint[]; other: ITelemetryPoint[] } => {
-  const groupedByCritter = groupFeaturesByCritters(features);
-  const latest = getGroupedLatestFeatures(groupedByCritter);
+const splitPings = (pings: ITelemetryPoint[], splitBy: PingGroupType = 'critter_id'): { latest: ITelemetryPoint[]; other: ITelemetryPoint[] } => {
+  const gp = groupPings(pings, null, splitBy);
+  const latest = getLatestPingsFromTelemetryGroup(gp);
   const latestIds = latest.map((l) => l.id);
-  const other = features.filter((p) => !latestIds.includes(p.id));
+  const other = pings.filter((p) => !latestIds.includes(p.id));
   return { latest, other };
 };
 
-// returns an array of the latest ping for each critter in the group
-const getGroupedLatestFeatures = (grouped: ITelemetryCritterGroup[]): ITelemetryPoint[] => {
+// returns an array of the latest ping for each telemetry group
+const getLatestPingsFromTelemetryGroup = (grouped: ITelemetryGroup[]): ITelemetryPoint[] => {
   const latestPings = [];
   grouped.forEach((g) => {
-    latestPings.push(getLatestTelemetryFeature(g.features));
+    latestPings.push(getLatestPing(g.features));
   });
   return latestPings;
 };
@@ -260,9 +266,9 @@ const getLast10Fixes = (
   pings: ITelemetryPoint[],
   tracks: ITelemetryLine[]
 ): { pings: ITelemetryPoint[]; tracks: ITelemetryLine[] } => {
-  const pingsGroupedByCritter = groupFeaturesByCritters(pings);
+  const pingsGroupedByCritter = groupPings(pings);
   const newPings = getLast10Points(pingsGroupedByCritter);
-  const newTracks = getLast10Tracks(groupFeaturesByCritters(newPings), tracks);
+  const newTracks = getLast10Tracks(groupPings(newPings), tracks);
   return {
     pings: newPings,
     tracks: newTracks
@@ -271,14 +277,14 @@ const getLast10Fixes = (
 
 // returns the most recent 9 telemetry points per critter group
 // 9 instead of 10 as the latest ping is stored in a separate layer
-const getLast10Points = (pings: ITelemetryCritterGroup[]): ITelemetryPoint[] => {
+const getLast10Points = (pings: ITelemetryGroup[]): ITelemetryPoint[] => {
   const p = [];
   for (let i = 0; i < pings.length; i++) {
     const features = pings[i].features;
     const sorted = features.sort((a, b) => {
       return new Date(b.properties.date_recorded).getTime() - new Date(a.properties.date_recorded).getTime();
     });
-    const last10 = sorted.filter((s, idx) => idx > 0 && idx <= 9);
+    const last10 = sorted.filter((s, idx) => idx > 0 && idx <= 10);
     p.push(...last10);
   }
   return p;
@@ -296,7 +302,7 @@ const getLast10Points = (pings: ITelemetryCritterGroup[]): ITelemetryPoint[] => 
  * the only difference is how Leaflet displays them!
  */
 const getLast10Tracks = (
-  groupedPings: ITelemetryCritterGroup[],
+  groupedPings: ITelemetryGroup[],
   originalTracks: ITelemetryLine[]
 ): ITelemetryLine[] => {
   const newTracks: ITelemetryLine[] = [];
@@ -322,22 +328,22 @@ const getLast10Tracks = (
 export {
   applyFilter,
   fillPoint,
-  flattenUniqueFeatureIDs,
-  getEarliestTelemetryFeature,
+  getPointIDsFromTelemetryGroup,
+  getEarliestPing,
   getOutlineColor,
   getFillColorByStatus,
-  getGroupedLatestFeatures,
+  getLatestPingsFromTelemetryGroup,
   getLast10Fixes,
   getLast10Points,
   getLast10Tracks,
-  getLatestTelemetryFeature,
-  getUniqueCritterIDsFromFeatures,
-  getUniqueDevicesFromFeatures,
-  groupFeaturesByCritters,
+  getLatestPing,
+  getUniqueCritterIDsFromSelectedPings,
+  getUniqueDevicesFromPings,
+  groupPings,
   groupFilters,
   MAP_COLOURS,
   MAP_COLOURS_OUTLINE,
   parseAnimalColour,
-  sortGroupedFeatures,
+  sortGroupedTelemetry,
   splitPings,
 };

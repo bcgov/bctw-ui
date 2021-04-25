@@ -9,13 +9,13 @@ import AddEditViewer from 'pages/data/common/AddEditViewer';
 import { useEffect, useState } from 'react';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
-import { TypeWithData } from 'types/common_types';
+import { BCTWType } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
 import { eCritterPermission } from 'types/user';
 import { dateObjectToDateStr } from 'utils/time';
 
 type CritterOverViewProps = {
-  type: TypeWithData;
+  type: BCTWType;
   detail: ITelemetryDetail;
 };
 
@@ -41,16 +41,16 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
   const [canEdit, setCanEdit] = useState<boolean>(false);
   const bctwApi = useTelemetryApi();
   const { data, error, isError, status } =
-    type === 'critter'
-      ? bctwApi.useType<Animal>('critter', detail.critter_id)
-      : bctwApi.useType<Collar>('collar', detail.collar_id);
+    type === 'animal'
+      ? bctwApi.useType<Animal>('animal', detail.critter_id)
+      : bctwApi.useType<Collar>('device', detail.collar_id);
 
   useEffect(() => {
     if (status === 'success') {
-      if (type === 'critter') {
+      if (type === 'animal') {
         setCritter(data as Animal);
         setCanEdit((data as Animal).permission_type === eCritterPermission.change);
-      } else if (type === 'collar') {
+      } else if (type === 'device') {
         setCollar(data as Collar);
         setCanEdit(true);
       }
@@ -77,7 +77,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
     return <div>{error}</div>;
   }
 
-  if (type === 'critter') {
+  if (type === 'animal') {
     // CRITTER DETAILS
     return (
       <>
