@@ -108,6 +108,7 @@ export default function MapPage(): JSX.Element {
   const handleBaseMapClick = (): void => {
     if (!wasDrawing) {
       setSelectedPingIDs([]);
+      hidePopup();
     }
     wasDrawing = false;
   }
