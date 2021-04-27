@@ -124,6 +124,9 @@ export default function MapPage(): JSX.Element {
 
   // refetch pings when start/end times are changed
   useEffect(() => {
+    // wipe the attribute panel state on refresh
+    setOnlySelected({show: false, critter_ids:[]});
+    setSelectedPingIDs([]);
     clearLayers();
   }, [range]);
 
@@ -248,9 +251,12 @@ export default function MapPage(): JSX.Element {
       ref.addLayer(unassignedTracksLayer);
       ref.addLayer(latestUPingsLayer);
     } else {
-      ref.removeLayer(unassignedPingsLayer);
-      ref.removeLayer(unassignedTracksLayer);
-      ref.removeLayer(latestUPingsLayer);
+      // fixme: why does this need a delay?
+      setTimeout(() => {
+        ref.removeLayer(unassignedPingsLayer)
+        ref.removeLayer(unassignedTracksLayer);
+        ref.removeLayer(latestUPingsLayer);
+      }, 100) ;
     }
   }, [showUnassignedLayers])
 

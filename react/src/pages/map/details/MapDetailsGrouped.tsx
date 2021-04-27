@@ -14,6 +14,7 @@ import {
 } from 'pages/map/map_helpers';
 import { MapDetailsBaseProps } from './MapDetails';
 import { dateObjectToDateStr } from 'utils/time';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 export type MapDetailsGroupedProps = MapDetailsBaseProps & {
   pings: ITelemetryGroup[];
@@ -30,7 +31,7 @@ const rows_to_render = [
   'wlh_id',
   'animal_id',
   'device_id',
-  'frequency',
+  'Frequency (MHz)',
   'capture_date',
   'Last Transmission',
   'Point Count'
@@ -53,6 +54,12 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
     const newChecked = val ? pings.map((f) => f.critter_id) : [];
     pushRowCheck(newChecked);
   };
+
+  useDidMountEffect(() => {
+    if (!crittersSelected.length) {
+      setCheckedGroups([]);
+    }
+  }, [crittersSelected]);
 
   const handleRowCheck = (v: GroupedCheckedStatus): void => {
     let newChecked = null;
@@ -139,6 +146,7 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       {/* cast the detail to a feature in order to determine the swatch colour */}
       <TableCell
         style={{
+          width: '5%',
           backgroundColor: row.animal_colour
             ? getFillColorByStatus({ properties: row, id: null, type: 'Feature', geometry: null })
             : MAP_COLOURS['unassigned point']

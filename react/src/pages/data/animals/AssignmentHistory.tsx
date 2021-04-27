@@ -27,7 +27,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
   useEffect(() => {
     if (history?.length) {
       const attachment = hasCollarCurrentlyAssigned(history);
-      setIsDeviceAttached(attachment.collar_id);
+      setIsDeviceAttached(attachment?.collar_id);
     }
   }, [history]);
 
