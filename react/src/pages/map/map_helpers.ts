@@ -57,7 +57,12 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
   }
   const { properties } = point;
   if (properties?.animal_status === 'Mortality') {
-    return MAP_COLOURS.mortality;
+    const { date_recorded, mortality_date} = properties;
+    // if the mortality date is not set, fill all points red
+    // otherwise only fill points red after the mortality date
+    if (!mortality_date || dayjs(date_recorded) > dayjs(mortality_date)) {
+      return MAP_COLOURS.mortality;
+    }
   } else if (properties?.device_status === 'Potential Mortality') {
     return MAP_COLOURS.malfunction;
   }

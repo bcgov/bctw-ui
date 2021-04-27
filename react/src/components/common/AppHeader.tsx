@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
-import { Link as MuiLink } from '@material-ui/core';
 
 // Icons
 import Icon from '@mdi/react';
@@ -21,7 +20,6 @@ type AppheaderProps = {
 const AppHeader = ({children}: AppheaderProps): JSX.Element => {
   const useUser = useContext(UserContext);
   const [user, setUser] = useState<User>(null);
-  // const preventDefault = (event) => event.preventDefault();
 
   useEffect(() => {
     if (useUser.ready) {
@@ -32,10 +30,10 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
   return (
     <header className={'app-header'}>
       <div className={'container'}>
-        <MuiLink href='/home' className={'brand'} color={'inherit'}>
+        <Link to='/map' className={'brand'} color={'inherit'}>
           <img src={headerImage} width={155} height={52} alt={'Government of British Columbia'} />
-          BCTW
-        </MuiLink>
+          <p>BCTW</p>
+        </Link>
         <nav className={'app-nav'}>
           <ul>
             <li><Link to='/map' color={'inherit'}>Home</Link></li>

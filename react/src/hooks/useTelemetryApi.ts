@@ -228,14 +228,16 @@ export const useTelemetryApi = () => {
    * @param user idir of the user to receive critter access to
    * @returns A simplified list of Animals that only has id, animal_id,
    * note: query keys are important! make sure to include params in the key
+   * note: enabled prop can be set to false to delay the query
    */
-  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }): UseQueryResult<UserCritterAccess[], AxiosError> => {
+  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }, enabled = true): UseQueryResult<UserCritterAccess[], AxiosError> => {
     const { user, filterOutNone } = param;
     return useQuery<UserCritterAccess[], AxiosError>(
       ['critterAccess', page, user],
       () => userApi.getUserCritterAccess(page, user, filterOutNone),
       {
-        ...defaultQueryOptions
+        ...defaultQueryOptions,
+        enabled 
       }
     );
   };

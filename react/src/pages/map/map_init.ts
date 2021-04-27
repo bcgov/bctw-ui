@@ -27,6 +27,7 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
     Device ID: ${p.device_id} (${p.device_vendor}) <br>
     ${p.frequency ? 'Frequency: ' + p.frequency + '<br>' : ''}
     ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
+    ${p.animal_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
     ${p.device_status ? 'Device Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
     ${p.population_unit ? 'Population Unit: ' + p.population_unit + '<br>' : ''}
     ${t} <br>

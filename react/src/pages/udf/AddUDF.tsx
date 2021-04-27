@@ -1,6 +1,18 @@
 import { useContext, useEffect, useState } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { CircularProgress, FormControl, IconButton, InputLabel, MenuItem, Select, Table as MuiTable, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import {
+  CircularProgress,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Table as MuiTable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow
+} from '@material-ui/core';
 import { eUDFType, IUDF } from 'types/udf';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
@@ -14,8 +26,6 @@ import { ModalBaseProps } from 'components/component_interfaces';
 import { useQueryClient } from 'react-query';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 
-/**
- */
 export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const queryClient = useQueryClient();
@@ -28,12 +38,12 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   const [canSave, setCanSave] = useState<boolean>(false);
 
   const { data: udfResults, status: udfStatus } = bctwApi.useUDF(eUDFType.critter_group);
-  // page of 0 is passed to indicate we want to load all values
-  // fixme: delay this when waiting on useUser context?
-  const { data: critterResults, status: critterStatus } = bctwApi.useCritterAccess(0, {
-    user: useUser.user?.idir ?? '',
-    filterOutNone: true
-  });
+
+  const { data: critterResults, status: critterStatus } = bctwApi.useCritterAccess(
+    0, // page 0 is passed to load all values
+    { user: useUser.user?.idir, filterOutNone: true },
+    useUser.ready // pass user ready status as 'enabled', to wait until user info is loaded
+  );
 
   // when the udfs are fetched
   useEffect(() => {
@@ -50,16 +60,16 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     if (critterStatus === 'success') {
       setCritters(critterResults);
     }
-  });
+  }, [critterStatus]);
 
-  const onSuccess = (p): void => {
-    responseDispatch({type: 'success', message: 'user defined groups saved!'})
+  const onSuccess = (): void => {
+    responseDispatch({ type: 'success', message: 'user defined groups saved!' });
     queryClient.invalidateQueries('getUDF');
-  }
+  };
 
   const onError = (e): void => {
-    responseDispatch({type: 'error', message: `failed to save user defined group: ${e}`})
-  }
+    responseDispatch({ type: 'error', message: `failed to save user defined group: ${e}` });
+  };
 
   // setup the save mutation
   const { mutateAsync, isLoading } = bctwApi.useMutateUDF({ onSuccess, onError });
@@ -79,7 +89,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     const dup = Object.assign({}, u);
     dup.key = '';
     setUdfs([...udfs, dup]);
-  }
+  };
 
   // when user changes the group name textfield
   const handleChangeName = (v: Record<string, unknown>, udf: IUDF): void => {
@@ -113,16 +123,16 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   };
 
   const handleSave = (): void => {
-    const udfInput = udfs.map(u => {
-      return {key: u.key, value: u.value, type: u.type}
+    const udfInput = udfs.map((u) => {
+      return { key: u.key, value: u.value, type: u.type };
     });
     mutateAsync(udfInput);
-  }
+  };
 
   const onClose = (): void => {
     setCanSave(false);
     handleClose(false);
-  }
+  };
 
   // critters are currently fetched only to display something useful (wlh_id)
   // instead of critter_id
@@ -136,11 +146,13 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
       <FormControl size='small' variant='outlined' className={'select-small'}>
         <InputLabel>Show</InputLabel>
         <Select>
-          {critters.map(c => <MenuItem key={c}>{c}</MenuItem>)}
+          {critters.map((c) => (
+            <MenuItem key={c}>{c}</MenuItem>
+          ))}
         </Select>
       </FormControl>
-    )
-  }
+    );
+  };
 
   const headers = ['Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate'];
   return (
@@ -150,7 +162,9 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
         <TableHead>
           <TableRow>
             {headers.map((h, idx) => (
-              <TableCell align='center' key={idx}><strong>{h}</strong></TableCell>
+              <TableCell align='center' key={idx}>
+                <strong>{h}</strong>
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>
@@ -167,13 +181,21 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
                 <TableCell>{renderCrittersAsDropdown(getCritterNamesFromIDs(u.value))}</TableCell>
                 <TableCell>{u.value.length}</TableCell>
                 <TableCell>
-                  <IconButton onClick={(): void => handleEditCritters(u)}><Icon icon='edit'/></IconButton>
+                  <IconButton onClick={(): void => handleEditCritters(u)}>
+                    <Icon icon='edit' />
+                  </IconButton>
                 </TableCell>
                 <TableCell>
-                  <IconButton onClick={(): void => deleteRow(u)}><Icon icon='close'/></IconButton>
+                  <IconButton onClick={(): void => deleteRow(u)}>
+                    <Icon icon='close' />
+                  </IconButton>
                 </TableCell>
                 <TableCell>
-                  <IconButton disabled={u.value.length === 0 || u.key.length === 0} onClick={(): void => duplicateRow(u)}><Icon icon='copy'/></IconButton>
+                  <IconButton
+                    disabled={u.value.length === 0 || u.key.length === 0}
+                    onClick={(): void => duplicateRow(u)}>
+                    <Icon icon='copy' />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             );
@@ -223,14 +245,14 @@ function PickCritters({ open, handleClose, onSave, udf }: PickCritterProps): JSX
   };
 
   /**
-    * fixme: when udf.value is empty, table handler for multiselection is
-    * not passing ids to {handleSelect}
-    * so @param values can be string[] | UserCritterAccess[]
+   * fixme: when udf.value is empty, table handler for multiselection is
+   * not passing ids to {handleSelect}
+   * so @param values can be string[] | UserCritterAccess[]
    */
   const handleSelect = (values: unknown): void => {
     setWasChanged(true);
     if (udf.value.length === 0) {
-      setIds((values as UserCritterAccess[]).map((v) => v.critter_id))
+      setIds((values as UserCritterAccess[]).map((v) => v.critter_id));
     } else {
       setIds(values as string[]);
     }
@@ -245,7 +267,7 @@ function PickCritters({ open, handleClose, onSave, udf }: PickCritterProps): JSX
   const beforeClose = (): void => {
     setWasChanged(false);
     handleClose(false);
-  }
+  };
 
   return (
     <Modal open={open} handleClose={beforeClose}>
@@ -259,7 +281,9 @@ function PickCritters({ open, handleClose, onSave, udf }: PickCritterProps): JSX
         alreadySelected={udf.value}
       />
       <div className={'admin-btn-row'}>
-        <Button disabled={!wasChanged} onClick={handleSave}>save</Button>
+        <Button disabled={!wasChanged} onClick={handleSave}>
+          save
+        </Button>
       </div>
     </Modal>
   );

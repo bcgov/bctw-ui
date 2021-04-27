@@ -23,6 +23,7 @@ type OnMapRowCellClick = (type: BCTWType, row: ITelemetryDetail) => void;
 
 interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
   critter_id: string;
+  mortality_date: Date;
   date_recorded: Date;
   device_vendor: string;
 }
@@ -74,6 +75,7 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   device_status: string;
   location: string;
   @Type(() => Date) date_recorded: Date;
+  @Type(() => Date) mortality_date: Date;
   @Expose() get formattedDevice(): string {
     return `${this.device_id} (${this.device_vendor}) `;
   }

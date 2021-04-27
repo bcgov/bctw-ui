@@ -1,15 +1,21 @@
 @import 'colours.scss';
 
 .paper-edit {
-  padding: 2rem;
+  padding: 1rem 2rem;
   margin: 1rem;
 }
 
 .edit-form-field {
   margin-bottom: 1rem;
-
   .MuiFormControl-root {
     width: 100%;
+  }
+}
+
+.edit-form-field-span {
+  .MuiFormControl-root {
+    width: 50%;
+    margin-bottom: 1rem;
   }
 }
 

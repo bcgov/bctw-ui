@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Table from 'components/table/Table';
-import { CollarHistory, hasCollarCurrentlyAssigned, ICollarHistory } from 'types/collar_history';
+import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { CollarStrings } from 'constants/strings';
@@ -17,7 +17,7 @@ type IAssignmentHistoryProps = {
 export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
   const { animalId } = props;
   const bctwApi = useTelemetryApi();
-  const [attachedCollar, setAttachedCollar] = useState<ICollarHistory>();
+  const [isDeviceAttached, setIsDeviceAttached] = useState<string>(null);
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
 
   const onNewData = (d: CollarHistory[]): void => {
@@ -25,12 +25,10 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
   };
 
   useEffect(() => {
-    const updateComponent = (): void => {
-      if (history && history.length) {
-        setAttachedCollar(hasCollarCurrentlyAssigned(history));
-      }
-    };
-    updateComponent();
+    if (history?.length) {
+      const attachment = hasCollarCurrentlyAssigned(history);
+      setIsDeviceAttached(attachment.collar_id);
+    }
   }, [history]);
 
   return (
@@ -41,7 +39,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
         queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
         paginate={history?.length >= 10}
       />
-      <PerformAssignmentAction collarId={attachedCollar?.collar_id ?? ''} hasCollar={!!attachedCollar} {...props} />
+      <PerformAssignmentAction collarId={isDeviceAttached} {...props} />
     </>
   );
 }
