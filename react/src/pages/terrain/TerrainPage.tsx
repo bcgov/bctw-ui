@@ -30,7 +30,7 @@ const TerrainPage: React.FC = () => {
       timeline: true,
       geocoder: false,
       baseLayerPicker: true,
-      fullscreenButton: false,
+      fullscreenButton: true,
       vrButton: false,
       homeButton: false,
       animation: true,
