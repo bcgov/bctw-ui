@@ -28,6 +28,9 @@
     margin-right: 1.25rem;
     margin-bottom: 4px;
   }
+  p {
+    color: $appHeaderColor; 
+  }
 }
 
 .app-header .brand:hover {

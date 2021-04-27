@@ -6,7 +6,6 @@ import { ModalProps } from 'components/component_interfaces';
 import { IconButton } from '@material-ui/core';
 import { Icon } from 'components/common';
 import './modal.scss';
-import AppHeader from 'components/common/AppHeader';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement },
@@ -18,11 +17,11 @@ const Transition = React.forwardRef(function Transition(
 export default function FullScreenDialog({ open, handleClose, children }: ModalProps): JSX.Element {
   return (
     <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
-      <AppHeader>
+      <div className='app-header dlg-full-header'>
         <IconButton edge='start' color='inherit' onClick={(e): void => handleClose(false)}>
           <Icon icon='close' />
         </IconButton>
-      </AppHeader>
+      </div>
       <div className={'dlg-full'}>{children}</div>
     </Dialog>
   );

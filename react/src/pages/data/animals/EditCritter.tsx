@@ -62,11 +62,12 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   const makeField = (
     iType: FormInputType,
     changeHandler: (v: Record<string, unknown>) => void,
-    hasError: boolean
+    hasError: boolean,
+    span?: boolean
   ): React.ReactNode => {
     const isRequired = requiredFields.includes(iType.key);
     const errorText = hasError && (errors[iType.key] as string);
-    return MakeEditFields(iType, changeHandler, hasError, editing, canEdit, isRequired, errorText);
+    return MakeEditFields(iType, changeHandler, hasError, editing, canEdit, isRequired, errorText, span);
   };
 
   return (
@@ -97,7 +98,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                   </Typography>
                   {inputTypes
                     .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
-                    .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                    .map((d) => makeField(d, onChange, !!errors[d.key], true))}
                 </Paper>
                 <Paper className={'paper-edit'} elevation={3}>
                   <Typography className={'edit-form-header'} variant='h5'>

@@ -4,14 +4,14 @@ import { BCTW } from 'types/common_types';
 import SelectCode from './SelectCode';
 
 /**
- * @param iType 
- * @param changeHandler 
- * @param hasError 
- * @param editing 
- * @param canEdit 
- * @param required 
- * @param errText 
- * @returns 
+ * @param iType
+ * @param changeHandler
+ * @param hasError
+ * @param editing
+ * @param canEdit
+ * @param required
+ * @param errText
+ * @returns
  */
 function CreateEditTextField<T extends BCTW>(
   iType: FormInputType,
@@ -73,15 +73,17 @@ function MakeEditFields<T extends BCTW>(
 ): React.ReactNode {
   let Comp;
   if (iType.type === eInputType.select) {
-    Comp = CreateEditSelectField(iType, changeHandler, hasError, editing, canEdit, required) 
+    Comp = CreateEditSelectField(iType, changeHandler, hasError, editing, canEdit, required);
   } else if (iType.type === eInputType.text || iType.type === eInputType.number) {
-    Comp = CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText)
+    Comp = CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText);
   }
-  return span ? {Comp} : (
+  return span ? (
+    <span className={'edit-form-field-span'}>{Comp}</span>
+  ) : (
     <div key={iType.key} className={'edit-form-field'}>
       {Comp}
     </div>
-  )
+  );
 }
 
 export { CreateEditTextField, CreateEditSelectField, MakeEditFields };

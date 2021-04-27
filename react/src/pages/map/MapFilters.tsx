@@ -1,5 +1,5 @@
 import { Button, Drawer, IconButton } from '@material-ui/core';
-import { FilterList, Close } from '@material-ui/icons';
+import { Close, ArrowForward } from '@material-ui/icons';
 import { PageProp } from 'components/component_interfaces';
 import clsx from 'clsx';
 import TextField from 'components/form/Input';
@@ -17,11 +17,13 @@ import { columnToHeader } from 'utils/common';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { CODE_FILTERS, DEVICE_STATUS_OPTIONS } from 'pages/map/map_constants';
+import { LightTooltip } from 'components/modal/Tooltip';
 
 type MapFiltersProps = PageProp & {
   start: string;
   end: string;
   uniqueDevices: number[];
+  unassignedDevices: number[];
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
@@ -30,6 +32,7 @@ type MapFiltersProps = PageProp & {
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
+  const { uniqueDevices, unassignedDevices } = props;
   const classes = drawerStyles();
   // controls filter panel visibility
   const [open, setOpen] = useState<boolean>(true); 
@@ -163,7 +166,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         }}>
         <div className={open ? 'side-panel-toolbar' : 'side-panel-toolbar-closed'}>
           {open ? <h3>Filters</h3> : null}
-          <IconButton onClick={handleDrawerOpen}>{open ? <Close /> : <FilterList htmlColor={'#ffffff'} />}</IconButton>
+          <IconButton onClick={handleDrawerOpen}>{open ? <Close /> : <ArrowForward htmlColor={'#ffffff'} />}</IconButton>
         </div>
         {open ? (
           <>
@@ -187,14 +190,22 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   changeHandler={(e): void => setEnd(e['tend'] as string)}
                 />
               </div>
-              <div>
-                {/* render the unassigned/assigned data points selector */}
-                <MultiSelect
-                  label={MapStrings.assignmentStatusLabel}
-                  data={DEVICE_STATUS_OPTIONS}
-                  changeHandler={props.onShowUnassignedDevices}
-                />
-              </div>
+              <LightTooltip title={
+                <>
+                  <p><b><em>{MapStrings.assignmentStatusOptionA}</em></b>{MapStrings.assignmentStatusTooltip1}</p>
+                  <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
+                  <p>{MapStrings.assignmentStatusTooltip3}</p>
+                </>
+              } placement='right-start' enterDelay={400}>
+                <div>
+                  {/* render the unassigned/assigned data points selector */}
+                  <MultiSelect
+                    label={MapStrings.assignmentStatusLabel}
+                    data={DEVICE_STATUS_OPTIONS}
+                    changeHandler={props.onShowUnassignedDevices}
+                  />
+                </div>
+              </LightTooltip>
               <div>
                 {/* render the last pings/ last 10 fixes checkboxes */}
                 <Checkbox
@@ -215,7 +226,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 <MultiSelect
                   renderTypeLabel='devices'
                   label={MapStrings.deviceSelectedLabel}
-                  data={props.uniqueDevices.map(d => {return {id: d, value: d}})}
+                  data={[...uniqueDevices, ...unassignedDevices].map(d => {return {id: d, value: d, displayLabel: unassignedDevices.includes(d) ? `${d} (unassigned)` : `${d}`}})}
                   changeHandler={handleChangeDeviceList}
                   triggerReset={reset}
                 />

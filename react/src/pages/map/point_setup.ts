@@ -1,6 +1,6 @@
 import * as L from 'leaflet';
 import { getFillColorByStatus, getOutlineColor, MAP_COLOURS, MAP_COLOURS_OUTLINE } from 'pages/map/map_helpers';
-import { ITelemetryFeature } from 'types/map';
+import { ITelemetryPoint } from 'types/map';
 
 const defaultPointStyle: L.CircleMarkerOptions = {
   radius: 8,
@@ -19,7 +19,7 @@ const createLatestPingIcon = (fillColour: string, color = '#000', size = '25px')
 // setup for the latest pings for assigned devices
 const setupLatestPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn): void => {
   pings.options = {
-    pointToLayer: (feature: ITelemetryFeature, latlng: L.LatLngExpression): L.Layer => {
+    pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
       const marker = new L.Marker(latlng, {
         icon: createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature))
       });
@@ -32,7 +32,7 @@ const setupLatestPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHa
 // setup for normal pings for assigned devices
 const setupPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn): void => {
   pings.options = {
-    pointToLayer: (feature: ITelemetryFeature, latlng: L.LatLngExpression): L.Layer => {
+    pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
       const color = getOutlineColor(feature);
       const fillColor = getFillColorByStatus(feature);
       const pointStyle = { fillColor, color, ...defaultPointStyle };
@@ -46,7 +46,7 @@ const setupPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerF
 
 const setupUnassignedPings = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn): void => {
   pings.options = {
-    pointToLayer: (feature: ITelemetryFeature, latlng: L.LatLngExpression): L.Layer => {
+    pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
       const pointStyle = {
         fillColor: MAP_COLOURS['unassigned point'],
         color: MAP_COLOURS_OUTLINE['unassigned point'],

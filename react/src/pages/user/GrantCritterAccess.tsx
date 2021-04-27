@@ -10,6 +10,7 @@ import { ITableQueryProps } from 'components/table/table_interfaces';
 import { IBulkUploadResults, IGrantCritterAccessResults, IUserCritterPermissionInput } from 'api/api_interfaces';
 import { formatAxiosError } from 'utils/common';
 import { MenuItem, Select } from '@material-ui/core';
+import { useQueryClient } from 'react-query';
 
 type IGrantCritterModalProps = {
   users: User;
@@ -25,6 +26,7 @@ type IGrantCritterModalProps = {
 export default function GrantCritterModal({ show, onClose, onSave, users }: IGrantCritterModalProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
+  const queryClient = useQueryClient();
   // which critters are selected in the table
   const [critters, setCritters] = useState<UserCritterAccess[]>([]);
   // state for each of the column select components rendered in the table
@@ -44,6 +46,7 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
         type: 'success',
         message: `animal access granted for users: ${users.idir}`
       });
+      queryClient.invalidateQueries('critterAccess');
     }
   };
 

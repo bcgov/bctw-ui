@@ -75,7 +75,7 @@ export default function CritterPage(): JSX.Element {
             </AddEditViewer>
           </ModifyCritterWrapper>
         </div>
-        <p>{editObj.critter_id}</p>
+        {/* <p>{editObj.critter_id}</p> */}
       </div>
     </ManageLayout>
   );

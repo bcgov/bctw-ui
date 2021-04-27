@@ -75,7 +75,7 @@ export default function CollarPage(): JSX.Element {
             </AddEditViewer>
           </ModifyCollarWrapper>
         </div>
-        <p>collar ID: {editObj.collar_id}</p>
+        {/* <p>collar ID: {editObj.collar_id}</p> */}
       </div>
     </ManageLayout>
   );

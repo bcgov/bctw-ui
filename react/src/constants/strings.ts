@@ -1,6 +1,6 @@
 const CritterStrings = {
   importTitle: 'Bulk Import Animals',
-  importText: 'Use this feature to add or update animals. The field critter_id MUST be present if you want to update an animal.',
+  importText: 'Use this feature to add or update animals. If "animal_id" AND "wlh_id" are present, the importer will consider it an existing animal and attempt to update it. If "device_id" is present, the importer will attempt to attach the collar to the device. The device must exist.',
   exportTitle: 'Bulk Export Animal Data',
   exportText: '',
   requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
@@ -15,6 +15,7 @@ const CritterStrings = {
 const FileStrings = {
   collarTemplateName: 'BCTW_bulk_import_device_template.csv',
   animalTemplateName: 'BCTW_bulk_import_animal_template.csv',
+  templateButtonText: 'Download Template',
 }
 
 const CollarStrings = {
@@ -54,8 +55,11 @@ const MapStrings = {
   filterUserCritterGroup: 'Custom Animal Group',
   deviceSelectedLabel: 'Device List',
   assignmentStatusLabel: 'Device Assignment Status',
-  assignmentStatusOptionA: 'Show Assigned Devices',
-  assignmentStatusOptionU: 'Show Unassigned Devices',
+  assignmentStatusOptionA: 'Assigned Devices',
+  assignmentStatusOptionU: 'Unassigned Devices',
+  assignmentStatusTooltip1: ': shows device telemetry that currently has an animal attached.',
+  assignmentStatusTooltip2: ': show device telemetry that does not have an animal attached.',
+  assignmentStatusTooltip3: 'To attach a device, click Manage from the top navigation bar and edit an animal.',
 }
 
 const MapTileLayers = {

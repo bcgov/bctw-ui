@@ -7,6 +7,7 @@ import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { CollarHistory } from 'types/collar_history';
@@ -17,7 +18,6 @@ type IPerformAssignmentActionProps = {
   animalId: string;
   collarId: string; // uuid of the attached collar
   canEdit: boolean; // does user have change permission?
-  hasCollar: boolean; // does the critter currently have a collar attached
 };
 /**
  * component that performs post requests to assign/unassign a collar
@@ -26,7 +26,6 @@ type IPerformAssignmentActionProps = {
  *  2. a modal that displays a list of available collars with a save button
  */
 export default function PerformAssignmentAction({
-  hasCollar,
   animalId,
   collarId,
   canEdit
@@ -36,7 +35,7 @@ export default function PerformAssignmentAction({
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
   //  state to manage if a collar is being linked or removed
-  const [isLink, setIsLink] = useState<boolean>(false);
+  const [isLink, setIsLink] = useState<boolean>(!!collarId);
   const responseDispatch = useResponseDispatch();
 
   const onSuccess = (data: CollarHistory): void => {
@@ -44,6 +43,7 @@ export default function PerformAssignmentAction({
       type: 'success',
       message: `device ${data.collar_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`
     });
+    setIsLink(o => !o);
   };
 
   const onError = (error: AxiosError): void =>
@@ -57,6 +57,12 @@ export default function PerformAssignmentAction({
     updateCollarHistory();
   };
 
+  useEffect(() => {
+    // update status when collarId prop updated from parent
+    // fixme: why isn't this be happening automatically?
+    setIsLink(!!collarId);
+  }, [collarId])
+
   // force the collar history, current assigned/unassigned critter pages to refetch
   const updateCollarHistory = async(): Promise<void> => {
     queryClient.invalidateQueries('collarAssignmentHistory');
@@ -66,7 +72,7 @@ export default function PerformAssignmentAction({
 
   const { mutateAsync } = bctwApi.useMutateLinkCollar({ onSuccess, onError });
 
-  const handleClickShowModal = (): void => (hasCollar ? setShowConfirmModal(true) : setShowAvailableModal(true));
+  const handleClickShowModal = (): void => (isLink ? setShowConfirmModal(true) : setShowAvailableModal(true));
 
   const closeModals = (): void => {
     setShowConfirmModal(false);
@@ -106,7 +112,7 @@ export default function PerformAssignmentAction({
         show={showAvailableModal}
         onClose={closeModals}
       />
-      <Button disabled={!canEdit} onClick={handleClickShowModal}>{hasCollar ? 'unassign device' : 'assign device'}</Button>
+      <Button disabled={!canEdit} onClick={handleClickShowModal}>{isLink ? 'remove device' : 'assign device' }</Button>
     </>
   );
 }

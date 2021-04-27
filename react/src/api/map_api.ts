@@ -1,12 +1,12 @@
 import { createUrl } from 'api/api_helpers';
-import { ITelemetryFeature, ITracksFeature } from 'types/map';
+import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import { ApiProps } from './api_interfaces';
 // import {GeoJSON} from 'leaflet';
 
 export const mapApi = (props: ApiProps) => {
   const { api, testUser } = props;
 
-  const getTracks = async (start: string, end: string, unassigned = false): Promise<ITracksFeature[]> => {
+  const getTracks = async (start: string, end: string, unassigned = false): Promise<ITelemetryLine[]> => {
     const url = createUrl({ api: 'get-critter-tracks', query: `start=${start}&end=${end}&unassigned=${unassigned}`, testUser });
     const { data } = await api.get(url);
     return data?.features;
@@ -18,7 +18,7 @@ export const mapApi = (props: ApiProps) => {
     return data;
   };
 
-  const getPings = async (start: string, end: string, unassigned = false): Promise<ITelemetryFeature[]> => {
+  const getPings = async (start: string, end: string, unassigned = false): Promise<ITelemetryPoint[]> => {
     const url = createUrl({ api: 'get-critters', query: `start=${start}&end=${end}&unassigned=${unassigned}`, testUser });
     const { data } = await api.get(url);
     return data?.features;

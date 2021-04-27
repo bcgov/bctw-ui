@@ -5,6 +5,7 @@ export interface ISelectMultipleData {
   id: string | number;
   value: string | number;
   default?: boolean;
+  displayLabel?: string;
 }
 
 type ISelectMultipleProps<T extends ISelectMultipleData> = SelectProps & {
@@ -79,7 +80,7 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: ISelec
                 }
                 onChange={(e, checked): void => handleCheckRow(d, checked)}
               />
-              {d.value}
+              {d.displayLabel ?? d.value}
             </MenuItem>
           );
         })}

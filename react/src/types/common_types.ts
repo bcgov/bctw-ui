@@ -15,4 +15,4 @@ export interface BctwBaseType {
 /**
  * defines the main object types that have metadata in BCTW
  */
-export type TypeWithData = 'critter' | 'collar'
+export type BCTWType = 'animal' | 'device'

@@ -26,10 +26,10 @@ import {
 import { UserContext } from 'contexts/UserContext';
 import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
-import { BCTW, TypeWithData } from 'types/common_types';
+import { BCTW, BCTWType } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
-import { ITelemetryFeature, ITracksFeature } from 'types/map';
+import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -70,16 +70,16 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const useTracks = (start: string, end: string): UseQueryResult<ITracksFeature[], AxiosError> => {
-    return useQuery<ITracksFeature[], AxiosError>(
+  const useTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
+    return useQuery<ITelemetryLine[], AxiosError>(
       ['tracks', start, end],
       () => mapApi.getTracks(start, end),
       defaultQueryOptions
     );
   };
 
-  const useUnassignedTracks = (start: string, end: string): UseQueryResult<ITracksFeature[], AxiosError> => {
-    return useQuery<ITracksFeature[], AxiosError>(
+  const useUnassignedTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
+    return useQuery<ITelemetryLine[], AxiosError>(
       ['unassigned_tracks', start, end],
       () => mapApi.getTracks(start, end, true),
       {...defaultQueryOptions, refetchOnMount: false, }
@@ -89,8 +89,8 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const usePings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
-    return useQuery<ITelemetryFeature[], AxiosError>(
+  const usePings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+    return useQuery<ITelemetryPoint[], AxiosError>(
       ['pings', { start, end }],
       () => mapApi.getPings(start, end),
       defaultQueryOptions
@@ -98,11 +98,11 @@ export const useTelemetryApi = () => {
   };
 
   // the same as usePings, but doesn't auto fetch due to enabled: false setting
-  const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryFeature[], AxiosError> => {
-    return useQuery<ITelemetryFeature[], AxiosError>(
+  const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+    return useQuery<ITelemetryPoint[], AxiosError>(
       ['unassigned_pings', { start, end}],
       () => mapApi.getPings(start, end, true),
-      {...defaultQueryOptions, refetchOnMount: false, }
+      defaultQueryOptions 
     );
   }
 
@@ -122,7 +122,7 @@ export const useTelemetryApi = () => {
     });
   };
 
-  const critterOptions = { ...defaultQueryOptions /*refetchOnMount: false, keepPreviousData: true */ };
+  const critterOptions = { ...defaultQueryOptions, keepPreviousData: true };
   /**
    *  retrieves critters that have a collar assigned
    */
@@ -155,7 +155,7 @@ export const useTelemetryApi = () => {
     );
 
   /**
-   * @returns a list of critters representing the audist history of @param critterId
+   * @returns a list of critters representing the audit history of @param critterId
    */
   const useCritterHistory = (page: number, critterId: string): UseQueryResult<Animal[]> => {
     return useQuery<Animal[], AxiosError>(
@@ -165,25 +165,22 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const codeOptions = {...defaultQueryOptions, refetchOnMount: false};
+
   /**
    * @param codeHeader the code header name used to determine which codes to fetch
    * @param page not currently used
    */
   const useCodes = (page: number, codeHeader: string): UseQueryResult<ICode[], AxiosError> => {
     const props = { page, codeHeader };
-    return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), {
-      ...defaultQueryOptions,
-      refetchOnMount: false
-    });
+    return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), codeOptions);
   };
 
   /**
    * retrieves list of code headers, no parameters
    */
   const useCodeHeaders = (): UseQueryResult<ICodeHeader[], AxiosError> => {
-    return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), {
-      ...defaultQueryOptions
-    });
+    return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), codeOptions);
   };
 
   /**
@@ -231,15 +228,16 @@ export const useTelemetryApi = () => {
    * @param user idir of the user to receive critter access to
    * @returns A simplified list of Animals that only has id, animal_id,
    * note: query keys are important! make sure to include params in the key
+   * note: enabled prop can be set to false to delay the query
    */
-  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }): UseQueryResult<UserCritterAccess[], AxiosError> => {
+  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }, enabled = true): UseQueryResult<UserCritterAccess[], AxiosError> => {
     const { user, filterOutNone } = param;
     return useQuery<UserCritterAccess[], AxiosError>(
       ['critterAccess', page, user],
       () => userApi.getUserCritterAccess(page, user, filterOutNone),
       {
-        ...defaultQueryOptions
-        // ...defaultQueryOptions, ...{refetchOnMount: false}
+        ...defaultQueryOptions,
+        enabled 
       }
     );
   };
@@ -256,7 +254,7 @@ export const useTelemetryApi = () => {
   /** default type getter for animals or collars
    * @returns
    */
-  const useType = <T extends BCTW>(type: TypeWithData, id: string): UseQueryResult<T> => {
+  const useType = <T extends BCTW>(type: BCTWType, id: string): UseQueryResult<T> => {
     return useQuery<T, AxiosError>(['getType', type], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions
     });

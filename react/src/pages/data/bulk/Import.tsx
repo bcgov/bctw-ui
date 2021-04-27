@@ -6,6 +6,7 @@ import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import FileInput from 'components/form/FileInput';
 import Modal from 'components/modal/Modal';
+import { FileStrings } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import React from 'react';
@@ -87,9 +88,9 @@ export default function Import<T>(props: ExportImportProps): JSX.Element {
           : null
       }
       <div className={styles.footer}>
-        {props.downloadTemplate? <Button variant='contained' color='primary' onClick={props.downloadTemplate}>Download template</Button> : null }
+        {isSuccess || isError ? <Button variant='contained' color='secondary' onClick={reset}>{`${importHadErrors() ? 'Try' : 'Upload'} Again`}</Button> : null}
         {isIdle ? <FileInput accept='.csv' onFileChosen={handleFileChange} /> : null}
-        {isSuccess || isError ? <Button variant='contained' onClick={reset}>{`${importHadErrors() ? 'try' : 'upload'} again`}</Button> : null}
+        {props.downloadTemplate? <Button variant='contained' color='primary' onClick={props.downloadTemplate}>{FileStrings.templateButtonText}</Button> : null }
       </div>
     </Modal>
   )

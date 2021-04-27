@@ -4,6 +4,12 @@
   background-color: #f1f3f5 !important;
 }
 
+.dlg-full-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
 .dlg-full-title {
   padding: 1rem 5rem;
 
