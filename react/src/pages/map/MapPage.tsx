@@ -26,6 +26,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { setupLatestPingOptions, setupPingOptions, setupSelectedPings, setupTracksOptions, setupUnassignedPings } from 'pages/map/point_setup';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
+import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 
 import MapIcon from '@material-ui/icons/Map';
 import LanguageIcon from '@material-ui/icons/Language';
@@ -49,6 +50,9 @@ import Terrain from '../terrain/TerrainPage';
 export default function MapPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const mapRef = useRef<L.Map>(null);
+
+  // The flag for which map is showing
+  const [map3D, setMap3D] = useState(false);
 
   // pings layer state
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
@@ -497,6 +501,24 @@ export default function MapPage(): JSX.Element {
     }
   };
 
+  const toggleTracks = (show: boolean): void => {
+    const ref = mapRef.current;
+    if (showUnassignedLayers) {
+      getTracksLayers().forEach(l => show ? ref.addLayer(l) : ref.removeLayer(l))
+      unassignedTracksLayer.bringToBack()
+    } else {
+      const l = getTracksLayers()[0];
+      show ? ref.addLayer(l) : ref.removeLayer(l)
+    } 
+    tracksLayer.bringToBack();
+  }
+
+  const togglePings = (show: boolean): void => {
+    const ref = mapRef.current;
+    const layers = showUnassignedLayers ? getPingLayers() : getPingLayers().slice(0, 2);
+    layers.forEach(l => show ? ref.addLayer(l) : ref.removeLayer(l));
+  }
+
   /**
    * @param b boolean on whether the map should be filtered to each critter's last 10 pings
    * fixme: line segment to the latest point not appearing
@@ -527,6 +549,8 @@ export default function MapPage(): JSX.Element {
 
   const getAssignedLayers = (): L.Layer[] => [latestPingsLayer, pingsLayer, tracksLayer];
   const getUnassignedLayers = (): L.Layer[] => [unassignedPingsLayer, latestUPingsLayer, unassignedTracksLayer];
+  const getTracksLayers = (): L.Layer[] => [tracksLayer, unassignedTracksLayer];
+  const getPingLayers = (): L.Layer[] => [pingsLayer, latestPingsLayer, unassignedPingsLayer, latestUPingsLayer];
 
   /**
    * when device assignment status select dropdown is changed
@@ -578,6 +602,15 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     unassignedPingsLayer.addTo(mapRef.current);
   }, [unassignedPingsLayer]);
+
+  // upon 3D -> 2D map, need to re-init
+  useDidMountEffect(() => {
+    if (!map3D) {
+      initMap(mapRef, drawnItems, selectedPingsLayer, tracksLayer, pingsLayer, handleDrawShape, handleBaseMapClick, handleWasDrawing);
+      togglePings(true);
+      toggleTracks(true);
+    }
+  }, [map3D])
 
   // trigger download on ctrl+s keyboard input
   const handleKeyPress = (e): void => {
@@ -637,28 +670,23 @@ export default function MapPage(): JSX.Element {
     transform: 'scale(0.7)',
     opacity: '0.7'
   };
-
-  // The flag for which map is showing
-  const [map3D, setMap3D] = useState(false);
-
   
   /**
    * ##toggleMap3D
    * Toggle value of _map3D_ for displaying 2D and 3D maps.
    * @returns Boolean
    */
-  const toggleMap3D = () => setMap3D(!map3D);
+  const toggleMap3D = (): void => setMap3D(!map3D);
 
   /**
    * ## toggleTitle
    * Toggle the tooltip for the toggleMap3D button
    */
-  const toggleTitle = () => {
+  const toggleTitle = (): string => {
     return (!map3D) ?
       "Switch to 3D terrain map" :
       "Switch to 2D map";
   };
-
 
   return (
     <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
@@ -681,7 +709,9 @@ export default function MapPage(): JSX.Element {
         {/* Map container for both 2D and 3D */}
         {map3D ?
           <Terrain/>:
-          <div id='map' onKeyDown={handleKeyPress} />
+          <div id='map' onKeyDown={handleKeyPress}>
+            <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
+          </div>
         }
 
         {/* The layer switching button*/}

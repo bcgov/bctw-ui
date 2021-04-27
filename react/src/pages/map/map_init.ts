@@ -94,9 +94,6 @@ const initMap = (
   const layerPicker = L.control.layers(null ,null,{position: 'topleft'});
   addTileLayers(mapRef, layerPicker);
 
-  layerPicker.addOverlay(tracks, 'Animal Tracks');
-  layerPicker.addOverlay(pings, 'Animal Locations');
-
   mapRef.current.addLayer(drawnItems);
   mapRef.current.addLayer(selectedPings);
 

@@ -189,3 +189,21 @@ $appearAboveMap: 314159;
 .bottom-panel-row-is-map-selected {
   background-color: lavender;
 }
+
+.map-layer-toggle-grp {
+  // propeties that leaflet-control class uses
+  z-index: 800;
+  pointer-events: visiblePainted;
+
+  position: absolute;
+  right: 0.5rem;
+  top: 18rem;
+  background-color: $appHeaderColor; 
+  border: 1px solid #000; 
+  padding: 4px;
+  height: 5.5rem;
+  width: 8rem;
+  * {
+    margin-left: 5px;
+  }
+}
