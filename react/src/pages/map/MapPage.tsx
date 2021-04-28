@@ -23,7 +23,7 @@ import { formatDay, getToday } from 'utils/time';
 import { BCTWType } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { setupLatestPingOptions, setupPingOptions, setupSelectedPings, setupTracksOptions, setupUnassignedPings } from 'pages/map/point_setup';
+import { setupLatestPingOptions, setupPingOptions, setupSelectedPings, setupTracksOptions } from 'pages/map/point_setup';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
@@ -64,8 +64,6 @@ export default function MapPage(): JSX.Element {
   const [unassignedPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Unassigned Pings
   const [unassignedTracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Unassigned Tracks
 
-  // the drawn shapes layer
-  let wasDrawing = false;
   const selectedPingsLayer = new L.GeoJSON();
   selectedPingsLayer.options = setupSelectedPings();
 
@@ -98,29 +96,6 @@ export default function MapPage(): JSX.Element {
   const [onlyLastKnown, setOnlyLastKnown] = useState<boolean>(false);
   const [onlyLast10, setOnlyLast10] = useState<boolean>(false);
 
-  // when finished drawing a shape, a click event occurs as the mouse is released.
-  // dont want to trigger the basemap click event, which wipes selectedPingIds
-  // doing this with usestate is not fast enough
-  const handleWasDrawing = (): void => {
-    wasDrawing = true;
-  }
-
-  /**
-   * still not a valid solution as @var {selectedPingIDs} is not in a valid context
-   * when this is called, so cant check that its non empty before wiping it. 
-   * fixme: when the basemap is clicked it wipes the selected status 
-   * from drawn shapes and bottom panel selected rows
-   * todo: maybe revert to trying to position the leaflet popup, since it has a proper 
-   * close handler?
-   */
-  const handleBaseMapClick = (): void => {
-    if (!wasDrawing) {
-      setSelectedPingIDs([]);
-      hidePopup();
-    }
-    wasDrawing = false;
-  }
-
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
 
@@ -144,11 +119,11 @@ export default function MapPage(): JSX.Element {
     const update = (): void => {
       if (fetchedPings && !isErrorPings) {
         // must be called before adding data to pings layer
-        setupPingOptions(pingsLayer, handlePointClick);
-        setupLatestPingOptions(latestPingsLayer, handlePointClick);
+        setupPingOptions(pingsLayer, handlePointClick, hidePopup, false);
+        setupLatestPingOptions(latestPingsLayer, handlePointClick, hidePopup, false);
         // re-apply filters
         if (filters.length) {
-          applyFiltersToPings(filters, fetchedPings);
+          applyFiltersToPings(filters);
         } else {
           setPings(fetchedPings);
         }
@@ -181,8 +156,8 @@ export default function MapPage(): JSX.Element {
     if (fetchedUnassignedPings && !isErrorUPings) {
       setUnassignedPings(fetchedUnassignedPings);
 
-      setupUnassignedPings(unassignedPingsLayer, handlePointClick);
-      setupLatestPingOptions(latestUPingsLayer, handlePointClick);
+      setupPingOptions(unassignedPingsLayer, handlePointClick, hidePopup, true);
+      setupLatestPingOptions(latestUPingsLayer, handlePointClick, hidePopup, true);
 
       unassignedPingsLayer.addData(fetchedUnassignedPings as any);
       latestUPingsLayer.addData(splitPings(fetchedUnassignedPings, 'collar_id').latest as any);
@@ -235,7 +210,7 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
-        initMap(mapRef, drawnItems, selectedPingsLayer, tracksLayer, pingsLayer, handleDrawShape, handleBaseMapClick, handleWasDrawing);
+        initMap(mapRef, drawnItems, selectedPingsLayer, handleDrawShape);
       }
       tracksLayer.bringToBack();
     };
@@ -284,11 +259,9 @@ export default function MapPage(): JSX.Element {
     // dont trigger basemap click that would clear the ping
     L.DomEvent.stopPropagation(event);
     const layer = event.target;
-    setSelectedPingIDs([]);
     const feature: ITelemetryPoint = layer?.feature;
     setPopupInnerHTML(feature);
     // set the feature id state so bottom panel will highlight the row
-    setSelectedPingIDs([feature.id]);
   };
 
   // when rows are checked in the details panel, highlight them
@@ -413,7 +386,7 @@ export default function MapPage(): JSX.Element {
   };
 
   // the handler that actually updates the ping state when the filter state is changed
-  const applyFiltersToPings = (filters: ICodeFilter[], newFeatures = pings): void => {
+  const applyFiltersToPings = (filters: ICodeFilter[]): void => {
     if (!filters.length) {
       // reset map state and bottom panel state
       setPings(fetchedPings)
@@ -421,7 +394,8 @@ export default function MapPage(): JSX.Element {
       return;
     }
     const groupedFilters = groupFilters(filters);
-    const filteredPings = applyFilter(groupedFilters, newFeatures);
+    // console.log(groupedFilters, newFeatures.length);
+    const filteredPings = applyFilter(groupedFilters, fetchedPings);
 
     setPings(filteredPings);
     redrawPings(filteredPings);
@@ -606,7 +580,7 @@ export default function MapPage(): JSX.Element {
   // upon 3D -> 2D map, need to re-init
   useDidMountEffect(() => {
     if (!map3D) {
-      initMap(mapRef, drawnItems, selectedPingsLayer, tracksLayer, pingsLayer, handleDrawShape, handleBaseMapClick, handleWasDrawing);
+      initMap(mapRef, drawnItems, selectedPingsLayer, handleDrawShape);
       togglePings(true);
       toggleTracks(true);
     }
@@ -648,45 +622,6 @@ export default function MapPage(): JSX.Element {
       setDragging(false);
     }
   }
-  // Style the map switching button
-  const switchMapStyle = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    backgroundColor: 'white',
-    color: '#464646',
-    width: '2.85rem',
-    height: '2.85rem',
-    top: '10px',
-    left: '10px',
-    zIndex: 1000,
-    borderRadius: '4px',
-    cursor: 'pointer'
-  } as React.CSSProperties;
-
-  // Style the image inside the map switching button
-  const iconStyle = {
-    transform: 'scale(0.7)',
-    opacity: '0.7'
-  };
-  
-  /**
-   * ##toggleMap3D
-   * Toggle value of _map3D_ for displaying 2D and 3D maps.
-   * @returns Boolean
-   */
-  const toggleMap3D = (): void => setMap3D(!map3D);
-
-  /**
-   * ## toggleTitle
-   * Toggle the tooltip for the toggleMap3D button
-   */
-  const toggleTitle = (): string => {
-    return (!map3D) ?
-      "Switch to 3D terrain map" :
-      "Switch to 2D map";
-  };
 
   return (
     <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
@@ -697,6 +632,8 @@ export default function MapPage(): JSX.Element {
         unassignedDevices={showUnassignedLayers ? getUniqueDevicesFromPings(fetchedUnassignedPings ?? []) : []}
         onApplyFilters={handleApplyChangesFromFilterPanel}
         onClickEditUdf={(): void => setShowUdfEdit(o => !o)}
+        // todo: figure out how to trigger when filter panel transition is completed.
+        onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
         onShowLatestPings={handleShowLastKnownLocation}
         onShowLastFixes={handleShowLast10Fixes}
         onShowUnassignedDevices={handleShowUnassignedDevices}
@@ -716,9 +653,9 @@ export default function MapPage(): JSX.Element {
 
         {/* The layer switching button*/}
         <div
-          style={switchMapStyle}
-          onClick={toggleMap3D}
-          title={toggleTitle()}
+          className={'map-icon map-dimension-btn icon-on'}
+          onClick={(): void => setMap3D(o => !o)}
+          title={map3D ? 'Switch to 2D map' : 'Switch to 3D terrain map'}
         >
           {map3D ? <MapIcon/>  : <LanguageIcon/>}
         </div>

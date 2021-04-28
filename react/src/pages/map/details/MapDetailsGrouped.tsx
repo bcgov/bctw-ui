@@ -109,7 +109,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 isChecked={checkedGroups.includes(u.critter_id)}
                 isSelectedInMap={crittersSelected.indexOf(u.critter_id) !== -1}
                 // todo: fixme: should it be the latest props that are displayed?
-                row={getLatestPing(u.features)?.properties}
+                row={plainToClass(TelemetryDetail, getLatestPing(u.features)?.properties)}
                 handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
               />
@@ -125,7 +125,7 @@ type MapDetailsTableRowProps = {
   pingCount: number;
   isSelectedInMap: boolean;
   isChecked: boolean;
-  row: ITelemetryDetail;
+  row: TelemetryDetail;
   handleRowCheck: (v: GroupedCheckedStatus) => void;
   handleShowOverview: OnMapRowCellClick;
 };
@@ -143,21 +143,20 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
-      {/* cast the detail to a feature in order to determine the swatch colour */}
       <TableCell
         style={{
           width: '5%',
           backgroundColor: row.animal_colour
+            // cast the detail to a feature in order to determine the swatch colour 
             ? getFillColorByStatus({ properties: row, id: null, type: 'Feature', geometry: null })
             : MAP_COLOURS['unassigned point']
         }}></TableCell>
       {row.critter_id ? <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} /> : <TableCell></TableCell>}
       {row.critter_id ? <CellWithLink row={row} propName={'animal_id'} onClickLink={(): void => handleShowOverview('animal', row)} /> : <TableCell></TableCell>}
       <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('device', row)} />
-      {/* todo: add frequency unit type */}
-      <TableCell>{row.frequency}</TableCell>
-      <TableCell>{row.capture_date ? dateObjectToDateStr(row.capture_date) : ''}</TableCell>
-      <TableCell>{dateObjectToDateStr(row.date_recorded)}</TableCell>
+      <TableCell>{row.paddedFrequency}</TableCell>
+      <TableCell>{row.formattedCaptureDate}</TableCell>
+      <TableCell>{row.formattedDate}</TableCell>
       <TableCell>{pingCount}</TableCell>
     </TableRow>
   );

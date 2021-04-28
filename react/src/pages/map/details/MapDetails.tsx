@@ -69,7 +69,8 @@ export default function MapDetails({
   const handleRowsChecked = (ids: number[]): void => {
     const grouped = groupPings(pings.filter((f) => ids.includes(f.id)));
     setPingGroupChecked(grouped);
-    handleRowSelected(ids);
+    // note: disabling highlighting ids in rows checked preworkshop
+    // handleRowSelected(ids);
     if (showOnlySelected) {
       handleShowOnlySelected({show: true, critter_ids: grouped.map(g => g.critter_id)});
     }

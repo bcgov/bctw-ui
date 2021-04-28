@@ -16,6 +16,7 @@ import appTheme from 'themes/appTheme';
 import { AppRouter } from './AppRouter';
 import { SnackbarWrapper } from 'components/common';
 import DefaultLayout from 'pages/layouts/DefaultLayout';
+import AppFooter from 'components/common/AppFooter';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -55,7 +56,7 @@ export default function App(): JSX.Element {
                         </ResponseProvider>
                       </div>
                     </div>
-                    {/* <AppFooter/> */}
+                    <AppFooter/>
                   </div>
                 </HashRouter>
               );

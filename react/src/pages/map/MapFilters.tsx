@@ -24,6 +24,7 @@ type MapFiltersProps = PageProp & {
   end: string;
   uniqueDevices: number[];
   unassignedDevices: number[];
+  onCollapsePanel: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
@@ -148,7 +149,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     changeFilter(asFilters, 'device_id');
   }
 
-  const handleDrawerOpen = (): void => setOpen((o) => !o);
+  const handleDrawerOpen = (): void => {
+    const newVal = !open;
+    setOpen(newVal);
+    if (open) {
+      // notify map parent that it needs to resize
+      props.onCollapsePanel();
+    }
+  }
 
   return (
     <div className={'side-panel'}>

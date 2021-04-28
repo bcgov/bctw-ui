@@ -3,7 +3,7 @@ import { GeoJsonObject, LineString, Point, Position } from 'geojson';
 import { IAnimalTelemetryBase } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common';
-import { formatWithUTCOffset } from 'utils/time';
+import { dateObjectToDateStr } from 'utils/time';
 import { BCTW, BCTWType } from './common_types';
 
 interface MapRange {
@@ -72,6 +72,7 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   device_id: number;
   device_vendor: string;
   frequency: number;
+  frequency_unit_code: string;
   device_status: string;
   location: string;
   @Type(() => Date) date_recorded: Date;
@@ -80,7 +81,13 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
     return `${this.device_id} (${this.device_vendor}) `;
   }
   @Expose() get formattedDate(): string {
-    return formatWithUTCOffset(this.date_recorded);
+    return dateObjectToDateStr(this.date_recorded);
+  }
+  @Expose() get formattedCaptureDate(): string {
+    return this.capture_date ? dateObjectToDateStr(this.capture_date) : '';
+  }
+  @Expose() get paddedFrequency(): string {
+    return padFrequency(this.frequency);
   }
   animal_colour: string;
 
@@ -119,6 +126,13 @@ const doesPointArrayContainPoint = (pings: Position[], coord: Position): boolean
     }
   }
   return false;
+}
+
+const padFrequency = (num: number): string => {
+  const freq = num.toString();
+  const numDecimalPlaces = freq.slice(freq.lastIndexOf('.') + 1).length;
+  const numToAdd = (3 - numDecimalPlaces) + freq.length;
+  return freq.padEnd(numToAdd, '0');
 }
 
 export type {

@@ -44,7 +44,7 @@ $appearAboveMap: 314159;
 }
 
 //
-// side panel
+// filter panel
 //
 
 .side-panel-toolbar {
@@ -93,7 +93,6 @@ $appearAboveMap: 314159;
 .side-panel-body {
   display: flex;
   flex-direction: column;
-  // padding: 0 2rem;
   margin: 0 auto;
 }
 
@@ -130,16 +129,15 @@ $appearAboveMap: 314159;
     overflow-x: hidden;
   }
   #drag {
-    height: 1px;
-    background-color: #000;
+    height: 4px;
+    background-color: #808080;
     cursor: n-resize;
   }
 }
 
 
 .bottom-tbl {
-  height: 70%;
-  // max-height: 24rem;
+  height: 80%;
 }
 
 // must be at least this index to appear for full-screen dialog
@@ -190,20 +188,47 @@ $appearAboveMap: 314159;
   background-color: lavender;
 }
 
-.map-layer-toggle-grp {
-  // propeties that leaflet-control class uses
-  z-index: 800;
-  pointer-events: visiblePainted;
+//
+// map page html icons
+// 
 
+// the leaflet icon that is always hidden
+.marker-popup {
+  visibility: hidden;
+}
+
+.map-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  right: 0.5rem;
-  top: 18rem;
-  background-color: $appHeaderColor; 
-  border: 1px solid #000; 
-  padding: 4px;
-  height: 5.5rem;
-  width: 8rem;
-  * {
-    margin-left: 5px;
-  }
+  width: 2.85rem;
+  height: 2.85rem;
+  z-index: 1000;
+  border-radius: 4px;
+  cursor: pointer;
+  left: 10px;
+}
+
+// toggles 3-2D
+.map-dimension-btn {
+  top: 10px;
+}
+
+.map-toggle-pings-btn {
+  top: 240px;
+}
+
+.map-toggle-tracks-btn {
+  top: 295px;
+}
+
+.icon-on {
+  background-color: $appHeaderColor;
+  color: #464646;
+}
+
+.icon-off {
+  color: $appHeaderColor;
+  background-color:#BEBEBE;
 }

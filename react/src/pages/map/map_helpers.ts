@@ -223,7 +223,7 @@ const getUniqueDevicesFromPings = (features: ITelemetryPoint[]): number[] => {
       ids.push(did);
     }
   });
-  return ids;
+  return ids.sort((a, b) => a -b);
 };
 
 /**

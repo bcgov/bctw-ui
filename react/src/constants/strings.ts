@@ -49,7 +49,7 @@ const CodeStrings = {
 const MapStrings = {
   lastPingLabel: 'Last Known Location',
   lastFixesLabel: 'Last 10 Fixes',
-  onlySelectedLabel: 'Show Only Selected',
+  onlySelectedLabel: 'Show Only Checked',
   filterRangeStart: 'Start Date',
   filterRangeEnd: 'End Date',
   filterUserCritterGroup: 'Custom Animal Group',

@@ -83,14 +83,9 @@ const initMap = (
   mapRef: MutableRefObject<L.Map>,
   drawnItems: L.FeatureGroup,
   selectedPings: L.GeoJSON,
-  tracks: L.GeoJSON,
-  pings: L.GeoJSON,
   drawSelectedLayer: () => void,
-  handleMapClick: () => void,
-  handleDrawFinished: () => void,
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
-  // const layerPicker = L.control.layers();
   const layerPicker = L.control.layers(null ,null,{position: 'topleft'});
   addTileLayers(mapRef, layerPicker);
 
@@ -155,12 +150,6 @@ const initMap = (
     .on('draw:deletestop', (e) => {
       drawSelectedLayer();
     })
-    .on('click', (e) => {
-      // this is fired before other handlers are called,
-      // so if the user did not click a layer point, it will hide the popup
-      handleMapClick();
-    })
-    .on(L.Draw.Event.DRAWSTOP, handleDrawFinished);
 };
 
 export { initMap, hidePopup, setPopupInnerHTML, addTileLayers };
