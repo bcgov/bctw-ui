@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LocationOn, LocationOff, Timeline } from '@material-ui/icons';
+import { LocationOn, Timeline } from '@material-ui/icons';
 
 type IMapLayerToggleControlProps = {
   handleToggleTracks: (b: boolean) => void;
@@ -27,10 +27,10 @@ export default function MapLayerToggleControl({
   return (
     <>
       <div className={`map-icon map-toggle-tracks-btn ${showTracks ? 'icon-on' : 'icon-off'}`} onClick={toggleTracks} title={'Toggle Tracks'}>
-        {<Timeline fontSize={showTracks ? 'large' : 'default'} />}
+        {<Timeline />}
       </div>
       <div className={`map-icon map-toggle-pings-btn ${showPings ? 'icon-on' : 'icon-off'}`} onClick={togglePings} title={'Toggle Locations'}>
-        {showPings ? <LocationOn /> : <LocationOff />}
+        {<LocationOn />}
       </div>
     </>
   );

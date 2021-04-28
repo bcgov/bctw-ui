@@ -1,6 +1,7 @@
 import { Button, Drawer, IconButton } from '@material-ui/core';
 import { Close, ArrowForward } from '@material-ui/icons';
 import { PageProp } from 'components/component_interfaces';
+import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
 import TextField from 'components/form/Input';
 import { useEffect, useState } from 'react';
@@ -158,6 +159,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
   }
 
+  const createDeviceList = (): ISelectMultipleData[] => {
+    const merged = [...uniqueDevices, ...unassignedDevices].sort((a,b) => a-b);
+    return merged.map(d => {
+      const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
+      return { id: d, value: d, displayLabel }
+    })
+  }
+
   return (
     <div className={'side-panel'}>
       <Drawer
@@ -231,10 +240,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               </div>
               <div>
                 {/* render the device list selector */}
-                <MultiSelect
-                  renderTypeLabel='devices'
+                <AutoComplete
                   label={MapStrings.deviceSelectedLabel}
-                  data={[...uniqueDevices, ...unassignedDevices].map(d => {return {id: d, value: d, displayLabel: unassignedDevices.includes(d) ? `${d} (unassigned)` : `${d}`}})}
+                  data={createDeviceList()}
                   changeHandler={handleChangeDeviceList}
                   triggerReset={reset}
                 />
