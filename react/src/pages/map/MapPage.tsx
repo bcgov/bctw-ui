@@ -615,12 +615,13 @@ export default function MapPage(): JSX.Element {
   // resizable state & handlers
   const [bottomPanelHeight, setBottomPanelHeight] = useState<number>(400);
   const [dragging, setDragging] = useState(false);
-  // update the height of the bottom div 
+  // update the height of the bottom panel 
   const onMove = (e: React.MouseEvent): void => {
     if (dragging) {
       const mpv = document.getElementById('map-view');
       const offset = mpv.offsetHeight-e.clientY;
-      setBottomPanelHeight(offset);
+      // 70 added to base to smooth out the initial 'jump' when drag started
+      setBottomPanelHeight(offset + 70);
     }
   }
   // when mouse is clicked on the 'drag' div id

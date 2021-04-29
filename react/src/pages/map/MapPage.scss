@@ -51,7 +51,7 @@ $appearAboveMap: 314159;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 3rem;
+  padding: 0 1rem;
 }
 
 .side-panel-toolbar-closed {
@@ -75,7 +75,7 @@ $appearAboveMap: 314159;
 }
 
 .side-panel-dates {
-  .MuiFormControl-root.MuiTextField-root {
+  .MuiFormControl-root.MuiTextField-root:nth-child(odd) {
     margin-right: 0.5rem;
   }
 }
@@ -185,7 +185,7 @@ $appearAboveMap: 314159;
 
 // hover effect when selecting a point / drawing a shape in map
 .bottom-panel-row-is-map-selected {
-  background-color: lavender;
+  background-color: $BCgovGold;
 }
 
 //
