@@ -2,7 +2,7 @@ import { Checkbox, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Sel
 import { useEffect, useState } from 'react';
 
 export interface ISelectMultipleData {
-  id: string | number;
+  id: number;
   value: string | number;
   default?: boolean;
   displayLabel?: string;

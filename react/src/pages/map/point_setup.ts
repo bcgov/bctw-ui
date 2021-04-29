@@ -37,7 +37,7 @@ const createLatestPingIcon = (fillColour: string, color = '#000'): L.DivIcon => 
 const latestSelectedPingIcon = createLatestPingIcon(MAP_COLOURS.selected);
 // setup for the latest pings for assigned devices
 // the icon is replaced when the marker is clicked
-const setupLatestPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn, closeHandler: () => void, isUnassigned: boolean): void => {
+const setupLatestPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn, closeHandler: L.LeafletEventHandlerFn, isUnassigned: boolean): void => {
   pings.options = {
     pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
       const unselectedIcon = createLatestPingIcon(isUnassigned ?  MAP_COLOURS['unassigned point'] : getFillColorByStatus(feature), isUnassigned ? MAP_COLOURS_OUTLINE['unassigned point'] : getOutlineColor(feature));
@@ -46,7 +46,7 @@ const setupLatestPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHa
       marker.bindPopup('', {className:'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
         e.target.setIcon(unselectedIcon)
-        closeHandler();
+        closeHandler(e);
       });
       marker.on('click', (e) => {
         e.target.setIcon(latestSelectedPingIcon);
@@ -57,9 +57,36 @@ const setupLatestPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHa
   };
 };
 
+const highlightLatestPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
+  layer.eachLayer((p: any) => {
+    const feature = p.feature;
+    if (typeof p.setIcon === 'function') {
+      if (selectedIDs.includes(feature.id)) {
+        p.setIcon(latestSelectedPingIcon);
+      } else {
+        p.setIcon(createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature)));
+      }
+    }
+  });
+};
+
+const highlightPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
+  layer.eachLayer((p: any) => {
+    const feature = p.feature;
+    if (typeof p.setStyle === 'function') {
+      p.setStyle({
+        weight: 1.0,
+        color: getOutlineColor(feature),
+        fillColor: getFillColorByStatus(feature, selectedIDs.includes(feature.id))
+      });
+    }
+  });
+}
+
+
 // setup for normal pings for assigned devices
 // when a ping is clicked/unselected, only the point style is changed
-const setupPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn, closeHandler: () => void, isUnassigned: boolean): void => {
+const setupPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn, closeHandler: L.LeafletEventHandlerFn , isUnassigned: boolean): void => {
   pings.options = {
     pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
       const critterStyle = animalColoredPointStyle(feature, isUnassigned);
@@ -67,7 +94,7 @@ const setupPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerF
       marker.bindPopup('', {className:'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
         e.target.setStyle(critterStyle);
-        closeHandler();
+        closeHandler(e);
       }) 
       marker.on('click', (e) => {
         e.target.setStyle(selectedPointStyle());
@@ -107,4 +134,4 @@ const setupSelectedPings = (): L.GeoJSONOptions => {
   };
 };
 
-export { createLatestPingIcon, defaultPointStyle, setupSelectedPings, setupLatestPingOptions, setupTracksOptions, setupPingOptions };
+export { highlightPings, highlightLatestPings, createLatestPingIcon, defaultPointStyle, setupSelectedPings, setupLatestPingOptions, setupTracksOptions, setupPingOptions };

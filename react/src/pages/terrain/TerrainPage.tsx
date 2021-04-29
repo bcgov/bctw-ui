@@ -6,16 +6,13 @@ import {
   Math,
   Ion,
   GeoJsonDataSource,
-  CzmlDataSource,
-  Color
-} from 'cesium';
+  CzmlDataSource} from 'cesium';
 import './TerrainPage.css';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { MapRange } from 'types/map';
 import dayjs from 'dayjs';
 import { formatDay, getToday } from 'utils/time';
 import { convert } from 'geojson2czml';
-import { map } from 'leaflet';
 
 
 

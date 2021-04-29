@@ -87,7 +87,7 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
     return this.capture_date ? dateObjectToDateStr(this.capture_date) : '';
   }
   @Expose() get paddedFrequency(): string {
-    return padFrequency(this.frequency);
+    return this.frequency ? padFrequency(this.frequency) : '';
   }
   animal_colour: string;
 
