@@ -98,4 +98,11 @@ button.logout {
   }
 }
 
+.alerts {
+  .MuiButtonBase-root.MuiIconButton-root {
+    color: $appHeaderColor;
+    font-size: 18px;
+  }
+}
+
 

@@ -74,7 +74,7 @@ function MakeEditFields<T extends BCTW>(
   let Comp;
   if (iType.type === eInputType.select) {
     Comp = CreateEditSelectField(iType, changeHandler, hasError, editing, canEdit, required);
-  } else if (iType.type === eInputType.text || iType.type === eInputType.number) {
+  } else if (iType.type === eInputType.text || iType.type === eInputType.number || iType.type === eInputType.date) {
     Comp = CreateEditTextField(iType, changeHandler, hasError, editing, canEdit, required, errText);
   }
   return span ? (

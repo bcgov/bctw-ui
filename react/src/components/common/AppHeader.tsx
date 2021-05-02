@@ -61,8 +61,8 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                     title='User Alerts'
                     size={1}
                   />
+                  {alertCount}
                 </IconButton>
-                {alertCount ? <span>{alertCount}</span> : null}
               </div>
             </li>
             <li>
@@ -78,11 +78,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                 <span>{user?.idir ?? 'user name'}</span>
               </div>
             </li>
-            <li>
-              <Button className={'logout'} color='primary'>
-                Log out
-              </Button>
-            </li>
+            <li><Button className={'logout'} color='primary'>Log out</Button></li>
             <li>{children}</li>
           </ul>
         </nav>

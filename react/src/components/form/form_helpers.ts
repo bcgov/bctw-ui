@@ -5,7 +5,8 @@ export enum eInputType {
   number = 'number',
   select = 'select',
   check = 'check',
-  unknown = 'unknown'
+  unknown = 'unknown',
+  date = 'date'
 }
 
 const stringsThatAreBools = ['true', 'false'];
@@ -36,14 +37,20 @@ function getInputTypesOfT<T>(
       return { key, type: eInputType.check, value: obj[key] };
     }
     const valType = getProperty(obj, key as any);
-    switch (typeof valType) {
-      case 'number':
-        return { key, type: eInputType.number, value: obj[key] };
-      case 'boolean':
-        return { key, type: eInputType.check, value: obj[key] };
-      case 'string':
-      default:
-        return { key, type: eInputType.text, value: obj[key] };
+    const value = obj[key];
+    if (typeof (valType as Date)?.getDay === 'function') {
+      return { key, type: eInputType.date, value}
+    }
+    else {
+      switch (typeof valType) {
+        case 'number':
+          return { key, type: eInputType.number, value};
+        case 'boolean':
+          return { key, type: eInputType.check, value};
+        case 'string':
+        default:
+          return { key, type: eInputType.text, value};
+      }
     }
   });
 }

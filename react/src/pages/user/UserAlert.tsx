@@ -87,8 +87,8 @@ export default function AlertPage(): JSX.Element {
                     <TableCell>{a.animal_id}</TableCell>
                     <TableCell>{a.wlh_id}</TableCell>
                     <TableCell>{a.animal_status}</TableCell>
-                    <TableCell>
-                      <strong>{a.formatAlertType()}</strong>
+                    <TableCell style={{color: 'red'}}>
+                      <strong>{a.formatAlert}</strong>
                     </TableCell>
                     <TableCell>{dateObjectToTimeStr(a.valid_from)}</TableCell>
                   </TableRow>
