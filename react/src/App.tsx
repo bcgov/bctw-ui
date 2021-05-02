@@ -5,11 +5,12 @@ import { makeStyles, ThemeProvider } from '@material-ui/core';
 import AppHeader from 'components/common/AppHeader';
 import { ResponseProvider } from 'contexts/ApiResponseContext';
 import { UserContext, UserStateContextProvider } from 'contexts/UserContext';
+import { AlertContext, AlertStateContextProvider } from 'contexts/UserAlertContext';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 // import { ReactQueryDevtools } from 'react-query/devtools'
 import { HashRouter } from 'react-router-dom';
-import { } from 'react-router-dom'
+import {} from 'react-router-dom';
 
 import appTheme from 'themes/appTheme';
 
@@ -38,31 +39,39 @@ export default function App(): JSX.Element {
     <QueryClientProvider client={queryClient}>
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       <ThemeProvider theme={appTheme}>
-        <UserStateContextProvider>
-          <UserContext.Consumer>
+        <AlertStateContextProvider>
+          <AlertContext.Consumer>
             {(): React.ReactNode => {
               return (
-                <HashRouter>
-                  <div className={classes.root}>
-                    <AppHeader />
-                    <div className={'app-body'}>
-                      <div className='app-body__inner'>
-                        <ResponseProvider>
-                          <SnackbarWrapper>
-                            <DefaultLayout>
-                              <AppRouter onContentChange={setSidebar} />
-                            </DefaultLayout>
-                          </SnackbarWrapper>
-                        </ResponseProvider>
-                      </div>
-                    </div>
-                    <AppFooter/>
-                  </div>
-                </HashRouter>
+                <UserStateContextProvider>
+                  <UserContext.Consumer>
+                    {(): React.ReactNode => {
+                      return (
+                        <HashRouter>
+                          <div className={classes.root}>
+                            <AppHeader />
+                            <div className={'app-body'}>
+                              <div className='app-body__inner'>
+                                <ResponseProvider>
+                                  <SnackbarWrapper>
+                                    <DefaultLayout>
+                                      <AppRouter onContentChange={setSidebar} />
+                                    </DefaultLayout>
+                                  </SnackbarWrapper>
+                                </ResponseProvider>
+                              </div>
+                            </div>
+                            <AppFooter />
+                          </div>
+                        </HashRouter>
+                      );
+                    }}
+                  </UserContext.Consumer>
+                </UserStateContextProvider>
               );
             }}
-          </UserContext.Consumer>
-        </UserStateContextProvider>
+          </AlertContext.Consumer>
+        </AlertStateContextProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

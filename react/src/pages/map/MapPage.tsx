@@ -199,7 +199,7 @@ export default function MapPage(): JSX.Element {
         return;
       }
     }
-  }, [fetchedTracks]);
+  }, [fetchedUnassignedTracks]);
 
   // when one of the map only filters are applied, set the state
   useEffect(() => {
