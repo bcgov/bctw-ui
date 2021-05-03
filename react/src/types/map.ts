@@ -58,7 +58,7 @@ interface ITelemetryGroup {
   features: ITelemetryPoint[];
 }
 
-// represents the jsonb built object in the database get_telemetry call
+// represents the jsonb object in the get_telemetry pg function
 export class TelemetryDetail implements BCTW, ITelemetryDetail {
   critter_id: string;
   species: string;
@@ -72,9 +72,9 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   device_id: number;
   device_vendor: string;
   frequency: number;
-  frequency_unit_code: string;
+  frequency_unit: string;
   device_status: string;
-  location: string;
+  collective_unit: string;
   @Type(() => Date) date_recorded: Date;
   @Type(() => Date) mortality_date: Date;
   @Expose() get formattedDevice(): string {
@@ -89,7 +89,7 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   @Expose() get paddedFrequency(): string {
     return this.frequency ? padFrequency(this.frequency) : '';
   }
-  animal_colour: string;
+  map_colour: string;
 
   formatPropAsHeader(str: string): string {
     switch (str) {

@@ -6,6 +6,7 @@ import { formatLatLong } from './common_helpers';
 
 const assignedCritterProps = ['animal_id', 'wlh_id', 'animal_status', 'device_id'];
 const unassignedCritterProps = ['animal_id', 'wlh_id', 'animal_status'];
+// props to show in the animal history modal
 const critterHistoryProps = [
   'animal_id',
   'wlh_id',
@@ -18,7 +19,7 @@ const critterHistoryProps = [
 ];
 
 // export/import properties
-const editableAnimalProperties = [
+const exportableAnimalProperties = [
   'critter_id',
   'animal_id',
   'animal_status',
@@ -55,12 +56,12 @@ const editableAnimalProperties = [
 export interface IAnimalTelemetryBase {
   species: string;
   wlh_id: string;
-  animal_colour: string;
+  map_colour: string;
   animal_id: string;
   animal_status: string;
   population_unit: string;
-  location: string;
   capture_date: Date;
+  collective_unit: string;
 }
 
 export interface IAnimal extends BCTW, BctwBaseType, IAnimalTelemetryBase {
@@ -68,38 +69,50 @@ export interface IAnimal extends BCTW, BctwBaseType, IAnimalTelemetryBase {
   critter_transaction_id: string;
   animal_id: string;
   animal_status: string;
-  // capture_date: Date;
+  associated_animal_id: string;
+  associated_animal_relationship: string;
+  capture_comment: string;
   capture_latitude: number;
   capture_longitude: number;
   capture_utm_easting: number;
   capture_utm_northing: number;
   capture_utm_zone: number;
-  ear_tag_left: string;
-  ear_tag_right: string;
+  animal_colouration: string;
+  ear_tag_id: string;
+  ear_tag_left_colour: string;
+  ear_tag_right_colour: string;
   estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
-  location: string;
+  map_colour: string;
+  mortality_comment: string;
   mortality_date: Date;
   mortality_latitude: number;
   mortality_longitude: number;
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
-  // nickname: string;
+  probable_cause_of_death: string;
+  ultimate_cause_of_death: string;
   population_unit: string;
-  re_capture: boolean;
+  recapture: boolean;
   region: string;
+  release_comment: string;
   release_date: Date;
+  release_latitude: number;
+  release_longitude: number;
+  release_utm_easting: number;
+  release_utm_northing: number;
+  release_utm_zone: number;
   sex: string;
   species: string;
   translocation: boolean;
   wlh_id: string;
+  user_comment: string;
   // adding device_id for enabling bulk import of critters
   device_id?: number;
   // fetched critters should contain this
   permission_type?: eCritterPermission;
-  animal_colour: string;
 }
 
 export class Animal implements IAnimal {
@@ -107,38 +120,52 @@ export class Animal implements IAnimal {
   critter_transaction_id: string;
   animal_id: string;
   animal_status: string;
+  associated_animal_id: string;
+  associated_animal_relationship: string;
+  capture_comment: string;
   @Type(() => Date) capture_date: Date;
   capture_latitude: number;
   capture_longitude: number;
   capture_utm_easting: number;
   capture_utm_northing: number;
   capture_utm_zone: number;
-  ear_tag_left: string;
-  ear_tag_right: string;
+  collective_unit: string;
+  animal_colouration: string;
+  ear_tag_id: string;
+  ear_tag_left_colour: string;
+  ear_tag_right_colour: string;
   estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
-  location: string;
+  map_colour: string;
+  mortality_comment: string;
   @Type(() => Date) mortality_date: Date;
   mortality_latitude: number;
   mortality_longitude: number;
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
-  // nickname: string;
+  probable_cause_of_death: string;
+  ultimate_cause_of_death: string;
   population_unit: string;
-  re_capture: boolean;
+  recapture: boolean;
   region: string;
+  release_comment: string;
+  release_latitude: number;
+  release_longitude: number;
+  release_utm_easting: number;
+  release_utm_northing: number;
+  release_utm_zone: number;
   @Type(() => Date) release_date: Date;
   sex: string;
   species: string;
   translocation: boolean;
   wlh_id: string;
+  user_comment: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
   permission_type: eCritterPermission;
   device_id?: number;
-  animal_colour: string;
   @Expose() get identifier(): string {
     return 'critter_id';
   }
@@ -169,10 +196,13 @@ export class Animal implements IAnimal {
   constructor() {
     this.animal_id = '';
     this.animal_status = '';
-    (this.juvenile_at_heel = 'N'), (this.population_unit = '');
+    (this.population_unit = '');
     this.region = '';
     this.species = '';
     this.wlh_id = '';
+    this.capture_date = new Date();
+    this.mortality_date = new Date();
+    this.release_date = new Date();
   }
 
   formatPropAsHeader(str: string): string {
@@ -202,7 +232,7 @@ export class Animal implements IAnimal {
 }
 
 export {
-  editableAnimalProperties,
+  exportableAnimalProperties,
   critterHistoryProps,
   unassignedCritterProps,
   assignedCritterProps,

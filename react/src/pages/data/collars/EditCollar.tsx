@@ -25,13 +25,12 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
 
   useEffect(() => {
-    setInputTypes(
-      getInputTypesOfT<Collar>(
-        isEdit ? editing : newCollar,
-        allFields.map((a) => a.prop),
-        allFields.filter((f) => f.isCode).map((r) => r.prop)
-      )
+    const ipt = getInputTypesOfT<Collar>(
+      isEdit ? editing : newCollar,
+      allFields.map((a) => a.prop),
+      allFields.filter((f) => f.isCode).map((r) => r.prop)
     );
+    setInputTypes(ipt);
   }, [editing, newCollar]);
 
   const validate = (o: Collar): boolean => {
@@ -59,7 +58,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
 
   const networkFields = [
     { prop: 'frequency' },
-    { prop: 'frequency_unit_code', isCode: true },
+    { prop: 'frequency_unit', isCode: true },
     { prop: 'satellite_network', isCode: true }
   ];
 

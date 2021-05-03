@@ -19,39 +19,44 @@ export interface ICollarBase {
 }
 export interface ICollarTelemetryBase extends ICollarBase {
   frequency: number;
-  // satellite_network: string;
   device_status;
   device_id: number;
 }
 
 export interface ICollar extends ICollarTelemetryBase, BCTW, BctwBaseType {
   collar_transaction_id: string;
+  camera_device_id: string;
   device_deployment_status: string;
   device_make: string;
   device_malfunction_type: string;
   device_model: string;
   device_status: string;
   device_type: string;
+  dropoff_device_id: number;
+  dropoff_frequency: number;
+  dropoff_frequency_unit: number;
   fix_rate: number;
   fix_success_rate: number;
   frequency: number;
-  frequency_unit_code: string;
+  frequency_unit: string;
   malfunction_date: Date;
+  purchase_comment: string;
+  purchase_month: number;
+  purchase_date: number;
+  purchase_year: number;
   retrieval_date: Date;
   retrieved: boolean;
   satellite_network: string;
+  user_comment: string;
   vendor_activation_status: boolean;
-  sensor_mortality?: boolean;
-  sensor_battery?: boolean;
-  // max_transmission_date: Date;
-  animal_id?: string; // get collars includes this if collar attached
+  // api call to retrieve attached collars includes this
+  animal_id?: string;
 }
 
 // properties displayed on collar pages
 const collarPropsToDisplay = [
   'device_id',
   'device_status',
-  // 'max_transmission_date', 
   'frequency',
   'device_type',
   'device_make',
@@ -59,7 +64,7 @@ const collarPropsToDisplay = [
 ];
 
 // export/import properties
-const editableCollarProperties = [
+const exportableCollarProperties = [
   'device_id',
   'device_deployment_status',
   'device_make',
@@ -70,7 +75,7 @@ const editableCollarProperties = [
   'fix_rate',
   'fix_success_rate',
   'frequency',
-  'frequency_unit_code',
+  'frequency_unit',
   'malfunction_date',
   'retrieval_date',
   'retrieved',
@@ -82,6 +87,7 @@ const editableCollarProperties = [
 const attachedCollarProps = ['(WLH_ID/Animal ID)', ...collarPropsToDisplay];
 export class Collar implements ICollar {
   collar_id: string;
+  camera_device_id: string;
   collar_transaction_id: string;
   device_id: number;
   device_deployment_status: string;
@@ -90,23 +96,31 @@ export class Collar implements ICollar {
   device_model: string;
   device_status: string;
   device_type: string;
+  dropoff_device_id: number;
+  dropoff_frequency: number;
+  dropoff_frequency_unit: number;
   fix_rate: number;
   fix_success_rate: number;
   frequency: number;
-  frequency_unit_code: string;
+  frequency_unit: string;
   @Type(() => Date) malfunction_date: Date;
+  purchase_comment: string;
+  purchase_month: number;
+  purchase_date: number;
+  purchase_year: number;
   @Type(() => Date) retrieval_date: Date;
   retrieved: boolean;
   satellite_network: string;
   vendor_activation_status: boolean;
-  sensor_mortality?: boolean;
-  sensor_battery?: boolean;
   animal_id?: string;
+  user_comment: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
   @Expose() get identifier(): string { return 'collar_id' }
 
   constructor(collar_type?: eNewCollarType) {
+    this.retrieval_date = new Date();
+    this.malfunction_date = new Date();
     if (collar_type) {
       switch(collar_type) {
         case eNewCollarType.VHF:
@@ -145,5 +159,5 @@ export class Collar implements ICollar {
 export {
   attachedCollarProps,
   collarPropsToDisplay,
-  editableCollarProperties,
+  exportableCollarProperties,
 };

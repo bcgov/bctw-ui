@@ -29,7 +29,7 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
     ${p.animal_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
     ${p.device_status ? 'Device Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
     Time: ${dayjs(t).format('MMMM D, YYYY h:mm A')} UTC<br>
-    Location: ${p.location}
+    Location: ${p.collective_unit}
   `;
   doc.innerHTML = text;
   doc.classList.add('appear-above-map');

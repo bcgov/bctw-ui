@@ -9,7 +9,7 @@ import Modal from 'components/modal/Modal';
 import { ModalBaseProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { IBulkUploadError, IBulkUploadResults } from 'api/api_interfaces';
-import { Collar, editableCollarProperties } from 'types/collar';
+import { Collar, exportableCollarProperties } from 'types/collar';
 import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
 import bulkStyles from 'pages/data/bulk/bulk_styles';
@@ -92,7 +92,7 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   };
 
   const onDownloadTemplate = (): void => {
-    download(editableCollarProperties.join(), FileStrings.collarTemplateName, '');
+    download(exportableCollarProperties.join(), FileStrings.collarTemplateName, '');
   }
 
   return (

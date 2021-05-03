@@ -66,7 +66,7 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
   } else if (properties?.device_status === 'Potential Mortality') {
     return MAP_COLOURS.malfunction;
   }
-  return parseAnimalColour(properties.animal_colour)?.fillColor ?? MAP_COLOURS.point;
+  return parseAnimalColour(properties.map_colour)?.fillColor ?? MAP_COLOURS.point;
 };
 
 // same as getFillColorByStatus - but for the point border/outline color
@@ -74,7 +74,7 @@ const getOutlineColor = (feature: ITelemetryPoint): string => {
   if (feature.id < 0) {
     return MAP_COLOURS_OUTLINE['unassigned point'];
   }
-  const colour = feature?.properties?.animal_colour;
+  const colour = feature?.properties?.map_colour;
   return colour ? parseAnimalColour(colour)?.color : MAP_COLOURS.outline;
 };
 

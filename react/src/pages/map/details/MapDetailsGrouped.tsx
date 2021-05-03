@@ -145,7 +145,7 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       <TableCell
         style={{
           width: '5%',
-          backgroundColor: parseAnimalColour(row.animal_colour).fillColor
+          backgroundColor: parseAnimalColour(row.map_colour).fillColor
         }}></TableCell>
       {row.critter_id ? <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} /> : <TableCell></TableCell>}
       {row.critter_id ? <CellWithLink row={row} propName={'animal_id'} onClickLink={(): void => handleShowOverview('animal', row)} /> : <TableCell></TableCell>}
