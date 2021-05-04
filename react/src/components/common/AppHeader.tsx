@@ -13,6 +13,8 @@ import { UserContext } from 'contexts/UserContext';
 import { User } from 'types/user';
 import { IconButton } from '@material-ui/core';
 import { AlertContext } from 'contexts/UserAlertContext';
+import UserAlert from 'pages/user/UserAlert';
+import Modal from 'components/modal/Modal';
 
 type AppheaderProps = {
   children?: JSX.Element;
@@ -23,6 +25,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   const [user, setUser] = useState<User>(null);
   const useAlert = useContext(AlertContext);
   const [alertCount, setAlertCount] = useState<number>(0);
+  const [showAlerts, setShowAlerts] = useState<boolean>(false);
 
   useEffect(() => {
     if (useUser.ready) {
@@ -45,26 +48,36 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
         </Link>
         <nav className={'app-nav'}>
           <ul>
-            <li><Link to='/map' color={'inherit'}>Home</Link></li>
-            <li><Link to='/data' color={'inherit'}>Manage</Link></li>
+            <li>
+              <Link to='/map' color={'inherit'}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to='/data' color={'inherit'}>
+                Manage
+              </Link>
+            </li>
           </ul>
         </nav>
         <nav className='profile-nav'>
           <ul className={'header-ul'}>
-            <li>
-              <div className={'alerts'}>
-                <IconButton component={Link} to='/alert' disabled={!alertCount}>
-                  <Icon
-                    path={mdiBell}
-                    color={alertCount ? 'red' : 'grey'}
-                    className={'icon'}
-                    title='User Alerts'
-                    size={1}
-                  />
-                  {alertCount}
-                </IconButton>
-              </div>
-            </li>
+            {alertCount > 0 ? (
+              <li>
+                <div className={'alerts'}>
+                  <IconButton onClick={(): void => setShowAlerts(o => !o)} disabled={!alertCount}>
+                    <Icon
+                      path={mdiBell}
+                      color={alertCount ? 'red' : 'white'}
+                      className={'icon'}
+                      title='User Alerts'
+                      size={1}
+                    />
+                    {alertCount}
+                  </IconButton>
+                </div>
+              </li>
+            ) : null}
             <li>
               <div className={'username'}>
                 <IconButton component={Link} to='/profile'>
@@ -78,11 +91,18 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                 <span>{user?.idir ?? 'user name'}</span>
               </div>
             </li>
-            <li><Button className={'logout'} color='primary'>Log out</Button></li>
+            <li>
+              <Button className={'logout'} color='primary'>
+                Log out
+              </Button>
+            </li>
             <li>{children}</li>
           </ul>
         </nav>
       </div>
+      <Modal open={showAlerts} handleClose={(): void => setShowAlerts(false)}>
+        <UserAlert />
+      </Modal>
     </header>
   );
 };

@@ -66,8 +66,6 @@ export default function CollarPage(): JSX.Element {
         </RowSelectedProvider>
         <CollarImport open={showImport} handleClose={(): void => setShowImport(false)} />
         <div className='button-row'>
-          {/* <ExportImportViewer {...exportProps} data={[...collarsA, ...collarsU]} /> */}
-          {/* <ConfirmModal {...confirmProps} /> */}
           <Button onClick={(): void => setShowImport(o => !o)}>Import</Button>
           <ModifyCollarWrapper editing={editObj}>
             <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
@@ -75,7 +73,6 @@ export default function CollarPage(): JSX.Element {
             </AddEditViewer>
           </ModifyCollarWrapper>
         </div>
-        {/* <p>collar ID: {editObj.collar_id}</p> */}
       </div>
     </ManageLayout>
   );

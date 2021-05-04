@@ -31,7 +31,6 @@ export default function AlertPage(): JSX.Element {
     setSelectedAlert(alerts.find((a) => a.alert_id === aid));
   };
 
-  //fixme: are these the right fields?
   const fieldsMortality = ['animal_status', 'collar_status'];
   const fieldsBattery = ['device_malfunction_type', 'collar_status']; //malfunction_date??
 
@@ -51,11 +50,11 @@ export default function AlertPage(): JSX.Element {
   }
 
   const display = [
-    'device_id',
-    'device_make',
-    'device_status',
-    'animal_id',
     'wlh_id',
+    'animal_id',
+    'device_id',
+    'Make',
+    'device_status',
     'animal_status',
     'alert_type',
     'valid_from'
@@ -81,15 +80,13 @@ export default function AlertPage(): JSX.Element {
                     onClick={(): void => handleSelectRow(a.alert_id)}
                     hover
                     key={a.alert_id}>
+                    <TableCell>{a.wlh_id}</TableCell>
+                    <TableCell>{a.animal_id}</TableCell>
                     <TableCell>{a.device_id}</TableCell>
                     <TableCell>{a.device_make}</TableCell>
                     <TableCell>{a.device_status}</TableCell>
-                    <TableCell>{a.animal_id}</TableCell>
-                    <TableCell>{a.wlh_id}</TableCell>
                     <TableCell>{a.animal_status}</TableCell>
-                    <TableCell style={{color: 'red'}}>
-                      <strong>{a.formatAlert}</strong>
-                    </TableCell>
+                    <TableCell style={{color: 'red'}}><strong>{a.formatAlert}</strong></TableCell>
                     <TableCell>{dateObjectToTimeStr(a.valid_from)}</TableCell>
                   </TableRow>
                 );
@@ -99,9 +96,7 @@ export default function AlertPage(): JSX.Element {
         </TableContainer>
       </Box>
       <div className={'admin-btn-row'}>
-        <Button disabled={!selectedAlert} onClick={setShowModal}>
-          update alert status
-        </Button>
+        <Button disabled={!selectedAlert} onClick={setShowModal}>update alert status</Button>
       </div>
       {createModal()}
     </div>

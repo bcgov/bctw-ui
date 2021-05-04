@@ -8,7 +8,7 @@ import { CollarStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { useEffect, useState } from 'react';
-import { Collar, eNewCollarType } from 'types/collar';
+import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import { removeProps } from 'utils/common';
 
 export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.Element {
@@ -49,26 +49,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     setNewCollar(new Collar(type));
   };
 
-  const generalFields = [
-    { prop: 'device_id' },
-    { prop: 'device_type', isCode: true },
-    { prop: 'device_make', isCode: true, span: true },
-    { prop: 'device_model' }
-  ];
-
-  const networkFields = [
-    { prop: 'frequency' },
-    { prop: 'frequency_unit', isCode: true },
-    { prop: 'satellite_network', isCode: true }
-  ];
-
-  const statusFields = [
-    { prop: 'device_status', isCode: true },
-    { prop: 'vendor_activation_status' },
-    { prop: 'device_deployment_status', isCode: true },
-    { prop: 'retrieval_date' }
-  ];
-
+  const { generalFields, networkFields, statusFields } = collarFormFields;
   const allFields: { prop: string; isCode?: boolean }[] = [...generalFields, ...networkFields, ...statusFields];
 
   const makeField = (

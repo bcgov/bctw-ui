@@ -7,7 +7,7 @@ import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { Animal, assignedCritterProps, exportableAnimalProperties, unassignedCritterProps } from 'types/animal';
+import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import download from 'downloadjs';
 
@@ -30,7 +30,7 @@ export default function CritterPage(): JSX.Element {
 
   // pass this function to the import modal to allow user to download animal csv bulk import
   const handleDownloadTemplate = (): void => {
-    download(exportableAnimalProperties.join(), FileStrings.animalTemplateName, '');
+    download(Object.keys(new Animal()).join(), FileStrings.animalTemplateName, '');
   }
 
   // props to be passed to the edit modal component
@@ -75,7 +75,6 @@ export default function CritterPage(): JSX.Element {
             </AddEditViewer>
           </ModifyCritterWrapper>
         </div>
-        {/* <p>{editObj.critter_id}</p> */}
       </div>
     </ManageLayout>
   );

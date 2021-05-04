@@ -1,17 +1,16 @@
 import { Button, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
-import TextField from 'components/form/Input';
+import { MakeEditFields } from 'components/form/create_form_components';
+import { FormInputType, getInputTypesOfT } from 'components/form/form_helpers';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import EditCritter from 'pages/data/animals/EditCritter';
 import ModifyCritterWrapper from 'pages/data/animals/ModifyCritterWrapper';
-import EditCollar from 'pages/data/collars/EditCollar';
 import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
-import AddEditViewer from 'pages/data/common/AddEditViewer';
-import { useEffect, useState } from 'react';
-import { Animal } from 'types/animal';
-import { Collar } from 'types/collar';
+import React, { useEffect, useState } from 'react';
+import { Animal, critterFormFields, FormFieldObject } from 'types/animal';
+import { Collar, collarFormFields } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
 import { eCritterPermission } from 'types/user';
+import { objectCompare } from 'utils/common';
 import { dateObjectToDateStr } from 'utils/time';
 
 type CritterOverViewProps = {
@@ -19,59 +18,90 @@ type CritterOverViewProps = {
   detail: ITelemetryDetail;
 };
 
-const critterGeneral = ['animal_status', 'species', 'sex', 'life_stage', 'estimated_age', 'juvenile_at_heel'];
+// critter fields to show
+const { generalFields: critterGeneralFields, identifierFields: critterIdFields, locationFields: critterLocFields } = critterFormFields;
 const critterMortality = ['mortality_date', 'mortalityCoords', 'mortalityUTM'];
-const critterIds = ['wlh_id', 'animal_id', 'ear_tag_left', 'ear_tag_right', 'population_unit'];
-const critterLoc = ['region'];
-//
-const collarGeneral = [
-  'device_make',
-  'device_type',
-  'device_model',
-  'device_id',
-  'frequency',
-  'frequency_unit_code',
-  'satellite_network'
-];
-const collarStatusFields = ['device_status', 'device_deployment_status', 'vendor_activation_status'];
+
+// collar fields to show
+const { generalFields: collarGeneralFields, networkFields, statusFields } = collarFormFields;
 
 export default function MapOverView({ type, detail }: CritterOverViewProps): JSX.Element {
-  const [critter, setCritter] = useState<Animal>(null);
-  const [collar, setCollar] = useState<Collar>(null);
-  const [canEdit, setCanEdit] = useState<boolean>(false);
   const bctwApi = useTelemetryApi();
+  const [editObj, setEditObj] = useState<Animal | Collar>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [canEdit, setCanEdit] = useState<boolean>(false);
+  const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
+
   const { data, error, isError, status } =
     type === 'animal'
       ? bctwApi.useType<Animal>('animal', detail.critter_id)
       : bctwApi.useType<Collar>('device', detail.collar_id);
 
+  const allFields: FormFieldObject[] = type ==='animal' ? [...critterGeneralFields, ...critterIdFields, ...critterLocFields] : [...collarGeneralFields, ...networkFields, ...statusFields];
+
   useEffect(() => {
     if (status === 'success') {
       if (type === 'animal') {
-        setCritter(data as Animal);
+        setEditObj(data as Animal);
         setCanEdit((data as Animal).permission_type === eCritterPermission.change);
       } else if (type === 'device') {
-        setCollar(data as Collar);
+        setEditObj(data as Collar);
         setCanEdit(true);
       }
+      setInputTypes(
+        getInputTypesOfT(
+          data,
+          allFields.map((a) => a.prop),
+          allFields.filter(f => f.isCode).map((a) => a.prop)
+        )
+      );
     }
   }, [status]);
 
-  const createDisabledFields = (props: string[], obj: Animal | Collar): React.ReactNode => {
-    return props.map((p, idx) => {
-      return (
-        <TextField
-          className={'text-disabled'}
-          key={idx}
-          propName={p}
-          defaultValue={obj[p] ?? ''}
-          disabled={true}
-          label={new Animal().formatPropAsHeader(p)}
-          changeHandler={(): void => {}}
-        />
-      );
+
+  const createFields = (props: string[]): React.ReactNode => {
+    if (!editObj) {
+      return;
+    }
+    const its = inputTypes.filter(i => props.includes(i.key));
+    return its.map((i) => {
+      const isRequired = true; // requiredFields.includes(iType.key);
+      const errorText = ''; // hasError && (errors[iType.key] as string);
+      return MakeEditFields(i, handleChange, false, editObj, isEditing, isRequired, errorText, true);
     });
   };
+
+  // triggered on a form input change, newProp will be an object with a single key and value
+  const handleChange = (newProp: Record<string, unknown>): void => {
+    console.log(newProp);
+    const n = Object.assign(editObj, newProp);
+    // setNewObj((old) => Object.assign(old, newProp));
+    // get the first key
+    const key: string = Object.keys(newProp)[0];
+    // create matching key/val object from the item being edited
+    const og = { [key]: editObj[key] ?? '' };
+    const isSame = objectCompare(newProp, og);
+    // setCanSave(isChange && !isSame);
+  };
+
+  const EditButton = (
+    <Button
+      className={'overview-btn'}
+      color='primary'
+      disabled={!canEdit}
+      onClick={(): void => setIsEditing((o) => !o)}
+      variant='outlined'>
+      Edit
+    </Button>
+  );
+
+  const createSection = (fields: React.ReactNode, title: string): JSX.Element => 
+    <div className={'dlg-details-section'}>
+      <div className={'dlg-details-content'}>
+        <h3>{title}</h3>
+        {fields}
+      </div>
+    </div>
 
   if (isError) {
     return <div>{error}</div>;
@@ -83,7 +113,7 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
       <>
         <Paper elevation={3} className={'dlg-full-title'}>
           <div>
-            <h1>WLH ID: {detail.wlh_id ?? 'No assigned ID'}</h1>
+            <h1>WLH ID: {detail.wlh_id ?? ''}</h1>
             <Button className={'dlg-title-btn'} onClick={null} variant='contained' size='small' color='primary'>
               Active
             </Button>
@@ -92,51 +122,21 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
             <span>Species: {detail.species}</span>
             <span>|</span>
             <span>Device: {detail.device_id ?? 'Unassigned'}</span>
-            {/* <span>ID: {detail.critter_id}</span> */}
           </div>
         </Paper>
         <Paper elevation={0} className={'dlg-full-body'}>
           <div className={'dlg-full-body-subtitle'}>
             <h2>Animal Details</h2>
-            <ModifyCritterWrapper editing={critter}>
-              <AddEditViewer<Animal>
-                disableEdit={!canEdit}
-                editing={critter ?? new Animal()}
-                empty={new Animal()}
-                disableAdd={true}
-                editBtn={<Button className={'overview-btn'} color='primary' variant='outlined'>Edit</Button>}>
-                <EditCritter editing={new Animal()} open={false} onSave={null} />
-              </AddEditViewer>
+            <ModifyCritterWrapper editing={editObj as Animal}>
+              {EditButton}
             </ModifyCritterWrapper>
           </div>
 
           <Paper elevation={3} className={'dlg-full-body-details'}>
-            <div className={'dlg-details-section'}>
-              <div className={'dlg-details-content'}>
-                <h3>General Information</h3>
-                {critter ? createDisabledFields(critterGeneral, critter) : null}
-              </div>
-            </div>
-            {critter?.animal_status === 'Mortality' ? (
-              <div className={'dlg-details-section'}>
-                <div className={'dlg-details-content'}>
-                  <h3>Mortality Details</h3>
-                  {critter ? createDisabledFields(critterMortality, critter) : null}
-                </div>
-              </div>
-            ) : null}
-            <div className={'dlg-details-section'}>
-              <div className={'dlg-details-content'}>
-                <h3>Identifiers</h3>
-                {critter ? createDisabledFields(critterIds, critter) : null}
-              </div>
-            </div>
-            <div className={'dlg-details-section'}>
-              <div className={'dlg-details-content'}>
-                <h3>Location</h3>
-                {critter ? createDisabledFields(critterLoc, critter) : null}
-              </div>
-            </div>
+            {createSection(createFields(critterGeneralFields.map(p => p.prop)), 'General Information')}
+            {(editObj as Animal)?.animal_status === 'Mortality' ?  createSection(createFields(critterMortality), 'Mortality Details') : null} 
+            {createSection(createFields(critterIdFields.map(f => f.prop)), 'Identifiers')}
+            {createSection(createFields(critterLocFields.map(f => f.prop)), 'Location')}
           </Paper>
           <div className={'dlg-full-body-subtitle'}>
             <h2>Capture and Release Events</h2>
@@ -144,7 +144,6 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
               Add Event
             </Button>
           </div>
-
           <Paper elevation={3} className={'dlg-full-body-details'}>
             <div className={'dlg-details-section'}>
               <SpecialEvent critter_id={detail.critter_id} collar_id={null} type={'capture'} />
@@ -164,24 +163,14 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
         <div className={'dlg-full-sub'}>
           <span>Frequency: {detail.frequency}</span>
           <span>|</span>
-          <span>Deployment Status: {collar?.device_deployment_status}</span>
+          <span>Deployment Status: {(editObj as Collar)?.device_deployment_status}</span>
         </div>
       </Paper>
       <Paper elevation={0} className={'dlg-full-body'}>
         <div className={'dlg-full-body-subtitle'}>
           <h2>Device Details</h2>
-          <ModifyCollarWrapper editing={collar ?? new Collar()}>
-            <AddEditViewer<Collar>
-              editing={collar ?? new Collar()}
-              empty={new Collar()}
-              disableAdd={true}
-              editBtn={
-                <Button disabled={!canEdit} className={'overview-btn'} color='primary' variant='outlined'>
-                  Edit
-                </Button>
-              }>
-              <EditCollar editing={new Collar()} open={false} onSave={(): void => { /* do nothing */}} />
-            </AddEditViewer>
+          <ModifyCollarWrapper editing={(editObj as Collar) ?? new Collar()}>
+            {EditButton}
           </ModifyCollarWrapper>
         </div>
 
@@ -189,13 +178,13 @@ export default function MapOverView({ type, detail }: CritterOverViewProps): JSX
           <div className={'dlg-details-section'}>
             <div className={'dlg-details-content'}>
               <h3>General Information</h3>
-              {collar ? createDisabledFields(collarGeneral, collar) : null}
+              {createFields([...collarGeneralFields, ...networkFields].map(f => f.prop))}
             </div>
           </div>
           <div className={'dlg-details-section'}>
             <div className={'dlg-details-content'}>
               <h3>Status</h3>
-              {collar ? createDisabledFields(collarStatusFields, collar) : null}
+              {createFields(statusFields.map(f => f.prop))}
             </div>
           </div>
         </Paper>

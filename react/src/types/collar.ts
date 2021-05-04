@@ -1,6 +1,7 @@
 import { columnToHeader } from 'utils/common';
 import { BCTW, BctwBaseType } from 'types/common_types';
-import { Type, Expose } from 'class-transformer';
+import { Type, Expose, Transform } from 'class-transformer';
+import { transformOpt } from 'types/animal';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -30,19 +31,16 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BctwBaseType {
   device_make: string;
   device_malfunction_type: string;
   device_model: string;
-  device_status: string;
   device_type: string;
   dropoff_device_id: number;
   dropoff_frequency: number;
-  dropoff_frequency_unit: number;
+  dropoff_frequency_unit: string;
   fix_rate: number;
   fix_success_rate: number;
-  frequency: number;
   frequency_unit: string;
   malfunction_date: Date;
   purchase_comment: string;
   purchase_month: number;
-  purchase_date: number;
   purchase_year: number;
   retrieval_date: Date;
   retrieved: boolean;
@@ -63,26 +61,6 @@ const collarPropsToDisplay = [
   'device_model',
 ];
 
-// export/import properties
-const exportableCollarProperties = [
-  'device_id',
-  'device_deployment_status',
-  'device_make',
-  'device_malfunction_type',
-  'device_model',
-  'device_status',
-  'device_type',
-  'fix_rate',
-  'fix_success_rate',
-  'frequency',
-  'frequency_unit',
-  'malfunction_date',
-  'retrieval_date',
-  'retrieved',
-  'satellite_network',
-  'vendor_activation_status',
-]
-
 // for attached collars, also display...
 const attachedCollarProps = ['(WLH_ID/Animal ID)', ...collarPropsToDisplay];
 export class Collar implements ICollar {
@@ -96,22 +74,21 @@ export class Collar implements ICollar {
   device_model: string;
   device_status: string;
   device_type: string;
-  dropoff_device_id: number;
-  dropoff_frequency: number;
-  dropoff_frequency_unit: number;
+  @Transform(v => v || 0, transformOpt) dropoff_device_id: number;
+  @Transform(v => v || 0, transformOpt) dropoff_frequency: number;
+  dropoff_frequency_unit: string;
   fix_rate: number;
   fix_success_rate: number;
-  frequency: number;
+  @Transform(v => v || 0, transformOpt) frequency: number;
   frequency_unit: string;
   @Type(() => Date) malfunction_date: Date;
   purchase_comment: string;
-  purchase_month: number;
-  purchase_date: number;
-  purchase_year: number;
-  @Type(() => Date) retrieval_date: Date;
-  retrieved: boolean;
+  @Transform(v => v || 0, transformOpt) purchase_month: number;
+  @Transform(v => v || 0, transformOpt) purchase_year: number;
+  @Transform(v => v || new Date(), transformOpt) retrieval_date: Date; // @Type(() => Date)
+  @Transform(v => v || false, transformOpt) retrieved: boolean;
   satellite_network: string;
-  vendor_activation_status: boolean;
+  @Transform(v => v || false, transformOpt) vendor_activation_status: boolean;
   animal_id?: string;
   user_comment: string;
   @Type(() => Date) valid_from: Date;
@@ -156,8 +133,28 @@ export class Collar implements ICollar {
   }
 }
 
+const collarFormFields = {
+  generalFields: [
+    { prop: 'device_id' },
+    { prop: 'device_type', isCode: true },
+    { prop: 'device_make', isCode: true, span: true },
+    { prop: 'device_model' }
+  ],
+  networkFields: [
+    { prop: 'frequency' },
+    { prop: 'frequency_unit', isCode: true },
+    { prop: 'satellite_network', isCode: true }
+  ],
+  statusFields: [
+    { prop: 'device_status', isCode: true },
+    { prop: 'vendor_activation_status' },
+    { prop: 'device_deployment_status', isCode: true },
+    { prop: 'retrieval_date' }
+  ]
+}
+
 export {
+  collarFormFields,
   attachedCollarProps,
   collarPropsToDisplay,
-  exportableCollarProperties,
 };

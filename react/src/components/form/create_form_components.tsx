@@ -39,6 +39,15 @@ function CreateEditTextField<T extends BCTW>(
   );
 }
 
+const createEditDateField = () => {
+  // todo:
+
+}
+const createEditCheckboxField = () => {
+  // todo:
+
+}
+
 function CreateEditSelectField<T extends BCTW>(
   iType: FormInputType,
   changeHandler: (v: Record<string, unknown>) => void,
@@ -57,6 +66,7 @@ function CreateEditSelectField<T extends BCTW>(
       changeHandler={changeHandler}
       required={required}
       error={hasError}
+      className={'select-control-small'}
     />
   );
 }
@@ -69,7 +79,8 @@ function MakeEditFields<T extends BCTW>(
   canEdit: boolean,
   required: boolean,
   errText: string,
-  span?: boolean
+  span?: boolean,
+  cl?: string
 ): React.ReactNode {
   let Comp;
   if (iType.type === eInputType.select) {

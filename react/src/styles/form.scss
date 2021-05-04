@@ -1,9 +1,14 @@
+  // default 
   .MuiFormControl-root.select-control {
     width: 100%;
   }
 
   .MuiFormControl-root.udf-select-control {
     width: 85%;
+  }
+
+  .MuiFormControl-root.select-control-small {
+    width: 25%;
   }
 
 // for use in overview pages to display disabled text fields
@@ -14,8 +19,4 @@
   .MuiInputBase-input {
     color: #000;
   }
-}
-
-.select-small {
-  min-width: 80px !important;
 }

@@ -7,11 +7,9 @@ import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import EditModal from 'pages/data/common/EditModal';
 import { useEffect, useState } from 'react';
-import { Animal } from 'types/animal';
+import { Animal, critterFormFields } from 'types/animal';
 import { eCritterPermission } from 'types/user';
 import { removeProps } from 'utils/common';
-
-// fixme: title pushed to top
 
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
   const { isEdit, editing } = props;
@@ -41,22 +39,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   const createTitle = (): string =>
     !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
 
-  const generalFields = [
-    { prop: 'animal_status', isCode: true },
-    { prop: 'species', isCode: true },
-    { prop: 'life_stage', isCode: true },
-    { prop: 'estimated_age' },
-    { prop: 'sex', isCode: true },
-    { prop: 'juvenile_at_heel', isCode: true }
-  ];
-  const identifierFields = [
-    { prop: 'wlh_id' },
-    { prop: 'animal_id' },
-    { prop: 'ear_tag_left' },
-    { prop: 'ear_tag_right' },
-    { prop: 'population_unit', isCode: true }
-  ];
-  const locationFields = [{ prop: 'region', isCode: true }, { prop: 'location' }];
+  const { generalFields,  identifierFields,  locationFields } = critterFormFields ;
   const allFields = [...locationFields, ...identifierFields, ...generalFields];
 
   const makeField = (

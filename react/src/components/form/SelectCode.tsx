@@ -20,7 +20,7 @@ type ISelectProps = SelectProps & {
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectCode(props: ISelectProps): JSX.Element {
-  const { addEmptyOption, codeHeader, defaultValue, changeHandler, changeHandlerMultiple, label: labelTitle, multiple, triggerReset } = props;
+  const { addEmptyOption, codeHeader, defaultValue, changeHandler, changeHandlerMultiple, label: labelTitle, multiple, triggerReset, className } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
   const [values, setValues] = useState<string[]>([]);
@@ -115,9 +115,10 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       ) : isLoading || isFetching ? (
         <div>loading...</div>
       ) : codes && codes.length ? (
-        <FormControl size='small' variant={'outlined'} className={'select-control'}>
+        <FormControl size='small' variant={'outlined'} className={className ?? 'select-control'}>
           <InputLabel>{labelTitle}</InputLabel>
           <Select
+            className={className}
             MenuProps={{
               anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
               transformOrigin: { vertical: 'top', horizontal: 'left' },
