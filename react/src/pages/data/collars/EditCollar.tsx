@@ -54,13 +54,24 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
 
   const makeField = (
     iType: FormInputType,
-    changeHandler: (v: Record<string, unknown>) => void,
-    hasError: boolean,
+    handleChange: (v: Record<string, unknown>) => void,
+    isError: boolean,
     span?: boolean
   ): React.ReactNode => {
     const isRequired = requiredFields.includes(iType.key);
-    const errorText = hasError && (errors[iType.key] as string);
-    return MakeEditFields(iType, changeHandler, hasError, editing, true, isRequired, errorText, span);
+    const errorText = isError && (errors[iType.key] as string);
+    return MakeEditFields(
+      {
+        formType: iType,
+        handleChange,
+        isError,
+        editing,
+        isEdit: true,
+        isRequired,
+        errorMessage: errorText
+      },
+      span
+    );
   };
 
   // render the choose collar type form if the add button was clicked
@@ -100,28 +111,40 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
               {isAddNewCollar ? (
                 chooseCollarType()
               ) : (
-                <>
-                  <form className='rootEditInput' autoComplete='off'>
-                    <Paper className={'paper-edit'} elevation={3}>
-                      <Typography className={'edit-form-header'} variant='h5'>General Information</Typography>
-                      {inputTypes
-                        .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
-                        .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                <form className='rootEditInput' autoComplete='off'>
+                  <Paper className={'dlg-full-title'} elevation={3}>
+                    <h1>Device ID: {editing.device_id}</h1>
+                    <div className={'dlg-full-sub'}>
+                      <span className='span'>Frequency: {editing.frequency}</span>
+                      <span className='span'>|</span>
+                      <span className='span'>Deployment Status: {editing?.device_deployment_status}</span>
+                    </div>
+                  </Paper>
+                  <Paper elevation={0} className={'dlg-full-body'}>
+
+                    <h2 className={'dlg-full-body-subtitle'}>Device Details</h2>
+                    <Paper elevation={3} className={'dlg-full-body-details'}>
+                      <div className={'dlg-details-section'}>
+                        <h3>General Information</h3>
+                        {inputTypes
+                          .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </div>
+                      <div className={'dlg-details-section'}>
+                        <h3>Frequency and Network</h3>
+                        {inputTypes
+                          .filter((f) => networkFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </div>
+                      <div className={'dlg-details-section'}>
+                        <h3>Status Information</h3>
+                        {inputTypes
+                          .filter((f) => statusFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </div>
                     </Paper>
-                    <Paper className={'paper-edit'} elevation={3}>
-                      <Typography className={'edit-form-header'} variant='h5'>Frequency and Network</Typography>
-                      {inputTypes
-                        .filter((f) => networkFields.map((x) => x.prop).includes(f.key))
-                        .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                    </Paper>
-                    <Paper className={'paper-edit'} elevation={3}>
-                      <Typography className={'edit-form-header'} variant='h5'>Status Information</Typography>
-                      {inputTypes
-                        .filter((f) => statusFields.map((x) => x.prop).includes(f.key))
-                        .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                    </Paper>
-                  </form>
-                </>
+                  </Paper>
+                </form>
               )}
             </>
           );

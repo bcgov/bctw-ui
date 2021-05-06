@@ -6,24 +6,44 @@ import 'leaflet/dist/leaflet.css';
 
 import { CircularProgress } from '@material-ui/core';
 import pointsWithinPolygon from '@turf/points-within-polygon';
-import DialogFullScreen from 'components/modal/DialogFullScreen';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import MapDetails from 'pages/map/details/MapDetails';
 import { initMap, setPopupInnerHTML, hidePopup } from 'pages/map/map_init';
-import { applyFilter, fillPoint, getLast10Fixes, getUniqueDevicesFromPings, groupFilters, splitPings, getUniqueCritterIDsFromSelectedPings, getPointIDsFromTelemetryGroup } from 'pages/map/map_helpers';
+import {
+  applyFilter,
+  fillPoint,
+  getLast10Fixes,
+  getUniqueDevicesFromPings,
+  groupFilters,
+  splitPings,
+  getUniqueCritterIDsFromSelectedPings} from 'pages/map/map_helpers';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
 import React, { useEffect, useRef, useState } from 'react';
 import tokml from 'tokml';
 import { ICodeFilter } from 'types/code';
-import { ITelemetryDetail, ITelemetryPoint, ITelemetryLine, MapRange, OnlySelectedCritters, IUnassignedTelemetryLine } from 'types/map';
+import {
+  ITelemetryDetail,
+  ITelemetryPoint,
+  ITelemetryLine,
+  MapRange,
+  OnlySelectedCritters,
+  IUnassignedTelemetryLine
+} from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { BCTWType } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { highlightLatestPings, highlightPings, setupLatestPingOptions, setupPingOptions, setupSelectedPings, setupTracksOptions } from 'pages/map/point_setup';
+import {
+  highlightLatestPings,
+  highlightPings,
+  setupLatestPingOptions,
+  setupPingOptions,
+  setupSelectedPings,
+  setupTracksOptions
+} from 'pages/map/point_setup';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
@@ -92,7 +112,7 @@ export default function MapPage(): JSX.Element {
 
   // state for tracking filters that limit map layers
   const [isMapOnlyFilterApplied, setIsMapOnlyFilterApplied] = useState<boolean>(false);
-  const [onlySelected, setOnlySelected] = useState<OnlySelectedCritters>({show: false, critter_ids: []});
+  const [onlySelected, setOnlySelected] = useState<OnlySelectedCritters>({ show: false, critter_ids: [] });
   const [onlyLastKnown, setOnlyLastKnown] = useState<boolean>(false);
   const [onlyLast10, setOnlyLast10] = useState<boolean>(false);
 
@@ -101,7 +121,7 @@ export default function MapPage(): JSX.Element {
   const drawnLines = [];
 
   // fetch the map data
-  const {start, end } = range;
+  const { start, end } = range;
   const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = bctwApi.usePings(start, end);
   const { isError: isErrorUPings, data: fetchedUnassignedPings } = bctwApi.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = bctwApi.useTracks(start, end);
@@ -110,7 +130,7 @@ export default function MapPage(): JSX.Element {
   // refetch pings when start/end times are changed
   useEffect(() => {
     // wipe the attribute panel state on refresh
-    setOnlySelected({show: false, critter_ids:[]});
+    setOnlySelected({ show: false, critter_ids: [] });
     setSelectedPingIDs([]);
     clearLayers();
   }, [range]);
@@ -132,7 +152,8 @@ export default function MapPage(): JSX.Element {
         if (isMapOnlyFilterApplied) {
           // filter what's shown on the map, but not the bottom panel
           if (onlySelected.show) {
-            const predicate = (l: ITelemetryPoint): boolean => onlySelected.critter_ids.includes(l.properties.critter_id);
+            const predicate = (l: ITelemetryPoint): boolean =>
+              onlySelected.critter_ids.includes(l.properties.critter_id);
             redrawLayers(fetchedPings.filter(predicate));
           } else if (onlyLast10) {
             const { pings, tracks } = getLast10Fixes(fetchedPings, fetchedTracks ?? []);
@@ -141,14 +162,14 @@ export default function MapPage(): JSX.Element {
           } else if (onlyLastKnown) {
             mapRef.current.removeLayer(pingsLayer);
             mapRef.current.removeLayer(tracksLayer);
-          } 
+          }
         } else if (!filters.length) {
           const { latest, other } = splitPings(fetchedPings);
           pingsLayer.addData(other as any);
           latestPingsLayer.addData(latest as any);
         }
       }
-    }
+    };
     update();
   }, [fetchedPings]);
 
@@ -205,7 +226,7 @@ export default function MapPage(): JSX.Element {
   useEffect(() => {
     const b = onlyLast10 || onlyLastKnown || (onlySelected && onlySelected.show);
     setIsMapOnlyFilterApplied(b);
-  }, [onlyLast10, onlyLastKnown, onlySelected])
+  }, [onlyLast10, onlyLastKnown, onlySelected]);
 
   // initialize the map
   useEffect(() => {
@@ -223,7 +244,7 @@ export default function MapPage(): JSX.Element {
     if (showExportModal || showOverviewModal || showUdfEdit) {
       hidePopup();
     }
-  }, [showExportModal, showOverviewModal, showUdfEdit])
+  }, [showExportModal, showOverviewModal, showUdfEdit]);
 
   // hide or show unattached device layers
   useEffect(() => {
@@ -238,15 +259,15 @@ export default function MapPage(): JSX.Element {
     } else {
       // fixme: why does this need a delay?
       setTimeout(() => {
-        ref.removeLayer(unassignedPingsLayer)
+        ref.removeLayer(unassignedPingsLayer);
         ref.removeLayer(unassignedTracksLayer);
         ref.removeLayer(latestUPingsLayer);
-      }, 100) ;
+      }, 100);
     }
-  }, [showUnassignedLayers])
+  }, [showUnassignedLayers]);
 
   /**
-   * when a map point is clicked, 
+   * when a map point is clicked,
    * populate the popup with metadata and show it
    */
   const handlePointClick = (event: L.LeafletEvent): void => {
@@ -262,10 +283,10 @@ export default function MapPage(): JSX.Element {
    */
   // todo: handle unselected pings
   const handlePointClose = (event: L.LeafletEvent): void => {
-    hidePopup()
+    hidePopup();
     // unhighlight them in bottom table
     setSelectedPingIDs([]);
-  }
+  };
 
   // when rows are checked in the details panel, highlight them
   // fixme: the highlight fill color is reset when new data is fetched
@@ -282,12 +303,12 @@ export default function MapPage(): JSX.Element {
 
     const pings = pingsLayer.toGeoJSON();
     const overlay = pointsWithinPolygon(pings as any, clipper as any);
-    const ids = [...overlay.features.map(f => f.id) as number[]]
+    const ids = [...(overlay.features.map((f) => f.id) as number[])];
     highlightPings(pingsLayer, ids);
 
     const latestPings = latestPingsLayer.toGeoJSON();
     const overlayLatest = pointsWithinPolygon(latestPings as any, clipper as any);
-    const latestIds = [...overlayLatest.features.map(f => f.id) as number[]];
+    const latestIds = [...(overlayLatest.features.map((f) => f.id) as number[])];
     highlightLatestPings(latestPingsLayer, latestIds);
 
     // highlight these rows in bottom panel
@@ -296,28 +317,28 @@ export default function MapPage(): JSX.Element {
 
   // note: using L.Layergroup isn't removing marker
   const handleDrawLine = (l: L.Layer): void => {
-    drawnLines.push(l)
-  }
+    drawnLines.push(l);
+  };
 
   // triggered when 'Delete' is clicked in the draw control
   const handleDeleteLine = (): void => {
     if (drawnLines.length) {
-      drawnLines.forEach(l => {
+      drawnLines.forEach((l) => {
         mapRef.current.removeLayer(l);
-      })
+      });
     }
-  }
-  
+  };
+
   // clears existing pings/tracks layers
   const clearLayers = (): void => {
     const layerPicker = L.control.layers();
     const allLayers = [...getAssignedLayers(), ...getUnassignedLayers()];
-    allLayers.forEach(l => {
+    allLayers.forEach((l) => {
       layerPicker.removeLayer(l);
       if (typeof (l as L.GeoJSON).clearLayers === 'function') {
         (l as L.GeoJSON).clearLayers();
       }
-    })
+    });
   };
 
   /**
@@ -326,7 +347,7 @@ export default function MapPage(): JSX.Element {
    */
   const redrawLayers = (newPings = fetchedPings, newTracks = fetchedTracks): void => {
     clearLayers();
-    const { latest, other} = splitPings(newPings);
+    const { latest, other } = splitPings(newPings);
     latestPingsLayer.addData(latest as any);
     pingsLayer.addData(other as any);
     tracksLayer.addData(newTracks as any);
@@ -348,8 +369,8 @@ export default function MapPage(): JSX.Element {
     latestPingsLayer.clearLayers();
     pingsLayer.addData(other as any);
     latestPingsLayer.addData(latest as any);
-    selectedPingIDs.forEach(f => fillPoint(f, true));
-  }
+    selectedPingIDs.forEach((f) => fillPoint(f, true));
+  };
 
   const redrawUnassignedPings = (upings = fetchedUnassignedPings): void => {
     const { latest, other } = splitPings(upings, 'critter_id');
@@ -363,7 +384,7 @@ export default function MapPage(): JSX.Element {
 
     unassignedPingsLayer.addData(other as any);
     latestUPingsLayer.addData(latest as any);
-  }
+  };
 
   // redraw only tracks
   const redrawTracks = (newTracks: ITelemetryLine[]): void => {
@@ -371,14 +392,14 @@ export default function MapPage(): JSX.Element {
     layerPicker.removeLayer(tracksLayer);
     tracksLayer.clearLayers();
     tracksLayer.addData(newTracks as any);
-  }
+  };
 
   const redrawUnassignedTracks = (ut: IUnassignedTelemetryLine[]): void => {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(unassignedTracksLayer);
     unassignedTracksLayer.clearLayers();
     unassignedTracksLayer.addData(ut as any);
-  }
+  };
 
   // triggered when side-panel filters are applied
   const handleApplyChangesFromFilterPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
@@ -390,7 +411,7 @@ export default function MapPage(): JSX.Element {
     setFilters(filters);
     applyFiltersToPings(filters);
     if (showUnassignedLayers) {
-      applyFiltersToUnassignedPings(filters)
+      applyFiltersToUnassignedPings(filters);
     }
   };
 
@@ -398,7 +419,7 @@ export default function MapPage(): JSX.Element {
   const applyFiltersToPings = (filters: ICodeFilter[]): void => {
     if (!filters.length) {
       // reset map state and bottom panel state
-      setPings(fetchedPings)
+      setPings(fetchedPings);
       redrawLayers();
       return;
     }
@@ -410,7 +431,7 @@ export default function MapPage(): JSX.Element {
     redrawPings(filteredPings);
 
     applyFiltersToTracks(filteredPings);
-  }
+  };
 
   const applyFiltersToUnassignedPings = (filters: ICodeFilter[], upings = fetchedUnassignedPings): void => {
     if (!filters.length) {
@@ -418,15 +439,15 @@ export default function MapPage(): JSX.Element {
       redrawLayers();
       return;
     }
-    const deviceIDFilter = groupFilters(filters).filter(gf => gf.code_header === 'device_id');
+    const deviceIDFilter = groupFilters(filters).filter((gf) => gf.code_header === 'device_id');
 
-    if (deviceIDFilter.length ) {
+    if (deviceIDFilter.length) {
       const filteredUPings = applyFilter(deviceIDFilter, fetchedUnassignedPings);
       setUnassignedPings(filteredUPings);
       redrawUnassignedPings(filteredUPings);
       applyFiltersToUnassignedTracks(filteredUPings);
     }
-  }
+  };
 
   /**
    * in order to know what tracks need to be updated, the filters need to be applied to pings first,
@@ -437,10 +458,13 @@ export default function MapPage(): JSX.Element {
     if (!fetchedTracks) {
       return;
     }
-    const uniqueCritterIDs = getUniqueCritterIDsFromSelectedPings(p, pings.map(p => p.id))
-    const filteredTracks = fetchedTracks.filter(t => uniqueCritterIDs.includes(t.properties.critter_id));
+    const uniqueCritterIDs = getUniqueCritterIDsFromSelectedPings(
+      p,
+      pings.map((p) => p.id)
+    );
+    const filteredTracks = fetchedTracks.filter((t) => uniqueCritterIDs.includes(t.properties.critter_id));
     redrawTracks(filteredTracks);
-  }
+  };
 
   const applyFiltersToUnassignedTracks = (up = unassignedPings): void => {
     if (!fetchedUnassignedTracks) {
@@ -448,9 +472,11 @@ export default function MapPage(): JSX.Element {
     }
     const uniqueDeviceIDs = getUniqueDevicesFromPings(up);
     // note: as IUnassignedTelemetryLine
-    const filteredTracks = (fetchedUnassignedTracks as any).filter((t) => uniqueDeviceIDs.includes(t.properties.collar_id));
+    const filteredTracks = (fetchedUnassignedTracks as any).filter((t) =>
+      uniqueDeviceIDs.includes(t.properties.collar_id)
+    );
     redrawUnassignedTracks(filteredTracks);
-  }
+  };
 
   // show the critter overview modal when a row is clicked in bottom panel
   const handleShowOverview = (type: BCTWType, row: ITelemetryDetail): void => {
@@ -487,20 +513,20 @@ export default function MapPage(): JSX.Element {
   const toggleTracks = (show: boolean): void => {
     const ref = mapRef.current;
     if (showUnassignedLayers) {
-      getTracksLayers().forEach(l => show ? ref.addLayer(l) : ref.removeLayer(l))
-      unassignedTracksLayer.bringToBack()
+      getTracksLayers().forEach((l) => (show ? ref.addLayer(l) : ref.removeLayer(l)));
+      unassignedTracksLayer.bringToBack();
     } else {
       const l = getTracksLayers()[0];
-      show ? ref.addLayer(l) : ref.removeLayer(l)
-    } 
+      show ? ref.addLayer(l) : ref.removeLayer(l);
+    }
     tracksLayer.bringToBack();
-  }
+  };
 
   const togglePings = (show: boolean): void => {
     const ref = mapRef.current;
     const layers = showUnassignedLayers ? getPingLayers() : getPingLayers().slice(0, 2);
-    layers.forEach(l => show ? ref.addLayer(l) : ref.removeLayer(l));
-  }
+    layers.forEach((l) => (show ? ref.addLayer(l) : ref.removeLayer(l)));
+  };
 
   /**
    * @param b boolean on whether the map should be filtered to each critter's last 10 pings
@@ -515,20 +541,20 @@ export default function MapPage(): JSX.Element {
     const { pings, tracks } = getLast10Fixes(fetchedPings, fetchedTracks);
     redrawPings(pings);
     redrawTracks(tracks);
-  }
+  };
 
   // only show critters selected in map details in the map
   const handleShowOnlySelected = (o: OnlySelectedCritters): void => {
     setOnlySelected(o);
     const { show, critter_ids } = o;
     if (show) {
-      const p = fetchedPings.filter(f => critter_ids.includes(f.properties.critter_id));
-      const t = fetchedTracks.filter(f => critter_ids.includes(f.properties.critter_id));
+      const p = fetchedPings.filter((f) => critter_ids.includes(f.properties.critter_id));
+      const t = fetchedTracks.filter((f) => critter_ids.includes(f.properties.critter_id));
       redrawLayers(p, t);
     } else {
       redrawLayers();
     }
-  }
+  };
 
   const getAssignedLayers = (): L.Layer[] => [latestPingsLayer, pingsLayer, tracksLayer];
   const getUnassignedLayers = (): L.Layer[] => [unassignedPingsLayer, latestUPingsLayer, unassignedTracksLayer];
@@ -540,32 +566,37 @@ export default function MapPage(): JSX.Element {
    * show or hide layers depending on what was selected
    */
   const handleShowUnassignedDevices = (o: ISelectMultipleData[]): void => {
-    const values = o.map(s => s.value);
+    const values = o.map((s) => s.value);
     // setting this state will trigger visibility of unassigned layers
     setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
 
     const ref = mapRef.current;
-    const layers = [0, 2].includes(values.length) ? [...getAssignedLayers(), ...getUnassignedLayers()] : getAssignedLayers();
+    const layers = [0, 2].includes(values.length)
+      ? [...getAssignedLayers(), ...getUnassignedLayers()]
+      : getAssignedLayers();
 
     // when all or no options are selected
-    if (layers.length > 3) { // ie - we are showing/hiding all layers
-      if (values.length === 2) { // show all was selected
-        layers.forEach(l => ref.addLayer(l));
-      } else if (values.length === 0) { // hide all was selected
-        layers.forEach(l => ref.removeLayer(l));
+    if (layers.length > 3) {
+      // ie - we are showing/hiding all layers
+      if (values.length === 2) {
+        // show all was selected
+        layers.forEach((l) => ref.addLayer(l));
+      } else if (values.length === 0) {
+        // hide all was selected
+        layers.forEach((l) => ref.removeLayer(l));
       }
       return;
     }
     if (values.includes(MapStrings.assignmentStatusOptionA)) {
-      layers.forEach(l => ref.addLayer(l))
+      layers.forEach((l) => ref.addLayer(l));
     } else {
-      layers.forEach(l => ref.removeLayer(l))
+      layers.forEach((l) => ref.removeLayer(l));
     }
-  }
+  };
 
   // Add the tracks layer
   useEffect(() => {
-    tracksLayer.addTo(mapRef.current)
+    tracksLayer.addTo(mapRef.current);
   }, [tracksLayer]);
 
   useEffect(() => {
@@ -593,7 +624,7 @@ export default function MapPage(): JSX.Element {
       togglePings(true);
       toggleTracks(true);
     }
-  }, [map3D])
+  }, [map3D]);
 
   // trigger download on ctrl+s keyboard input
   const handleKeyPress = (e): void => {
@@ -615,15 +646,15 @@ export default function MapPage(): JSX.Element {
   // resizable state & handlers
   const [bottomPanelHeight, setBottomPanelHeight] = useState<number>(400);
   const [dragging, setDragging] = useState(false);
-  // update the height of the bottom panel 
+  // update the height of the bottom panel
   const onMove = (e: React.MouseEvent): void => {
     if (dragging) {
       const mpv = document.getElementById('map-view');
-      const offset = mpv.offsetHeight-e.clientY;
+      const offset = mpv.offsetHeight - e.clientY;
       // 70 added to base to smooth out the initial 'jump' when drag started
       setBottomPanelHeight(offset + 70);
     }
-  }
+  };
   // when mouse is clicked on the 'drag' div id
   const onDown = (): void => setDragging(true);
   // consider the 'dragging' event finished when the mouse is released anywhere on the screen
@@ -631,17 +662,16 @@ export default function MapPage(): JSX.Element {
     if (dragging) {
       setDragging(false);
     }
-  }
+  };
 
   return map3D ? (
     <>
       <Terrain />
       <div
         className={'map-icon map-dimension-btn icon-on'}
-        onClick={(): void => setMap3D(o => !o)}
-        title={map3D ? 'Switch to 2D map' : 'Switch to 3D terrain map'}
-      >
-        <MapIcon/>  
+        onClick={(): void => setMap3D((o) => !o)}
+        title={map3D ? 'Switch to 2D map' : 'Switch to 3D terrain map'}>
+        <MapIcon />
       </div>
     </>
   ) : (
@@ -652,7 +682,7 @@ export default function MapPage(): JSX.Element {
         uniqueDevices={getUniqueDevicesFromPings(fetchedPings ?? [])}
         unassignedDevices={showUnassignedLayers ? getUniqueDevicesFromPings(fetchedUnassignedPings ?? []) : []}
         onApplyFilters={handleApplyChangesFromFilterPanel}
-        onClickEditUdf={(): void => setShowUdfEdit(o => !o)}
+        onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
         // todo: trigger when filter panel transition is completed without timeout
         onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
         onShowLatestPings={handleShowLastKnownLocation}
@@ -661,8 +691,8 @@ export default function MapPage(): JSX.Element {
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
-        
-        <div id='popup' style={{bottom: bottomPanelHeight}}/>
+
+        <div id='popup' style={{ bottom: bottomPanelHeight }} />
 
         <div id='map' onKeyDown={handleKeyPress}>
           <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
@@ -671,15 +701,16 @@ export default function MapPage(): JSX.Element {
         {/* The layer switching button*/}
         <div
           className={'map-icon map-dimension-btn icon-on'}
-          onClick={(): void => setMap3D(o => !o)}
-          title={map3D ? 'Switch to 2D map' : 'Switch to 3D terrain map'}
-        >
-          <LanguageIcon/>
+          onClick={(): void => setMap3D((o) => !o)}
+          title={map3D ? 'Switch to 2D map' : 'Switch to 3D terrain map'}>
+          <LanguageIcon />
         </div>
 
-        <div style={{height: bottomPanelHeight}} className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
+        <div
+          style={{ height: bottomPanelHeight }}
+          className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
           <div onMouseDown={onDown} id='drag'></div>
-          <MapDetails 
+          <MapDetails
             pings={[...pings]}
             unassignedPings={showUnassignedLayers ? [...unassignedPings] : []}
             selectedAssignedIDs={selectedPingIDs}
@@ -690,10 +721,15 @@ export default function MapPage(): JSX.Element {
             setShowExportModal={setShowExportModal}
           />
         </div>
-        <DialogFullScreen open={showOverviewModal} handleClose={setShowModal}>
-          <MapOverView type={overviewType} detail={selectedDetail} />
-        </DialogFullScreen>
-        <AddUDF open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)}/>
+        {selectedDetail ? (
+          <MapOverView
+            open={showOverviewModal}
+            handleClose={setShowModal}
+            type={overviewType}
+            detail={selectedDetail}
+          />
+        ) : null}
+        <AddUDF open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)} />
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import CollarPage from 'pages/data/collars/CollarPage';
 import Home from 'pages/Home';
 import MapPage from 'pages/map/MapPage';
 import TerrainPage from 'pages/terrain/TerrainPage';
-import AlertPage from 'pages/user/UserAlert';
 import AdminPage from 'pages/user/AdminPage';
 import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent, useEffect } from 'react';

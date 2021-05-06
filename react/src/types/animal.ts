@@ -6,17 +6,6 @@ import { formatLatLong } from './common_helpers';
 
 const assignedCritterProps = ['animal_id', 'wlh_id', 'animal_status', 'device_id'];
 const unassignedCritterProps = ['animal_id', 'wlh_id', 'animal_status'];
-// props to show in the animal history modal
-const critterHistoryProps = [
-  'animal_id',
-  'wlh_id',
-  'animal_status',
-  'juvenile_at_heel',
-  'region',
-  'population_unit',
-  'valid_from',
-  'valid_to'
-];
 
 // properties re-used in Telemetry
 export interface IAnimalTelemetryBase {
@@ -85,42 +74,42 @@ export class Animal implements IAnimal {
   associated_animal_relationship: string;
   capture_comment: string;
   @Type(() => Date) capture_date: Date;
-  @Transform(v => v || 0, transformOpt) capture_latitude: number;
-  @Transform(v => v || 0, transformOpt) capture_longitude: number;
-  @Transform(v => v || 0, transformOpt) capture_utm_easting: number;
-  @Transform(v => v || 0, transformOpt) capture_utm_northing: number;
-  @Transform(v => v || 0, transformOpt) capture_utm_zone: number;
+  @Transform((v) => v || 0, transformOpt) capture_latitude: number;
+  @Transform((v) => v || 0, transformOpt) capture_longitude: number;
+  @Transform((v) => v || 0, transformOpt) capture_utm_easting: number;
+  @Transform((v) => v || 0, transformOpt) capture_utm_northing: number;
+  @Transform((v) => v || 0, transformOpt) capture_utm_zone: number;
   collective_unit: string;
   animal_colouration: string;
   ear_tag_id: string;
   ear_tag_left_colour: string;
   ear_tag_right_colour: string;
-  @Transform(value => value || 0, { toClassOnly: true }) estimated_age: number;
+  @Transform((value) => value || 0, { toClassOnly: true }) estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
   map_colour: string;
   mortality_comment: string;
   @Type(() => Date) mortality_date: Date;
-  @Transform(v => v || 0, transformOpt) mortality_latitude: number;
-  @Transform(v => v || 0, transformOpt) mortality_longitude: number;
-  @Transform(v => v || 0, transformOpt) mortality_utm_easting: number;
-  @Transform(v => v || 0, transformOpt) mortality_utm_northing: number;
-  @Transform(v => v || 0, transformOpt) mortality_utm_zone: number;
+  @Transform((v) => v || 0, transformOpt) mortality_latitude: number;
+  @Transform((v) => v || 0, transformOpt) mortality_longitude: number;
+  @Transform((v) => v || 0, transformOpt) mortality_utm_easting: number;
+  @Transform((v) => v || 0, transformOpt) mortality_utm_northing: number;
+  @Transform((v) => v || 0, transformOpt) mortality_utm_zone: number;
   probable_cause_of_death: string;
   ultimate_cause_of_death: string;
-  population_unit: string;
-  @Transform(v => v || false, transformOpt) recapture: boolean;
+  @Transform((v) => v || '', transformOpt) population_unit: string;
+  @Transform((v) => v || false, transformOpt) recapture: boolean;
   region: string;
   release_comment: string;
-  @Transform(v => v || 0, transformOpt) release_latitude: number;
-  @Transform(v => v || 0, transformOpt) release_longitude: number;
-  @Transform(v => v || 0, transformOpt) release_utm_easting: number;
-  @Transform(v => v || 0, transformOpt) release_utm_northing: number;
-  @Transform(v => v || 0, transformOpt) release_utm_zone: number;
+  @Transform((v) => v || 0, transformOpt) release_latitude: number;
+  @Transform((v) => v || 0, transformOpt) release_longitude: number;
+  @Transform((v) => v || 0, transformOpt) release_utm_easting: number;
+  @Transform((v) => v || 0, transformOpt) release_utm_northing: number;
+  @Transform((v) => v || 0, transformOpt) release_utm_zone: number;
   @Type(() => Date) release_date: Date;
   sex: string;
   species: string;
-  @Transform(v => v || false, transformOpt) translocation: boolean;
+  @Transform((v) => v || false, transformOpt) translocation: boolean;
   wlh_id: string;
   user_comment: string;
   @Type(() => Date) valid_from: Date;
@@ -151,13 +140,14 @@ export class Animal implements IAnimal {
   }
   @Expose() get captureUTM(): string {
     return this.capture_utm_zone && this.capture_utm_easting && this.capture_utm_northing
-      ? `${this.capture_utm_zone}/${this.capture_utm_easting}/${this.capture_utm_northing}`: '';
+      ? `${this.capture_utm_zone}/${this.capture_utm_easting}/${this.capture_utm_northing}`
+      : '';
   }
 
   constructor() {
     this.animal_id = '';
     this.animal_status = '';
-    (this.population_unit = '');
+    this.population_unit = '';
     this.region = '';
     this.species = '';
     this.wlh_id = '';
@@ -181,10 +171,10 @@ export class Animal implements IAnimal {
         return 'Population';
       case 'mortalityCoords':
       case 'captureCoords':
-        return 'Coordinates (Lat/Long)'
+        return 'Coordinates (Lat/Long)';
       case 'mortalityUTM':
       case 'captureUTM':
-        return 'UTM'
+        return 'UTM';
       case 'animal_colour':
         return 'Colour';
       default:
@@ -197,7 +187,8 @@ export type FormFieldObject = {
   prop: string;
   isCode?: boolean;
   required?: boolean;
-}
+};
+
 export const critterFormFields: Record<string, FormFieldObject[]> = {
   generalFields: [
     { prop: 'animal_status', isCode: true, required: true },
@@ -213,22 +204,25 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'ear_tag_id' },
     { prop: 'ear_tag_left_colour' },
     { prop: 'ear_tag_right_colour' },
-    { prop: 'population_unit', isCode: true }
+    { prop: 'population_unit', isCode: true },
+    { prop: 'translocation'},
+    { prop: 'capture_date'},
   ],
-  locationFields: [
-    { prop: 'region', isCode: true },
-    { prop: 'collective_unit' }
-  ],
-  mortalityFields: [
-    { prop: 'mortality_date'},
-    { prop: 'mortality_comment'},
-  ],
-  captureFields: [ ],
-  releaseFields: [ ]
-}
+  locationFields: [{ prop: 'region', isCode: true }, { prop: 'collective_unit' }],
+  mortalityFields: [{ prop: 'mortality_date' }, { prop: 'mortality_comment' }],
+  captureFields: [],
+  releaseFields: [],
+  // to show in the animal history modal
+  historyProps: [
+    { prop: 'animal_id' },
+    { prop: 'wlh_id' },
+    { prop: 'animal_status' },
+    { prop: 'juvenile_at_heel' },
+    { prop: 'region' },
+    { prop: 'population_unit' },
+    { prop: 'valid_from' },
+    { prop: 'valid_to' }
+  ]
+};
 
-export {
-  critterHistoryProps,
-  unassignedCritterProps,
-  assignedCritterProps,
-}
+export { unassignedCritterProps, assignedCritterProps };

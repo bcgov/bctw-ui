@@ -20,14 +20,32 @@ type ISelectProps = SelectProps & {
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectCode(props: ISelectProps): JSX.Element {
-  const { addEmptyOption, codeHeader, defaultValue, changeHandler, changeHandlerMultiple, label: labelTitle, multiple, triggerReset, className } = props;
+  const {
+    addEmptyOption,
+    codeHeader,
+    defaultValue,
+    changeHandler,
+    changeHandlerMultiple,
+    label,
+    multiple,
+    triggerReset,
+    className,
+    style
+  } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
 
   // to handle React warning about not recognizing the prop on a DOM element
-  const propsToPass = removeProps(props, [ 'addEmptyOption', 'codeHeader', 'changeHandler', 'labelTitle', 'changeHandlerMultiple', 'triggerReset' ]);
+  const propsToPass = removeProps(props, [
+    'addEmptyOption',
+    'codeHeader',
+    'changeHandler',
+    'labelTitle',
+    'changeHandlerMultiple',
+    'triggerReset'
+  ]);
 
   // load this codeHeaders codes from db
   const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useCodes(0, codeHeader);
@@ -38,8 +56,8 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
         return;
       }
       // add an empty option to beginning, use ' ' as sometimes the value is defaulted to ''
-      if (addEmptyOption && data.findIndex(d => d.id === 0) === -1) {
-        data.push({id: 0, code: '', description: FormStrings.emptySelectValue})
+      if (addEmptyOption && data.findIndex((d) => d.id === 0) === -1) {
+        data.push({ id: 0, code: '', description: FormStrings.emptySelectValue });
       }
       setCodes(data);
       // if a default was set (a code description, update the value to its actual value)
@@ -71,7 +89,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     pushChangeMultiple(selected);
   };
 
-  // triggered when the default value is changed 
+  // triggered when the default value is changed
   // ex. different editing object selected
   const reset = (): void => {
     const v = defaultValue;
@@ -115,16 +133,16 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       ) : isLoading || isFetching ? (
         <div>loading...</div>
       ) : codes && codes.length ? (
-        <FormControl size='small' variant={'outlined'} className={className ?? 'select-control'}>
-          <InputLabel>{labelTitle}</InputLabel>
+        <FormControl style={style} size='small' variant={'outlined'} className={className ?? 'select-control'}>
+          <InputLabel>{label}</InputLabel>
           <Select
             className={className}
             MenuProps={{
               anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
               transformOrigin: { vertical: 'top', horizontal: 'left' },
-              getContentAnchorEl: null,
+              getContentAnchorEl: null
             }}
-            label={labelTitle}
+            label={label}
             variant={'outlined'}
             value={multiple ? values : value}
             onChange={multiple ? handleChangeMultiple : handleChange}

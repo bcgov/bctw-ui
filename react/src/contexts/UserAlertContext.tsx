@@ -21,9 +21,10 @@ export const AlertStateContextProvider: React.FC = (props) => {
         console.log('alerts retrieved', data?.length)
       } else if (isError) {
         console.log('err retrieving alerts', error)
-      } else if (isLoading || isFetching) {
-        console.log('fetching user alerts');
-      }
+      } 
+      // else if (isLoading || isFetching) {
+      //   console.log('fetching user alerts');
+      // }
     };
     update();
   }, [status]);

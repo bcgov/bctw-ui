@@ -1,10 +1,9 @@
 import { IUpsertPayload } from 'api/api_interfaces';
 import { EditModalBaseProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
-import Modal from 'components/modal/Modal';
 import ChangeContext from 'contexts/InputChangeContext';
 import React, { useEffect, useState } from 'react';
-import { Animal, critterHistoryProps } from 'types/animal';
+import { Animal, critterFormFields } from 'types/animal';
 import { Collar } from 'types/collar';
 import { objectCompare, omitNull } from 'utils/common';
 import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
@@ -12,6 +11,8 @@ import { CollarStrings } from 'constants/strings';
 
 import HistoryPage from './HistoryPage';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
+import Modal from 'components/modal/Modal';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -60,7 +61,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
         setHistoryParams({
           query: bctwApi.useCritterHistory,
           param: editing.critter_id,
-          propsToDisplay: critterHistoryProps
+          propsToDisplay: critterFormFields.historyProps.map(p => p.prop),
         });
       } else if (editing instanceof Collar) {
         setHistoryParams({
@@ -115,22 +116,21 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   };
 
   return (
-    <>
-      <Modal open={open} handleClose={onClose} title={title}>
-        {showHistory ? (
-          <HistoryPage {...historyParams} />
-        ) : (
-          <ChangeContext.Provider value={handleChange}>
-            {children}
-            {hideSave ? null : (
-              <Button className='editSaveBtn' onClick={handleSave} disabled={!canSave}>
-                save
-              </Button>
-            )}
-          </ChangeContext.Provider>
+    <FullScreenDialog open={open} handleClose={onClose} title={title}>
+      <ChangeContext.Provider value={handleChange}>
+        {children}
+        {hideSave ? null : (
+          <Button className='editSaveBtn' onClick={handleSave} disabled={!canSave}>
+            save
+          </Button>
         )}
-        {isEdit ? <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button> : null}
-      </Modal>
-    </>
+        {showHistory ? (
+          <Modal open={showHistory} handleClose={(): void => setShowHistory(false)}>
+            <HistoryPage {...historyParams} />
+          </Modal>
+        ) : null}
+      </ChangeContext.Provider>
+      {isEdit ? <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button> : null}
+    </FullScreenDialog>
   );
 }

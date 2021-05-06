@@ -7,16 +7,17 @@ import { columnToHeader, removeProps } from 'utils/common';
 interface ICheckboxProps extends IInputProps, CheckboxProps {
   initialValue: boolean;
   label: string;
+  propName?: string;
 }
 export default function Checkbox(props: ICheckboxProps): JSX.Element {
-  const { initialValue, label, changeHandler } = props;
+  const { initialValue, label, changeHandler, propName } = props;
 
   const [checked, setChecked] = useState(initialValue);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const checked = event.target.checked;
     setChecked(checked);
-    changeHandler({[label]: checked });
+    changeHandler({[propName ?? label]: checked });
   };
 
   // rerender if the default was changed

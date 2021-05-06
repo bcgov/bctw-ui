@@ -255,7 +255,7 @@ export const useTelemetryApi = () => {
    * @returns
    */
   const useType = <T extends BCTW>(type: BCTWType, id: string): UseQueryResult<T> => {
-    return useQuery<T, AxiosError>(['getType', type], () => bulkApi.getType(type, id), {
+    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions
     });
   };
