@@ -1,5 +1,5 @@
 import { columnToHeader } from 'utils/common';
-import { BCTW, BctwBaseType, FormFieldObject } from 'types/common_types';
+import { BCTW, BCTWBaseType, FormFieldObject } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { eCritterPermission } from './user';
 import { formatLatLong } from './common_helpers';
@@ -19,7 +19,7 @@ export interface IAnimalTelemetryBase {
   collective_unit: string;
 }
 
-export interface IAnimal extends BCTW, BctwBaseType, IAnimalTelemetryBase {
+export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase {
   critter_id: string;
   critter_transaction_id: string;
   associated_animal_id: string;
@@ -84,7 +84,7 @@ export class Animal implements IAnimal {
   ear_tag_id: string;
   ear_tag_left_colour: string;
   ear_tag_right_colour: string;
-  @Transform((value) => value || 0, { toClassOnly: true }) estimated_age: number;
+  @Transform((value) => value || 0, transformOpt) estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
   map_colour: string;

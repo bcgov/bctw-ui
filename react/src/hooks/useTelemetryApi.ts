@@ -25,7 +25,7 @@ import {
 } from '../api/api_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useContext } from 'react';
-import { TelemetryAlert } from 'types/alert';
+import { ITelemetryAlertInput, TelemetryAlert } from 'types/alert';
 import { BCTW, BCTWType } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
@@ -341,6 +341,9 @@ export const useTelemetryApi = () => {
   const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDFInput[]>): UseMutationResult<IUDF[]> =>
     useMutation<IUDF[], AxiosError, IUDFInput[]>((body) => userApi.upsertUDF(body), config);
 
+  const useMutateUserAlert = (config: UseMutationOptions<boolean, AxiosError, ITelemetryAlertInput[]>): UseMutationResult<boolean> =>
+    useMutation<boolean, AxiosError, ITelemetryAlertInput[]>((body) => userApi.updateAlert(body), config);
+
   return {
     // queries
     useAlert,
@@ -372,6 +375,7 @@ export const useTelemetryApi = () => {
     useMutateLinkCollar,
     useMutateGrantCritterAccess,
     useMutateUDF,
-    useDelete
+    useDelete,
+    useMutateUserAlert,
   };
 };

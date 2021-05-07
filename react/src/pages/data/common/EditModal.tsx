@@ -1,5 +1,5 @@
 import { IUpsertPayload } from 'api/api_interfaces';
-import { EditModalBaseProps } from 'components/component_interfaces';
+import { EditModalBaseProps, ModalBaseProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import React, { useEffect, useState } from 'react';
@@ -18,7 +18,9 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
   isEdit: boolean;
   hideSave?: boolean;
+  hideHistory?: boolean;
   newT: T;
+  showInFullScreen?: boolean;
   onReset?: () => void;
   onValidate?: (o: T) => boolean;
 };
@@ -47,7 +49,9 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     onValidate,
     onReset,
     isEdit,
-    hideSave = false
+    hideHistory = false,
+    hideSave = false,
+    showInFullScreen = true
   } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
@@ -55,13 +59,14 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>(null);
 
+  // based on the type of T provided, set the history query status
   useEffect(() => {
     const updateParams = (): void => {
       if (editing instanceof Animal) {
         setHistoryParams({
           query: bctwApi.useCritterHistory,
           param: editing.critter_id,
-          propsToDisplay: critterFormFields.historyProps.map(p => p.prop),
+          propsToDisplay: critterFormFields.historyProps.map((p) => p.prop)
         });
       } else if (editing instanceof Collar) {
         setHistoryParams({
@@ -115,8 +120,9 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     handleClose(false);
   };
 
-  return (
-    <FullScreenDialog open={open} handleClose={onClose} title={title}>
+  const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
+  const childrenComponents = (
+    <>
       <ChangeContext.Provider value={handleChange}>
         {children}
         {hideSave ? null : (
@@ -130,7 +136,14 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
           </Modal>
         ) : null}
       </ChangeContext.Provider>
-      {isEdit ? <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button> : null}
-    </FullScreenDialog>
+      {isEdit && !hideHistory ? (
+        <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button>
+      ) : null}
+    </>
+  );
+  return showInFullScreen ? (
+    <FullScreenDialog {...modalProps}>{childrenComponents}</FullScreenDialog>
+  ) : (
+    <Modal {...modalProps}>{childrenComponents}</Modal>
   );
 }

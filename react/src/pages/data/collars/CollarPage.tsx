@@ -37,7 +37,8 @@ export default function CollarPage(): JSX.Element {
   const editProps = {
     editing: editObj,
     open: false,
-    onSave: null
+    onSave: null,
+    handleClose: null,
   };
 
   const tableProps: ITableQueryProps<Collar> = {

@@ -1,4 +1,4 @@
-import { BCTW, BctwBaseType } from './common_types';
+import { BCTW, BCTWBaseType } from './common_types';
 import { Type } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
 
@@ -51,7 +51,7 @@ export class CodeHeader implements BCTW, ICodeHeader {
 }
 
 // represents what a code header should look like when sending to api
-export class CodeHeaderInput implements BCTW, BctwBaseType {
+export class CodeHeaderInput implements BCTW, BCTWBaseType {
   code_category_id: number;
   code_header_name: string;
   code_header_title: string;

@@ -1,6 +1,6 @@
 import { Type, Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
-import { BCTW, BctwBaseType } from './common_types';
+import { BCTW, BCTWBaseType } from './common_types';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -14,7 +14,7 @@ export enum eCritterPermission {
   none = 'none',
 }
 
-export interface IUser extends BCTW, BctwBaseType {
+export interface IUser extends BCTW, BCTWBaseType {
   id: number;
   idir: string;
   bceid: string;

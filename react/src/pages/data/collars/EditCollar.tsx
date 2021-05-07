@@ -1,7 +1,7 @@
 import { Paper, Typography } from '@material-ui/core';
 import { CritterCollarModalProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
-import { MakeEditFields } from 'components/form/create_form_components';
+import { MakeEditField } from 'components/form/create_form_components';
 import { getInputTypesOfT, validateRequiredFields, FormInputType } from 'components/form/form_helpers';
 import useModalStyles from 'components/modal/modal_styles';
 import { CollarStrings as CS } from 'constants/strings';
@@ -60,17 +60,14 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   ): React.ReactNode => {
     const isRequired = requiredFields.includes(iType.key);
     const errorText = isError && (errors[iType.key] as string);
-    return MakeEditFields(
+    return MakeEditField(
       {
         formType: iType,
         handleChange,
-        isError,
-        editing,
-        isEdit: true,
-        isRequired,
-        errorMessage: errorText
+        required: isRequired,
+        errorMessage: errorText,
+        span
       },
-      span
     );
   };
 

@@ -12,8 +12,8 @@
 ```
   REACT_APP_IDIR=your_idir_goes_here
 ```
-1. run the dev server, it should automatically open a browser
+1. run the dev server
 ```
-  npm run start_windows
+  npm run dev
 ```
-1. Check your terminal shell that is running the API for errors
+1. open a browser and navigate to `http://localhost:1111`

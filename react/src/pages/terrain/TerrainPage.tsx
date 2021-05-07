@@ -7,7 +7,7 @@ import {
   Ion,
   GeoJsonDataSource,
   CzmlDataSource} from 'cesium';
-import './TerrainPage.css';
+import './TerrainPage.scss';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { MapRange } from 'types/map';
 import dayjs from 'dayjs';

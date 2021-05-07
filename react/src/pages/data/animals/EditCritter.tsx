@@ -1,7 +1,7 @@
 import { Paper } from '@material-ui/core';
 import { CritterCollarModalProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
-import { MakeEditFields } from 'components/form/create_form_components';
+import { MakeEditField } from 'components/form/create_form_components';
 import { getInputTypesOfT, validateRequiredFields, FormInputType } from 'components/form/form_helpers';
 import Modal from 'components/modal/Modal';
 import { CritterStrings as CS } from 'constants/strings';
@@ -45,7 +45,6 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
 
   const { generalFields, identifierFields, locationFields } = critterFormFields;
   const allFields = [...locationFields, ...identifierFields, ...generalFields];
-  // console.log(editing)
 
   return (
     <EditModal title={createTitle()} newT={new Animal()} onValidate={validateForm} isEdit={isEdit} {...props}>
@@ -60,15 +59,14 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
           };
 
           const makeFormField = (formType: FormInputType): React.ReactNode => {
-            return MakeEditFields({
+            return MakeEditField({
               formType,
               handleChange: onChange,
-              isError: !!errors[formType.key],
-              editing,
-              isEdit: canEdit,
-              isRequired: requiredFields.includes(formType.key),
-              errorMessage: !!errors[formType.key] && (errors[formType.key] as string)
-            }, true);
+              disabled: !canEdit,
+              required: requiredFields.includes(formType.key),
+              errorMessage: !!errors[formType.key] && (errors[formType.key] as string),
+              span: true
+            });
           };
           return (
             <form className='rootEditInput' autoComplete='off'>
@@ -90,6 +88,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                 <Paper elevation={3} className={'dlg-full-body-details'}>
                   <div className={'dlg-details-section'}>
                     <h3>General Information</h3>
+                    {/* <GridList component={'div'} cellHeight={80} cols={4}> */}
                     {inputTypes
                       .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
                       .map((formType) => makeFormField(formType))}

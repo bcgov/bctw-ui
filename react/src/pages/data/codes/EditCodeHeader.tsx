@@ -48,7 +48,7 @@ export default function EditCodeHeader(props: EditCodeModalProps): JSX.Element {
                       <TextField
                         key={d.key}
                         propName={d.key}
-                        defaultValue={d.value}
+                        defaultValue={d.value as string}
                         type={d.type}
                         label={new CodeHeaderInput().formatPropAsHeader(d.key)}
                         disabled={false}

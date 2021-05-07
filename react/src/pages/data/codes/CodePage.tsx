@@ -53,7 +53,8 @@ const CodePage: React.FC = () => {
     editing: new CodeHeaderInput(),
     open: false,
     onSave: handleSave,
-    selectableProps: []
+    selectableProps: [],
+    handleClose: null,
   };
 
   return (

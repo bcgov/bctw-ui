@@ -23,7 +23,7 @@ export default function DateInput(props: DateInputProps): JSX.Element {
     <MuiPickersUtilsProvider utils={DayjsUtils}>
       <KeyboardDatePicker
         autoOk={true}
-        style={{width: '170px'}}
+        style={{width: '200px'}}
         inputVariant={'outlined'}
         disableToolbar
         variant='dialog'

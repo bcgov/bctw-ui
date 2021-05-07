@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Checkbox as MuiCheckbox, CheckboxProps } from '@material-ui/core/';
 import { FormControlLabel } from '@material-ui/core';
-import { IInputProps } from 'components/component_interfaces';
+import { CheckBoxChangeHandler } from 'components/component_interfaces';
 import { columnToHeader, removeProps } from 'utils/common';
 
-interface ICheckboxProps extends IInputProps, CheckboxProps {
+interface ICheckboxProps extends CheckboxProps {
   initialValue: boolean;
   label: string;
   propName?: string;
+  changeHandler: CheckBoxChangeHandler;
 }
 export default function Checkbox(props: ICheckboxProps): JSX.Element {
   const { initialValue, label, changeHandler, propName } = props;

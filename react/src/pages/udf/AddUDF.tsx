@@ -92,7 +92,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   };
 
   // when user changes the group name textfield
-  const handleChangeName = (v: Record<string, unknown>, udf: IUDF): void => {
+  const handleChangeName = (v: Record<string, string | number>, udf: IUDF): void => {
     const newKey = v['group'] as string;
     if (!newKey) {
       return;
@@ -169,27 +169,33 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
           </TableRow>
         </TableHead>
         <TableBody>
+          {/* iterate the UDFs */}
           {udfs.map((u, idx) => {
             return (
               <TableRow key={idx}>
                 <TableCell>
+                  {/* the UDF name text field */}
                   <TextField
                     changeHandler={(v): void => handleChangeName(v, u)}
                     propName={'group'}
-                    value={u.key}></TextField>
+                    defaultValue={u.key}></TextField>
                 </TableCell>
+                {/* the dropdown that displays the animal IDs contained in the group */}
                 <TableCell>{renderCrittersAsDropdown(getCritterNamesFromIDs(u.value))}</TableCell>
                 <TableCell>{u.value.length}</TableCell>
+                {/* show the critter selection modal when edit is clicked */}
                 <TableCell>
                   <IconButton onClick={(): void => handleEditCritters(u)}>
                     <Icon icon='edit' />
                   </IconButton>
                 </TableCell>
+                {/* delete this row */}
                 <TableCell>
                   <IconButton onClick={(): void => deleteRow(u)}>
                     <Icon icon='close' />
                   </IconButton>
                 </TableCell>
+                {/* duplicate this row */}
                 <TableCell>
                   <IconButton
                     disabled={u.value.length === 0 || u.key.length === 0}

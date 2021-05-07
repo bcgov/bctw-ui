@@ -15,7 +15,7 @@ type PageProp = {
 */
 type ModalBaseProps = {
   open: boolean;
-  handleClose?: (v: boolean) => void;
+  handleClose: (v: boolean) => void;
   title?: string;
 };
 
@@ -54,16 +54,17 @@ type ExportImportProps = ModalBaseProps & {
   downloadTemplate?: () => void;
 };
 
-interface IInputProps {
-  changeHandler: (o: Record<string, unknown>) => void;
-}
+type InputChangeHandler = (o: Record<string, string | number>) => void;
+type CheckBoxChangeHandler = (o: Record<string, boolean>) => void;
 
 /**
  * @param propName property name of T, used for label
 */
-interface ITextfieldProps extends IInputProps, StandardTextFieldProps {
+interface ITextfieldProps extends StandardTextFieldProps {
   propName: string;
+  defaultValue: string | number;
   outline?: boolean;
+  changeHandler: InputChangeHandler;
 }
 
 interface INotificationMessage {
@@ -77,9 +78,10 @@ export type {
   ModalBaseProps,
   ExportImportProps,
   EditModalBaseProps,
-  IInputProps,
   ITextfieldProps,
   INotificationMessage,
   ConfirmModalProps,
-  PageProp
+  PageProp,
+  CheckBoxChangeHandler,
+  InputChangeHandler,
 };

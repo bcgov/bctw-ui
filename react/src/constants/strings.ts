@@ -71,6 +71,11 @@ const FormStrings = {
   emptySelectValue: 'Blank',
 }
 
+const UserAlertStrings = {
+  dimissAlert: 'Are you sure you want to dismiss this alert?',
+  mortalityFormTitle: 'Mortality Event',
+}
+
 export {
   CodeStrings,
   CollarStrings,
@@ -79,4 +84,5 @@ export {
   MapStrings,
   MapTileLayers,
   FileStrings,
+  UserAlertStrings,
 }

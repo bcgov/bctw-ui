@@ -3,7 +3,7 @@ export type BCTW = {
   identifier?: string; // used in tables to identify unique rows
 }
 
-export interface BctwBaseType {
+export interface BCTWBaseType {
   created_at?: Date;
   created_by_user_id?: number;
   updated_at?: Date;

@@ -6,7 +6,7 @@ type IDefaultLayoutProps = {
 };
 
 /**
-  show sidebar on data management screens
+  shows sidebar on data management screens
 **/
 export default function ManageLayout({ children }: IDefaultLayoutProps): JSX.Element {
   return (

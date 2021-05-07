@@ -1,5 +1,5 @@
 import { columnToHeader } from 'utils/common';
-import { BCTW, BctwBaseType } from 'types/common_types';
+import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';
 
@@ -24,7 +24,7 @@ export interface ICollarTelemetryBase extends ICollarBase {
   device_id: number;
 }
 
-export interface ICollar extends ICollarTelemetryBase, BCTW, BctwBaseType {
+export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   collar_transaction_id: string;
   camera_device_id: string;
   device_deployment_status: string;
