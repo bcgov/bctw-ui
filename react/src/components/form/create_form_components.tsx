@@ -19,26 +19,25 @@ type CreateInputProps<T> = CreateInputBaseProps<T> & {
   isRequired: boolean;
 };
 
-const baseStyle = {marginRight: '10px'};
+const baseStyle = { marginRight: '10px' };
 
 function CreateEditTextField<T extends BCTW>({
-  editing,
   errorMessage,
   formType,
   isEdit,
   isError,
   isRequired,
   handleChange
-}: CreateInputProps<T>): JSX.Element {
+}: CreateInputProps<T>, label: string): JSX.Element {
   return (
     <TextField
       outline={true}
       key={formType.key}
-      style={{width: '200px', ...baseStyle}}
+      style={{ width: '200px', ...baseStyle }}
       propName={formType.key}
       defaultValue={formType.value}
       type={formType.type}
-      label={editing.formatPropAsHeader(formType.key)}
+      label={label}
       disabled={!isEdit}
       changeHandler={handleChange}
       required={isRequired}
@@ -49,46 +48,43 @@ function CreateEditTextField<T extends BCTW>({
 }
 
 function CreateEditDateField<T extends BCTW>({
-  editing,
   formType,
   handleChange
-}: CreateInputBaseProps<T>): JSX.Element {
+}: CreateInputBaseProps<T>, label: string): JSX.Element {
   return (
     <DateInput
       propName={formType.key}
-      label={editing.formatPropAsHeader(formType.key)}
+      label={label}
       defaultValue={formType.value as Date}
       changeHandler={handleChange}></DateInput>
   );
 }
 
 function CreateEditCheckboxField<T extends BCTW>({
-  editing,
   formType,
   handleChange
-}: CreateInputBaseProps<T>): JSX.Element {
+}: CreateInputBaseProps<T>, label: string): JSX.Element {
   return (
     <CheckBox
       changeHandler={handleChange}
       initialValue={formType.value as boolean}
-      label={editing.formatPropAsHeader(formType.key)}
+      label={label}
       propName={formType.key}
     />
   );
 }
 
 function CreateEditSelectField<T extends BCTW>({
-  editing,
   formType,
   isEdit,
   isError,
   isRequired,
   handleChange
-}: CreateInputProps<T>): JSX.Element {
+}: CreateInputProps<T>, label: string): JSX.Element {
   return (
     <SelectCode
-      style={{width: '200px', ...baseStyle }}
-      label={editing.formatPropAsHeader(formType.key)}
+      style={{ width: '200px', ...baseStyle }}
+      label={label}
       disabled={!isEdit}
       key={formType.key}
       codeHeader={formType.key}
@@ -101,20 +97,21 @@ function CreateEditSelectField<T extends BCTW>({
   );
 }
 
-function MakeEditFields<T extends BCTW>(
-  props: CreateInputProps<T>,
-  span = false
-): React.ReactNode {
+function MakeEditFields<T extends BCTW>(props: CreateInputProps<T>, span = false): React.ReactNode {
   const inputType = props.formType.type;
+  const label =
+    typeof props.editing.formatPropAsHeader === 'function'
+      ? props.editing.formatPropAsHeader(props.formType.key)
+      : props.formType.key;
   let Comp: React.ReactNode;
   if (inputType === eInputType.check) {
-    Comp = CreateEditCheckboxField(props);
+    Comp = CreateEditCheckboxField(props, label);
   } else if (inputType === eInputType.date) {
-    Comp = CreateEditDateField(props);
+    Comp = CreateEditDateField(props, label);
   } else if (inputType === eInputType.select) {
-    Comp = CreateEditSelectField(props);
+    Comp = CreateEditSelectField(props, label);
   } else if (inputType === eInputType.text || inputType === eInputType.number) {
-    Comp = CreateEditTextField(props);
+    Comp = CreateEditTextField(props, label);
   }
   return span ? (
     <span className={'edit-form-field-span'}>{Comp}</span>

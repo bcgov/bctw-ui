@@ -1,5 +1,5 @@
 import { columnToHeader } from 'utils/common';
-import { BCTW, BctwBaseType } from 'types/common_types';
+import { BCTW, BctwBaseType, FormFieldObject } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { eCritterPermission } from './user';
 import { formatLatLong } from './common_helpers';
@@ -159,35 +159,20 @@ export class Animal implements IAnimal {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'animal_id':
-        return 'Animal ID';
-      case 'device_id':
-        return 'Device ID';
-      case 'wlh_id':
-        return 'WLH ID';
       case 'juvenile_at_heel':
         return 'Calf Status';
-      case 'population_unit':
-        return 'Population';
       case 'mortalityCoords':
       case 'captureCoords':
         return 'Coordinates (Lat/Long)';
       case 'mortalityUTM':
       case 'captureUTM':
         return 'UTM';
-      case 'animal_colour':
-        return 'Colour';
       default:
         return columnToHeader(str);
     }
   }
 }
 
-export type FormFieldObject = {
-  prop: string;
-  isCode?: boolean;
-  required?: boolean;
-};
 
 export const critterFormFields: Record<string, FormFieldObject[]> = {
   generalFields: [
@@ -205,8 +190,8 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'ear_tag_left_colour' },
     { prop: 'ear_tag_right_colour' },
     { prop: 'population_unit', isCode: true },
-    { prop: 'translocation'},
-    { prop: 'capture_date'},
+    // { prop: 'translocation' },
+    // { prop: 'capture_date' }
   ],
   locationFields: [{ prop: 'region', isCode: true }, { prop: 'collective_unit' }],
   mortalityFields: [{ prop: 'mortality_date' }, { prop: 'mortality_comment' }],
@@ -224,5 +209,6 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'valid_to' }
   ]
 };
+
 
 export { unassignedCritterProps, assignedCritterProps };

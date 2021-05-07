@@ -115,18 +115,11 @@ export class Collar implements ICollar {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'device_id':
-        return 'Device ID';
-      case 'animal_id':
-        return 'Individual ID';
-      case 'max_transmission_date':
-        return 'Last Update';
       case 'device_type':
       case 'device_make':
       case 'device_model':
-        return columnToHeader(str.replace('device_', ''));
       case 'device_deployment_status':
-        return 'Deployed';
+        return columnToHeader(str.replace('device_', ''));
       default:
         return columnToHeader(str);
     }

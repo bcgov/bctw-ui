@@ -92,16 +92,7 @@ export class TelemetryDetail implements BCTW, ITelemetryDetail {
   map_colour: string;
 
   formatPropAsHeader(str: string): string {
-    switch (str) {
-      case 'wlh_id':
-        return 'WLH ID';
-      case 'animal_id':
-        return 'Animal ID';
-      case 'device_id':
-        return 'Device ID';
-      default:
-        return columnToHeader(str);
-    }
+    return columnToHeader(str);
   }
 }
 

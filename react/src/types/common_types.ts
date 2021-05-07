@@ -16,3 +16,12 @@ export interface BctwBaseType {
  * defines the main object types that have metadata in BCTW
  */
 export type BCTWType = 'animal' | 'device'
+
+/**
+ * 
+ */
+export type FormFieldObject = {
+  prop: string;
+  isCode?: boolean;
+  required?: boolean;
+};

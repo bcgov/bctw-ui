@@ -26,8 +26,6 @@ export class CollarHistory implements ICollarHistory {
     switch (str) {
       case this.identifier:
         return 'Assignment ID';
-      case 'device_id':
-        return 'Device ID';
       default:
         return columnToHeader(str);
     }

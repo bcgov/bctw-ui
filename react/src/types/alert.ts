@@ -1,4 +1,5 @@
 import { Type, Expose } from 'class-transformer';
+import { columnToHeader } from 'utils/common';
 import { Animal } from './animal';
 import { Collar } from './collar';
 
@@ -52,12 +53,10 @@ export class TelemetryAlert implements ITelemetryAlert {
 
   static formatPropAsHeader(str: string): string {
     switch(str) {
-      case 'device_id':
-        return 'Device ID';
       case 'valid_from':
         return 'Recorded At';
       default: 
-        return new Animal().formatPropAsHeader(str);
+        return columnToHeader(str);
     }
   }
 }
