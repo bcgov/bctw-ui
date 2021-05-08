@@ -9,26 +9,28 @@ export default function TextField(props: ITextfieldProps): JSX.Element {
 
   useEffect(() => {
     const o = { [propName]: defaultValue };
-    changeHandler(o)
+    changeHandler(o);
   }, [defaultValue]);
 
-  const propsToPass = removeProps(props ,['propName', 'changeHandler', 'outline']);
-  
+  const propsToPass = removeProps(props, ['propName', 'changeHandler', 'outline']);
+
+  const handleChange = (event): void => {
+    let o;
+    if (typeof defaultValue === 'number') {
+      o = { [propName]: +event.target.value };
+    } else {
+      o = { [propName]: event.target.value };
+    }
+    changeHandler(o);
+  };
+
   return (
     <MuiTextField
       variant={outline ? 'outlined' : 'standard'}
       size='small'
       style={style ?? baseStyle}
       {...propsToPass}
-      onChange={(event): void => {
-        let o;
-        if (typeof defaultValue === 'number') {
-          o = { [propName]: +(event.target.value)};
-        } else {
-          o = { [propName]: event.target.value};
-        }
-        changeHandler(o);
-      }}
+      onChange={handleChange}
     />
   );
 }

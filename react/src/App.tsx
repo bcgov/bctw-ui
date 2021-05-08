@@ -33,46 +33,46 @@ const queryClient = new QueryClient();
 
 export default function App(): JSX.Element {
   const classes = useStyles();
-  const [sidebar, setSidebar] = useState<JSX.Element>();
+  // const [sidebar, setSidebar] = useState<JSX.Element>();
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-      <ThemeProvider theme={appTheme}>
-        <AlertStateContextProvider>
-          <AlertContext.Consumer>
-            {(): React.ReactNode => {
-              return (
-                <UserStateContextProvider>
-                  <UserContext.Consumer>
-                    {(): React.ReactNode => {
-                      return (
-                        <HashRouter>
-                          <div className={classes.root}>
-                            <AppHeader />
-                            <div className={'app-body'}>
-                              <div className='app-body__inner'>
-                                <ResponseProvider>
+      <ResponseProvider>
+        <ThemeProvider theme={appTheme}>
+          <AlertStateContextProvider>
+            <AlertContext.Consumer>
+              {(): React.ReactNode => {
+                return (
+                  <UserStateContextProvider>
+                    <UserContext.Consumer>
+                      {(): React.ReactNode => {
+                        return (
+                          <HashRouter>
+                            <div className={classes.root}>
+                              <AppHeader />
+                              <div className={'app-body'}>
+                                <div className='app-body__inner'>
                                   <SnackbarWrapper>
                                     <DefaultLayout>
-                                      <AppRouter onContentChange={setSidebar} />
+                                      <AppRouter />
                                     </DefaultLayout>
                                   </SnackbarWrapper>
-                                </ResponseProvider>
+                                </div>
                               </div>
+                              <AppFooter />
                             </div>
-                            <AppFooter />
-                          </div>
-                        </HashRouter>
-                      );
-                    }}
-                  </UserContext.Consumer>
-                </UserStateContextProvider>
-              );
-            }}
-          </AlertContext.Consumer>
-        </AlertStateContextProvider>
-      </ThemeProvider>
+                          </HashRouter>
+                        );
+                      }}
+                    </UserContext.Consumer>
+                  </UserStateContextProvider>
+                );
+              }}
+            </AlertContext.Consumer>
+          </AlertStateContextProvider>
+        </ThemeProvider>
+      </ResponseProvider>
     </QueryClientProvider>
   );
 }

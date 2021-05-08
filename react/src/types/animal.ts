@@ -152,6 +152,7 @@ export class Animal implements IAnimal {
     this.species = '';
     this.wlh_id = '';
     this.estimated_age = 0;
+    // fixme: on creation of new critters...dont want to preserve these
     this.capture_date = new Date();
     this.mortality_date = new Date();
     this.release_date = new Date();

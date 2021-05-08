@@ -22,7 +22,7 @@ interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar  {
 }
 
 interface ITelemetryAlertInput {
-  alert_id: number[];
+  alert_ids: number[];
   alert_action: 'dismiss';
 }
 
@@ -66,7 +66,7 @@ export class TelemetryAlert implements ITelemetryAlert, BCTW {
   static formatPropAsHeader(str: string): string {
     switch(str) {
       case 'valid_from':
-        return 'Recorded At';
+        return 'Notification Time';
       default: 
         return columnToHeader(str);
     }

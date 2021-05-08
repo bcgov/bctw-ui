@@ -64,7 +64,7 @@ export const userApi = (props: ApiProps) => {
   }
 
   const updateAlert = async (body: ITelemetryAlertInput[]): Promise<boolean> => {
-    const url = createUrl({api: 'update-user-alert'});
+    const url = createUrl({api: 'expire-user-alert'});
     const { data } = await api.post(url, body);
     return true;
   }

@@ -32,17 +32,20 @@ function CreateEditTextField(props: CreateInputProps): JSX.Element {
       {...props}
       changeHandler={props.handleChange}
       error={!!props.errorMessage ?? false}
+      helperText={props.errorMessage}
     />
   );
 }
 
-function CreateEditDateField({ formType, handleChange, label }: CreateInputProps): JSX.Element {
+function CreateEditDateField({ formType, handleChange, label, disabled }: CreateInputProps): JSX.Element {
   return (
     <DateInput
       propName={formType.key}
       label={label}
       defaultValue={formType.value as Date}
-      changeHandler={handleChange}></DateInput>
+      changeHandler={handleChange}
+      disabled={disabled}
+    />
   );
 }
 
@@ -100,7 +103,7 @@ function MakeEditField({
   } else if (inputType === eInputType.select) {
     Comp = CreateEditSelectField({ formType, handleChange, disabled, required, errorMessage, label: lbl });
   } else if (inputType === eInputType.text || inputType === eInputType.number) {
-    Comp = CreateEditTextField({ formType, handleChange, label: lbl });
+    Comp = CreateEditTextField({ formType, handleChange, errorMessage, required, label: lbl });
   }
   return span ? (
     <span className={'edit-form-field-span'}>{Comp}</span>

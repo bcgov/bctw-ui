@@ -3,8 +3,9 @@ import DayjsUtils from '@date-io/dayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { formatDay } from 'utils/time';
+import { StandardTextFieldProps } from '@material-ui/core/TextField';
 
-type DateInputProps = {
+type DateInputProps = StandardTextFieldProps & {
   propName: string;
   label: string;
   defaultValue: Date;
@@ -26,6 +27,7 @@ export default function DateInput(props: DateInputProps): JSX.Element {
         style={{width: '200px'}}
         inputVariant={'outlined'}
         disableToolbar
+        disabled={props.disabled}
         variant='dialog'
         format={selectedDate.format('YYYY/MM/DD')}
         margin='normal'

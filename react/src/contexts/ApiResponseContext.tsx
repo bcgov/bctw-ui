@@ -9,13 +9,13 @@ const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => 
   const [state, dispatch] = useState<INotificationMessage>(null);
 
   const clearNotif = (): void => dispatch(null);
-  const timer = 6000;
+  const notifDisplayTime = 6000;
 
   // automatically clear the notification after timer elapsed
   useEffect(() => {
     const timeout = (): void => {
       if (state?.message) {
-        setTimeout(clearNotif, timer);
+        setTimeout(clearNotif, notifDisplayTime);
       }
     };
     timeout();
@@ -44,7 +44,7 @@ const useResponseState = (): INotificationMessage => {
  */
 const useResponseDispatch = (): ((notif: INotificationMessage | null) => null) => {
   const context = useContext(ApiResponseDispatch);
-  if (context === undefined) {
+  if (context === null) {
     throw new Error('useResponseDispatch must be used within a responseProvider');
   }
   return context;

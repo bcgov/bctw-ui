@@ -14,7 +14,7 @@ export type RouteKey = {
   path: string;
   title: string;
   name: string;
-  component: FunctionComponent<{ setSidebarContent: (component: JSX.Element) => void }>;
+  component: FunctionComponent<{ /*setSidebarContent: (component: JSX.Element) => void */ }>;
   sort: number;
   icon?: string;
   requiresAdmin?: boolean;
@@ -32,14 +32,8 @@ const AppRoutes: RouteKey[] = [
   { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 2 }
 ];
 
-type AppRouterProps = {
-  onContentChange: (component: JSX.Element) => void;
-};
-
-const AppRouter = ({ onContentChange }: AppRouterProps): JSX.Element => {
-  const routeProps = { setSidebarContent: onContentChange };
+const AppRouter = (): JSX.Element => {
   const history = useHistory();
-
   useEffect(() => {
     return history.listen((location) => {
       // wipe the sidebar content when navigation to new page
@@ -58,7 +52,7 @@ const AppRouter = ({ onContentChange }: AppRouterProps): JSX.Element => {
             path={route.path}
             render={(): JSX.Element => {
               const RouteComponent = route.component;
-              return <RouteComponent {...routeProps} />;
+              return <RouteComponent />;
             }}
           />
         );
