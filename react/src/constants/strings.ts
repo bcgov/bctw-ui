@@ -18,6 +18,12 @@ const FileStrings = {
   templateButtonText: 'Download Template',
 }
 
+const WorkflowStrings = {
+  captureWorkflowTitle: 'Capture Event Workflow',
+  releaseWorkflowTitle: 'Release Event Workflow',
+  mortalityWorkflowTitle: 'Mortality Event Workflow',
+}
+
 const CollarStrings = {
   assignedCollarsTableTitle: 'Assigned Devices',
   availableCollarsTableTitle: 'Unassigned Devices',
@@ -80,9 +86,10 @@ export {
   CodeStrings,
   CollarStrings,
   CritterStrings,
+  FileStrings,
   FormStrings,
   MapStrings,
   MapTileLayers,
-  FileStrings,
   UserAlertStrings,
+  WorkflowStrings,
 }

@@ -7,6 +7,9 @@ import Modal from 'components/modal/Modal';
 import { CritterStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
+import CaptureWorkflow from 'pages/data/animals/CaptureWorkflow';
+import ReleaseWorkflow from 'pages/data/animals/ReleaseWorkflow';
+import MortalityWorkflow from 'pages/data/animals/MortalityWorkflow';
 import EditModal from 'pages/data/common/EditModal';
 import React, { useEffect, useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
@@ -133,18 +136,18 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                     </Modal>
                   ) : null}
                   {isEdit && showCaptureWorkflow ? (
-                    <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
-                      <AssignmentHistory animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                    <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
+                      <CaptureWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
                     </Modal>
                   ) : null}
                   {isEdit && showReleaseWorkflow ? (
-                    <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
-                      <AssignmentHistory animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                    <Modal open={showReleaseWorkflow} handleClose={(): void => setShowReleaseWorkflow(false)}>
+                      <ReleaseWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
                     </Modal>
                   ) : null}
                   {isEdit && showMortalityWorkflow ? (
-                    <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
-                      <AssignmentHistory animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                    <Modal open={showMortalityWorkflow} handleClose={(): void => setShowMortalityWorkflow(false)}>
+                      <MortalityWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
                     </Modal>
                   ) : null}
                 </Paper>
