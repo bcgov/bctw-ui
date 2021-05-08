@@ -25,7 +25,7 @@ type GroupedCheckedStatus = {
 
 const rows_to_render = [
   'Colour',
-  'wlh_id',
+  'WLH ID',
   'animal_id',
   'device_id',
   'Frequency (MHz)',

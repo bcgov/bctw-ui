@@ -18,6 +18,12 @@ const FileStrings = {
   templateButtonText: 'Download Template',
 }
 
+const WorkflowStrings = {
+  captureWorkflowTitle: 'Capture Event Workflow',
+  releaseWorkflowTitle: 'Release Event Workflow',
+  mortalityWorkflowTitle: 'Mortality Event Workflow',
+}
+
 const CollarStrings = {
   assignedCollarsTableTitle: 'Assigned Devices',
   availableCollarsTableTitle: 'Unassigned Devices',
@@ -32,7 +38,8 @@ const CollarStrings = {
   addCollarVHF: 'VHF Device',
   importTitle: 'Bulk Import VHF Devices',
   importText: 'Use this feature to add multiple new devices.',
-  assignmentHistoryTitle: 'Device Assignment History',
+  assignmentHistoryByAnimalTitle: 'History of Devices Assigned',
+  assignmentHistoryByDeviceTitle: 'History of Animals Assigned',
   collarImportStartMsg: 'What do you want to do?',
   collarImportKeyX: 'Create new Vectronic devices using .keyx file(s)',
   collarImportDowloadTemplate: 'Download a CSV template for importing device metadata',
@@ -80,9 +87,10 @@ export {
   CodeStrings,
   CollarStrings,
   CritterStrings,
+  FileStrings,
   FormStrings,
   MapStrings,
   MapTileLayers,
-  FileStrings,
   UserAlertStrings,
+  WorkflowStrings,
 }

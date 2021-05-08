@@ -11,8 +11,12 @@
 }
 
 .dlg-full-title {
-  padding: 1rem 5rem;
+  padding: 1rem 4rem;
   h1 {
+    display: inline;
+    margin-right: 1rem;
+  }
+  h3 {
     display: inline;
     margin-right: 1rem;
   }
@@ -23,6 +27,12 @@
     margin-right: 1rem;
     font-size: larger;
     color: #495057;
+  }
+  .button_span {
+    float:right;
+  }
+  .button {
+    margin-left: 0.5em;
   }
 }
 
