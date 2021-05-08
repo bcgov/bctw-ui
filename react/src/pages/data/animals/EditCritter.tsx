@@ -49,8 +49,24 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   const createTitle = (): string =>
     !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
 
-  const { identifierFields, generalFields, locationFields } = critterFormFields;
-  const allFields = [...identifierFields, ...locationFields, ...generalFields];
+  const {
+    associatedAnimalFields,
+    captureFields,
+    characteristicsFields,
+    identifierFields,
+    mortalityFields,
+    releaseFields,
+    userCommentField
+  } = critterFormFields;
+  const allFields = [
+    ...associatedAnimalFields,
+    ...captureFields,
+    ...characteristicsFields,
+    ...identifierFields,
+    ...mortalityFields,
+    ...releaseFields,
+    ...userCommentField
+  ];
 
   return (
     <EditModal title={createTitle()} newT={new Animal()} onValidate={validateForm} isEdit={isEdit} {...props}>
@@ -117,16 +133,40 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                       .map((f) => makeFormField(f))}
                   </div>
                   <div className={'dlg-details-section'}>
-                  <h3>General Information</h3>
+                  <h3>Characteristics</h3>
                     {/* <GridList component={'div'} cellHeight={80} cols={4}> */}
                     {inputTypes
-                      .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
+                      .filter((f) => characteristicsFields.map((x) => x.prop).includes(f.key))
                       .map((formType) => makeFormField(formType))}
                   </div>
                   <div className={'dlg-details-section'}>
-                    <h3>Location</h3>
+                    <h3>Latest Capture Details</h3>
                     {inputTypes
-                      .filter((f) => locationFields.map((x) => x.prop).includes(f.key))
+                      .filter((f) => captureFields.map((x) => x.prop).includes(f.key))
+                      .map((f) => makeFormField(f))}
+                  </div>
+                  <div className={'dlg-details-section'}>
+                    <h3>Latest Release Details</h3>
+                    {inputTypes
+                      .filter((f) => releaseFields.map((x) => x.prop).includes(f.key))
+                      .map((f) => makeFormField(f))}
+                  </div>
+                  <div className={'dlg-details-section'}>
+                    <h3>Mortality Details</h3>
+                    {inputTypes
+                      .filter((f) => mortalityFields.map((x) => x.prop).includes(f.key))
+                      .map((f) => makeFormField(f))}
+                  </div>
+                  <div className={'dlg-details-section'}>
+                    <h3>Association with Another Individual</h3>
+                    {inputTypes
+                      .filter((f) => associatedAnimalFields.map((x) => x.prop).includes(f.key))
+                      .map((f) => makeFormField(f))}
+                  </div>
+                  <div className={'dlg-details-section'}>
+                    <h3>Biologist's Comments</h3>
+                    {inputTypes
+                      .filter((f) => userCommentField.map((x) => x.prop).includes(f.key))
                       .map((f) => makeFormField(f))}
                   </div>
                   {/* dont show assignment history for new critters */}

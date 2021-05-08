@@ -173,30 +173,30 @@ export class Animal implements IAnimal {
   }
 }
 
-
 export const critterFormFields: Record<string, FormFieldObject[]> = {
-  generalFields: [
+  associatedAnimalFields: [
+    { prop: 'associated_animal_id' },
+    { prop: 'associated_animal_relationship' /*, isCode: true */ }
+  ],
+  captureFields: [
+    { prop: 'capture_date', required: true },
+    { prop: 'capture_latitude' },
+    { prop: 'capture_longitude' },
+    { prop: 'capture_utm_zone' },
+    { prop: 'capture_utm_easting' },
+    { prop: 'capture_utm_northing' },
+    { prop: 'region', isCode: true /*, required: true */ },
+    { prop: 'recapture' /*, isCode: true */ },
+    { prop: 'capture_comment' }
+  ],
+  characteristicsFields: [
     { prop: 'animal_status', isCode: true, required: true },
-    { prop: 'species', isCode: true },
-    { prop: 'life_stage', isCode: true },
-    { prop: 'estimated_age' },
+    { prop: 'species', isCode: true, required: true },
     { prop: 'sex', isCode: true },
+    { prop: 'estimated_age' },
+    { prop: 'life_stage', isCode: true },
     { prop: 'juvenile_at_heel', isCode: true }
   ],
-  identifierFields: [
-    { prop: 'wlh_id' },
-    { prop: 'animal_id' },
-    { prop: 'ear_tag_id' },
-    { prop: 'ear_tag_left_colour' },
-    { prop: 'ear_tag_right_colour' },
-    { prop: 'population_unit', isCode: true },
-    // { prop: 'translocation' },
-    // { prop: 'capture_date' }
-  ],
-  locationFields: [{ prop: 'region', isCode: true }, { prop: 'collective_unit' }],
-  mortalityFields: [{ prop: 'mortality_date' }, { prop: 'mortality_comment' }],
-  captureFields: [],
-  releaseFields: [],
   // to show in the animal history modal
   historyProps: [
     { prop: 'animal_id' },
@@ -207,8 +207,41 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'population_unit' },
     { prop: 'valid_from' },
     { prop: 'valid_to' }
+  ],
+  identifierFields: [
+    { prop: 'wlh_id' },
+    { prop: 'animal_id' },
+    { prop: 'population_unit', isCode: true },
+    { prop: 'collective_unit' },
+    { prop: 'ear_tag_left_colour' /*, isCode: true */ },
+    { prop: 'ear_tag_right_colour' /*, isCode: true */ },
+    { prop: 'ear_tag_id' },
+    { prop: 'animal_colouration' }
+  ],
+  mortalityFields: [
+    { prop: 'mortality_date' /*, required: true */ },
+    { prop: 'mortality_latitude' }, 
+    { prop: 'mortality_longitude' },
+    { prop: 'mortality_utm_zone' },
+    { prop: 'mortality_utm_easting' },
+    { prop: 'mortality_utm_northing' },
+    { prop: 'probable_cause_of_death' },
+    { prop: 'ultimate_cause_of_death' },
+    { prop: 'mortality_comment' },
+  ],
+  releaseFields: [
+    { prop: 'release_date' /*, required: true */ },
+    { prop: 'release_latitude' }, 
+    { prop: 'release_longitude' },
+    { prop: 'release_utm_zone' },
+    { prop: 'release_utm_easting' },
+    { prop: 'release_utm_northing' },
+    { prop: 'translocation' /*, isCode: true */ },
+    { prop: 'release_comment' },
+  ],
+  userCommentField : [
+    { prop: 'user_comment' }
   ]
 };
-
 
 export { unassignedCritterProps, assignedCritterProps };
