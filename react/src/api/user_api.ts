@@ -57,9 +57,10 @@ export const userApi = (props: ApiProps) => {
 
   const getUserAlerts = async (
   ): Promise<TelemetryAlert[]> => {
+    // console.log('fetching user alerts')
     const url = createUrl({api: 'get-user-alerts'});
     const { data } = await api.get(url);
-    const converted = data.map((json: ITelemetryDetail[]) => plainToClass(TelemetryAlert, json));
+    const converted = data?.map((json: ITelemetryDetail[]) => plainToClass(TelemetryAlert, json));
     return converted;
   }
 

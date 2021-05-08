@@ -65,7 +65,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
             {alertCount > 0 ? (
               <li>
                 <div className={'alerts'}>
-                  <IconButton onClick={(): void => setShowAlerts(o => !o)} disabled={!alertCount}>
+                  <IconButton onClick={(): void => setShowAlerts((o) => !o)} disabled={!alertCount}>
                     <Icon
                       path={mdiBell}
                       color={alertCount ? 'red' : 'white'}

@@ -91,7 +91,7 @@ export default function AlertPage(): JSX.Element {
     };
     await dismissAlertMutation(payload);
     // trigger context to reload alerts
-    useAlerts.refetch();
+    useAlerts.invalidate();
   };
 
   // todo: SNOOZE
@@ -134,8 +134,8 @@ export default function AlertPage(): JSX.Element {
                     <TableCell>{a.animal_id}</TableCell>
                     <TableCell>{a.device_id}</TableCell>
                     <TableCell>{a.device_make}</TableCell>
-                    <TableCell>{a.device_status}</TableCell>
-                    <TableCell>{a.animal_status}</TableCell>
+                    {/* <TableCell>{a.device_status}</TableCell> */}
+                    {/* <TableCell>{a.animal_status}</TableCell> */}
                     <TableCell style={{ color: 'red' }}>
                       <strong>{a.formatAlert}</strong>
                     </TableCell>

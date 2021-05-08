@@ -1,3 +1,4 @@
+import { omitNull } from 'utils/common';
 import { Animal } from './animal'
 import { Collar } from './collar'
 import { LocationEvent } from './location_event'
@@ -30,8 +31,6 @@ export default class MortalityEvent implements IMortalityEvent {
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
     this.animal_status = 'Potential Mortality';
-    // set the mortality date to the date of the alert valid_from 'notification time'
-    // this.location_event = new LocationEvent('mortality', mortalityDate);
   }
 
   get editableProps(): string[] {
@@ -56,7 +55,8 @@ export default class MortalityEvent implements IMortalityEvent {
     a.mortality_utm_zone = l.utm_zone;
     delete a.capture_date;
     delete a.release_date;
-    return a;
+    delete a.estimated_age;
+    return omitNull(a)
   }
 
   get getCollar(): Collar {
@@ -69,6 +69,6 @@ export default class MortalityEvent implements IMortalityEvent {
     c.device_status = this.device_status;
     c.device_deployment_status = this.device_deployment_status;
     delete c.malfunction_date;
-    return c;
+    return omitNull(c);
   }
 }
