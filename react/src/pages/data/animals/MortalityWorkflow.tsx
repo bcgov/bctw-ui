@@ -65,10 +65,10 @@ export default function MortalityWorkflow(props: IMortalityWorkflowProps<Animal>
             <h2 className={'dlg-full-body-subtitle'}>{WorkflowStrings.mortalityWorkflowTitle}</h2>
             <Paper elevation={3} className={'dlg-full-body-details'}>
               <div className={'dlg-details-section'}>
-              <h3>Mortality Details</h3>
-                {inputTypes
-                  .filter((f) => mortalityFields.map((x) => x.prop).includes(f.key))
-                  .map((f) => makeFormField(f))}
+                <h3>Mortality Details</h3>
+                  {inputTypes
+                    .filter((f) => mortalityFields.map((x) => x.prop).includes(f.key))
+                    .map((f) => makeFormField(f))}
               </div>
             </Paper>
           </div>
