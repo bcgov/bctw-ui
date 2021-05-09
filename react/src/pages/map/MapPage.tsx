@@ -670,7 +670,7 @@ export default function MapPage(): JSX.Element {
       <div
         className={'map-icon map-dimension-btn icon-on'}
         onClick={(): void => setMap3D((o) => !o)}
-        title={map3D ? 'Switch to 2D map' : 'Switch to 3D terrain map'}>
+        title={map3D ? 'Switch to 2D view' : 'Switch to 3D view'}>
         <MapIcon />
       </div>
     </>
@@ -702,7 +702,7 @@ export default function MapPage(): JSX.Element {
         <div
           className={'map-icon map-dimension-btn icon-on'}
           onClick={(): void => setMap3D((o) => !o)}
-          title={map3D ? 'Switch to 2D map' : 'Switch to 3D terrain map'}>
+          title={map3D ? 'Switch to 2D map' : 'Switch to 3D view'}>
           <LanguageIcon />
         </div>
 

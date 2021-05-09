@@ -9,12 +9,14 @@ import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import CaptureWorkflow from 'pages/data/animals/CaptureWorkflow';
 import ReleaseWorkflow from 'pages/data/animals/ReleaseWorkflow';
-import MortalityWorkflow from 'pages/data/animals/MortalityWorkflow';
+import MortalityEventForm from 'pages/data/events/MortalityEventForm';
 import EditModal from 'pages/data/common/EditModal';
 import React, { useEffect, useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
 import { eCritterPermission } from 'types/user';
 import { removeProps } from 'utils/common';
+import { TelemetryAlert } from 'types/alert';
+
 
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
   const { isEdit, editing } = props;
@@ -44,6 +46,15 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
+  const alert = new TelemetryAlert();
+  {
+    alert.critter_id = editing.critter_id;
+    alert.collar_id = "12345";
+    alert.device_id = editing.device_id;
+    alert.wlh_id = editing.wlh_id;
+    alert.valid_from = editing.valid_from; // Does this make sense?
+  }
 
   const createTitle = (): string =>
     !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
@@ -187,9 +198,12 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                     </Modal>
                   ) : null}
                   {isEdit && showMortalityWorkflow ? (
-                    <Modal open={showMortalityWorkflow} handleClose={(): void => setShowMortalityWorkflow(false)}>
-                      <MortalityWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
-                    </Modal>
+                    <MortalityEventForm
+                      alert={alert}
+                      open={showMortalityWorkflow} 
+                      handleClose={(): void => setShowMortalityWorkflow(false)}
+                      handleSave={null}
+                    />
                   ) : null}
                 </Paper>
               </Paper>
