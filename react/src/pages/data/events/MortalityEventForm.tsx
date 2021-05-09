@@ -2,14 +2,14 @@ import { Paper } from '@material-ui/core';
 import ChangeContext from 'contexts/InputChangeContext';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { CreateEditCheckboxField, CreateEditDateField, MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT } from 'components/form/form_helpers';
+import { getInputTypesOfT, objHasErrors } from 'components/form/form_helpers';
 import { UserAlertStrings } from 'constants/strings';
 import { TelemetryAlert } from 'types/alert';
 import { LocationEvent } from 'types/location_event';
 import EditModal from '../common/EditModal';
 import { useState } from 'react';
 import LocationEventForm from './LocationEventForm';
-import { columnToHeader, removeProps } from 'utils/common';
+import { removeProps } from 'utils/common';
 import MortalityEvent from 'types/mortality_event';
 import { IUpsertPayload } from 'api/api_interfaces';
 import { Collar } from 'types/collar';
@@ -54,12 +54,15 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
     setLocationEvent(new LocationEvent('mortality', alert.valid_from))
   }, [alert]);
 
+  const asTableHeader = (header: string): string => mortalityEvent.formatPropAsHeader(header);
+
   return (
     <EditModal<MortalityEvent>
       showInFullScreen={false}
       handleClose={handleClose}
       onSave={onSave}
       editing={mortalityEvent}
+      hasErrors={():boolean => objHasErrors(errors)}
       open={open}
       // the instance that the editmodal will save changed fields to
       newT={Object.assign({}, mortalityEvent)}
@@ -76,6 +79,15 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
           };
 
           const onChangeLocationProp = (v: Record<string, unknown>): void => {
+            // when switching coordinate types...dont make form savable
+            if (Object.values(v).includes(undefined)) {
+              return;
+            }
+            // the property name will be the 'key' of the first key in Object.values
+            const justProp = {[Object.keys(v)[0]]: v.error};
+            const newErrors = Object.assign(errors, justProp)
+            setErrors(newErrors)
+
             const l = Object.assign(locationEvent, v)
             setLocationEvent(l)
             handlerFromContext(l, true);
@@ -104,13 +116,13 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                   <div className={'dlg-details-section'}>
                     <h3>Device Details</h3>
                     <div>
-                      {CreateEditCheckboxField({formType: retrievedField, label: columnToHeader(retrievedField.key), handleChange: onChange})}
+                      {CreateEditCheckboxField({formType: retrievedField, label: asTableHeader(retrievedField.key), handleChange: onChange})}
                     </div>
                     <div>
-                      {CreateEditDateField({formType: retrievedDateField, label: columnToHeader(retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
+                      {CreateEditDateField({formType: retrievedDateField, label: asTableHeader(retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
                     </div>
                     <div style={{marginBottom: '10px'}}>
-                      {CreateEditCheckboxField({formType: vafField, label: columnToHeader(vafField.key), handleChange: onChange})}
+                      {CreateEditCheckboxField({formType: vafField, label: asTableHeader(vafField.key), handleChange: onChange})}
                     </div>
                     {deviceStatusFields.map((formType) => {
                       return MakeEditField({

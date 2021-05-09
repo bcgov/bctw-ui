@@ -19,7 +19,13 @@ export interface IAnimalTelemetryBase {
   collective_unit: string;
 }
 
-export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase {
+
+// animals attached to devices should have these properties
+interface IOptionallyAttachedDevice {
+  collar_id?: string;
+  device_id?: number;
+}
+export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOptionallyAttachedDevice {
   critter_id: string;
   critter_transaction_id: string;
   associated_animal_id: string;
@@ -58,8 +64,6 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase {
   sex: string;
   translocation: boolean;
   user_comment: string;
-  // adding device_id for enabling bulk import of critters
-  device_id?: number;
   // fetched critters should contain this
   permission_type?: eCritterPermission;
 }
@@ -116,6 +120,7 @@ export class Animal implements IAnimal {
   @Type(() => Date) valid_to: Date;
   permission_type: eCritterPermission;
   device_id?: number;
+  collar_id?: string;
   @Expose() get identifier(): string {
     return 'critter_id';
   }

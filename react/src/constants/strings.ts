@@ -22,6 +22,8 @@ const WorkflowStrings = {
   captureWorkflowTitle: 'Capture Event Workflow',
   releaseWorkflowTitle: 'Release Event Workflow',
   mortalityWorkflowTitle: 'Mortality Event Workflow',
+  locationEventCoordTypeUTM: 'Use UTM',
+  locationEventCoordTypeLat: 'Use Lat/Long',
 }
 
 const CollarStrings = {
@@ -76,10 +78,18 @@ const MapTileLayers = {
 
 const FormStrings = {
   emptySelectValue: 'Blank',
+  validateNegativeLongitude: 'Longitude must be negative',
+  validateNumber: 'Must be a number',
 }
 
 const UserAlertStrings = {
-  dimissAlert: 'Are you sure you want to dismiss this alert?',
+  snoozeConfirmation: (remainingCount: number): string => {
+    if (remainingCount === 1) {
+      return `There is only one snooze remaining! Tomorrow you will be forced to update. Are you sure you want to snooze?`
+    }
+    return `There are ${remainingCount} snoozes remaining. Are you sure you want to snooze the alert until tomorrow?`;
+  },
+  noMoreSnoozes: 'Maximum number of snoozes performed, you must perform the alert update',
   mortalityFormTitle: 'Mortality Event',
 }
 

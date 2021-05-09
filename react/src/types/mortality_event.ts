@@ -1,6 +1,7 @@
-import { omitNull } from 'utils/common';
+import { columnToHeader, omitNull } from 'utils/common';
 import { Animal } from './animal'
 import { Collar } from './collar'
+import { BCTW } from './common_types';
 import { LocationEvent } from './location_event'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -8,7 +9,7 @@ interface IMortalityEvent extends
   Pick<Animal, 'critter_id' | 'animal_status' >,
   Pick<Collar, 'collar_id' | 'device_id' | 'retrieved' | 'retrieval_date' | 'vendor_activation_status' | 'device_deployment_status' | 'device_status'> {}
 
-export default class MortalityEvent implements IMortalityEvent {
+export default class MortalityEvent implements IMortalityEvent, BCTW {
   critter_id: string;
   animal_status: string;
   collar_id: string;
@@ -31,6 +32,15 @@ export default class MortalityEvent implements IMortalityEvent {
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
     this.animal_status = 'Potential Mortality';
+  }
+
+  formatPropAsHeader(s: string): string {
+    switch(s) {
+      case 'vendor_activation_status':
+        return 'Is device deactivated?'
+      default:
+        return columnToHeader(s);
+    }
   }
 
   get editableProps(): string[] {

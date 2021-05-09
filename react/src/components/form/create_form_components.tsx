@@ -1,5 +1,6 @@
 import { eInputType, FormInputType } from 'components/form/form_helpers';
 import TextField from 'components/form/Input';
+import NumberField from 'components/form/NumberInput';
 import SelectCode from './SelectCode';
 import DateInput from 'components/form/Date';
 import CheckBox from 'components/form/Checkbox';
@@ -19,15 +20,22 @@ type CreateInputProps = CreateInputBaseProps & {
   span?: boolean;
 };
 
-
 function CreateEditTextField(props: CreateInputProps): JSX.Element {
   const { key, value, type } = props.formType;
-  return (
+  return typeof value === 'number' ? (
+    <NumberField
+      propName={key}
+      key={key}
+      defaultValue={value as number}
+      changeHandler={props.handleChange}
+      {...props}
+    />
+  ) : (
     <TextField
       outline={true}
       key={key}
       propName={key}
-      defaultValue={typeof value === 'number' ? value as number : value as string}
+      defaultValue={value as string}
       type={type}
       {...props}
       changeHandler={props.handleChange}

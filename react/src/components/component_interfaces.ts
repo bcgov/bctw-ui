@@ -1,4 +1,3 @@
-import { StandardTextFieldProps } from '@material-ui/core';
 import { IUpsertPayload } from 'api/api_interfaces';
 
 /**
@@ -54,18 +53,12 @@ type ExportImportProps = ModalBaseProps & {
   downloadTemplate?: () => void;
 };
 
-type InputChangeHandler = (o: Record<string, string | number>) => void;
+type InputChangeHandler = (o: Record<string, string | number | boolean>) => void;
 type CheckBoxChangeHandler = (o: Record<string, boolean>) => void;
 
 /**
  * @param propName property name of T, used for label
 */
-interface ITextfieldProps extends StandardTextFieldProps {
-  propName: string;
-  defaultValue: string | number;
-  outline?: boolean;
-  changeHandler: InputChangeHandler;
-}
 
 interface INotificationMessage {
   message: string;
@@ -78,7 +71,6 @@ export type {
   ModalBaseProps,
   ExportImportProps,
   EditModalBaseProps,
-  ITextfieldProps,
   INotificationMessage,
   ConfirmModalProps,
   PageProp,

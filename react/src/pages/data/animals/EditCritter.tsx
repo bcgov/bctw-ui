@@ -39,7 +39,6 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
     );
   }, [editing]);
 
-  // fixme: pure
   const validateForm = (o: Animal): boolean => {
     const errors = validateRequiredFields(o, requiredFields);
     setErrors(errors);
@@ -86,6 +85,9 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
               handleChange: onChange,
               disabled: !canEdit,
               required: requiredFields.includes(formType.key),
+              /* does the errors object have a property matching this key?
+                if so, get its error
+              */
               errorMessage: !!errors[formType.key] && (errors[formType.key] as string),
               span: true
             });

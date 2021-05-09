@@ -1,10 +1,19 @@
-import { TextField as MuiTextField } from '@material-ui/core';
-import { ITextfieldProps } from 'components/component_interfaces';
+import { StandardTextFieldProps, TextField as MuiTextField } from '@material-ui/core';
+import { baseInputStyle } from 'components/component_constants';
+import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common';
 
-const baseStyle = { marginRight: '10px', width: '200px' };
-export default function TextField(props: ITextfieldProps): JSX.Element {
+interface ITextInputProps extends StandardTextFieldProps {
+  propName: string;
+  defaultValue: string;
+  outline?: boolean;
+  changeHandler: InputChangeHandler;
+}
+
+export const inputPropsToRemove = ['outline', 'propName', 'changeHandler', 'validate', 'errorMessage', 'handleChange', 'formType']
+
+export default function TextField(props: ITextInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, outline, style } = props;
 
   useEffect(() => {
@@ -12,7 +21,7 @@ export default function TextField(props: ITextfieldProps): JSX.Element {
     changeHandler(o);
   }, [defaultValue]);
 
-  const propsToPass = removeProps(props, ['propName', 'changeHandler', 'outline']);
+  const propsToPass = removeProps(props, inputPropsToRemove);
 
   const handleChange = (event): void => {
     let o;
@@ -27,8 +36,8 @@ export default function TextField(props: ITextfieldProps): JSX.Element {
   return (
     <MuiTextField
       variant={outline ? 'outlined' : 'standard'}
-      size='small'
-      style={style ?? baseStyle}
+      size={'small'}
+      style={style ?? baseInputStyle}
       {...propsToPass}
       onChange={handleChange}
     />
