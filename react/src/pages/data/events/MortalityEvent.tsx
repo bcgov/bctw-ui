@@ -5,6 +5,7 @@ import { getInputTypesOfT } from 'components/form/form_helpers';
 import { UserAlertStrings } from 'constants/strings';
 import { TelemetryAlert } from 'types/alert';
 import { FormFieldObject } from 'types/common_types';
+import { LocationEvent } from 'types/event';
 import EditModal from '../common/EditModal';
 import LocationEventForm from './LocationEvent';
 
@@ -76,7 +77,7 @@ export default function MortalityEvent({ alert, open, handleClose }: MortEventPr
             </div>
             <div className={'dlg-details-section'}>
               <h3>Event Details</h3>
-              <LocationEventForm eventType={'mortality'} handleChange={handleChangeForm} />
+              <LocationEventForm event={new LocationEvent('mortality')} handleChange={handleChangeForm} />
             </div>
           </Paper>
         </Paper>
