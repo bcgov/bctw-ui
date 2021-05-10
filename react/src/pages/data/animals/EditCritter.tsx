@@ -140,6 +140,18 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                       .map((formType) => makeFormField(formType))}
                   </div>
                   <div className={'dlg-details-section'}>
+                    <h3>Association with Another Individual</h3>
+                    {inputTypes
+                      .filter((f) => associatedAnimalFields.map((x) => x.prop).includes(f.key))
+                      .map((f) => makeFormField(f))}
+                  </div>
+                  <div className={'dlg-details-section'}>
+                    <h3>Comments About This Animal</h3>
+                    {inputTypes
+                      .filter((f) => userCommentField.map((x) => x.prop).includes(f.key))
+                      .map((f) => makeFormField(f))}
+                  </div>
+                  <div className={'dlg-details-section'}>
                     <h3>Latest Capture Details</h3>
                     {inputTypes
                       .filter((f) => captureFields.map((x) => x.prop).includes(f.key))
@@ -155,18 +167,6 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                     <h3>Mortality Details</h3>
                     {inputTypes
                       .filter((f) => mortalityFields.map((x) => x.prop).includes(f.key))
-                      .map((f) => makeFormField(f))}
-                  </div>
-                  <div className={'dlg-details-section'}>
-                    <h3>Association with Another Individual</h3>
-                    {inputTypes
-                      .filter((f) => associatedAnimalFields.map((x) => x.prop).includes(f.key))
-                      .map((f) => makeFormField(f))}
-                  </div>
-                  <div className={'dlg-details-section'}>
-                    <h3>Biologist's Comments</h3>
-                    {inputTypes
-                      .filter((f) => userCommentField.map((x) => x.prop).includes(f.key))
                       .map((f) => makeFormField(f))}
                   </div>
                   {/* dont show assignment history for new critters */}

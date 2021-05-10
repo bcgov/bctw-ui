@@ -193,6 +193,7 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'animal_status', isCode: true, required: true },
     { prop: 'species', isCode: true, required: true },
     { prop: 'sex', isCode: true },
+    { prop: 'animal_colouration' },
     { prop: 'estimated_age' },
     { prop: 'life_stage', isCode: true },
     { prop: 'juvenile_at_heel', isCode: true }
@@ -216,7 +217,6 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'ear_tag_left_colour' /*, isCode: true */ },
     { prop: 'ear_tag_right_colour' /*, isCode: true */ },
     { prop: 'ear_tag_id' },
-    { prop: 'animal_colouration' }
   ],
   mortalityFields: [
     { prop: 'mortality_date' /*, required: true */ },
@@ -236,7 +236,7 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'release_utm_zone' },
     { prop: 'release_utm_easting' },
     { prop: 'release_utm_northing' },
-    { prop: 'translocation' /*, isCode: true */ },
+    { prop: 'translocation' },
     { prop: 'release_comment' },
   ],
   userCommentField : [
