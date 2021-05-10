@@ -10,10 +10,15 @@ import EditModal from 'pages/data/common/EditModal';
 import { useEffect, useState } from 'react';
 import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import { removeProps } from 'utils/common';
+import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
+import Modal from 'components/modal/Modal';
 
 export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.Element {
   const { isEdit, editing } = props;
   const modalClasses = useModalStyles();
+
+  //const canEdit = !isEdit ? true : editing.permission_type === eCritterPermission.change;
+  const canEdit = !isEdit ? true : true;
 
   // set the collar type when add collar is selected
   const [collarType, setCollarType] = useState<eNewCollarType>(eNewCollarType.Other);
@@ -23,6 +28,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
   const requiredFields = CS.requiredProps;
   const [errors, setErrors] = useState<Record<string, unknown>>({});
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
+  const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
 
   useEffect(() => {
     const ipt = getInputTypesOfT<Collar>(
@@ -84,6 +90,13 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     );
   };
 
+  const padFrequency = (num: number): string => {
+    const freq = num.toString();
+    const numDecimalPlaces = freq.slice(freq.lastIndexOf('.') + 1).length;
+    const numToAdd = (3 - numDecimalPlaces) + freq.length;
+    return freq.padEnd(numToAdd, '0');
+  }  
+
   const isAddNewCollar = !isEdit && collarType === eNewCollarType.Other;
   return (
     <EditModal
@@ -110,12 +123,21 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
               ) : (
                 <form className='rootEditInput' autoComplete='off'>
                   <Paper className={'dlg-full-title'} elevation={3}>
+                  <div className={'dlg-full-sub'}>
                     <h1>Device ID: {editing.device_id}</h1>
                     <div className={'dlg-full-sub'}>
-                      <span className='span'>Frequency: {editing.frequency}</span>
+                      <span className='span'>Frequency: {padFrequency(editing.frequency)} MHz</span>
                       <span className='span'>|</span>
                       <span className='span'>Deployment Status: {editing?.device_deployment_status}</span>
+                      <span className='button_span'>
+                      {isEdit ? (
+                        <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
+                          Assign Animal to Device
+                        </Button>
+                      ) : null}
+                      </span>
                     </div>
+                  </div>
                   </Paper>
                   <Paper elevation={0} className={'dlg-full-body'}>
 
@@ -139,6 +161,11 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                           .filter((f) => statusFields.map((x) => x.prop).includes(f.key))
                           .map((d) => makeField(d, onChange, !!errors[d.key]))}
                       </div>
+                      {isEdit && showAssignmentHistory ? (
+                        <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
+                          <AssignmentHistory assignAnimalToDevice={true} animalId="" deviceId={editing.collar_id} canEdit={canEdit} {...props} />
+                        </Modal>
+                      ) : null}
                     </Paper>
                   </Paper>
                 </form>

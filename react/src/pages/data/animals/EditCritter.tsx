@@ -101,7 +101,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                   <span className='button_span'>
                     {isEdit ? (
                       <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
-                        Device Assignment
+                        Assign Device to Animal
                       </Button>
                     ) : null}
                     {isEdit ? (
@@ -171,7 +171,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                   {/* dont show assignment history for new critters */}
                   {isEdit && showAssignmentHistory ? (
                     <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
-                      <AssignmentHistory animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                      <AssignmentHistory animalId={editing.critter_id} deviceId="" canEdit={canEdit} {...props} />
                     </Modal>
                   ) : null}
                   {isEdit && showCaptureWorkflow ? (

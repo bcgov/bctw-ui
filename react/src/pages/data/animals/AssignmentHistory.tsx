@@ -7,7 +7,9 @@ import { CollarStrings } from 'constants/strings';
 
 type IAssignmentHistoryProps = {
   animalId: string;
+  deviceId: string;
   canEdit: boolean; // passed to child PerformAssignmentAction component
+  assignAnimalToDevice?: boolean;
 };
 
 /**
@@ -15,7 +17,7 @@ type IAssignmentHistoryProps = {
  *  all of the collar assign/unassign handling components
  */
 export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
-  const { animalId } = props;
+  const { animalId, deviceId, assignAnimalToDevice } = props;
   const bctwApi = useTelemetryApi();
   const [isDeviceAttached, setIsDeviceAttached] = useState<string>(null);
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
@@ -24,22 +26,49 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
     setCollarHistory(d);
   };
 
-  useEffect(() => {
-    if (history?.length) {
-      const attachment = hasCollarCurrentlyAssigned(history);
-      setIsDeviceAttached(attachment?.collar_id);
-    }
-  }, [history]);
+  if (assignAnimalToDevice) {
+/*
+    useEffect(() => {
+      if (history?.length) {
+        const attachment = hasCollarCurrentlyAssigned(history);
+        setIsDeviceAttached(attachment?.collar_id);
+      }
+    }, [history]);
+*/
+    return (
+      <>
+        This is a test
+      </>
+      /*
+      <>
+        <Table
+          title={CollarStrings.assignmentHistoryTitle}
+          headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
+          queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
+          paginate={history?.length >= 10}
+        />
+        <PerformAssignmentAction collarId={isDeviceAttached} {...props} />
+      </>
+*/
+    );
+  } else {
+    useEffect(() => {
+      if (history?.length) {
+        const attachment = hasCollarCurrentlyAssigned(history);
+        setIsDeviceAttached(attachment?.collar_id);
+      }
+    }, [history]);
+    return (
+      <>
+        <Table
+          title={CollarStrings.assignmentHistoryTitle}
+          headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
+          queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
+          paginate={history?.length >= 10}
+        />
+        <PerformAssignmentAction collarId={isDeviceAttached} {...props} />
+      </>
+    );
+  }
 
-  return (
-    <>
-      <Table
-        title={CollarStrings.assignmentHistoryTitle}
-        headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
-        queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
-        paginate={history?.length >= 10}
-      />
-      <PerformAssignmentAction collarId={isDeviceAttached} {...props} />
-    </>
-  );
 }
