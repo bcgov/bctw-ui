@@ -16,13 +16,17 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
   collar_id: string;
   device_id: number;
   retrieved: boolean;
-  // todo: note:
+  // todo:
   shouldUnattachDevice: boolean;
   retrieval_date: Date;
   vendor_activation_status: boolean;
   device_deployment_status: string;
   device_status: string;
   location_event: LocationEvent;
+  // deviceUnassigned: boolean;
+  // pcod: string;
+  // pcod_predator_species: string;
+  pcod_confidence_value: string;
 
   constructor(critterId: string, collarId: string, deviceId: number) {
     this.critter_id = critterId;
@@ -40,8 +44,18 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
 
   formatPropAsHeader(s: string): string {
     switch(s) {
+      case 'retrieved':
+        return 'Device Has Been Retrieved?'
       case 'vendor_activation_status':
-        return 'Is device deactivated?'
+        return 'Is Device Still Active With Vendor?';
+      case 'pcod':
+        return 'Proximate Cause of Death';
+      case 'pcod_predator_species':
+        return 'PCOD Predator Species';
+      case 'pcod_confidence_value':
+        return 'PCOD Confidence Value';
+      case 'shouldUnattachDevice':
+        return 'Unassign device from animal?';
       default:
         return columnToHeader(s);
     }

@@ -16,7 +16,7 @@ type CritterOverViewProps = ModalBaseProps & {
   detail: ITelemetryDetail;
 };
 
-export default function MapOverView({ type, detail, open, handleClose }: CritterOverViewProps): JSX.Element {
+export default function MapOverview({ type, detail, open, handleClose }: CritterOverViewProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | Collar>(null);
   const [canEdit, setCanEdit] = useState<boolean>(false);
