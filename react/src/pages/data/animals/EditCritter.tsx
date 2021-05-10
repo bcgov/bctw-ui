@@ -93,8 +93,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
           return (
             <form className='rootEditInput' autoComplete='off'>
               <Paper className={'dlg-full-title'} elevation={3}>
-                <h1>WLH ID: {editing?.wlh_id ?? '-'}</h1>
-                <h3>{editing?.animal_id ? `(Animal ID: ${editing.animal_id})` : ""}</h3>
+                <h1>WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{fontWeight:100}}>/</span>&nbsp; Animal ID: {editing?.animal_id ?? '-'}</h1>
                 <div className={'dlg-full-sub'}>
                   <span className='span'>Species: {editing.species}</span>
                   <span className='span'>|</span>
