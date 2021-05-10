@@ -37,19 +37,13 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
 */
     return (
       <>
-        This is a test
-      </>
-      /*
-      <>
         <Table
-          title={CollarStrings.assignmentHistoryTitle}
+          title={CollarStrings.assignmentHistoryByDeviceTitle}
           headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
-          queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
+          queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: deviceId, onNewData: onNewData }}
           paginate={history?.length >= 10}
         />
-        <PerformAssignmentAction collarId={isDeviceAttached} {...props} />
       </>
-*/
     );
   } else {
     useEffect(() => {
@@ -61,7 +55,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
     return (
       <>
         <Table
-          title={CollarStrings.assignmentHistoryTitle}
+          title={CollarStrings.assignmentHistoryByAnimalTitle}
           headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
           queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
           paginate={history?.length >= 10}

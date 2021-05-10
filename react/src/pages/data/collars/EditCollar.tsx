@@ -72,7 +72,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
         handleChange,
         required: isRequired,
         errorMessage: errorText,
-        span
+        span: true
       },
     );
   };
@@ -126,7 +126,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                   <div className={'dlg-full-sub'}>
                     <h1>Device ID: {editing.device_id}</h1>
                     <div className={'dlg-full-sub'}>
-                      <span className='span'>Frequency: {padFrequency(editing.frequency)} MHz</span>
+                      <span className='span'>Frequency: {editing?.frequency ? padFrequency(editing.frequency) : "-"} MHz</span>
                       <span className='span'>|</span>
                       <span className='span'>Deployment Status: {editing?.device_deployment_status}</span>
                       <span className='button_span'>
@@ -140,7 +140,6 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                   </div>
                   </Paper>
                   <Paper elevation={0} className={'dlg-full-body'}>
-
                     <h2 className={'dlg-full-body-subtitle'}>Device Details</h2>
                     <Paper elevation={3} className={'dlg-full-body-details'}>
                       <div className={'dlg-details-section'}>
