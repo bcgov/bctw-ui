@@ -15,6 +15,7 @@ import { IUpsertPayload } from 'api/api_interfaces';
 import { Collar } from 'types/collar';
 import { Animal } from 'types/animal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { formatLabel } from 'types/common_helpers';
 
 type MortEventProps = ModalBaseProps & {
   alert: TelemetryAlert;
@@ -26,7 +27,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
   const [mortalityEvent, setMortalityEvent] = useState<MortalityEvent>(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id))
   const [locationEvent, setLocationEvent] = useState<LocationEvent>(new LocationEvent('mortality', alert.valid_from));
 
-  const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.editableProps, mortalityEvent.propsThatAreCodes);
+  const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.editableProps.map(c => ({prop: c})), mortalityEvent.propsThatAreCodes);
   const required = true;
 
   const retrievedField = formFields.find(f => f.key === 'retrieved');
@@ -53,8 +54,6 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
     setMortalityEvent(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id))
     setLocationEvent(new LocationEvent('mortality', alert.valid_from))
   }, [alert]);
-
-  const asTableHeader = (header: string): string => mortalityEvent.formatPropAsHeader(header);
 
   return (
     <EditModal<MortalityEvent>
@@ -110,19 +109,18 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                 </div>
               </Paper>
               {/* form body */}
-              <Paper elevation={0} className={'dlg-full-body'}>
-                <h2 className={'dlg-full-body-subtitle'}></h2>
+              <Paper elevation={0}>
                 <Paper elevation={3} className={'dlg-full-body-details'}>
                   <div className={'dlg-details-section'}>
                     <h3>Device Details</h3>
                     <div>
-                      {CreateEditCheckboxField({formType: retrievedField, label: asTableHeader(retrievedField.key), handleChange: onChange})}
+                      {CreateEditCheckboxField({formType: retrievedField, label: formatLabel(mortalityEvent, retrievedField.key), handleChange: onChange})}
                     </div>
                     <div>
-                      {CreateEditDateField({formType: retrievedDateField, label: asTableHeader(retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
+                      {CreateEditDateField({formType: retrievedDateField, label: formatLabel(mortalityEvent, retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
                     </div>
                     <div style={{marginBottom: '10px'}}>
-                      {CreateEditCheckboxField({formType: vafField, label: asTableHeader(vafField.key), handleChange: onChange})}
+                      {CreateEditCheckboxField({formType: vafField, label: formatLabel(mortalityEvent, vafField.key), handleChange: onChange})}
                     </div>
                     {deviceStatusFields.map((formType) => {
                       return MakeEditField({

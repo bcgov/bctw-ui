@@ -23,5 +23,8 @@ export type BCTWType = 'animal' | 'device'
 export type FormFieldObject = {
   prop: string;
   isCode?: boolean;
+  isDate?: boolean;
+  isBool?: boolean;
   required?: boolean;
+  span?: boolean;
 };

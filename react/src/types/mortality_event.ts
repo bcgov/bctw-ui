@@ -4,10 +4,11 @@ import { Collar } from './collar'
 import { BCTW } from './common_types';
 import { LocationEvent } from './location_event'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IMortalityEvent extends 
   Pick<Animal, 'critter_id' | 'animal_status' >,
-  Pick<Collar, 'collar_id' | 'device_id' | 'retrieved' | 'retrieval_date' | 'vendor_activation_status' | 'device_deployment_status' | 'device_status'> {}
+  Pick<Collar, 'collar_id' | 'device_id' | 'retrieved' | 'retrieval_date' | 'vendor_activation_status' | 'device_deployment_status' | 'device_status'> {
+  shouldUnattachDevice: boolean;
+}
 
 export default class MortalityEvent implements IMortalityEvent, BCTW {
   critter_id: string;
@@ -15,6 +16,8 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
   collar_id: string;
   device_id: number;
   retrieved: boolean;
+  // todo: note:
+  shouldUnattachDevice: boolean;
   retrieval_date: Date;
   vendor_activation_status: boolean;
   device_deployment_status: string;
@@ -32,6 +35,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
     this.animal_status = 'Potential Mortality';
+    this.shouldUnattachDevice = false;
   }
 
   formatPropAsHeader(s: string): string {

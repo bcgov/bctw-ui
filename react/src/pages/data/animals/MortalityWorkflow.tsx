@@ -26,7 +26,7 @@ export default function MortalityWorkflow(props: IMortalityWorkflowProps<Animal>
     setInputTypes(
       getInputTypesOfT<Animal>(
         editing,
-        allFields.map((a) => a.prop),
+        allFields,
         allFields.filter((f) => f.isCode).map((a) => a.prop)
       )
     );
@@ -62,7 +62,7 @@ export default function MortalityWorkflow(props: IMortalityWorkflowProps<Animal>
         };
         return (
           <div>
-            <h2 className={'dlg-full-body-subtitle'}>{WorkflowStrings.mortalityWorkflowTitle}</h2>
+            <h2>{WorkflowStrings.mortalityWorkflowTitle}</h2>
             <Paper elevation={3} className={'dlg-full-body-details'}>
               <div className={'dlg-details-section'}>
                 <h3>Mortality Details</h3>

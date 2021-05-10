@@ -69,6 +69,8 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
 }
 
 export const transformOpt = { toClassOnly: true };
+
+// todo: all collar critter dates need to be transformed to dates if null.
 export class Animal implements IAnimal {
   critter_id: string;
   critter_transaction_id: string;
@@ -165,6 +167,10 @@ export class Animal implements IAnimal {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
+      case 'probable_cause_of_death':
+        return 'Proximate Cause of Death';
+      case 'associated_animal_relationship':
+        return 'Associated Relationship';
       case 'juvenile_at_heel':
         return 'Calf Status';
       case 'mortalityCoords':
@@ -192,7 +198,7 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'capture_utm_easting' },
     { prop: 'capture_utm_northing' },
     { prop: 'region', isCode: true /*, required: true */ },
-    { prop: 'recapture' /*, isCode: true */ },
+    { prop: 'recapture', isBool: true },
     { prop: 'capture_comment' }
   ],
   characteristicsFields: [
@@ -225,7 +231,7 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'ear_tag_id' },
   ],
   mortalityFields: [
-    { prop: 'mortality_date' /*, required: true */ },
+    { prop: 'mortality_date', isDate: true /*, required: true */ },
     { prop: 'mortality_latitude' }, 
     { prop: 'mortality_longitude' },
     { prop: 'mortality_utm_zone' },

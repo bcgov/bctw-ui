@@ -18,12 +18,13 @@ export default function EditCodeHeader(props: EditCodeModalProps): JSX.Element {
   const { isEdit, editing, editableProps, selectableProps } = props;
   const [errors, setErrors] = useState<Record<string, unknown>>({});
 
-  const inputTypes = getInputTypesOfT<CodeHeaderInput>(editing, editableProps, selectableProps);
+  const inputTypes = getInputTypesOfT<CodeHeaderInput>(editing, editableProps.map(e => ({prop: e})), selectableProps);
   return (
     <EditModal
       title={S.addHeaderTitle}
       newT={new CodeHeaderInput()}
       onValidate={(): boolean => true}
+      showInFullScreen={false}
       onReset={close}
       isEdit={isEdit}
       {...props}>

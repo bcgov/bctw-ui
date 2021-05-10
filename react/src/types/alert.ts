@@ -3,30 +3,28 @@ import { columnToHeader } from 'utils/common';
 import { Animal, transformOpt } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTW } from 'types/common_types';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { formatTime } from 'utils/time';
 
+// possible types of telemetry alerts
 enum eAlertType {
   battery = 'battery',
   mortality = 'mortality'
 }
 
-type TelemetryAlertCollar = Pick<Collar, 
-'collar_id' | 'device_id'| 'device_status'| 'device_deployment_status' | 'retrieval_date' | 'retrieved' | 'vendor_activation_status'>;
-type TelemetryAlertAnimal = Pick<Animal, 
-'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id' | 'mortality_date' | 'mortality_latitude' | 'mortality_longitude' | 'mortality_utm_easting' | 'mortality_utm_northing' | 'mortality_utm_zone'>;
+// props inherited from BCTW types
+type TelemetryAlertCollar = Pick<Collar, | 'collar_id' | 'device_id' | 'device_status'
+| 'device_deployment_status' | 'retrieval_date' | 'retrieved' | 'vendor_activation_status'>;
+type TelemetryAlertAnimal = Pick<Animal, | 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id'
+| 'mortality_date' | 'mortality_latitude' | 'mortality_longitude' | 'mortality_utm_easting' | 'mortality_utm_northing' | 'mortality_utm_zone' >;
 
-interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar  {
+interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar {
   alert_id: number;
   alert_type: eAlertType;
   valid_from: Date;
   valid_to: Date;
   snoozed_to: Date;
   snooze_count: number;
-}
-
-interface ITelemetryAlertInput {
-  alert_ids: number[];
-  alert_action: 'dismiss';
 }
 
 export class TelemetryAlert implements ITelemetryAlert, BCTW {
@@ -41,21 +39,21 @@ export class TelemetryAlert implements ITelemetryAlert, BCTW {
   device_make: string;
   device_status: string;
   device_deployment_status: string;
-  @Transform(v => v || new Date(), transformOpt) retrieval_date: Date;
+  @Transform((v) => v || new Date(), transformOpt) retrieval_date: Date;
   @Transform((v) => v || false, transformOpt) retrieved: boolean;
   vendor_activation_status: boolean;
   critter_id: string;
   animal_id: string;
   wlh_id: string;
   animal_status: string;
-  @Transform(v => v || new Date(), transformOpt) mortality_date: Date;
-  mortality_latitude: number; 
+  @Transform((v) => v || new Date(), transformOpt) mortality_date: Date;
+  mortality_latitude: number;
   mortality_longitude: number;
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
   @Expose() get isSnoozed(): boolean {
-    return dayjs().isBefore(dayjs(this.snoozed_to))
+    return dayjs().isBefore(dayjs(this.snoozed_to));
   }
   @Expose() get identifier(): string {
     return 'alert_id';
@@ -63,29 +61,53 @@ export class TelemetryAlert implements ITelemetryAlert, BCTW {
   @Expose() get snoozesMax(): number {
     return 3;
   }
+  @Expose() get snoozeStatus(): string {
+    if (this.isSnoozed) {
+      return 'currently snoozed';
+    } else {
+      return `${this.snoozesMax - this.snooze_count} snoozes available`;
+    }
+  }
   @Expose() get formatAlert(): string {
-    switch(this.alert_type) {
+    switch (this.alert_type) {
       case eAlertType.mortality:
         return 'Potential Mortality';
       case eAlertType.battery:
-        return 'Low Battery'
+        return 'Low Battery';
       default:
         return 'unknown';
     }
   }
 
   static formatPropAsHeader(str: string): string {
-    switch(str) {
+    switch (str) {
       case 'valid_from':
         return 'Notification Time';
-      default: 
+      default:
         return columnToHeader(str);
     }
   }
+
+  performSnooze(): TelemetryAlert {
+    this.snooze_count++;
+    const curSnooze: Dayjs = dayjs(this.snoozed_to ?? dayjs());
+    this.snoozed_to = curSnooze.add(1, 'day').toDate();
+    return this;
+  }
+  expireAlert(): TelemetryAlert {
+    this.valid_to = new Date();
+    return this;
+  }
+
+  // for saving
+  toJSON(): Record<string, unknown> {
+    return {
+      alert_id: this.alert_id,
+      valid_to: this.valid_to === null ? null : dayjs().subtract(1, 'hour').format(formatTime),
+      snooze_count: this.snooze_count,
+      snoozed_to: this.snoozed_to === null ? null : dayjs(this.snoozed_to).format(formatTime)
+    };
+  }
 }
 
-export type {
-  eAlertType,
-  ITelemetryAlert,
-  ITelemetryAlertInput,
-}
+export type { eAlertType, ITelemetryAlert };

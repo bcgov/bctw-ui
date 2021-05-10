@@ -35,7 +35,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
     setInputTypes(
       getInputTypesOfT<Animal>(
         editing,
-        allFields.map((a) => a.prop),
+        allFields,
         allFields.filter((f) => f.isCode).map((a) => a.prop)
       )
     );
@@ -91,15 +91,17 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
           };
 
           const makeFormField = (formType: FormInputType): React.ReactNode => {
+            const { key } = formType;
             return MakeEditField({
               formType,
               handleChange: onChange,
               disabled: !canEdit,
-              required: requiredFields.includes(formType.key),
+              required: requiredFields.includes(key),
+              label: editing.formatPropAsHeader(key),
               /* does the errors object have a property matching this key?
                 if so, get its error
               */
-              errorMessage: !!errors[formType.key] && (errors[formType.key] as string),
+              errorMessage: !!errors[key] && (errors[key] as string),
               span: true
             });
           };
@@ -135,8 +137,8 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                     </span>
                 </div>
               </Paper>
-              <Paper elevation={0} className={'dlg-full-body'}>
-                <h2 className={'dlg-full-body-subtitle'}>Animal Details</h2>
+              <Paper elevation={0}>
+                <h2>Animal Details</h2>
                 <Paper elevation={3} className={'dlg-full-body-details'}>
                   <div className={'dlg-details-section'}>
                   <h3>Identifiers</h3>

@@ -21,16 +21,17 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const p = plainToClass(TelemetryDetail, feature.properties);
   const t = dayjs(p.date_recorded).format(formatLocal);
   const text = `
-    ${p.species ? 'Species: ' + p.species  + '<br>' : ''}
+    ${p.species ? 'Species: ' + p.species + '<br>' : ''}
     ${p.wlh_id ? 'WLH ID: ' + p.wlh_id + '<br>' : ''}
     ${p.animal_id ? 'Animal ID: ' + p.animal_id + '<br>' : ''}
     Device ID: ${p.formattedDevice}<br>
     Frequency (MHz): ${p.paddedFrequency}<br>
     ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
     ${p.animal_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
+    ${p.sex ? 'Sex: ' + p.sex + '<br>' : ''}
     ${p.device_status ? 'Device Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
     Time: ${dayjs(t).format('MMMM D, YYYY h:mm A')} UTC<br>
-    Location: ${p.collective_unit}
+    ${p.collective_unit ? 'Location: ' + '<b>' + p.collective_unit + '</b><br' : ''}
   `;
   doc.innerHTML = text;
   doc.classList.add('appear-above-map');

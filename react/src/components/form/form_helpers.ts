@@ -1,4 +1,4 @@
-import { getProperty } from 'utils/common';
+import { FormFieldObject } from 'types/common_types';
 
 export enum eInputType {
   text = 'text',
@@ -24,27 +24,27 @@ export type FormInputType = {
  * @param selectableProps which properties will be used in select inputs
  * @return array of @type {FormInputType}
  */
-function getInputTypesOfT<T>(obj: T, editableProps: string[], selectableProps: string[]): FormInputType[] {
-  return editableProps.map((key: string) => {
-    if (selectableProps.includes(key)) {
-      return { key, type: eInputType.select, value: obj[key] };
+function getInputTypesOfT<T>(obj: T, editableProps: FormFieldObject[], selectableProps: string[]): FormInputType[] {
+  return editableProps.map((field: FormFieldObject) => {
+    const { prop, isCode, isDate } = field;
+    if (selectableProps.includes(prop)) {
+      return { key: prop, type: eInputType.select, value: obj[prop] };
     }
-    if (stringsThatAreBools.includes(obj[key]) || propsToRenderAsCheckbox.includes(key)) {
-      return { key, type: eInputType.check, value: obj[key] };
+    if (stringsThatAreBools.includes(obj[prop]) || propsToRenderAsCheckbox.includes(prop)) {
+      return { key: prop, type: eInputType.check, value: obj[prop] };
     }
-    const valType = getProperty(obj, key as any);
-    const value = obj[key];
-    if (typeof (valType as Date)?.getDay === 'function') {
-      return { key, type: eInputType.date, value };
+    const value = obj[prop];
+    if (typeof (value as Date)?.getDay === 'function' || isDate) {
+      return { key: prop, type: eInputType.date, value };
     } else {
-      switch (typeof valType) {
+      switch (typeof value) {
         case 'number':
-          return { key, type: eInputType.number, value };
+          return { key: prop, type: eInputType.number, value };
         case 'boolean':
-          return { key, type: eInputType.check, value };
+          return { key: prop, type: eInputType.check, value };
         case 'string':
         default:
-          return { key, type: eInputType.text, value };
+          return { key: prop, type: eInputType.text, value };
       }
     }
   });

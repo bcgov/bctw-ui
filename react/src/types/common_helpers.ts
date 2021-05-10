@@ -1,3 +1,5 @@
+import { BCTW } from "./common_types";
+
 const countDecimals = (value: number): number => {
   if(Math.floor(value) === value) return 0;
   return value.toString().split(".")[1].length || 0; 
@@ -13,6 +15,9 @@ const formatLatLong = (lat: number, long: number): string => {
   return `${lat.toFixed(2)}\xb0 ${long.toFixed(2)}\xb0`;
 }
 
+const formatLabel = <T extends BCTW>(o: T, key: string): string => 
+  o.formatPropAsHeader(key);
+
 const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
 
 export {
@@ -20,4 +25,5 @@ export {
   evaluateBoolean,
   formatLatLong,
   formatUTM,
+  formatLabel,
 }

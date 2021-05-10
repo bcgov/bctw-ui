@@ -1,5 +1,11 @@
 @import 'styles/colours.scss';
 
+// dialogs in non-fullscreen have 600px max by default
+.dialog-modal {
+  .MuiDialog-paperWidthSm {
+    max-width: 80%;
+  }
+}
 .MuiDialog-paperFullScreen {
   background-color: #f1f3f5 !important;
 }
@@ -36,28 +42,7 @@
   }
 }
 
-.dlg-full-body {
-  background-color: #f1f3f5 !important;
-  padding: 0 4rem;
-}
-
-.dlg-full-body-subtitle {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-content: center;
-
-  // .MuiButton-outlinedPrimary {
-  //   background-color: #ffffff;
-  //   border: 0.15rem solid $BCgovBlue;
-  //   color: $BCgovBlue;
-  //   height: 2.5rem;
-  //   margin-top: 1rem;
-  // }
-}
-
 .dlg-full-body-details {
-  background-color: #fff !important;
   margin-bottom: 2rem;
 }
 

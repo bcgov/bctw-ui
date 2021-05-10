@@ -1,5 +1,5 @@
 import { columnToHeader } from 'utils/common';
-import { BCTW, BCTWBaseType } from 'types/common_types';
+import { BCTW, BCTWBaseType, FormFieldObject } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';
 
@@ -95,9 +95,12 @@ export class Collar implements ICollar {
   @Type(() => Date) valid_to: Date;
   @Expose() get identifier(): string { return 'collar_id' }
 
+  // fixme: 
   constructor(collar_type?: eNewCollarType) {
     this.retrieval_date = new Date();
     this.malfunction_date = new Date();
+    this.vendor_activation_status = false;
+    this.device_id = 0;
     if (collar_type) {
       switch(collar_type) {
         case eNewCollarType.VHF:
@@ -120,13 +123,15 @@ export class Collar implements ICollar {
       case 'device_model':
       case 'device_deployment_status':
         return columnToHeader(str.replace('device_', ''));
+      case 'vendor_activation_status':
+        return 'Is device deactivated?'
       default:
         return columnToHeader(str);
     }
   }
 }
 
-const collarFormFields = {
+const collarFormFields: Record<string, FormFieldObject[]> = {
   generalFields: [
     { prop: 'device_id' },
     { prop: 'device_type', isCode: true },
@@ -142,7 +147,7 @@ const collarFormFields = {
     { prop: 'device_status', isCode: true },
     { prop: 'vendor_activation_status' },
     { prop: 'device_deployment_status', isCode: true },
-    { prop: 'retrieval_date' }
+    { prop: 'retrieval_date', isDate: true }
   ]
 }
 

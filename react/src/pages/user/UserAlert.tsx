@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { CircularProgress, IconButton, TableHead, Typography } from '@material-ui/core';
-import { ITelemetryAlertInput, TelemetryAlert } from 'types/alert';
+import { TelemetryAlert } from 'types/alert';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@material-ui/core';
 import { dateObjectToTimeStr } from 'utils/time';
@@ -36,8 +36,8 @@ export default function AlertPage(): JSX.Element {
     update();
   }, [useAlerts]);
 
-  const onDismissSuccess = async (): Promise<void> => {
-    // responseDispatch({ type: 'success', message: `telemetry alert dismissed` });
+  const onAlertSavedSuccess = async (): Promise<void> => {
+    responseDispatch({ type: 'success', message: `telemetry alert saved` });
   };
 
   const onSuccess = async (data: IBulkUploadResults<Animal | Collar>): Promise<void> => {
@@ -49,8 +49,10 @@ export default function AlertPage(): JSX.Element {
       responseDispatch({ type: 'success', message: 'event saved!' });
     }
     if ((results as Collar[])[0]?.collar_id) {
-      // only refetch if sucessful
-      await updateAlert();
+      // this alert is now considered 'expired'.
+      const a = Object.assign(new TelemetryAlert(), selectedAlert);
+      a.expireAlert();
+      await updateAlert(a);
     }
   };
 
@@ -58,7 +60,7 @@ export default function AlertPage(): JSX.Element {
 
   // setup the mutations for saving critters, collars, and updating the alert
   const { mutateAsync: saveAlert, isLoading: isSavingAlert } = bctwApi.useMutateUserAlert({
-    onSuccess: onDismissSuccess,
+    onSuccess: onAlertSavedSuccess,
     onError
   });
   const { mutateAsync: saveCritter } = bctwApi.useMutateCritter({ onSuccess, onError });
@@ -70,8 +72,12 @@ export default function AlertPage(): JSX.Element {
   };
 
 
+  /**
+   * performs updates of collar and critter
+   * note: move this into its own hook, but keep as separate api endpoint calls? 
+   */
   const handleSave = async (animal: Animal, collar: Collar): Promise<void> => {
-    responseDispatch({ type: 'error', message: `not enabled yet!` });
+    responseDispatch({ type: 'error', message: `saving mortality event not enabled yet!` });
     return;
     if (animal && animal.critter_id) {
       // console.log('critter payload', animal);
@@ -85,21 +91,21 @@ export default function AlertPage(): JSX.Element {
     }
   };
 
+  /**
+   * posts the updated alert to API
+   */
+  const updateAlert = async (alert: TelemetryAlert): Promise<void> => {
+    console.log('saving this alert', alert.toJSON());
+    // responseDispatch({ type: 'error', message: `snoozing not enabled yet!` });
+    await saveAlert([alert]);
+    // trigger the alert context to refetch
+    useAlerts.invalidate();
+  };
+
+  // user selected to take action on the alert, show the update modal
   const editAlert = (row: TelemetryAlert): void => {
     setSelectedAlert(row);
     setShowUpdateModal(true);
-  };
-
-  const updateAlert = async (): Promise<void> => {
-    responseDispatch({ type: 'error', message: `snoozing not enabled yet!` });
-    return;
-    const payload: ITelemetryAlertInput = {
-      alert_ids: [selectedAlert?.alert_id],
-      alert_action: 'dismiss'
-    };
-    await saveAlert(payload);
-    // trigger context to reload alerts
-    useAlerts.invalidate();
   };
 
   // show the modal that requires the user to confirm the snooze action
@@ -109,9 +115,11 @@ export default function AlertPage(): JSX.Element {
     setShowSnoozeModal(true);
   };
 
-  // when the user clicks 'yes' in the confirmation modal
-  const handleConfirmSnooze = (): void => {
-    updateAlert();
+  // when the snooze action is confirmed, update the snooze and call {updateAlert}
+  const handleConfirmSnooze = async (): Promise<void> => {
+    const snoozed = Object.assign(new TelemetryAlert(), selectedAlert);
+    snoozed.performSnooze();
+    await updateAlert(snoozed);
     setShowSnoozeModal(false);
   };
 
@@ -124,13 +132,14 @@ export default function AlertPage(): JSX.Element {
     'valid_from',
     'update',
     'Snooze Status',
-    'Snooze Count',
+    'Snoozes Used',
     'Snooze'
   ];
 
   if (!alerts?.length) {
     return <div>no alerts</div>;
   }
+
   return (
     <div className={'container'}>
       <Typography variant='h4'>Alerts</Typography>
@@ -168,19 +177,16 @@ export default function AlertPage(): JSX.Element {
                           <Icon icon='edit' />
                         </IconButton>
                       </TableCell>
-                      <TableCell>{a.isSnoozed ? 'Snoozed' : 'Not Snoozed'}</TableCell>
+                      <TableCell>{a.snoozeStatus}</TableCell>
                       <TableCell>{a.snooze_count}</TableCell>
                       <TableCell>
-                        {a.isSnoozed ? null : a.snooze_count < 3 ? (
+                        {a.isSnoozed ? null : a.snooze_count < a.snoozesMax ? (
                           <IconButton onClick={(): void => handleClickSnooze(a)}>
                             <Icon icon='snooze' />
                           </IconButton>
                         ) : (
-                          <IconButton
-                            onClick={(): void =>
-                              responseDispatch({ type: 'error', message: 'no more snoozes available!' })
-                            }>
-                            <Icon icon='cannotSnooze' />
+                          <IconButton disabled={true} >
+                            <Icon icon='cannotSnooze'/>
                           </IconButton>
                         )}
                       </TableCell>

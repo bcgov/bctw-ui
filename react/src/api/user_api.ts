@@ -1,7 +1,6 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { ITelemetryAlertInput, TelemetryAlert } from 'types/alert';
-import { ITelemetryDetail } from 'types/map';
+import { TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { eCritterPermission, IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 import {
@@ -60,14 +59,15 @@ export const userApi = (props: ApiProps) => {
     // console.log('fetching user alerts')
     const url = createUrl({api: 'get-user-alerts'});
     const { data } = await api.get(url);
-    const converted = data?.map((json: ITelemetryDetail[]) => plainToClass(TelemetryAlert, json));
+    const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
     return converted;
   }
 
-  const updateAlert = async (body: ITelemetryAlertInput[]): Promise<boolean> => {
-    const url = createUrl({api: 'expire-user-alert'});
+  const updateAlert = async (body: TelemetryAlert[]): Promise<TelemetryAlert[]> => {
+    const url = createUrl({api: 'update-user-alert'});
     const { data } = await api.post(url, body);
-    return true;
+    const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
+    return converted;
   }
 
   const getUDF = async (
