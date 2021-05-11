@@ -81,8 +81,8 @@ const MapStrings = {
   toggleFixesLabel: 'Toggle fixes',
   toggleTracksLabel: 'Toggle tracks',
   drawLineLabel: 'Measure distance',
-  drawPolygonLabel: 'Select fixes by polygon',
-  drawRectangleLabel: 'Select fixes by rectangle',
+  drawPolygonLabel: 'Select fixes by drawing a polygon',
+  drawRectangleLabel: 'Select fixes by drawing a rectangle',
 }
 
 const MapTileLayers = {
