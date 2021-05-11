@@ -192,9 +192,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 {/* render the date pickers */}
 
                 <LightTooltip title={
-                  <>
                     <p>{MapStrings.startDateTooltip}</p>
-                  </>
                 } placement='right-start' enterDelay={750}>
                   <span>
                     <TextField
@@ -208,9 +206,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   </span>
                 </LightTooltip>
                 <LightTooltip title={
-                  <>
                     <p>{MapStrings.endDateTooltip}</p>
-                  </>
                 } placement='right-start' enterDelay={750}>
                   <span>
                     <TextField
@@ -243,9 +239,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <div>
                 {/* render the last pings/ last 10 fixes checkboxes */}
                 <LightTooltip title={
-                  <>
                     <p>{MapStrings.lastKnownLocationTooltip}</p>
-                  </>
                 } placement='right-start' enterDelay={750}>
                   <span>
                     <Checkbox
@@ -257,9 +251,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   </span>
                 </LightTooltip>
                 <LightTooltip title={
-                  <>
                     <p>{MapStrings.lastFixesTooltip}</p>
-                  </>
                 } placement='right-start' enterDelay={750}>
                   <span>
                     <Checkbox
@@ -290,9 +282,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               {createMultiSelects()}
               {/* render the custom animal set component */}
               <LightTooltip title={
-                <>
                   <p>{MapStrings.customAnimalGroupLabelTooltip}</p>
-                </>
               } placement='right-start' enterDelay={750}>
                 <div className={'side-panel-udf'}>
                   <SelectUDF

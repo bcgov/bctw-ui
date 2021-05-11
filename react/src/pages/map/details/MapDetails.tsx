@@ -88,9 +88,7 @@ export default function MapDetails({
       <div className={'map-bottom-panel-title'}>
 
         <LightTooltip title={
-          <>
             <p>{MapStrings.showOnlyCheckedTooltip}</p>
-          </>
         } placement='left-start' enterDelay={750}>
           <span>
             <Checkbox
