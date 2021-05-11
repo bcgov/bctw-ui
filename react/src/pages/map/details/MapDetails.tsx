@@ -7,6 +7,7 @@ import MapExport from 'pages/map/MapExport';
 import { Button } from '@material-ui/core';
 import { MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { LightTooltip } from 'components/modal/Tooltip';
 
 export type MapDetailsBaseProps = {
   handleRowSelected: OnPanelRowSelect;
@@ -76,7 +77,7 @@ export default function MapDetails({
   };
 
   const handleShowSelectedChecked = (val: Record<string, boolean>): void => {
-    const isChecked = val[MapStrings.onlySelectedLabel];
+    const isChecked = val[MapStrings.showOnlyCheckedLabel];
     setShowOnlySelected(isChecked);
     // call the parent handler
     handleShowOnlySelected({show: isChecked, critter_ids: pingGroupChecked.map(g => g.critter_id)});
@@ -85,11 +86,20 @@ export default function MapDetails({
   return (
     <>
       <div className={'map-bottom-panel-title'}>
-        <Checkbox
-          label={MapStrings.onlySelectedLabel}
-          initialValue={false}
-          changeHandler={handleShowSelectedChecked}
-        />
+
+        <LightTooltip title={
+          <>
+            <p>{MapStrings.showOnlyCheckedTooltip}</p>
+          </>
+        } placement='left-start' enterDelay={750}>
+          <span>
+            <Checkbox
+              label={MapStrings.showOnlyCheckedLabel}
+              initialValue={false}
+              changeHandler={handleShowSelectedChecked}
+            />
+          </span>
+        </LightTooltip>
         <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
       </div>
       <MapDetailsGrouped

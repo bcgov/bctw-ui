@@ -8,6 +8,7 @@ import React, { MutableRefObject } from 'react';
 import { MapTileLayers } from 'constants/strings';
 import { ITelemetryPoint, TelemetryDetail } from 'types/map';
 import { plainToClass } from 'class-transformer';
+import { MapStrings } from 'constants/strings';
 
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
@@ -87,6 +88,9 @@ const initMap = (
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
   const layerPicker = L.control.layers(null ,null,{position: 'topleft'});
+  L.drawLocal.draw.toolbar.buttons.polyline = MapStrings.drawLineLabel;
+  L.drawLocal.draw.toolbar.buttons.polygon = MapStrings.drawPolygonLabel;
+  L.drawLocal.draw.toolbar.buttons.rectangle = MapStrings.drawRectangleLabel;
   addTileLayers(mapRef, layerPicker);
 
   mapRef.current.addLayer(drawnItems);

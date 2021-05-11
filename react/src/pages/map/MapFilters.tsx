@@ -190,22 +190,39 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             <div className='side-panel-body'>
               <div className={'side-panel-dates'}>
                 {/* render the date pickers */}
-                <TextField
-                  outline={true}
-                  label={MapStrings.filterRangeStart}
-                  type='date'
-                  defaultValue={start}
-                  propName='tstart'
-                  changeHandler={(e): void => setStart(e['tstart'] as string)}
-                />
-                <TextField
-                  outline={true}
-                  label={MapStrings.filterRangeEnd}
-                  type='date'
-                  defaultValue={end}
-                  propName='tend'
-                  changeHandler={(e): void => setEnd(e['tend'] as string)}
-                />
+
+                <LightTooltip title={
+                  <>
+                    <p>{MapStrings.startDateTooltip}</p>
+                  </>
+                } placement='right-start' enterDelay={750}>
+                  <span>
+                    <TextField
+                      outline={true}
+                      label={MapStrings.startDateLabel}
+                      type='date'
+                      defaultValue={start}
+                      propName='tstart'
+                      changeHandler={(e): void => setStart(e['tstart'] as string)}
+                    />
+                  </span>
+                </LightTooltip>
+                <LightTooltip title={
+                  <>
+                    <p>{MapStrings.endDateTooltip}</p>
+                  </>
+                } placement='right-start' enterDelay={750}>
+                  <span>
+                    <TextField
+                      outline={true}
+                      label={MapStrings.endDateLabel}
+                      type='date'
+                      defaultValue={end}
+                      propName='tend'
+                      changeHandler={(e): void => setEnd(e['tend'] as string)}
+                    />
+                  </span>
+                </LightTooltip>
               </div>
               <LightTooltip title={
                 <>
@@ -213,7 +230,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
                   <p>{MapStrings.assignmentStatusTooltip3}</p>
                 </>
-              } placement='right-start' enterDelay={400}>
+              } placement='right-start' enterDelay={750}>
                 <div>
                   {/* render the unassigned/assigned data points selector */}
                   <MultiSelect
@@ -225,42 +242,70 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               </LightTooltip>
               <div>
                 {/* render the last pings/ last 10 fixes checkboxes */}
-                <Checkbox
-                  label={MapStrings.lastPingLabel}
-                  initialValue={isLatestPing}
-                  changeHandler={(): void => setIsLatestPing(o => !o)}
-                  disabled={isLastFixes}
-                />
-                <Checkbox
-                  label={MapStrings.lastFixesLabel}
-                  initialValue={isLastFixes}
-                  changeHandler={(): void => setIsLastFixes(o => !o)}
-                  disabled={isLatestPing}
-                />
+                <LightTooltip title={
+                  <>
+                    <p>{MapStrings.lastKnownLocationTooltip}</p>
+                  </>
+                } placement='right-start' enterDelay={750}>
+                  <span>
+                    <Checkbox
+                      label={MapStrings.lastKnownLocationLabel}
+                      initialValue={isLatestPing}
+                      changeHandler={(): void => setIsLatestPing(o => !o)}
+                      disabled={isLastFixes}
+                  />
+                  </span>
+                </LightTooltip>
+                <LightTooltip title={
+                  <>
+                    <p>{MapStrings.lastFixesTooltip}</p>
+                  </>
+                } placement='right-start' enterDelay={750}>
+                  <span>
+                    <Checkbox
+                      label={MapStrings.lastFixesLabel}
+                      initialValue={isLastFixes}
+                      changeHandler={(): void => setIsLastFixes(o => !o)}
+                      disabled={isLatestPing}
+                    />
+                  </span>
+                </LightTooltip>
               </div>
-              <div>
-                {/* render the device list selector */}
-                <AutoComplete
-                  label={MapStrings.deviceSelectedLabel}
-                  data={createDeviceList()}
-                  changeHandler={handleChangeDeviceList}
-                  triggerReset={reset}
-                />
-              </div>
+              {/* render the device list selector */}
+              <LightTooltip title={
+                <>
+                  <p>{MapStrings.deviceListTooltip}</p>
+                </>
+              } placement='right-start' enterDelay={750}>
+                <div>
+                    <AutoComplete
+                      label={MapStrings.deviceListLabel}
+                      data={createDeviceList()}
+                      changeHandler={handleChangeDeviceList}
+                      triggerReset={reset}
+                    />
+                </div>
+              </LightTooltip>
               {/* render the other select filter components */}
               {createMultiSelects()}
               {/* render the custom animal set component */}
-              <div className={'side-panel-udf'}>
-                <SelectUDF
-                  triggerReset={reset}
-                  udfType={eUDFType.critter_group}
-                  label={MapStrings.filterUserCritterGroup}
-                  changeHandler={handleChangeUDF}
-                />
-                <IconButton onClick={props.onClickEditUdf}>
-                  <Icon icon='edit' />
-                </IconButton>
-              </div>
+              <LightTooltip title={
+                <>
+                  <p>{MapStrings.customAnimalGroupLabelTooltip}</p>
+                </>
+              } placement='right-start' enterDelay={750}>
+                <div className={'side-panel-udf'}>
+                  <SelectUDF
+                    triggerReset={reset}
+                    udfType={eUDFType.critter_group}
+                    label={MapStrings.customAnimalGroupLabel}
+                    changeHandler={handleChangeUDF}
+                  />
+                  <IconButton onClick={props.onClickEditUdf}>
+                    <Icon icon='edit' />
+                  </IconButton>
+                </div>
+              </LightTooltip>
               <hr />
               <div className={'side-btns'}>
                 <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>
