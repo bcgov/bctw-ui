@@ -15,11 +15,38 @@ import { IUpsertPayload } from 'api/api_interfaces';
 import { Collar } from 'types/collar';
 import { Animal } from 'types/animal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import MultiSelect from 'components/form/MultiSelect';
 
 type MortEventProps = ModalBaseProps & {
   alert: TelemetryAlert;
   handleSave: (animal: Animal, collar: Collar) => void;
 };
+
+// temporary: for UAT2 workshop
+const pcodPredatorSpeciesValues = [
+  { id: 0, value: 'Coyote' },
+  { id: 1, value: 'Unknown Canid' },
+  { id: 2, value: 'Bobcat' }
+]
+
+// temporary: for UAT2 workshop
+const pcodValues = [
+  { id: 0, value: 'predation_location', displayLabel: 'Predation: Location known' },
+  { id: 1, value: 'predation_no_location', displayLabel: 'Predation: Location unknown' },
+  { id: 2, value: 'predation_probable', displayLabel: 'Predation: Suspected' },
+  { id: 3, value: 'hunting_unlicenced', displayLabel: 'Hunting: Unlicensed' },
+  { id: 4, value: 'hunting_licenced', displayLabel: 'Hunting: Licensed' },
+  { id: 5, value: 'accident_collision', displayLabel: 'Accident: Vehicular collision' },
+  { id: 6, value: 'accident_natural', displayLabel: 'Accident: Natural' },
+  { id: 7, value: 'accident_capture', displayLabel: 'Accident: Capture-related injury' },
+  { id: 8, value: 'health_related', displayLabel: 'Health-related' },
+  { id: 9, value: 'health_starvation', displayLabel: 'Health-related: Starvation' },
+  { id: 10, value: 'unknown', displayLabel: 'Unknown' },
+  { id: 11, value: 'other', displayLabel: 'Other' },
+  { id: 12, value: 'natural', displayLabel: 'Natual' },
+  { id: 13, value: 'removal', displayLabel: 'Removal' },
+  { id: 14, value: 'trapping', displayLabel: 'Trapping' }
+]
 
 export default function MortalityEventForm({ alert, open, handleClose, handleSave }: MortEventProps): JSX.Element {
   const [errors, setErrors] = useState({});
@@ -29,10 +56,12 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
   const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.editableProps, mortalityEvent.propsThatAreCodes);
   const required = true;
 
+  const deviceUnassignedField = formFields.find(f => f.key === 'deviceUnassigned');
   const retrievedField = formFields.find(f => f.key === 'retrieved');
   const retrievedDateField = formFields.find(f => f.key === 'retrieval_date');
   const animalStatusField = formFields.find(f => f.key === 'animal_status');
-  const vafField = formFields.find(f => f.key === 'vendor_activation_status');
+  const pcodConfidenceValueField = formFields.find(f => f.key === 'pcod_confidence_value');
+  const vasField = formFields.find(f => f.key === 'vendor_activation_status');
   const deviceStatusFields = formFields.filter(f => ['device_status', 'device_deployment_status'].includes(f.key))
 
   /**
@@ -114,7 +143,13 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                 <h2 className={'dlg-full-body-subtitle'}></h2>
                 <Paper elevation={3} className={'dlg-full-body-details'}>
                   <div className={'dlg-details-section'}>
-                    <h3>Device Details</h3>
+                    <h3>Update Assignment Details</h3>
+                    <div>
+                      {CreateEditCheckboxField({formType: deviceUnassignedField, label: asTableHeader("Unassign device from animal?"), handleChange: onChange})}
+                    </div>
+                  </div>
+                  <div className={'dlg-details-section'}>
+                    <h3>Update Device Details</h3>
                     <div>
                       {CreateEditCheckboxField({formType: retrievedField, label: asTableHeader(retrievedField.key), handleChange: onChange})}
                     </div>
@@ -122,7 +157,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                       {CreateEditDateField({formType: retrievedDateField, label: asTableHeader(retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
                     </div>
                     <div style={{marginBottom: '10px'}}>
-                      {CreateEditCheckboxField({formType: vafField, label: asTableHeader(vafField.key), handleChange: onChange})}
+                      {CreateEditCheckboxField({formType: vasField, label: asTableHeader(vasField.key), handleChange: onChange})}
                     </div>
                     {deviceStatusFields.map((formType) => {
                       return MakeEditField({
@@ -134,8 +169,21 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                     })}
                   </div>
                   <div className={'dlg-details-section'}>
-                    <h3>Animal Details</h3>
+                    <h3>Update Animal Details</h3>
                     {MakeEditField({formType: animalStatusField, handleChange: onChange, required, errorMessage: ''})}
+                    { /* temporary: for UAT2 workshop */ }
+                    <div style={{marginBottom: '18px'}}>
+                      <MultiSelect label="Proximate Cause of Death" changeHandler={() => ""} data={pcodValues} />
+                    </div>
+                    <div style={{marginBottom: '18px'}}>
+                      <MultiSelect label="Predator Species" changeHandler={() => ""} data={pcodPredatorSpeciesValues} />
+                    </div>
+                    <div style={{marginBottom: '6px'}}>
+                      {MakeEditField({formType: pcodConfidenceValueField, label: "Confidence", handleChange: onChange, errorMessage: ''})}
+                    </div>
+                  </div>
+                  <div className={'dlg-details-section'}>
+                    <h3>Event Details &amp; Comment</h3>
                     <LocationEventForm event={locationEvent} handleChange={onChangeLocationProp} />
                   </div>
                 </Paper>

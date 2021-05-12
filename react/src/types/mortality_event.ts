@@ -20,6 +20,10 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
   device_deployment_status: string;
   device_status: string;
   location_event: LocationEvent;
+  deviceUnassigned: boolean;
+  // pcod: string;
+  // pcod_predator_species: string;
+  pcod_confidence_value: string;
 
   constructor(critterId: string, collarId: string, deviceId: number) {
     this.critter_id = critterId;
@@ -32,13 +36,22 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
     this.animal_status = 'Potential Mortality';
+    this.deviceUnassigned = true;
   }
 
   formatPropAsHeader(s: string): string {
     switch(s) {
+      case 'retrieved':
+        return 'Device Has Been retrieved?'
       case 'vendor_activation_status':
-        return 'Is device deactivated?'
-      default:
+        return 'Is Device Still Active With Vendor?'
+      case 'pcod':
+        return 'Proximate Cause of Death' 
+      case 'pcod_predator_species':
+        return 'PCOD Predator Species' 
+      case 'pcod_confidence_value':
+        return 'PCOD Confidence Value' 
+        default:
         return columnToHeader(s);
     }
   }
