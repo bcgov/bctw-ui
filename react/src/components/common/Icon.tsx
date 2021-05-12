@@ -16,7 +16,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import EditIcon from '@material-ui/icons/Edit';
+import SnoozeIcon from '@material-ui/icons/Snooze';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import AlarmOffIcon from '@material-ui/icons/AlarmOff';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -38,6 +40,8 @@ const mappings: Record<string, JSX.Element> = {
   error: <ErrorIcon htmlColor='orange'/>,
   edit: <EditIcon />,
   copy: <FileCopyIcon />,
+  snooze: <SnoozeIcon />,
+  cannotSnooze: <AlarmOffIcon />
 };
 
 type IconProps = {

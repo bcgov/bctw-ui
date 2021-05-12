@@ -92,7 +92,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   };
 
   // when user changes the group name textfield
-  const handleChangeName = (v: Record<string, string | number>, udf: IUDF): void => {
+  const handleChangeName = (v: Record<string, string | number | boolean>, udf: IUDF): void => {
     const newKey = v['group'] as string;
     if (!newKey) {
       return;

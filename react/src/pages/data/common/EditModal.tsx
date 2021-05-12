@@ -13,6 +13,11 @@ import HistoryPage from './HistoryPage';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
 import Modal from 'components/modal/Modal';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+
+/**
+ * todo: fixme: move form error handling to this component
+ */
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -23,6 +28,7 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
   showInFullScreen?: boolean;
   onReset?: () => void;
   onValidate?: (o: T) => boolean;
+  hasErrors?: () => boolean;
 };
 
 /**
@@ -51,7 +57,8 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     isEdit,
     hideHistory = false,
     hideSave = false,
-    showInFullScreen = true
+    showInFullScreen = true,
+    hasErrors,
   } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
@@ -79,6 +86,12 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     updateParams();
   }, [editing]);
 
+  useDidMountEffect(() => {
+    if (open) {
+      setCanSave(false);
+    }
+  }, [open])
+
   const displayHistory = (): void => {
     setShowHistory((o) => !o);
   };
@@ -94,14 +107,25 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
       isEdit,
       // use Object.assign to preserve class methods
       body: Object.assign(omitNull(editing), omitNull(newObj))
-      // { ...omitNull(editing), ...omitNull(newObj) }
     };
     // console.log(JSON.stringify(toSave))
     onSave(toSave);
   };
 
   // triggered on a form input change, newProp will be an object with a single key and value
+  // fixme: why does isChange exist
   const handleChange = (newProp: Record<string, unknown>, isChange = true): void => {
+    if (newProp.hasError) {
+      setCanSave(false);
+      return;
+    }
+    // todo: only when prop has actually changed 
+    // otherwise enabled at form load
+    if (typeof hasErrors === 'function') {
+      const hasEm = hasErrors();
+      setCanSave(!hasEm);
+      return;
+    }
     setNewObj((old) => Object.assign(old, newProp));
     // get the first key
     const key: string = Object.keys(newProp)[0];

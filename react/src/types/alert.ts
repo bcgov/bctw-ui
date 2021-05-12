@@ -3,6 +3,7 @@ import { columnToHeader } from 'utils/common';
 import { Animal, transformOpt } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTW } from 'types/common_types';
+import dayjs from 'dayjs';
 
 enum eAlertType {
   battery = 'battery',
@@ -19,6 +20,8 @@ interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar  {
   alert_type: eAlertType;
   valid_from: Date;
   valid_to: Date;
+  snoozed_to: Date;
+  snooze_count: number;
 }
 
 interface ITelemetryAlertInput {
@@ -31,6 +34,8 @@ export class TelemetryAlert implements ITelemetryAlert, BCTW {
   alert_type: eAlertType;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
+  @Type(() => Date) snoozed_to: Date;
+  snooze_count: number;
   collar_id: string;
   device_id: number;
   device_make: string;
@@ -49,8 +54,14 @@ export class TelemetryAlert implements ITelemetryAlert, BCTW {
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
+  @Expose() get isSnoozed(): boolean {
+    return dayjs().isBefore(dayjs(this.snoozed_to))
+  }
   @Expose() get identifier(): string {
     return 'alert_id';
+  }
+  @Expose() get snoozesMax(): number {
+    return 3;
   }
   @Expose() get formatAlert(): string {
     switch(this.alert_type) {
