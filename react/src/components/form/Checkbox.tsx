@@ -3,6 +3,7 @@ import { Checkbox as MuiCheckbox, CheckboxProps } from '@material-ui/core/';
 import { FormControlLabel } from '@material-ui/core';
 import { CheckBoxChangeHandler } from 'components/component_interfaces';
 import { columnToHeader, removeProps } from 'utils/common';
+import { inputPropsToRemove } from './Input';
 
 interface ICheckboxProps extends CheckboxProps {
   initialValue: boolean;
@@ -27,7 +28,7 @@ export default function Checkbox(props: ICheckboxProps): JSX.Element {
   }, [initialValue]);
 
   // passing props that dont belong in dom is throwing errors
-  const propsToPass = removeProps(props, ['changeHandler', 'initialValue']);
+  const propsToPass = removeProps(props, [...inputPropsToRemove, 'initialValue']);
 
   return (
     <>

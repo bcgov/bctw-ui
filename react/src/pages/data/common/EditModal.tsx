@@ -97,14 +97,14 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   };
 
   const handleSave = (): void => {
+    // use Object.assign to preserve class methods
+    const body = omitNull(Object.assign(editing, newObj));
     if (typeof onValidate === 'function') {
-      if (!onValidate(newObj)) {
+      if (!onValidate(body)) {
         console.log('EditModal: save invalid');
         return;
       }
     }
-    // use Object.assign to preserve class methods
-    const body = omitNull(Object.assign(editing, newObj));
     console.log(JSON.stringify(body, null, 2));
     const toSave: IUpsertPayload<T> = { isEdit, body };
     onSave(toSave);

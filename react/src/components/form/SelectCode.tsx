@@ -44,7 +44,8 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     'changeHandler',
     'labelTitle',
     'changeHandlerMultiple',
-    'triggerReset'
+    'triggerReset',
+    'defaultValue'
   ]);
 
   // load this codeHeaders codes from db
