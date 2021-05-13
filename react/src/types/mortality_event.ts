@@ -33,8 +33,8 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     this.collar_id = collarId;
     this.device_id = deviceId;
     this.retrieval_date = new Date();
-    this.retrieved = true;
-    this.vendor_activation_status = false;
+    this.retrieved = false;
+    this.vendor_activation_status = true;
     // workflow defaulted fields
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
@@ -45,7 +45,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
   formatPropAsHeader(s: string): string {
     switch(s) {
       case 'retrieved':
-        return 'Device Has Been Retrieved?'
+        return 'Has Device Been Retrieved?'
       case 'vendor_activation_status':
         return 'Is Device Still Active With Vendor?';
       case 'pcod':

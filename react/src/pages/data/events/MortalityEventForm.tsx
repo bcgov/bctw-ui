@@ -17,6 +17,7 @@ import { Animal } from 'types/animal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatLabel } from 'types/common_helpers';
 import MultiSelect from 'components/form/MultiSelect';
+import { LightTooltip } from 'components/modal/Tooltip';
 
 type MortEventProps = ModalBaseProps & {
   alert: TelemetryAlert;
@@ -142,9 +143,13 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                 <Paper elevation={3} className={'dlg-full-body-details'}>
                   <div className={'dlg-details-section'}>
                     <h3>Update Assignment Details</h3>
+                    <LightTooltip title={
+                      <p>If you unassign the device, no new telemetry from this device will be connected to this animal.</p>
+                    } placement='right' enterDelay={750}>
                     <div>
                       {CreateEditCheckboxField({formType: deviceUnassignedField, label: formatLabel(mortalityEvent, deviceUnassignedField.key), handleChange: onChange})}
                     </div>
+                    </LightTooltip>
                   </div>
                   <div className={'dlg-details-section'}>
                     <h3>Update Device Details</h3>
@@ -181,7 +186,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                     </div>
                   </div>
                   <div className={'dlg-details-section'}>
-                    <h3>Event Details &amp; Comment</h3>
+                    <h3>Mortality Event Details &amp; Comment</h3>
                     <LocationEventForm event={locationEvent} handleChange={onChangeLocationProp} />
                   </div>
                 </Paper>
