@@ -1,5 +1,5 @@
 import { CritterCollarModalProps } from 'components/component_interfaces';
-import { getInputTypesOfT, eInputType } from 'components/form/form_helpers';
+import { getInputTypesOfT } from 'components/form/form_helpers';
 import TextField from 'components/form/Input';
 import ChangeContext from 'contexts/InputChangeContext';
 import { CodeHeaderInput } from 'types/code';
@@ -7,6 +7,7 @@ import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { CodeStrings as S } from 'constants/strings';
 import { removeProps } from 'utils/common';
+import { eInputType } from 'types/form_types';
 
 // todo: remove these
 type EditCodeModalProps = CritterCollarModalProps<CodeHeaderInput> & {

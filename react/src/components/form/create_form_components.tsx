@@ -1,4 +1,3 @@
-import { eInputType, FormInputType } from 'components/form/form_helpers';
 import TextField from 'components/form/Input';
 import NumberField from 'components/form/NumberInput';
 import SelectCode from './SelectCode';
@@ -6,6 +5,7 @@ import DateInput from 'components/form/Date';
 import CheckBox from 'components/form/Checkbox';
 import React from 'react';
 import { columnToHeader } from 'utils/common';
+import { eInputType, FormInputType } from 'types/form_types';
 
 type CreateInputBaseProps = {
   formType: FormInputType;
