@@ -172,7 +172,7 @@ export class Animal implements IAnimal {
       case 'associated_animal_relationship':
         return 'Associated Relationship';
       case 'juvenile_at_heel':
-        return 'Calf Status';
+        return 'Juvenile at Heel?';
       case 'mortalityCoords':
       case 'captureCoords':
         return 'Coordinates (Lat/Long)';

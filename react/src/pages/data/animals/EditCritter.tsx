@@ -154,7 +154,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                       .map((formType) => makeFormField(formType))}
                   </div>
                   <div className={'dlg-details-section'}>
-                    <h3>Association with Another Individual</h3>
+                    <h3>Association With Another Individual</h3>
                     {inputTypes
                       .filter((f) => associatedAnimalFields.map((x) => x.prop).includes(f.key))
                       .map((f) => makeFormField(f))}
