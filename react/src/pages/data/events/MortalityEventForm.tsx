@@ -153,23 +153,35 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                   </div>
                   <div className={'dlg-details-section'}>
                     <h3>Update Device Details</h3>
-                    <div>
-                      {CreateEditCheckboxField({formType: retrievedField, label: formatLabel(mortalityEvent, retrievedField.key), handleChange: onChange})}
-                    </div>
-                    <div>
-                      {CreateEditDateField({formType: retrievedDateField, label: formatLabel(mortalityEvent, retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
-                    </div>
-                    <div style={{marginBottom: '10px'}}>
-                      {CreateEditCheckboxField({formType: vasField, label: formatLabel(mortalityEvent, vasField.key), handleChange: onChange})}
-                    </div>
-                    {deviceStatusFields.map((formType) => {
+                    <LightTooltip title={
+                      <p>If <strong>checked</strong>, <i>Device Deployment Status</i> will be automatically set to <em>"Not Deployed"</em>.</p>
+                    } placement='right' enterDelay={750}>
+                      <div>
+                        {CreateEditCheckboxField({formType: retrievedField, label: formatLabel(mortalityEvent, retrievedField.key), handleChange: onChange})}
+                      </div>
+                    </LightTooltip>
+                    <LightTooltip title={
+                      <p>TODO: If <strong>checked</strong>then...</p>
+                    } placement='right' enterDelay={750}>
+                      <div>
+                        {CreateEditDateField({formType: retrievedDateField, label: formatLabel(mortalityEvent, retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
+                      </div>
+                    </LightTooltip>
+                    <LightTooltip title={
+                      <p>TODO: If <strong>checked</strong>then...</p>
+                    } placement='right' enterDelay={750}>
+                      <div style={{marginBottom: '10px'}}>
+                        {CreateEditCheckboxField({formType: vasField, label: formatLabel(mortalityEvent, vasField.key), handleChange: onChange})}
+                      </div>
+                    </LightTooltip>
+                    { /* deviceStatusFields.map((formType) => {
                       return MakeEditField({
                         formType,
                         handleChange: onChange,
                         required,
                         errorMessage: !!errors[formType.key] && (errors[formType.key]),
                       });
-                    })}
+                    }) */ }
                   </div>
                   <div className={'dlg-details-section'}>
                     <h3>Update Animal Details</h3>
