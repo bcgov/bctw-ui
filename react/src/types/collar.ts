@@ -26,7 +26,7 @@ export interface ICollarTelemetryBase extends ICollarBase {
 
 export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   collar_transaction_id: string;
-  camera_device_id: string;
+  camera_device_id: number;
   device_deployment_status: string;
   device_make: string;
   device_malfunction_type: string;
@@ -65,7 +65,7 @@ const collarPropsToDisplay = [
 const attachedCollarProps = ['(WLH_ID/Animal ID)', ...collarPropsToDisplay];
 export class Collar implements ICollar {
   collar_id: string;
-  camera_device_id: string;
+  @Transform(v => v || 0, transformOpt) camera_device_id: number;
   collar_transaction_id: string;
   device_id: number;
   device_deployment_status: string;
@@ -118,13 +118,22 @@ export class Collar implements ICollar {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'device_type':
-      case 'device_make':
-      case 'device_model':
       case 'device_deployment_status':
-        return columnToHeader(str.replace('device_', ''));
-      case 'vendor_activation_status':
-        return 'Is device deactivated?'
+        return columnToHeader(str.replace('device_', ''))
+      case 'frequency':
+        return 'Beacon Frequency'
+      case 'camera_device_id':
+        return 'Camera Module ID';
+      case 'dropoff_device_id':
+        return 'Drop-off Module ID'
+      case 'dropoff_frequency':
+        return 'Drop-off Module Frequency'
+      case 'dropoff_frequency_unit':
+        return 'Drop-off Module Frequency Unit'
+        case 'implant_device_id':
+          return 'Implant Module ID'
+        case 'vendor_activation_status':
+        return 'Is device active with vendor?'
       default:
         return columnToHeader(str);
     }
@@ -132,22 +141,41 @@ export class Collar implements ICollar {
 }
 
 const collarFormFields: Record<string, FormFieldObject[]> = {
-  generalFields: [
-    { prop: 'device_id' },
+  communicationFields: [
     { prop: 'device_type', isCode: true },
-    { prop: 'device_make', isCode: true, span: true },
-    { prop: 'device_model' }
-  ],
-  networkFields: [
+    { prop: 'satellite_network', isCode: true },
     { prop: 'frequency' },
     { prop: 'frequency_unit', isCode: true },
-    { prop: 'satellite_network', isCode: true }
+    { prop: 'vendor_activation_status', isBool: true },
+    { prop: 'fix_rate' }
+  ],
+  deviceOptionFields: [
+    { prop: 'camera_device_id' },
+    { prop: 'dropoff_device_id' },
+    { prop: 'dropoff_frequency' },
+    { prop: 'dropoff_frequency_unit' },
+    { prop: 'implant_device_id' }
+  ],
+  identifierFields: [
+    { prop: 'device_id' },
+    { prop: 'device_make', isCode: true },
+    { prop: 'device_model' }
+  ],
+  purchaseFields: [
+    { prop: 'purchase_year' },
+    { prop: 'purchase_month' },
+    { prop: 'purchase_comment' }
   ],
   statusFields: [
     { prop: 'device_status', isCode: true },
-    { prop: 'vendor_activation_status' },
+    { prop: 'malfunction_date' },
+    { prop: 'malfunction_type' },
     { prop: 'device_deployment_status', isCode: true },
+    { prop: 'retrieved', isBool: true },
     { prop: 'retrieval_date', isDate: true }
+  ],
+  userCommentField: [
+    { prop: 'user_comment' }
   ]
 }
 

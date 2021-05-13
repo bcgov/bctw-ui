@@ -56,8 +56,8 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     setNewCollar(new Collar(type));
   };
 
-  const { generalFields, networkFields, statusFields } = collarFormFields;
-  const allFields = [...generalFields, ...networkFields, ...statusFields];
+  const { communicationFields, deviceOptionFields, identifierFields, purchaseFields, statusFields, userCommentField } = collarFormFields;
+  const allFields = [ ...communicationFields, ...deviceOptionFields, ...identifierFields, ...purchaseFields, ...statusFields, ...userCommentField ];
 
   const makeField = (
     iType: FormInputType,
@@ -145,21 +145,39 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                     <h2>Device Details</h2>
                     <Paper elevation={3} className={'dlg-full-body-details'}>
                       <div className={'dlg-details-section'}>
-                        <h3>General Information</h3>
+                        <h3>Identifiers</h3>
                         {inputTypes
-                          .filter((f) => generalFields.map((x) => x.prop).includes(f.key))
+                          .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
                           .map((d) => makeField(d, onChange, !!errors[d.key]))}
                       </div>
                       <div className={'dlg-details-section'}>
-                        <h3>Frequency and Network</h3>
-                        {inputTypes
-                          .filter((f) => networkFields.map((x) => x.prop).includes(f.key))
-                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
-                      </div>
-                      <div className={'dlg-details-section'}>
-                        <h3>Status Information</h3>
+                        <h3>Device Status</h3>
                         {inputTypes
                           .filter((f) => statusFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </div>
+                      <div className={'dlg-details-section'}>
+                        <h3>Satellite Network &amp; Beacon Frequency</h3>
+                        {inputTypes
+                          .filter((f) => communicationFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </div>
+                      <div className={'dlg-details-section'}>
+                        <h3>Comments About This Device</h3>
+                        {inputTypes
+                          .filter((f) => userCommentField.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </div>
+                      <div className={'dlg-details-section'}>
+                        <h3>Additional Device Sensors &amp; Features</h3>
+                        {inputTypes
+                          .filter((f) => deviceOptionFields.map((x) => x.prop).includes(f.key))
+                          .map((d) => makeField(d, onChange, !!errors[d.key]))}
+                      </div>
+                      <div className={'dlg-details-section'}>
+                        <h3>Purchase Details</h3>
+                        {inputTypes
+                          .filter((f) => purchaseFields.map((x) => x.prop).includes(f.key))
                           .map((d) => makeField(d, onChange, !!errors[d.key]))}
                       </div>
                       {isEdit && showAssignmentHistory ? (
