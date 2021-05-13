@@ -18,7 +18,9 @@ interface INumberInputProps extends StandardTextFieldProps {
 export default function NumberField(props: INumberInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, validate } = props;
   const [err, setErr] = useState<string>('');
-  const [val, setVal] = useState<number>(defaultValue);
+  // consider -1 to be an invalid default value, as it was likely used to make sure this
+  // prop uses a number field but is actually null
+  const [val, setVal] = useState<number>(defaultValue === -1 ? undefined : defaultValue);
 
   useEffect(() => {
     const o = { [propName]: defaultValue, error: err };
@@ -68,7 +70,7 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
       style={style ?? baseInputStyle}
       onChange={handleChange}
       helperText={err}
-      // todo: 
+      // todo: style the error 
       // FormHelperTextProps={{variant: 'outlined'}}
       error={!!err}
       {...propsToPass}

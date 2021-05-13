@@ -80,38 +80,38 @@ export class Animal implements IAnimal {
   associated_animal_relationship: string;
   capture_comment: string;
   @Type(() => Date) capture_date: Date;
-  @Transform((v) => v || 0, transformOpt) capture_latitude: number;
-  @Transform((v) => v || 0, transformOpt) capture_longitude: number;
-  @Transform((v) => v || 0, transformOpt) capture_utm_easting: number;
-  @Transform((v) => v || 0, transformOpt) capture_utm_northing: number;
-  @Transform((v) => v || 0, transformOpt) capture_utm_zone: number;
+  @Transform((v) => v || -1, transformOpt) capture_latitude: number;
+  @Transform((v) => v || -1, transformOpt) capture_longitude: number;
+  @Transform((v) => v || -1, transformOpt) capture_utm_easting: number;
+  @Transform((v) => v || -1, transformOpt) capture_utm_northing: number;
+  @Transform((v) => v || -1, transformOpt) capture_utm_zone: number;
   collective_unit: string;
   animal_colouration: string;
   ear_tag_id: string;
   ear_tag_left_colour: string;
   ear_tag_right_colour: string;
-  @Transform((value) => value || 0, transformOpt) estimated_age: number;
+  @Transform((value) => value || -1, transformOpt) estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
   map_colour: string;
   mortality_comment: string;
   @Type(() => Date) mortality_date: Date;
-  @Transform((v) => v || 0, transformOpt) mortality_latitude: number;
-  @Transform((v) => v || 0, transformOpt) mortality_longitude: number;
-  @Transform((v) => v || 0, transformOpt) mortality_utm_easting: number;
-  @Transform((v) => v || 0, transformOpt) mortality_utm_northing: number;
-  @Transform((v) => v || 0, transformOpt) mortality_utm_zone: number;
+  @Transform((v) => v || -1, transformOpt) mortality_latitude: number;
+  @Transform((v) => v || -1, transformOpt) mortality_longitude: number;
+  @Transform((v) => v || -1, transformOpt) mortality_utm_easting: number;
+  @Transform((v) => v || -1, transformOpt) mortality_utm_northing: number;
+  @Transform((v) => v || -1, transformOpt) mortality_utm_zone: number;
   probable_cause_of_death: string;
   ultimate_cause_of_death: string;
   @Transform((v) => v || '', transformOpt) population_unit: string;
   @Transform((v) => v || false, transformOpt) recapture: boolean;
   region: string;
   release_comment: string;
-  @Transform((v) => v || 0, transformOpt) release_latitude: number;
-  @Transform((v) => v || 0, transformOpt) release_longitude: number;
-  @Transform((v) => v || 0, transformOpt) release_utm_easting: number;
-  @Transform((v) => v || 0, transformOpt) release_utm_northing: number;
-  @Transform((v) => v || 0, transformOpt) release_utm_zone: number;
+  @Transform((v) => v || -1, transformOpt) release_latitude: number;
+  @Transform((v) => v || -1, transformOpt) release_longitude: number;
+  @Transform((v) => v || -1, transformOpt) release_utm_easting: number;
+  @Transform((v) => v || -1, transformOpt) release_utm_northing: number;
+  @Transform((v) => v || -1, transformOpt) release_utm_zone: number;
   @Type(() => Date) release_date: Date;
   sex: string;
   species: string;
@@ -154,15 +154,14 @@ export class Animal implements IAnimal {
   constructor() {
     this.animal_id = '';
     this.animal_status = '';
-    this.population_unit = '';
     this.region = '';
     this.species = '';
     this.wlh_id = '';
-    this.estimated_age = 0;
-    // fixme: on creation of new critters...dont want to preserve these
-    this.capture_date = new Date();
-    this.mortality_date = new Date();
-    this.release_date = new Date();
+  }
+
+  toJSON(): Animal {
+    delete this.map_colour;
+    return this;
   }
 
   formatPropAsHeader(str: string): string {
@@ -191,7 +190,7 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'associated_animal_relationship' /*, isCode: true */ }
   ],
   captureFields: [
-    { prop: 'capture_date', required: true },
+    { prop: 'capture_date', required: true, isDate: true },
     { prop: 'capture_latitude' },
     { prop: 'capture_longitude' },
     { prop: 'capture_utm_zone' },
@@ -242,7 +241,7 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'mortality_comment' },
   ],
   releaseFields: [
-    { prop: 'release_date' /*, required: true */ },
+    { prop: 'release_date', isDate: true /*, required: true */ },
     { prop: 'release_latitude' }, 
     { prop: 'release_longitude' },
     { prop: 'release_utm_zone' },

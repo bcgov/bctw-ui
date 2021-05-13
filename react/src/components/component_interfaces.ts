@@ -36,9 +36,11 @@ type EditModalBaseProps<T> = ModalBaseProps & {
 
 /**
  * @param isEdit boolean representing whether the modal is adding a new T or editing
+ * @param validateFailed a function handled in the ModifyWrapper that can display notifications
 */
 type CritterCollarModalProps<T> = EditModalBaseProps<T> & {
   isEdit?: boolean;
+  validateFailed?: (errors: Record<string, unknown>) => void;
 };
 
 type ConfirmModalProps = ModalBaseProps & {

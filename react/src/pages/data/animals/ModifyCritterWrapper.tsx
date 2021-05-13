@@ -50,13 +50,19 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     queryClient.invalidateQueries('critters_assigned');
     queryClient.invalidateQueries('critters_unassigned');
     queryClient.invalidateQueries('getType');
+    queryClient.invalidateQueries('pings');
   };
 
   // setup the mutations
   const { mutateAsync: saveMutation } = bctwApi.useMutateCritter({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
-  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => await saveMutation(a);
+  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
+    const { isEdit, body } = a;
+    const formatted = body.toJSON();
+    return await saveMutation({isEdit, body: formatted});
+  } 
+
   const deleteCritter = async (critterId: string): Promise<void> => {
     const payload: IDeleteType = {
       id: critterId,
@@ -86,11 +92,16 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     deleteCritter(editing?.critter_id)
     setShow(false);
   }
+  
+  const validateFailed = (errors: Record<string, unknown>): void => {
+    responseDispatch({ type: 'error', message: `missing required fields: ${Object.keys(errors).join(', ')}` });
+  }
 
-  const passTheseProps: Pick<IAddEditProps<Animal>, 'cannotEdit' | 'onDelete' | 'onSave'> = {
+  const passTheseProps = {
     cannotEdit: perm !== eCritterPermission.change,
     onDelete: handleDeleteButtonClicked,
     onSave: saveCritter,
+    validateFailed
   }
 
   return (

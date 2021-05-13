@@ -58,11 +58,11 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     hideHistory = false,
     hideSave = false,
     showInFullScreen = true,
-    hasErrors,
+    hasErrors
   } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
-  const [newObj, setNewObj] = useState<T>(newT);
+  const [newObj, setNewObj] = useState<T>(Object.assign({}, editing));
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>(null);
 
@@ -90,7 +90,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     if (open) {
       setCanSave(false);
     }
-  }, [open])
+  }, [open]);
 
   const displayHistory = (): void => {
     setShowHistory((o) => !o);
@@ -99,16 +99,14 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const handleSave = (): void => {
     if (typeof onValidate === 'function') {
       if (!onValidate(newObj)) {
-        console.log('EditModal: save invalid')
+        console.log('EditModal: save invalid');
         return;
       }
     }
-    const toSave: IUpsertPayload<T> = {
-      isEdit,
-      // use Object.assign to preserve class methods
-      body: Object.assign(omitNull(editing), omitNull(newObj))
-    };
-    // console.log(JSON.stringify(toSave))
+    // use Object.assign to preserve class methods
+    const body = omitNull(Object.assign(editing, newObj));
+    console.log(JSON.stringify(body, null, 2));
+    const toSave: IUpsertPayload<T> = { isEdit, body };
     onSave(toSave);
   };
 
@@ -119,14 +117,15 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
       setCanSave(false);
       return;
     }
-    // todo: only when prop has actually changed 
+    // todo: only when prop has actually changed
     // otherwise enabled at form load
     if (typeof hasErrors === 'function') {
       const hasEm = hasErrors();
       setCanSave(!hasEm);
       return;
     }
-    setNewObj((old) => Object.assign(old, newProp));
+    const modified = { ...newObj, ...newProp };
+    setNewObj(modified);
     // get the first key
     const key: string = Object.keys(newProp)[0];
     // create matching key/val object from the item being edited
@@ -150,25 +149,26 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
 
   const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
   const childrenComponents = (
-    <>
-      <ChangeContext.Provider value={handleChange}>
-        {children}
-        {hideSave ? null : (
-          <Button className='editSaveBtn' onClick={handleSave} disabled={!canSave}>
-            save
-          </Button>
-        )}
-        {showHistory ? (
-          <Modal open={showHistory} handleClose={(): void => setShowHistory(false)}>
-            <HistoryPage {...historyParams} />
-          </Modal>
-        ) : null}
-      </ChangeContext.Provider>
+    // wrap children in the change context provider so they have 
+    // access to this components form handler {handleChange}
+    <ChangeContext.Provider value={handleChange}>
+      {hideSave ? null : (
+        <Button className='editSaveBtn' onClick={handleSave} disabled={!canSave}>
+          save
+        </Button>
+      )}
+      {showHistory ? (
+        <Modal open={showHistory} handleClose={(): void => setShowHistory(false)}>
+          <HistoryPage {...historyParams} />
+        </Modal>
+      ) : null}
       {isEdit && !hideHistory ? (
         <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button>
       ) : null}
-    </>
+      {children}
+    </ChangeContext.Provider>
   );
+
   return showInFullScreen ? (
     <FullScreenDialog {...modalProps}>{childrenComponents}</FullScreenDialog>
   ) : (

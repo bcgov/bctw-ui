@@ -74,17 +74,17 @@ export class Collar implements ICollar {
   device_model: string;
   device_status: string;
   device_type: string;
-  @Transform(v => v || 0, transformOpt) dropoff_device_id: number;
-  @Transform(v => v || 0, transformOpt) dropoff_frequency: number;
+  @Transform(v => v || -1, transformOpt) dropoff_device_id: number;
+  @Transform(v => v || -1, transformOpt) dropoff_frequency: number;
   dropoff_frequency_unit: string;
   fix_rate: number;
   fix_success_rate: number;
-  @Transform(v => v || 0, transformOpt) frequency: number;
+  @Transform(v => v || -1, transformOpt) frequency: number;
   frequency_unit: string;
   @Type(() => Date) malfunction_date: Date;
   purchase_comment: string;
-  @Transform(v => v || 0, transformOpt) purchase_month: number;
-  @Transform(v => v || 0, transformOpt) purchase_year: number;
+  @Transform(v => v || -1, transformOpt) purchase_month: number;
+  @Transform(v => v || -1, transformOpt) purchase_year: number;
   @Transform(v => v || new Date(), transformOpt) retrieval_date: Date; // @Type(() => Date)
   @Transform(v => v || false, transformOpt) retrieved: boolean;
   satellite_network: string;
