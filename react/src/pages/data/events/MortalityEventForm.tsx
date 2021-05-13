@@ -45,7 +45,7 @@ const pcodValues = [
   { id: 9, value: 'health_starvation', displayLabel: 'Health-related: Starvation' },
   { id: 10, value: 'unknown', displayLabel: 'Unknown' },
   { id: 11, value: 'other', displayLabel: 'Other' },
-  { id: 12, value: 'natural', displayLabel: 'Natual' },
+  { id: 12, value: 'natural', displayLabel: 'Natural' },
   { id: 13, value: 'removal', displayLabel: 'Removal' },
   { id: 14, value: 'trapping', displayLabel: 'Trapping' }
 ]
