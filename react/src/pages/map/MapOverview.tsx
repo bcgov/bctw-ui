@@ -23,7 +23,7 @@ export default function MapOverview({ type, detail, open, handleClose }: Critter
   const [canEdit, setCanEdit] = useState<boolean>(false);
   const { critter_id, collar_id } = detail;
 
-  const { data, error, isError, status } =
+  const { data, error, isError, status, remove } =
     type === 'animal'
       ? bctwApi.useType<Animal>('animal', critter_id)
       : bctwApi.useType<Collar>('device', collar_id);
@@ -40,6 +40,17 @@ export default function MapOverview({ type, detail, open, handleClose }: Critter
       }
     }
   }, [status]);
+
+  /**
+   * fixme: when a new detail is selected, the old editobj is still in the query cache,
+   * invalidating it doesn't seem to work. remove it instead.
+   */
+  useDidMountEffect(() => {
+    const update = (): void => {
+      remove();
+    }
+    update();
+  }, [detail]);
 
   useDidMountEffect(() => {
     const update = (): void => {
