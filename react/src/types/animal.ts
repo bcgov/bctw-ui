@@ -1,8 +1,9 @@
 import { columnToHeader } from 'utils/common';
-import { BCTW, BCTWBaseType, FormFieldObject } from 'types/common_types';
+import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
-import { eCritterPermission } from './user';
-import { formatLatLong } from './common_helpers';
+import { eCritterPermission } from 'types/user';
+import { formatLatLong } from 'types/common_helpers';
+import { FormFieldObject } from 'types/form_types';
 
 const assignedCritterProps = ['animal_id', 'wlh_id', 'animal_status', 'device_id'];
 const unassignedCritterProps = ['animal_id', 'wlh_id', 'animal_status'];
@@ -18,7 +19,6 @@ export interface IAnimalTelemetryBase {
   capture_date: Date;
   collective_unit: string;
 }
-
 
 // animals attached to devices should have these properties
 interface IOptionallyAttachedDevice {
@@ -68,9 +68,8 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
   permission_type?: eCritterPermission;
 }
 
-export const transformOpt = { toClassOnly: true };
+const transformOpt = { toClassOnly: true };
 
-// todo: all collar critter dates need to be transformed to dates if null.
 export class Animal implements IAnimal {
   critter_id: string;
   critter_transaction_id: string;
@@ -184,7 +183,7 @@ export class Animal implements IAnimal {
   }
 }
 
-export const critterFormFields: Record<string, FormFieldObject[]> = {
+const critterFormFields: Record<string, FormFieldObject[]> = {
   associatedAnimalFields: [
     { prop: 'associated_animal_id' },
     { prop: 'associated_animal_relationship' /*, isCode: true */ }
@@ -255,4 +254,4 @@ export const critterFormFields: Record<string, FormFieldObject[]> = {
   ]
 };
 
-export { unassignedCritterProps, assignedCritterProps };
+export { unassignedCritterProps, assignedCritterProps, critterFormFields, transformOpt };

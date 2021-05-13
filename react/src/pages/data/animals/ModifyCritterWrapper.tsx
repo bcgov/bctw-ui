@@ -1,7 +1,6 @@
 import { Animal } from 'types/animal';
 import { cloneElement, useState, useEffect } from 'react';
 import { eCritterPermission } from 'types/user';
-import { IAddEditProps } from 'pages/data/common/AddEditViewer';
 import { useQueryClient } from 'react-query';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -58,9 +57,9 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
   const saveCritter = async (a: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
-    const { isEdit, body } = a;
+    const { body } = a;
     const formatted = body.toJSON();
-    return await saveMutation({isEdit, body: formatted});
+    return await saveMutation({ body: formatted});
   } 
 
   const deleteCritter = async (critterId: string): Promise<void> => {

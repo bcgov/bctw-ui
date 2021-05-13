@@ -1,5 +1,4 @@
 const IS_PROD = +(window.location.port) === 1111 ? false : true;
-
 interface CreateUrlParams {
   api: string;
   query?: string;

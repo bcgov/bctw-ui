@@ -5,10 +5,8 @@ const LightTooltip = withStyles((theme: Theme) => ({
     backgroundColor: theme.palette.common.white,
     color: 'rgba(0, 0, 0, 0.87)',
     boxShadow: theme.shadows[1],
-    fontSize: 14,
-  },
+    fontSize: 14
+  }
 }))(Tooltip);
 
-export {
-  LightTooltip
-}
+export default LightTooltip;

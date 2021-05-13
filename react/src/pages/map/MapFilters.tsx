@@ -1,6 +1,5 @@
 import { Button, Drawer, IconButton } from '@material-ui/core';
 import { Close, ArrowForward } from '@material-ui/icons';
-import { PageProp } from 'components/component_interfaces';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
 import TextField from 'components/form/Input';
@@ -18,9 +17,9 @@ import { columnToHeader } from 'utils/common';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { CODE_FILTERS, DEVICE_STATUS_OPTIONS } from 'pages/map/map_constants';
-import { LightTooltip } from 'components/modal/Tooltip';
+import { Tooltip } from 'components/common';
 
-type MapFiltersProps = PageProp & {
+type MapFiltersProps = {
   start: string;
   end: string;
   uniqueDevices: number[];
@@ -37,7 +36,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const { uniqueDevices, unassignedDevices } = props;
   const classes = drawerStyles();
   // controls filter panel visibility
-  const [open, setOpen] = useState<boolean>(true); 
+  const [open, setOpen] = useState<boolean>(true);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
   const [numFiltersSelected, setNumFiltersSelected] = useState<number>(0);
   // state for start and end ranges (date pickers)
@@ -45,7 +44,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const [end, setEnd] = useState<string>(props.end);
   const [wasDatesChanged, setWasDatesChanged] = useState<boolean>(false);
   // reset filter button status
-  const [reset, setReset] = useState<boolean>(false); 
+  const [reset, setReset] = useState<boolean>(false);
   // controls apply button disabled status
   const [applyButtonStatus, setApplyButtonStatus] = useState<boolean>(true);
   const [isLatestPing, setIsLatestPing] = useState<boolean>(false);
@@ -70,11 +69,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // call parent handler when latest ping changes
   useDidMountEffect(() => {
     props.onShowLatestPings(isLatestPing);
-  }, [isLatestPing])
+  }, [isLatestPing]);
 
   useDidMountEffect(() => {
     props.onShowLastFixes(isLastFixes);
-  }, [isLastFixes])
+  }, [isLastFixes]);
 
   /**
    * handler for when a select component is changed
@@ -144,11 +143,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const handleChangeDeviceList = (values: ISelectMultipleData[]): void => {
-    const asFilters: ICodeFilter[] = values.map(v => {
-      return {code_header: 'device_id', description: v.value as number, code: '', code_header_title: '', id: 0}
-    }) 
+    const asFilters: ICodeFilter[] = values.map((v) => {
+      return { code_header: 'device_id', description: v.value as number, code: '', code_header_title: '', id: 0 };
+    });
     changeFilter(asFilters, 'device_id');
-  }
+  };
 
   const handleDrawerOpen = (): void => {
     const newVal = !open;
@@ -157,15 +156,15 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       // notify map parent that it needs to resize
       props.onCollapsePanel();
     }
-  }
+  };
 
   const createDeviceList = (): ISelectMultipleData[] => {
-    const merged = [...uniqueDevices, ...unassignedDevices].sort((a,b) => a-b);
-    return merged.map(d => {
+    const merged = [...uniqueDevices, ...unassignedDevices].sort((a, b) => a - b);
+    return merged.map((d) => {
       const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
-      return { id: d, value: d, displayLabel }
-    })
-  }
+      return { id: d, value: d, displayLabel };
+    });
+  };
 
   return (
     <div className={'side-panel'}>
@@ -183,7 +182,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         }}>
         <div className={open ? 'side-panel-toolbar' : 'side-panel-toolbar-closed'}>
           {open ? <h3>Filters</h3> : null}
-          <IconButton onClick={handleDrawerOpen}>{open ? <Close /> : <ArrowForward htmlColor={'#ffffff'} />}</IconButton>
+          <IconButton onClick={handleDrawerOpen}>
+            {open ? <Close /> : <ArrowForward htmlColor={'#ffffff'} />}
+          </IconButton>
         </div>
         {open ? (
           <>
@@ -191,9 +192,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <div className={'side-panel-dates'}>
                 {/* render the date pickers */}
 
-                <LightTooltip title={
-                    <p>{MapStrings.startDateTooltip}</p>
-                } placement='right-start' enterDelay={750}>
+                <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} placement='right-start' enterDelay={750}>
                   <span>
                     <TextField
                       outline={true}
@@ -204,10 +203,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                       changeHandler={(e): void => setStart(e['tstart'] as string)}
                     />
                   </span>
-                </LightTooltip>
-                <LightTooltip title={
-                    <p>{MapStrings.endDateTooltip}</p>
-                } placement='right-start' enterDelay={750}>
+                </Tooltip>
+                <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} placement='right-start' enterDelay={750}>
                   <span>
                     <TextField
                       outline={true}
@@ -218,15 +215,28 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                       changeHandler={(e): void => setEnd(e['tend'] as string)}
                     />
                   </span>
-                </LightTooltip>
+                </Tooltip>
               </div>
-              <LightTooltip title={
-                <>
-                  <p><b><em>{MapStrings.assignmentStatusOptionA}</em></b>{MapStrings.assignmentStatusTooltip1}</p>
-                  <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
-                  <p>{MapStrings.assignmentStatusTooltip3}</p>
-                </>
-              } placement='right-start' enterDelay={750}>
+              <Tooltip
+                title={
+                  <>
+                    <p>
+                      <b>
+                        <em>{MapStrings.assignmentStatusOptionA}</em>
+                      </b>
+                      {MapStrings.assignmentStatusTooltip1}
+                    </p>
+                    <p>
+                      <b>
+                        <em>{MapStrings.assignmentStatusOptionU}</em>
+                      </b>
+                      {MapStrings.assignmentStatusTooltip2}
+                    </p>
+                    <p>{MapStrings.assignmentStatusTooltip3}</p>
+                  </>
+                }
+                placement='right-start'
+                enterDelay={750}>
                 <div>
                   {/* render the unassigned/assigned data points selector */}
                   <MultiSelect
@@ -235,55 +245,55 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     changeHandler={props.onShowUnassignedDevices}
                   />
                 </div>
-              </LightTooltip>
+              </Tooltip>
               <div>
                 {/* render the last pings/ last 10 fixes checkboxes */}
-                <LightTooltip title={
-                    <p>{MapStrings.lastKnownLocationTooltip}</p>
-                } placement='right-start' enterDelay={750}>
+                <Tooltip title={<p>{MapStrings.lastKnownLocationTooltip}</p>} placement='right-start' enterDelay={750}>
                   <span>
                     <Checkbox
                       label={MapStrings.lastKnownLocationLabel}
                       initialValue={isLatestPing}
-                      changeHandler={(): void => setIsLatestPing(o => !o)}
+                      changeHandler={(): void => setIsLatestPing((o) => !o)}
                       disabled={isLastFixes}
-                  />
+                    />
                   </span>
-                </LightTooltip>
-                <LightTooltip title={
-                    <p>{MapStrings.lastFixesTooltip}</p>
-                } placement='right-start' enterDelay={750}>
+                </Tooltip>
+                <Tooltip title={<p>{MapStrings.lastFixesTooltip}</p>} placement='right-start' enterDelay={750}>
                   <span>
                     <Checkbox
                       label={MapStrings.lastFixesLabel}
                       initialValue={isLastFixes}
-                      changeHandler={(): void => setIsLastFixes(o => !o)}
+                      changeHandler={(): void => setIsLastFixes((o) => !o)}
                       disabled={isLatestPing}
                     />
                   </span>
-                </LightTooltip>
+                </Tooltip>
               </div>
               {/* render the device list selector */}
-              <LightTooltip title={
-                <>
-                  <p>{MapStrings.deviceListTooltip}</p>
-                </>
-              } placement='right-start' enterDelay={750}>
+              <Tooltip
+                title={
+                  <>
+                    <p>{MapStrings.deviceListTooltip}</p>
+                  </>
+                }
+                placement='right-start'
+                enterDelay={750}>
                 <div>
-                    <AutoComplete
-                      label={MapStrings.deviceListLabel}
-                      data={createDeviceList()}
-                      changeHandler={handleChangeDeviceList}
-                      triggerReset={reset}
-                    />
+                  <AutoComplete
+                    label={MapStrings.deviceListLabel}
+                    data={createDeviceList()}
+                    changeHandler={handleChangeDeviceList}
+                    triggerReset={reset}
+                  />
                 </div>
-              </LightTooltip>
+              </Tooltip>
               {/* render the other select filter components */}
               {createMultiSelects()}
               {/* render the custom animal set component */}
-              <LightTooltip title={
-                  <p>{MapStrings.customAnimalGroupLabelTooltip}</p>
-              } placement='right-start' enterDelay={750}>
+              <Tooltip
+                title={<p>{MapStrings.customAnimalGroupLabelTooltip}</p>}
+                placement='right-start'
+                enterDelay={750}>
                 <div className={'side-panel-udf'}>
                   <SelectUDF
                     triggerReset={reset}
@@ -295,7 +305,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     <Icon icon='edit' />
                   </IconButton>
                 </div>
-              </LightTooltip>
+              </Tooltip>
               <hr />
               <div className={'side-btns'}>
                 <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>

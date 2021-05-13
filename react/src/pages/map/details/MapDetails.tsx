@@ -7,7 +7,7 @@ import MapExport from 'pages/map/MapExport';
 import { Button } from '@material-ui/core';
 import { MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { LightTooltip } from 'components/modal/Tooltip';
+import { Tooltip } from 'components/common';
 
 export type MapDetailsBaseProps = {
   handleRowSelected: OnPanelRowSelect;
@@ -87,8 +87,8 @@ export default function MapDetails({
     <>
       <div className={'map-bottom-panel-title'}>
 
-        <LightTooltip title={
-            <p>{MapStrings.showOnlyCheckedTooltip}</p>
+        <Tooltip title={
+          <p>{MapStrings.showOnlyCheckedTooltip}</p>
         } placement='left-start' enterDelay={750}>
           <span>
             <Checkbox
@@ -97,7 +97,7 @@ export default function MapDetails({
               changeHandler={handleShowSelectedChecked}
             />
           </span>
-        </LightTooltip>
+        </Tooltip>
         <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
       </div>
       <MapDetailsGrouped

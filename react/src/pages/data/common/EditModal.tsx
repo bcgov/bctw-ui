@@ -21,10 +21,10 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
-  isEdit: boolean;
+  // will only be true when 'Add' is selected from data management
+  isCreatingNew?: boolean;
   hideSave?: boolean;
   hideHistory?: boolean;
-  newT: T;
   showInFullScreen?: boolean;
   onReset?: () => void;
   onValidate?: (o: T) => boolean;
@@ -50,11 +50,10 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     open,
     handleClose,
     editing,
-    newT,
     onSave,
     onValidate,
     onReset,
-    isEdit,
+    isCreatingNew = false,
     hideHistory = false,
     hideSave = false,
     showInFullScreen = true,
@@ -106,7 +105,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
       }
     }
     console.log(JSON.stringify(body, null, 2));
-    const toSave: IUpsertPayload<T> = { isEdit, body };
+    const toSave: IUpsertPayload<T> = { body };
     onSave(toSave);
   };
 
@@ -152,19 +151,21 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     // wrap children in the change context provider so they have 
     // access to this components form handler {handleChange}
     <ChangeContext.Provider value={handleChange}>
+      {/* render save button */}
       {hideSave ? null : (
         <Button className='editSaveBtn' onClick={handleSave} disabled={!canSave}>
           save
         </Button>
       )}
+      {/* render show history  */}
       {showHistory ? (
         <Modal open={showHistory} handleClose={(): void => setShowHistory(false)}>
           <HistoryPage {...historyParams} />
         </Modal>
       ) : null}
-      {isEdit && !hideHistory ? (
+      {isCreatingNew || hideHistory ? null : (
         <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button>
-      ) : null}
+      )}
       {children}
     </ChangeContext.Provider>
   );

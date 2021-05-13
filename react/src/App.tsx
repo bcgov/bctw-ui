@@ -6,7 +6,6 @@ import AppHeader from 'components/common/AppHeader';
 import { ResponseProvider } from 'contexts/ApiResponseContext';
 import { UserContext, UserStateContextProvider } from 'contexts/UserContext';
 import { AlertContext, AlertStateContextProvider } from 'contexts/UserAlertContext';
-import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 // import { ReactQueryDevtools } from 'react-query/devtools'
 import { HashRouter } from 'react-router-dom';
@@ -33,11 +32,11 @@ const queryClient = new QueryClient();
 
 export default function App(): JSX.Element {
   const classes = useStyles();
-  // const [sidebar, setSidebar] = useState<JSX.Element>();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+      {/* uncomment to debug query/caching issues */}
+      {/* <ReactQueryDevtools initialIsOpen={false} />  */}
       <ResponseProvider>
         <ThemeProvider theme={appTheme}>
           <AlertStateContextProvider>

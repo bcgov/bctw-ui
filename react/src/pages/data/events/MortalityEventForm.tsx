@@ -17,7 +17,7 @@ import { Animal } from 'types/animal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatLabel } from 'types/common_helpers';
 import MultiSelect from 'components/form/MultiSelect';
-import { LightTooltip } from 'components/modal/Tooltip';
+import { Tooltip } from 'components/common';
 
 type MortEventProps = ModalBaseProps & {
   alert: TelemetryAlert;
@@ -94,8 +94,8 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
       hasErrors={():boolean => objHasErrors(errors)}
       open={open}
       // the instance that the editmodal will save changed fields to
-      newT={Object.assign({}, mortalityEvent)}
-      isEdit={true}
+      // newT={Object.assign({}, mortalityEvent)}
+      // isEdit={true}
       hideHistory={true}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
@@ -143,37 +143,37 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                 <Paper elevation={3} className={'dlg-full-body-details'}>
                   <div className={'dlg-details-section'}>
                     <h3>Update Assignment Details</h3>
-                    <LightTooltip title={
+                    <Tooltip title={
                       <p>If you unassign the device, no new telemetry from this device will be connected to this animal.</p>
                     } placement='right' enterDelay={750}>
                     <div>
                       {CreateEditCheckboxField({formType: deviceUnassignedField, label: formatLabel(mortalityEvent, deviceUnassignedField.key), handleChange: onChange})}
                     </div>
-                    </LightTooltip>
+                    </Tooltip>
                   </div>
                   <div className={'dlg-details-section'}>
                     <h3>Update Device Details</h3>
-                    <LightTooltip title={
+                    <Tooltip title={
                       <p>If <strong>checked</strong>, <i>Device Deployment Status</i> will be automatically set to <em>"Not Deployed"</em>.</p>
                     } placement='right' enterDelay={750}>
                       <div>
                         {CreateEditCheckboxField({formType: retrievedField, label: formatLabel(mortalityEvent, retrievedField.key), handleChange: onChange})}
                       </div>
-                    </LightTooltip>
-                    <LightTooltip title={
+                    </Tooltip>
+                    <Tooltip title={
                       <p>TODO: If <strong>checked</strong>then...</p>
                     } placement='right' enterDelay={750}>
                       <div>
                         {CreateEditDateField({formType: retrievedDateField, label: formatLabel(mortalityEvent, retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
                       </div>
-                    </LightTooltip>
-                    <LightTooltip title={
+                    </Tooltip>
+                    <Tooltip title={
                       <p>TODO: If <strong>checked</strong>then...</p>
                     } placement='right' enterDelay={750}>
                       <div style={{marginBottom: '10px'}}>
                         {CreateEditCheckboxField({formType: vasField, label: formatLabel(mortalityEvent, vasField.key), handleChange: onChange})}
                       </div>
-                    </LightTooltip>
+                    </Tooltip>
                     { /* deviceStatusFields.map((formType) => {
                       return MakeEditField({
                         formType,

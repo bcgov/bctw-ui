@@ -81,12 +81,12 @@ export default function AlertPage(): JSX.Element {
     return;
     if (animal && animal.critter_id) {
       // console.log('critter payload', animal);
-      const b: IUpsertPayload<Animal> = { body: animal, isEdit: true };
+      const b: IUpsertPayload<Animal> = { body: animal };
       await saveCritter(b);
     }
     if (collar && collar.collar_id) {
       // console.log('collar payload', collar);
-      const b: IUpsertPayload<Collar> = { body: collar, isEdit: true };
+      const b: IUpsertPayload<Collar> = { body: collar };
       await saveCollar(b);
     }
   };

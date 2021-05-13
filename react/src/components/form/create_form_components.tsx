@@ -57,13 +57,14 @@ function CreateEditDateField({ formType, handleChange, label, disabled }: Create
   );
 }
 
-function CreateEditCheckboxField({ formType, handleChange, label }: CreateInputProps): JSX.Element {
+function CreateEditCheckboxField({ formType, handleChange, label, disabled }: CreateInputProps): JSX.Element {
   return (
     <CheckBox
       changeHandler={handleChange}
       initialValue={formType.value as boolean}
       label={label}
       propName={formType.key}
+      disabled={disabled}
     />
   );
 }
@@ -105,13 +106,13 @@ function MakeEditField({
   const lbl = label ?? columnToHeader(formType.key);
   let Comp: React.ReactNode;
   if (inputType === eInputType.check) {
-    Comp = CreateEditCheckboxField({ formType, handleChange, label: lbl });
+    Comp = CreateEditCheckboxField({ formType, handleChange, disabled, label: lbl });
   } else if (inputType === eInputType.date) {
-    Comp = CreateEditDateField({ formType, handleChange, label: lbl });
+    Comp = CreateEditDateField({ formType, handleChange, disabled, label: lbl });
   } else if (inputType === eInputType.select) {
     Comp = CreateEditSelectField({ formType, handleChange, disabled, required, errorMessage, label: lbl });
   } else if (inputType === eInputType.text || inputType === eInputType.number) {
-    Comp = CreateEditTextField({ formType, handleChange, errorMessage, required, label: lbl });
+    Comp = CreateEditTextField({ formType, handleChange, errorMessage, disabled, required, label: lbl });
   }
   return span ? (
     <span className={'edit-form-field-span'}>{Comp}</span>

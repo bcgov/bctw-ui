@@ -81,9 +81,6 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     a.mortality_utm_easting = l.utm_easting;
     a.mortality_utm_northing = l.utm_northing;
     a.mortality_utm_zone = l.utm_zone;
-    delete a.capture_date;
-    delete a.release_date;
-    delete a.estimated_age;
     return omitNull(a)
   }
 

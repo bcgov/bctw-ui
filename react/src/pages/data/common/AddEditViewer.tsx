@@ -33,17 +33,17 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
   const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isCreatingNew, setIsCreatingNew] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const handleClickAdd = (): void => {
-    setIsEditMode(false);
+    setIsCreatingNew(true);
     setEditObj(empty);
     setShowModal((o) => !o);
   };
 
   const handleClickEdit = (): void => {
-    setIsEditMode(true);
+    setIsCreatingNew(false);
     setEditObj(editing);
     setShowModal((o) => !o);
   };
@@ -71,10 +71,10 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
 
   // override the open/close handlers and props
   // of the child EditModal component
-  const editorProps: Pick<IEditModalProps<T>, 'editing' |'open' | 'isEdit' | 'onSave' | 'handleClose'> = {
+  const editorProps: Pick<IEditModalProps<T>, 'editing' |'open' | 'isCreatingNew' | 'onSave' | 'handleClose'> = {
     editing: editObj,
     open: showModal,
-    isEdit: isEditMode,
+    isCreatingNew,
     handleClose,
     onSave: handleClickSave
   };

@@ -1,23 +1,8 @@
-import { FormFieldObject } from 'types/common_types';
+import { FormFieldObject, eInputType, FormInputType } from 'types/form_types';
 
-export enum eInputType {
-  text = 'text',
-  number = 'number',
-  select = 'select',
-  check = 'check',
-  unknown = 'unknown',
-  date = 'date'
-}
-
-const stringsThatAreBools = ['true', 'false'];
 // some properties that should be stored as booleans in the db arent.
-const propsToRenderAsCheckbox = [];
+const stringsThatAreBools = ['true', 'false'];
 
-export type FormInputType = {
-  key: string;
-  type: eInputType;
-  value: unknown;
-};
 /**
  * @param obj the object being edited
  * @param editableProps object properties to be added as form inputs
@@ -30,7 +15,7 @@ function getInputTypesOfT<T>(obj: T, editableProps: FormFieldObject[], selectabl
     if (selectableProps.includes(prop)) {
       return { key: prop, type: eInputType.select, value: obj[prop] };
     }
-    if (stringsThatAreBools.includes(obj[prop]) || propsToRenderAsCheckbox.includes(prop)) {
+    if (stringsThatAreBools.includes(obj[prop])) {
       return { key: prop, type: eInputType.check, value: obj[prop] };
     }
     const value = obj[prop];
@@ -76,7 +61,7 @@ const validateRequiredFields = <T>(o: T, required: string[]): Record<string, unk
  * ex. '' and undefined would be false, but 'hi' would be true
  */
 const objHasErrors = (errorObj: Record<string, unknown>): boolean => {
-  return !!Object.values(errorObj).filter(f => f).length;
+  return !!Object.values(errorObj).filter((f) => f).length;
 };
 
 export { getInputTypesOfT, isValidEditObject, validateRequiredFields, objHasErrors };

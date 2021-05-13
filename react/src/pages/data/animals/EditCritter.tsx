@@ -2,7 +2,7 @@ import { Paper } from '@material-ui/core';
 import { CritterCollarModalProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT, validateRequiredFields, FormInputType } from 'components/form/form_helpers';
+import { getInputTypesOfT, validateRequiredFields } from 'components/form/form_helpers';
 import Modal from 'components/modal/Modal';
 import { CritterStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
@@ -16,11 +16,13 @@ import { Animal, critterFormFields } from 'types/animal';
 import { eCritterPermission } from 'types/user';
 import { removeProps } from 'utils/common';
 import { TelemetryAlert } from 'types/alert';
+import { FormInputType } from 'types/form_types';
 
 export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
-  const { isEdit, editing } = props;
+  const { isCreatingNew, editing } = props;
 
-  const canEdit = !isEdit ? true : editing.permission_type === eCritterPermission.change;
+  // for new critters, permission will be undefined
+  const canEdit = editing.permission_type === eCritterPermission.change || editing.permission_type === undefined;
   const requiredFields = CS.requiredProps;
 
   const [errors, setErrors] = useState<Record<string, unknown>>({});
@@ -63,7 +65,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   }
 
   const createTitle = (): string =>
-    !isEdit ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
+    !isCreatingNew ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
 
   const {
     associatedAnimalFields,
@@ -105,7 +107,7 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
   };
 
   return (
-    <EditModal title={createTitle()} newT={new Animal()} onValidate={validateForm} isEdit={isEdit} {...props}>
+    <EditModal hideSave={!canEdit} title={createTitle()} onValidate={validateForm} {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
@@ -127,22 +129,22 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                   <span className='span'>|</span>
                   <span className='span'>Device: {editing.device_id ?? 'Unassigned'}</span>
                   <span className='button_span'>
-                    {isEdit ? (
+                    {!isCreatingNew ? (
                       <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
                         Assign Device to Animal
                       </Button>
                     ) : null}
-                    {isEdit ? (
+                    {!isCreatingNew ? (
                       <Button className='button' onClick={(): void => setShowCaptureWorkflow((o) => !o)}>
                         Capture Event
                       </Button>
                     ) : null}
-                    {isEdit ? (
+                    {!isCreatingNew ? (
                       <Button className='button' onClick={(): void => setShowReleaseWorkflow((o) => !o)}>
                         Release Event
                       </Button>
                     ) : null}
-                    {isEdit ? (
+                    {!isCreatingNew ? (
                       <Button className='button' onClick={(): void => setShowMortalityWorkflow((o) => !o)}>
                         Mortality Event
                       </Button>
@@ -196,22 +198,22 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                       .map((f) => makeFormField(f, onChange))}
                   </div>
                   {/* dont show assignment history for new critters */}
-                  {isEdit && showAssignmentHistory ? (
+                  {!isCreatingNew && showAssignmentHistory ? (
                     <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
                       <AssignmentHistory animalId={editing.critter_id} deviceId='' canEdit={canEdit} {...props} />
                     </Modal>
                   ) : null}
-                  {isEdit && showCaptureWorkflow ? (
+                  {!isCreatingNew && showCaptureWorkflow ? (
                     <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
                       <CaptureWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
                     </Modal>
                   ) : null}
-                  {isEdit && showReleaseWorkflow ? (
+                  {!isCreatingNew && showReleaseWorkflow ? (
                     <Modal open={showReleaseWorkflow} handleClose={(): void => setShowReleaseWorkflow(false)}>
                       <ReleaseWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
                     </Modal>
                   ) : null}
-                  {isEdit && showMortalityWorkflow ? (
+                  {!isCreatingNew && showMortalityWorkflow ? (
                     <MortalityEventForm
                       alert={alert}
                       open={showMortalityWorkflow}

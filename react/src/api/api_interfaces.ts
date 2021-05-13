@@ -19,7 +19,8 @@ enum eCritterFetchType {
  * @param body object of T being added
  */
 interface IUpsertPayload<T> {
-  isEdit: boolean;
+  // note: don't believe this is needed any longer as all endpoints are upsert-like
+  // isEdit: boolean;
   body: T;
 }
 

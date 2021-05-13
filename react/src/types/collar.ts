@@ -1,7 +1,8 @@
 import { columnToHeader } from 'utils/common';
-import { BCTW, BCTWBaseType, FormFieldObject } from 'types/common_types';
+import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';
+import { FormFieldObject } from 'types/form_types';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -130,9 +131,9 @@ export class Collar implements ICollar {
         return 'Drop-off Module Frequency'
       case 'dropoff_frequency_unit':
         return 'Drop-off Module Frequency Unit'
-        case 'implant_device_id':
-          return 'Implant Module ID'
-        case 'vendor_activation_status':
+      case 'implant_device_id':
+        return 'Implant Module ID'
+      case 'vendor_activation_status':
         return 'Is device active with vendor?'
       default:
         return columnToHeader(str);

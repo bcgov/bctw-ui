@@ -2,7 +2,7 @@ import { Paper, Typography } from '@material-ui/core';
 import { CritterCollarModalProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT, validateRequiredFields, FormInputType } from 'components/form/form_helpers';
+import { getInputTypesOfT, validateRequiredFields } from 'components/form/form_helpers';
 import useModalStyles from 'components/modal/modal_styles';
 import { CollarStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
@@ -13,19 +13,18 @@ import { removeProps } from 'utils/common';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import Modal from 'components/modal/Modal';
 import { formatLabel } from 'types/common_helpers';
+import { FormInputType } from 'types/form_types';
 
 export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.Element {
-  const { isEdit, editing } = props;
+  const { editing, isCreatingNew } = props;
   const modalClasses = useModalStyles();
-
-  //const canEdit = !isEdit ? true : editing.permission_type === eCritterPermission.change;
-  const canEdit = !isEdit ? true : true;
+  //todo: collar editing permission?
 
   // set the collar type when add collar is selected
   const [collarType, setCollarType] = useState<eNewCollarType>(eNewCollarType.Other);
   const [newCollar, setNewCollar] = useState<Collar>(editing);
 
-  const title = isEdit ? `Editing device ${editing.device_id}` : `Add a new ${collarType} collar`;
+  const title = isCreatingNew ? `Add a new ${collarType} collar` : `Editing device ${editing.device_id}`;  
   const requiredFields = CS.requiredProps;
   const [errors, setErrors] = useState<Record<string, unknown>>({});
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
@@ -33,7 +32,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
 
   useEffect(() => {
     const ipt = getInputTypesOfT<Collar>(
-      isEdit ? editing : newCollar,
+      editing,
       allFields,
       allFields.filter((f) => f.isCode).map((r) => r.prop)
     );
@@ -63,7 +62,6 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     iType: FormInputType,
     handleChange: (v: Record<string, unknown>) => void,
     isError: boolean,
-    span?: boolean
   ): React.ReactNode => {
     const isRequired = requiredFields.includes(iType.key);
     const errorText = isError && (errors[iType.key] as string);
@@ -97,15 +95,12 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
     return freq.padEnd(numToAdd, '0');
   };
 
-  const isAddNewCollar = !isEdit && collarType === eNewCollarType.Other;
   return (
     <EditModal
       title={title}
-      newT={new Collar()}
       onValidate={validate}
       onReset={close}
-      isEdit={isEdit}
-      hideSave={isAddNewCollar}
+      hideSave={isCreatingNew}
       {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
@@ -118,7 +113,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
           };
           return (
             <>
-              {isAddNewCollar ? (
+              {isCreatingNew ? (
                 chooseCollarType()
               ) : (
                 <form className='rootEditInput' autoComplete='off'>
@@ -132,7 +127,7 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                         <span className='span'>|</span>
                         <span className='span'>Deployment Status: {editing?.device_deployment_status}</span>
                         <span className='button_span'>
-                          {isEdit ? (
+                          {!isCreatingNew ? (
                             <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
                               Assign Animal to Device
                             </Button>
@@ -180,13 +175,13 @@ export default function EditCollar(props: CritterCollarModalProps<Collar>): JSX.
                           .filter((f) => purchaseFields.map((x) => x.prop).includes(f.key))
                           .map((d) => makeField(d, onChange, !!errors[d.key]))}
                       </div>
-                      {isEdit && showAssignmentHistory ? (
+                      {!isCreatingNew && showAssignmentHistory ? (
                         <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
                           <AssignmentHistory
                             assignAnimalToDevice={true}
                             animalId=''
                             deviceId={editing.collar_id}
-                            canEdit={canEdit}
+                            canEdit={true}
                             {...props}
                           />
                         </Modal>
