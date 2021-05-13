@@ -48,7 +48,7 @@ const columnToHeader = (prop: string): string => {
 const omitNull = <T,>(obj: T): T => {
   const copy = Object.assign(obj, {});
   Object.keys(copy)
-    .filter(k => obj[k] === null || obj[k] === undefined || obj[k] === '')
+    .filter(k => obj[k] === null || obj[k] === undefined || obj[k] === '' || obj[k] === 'null' || obj[k] === -1)
     .forEach(k => delete (obj[k]));
   return copy;
 }

@@ -1,4 +1,5 @@
 import { ModalBaseProps } from 'components/component_interfaces';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ModifyCritterWrapper from 'pages/data/animals/ModifyCritterWrapper';
@@ -40,11 +41,19 @@ export default function MapOverview({ type, detail, open, handleClose }: Critter
     }
   }, [status]);
 
+  useDidMountEffect(() => {
+    const update = (): void => {
+      // note: force re-render of child edit components when data is fetched
+    }
+    update();
+  }, [editObj]);
+
   if (isError) {
     return <div>{error}</div>;
   }
 
   // props to pass to edit modal
+  // fixme: casting detail
   const editProps = { editing: editObj ?? (detail as any), handleClose, open, onSave: null, isEdit: canEdit };
 
   if (type === 'animal') {
@@ -61,71 +70,3 @@ export default function MapOverview({ type, detail, open, handleClose }: Critter
     );
   }
 }
-/* 
-
-type ISpecialEventProps = {
-  type: 'malfunction' | 'capture';
-  collar_id: string;
-  critter_id: string;
-};
-
-function SpecialEvent({ critter_id, collar_id, type }: ISpecialEventProps): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const { data, status, error } =
-    type === 'capture' ? bctwApi.useCritterHistory(1, critter_id) : bctwApi.useCollarHistory(1, collar_id);
-
-  switch (status) {
-    case 'loading':
-      return <div>loading...</div>;
-    case 'error':
-      return (
-        <div>
-          unable to load {type === 'capture' ? 'capture' : 'malfunction'} history: {error}
-        </div>
-      );
-    default:
-      break;
-  }
-  const filtered =
-    type === 'capture'
-      ? (data as Animal[]).filter((a) => a.capture_date)
-      : (data as Collar[]).filter((c) => c.malfunction_date);
-  if (!filtered.length) {
-    return <div>history contains no events</div>;
-  }
-  return (
-    <Table>
-      <TableHead>
-        {type === 'capture' ? (
-          <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Location</TableCell>
-            <TableCell>UTM</TableCell>
-          </TableRow>
-        ) : (
-          <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Type</TableCell>
-          </TableRow>
-        )}
-      </TableHead>
-      <TableBody>
-        {type === 'capture'
-          ? (filtered as Animal[]).map((f) => (
-              <TableRow key={f.critter_id}>
-                <TableCell>{dateObjectToDateStr(f.capture_date)}</TableCell>
-                <TableCell>{f.captureCoords}</TableCell>
-                <TableCell>{f.captureUTM}</TableCell>
-              </TableRow>
-            ))
-          : (filtered as Collar[]).map((c) => (
-              <TableRow key={c.collar_id}>
-                <TableCell>{c.malfunction_date}</TableCell>
-                <TableCell>{c.device_malfunction_type}</TableCell>
-              </TableRow>
-            ))}
-      </TableBody>
-    </Table>
-  );
-}
-*/

@@ -3,6 +3,7 @@ import { baseInputStyle } from 'components/component_constants';
 import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common';
+import {useState} from 'react';
 
 interface ITextInputProps extends StandardTextFieldProps {
   propName: string;
@@ -11,26 +12,23 @@ interface ITextInputProps extends StandardTextFieldProps {
   changeHandler: InputChangeHandler;
 }
 
-export const inputPropsToRemove = ['outline', 'propName', 'changeHandler', 'validate', 'errorMessage', 'handleChange', 'formType']
+export const inputPropsToRemove = ['outline', 'propName', 'changeHandler', 'validate', 'errorMessage', 'handleChange', 'formType', 'defaultValue']
 
 export default function TextField(props: ITextInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, outline, style } = props;
+  const [val, setVal] = useState<string>(defaultValue ?? '');
 
   useEffect(() => {
-    const o = { [propName]: defaultValue };
-    changeHandler(o);
+    setVal(defaultValue ?? '');
+    changeHandler({ [propName]: defaultValue });
   }, [defaultValue]);
 
   const propsToPass = removeProps(props, inputPropsToRemove);
 
   const handleChange = (event): void => {
-    let o;
-    if (typeof defaultValue === 'number') {
-      o = { [propName]: +event.target.value };
-    } else {
-      o = { [propName]: event.target.value };
-    }
-    changeHandler(o);
+    const target = event.target.value;
+    setVal(target);
+    changeHandler({ [propName]: target });
   };
 
   return (
@@ -38,8 +36,9 @@ export default function TextField(props: ITextInputProps): JSX.Element {
       variant={outline ? 'outlined' : 'standard'}
       size={'small'}
       style={style ?? baseInputStyle}
-      {...propsToPass}
+      value={val}
       onChange={handleChange}
+      {...propsToPass}
     />
   );
 }
