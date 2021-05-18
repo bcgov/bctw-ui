@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import { CircularProgress, Typography } from '@material-ui/core';
 import { CollarStrings as S, FileStrings } from 'constants/strings';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -15,7 +15,6 @@ import { useQueryClient } from 'react-query';
 import bulkStyles from 'pages/data/bulk/bulk_styles';
 
 type CollarImportProps = ModalBaseProps & {
-
 };
 export default function CollarImport({ open, handleClose }: CollarImportProps): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -28,13 +27,13 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   // when successful posts are made to add new collars, refetch the collar page
   const invalidate = (): void => {
     queryClient.invalidateQueries('collartype');
-  }
+  };
 
   const onSuccessKeyx = (response: IBulkUploadResults<Collar>): void => {
     if (response.errors.length) {
       setErrors(response.errors);
     } else {
-      const newkeyx = response.results.map(r => r.device_id).join(', ');
+      const newkeyx = response.results.map((r) => r.device_id).join(', ');
       setMessage(`devices ${newkeyx} were successfully registered!`);
       invalidate();
     }
@@ -42,10 +41,10 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
 
   const onSuccessCsv = (response: IBulkUploadResults<Collar>): void => {
     if (response.errors.length) {
-      setMessage(`a bulk upload completed but there were ${response.errors.length} error(s)`) ;
+      setMessage(`a bulk upload completed but there were ${response.errors.length} error(s)`);
       setErrors(response.errors);
     } else {
-      const newkeyx = response.results.map(r => r.device_id).join(', ');
+      const newkeyx = response.results.map((r) => r.device_id).join(', ');
       setMessage(`devices ${newkeyx} were successfully updated!`);
       invalidate();
     }
@@ -55,7 +54,7 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
     setMessage(e.message);
   };
 
-  useEffect( () => {
+  useEffect(() => {
     reset();
   }, [importType]);
 
@@ -64,21 +63,23 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
     resetKeyx();
     setMessage('');
     setErrors([]);
-  }
+  };
 
   const onClose = (): void => {
     reset();
     handleClose(false);
-  }
+  };
 
   // the bulk file handler mutation for importing .keyx files
-  const { mutateAsync: mutateKeyx, reset: resetKeyx } = bctwApi.useMutateBulkXml({
-    onSuccess: onSuccessKeyx, onError
+  const { mutateAsync: mutateKeyx, reset: resetKeyx, isLoading: isPostingKeyx } = bctwApi.useMutateBulkXml({
+    onSuccess: onSuccessKeyx,
+    onError
   });
 
   // the single file mutation for importing a single .csv file with metadata
-  const { mutateAsync: mutateCsv, reset: resetCsv } = bctwApi.useMutateBulkCsv({
-    onSuccess: onSuccessCsv, onError
+  const { mutateAsync: mutateCsv, reset: resetCsv, isLoading: isPostingCsv } = bctwApi.useMutateBulkCsv({
+    onSuccess: onSuccessCsv,
+    onError
   });
 
   const onCsvFile = async (fieldName: string, files: FileList): Promise<void> => {
@@ -93,7 +94,7 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
 
   const onDownloadTemplate = (): void => {
     download(Object.keys(new Collar()).join(), FileStrings.collarTemplateName, '');
-  }
+  };
 
   return (
     <Modal open={open} handleClose={onClose} title={'Device Import'}>
@@ -108,23 +109,40 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
         <Typography variant={'h6'} onClick={(): void => setImportType('template')} className={'link link-hover'}>
           {S.collarImportDowloadTemplate}
         </Typography>
-        <div className={'import-btn'}>
-          {importType === 'keyx' ? <FileInput accept='.keyx' buttonText={S.keyxButtonText} fileName={''} multiple={true} onFileChosen={onKeyXFiles} /> : null }
-          {importType === 'csv' ? <FileInput accept='.csv' buttonText={S.csvButtonText} onFileChosen={onCsvFile} /> : null }
-          {importType === 'template' ? <Button color='secondary' onClick={onDownloadTemplate}>{FileStrings.templateButtonText}</Button> : null }
-        </div>
+        {/* show progress if waiting on API result */}
+        {isPostingKeyx || isPostingCsv ? (
+          <CircularProgress />
+        ) : (
+          <div className={'import-btn'}>
+            {importType === 'keyx' ? (
+              <FileInput
+                accept='.keyx'
+                buttonText={S.keyxButtonText}
+                fileName={''}
+                multiple={true}
+                onFileChosen={onKeyXFiles}
+              />
+            ) : null}
+            {importType === 'csv' ? (
+              <FileInput accept='.csv' buttonText={S.csvButtonText} onFileChosen={onCsvFile} />
+            ) : null}
+            {importType === 'template' ? (
+              <Button color='secondary' onClick={onDownloadTemplate}>
+                {FileStrings.templateButtonText}
+              </Button>
+            ) : null}
+          </div>
+        )}
         {message ? <hr></hr> : null}
         <div className={'response'}>{message}</div>
-        {
-          errors.map(e => {
-            return (
-              <div key={e.rownum}>
-                <span className={styles.errRow}>Row {e.rownum}</span>
-                <span className={styles.err}>{e.error}</span>
-              </div>
-            )
-          })
-        }
+        {errors.map((e) => {
+          return (
+            <div key={e.rownum}>
+              <span className={styles.errRow}>Row {e.rownum}</span>
+              <span className={styles.err}>{e.error}</span>
+            </div>
+          );
+        })}
       </div>
     </Modal>
   );

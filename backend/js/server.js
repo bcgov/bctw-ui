@@ -94,9 +94,10 @@ const proxyApi = function (req, res, next) {
   const successHandler = (response) => res.json(response.data);
 
   if (req.method === 'POST') {
-    if (req.file || req.files) {
-      const form = handleFiles(req);
-      const config = { headers: form.getHeaders() };
+    const { file, files } = req;
+    if (file || files) {
+      const { form, config } = file ? handleFile(file) : handleFiles(files);
+      console.log(JSON.stringify(form, null, 2));
       axios.post(url, form, config)
         .then(successHandler)
         .catch(errHandler)
@@ -118,20 +119,29 @@ const proxyApi = function (req, res, next) {
   }
 };
 
-/*
+/**
   * csv files can only be imported one at a time
-  * multiple xml files can be processed
-  * depending on the type of file uploaded, create a new formdata object to pass on to the server
-*/
-const handleFiles = function (req) {
-  const { file, files } = req;
-  const form = new FormData();
+ */
+const handleFile = function(file) {
   if (file) {
+    const form = new FormData();
     form.append('csv', file.buffer, file.originalname);
-  } else if (files && files.length) {
-    files.forEach(f => form.append(f.fieldname, f.buffer, f.originalname));
+    return { form, config: { headers: form.getHeaders() }}
   }
-  return form;
+}
+
+/*
+  * multiple xml files can be processed
+  * depending on the type of file uploaded, 
+  * create a new formdata object to pass on to the server
+*/
+const handleFiles = function (files) {
+  if (files && files.length) {
+    const form = new FormData();
+    files.forEach(f => form.append(f.fieldname, f.buffer, f.originalname));
+    // Axios will throw if posting the form as an array, stringify it first
+    return { form, config: { headers: form.getHeaders(), options: { json: true}}}
+  }
 }
 
 /* ## gardenGate
