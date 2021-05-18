@@ -8,17 +8,15 @@ const morgan = require('morgan');
 const multer = require('multer');
 const helmet = require('helmet');
 const express = require('express');
-const bodyParser = require('body-parser');
 const expressSession = require('express-session');
 const keycloakConnect = require('keycloak-connect');
 
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
 const isProd = process.env.NODE_ENV === 'production' ? true : false;
+const isTest = process.env.TEST === 'true';
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
-
-// const authorizedUsers = JSON.parse(process.env.BCTW_AUTHORIZED_USERS);
 
 var memoryStore = new expressSession.MemoryStore();
 
@@ -75,7 +73,7 @@ const proxyApi = function (req, res, next) {
   // The domain and username
   let url;
   if (isProd) {
-    const cred = req.kauth.grant.access_token.content.preferred_username;
+    const cred = !isTest ? req.kauth.grant.access_token.content.preferred_username : 'test@idir';
     const domain = cred.split('@')[1];
     const user = cred.split('@')[0];
     url = `${apiHost}:${apiPort}/${endpoint}`;
@@ -89,7 +87,10 @@ const proxyApi = function (req, res, next) {
   }
 
   console.log(`url: ${url}, type: ${req.method}`);
-  const errHandler = (err) => res.status(500).json({ error: err });
+  const errHandler = (err) => {
+    console.error(err.response);
+    res.status(500).json({ error: err.response.data });
+  }
   const successHandler = (response) => res.json(response.data);
 
   if (req.method === 'POST') {
@@ -117,15 +118,18 @@ const proxyApi = function (req, res, next) {
   }
 };
 
+/*
+  * csv files can only be imported one at a time
+  * multiple xml files can be processed
+  * depending on the type of file uploaded, create a new formdata object to pass on to the server
+*/
 const handleFiles = function (req) {
   const { file, files } = req;
   const form = new FormData();
   if (file) {
     form.append('csv', file.buffer, file.originalname);
   } else if (files && files.length) {
-    Array
-      .from(Array(files.length).keys())
-      .map(i => form.append('xml', files[i], files[i].name))
+    files.forEach(f => form.append(f.fieldname, f.buffer, f.originalname));
   }
   return form;
 }
@@ -214,13 +218,8 @@ var app = express()
   .use(helmet())
   .use(cors())
   .use(morgan(logger))
-  .use(bodyParser.json({
-    limit: '50mb'
-  }))
-  .use(bodyParser.urlencoded({
-    limit: '50mb',
-    extended: true
-  }))
+  .use(express.json({ limit: '50mb' }))
+  .use(express.urlencoded({ limit: '50mb', extended: true }))
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
@@ -228,8 +227,13 @@ var app = express()
   // .use(authenticate) 
   .get('/denied', denied);
 
+if (isTest) {
+  app
+    .post('/api/import-csv', upload.single('csv'), pageHandler)
+    .post('/api/import-xml', upload.array('xml'), pageHandler)
+    .post('/api/:endpoint', proxyApi)
 // Use keycloak authentication only in Production
-if (isProd) {
+} else if (isProd) {
   app
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
@@ -238,6 +242,7 @@ if (isProd) {
     .post('/api/import-csv', upload.single('csv'), keycloak.protect(), pageHandler)
     .post('/api/import-xml', upload.array('xml'), keycloak.protect(), pageHandler)
     .post('/api/:endpoint', keycloak.protect(), proxyApi)
+    // delete handlers
     .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
 } else {
   app

@@ -43,9 +43,12 @@ const CollarStrings = {
   assignmentHistoryByAnimalTitle: 'History of Devices Assigned',
   assignmentHistoryByDeviceTitle: 'History of Animals Assigned',
   collarImportStartMsg: 'What do you want to do?',
-  collarImportKeyX: 'Create new Vectronic devices using .keyx file(s)',
+  collarImportKeyX: 'Create new Vectronic devices using one or more .keyx files. The .keyx file must be imported before importing Vectronic device metadata via CSV.',
   collarImportDowloadTemplate: 'Download a CSV template for importing device metadata',
   collarImportMetadata: 'Import metadata for existing devices using a .CSV file',
+  keyxButtonText: 'Upload KeyX files',
+  csvButtonText: 'Upload CSV file',
+
 }
 
 const CodeStrings = {

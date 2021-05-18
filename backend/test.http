@@ -25,8 +25,15 @@ content-type: application/json
 ###
 http://localhost:8080/api/get-last-pings
 
-
-###
+### test csv file import
+# location of the data.csv file is configured in .vscode/settings.json
+# ex:
+# "rest-client.environmentVariables": {
+  # "dev": {
+    # "csv": "/home/data.csv",
+    # "idir": "test",
+  # },
+# }
 POST http://localhost:8080/api/import-csv HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
@@ -35,4 +42,15 @@ Content-Disposition: form-data; name="csv"; filename="data.csv"
 Content-Type: text/csv
 
 <@ {{csv}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### test .keyx file import 
+POST http://localhost:8080/api/import-xml HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="xml"; filename="{{keyx}}"
+Content-Type: text/xml
+
+<@ {{keyx}}>
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--

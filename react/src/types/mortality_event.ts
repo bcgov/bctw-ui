@@ -5,7 +5,7 @@ import { BCTW } from './common_types';
 import { LocationEvent } from './location_event'
 
 interface IMortalityEvent extends 
-  Pick<Animal, 'critter_id' | 'animal_status' >,
+  Pick<Animal, 'critter_id' | 'animal_status' | 'proximate_cause_of_death' | 'predator_species' >,
   Pick<Collar, 'collar_id' | 'device_id' | 'retrieved' | 'retrieval_date' | 'vendor_activation_status' | 'device_deployment_status' | 'device_status'> {
   shouldUnattachDevice: boolean;
 }
@@ -13,20 +13,19 @@ interface IMortalityEvent extends
 export default class MortalityEvent implements IMortalityEvent, BCTW {
   critter_id: string;
   animal_status: string;
+  proximate_cause_of_death: string;
+  predator_species: string; //todo:
   collar_id: string;
   device_id: number;
   retrieved: boolean;
-  // todo:
-  shouldUnattachDevice: boolean;
+  shouldUnattachDevice: boolean; // todo:
   retrieval_date: Date;
   vendor_activation_status: boolean;
   device_deployment_status: string;
   device_status: string;
   location_event: LocationEvent;
   // deviceUnassigned: boolean;
-  // pcod: string;
-  // pcod_predator_species: string;
-  pcod_confidence_value: string;
+  pcod_confidence_value: string; // todo:
 
   constructor(critterId: string, collarId: string, deviceId: number) {
     this.critter_id = critterId;
@@ -48,8 +47,6 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
         return 'Has Device Been Retrieved?'
       case 'vendor_activation_status':
         return 'Is Device Still Active With Vendor?';
-      case 'pcod':
-        return 'Proximate Cause of Death';
       case 'pcod_predator_species':
         return 'PCOD Predator Species';
       case 'pcod_confidence_value':
@@ -66,7 +63,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
   }
 
   get propsThatAreCodes(): string[] {
-    return ['animal_status', 'device_deployment_status', 'device_status'];
+    return ['animal_status', 'device_deployment_status', 'device_status', 'proximate_cause_of_death'];
   }
 
   get getCritter(): Animal {

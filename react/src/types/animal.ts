@@ -50,7 +50,8 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
-  probable_cause_of_death: string;
+  predator_species: string;
+  proximate_cause_of_death: string;
   ultimate_cause_of_death: string;
   recapture: boolean;
   region: string;
@@ -100,7 +101,8 @@ export class Animal implements IAnimal {
   @Transform((v) => v || -1, transformOpt) mortality_utm_easting: number;
   @Transform((v) => v || -1, transformOpt) mortality_utm_northing: number;
   @Transform((v) => v || -1, transformOpt) mortality_utm_zone: number;
-  probable_cause_of_death: string;
+  predator_species: string;
+  proximate_cause_of_death: string;
   ultimate_cause_of_death: string;
   @Transform((v) => v || '', transformOpt) population_unit: string;
   @Transform((v) => v || false, transformOpt) recapture: boolean;
@@ -165,12 +167,13 @@ export class Animal implements IAnimal {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'probable_cause_of_death':
-        return 'Proximate Cause of Death';
+      case 'wlh_id':
+        return 'WLH ID';
       case 'associated_animal_relationship':
         return 'Associated Relationship';
       case 'juvenile_at_heel':
         return 'Juvenile at Heel?';
+      // used in bottom map details
       case 'mortalityCoords':
       case 'captureCoords':
         return 'Coordinates (Lat/Long)';
@@ -208,7 +211,7 @@ const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'life_stage', isCode: true },
     { prop: 'juvenile_at_heel', isCode: true }
   ],
-  // to show in the animal history modal
+  // to show in the animal metadata history window
   historyProps: [
     { prop: 'animal_id' },
     { prop: 'wlh_id' },
@@ -235,8 +238,10 @@ const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'mortality_utm_zone' },
     { prop: 'mortality_utm_easting' },
     { prop: 'mortality_utm_northing' },
-    { prop: 'probable_cause_of_death' },
-    { prop: 'ultimate_cause_of_death' },
+    { prop: 'proximate_cause_of_death', isCode: true },
+    { prop: 'ultimate_cause_of_death', isCode: true, codeName: 'proximate_cause_of_death' },
+    // todo:
+    { prop: 'predation_species', /* isCode: true */ },
     { prop: 'mortality_comment' },
   ],
   releaseFields: [

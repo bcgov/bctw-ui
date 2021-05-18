@@ -83,7 +83,7 @@ function CreateEditSelectField({
       label={label}
       disabled={disabled}
       key={formType.key}
-      codeHeader={formType.key}
+      codeHeader={formType?.codeName ?? formType.key}
       defaultValue={formType.value as string}
       changeHandler={handleChange}
       required={required}

@@ -4,7 +4,7 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "debug *nix",
+      "name": "debug linux",
       "url": "http://localhost:1111",
       "webRoot": "${workspaceFolder}/react",
       // WSL-specific source map
@@ -20,7 +20,7 @@
       "webRoot": "${workspaceFolder}/react",
     },
     {
-      "name": "launch keycloak server.js",
+      "name": "debug backend",
       "program": "${workspaceFolder}/backend/js/server.js",
       "request": "launch",
       "skipFiles": [ "<node_internals>/**" ],

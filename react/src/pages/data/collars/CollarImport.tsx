@@ -109,8 +109,8 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
           {S.collarImportDowloadTemplate}
         </Typography>
         <div className={'import-btn'}>
-          {importType === 'keyx' ? <FileInput accept='.keyx' buttonText='Upload KeyX file(s)' fileName={''} multiple={true} onFileChosen={onKeyXFiles} /> : null }
-          {importType === 'csv' ? <FileInput accept='.csv' buttonText='Upload CSV file' onFileChosen={onCsvFile} /> : null }
+          {importType === 'keyx' ? <FileInput accept='.keyx' buttonText={S.keyxButtonText} fileName={''} multiple={true} onFileChosen={onKeyXFiles} /> : null }
+          {importType === 'csv' ? <FileInput accept='.csv' buttonText={S.csvButtonText} onFileChosen={onCsvFile} /> : null }
           {importType === 'template' ? <Button color='secondary' onClick={onDownloadTemplate}>{FileStrings.templateButtonText}</Button> : null }
         </div>
         {message ? <hr></hr> : null}

@@ -147,8 +147,8 @@ const collarFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'satellite_network', isCode: true },
     { prop: 'frequency' },
     { prop: 'frequency_unit', isCode: true },
+    { prop: 'fix_rate' },
     { prop: 'vendor_activation_status', isBool: true },
-    { prop: 'fix_rate' }
   ],
   deviceOptionFields: [
     { prop: 'camera_device_id' },
@@ -172,8 +172,8 @@ const collarFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'malfunction_date' },
     { prop: 'malfunction_type' },
     { prop: 'device_deployment_status', isCode: true },
-    { prop: 'retrieved', isBool: true },
-    { prop: 'retrieval_date', isDate: true }
+    { prop: 'retrieval_date', isDate: true },
+    { prop: 'retrieved', isBool: true }
   ],
   userCommentField: [
     { prop: 'user_comment' }

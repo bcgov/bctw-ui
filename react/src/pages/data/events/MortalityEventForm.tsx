@@ -31,29 +31,11 @@ const pcodPredatorSpeciesValues = [
   { id: 2, value: 'Bobcat' }
 ]
 
-// temporary: for UAT2 workshop
-const pcodValues = [
-  { id: 0, value: 'predation_location', displayLabel: 'Predation: Location known' },
-  { id: 1, value: 'predation_no_location', displayLabel: 'Predation: Location unknown' },
-  { id: 2, value: 'predation_probable', displayLabel: 'Predation: Suspected' },
-  { id: 3, value: 'hunting_unlicenced', displayLabel: 'Hunting: Unlicensed' },
-  { id: 4, value: 'hunting_licenced', displayLabel: 'Hunting: Licensed' },
-  { id: 5, value: 'accident_collision', displayLabel: 'Accident: Vehicular collision' },
-  { id: 6, value: 'accident_natural', displayLabel: 'Accident: Natural' },
-  { id: 7, value: 'accident_capture', displayLabel: 'Accident: Capture-related injury' },
-  { id: 8, value: 'health_related', displayLabel: 'Health-related' },
-  { id: 9, value: 'health_starvation', displayLabel: 'Health-related: Starvation' },
-  { id: 10, value: 'unknown', displayLabel: 'Unknown' },
-  { id: 11, value: 'other', displayLabel: 'Other' },
-  { id: 12, value: 'natural', displayLabel: 'Natural' },
-  { id: 13, value: 'removal', displayLabel: 'Removal' },
-  { id: 14, value: 'trapping', displayLabel: 'Trapping' }
-]
-
 export default function MortalityEventForm({ alert, open, handleClose, handleSave }: MortEventProps): JSX.Element {
   const [errors, setErrors] = useState({});
   const [mortalityEvent, setMortalityEvent] = useState<MortalityEvent>(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id))
   const [locationEvent, setLocationEvent] = useState<LocationEvent>(new LocationEvent('mortality', alert.valid_from));
+  const [isRetrieved, setIsRetrieved] = useState<boolean>(alert.retrieved);
 
   const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.editableProps.map(c => ({prop: c})), mortalityEvent.propsThatAreCodes);
   const required = true;
@@ -62,6 +44,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
   const retrievedField = formFields.find(f => f.key === 'retrieved');
   const retrievedDateField = formFields.find(f => f.key === 'retrieval_date');
   const animalStatusField = formFields.find(f => f.key === 'animal_status');
+  const pcodField = formFields.find(f => f.key === 'proximate_cause_of_death');
   const pcodConfidenceValueField = formFields.find(f => f.key === 'pcod_confidence_value');
   const vasField = formFields.find(f => f.key === 'vendor_activation_status');
   const deviceStatusFields = formFields.filter(f => ['device_status', 'device_deployment_status'].includes(f.key))
@@ -79,6 +62,10 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
     await handleSave(a, c);
     handleClose(false);
   }
+  useDidMountEffect(() => {
+    // trigger re-render of retrieved_date field
+    // todo: delete this field on-save if disabled?
+  }, [isRetrieved]);
 
   useDidMountEffect(() => {
     setMortalityEvent(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id))
@@ -103,6 +90,10 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
           const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
             if (v) {
               setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
+            }
+            // update the disabled status of the retrieved_date field
+            if (Object.keys(v).includes('retrieved')) {
+              setIsRetrieved(v.retrieved as boolean);
             }
             handlerFromContext(v, modifyCanSave);
           };
@@ -146,9 +137,9 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                     <Tooltip title={
                       <p>If you unassign the device, no new telemetry from this device will be connected to this animal.</p>
                     } placement='right' enterDelay={750}>
-                    <div>
-                      {CreateEditCheckboxField({formType: deviceUnassignedField, label: formatLabel(mortalityEvent, deviceUnassignedField.key), handleChange: onChange})}
-                    </div>
+                      <div>
+                        {CreateEditCheckboxField({formType: deviceUnassignedField, label: formatLabel(mortalityEvent, deviceUnassignedField.key), handleChange: onChange})}
+                      </div>
                     </Tooltip>
                   </div>
                   <div className={'dlg-details-section'}>
@@ -164,7 +155,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                       <p>TODO: If <strong>checked</strong>then...</p>
                     } placement='right' enterDelay={750}>
                       <div>
-                        {CreateEditDateField({formType: retrievedDateField, label: formatLabel(mortalityEvent, retrievedDateField.key), handleChange: onChange, disabled: !mortalityEvent.retrieved})}
+                        {CreateEditDateField({formType: retrievedDateField, label: formatLabel(mortalityEvent, retrievedDateField.key), handleChange: onChange, disabled: !isRetrieved})}
                       </div>
                     </Tooltip>
                     <Tooltip title={
@@ -186,9 +177,8 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                   <div className={'dlg-details-section'}>
                     <h3>Update Animal Details</h3>
                     {MakeEditField({formType: animalStatusField, handleChange: onChange, required, errorMessage: ''})}
-                    { /* temporary: for UAT2 workshop */ }
                     <div style={{marginBottom: '18px'}}>
-                      <MultiSelect label="Proximate Cause of Death" changeHandler={() => ""} data={pcodValues} />
+                      {MakeEditField({formType: pcodField, handleChange: onChange, required, errorMessage: ''})}
                     </div>
                     <div style={{marginBottom: '18px'}}>
                       <MultiSelect label="Predator Species" changeHandler={() => ""} data={pcodPredatorSpeciesValues} />

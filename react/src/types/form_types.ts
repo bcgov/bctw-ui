@@ -15,6 +15,7 @@ type FormInputType = {
   key: string;
   type: eInputType;
   value: unknown;
+  codeName?: string;
 };
 
 /**
@@ -25,6 +26,7 @@ type FormInputType = {
 type FormFieldObject = {
   prop: string;
   isCode?: boolean;
+  codeName?: string;
   isDate?: boolean;
   isBool?: boolean;
   required?: boolean;

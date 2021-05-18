@@ -28,6 +28,7 @@ export default function DateInput(props: DateInputProps): JSX.Element {
         inputVariant={'outlined'}
         disableToolbar
         disabled={props.disabled}
+        size={'small'}
         variant='dialog'
         // a plain empty string renders as today?
         format={dayjs.isDayjs(selectedDate) ? selectedDate.format('YYYY/MM/DD') : ' '}

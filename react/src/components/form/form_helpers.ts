@@ -11,9 +11,9 @@ const stringsThatAreBools = ['true', 'false'];
  */
 function getInputTypesOfT<T>(obj: T, editableProps: FormFieldObject[], selectableProps: string[]): FormInputType[] {
   return editableProps.map((field: FormFieldObject) => {
-    const { prop, isCode, isDate } = field;
-    if (selectableProps.includes(prop)) {
-      return { key: prop, type: eInputType.select, value: obj[prop] };
+    const { prop, isCode, codeName, isDate } = field;
+    if (selectableProps.includes(prop) || isCode) {
+      return { key: prop, type: eInputType.select, value: obj[prop], codeName };
     }
     if (stringsThatAreBools.includes(obj[prop])) {
       return { key: prop, type: eInputType.check, value: obj[prop] };
