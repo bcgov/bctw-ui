@@ -18,13 +18,12 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
   collar_id: string;
   device_id: number;
   retrieved: boolean;
-  shouldUnattachDevice: boolean; // todo:
+  shouldUnattachDevice: boolean;
   retrieval_date: Date;
   vendor_activation_status: boolean;
   device_deployment_status: string;
   device_status: string;
   location_event: LocationEvent;
-  // deviceUnassigned: boolean;
   pcod_confidence_value: string; // todo:
 
   constructor(critterId: string, collarId: string, deviceId: number) {
@@ -35,6 +34,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     this.retrieved = false;
     this.vendor_activation_status = true;
     // workflow defaulted fields
+    this.shouldUnattachDevice = false;
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
     this.animal_status = 'Potential Mortality';
@@ -66,6 +66,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     return ['animal_status', 'device_deployment_status', 'device_status', 'proximate_cause_of_death'];
   }
 
+  // retrieve the animal metadata fields from the mortality event
   get getCritter(): Animal {
     const a = new Animal();
     const l = this.location_event;
@@ -81,6 +82,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     return omitNull(a)
   }
 
+  // retrieve the collar metadata fields from the event
   get getCollar(): Collar {
     const c = new Collar();
     c.collar_id = this.collar_id;
@@ -91,6 +93,24 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     c.device_status = this.device_status;
     c.device_deployment_status = this.device_deployment_status;
     delete c.malfunction_date;
+    delete c.frequency;
     return omitNull(c);
+  }
+
+  toJSON(): MortalityEvent {
+    // if marked as not retrieved, wipe the retrieval date.
+    if (!this.retrieved) {
+      delete this.retrieval_date;
+    }
+    // preserve lat/long or UTM, but not both
+    if (this.location_event.latitude && this.location_event.longitude) {
+      delete this.location_event.utm_easting;
+      delete this.location_event.utm_northing;
+      delete this.location_event.utm_easting;
+    } else {
+      delete this.location_event.latitude;
+      delete this.location_event.longitude;
+    }
+    return this;
   }
 }

@@ -3,6 +3,7 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
+import { eventApi as event_api } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { userApi as user_api } from 'api/user_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
@@ -30,6 +31,7 @@ import { BCTW, BCTWType } from 'types/common_types';
 import { exportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
+import MortalityEvent from 'types/mortality_event';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -62,6 +64,7 @@ export const useTelemetryApi = () => {
   const bulkApi = bulk_api(api);
   const mapApi = map_api({ api, testUser });
   const userApi = user_api({ api, testUser });
+  const eventApi = event_api({ api });
 
   const defaultQueryOptions = {
     refetchOnWindowFocus: false
@@ -341,8 +344,13 @@ export const useTelemetryApi = () => {
   const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDFInput[]>): UseMutationResult<IUDF[]> =>
     useMutation<IUDF[], AxiosError, IUDFInput[]>((body) => userApi.upsertUDF(body), config);
 
+  /** expire or snooze a user telemetry alert */
   const useMutateUserAlert = (config: UseMutationOptions<TelemetryAlert[], AxiosError, TelemetryAlert[]>): UseMutationResult<TelemetryAlert[]> =>
     useMutation<TelemetryAlert[], AxiosError, TelemetryAlert[]>((body) => userApi.updateAlert(body), config);
+  
+  /** POST a mortality event form */
+  const useMutateMortalityEvent = (config: UseMutationOptions<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>): UseMutationResult<IBulkUploadResults<unknown>> =>
+    useMutation<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
 
   return {
     // queries
@@ -377,5 +385,6 @@ export const useTelemetryApi = () => {
     useMutateUDF,
     useDelete,
     useMutateUserAlert,
+    useMutateMortalityEvent,
   };
 };

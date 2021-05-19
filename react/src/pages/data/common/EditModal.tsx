@@ -104,7 +104,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
         return;
       }
     }
-    console.log(JSON.stringify(body, null, 2));
+    // console.log(JSON.stringify(body, null, 2));
     const toSave: IUpsertPayload<T> = { body };
     onSave(toSave);
   };
@@ -119,9 +119,11 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     // todo: only when prop has actually changed
     // otherwise enabled at form load
     if (typeof hasErrors === 'function') {
-      const hasEm = hasErrors();
-      setCanSave(!hasEm);
-      return;
+      const errs = hasErrors();
+      setCanSave(!errs);
+      if (errs) {
+        return;
+      }
     }
     const modified = { ...newObj, ...newProp };
     setNewObj(modified);

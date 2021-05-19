@@ -19,6 +19,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import SnoozeIcon from '@material-ui/icons/Snooze';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import AlarmOffIcon from '@material-ui/icons/AlarmOff';
+import WarningIcon from '@material-ui/icons/Warning';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -41,7 +42,8 @@ const mappings: Record<string, JSX.Element> = {
   edit: <EditIcon />,
   copy: <FileCopyIcon />,
   snooze: <SnoozeIcon />,
-  cannotSnooze: <AlarmOffIcon />
+  cannotSnooze: <AlarmOffIcon />,
+  warning: <WarningIcon htmlColor='orange' />,
 };
 
 type IconProps = {

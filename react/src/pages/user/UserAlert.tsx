@@ -12,9 +12,8 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { formatAxiosError } from 'utils/common';
 import { AxiosError } from 'axios';
-import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
-import { Animal } from 'types/animal';
-import { Collar } from 'types/collar';
+import { IBulkUploadResults } from 'api/api_interfaces';
+import MortalityEvent from 'types/mortality_event';
 
 export default function AlertPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -36,58 +35,45 @@ export default function AlertPage(): JSX.Element {
     update();
   }, [useAlerts]);
 
-  const onAlertSavedSuccess = async (): Promise<void> => {
+  const onAlertSaved = async (): Promise<void> => {
     responseDispatch({ type: 'success', message: `telemetry alert saved` });
   };
 
-  const onSuccess = async (data: IBulkUploadResults<Animal | Collar>): Promise<void> => {
-    console.log('data returned from mortality alert context', data);
+  const onMortalitySaved = async (data: IBulkUploadResults<unknown>): Promise<void> => {
+    // console.log('data returned from mortality alert context', data);
     const { errors, results } = data;
     if (errors.length) {
       responseDispatch({ type: 'error', message: `${errors.map((e) => e.error)}` });
-    } else {
-      responseDispatch({ type: 'success', message: 'event saved!' });
-    }
-    if ((results as Collar[])[0]?.collar_id) {
-      // this alert is now considered 'expired'.
+    } else if (results.length) {
+      responseDispatch({ type: 'success', message: 'mortality event saved!' });
+      // console.log(selectedAlert);
+      // expire the telemetry alert
       const a = Object.assign(new TelemetryAlert(), selectedAlert);
-      a.expireAlert();
+      a.expireAlert(); // updates the expiry date
       await updateAlert(a);
     }
   };
 
   const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
 
-  // setup the mutations for saving critters, collars, and updating the alert
+  // setup the mutations
   const { mutateAsync: saveAlert, isLoading: isSavingAlert } = bctwApi.useMutateUserAlert({
-    onSuccess: onAlertSavedSuccess,
+    onSuccess: onAlertSaved,
     onError
   });
-  const { mutateAsync: saveCritter } = bctwApi.useMutateCritter({ onSuccess, onError });
-  const { mutateAsync: saveCollar } = bctwApi.useMutateCollar({ onSuccess, onError });
+  const { mutateAsync: saveMortality } = bctwApi.useMutateMortalityEvent({ onSuccess: onMortalitySaved, onError });
 
   const handleSelectRow = (aid: number): void => {
     const selected = alerts.find((a) => a.alert_id === aid);
     setSelectedAlert(selected);
   };
 
-
   /**
-   * performs updates of collar and critter
-   * note: move this into its own hook, but keep as separate api endpoint calls? 
+   * performs metadata updates of collar/critter
    */
-  const handleSave = async (animal: Animal, collar: Collar): Promise<void> => {
-    responseDispatch({ type: 'error', message: `saving mortality event not enabled yet!` });
-    return;
-    if (animal && animal.critter_id) {
-      // console.log('critter payload', animal);
-      const b: IUpsertPayload<Animal> = { body: animal };
-      await saveCritter(b);
-    }
-    if (collar && collar.collar_id) {
-      // console.log('collar payload', collar);
-      const b: IUpsertPayload<Collar> = { body: collar };
-      await saveCollar(b);
+  const handleSave = async (event: MortalityEvent): Promise<void> => {
+    if (event) {
+      await saveMortality(event);
     }
   };
 
@@ -96,7 +82,6 @@ export default function AlertPage(): JSX.Element {
    */
   const updateAlert = async (alert: TelemetryAlert): Promise<void> => {
     console.log('saving this alert', alert.toJSON());
-    // responseDispatch({ type: 'error', message: `snoozing not enabled yet!` });
     await saveAlert([alert]);
     // trigger the alert context to refetch
     useAlerts.invalidate();
@@ -132,8 +117,7 @@ export default function AlertPage(): JSX.Element {
     'valid_from',
     'update',
     'Snooze Status',
-    'Snoozes Used',
-    'Snooze'
+    'Snooze Action'
   ];
 
   if (!alerts?.length) {
@@ -142,12 +126,12 @@ export default function AlertPage(): JSX.Element {
 
   return (
     <div className={'container'}>
-      <Typography variant='h4'>Alerts</Typography>
+      <Typography variant='h4'>Alerts ({alerts.length})</Typography>
       <Box p={3}>
         {isSavingAlert ? (
           <CircularProgress />
         ) : (
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} style={{padding: '3px'}}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -161,6 +145,12 @@ export default function AlertPage(): JSX.Element {
                   return (
                     <TableRow
                       className={a?.alert_id === selectedAlert?.alert_id ? 'row-selected' : ''}
+                      // highlight when there are no snoozes left
+                      style={
+                        a.snoozesAvailable === 0 && !a.isSnoozed
+                          ? { border: '3px solid orange', backgroundColor: 'rgba(255,204,0,0.4)' }
+                          : {}
+                      }
                       onClick={(): void => handleSelectRow(a.alert_id)}
                       hover
                       key={a.alert_id}>
@@ -177,16 +167,21 @@ export default function AlertPage(): JSX.Element {
                           <Icon icon='edit' />
                         </IconButton>
                       </TableCell>
-                      <TableCell>{a.snoozeStatus}</TableCell>
-                      <TableCell>{a.snooze_count}</TableCell>
                       <TableCell>
-                        {a.isSnoozed ? null : a.snooze_count < a.snoozesMax ? (
+                        {a.snooze_count === a.snoozesMax ? <b>{a.snoozeStatus}</b> : a.snoozeStatus}
+                      </TableCell>
+                      <TableCell>
+                        {!a.isSnoozed && a.snoozesAvailable === 0 ? (
+                          <IconButton disabled={true}>
+                            <Icon icon='warning'></Icon>
+                          </IconButton>
+                        ) : a.isSnoozed ? null : a.snoozesAvailable > 0 ? (
                           <IconButton onClick={(): void => handleClickSnooze(a)}>
                             <Icon icon='snooze' />
                           </IconButton>
                         ) : (
-                          <IconButton disabled={true} >
-                            <Icon icon='cannotSnooze'/>
+                          <IconButton disabled={true}>
+                            <Icon icon='cannotSnooze' />
                           </IconButton>
                         )}
                       </TableCell>

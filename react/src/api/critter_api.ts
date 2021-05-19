@@ -2,6 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { Animal, IAnimal } from 'types/animal';
 import { CollarHistory } from 'types/collar_history';
+import { linkCollarEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
 
 import { ApiProps, eCritterFetchType, IBulkUploadResults, ICollarLinkPayload, IDeleteType, IUpsertPayload } from './api_interfaces';
 
@@ -22,7 +23,7 @@ export const critterApi = (props: ApiProps) => {
   }
 
   const linkCollar = async (body: ICollarLinkPayload): Promise<CollarHistory> => {
-    const url = createUrl({ api: 'change-animal-collar', testUser});
+    const url = createUrl({ api: linkCollarEndpoint, testUser});
     // console.log(`posting ${link}: ${JSON.stringify(body.data)}`);
     const { data } = await api.post(url, body);
     return plainToClass(CollarHistory, data[0]);
@@ -30,7 +31,7 @@ export const critterApi = (props: ApiProps) => {
 
   const upsertCritter = async (payload: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
     const { body } = payload;
-    const url = createUrl({ api: 'upsert-animal', testUser });
+    const url = createUrl({ api: upsertCritterEndpoint, testUser });
     // const critters = body.map(a => serialize(a))
     const { data } = await api.post(url, body);
     return data;

@@ -3,12 +3,13 @@ import { plainToClass } from 'class-transformer';
 import { TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { eCritterPermission, IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
+import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
 import {
   IUserCritterPermissionInput,
   IGrantCritterAccessResults,
   IBulkUploadResults,
   ApiProps
-} from './api_interfaces';
+} from 'api/api_interfaces';
 
 export const userApi = (props: ApiProps) => {
   const { api, testUser } = props;
@@ -64,7 +65,7 @@ export const userApi = (props: ApiProps) => {
   }
 
   const updateAlert = async (body: TelemetryAlert[]): Promise<TelemetryAlert[]> => {
-    const url = createUrl({api: 'update-user-alert'});
+    const url = createUrl({api: upsertAlertEndpoint});
     const { data } = await api.post(url, body);
     const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
     return converted;

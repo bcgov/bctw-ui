@@ -4,7 +4,7 @@ import { Animal, transformOpt } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTW } from 'types/common_types';
 import dayjs, { Dayjs } from 'dayjs';
-import { formatTime } from 'utils/time';
+import { formatDay, formatTime } from 'utils/time';
 
 // possible types of telemetry alerts
 enum eAlertType {
@@ -61,11 +61,15 @@ export class TelemetryAlert implements ITelemetryAlert, BCTW {
   @Expose() get snoozesMax(): number {
     return 3;
   }
+  @Expose() get snoozesAvailable(): number {
+    return this.snoozesMax - this.snooze_count;
+  }
   @Expose() get snoozeStatus(): string {
+    const usedSofar = `(${this.snooze_count} used)`;
     if (this.isSnoozed) {
-      return 'currently snoozed';
+      return `snoozed until ${dayjs(this.snoozed_to).format(formatDay)} ${usedSofar}`;
     } else {
-      return `${this.snoozesMax - this.snooze_count} snoozes available`;
+      return `${this.snoozesAvailable} snoozes available ${usedSofar}`;
     }
   }
   @Expose() get formatAlert(): string {

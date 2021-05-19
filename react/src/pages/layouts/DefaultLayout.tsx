@@ -1,6 +1,9 @@
 import { AxiosError } from 'axios';
 import { useState, useEffect, useContext } from 'react';
 import { UserContext } from 'contexts/UserContext';
+import { AlertContext } from 'contexts/UserAlertContext';
+import UserAlert from 'pages/user/UserAlert';
+import { Modal } from 'components/common';
 
 type IDefaultLayoutProps = {
   children: React.ReactNode;
@@ -8,10 +11,14 @@ type IDefaultLayoutProps = {
 
 /**
  * wrap this component around child components that require the user to exist
+ * assuming the user exists, also forces open the alerts modal 
+ * if there are alerts that require action
  */
 export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.Element {
   const userChanges = useContext(UserContext);
+  const useAlert = useContext(AlertContext);
   const [err, setErr] = useState<AxiosError>(null);
+  const [showAlerts, setShowAlerts] = useState<boolean>(false);
 
   useEffect(() => {
     const updateComponent = (): void => {
@@ -23,6 +30,19 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
     updateComponent();
   }, [userChanges]);
 
+  useEffect(() => {
+    if (useAlert?.alerts?.length) {
+      const isCriticalToUpdate = useAlert.alerts.some((a) => !a.isSnoozed && a.snoozesAvailable === 0);
+      if (isCriticalToUpdate) {
+        console.log('at least one alert is critical, force open alert dialog');
+        setShowAlerts(true);
+      } else {
+        // console.log('no alerts in crital state, do not auto open alert dialog');
+        setShowAlerts(false);
+      }
+    }
+  }, [useAlert]);
+
   if (err) {
     // unauthorized
     if (err.response?.status === 401) {
@@ -30,5 +50,17 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
     }
     return <div>ERROR {err?.response?.data}</div>;
   }
-  return <>{children}</>;
+  // pass these props to the modal to 'force' the user to perform the alert action
+  const disableCloseModalProps = {
+    disableBackdropClick: true,
+    disableEscapeKeyDown: true
+  };
+  return (
+    <>
+      <Modal open={showAlerts} handleClose={(): void => setShowAlerts(false)} {...disableCloseModalProps}>
+        <UserAlert />
+      </Modal>
+      {children}
+    </>
+  );
 }

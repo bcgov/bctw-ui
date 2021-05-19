@@ -3,7 +3,7 @@ import ChangeContext from 'contexts/InputChangeContext';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { CreateEditCheckboxField, CreateEditDateField, MakeEditField } from 'components/form/create_form_components';
 import { getInputTypesOfT, objHasErrors } from 'components/form/form_helpers';
-import { UserAlertStrings } from 'constants/strings';
+import { UserAlertStrings, WorkflowStrings } from 'constants/strings';
 import { TelemetryAlert } from 'types/alert';
 import { LocationEvent } from 'types/location_event';
 import EditModal from '../common/EditModal';
@@ -12,30 +12,20 @@ import LocationEventForm from './LocationEventForm';
 import { removeProps } from 'utils/common';
 import MortalityEvent from 'types/mortality_event';
 import { IUpsertPayload } from 'api/api_interfaces';
-import { Collar } from 'types/collar';
-import { Animal } from 'types/animal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatLabel } from 'types/common_helpers';
-import MultiSelect from 'components/form/MultiSelect';
 import { Tooltip } from 'components/common';
 
 type MortEventProps = ModalBaseProps & {
   alert: TelemetryAlert;
-  handleSave: (animal: Animal, collar: Collar) => void;
+  handleSave: (event: MortalityEvent) => void;
 };
-
-// temporary: for UAT2 workshop
-const pcodPredatorSpeciesValues = [
-  { id: 0, value: 'Coyote' },
-  { id: 1, value: 'Unknown Canid' },
-  { id: 2, value: 'Bobcat' }
-]
 
 export default function MortalityEventForm({ alert, open, handleClose, handleSave }: MortEventProps): JSX.Element {
   const [errors, setErrors] = useState({});
   const [mortalityEvent, setMortalityEvent] = useState<MortalityEvent>(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id))
   const [locationEvent, setLocationEvent] = useState<LocationEvent>(new LocationEvent('mortality', alert.valid_from));
-  const [isRetrieved, setIsRetrieved] = useState<boolean>(alert.retrieved);
+  const [isRetrieved, setIsRetrieved] = useState<boolean>(false);
 
   const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.editableProps.map(c => ({prop: c})), mortalityEvent.propsThatAreCodes);
   const required = true;
@@ -45,9 +35,9 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
   const retrievedDateField = formFields.find(f => f.key === 'retrieval_date');
   const animalStatusField = formFields.find(f => f.key === 'animal_status');
   const pcodField = formFields.find(f => f.key === 'proximate_cause_of_death');
-  const pcodConfidenceValueField = formFields.find(f => f.key === 'pcod_confidence_value');
+  // const pcodConfidenceValueField = formFields.find(f => f.key === 'pcod_confidence_value');
   const vasField = formFields.find(f => f.key === 'vendor_activation_status');
-  const deviceStatusFields = formFields.filter(f => ['device_status', 'device_deployment_status'].includes(f.key))
+  // const deviceStatusFields = formFields.filter(f => ['device_status', 'device_deployment_status'].includes(f.key))
 
   /**
    * break the MortalityEvent into collar/critter specific properties 
@@ -57,9 +47,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
   const onSave = async (payload: IUpsertPayload<MortalityEvent>): Promise<void> => {
     const { body } = payload;
     body.location_event = locationEvent;
-    const a = body.getCritter;
-    const c = body.getCollar;
-    await handleSave(a, c);
+    await handleSave(body);
     handleClose(false);
   }
   useDidMountEffect(() => {
@@ -72,6 +60,9 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
     setLocationEvent(new LocationEvent('mortality', alert.valid_from))
   }, [alert]);
 
+  if (!animalStatusField ) {
+    return <div>oops..</div>
+  }
   return (
     <EditModal<MortalityEvent>
       showInFullScreen={false}
@@ -80,9 +71,6 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
       editing={mortalityEvent}
       hasErrors={():boolean => objHasErrors(errors)}
       open={open}
-      // the instance that the editmodal will save changed fields to
-      // newT={Object.assign({}, mortalityEvent)}
-      // isEdit={true}
       hideHistory={true}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
@@ -134,9 +122,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                 <Paper elevation={3} className={'dlg-full-body-details'}>
                   <div className={'dlg-details-section'}>
                     <h3>Update Assignment Details</h3>
-                    <Tooltip title={
-                      <p>If you unassign the device, no new telemetry from this device will be connected to this animal.</p>
-                    } placement='right' enterDelay={750}>
+                    <Tooltip title={<p>{WorkflowStrings.mortalityUnassignDeviceTooltip}</p>} placement='right' enterDelay={750}>
                       <div>
                         {CreateEditCheckboxField({formType: deviceUnassignedField, label: formatLabel(mortalityEvent, deviceUnassignedField.key), handleChange: onChange})}
                       </div>
@@ -155,7 +141,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                       <p>TODO: If <strong>checked</strong>then...</p>
                     } placement='right' enterDelay={750}>
                       <div>
-                        {CreateEditDateField({formType: retrievedDateField, label: formatLabel(mortalityEvent, retrievedDateField.key), handleChange: onChange, disabled: !isRetrieved})}
+                        {retrievedDateField ? CreateEditDateField({formType: retrievedDateField, label: formatLabel(mortalityEvent, retrievedDateField?.key), handleChange: onChange, disabled: !isRetrieved}) : null}
                       </div>
                     </Tooltip>
                     <Tooltip title={
@@ -176,16 +162,16 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                   </div>
                   <div className={'dlg-details-section'}>
                     <h3>Update Animal Details</h3>
-                    {MakeEditField({formType: animalStatusField, handleChange: onChange, required, errorMessage: ''})}
+                    {animalStatusField ? MakeEditField({formType: animalStatusField, handleChange: onChange, required, errorMessage: ''}) : null}
                     <div style={{marginBottom: '18px'}}>
-                      {MakeEditField({formType: pcodField, handleChange: onChange, required, errorMessage: ''})}
+                      {pcodField ? MakeEditField({formType: pcodField, handleChange: onChange, required, errorMessage: ''}) : null}
                     </div>
-                    <div style={{marginBottom: '18px'}}>
+                    {/* <div style={{marginBottom: '18px'}}>
                       <MultiSelect label="Predator Species" changeHandler={() => ""} data={pcodPredatorSpeciesValues} />
-                    </div>
-                    <div style={{marginBottom: '6px'}}>
+                    </div> */}
+                    {/* <div style={{marginBottom: '6px'}}>
                       {MakeEditField({formType: pcodConfidenceValueField, label: "Confidence", handleChange: onChange, errorMessage: ''})}
-                    </div>
+                    </div> */}
                   </div>
                   <div className={'dlg-details-section'}>
                     <h3>Mortality Event Details &amp; Comment</h3>

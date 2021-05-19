@@ -22,7 +22,7 @@ export const AlertStateContextProvider: React.FC = (props) => {
     // also watch dataUpdatedAt for query invalidations, otherwise
     // the context is not reset
     const update = (): void => {
-      console.log('user alert status', status, data);
+      // console.log('user alert status', status, data);
       if (status === 'success') {
         setAlertContext({ alerts: data, invalidate, error: null});
       } else if (status === 'error') {

@@ -47,19 +47,20 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
   const handleChange = (event): void => {
     setErr('')
     const target = event.target.value;
-    // allow the negative sign
+    // allow the negative sign at the start of input
     if (target === '-') {
       setVal(target);
       return;
     }
-    const n = parseInt(target);
+    const n = parseFloat(target);
     if (isNaN(n)) {
-      // fixme: setting val to undefined doesn't trigger useeffect
+      // note: setting val to undefined doesn't trigger useEffect
       setVal(0);
       setErr(FormStrings.validateNumber);
       return;
     }
-    setVal(n);
+    // parseFloat will remove the '.' if inputted individually.
+    setVal(target[target.length - 1] === '.' ? target : n);
   };
 
   return (

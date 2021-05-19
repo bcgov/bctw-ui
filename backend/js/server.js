@@ -96,8 +96,10 @@ const proxyApi = function (req, res, next) {
   if (req.method === 'POST') {
     const { file, files } = req;
     if (file || files) {
+      // depending on the type of file uploaded
+      // create a new formdata object to pass on to the server
       const { form, config } = file ? handleFile(file) : handleFiles(files);
-      console.log(JSON.stringify(form, null, 2));
+      // console.log(JSON.stringify(form, null, 2));
       axios.post(url, form, config)
         .then(successHandler)
         .catch(errHandler)
@@ -132,14 +134,12 @@ const handleFile = function(file) {
 
 /*
   * multiple xml files can be processed
-  * depending on the type of file uploaded, 
-  * create a new formdata object to pass on to the server
 */
 const handleFiles = function (files) {
   if (files && files.length) {
     const form = new FormData();
     files.forEach(f => form.append(f.fieldname, f.buffer, f.originalname));
-    // Axios will throw if posting the form as an array, stringify it first
+    // Axios will throw if posting the form as an array, specify the json option to stringify it
     return { form, config: { headers: form.getHeaders(), options: { json: true}}}
   }
 }

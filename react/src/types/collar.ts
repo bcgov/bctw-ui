@@ -48,7 +48,7 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   satellite_network: string;
   user_comment: string;
   vendor_activation_status: boolean;
-  // api call to retrieve attached collars includes this
+  // collars attached to a critter should includes this prop
   animal_id?: string;
 }
 

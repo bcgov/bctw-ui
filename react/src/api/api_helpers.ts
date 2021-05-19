@@ -41,6 +41,7 @@ const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
   return url;
 }
 
+// used by form handlers to upload files to the server
 const createFormData = (name: string, files: FileList): FormData => {
   const formData = new FormData();
   Array

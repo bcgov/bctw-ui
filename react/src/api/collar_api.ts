@@ -2,6 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollar, Collar } from 'types/collar';
 import { ICollarHistory, CollarHistory } from 'types/collar_history';
+import { upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps, IBulkUploadResults, IUpsertPayload } from './api_interfaces';
 
 export const collarApi = (props: ApiProps) => {
@@ -39,7 +40,7 @@ export const collarApi = (props: ApiProps) => {
 
   const upsertCollar = async (payload: IUpsertPayload<Collar>): Promise<IBulkUploadResults<Collar>> => {
     const { body } = payload;
-    const url = createUrl({api: 'upsert-collar', testUser});
+    const url = createUrl({api: upsertDeviceEndpoint, testUser});
     const { data } = await api.post(url, body);
     return data;
   }
