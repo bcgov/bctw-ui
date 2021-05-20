@@ -126,8 +126,7 @@ export default function AlertPage(): JSX.Element {
 
   return (
     <div className={'container'}>
-      <Typography variant='h4'>Alerts ({alerts.length})</Typography>
-      <Box p={3}>
+      <Box p={1}>
         {isSavingAlert ? (
           <CircularProgress />
         ) : (

@@ -1,3 +1,4 @@
+import { DialogProps } from '@material-ui/core';
 import { IUpsertPayload } from 'api/api_interfaces';
 
 /**
@@ -6,7 +7,7 @@ import { IUpsertPayload } from 'api/api_interfaces';
  * @param handleClose parent handler when modal is closed
  * @param title modal title string
 */
-type ModalBaseProps = {
+type ModalBaseProps = Pick<DialogProps, 'disableBackdropClick'> & {
   open: boolean;
   handleClose: (v: boolean) => void;
   title?: string;
@@ -44,7 +45,7 @@ type CritterCollarModalProps<T> = EditModalBaseProps<T> & {
  * props specific to the data management Export modals
  */
 type ExportImportProps = ModalBaseProps & {
-  message?: string;
+  message?: string | React.ReactNode;
   downloadTemplate?: () => void;
 };
 

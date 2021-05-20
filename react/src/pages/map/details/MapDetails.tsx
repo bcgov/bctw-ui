@@ -86,7 +86,6 @@ export default function MapDetails({
   return (
     <>
       <div className={'map-bottom-panel-title'}>
-
         <Tooltip title={
           <p>{MapStrings.showOnlyCheckedTooltip}</p>
         } placement='left-start' enterDelay={750}>

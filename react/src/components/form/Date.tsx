@@ -10,10 +10,12 @@ type DateInputProps = StandardTextFieldProps & {
   label: string;
   defaultValue: Date;
   changeHandler: (v: Record<string, unknown>) => void;
+  minDate?: Date;
+  maxDate?: Date;
 };
 
 export default function DateInput(props: DateInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName } = props;
+  const { defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
   const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultValue ? dayjs(defaultValue) : undefined);
 
   const handleDateChange = (date: Dayjs | null): void => {
@@ -37,6 +39,8 @@ export default function DateInput(props: DateInputProps): JSX.Element {
         value={selectedDate}
         onChange={handleDateChange}
         KeyboardButtonProps={{ 'aria-label': 'change date' }}
+        minDate={minDate}
+        maxDate={maxDate}
       />
     </MuiPickersUtilsProvider>
   );

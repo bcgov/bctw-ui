@@ -42,5 +42,4 @@ export const bulkApi = (api: AxiosInstance) => {
     uploadCsv,
     uploadFiles,
   }
-
 }

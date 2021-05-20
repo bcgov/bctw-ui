@@ -1,6 +1,6 @@
 const CritterStrings = {
   importTitle: 'Bulk Import Animals',
-  importText: 'Use this feature to add or update animals. If "animal_id" AND "wlh_id" are present, the importer will consider it an existing animal and attempt to update it. If "device_id" is present, the importer will attempt to attach the collar to the device. The device must exist.',
+  // importText: 'Use this feature to add or update animals. "animal_id" AND "wlh_id" OR "critter_id" must be included for the importer to perform an update to an existing animal. If "device_id" is present, the importer will attempt to attach the collar to the device. The device must exist.',
   exportTitle: 'Bulk Export Animal Data',
   exportText: '',
   requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],

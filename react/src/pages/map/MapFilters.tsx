@@ -2,7 +2,6 @@ import { Button, Drawer, IconButton } from '@material-ui/core';
 import { Close, ArrowForward } from '@material-ui/icons';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
-import TextField from 'components/form/Input';
 import { useEffect, useState } from 'react';
 import SelectCode from 'components/form/SelectCode';
 import { ICodeFilter } from 'types/code';
@@ -18,6 +17,7 @@ import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { CODE_FILTERS, DEVICE_STATUS_OPTIONS } from 'pages/map/map_constants';
 import { Tooltip } from 'components/common';
+import DateInput from 'components/form/Date';
 
 type MapFiltersProps = {
   start: string;
@@ -191,31 +191,24 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             <div className='side-panel-body'>
               <div className={'side-panel-dates'}>
                 {/* render the date pickers */}
-
-                <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} placement='right-start' enterDelay={750}>
-                  <span>
-                    <TextField
-                      outline={true}
-                      label={MapStrings.startDateLabel}
-                      type='date'
-                      defaultValue={start}
-                      propName='tstart'
-                      changeHandler={(e): void => setStart(e['tstart'] as string)}
-                    />
-                  </span>
-                </Tooltip>
-                <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} placement='right-start' enterDelay={750}>
-                  <span>
-                    <TextField
-                      outline={true}
-                      label={MapStrings.endDateLabel}
-                      type='date'
-                      defaultValue={end}
-                      propName='tend'
-                      changeHandler={(e): void => setEnd(e['tend'] as string)}
-                    />
-                  </span>
-                </Tooltip>
+                {/* <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
+                <DateInput
+                  propName='tstart'
+                  label={MapStrings.startDateLabel}
+                  defaultValue={new Date(start)}
+                  changeHandler={(e): void => setStart(e['tstart'] as string)}
+                  maxDate={new Date(end)}
+                />
+                {/* </Tooltip> */}
+                {/* <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
+                <DateInput
+                  propName='tend'
+                  label={MapStrings.endDateLabel}
+                  defaultValue={new Date(end)}
+                  changeHandler={(e): void => setEnd(e['tend'] as string)}
+                  minDate={new Date(start)}
+                />
+                {/* </Tooltip> */}
               </div>
               <Tooltip
                 title={

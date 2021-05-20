@@ -3,11 +3,11 @@ import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import Export from 'pages/data/bulk/Export';
 import Import from 'pages/data/bulk/Import';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 type IImportExportProps<T> = {
   iTitle?: string;
-  iMsg?: string;
+  iMsg?: string | React.ReactNode;
   eTitle?: string;
   eMsg?: string;
   data: T[];

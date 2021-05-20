@@ -30,7 +30,7 @@ const rows_to_render = [
   'device_id',
   'Frequency (MHz)',
   'capture_date',
-  'Last Transmission',
+  'Last Transmission'
 ];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
@@ -80,8 +80,8 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
     handleRowSelected(pointIDs);
   };
 
-  const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0)
- 
+  const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
+
   return (
     <TableContainer component={Paper} className={'bottom-tbl'}>
       <Table stickyHeader size='small'>
@@ -138,7 +138,9 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
   };
 
   return (
-    <TableRow hover className={`map-bottom-panel-row ${isSelectedInMap ? 'bottom-panel-row-is-map-selected' : ''}`}>
+    <TableRow
+      hover={!isSelectedInMap}
+      className={`map-bottom-panel-row ${isSelectedInMap ? 'bottom-panel-row-is-map-selected' : ''}`}>
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
@@ -147,8 +149,16 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
           width: '5%',
           backgroundColor: parseAnimalColour(row.map_colour).fillColor
         }}></TableCell>
-      {row.critter_id ? <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} /> : <TableCell></TableCell>}
-      {row.critter_id ? <CellWithLink row={row} propName={'animal_id'} onClickLink={(): void => handleShowOverview('animal', row)} /> : <TableCell></TableCell>}
+      {row.critter_id ? (
+        <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
+      ) : (
+        <TableCell></TableCell>
+      )}
+      {row.critter_id ? (
+        <CellWithLink row={row} propName={'animal_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
+      ) : (
+        <TableCell></TableCell>
+      )}
       <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('device', row)} />
       <TableCell>{row.paddedFrequency}</TableCell>
       <TableCell>{row.formattedCaptureDate}</TableCell>

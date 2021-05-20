@@ -37,7 +37,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
         console.log('at least one alert is critical, force open alert dialog');
         setShowAlerts(true);
       } else {
-        // console.log('no alerts in crital state, do not auto open alert dialog');
+        console.log('no alerts in crital state, hide alert dialog');
         setShowAlerts(false);
       }
     }
@@ -57,7 +57,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   };
   return (
     <>
-      <Modal open={showAlerts} handleClose={(): void => setShowAlerts(false)} {...disableCloseModalProps}>
+      <Modal title={`Alerts (${useAlert?.alerts?.length})`} open={showAlerts} handleClose={(): void => setShowAlerts(false)} {...disableCloseModalProps}>
         <UserAlert />
       </Modal>
       {children}

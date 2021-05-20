@@ -164,11 +164,10 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
 
   return (
     <>
-      <Modal open={show} handleClose={handleClose}>
+      <Modal open={show} handleClose={handleClose} title={`Modifying ${users?.idir ?? 'user'}'s Animal Access`}>
         <Table
           customColumns={[{ column: newColumn, header: newHeader }]}
           headers={['animal_id', 'wlh_id', 'device_id', 'device_make', 'population_unit']}
-          title={`Modifying ${users?.idir ?? 'user'}'s Animal Access`}
           queryProps={tableQueryProps}
           onSelectMultiple={handleTableRowSelect}
           isMultiSelect={true}

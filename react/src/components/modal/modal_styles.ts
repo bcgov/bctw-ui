@@ -9,17 +9,6 @@ const modalStyles = makeStyles((theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between'
     },
-    // dialog: {
-    //   maxWidth: '80vh'
-    // },
-    // modal: {
-    //   margin: 'auto 0',
-    //   display: 'flex',
-    //   alignItems: 'center',
-    //   justifyContent: 'center',
-    //   maxHeight: '70vh',
-    //   overflowY: 'auto',
-    // },
     paper: {
       backgroundColor: '#f1f3f5',
       border: '2px solid #000',
@@ -28,7 +17,9 @@ const modalStyles = makeStyles((theme: Theme) =>
       overflowY: 'auto',
     },
     title: {
-      textAlign: 'center',
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between'
     },
   })
 );

@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import download from 'downloadjs';
+import { critterImportMessage } from 'constants/formatted_string_components';
 
 export default function CritterPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -45,7 +46,7 @@ export default function CritterPage(): JSX.Element {
     eMsg: CS.exportText,
     eTitle: CS.exportTitle,
     iTitle: CS.importTitle,
-    iMsg: CS.importText,
+    iMsg: critterImportMessage,
     downloadTemplate: handleDownloadTemplate,
   };
 
