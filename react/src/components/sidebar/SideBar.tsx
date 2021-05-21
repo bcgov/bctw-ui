@@ -50,8 +50,9 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
       case '/devices':
       case '/codes':
       case '/profile':
+      case '/import':
       case '/admin':
-        handleSetVisible(['animals', 'codes', 'devices']);
+        handleSetVisible(['animals', 'codes', 'devices', 'import']);
         return;
     }
   }, [location, isAdmin]); // only fire when these states change

@@ -1,7 +1,6 @@
 import { createUrl } from 'api/api_helpers';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import { ApiProps } from './api_interfaces';
-// import {GeoJSON} from 'leaflet';
 
 export const mapApi = (props: ApiProps) => {
   const { api, testUser } = props;

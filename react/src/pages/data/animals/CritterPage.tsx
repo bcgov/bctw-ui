@@ -10,7 +10,6 @@ import { useState } from 'react';
 import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import download from 'downloadjs';
-import { critterImportMessage } from 'constants/formatted_string_components';
 
 export default function CritterPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -23,7 +22,6 @@ export default function CritterPage(): JSX.Element {
 
   const handleSelect = (row: Animal): void => {
     setEditObj(row);
-    // props.setSidebarContent(<p>critter id: {row.critter_id}</p>);
   };
 
   // set the export state when table loads
@@ -45,8 +43,6 @@ export default function CritterPage(): JSX.Element {
   const exportProps = {
     eMsg: CS.exportText,
     eTitle: CS.exportTitle,
-    iTitle: CS.importTitle,
-    iMsg: critterImportMessage,
     downloadTemplate: handleDownloadTemplate,
   };
 

@@ -1,105 +1,231 @@
-import { CircularProgress, Typography } from '@material-ui/core';
+import { Button, CircularProgress, FormControlLabel, Radio, RadioGroup, Typography } from '@material-ui/core';
 import { createFormData } from 'api/api_helpers';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { NotificationMessage } from 'components/common';
-import { ExportImportProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
+// import Button from 'components/form/Button';
 import FileInput from 'components/form/FileInput';
-import Modal from 'components/modal/Modal';
+import { useState } from 'react';
 import BasicTable from 'components/table/BasicTable';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import ManageLayout from 'pages/layouts/ManageLayout';
 import React from 'react';
 import { formatAxiosError } from 'utils/common';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import {
+  bothImportMessage,
+  critterImportMessage,
+  deviceImportMessage,
+  pointImportMessage
+} from 'constants/formatted_string_components';
+import download from 'downloadjs';
+import { FileStrings, ImportSteps } from 'constants/strings';
+import { Animal } from 'types/animal';
+import { Collar } from 'types/collar';
+import { HistoricalTelemetry, HistoricalTelemetryInput, isHistoricalTelemetry } from 'types/point_import';
+import { classToPlain, plainToClass } from 'class-transformer';
 
-/* todo: 
-  force refetch or set cache of T on successful mutation
-  copyrow?
-*/
+enum eImportType {
+  animal = 'animal',
+  device = 'device',
+  both = 'both',
+  // code = 'code',
+  point = 'point'
+}
+
+// rendered as the radio options
+const radios = [
+  { value: eImportType.animal, header: 'Animal Metadata' },
+  { value: eImportType.device, header: 'Device Metadata' },
+  { value: eImportType.both, header: 'Animal and Device Metadata' },
+  { value: eImportType.point, header: 'Historical Telemetry' }
+];
 
 /**
- *
  * @param message whats displayed as body of import modal
  * @param handleToast handler from parent, called when mutation is complete
  */
-export default function Import<T>(props: ExportImportProps): JSX.Element {
+export default function Import<T>(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
+  const [importType, setImportType] = useState<eImportType>();
+  const [message, setMessage] = useState<React.ReactNode | string>('');
 
-  const onSuccess = (data: IBulkUploadResults<T>): void =>
+  // change the import message displayed when user selects a radio option
+  useDidMountEffect(() => {
+    const update = (): void => {
+      switch (importType) {
+        case eImportType.animal:
+          setMessage(critterImportMessage);
+          return;
+        case eImportType.device:
+          setMessage(deviceImportMessage);
+          return;
+        case eImportType.both:
+          setMessage(bothImportMessage);
+          return;
+        case eImportType.point:
+          setMessage(pointImportMessage);
+          return;
+      }
+    };
+    update();
+  }, [importType]);
+
+  // handle a successful csv upload response
+  const onSuccess = (data: IBulkUploadResults<T>): void => {
     responseDispatch({
       type: 'success',
       message: `a bulk upload was completed ${data.errors.length ? ', but there were errors.' : 'successfully.'}`
     });
+  };
 
+  // todo: handle a failed csv upload response
+  const onError = (): void => {};
+
+  /**
+   * while the response may have returned successfully, often the import will have failed
+   * in this case @type {IBulkUploadResults} will contain an error array
+   */
+  const didImportHaveErrors = (): boolean => isSuccess && data.errors.length > 0;
+
+  // setup the import mutation
   const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = bctwApi.useMutateBulkCsv({
-    onSuccess
+    onSuccess,
+    onError
   });
+
+  /**
+   * based on the import type selected, download a template CSV file
+   */
+  const downloadTemplate = (): void => {
+    let downloadStr = '';
+    let templateName = '';
+    switch (importType) {
+      case eImportType.animal:
+        downloadStr = Object.keys(new Animal()).join();
+        templateName = FileStrings.animalTemplateName;
+        break;
+      case eImportType.device:
+        downloadStr = Object.keys(new Collar()).join();
+        templateName = FileStrings.collarTemplateName;
+        break;
+      case eImportType.point:
+        downloadStr = Object.keys(new HistoricalTelemetryInput()).join();
+        templateName = FileStrings.pointTemplateName;
+        break;
+      case eImportType.both:
+        downloadStr = [...Object.keys(new Animal()), ...Object.keys(new Collar())].join();
+        templateName = FileStrings.bothTemplateName;
+    }
+    if (downloadStr && templateName) {
+      download(downloadStr, templateName);
+    } else {
+      responseDispatch({ type: 'error', message: `unable to download ${importType} template` });
+    }
+  };
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
     save(createFormData(fieldName, files));
   };
 
+  // call the save mutation with the For
   const save = async (form: FormData): Promise<any> => await mutateAsync(form);
 
-  const copy = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, row: JSON): void => {
-    // todo:
-    event.preventDefault();
+  // the radio button handler
+  const changeImportType = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const val = event.target.value as eImportType;
+    setImportType(val);
   };
 
-  const onClose = (): void => {
-    reset();
-    props.handleClose(false);
-  };
-
-  const importHadErrors = (): boolean => isSuccess && data.errors.length > 0;
-
+  // renders the result/error table when the API returs result of the import
   const renderResults = (data: IBulkUploadResults<T>): React.ReactNode => {
     const { errors, results } = data;
+    // console.log(data);
     if (errors.length) {
       return (
-        <BasicTable 
-          headers={['rownum', 'error']}
-          data={errors}
-          rowIdentifier={'rownum'}
-        />
+        <>
+          <div style={{marginBottom: '10px'}}>
+            <NotificationMessage type='error' message={'There were errors during the import'} />
+          </div>
+          <BasicTable headers={['rownum', 'error']} data={errors} rowIdentifier={'rownum'} />
+        </>
       );
     }
-
-    const numSuccessful = results.length;
-    const msg = `${numSuccessful} item${numSuccessful > 1 ? 's' : ''} ${
-      numSuccessful > 1 ? 'were ' : 'was'
-    } successfully imported`;
-    return <NotificationMessage type='success' message={msg} />;
+    // todo: show other import results
+    if (isHistoricalTelemetry(results[0])) {
+      const asClass = plainToClass(HistoricalTelemetry, results);
+      return (
+        <>
+          <div style={{marginBottom: '10px'}}>
+            <NotificationMessage type='success' message={`${results.length} historical telemetry records were imported successfully.`} />
+          </div>
+          <BasicTable data={classToPlain(asClass) as T[]} rowIdentifier={'device_id' as keyof T} />
+        </>
+      );
+    }
   };
 
   return (
-    <Modal {...props} handleClose={onClose}>
-      {isLoading ? (<div>saving...<CircularProgress /></div>) : null}
-      <Typography>{props.message ?? ''}</Typography>
+    <ManageLayout>
+      <div className='container'>
+        {/* save progress indicator */}
+        {isLoading ? (
+          <div>
+            saving...
+            <CircularProgress />
+          </div>
+        ) : null}
+        <h2>Bulk Import Data</h2>
+        {/* import type options and instructions */}
+        <div className={'import-setup'}>
+          <div className={'import-choice'}>
+            <Typography variant='h5'>{'What do you want to import?'}</Typography>
+            <RadioGroup aria-label='position' name='import-type' value={importType} onChange={changeImportType}>
+              {radios.map((r) => (
+                <FormControlLabel
+                  value={r.value}
+                  control={<Radio color='primary' />}
+                  label={r.header}
+                  labelPlacement='end'
+                />
+              ))}
+            </RadioGroup>
+          </div>
+          <div className={'import-steps'}>
+            <Typography variant='h5'>{'Import Instructions'}</Typography>
+            <ol>
+              {ImportSteps.map((step, index) => {
+                {/* render the download template button */}
+                if (index === 0 && importType) {
+                  return (
+                    <li onClick={downloadTemplate} className={'map-details-cell-hover map-details-clickable-cell'}>
+                      {step}
+                    </li>
+                  );
+                }
+                return <li>{step}</li>
+              })}
+            </ol>
+          </div>
+        </div> {/* import-setup */}
 
-      {/* the download template button */}
-      {props.downloadTemplate ? (
-        <div style={{marginBottom: '10px'}}>
-          <p className={'map-details-cell-hover map-details-clickable-cell'} onClick={props.downloadTemplate}>
-            Click here to download a template
-          </p>
-        </div>
-      ) : null}
-
-      {isSuccess ? renderResults(data) : null}
-
-      {/* the the upload or try again button */}
-      <div>
+        {/* upload/try again button */}
         {isSuccess || isError ? (
-          <Button variant='contained' color='secondary' onClick={reset}>{`${
-            importHadErrors() ? 'Try' : 'Upload'
+          <Button style={{maxWidth: '150px'}} variant='contained' color='primary' onClick={reset}>{`${
+            didImportHaveErrors() ? 'Try' : 'Upload'
           } Again`}</Button>
         ) : null}
-        {isIdle ? <FileInput accept='.csv' onFileChosen={handleFileChange} /> : null}
-      </div>
+        {isIdle ? <FileInput accept='.csv' disabled={!importType} onFileChosen={handleFileChange} /> : null}
 
-      {isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> : null}
-    </Modal>
+        {/* import type-specific message */}
+        <Typography style={{ minHeight: '200px', margin: '10px 0' }}>{message ?? ''}</Typography>
+
+        {/* import results table */}
+        <div style={{ minHeight: '200px', margin: '10px 0' }}>{isSuccess ? renderResults(data) : null}</div>
+
+        {isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> : null}
+      </div>
+    </ManageLayout>
   );
 }

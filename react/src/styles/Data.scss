@@ -30,8 +30,8 @@
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 5px 5px;
+  // align-items: center;
+  padding: 5px 20px;
 }
 
 .button-row {
@@ -83,4 +83,17 @@
   width: 100%;
   padding: 0 5px;
   justify-content: flex-end;
+}
+
+// IMPORTER
+.import-setup {
+  display: flex;
+  flex-direction: row;
+
+  div {
+    margin-right: 20px;
+  }
+  h5 {
+    margin-bottom: 10px;
+  }
 }

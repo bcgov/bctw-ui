@@ -213,18 +213,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Tooltip
                 title={
                   <>
-                    <p>
-                      <b>
-                        <em>{MapStrings.assignmentStatusOptionA}</em>
-                      </b>
-                      {MapStrings.assignmentStatusTooltip1}
-                    </p>
-                    <p>
-                      <b>
-                        <em>{MapStrings.assignmentStatusOptionU}</em>
-                      </b>
-                      {MapStrings.assignmentStatusTooltip2}
-                    </p>
+                    <p><b><em>{MapStrings.assignmentStatusOptionA}</em></b>{MapStrings.assignmentStatusTooltip1}</p>
+                    <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
                     <p>{MapStrings.assignmentStatusTooltip3}</p>
                   </>
                 }

@@ -3,6 +3,7 @@ import CodePage from 'pages/data/codes/CodePage';
 import CollarPage from 'pages/data/collars/CollarPage';
 import Home from 'pages/Home';
 import MapPage from 'pages/map/MapPage';
+import Import from 'pages/data/bulk/Import';
 import TerrainPage from 'pages/terrain/TerrainPage';
 import AdminPage from 'pages/user/AdminPage';
 import UserProfile from 'pages/user/UserProfile';
@@ -24,12 +25,13 @@ const AppRoutes: RouteKey[] = [
   { name: 'animals', path: '/animals', title: 'Animals', component: CritterPage, sort: 1, icon: 'critter' },
   { name: 'codes', path: '/codes', title: 'Codes', component: CodePage, sort: 2, icon: 'code' },
   { name: 'devices', path: '/devices', title: 'Devices', component: CollarPage, sort: 1, icon: 'collar' },
+  { name: 'import', path: '/import', title: 'Import', component: Import, sort: 4, icon: 'arrow-up'},
   { name: 'map', path: '/map', title: 'Location Map', component: MapPage, sort: 1, icon: 'map' },
   { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain' },
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
   { name: 'profile', path: '/profile', title: 'Profile', component: UserProfile, sort: 2, icon: 'profile' },
-  { name: 'admin', path: '/admin', title: 'Admin', component: AdminPage, sort: 3, icon: 'admin' },
-  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 2 }
+  { name: 'admin', path: '/admin', title: 'Admin', component: AdminPage, sort: 5, icon: 'admin' },
+  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 100 }
 ];
 
 const AppRouter = (): JSX.Element => {
