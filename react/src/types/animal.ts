@@ -167,6 +167,8 @@ export class Animal implements IAnimal {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
+      case 'critter_id':
+        return 'BCTW ID';
       case 'wlh_id':
         return 'WLH ID';
       case 'associated_animal_relationship':

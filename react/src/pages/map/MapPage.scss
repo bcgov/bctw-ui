@@ -171,14 +171,14 @@ $appearAboveMap: 1001;
 }
 
 // the bottom panel table cell that opens the overview modal when clicked
-.map-details-clickable-cell {
+.clickable-cell {
   // width: 30%; // so the cursor doesn't appear on the whole cell
   color: rgb(58, 164, 255) !important;
   font-weight: 500;
   text-decoration: underline;
 }
 
-.map-details-cell-hover {
+.cell-hover {
   cursor: pointer;
 }
 

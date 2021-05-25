@@ -128,6 +128,8 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
                   <span className='span'>Species: {editing.species}</span>
                   <span className='span'>|</span>
                   <span className='span'>Device: {editing.device_id ?? 'Unassigned'}</span>
+                  <span className='span'>|</span>
+                  <span className='span'>BCTW ID: {editing.critter_id}</span>
                   <span className='button_span'>
                     {!isCreatingNew ? (
                       <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>

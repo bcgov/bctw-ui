@@ -25,7 +25,6 @@ export default function BasicTable<T>({
   const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>();
-  // const [rowIdentifier, setRowIdentifier] = useState<string>('id');
 
   const handleSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';

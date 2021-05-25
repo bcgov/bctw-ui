@@ -23,12 +23,12 @@ import {
   IGrantCritterAccessResults,
   IUpsertPayload,
   IUserCritterPermissionInput
-} from '../api/api_interfaces';
+} from 'api/api_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { BCTW, BCTWType } from 'types/common_types';
-import { exportQueryParams } from 'types/export';
+import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import MortalityEvent from 'types/mortality_event';
@@ -275,8 +275,8 @@ export const useTelemetryApi = () => {
   /**
    * 
   */
-  const useExport = (config: UseMutationOptions<string[], AxiosError, exportQueryParams>): UseMutationResult<string[]> => {
-    return useMutation<string[], AxiosError, exportQueryParams>((body) => bulkApi.getExportData(body), config);
+  const useExport = (config: UseMutationOptions<string[], AxiosError, ExportQueryParams>): UseMutationResult<string[]> => {
+    return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
   };
 
   /**

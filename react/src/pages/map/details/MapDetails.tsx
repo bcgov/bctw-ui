@@ -1,6 +1,6 @@
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
-import { DetailsSortOption, ITelemetryPoint, ITelemetryGroup, OnPanelRowSelect, OnMapRowCellClick, OnlySelectedCritters } from 'types/map';
+import { DetailsSortOption, ITelemetryPoint, ITelemetryGroup, OnPanelRowSelect, OnMapRowCellClick, OnlySelectedCritters, MapRange } from 'types/map';
 import Checkbox from 'components/form/Checkbox';
 import { getPointIDsFromTelemetryGroup, getUniqueCritterIDsFromSelectedPings, groupPings } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
@@ -14,15 +14,22 @@ export type MapDetailsBaseProps = {
   handleShowOverview: OnMapRowCellClick;
 };
 
-type MapDetailsProps = MapDetailsBaseProps & {
+export type MapDetailsProps = MapDetailsBaseProps & {
   pings: ITelemetryPoint[];
   unassignedPings: ITelemetryPoint[];
+  // telemetry IDs of points that have a device/animal attached
   selectedAssignedIDs: number[];
   showExportModal: boolean;
   setShowExportModal: (b: boolean) => void;
-  handleShowOnlySelected: (o: OnlySelectedCritters) => void;
+  // handler for when 'show only checked' is clicked.
+  handleShowOnlySelected: (o: OnlySelectedCritters) => void; 
+  timeRange: MapRange;
 };
 
+/**
+ * the bottom details panel (aka attribute table) of the 2D map
+ * note: fixme: unassigned points not handled correctly for all features!
+ */
 export default function MapDetails({
   pings,
   unassignedPings,
@@ -31,13 +38,18 @@ export default function MapDetails({
   handleShowOnlySelected,
   handleRowSelected,
   showExportModal,
-  setShowExportModal
+  setShowExportModal,
+  timeRange
 }: MapDetailsProps): JSX.Element {
+  // ping state from the map. Applying filters will update this state
   const [groupedPings, setGroupedPings] = useState<ITelemetryGroup[]>([]);
   const [groupedUnassignedPings, setGroupedUnassignedPings] = useState<ITelemetryGroup[]>([]);
+
   const [crittersSelectedInMap, setCrittersSelectedInMap] = useState<string[]>([]);
-  // for export state
+
+  // state for the 'checked' rows in the table
   const [pingGroupChecked, setPingGroupChecked] = useState<ITelemetryGroup[]>([]);
+
   const [showOnlySelected, setShowOnlySelected] = useState<boolean>(false);
   const [sort] = useState<DetailsSortOption>('wlh_id');
 
@@ -49,8 +61,7 @@ export default function MapDetails({
     setGroupedUnassignedPings(byDevice);
   }, [pings]);
 
-  // when user limits features selection via the map
-  // highlight them in child details component
+  // when user limits features selection via the map highlight them in child details component
   useEffect(() => {
     const update = (): void => {
       const critterIds = getUniqueCritterIDsFromSelectedPings(pings, selectedAssignedIDs);
@@ -66,12 +77,13 @@ export default function MapDetails({
     }
   }, [showOnlySelected])
 
-  // upon rows checked in each row
+  // upon rows checked in each row, note: unassigned IDs are negative integers
   const handleRowsChecked = (ids: number[]): void => {
-    const grouped = groupPings(pings.filter((f) => ids.includes(f.id)));
+    const grouped = groupPings([...pings, ...unassignedPings].filter((f) => ids.includes(f.id)));
     setPingGroupChecked(grouped);
     handleRowSelected(ids);
     if (showOnlySelected) {
+      // fixme: unassigned not handled!
       handleShowOnlySelected({show: true, critter_ids: grouped.map(g => g.critter_id)});
     }
   };
@@ -106,18 +118,11 @@ export default function MapDetails({
         handleRowSelected={handleRowsChecked}
       />
       <MapExport
-        critter_ids={
-          pingGroupChecked.length
-            ? pingGroupChecked.map((g) => g.critter_id)
-            : groupedPings.map((f) => f.critter_id)
-        }
-        collar_ids={
-          pingGroupChecked.length
-            ? pingGroupChecked.map((f) => f.features[0].properties.collar_id)
-            : groupedPings.map((f) => f.features[0].properties.collar_id)
-        }
+        groupedAssignedPings={pingGroupChecked.length ? pingGroupChecked : groupedPings}
+        groupedUnassignedPings={groupedUnassignedPings}
         open={showExportModal}
         handleClose={(): void => setShowExportModal(false)}
+        range={timeRange}
       />
     </>
   );

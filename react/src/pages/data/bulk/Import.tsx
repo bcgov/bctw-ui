@@ -2,7 +2,6 @@ import { Button, CircularProgress, FormControlLabel, Radio, RadioGroup, Typograp
 import { createFormData } from 'api/api_helpers';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { NotificationMessage } from 'components/common';
-// import Button from 'components/form/Button';
 import FileInput from 'components/form/FileInput';
 import { useState } from 'react';
 import BasicTable from 'components/table/BasicTable';
@@ -199,7 +198,7 @@ export default function Import<T>(): JSX.Element {
                 {/* render the download template button */}
                 if (index === 0 && importType) {
                   return (
-                    <li onClick={downloadTemplate} className={'map-details-cell-hover map-details-clickable-cell'}>
+                    <li onClick={downloadTemplate} className={'cell-hover map-details-clickable-cell'}>
                       {step}
                     </li>
                   );
@@ -219,10 +218,10 @@ export default function Import<T>(): JSX.Element {
         {isIdle ? <FileInput accept='.csv' disabled={!importType} onFileChosen={handleFileChange} /> : null}
 
         {/* import type-specific message */}
-        <Typography style={{ minHeight: '200px', margin: '10px 0' }}>{message ?? ''}</Typography>
+        <Typography style={{ minHeight: '200px', margin: '10px 0'}}>{message ?? ''}</Typography>
 
         {/* import results table */}
-        <div style={{ minHeight: '200px', margin: '10px 0' }}>{isSuccess ? renderResults(data) : null}</div>
+        <div style={{ minHeight: '200px', margin: '10px 0', overflowY: 'auto'}}>{isSuccess ? renderResults(data) : null}</div>
 
         {isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> : null}
       </div>
