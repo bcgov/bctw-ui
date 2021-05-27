@@ -140,29 +140,38 @@ export default function Import<T>(): JSX.Element {
   // renders the result/error table when the API returs result of the import
   const renderResults = (data: IBulkUploadResults<T>): React.ReactNode => {
     const { errors, results } = data;
-    // console.log(data);
-    if (errors.length) {
-      return (
-        <>
-          <div style={{marginBottom: '10px'}}>
-            <NotificationMessage type='error' message={'There were errors during the import'} />
-          </div>
-          <BasicTable headers={['rownum', 'error']} data={errors} rowIdentifier={'rownum'} />
-        </>
-      );
+    const toShow = [];
+    const isErrors = !!errors.length;
+    let tableProps;
+    if (isErrors) {
+      tableProps = { headers: ['rownum', 'error'], rowIdentifier: 'rownum'};
+    } else {
+      let rowID = 'device_id'; 
+      results.forEach((r) => {
+        if (isHistoricalTelemetry(r)) {
+          toShow.push(plainToClass(HistoricalTelemetry, r))
+        } else if ((r as unknown as Animal).critter_id) {
+          toShow.push(plainToClass(Animal, r));
+          rowID = 'critter_id';
+        } else if ((r as unknown as Collar).collar_id) {
+          toShow.push(plainToClass(Collar, r));
+        }
+      })
+      tableProps = { rowIdentifier: rowID };
     }
-    // todo: show other import results
-    if (isHistoricalTelemetry(results[0])) {
-      const asClass = plainToClass(HistoricalTelemetry, results);
-      return (
-        <>
-          <div style={{marginBottom: '10px'}}>
-            <NotificationMessage type='success' message={`${results.length} historical telemetry records were imported successfully.`} />
-          </div>
-          <BasicTable data={classToPlain(asClass) as T[]} rowIdentifier={'device_id' as keyof T} />
-        </>
-      );
-    }
+    return (
+      <>
+        <div style={{ marginBottom: '10px' }}>
+          <NotificationMessage
+            type={isError ? 'error' : 'success'}
+            message={
+              isError ? 'There were errors during the import' : `${results.length} record(s) were imported successfully.`
+            }
+          />
+        </div>
+        <BasicTable data={isError ? errors : classToPlain(toShow) as T[]} {...tableProps} />
+      </>
+    );
   };
 
   return (
@@ -198,7 +207,7 @@ export default function Import<T>(): JSX.Element {
                 {/* render the download template button */}
                 if (index === 0 && importType) {
                   return (
-                    <li onClick={downloadTemplate} className={'cell-hover map-details-clickable-cell'}>
+                    <li onClick={downloadTemplate} className={'cell-hover clickable-cell'}>
                       {step}
                     </li>
                   );
@@ -221,7 +230,7 @@ export default function Import<T>(): JSX.Element {
         <Typography style={{ minHeight: '200px', margin: '10px 0'}}>{message ?? ''}</Typography>
 
         {/* import results table */}
-        <div style={{ minHeight: '200px', margin: '10px 0', overflowY: 'auto'}}>{isSuccess ? renderResults(data) : null}</div>
+        <div style={{ minHeight: '200px', maxWidth: '80%', margin: '10px 0', overflowY: 'auto', overflowX: 'auto'}}>{isSuccess ? renderResults(data) : null}</div>
 
         {isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> : null}
       </div>

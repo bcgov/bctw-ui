@@ -152,12 +152,11 @@ export class Animal implements IAnimal {
       : '';
   }
 
-  constructor() {
-    this.animal_id = '';
-    this.animal_status = '';
-    this.region = '';
-    this.species = '';
-    this.wlh_id = '';
+  constructor(aid?: string, status?: string, sp?: string, wlhid?: string) {
+    this.animal_id = aid ?? '';
+    this.animal_status = status ?? '';
+    this.species = sp ?? '';
+    this.wlh_id = wlhid ?? '';
   }
 
   toJSON(): Animal {

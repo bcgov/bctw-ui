@@ -43,9 +43,9 @@ export default function AdminPage(): JSX.Element {
         />
         {/* {responseState ? <NotificationMessage type={responseState.type} message={responseState.message} /> : null} */}
         <div className='admin-btn-row'>
-          <Button disabled={!ids} onClick={(): void => onClickShowModal(true)}>
-            Edit
-          </Button>
+          <Button disabled={!ids} onClick={(): void => onClickShowModal(true)}>Edit User Access</Button>
+          {/* todo: */}
+          {/* <Button onClick={(): void => onClickShowModal(true)}>Edit User</Button> */}
         </div>
         <GrantCritterModal show={showModal} onClose={(): void => setShowModal(false)} onSave={onSave} users={ids} />
       </div>

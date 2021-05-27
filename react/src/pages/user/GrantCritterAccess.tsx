@@ -23,7 +23,7 @@ type IGrantCritterModalProps = {
  * modal that shows a list of critters that can be individually or multi selected.
  * passes a custom select header/column component to the Table
  */
-export default function GrantCritterModal({ show, onClose, onSave, users }: IGrantCritterModalProps): JSX.Element {
+export default function GrantCritterModal({ show, onClose, users }: IGrantCritterModalProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
@@ -38,8 +38,8 @@ export default function GrantCritterModal({ show, onClose, onSave, users }: IGra
 
   // show notification on successful user/critter grant api call
   const onSuccess = (ret: IBulkUploadResults<IGrantCritterAccessResults>): void => {
-    const { errors, results } = ret;
-    if (ret.errors.length) {
+    const { errors } = ret;
+    if (errors.length) {
       responseDispatch({ type: 'error', message: `${errors.join()}` });
     } else {
       responseDispatch({

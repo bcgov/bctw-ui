@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { CircularProgress, IconButton, TableHead, Typography } from '@material-ui/core';
+import { CircularProgress, IconButton, TableHead } from '@material-ui/core';
 import { TelemetryAlert } from 'types/alert';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@material-ui/core';

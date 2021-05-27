@@ -96,6 +96,7 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
     const flattened: Record<string,unknown>[] = data.flatMap(d => omitNull(d));
     const asGeoJSON = flattened.map((d, i) => {
       const withoutGeom = Object.assign({}, d);
+      // remove objects from the geojson feature.
       delete withoutGeom.geom;
       return { 
         type: 'Feature',
@@ -120,32 +121,33 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
     setExportParams(n)
   }
 
+  const cellClass = 'cell-hover clickable-cell';
   return (
     <Modal open={open} handleClose={handleClose} title={'Export'}>
       <>
         {isLoading ? <CircularProgress /> : null}
         <p><b>{critter_ids.length}</b> unique animals selected. <b>{collar_ids.length}</b> unique devices selected</p>
         <Typography variant='h5'>Export the history for:</Typography>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} style={{marginTop:'10px'}}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><Typography>{range.start} to {range.end}</Typography></TableCell>
-                <TableCell><Typography>All time</Typography></TableCell>
+                <TableCell><Typography style={{fontWeight: 'bold'}}>{range.start} to {range.end}</Typography></TableCell>
+                <TableCell><Typography style={{fontWeight: 'bold'}}>All time</Typography></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell className={'cell-hover clickable-cell'} onClick={(): void => clickExport(eExportType.animal, 'selected')}>Animal metadata</TableCell>
-                <TableCell className={'cell-hover clickable-cell'} onClick={(): void => clickExport(eExportType.animal, 'all')}>Animal metadata</TableCell>
+                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.animal, 'selected')}>Animal metadata</TableCell>
+                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.animal, 'all')}>Animal metadata</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className={'cell-hover clickable-cell'} onClick={(): void => clickExport(eExportType.collar, 'selected')}>Device metadata</TableCell>
-                <TableCell className={'cell-hover clickable-cell'} onClick={(): void => clickExport(eExportType.collar, 'all')}>Device metadata</TableCell>
+                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.collar, 'selected')}>Device metadata</TableCell>
+                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.collar, 'all')}>Device metadata</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className={'cell-hover clickable-cell'} onClick={(): void => clickExport(eExportType.movement, 'selected')}>Movement</TableCell>
-                <TableCell className={'cell-hover clickable-cell'} onClick={(): void => clickExport(eExportType.movement, 'all')}>Movement</TableCell> 
+                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.movement, 'selected')}>Movement</TableCell>
+                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.movement, 'all')}>Movement</TableCell> 
               </TableRow>
             </TableBody>
           </Table>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Table as MuiTable,
   TableBody,
@@ -23,6 +23,7 @@ import { UseQueryResult } from 'react-query';
 import { BCTW } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 export default function Table<T extends BCTW>({
   customColumns,
@@ -44,6 +45,12 @@ export default function Table<T extends BCTW>({
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState<number>(1);
   const [rowIdentifier, setRowIdentifier] = useState<string>('id');
+  /**
+   * since data is updated when the page is changed, use the 'values'
+   * state to keep track of the entire set of data across pages.
+   * this state is passed to the parent select handlers
+   */
+  const [values, setValues] = useState<T[]>([]);
 
   const onSuccess = (results: T[]): void => {
     const first = results[0];
@@ -55,7 +62,7 @@ export default function Table<T extends BCTW>({
     }
   };
 
-  useEffect(() => {
+  useDidMountEffect(() => {
     if (useRowState && data.length) {
       const found = data.findIndex(p => p[rowIdentifier] === useRowState);
       if (found === -1) {
@@ -71,15 +78,23 @@ export default function Table<T extends BCTW>({
     error,
     data,
     isPreviousData,
-    isSuccess
+    isSuccess,
   }: UseQueryResult<T[], AxiosError> = query(
     page,
     param
   );
 
-  useEffect(() => {
+  useDidMountEffect(() => {
     if (isSuccess) {
       onSuccess(data);
+      const newV = [];
+      data.forEach(d => {
+        const found = values.find(v => d[rowIdentifier] === v[rowIdentifier]);
+        if (!found) {
+          newV.push(d);
+        }
+      })
+      setValues(o => [...o, ...newV]);
     }
   }, [isSuccess]);
 
@@ -91,10 +106,10 @@ export default function Table<T extends BCTW>({
 
   const handleSelectAll = (event): void => {
     if (event.target.checked) {
-      const newIds = data.map((r) => r[rowIdentifier]);
+      const newIds = [...selected, ...data.map((r) => r[rowIdentifier])];
       setSelected(newIds);
       if (typeof onSelectMultiple === 'function') {
-        onSelectMultiple(data.filter((d) => newIds.includes(d[rowIdentifier])));
+        onSelectMultiple(values.filter((d) => newIds.includes(d[rowIdentifier])));
       }
       return;
     }
@@ -107,6 +122,7 @@ export default function Table<T extends BCTW>({
     }
     if (typeof onSelect === 'function' && data?.length) {
       setSelected([id]);
+      // a row can only be selected from the current pages data set
       const row = data.find((d) => d[rowIdentifier] === id);
       onSelect(row);
     }
@@ -132,13 +148,11 @@ export default function Table<T extends BCTW>({
       newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
     setSelected(newSelected);
-    // fixme: data only has the current pages contents, when there could be items selected
-    // by default on another page.
     if (alreadySelected.length) {
       onSelectMultiple(newSelected);
     } else {
       // send T[] not just the identifiers
-      onSelectMultiple(data.filter((d) => newSelected.includes(d[rowIdentifier])));
+      onSelectMultiple(values.filter((d) => newSelected.includes(d[rowIdentifier])));
     }
   }
 
@@ -199,7 +213,7 @@ export default function Table<T extends BCTW>({
                 orderBy={(orderBy as string) ?? ''}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAll}
-                rowCount={data?.length ?? 0}
+                rowCount={values?.length ?? 0}
                 customHeaders={customColumns?.map((c) => c.header) ?? []}
               />
             )}
