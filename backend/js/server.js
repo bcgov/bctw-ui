@@ -1,4 +1,5 @@
 /* Bare bones static file server */
+const pg = require('pg');
 const pug = require('pug');
 const axios = require('axios');
 const path = require('path')
@@ -18,6 +19,19 @@ const isProd = process.env.NODE_ENV === 'production' ? true : false;
 const isTest = process.env.TEST === 'true';
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
+
+const pgPort = +(isProd ? process.env.POSTGRES_SERVER_PORT ?? '5432' : '5432');
+const pgHost = isProd ? process.env.POSTGRES_SERVER_HOST : 'localhost';
+
+// Set up the database pool
+const pgPool = new pg.Pool({
+  user: process.env.POSTGRES_USER,
+  database: process.env.POSTGRES_DB,
+  password: process.env.POSTGRES_PASSWORD,
+  host: pgHost,
+  port: pgPort,
+  max: 10,
+});
 
 var memoryStore = new expressSession.MemoryStore();
 
