@@ -1,4 +1,5 @@
 /* Bare bones static file server */
+const pug = require('pug');
 const axios = require('axios');
 const path = require('path')
 const cors = require('cors');
@@ -47,6 +48,8 @@ var session = {
   secret: sessionSalt,
   store: memoryStore
 };
+
+
 
 const appendQueryToUrl = (url, query) => {
   if (!query) return url;
@@ -210,6 +213,83 @@ const authenticate = function (req, res, next) {
   }
 };
 
+/**
+ * # onboarding
+ * Accept requests for access to the site.
+ * Send requests to product owner via email (CHES).
+ * @param req {object} Express request object
+ * @param res {object} Express response object
+ */
+const onboarding = (req,res) => {
+  const template = pug.compileFile('onboarding/index.pug')
+  const html = template();
+  res.status(200).send(html);
+};
+
+const onboardingAccess = async (req,res) => {
+  const email = req.body?.email;
+  // Reject if no email
+  if (!email) return res.status(406).send('No email supplied');
+
+  // Get all the environment variable dependencies
+  const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
+  const apiUrl = `${process.env.BCTW_CHES_API_URL}/api/v1/email`;
+  const username = process.env.BCTW_CHES_USERNAME;
+  const password = process.env.BCTW_CHES_PASSWORD;
+  const fromEmail = process.env.BCTW_CHES_FROM_EMAIL;
+  const toEmail = process.env.BCTW_CHES_TO_EMAIL;
+
+  // Create the authorization hash
+  const prehash = Buffer.from(`${username}:${password}`,'utf8')
+    .toString('base64');
+  const hash = `Basic ${prehash}`;
+
+  const tokenParcel = await axios.post(
+    tokenUrl,
+    'grant_type=client_credentials',
+    {headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": hash
+    }
+  });
+
+  const pretoken = tokenParcel.data?.access_token;
+  if (!pretoken) return res.status(500).send('Authentication failed');
+  const token = `Bearer ${pretoken}`;
+
+  const emailMessage = `
+    Access to the BC Telemetry Warehouse has be requested by
+    <a href="mailto:${email}">${email}</a>.
+  `
+  const emailPayload = {
+    subject: 'Access request for the BC Telemetry Warehouse',
+    priority: 'normal',
+    encoding: 'utf-8',
+    bodyType: 'html',
+    body: emailMessage,
+    from: fromEmail,
+    to: [toEmail],
+    cc: [],
+    bcc: [],
+    delayTS: 0
+  }
+
+  axios.post(
+    apiUrl,
+    emailPayload,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  ).then((response) => {
+    res.status(200).send('Email was sent');
+  }).catch((error) => {
+    res.status(500).send('Email failed');
+  })
+};
+
 
 /* ## denied
   The route to the denied service page
@@ -233,8 +313,29 @@ var app = express()
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
-  // BCTW Gate - deprecated, handled in app
-  // .use(authenticate) 
+  .get('/onboarding',onboarding)
+  .post('/onboarding',onboardingAccess)
+  .all('*', async (req,res,next) => {
+    /**
+     * If you get here you have a valid IDIR.
+     * Check if the user is registerd in the database.
+     * If yes.... Pass through.
+     * Else... Direct to the onboarding page.
+     */
+    const idir = req.query.idir;
+    const sql = 'select idir from bctw.user'
+    const client = await pgPool.connect();
+    const result = await client.query(sql);
+    const idirs = result.rows.map((row) => row.idir);
+    const registered = (idirs.indexOf(idir) > 0) ? true : false;
+
+    if (registered) {
+      next(); // pass through
+    } else {
+      res.redirect('/onboarding'); // reject
+    }
+    client?.release();
+  })
   .get('/denied', denied);
 
 if (isTest) {
