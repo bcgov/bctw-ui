@@ -20,16 +20,13 @@ const isTest = process.env.TEST === 'true';
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
 
-const pgPort = +(isProd ? process.env.POSTGRES_SERVER_PORT ?? '5432' : '5432');
-const pgHost = isProd ? process.env.POSTGRES_SERVER_HOST : 'localhost';
-
 // Set up the database pool
 const pgPool = new pg.Pool({
   user: process.env.POSTGRES_USER,
   database: process.env.POSTGRES_DB,
   password: process.env.POSTGRES_PASSWORD,
-  host: pgHost,
-  port: pgPort,
+  host: process.env.POSTGRES_SERVER_HOST,
+  port: process.env.POSTGRES_SERVER_PORT,
   max: 10,
 });
 
@@ -241,7 +238,7 @@ const onboarding = (req,res) => {
 };
 
 const onboardingAccess = async (req,res) => {
-  const email = req.body?.email;
+  const email = req.body.email;
   // Reject if no email
   if (!email) return res.status(406).send('No email supplied');
 
@@ -267,7 +264,7 @@ const onboardingAccess = async (req,res) => {
     }
   });
 
-  const pretoken = tokenParcel.data?.access_token;
+  const pretoken = tokenParcel.data.access_token;
   if (!pretoken) return res.status(500).send('Authentication failed');
   const token = `Bearer ${pretoken}`;
 
@@ -348,7 +345,7 @@ var app = express()
     } else {
       res.redirect('/onboarding'); // reject
     }
-    client?.release();
+    client.release();
   })
   .get('/denied', denied);
 
