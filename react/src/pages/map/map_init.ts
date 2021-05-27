@@ -9,6 +9,7 @@ import { MapTileLayers } from 'constants/strings';
 import { ITelemetryPoint, TelemetryDetail } from 'types/map';
 import { plainToClass } from 'class-transformer';
 import { MapStrings } from 'constants/strings';
+import { Map } from '@material-ui/icons';
 
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
@@ -40,7 +41,17 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
 // The BCGW URL
 const bcgw = 'http://openmaps.gov.bc.ca/geo/pub/ows';
 
-// Ungulate Winter Ranges
+// TRIM contour lines
+const getTCL = () => {
+  return L.tileLayer.wms(bcgw, {
+    layers: 'WHSE_BASEMAPPING.TRIM_CONTOUR_LINES',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.6
+  });
+};
+
+// ungulate winter ranges
 const getUWR = () => {
   return L.tileLayer.wms(bcgw, {
     layers: 'WHSE_WILDLIFE_MANAGEMENT.WCP_UNGULATE_WINTER_RANGE_SP',
@@ -50,7 +61,7 @@ const getUWR = () => {
   });
 };
 
-// Cariboo Herd Locations
+// caribou herd locations
 const getCHL = () => {
   return L.tileLayer.wms(bcgw, {
     layers: 'WHSE_WILDLIFE_INVENTORY.GCPB_CARIBOU_POPULATION_SP',
@@ -61,20 +72,25 @@ const getCHL = () => {
 };
 
 const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Control.Layers): void => {
+
   const bingOrtho = L.tileLayer(MapTileLayers.bing, {
     attribution: '&copy; <a href="https://esri.com">ESRI Basemap</a> ',
     maxZoom: 24,
     maxNativeZoom: 17
   }).addTo(mapRef.current);
-
   const bcGovBaseLayer = L.tileLayer(MapTileLayers.govBase, {
     maxZoom: 24,
     attribution: '&copy; <a href="https://www2.gov.bc.ca/gov/content/home">BC Government</a> '
   });
+  const esriWorldTopo = L.tileLayer(MapTileLayers.esriWorldTopo, {
+    maxZoom: 24
+  });
   layerPicker.addBaseLayer(bingOrtho, 'Bing Satellite');
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
+  layerPicker.addBaseLayer(esriWorldTopo, 'ESRI World Topo');
 
   // Some BCGW Overlays
+  layerPicker.addOverlay(getTCL(), 'TRIM Countour Lines');
   layerPicker.addOverlay(getUWR(), 'Ungulate Winter Range');
   layerPicker.addOverlay(getCHL(), 'Cariboo Herd Boundaries');
 };
