@@ -45,7 +45,7 @@ export default function TextField(props: ITextInputProps): JSX.Element {
     handleIsRequired(target);
   };
 
-  const handleIsRequired = (v: string) => {
+  const handleIsRequired = (v: string): void => {
     if (!v && required) {
       setErr(FormStrings.isRequired);
     }
@@ -57,7 +57,7 @@ export default function TextField(props: ITextInputProps): JSX.Element {
     setErr(msg);
   }
 
-  const callParentHandler = (): void => changeHandler({ [propName]: val, hasError: !!err.length });
+  const callParentHandler = (): void => changeHandler({ [propName]: val, error: !!err.length });
 
   const propsToPass = removeProps(props, inputPropsToRemove);
 

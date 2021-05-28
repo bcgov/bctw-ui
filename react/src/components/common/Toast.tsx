@@ -1,6 +1,7 @@
 import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import { Portal } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
 
 type IToastProps = {
   message: string;
@@ -10,7 +11,6 @@ type IToastProps = {
   type?: 'error' | 'warning' | 'info' | 'success';
 };
 
-// todo: style snackbar 
 export default function Toast({ message, show, action, onClose, type }: IToastProps): JSX.Element {
   return (
     <>
@@ -23,9 +23,11 @@ export default function Toast({ message, show, action, onClose, type }: IToastPr
           open={show}
           autoHideDuration={8000}
           onClose={onClose}
-          action={action}
-          message={message}
-        />
+          action={action}>
+          <Alert onClose={onClose} severity={type}>
+            {message}
+          </Alert>
+        </Snackbar>
       </Portal>
     </>
   );

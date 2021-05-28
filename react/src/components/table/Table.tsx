@@ -75,14 +75,11 @@ export default function Table<T extends BCTW>({
     data,
     isPreviousData,
     isSuccess,
-  }: UseQueryResult<T[], AxiosError> = query(
-    page,
-    param
-  );
+  }: UseQueryResult<T[], AxiosError> = query(page, param);
 
   // set the row identifier when data is changed
   useDidMountEffect(() => {
-    const first = data[0];
+    const first = data && data.length && data[0];
     if (first && typeof first.identifier === 'string') {
       setRowIdentifier(first.identifier);
     }

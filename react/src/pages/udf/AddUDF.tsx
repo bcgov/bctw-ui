@@ -40,9 +40,9 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   const { data: udfResults, status: udfStatus } = bctwApi.useUDF(eUDFType.critter_group);
 
   const { data: critterResults, status: critterStatus } = bctwApi.useCritterAccess(
-    0, // page 0 is passed to load all values
+    0, // page 0 is used to load all values
     { user: useUser.user?.idir, filterOutNone: true },
-    useUser.ready // pass user ready status as 'enabled', to wait until user info is loaded
+    // useUser.ready // pass user ready status as 'enabled', to wait until user info is loaded
   );
 
   // when the udfs are fetched
@@ -143,7 +143,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
 
   const renderCrittersAsDropdown = (critters: string[]): JSX.Element => {
     return (
-      <FormControl size='small' variant='outlined' className={'select-small'}>
+      <FormControl style={{width: '100px'}} size='small' variant='outlined' className={'select-small'}>
         <InputLabel>Show</InputLabel>
         <Select>
           {critters.map((c) => (

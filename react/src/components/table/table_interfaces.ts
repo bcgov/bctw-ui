@@ -1,34 +1,37 @@
+import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
 import { BCTW } from 'types/common_types';
 
 type Order = 'asc' | 'desc';
 
+/**
+ * @param property key of T used to sort by
+ * @param order see @type {Order}
+ */
 interface ITableSortProp<T> {
   property: keyof T;
   order: Order;
 }
 
 /**
- *
- */
+ * a hook from @file 'hooks/useTelemetryApi.ts passed to a data table 
+*/
 type ITableQuery<T> = (
   page: number,
-  param?: string | number | unknown,
+  param?: unknown,
   config?: Record<string, unknown>
-  // ) => UseQueryResult<T[], AxiosError>;
-) => UseQueryResult;
+) => UseQueryResult<T[], AxiosError>;
 
 /**
- * @param query - name of api hook
- * @param queryProp - param to pass to hook
+ * @param defaultSort 
+ * @param query - the bctwApi hook 
  * @param onNewData handler to call when new data is loaded
  */
 interface ITableQueryProps<T extends BCTW> {
   defaultSort?: ITableSortProp<T>;
-  param?: string | number | unknown;
-  // fixme:
-  query: any;
-  // query: (page: number, param?: number | string | 'unknown') => UseQueryResult<T[], AxiosError>;
+  param?: unknown;
+  // query: ITableQuery<T>
+  query: any; //fixme:
   onNewData?: (data: T[]) => void;
 }
 
@@ -38,17 +41,15 @@ interface ICustomTableColumn<T> {
 }
 
 /**
- * @param columns array of functions that return components to add as additional columns
- * @param headers assuming not all data properties are displayed in the table. * required
- * @param isMultiSelect render row of checkboxes and different toolbar - default to false
- * @param paginate should the pagination actions be displayed?
- * @param queryProps which query to use
- * @param rowIdentifier what uniquely identifies a row (ex device_id for a collar). defaults to 'id'
- * @param title display as table title
+ * @param customColumns array of functions that return components to add as additional columns
+ * @param headers displays all props of T unless this is included
+ * @param isMultiSelect renders a row of checkboxes and a special toolbar if true
+ * @param paginate should the pagination actions be displayed
+ * @param queryProps which query to use - see @type {ITableQuery}
+ * @param title displayed as table title
  * @param onSelect parent handler triggered when a row is clicked
- * @param onSelectMultiple isMultiSelect must be true
- */
-
+ * @param onSelectMultiple parent handler triggered when a row is checked if @param isMultiSelect
+*/
 type ITableProps<T> = {
   customColumns?: ICustomTableColumn<T>[];
   headers?: string[];
@@ -56,7 +57,6 @@ type ITableProps<T> = {
   alreadySelected?: string[]
   paginate?: boolean;
   queryProps: ITableQueryProps<T>;
-  // rowIdentifier?: string;
   title?: string;
   onSelect?: (row: T) => void;
   onSelectMultiple?: (rowIds: T[]) => void;
@@ -64,7 +64,7 @@ type ITableProps<T> = {
 
 /**
  * interface used to generate headers in TableHead
- */
+*/
 interface HeadCell<T> {
   disablePadding: boolean;
   id: keyof T;
@@ -74,14 +74,15 @@ interface HeadCell<T> {
 
 /**
  * @param customHeaders passed from the main tables customColumns
- * @param headerData an instance of a BCTW class passed from the table query to API
+ * @param headerData an instance of T
  * @param headersToDisplay string array of what should be displayed as a header
- * @param isMultiSelect passed from parent table
- * @param numSelected used in multiselect tables to determine if all rows are selected
+ * @param isMultiSelect boolean
+ * @param numSelected used when @param isMultiSelect to determine if all rows are selected
  * @param onRequestSort sort handler
- * @param onSelectAllClick passed from the table prop
- *
- */
+ * @param order see @type {Order}
+ * @param orderBy should be a key of T
+ * @param onSelectAllClick handler for when table header 'select all' is checked
+*/
 interface ITableHeadProps<T> {
   customHeaders: ((row: T, idx: number) => JSX.Element)[];
   headerData: T;

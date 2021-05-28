@@ -111,14 +111,14 @@ export default function GrantCritterModal({ show, onClose, users }: IGrantCritte
     });
   };
 
-  const tableQueryProps: ITableQueryProps<any> = {
+  const tableQueryProps: ITableQueryProps<UserCritterAccess> = {
     query: bctwApi.useCritterAccess,
     param: { user: users?.idir },
     onNewData: handleDataLoaded
   };
 
   // a custom table body component rendered for each data row
-  const newColumn = (row: UserCritterAccess, idx: number): JSX.Element => {
+  const newColumn = (row: UserCritterAccess): JSX.Element => {
     const perm =
       accessTypes.find((cp) => cp.critter_id === row.critter_id)?.permission_type ??
       row?.permission_type ??
@@ -146,20 +146,22 @@ export default function GrantCritterModal({ show, onClose, users }: IGrantCritte
 
   // a custom table header component. selecting an option from the dropdown
   // updates all of the newColumn selects above.
+  // note: disable this as of new privileges workflow
   const newHeader = (): JSX.Element => {
-    return (
-      <Select
-        value={tableHeaderCritterSelectOption}
-        onChange={(e: React.ChangeEvent<{ value: unknown }>): void => {
-          setTableHeaderCritterSelectOption(e.target.value as eCritterPermission);
-        }}>
-        {Object.values(eCritterPermission).map((d) => (
-          <MenuItem key={`headermenuItem-${d}`} value={d}>
-            {d}
-          </MenuItem>
-        ))}
-      </Select>
-    );
+    return <></>
+    // return (
+    //   <Select
+    //     value={tableHeaderCritterSelectOption}
+    //     onChange={(e: React.ChangeEvent<{ value: unknown }>): void => {
+    //       setTableHeaderCritterSelectOption(e.target.value as eCritterPermission);
+    //     }}>
+    //     {Object.values(eCritterPermission).map((d) => (
+    //       <MenuItem key={`headermenuItem-${d}`} value={d}>
+    //         {d}
+    //       </MenuItem>
+    //     ))}
+    //   </Select>
+    // );
   };
 
   return (
@@ -172,9 +174,7 @@ export default function GrantCritterModal({ show, onClose, users }: IGrantCritte
           onSelectMultiple={handleTableRowSelect}
           isMultiSelect={true}
         />
-        <Button disabled={!critters.length} onClick={handleSave}>
-          Save
-        </Button>
+        <Button disabled={!critters.length} onClick={handleSave}>Save</Button>
       </Modal>
     </>
   );

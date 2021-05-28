@@ -16,8 +16,8 @@ export const bulkApi = (api: AxiosInstance) => {
     return data;
   };
 
+  /** uploads one or more xml files to be parsed as Vectronic .keyx */
   const uploadFiles = async(form: FormData): Promise<IBulkUploadResults<any>> => {
-    // todo: add multi-file support to server.js
     const url = createUrl({api: 'import-xml'});
     const { data } = await api.post(url, form);
     return data;

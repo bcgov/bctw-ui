@@ -2,7 +2,7 @@ import { Paper } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT, validateRequiredFields } from 'components/form/form_helpers';
+import { getInputTypesOfT } from 'components/form/form_helpers';
 import Modal from 'components/modal/Modal';
 import { CritterStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
@@ -14,7 +14,6 @@ import EditModal from 'pages/data/common/EditModal';
 import React, { useEffect, useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
 import { eCritterPermission } from 'types/user';
-import { removeProps } from 'utils/common';
 import { TelemetryAlert } from 'types/alert';
 import { FormInputType } from 'types/form_types';
 
@@ -25,7 +24,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
   const canEdit = editing.permission_type === eCritterPermission.change || editing.permission_type === undefined;
   const requiredFields = CS.requiredProps;
 
-  // const [errors, setErrors] = useState<Record<string, unknown>>({});
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
   const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
@@ -44,17 +42,7 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
     updateFields();
   }, [editing]);
 
-  // const validateForm = (o: Animal): boolean => {
-  //   const errors = validateRequiredFields(o, requiredFields);
-  //   setErrors(errors);
-  //   const hasErrors = Object.keys(errors).length !== 0;
-  //   if (hasErrors && props.validateFailed) {
-  //     props.validateFailed(errors);
-  //   }
-  //   return !hasErrors;
-  // };
-
-  // fixme:
+  // fixme: dont instantiate mortality form like this..
   const alert = new TelemetryAlert();
   {
     alert.critter_id = editing.critter_id;
@@ -95,10 +83,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
       disabled: !canEdit,
       required: requiredFields.includes(key),
       label: editing.formatPropAsHeader(key),
-      /* does the errors object have a property matching this key?
-        if so, get its error
-      */
-      // errorMessage: !!errors[key] && (errors[key] as string),
       span: true
     });
   };
@@ -145,9 +129,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
-            // if (v) {
-            //   setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
-            // }
             handlerFromContext(v, modifyCanSave);
           };
           return (

@@ -16,20 +16,13 @@ import Modal from 'components/modal/Modal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { Paper } from '@material-ui/core';
 
-/**
- * todo: fixme: move form error handling to this component
- */
-
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
-  // will only be true when 'Add' is selected from data management
-  isCreatingNew?: boolean;
+  isCreatingNew?: boolean; 
   hideSave?: boolean;
   hideHistory?: boolean;
   showInFullScreen?: boolean;
   onReset?: () => void;
-  // onValidate?: (o: T) => boolean;
-  // hasErrors?: () => boolean;
   headerComponent?: JSX.Element;
 };
 
@@ -39,10 +32,13 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * - whether the form can be saved
  *
  * - uses the ChangeContext provider to force child form components to pass their changeHandlers to this component so that [canSave] can be determined
- * @param newT an empty instance of T used to reset the form
- * @param hideSave optionally hide save button, default to false
- * @param onValidate called before saving
- * @param onReset a close handler for the editCritter/collar pages - since default handler is overwritten in AddEditViewer
+ * @param children child form component
+ * @param isCreatingNew true when 'Add' is selected from data management
+ * @param hideSave optionally hide save button
+ * @param hideHIstory optionally hide the 'show history' button
+ * @param showInFullScreen render as a modal or fullscreen dialog?
+ * @param onReset a close handler since default handler is overwritten in AddEditViewer
+ * @param headerComponent 
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -53,14 +49,12 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     handleClose,
     editing,
     onSave,
-    // onValidate,
     onReset,
     headerComponent,
     isCreatingNew = false,
     hideHistory = false,
     hideSave = false,
     showInFullScreen = true,
-    // hasErrors
   } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
@@ -69,7 +63,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>(null);
   const [errors, setErrors] = useState<Record<string, boolean>>(Object.assign({}));
 
-  // based on the type of T provided, set the history query status
+  // set the history query status
   useEffect(() => {
     const updateParams = (): void => {
       if (editing instanceof Animal) {
@@ -89,7 +83,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     updateParams();
   }, [editing]);
 
-  // when the edit modal opens, disable save
+  // when the modal opens, disable save
   useDidMountEffect(() => {
     if (open) {
       setCanSave(false);
@@ -110,15 +104,9 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const handleSave = (): void => {
     // use Object.assign to preserve class methods
     const body = omitNull(Object.assign(editing, newObj));
-    // if (typeof onValidate === 'function') {
-    //   if (!onValidate(body)) {
-    //     console.log('EditModal: save invalid');
-    //     return;
-    //   }
-    // }
     console.log(JSON.stringify(body, null, 2));
     const toSave: IUpsertPayload<T> = { body };
-    // onSave(toSave);
+    onSave(toSave);
   };
 
   // triggered on a form input change, newProp will be an object with a single key and value
@@ -126,7 +114,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     console.log(newProp);
     // update the error state
     const key: string = Object.keys(newProp)[0];
-    const newErrors = Object.assign(errors, {[key]: newProp.hasError});
+    const newErrors = Object.assign(errors, {[key]: newProp.error});
     setErrors({...newErrors});
     // update the editing state
     const modified = { ...newObj, ...newProp };

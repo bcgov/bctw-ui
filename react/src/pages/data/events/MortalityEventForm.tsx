@@ -2,7 +2,7 @@ import { Paper } from '@material-ui/core';
 import ChangeContext from 'contexts/InputChangeContext';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { CreateEditCheckboxField, CreateEditDateField, MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT, objHasErrors } from 'components/form/form_helpers';
+import { getInputTypesOfT } from 'components/form/form_helpers';
 import { UserAlertStrings, WorkflowStrings } from 'constants/strings';
 import { TelemetryAlert } from 'types/alert';
 import { LocationEvent } from 'types/location_event';
@@ -129,6 +129,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
 
             const l = Object.assign(locationEvent, v);
             setLocationEvent(l);
+            // fixme: passing the entire object?
             handlerFromContext(l, true);
           };
 

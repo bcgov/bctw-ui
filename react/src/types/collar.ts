@@ -102,7 +102,6 @@ export class Collar implements ICollar {
     return freq.padEnd(numToAdd, '0');
   }
 
-  // fixme: 
   constructor(collar_type?: eNewCollarType) {
     this.retrieval_date = new Date();
     this.malfunction_date = new Date();

@@ -10,15 +10,24 @@ import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type ISelectProps = SelectProps & {
-  codeHeader: string; // code header type to retrieve
-  defaultValue?: string; // will otherwise default to empty string
-  label: string;
-  // todo: get rid of ischange?
-  changeHandler: (o: Record<string, unknown>, isChange: boolean) => void;
+  codeHeader: string;
+  defaultValue?: string;
+  changeHandler: (o: Record<string, unknown>) => void;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
-  triggerReset?: boolean; // force components that are 'multiple' to unselect all values
-  addEmptyOption?: boolean; // optionally add a 'blank' entry to bottom of select menu
+  triggerReset?: boolean;
+  addEmptyOption?: boolean;
 };
+
+/**
+ * a dropdown select component that loads code tables for options
+ * @param codeHeader the code_header_name to load codes from
+ * @param defaultValue default code description to display
+ * @param changeHandler called when a dropdown option is selected
+ * @param multiple specific props:
+    * @param changeHandlerMultiple
+    * @param triggerReset unchecks all selected values
+    * @param addEmptyOption optionally add a 'blank' entry to end of select options
+*/
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
 export default function SelectCode(props: ISelectProps): JSX.Element {
@@ -74,28 +83,31 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     updateOptions();
   }, [isSuccess]);
 
+  // when the parent component forces a reset
   useEffect(() => {
     if (triggerReset && multiple) {
-      // console.log('reset triggered from parent component!');
       setValues([]);
     }
   }, [triggerReset]);
 
+  // when default value changed, call reset handler
   useDidMountEffect(() => {
     reset();
   }, [defaultValue]);
 
+  // call the parent change handler when the selected value or error status changes
   useDidMountEffect(() => {
     pushChange(value);
   }, [value, hasError])
 
+  // default handler when @param multiple is false
   const handleChange = (event: React.ChangeEvent<{ value }>): void => {
     setHasError(false);
     const v = event.target.value;
     setValue(v);
-    // pushChange(v);
   };
 
+  // default handler when @param multiple is true
   const handleChangeMultiple = (event: React.ChangeEvent<{ value }>): void => {
     const selected = event.target.value as string[];
     setValues(selected);
@@ -116,9 +128,9 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
   // call the parent changeHandler
   const pushChange = (v: string): void => {
     const code = codes.find((c) => c.description === v)?.code ?? v;
-    const ret = { [codeHeader]: code, hasError };
+    const ret = { [codeHeader]: code, error: hasError };
     if (typeof changeHandler === 'function') {
-      changeHandler(ret, false);
+      changeHandler(ret);
     }
   };
 
