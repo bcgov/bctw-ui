@@ -7,11 +7,13 @@ import { NotificationMessage } from 'components/common';
 import { formatAxiosError, removeProps } from 'utils/common';
 import { SelectProps } from '@material-ui/core';
 import { FormStrings } from 'constants/strings';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type ISelectProps = SelectProps & {
   codeHeader: string; // code header type to retrieve
   defaultValue?: string; // will otherwise default to empty string
   label: string;
+  // todo: get rid of ischange?
   changeHandler: (o: Record<string, unknown>, isChange: boolean) => void;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
   triggerReset?: boolean; // force components that are 'multiple' to unselect all values
@@ -30,12 +32,14 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     multiple,
     triggerReset,
     className,
-    style
+    style,
+    required
   } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
+  const [hasError, setHasError] = useState<boolean>(required && !defaultValue ? true : false);
 
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
@@ -51,6 +55,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
   // load this codeHeaders codes from db
   const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useCodes(0, codeHeader);
 
+  // when data is successfully fetched
   useEffect(() => {
     const updateOptions = (): void => {
       if (!data?.length) {
@@ -64,9 +69,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       // if a default was set (a code description, update the value to its actual value)
       // pass false as second param to not update the modals 'is saveable property'
       const found = data.find((d) => d.description === defaultValue);
-      if (found) {
-        pushChange(found.code, false);
-      }
+      setValue(found?.description ?? '');
     };
     updateOptions();
   }, [isSuccess]);
@@ -78,10 +81,19 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     }
   }, [triggerReset]);
 
+  useDidMountEffect(() => {
+    reset();
+  }, [defaultValue]);
+
+  useDidMountEffect(() => {
+    pushChange(value);
+  }, [value, hasError])
+
   const handleChange = (event: React.ChangeEvent<{ value }>): void => {
+    setHasError(false);
     const v = event.target.value;
     setValue(v);
-    pushChange(v, true);
+    // pushChange(v);
   };
 
   const handleChangeMultiple = (event: React.ChangeEvent<{ value }>): void => {
@@ -102,11 +114,11 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
   };
 
   // call the parent changeHandler
-  const pushChange = (v: unknown, isChange: boolean): void => {
+  const pushChange = (v: string): void => {
     const code = codes.find((c) => c.description === v)?.code ?? v;
-    const ret = { [codeHeader]: code };
+    const ret = { [codeHeader]: code, hasError };
     if (typeof changeHandler === 'function') {
-      changeHandler(ret, isChange);
+      changeHandler(ret, false);
     }
   };
 
@@ -123,10 +135,6 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     }
   };
 
-  useEffect(() => {
-    reset();
-  }, [defaultValue]);
-
   return (
     <>
       {isError ? (
@@ -134,7 +142,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       ) : isLoading || isFetching ? (
         <div>loading...</div>
       ) : codes && codes.length ? (
-        <FormControl style={style} size='small' variant={'outlined'} className={className ?? 'select-control'}>
+        <FormControl error={hasError} style={style} size='small' variant={'outlined'} className={className ?? 'select-control'}>
           <InputLabel>{label}</InputLabel>
           <Select
             className={className}

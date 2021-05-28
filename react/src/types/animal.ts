@@ -207,7 +207,7 @@ const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'animal_status', isCode: true, required: true },
     { prop: 'species', isCode: true, required: true },
     { prop: 'sex', isCode: true },
-    { prop: 'animal_colouration' },
+    { prop: 'animal_colouration', isCode: true, codeName: 'colour'},
     { prop: 'estimated_age' },
     { prop: 'life_stage', isCode: true },
     { prop: 'juvenile_at_heel', isCode: true }
@@ -228,8 +228,8 @@ const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'animal_id' },
     { prop: 'population_unit', isCode: true },
     { prop: 'collective_unit' },
-    { prop: 'ear_tag_left_colour' /*, isCode: true */ },
-    { prop: 'ear_tag_right_colour' /*, isCode: true */ },
+    { prop: 'ear_tag_left_colour', isCode: true, codeName: 'colour' },
+    { prop: 'ear_tag_right_colour', isCode: true, codeName: 'colour'  },
     { prop: 'ear_tag_id' },
   ],
   mortalityFields: [
@@ -241,8 +241,7 @@ const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'mortality_utm_northing' },
     { prop: 'proximate_cause_of_death', isCode: true },
     { prop: 'ultimate_cause_of_death', isCode: true, codeName: 'proximate_cause_of_death' },
-    // todo:
-    { prop: 'predation_species', /* isCode: true */ },
+    { prop: 'predation_species', /* isCode: true */ }, // todo:
     { prop: 'mortality_comment' },
   ],
   releaseFields: [

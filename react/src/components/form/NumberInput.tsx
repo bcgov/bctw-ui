@@ -4,7 +4,7 @@ import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common';
 import { useState } from 'react';
-import { inputPropsToRemove } from './Input';
+import { inputPropsToRemove } from 'components/form/TextInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
 
@@ -15,6 +15,7 @@ interface INumberInputProps extends StandardTextFieldProps {
   validate?: (v: number) => string;
 }
 
+// todo: required && can't be 0?
 export default function NumberField(props: INumberInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, validate } = props;
   const [err, setErr] = useState<string>('');

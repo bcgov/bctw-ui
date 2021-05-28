@@ -53,10 +53,6 @@ export default function Table<T extends BCTW>({
   const [values, setValues] = useState<T[]>([]);
 
   const onSuccess = (results: T[]): void => {
-    const first = results[0];
-    if (first && typeof first.identifier === 'string') {
-      setRowIdentifier(first.identifier);
-    }
     if (typeof onNewData === 'function') {
       onNewData(results);
     }
@@ -83,6 +79,14 @@ export default function Table<T extends BCTW>({
     page,
     param
   );
+
+  // set the row identifier when data is changed
+  useDidMountEffect(() => {
+    const first = data[0];
+    if (first && typeof first.identifier === 'string') {
+      setRowIdentifier(first.identifier);
+    }
+  }, [data])
 
   useDidMountEffect(() => {
     if (isSuccess) {

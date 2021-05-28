@@ -95,6 +95,12 @@ export class Collar implements ICollar {
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
   @Expose() get identifier(): string { return 'collar_id' }
+  @Expose() get frequencyPadded(): string {
+    const freq = this.frequency.toString();
+    const numDecimalPlaces = freq.slice(freq.lastIndexOf('.') + 1).length;
+    const numToAdd = 3 - numDecimalPlaces + freq.length;
+    return freq.padEnd(numToAdd, '0');
+  }
 
   // fixme: 
   constructor(collar_type?: eNewCollarType) {

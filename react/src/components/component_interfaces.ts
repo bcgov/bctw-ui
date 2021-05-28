@@ -35,7 +35,7 @@ type EditModalBaseProps<T> = ModalBaseProps & {
  * @param isCreatingNew boolean representing whether the modal is creating or editing T
  * @param validateFailed a function handled in the ModifyWrapper that can display notifications
 */
-type CritterCollarModalProps<T> = EditModalBaseProps<T> & {
+type EditorProps<T> = EditModalBaseProps<T> & {
   isCreatingNew?: boolean;
   validateFailed?: (errors: Record<string, unknown>) => void;
 };
@@ -66,7 +66,7 @@ interface INotificationMessage {
 }
 
 export type {
-  CritterCollarModalProps,
+  EditorProps,
   ModalProps,
   ModalBaseProps,
   ExportImportProps,

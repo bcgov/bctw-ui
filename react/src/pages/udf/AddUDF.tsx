@@ -17,7 +17,7 @@ import { eUDFType, IUDF } from 'types/udf';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import Modal from 'components/modal/Modal';
-import TextField from 'components/form/Input';
+import TextField from 'components/form/TextInput';
 import { UserCritterAccess } from 'types/user';
 import { Icon } from 'components/common';
 import Table from 'components/table/Table';

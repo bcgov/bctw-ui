@@ -351,6 +351,10 @@ export const useTelemetryApi = () => {
   /** POST a mortality event form */
   const useMutateMortalityEvent = (config: UseMutationOptions<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>): UseMutationResult<IBulkUploadResults<unknown>> =>
     useMutation<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
+  
+  /** add or update a user */
+  const useMutateUser = (config: UseMutationOptions<User, AxiosError, User>): UseMutationResult<User> =>
+    useMutation<User, AxiosError, User>((body) => userApi.addUser(body), config);
 
   return {
     // queries
@@ -383,6 +387,7 @@ export const useTelemetryApi = () => {
     useMutateLinkCollar,
     useMutateGrantCritterAccess,
     useMutateUDF,
+    useMutateUser,
     useDelete,
     useMutateUserAlert,
     useMutateMortalityEvent,

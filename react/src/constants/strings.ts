@@ -107,6 +107,7 @@ const FormStrings = {
   emptySelectValue: 'Blank',
   validateNegativeLongitude: 'Longitude must be negative',
   validateNumber: 'Must be a number',
+  isRequired: 'field is required'
 }
 
 const UserAlertStrings = {

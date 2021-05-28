@@ -1,6 +1,7 @@
 import { Type, Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
 import { BCTW, BCTWBaseType } from './common_types';
+import { FormFieldObject } from './form_types';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -31,9 +32,21 @@ export class User implements IUser {
   @Type(() => Date)valid_to: Date;
 
   formatPropAsHeader(str: string): string {
-    return columnToHeader(str);
+    switch (str) {
+      case 'idir': 
+      case 'bceid':
+        return str.toUpperCase();
+      default: 
+        return columnToHeader(str);
+    }
   }
 }
+
+export const userFormFields: FormFieldObject[] = [
+  { prop: 'idir' },
+  { prop: 'bceid' },
+  { prop: 'email' },
+]
 
 export interface IUserCritterAccessInput {
   critter_id: string;

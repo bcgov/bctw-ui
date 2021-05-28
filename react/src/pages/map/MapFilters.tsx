@@ -254,11 +254,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               </div>
               {/* render the device list selector */}
               <Tooltip
-                title={
-                  <>
-                    <p>{MapStrings.deviceListTooltip}</p>
-                  </>
-                }
+                title={<p>{MapStrings.deviceListTooltip}</p>}
                 placement='right-start'
                 enterDelay={750}>
                 <div>

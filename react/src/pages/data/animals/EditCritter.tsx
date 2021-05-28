@@ -1,5 +1,5 @@
 import { Paper } from '@material-ui/core';
-import { CritterCollarModalProps } from 'components/component_interfaces';
+import { EditorProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { MakeEditField } from 'components/form/create_form_components';
 import { getInputTypesOfT, validateRequiredFields } from 'components/form/form_helpers';
@@ -18,14 +18,14 @@ import { removeProps } from 'utils/common';
 import { TelemetryAlert } from 'types/alert';
 import { FormInputType } from 'types/form_types';
 
-export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX.Element {
+export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
   const { isCreatingNew, editing } = props;
 
   // for new critters, permission will be undefined
   const canEdit = editing.permission_type === eCritterPermission.change || editing.permission_type === undefined;
   const requiredFields = CS.requiredProps;
 
-  const [errors, setErrors] = useState<Record<string, unknown>>({});
+  // const [errors, setErrors] = useState<Record<string, unknown>>({});
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
   const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
@@ -44,15 +44,15 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
     updateFields();
   }, [editing]);
 
-  const validateForm = (o: Animal): boolean => {
-    const errors = validateRequiredFields(o, requiredFields);
-    setErrors(errors);
-    const hasErrors = Object.keys(errors).length !== 0;
-    if (hasErrors && props.validateFailed) {
-      props.validateFailed(errors);
-    }
-    return !hasErrors;
-  };
+  // const validateForm = (o: Animal): boolean => {
+  //   const errors = validateRequiredFields(o, requiredFields);
+  //   setErrors(errors);
+  //   const hasErrors = Object.keys(errors).length !== 0;
+  //   if (hasErrors && props.validateFailed) {
+  //     props.validateFailed(errors);
+  //   }
+  //   return !hasErrors;
+  // };
 
   // fixme:
   const alert = new TelemetryAlert();
@@ -63,9 +63,6 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
     alert.wlh_id = editing.wlh_id;
     alert.valid_from = editing.valid_from; // Does this make sense?
   }
-
-  const createTitle = (): string =>
-    !isCreatingNew ? 'Add a new animal' : `${canEdit ? 'Editing' : 'Viewing'} ${editing.name}`;
 
   const {
     associatedAnimalFields,
@@ -101,131 +98,130 @@ export default function EditCritter(props: CritterCollarModalProps<Animal>): JSX
       /* does the errors object have a property matching this key?
         if so, get its error
       */
-      errorMessage: !!errors[key] && (errors[key] as string),
+      // errorMessage: !!errors[key] && (errors[key] as string),
       span: true
     });
   };
 
+  const Header = (
+    <Paper className={'dlg-full-title'} elevation={3}>
+      {isCreatingNew ? (
+        <h1>Create an Animal</h1>
+      ) : (
+        <>
+          <h1>
+            WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '}
+            {editing?.animal_id ?? '-'}
+          </h1>
+          <div className={'dlg-full-sub'}>
+            <span className='span'>Species: {editing.species}</span>
+            <span className='span'>|</span>
+            <span className='span'>Device: {editing.device_id ?? 'Unassigned'}</span>
+            <span className='span'>|</span>
+            <span className='span'>BCTW ID: {editing.critter_id}</span>
+            <span className='button_span'>
+              <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
+                Assign Device to Animal
+              </Button>
+              <Button className='button' onClick={(): void => setShowCaptureWorkflow((o) => !o)}>
+                Capture Event
+              </Button>
+              <Button className='button' onClick={(): void => setShowReleaseWorkflow((o) => !o)}>
+                Release Event
+              </Button>
+              <Button className='button' onClick={(): void => setShowMortalityWorkflow((o) => !o)}>
+                Mortality Event
+              </Button>
+            </span>
+          </div>
+        </>
+      )}
+    </Paper>
+  );
+
   return (
-    <EditModal hideSave={!canEdit} title={createTitle()} onValidate={validateForm} {...props}>
+    <EditModal headerComponent={Header} hideSave={!canEdit} {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
-            if (v) {
-              setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
-            }
+            // if (v) {
+            //   setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
+            // }
             handlerFromContext(v, modifyCanSave);
           };
           return (
-            <form className='rootEditInput' autoComplete='off'>
-              <Paper className={'dlg-full-title'} elevation={3}>
-                <h1>
-                  WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '}
-                  {editing?.animal_id ?? '-'}
-                </h1>
-                <div className={'dlg-full-sub'}>
-                  <span className='span'>Species: {editing.species}</span>
-                  <span className='span'>|</span>
-                  <span className='span'>Device: {editing.device_id ?? 'Unassigned'}</span>
-                  <span className='span'>|</span>
-                  <span className='span'>BCTW ID: {editing.critter_id}</span>
-                  <span className='button_span'>
-                    {!isCreatingNew ? (
-                      <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
-                        Assign Device to Animal
-                      </Button>
-                    ) : null}
-                    {!isCreatingNew ? (
-                      <Button className='button' onClick={(): void => setShowCaptureWorkflow((o) => !o)}>
-                        Capture Event
-                      </Button>
-                    ) : null}
-                    {!isCreatingNew ? (
-                      <Button className='button' onClick={(): void => setShowReleaseWorkflow((o) => !o)}>
-                        Release Event
-                      </Button>
-                    ) : null}
-                    {!isCreatingNew ? (
-                      <Button className='button' onClick={(): void => setShowMortalityWorkflow((o) => !o)}>
-                        Mortality Event
-                      </Button>
-                    ) : null}
-                  </span>
+            <>
+              <Paper elevation={0} className={'dlg-full-form'}>
+                {/* <h2>Animal Details</h2> */}
+                <div className={'dlg-details-section'}>
+                  <h3>Identifiers</h3>
+                  {inputTypes
+                    .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
+                    .map((f) => makeFormField(f, onChange))}
                 </div>
+                <div className={'dlg-details-section'}>
+                  <h3>Characteristics</h3>
+                  {inputTypes
+                    .filter((f) => characteristicsFields.map((x) => x.prop).includes(f.key))
+                    .map((formType) => makeFormField(formType, onChange))}
+                </div>
+                <div className={'dlg-details-section'}>
+                  <h3>Association With Another Individual</h3>
+                  {inputTypes
+                    .filter((f) => associatedAnimalFields.map((x) => x.prop).includes(f.key))
+                    .map((f) => makeFormField(f, onChange))}
+                </div>
+                <div className={'dlg-details-section'}>
+                  <h3>Comments About This Animal</h3>
+                  {inputTypes
+                    .filter((f) => userCommentField.map((x) => x.prop).includes(f.key))
+                    .map((f) => makeFormField(f, onChange))}
+                </div>
+                <div className={'dlg-details-section'}>
+                  <h3>Latest Capture Details</h3>
+                  {inputTypes
+                    .filter((f) => captureFields.map((x) => x.prop).includes(f.key))
+                    .map((f) => makeFormField(f, onChange))}
+                </div>
+                <div className={'dlg-details-section'}>
+                  <h3>Latest Release Details</h3>
+                  {inputTypes
+                    .filter((f) => releaseFields.map((x) => x.prop).includes(f.key))
+                    .map((f) => makeFormField(f, onChange))}
+                </div>
+                <div className={'dlg-details-section'}>
+                  <h3>Mortality Details</h3>
+                  {inputTypes
+                    .filter((f) => mortalityFields.map((x) => x.prop).includes(f.key))
+                    .map((f) => makeFormField(f, onChange))}
+                </div>
+                {/* dont show assignment history for new critters */}
+                {!isCreatingNew && showAssignmentHistory ? (
+                  <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
+                    <AssignmentHistory animalId={editing.critter_id} deviceId='' canEdit={canEdit} {...props} />
+                  </Modal>
+                ) : null}
+                {!isCreatingNew && showCaptureWorkflow ? (
+                  <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
+                    <CaptureWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                  </Modal>
+                ) : null}
+                {!isCreatingNew && showReleaseWorkflow ? (
+                  <Modal open={showReleaseWorkflow} handleClose={(): void => setShowReleaseWorkflow(false)}>
+                    <ReleaseWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                  </Modal>
+                ) : null}
+                {!isCreatingNew && showMortalityWorkflow ? (
+                  <MortalityEventForm
+                    alert={alert}
+                    open={showMortalityWorkflow}
+                    handleClose={(): void => setShowMortalityWorkflow(false)}
+                    handleSave={null}
+                  />
+                ) : null}
               </Paper>
-              <Paper elevation={0}>
-                <h2>Animal Details</h2>
-                <Paper elevation={3} className={'dlg-full-body-details'}>
-                  <div className={'dlg-details-section'}>
-                    <h3>Identifiers</h3>
-                    {inputTypes
-                      .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
-                      .map((f) => makeFormField(f, onChange))}
-                  </div>
-                  <div className={'dlg-details-section'}>
-                    <h3>Characteristics</h3>
-                    {inputTypes
-                      .filter((f) => characteristicsFields.map((x) => x.prop).includes(f.key))
-                      .map((formType) => makeFormField(formType, onChange))}
-                  </div>
-                  <div className={'dlg-details-section'}>
-                    <h3>Association With Another Individual</h3>
-                    {inputTypes
-                      .filter((f) => associatedAnimalFields.map((x) => x.prop).includes(f.key))
-                      .map((f) => makeFormField(f, onChange))}
-                  </div>
-                  <div className={'dlg-details-section'}>
-                    <h3>Comments About This Animal</h3>
-                    {inputTypes
-                      .filter((f) => userCommentField.map((x) => x.prop).includes(f.key))
-                      .map((f) => makeFormField(f, onChange))}
-                  </div>
-                  <div className={'dlg-details-section'}>
-                    <h3>Latest Capture Details</h3>
-                    {inputTypes
-                      .filter((f) => captureFields.map((x) => x.prop).includes(f.key))
-                      .map((f) => makeFormField(f, onChange))}
-                  </div>
-                  <div className={'dlg-details-section'}>
-                    <h3>Latest Release Details</h3>
-                    {inputTypes
-                      .filter((f) => releaseFields.map((x) => x.prop).includes(f.key))
-                      .map((f) => makeFormField(f, onChange))}
-                  </div>
-                  <div className={'dlg-details-section'}>
-                    <h3>Mortality Details</h3>
-                    {inputTypes
-                      .filter((f) => mortalityFields.map((x) => x.prop).includes(f.key))
-                      .map((f) => makeFormField(f, onChange))}
-                  </div>
-                  {/* dont show assignment history for new critters */}
-                  {!isCreatingNew && showAssignmentHistory ? (
-                    <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
-                      <AssignmentHistory animalId={editing.critter_id} deviceId='' canEdit={canEdit} {...props} />
-                    </Modal>
-                  ) : null}
-                  {!isCreatingNew && showCaptureWorkflow ? (
-                    <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
-                      <CaptureWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
-                    </Modal>
-                  ) : null}
-                  {!isCreatingNew && showReleaseWorkflow ? (
-                    <Modal open={showReleaseWorkflow} handleClose={(): void => setShowReleaseWorkflow(false)}>
-                      <ReleaseWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
-                    </Modal>
-                  ) : null}
-                  {!isCreatingNew && showMortalityWorkflow ? (
-                    <MortalityEventForm
-                      alert={alert}
-                      open={showMortalityWorkflow}
-                      handleClose={(): void => setShowMortalityWorkflow(false)}
-                      handleSave={null}
-                    />
-                  ) : null}
-                </Paper>
-              </Paper>
-            </form>
+            </>
           );
         }}
       </ChangeContext.Consumer>

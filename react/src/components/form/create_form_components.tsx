@@ -1,4 +1,4 @@
-import TextField from 'components/form/Input';
+import TextField from 'components/form/TextInput';
 import NumberField from 'components/form/NumberInput';
 import SelectCode from './SelectCode';
 import DateInput from 'components/form/Date';
@@ -32,7 +32,6 @@ function CreateEditTextField(props: CreateInputProps): JSX.Element {
     />
   ) : (
     <TextField
-      outline={true}
       key={key}
       propName={key}
       defaultValue={value as string}

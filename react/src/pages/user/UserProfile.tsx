@@ -4,7 +4,7 @@ import { User } from 'types/user';
 import { CircularProgress } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
 import Table from 'components/table/Table';
-import TextField from 'components/form/Input';
+import TextField from 'components/form/TextInput';
 import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { MenuItem, Select, InputLabel } from '@material-ui/core';
