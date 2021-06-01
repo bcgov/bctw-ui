@@ -21,6 +21,7 @@ export default function CritterPage(): JSX.Element {
   const [critterU, setCrittersU] = useState<Animal[]>([]);
 
   const handleSelect = (row: Animal): void => {
+    // console.log(`critter_id: ${row.critter_id} p: ${row.permission_type}`);
     setEditObj(row);
   };
 

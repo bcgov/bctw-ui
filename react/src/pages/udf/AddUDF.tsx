@@ -41,7 +41,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
 
   const { data: critterResults, status: critterStatus } = bctwApi.useCritterAccess(
     0, // page 0 is used to load all values
-    { user: useUser.user?.idir, filterOutNone: true },
+    { user: useUser.user, filterOutNone: true },
     // useUser.ready // pass user ready status as 'enabled', to wait until user info is loaded
   );
 

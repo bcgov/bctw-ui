@@ -5,15 +5,16 @@ import Table from 'components/table/Table';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
-import { eCritterPermission, IUserCritterAccessInput, User, UserCritterAccess } from 'types/user';
+import { IUserCritterAccessInput, User, UserCritterAccess } from 'types/user';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { IBulkUploadResults, IGrantCritterAccessResults, IUserCritterPermissionInput } from 'api/api_interfaces';
 import { formatAxiosError } from 'utils/common';
 import { MenuItem, Select } from '@material-ui/core';
 import { useQueryClient } from 'react-query';
+import { eCritterPermission } from 'types/permission';
 
 type IGrantCritterModalProps = {
-  users: User;
+  user: User;
   show: boolean;
   onClose: (close: boolean) => void;
   onSave: (collar_id: string) => void;
@@ -23,7 +24,7 @@ type IGrantCritterModalProps = {
  * modal that shows a list of critters that can be individually or multi selected.
  * passes a custom select header/column component to the Table
  */
-export default function GrantCritterModal({ show, onClose, users }: IGrantCritterModalProps): JSX.Element {
+export default function GrantCritterModal({ show, onClose, user }: IGrantCritterModalProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
@@ -44,7 +45,7 @@ export default function GrantCritterModal({ show, onClose, users }: IGrantCritte
     } else {
       responseDispatch({
         type: 'success',
-        message: `animal access granted for users: ${users.idir}`
+        message: `animal access granted for users: ${user.idir}`
       });
       queryClient.invalidateQueries('critterAccess');
     }
@@ -76,12 +77,16 @@ export default function GrantCritterModal({ show, onClose, users }: IGrantCritte
       const permission_type = accessTypes.find((a) => a.critter_id === c.critter_id).permission_type;
       return { critter_id: c.critter_id, permission_type };
     });
-    const data: IUserCritterPermissionInput[] = [users].map((i) => {
-      return {
-        userId: i.id,
-        access
-      };
-    });
+    // const data: IUserCritterPermissionInput[] = [user].map((i) => {
+    //   return {
+    //     userId: i.id,
+    //     access
+    //   };
+    // });
+    const data: IUserCritterPermissionInput = {
+      userId: user.id,
+      access
+    }
     // console.log(JSON.stringify(data, null, 2));
     await mutateAsync(data);
     handleClose();
@@ -113,7 +118,7 @@ export default function GrantCritterModal({ show, onClose, users }: IGrantCritte
 
   const tableQueryProps: ITableQueryProps<UserCritterAccess> = {
     query: bctwApi.useCritterAccess,
-    param: { user: users?.idir },
+    param: { user },
     onNewData: handleDataLoaded
   };
 
@@ -166,7 +171,7 @@ export default function GrantCritterModal({ show, onClose, users }: IGrantCritte
 
   return (
     <>
-      <Modal open={show} handleClose={handleClose} title={`Modifying ${users?.idir ?? 'user'}'s Animal Access`}>
+      <Modal open={show} handleClose={handleClose} title={`Modifying ${user?.idir ?? 'user'}'s Animal Access`}>
         <Table
           customColumns={[{ column: newColumn, header: newHeader }]}
           headers={['animal_id', 'wlh_id', 'device_id', 'device_make', 'population_unit']}

@@ -1,6 +1,6 @@
 import { Animal } from 'types/animal';
 import { cloneElement, useState, useEffect } from 'react';
-import { eCritterPermission } from 'types/user';
+import { eCritterPermission, permissionCanModify  } from 'types/permission';
 import { useQueryClient } from 'react-query';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -96,8 +96,8 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     responseDispatch({ type: 'error', message: `missing required fields: ${Object.keys(errors).join(', ')}` });
   }
 
-  const passTheseProps = {
-    cannotEdit: perm !== eCritterPermission.change,
+  const passTheseProps /* : Pick<IAddEditProps<Animal>, 'onDelete' | 'onSave' | 'cannotEdit'>*/ = {
+    cannotEdit: !permissionCanModify(perm),
     onDelete: handleDeleteButtonClicked,
     onSave: saveCritter,
     validateFailed

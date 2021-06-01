@@ -1,7 +1,7 @@
 import { columnToHeader } from 'utils/common';
 import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
-import { eCritterPermission } from 'types/user';
+import { eCritterPermission } from 'types/permission';
 import { formatLatLong } from 'types/common_helpers';
 import { FormFieldObject } from 'types/form_types';
 

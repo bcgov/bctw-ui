@@ -7,7 +7,7 @@ import Table from 'components/table/Table';
 import TextField from 'components/form/TextInput';
 import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
-import { MenuItem, Select, InputLabel } from '@material-ui/core';
+// import { MenuItem, Select, InputLabel } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useQueryClient } from 'react-query';
 import ManageLayout from 'pages/layouts/ManageLayout';
@@ -21,10 +21,11 @@ export default function UserProfile(): JSX.Element {
   const [user, setUser] = useState<User>(null);
 
   // select dropdown options
-  const [testUserOptions, setTestUserOptions] = useState<string[]>([null, 'Biologist1', 'Biologist2']);
+  // const [testUserOptions, setTestUserOptions] = useState<string[]>([null, 'Biologist1', 'Biologist2']);
 
   // sets UserContext when select changes
-  const [testUser, setTestUser] = useState<string>(testUserOptions[1]);
+  // note: disabled test user
+  // const [testUser, setTestUser] = useState<string>(testUserOptions[1]);
   const userDispatch = useUserContextDispatch();
 
   // const queryStr = 'useCritterAccess';
@@ -35,11 +36,11 @@ export default function UserProfile(): JSX.Element {
       if (useUser.ready) {
         setUser(useUser.user);
         // update the test users list and set to current idir
-        const me = useUser.user.idir;
-        if (testUserOptions[0] === null) {
-          setTestUserOptions((o) => [me, ...o.slice(1)]);
-        }
-        setTestUser(useUser.testUser ?? me);
+        // const me = useUser.user.idir;
+        // if (testUserOptions[0] === null) {
+        //   setTestUserOptions((o) => [me, ...o.slice(1)]);
+        // }
+        // setTestUser(useUser.testUser ?? me);
       }
     };
     update();
@@ -51,7 +52,7 @@ export default function UserProfile(): JSX.Element {
 
   const onSelectTestUser = (e): void => {
     const v = e.target.value;
-    setTestUser(v);
+    // setTestUser(v);
     queryClient.invalidateQueries('critterAccess');
     // set the user context's testUser property
     const updatedUser = { ...useUser, ...{ testUser: v } };
@@ -64,7 +65,7 @@ export default function UserProfile(): JSX.Element {
 
   const tableProps: ITableQueryProps<Animal> = {
     query: bctwApi.useCritterAccess,
-    param: { user: testUser, filterOutNone: true }
+    param: { user, filterOutNone: true }
   };
 
   return (
@@ -89,10 +90,10 @@ export default function UserProfile(): JSX.Element {
           title='Animals you have access to:'
           queryProps={tableProps}
         />
-        <Typography variant='h5'>Swap User</Typography>
-        <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography>
+        {/* <Typography variant='h5'>Swap User</Typography>
+        <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography> */}
 
-        <div className='user-test-swap'>
+        {/* <div className='user-test-swap'>
           <InputLabel>Test Account</InputLabel>
           <Select value={testUser} onChange={onSelectTestUser}>
             {testUserOptions.map((s, i) => {
@@ -103,7 +104,7 @@ export default function UserProfile(): JSX.Element {
               );
             })}
           </Select>
-        </div>
+        </div> */}
       </div>
     </ManageLayout>
   );

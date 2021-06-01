@@ -1,7 +1,8 @@
 import { Type, Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
-import { BCTW, BCTWBaseType } from './common_types';
-import { FormFieldObject } from './form_types';
+import { BCTW, BCTWBaseType } from 'types/common_types';
+import { FormFieldObject } from 'types/form_types';
+import { eCritterPermission } from 'types/permission';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -9,21 +10,18 @@ export enum eUserRole {
   observer = 'observer'
 }
 
-export enum eCritterPermission {
-  view = 'view',
-  change = 'change',
-  none = 'none',
-}
-
 export interface IUser extends BCTW, BCTWBaseType {
   id: number;
   idir: string;
   bceid: string;
   email: string;
+  // indicates if the user is considered the owner of at least one animal
+  is_owner?: boolean; 
 }
 
 export class User implements IUser {
   role_type: eUserRole;
+  is_owner: boolean;
   id: number;
   idir: string;
   bceid: string;

@@ -173,7 +173,7 @@ export const useTelemetryApi = () => {
   /**
    * @param codeHeader the code header name used to determine which codes to fetch
    * @param page not currently used
-   */
+  */
   const useCodes = (page: number, codeHeader: string): UseQueryResult<ICode[], AxiosError> => {
     const props = { page, codeHeader };
     return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), codeOptions);
@@ -181,14 +181,14 @@ export const useTelemetryApi = () => {
 
   /**
    * retrieves list of code headers, no parameters
-   */
+  */
   const useCodeHeaders = (): UseQueryResult<ICodeHeader[], AxiosError> => {
     return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), codeOptions);
   };
 
   /**
    * @param critterId serial integer of the critter to be fetched (not animal_id)
-   */
+  */
   const useCollarAssignmentHistory = (
     page: number,
     critterId: number,
@@ -203,7 +203,7 @@ export const useTelemetryApi = () => {
 
   /**
    * @returns a list of collars represnting the audit history of @param collarId
-   */
+  */
   const useCollarHistory = (page: number, collarId: string, config?: Record<string, unknown>): UseQueryResult => {
     return useQuery<Collar[], AxiosError>(['collarHistory', collarId], () => collarApi.getCollarHistory(collarId), {
       ...config
@@ -234,7 +234,7 @@ export const useTelemetryApi = () => {
    * note: enabled prop can be set to false to delay the query
    * todo: does that work? ^
    */
-  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean } /*, enabled = true*/): UseQueryResult<UserCritterAccess[], AxiosError> => {
+  const useCritterAccess = (page: number, param: { user: User; filterOutNone: boolean } /*, enabled = true*/): UseQueryResult<UserCritterAccess[], AxiosError> => {
     const { user, filterOutNone } = param;
     return useQuery<UserCritterAccess[], AxiosError>(
       ['critterAccess', page, user],

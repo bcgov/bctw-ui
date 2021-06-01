@@ -8,6 +8,8 @@ import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/common';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { Collar } from 'types/collar';
+import { permissionCanModify, eCritterPermission } from 'types/permission';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type IModifyWrapperProps = {
   editing: Collar;
@@ -22,6 +24,12 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
 
   const { editing, children } = props;
   const [show, setShow] = useState<boolean>(false);
+  const [perm, setPerm] = useState<eCritterPermission>(eCritterPermission.none);
+
+  useDidMountEffect(() => {
+    // console.log('modifycollarwrappper', editing.permission_type)
+    setPerm(editing.permission_type)
+  }, [editing]);
 
   // handlers for mutation response
   const onSaveSuccess = (data: IBulkUploadResults<Collar>): void => {
@@ -71,9 +79,10 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
     setShow(false);
   }
 
-  const passTheseProps: Pick<IAddEditProps<Collar>, 'onDelete' | 'onSave'> = {
+  const passTheseProps: Pick<IAddEditProps<Collar>, 'onDelete' | 'onSave' | 'cannotEdit'> = {
+    cannotEdit: !permissionCanModify(perm),
     onDelete: handleDeleteButtonClicked,
-    onSave: saveCollar,
+    onSave: saveCollar
   }
 
   return (

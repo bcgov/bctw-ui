@@ -18,6 +18,7 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
   const classes = drawerStyles();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
   const [open, setOpen] = React.useState(false);
   const userChanges = useContext(UserContext);
@@ -30,6 +31,7 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
       if (userChanges?.ready) {
         const user = userChanges.user;
         setIsAdmin(user.role_type === 'administrator');
+        setIsOwner(user.is_owner);
       }
     };
     updateComponent();
@@ -38,7 +40,10 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
-      curRoutes.push(routes.find((r) => r.name === 'admin'));
+      curRoutes.push(routes.find((r) => r.name === 'user-admin'));
+    }
+    if (isOwner) {
+      curRoutes.push(routes.find((r) => r.name === 'animal-access'));
     }
     setVisibleRoutes(curRoutes);
   };
@@ -51,11 +56,12 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
       case '/codes':
       case '/profile':
       case '/import':
-      case '/admin':
+      case '/user-admin':
+      case '/animal-access':
         handleSetVisible(['animals', 'codes', 'devices', 'import']);
         return;
     }
-  }, [location, isAdmin]); // only fire when these states change
+  }, [location, isAdmin, isOwner]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (

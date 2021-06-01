@@ -13,15 +13,15 @@ import MortalityEventForm from 'pages/data/events/MortalityEventForm';
 import EditModal from 'pages/data/common/EditModal';
 import React, { useEffect, useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
-import { eCritterPermission } from 'types/user';
 import { TelemetryAlert } from 'types/alert';
 import { FormInputType } from 'types/form_types';
+import { permissionCanModify } from 'types/permission';
 
 export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
   const { isCreatingNew, editing } = props;
 
   // for new critters, permission will be undefined
-  const canEdit = editing.permission_type === eCritterPermission.change || editing.permission_type === undefined;
+  const canEdit = permissionCanModify(editing.permission_type) || editing.critter_id === undefined;
   const requiredFields = CS.requiredProps;
 
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);

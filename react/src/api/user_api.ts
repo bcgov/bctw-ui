@@ -2,7 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
-import { eCritterPermission, IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
+import { IUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
 import {
   IUserCritterPermissionInput,
@@ -10,6 +10,7 @@ import {
   IBulkUploadResults,
   ApiProps
 } from 'api/api_interfaces';
+import { eCritterPermission } from 'types/permission';
 
 export const userApi = (props: ApiProps) => {
   const { api, testUser } = props;
@@ -46,10 +47,11 @@ export const userApi = (props: ApiProps) => {
 
   const getUserCritterAccess = async (
     page: number,
-    user: string,
+    user: User,
     filterOutNone = false
   ): Promise<UserCritterAccess[]> => {
-    const url = createUrl({ api: `get-critter-access/${user}`, query: `filterOutNone=${filterOutNone}`, page });
+    const filters = `owner,subowner,view,change${!filterOutNone ? ',none' : ''}`;
+    const url = createUrl({ api: `get-critter-access/${user.idir}`, query: `filters=${filters}`, page });
     const { data } = await api.get(url);
     const converted = data.map((json: IUserCritterAccess[]) => plainToClass(UserCritterAccess, json));
     return filterOutNone ? converted.filter((d) => d.permission_type !== eCritterPermission.none) : converted;
@@ -67,8 +69,11 @@ export const userApi = (props: ApiProps) => {
   const updateAlert = async (body: TelemetryAlert[]): Promise<TelemetryAlert[]> => {
     const url = createUrl({api: upsertAlertEndpoint});
     const { data } = await api.post(url, body);
-    const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
-    return converted;
+    if (data && data.length) {
+      const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
+      return converted;
+    }
+    return [];
   }
 
   const getUDF = async (

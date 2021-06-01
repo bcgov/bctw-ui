@@ -3,6 +3,7 @@ import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';
 import { FormFieldObject } from 'types/form_types';
+import { eCritterPermission } from 'types/permission';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -50,6 +51,8 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   vendor_activation_status: boolean;
   // collars attached to a critter should includes this prop
   animal_id?: string;
+  // fetched collars should contain this
+  permission_type?: eCritterPermission;
 }
 
 // properties displayed on collar pages
@@ -94,6 +97,7 @@ export class Collar implements ICollar {
   user_comment: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
+  permission_type: eCritterPermission;
   @Expose() get identifier(): string { return 'collar_id' }
   @Expose() get frequencyPadded(): string {
     const freq = this.frequency.toString();

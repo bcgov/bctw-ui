@@ -10,7 +10,7 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
-import { eCritterPermission } from 'types/user';
+import { eCritterPermission } from 'types/permission';
 
 type CritterOverViewProps = ModalBaseProps & {
   type: BCTWType;

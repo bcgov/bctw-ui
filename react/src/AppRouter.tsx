@@ -5,11 +5,12 @@ import Home from 'pages/Home';
 import MapPage from 'pages/map/MapPage';
 import Import from 'pages/data/bulk/Import';
 import TerrainPage from 'pages/terrain/TerrainPage';
-import AdminPage from 'pages/user/AdminPage';
+import GrantCritterAccessPage from 'pages/user/GrantCritterAccessPage';
 import UserProfile from 'pages/user/UserProfile';
-import { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { useHistory } from 'react-router-dom';
+// import { useHistory } from 'react-router-dom';
+import UserAdminPage from 'pages/user/UserAdmin';
 
 export type RouteKey = {
   path: string;
@@ -30,18 +31,21 @@ const AppRoutes: RouteKey[] = [
   { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain' },
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
   { name: 'profile', path: '/profile', title: 'Profile', component: UserProfile, sort: 2, icon: 'profile' },
-  { name: 'admin', path: '/admin', title: 'Admin', component: AdminPage, sort: 5, icon: 'admin' },
+  { name: 'animal-access', path: '/animal-access', title: 'Animal Access', component: GrantCritterAccessPage, sort: 5, icon: 'filter' },
+  { name: 'user-admin', path: '/user-admin', title: 'User Admin', component: UserAdminPage, sort: 5, icon: 'admin' },
   { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 100 }
 ];
 
 const AppRouter = (): JSX.Element => {
+  /*
   const history = useHistory();
   useEffect(() => {
     return history.listen((location) => {
       // wipe the sidebar content when navigation to new page
-      // onContentChange(null);
+      onContentChange(null);
     });
   }, [history]);
+  */
 
   return (
     <Switch>

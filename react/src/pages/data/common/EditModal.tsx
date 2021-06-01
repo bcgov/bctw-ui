@@ -5,7 +5,7 @@ import ChangeContext from 'contexts/InputChangeContext';
 import React, { useEffect, useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
 import { Collar } from 'types/collar';
-import { objectCompare, omitNull } from 'utils/common';
+import { omitNull } from 'utils/common';
 import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
 import { CollarStrings } from 'constants/strings';
 
@@ -111,7 +111,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
 
   // triggered on a form input change, newProp will be an object with a single key and value
   const handleChange = (newProp: Record<string, unknown>): void => {
-    console.log(newProp);
+    // console.log(newProp);
     // update the error state
     const key: string = Object.keys(newProp)[0];
     const newErrors = Object.assign(errors, {[key]: newProp.error});

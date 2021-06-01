@@ -13,6 +13,7 @@ import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import Modal from 'components/modal/Modal';
 import { formatLabel } from 'types/common_helpers';
 import { FormInputType } from 'types/form_types';
+import { permissionCanModify } from 'types/permission';
 
 export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   const { editing, isCreatingNew } = props;
@@ -22,6 +23,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   // set the collar type when add collar is selected
   const [collarType, setCollarType] = useState<eNewCollarType>(eNewCollarType.Other);
   const [newCollar, setNewCollar] = useState<Collar>(editing);
+  const canEdit = permissionCanModify(editing.permission_type) || editing.collar_id === undefined;
 
   // const title = isCreatingNew ? `Add a new ${collarType} collar` : `Editing device ${editing.device_id}`;
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
@@ -78,6 +80,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     return MakeEditField({
       formType: iType,
       handleChange,
+      disabled: !canEdit,
       required: isRequired,
       label: formatLabel(editing, iType.key),
       span: true
@@ -107,13 +110,13 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
               <span className='span'>Frequency: {editing?.frequency ? editing.frequencyPadded : '-'} MHz</span>
               <span className='span'>|</span>
               <span className='span'>Deployment Status: {editing?.device_deployment_status}</span>
-              <span className='button_span'>
+              {/* <span className='button_span'>
                 {!isCreatingNew ? (
                   <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
                     Assign Animal to Device
                   </Button>
                 ) : null}
-              </span>
+              </span> */}
             </div>
           </div>
         </>
@@ -122,7 +125,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   );
 
   return (
-    <EditModal headerComponent={Header} onReset={close} {...props}>
+    <EditModal headerComponent={Header} hideSave={!canEdit} onReset={close} {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
           // do form validation before passing change handler to EditModal
@@ -130,7 +133,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
             // if (v) {
             //   setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
             // }
-            console.log(v);
+            // console.log(v);
             handlerFromContext(v, modifyCanSave);
           };
           return (
