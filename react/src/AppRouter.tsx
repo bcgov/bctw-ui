@@ -5,12 +5,12 @@ import Home from 'pages/Home';
 import MapPage from 'pages/map/MapPage';
 import Import from 'pages/data/bulk/Import';
 import TerrainPage from 'pages/terrain/TerrainPage';
-import GrantCritterAccessPage from 'pages/user/GrantCritterAccessPage';
+import GrantCritterAccessPage from 'pages/permissions/GrantCritterAccessPage';
 import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 // import { useHistory } from 'react-router-dom';
-import UserAdminPage from 'pages/user/UserAdmin';
+import UserAdminPage from 'pages/admin/UserAdmin';
 
 export type RouteKey = {
   path: string;

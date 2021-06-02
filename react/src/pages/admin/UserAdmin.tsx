@@ -9,6 +9,10 @@ import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditUser from 'pages/user/EditUser';
 import { IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 
+/**
+ * page for user admin. requires admin user role.  
+ * uses @component {EditUser}
+ */
 export default function UserAdminPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const [userModified, setUserModified] = useState<User>({} as User);

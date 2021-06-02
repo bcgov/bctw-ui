@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Table from 'components/table/Table';
 import Button from 'components/form/Button';
 import { User } from 'types/user';
-import GrantCritterModal from 'pages/user/GrantCritterAccessModal';
+import GrantCritterModal from 'pages/permissions/GrantCritterAccessModal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { Typography } from '@material-ui/core';

@@ -32,7 +32,7 @@ export default function GrantCritterModal({ show, onClose, user }: IGrantCritter
   const [critters, setCritters] = useState<UserCritterAccess[]>([]);
   // state for each of the column select components rendered in the table
   const [accessTypes, setAccessTypes] = useState<IUserCritterAccessInput[]>([]);
-  // state for the custom header select dropdown
+  // state for the custom header select dropdown (updates all values on the page to the selected)
   const [tableHeaderCritterSelectOption, setTableHeaderCritterSelectOption] = useState<eCritterPermission>(
     eCritterPermission.view
   );
@@ -122,15 +122,18 @@ export default function GrantCritterModal({ show, onClose, user }: IGrantCritter
     onNewData: handleDataLoaded
   };
 
-  // a custom table body component rendered for each data row
+  /**
+   * adds a select dropdown component at the left side of each table row that 
+   * allows the user to select a permission type for the animal row
+   */
   const newColumn = (row: UserCritterAccess): JSX.Element => {
-    const perm =
+    const defaultPermission =
       accessTypes.find((cp) => cp.critter_id === row.critter_id)?.permission_type ??
       row?.permission_type ??
       eCritterPermission.view;
     return (
       <Select
-        value={perm}
+        value={defaultPermission}
         onChange={(v: React.ChangeEvent<{ value: unknown }>): void => {
           const permission = v.target.value as eCritterPermission;
           setAccessTypes((prevState) => {
@@ -140,11 +143,13 @@ export default function GrantCritterModal({ show, onClose, user }: IGrantCritter
             return cp;
           });
         }}>
-        {Object.values(eCritterPermission).map((d) => (
-          <MenuItem key={`menuItem-${d}`} value={d}>
-            {d}
-          </MenuItem>
-        ))}
+        {Object.values(eCritterPermission)
+          .sort()
+          .map((d) => (
+            <MenuItem key={`menuItem-${d}`} value={d}>
+              {d}
+            </MenuItem>
+          ))}
       </Select>
     );
   };

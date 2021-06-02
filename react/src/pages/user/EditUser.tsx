@@ -9,6 +9,10 @@ import { formatLabel } from 'types/common_helpers';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormInputType } from 'types/form_types';
 
+/**
+ * the edit user form, implemented in pags/admin/UserAdmin
+ * todo: also implement in UserProfile?
+ */
 export default function EditUser(props: EditorProps<User>): JSX.Element {
   const { editing } = props;
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
