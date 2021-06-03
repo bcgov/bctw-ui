@@ -339,6 +339,7 @@ var app = express()
     const result = await client.query(sql);
     const idirs = result.rows.map((row) => row.idir);
     const registered = (idirs.indexOf(idir) > 0) ? true : false;
+    console.log('registeredXXX:',registered);
 
     if (registered) {
       next(); // pass through
