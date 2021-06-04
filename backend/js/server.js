@@ -324,29 +324,42 @@ var app = express()
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
-  .get('/onboarding',onboarding)
-  .post('/onboarding',onboardingAccess)
-  .all('*', async (req,res,next) => {
+  .get('/onboarding', keycloak.protect(), onboarding)
+  .post('/onboarding', keycloak.protect(), onboardingAccess)
+  .all('*', keycloak.protect(), async (req,res,next) => {
     /**
      * If you get here you have a valid IDIR.
      * Check if the user is registerd in the database.
      * If yes.... Pass through.
      * Else... Direct to the onboarding page.
      */
-    const idir = req.query.idir;
+    console.log('content barf',req.kauth.grant.access_token.content);
+    // Collect all user data from the keycloak object
+    const data = req.kauth.grant.access_token.content;
+    const domain = data.preferred_username.split('@')[1];
+    const user = data.preferred_username.split('@')[0];
+    const email = data.email;
+    const givenName = data.given_name;
+    const familyName = data.family_name;
+
+    // Get a list of all allowed users
     const sql = 'select idir from bctw.user'
     const client = await pgPool.connect();
     const result = await client.query(sql);
     const idirs = result.rows.map((row) => row.idir);
-    const registered = (idirs.indexOf(idir) > 0) ? true : false;
-    console.log('registeredXXX:',registered);
+    // Is the current user registered: Boolean
+    const registered = (idirs.indexOf(user) > 0) ? true : false;
+
+    // Formulate the url and data to be sent to the onboarding page
+    let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
+    url += `&given=${givenName}&family=${familyName}`;
 
     if (registered) {
       next(); // pass through
     } else {
-      res.redirect('/onboarding'); // reject
+      res.redirect(url); // reject and go to the onboarding page
     }
-    client.release();
+    client.release(); // Release database connection
   })
   .get('/denied', denied);
 
