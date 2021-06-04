@@ -334,7 +334,8 @@ var app = express()
      * Else... Direct to the onboarding page.
      */
     const idir = req.query.idir;
-    console.log(req)
+    // console.log(req)
+    console.log('content barf',req.kauth.grant.access_token.content);
     console.log('Find the idir in the above');
     console.log('idir',idir)
     const sql = 'select idir from bctw.user'
