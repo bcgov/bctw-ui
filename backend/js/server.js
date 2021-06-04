@@ -334,10 +334,14 @@ var app = express()
      * Else... Direct to the onboarding page.
      */
     const idir = req.query.idir;
+    console.log(req)
+    console.log('Find the idir in the above');
+    console.log('idir',idir)
     const sql = 'select idir from bctw.user'
     const client = await pgPool.connect();
     const result = await client.query(sql);
     const idirs = result.rows.map((row) => row.idir);
+    console.log('idirs',idirs)
     const registered = (idirs.indexOf(idir) > 0) ? true : false;
     console.log('registeredXXX:',registered);
 
