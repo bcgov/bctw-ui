@@ -324,8 +324,8 @@ var app = express()
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
-  .get('/onboarding',onboarding)
-  .post('/onboarding',onboardingAccess)
+  .get('/onboarding', keycloak.protect(), onboarding)
+  .post('/onboarding', keycloak.protect(), onboardingAccess)
   .all('*', keycloak.protect(), async (req,res,next) => {
     /**
      * If you get here you have a valid IDIR.
