@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import Button from 'components/form/Button';
 import { User } from 'types/user';
 import GrantCritterModal from 'pages/permissions/GrantCritterAccessModal';
@@ -21,7 +21,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
         <Typography variant='h4' component='div'>Modify user animal access</Typography>
         {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
         <Typography variant='body2' component='p'>A user has access to devices through the user-animal association.</Typography>
-        <Table
+        <DataTable
           headers={['id', 'idir', 'bceid', 'role_type', 'is_owner']}
           title='Users'
           queryProps={tableProps}

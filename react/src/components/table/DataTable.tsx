@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Table as MuiTable,
+  Table,
   TableBody,
   TableCell,
   TableContainer,
@@ -25,7 +25,7 @@ import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
-export default function Table<T extends BCTW>({
+export default function DataTable<T extends BCTW>({
   customColumns,
   headers,
   queryProps,
@@ -203,7 +203,7 @@ export default function Table<T extends BCTW>({
       <Paper className={'paper'}>
         {renderToolbar()}
         <TableContainer component={Paper}>
-          <MuiTable className={'table'} size='small'>
+          <Table className={'table'} size='small'>
             {data === undefined ? null : (
               <TableHead
                 headersToDisplay={headerProps}
@@ -268,7 +268,7 @@ export default function Table<T extends BCTW>({
                   );
                 })}
             </TableBody>
-          </MuiTable>
+          </Table>
           {
             !paginate ||
             isLoading ||

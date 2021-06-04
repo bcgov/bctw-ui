@@ -32,6 +32,7 @@ import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import MortalityEvent from 'types/mortality_event';
+import { eCritterPermission } from 'types/permission';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -128,7 +129,7 @@ export const useTelemetryApi = () => {
   const critterOptions = { ...defaultQueryOptions, keepPreviousData: true };
   /**
    *  retrieves critters that have a collar assigned
-   */
+  */
   const useAssignedCritters = (page: number): UseQueryResult<Animal[]> => {
     return useQuery<Animal[], AxiosError>(
       ['critters_assigned', page],
@@ -139,7 +140,7 @@ export const useTelemetryApi = () => {
 
   /**
    * retrieves critters not assigned to a collar
-   */
+  */
   const useUnassignedCritters = (page: number): UseQueryResult<Animal[]> =>
     useQuery<Animal[], AxiosError>(
       ['critters_unassigned', page],
@@ -149,13 +150,14 @@ export const useTelemetryApi = () => {
 
   /**
    * retrieves all critters, must be admin
-   */
-  const useAllCritters = (page: number): UseQueryResult<Animal[]> =>
-    useQuery<Animal[], AxiosError>(
-      ['critters', page],
-      () => critterApi.getCritters(page, eCritterFetchType.all),
-      critterOptions
-    );
+   * note: deprecated?
+  */
+  // const useAllCritters = (page: number): UseQueryResult<Animal[]> =>
+  //   useQuery<Animal[], AxiosError>(
+  //     ['critters', page],
+  //     () => critterApi.getCritters(page, eCritterFetchType.all),
+  //     critterOptions
+  //   );
 
   /**
    * @returns a list of critters representing the audit history of @param critterId
@@ -228,21 +230,16 @@ export const useTelemetryApi = () => {
   };
 
   /**
-   * @param user idir of the user to receive critter access to
-   * @returns A simplified list of Animals that only has id, animal_id,
+   * @param user who to retrieve critter access for 
+   * @returns an array of @type {UserCritterAccess}
    * note: query keys are important! make sure to include params in the key
    * note: enabled prop can be set to false to delay the query
-   * todo: does that work? ^
    */
-  const useCritterAccess = (page: number, param: { user: User; filterOutNone: boolean } /*, enabled = true*/): UseQueryResult<UserCritterAccess[], AxiosError> => {
-    const { user, filterOutNone } = param;
+  const useCritterAccess = (page: number, param: {user: User; filter?: eCritterPermission[]} /*, enabled = true*/): UseQueryResult<UserCritterAccess[], AxiosError> => {
+    const { user, filter } = param;
     return useQuery<UserCritterAccess[], AxiosError>(
       ['critterAccess', page, user],
-      () => userApi.getUserCritterAccess(page, user, filterOutNone),
-      {
-        ...defaultQueryOptions,
-        // enabled 
-      }
+      () => userApi.getUserCritterAccess(page, user, filter), defaultQueryOptions
     );
   };
 
@@ -367,7 +364,7 @@ export const useTelemetryApi = () => {
     usePings,
     useUnassignedPings,
     useCollarType,
-    useAllCritters,
+    // useAllCritters,
     useAssignedCritters,
     useUnassignedCritters,
     useCritterHistory,

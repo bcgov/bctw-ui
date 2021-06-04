@@ -681,10 +681,10 @@ export default function MapPage(): JSX.Element {
         </div>
 
         {/* The layer switching button*/}
-        <div
-          className={'map-icon map-dimension-btn icon-on'}
-          onClick={(): void => setMap3D((o) => !o)}
-          title={map3D ? 'Switch to 2D map' : 'Switch to 3D view'}>
+        {/* disabled for now */}
+        <div className={'map-icon map-dimension-btn icon-off'}>
+          {/* onClick={(): void => setMap3D((o) => !o)} */}
+          {/* title={map3D ? 'Switch to 2D map' : 'Switch to 3D view'}> */}
           <LanguageIcon />
         </div>
 

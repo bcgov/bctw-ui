@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserContext, useUserContextDispatch } from 'contexts/UserContext';
-import { User } from 'types/user';
+import { User, userFormFields } from 'types/user';
 import { CircularProgress } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import TextField from 'components/form/TextInput';
 import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
@@ -11,6 +11,7 @@ import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useQueryClient } from 'react-query';
 import ManageLayout from 'pages/layouts/ManageLayout';
+import { permissionTableBasicHeaders } from 'types/permission';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
@@ -65,17 +66,29 @@ export default function UserProfile(): JSX.Element {
 
   const tableProps: ITableQueryProps<Animal> = {
     query: bctwApi.useCritterAccess,
-    param: { user, filterOutNone: true }
+    param: { user }
   };
 
   return (
     <ManageLayout>
       <div className='user-profile'>
-        <Typography variant='h6'>
-          Your Role Type: <strong>{user.role_type}</strong>
+        <Typography variant='h5'>
+          Your Role: <strong>{user.role_type}</strong>
         </Typography>
         <div className='user-input-grp'>
-          <TextField propName='idir' defaultValue={user.idir} disabled={true} label='IDIR' changeHandler={onChange} />
+          {userFormFields.map((p) => {
+            const { prop } = p;
+            return (
+              <TextField
+                propName={p.prop}
+                defaultValue={user[prop]}
+                disabled={true}
+                label={prop.toUpperCase()}
+                changeHandler={(): void => {}}
+              />
+            );
+          })}
+          {/* <TextField propName='idir' defaultValue={user.idir} disabled={true} label='IDIR' changeHandler={onChange} />
           <TextField
             propName='email'
             type='email'
@@ -83,28 +96,13 @@ export default function UserProfile(): JSX.Element {
             disabled={true}
             label='EMAIL'
             changeHandler={onChange}
-          />
+          /> */}
         </div>
-        <Table
-          headers={['animal_id', 'wlh_id', 'device_id', 'device_make', 'permission_type']}
+        <DataTable
+          headers={permissionTableBasicHeaders}
           title='Animals you have access to:'
           queryProps={tableProps}
         />
-        {/* <Typography variant='h5'>Swap User</Typography>
-        <Typography variant='body2'>Use the select menu below to pretend to be a user with a different IDIR</Typography> */}
-
-        {/* <div className='user-test-swap'>
-          <InputLabel>Test Account</InputLabel>
-          <Select value={testUser} onChange={onSelectTestUser}>
-            {testUserOptions.map((s, i) => {
-              return (
-                <MenuItem key={i} value={s}>
-                  {s}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </div> */}
       </div>
     </ManageLayout>
   );

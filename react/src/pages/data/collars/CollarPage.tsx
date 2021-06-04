@@ -1,5 +1,5 @@
 import Button from 'components/form/Button';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { CollarStrings as S } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
@@ -50,13 +50,13 @@ export default function CollarPage(): JSX.Element {
       <div className='container'>
         <RowSelectedProvider>
           <>
-            <Table
+            <DataTable
               headers={attachedCollarProps}
               title={S.assignedCollarsTableTitle}
               queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
               onSelect={handleSelect}
             />
-            <Table
+            <DataTable
               headers={collarPropsToDisplay}
               title={S.availableCollarsTableTitle}
               queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}

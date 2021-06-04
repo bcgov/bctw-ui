@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -11,9 +11,8 @@ type IMortalityWorkflowProps = {
 };
 
 /**
- *  displays a table with collar history and nests
- *  all of the collar assign/unassign handling components
- */
+ * fixme: todo: very incomplete
+*/
 export default function MortalityWorkflow(props: IMortalityWorkflowProps): JSX.Element {
   const { animalId } = props;
   const bctwApi = useTelemetryApi();

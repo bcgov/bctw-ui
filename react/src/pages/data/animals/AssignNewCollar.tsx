@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { collarPropsToDisplay, Collar, eCollarAssignedStatus } from 'types/collar';
 import { CritterStrings as CS } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -25,7 +25,7 @@ export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignN
   return (
     <>
       <Modal open={show} handleClose={onClose}>
-        <Table
+        <DataTable
           headers={collarPropsToDisplay}
           title={CS.collarAssignmentTitle}
           queryProps={{ query: bctwApi.useCollarType, param: eCollarAssignedStatus.Available }}

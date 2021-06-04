@@ -1,4 +1,4 @@
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { CritterStrings as CS, FileStrings } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -52,13 +52,13 @@ export default function CritterPage(): JSX.Element {
       <div className='container'>
         <RowSelectedProvider>
           <>
-            <Table
+            <DataTable
               headers={assignedCritterProps}
               title={CS.assignedTableTitle}
               queryProps={{ query: bctwApi.useAssignedCritters, onNewData }}
               onSelect={handleSelect}
             />
-            <Table
+            <DataTable
               headers={unassignedCritterProps}
               title={CS.unassignedTableTitle}
               queryProps={{ query: bctwApi.useUnassignedCritters, onNewData }}

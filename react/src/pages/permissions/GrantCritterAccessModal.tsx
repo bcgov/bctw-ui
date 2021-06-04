@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
@@ -68,6 +68,7 @@ export default function GrantCritterModal({ show, onClose, user }: IGrantCritter
   }, [tableHeaderCritterSelectOption]);
 
   const handleTableRowSelect = (critters: UserCritterAccess[]): void => {
+    console.log('row clicked')
     setCritters(critters);
   };
 
@@ -118,12 +119,21 @@ export default function GrantCritterModal({ show, onClose, user }: IGrantCritter
 
   const tableQueryProps: ITableQueryProps<UserCritterAccess> = {
     query: bctwApi.useCritterAccess,
-    param: { user },
+    param: {
+      user,
+      filter: [
+        eCritterPermission.none,
+        eCritterPermission.owner,
+        eCritterPermission.subowner,
+        eCritterPermission.view,
+        eCritterPermission.change
+      ]
+    },
     onNewData: handleDataLoaded
   };
 
-  /**
-   * adds a select dropdown component at the left side of each table row that 
+
+  /** * adds a select dropdown component at the left side of each table row that 
    * allows the user to select a permission type for the animal row
    */
   const newColumn = (row: UserCritterAccess): JSX.Element => {
@@ -135,6 +145,8 @@ export default function GrantCritterModal({ show, onClose, user }: IGrantCritter
       <Select
         value={defaultPermission}
         onChange={(v: React.ChangeEvent<{ value: unknown }>): void => {
+          // dont propagate the event to the row selected handler
+          v.stopPropagation();
           const permission = v.target.value as eCritterPermission;
           setAccessTypes((prevState) => {
             const idx = prevState.findIndex((c) => c.critter_id === row.critter_id);
@@ -175,17 +187,15 @@ export default function GrantCritterModal({ show, onClose, user }: IGrantCritter
   };
 
   return (
-    <>
-      <Modal open={show} handleClose={handleClose} title={`Modifying ${user?.idir ?? 'user'}'s Animal Access`}>
-        <Table
-          customColumns={[{ column: newColumn, header: newHeader }]}
-          headers={['animal_id', 'wlh_id', 'device_id', 'device_make', 'population_unit']}
-          queryProps={tableQueryProps}
-          onSelectMultiple={handleTableRowSelect}
-          isMultiSelect={true}
-        />
-        <Button disabled={!critters.length} onClick={handleSave}>Save</Button>
-      </Modal>
-    </>
+    <Modal open={show} handleClose={handleClose} title={`Modifying ${user?.idir ?? 'user'}'s Animal Access`}>
+      <DataTable
+        customColumns={[{ column: newColumn, header: newHeader }]}
+        headers={['animal_id', 'wlh_id', 'device_id', 'device_make', 'population_unit']}
+        queryProps={tableQueryProps}
+        onSelectMultiple={handleTableRowSelect}
+        isMultiSelect={true}
+      />
+      <Button disabled={!critters.length} onClick={handleSave}>Save</Button>
+    </Modal>
   );
 }

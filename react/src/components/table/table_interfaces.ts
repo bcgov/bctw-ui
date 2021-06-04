@@ -40,6 +40,7 @@ interface ICustomTableColumn<T> {
   column: (row: T, idx: number) => JSX.Element;
 }
 
+
 /**
  * @param customColumns array of functions that return components to add as additional columns
  * @param headers displays all props of T unless this is included
@@ -50,16 +51,22 @@ interface ICustomTableColumn<T> {
  * @param onSelect parent handler triggered when a row is clicked
  * @param onSelectMultiple parent handler triggered when a row is checked if @param isMultiSelect
 */
-type ITableProps<T> = {
-  customColumns?: ICustomTableColumn<T>[];
+
+type IPlainTableProps<T> = {
   headers?: string[];
-  isMultiSelect?: boolean;
-  alreadySelected?: string[]
-  paginate?: boolean;
-  queryProps: ITableQueryProps<T>;
   title?: string;
   onSelect?: (row: T) => void;
-  onSelectMultiple?: (rowIds: T[]) => void;
+}
+
+type ITableProps<T> = IPlainTableProps<T> & {
+  customColumns?: ICustomTableColumn<T>[];
+  isMultiSelect?: boolean;
+  // fixme:
+  // alreadySelected?: T[];
+  alreadySelected?: string[];
+  paginate?: boolean;
+  queryProps: ITableQueryProps<T>;
+  onSelectMultiple?: (rows: T[]) => void;
 };
 
 /**
@@ -102,6 +109,7 @@ export type {
   ICustomTableColumn,
   ITableQuery,
   ITableHeadProps,
+  IPlainTableProps,
   ITableProps,
   ITableQueryProps,
   ITableSortProp

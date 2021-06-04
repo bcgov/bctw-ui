@@ -1,4 +1,7 @@
-import { ICodeFilter } from "./code";
+import { columnToHeader } from 'utils/common';
+import { ICodeFilter } from './code';
+import { BCTW } from './common_types';
+import { Expose } from 'class-transformer';
 
 export enum eUDFType {
   critter_group = 'critter_group'
@@ -18,7 +21,25 @@ export interface IUDF extends IUDFInput {
   changed?: boolean;
 }
 
-// transforms udfs into normal filters
+export class UDF implements IUDF, BCTW {
+  type: eUDFType;
+  key: string;
+  value: string[];
+  udf_id: number;
+  user_id: number;
+  changed?: boolean;
+  @Expose() get identifier(): string {
+    return 'key';
+  }
+  formatPropAsHeader(str: string):string {
+    return columnToHeader(str);
+  }
+}
+
+/**
+ * @returns UDFs transformed into normal @type {ICodeFilter}
+ * which can be used in the map filter panel
+*/
 const transformUdfToCodeFilter = (udfs: IUDF[], udfType: eUDFType): ICodeFilter[] => {
   let prop = '';
   switch(udfType) {
@@ -39,6 +60,4 @@ const transformUdfToCodeFilter = (udfs: IUDF[], udfType: eUDFType): ICodeFilter[
   })
 }
 
-export {
-  transformUdfToCodeFilter,
-}
+export { transformUdfToCodeFilter }

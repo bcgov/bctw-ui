@@ -1,16 +1,14 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableRow } from '@material-ui/core';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
-import { ITableProps, Order } from 'components/table/table_interfaces';
+import { IPlainTableProps, Order } from 'components/table/table_interfaces';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 
 /**
- * this component is similar to components/table/table.tsx,
- * but this one expects the data to be provided and won't load from a query
+ * A normal, non-data table. Expects the data to be provided.
  * todo: add paginate, multiple support?
- */
-
-type BasicTableProps<T> = Pick<ITableProps<T>, 'headers' | 'title' | 'onSelect'> & {
+*/
+export type BasicTableProps<T> = IPlainTableProps<T> & {
   data: T[];
   rowIdentifier: keyof T;
 };

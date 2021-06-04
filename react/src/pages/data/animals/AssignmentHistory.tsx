@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -36,14 +36,12 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
     }, [history]);
 */
     return (
-      <>
-        <Table
-          title={CollarStrings.assignmentHistoryByDeviceTitle}
-          headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
-          queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: deviceId, onNewData: onNewData }}
-          paginate={history?.length >= 10}
-        />
-      </>
+      <DataTable
+        title={CollarStrings.assignmentHistoryByDeviceTitle}
+        headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
+        queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: deviceId, onNewData: onNewData }}
+        paginate={history?.length >= 10}
+      />
     );
   } else {
     useEffect(() => {
@@ -54,7 +52,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.E
     }, [history]);
     return (
       <>
-        <Table
+        <DataTable
           title={CollarStrings.assignmentHistoryByAnimalTitle}
           headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
           queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}

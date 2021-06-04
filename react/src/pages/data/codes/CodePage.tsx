@@ -1,7 +1,7 @@
 import { ButtonGroup, Typography } from '@material-ui/core';
 import { NotificationMessage } from 'components/common';
 import Button from 'components/form/Button';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
@@ -79,7 +79,7 @@ const CodePage: React.FC = () => {
               })}
             </ButtonGroup>
             {codeHeader ? (
-              <Table
+              <DataTable
                 headers={props}
                 title={`${title} Codes`}
                 queryProps={{ query: bctwApi.useCodes, param: codeHeader?.type ?? 'region' }}

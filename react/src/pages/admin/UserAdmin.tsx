@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { User } from 'types/user';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
@@ -52,7 +52,7 @@ export default function UserAdminPage(): JSX.Element {
       <div className='container'>
         <Typography variant='h4' component='div'>Modify users</Typography>
         {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
-        <Table
+        <DataTable
           headers={['id', 'idir', 'bceid', 'email', 'role_type']}
           title='Users'
           queryProps={tableProps}
