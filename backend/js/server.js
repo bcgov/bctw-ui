@@ -326,7 +326,7 @@ var app = express()
   .use(gardenGate) // Keycloak Gate
   .get('/onboarding',onboarding)
   .post('/onboarding',onboardingAccess)
-  .all('*', async (req,res,next) => {
+  .all('*', keycloak.protect(), async (req,res,next) => {
     /**
      * If you get here you have a valid IDIR.
      * Check if the user is registerd in the database.
