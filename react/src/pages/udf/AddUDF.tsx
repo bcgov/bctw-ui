@@ -136,8 +136,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     handleClose(false);
   };
 
-
-  // create the components to render in the EditTable
+  // components to render in the EditTable
 
   /**
    * displays critter names (wlh_id/animal_id) from a UDFs value,
@@ -200,7 +199,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   return (
     <Modal open={open} handleClose={onClose}>
       {isLoading ? <CircularProgress /> : null}
-      {/*  */}
+
       <EditTable
         canSave={canSave}
         columns={[
@@ -213,7 +212,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
         onRowModified={handleRowModified}
         onSave={handleSave}
       />
-      {/*  */}
+
       {currentUdf ? (
         <PickCritterPermissionModal
           open={showCritterSelection}
@@ -222,6 +221,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
           alreadySelected={currentUdf.value}
           filter={filterOutNonePermissions}
           title={`Select Animals For Group ${currentUdf.key}`}
+          showSelectPermission={false}
         />
       ) : null}
     </Modal>

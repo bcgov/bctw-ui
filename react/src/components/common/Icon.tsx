@@ -20,6 +20,8 @@ import SnoozeIcon from '@material-ui/icons/Snooze';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import AlarmOffIcon from '@material-ui/icons/AlarmOff';
 import WarningIcon from '@material-ui/icons/Warning';
+import AccessibilityIcon from '@material-ui/icons/Accessibility';
+import ReplayIcon from '@material-ui/icons/Replay';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -44,6 +46,8 @@ const mappings: Record<string, JSX.Element> = {
   snooze: <SnoozeIcon />,
   cannotSnooze: <AlarmOffIcon />,
   warning: <WarningIcon htmlColor='orange' />,
+  person: <AccessibilityIcon />,
+  reset: <ReplayIcon />,
 };
 
 type IconProps = {

@@ -46,13 +46,6 @@ export const userFormFields: FormFieldObject[] = [
   { prop: 'email' },
 ]
 
-/**
- * note: the database uses animal id since the bctw.user_aniaml_assignment table hasn't been updated from animal_id -> critter_id.
- */
-export interface IUserCritterAccessInput {
-  critter_id: string;
-  permission_type: eCritterPermission;
-}
 export interface IUserCritterAccess {
   critter_id: string;
   animal_id: string;
@@ -62,6 +55,14 @@ export interface IUserCritterAccess {
   device_id: number;
   device_make: string;
   frequency: number;
+  permission_type: eCritterPermission;
+}
+
+/**
+ * note: the database uses animal id since the bctw.user_aniaml_assignment table hasn't been updated from animal_id -> critter_id.
+*/
+export interface IUserCritterAccessInput extends Partial<IUserCritterAccess> {
+  critter_id: string;
   permission_type: eCritterPermission;
 }
 

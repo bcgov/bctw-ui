@@ -1,24 +1,21 @@
 import Button from 'components/form/Button';
-import {
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow
-} from '@material-ui/core';
+import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { Icon } from 'components/common';
 import { BCTW } from 'types/common_types';
 import { IPlainTableProps } from './table_interfaces';
 
-export type EditTableRowAction = 'add' | 'delete' | 'duplicate' | 'edit';
+export type EditTableRowAction = 'add' | 'delete' | 'duplicate' | 'edit' | 'reset';
 
 type EditTableProps<T> = IPlainTableProps<T> & {
   canSave: boolean;
-  columns: ((d: T) => JSX.Element)[]; 
+  columns: ((d: T) => JSX.Element)[];
   data: T[];
   onRowModified: (n: T, action: EditTableRowAction) => void;
   onSave: () => void;
+  hideAdd?: boolean;
+  hideDuplicate?: boolean;
+  hideDelete?: boolean;
+  showReset?: boolean;
 };
 
 /**
@@ -27,9 +24,9 @@ type EditTableProps<T> = IPlainTableProps<T> & {
  * @param data - the table data
  * @param onRowModified - call parent handler with the row clicked and @type {EditTableRowAction}
  * @param onSave - calls parent handler when save button clicked
-*/
+ */
 export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX.Element {
-  const { canSave, headers, data, onRowModified, onSave, columns } = props;
+  const { canSave, headers, data, onRowModified, onSave, columns, hideAdd, hideDuplicate, hideDelete, showReset } = props;
 
   return (
     <>
@@ -57,25 +54,43 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
                   </IconButton>
                 </TableCell>
                 {/* delete button */}
-                <TableCell>
-                  <IconButton onClick={(): void => onRowModified(u, 'delete')}>
-                    <Icon icon='close' />
-                  </IconButton>
-                </TableCell>
+                {hideDelete ? null : (
+                  <TableCell>
+                    <IconButton onClick={(): void => onRowModified(u, 'delete')}>
+                      <Icon icon='close' />
+                    </IconButton>
+                  </TableCell>
+                )}
                 {/* duplicate button */}
-                <TableCell>
-                  <IconButton disabled={false} onClick={(): void => onRowModified(u, 'duplicate')}>
-                    <Icon icon='copy' />
-                  </IconButton>
-                </TableCell>
+                {hideDuplicate ? null : (
+                  <TableCell>
+                    <IconButton onClick={(): void => onRowModified(u, 'duplicate')}>
+                      <Icon icon='copy' />
+                    </IconButton>
+                  </TableCell>
+                )}
+                {/* reset button (not visible by default) */}
+                {showReset ? (
+                  <TableCell>
+                    <IconButton onClick={(): void => onRowModified(u, 'reset')}>
+                      <Icon icon='reset' />
+                    </IconButton>
+                  </TableCell>
+                ) : null }
               </TableRow>
             );
           })}
         </TableBody>
       </Table>
       <div className={'side-btns'}>
-        <Button onClick={(): void => onRowModified(null, 'add')} color='primary' variant='outlined'>Add Row</Button>
-        <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>Save</Button>
+        {hideAdd ? null : (
+          <Button onClick={(): void => onRowModified(null, 'add')} color='primary' variant='outlined'>
+            Add Row
+          </Button>
+        )}
+        <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>
+          Save
+        </Button>
       </div>
     </>
   );

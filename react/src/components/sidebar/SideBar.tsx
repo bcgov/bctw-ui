@@ -1,7 +1,7 @@
-import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@material-ui/core';
+import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import clsx from 'clsx';
 import { RouteKey } from 'AppRouter';
-import { Icon } from 'components/common';
+import { Icon, Tooltip } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -41,9 +41,11 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
       curRoutes.push(routes.find((r) => r.name === 'user-admin'));
-    }
-    if (isOwner) {
       curRoutes.push(routes.find((r) => r.name === 'animal-access'));
+      curRoutes.push(routes.find((r) => r.name === 'handle-permission-request'));
+    }
+    if (isOwner /* && !isAdmin */) {
+      curRoutes.push(routes.find((r) => r.name === 'owner-access'));
     }
     setVisibleRoutes(curRoutes);
   };

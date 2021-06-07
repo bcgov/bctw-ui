@@ -6,6 +6,7 @@ import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { userApi as user_api } from 'api/user_api';
+import { permissionApi, permissionApi as permission_api } from 'api/permission_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
@@ -13,7 +14,7 @@ import { Animal } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
-import { User, UserCritterAccess } from 'types/user';
+import { IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
   eCritterFetchType,
@@ -32,7 +33,7 @@ import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import MortalityEvent from 'types/mortality_event';
-import { eCritterPermission } from 'types/permission';
+import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, PermissionRequest } from 'types/permission';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -66,6 +67,7 @@ export const useTelemetryApi = () => {
   const mapApi = map_api({ api, testUser });
   const userApi = user_api({ api, testUser });
   const eventApi = event_api({ api });
+  const permissionApi = permission_api({ api});
 
   const defaultQueryOptions = {
     refetchOnWindowFocus: false
@@ -239,7 +241,7 @@ export const useTelemetryApi = () => {
     const { user, filter } = param;
     return useQuery<UserCritterAccess[], AxiosError>(
       ['critterAccess', page, user],
-      () => userApi.getUserCritterAccess(page, user, filter), defaultQueryOptions
+      () => permissionApi.getUserCritterAccess(page, user, filter), defaultQueryOptions
     );
   };
 
@@ -270,18 +272,23 @@ export const useTelemetryApi = () => {
     });
   }
 
+  /** see permission_api documentation */
+  const usePermissionRequests = (): UseQueryResult<PermissionRequest[]> => {
+    return useQuery<PermissionRequest[], AxiosError>(['getRequests'], () => permissionApi.getPermissionRequest());
+  }
+
   /**
+   *
+   * mutations - post/delete requests
    * 
+   */
+
+  /**
+   * todo:
   */
   const useExport = (config: UseMutationOptions<string[], AxiosError, ExportQueryParams>): UseMutationResult<string[]> => {
     return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
   };
-
-  /**
-   *
-   * mutations
-   * 
-   */
 
   /** save a code header */
   const useMutateCodeHeader = (
@@ -330,7 +337,7 @@ export const useTelemetryApi = () => {
     config: UseMutationOptions<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>
   ): UseMutationResult =>
     useMutation<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>(
-      (body) => userApi.grantCritterAccessToUser(body),
+      (body) => permissionApi.grantCritterAccessToUser(body),
       config
     );
 
@@ -353,6 +360,14 @@ export const useTelemetryApi = () => {
   /** add or update a user */
   const useMutateUser = (config: UseMutationOptions<User, AxiosError, User>): UseMutationResult<User> =>
     useMutation<User, AxiosError, User>((body) => userApi.addUser(body), config);
+  
+  /** see permission_api doc */ 
+  const useMutateSubmitPermissionRequest = (config: UseMutationOptions<unknown, AxiosError, IPermissionRequestInput>): UseMutationResult<unknown> => 
+    useMutation<unknown, AxiosError, IPermissionRequestInput>((body) => permissionApi.submitPermissionRequest(body), config);
+
+  /** see permission_api doc */ 
+  const useMutateTakeActionOnPermissionRequest = (config: UseMutationOptions<IUserCritterAccess, AxiosError, IExecutePermissionRequest>): UseMutationResult<IUserCritterAccess> => 
+    useMutation<IUserCritterAccess, AxiosError, IExecutePermissionRequest>((body) => permissionApi.takeActionOnPermissionRequest(body), config);
 
   return {
     // queries
@@ -376,6 +391,7 @@ export const useTelemetryApi = () => {
     useCritterAccess,
     useExport,
     useUDF,
+    usePermissionRequests,
     // mutations
     useMutateCodeHeader,
     useMutateBulkCsv,
@@ -389,5 +405,7 @@ export const useTelemetryApi = () => {
     useDelete,
     useMutateUserAlert,
     useMutateMortalityEvent,
+    useMutateSubmitPermissionRequest,
+    useMutateTakeActionOnPermissionRequest,
   };
 };

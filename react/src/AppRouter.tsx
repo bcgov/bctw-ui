@@ -11,6 +11,8 @@ import { FunctionComponent } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 // import { useHistory } from 'react-router-dom';
 import UserAdminPage from 'pages/admin/UserAdmin';
+import OwnerRequestPermission from 'pages/permissions/OwnerRequestPermission';
+import AdminHandleRequestPermissionPage from 'pages/permissions/AdminHandleRequestPermission';
 
 export type RouteKey = {
   path: string;
@@ -22,6 +24,8 @@ export type RouteKey = {
   requiresAdmin?: boolean;
 };
 
+
+const adminTitle = '(Administrator)';
 const AppRoutes: RouteKey[] = [
   { name: 'animals', path: '/animals', title: 'Animals', component: CritterPage, sort: 1, icon: 'critter' },
   { name: 'codes', path: '/codes', title: 'Codes', component: CodePage, sort: 2, icon: 'code' },
@@ -31,8 +35,10 @@ const AppRoutes: RouteKey[] = [
   { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain' },
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
   { name: 'profile', path: '/profile', title: 'Profile', component: UserProfile, sort: 2, icon: 'profile' },
-  { name: 'animal-access', path: '/animal-access', title: 'Animal Access', component: GrantCritterAccessPage, sort: 5, icon: 'filter' },
-  { name: 'user-admin', path: '/user-admin', title: 'User Admin', component: UserAdminPage, sort: 5, icon: 'admin' },
+  { name: 'animal-access', path: '/animal-access', title: `Manage User Animal Access ${adminTitle}`, component: GrantCritterAccessPage, sort: 5, icon: 'filter' },
+  { name: 'owner-access', path: '/owner-access', title: 'Owner Access', component: OwnerRequestPermission, sort: 5, icon: 'person' },
+  { name: 'handle-permission-request', path: '/permission-requests', title: 'Grant Permission Requests', component: AdminHandleRequestPermissionPage, sort: 5, icon: 'edit' },
+  { name: 'user-admin', path: '/user-admin', title: `Manage Users ${adminTitle}`, component: UserAdminPage, sort: 5, icon: 'admin' },
   { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 100 }
 ];
 
