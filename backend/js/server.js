@@ -353,6 +353,7 @@ var app = express()
     // Formulate the url and data to be sent to the onboarding page
     let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
     url += `&given=${givenName}&family=${familyName}`;
+    console.log('params to /onboarding page',url);
 
     if (registered) {
       next(); // pass through
