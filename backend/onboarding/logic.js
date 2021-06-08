@@ -18,6 +18,7 @@ const clicked = async () => {
 
     fetch(request)
       .then((res) => {
+        console.log(res);
         M.toast({html: 'Your request was sent successfully'});
         input.value = '';
       })
