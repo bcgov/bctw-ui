@@ -7,7 +7,7 @@ export const ApiResponseDispatch = createContext(null);
 /**
  * fixme: change the name of this, since it really is just a 
  * context that any child component can use to show a notification
- */
+*/
 
 const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => {
   const { children } = props;

@@ -25,6 +25,11 @@ import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
+/**
+ * Data table component, fetches data to display from @param {queryProps}
+ * supports pagination, sorting, single or multiple selection
+ * todo: search filter
+*/
 export default function DataTable<T extends BCTW>({
   customColumns,
   headers,
@@ -49,15 +54,10 @@ export default function DataTable<T extends BCTW>({
    * since data is updated when the page is changed, use the 'values'
    * state to keep track of the entire set of data across pages.
    * this state is passed to the parent select handlers
-   */
+  */
   const [values, setValues] = useState<T[]>([]);
 
-  const onSuccess = (results: T[]): void => {
-    if (typeof onNewData === 'function') {
-      onNewData(results);
-    }
-  };
-
+  // if a row is selected in a different table, unselect all rows in this table
   useDidMountEffect(() => {
     if (useRowState && data.length) {
       const found = data.findIndex(p => p[rowIdentifier] === useRowState);
@@ -67,6 +67,7 @@ export default function DataTable<T extends BCTW>({
     }
   }, [useRowState])
 
+  // fetch the data from the props query
   const {
     isFetching,
     isLoading,
@@ -77,18 +78,20 @@ export default function DataTable<T extends BCTW>({
     isSuccess,
   }: UseQueryResult<T[], AxiosError> = query(page, param);
 
-  // set the row identifier when data is changed
   useDidMountEffect(() => {
-    const first = data && data.length && data[0];
-    if (first && typeof first.identifier === 'string') {
-      setRowIdentifier(first.identifier);
-    }
-  }, [data])
-
-  useDidMountEffect(() => {
+    // console.log('data changed, successfully fetched: ', isSuccess);
     if (isSuccess) {
-      onSuccess(data);
+      // update the row identifier
+      const first = data && data.length && data[0];
+      if (first && typeof first.identifier === 'string') {
+        setRowIdentifier(first.identifier);
+      }
+      // update the parent handler when new data is fetched
+      if (typeof onNewData === 'function') {
+        onNewData(data);
+      }
       const newV = [];
+      // update the values state
       data.forEach(d => {
         const found = values.find(v => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
@@ -97,7 +100,7 @@ export default function DataTable<T extends BCTW>({
       })
       setValues(o => [...o, ...newV]);
     }
-  }, [isSuccess]);
+  }, [data])
 
   const handleSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -178,7 +181,7 @@ export default function DataTable<T extends BCTW>({
         {isFetching || isLoading ? (
           <CircularProgress />
         ) : isError ? (
-          <NotificationMessage type='error' message={formatAxiosError(error)} />
+          <NotificationMessage severity='error' message={formatAxiosError(error)} />
         ) : (
           'no data available'
         )}
@@ -223,7 +226,6 @@ export default function DataTable<T extends BCTW>({
                 ? renderNoData()
                 : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: BCTW, prop: number) => {
                   const isRowSelected = isSelected(obj[rowIdentifier]);
-                  // const labelId = `enhanced-table-checkbox-${prop}`;
                   return (
                     <TableRow
                       hover
@@ -274,7 +276,11 @@ export default function DataTable<T extends BCTW>({
             isLoading ||
             isFetching ||
             isError ||
-            // hide pagination when total results are under page limit (10)
+            /**
+             * hide pagination when total results are under page limit (10)
+             * possible that only 10 results are actually available, in which 
+             * case the next page will load no new results
+            */
             (isSuccess && data?.length < 10 && paginate && page === 1)
               ? null : 
               <PaginationActions

@@ -15,7 +15,9 @@ type EditTableProps<T> = IPlainTableProps<T> & {
   hideAdd?: boolean;
   hideDuplicate?: boolean;
   hideDelete?: boolean;
+  hideSave?: boolean;
   showReset?: boolean;
+  saveButtonText?: string;
 };
 
 /**
@@ -26,7 +28,20 @@ type EditTableProps<T> = IPlainTableProps<T> & {
  * @param onSave - calls parent handler when save button clicked
  */
 export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX.Element {
-  const { canSave, headers, data, onRowModified, onSave, columns, hideAdd, hideDuplicate, hideDelete, showReset } = props;
+  const {
+    canSave,
+    headers,
+    hideSave,
+    data,
+    onRowModified,
+    onSave,
+    columns,
+    hideAdd,
+    hideDuplicate,
+    hideDelete,
+    showReset,
+    saveButtonText
+  } = props;
 
   return (
     <>
@@ -45,7 +60,9 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
             return (
               <TableRow key={idx}>
                 {/* render columns passed in from props */}
-                {columns.map((cb) => cb(u))}
+                {columns.map((cb) => (
+                  <TableCell>{cb(u)}</TableCell>
+                ))}
 
                 {/* edit button */}
                 <TableCell>
@@ -76,7 +93,7 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
                       <Icon icon='reset' />
                     </IconButton>
                   </TableCell>
-                ) : null }
+                ) : null}
               </TableRow>
             );
           })}
@@ -88,9 +105,11 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
             Add Row
           </Button>
         )}
-        <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>
-          Save
-        </Button>
+        {hideSave ? null : (
+          <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>
+            {saveButtonText ?? 'Save'}
+          </Button>
+        )}
       </div>
     </>
   );

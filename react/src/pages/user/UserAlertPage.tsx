@@ -36,16 +36,16 @@ export default function AlertPage(): JSX.Element {
   }, [useAlerts]);
 
   const onAlertSaved = async (): Promise<void> => {
-    responseDispatch({ type: 'success', message: `telemetry alert saved` });
+    responseDispatch({ severity: 'success', message: `telemetry alert saved` });
   };
 
   const onMortalitySaved = async (data: IBulkUploadResults<unknown>): Promise<void> => {
     // console.log('data returned from mortality alert context', data);
     const { errors, results } = data;
     if (errors.length) {
-      responseDispatch({ type: 'error', message: `${errors.map((e) => e.error)}` });
+      responseDispatch({ severity: 'error', message: `${errors.map((e) => e.error)}` });
     } else if (results.length) {
-      responseDispatch({ type: 'success', message: 'mortality event saved!' });
+      responseDispatch({ severity: 'success', message: 'mortality event saved!' });
       // console.log(selectedAlert);
       // expire the telemetry alert
       const a = Object.assign(new TelemetryAlert(), selectedAlert);
@@ -54,7 +54,7 @@ export default function AlertPage(): JSX.Element {
     }
   };
 
-  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutations
   const { mutateAsync: saveAlert, isLoading: isSavingAlert } = bctwApi.useMutateUserAlert({

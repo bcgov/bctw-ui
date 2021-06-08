@@ -150,7 +150,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
   return (
     <>
       {isError ? (
-        <NotificationMessage type='error' message={formatAxiosError(error)} />
+        <NotificationMessage severity='error' message={formatAxiosError(error)} />
       ) : isLoading || isFetching ? (
         <div>loading...</div>
       ) : codes && codes.length ? (

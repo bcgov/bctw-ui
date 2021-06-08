@@ -57,12 +57,12 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   }, [critterStatus]);
 
   const onSuccess = (): void => {
-    responseDispatch({ type: 'success', message: 'user defined groups saved!' });
+    responseDispatch({ severity: 'success', message: 'user defined groups saved!' });
     queryClient.invalidateQueries('getUDF');
   };
 
   const onError = (e): void => {
-    responseDispatch({ type: 'error', message: `failed to save user defined group: ${e}` });
+    responseDispatch({ severity: 'error', message: `failed to save user defined group: ${e}` });
   };
 
   // setup the save mutation to save the UDF
@@ -147,37 +147,31 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
       return <></>
     }
     return (
-      <TableCell>
-        <FormControl style={{ width: '100px' }} size='small' variant='outlined' className={'select-small'}>
-          <InputLabel>Show</InputLabel>
-          <Select>
-            {critters
-              .filter((c) => u?.value?.includes(c.critter_id))
-              .map((c: UserCritterAccess) => (
-                <MenuItem key={c.critter_id}>{c.name}</MenuItem>
-              ))}
-          </Select>
-        </FormControl>
-      </TableCell>
+      <FormControl style={{ width: '100px' }} size='small' variant='outlined' className={'select-small'}>
+        <InputLabel>Show</InputLabel>
+        <Select disabled={u?.value?.length === 0}>
+          {critters
+            .filter((c) => u?.value?.includes(c.critter_id))
+            .map((c: UserCritterAccess) => (
+              <MenuItem key={c.critter_id}>{c.name}</MenuItem>
+            ))}
+        </Select>
+      </FormControl>
     );
   };
 
   // renders a textfield containing the name of the UDF
-  const renderUDFNameField = (u: UDF): JSX.Element => {
-    return (
-      <TableCell>
-        <TextField
-          changeHandler={(v): void => handleChangeName(v, u)}
-          propName={'group'}
-          defaultValue={u.key}
-          required={true}/>
-      </TableCell>
-    )
-  }
+  const renderUDFNameField = (u: UDF): JSX.Element => (
+    <TextField
+      changeHandler={(v): void => handleChangeName(v, u)}
+      propName={'group'}
+      defaultValue={u.key}
+      required={true}/>
+  )
+ 
 
   // renders a plain table cell 
-  const renderNumCrittersSelected = (u: UDF): JSX.Element => 
-    <TableCell>{u?.value?.length}</TableCell>
+  const renderNumCrittersSelected = (u: UDF): JSX.Element => <>{u?.value?.length}</>
 
   const handleRowModified = (u: UDF, action: EditTableRowAction): void => {
     switch(action) {

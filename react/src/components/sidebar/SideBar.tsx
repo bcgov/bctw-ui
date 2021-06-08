@@ -10,11 +10,11 @@ import drawerStyles from './drawer_classes';
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
-  sidebarContent?: React.ReactNode; // what's displayed in the drawer below the sidebar's navigation section
+  // sidebarContent?: React.ReactNode; // what's displayed in the drawer below the sidebar's navigation section
   collapseAble: boolean;
 };
 
-export default function SideBar({ routes, sidebarContent, collapseAble }: SideBarProps): JSX.Element {
+export default function SideBar({ routes, collapseAble }: SideBarProps): JSX.Element {
   const classes = drawerStyles();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -92,25 +92,25 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
           </div>
         ) : null}
         <Divider />
-        <List>
-          {routesToShow.map((route: RouteKey, idx: number) => {
-            return (
-              <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
-                {route.icon ? (
-                  <Tooltip title={route.title}>
+        <List component='nav'>
+          {routesToShow
+            .filter((r) => r.name !== 'notFound' && r.icon)
+            .map((route: RouteKey, idx: number) => {
+              return (
+                <Tooltip title={route.title}>
+                  <ListItem button key={idx} {...{ component: Link, to: route.path }}>
                     <ListItemIcon className={'sidebar-icon'}>
                       <Icon icon={route.icon} />
                     </ListItemIcon>
-                  </Tooltip>
-                ) : null}
-                <ListItemText className={'list-item-txt'} primary={route.title} />
-              </ListItem>
-            );
-          })}
+                    <ListItemText className={'list-item-txt'} primary={route.title} />
+                  </ListItem>
+                </Tooltip>
+              );
+            })}
         </List>
       </Drawer>
       <Divider />
-      <div>{sidebarContent}</div>
+      {/* <div>{sidebarContent}</div> */}
     </div>
   );
 }

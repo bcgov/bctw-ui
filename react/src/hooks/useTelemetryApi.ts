@@ -273,7 +273,7 @@ export const useTelemetryApi = () => {
   }
 
   /** see permission_api documentation */
-  const usePermissionRequests = (): UseQueryResult<PermissionRequest[]> => {
+  const usePermissionRequests = (): UseQueryResult<PermissionRequest[], AxiosError> => {
     return useQuery<PermissionRequest[], AxiosError>(['getRequests'], () => permissionApi.getPermissionRequest());
   }
 

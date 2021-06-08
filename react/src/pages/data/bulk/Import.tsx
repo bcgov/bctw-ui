@@ -74,7 +74,7 @@ export default function Import<T>(): JSX.Element {
   // handle a successful csv upload response
   const onSuccess = (data: IBulkUploadResults<T>): void => {
     responseDispatch({
-      type: 'success',
+      severity: 'success',
       message: `a bulk upload was completed ${data.errors.length ? ', but there were errors.' : 'successfully.'}`
     });
   };
@@ -120,7 +120,7 @@ export default function Import<T>(): JSX.Element {
     if (downloadStr && templateName) {
       download(downloadStr, templateName);
     } else {
-      responseDispatch({ type: 'error', message: `unable to download ${importType} template` });
+      responseDispatch({ severity: 'error', message: `unable to download ${importType} template` });
     }
   };
 
@@ -163,7 +163,7 @@ export default function Import<T>(): JSX.Element {
       <>
         <div style={{ marginBottom: '10px' }}>
           <NotificationMessage
-            type={isError ? 'error' : 'success'}
+            severity={isError ? 'error' : 'success'}
             message={
               isError ? 'There were errors during the import' : `${results.length} record(s) were imported successfully.`
             }
@@ -232,7 +232,7 @@ export default function Import<T>(): JSX.Element {
         {/* import results table */}
         <div style={{ minHeight: '200px', maxWidth: '80%', margin: '10px 0', overflowY: 'auto', overflowX: 'auto'}}>{isSuccess ? renderResults(data) : null}</div>
 
-        {isError ? <NotificationMessage type='error' message={formatAxiosError(error)} /> : null}
+        {isError ? <NotificationMessage severity='error' message={formatAxiosError(error)} /> : null}
       </div>
     </ManageLayout>
   );

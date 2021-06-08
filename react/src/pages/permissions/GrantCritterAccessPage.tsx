@@ -11,7 +11,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useQueryClient } from 'react-query';
 import { IBulkUploadResults, IGrantCritterAccessResults, IUserCritterPermissionInput } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
-import { filterOutNonePermissions, eCritterPermission } from 'types/permission';
+import { adminPermissionOptions } from 'types/permission';
 import { formatAxiosError } from 'utils/common';
 
 export default function GrantCritterAccessPage(): JSX.Element {
@@ -27,10 +27,10 @@ export default function GrantCritterAccessPage(): JSX.Element {
   const onSuccess = (ret: IBulkUploadResults<IGrantCritterAccessResults>): void => {
     const { errors } = ret;
     if (errors.length) {
-      responseDispatch({ type: 'error', message: `${errors.join()}` });
+      responseDispatch({ severity: 'error', message: `${errors.join()}` });
     } else {
       responseDispatch({
-        type: 'success',
+        severity: 'success',
         message: `animal access granted for users: ${user.idir}`
       });
       queryClient.invalidateQueries('critterAccess');
@@ -39,7 +39,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
 
   const onError = (error: AxiosError): void => {
     console.error(error);
-    responseDispatch({ type: 'error', message: formatAxiosError(error) });
+    responseDispatch({ severity: 'error', message: formatAxiosError(error) });
   }
 
   const { mutateAsync } = bctwApi.useMutateGrantCritterAccess({ onSuccess, onError });
@@ -70,7 +70,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
           handleClose={(): void => setShowModal(false)}
           title={`Modifying ${user?.idir ?? 'user'}'s Animal Access`}
           onSave={handleSave}
-          filter={[...filterOutNonePermissions, eCritterPermission.none]}
+          filter={adminPermissionOptions}
           alreadySelected={[]}
           showSelectPermission={true}
           userToLoad={user}

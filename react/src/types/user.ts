@@ -28,6 +28,9 @@ export class User implements IUser {
   email: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
+  @Expose() get is_admin(): boolean {
+    return this.role_type === eUserRole.administrator;
+  }
 
   formatPropAsHeader(str: string): string {
     switch (str) {

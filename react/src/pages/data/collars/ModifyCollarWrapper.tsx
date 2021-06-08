@@ -34,18 +34,18 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   // handlers for mutation response
   const onSaveSuccess = (data: IBulkUploadResults<Collar>): void => {
     if (data.errors.length) {
-      responseDispatch({ type: 'error', message: `${data.errors[0].error}` });
+      responseDispatch({ severity: 'error', message: `${data.errors[0].error}` });
       return;
     }
     const collar = data.results[0];
-    responseDispatch({ type: 'success', message: `collar ${collar.device_id} saved` });
+    responseDispatch({ severity: 'success', message: `collar ${collar.device_id} saved` });
     queryClient.invalidateQueries('collartype');
   };
 
-  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
   const onDeleteSuccess = async (): Promise<void> => {
-    responseDispatch({ type: 'success', message: `collar deleted successfully` });
+    responseDispatch({ severity: 'success', message: `collar deleted successfully` });
     queryClient.invalidateQueries('collartype');
     queryClient.invalidateQueries('getType');
   };

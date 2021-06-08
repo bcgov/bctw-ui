@@ -11,10 +11,13 @@ export default function SnackbarWrapper(props: SnackbarWrapperProps): JSX.Elemen
 
   useEffect(() => {
     ((): void => {
-      if (responseState?.message?.length || responseState?.type === 'error') {
-        setShowToast(true);
-      } else {
-        setShowToast(false);
+      if (responseState) {
+        const { message, severity } = responseState;
+        if (message || severity === 'error') {
+          setShowToast(true);
+        } else {
+          setShowToast(false);
+        }
       }
     })()
   }, [responseState])
@@ -22,7 +25,7 @@ export default function SnackbarWrapper(props: SnackbarWrapperProps): JSX.Elemen
   return (
     <>
       {props.children}
-      <Toast show={showToast} message={responseState?.message} onClose={(): void => setShowToast(false)} />
+      <Toast severity={responseState?.severity} show={showToast} message={responseState?.message} onClose={(): void => setShowToast(false)} />
     </>
   )
 }

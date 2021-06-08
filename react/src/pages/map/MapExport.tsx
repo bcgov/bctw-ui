@@ -110,7 +110,7 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
   }
 
   // show notification when an error occurs
-  const onError = (err): void => responseDispatch({type: 'error', message: formatAxiosError(err)});
+  const onError = (err): void => responseDispatch({severity: 'error', message: formatAxiosError(err)});
 
   // setup the API call 
   const { mutateAsync, reset, isLoading } = bctwApi.useExport({ onSuccess, onError });

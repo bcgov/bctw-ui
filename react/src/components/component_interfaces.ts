@@ -1,4 +1,5 @@
 import { DialogProps } from '@material-ui/core';
+import { AlertProps } from '@material-ui/lab/Alert';
 import { IUpsertPayload } from 'api/api_interfaces';
 
 /**
@@ -60,9 +61,8 @@ type CheckBoxChangeHandler = (o: Record<string, boolean>) => void;
  * ex. many components on successful/failed API responses will 
  * pass this type to the ApiResponseContext to show the result
  */
-interface INotificationMessage {
+interface INotificationMessage extends Pick<AlertProps, 'severity'>  {
   message: string;
-  type: 'error' | 'success' | 'none';
 }
 
 export type {

@@ -68,7 +68,7 @@ const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
 /**
  * formats an Axios error to a string
  */
-const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? err.message}`;
+const formatAxiosError = (err: AxiosError): string => `${err.response?.data?.error ?? err.message}`;
 
 export {
   columnToHeader,

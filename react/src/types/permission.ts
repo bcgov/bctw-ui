@@ -20,6 +20,11 @@ const filterOutNonePermissions: eCritterPermission[] = [
   eCritterPermission.change
 ];
 
+// an owner can delegate these animal permissions to other users
+const ownerPermissionOptions: eCritterPermission[] = [eCritterPermission.subowner, eCritterPermission.view];
+// standard for what an admin should see - includes 'none'
+const adminPermissionOptions: eCritterPermission[] = [...filterOutNonePermissions, eCritterPermission.none];
+
 // what's displayed as fields in most 'critter picker' tables
 const permissionTableBasicHeaders = ['animal_id', 'wlh_id', 'device_id', 'device_make', 'frequency', 'permission_type'];
 
@@ -28,7 +33,7 @@ const permissionTableBasicHeaders = ['animal_id', 'wlh_id', 'device_id', 'device
  * users to receive animal permissions
 */
 export interface IPermissionRequestInput {
-  request_id: number;
+  // request_id: number;
   user_email_list: string[];
   // note: actually the critter_id :(
   // todo: convert to IUserCritterAccess?
@@ -36,7 +41,7 @@ export interface IPermissionRequestInput {
     animal_id: string;
     permission_type: eCritterPermission;
   }[];
-  request_comment: string;
+  request_comment?: string;
 }
 
 export class PermissionRequestInput implements IPermissionRequestInput {
@@ -87,22 +92,34 @@ export class PermissionRequest implements BCTW {
   }
 }
 
+export interface IGroupedRequest {
+  id: number;
+  requests: PermissionRequest[];
+}
+
+// todo: doc
+const groupPermissionRequests = (r: PermissionRequest[]): IGroupedRequest[] => {
+  const result = [];
+  r.forEach(req => {
+    const id = req.request_id;
+    const found = result.find(f => f.id === id);
+    if (found) {
+      found.requests.push(req);
+    } else {
+      const n = {id, requests: [req]}
+      result.push(n);
+    }
+  })
+  return result;
+}
+
 /**
  * the object the admin submits to grant / denty a permission request
+ * in the permission API @function {takeActionOnPermissionRequest}
 */
 export interface IExecutePermissionRequest extends Pick<IPermissionRequest, 'request_id'> {
   is_grant: boolean; // whether or not to approve or deny
 }
-
-/**
- * the request type that an administrator will see
-*/
-// export interface IPermissionRequest
-//   extends Omit<IPermissionRequestInput, 'user_emails'>,
-//   Pick<BCTWBaseType, 'valid_from' | 'valid_to' | 'created_at'> {
-//   user_id_list: number[];
-//   requested_by_user_id: number;
-// }
 
 /* permission-related helpers */
 const permissionCanModify = (p: eCritterPermission): boolean => {
@@ -113,4 +130,12 @@ const canRemoveDeviceFromAnimal = (p: eCritterPermission): boolean => {
   return p === eCritterPermission.owner || p === eCritterPermission.admin;
 };
 
-export { permissionCanModify, canRemoveDeviceFromAnimal, filterOutNonePermissions, permissionTableBasicHeaders };
+export {
+  adminPermissionOptions,
+  ownerPermissionOptions,
+  permissionCanModify,
+  canRemoveDeviceFromAnimal,
+  filterOutNonePermissions,
+  permissionTableBasicHeaders,
+  groupPermissionRequests
+};

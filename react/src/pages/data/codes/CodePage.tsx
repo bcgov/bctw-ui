@@ -23,11 +23,11 @@ const CodePage: React.FC = () => {
 
   const onSuccess = (data): void => {
     if (data.errors.length) {
-      responseDispatch({ type: 'error', message: `${data.errors[0].error}` });
+      responseDispatch({ severity: 'error', message: `${data.errors[0].error}` });
       return;
     }
     const header = data.results[0];
-    responseDispatch({ type: 'success', message: `code header ${header.code_header_name} saved` });
+    responseDispatch({ severity: 'success', message: `code header ${header.code_header_name} saved` });
     // todo: invalidate code_header query?
   };
 
@@ -63,7 +63,7 @@ const CodePage: React.FC = () => {
         {isFetching || isLoading ? (
           <div>loading...</div>
         ) : isError ? (
-          <NotificationMessage type='error' message={formatAxiosError(error)} />
+          <NotificationMessage severity='error' message={formatAxiosError(error)} />
         ) : (
           <>
             <Typography align='center' variant='h6'>

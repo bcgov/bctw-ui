@@ -40,7 +40,7 @@ export default function PerformAssignmentAction({
 
   const onSuccess = (data: CollarHistory): void => {
     updateStatus({
-      type: 'success',
+      severity: 'success',
       message: `device ${data.collar_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`
     });
     setIsLink(o => !o);
@@ -48,7 +48,7 @@ export default function PerformAssignmentAction({
 
   const onError = (error: AxiosError): void =>
     updateStatus({
-      type: 'error',
+      severity: 'error',
       message: `error ${isLink ? 'linking' : 'removing'} device: ${formatAxiosError(error)}`
     });
 

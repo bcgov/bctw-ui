@@ -29,20 +29,20 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const onSaveSuccess = async (data: IBulkUploadResults<Animal>): Promise<void> => {
     const { errors, results } = data;
     if (errors.length) {
-      responseDispatch({ type: 'error', message: `${errors.map(e => e.error)}` });
+      responseDispatch({ severity: 'error', message: `${errors.map(e => e.error)}` });
     } else {
       const critter = results[0];
-      responseDispatch({ type: 'success', message: `${critter.animal_id} saved!` });
+      responseDispatch({ severity: 'success', message: `${critter.animal_id} saved!` });
       invalidateCritterQueries();
     }
   };
 
   const onDeleteSuccess = async (): Promise<void> => {
-    responseDispatch({ type: 'success', message: `critter deleted successfully` });
+    responseDispatch({ severity: 'success', message: `critter deleted successfully` });
     invalidateCritterQueries();
   };
 
-  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
   // force refetch on critter queries
   const invalidateCritterQueries = async (): Promise<void> => {
@@ -93,7 +93,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   }
   
   const validateFailed = (errors: Record<string, unknown>): void => {
-    responseDispatch({ type: 'error', message: `missing required fields: ${Object.keys(errors).join(', ')}` });
+    responseDispatch({ severity: 'error', message: `missing required fields: ${Object.keys(errors).join(', ')}` });
   }
 
   const passTheseProps /* : Pick<IAddEditProps<Animal>, 'onDelete' | 'onSave' | 'cannotEdit'>*/ = {
