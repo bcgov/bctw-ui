@@ -4,6 +4,7 @@ import Icon from 'components/common/Icon';
 import Toast from 'components/common/Toast';
 import LightTooltip from 'components/common/Tooltip';
 import Modal from 'components/modal/Modal';
+import List from 'components/common/List';
 
 // simply re-exports common components
 export {
@@ -11,6 +12,7 @@ export {
   SnackbarWrapper,
   Icon,
   Toast,
+  List,
   LightTooltip as Tooltip,
   Modal,
 }

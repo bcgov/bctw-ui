@@ -37,6 +37,9 @@ export const permissionApi = (props: ApiProps) => {
     user: User,
     filter: eCritterPermission[] = filterOutNonePermissions
   ): Promise<UserCritterAccess[]> => {
+    if (!user) {
+      return null;
+    }
     const filtersAsString = filter.join(',');
     const url = createUrl({ api: `get-critter-access/${user.idir}`, query: `filters=${filtersAsString}`, page });
     const { data } = await api.get(url);

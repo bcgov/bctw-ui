@@ -2,28 +2,34 @@ import Button from 'components/form/Button';
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { Icon } from 'components/common';
 import { BCTW } from 'types/common_types';
-import { IPlainTableProps } from './table_interfaces';
+import { IPlainTableProps } from 'components/table/table_interfaces';
 
 export type EditTableRowAction = 'add' | 'delete' | 'duplicate' | 'edit' | 'reset';
 
-type EditTableProps<T> = IPlainTableProps<T> & {
+type EditTableVisibilityProps = {
+  hideAll?: boolean;
+  hideAdd?: boolean;
+  hideDuplicate?: boolean;
+  hideDelete?: boolean;
+  hideEdit?: boolean;
+  hideSave?: boolean;
+  showReset?: boolean;
+};
+
+type EditTableProps<T> = IPlainTableProps<T> & EditTableVisibilityProps & {
   canSave: boolean;
   columns: ((d: T) => JSX.Element)[];
   data: T[];
   onRowModified: (n: T, action: EditTableRowAction) => void;
   onSave: () => void;
-  hideAdd?: boolean;
-  hideDuplicate?: boolean;
-  hideDelete?: boolean;
-  hideSave?: boolean;
-  showReset?: boolean;
   saveButtonText?: string;
 };
 
 /**
  * @param columns - array of functions that return a component (rendered before the editing buttons)
- * @param canSave - is the save button clickable
- * @param data - the table data
+ * @param canSave - is the save button enabled
+ * @param data - the table data - when @param columns are rendered, the data row at the current row index is passed
+ * to the column renderer function as a prop 
  * @param onRowModified - call parent handler with the row clicked and @type {EditTableRowAction}
  * @param onSave - calls parent handler when save button clicked
  */
@@ -37,8 +43,10 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
     onSave,
     columns,
     hideAdd,
+    hideAll,
     hideDuplicate,
     hideDelete,
+    hideEdit,
     showReset,
     saveButtonText
   } = props;
@@ -49,7 +57,7 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
         <TableHead>
           <TableRow>
             {headers.map((h, idx) => (
-              <TableCell align='center' key={idx}>
+              <TableCell align='center' key={`head-${idx}`}>
                 <strong>{h}</strong>
               </TableCell>
             ))}
@@ -57,24 +65,28 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
         </TableHead>
         <TableBody>
           {data.map((u, idx) => {
-            return (
-              <TableRow key={idx}>
-                {/* render columns passed in from props */}
-                {columns.map((cb) => (
-                  <TableCell>{cb(u)}</TableCell>
-                ))}
+            const rowkey = `body-${idx}`;
+            const ComponentsFromProps = columns.map((cb, idx) => <TableCell key={`custom-${idx}`}>{cb(u)}</TableCell>);
+
+            return hideAll ? (
+              <TableRow key={rowkey}>{ComponentsFromProps}</TableRow>
+            ) : (
+              <TableRow key={rowkey}>
+                {ComponentsFromProps}
 
                 {/* edit button */}
-                <TableCell>
-                  <IconButton onClick={(): void => onRowModified(u, 'edit')}>
-                    <Icon icon='edit' />
-                  </IconButton>
-                </TableCell>
+                {hideEdit ? null : (
+                  <TableCell>
+                    <IconButton onClick={(): void => onRowModified(u, 'edit')}>
+                      <Icon icon='edit' />
+                    </IconButton>
+                  </TableCell>
+                )}
                 {/* delete button */}
                 {hideDelete ? null : (
                   <TableCell>
                     <IconButton onClick={(): void => onRowModified(u, 'delete')}>
-                      <Icon icon='close' />
+                      <Icon icon='close' htmlColor='#8B0000' />
                     </IconButton>
                   </TableCell>
                 )}
@@ -99,18 +111,20 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
           })}
         </TableBody>
       </Table>
-      <div className={'side-btns'}>
-        {hideAdd ? null : (
-          <Button onClick={(): void => onRowModified(null, 'add')} color='primary' variant='outlined'>
-            Add Row
-          </Button>
-        )}
-        {hideSave ? null : (
-          <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>
-            {saveButtonText ?? 'Save'}
-          </Button>
-        )}
-      </div>
+      {hideAll ? null : (
+        <div className={'side-btns'}>
+          {hideAdd ? null : (
+            <Button onClick={(): void => onRowModified(null, 'add')} color='primary' variant='outlined'>
+              Add Row
+            </Button>
+          )}
+          {hideSave ? null : (
+            <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>
+              {saveButtonText ?? 'Save'}
+            </Button>
+          )}
+        </div>
+      )}
     </>
   );
 }

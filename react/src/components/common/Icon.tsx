@@ -1,3 +1,4 @@
+import {cloneElement} from 'react';
 import Add from '@material-ui/icons/Add';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -52,9 +53,9 @@ const mappings: Record<string, JSX.Element> = {
 
 type IconProps = {
   icon: string;
-  color?: string;
+  htmlColor?: string;
 };
 
-export default function Icon ({icon, color}: IconProps): JSX.Element {
-  return mappings[icon];
+export default function Icon ({icon, htmlColor}: IconProps): JSX.Element {
+  return cloneElement(mappings[icon], {htmlColor})
 }

@@ -6,7 +6,7 @@ import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { userApi as user_api } from 'api/user_api';
-import { permissionApi, permissionApi as permission_api } from 'api/permission_api';
+import { permissionApi as permission_api } from 'api/permission_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';

@@ -68,6 +68,7 @@ export interface IPermissionRequest {
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
+  permission_type: eCritterPermission;
   // flag indicating whether or not the request has been granted/denied
   is_expired: boolean;
 }
@@ -82,7 +83,7 @@ export class PermissionRequest implements BCTW {
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
-  // flag indicating whether or not the request has been granted/denied
+  permission_type: eCritterPermission;
   is_expired: boolean;
   @Expose() get identifier(): string {
     return 'request_id';

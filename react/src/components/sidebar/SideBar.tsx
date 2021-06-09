@@ -97,8 +97,8 @@ export default function SideBar({ routes, collapseAble }: SideBarProps): JSX.Ele
             .filter((r) => r.name !== 'notFound' && r.icon)
             .map((route: RouteKey, idx: number) => {
               return (
-                <Tooltip title={route.title}>
-                  <ListItem button key={idx} {...{ component: Link, to: route.path }}>
+                <Tooltip key={idx} title={route.title}>
+                  <ListItem button {...{ component: Link, to: route.path }}>
                     <ListItemIcon className={'sidebar-icon'}>
                       <Icon icon={route.icon} />
                     </ListItemIcon>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Typography } from '@material-ui/core';
+import { IconButton, Typography } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import OwnerLayout from 'pages/layouts/OwnerLayout';
 import { eCritterPermission, IPermissionRequestInput, PermissionRequestInput } from 'types/permission';
@@ -11,10 +11,13 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { IUserCritterPermissionInput } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/common';
+import { Icon, NotificationMessage } from 'components/common';
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 /**
  *
- */
+*/
 export default function OwnerRequestPermission(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
@@ -28,13 +31,22 @@ export default function OwnerRequestPermission(): JSX.Element {
   const [emailErr, setEmailErr] = useState<boolean>(false);
   const [comment, setComment] = useState<string>('');
 
+  const [error, setError] = useState<string>('');
+
+  // reset error on changing emails
+  useDidMountEffect(() => {
+    setError('');
+  }, [emailList])
+
   const onSuccess = (data): void => {
     console.log('successful request submission', data);
     responseDispatch({severity: 'success', message: 'permission request submitted succssfully'});
+    setError('');
   }
 
   const onError = (err: AxiosError): void => {
     console.log(err)
+    setError(err?.response?.data);
     responseDispatch({severity: 'error', message: formatAxiosError(err)});
   }
 
@@ -73,7 +85,9 @@ export default function OwnerRequestPermission(): JSX.Element {
     setEmail('');
     setEmailList([]);
     const u = Object.assign({}, permission);
-    u.access.length = 0;
+    if (u.access?.length) {
+      u.access.length = 0;
+    }
     setPermission(u);
   };
 
@@ -118,15 +132,25 @@ export default function OwnerRequestPermission(): JSX.Element {
     )
   }
 
+  const listStyle: CSSProperties = { listStyle: 'none', minWidth: '200px', maxWidth: '300px'};
   const renderEmailList = (): JSX.Element => {
     return (
-      <ul style={{ listStyle: 'none' }}>
-        {emailList.length ? emailList.map((e) => <li>{e}</li>) : <li>no emails added</li>}
+      <ul style={listStyle}>
+        {emailList.length ? (
+          emailList.map((e) => (
+            <li>{e}
+              <IconButton size='small' onClick={():void => setEmailList([...emailList.filter(em => em !== e)])}>
+                <Icon icon='close' htmlColor='red' />
+              </IconButton>
+            </li>
+          ))
+        ) : (
+          <li style={{width: '200px'}}></li>
+        )}
       </ul>
     );
   };
 
-  const listStyle = { listStyle: 'none' };
 
   const renderPermissionList = (): JSX.Element => {
     const p = permission?.access;
@@ -178,7 +202,7 @@ export default function OwnerRequestPermission(): JSX.Element {
           canSave={!!(emailList.length && permission?.access?.length)}
           columns={[renderEmailField, renderAddEmailBtn, renderEmailList, renderCritterList, renderPermissionList, renderCommentField]}
           data={[new PermissionRequestInput()]}
-          headers={['', '', 'Emails', 'Animal Identifier', 'Permission Type', 'Submission Comment']}
+          headers={['', '', 'Emails', 'Animal Identifier', 'Permission Type', 'Submission Comment', 'Edit', 'Reset']}
           onRowModified={handleRowModified}
           onSave={handleSavePermission}
           hideAdd={true}
@@ -187,8 +211,8 @@ export default function OwnerRequestPermission(): JSX.Element {
           showReset={true}
           saveButtonText={'Submit Permission Request'}
         />
+        {/* todo:... */}
         {/* <Typography>View past permission requests</Typography> */}
-        {/* <div>todo:...</div> */}
         <PickCritterPermissionModal
           open={showPickCritterModal}
           handleClose={(): void => setShowPickCritterModal(false)}
@@ -198,6 +222,16 @@ export default function OwnerRequestPermission(): JSX.Element {
           title={`Select Animals`}
           showSelectPermission={true}
         />
+        {
+          error ? (
+            <div style={{ marginBottom: '10px' }}>
+              <NotificationMessage
+                severity={'error'}
+                message={error}
+              />
+            </div>
+          ) : null
+        }
       </>
     </OwnerLayout>
   );
