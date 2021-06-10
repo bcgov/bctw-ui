@@ -271,8 +271,12 @@ const onboardingRedirect = async (req,res,next) => {
  * @param res {object} Express response object
  */
 const onboarding = (req,res) => {
+  // Collect all user data from the keycloak object
+  const data = req.kauth.grant.access_token.content;
+  const firstName = data.given_name;
+
   const template = pug.compileFile('onboarding/index.pug')
-  const html = template();
+  const html = template({firstName});
   res.status(200).send(html);
 };
 
