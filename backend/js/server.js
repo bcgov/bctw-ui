@@ -289,7 +289,7 @@ const onboardingAccess = async (req,res) => {
     const result = await client.query(sql);
     const idirs = result.rows.map((row) => row.idir);
     // Is the current user registered: Boolean
-    const registered = (idirs.indexOf(user) > 0) ? true : false;
+    const registered = (idirs.includes(user)) ? true : false;
 
     // Formulate the url and data to be sent to the onboarding page
     let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
