@@ -15,7 +15,7 @@ import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
 export default function CollarPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
 
-  const [editObj, setEditObj] = useState<Collar>(new Collar());
+  const [editObj, setEditObj] = useState<Collar>({} as Collar);
   const [showImport, setShowImport] = useState<boolean>(false);
 
   // set editing object when table row is selected
@@ -25,25 +25,22 @@ export default function CollarPage(): JSX.Element {
   };
 
   // pass as callback to table component to set export data when api returns collar data
-  const onNewData = (d: Collar[]): void => {
+  // const onNewData = (d: Collar[]): void => {
   //   if (d.length && d[0].animal_id) {
   //     setCollarsA(d);
   //   } else {
   //     setCollarsU(d);
   //   }
-  };
+  // };
 
   const editProps = {
-    editing: editObj,
+    editing: new Collar(),
     open: false,
     onSave: null,
     handleClose: null,
   };
 
-  const tableProps: ITableQueryProps<Collar> = {
-    query: bctwApi.useCollarType,
-    onNewData
-  };
+  const tableProps: ITableQueryProps<Collar> = { query: bctwApi.useCollarType, /* onNewData */ };
   
   return (
     <ManageLayout>

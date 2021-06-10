@@ -4,63 +4,45 @@ import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history'
 import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { CollarStrings } from 'constants/strings';
+import { ModalBaseProps } from 'components/component_interfaces';
+import { Modal } from 'components/common';
+import { eCritterPermission } from 'types/permission';
 
-type IAssignmentHistoryProps = {
-  animalId: string;
-  deviceId: string;
-  canEdit: boolean; // passed to child PerformAssignmentAction component
-  assignAnimalToDevice?: boolean;
+export type IAssignmentHistoryProps = Pick<ModalBaseProps, 'open' | 'handleClose'> & {
+  critter_id: string;
+  permission_type: eCritterPermission; 
 };
 
 /**
- *  displays a table with collar history and nests
- *  all of the collar assign/unassign handling components
- */
+ * displays a table with collar history and collar assign/unassign handling components
+ * todo: properly enable assignment to animal from edit device
+*/
 export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
-  const { animalId, deviceId, assignAnimalToDevice } = props;
+  const { critter_id, open, handleClose } = props;
   const bctwApi = useTelemetryApi();
-  const [isDeviceAttached, setIsDeviceAttached] = useState<string>(null);
+  const [attachedCollarID, setAttachedCollarID] = useState<string>('');
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
 
   const onNewData = (d: CollarHistory[]): void => {
     setCollarHistory(d);
   };
 
-  if (assignAnimalToDevice) {
-/*
-    useEffect(() => {
-      if (history?.length) {
-        const attachment = hasCollarCurrentlyAssigned(history);
-        setIsDeviceAttached(attachment?.collar_id);
-      }
-    }, [history]);
-*/
-    return (
+  useEffect(() => {
+    if (history?.length) {
+      const attachment = hasCollarCurrentlyAssigned(history);
+      setAttachedCollarID(attachment?.collar_id);
+    }
+  }, [history]);
+
+  return (
+    <Modal open={open} handleClose={handleClose}>
       <DataTable
-        title={CollarStrings.assignmentHistoryByDeviceTitle}
+        title={CollarStrings.assignmentHistoryByAnimalTitle}
         headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
-        queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: deviceId, onNewData: onNewData }}
+        queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
         paginate={history?.length >= 10}
       />
-    );
-  } else {
-    useEffect(() => {
-      if (history?.length) {
-        const attachment = hasCollarCurrentlyAssigned(history);
-        setIsDeviceAttached(attachment?.collar_id);
-      }
-    }, [history]);
-    return (
-      <>
-        <DataTable
-          title={CollarStrings.assignmentHistoryByAnimalTitle}
-          headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
-          queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: animalId, onNewData: onNewData }}
-          paginate={history?.length >= 10}
-        />
-        <PerformAssignmentAction collarId={isDeviceAttached} {...props} />
-      </>
-    );
-  }
-
+      <PerformAssignmentAction collar_id={attachedCollarID} {...props} />
+    </Modal>
+  );
 }

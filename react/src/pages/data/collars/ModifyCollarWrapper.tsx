@@ -8,7 +8,7 @@ import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/common';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { Collar } from 'types/collar';
-import { permissionCanModify, eCritterPermission } from 'types/permission';
+import { permissionCanModify } from 'types/permission';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type IModifyWrapperProps = {
@@ -24,11 +24,10 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
 
   const { editing, children } = props;
   const [show, setShow] = useState<boolean>(false);
-  const [perm, setPerm] = useState<eCritterPermission>(eCritterPermission.none);
+  const [canEdit, setCanEdit] = useState<boolean>(false);
 
   useDidMountEffect(() => {
-    // console.log('modifycollarwrappper', editing.permission_type)
-    setPerm(editing.permission_type)
+    setCanEdit(permissionCanModify(editing?.permission_type));
   }, [editing]);
 
   // handlers for mutation response
@@ -54,7 +53,13 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   const { mutateAsync: saveMutation } = bctwApi.useMutateCollar({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
-  const saveCollar = async (c: IUpsertPayload<Collar>): Promise<IBulkUploadResults<Collar>> => await saveMutation(c);
+  const saveCollar = async (c: IUpsertPayload<Collar>): Promise<void> => {
+    const {body } = c;
+    const formatted = body.toJSON();
+    console.log('ModifyCollarWrapper: saving device ', JSON.stringify(formatted, null, 2));
+    await saveMutation(c);
+  }
+
   const deleteCollar = async (): Promise<void> => {
     const payload: IDeleteType = {
       id: editing.collar_id,
@@ -80,7 +85,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   }
 
   const passTheseProps: Pick<IAddEditProps<Collar>, 'onDelete' | 'onSave' | 'cannotEdit'> = {
-    cannotEdit: !permissionCanModify(perm),
+    cannotEdit: !canEdit,
     onDelete: handleDeleteButtonClicked,
     onSave: saveCollar
   }

@@ -23,7 +23,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
 
   return (
     <EditModal
-      hideHistory={true}
+      disableHistory={true}
       title={editing?.id ? `Editing ${editing.idir}` : 'Create New User'}
       showInFullScreen={false}
       onReset={close}

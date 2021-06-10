@@ -21,12 +21,16 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
    * consider -1 to be an invalid default value - probably used to make sure this
    * @param propName renders a @function numberField but is actually null
   */
-  const [val, setVal] = useState<number>(defaultValue === -1 ? undefined : defaultValue);
+  const [val, setVal] = useState(defaultValue === -1 ? '' : defaultValue);
   const [err, setErr] = useState<string>('');
 
-  // when default value is changed
+  /**
+   * when default value is changed
+   * undefined values are sometimes cast to -1 to make sure the form compoent is
+   * rendered as a number input. h
+   */
   useEffect(() => {
-    setVal(defaultValue);
+    setVal(defaultValue === -1 ? '' : defaultValue);
     handleIsRequired(defaultValue);
   }, [defaultValue]);
 
@@ -37,12 +41,12 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
   // error handling triggered when val is changed
   useDidMountEffect(() => {
     let err = '';
-    if (isNaN(val)) {
+    if (isNaN(val as number)) {
       callParentHandler();
       return;
     } 
     else if (typeof validate === 'function') {
-      err = validate(val);
+      err = validate(val as number);
       setErr(err);
     }
   }, [val]);

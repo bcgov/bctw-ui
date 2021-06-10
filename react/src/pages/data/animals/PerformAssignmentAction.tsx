@@ -11,32 +11,34 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { CollarHistory } from 'types/collar_history';
+import { canRemoveDeviceFromAnimal } from 'types/permission';
 import { formatAxiosError } from 'utils/common';
 import { getNow } from 'utils/time';
+import { IAssignmentHistoryProps } from './AssignmentHistory';
 
-type IPerformAssignmentActionProps = {
-  animalId: string;
-  collarId: string; // uuid of the attached collar
-  canEdit: boolean; // does user have change permission?
+type IPerformAssignmentActionProps = Pick<IAssignmentHistoryProps, 'critter_id' | 'permission_type'> & {
+  collar_id: string;
 };
 /**
  * component that performs post requests to assign/unassign a collar
  * consists of:
  *  1. a confirmation dialog if user chooses to unassign the collar
  *  2. a modal that displays a list of available collars with a save button
- */
+*/
 export default function PerformAssignmentAction({
-  animalId,
-  collarId,
-  canEdit
+  critter_id,
+  collar_id,
+  permission_type
 }: IPerformAssignmentActionProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const queryClient = useQueryClient();
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
-  //  state to manage if a collar is being linked or removed
-  const [isLink, setIsLink] = useState<boolean>(!!collarId);
+  // state to manage if a collar is being linked or removed
+  const [isLink, setIsLink] = useState<boolean>(!!collar_id);
   const responseDispatch = useResponseDispatch();
+  // only owners and administrators can unlink devices
+  const [canEdit] = useState<boolean>(canRemoveDeviceFromAnimal(permission_type))
 
   const onSuccess = (data: CollarHistory): void => {
     updateStatus({
@@ -58,10 +60,10 @@ export default function PerformAssignmentAction({
   };
 
   useEffect(() => {
-    // update status when collarId prop updated from parent
-    // fixme: why isn't this be happening automatically?
-    setIsLink(!!collarId);
-  }, [collarId])
+    // fixme:
+    // update status when collarId prop updated from parent  why isn't this be happening automatically?
+    setIsLink(!!collar_id);
+  }, [collar_id])
 
   // force the collar history, current assigned/unassigned critter pages to refetch
   const updateCollarHistory = async(): Promise<void> => {
@@ -87,7 +89,7 @@ export default function PerformAssignmentAction({
       isLink: isAssign,
       data: {
         collar_id,
-        animal_id: animalId,
+        animal_id: critter_id,
       }
     };
     if (isAssign) {
@@ -101,7 +103,7 @@ export default function PerformAssignmentAction({
   return (
     <>
       <ConfirmModal
-        handleClickYes={(): Promise<void> => save(collarId, false)}
+        handleClickYes={(): Promise<void> => save(collar_id, false)}
         handleClose={closeModals}
         open={showConfirmModal}
         message={CS.collarRemovalText}

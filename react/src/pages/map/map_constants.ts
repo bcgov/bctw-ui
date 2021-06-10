@@ -6,13 +6,13 @@ const DEVICE_STATUS_OPTIONS = [
   { id: 2, value: MapStrings.assignmentStatusOptionU }
 ];
 
-// code select dropdowns displayed in map filters panel
-const CODE_FILTERS: { header: string; label?: string }[] = [
+// dropdown filters displayed in map filters panel
+const CODE_FILTERS: { header: string; label?: string, filter?: string[] }[] = [
   { header: 'species' },
   { header: 'animal_status' },
   { header: 'device_status' },
   { header: 'sex' },
-  { header: 'population_unit' },
+  { header: 'population_unit', filter: [] },
 
 ];
 

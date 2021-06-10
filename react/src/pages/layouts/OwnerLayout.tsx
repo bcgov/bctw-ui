@@ -20,7 +20,7 @@ export default function OwnerLayout({ children }: IDefaultLayoutProps): JSX.Elem
     const updateComponent = (): void => {
       const { ready, user } = userChanges;
       if (ready && !user.is_owner) {
-        console.log('no owner access, rerouting to home')
+        // console.log('no owner access, rerouting to home')
         history.push('/home');
       }
     };

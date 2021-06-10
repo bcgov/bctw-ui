@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
+import { Animal } from './animal';
 import { BCTW } from './common_types';
 
 export enum eCritterPermission {
@@ -8,7 +9,7 @@ export enum eCritterPermission {
   view = 'view',
   none = 'none',
   change = 'change', // to be removed
-  admin = '' // technically not an option
+  admin = 'admin' // technically not an option
 }
 
 // the 'stock' critter permission filter - filters out only animals with 'none' permissions
@@ -55,28 +56,30 @@ export class PermissionRequestInput implements IPermissionRequestInput {
 }
 
 /**
- * what an admin sees in the requests page.
- * retrieved from the API schema view permission_request_v
+ * interface that represents:
+ * a) what an admin sees in the requests page - from the API schema view permission_request_v
+ * b) what an owner sees in the request history table (some fields)
 */
-export interface IPermissionRequest {
-  animal_id: string;
-  wlh_id: string;
+export interface IPermissionRequest extends Pick<Animal, 'animal_id' | 'wlh_id'> {
   request_id: number;
+  requested_by: string; // idir or bceid
   requested_by_email: string;
   requested_by_name: string;
+  // note: in the case of the owner history - should this be approved at?
   requested_at: Date;
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
   permission_type: eCritterPermission;
-  // flag indicating whether or not the request has been granted/denied
+  // flag indicating whether or not the request has been dealt with
   is_expired: boolean;
 }
 
-export class PermissionRequest implements BCTW {
+export class PermissionRequest implements BCTW, IPermissionRequest {
   animal_id: string;
   wlh_id: string;
   request_id: number;
+  requested_by: string;
   requested_by_email: string;
   requested_by_name: string;
   requested_at: Date;

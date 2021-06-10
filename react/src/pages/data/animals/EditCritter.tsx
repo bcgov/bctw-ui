@@ -3,32 +3,30 @@ import { EditorProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { MakeEditField } from 'components/form/create_form_components';
 import { getInputTypesOfT } from 'components/form/form_helpers';
-import Modal from 'components/modal/Modal';
 import { CritterStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
-import CaptureWorkflow from 'pages/data/animals/CaptureWorkflow';
-import ReleaseWorkflow from 'pages/data/animals/ReleaseWorkflow';
-import MortalityEventForm from 'pages/data/events/MortalityEventForm';
 import EditModal from 'pages/data/common/EditModal';
 import React, { useEffect, useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
-import { TelemetryAlert } from 'types/alert';
 import { FormInputType } from 'types/form_types';
 import { permissionCanModify } from 'types/permission';
 
+/**
+ * the main animal form
+ * todo: complete capture/release/mortality workflows -> uncomment when complete
+*/
 export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
   const { isCreatingNew, editing } = props;
 
-  // for new critters, permission will be undefined
-  const canEdit = permissionCanModify(editing.permission_type) || editing.critter_id === undefined;
+  const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const requiredFields = CS.requiredProps;
 
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
-  const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
-  const [showReleaseWorkflow, setShowReleaseWorkflow] = useState<boolean>(false);
-  const [showMortalityWorkflow, setShowMortalityWorkflow] = useState<boolean>(false);
+  // const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
+  // const [showReleaseWorkflow, setShowReleaseWorkflow] = useState<boolean>(false);
+  // const [showMortalityWorkflow, setShowMortalityWorkflow] = useState<boolean>(false);
 
   useEffect(() => {
     const updateFields = (): void => {
@@ -42,15 +40,14 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
     updateFields();
   }, [editing]);
 
-  // fixme: dont instantiate mortality form like this..
-  const alert = new TelemetryAlert();
-  {
-    alert.critter_id = editing.critter_id;
-    alert.collar_id = '12345';
-    alert.device_id = editing.device_id;
-    alert.wlh_id = editing.wlh_id;
-    alert.valid_from = editing.valid_from; // Does this make sense?
-  }
+  // const alert = new TelemetryAlert();
+  // {
+  //   alert.critter_id = editing.critter_id;
+  //   alert.collar_id = '12345';
+  //   alert.device_id = editing.device_id;
+  //   alert.wlh_id = editing.wlh_id;
+  //   alert.valid_from = editing.valid_from; // Does this make sense?
+  // }
 
   const {
     associatedAnimalFields,
@@ -83,7 +80,7 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
       disabled: !canEdit,
       required: requiredFields.includes(key),
       label: editing.formatPropAsHeader(key),
-      span: true
+      span: true,
     });
   };
 
@@ -103,11 +100,14 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
             <span className='span'>Device: {editing.device_id ?? 'Unassigned'}</span>
             <span className='span'>|</span>
             <span className='span'>BCTW ID: {editing.critter_id}</span>
+            <span className='span'>|</span>
+            <span className='span'>Permission: {editing.permission_type}</span>
             <span className='button_span'>
               <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
-                Assign Device to Animal
+                Device Assignment
               </Button>
-              <Button className='button' onClick={(): void => setShowCaptureWorkflow((o) => !o)}>
+              {/* note: add these when workflows completed  */}
+              {/* <Button className='button' onClick={(): void => setShowCaptureWorkflow((o) => !o)}>
                 Capture Event
               </Button>
               <Button className='button' onClick={(): void => setShowReleaseWorkflow((o) => !o)}>
@@ -115,7 +115,7 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
               </Button>
               <Button className='button' onClick={(): void => setShowMortalityWorkflow((o) => !o)}>
                 Mortality Event
-              </Button>
+              </Button> */}
             </span>
           </div>
         </>
@@ -178,12 +178,16 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                     .map((f) => makeFormField(f, onChange))}
                 </div>
                 {/* dont show assignment history for new critters */}
-                {!isCreatingNew && showAssignmentHistory ? (
-                  <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
-                    <AssignmentHistory animalId={editing.critter_id} deviceId='' canEdit={canEdit} {...props} />
-                  </Modal>
+                {!isCreatingNew ? (
+                  <AssignmentHistory
+                    open={showAssignmentHistory}
+                    handleClose={(): void => setShowAssignmentHistory(false)}
+                    critter_id={editing.critter_id}
+                    permission_type={editing.permission_type}
+                  />
                 ) : null}
-                {!isCreatingNew && showCaptureWorkflow ? (
+
+                {/* {!isCreatingNew && showCaptureWorkflow ? (
                   <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
                     <CaptureWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
                   </Modal>
@@ -200,7 +204,7 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                     handleClose={(): void => setShowMortalityWorkflow(false)}
                     handleSave={null}
                   />
-                ) : null}
+                ) : null} */}
               </Paper>
             </>
           );

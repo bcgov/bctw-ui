@@ -4,6 +4,7 @@ import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';
 import { FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
+import { getInvalidDate, isInvalidDate } from 'utils/time';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -89,7 +90,7 @@ export class Collar implements ICollar {
   purchase_comment: string;
   @Transform(v => v || -1, transformOpt) purchase_month: number;
   @Transform(v => v || -1, transformOpt) purchase_year: number;
-  @Transform(v => v || new Date(), transformOpt) retrieval_date: Date; // @Type(() => Date)
+  @Transform(v => v || getInvalidDate(), transformOpt) retrieval_date: Date;
   @Transform(v => v || false, transformOpt) retrieved: boolean;
   satellite_network: string;
   @Transform(v => v || false, transformOpt) vendor_activation_status: boolean;
@@ -107,8 +108,8 @@ export class Collar implements ICollar {
   }
 
   constructor(collar_type?: eNewCollarType) {
-    this.retrieval_date = new Date();
-    this.malfunction_date = new Date();
+    this.retrieval_date = getInvalidDate()
+    this.malfunction_date = getInvalidDate();
     this.vendor_activation_status = false;
     this.device_id = 0;
     if (collar_type) {
@@ -124,6 +125,16 @@ export class Collar implements ICollar {
     }
     this.frequency = 0;
     this.device_id = 0;
+  }
+
+  toJSON(): Collar {
+    if (isInvalidDate(this.retrieval_date)) {
+      delete this.retrieval_date;
+    }
+    if (isInvalidDate(this.malfunction_date)) {
+      delete this.malfunction_date
+    }
+    return this;
   }
 
   formatPropAsHeader(str: string): string {
@@ -179,7 +190,7 @@ const collarFormFields: Record<string, FormFieldObject[]> = {
   statusFields: [
     { prop: 'device_status', isCode: true },
     { prop: 'malfunction_date' },
-    { prop: 'malfunction_type' },
+    { prop: 'device_malfunction_type', isCode: true },
     { prop: 'device_deployment_status', isCode: true },
     { prop: 'retrieval_date', isDate: true },
     { prop: 'retrieved', isBool: true }

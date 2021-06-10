@@ -61,6 +61,20 @@ export const permissionApi = (props: ApiProps) => {
   }
 
   /**
+   * an endpoint for an owner to view results successful permission requests
+   * that were granted.
+   * permission requests. @returns {PermissionRequest[]}, which queries 
+   * the API schemas user_animal_assignment_v view. Note: some fields
+   * will not be present! ex. request_id 
+   * @param (none) - uses the user's IDIR only
+  */
+  const getPermissionHistory = async (page = 1): Promise<PermissionRequest[]> => {
+    const { data } = await api.get(createUrl({ api: `permission-history`, page}));
+    const converted = data.map(d => plainToClass(PermissionRequest, d));
+    return converted;
+  }
+
+  /**
    * an endpoint for an owner to submit a permission request to grant one or more email addresses access
    * to a list of animals
   */
@@ -85,6 +99,7 @@ export const permissionApi = (props: ApiProps) => {
     grantCritterAccessToUser,
     submitPermissionRequest,
     getPermissionRequest,
+    getPermissionHistory,
     takeActionOnPermissionRequest
   };
 };

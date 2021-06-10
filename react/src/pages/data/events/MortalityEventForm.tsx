@@ -102,7 +102,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
       // hasErrors={(): boolean => objHasErrors(errors)}
       open={open}
       headerComponent={Header}
-      hideHistory={true}>
+      disableHistory={true}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function

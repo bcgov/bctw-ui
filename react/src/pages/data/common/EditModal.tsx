@@ -18,9 +18,8 @@ import { Paper } from '@material-ui/core';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
-  isCreatingNew?: boolean; 
   hideSave?: boolean;
-  hideHistory?: boolean;
+  disableHistory?: boolean;
   showInFullScreen?: boolean;
   onReset?: () => void;
   headerComponent?: JSX.Element;
@@ -51,8 +50,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     onSave,
     onReset,
     headerComponent,
-    isCreatingNew = false,
-    hideHistory = false,
+    disableHistory = false,
     hideSave = false,
     showInFullScreen = true,
   } = props;
@@ -104,7 +102,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const handleSave = (): void => {
     // use Object.assign to preserve class methods
     const body = omitNull(Object.assign(editing, newObj));
-    console.log(JSON.stringify(body, null, 2));
+    // console.log(JSON.stringify(body, null, 2));
     const toSave: IUpsertPayload<T> = { body };
     onSave(toSave);
   };
@@ -156,7 +154,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
           {headerComponent}
           <div style={{ display: 'flex', justifyContent:'flex-end' }}>
             {/* show history button */}
-            {isCreatingNew || hideHistory ? null : (
+            {disableHistory ? null : (
               <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button>
             )}
             {/* save button */}

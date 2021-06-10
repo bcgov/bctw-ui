@@ -3,7 +3,7 @@ import { CritterStrings as CS, FileStrings } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
-import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
+// import ExportImportViewer, { IImportExportProps } from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
@@ -17,16 +17,15 @@ export default function CritterPage(): JSX.Element {
   const [editObj, setEditObj] = useState<Animal>({} as Animal);
 
   // for exporting state
-  const [critterA, setCrittersA] = useState<Animal[]>([]);
-  const [critterU, setCrittersU] = useState<Animal[]>([]);
+  // const [critterA, setCrittersA] = useState<Animal[]>([]);
+  // const [critterU, setCrittersU] = useState<Animal[]>([]);
 
   const handleSelect = (row: Animal): void => {
-    // console.log(`critter_id: ${row.critter_id} p: ${row.permission_type}`);
     setEditObj(row);
   };
 
   // set the export state when table loads
-  const onNewData = (d: Animal[]): void => (d.length && d[0].device_id ? setCrittersA(d) : setCrittersU(d));
+  // const onNewData = (d: Animal[]): void => (d.length && d[0].device_id ? setCrittersA(d) : setCrittersU(d));
 
   // pass this function to the import modal to allow user to download animal csv bulk import
   const handleDownloadTemplate = (): void => {
@@ -41,11 +40,12 @@ export default function CritterPage(): JSX.Element {
     handleClose: null,
   };
 
-  const exportProps = {
-    eMsg: CS.exportText,
-    eTitle: CS.exportTitle,
-    downloadTemplate: handleDownloadTemplate,
-  };
+  // const exportProps: IImportExportProps<Animal> = {
+  //   eMsg: CS.exportText,
+  //   eTitle: CS.exportTitle,
+  //   downloadTemplate: handleDownloadTemplate,
+  //   data: []
+  // };
 
   return (
     <ManageLayout>
@@ -55,19 +55,21 @@ export default function CritterPage(): JSX.Element {
             <DataTable
               headers={assignedCritterProps}
               title={CS.assignedTableTitle}
-              queryProps={{ query: bctwApi.useAssignedCritters, onNewData }}
+              queryProps={{ query: bctwApi.useAssignedCritters}}
               onSelect={handleSelect}
             />
             <DataTable
               headers={unassignedCritterProps}
               title={CS.unassignedTableTitle}
-              queryProps={{ query: bctwApi.useUnassignedCritters, onNewData }}
+              queryProps={{ query: bctwApi.useUnassignedCritters}}
               onSelect={handleSelect}
             />
           </>
         </RowSelectedProvider>
         <div className='button-row'>
-          <ExportImportViewer {...exportProps} data={[...critterA, ...critterU]} />
+          {/* <ExportImportViewer {...exportProps} /> */}
+          {/* render empty div to push add/edit viewer buttons to right */}
+          <div></div> 
           <ModifyCritterWrapper editing={editObj}>
             <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
               <EditCritter {...editProps} />

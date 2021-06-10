@@ -46,11 +46,14 @@ export const userApi = (props: ApiProps) => {
    * @returns {TelemetryAlert[]} that the user has access to (through their critters)
   */
   const getUserAlerts = async (): Promise<TelemetryAlert[]> => {
-    // console.log('fetching user alerts')
     const url = createUrl({ api: 'get-user-alerts' });
     const { data } = await api.get(url);
-    const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
-    return converted;
+    // console.log('user alerts fetched', data);
+    if (data && Array.isArray(data)) {
+      const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
+      return converted;
+    }
+    return [];
   };
 
   /**

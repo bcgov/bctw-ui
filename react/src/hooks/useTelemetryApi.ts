@@ -69,9 +69,7 @@ export const useTelemetryApi = () => {
   const eventApi = event_api({ api });
   const permissionApi = permission_api({ api});
 
-  const defaultQueryOptions = {
-    refetchOnWindowFocus: false
-  };
+  const defaultQueryOptions = { refetchOnWindowFocus: false };
 
   /**
    *
@@ -149,17 +147,6 @@ export const useTelemetryApi = () => {
       () => critterApi.getCritters(page, eCritterFetchType.unassigned),
       critterOptions
     );
-
-  /**
-   * retrieves all critters, must be admin
-   * note: deprecated?
-  */
-  // const useAllCritters = (page: number): UseQueryResult<Animal[]> =>
-  //   useQuery<Animal[], AxiosError>(
-  //     ['critters', page],
-  //     () => critterApi.getCritters(page, eCritterFetchType.all),
-  //     critterOptions
-  //   );
 
   /**
    * @returns a list of critters representing the audit history of @param critterId
@@ -274,7 +261,12 @@ export const useTelemetryApi = () => {
 
   /** see permission_api documentation */
   const usePermissionRequests = (): UseQueryResult<PermissionRequest[], AxiosError> => {
-    return useQuery<PermissionRequest[], AxiosError>(['getRequests'], () => permissionApi.getPermissionRequest());
+    return useQuery<PermissionRequest[], AxiosError>(['getRequests'], () => permissionApi.getPermissionRequest(), defaultQueryOptions);
+  }
+
+  /** see permission_api documentation */
+  const usePermissionHistory = (page: number): UseQueryResult<PermissionRequest[], AxiosError> => {
+    return useQuery<PermissionRequest[], AxiosError>(['getRequestHistory', page], () => permissionApi.getPermissionHistory(page), defaultQueryOptions);
   }
 
   /**
@@ -392,6 +384,7 @@ export const useTelemetryApi = () => {
     useExport,
     useUDF,
     usePermissionRequests,
+    usePermissionHistory,
     // mutations
     useMutateCodeHeader,
     useMutateBulkCsv,

@@ -24,9 +24,9 @@ type ISelectProps = SelectProps & {
  * @param defaultValue default code description to display
  * @param changeHandler called when a dropdown option is selected
  * @param multiple specific props:
-    * @param changeHandlerMultiple
-    * @param triggerReset unchecks all selected values
-    * @param addEmptyOption optionally add a 'blank' entry to end of select options
+ *   @param changeHandlerMultiple
+ *   @param triggerReset unchecks all selected values
+ *   @param addEmptyOption optionally add a 'blank' entry to end of select options
 */
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage

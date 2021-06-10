@@ -1,6 +1,6 @@
 import { Animal } from 'types/animal';
 import { cloneElement, useState, useEffect } from 'react';
-import { eCritterPermission, permissionCanModify  } from 'types/permission';
+import { permissionCanModify  } from 'types/permission';
 import { useQueryClient } from 'react-query';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -14,14 +14,17 @@ type IModifyWrapperProps = {
   children: JSX.Element;
 };
 
-// wraps the AddEditViewer to provide additional critter/user-specific functionality
+/**
+ * wraps child components to provide the actual POST request endpoints for the animal 
+ * includes editing and deletes
+ */
 export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
 
   const { editing, children } = props;
-  const [perm, setPerm] = useState<eCritterPermission>(eCritterPermission.none);
+  const [canEdit, setCanEdit] = useState<boolean>(false);
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
 
@@ -56,10 +59,11 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const { mutateAsync: saveMutation } = bctwApi.useMutateCritter({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
-  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
+  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<void> => {
     const { body } = a;
     const formatted = body.toJSON();
-    return await saveMutation({ body: formatted});
+    console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
+    await saveMutation({ body: formatted});
   } 
 
   const deleteCritter = async (critterId: string): Promise<void> => {
@@ -73,7 +77,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   useEffect(() => {
     const upd = (): void => {
       setHasCollar(!!editing?.device_id)
-      setPerm(editing?.permission_type)
+      setCanEdit(permissionCanModify(editing?.permission_type));
     }
     upd();
   }, [editing]);
@@ -96,8 +100,9 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     responseDispatch({ severity: 'error', message: `missing required fields: ${Object.keys(errors).join(', ')}` });
   }
 
-  const passTheseProps /* : Pick<IAddEditProps<Animal>, 'onDelete' | 'onSave' | 'cannotEdit'>*/ = {
-    cannotEdit: !permissionCanModify(perm),
+  // pass the permission_type down so the AddEditViewer can set the edit/view button status
+  const passTheseProps = {
+    cannotEdit: !canEdit,
     onDelete: handleDeleteButtonClicked,
     onSave: saveCritter,
     validateFailed

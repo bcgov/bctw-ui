@@ -14,6 +14,7 @@ import { formatAxiosError } from 'utils/common';
 import { Icon, NotificationMessage } from 'components/common';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import DataTable from 'components/table/DataTable';
 
 /**
  *
@@ -42,6 +43,7 @@ export default function OwnerRequestPermission(): JSX.Element {
     console.log('successful request submission', data);
     responseDispatch({severity: 'success', message: 'permission request submitted succssfully'});
     setError('');
+    reset();
   }
 
   const onError = (err: AxiosError): void => {
@@ -232,6 +234,11 @@ export default function OwnerRequestPermission(): JSX.Element {
             </div>
           ) : null
         }
+        <DataTable
+          title={'Successful Permission History (approved by an administrator)'}
+          headers={['animal_id', 'wlh_id', 'requested_for_email', 'requested_at', 'permission_type']}
+          queryProps={{ query: bctwApi.usePermissionHistory}}
+        />
       </>
     </OwnerLayout>
   );

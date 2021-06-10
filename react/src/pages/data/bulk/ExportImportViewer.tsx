@@ -5,7 +5,7 @@ import Export from 'pages/data/bulk/Export';
 // import Import from 'pages/data/bulk/Import';
 import React, { useState } from 'react';
 
-type IImportExportProps<T> = {
+export type IImportExportProps<T> = {
   iTitle?: string;
   iMsg?: string | React.ReactNode;
   eTitle?: string;

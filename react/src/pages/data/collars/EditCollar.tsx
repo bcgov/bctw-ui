@@ -1,29 +1,28 @@
 import { Paper } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
 import { MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT, validateRequiredFields } from 'components/form/form_helpers';
+import { getInputTypesOfT } from 'components/form/form_helpers';
 import { CollarStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { useEffect, useState } from 'react';
 import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
-import { removeProps } from 'utils/common';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import Modal from 'components/modal/Modal';
 import { formatLabel } from 'types/common_helpers';
 import { FormInputType } from 'types/form_types';
 import { permissionCanModify } from 'types/permission';
 
+/**
+ * todo: reimplement auto defaulting of fields based on collar type select
+*/
 export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
-  const { editing, isCreatingNew } = props;
-  //todo: collar editing permission?
-  //todo: reimplement auto defaulting of fields based on collar type select
+  const { isCreatingNew, editing } = props;
 
   // set the collar type when add collar is selected
   const [collarType, setCollarType] = useState<eNewCollarType>(eNewCollarType.Other);
   const [newCollar, setNewCollar] = useState<Collar>(editing);
-  const canEdit = permissionCanModify(editing.permission_type) || editing.collar_id === undefined;
+  const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
   // const title = isCreatingNew ? `Add a new ${collarType} collar` : `Editing device ${editing.device_id}`;
   const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
@@ -37,13 +36,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     );
     setInputTypes(ipt);
   }, [editing, newCollar]);
-
-  // const validate = (o: Collar): boolean => {
-  //   const errors = validateRequiredFields(o, requiredFields);
-  //   console.log(errors);
-  //   setErrors(errors);
-  //   return Object.keys(errors).length === 0;
-  // };
 
   const close = (): void => {
     setCollarType(eNewCollarType.Other);
@@ -110,6 +102,8 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
               <span className='span'>Frequency: {editing?.frequency ? editing.frequencyPadded : '-'} MHz</span>
               <span className='span'>|</span>
               <span className='span'>Deployment Status: {editing?.device_deployment_status}</span>
+              <span className='span'>|</span>
+              <span className='span'>Permission: {editing.permission_type}</span>
               {/* <span className='button_span'>
                 {!isCreatingNew ? (
                   <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
@@ -176,17 +170,17 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                     .filter((f) => purchaseFields.map((x) => x.prop).includes(f.key))
                     .map((d) => makeField(d, onChange))}
                 </div>
-                {!isCreatingNew && showAssignmentHistory ? (
+                {/* {!isCreatingNew && showAssignmentHistory ? (
                   <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
                     <AssignmentHistory
                       assignAnimalToDevice={true}
-                      animalId=''
+                      critter_id=''
                       deviceId={editing.collar_id}
                       canEdit={true}
                       {...props}
                     />
                   </Modal>
-                ) : null}
+                ) : null} */}
               </Paper>
             </>
           );

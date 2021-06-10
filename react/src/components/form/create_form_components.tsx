@@ -25,14 +25,14 @@ function CreateEditTextField(props: CreateInputProps): JSX.Element {
   return typeof value === 'number' ? (
     <NumberField
       propName={key}
-      key={key}
+      key={`input-num-${key}`}
       defaultValue={value as number}
       changeHandler={props.handleChange}
       {...props}
     />
   ) : (
     <TextField
-      key={key}
+      key={`input-text-${key}`}
       propName={key}
       defaultValue={value as string}
       type={type}
@@ -52,6 +52,7 @@ function CreateEditDateField({ formType, handleChange, label, disabled }: Create
       defaultValue={formType.value as Date}
       changeHandler={handleChange}
       disabled={disabled}
+      key={`input-date-${formType.key}`}
     />
   );
 }
@@ -64,6 +65,7 @@ function CreateEditCheckboxField({ formType, handleChange, label, disabled }: Cr
       label={label}
       propName={formType.key}
       disabled={disabled}
+      key={`input-check-${formType.key}`}
     />
   );
 }
@@ -114,7 +116,7 @@ function MakeEditField({
     Comp = CreateEditTextField({ formType, handleChange, errorMessage, disabled, required, label: lbl });
   }
   return span ? (
-    <span className={'edit-form-field-span'}>{Comp}</span>
+    <span key={`span-${formType.key}`} className={'edit-form-field-span'}>{Comp}</span>
   ) : (
     <div key={formType.key} className={'edit-form-field'}>
       {Comp}
