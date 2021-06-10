@@ -374,8 +374,7 @@ if (isProd) {
 } else{
   app
     .get('/onboarding',  onboarding)
-    .post('/onboarding', onboardingAccess)
-    .all('*', onboardingRedirect);
+    .post('/onboarding', onboardingAccess);
 }
 
 if (isTest) {
