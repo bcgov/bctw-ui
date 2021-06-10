@@ -264,6 +264,45 @@ const onboardingAccess = async (req,res) => {
     }
   });
 
+/**
+ * # onboardingRedirect
+ * If you get here you have a valid IDIR.
+ * Check if the user is registerd in the database.
+ * If yes.... Pass through.
+ * Else... Direct to the onboarding page.
+ * @param req {object} Express request object
+ * @param res {object} Express response object
+ * @param next {function} Express function to continue on
+ */
+  const onboardingRedirect = async (req,res,next) => {
+    // Collect all user data from the keycloak object
+    const data = req.kauth.grant.access_token.content;
+    const domain = data.preferred_username.split('@')[1];
+    const user = data.preferred_username.split('@')[0];
+    const email = data.email;
+    const givenName = data.given_name;
+    const familyName = data.family_name;
+
+    // Get a list of all allowed users
+    const sql = 'select idir from bctw.user'
+    const client = await pgPool.connect();
+    const result = await client.query(sql);
+    const idirs = result.rows.map((row) => row.idir);
+    // Is the current user registered: Boolean
+    const registered = (idirs.indexOf(user) > 0) ? true : false;
+
+    // Formulate the url and data to be sent to the onboarding page
+    let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
+    url += `&given=${givenName}&family=${familyName}`;
+
+    if (registered) {
+      next(); // pass through
+    } else {
+      res.redirect(url); // reject and go to the onboarding page
+    }
+    client.release(); // Release database connection
+  };
+
   const pretoken = tokenParcel.data.access_token;
   if (!pretoken) return res.status(500).send('Authentication failed');
   const token = `Bearer ${pretoken}`;
@@ -326,41 +365,7 @@ var app = express()
   .use(gardenGate) // Keycloak Gate
   .get('/onboarding', keycloak.protect(), onboarding)
   .post('/onboarding', keycloak.protect(), onboardingAccess)
-  .all('*', keycloak.protect(), async (req,res,next) => {
-    /**
-     * If you get here you have a valid IDIR.
-     * Check if the user is registerd in the database.
-     * If yes.... Pass through.
-     * Else... Direct to the onboarding page.
-     */
-    // Collect all user data from the keycloak object
-    const data = req.kauth.grant.access_token.content;
-    const domain = data.preferred_username.split('@')[1];
-    const user = data.preferred_username.split('@')[0];
-    const email = data.email;
-    const givenName = data.given_name;
-    const familyName = data.family_name;
-
-    // Get a list of all allowed users
-    const sql = 'select idir from bctw.user'
-    const client = await pgPool.connect();
-    const result = await client.query(sql);
-    const idirs = result.rows.map((row) => row.idir);
-    // Is the current user registered: Boolean
-    const registered = (idirs.indexOf(user) > 0) ? true : false;
-
-    // Formulate the url and data to be sent to the onboarding page
-    let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
-    url += `&given=${givenName}&family=${familyName}`;
-    console.log('params to /onboarding page',url);
-
-    if (registered) {
-      next(); // pass through
-    } else {
-      res.redirect(url); // reject and go to the onboarding page
-    }
-    client.release(); // Release database connection
-  })
+  .all('*', keycloak.protect(), onboardingRedirect)
   .get('/denied', denied);
 
 if (isTest) {
