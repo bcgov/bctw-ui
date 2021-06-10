@@ -333,7 +333,6 @@ var app = express()
      * If yes.... Pass through.
      * Else... Direct to the onboarding page.
      */
-    console.log('content barf',req.kauth.grant.access_token.content);
     // Collect all user data from the keycloak object
     const data = req.kauth.grant.access_token.content;
     const domain = data.preferred_username.split('@')[1];
