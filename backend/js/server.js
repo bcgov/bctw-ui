@@ -255,6 +255,7 @@ const onboardingRedirect = async (req,res,next) => {
   let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
   url += `&given=${givenName}&family=${familyName}`;
 
+
   if (registered) {
     next(); // pass through
   } else {
@@ -272,8 +273,13 @@ const onboardingRedirect = async (req,res,next) => {
  */
 const onboarding = (req,res) => {
   // Collect all user data from the keycloak object
-  const data = req.kauth.grant.access_token.content;
-  const firstName = data.given_name;
+  let firstName
+  if (req.kauth.grant) {
+    const data = req.kauth.grant.access_token.content;
+    firstName = data.given_name;
+  } else {
+    firstName = '';
+  }
 
   const template = pug.compileFile('onboarding/index.pug')
   const html = template({firstName});
