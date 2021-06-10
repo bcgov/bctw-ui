@@ -277,9 +277,8 @@ const onboarding = (req,res) => {
 };
 
 const onboardingAccess = async (req,res) => {
-  const email = req.body.email;
-  // Reject if no email
-  if (!email) return res.status(406).send('No email supplied');
+  // This data will be inserted into the email
+  const {user, domain, email, firstName, lastName, msg} = req.body;
 
   // Get all the environment variable dependencies
   const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
@@ -309,7 +308,17 @@ const onboardingAccess = async (req,res) => {
   const token = `Bearer ${pretoken}`;
 
   const emailMessage = `
-    Access to the BC Telemetry Warehouse has be requested by
+    <div>
+      <p>Access to the BC Telemetry Warehouse has be requested by
+      ${domain} user ${firstName} ${lastName}. Username is ${user}</p>.
+      <p>Provided reason is as follows:</p>
+    </div>
+
+    <div style="margin=10px; border-style:solid; border-width:1px;
+    border-color: #626262 color: #626262 padding=5px border-radius:10px>
+      <p>${msg}</p>
+    </div>
+    <hr>
     <a href="mailto:${email}">${email}</a>.
   `
   const emailPayload = {
