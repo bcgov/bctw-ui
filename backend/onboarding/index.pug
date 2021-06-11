@@ -19,14 +19,13 @@ html
       .title Telemetry Warehouse
 
       p.desc
-        | Thank you for your interest in the BC Telemetry Warehouse.  To request access please submit your email and someone will contact you shortly.
+        | Thank you for your interest in the BC Telemetry Warehouse #{firstName}.  Please submit a reason for requesting access below.
 
       form
         .input-field
-          i(class='material-icons prefix') mail_outline
-          input(id='icon_prefix' type='email' class='validate')
-          label(for='icon_prefix') Email Address 
-          span(class='helper-text' data-error='Invalid Email' data-success='Valid Email')
+          i(class='material-icons prefix') assignment
+          textarea(id='icon_prefix' class='materialize-textarea')
+          label(for='icon_prefix') Reason for requesting access
         a(
           class='waves-effect waves-light btn'
           onclick='clicked()'

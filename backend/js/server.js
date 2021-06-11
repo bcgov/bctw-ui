@@ -225,6 +225,46 @@ const authenticate = function (req, res, next) {
 };
 
 /**
+ * # onboardingRedirect
+ * If you get here you have a valid IDIR.
+ * Check if the user is registerd in the database.
+ * If yes.... Pass through.
+ * Else... Direct to the onboarding page.
+ * @param req {object} Express request object
+ * @param res {object} Express response object
+ * @param next {function} Express function to continue on
+ */
+const onboardingRedirect = async (req,res,next) => {
+  // Collect all user data from the keycloak object
+  const data = req.kauth.grant.access_token.content;
+  const domain = data.preferred_username.split('@')[1];
+  const user = data.preferred_username.split('@')[0];
+  const email = data.email;
+  const givenName = data.given_name;
+  const familyName = data.family_name;
+
+  // Get a list of all allowed users
+  const sql = 'select idir from bctw.user'
+  const client = await pgPool.connect();
+  const result = await client.query(sql);
+  const idirs = result.rows.map((row) => row.idir);
+  // Is the current user registered: Boolean
+  const registered = (idirs.includes(user)) ? true : false;
+
+  // Formulate the url and data to be sent to the onboarding page
+  let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
+  url += `&given=${givenName}&family=${familyName}`;
+
+
+  if (registered) {
+    next(); // pass through
+  } else {
+    res.redirect(url); // reject and go to the onboarding page
+  }
+  client.release(); // Release database connection
+};
+
+/**
  * # onboarding
  * Accept requests for access to the site.
  * Send requests to product owner via email (CHES).
@@ -232,15 +272,23 @@ const authenticate = function (req, res, next) {
  * @param res {object} Express response object
  */
 const onboarding = (req,res) => {
+  // Collect all user data from the keycloak object
+  let firstName
+  if (req.kauth.grant) {
+    const data = req.kauth.grant.access_token.content;
+    firstName = data.given_name;
+  } else {
+    firstName = '';
+  }
+
   const template = pug.compileFile('onboarding/index.pug')
-  const html = template();
+  const html = template({firstName});
   res.status(200).send(html);
 };
 
 const onboardingAccess = async (req,res) => {
-  const email = req.body.email;
-  // Reject if no email
-  if (!email) return res.status(406).send('No email supplied');
+  // This data will be inserted into the email
+  const {user, domain, email, firstName, lastName, msg} = req.body;
 
   // Get all the environment variable dependencies
   const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
@@ -264,12 +312,23 @@ const onboardingAccess = async (req,res) => {
     }
   });
 
+
   const pretoken = tokenParcel.data.access_token;
   if (!pretoken) return res.status(500).send('Authentication failed');
   const token = `Bearer ${pretoken}`;
 
   const emailMessage = `
-    Access to the BC Telemetry Warehouse has be requested by
+    <div>
+      <p>Access to the BC Telemetry Warehouse has be requested by
+      ${domain} user ${firstName} ${lastName}. Username is ${user}</p>.
+      <p>Provided reason is as follows:</p>
+    </div>
+
+    <div style="margin=10px; border-style:solid; border-width:1px;
+    border-color: #626262 color: #626262 padding=5px border-radius:10px>
+      <p>${msg}</p>
+    </div>
+    <hr>
     <a href="mailto:${email}">${email}</a>.
   `
   const emailPayload = {
@@ -324,45 +383,18 @@ var app = express()
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
-  .get('/onboarding', keycloak.protect(), onboarding)
-  .post('/onboarding', keycloak.protect(), onboardingAccess)
-  .all('*', keycloak.protect(), async (req,res,next) => {
-    /**
-     * If you get here you have a valid IDIR.
-     * Check if the user is registerd in the database.
-     * If yes.... Pass through.
-     * Else... Direct to the onboarding page.
-     */
-    console.log('content barf',req.kauth.grant.access_token.content);
-    // Collect all user data from the keycloak object
-    const data = req.kauth.grant.access_token.content;
-    const domain = data.preferred_username.split('@')[1];
-    const user = data.preferred_username.split('@')[0];
-    const email = data.email;
-    const givenName = data.given_name;
-    const familyName = data.family_name;
-
-    // Get a list of all allowed users
-    const sql = 'select idir from bctw.user'
-    const client = await pgPool.connect();
-    const result = await client.query(sql);
-    const idirs = result.rows.map((row) => row.idir);
-    // Is the current user registered: Boolean
-    const registered = (idirs.indexOf(user) > 0) ? true : false;
-
-    // Formulate the url and data to be sent to the onboarding page
-    let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
-    url += `&given=${givenName}&family=${familyName}`;
-    console.log('params to /onboarding page',url);
-
-    if (registered) {
-      next(); // pass through
-    } else {
-      res.redirect(url); // reject and go to the onboarding page
-    }
-    client.release(); // Release database connection
-  })
   .get('/denied', denied);
+
+if (isProd) {
+  app
+    .get('/onboarding', keycloak.protect(), onboarding)
+    .post('/onboarding', keycloak.protect(), onboardingAccess)
+    .all('*', keycloak.protect(), onboardingRedirect);
+} else{
+  app
+    .get('/onboarding',  onboarding)
+    .post('/onboarding', onboardingAccess);
+}
 
 if (isTest) {
   app
