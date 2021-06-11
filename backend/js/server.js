@@ -287,6 +287,7 @@ const onboarding = (req,res) => {
 };
 
 const onboardingAccess = async (req,res) => {
+  console.log(req.body);
   // This data will be inserted into the email
   const {user, domain, email, firstName, lastName, msg} = req.body;
 
@@ -294,7 +295,7 @@ const onboardingAccess = async (req,res) => {
   console.log('domain',domain)
   console.log('email',email)
   console.log('firstName',firstName)
-  console.log('lastName',firstName)
+  console.log('lastName',lastName)
   console.log('msg',msg)
 
   // Get all the environment variable dependencies
