@@ -21,6 +21,10 @@ const clicked = async () => {
     lastName,
     msg
   }
+  console.log('payload',payload)
+  console.log(payload)
+  console.log('msg',msg)
+  console.log(msg)
 
   /**
    * If valid email...
