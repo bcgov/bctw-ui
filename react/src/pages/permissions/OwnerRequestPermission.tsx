@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { IconButton, Typography } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import OwnerLayout from 'pages/layouts/OwnerLayout';
-import { eCritterPermission, IPermissionRequestInput, PermissionRequestInput } from 'types/permission';
+import { eCritterPermission, IPermissionRequestInput, ownerPermissionOptions, PermissionRequestInput, permissionTableBasicHeaders } from 'types/permission';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import TextField from 'components/form/TextInput';
 import EditTable, { EditTableRowAction } from 'components/table/EditTable';
@@ -15,6 +15,7 @@ import { Icon, NotificationMessage } from 'components/common';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import DataTable from 'components/table/DataTable';
+import { IUserCritterAccessInput } from 'types/user';
 
 /**
  *
@@ -94,10 +95,9 @@ export default function OwnerRequestPermission(): JSX.Element {
   };
 
   const handleSavePermission = async (): Promise<void> => {
-    const critter_permissions_list = permission.access.map(a => ({animal_id: a.critter_id, permission_type: a.permission_type}));
     const body: IPermissionRequestInput = {
       user_email_list: emailList,
-      critter_permissions_list,
+      critter_permissions_list: permission.access,
     }
     console.log(JSON.stringify(body, null, 2))
     mutateAsync(body);
@@ -180,6 +180,17 @@ export default function OwnerRequestPermission(): JSX.Element {
     );
   };
 
+  // the submit button state
+  const canSubmitRequest = (): boolean => {
+    const access = permission?.access ?? [];
+    access.forEach((a: IUserCritterAccessInput) => {
+      if (!ownerPermissionOptions.includes(a.permission_type)) {
+        return false;
+      }
+    })
+    return !!(emailList.length && access.length)
+  }
+
   const renderAddEmailBtn = (): JSX.Element => (
     <Button disabled={!email.length || emailErr} onClick={handleAddEmail}>
       Add Email
@@ -201,7 +212,7 @@ export default function OwnerRequestPermission(): JSX.Element {
           <li>An administrator will be notified of the pending request</li>
         </ol>
         <EditTable
-          canSave={!!(emailList.length && permission?.access?.length)}
+          canSave={canSubmitRequest()}
           columns={[renderEmailField, renderAddEmailBtn, renderEmailList, renderCritterList, renderPermissionList, renderCommentField]}
           data={[new PermissionRequestInput()]}
           headers={['', '', 'Emails', 'Animal Identifier', 'Permission Type', 'Submission Comment', 'Edit', 'Reset']}
@@ -213,8 +224,6 @@ export default function OwnerRequestPermission(): JSX.Element {
           showReset={true}
           saveButtonText={'Submit Permission Request'}
         />
-        {/* todo:... */}
-        {/* <Typography>View past permission requests</Typography> */}
         <PickCritterPermissionModal
           open={showPickCritterModal}
           handleClose={(): void => setShowPickCritterModal(false)}
@@ -223,6 +232,7 @@ export default function OwnerRequestPermission(): JSX.Element {
           filter={[eCritterPermission.owner]}
           title={`Select Animals`}
           showSelectPermission={true}
+          headersToShow={permissionTableBasicHeaders.filter(p => p !== 'permission_type')}
         />
         {
           error ? (

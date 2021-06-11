@@ -2,13 +2,13 @@ import { Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
 import { Animal } from './animal';
 import { BCTW } from './common_types';
+import { IUserCritterAccessInput } from './user';
 
 export enum eCritterPermission {
   owner = 'owner', // the user created this object
-  subowner = 'subowner', //
-  view = 'view',
-  none = 'none',
-  change = 'change', // to be removed
+  editor = 'editor', // previously 'subowner'
+  observer = 'observer', // previously 'view'
+  none = 'none', // 
   admin = 'admin' // technically not an option
 }
 
@@ -16,13 +16,12 @@ export enum eCritterPermission {
 // the endpoint to fetch critter permissions uses this as a default option
 const filterOutNonePermissions: eCritterPermission[] = [
   eCritterPermission.owner,
-  eCritterPermission.subowner,
-  eCritterPermission.view,
-  eCritterPermission.change
+  eCritterPermission.editor,
+  eCritterPermission.observer,
 ];
 
 // an owner can delegate these animal permissions to other users
-const ownerPermissionOptions: eCritterPermission[] = [eCritterPermission.subowner, eCritterPermission.view];
+const ownerPermissionOptions: eCritterPermission[] = [eCritterPermission.editor, eCritterPermission.observer];
 // standard for what an admin should see - includes 'none'
 const adminPermissionOptions: eCritterPermission[] = [...filterOutNonePermissions, eCritterPermission.none];
 
@@ -34,24 +33,15 @@ const permissionTableBasicHeaders = ['animal_id', 'wlh_id', 'device_id', 'device
  * users to receive animal permissions
 */
 export interface IPermissionRequestInput {
-  // request_id: number;
   user_email_list: string[];
-  // note: actually the critter_id :(
-  // todo: convert to IUserCritterAccess?
-  critter_permissions_list: {
-    animal_id: string;
-    permission_type: eCritterPermission;
-  }[];
+  critter_permissions_list: IUserCritterAccessInput[];
   request_comment?: string;
 }
 
 export class PermissionRequestInput implements IPermissionRequestInput {
   request_id: number;
   user_email_list: string[];
-  critter_permissions_list: {
-    animal_id: string;
-    permission_type: eCritterPermission;
-  }[];
+  critter_permissions_list: IUserCritterAccessInput[];
   request_comment: string;
 }
 
@@ -96,12 +86,16 @@ export class PermissionRequest implements BCTW, IPermissionRequest {
   }
 }
 
+/**
+ * the requests view splits one permission request into multiple rows
+ * for each user email and critter/permission. This interface is used to group
+ * requests by @property {request_id}
+ */
 export interface IGroupedRequest {
   id: number;
   requests: PermissionRequest[];
 }
 
-// todo: doc
 const groupPermissionRequests = (r: PermissionRequest[]): IGroupedRequest[] => {
   const result = [];
   r.forEach(req => {
@@ -127,7 +121,7 @@ export interface IExecutePermissionRequest extends Pick<IPermissionRequest, 'req
 
 /* permission-related helpers */
 const permissionCanModify = (p: eCritterPermission): boolean => {
-  return p === eCritterPermission.admin || p === eCritterPermission.subowner || p === eCritterPermission.owner;
+  return p === eCritterPermission.admin || p === eCritterPermission.editor || p === eCritterPermission.owner;
 };
 
 const canRemoveDeviceFromAnimal = (p: eCritterPermission): boolean => {

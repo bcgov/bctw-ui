@@ -7,7 +7,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AuthLayout from 'pages/layouts/AuthLayout';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getUniqueValuesOfT } from 'types/common_helpers';
 import { groupPermissionRequests, IExecutePermissionRequest, IGroupedRequest } from 'types/permission';
 import { formatAxiosError } from 'utils/common';
@@ -24,6 +24,12 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   const [isGrant, setIsGrant] = useState<boolean>(false);
   const [selectedRequestID, setSelectedRequestID] = useState<number>();
+
+  useEffect(() => {
+    if (data) {
+      setRequests(groupPermissionRequests(data));
+    }
+  }, [data])
 
   // set permission request state on fetch
   useDidMountEffect(() => {
