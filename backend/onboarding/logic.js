@@ -21,10 +21,6 @@ const clicked = async () => {
     lastName,
     msg
   }
-  console.log('payload',payload)
-  console.log(payload)
-  console.log('msg',msg)
-  console.log(msg)
 
   /**
    * If valid email...
@@ -35,7 +31,7 @@ const clicked = async () => {
   if (re.test(email)) {
     const request = new Request('/onboarding',{
       method: 'POST',
-      body: payload,
+      body: JSON.stringify(payload),
       headers: {'content-Type': 'application/json'}
     });
 

@@ -335,17 +335,20 @@ const onboardingAccess = async (req,res) => {
 
   const emailMessage = `
     <div>
-      <p>Access to the BC Telemetry Warehouse has be requested by
-      ${domain} user ${firstName} ${lastName}. Username is ${user}</p>.
-      <p>Provided reason is as follows:</p>
+      Access to the BC Telemetry Warehouse has be requested by
+      ${domain} user ${firstName} ${lastName}. Username is ${user}.
+    </div>
+    <div>
+      Provided reason is as follows:
     </div>
 
     <div style="margin=10px; border-style:solid; border-width:1px;
-    border-color: #626262 color: #626262 padding=5px border-radius:10px>
-      <p>${msg}</p>
+    border-color: #626262; color: #626262; padding=5px; border-radius:10px;">
+      ${msg}
     </div>
-    <hr>
-    <a href="mailto:${email}">${email}</a>.
+    <div style="border-width: 1px; border-color: #626262; border-style: solid none none none;">
+      <a href="mailto:${email}">${email}</a>.
+    </div>
   `
 
   console.log(emailMessage);
