@@ -290,6 +290,13 @@ const onboardingAccess = async (req,res) => {
   // This data will be inserted into the email
   const {user, domain, email, firstName, lastName, msg} = req.body;
 
+  console.log('user',user)
+  console.log('domain',domain)
+  console.log('email',email)
+  console.log('firstName',firstName)
+  console.log('lastName',firstName)
+  console.log('msg',msg)
+
   // Get all the environment variable dependencies
   const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
   const apiUrl = `${process.env.BCTW_CHES_API_URL}/api/v1/email`;
@@ -298,10 +305,18 @@ const onboardingAccess = async (req,res) => {
   const fromEmail = process.env.BCTW_CHES_FROM_EMAIL;
   const toEmail = process.env.BCTW_CHES_TO_EMAIL;
 
+  console.log('tokenUrl',tokenUrl)
+  console.log('apiUrl',apiUrl)
+  console.log('username',username)
+  console.log('password',password)
+  console.log('fromEmail',fromEmail)
+  console.log('toEmail',toEmail)
+
   // Create the authorization hash
   const prehash = Buffer.from(`${username}:${password}`,'utf8')
     .toString('base64');
   const hash = `Basic ${prehash}`;
+  console.log('hash',hash)
 
   const tokenParcel = await axios.post(
     tokenUrl,
@@ -331,6 +346,9 @@ const onboardingAccess = async (req,res) => {
     <hr>
     <a href="mailto:${email}">${email}</a>.
   `
+
+  console.log(emailMessage);
+
   const emailPayload = {
     subject: 'Access request for the BC Telemetry Warehouse',
     priority: 'normal',
