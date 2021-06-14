@@ -5,9 +5,9 @@ import Button from 'components/form/Button';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
-import { useEffect } from 'react';
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { CollarHistory } from 'types/collar_history';
@@ -24,7 +24,7 @@ type IPerformAssignmentActionProps = Pick<IAssignmentHistoryProps, 'critter_id' 
  * consists of:
  *  1. a confirmation dialog if user chooses to unassign the collar
  *  2. a modal that displays a list of available collars with a save button
-*/
+ */
 export default function PerformAssignmentAction({
   critter_id,
   collar_id,
@@ -36,16 +36,35 @@ export default function PerformAssignmentAction({
   const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
   // state to manage if a collar is being linked or removed
   const [isLink, setIsLink] = useState<boolean>(!!collar_id);
+  const [canEdit, setCanEdit] = useState<boolean>(false);
   const responseDispatch = useResponseDispatch();
-  // only owners and administrators can unlink devices
-  const [canEdit] = useState<boolean>(canRemoveDeviceFromAnimal(permission_type))
+
+  /**
+   * users with admin/owner permission can attach/unattach devices
+   * users with editor permission can only unattach devices
+   */
+  const determineButtonState = (): boolean => {
+    if (canRemoveDeviceFromAnimal(permission_type)) {
+      return true;
+    }
+    if (permission_type === 'editor') {
+      return isLink ? false : true;
+    }
+    return false;
+  };
+
+  useDidMountEffect(() => {
+    // console.log(`perm: ${permission_type}, islink : ${isLink}`);
+    setIsLink(!!collar_id);
+    setCanEdit(determineButtonState());
+  }, [collar_id, critter_id]);
 
   const onSuccess = (data: CollarHistory): void => {
     updateStatus({
       severity: 'success',
       message: `device ${data.collar_id} successfully ${isLink ? 'linked to' : 'removed from'} critter`
     });
-    setIsLink(o => !o);
+    setIsLink((o) => !o);
   };
 
   const onError = (error: AxiosError): void =>
@@ -59,19 +78,14 @@ export default function PerformAssignmentAction({
     updateCollarHistory();
   };
 
-  useEffect(() => {
-    // fixme:
-    // update status when collarId prop updated from parent  why isn't this be happening automatically?
-    setIsLink(!!collar_id);
-  }, [collar_id])
-
   // force the collar history, current assigned/unassigned critter pages to refetch
-  const updateCollarHistory = async(): Promise<void> => {
+  const updateCollarHistory = async (): Promise<void> => {
     queryClient.invalidateQueries('collarAssignmentHistory');
     queryClient.invalidateQueries('critters_unassigned');
     queryClient.invalidateQueries('critters_assigned');
-  }
+  };
 
+  // setup the mutation
   const { mutateAsync } = bctwApi.useMutateLinkCollar({ onSuccess, onError });
 
   const handleClickShowModal = (): void => (isLink ? setShowConfirmModal(true) : setShowAvailableModal(true));
@@ -89,12 +103,14 @@ export default function PerformAssignmentAction({
       isLink: isAssign,
       data: {
         collar_id,
-        animal_id: critter_id,
+        animal_id: critter_id
       }
     };
     if (isAssign) {
+      // if attaching the collar, set the start of the animal/device relationship to now
       payload.data.valid_from = now;
     } else {
+      // otherwise - set the end of the relationship to now
       payload.data.valid_to = now;
     }
     await mutateAsync(payload);
@@ -114,7 +130,9 @@ export default function PerformAssignmentAction({
         show={showAvailableModal}
         onClose={closeModals}
       />
-      <Button disabled={!canEdit} onClick={handleClickShowModal}>{isLink ? 'remove device' : 'assign device' }</Button>
+      <Button disabled={!canEdit} onClick={handleClickShowModal}>
+        {isLink ? 'remove device' : 'assign device'}
+      </Button>
     </>
   );
 }
