@@ -35,6 +35,7 @@ export class User implements IUser {
   formatPropAsHeader(str: string): string {
     switch (str) {
       case 'idir': 
+      case 'id':
       case 'bceid':
         return str.toUpperCase();
       default: 
@@ -73,6 +74,7 @@ export class UserCritterAccess implements IUserCritterAccess {
   critter_id: string;
   animal_id: string;
   wlh_id: string;
+  species: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   device_id: number;

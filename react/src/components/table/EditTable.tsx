@@ -3,6 +3,8 @@ import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@m
 import { Icon } from 'components/common';
 import { BCTW } from 'types/common_types';
 import { IPlainTableProps } from 'components/table/table_interfaces';
+import './table.scss';
+import TableContainer from './TableContainer';
 
 export type EditTableRowAction = 'add' | 'delete' | 'duplicate' | 'edit' | 'reset';
 
@@ -29,7 +31,7 @@ type EditTableProps<T> = IPlainTableProps<T> & EditTableVisibilityProps & {
  * @param columns - array of functions that return a component (rendered before the editing buttons)
  * @param canSave - is the save button enabled
  * @param data - the table data - when @param columns are rendered, the data row at the current row index is passed
- * to the column renderer function as a prop 
+ * to the column renderer function as a prop
  * @param onRowModified - call parent handler with the row clicked and @type {EditTableRowAction}
  * @param onSave - calls parent handler when save button clicked
  */
@@ -53,64 +55,68 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
 
   return (
     <>
-      <Table className={'udf-table'}>
-        <TableHead>
-          <TableRow>
-            {headers.map((h, idx) => (
-              <TableCell align='center' key={`head-${idx}`}>
-                <strong>{h}</strong>
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((u, idx) => {
-            const rowkey = `body-${idx}`;
-            const ComponentsFromProps = columns.map((cb, idx) => <TableCell key={`custom-${idx}`}>{cb(u)}</TableCell>);
+      <TableContainer>
+        <Table className={'root'}>
+          <TableHead>
+            <TableRow>
+              {headers.map((h, idx) => (
+                <TableCell align='center' key={`head-${idx}`}>
+                  <strong>{h}</strong>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((u, idx) => {
+              const rowkey = `body-${idx}`;
+              const ComponentsFromProps = columns.map((cb, idx) => (
+                <TableCell key={`custom-${idx}`}>{cb(u)}</TableCell>
+              ));
 
-            return hideAll ? (
-              <TableRow key={rowkey}>{ComponentsFromProps}</TableRow>
-            ) : (
-              <TableRow key={rowkey}>
-                {ComponentsFromProps}
+              return hideAll ? (
+                <TableRow key={rowkey}>{ComponentsFromProps}</TableRow>
+              ) : (
+                <TableRow key={rowkey}>
+                  {ComponentsFromProps}
 
-                {/* edit button */}
-                {hideEdit ? null : (
-                  <TableCell>
-                    <IconButton onClick={(): void => onRowModified(u, 'edit')}>
-                      <Icon icon='edit' />
-                    </IconButton>
-                  </TableCell>
-                )}
-                {/* delete button */}
-                {hideDelete ? null : (
-                  <TableCell>
-                    <IconButton onClick={(): void => onRowModified(u, 'delete')}>
-                      <Icon icon='close' htmlColor='#8B0000' />
-                    </IconButton>
-                  </TableCell>
-                )}
-                {/* duplicate button */}
-                {hideDuplicate ? null : (
-                  <TableCell>
-                    <IconButton onClick={(): void => onRowModified(u, 'duplicate')}>
-                      <Icon icon='copy' />
-                    </IconButton>
-                  </TableCell>
-                )}
-                {/* reset button (not visible by default) */}
-                {showReset ? (
-                  <TableCell>
-                    <IconButton onClick={(): void => onRowModified(u, 'reset')}>
-                      <Icon icon='reset' />
-                    </IconButton>
-                  </TableCell>
-                ) : null}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                  {/* edit button */}
+                  {hideEdit ? null : (
+                    <TableCell>
+                      <IconButton onClick={(): void => onRowModified(u, 'edit')}>
+                        <Icon icon='edit' />
+                      </IconButton>
+                    </TableCell>
+                  )}
+                  {/* delete button */}
+                  {hideDelete ? null : (
+                    <TableCell>
+                      <IconButton onClick={(): void => onRowModified(u, 'delete')}>
+                        <Icon icon='close' htmlColor='#8B0000' />
+                      </IconButton>
+                    </TableCell>
+                  )}
+                  {/* duplicate button */}
+                  {hideDuplicate ? null : (
+                    <TableCell>
+                      <IconButton onClick={(): void => onRowModified(u, 'duplicate')}>
+                        <Icon icon='copy' />
+                      </IconButton>
+                    </TableCell>
+                  )}
+                  {/* reset button (not visible by default) */}
+                  {showReset ? (
+                    <TableCell>
+                      <IconButton onClick={(): void => onRowModified(u, 'reset')}>
+                        <Icon icon='reset' />
+                      </IconButton>
+                    </TableCell>
+                  ) : null}
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
       {hideAll ? null : (
         <div className={'side-btns'}>
           {hideAdd ? null : (

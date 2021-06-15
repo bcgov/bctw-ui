@@ -3,7 +3,7 @@ import {
   TableCell,
   TableHead as MuiTableHead,
   TableRow,
-  TableSortLabel
+  TableSortLabel,
 } from '@material-ui/core';
 import { createHeadCell } from 'components/table/table_helpers';
 import { BCTW } from 'types/common_types';

@@ -1,23 +1,20 @@
-import React, { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableRow,
-  Toolbar,
-  Typography,
-  Paper,
   Checkbox,
   CircularProgress
 } from '@material-ui/core';
-import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
+import TableContainer from './TableContainer';
+import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from './TablePaginate';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError } from 'utils/common';
-import { ICustomTableColumn, ITableProps, Order } from './table_interfaces';
+import { ICustomTableColumn, ITableFilter, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
 import { BCTW } from 'types/common_types';
@@ -28,8 +25,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 /**
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
- * todo: search filter
-*/
+ */
 export default function DataTable<T extends BCTW>({
   customColumns,
   headers,
@@ -39,33 +35,35 @@ export default function DataTable<T extends BCTW>({
   onSelectMultiple,
   paginate = true,
   isMultiSelect = false,
-  alreadySelected = [],
+  alreadySelected = []
 }: ITableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
 
+  const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState<number>(1);
   const [rowIdentifier, setRowIdentifier] = useState<string>('id');
+  const rowsPerPage = 10;
   /**
    * since data is updated when the page is changed, use the 'values'
    * state to keep track of the entire set of data across pages.
    * this state is passed to the parent select handlers
-  */
+   */
   const [values, setValues] = useState<T[]>([]);
 
   // if a row is selected in a different table, unselect all rows in this table
   useDidMountEffect(() => {
     if (useRowState && data.length) {
-      const found = data.findIndex(p => p[rowIdentifier] === useRowState);
+      const found = data.findIndex((p) => p[rowIdentifier] === useRowState);
       if (found === -1) {
-        setSelected([])
+        setSelected([]);
       }
     }
-  }, [useRowState])
+  }, [useRowState]);
 
   // fetch the data from the props query
   const {
@@ -75,7 +73,7 @@ export default function DataTable<T extends BCTW>({
     error,
     data,
     isPreviousData,
-    isSuccess,
+    isSuccess
   }: UseQueryResult<T[], AxiosError> = query(page, param);
 
   useDidMountEffect(() => {
@@ -92,15 +90,15 @@ export default function DataTable<T extends BCTW>({
       }
       const newV = [];
       // update the values state
-      data.forEach(d => {
-        const found = values.find(v => d[rowIdentifier] === v[rowIdentifier]);
+      data.forEach((d) => {
+        const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
           newV.push(d);
         }
-      })
-      setValues(o => [...o, ...newV]);
+      });
+      setValues((o) => [...o, ...newV]);
     }
-  }, [data])
+  }, [data]);
 
   const handleSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -122,7 +120,7 @@ export default function DataTable<T extends BCTW>({
 
   const handleClickRow = (event: React.MouseEvent<unknown>, id: string): void => {
     if (isMultiSelect && typeof onSelectMultiple === 'function') {
-      handleClickRowMultiEnabled(event, id)
+      handleClickRowMultiEnabled(event, id);
     }
     if (typeof onSelect === 'function' && data?.length) {
       setSelected([id]);
@@ -138,7 +136,7 @@ export default function DataTable<T extends BCTW>({
 
   const handleClickRowMultiEnabled = (event: React.MouseEvent<unknown>, id: string): void => {
     if (typeof onSelectMultiple !== 'function') {
-      return
+      return;
     }
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
@@ -158,7 +156,7 @@ export default function DataTable<T extends BCTW>({
       // send T[] not just the identifiers
       onSelectMultiple(values.filter((d) => newSelected.includes(d[rowIdentifier])));
     }
-  }
+  };
 
   const isSelected = (id: string): boolean => {
     return selected.indexOf(id) !== -1;
@@ -173,6 +171,10 @@ export default function DataTable<T extends BCTW>({
       }
     }
     setPage(page);
+  };
+
+  const handleFilter = (filter: ITableFilter): void => {
+    setFilter(filter);
   };
 
   const renderNoData = (): JSX.Element => (
@@ -190,41 +192,53 @@ export default function DataTable<T extends BCTW>({
   );
 
   const renderToolbar = (): JSX.Element =>
-    isMultiSelect ? (
-      <TableToolbar numSelected={selected.length} title={title} />
-    ) : (
-      <Toolbar className={'toolbar'}>
-        <Typography className={'title'} variant='h6' component='div'>
-          <strong>{title}</strong>
-        </Typography>
-      </Toolbar>
-    );
+    <TableToolbar
+      rowCount={values.length}
+      numSelected={selected.length}
+      title={title}
+      onChangeFilter={handleFilter}
+      filterableProperties={headers ?? Object.keys((data && data[0]) ?? [])}
+    />
 
-  const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
+  const getHeaderProps = (): string[] => headers ?? Object.keys((data && data[0]) ?? []);
+  const headerProps = useMemo(() => getHeaderProps(), []);
+   
+  // called in the render function
+  // determines which values to render, based on page and filters applied
+  const perPage = (): T[] => {
+    const results =
+      filter && filter.term
+        ? fuzzySearchMutipleWords(values, filter.keys && filter.keys.length ? filter.keys : headerProps, filter.term)
+        : values;
+    const start = (rowsPerPage + page - rowsPerPage - 1) * rowsPerPage;
+    const end = rowsPerPage * page - 1;
+    // console.log(`slice start ${start}, slice end ${end}`);
+    return results.length > rowsPerPage ?  results.slice(start, end) : results;
+  };
+
   return (
-    <div className={'root'}>
-      <Paper className={'paper'}>
-        {renderToolbar()}
-        <TableContainer component={Paper}>
-          <Table className={'table'} size='small'>
-            {data === undefined ? null : (
-              <TableHead
-                headersToDisplay={headerProps}
-                headerData={data && data[0]}
-                isMultiSelect={isMultiSelect}
-                numSelected={selected.length}
-                order={order}
-                orderBy={(orderBy as string) ?? ''}
-                onRequestSort={handleSort}
-                onSelectAllClick={handleSelectAll}
-                rowCount={values?.length ?? 0}
-                customHeaders={customColumns?.map((c) => c.header) ?? []}
-              />
-            )}
-            <TableBody>
-              {(data && data.length === 0) || isFetching || isLoading || isError
-                ? renderNoData()
-                : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: BCTW, prop: number) => {
+    <TableContainer toolbar={renderToolbar()}>
+      <>
+        <Table className={'table'} size='small'>
+          {data === undefined ? null : (
+            <TableHead
+              headersToDisplay={headerProps as string[]}
+              headerData={data && data[0]}
+              isMultiSelect={isMultiSelect}
+              numSelected={selected.length}
+              order={order}
+              orderBy={(orderBy as string) ?? ''}
+              onRequestSort={handleSort}
+              onSelectAllClick={handleSelectAll}
+              rowCount={values?.length ?? 0}
+              customHeaders={customColumns?.map((c) => c.header) ?? []}
+            />
+          )}
+          <TableBody>
+            {(values && values.length === 0) || isFetching || isLoading || isError
+              ? renderNoData()
+              : stableSort(perPage(), getComparator(order, orderBy)).map(
+                (obj: BCTW, prop: number) => {
                   const isRowSelected = isSelected(obj[rowIdentifier]);
                   return (
                     <TableRow
@@ -243,7 +257,6 @@ export default function DataTable<T extends BCTW>({
                           <Checkbox
                             color='primary'
                             checked={isRowSelected}
-                            // inputProps={{ 'aria-labelledby': labelId }}
                           />
                         </TableCell>
                       ) : null}
@@ -268,30 +281,20 @@ export default function DataTable<T extends BCTW>({
                         : null}
                     </TableRow>
                   );
-                })}
-            </TableBody>
-          </Table>
-          {
-            !paginate ||
-            isLoading ||
-            isFetching ||
-            isError ||
-            /**
-             * hide pagination when total results are under page limit (10)
-             * possible that only 10 results are actually available, in which 
-             * case the next page will load no new results
-            */
-            (isSuccess && data?.length < 10 && paginate && page === 1)
-              ? null : 
-              <PaginationActions
-                count={data.length}
-                page={page}
-                rowsPerPage={10}
-                onChangePage={handlePageChange}
-              />
-          }
-        </TableContainer>
-      </Paper>
-    </div>
+                }
+              )}
+          </TableBody>
+        </Table>
+        {/* 
+         * hide pagination when total results are under page limit (10)
+         * possible that only 10 results are actually available, in which
+         * case the next page will load no new results
+        */}
+        {!paginate || isLoading || isFetching || isError || 
+        (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
+            <PaginationActions count={data.length} page={page} rowsPerPage={rowsPerPage} onChangePage={handlePageChange} />
+          )}
+      </>
+    </TableContainer>
   );
 }

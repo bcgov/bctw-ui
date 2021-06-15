@@ -103,6 +103,14 @@ interface ITableHeadProps<T> {
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+type FilterOperator = 'equals' | 'contains';
+
+interface ITableFilter {
+  keys: string[];
+  operator: FilterOperator;
+  term: string;
+}
+
 export type {
   HeadCell,
   Order,
@@ -112,5 +120,7 @@ export type {
   IPlainTableProps,
   ITableProps,
   ITableQueryProps,
-  ITableSortProp
+  ITableSortProp,
+  ITableFilter,
+  FilterOperator,
 };

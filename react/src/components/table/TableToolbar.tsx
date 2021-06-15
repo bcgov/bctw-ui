@@ -1,8 +1,7 @@
 import { makeStyles, Toolbar, Typography, lighten } from '@material-ui/core';
-// import { IconButton, Tooltip } from '@material-ui/core';
-// import DeleteIcon from '@material-ui/icons/Delete';
-// import FilterListIcon from '@material-ui/icons/FilterList';
 import clsx from 'clsx';
+import TableFilter from './TableFilters';
+import { ITableFilter } from './table_interfaces';
 
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
@@ -12,24 +11,27 @@ const useToolbarStyles = makeStyles((theme) => ({
   highlight:
     theme.palette.type === 'light'
       ? {
-        color: theme.palette.secondary.main,
-        backgroundColor: lighten(theme.palette.secondary.light, 0.85)
-      }
+          color: theme.palette.secondary.main,
+          backgroundColor: lighten(theme.palette.secondary.light, 0.85)
+        }
       : {
-        color: theme.palette.text.primary,
-        backgroundColor: theme.palette.secondary.dark
-      },
+          color: theme.palette.text.primary,
+          backgroundColor: theme.palette.secondary.dark
+        },
   title: {
     flex: '1 1 100%'
   }
 }));
 
-type TableToolbarProps = {
+type TableToolbarProps<T> = {
   numSelected: number;
+  rowCount: number;
   title: string;
+  filterableProperties: string[];
+  onChangeFilter: (filter: ITableFilter) => void;
 };
 
-export default function TableToolbar(props: TableToolbarProps): JSX.Element {
+export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Element {
   const classes = useToolbarStyles();
   const { numSelected, title } = props;
 
@@ -47,19 +49,7 @@ export default function TableToolbar(props: TableToolbarProps): JSX.Element {
           {title ?? ''}
         </Typography>
       )}
-      {/* {numSelected > 0 ? (
-        <Tooltip title='Delete'>
-          <IconButton aria-label='delete'>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title='Filter list'>
-          <IconButton aria-label='filter list'>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )} */}
+      <TableFilter {...props} />
     </Toolbar>
   );
 }
