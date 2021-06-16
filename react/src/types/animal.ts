@@ -8,7 +8,9 @@ import { FormFieldObject } from 'types/form_types';
 const assignedCritterProps = ['animal_id', 'wlh_id', 'animal_status', 'device_id'];
 const unassignedCritterProps = ['animal_id', 'wlh_id', 'animal_status'];
 
-// properties re-used in Telemetry
+/**
+ * these properties are re-used in Telemetry classes (map.ts)
+ */
 export interface IAnimalTelemetryBase {
   species: string;
   wlh_id: string;
@@ -187,7 +189,7 @@ export class Animal implements IAnimal {
   }
 }
 
-const critterFormFields: Record<string, FormFieldObject[]> = {
+const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   associatedAnimalFields: [
     { prop: 'associated_animal_id' },
     { prop: 'associated_animal_relationship' /*, isCode: true */ }
@@ -241,7 +243,7 @@ const critterFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'mortality_utm_northing' },
     { prop: 'proximate_cause_of_death', isCode: true },
     { prop: 'ultimate_cause_of_death', isCode: true, codeName: 'proximate_cause_of_death' },
-    { prop: 'predation_species', /* isCode: true */ }, // todo:
+    { prop: 'predator_species', /* isCode: true */ }, // todo:
     { prop: 'mortality_comment' },
   ],
   releaseFields: [

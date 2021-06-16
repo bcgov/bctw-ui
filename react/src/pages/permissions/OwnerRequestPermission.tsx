@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { IconButton, Typography } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import OwnerLayout from 'pages/layouts/OwnerLayout';
-import { eCritterPermission, IPermissionRequestInput, ownerPermissionOptions, PermissionRequestInput, permissionTableBasicHeaders } from 'types/permission';
+import { eCritterPermission, IPermissionRequestInput, OwnerHistoryFields, ownerPermissionOptions, PermissionRequestInput } from 'types/permission';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import TextField from 'components/form/TextInput';
 import EditTable, { EditTableRowAction } from 'components/table/EditTable';
@@ -15,7 +15,7 @@ import { Icon, NotificationMessage } from 'components/common';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import DataTable from 'components/table/DataTable';
-import { IUserCritterAccessInput } from 'types/user';
+import { IUserCritterAccessInput, PermissionTableHeaders } from 'types/user';
 
 /**
  *
@@ -215,7 +215,7 @@ export default function OwnerRequestPermission(): JSX.Element {
           canSave={canSubmitRequest()}
           columns={[renderEmailField, renderAddEmailBtn, renderEmailList, renderCritterList, renderPermissionList, renderCommentField]}
           data={[new PermissionRequestInput()]}
-          headers={['', '', 'Emails', 'Animal Identifier', 'Permission Type', 'Submission Comment', 'Edit', 'Reset']}
+          headers={['', '', 'Emails', 'Animal Identifier', 'Permission Type', 'Comment', 'Edit', 'Reset']}
           onRowModified={handleRowModified}
           onSave={handleSavePermission}
           hideAdd={true}
@@ -232,7 +232,7 @@ export default function OwnerRequestPermission(): JSX.Element {
           filter={[eCritterPermission.owner]}
           title={`Select Animals`}
           showSelectPermission={true}
-          headersToShow={permissionTableBasicHeaders.filter(p => p !== 'permission_type')}
+          headersToShow={PermissionTableHeaders.filter(p => p !== 'permission_type')}
         />
         {
           error ? (
@@ -246,7 +246,7 @@ export default function OwnerRequestPermission(): JSX.Element {
         }
         <DataTable
           title={'Successful Permission History (approved by an administrator)'}
-          headers={['animal_id', 'wlh_id', 'requested_for_email', 'requested_at', 'permission_type']}
+          headers={OwnerHistoryFields}
           queryProps={{ query: bctwApi.usePermissionHistory}}
         />
       </>

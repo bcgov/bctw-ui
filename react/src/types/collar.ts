@@ -161,7 +161,7 @@ export class Collar implements ICollar {
   }
 }
 
-const collarFormFields: Record<string, FormFieldObject[]> = {
+const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   communicationFields: [
     { prop: 'device_type', isCode: true },
     { prop: 'satellite_network', isCode: true },
@@ -175,7 +175,7 @@ const collarFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'dropoff_device_id' },
     { prop: 'dropoff_frequency' },
     { prop: 'dropoff_frequency_unit' },
-    { prop: 'implant_device_id' }
+    // { prop: 'implant_device_id' } // fixme:
   ],
   identifierFields: [
     { prop: 'device_id' },

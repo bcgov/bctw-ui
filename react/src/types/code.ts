@@ -1,6 +1,7 @@
 import { BCTW, BCTWBaseType } from './common_types';
 import { Type } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
+import { FormFieldObject } from './form_types';
 
 // used in select multiple component 
 interface ICodeFilter {
@@ -71,6 +72,12 @@ export class CodeHeaderInput implements BCTW, BCTWBaseType {
     return columnToHeader(trimCode);
   }
 }
+
+export const CodeFormFields: FormFieldObject<CodeHeaderInput>[] = [
+  { prop: 'code_header_name' },
+  { prop: 'code_header_title' },
+  { prop: 'code_header_description' },
+];
 
 export type {
   ICode,

@@ -1,9 +1,12 @@
 .root {
   width: 100%;
-  min-height: 450px;
 }
 .table {
-  min-width: 650px;
+  min-width: 600px;
+}
+.table-min-height {
+  min-width: 600px;
+  min-height: 400px;
 }
 .paper {
   width: 100%;

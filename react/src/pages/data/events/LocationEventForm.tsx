@@ -19,7 +19,7 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
   const { event, handleChange } = props;
   const [useUTM, setUseUTM] = useState<string>('utm');
 
-  const formFields = getInputTypesOfT(event, Object.keys(event).map(p => ({prop: p})), []);
+  const formFields = getInputTypesOfT(event, Object.keys(event).map(p => ({prop: p as keyof LocationEvent})), []);
 
   // create the form inputs
   const longField = formFields.find((f) => f.key.includes('longitude'));

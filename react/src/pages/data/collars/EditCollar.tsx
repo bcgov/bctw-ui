@@ -137,37 +137,37 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                 <div className={'dlg-details-section'}>
                   <h3>Identifiers</h3>
                   {inputTypes
-                    .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => identifierFields.map((x) => x.prop as string).includes(f.key))
                     .map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Device Status</h3>
                   {inputTypes
-                    .filter((f) => statusFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => statusFields.map((x) => x.prop as string).includes(f.key))
                     .map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Satellite Network &amp; Beacon Frequency</h3>
                   {inputTypes
-                    .filter((f) => communicationFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => communicationFields.map((x) => x.prop as string).includes(f.key))
                     .map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Comments About This Device</h3>
                   {inputTypes
-                    .filter((f) => userCommentField.map((x) => x.prop).includes(f.key))
+                    .filter((f) => userCommentField.map((x) => x.prop as string).includes(f.key))
                     .map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Additional Device Sensors &amp; Features</h3>
                   {inputTypes
-                    .filter((f) => deviceOptionFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => deviceOptionFields.map((x) => x.prop as string).includes(f.key))
                     .map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Purchase Details</h3>
                   {inputTypes
-                    .filter((f) => purchaseFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => purchaseFields.map((x) => x.prop as string).includes(f.key))
                     .map((d) => makeField(d, onChange))}
                 </div>
                 {/* {!isCreatingNew && showAssignmentHistory ? (

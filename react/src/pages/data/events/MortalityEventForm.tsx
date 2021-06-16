@@ -37,7 +37,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
 
   const formFields = getInputTypesOfT<MortalityEvent>(
     mortalityEvent,
-    mortalityEvent.editableProps.map((c) => ({ prop: c })),
+    mortalityEvent.editableProps.map((c) => ({ prop: c as keyof MortalityEvent})),
     mortalityEvent.propsThatAreCodes
   );
   const required = true;

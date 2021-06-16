@@ -219,7 +219,7 @@ export default function DataTable<T extends BCTW>({
   return (
     <TableContainer toolbar={renderToolbar()}>
       <>
-        <Table className={'table'} size='small'>
+        <Table className={values?.length >= 10 ? 'table-min-height' : 'table'} size='small'>
           {data === undefined ? null : (
             <TableHead
               headersToDisplay={headerProps as string[]}

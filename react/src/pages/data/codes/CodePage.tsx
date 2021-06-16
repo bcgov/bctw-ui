@@ -6,7 +6,7 @@ import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import React, { useState } from 'react';
-import { CodeHeader, CodeHeaderInput, ICodeHeader } from 'types/code';
+import { CodeFormFields, CodeHeader, CodeHeaderInput, ICodeHeader } from 'types/code';
 import { formatAxiosError } from 'utils/common';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditCodeHeader from 'pages/data/codes/EditCodeHeader';
@@ -49,7 +49,7 @@ const CodePage: React.FC = () => {
   };
 
   const editProps = {
-    editableProps: S.editableProps,
+    editableProps: CodeFormFields.map(s => s.prop),
     editing: new CodeHeaderInput(),
     open: false,
     onSave: handleSave,

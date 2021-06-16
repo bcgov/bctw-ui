@@ -7,7 +7,7 @@ import { CritterStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import EditModal from 'pages/data/common/EditModal';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
 import { FormInputType } from 'types/form_types';
 import { permissionCanModify } from 'types/permission';
@@ -138,43 +138,43 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                 <div className={'dlg-details-section'}>
                   <h3>Identifiers</h3>
                   {inputTypes
-                    .filter((f) => identifierFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => identifierFields.map((x) => x.prop as string).includes(f.key))
                     .map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Characteristics</h3>
                   {inputTypes
-                    .filter((f) => characteristicsFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => characteristicsFields.map((x) => x.prop as string).includes(f.key))
                     .map((formType) => makeFormField(formType, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Association With Another Individual</h3>
                   {inputTypes
-                    .filter((f) => associatedAnimalFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => associatedAnimalFields.map((x) => x.prop as string).includes(f.key))
                     .map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Comments About This Animal</h3>
                   {inputTypes
-                    .filter((f) => userCommentField.map((x) => x.prop).includes(f.key))
+                    .filter((f) => userCommentField.map((x) => x.prop as string).includes(f.key))
                     .map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Latest Capture Details</h3>
                   {inputTypes
-                    .filter((f) => captureFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => captureFields.map((x) => x.prop as string).includes(f.key))
                     .map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Latest Release Details</h3>
                   {inputTypes
-                    .filter((f) => releaseFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => releaseFields.map((x) => x.prop as string).includes(f.key))
                     .map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Mortality Details</h3>
                   {inputTypes
-                    .filter((f) => mortalityFields.map((x) => x.prop).includes(f.key))
+                    .filter((f) => mortalityFields.map((x) => x.prop as string).includes(f.key))
                     .map((f) => makeFormField(f, onChange))}
                 </div>
                 {/* dont show assignment history for new critters */}

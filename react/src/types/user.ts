@@ -44,7 +44,7 @@ export class User implements IUser {
   }
 }
 
-export const userFormFields: FormFieldObject[] = [
+export const userFormFields: FormFieldObject<User>[] = [
   { prop: 'idir' },
   { prop: 'bceid' },
   { prop: 'email' },
@@ -86,3 +86,11 @@ export class UserCritterAccess implements IUserCritterAccess {
     return this.animal_id ?? this.wlh_id;
   }
 }
+
+const TestUCA = new UserCritterAccess();
+// what's displayed as fields 'user/critter permission' table modals
+export const PermissionTableHeaders: (keyof typeof TestUCA)[] = [
+  'wlh_id', 'animal_id', 'species',
+  'device_id', 'device_make', 'frequency',
+  'permission_type'
+];

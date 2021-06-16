@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserContext, useUserContextDispatch } from 'contexts/UserContext';
-import { User, userFormFields } from 'types/user';
+import { PermissionTableHeaders, User, userFormFields } from 'types/user';
 import { CircularProgress } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
 import DataTable from 'components/table/DataTable';
@@ -11,7 +11,6 @@ import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useQueryClient } from 'react-query';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import { permissionTableBasicHeaders } from 'types/permission';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
@@ -81,7 +80,7 @@ export default function UserProfile(): JSX.Element {
             return (
               <TextField
                 propName={p.prop}
-                defaultValue={user[prop]}
+                defaultValue={user[prop as string]}
                 disabled={true}
                 label={prop.toUpperCase()}
                 changeHandler={(): void => {}}
@@ -99,7 +98,7 @@ export default function UserProfile(): JSX.Element {
           /> */}
         </div>
         <DataTable
-          headers={permissionTableBasicHeaders}
+          headers={PermissionTableHeaders}
           title='Animals you have access to:'
           queryProps={tableProps}
         />

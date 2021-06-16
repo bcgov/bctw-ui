@@ -23,8 +23,8 @@ type FormInputType = {
  * ex. a device retrieved date could be null, but it should be rendered
  * in a form as a date input
  */
-type FormFieldObject = {
-  prop: string;
+type FormFieldObject<T> = {
+  prop: keyof T;
   isCode?: boolean;
   codeName?: string;
   isDate?: boolean;

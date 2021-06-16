@@ -1,7 +1,8 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
+import { dateObjectToTimeStr } from 'utils/time';
 import { Animal } from './animal';
-import { BCTW } from './common_types';
+import { BCTW, BCTWBaseType } from './common_types';
 import { IUserCritterAccessInput } from './user';
 
 export enum eCritterPermission {
@@ -25,9 +26,6 @@ const ownerPermissionOptions: eCritterPermission[] = [eCritterPermission.editor,
 // standard for what an admin should see - includes 'none'
 const adminPermissionOptions: eCritterPermission[] = [...filterOutNonePermissions, eCritterPermission.none];
 
-// what's displayed as fields in most 'critter picker' tables
-const permissionTableBasicHeaders = ['animal_id', 'wlh_id', 'device_id', 'device_make', 'frequency', 'permission_type'];
-
 /**
  * the type that an 'owner' will submit a request for other
  * users to receive animal permissions
@@ -50,34 +48,52 @@ export class PermissionRequestInput implements IPermissionRequestInput {
  * a) what an admin sees in the requests page - from the API schema view permission_request_v
  * b) what an owner sees in the request history table (some fields)
 */
-export interface IPermissionRequest extends Pick<Animal, 'animal_id' | 'wlh_id'> {
+export interface IPermissionRequest extends 
+  Pick<Animal, 'animal_id' | 'wlh_id' | 'species'>, Pick<BCTWBaseType, 'valid_to'> {
   request_id: number;
   requested_by: string; // idir or bceid
   requested_by_email: string;
   requested_by_name: string;
-  // note: in the case of the owner history - should this be approved at?
-  requested_at: Date;
+  requested_date: Date;
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
   permission_type: eCritterPermission;
-  // flag indicating whether or not the request has been dealt with
-  is_expired: boolean;
+  was_granted: boolean;
+  was_denied_reason: string;
 }
 
+export type PermissionRequestStatus = 'approved' | 'denied' | 'pending' | 'unknown';
 export class PermissionRequest implements BCTW, IPermissionRequest {
   animal_id: string;
   wlh_id: string;
+  species: string;
   request_id: number;
   requested_by: string;
   requested_by_email: string;
   requested_by_name: string;
-  requested_at: Date;
+  // todo: all dates should do this?
+  @Transform((t) => dateObjectToTimeStr(t)) requested_date: Date;
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
   permission_type: eCritterPermission;
-  is_expired: boolean;
+  was_granted: boolean;
+  was_denied_reason: string;
+  valid_to: Date;
+  @Expose() get status(): PermissionRequestStatus {
+    if (this.valid_to === null) {
+      return 'pending';
+    } 
+    switch (this.was_granted) {
+      case true: 
+        return 'approved';
+      case false:
+        return 'denied';
+      default:
+        return 'unknown';
+    }
+  }
   @Expose() get identifier(): string {
     return 'request_id';
   }
@@ -85,6 +101,22 @@ export class PermissionRequest implements BCTW, IPermissionRequest {
     return columnToHeader(str);
   }
 }
+
+// note: new way to create 'typeable' list of fields
+// used in OwnerRequestPermission
+const NewPermRequest = new PermissionRequest();
+const OwnerHistoryFields: (keyof typeof NewPermRequest)[] = [
+  'wlh_id', 'animal_id', 'species', 'requested_date',
+  'requested_for_name', 'requested_for_email',
+  'permission_type', 'status', 'was_denied_reason',
+];
+
+
+// strings that an admin can choose from for default 'im denying this permission because...'
+const ReasonsPermissionWasDenied = [
+  'Not given',
+  'Add other reasons here...',
+];
 
 /**
  * the requests view splits one permission request into multiple rows
@@ -117,6 +149,7 @@ const groupPermissionRequests = (r: PermissionRequest[]): IGroupedRequest[] => {
 */
 export interface IExecutePermissionRequest extends Pick<IPermissionRequest, 'request_id'> {
   is_grant: boolean; // whether or not to approve or deny
+  was_denied_reason: string; // optional message if the request is being denied
 }
 
 /* permission-related helpers */
@@ -134,6 +167,7 @@ export {
   permissionCanModify,
   canRemoveDeviceFromAnimal,
   filterOutNonePermissions,
-  permissionTableBasicHeaders,
-  groupPermissionRequests
+  groupPermissionRequests,
+  OwnerHistoryFields,
+  ReasonsPermissionWasDenied
 };

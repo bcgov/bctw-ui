@@ -2,10 +2,10 @@ import { EditorProps } from 'components/component_interfaces';
 import { getInputTypesOfT } from 'components/form/form_helpers';
 import TextField from 'components/form/TextInput';
 import ChangeContext from 'contexts/InputChangeContext';
-import { CodeHeaderInput } from 'types/code';
+import { CodeFormFields, CodeHeaderInput } from 'types/code';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
-import { CodeStrings, CodeStrings as S } from 'constants/strings';
+import { CodeStrings as S } from 'constants/strings';
 import { removeProps } from 'utils/common';
 import { eInputType } from 'types/form_types';
 
@@ -15,7 +15,7 @@ export default function EditCodeHeader(props: EditorProps<CodeHeaderInput>): JSX
 
   const inputTypes = getInputTypesOfT<CodeHeaderInput>(
     editing,
-    CodeStrings.editableProps.map((e) => ({ prop: e })),
+    CodeFormFields,
     []
   );
   return (
