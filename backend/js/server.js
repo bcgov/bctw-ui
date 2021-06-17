@@ -81,7 +81,7 @@ const proxyApi = function (req, res, next) {
 
   // The parameter string
   const query = Object.keys(req.query).map((key) => {
-    return `${key}=${req.query[key]}`
+    return `${key}=${req.query[key]}`;
   }).join('&');
 
   // The domain and username
