@@ -56,7 +56,7 @@ export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX
   return (
     <>
       <TableContainer>
-        <Table className={'root'}>
+        <Table>
           <TableHead>
             <TableRow>
               {headers.map((h, idx) => (

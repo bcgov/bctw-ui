@@ -48,6 +48,7 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         aria-label="next page"
       ><KeyboardArrowRight /></IconButton>
 
+      {/* note: goto last page not shown */}
       {/* <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
