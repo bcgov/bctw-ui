@@ -296,7 +296,7 @@ const onboardingAccess = async (req,res) => {
   const username = process.env.BCTW_CHES_USERNAME;
   const password = process.env.BCTW_CHES_PASSWORD;
   const fromEmail = process.env.BCTW_CHES_FROM_EMAIL;
-  const toEmail = process.env.BCTW_CHES_TO_EMAIL;
+  const toEmail = process.env.BCTW_CHES_TO_EMAIL.split(',');
 
   // Create the authorization hash
   const prehash = Buffer.from(`${username}:${password}`,'utf8')
@@ -320,7 +320,7 @@ const onboardingAccess = async (req,res) => {
   const emailMessage = `
     <div>
       Access to the BC Telemetry Warehouse has be requested by
-      <b>${domain}</b> user <b>${firstName} ${lastName}</b>. Username is <b>${user}<br>.
+      <b>${domain}</b> user <b>${firstName} ${lastName}</b>. Username is <b>${user}</b>.
     </div>
     <br>
     <div>
@@ -344,7 +344,7 @@ const onboardingAccess = async (req,res) => {
     bodyType: 'html',
     body: emailMessage,
     from: fromEmail,
-    to: [toEmail],
+    to: toEmail,
     cc: [],
     bcc: [],
     delayTS: 0
@@ -390,6 +390,7 @@ var app = express()
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
   .get('/denied', denied);
+
 
 if (isProd) {
   app
