@@ -22,6 +22,8 @@ import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
+// note: const override for disabling pagination
+const DISABLE_PAGINATION = true;
 /**
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
@@ -47,7 +49,8 @@ export default function DataTable<T extends BCTW>({
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState<number>(1);
   const [rowIdentifier, setRowIdentifier] = useState<string>('id');
-  const rowsPerPage = 10;
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const isPaginate = paginate && !DISABLE_PAGINATION;
   /**
    * since data is updated when the page is changed, use the 'values'
    * state to keep track of the entire set of data across pages.
@@ -97,6 +100,7 @@ export default function DataTable<T extends BCTW>({
         }
       });
       setValues((o) => [...o, ...newV]);
+      setRowsPerPage(o => isPaginate ? o : data.length);
     }
   }, [data]);
 
@@ -219,7 +223,7 @@ export default function DataTable<T extends BCTW>({
   return (
     <TableContainer toolbar={renderToolbar()}>
       <>
-        <Table className={values?.length >= 10 ? 'table-min-height' : 'table'} size='small'>
+        <Table stickyHeader size='small'>
           {data === undefined ? null : (
             <TableHead
               headersToDisplay={headerProps as string[]}
@@ -290,7 +294,7 @@ export default function DataTable<T extends BCTW>({
          * possible that only 10 results are actually available, in which
          * case the next page will load no new results
         */}
-        {!paginate || isLoading || isFetching || isError || 
+        {!isPaginate || isLoading || isFetching || isError || 
         (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
             <PaginationActions count={data.length} page={page} rowsPerPage={rowsPerPage} onChangePage={handlePageChange} />
           )}
