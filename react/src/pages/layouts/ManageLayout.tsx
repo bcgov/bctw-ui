@@ -11,8 +11,8 @@ type IDefaultLayoutProps = {
 export default function ManageLayout({ children }: IDefaultLayoutProps): JSX.Element {
   return (
     <>
-      <SideBar routes={AppRoutes} sidebarContent={null} collapseAble={false} />
-      {children}
+      <SideBar routes={AppRoutes} collapseAble={false} />
+      <div className={'content-main'}>{children}</div>
     </>
   );
 }

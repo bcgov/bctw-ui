@@ -28,6 +28,7 @@ export const UserStateContextProvider: React.FC = (props) => {
     const update = (): void => {
       if (status === 'success') {
         const user = data;
+        // console.log('user context: ', user)
         setUserContext({ ready: true, user });
       } else if (isLoading || isFetching) {
         setUserContext({ ready: false, user: null });

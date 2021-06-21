@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { useState, useEffect, useContext } from 'react';
 import { UserContext } from 'contexts/UserContext';
 import { AlertContext } from 'contexts/UserAlertContext';
-import UserAlert from 'pages/user/UserAlert';
+import UserAlert from 'pages/user/UserAlertPage';
 import { Modal } from 'components/common';
 
 type IDefaultLayoutProps = {

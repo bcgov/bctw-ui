@@ -73,7 +73,7 @@ interface IGetCodeProps extends IBaseGetProps {
 
 // types that can be deleted
 interface IDeleteType {
-  objType: 'animal' | 'collar';
+  objType: 'animal' | 'collar' | 'user';
   id: string;
 }
 

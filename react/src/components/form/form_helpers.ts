@@ -9,27 +9,30 @@ const stringsThatAreBools = ['true', 'false'];
  * @param selectableProps which properties will be used in select inputs
  * @return array of @type {FormInputType}
  */
-function getInputTypesOfT<T>(obj: T, editableProps: FormFieldObject[], selectableProps: string[]): FormInputType[] {
-  return editableProps.map((field: FormFieldObject) => {
+function getInputTypesOfT<T>(obj: T, editableProps: FormFieldObject<T>[], selectableProps: string[]): FormInputType[] {
+  return editableProps.map((field: FormFieldObject<T>) => {
     const { prop, isCode, codeName, isDate } = field;
-    if (selectableProps.includes(prop) || isCode) {
-      return { key: prop, type: eInputType.select, value: obj[prop], codeName };
+    const key = prop as string;
+    const value = obj[key];
+
+    if (selectableProps.includes(key) || isCode) {
+      return { key, type: eInputType.select, value, codeName };
     }
-    if (stringsThatAreBools.includes(obj[prop])) {
-      return { key: prop, type: eInputType.check, value: obj[prop] };
+    if (stringsThatAreBools.includes(obj[prop as string])) {
+      return { key, type: eInputType.check, value };
     }
-    const value = obj[prop];
-    if (typeof (value as Date)?.getDay === 'function' || isDate) {
-      return { key: prop, type: eInputType.date, value };
-    } else {
+    if (typeof (value as unknown as Date)?.getDay === 'function' || isDate) {
+      return { key, type: eInputType.date, value };
+    } 
+    else {
       switch (typeof value) {
         case 'number':
-          return { key: prop, type: eInputType.number, value };
+          return { key, type: eInputType.number, value };
         case 'boolean':
-          return { key: prop, type: eInputType.check, value };
+          return { key, type: eInputType.check, value };
         case 'string':
         default:
-          return { key: prop, type: eInputType.text, value };
+          return { key, type: eInputType.text, value };
       }
     }
   });

@@ -4,7 +4,7 @@ import { plainToClass } from 'class-transformer';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTW, BCTWType } from 'types/common_types';
-import { exportQueryParams } from 'types/export';
+import { ExportQueryParams } from 'types/export';
 
 import { IBulkUploadResults } from './api_interfaces';
 
@@ -16,8 +16,8 @@ export const bulkApi = (api: AxiosInstance) => {
     return data;
   };
 
+  /** uploads one or more xml files to be parsed as Vectronic .keyx */
   const uploadFiles = async(form: FormData): Promise<IBulkUploadResults<any>> => {
-    // todo: add multi-file support to server.js
     const url = createUrl({api: 'import-xml'});
     const { data } = await api.post(url, form);
     return data;
@@ -29,7 +29,7 @@ export const bulkApi = (api: AxiosInstance) => {
     return data.map(json => type === 'animal' ? plainToClass(Animal, json) : plainToClass(Collar, json))[0];
   }
 
-  const getExportData = async (body: exportQueryParams): Promise<string[]> => {
+  const getExportData = async (body: ExportQueryParams): Promise<string[]> => {
     const url = createUrl({ api: `export`})
     const { data } = await api.post(url, body);
     const results = data.flat();

@@ -4,11 +4,12 @@ const RowSelectedContext = createContext<string>(null);
 const RowSelectedDispatch = createContext(null);
 
 /**
- * on views with multiple tables that dont have multiselect enabled, we only one one row 
+ * on views with multiple tables that dont have multiselect enabled, only want one one row 
  * selected on the whole page. (ex. main critter/collar pages)
+ * 
  * The table dispatches the unique row ID when selected, which is sets the context state.
  * The table is also listening to context changes, and checks if the row ID is one if its own. 
- * If the row Id selected is not one of its own, it unselects the row. The component with 
+ * If the row ID selected is not one of its own, it unselects the row. The component with 
  * multiple tables must wrap the RowSelectedProvider
  */
 const RowSelectedProvider = (props: { children: React.ReactNode }): JSX.Element => {

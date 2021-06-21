@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { ButtonGroup } from '@material-ui/core';
 import Button from 'components/form/Button';
 import { BCTW } from 'types/common_types';
 import { IUpsertPayload } from 'api/api_interfaces';
 import { IEditModalProps } from 'pages/data/common/EditModal';
+import { EditorProps } from 'components/component_interfaces';
 
 export type IAddEditProps<T> = {
   cannotEdit?: boolean;
@@ -15,6 +15,9 @@ export type IAddEditProps<T> = {
   empty: T;
   onDelete?: (id: string) => void;
   onSave?: (a: IUpsertPayload<T>) => void;
+  editText?: string;
+  addText?: string
+  deleteText?: string;
 };
 
 /**
@@ -30,7 +33,7 @@ export type IAddEditProps<T> = {
  * @param editButton optional - used in map overview screens
  **/
 export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): JSX.Element {
-  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave } = props;
+  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isCreatingNew, setIsCreatingNew] = useState<boolean>(false);
@@ -69,14 +72,17 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
     setShowModal(false);
   };
 
-  // override the open/close handlers and props
-  // of the child EditModal component
-  const editorProps: Pick<IEditModalProps<T>, 'editing' |'open' | 'isCreatingNew' | 'onSave' | 'handleClose'> = {
-    editing: editObj,
-    open: showModal,
+  // override the open/close handlers and props of the child EditModal component
+  const editorProps: Pick<IEditModalProps<T>, 'editing' |'open' | 'onSave' | 'handleClose' | 'disableHistory'>
+  & Pick<EditorProps<T>, 'isCreatingNew'> = {
+    // if this is a new instance - pass an empty object
+    editing: isCreatingNew ? empty : editObj,
+    // required in EditX components (ex. EditCritter)
     isCreatingNew,
+    open: showModal,
+    disableHistory: isCreatingNew,
     handleClose,
-    onSave: handleClickSave
+    onSave: handleClickSave,
   };
 
   // do the same for the edit btn props
@@ -97,17 +103,20 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
 
   return (
     <>
-      {/* clone element to pass additional props to it */}
+      {/* clone child EditModal component to pass additional props */}
       {React.cloneElement(children, editorProps)}
-      <ButtonGroup size='small' variant='contained' color='primary'>
+      <div>
+        {/* render delete button */}
         {enableDelete() ? (
           <Button color='secondary' disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
-            delete
+            {`Delete ${deleteText ?? ''}`}
           </Button>
         ) : null}
-        {disableAdd ? null : <Button onClick={handleClickAdd}>add</Button>}
-        <Button {...editBtnProps}>{cannotEdit ? 'view' : 'edit'}</Button>
-      </ButtonGroup>
+        {/* render add button */}
+        {disableAdd ? null : <Button onClick={handleClickAdd}>{`Add ${addText ?? ''}`}</Button>}
+        {/* render edit button */}
+        <Button {...editBtnProps}>{` ${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}</Button>
+      </div>
     </>
   );
 }

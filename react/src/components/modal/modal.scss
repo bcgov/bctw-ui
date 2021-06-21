@@ -29,6 +29,7 @@
 }
 
 .dlg-full-sub {
+  overflow-y: auto !important;
   .span {
     margin-right: 1rem;
     font-size: larger;
@@ -42,14 +43,12 @@
   }
 }
 
-.dlg-full-body-details {
-  margin-bottom: 2rem;
+.dlg-full-form {
+  margin-top: 5px;
 }
 
 .dlg-details-section {
-  border-bottom: 1px solid #ced4da;
-  padding: 0.5rem 1.5rem;
-  margin-bottom: 1px solid;
+  padding: 0.5;
 }
 
 .MuiAppBar-positionFixed {
@@ -59,11 +58,6 @@
 // on overview pages, make disabled fields normal font color
 .Mui-disabled {
   color: inherit;
-}
-
-// udf modal
-.udf-table {
-  margin-bottom: 0.5rem;
 }
 
 // collar import modal

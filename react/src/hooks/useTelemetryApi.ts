@@ -6,6 +6,7 @@ import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { userApi as user_api } from 'api/user_api';
+import { permissionApi as permission_api } from 'api/permission_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
@@ -13,7 +14,7 @@ import { Animal } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
-import { User, UserCritterAccess } from 'types/user';
+import { IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
   eCritterFetchType,
@@ -23,15 +24,16 @@ import {
   IGrantCritterAccessResults,
   IUpsertPayload,
   IUserCritterPermissionInput
-} from '../api/api_interfaces';
+} from 'api/api_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { BCTW, BCTWType } from 'types/common_types';
-import { exportQueryParams } from 'types/export';
+import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import MortalityEvent from 'types/mortality_event';
+import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, PermissionRequest } from 'types/permission';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -65,10 +67,9 @@ export const useTelemetryApi = () => {
   const mapApi = map_api({ api, testUser });
   const userApi = user_api({ api, testUser });
   const eventApi = event_api({ api });
+  const permissionApi = permission_api({ api});
 
-  const defaultQueryOptions = {
-    refetchOnWindowFocus: false
-  };
+  const defaultQueryOptions = { refetchOnWindowFocus: false };
 
   /**
    *
@@ -128,7 +129,7 @@ export const useTelemetryApi = () => {
   const critterOptions = { ...defaultQueryOptions, keepPreviousData: true };
   /**
    *  retrieves critters that have a collar assigned
-   */
+  */
   const useAssignedCritters = (page: number): UseQueryResult<Animal[]> => {
     return useQuery<Animal[], AxiosError>(
       ['critters_assigned', page],
@@ -139,21 +140,11 @@ export const useTelemetryApi = () => {
 
   /**
    * retrieves critters not assigned to a collar
-   */
+  */
   const useUnassignedCritters = (page: number): UseQueryResult<Animal[]> =>
     useQuery<Animal[], AxiosError>(
       ['critters_unassigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned),
-      critterOptions
-    );
-
-  /**
-   * retrieves all critters, must be admin
-   */
-  const useAllCritters = (page: number): UseQueryResult<Animal[]> =>
-    useQuery<Animal[], AxiosError>(
-      ['critters', page],
-      () => critterApi.getCritters(page, eCritterFetchType.all),
       critterOptions
     );
 
@@ -173,7 +164,7 @@ export const useTelemetryApi = () => {
   /**
    * @param codeHeader the code header name used to determine which codes to fetch
    * @param page not currently used
-   */
+  */
   const useCodes = (page: number, codeHeader: string): UseQueryResult<ICode[], AxiosError> => {
     const props = { page, codeHeader };
     return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), codeOptions);
@@ -181,14 +172,14 @@ export const useTelemetryApi = () => {
 
   /**
    * retrieves list of code headers, no parameters
-   */
+  */
   const useCodeHeaders = (): UseQueryResult<ICodeHeader[], AxiosError> => {
     return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), codeOptions);
   };
 
   /**
    * @param critterId serial integer of the critter to be fetched (not animal_id)
-   */
+  */
   const useCollarAssignmentHistory = (
     page: number,
     critterId: number,
@@ -203,7 +194,7 @@ export const useTelemetryApi = () => {
 
   /**
    * @returns a list of collars represnting the audit history of @param collarId
-   */
+  */
   const useCollarHistory = (page: number, collarId: string, config?: Record<string, unknown>): UseQueryResult => {
     return useQuery<Collar[], AxiosError>(['collarHistory', collarId], () => collarApi.getCollarHistory(collarId), {
       ...config
@@ -228,20 +219,16 @@ export const useTelemetryApi = () => {
   };
 
   /**
-   * @param user idir of the user to receive critter access to
-   * @returns A simplified list of Animals that only has id, animal_id,
+   * @param user who to retrieve critter access for 
+   * @returns an array of @type {UserCritterAccess}
    * note: query keys are important! make sure to include params in the key
    * note: enabled prop can be set to false to delay the query
    */
-  const useCritterAccess = (page: number, param: { user: string; filterOutNone: boolean }, enabled = true): UseQueryResult<UserCritterAccess[], AxiosError> => {
-    const { user, filterOutNone } = param;
+  const useCritterAccess = (page: number, param: {user: User; filter?: eCritterPermission[]} /*, enabled = true*/): UseQueryResult<UserCritterAccess[], AxiosError> => {
+    const { user, filter } = param;
     return useQuery<UserCritterAccess[], AxiosError>(
       ['critterAccess', page, user],
-      () => userApi.getUserCritterAccess(page, user, filterOutNone),
-      {
-        ...defaultQueryOptions,
-        enabled 
-      }
+      () => permissionApi.getUserCritterAccess(page, user, filter), defaultQueryOptions
     );
   };
 
@@ -272,18 +259,28 @@ export const useTelemetryApi = () => {
     });
   }
 
-  /**
-   * 
-  */
-  const useExport = (config: UseMutationOptions<string[], AxiosError, exportQueryParams>): UseMutationResult<string[]> => {
-    return useMutation<string[], AxiosError, exportQueryParams>((body) => bulkApi.getExportData(body), config);
-  };
+  /** see permission_api documentation */
+  const usePermissionRequests = (): UseQueryResult<PermissionRequest[], AxiosError> => {
+    return useQuery<PermissionRequest[], AxiosError>(['getRequests'], () => permissionApi.getPermissionRequest(), defaultQueryOptions);
+  }
+
+  /** see permission_api documentation */
+  const usePermissionHistory = (page: number): UseQueryResult<PermissionRequest[], AxiosError> => {
+    return useQuery<PermissionRequest[], AxiosError>(['getRequestHistory', page], () => permissionApi.getPermissionHistory(page), defaultQueryOptions);
+  }
 
   /**
    *
-   * mutations
+   * mutations - post/delete requests
    * 
    */
+
+  /**
+   * todo:
+  */
+  const useExport = (config: UseMutationOptions<string[], AxiosError, ExportQueryParams>): UseMutationResult<string[]> => {
+    return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
+  };
 
   /** save a code header */
   const useMutateCodeHeader = (
@@ -332,7 +329,7 @@ export const useTelemetryApi = () => {
     config: UseMutationOptions<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>
   ): UseMutationResult =>
     useMutation<IBulkUploadResults<IGrantCritterAccessResults>, AxiosError, IUserCritterPermissionInput>(
-      (body) => userApi.grantCritterAccessToUser(body),
+      (body) => permissionApi.grantCritterAccessToUser(body),
       config
     );
 
@@ -351,6 +348,18 @@ export const useTelemetryApi = () => {
   /** POST a mortality event form */
   const useMutateMortalityEvent = (config: UseMutationOptions<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>): UseMutationResult<IBulkUploadResults<unknown>> =>
     useMutation<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
+  
+  /** add or update a user */
+  const useMutateUser = (config: UseMutationOptions<User, AxiosError, User>): UseMutationResult<User> =>
+    useMutation<User, AxiosError, User>((body) => userApi.addUser(body), config);
+  
+  /** see permission_api doc */ 
+  const useMutateSubmitPermissionRequest = (config: UseMutationOptions<unknown, AxiosError, IPermissionRequestInput>): UseMutationResult<unknown> => 
+    useMutation<unknown, AxiosError, IPermissionRequestInput>((body) => permissionApi.submitPermissionRequest(body), config);
+
+  /** see permission_api doc */ 
+  const useMutateTakeActionOnPermissionRequest = (config: UseMutationOptions<IUserCritterAccess, AxiosError, IExecutePermissionRequest>): UseMutationResult<IUserCritterAccess> => 
+    useMutation<IUserCritterAccess, AxiosError, IExecutePermissionRequest>((body) => permissionApi.takeActionOnPermissionRequest(body), config);
 
   return {
     // queries
@@ -362,7 +371,7 @@ export const useTelemetryApi = () => {
     usePings,
     useUnassignedPings,
     useCollarType,
-    useAllCritters,
+    // useAllCritters,
     useAssignedCritters,
     useUnassignedCritters,
     useCritterHistory,
@@ -374,6 +383,8 @@ export const useTelemetryApi = () => {
     useCritterAccess,
     useExport,
     useUDF,
+    usePermissionRequests,
+    usePermissionHistory,
     // mutations
     useMutateCodeHeader,
     useMutateBulkCsv,
@@ -383,8 +394,11 @@ export const useTelemetryApi = () => {
     useMutateLinkCollar,
     useMutateGrantCritterAccess,
     useMutateUDF,
+    useMutateUser,
     useDelete,
     useMutateUserAlert,
     useMutateMortalityEvent,
+    useMutateSubmitPermissionRequest,
+    useMutateTakeActionOnPermissionRequest,
   };
 };

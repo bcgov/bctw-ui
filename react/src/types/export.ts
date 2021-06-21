@@ -1,3 +1,5 @@
+import { MapRange } from './map';
+
 export enum eExportType {
   all = 'all',
   animal = 'animal',
@@ -5,11 +7,13 @@ export enum eExportType {
   movement = 'movement',
 }
 
-interface exportQueryParams {
-  ids: string[];
+interface ExportQueryParams {
+  critter_ids: string[];
+  collar_ids: string[];
   type: eExportType
+  range?: MapRange;
 }
 
 export type {
-  exportQueryParams
+  ExportQueryParams
 }

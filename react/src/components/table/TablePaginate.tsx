@@ -1,19 +1,8 @@
 import React from 'react';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      float: 'right',
-      flexShrink: 0,
-      marginLeft: theme.spacing(2.5),
-    },
-  }),
-);
 
 interface TablePaginationActionsProps {
   count: number;
@@ -23,7 +12,6 @@ interface TablePaginationActionsProps {
 }
 
 export default function PaginationActions(props: TablePaginationActionsProps): JSX.Element {
-  const classes = useStyles();
   const { count, page, rowsPerPage, onChangePage } = props;
 
   const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -39,7 +27,7 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
   };
 
   return (
-    <div className={classes.root}>
+    <div className={'paginate'}>
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 1}
@@ -60,6 +48,7 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         aria-label="next page"
       ><KeyboardArrowRight /></IconButton>
 
+      {/* note: goto last page not shown */}
       {/* <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}

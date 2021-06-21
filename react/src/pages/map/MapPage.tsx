@@ -7,7 +7,6 @@ import 'leaflet/dist/leaflet.css';
 import { CircularProgress } from '@material-ui/core';
 import pointsWithinPolygon from '@turf/points-within-polygon';
 import dayjs from 'dayjs';
-import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import MapDetails from 'pages/map/details/MapDetails';
 import { initMap, setPopupInnerHTML, hidePopup } from 'pages/map/map_init';
@@ -22,7 +21,6 @@ import {
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
 import React, { useEffect, useRef, useState } from 'react';
-import tokml from 'tokml';
 import { ICodeFilter } from 'types/code';
 import {
   ITelemetryDetail,
@@ -626,22 +624,6 @@ export default function MapPage(): JSX.Element {
     }
   }, [map3D]);
 
-  // trigger download on ctrl+s keyboard input
-  const handleKeyPress = (e): void => {
-    if (!(e.ctrlKey && e.keyCode == 83)) {
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    let kml;
-    if ((selectedPingsLayer.toGeoJSON() as any).features.length > 0) {
-      kml = tokml((selectedPingsLayer as any).toGeoJSON());
-    } else {
-      kml = tokml((pingsLayer as any).toGeoJSON());
-    }
-    download(kml, 'devices.kml', 'application/xml');
-  };
-
   // todo: move this to separate component / wrapper
   // resizable state & handlers
   const [bottomPanelHeight, setBottomPanelHeight] = useState<number>(400);
@@ -694,21 +676,21 @@ export default function MapPage(): JSX.Element {
 
         <div id='popup' style={{ bottom: bottomPanelHeight }} />
 
-        <div id='map' onKeyDown={handleKeyPress}>
+        <div id='map'>
           <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
         </div>
 
         {/* The layer switching button*/}
-        <div
-          className={'map-icon map-dimension-btn icon-on'}
-          onClick={(): void => setMap3D((o) => !o)}
-          title={map3D ? 'Switch to 2D map' : 'Switch to 3D view'}>
+        {/* disabled for now */}
+        <div className={'map-icon map-dimension-btn icon-off'}>
+          {/* onClick={(): void => setMap3D((o) => !o)} */}
+          {/* title={map3D ? 'Switch to 2D map' : 'Switch to 3D view'}> */}
           <LanguageIcon />
         </div>
 
         <div
           style={{ height: bottomPanelHeight }}
-          className={`bottom-panel ${showOverviewModal || showExportModal || showUdfEdit ? '' : 'appear-above-map'}`}>
+          className={`bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}>
           <div onMouseDown={onDown} id='drag'></div>
           <MapDetails
             pings={[...pings]}
@@ -719,6 +701,7 @@ export default function MapPage(): JSX.Element {
             handleRowSelected={handleDetailPaneRowSelect}
             showExportModal={showExportModal}
             setShowExportModal={setShowExportModal}
+            timeRange={range}
           />
         </div>
         {selectedDetail ? (

@@ -1,6 +1,6 @@
 import { Animal } from 'types/animal';
 import { cloneElement, useState, useEffect } from 'react';
-import { eCritterPermission } from 'types/user';
+import { permissionCanModify  } from 'types/permission';
 import { useQueryClient } from 'react-query';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -14,14 +14,17 @@ type IModifyWrapperProps = {
   children: JSX.Element;
 };
 
-// wraps the AddEditViewer to provide additional critter/user-specific functionality
+/**
+ * wraps child components to provide the actual POST request endpoints for the animal 
+ * includes editing and deletes
+ */
 export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
 
   const { editing, children } = props;
-  const [perm, setPerm] = useState<eCritterPermission>(eCritterPermission.none);
+  const [canEdit, setCanEdit] = useState<boolean>(false);
   const [hasCollar, setHasCollar] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
 
@@ -29,20 +32,20 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const onSaveSuccess = async (data: IBulkUploadResults<Animal>): Promise<void> => {
     const { errors, results } = data;
     if (errors.length) {
-      responseDispatch({ type: 'error', message: `${errors.map(e => e.error)}` });
+      responseDispatch({ severity: 'error', message: `${errors.map(e => e.error)}` });
     } else {
       const critter = results[0];
-      responseDispatch({ type: 'success', message: `${critter.animal_id} saved!` });
+      responseDispatch({ severity: 'success', message: `${critter.animal_id} saved!` });
       invalidateCritterQueries();
     }
   };
 
   const onDeleteSuccess = async (): Promise<void> => {
-    responseDispatch({ type: 'success', message: `critter deleted successfully` });
+    responseDispatch({ severity: 'success', message: `critter deleted successfully` });
     invalidateCritterQueries();
   };
 
-  const onError = (error: AxiosError): void => responseDispatch({ type: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
   // force refetch on critter queries
   const invalidateCritterQueries = async (): Promise<void> => {
@@ -56,10 +59,11 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const { mutateAsync: saveMutation } = bctwApi.useMutateCritter({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
-  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
+  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<void> => {
     const { body } = a;
     const formatted = body.toJSON();
-    return await saveMutation({ body: formatted});
+    console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
+    await saveMutation({ body: formatted});
   } 
 
   const deleteCritter = async (critterId: string): Promise<void> => {
@@ -73,7 +77,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   useEffect(() => {
     const upd = (): void => {
       setHasCollar(!!editing?.device_id)
-      setPerm(editing?.permission_type)
+      setCanEdit(permissionCanModify(editing?.permission_type));
     }
     upd();
   }, [editing]);
@@ -93,11 +97,12 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   }
   
   const validateFailed = (errors: Record<string, unknown>): void => {
-    responseDispatch({ type: 'error', message: `missing required fields: ${Object.keys(errors).join(', ')}` });
+    responseDispatch({ severity: 'error', message: `missing required fields: ${Object.keys(errors).join(', ')}` });
   }
 
+  // pass the permission_type down so the AddEditViewer can set the edit/view button status
   const passTheseProps = {
-    cannotEdit: perm !== eCritterPermission.change,
+    cannotEdit: !canEdit,
     onDelete: handleDeleteButtonClicked,
     onSave: saveCritter,
     validateFailed

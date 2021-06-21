@@ -1,5 +1,5 @@
 import { Checkbox, FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectProps } from '@material-ui/core';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export interface ISelectMultipleData {
   id: number;
@@ -10,6 +10,7 @@ export interface ISelectMultipleData {
 
 type ISelectMultipleProps<T extends ISelectMultipleData> = SelectProps & {
   label: string;
+  renderValue?: (value: unknown) => React.ReactNode;
   renderTypeLabel?: string; // what to show when multiple are selected
   changeHandler: (o: T[]) => void;
   triggerReset?: boolean; // force unselect of all values
@@ -61,12 +62,13 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: ISelec
         // fixme: not sure why the input prop is required to have the 'notch' wide enough
         // to not cover the label. works fine in SelectCode without this??
         input={<OutlinedInput labelWidth={label.length * 7} />}
+        style={props.style}
         multiple={true}
         variant={'outlined'}
         value={selected}
-        renderValue={(): string =>
+        renderValue={props.renderValue ?? ((): string =>
           selected.length > 3 ? `${selected.length} ${renderTypeLabel ?? ''} selected` : selected.join(', ')
-        }>
+        )}>
         {[...[selectAll], ...data].map((d: T, idx: number) => {
           return (
             <MenuItem key={`${idx}-${d.id}`} value={d.value}>

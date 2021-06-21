@@ -1,30 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  Table as MuiTable,
+  Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableRow,
-  Toolbar,
-  Typography,
-  Paper,
   Checkbox,
   CircularProgress
 } from '@material-ui/core';
-import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
+import TableContainer from './TableContainer';
+import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from './TablePaginate';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError } from 'utils/common';
-import { ICustomTableColumn, ITableProps, Order } from './table_interfaces';
+import { ICustomTableColumn, ITableFilter, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
 import { BCTW } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
-export default function Table<T extends BCTW>({
+// note: const override for disabling pagination
+const DISABLE_PAGINATION = true;
+/**
+ * Data table component, fetches data to display from @param {queryProps}
+ * supports pagination, sorting, single or multiple selection
+ */
+export default function DataTable<T extends BCTW>({
   customColumns,
   headers,
   queryProps,
@@ -33,37 +37,38 @@ export default function Table<T extends BCTW>({
   onSelectMultiple,
   paginate = true,
   isMultiSelect = false,
-  alreadySelected = [],
+  alreadySelected = []
 }: ITableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
 
+  const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState<number>(1);
   const [rowIdentifier, setRowIdentifier] = useState<string>('id');
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const isPaginate = paginate && !DISABLE_PAGINATION;
+  /**
+   * since data is updated when the page is changed, use the 'values'
+   * state to keep track of the entire set of data across pages.
+   * this state is passed to the parent select handlers
+   */
+  const [values, setValues] = useState<T[]>([]);
 
-  const onSuccess = (results: T[]): void => {
-    const first = results[0];
-    if (first && typeof first.identifier === 'string') {
-      setRowIdentifier(first.identifier);
-    }
-    if (typeof onNewData === 'function') {
-      onNewData(results);
-    }
-  };
-
-  useEffect(() => {
+  // if a row is selected in a different table, unselect all rows in this table
+  useDidMountEffect(() => {
     if (useRowState && data.length) {
-      const found = data.findIndex(p => p[rowIdentifier] === useRowState);
+      const found = data.findIndex((p) => p[rowIdentifier] === useRowState);
       if (found === -1) {
-        setSelected([])
+        setSelected([]);
       }
     }
-  }, [useRowState])
+  }, [useRowState]);
 
+  // fetch the data from the props query
   const {
     isFetching,
     isLoading,
@@ -72,16 +77,32 @@ export default function Table<T extends BCTW>({
     data,
     isPreviousData,
     isSuccess
-  }: UseQueryResult<T[], AxiosError> = query(
-    page,
-    param
-  );
+  }: UseQueryResult<T[], AxiosError> = query(page, param);
 
-  useEffect(() => {
+  useDidMountEffect(() => {
+    // console.log('data changed, successfully fetched: ', isSuccess);
     if (isSuccess) {
-      onSuccess(data);
+      // update the row identifier
+      const first = data && data.length && data[0];
+      if (first && typeof first.identifier === 'string') {
+        setRowIdentifier(first.identifier);
+      }
+      // update the parent handler when new data is fetched
+      if (typeof onNewData === 'function') {
+        onNewData(data);
+      }
+      const newV = [];
+      // update the values state
+      data.forEach((d) => {
+        const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
+        if (!found) {
+          newV.push(d);
+        }
+      });
+      setValues((o) => [...o, ...newV]);
+      setRowsPerPage(o => isPaginate ? o : data.length);
     }
-  }, [isSuccess]);
+  }, [data]);
 
   const handleSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -91,10 +112,10 @@ export default function Table<T extends BCTW>({
 
   const handleSelectAll = (event): void => {
     if (event.target.checked) {
-      const newIds = data.map((r) => r[rowIdentifier]);
+      const newIds = [...selected, ...data.map((r) => r[rowIdentifier])];
       setSelected(newIds);
       if (typeof onSelectMultiple === 'function') {
-        onSelectMultiple(data.filter((d) => newIds.includes(d[rowIdentifier])));
+        onSelectMultiple(values.filter((d) => newIds.includes(d[rowIdentifier])));
       }
       return;
     }
@@ -103,10 +124,11 @@ export default function Table<T extends BCTW>({
 
   const handleClickRow = (event: React.MouseEvent<unknown>, id: string): void => {
     if (isMultiSelect && typeof onSelectMultiple === 'function') {
-      handleClickRowMultiEnabled(event, id)
+      handleClickRowMultiEnabled(event, id);
     }
     if (typeof onSelect === 'function' && data?.length) {
       setSelected([id]);
+      // a row can only be selected from the current pages data set
       const row = data.find((d) => d[rowIdentifier] === id);
       onSelect(row);
     }
@@ -118,7 +140,7 @@ export default function Table<T extends BCTW>({
 
   const handleClickRowMultiEnabled = (event: React.MouseEvent<unknown>, id: string): void => {
     if (typeof onSelectMultiple !== 'function') {
-      return
+      return;
     }
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
@@ -132,15 +154,13 @@ export default function Table<T extends BCTW>({
       newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
     setSelected(newSelected);
-    // fixme: data only has the current pages contents, when there could be items selected
-    // by default on another page.
     if (alreadySelected.length) {
       onSelectMultiple(newSelected);
     } else {
       // send T[] not just the identifiers
-      onSelectMultiple(data.filter((d) => newSelected.includes(d[rowIdentifier])));
+      onSelectMultiple(values.filter((d) => newSelected.includes(d[rowIdentifier])));
     }
-  }
+  };
 
   const isSelected = (id: string): boolean => {
     return selected.indexOf(id) !== -1;
@@ -157,13 +177,17 @@ export default function Table<T extends BCTW>({
     setPage(page);
   };
 
+  const handleFilter = (filter: ITableFilter): void => {
+    setFilter(filter);
+  };
+
   const renderNoData = (): JSX.Element => (
     <TableRow>
       <TableCell>
         {isFetching || isLoading ? (
           <CircularProgress />
         ) : isError ? (
-          <NotificationMessage type='error' message={formatAxiosError(error)} />
+          <NotificationMessage severity='error' message={formatAxiosError(error)} />
         ) : (
           'no data available'
         )}
@@ -172,43 +196,54 @@ export default function Table<T extends BCTW>({
   );
 
   const renderToolbar = (): JSX.Element =>
-    isMultiSelect ? (
-      <TableToolbar numSelected={selected.length} title={title} />
-    ) : (
-      <Toolbar className={'toolbar'}>
-        <Typography className={'title'} variant='h6' component='div'>
-          <strong>{title}</strong>
-        </Typography>
-      </Toolbar>
-    );
+    <TableToolbar
+      rowCount={values.length}
+      numSelected={selected.length}
+      title={title}
+      onChangeFilter={handleFilter}
+      filterableProperties={headers ?? Object.keys((data && data[0]) ?? [])}
+    />
 
-  const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
+  const getHeaderProps = (): string[] => headers ?? Object.keys((data && data[0]) ?? []);
+  const headerProps = useMemo(() => getHeaderProps(), []);
+   
+  // called in the render function
+  // determines which values to render, based on page and filters applied
+  const perPage = (): T[] => {
+    const results =
+      filter && filter.term
+        ? fuzzySearchMutipleWords(values, filter.keys && filter.keys.length ? filter.keys : headerProps, filter.term)
+        : values;
+    const start = (rowsPerPage + page - rowsPerPage - 1) * rowsPerPage;
+    const end = rowsPerPage * page - 1;
+    // console.log(`slice start ${start}, slice end ${end}`);
+    return results.length > rowsPerPage ?  results.slice(start, end) : results;
+  };
+
   return (
-    <div className={'root'}>
-      <Paper className={'paper'}>
-        {renderToolbar()}
-        <TableContainer component={Paper}>
-          <MuiTable className={'table'} size='small'>
-            {data === undefined ? null : (
-              <TableHead
-                headersToDisplay={headerProps}
-                headerData={data && data[0]}
-                isMultiSelect={isMultiSelect}
-                numSelected={selected.length}
-                order={order}
-                orderBy={(orderBy as string) ?? ''}
-                onRequestSort={handleSort}
-                onSelectAllClick={handleSelectAll}
-                rowCount={data?.length ?? 0}
-                customHeaders={customColumns?.map((c) => c.header) ?? []}
-              />
-            )}
-            <TableBody>
-              {(data && data.length === 0) || isFetching || isLoading || isError
-                ? renderNoData()
-                : stableSort(data ?? [], getComparator(order, orderBy)).map((obj: BCTW, prop: number) => {
+    <TableContainer toolbar={renderToolbar()}>
+      <>
+        <Table stickyHeader size='small'>
+          {data === undefined ? null : (
+            <TableHead
+              headersToDisplay={headerProps as string[]}
+              headerData={data && data[0]}
+              isMultiSelect={isMultiSelect}
+              numSelected={selected.length}
+              order={order}
+              orderBy={(orderBy as string) ?? ''}
+              onRequestSort={handleSort}
+              onSelectAllClick={handleSelectAll}
+              rowCount={values?.length ?? 0}
+              customHeaders={customColumns?.map((c) => c.header) ?? []}
+            />
+          )}
+          <TableBody>
+            {(values && values.length === 0) || isFetching || isLoading || isError
+              ? renderNoData()
+              : stableSort(perPage(), getComparator(order, orderBy)).map(
+                (obj: BCTW, prop: number) => {
                   const isRowSelected = isSelected(obj[rowIdentifier]);
-                  // const labelId = `enhanced-table-checkbox-${prop}`;
                   return (
                     <TableRow
                       hover
@@ -226,7 +261,6 @@ export default function Table<T extends BCTW>({
                           <Checkbox
                             color='primary'
                             checked={isRowSelected}
-                            // inputProps={{ 'aria-labelledby': labelId }}
                           />
                         </TableCell>
                       ) : null}
@@ -251,26 +285,20 @@ export default function Table<T extends BCTW>({
                         : null}
                     </TableRow>
                   );
-                })}
-            </TableBody>
-          </MuiTable>
-          {
-            !paginate ||
-            isLoading ||
-            isFetching ||
-            isError ||
-            // hide pagination when total results are under page limit (10)
-            (isSuccess && data?.length < 10 && paginate && page === 1)
-              ? null : 
-              <PaginationActions
-                count={data.length}
-                page={page}
-                rowsPerPage={10}
-                onChangePage={handlePageChange}
-              />
-          }
-        </TableContainer>
-      </Paper>
-    </div>
+                }
+              )}
+          </TableBody>
+        </Table>
+        {/* 
+         * hide pagination when total results are under page limit (10)
+         * possible that only 10 results are actually available, in which
+         * case the next page will load no new results
+        */}
+        {!isPaginate || isLoading || isFetching || isError || 
+        (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
+            <PaginationActions count={data.length} page={page} rowsPerPage={rowsPerPage} onChangePage={handlePageChange} />
+          )}
+      </>
+    </TableContainer>
   );
 }

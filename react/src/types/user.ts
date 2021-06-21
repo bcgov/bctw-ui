@@ -1,6 +1,8 @@
 import { Type, Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
-import { BCTW, BCTWBaseType } from './common_types';
+import { BCTW, BCTWBaseType } from 'types/common_types';
+import { FormFieldObject } from 'types/form_types';
+import { eCritterPermission } from 'types/permission';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -8,37 +10,46 @@ export enum eUserRole {
   observer = 'observer'
 }
 
-export enum eCritterPermission {
-  view = 'view',
-  change = 'change',
-  none = 'none',
-}
-
 export interface IUser extends BCTW, BCTWBaseType {
   id: number;
   idir: string;
   bceid: string;
   email: string;
+  // indicates if the user is considered the owner of at least one animal
+  is_owner?: boolean; 
 }
 
 export class User implements IUser {
   role_type: eUserRole;
+  is_owner: boolean;
   id: number;
   idir: string;
   bceid: string;
   email: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
+  @Expose() get is_admin(): boolean {
+    return this.role_type === eUserRole.administrator;
+  }
 
   formatPropAsHeader(str: string): string {
-    return columnToHeader(str);
+    switch (str) {
+      case 'idir': 
+      case 'id':
+      case 'bceid':
+        return str.toUpperCase();
+      default: 
+        return columnToHeader(str);
+    }
   }
 }
 
-export interface IUserCritterAccessInput {
-  critter_id: string;
-  permission_type: eCritterPermission;
-}
+export const userFormFields: FormFieldObject<User>[] = [
+  { prop: 'idir' },
+  { prop: 'bceid' },
+  { prop: 'email' },
+]
+
 export interface IUserCritterAccess {
   critter_id: string;
   animal_id: string;
@@ -51,10 +62,19 @@ export interface IUserCritterAccess {
   permission_type: eCritterPermission;
 }
 
+/**
+ * note: the database uses animal id since the bctw.user_aniaml_assignment table hasn't been updated from animal_id -> critter_id.
+*/
+export interface IUserCritterAccessInput extends Partial<IUserCritterAccess> {
+  critter_id: string;
+  permission_type: eCritterPermission;
+}
+
 export class UserCritterAccess implements IUserCritterAccess {
   critter_id: string;
   animal_id: string;
   wlh_id: string;
+  species: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   device_id: number;
@@ -66,3 +86,11 @@ export class UserCritterAccess implements IUserCritterAccess {
     return this.animal_id ?? this.wlh_id;
   }
 }
+
+const TestUCA = new UserCritterAccess();
+// what's displayed as fields 'user/critter permission' table modals
+export const PermissionTableHeaders: (keyof typeof TestUCA)[] = [
+  'wlh_id', 'animal_id', 'species',
+  'device_id', 'device_make', 'frequency',
+  'permission_type'
+];

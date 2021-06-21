@@ -1,3 +1,4 @@
+import { matchSorter } from 'match-sorter';
 import { getProperty } from 'utils/common';
 import { Order, HeadCell } from 'components/table/table_interfaces';
 import { dateObjectToTimeStr } from 'utils/time';
@@ -65,18 +66,17 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
 
 interface ICellFormat {
   align: 'inherit' | 'left' | 'center' | 'right' | 'justify';
-  value: string | number | any;
+  value: string | number | JSX.Element;
 }
 /**
- * 
+ *
  * @param obj object being displayed
  * @param key the property to render in this table cell
  */
-
 function formatTableCell<T>(obj: T, key: string): ICellFormat {
   const value = obj[key];
   if (typeof value === 'boolean') {
-    return {align: 'center', value: <Icon icon={value ? 'done' : 'close'}/> }
+    return { align: 'center', value: <Icon icon={value ? 'done' : 'close'} /> };
   }
   if (typeof value?.getMonth === 'function') {
     return { align: 'right', value: dateObjectToTimeStr(value) };
@@ -86,7 +86,25 @@ function formatTableCell<T>(obj: T, key: string): ICellFormat {
   } else if (typeof value === 'string') {
     return { align: 'center', value };
   }
-  return {align: 'left', value};
+  return { align: 'left', value };
 }
 
-export { descendingComparator, getComparator, stableSort, createHeadCell, formatTableCell };
+/**
+ * @param rows array of data [{a: "a", b: "b"}, {a: "c", b: "d"}]
+ * @param keys keys to search ["a", "b"]
+ * @param filterValue potentially multi-word search string "two words"
+ * @returns
+ */
+function fuzzySearchMutipleWords<T>(rows: T[], keys: string[], filterValue: string): T[] {
+  if (!filterValue || !filterValue.length) {
+    return rows;
+  }
+  const terms = filterValue.split(' ');
+  if (!terms) {
+    return rows;
+  }
+  // reduceRight will mean sorting is done by score for the _first_ entered word.
+  return terms.reduceRight((results, term) => matchSorter(results, term, { keys }), rows);
+}
+
+export { fuzzySearchMutipleWords, descendingComparator, getComparator, stableSort, createHeadCell, formatTableCell };

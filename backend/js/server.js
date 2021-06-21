@@ -1,4 +1,6 @@
 /* Bare bones static file server */
+const pg = require('pg');
+const pug = require('pug');
 const axios = require('axios');
 const path = require('path')
 const cors = require('cors');
@@ -17,6 +19,16 @@ const isProd = process.env.NODE_ENV === 'production' ? true : false;
 const isTest = process.env.TEST === 'true';
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
+
+// Set up the database pool
+const pgPool = new pg.Pool({
+  user: process.env.POSTGRES_USER,
+  database: process.env.POSTGRES_DB,
+  password: process.env.POSTGRES_PASSWORD,
+  host: process.env.POSTGRES_SERVER_HOST,
+  port: process.env.POSTGRES_SERVER_PORT,
+  max: 10,
+});
 
 var memoryStore = new expressSession.MemoryStore();
 
@@ -48,6 +60,8 @@ var session = {
   store: memoryStore
 };
 
+
+
 const appendQueryToUrl = (url, query) => {
   if (!query) return url;
   return url.includes('?') ?
@@ -67,7 +81,7 @@ const proxyApi = function (req, res, next) {
 
   // The parameter string
   const query = Object.keys(req.query).map((key) => {
-    return `${key}=${req.query[key]}`
+    return `${key}=${req.query[key]}`;
   }).join('&');
 
   // The domain and username
@@ -210,6 +224,148 @@ const authenticate = function (req, res, next) {
   }
 };
 
+/**
+ * # onboardingRedirect
+ * If you get here you have a valid IDIR.
+ * Check if the user is registerd in the database.
+ * If yes.... Pass through.
+ * Else... Direct to the onboarding page.
+ * @param req {object} Express request object
+ * @param res {object} Express response object
+ * @param next {function} Express function to continue on
+ */
+const onboardingRedirect = async (req,res,next) => {
+  // Collect all user data from the keycloak object
+  const data = req.kauth.grant.access_token.content;
+  const domain = data.preferred_username.split('@')[1];
+  const user = data.preferred_username.split('@')[0];
+  const email = data.email;
+  const givenName = data.given_name;
+  const familyName = data.family_name;
+
+  // Get a list of all allowed users
+  const sql = 'select idir from bctw.user'
+  const client = await pgPool.connect();
+  const result = await client.query(sql);
+  const idirs = result.rows.map((row) => row.idir);
+  // Is the current user registered: Boolean
+  const registered = (idirs.includes(user)) ? true : false;
+
+  // Formulate the url and data to be sent to the onboarding page
+  let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
+  url += `&given=${givenName}&family=${familyName}`;
+
+
+  if (registered) {
+    next(); // pass through
+  } else {
+    res.redirect(url); // reject and go to the onboarding page
+  }
+  client.release(); // Release database connection
+};
+
+/**
+ * # onboarding
+ * Accept requests for access to the site.
+ * Send requests to product owner via email (CHES).
+ * @param req {object} Express request object
+ * @param res {object} Express response object
+ */
+const onboarding = (req,res) => {
+  // Collect all user data from the keycloak object
+  let firstName
+  if (req.kauth.grant) {
+    const data = req.kauth.grant.access_token.content;
+    firstName = data.given_name;
+  } else {
+    firstName = '';
+  }
+
+  const template = pug.compileFile('onboarding/index.pug')
+  const html = template({firstName});
+  res.status(200).send(html);
+};
+
+const onboardingAccess = async (req,res) => {
+  // This data will be inserted into the email
+  const {user, domain, email, firstName, lastName, msg} = req.body;
+
+  // Get all the environment variable dependencies
+  const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
+  const apiUrl = `${process.env.BCTW_CHES_API_URL}/api/v1/email`;
+  const username = process.env.BCTW_CHES_USERNAME;
+  const password = process.env.BCTW_CHES_PASSWORD;
+  const fromEmail = process.env.BCTW_CHES_FROM_EMAIL;
+  const toEmail = process.env.BCTW_CHES_TO_EMAIL.split(',');
+
+  // Create the authorization hash
+  const prehash = Buffer.from(`${username}:${password}`,'utf8')
+    .toString('base64');
+  const hash = `Basic ${prehash}`;
+
+  const tokenParcel = await axios.post(
+    tokenUrl,
+    'grant_type=client_credentials',
+    {headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": hash
+    }
+  });
+
+
+  const pretoken = tokenParcel.data.access_token;
+  if (!pretoken) return res.status(500).send('Authentication failed');
+  const token = `Bearer ${pretoken}`;
+
+  const emailMessage = `
+    <div>
+      Access to the BC Telemetry Warehouse has be requested by
+      <b>${domain}</b> user <b>${firstName} ${lastName}</b>. Username is <b>${user}</b>.
+    </div>
+    <br>
+    <div>
+      <u>Provided reason is as follows</u>:
+    </div>
+
+    <div style="padding=10px; color: #626262;">
+      ${msg}
+    </div>
+    <br>
+    
+    <div style="border-width: 1px; border-color: #626262; border-style: solid none none none;">
+      <a href="mailto:${email}">${email}</a>.
+    </div>
+  `
+
+  const emailPayload = {
+    subject: 'Access request for the BC Telemetry Warehouse',
+    priority: 'normal',
+    encoding: 'utf-8',
+    bodyType: 'html',
+    body: emailMessage,
+    from: fromEmail,
+    to: toEmail,
+    cc: [],
+    bcc: [],
+    delayTS: 0
+  }
+
+  axios.post(
+    apiUrl,
+    emailPayload,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  ).then((response) => {
+    res.status(200).send('Email was sent');
+  }).catch((error) => {
+    res.status(500).send('Email failed');
+  })
+};
+
 
 /* ## denied
   The route to the denied service page
@@ -233,9 +389,19 @@ var app = express()
   .use(expressSession(session))
   .use(keycloak.middleware())
   .use(gardenGate) // Keycloak Gate
-  // BCTW Gate - deprecated, handled in app
-  // .use(authenticate) 
   .get('/denied', denied);
+
+
+if (isProd) {
+  app
+    .get('/onboarding', keycloak.protect(), onboarding)
+    .post('/onboarding', keycloak.protect(), onboardingAccess)
+    .all('*', keycloak.protect(), onboardingRedirect);
+} else{
+  app
+    .get('/onboarding',  onboarding)
+    .post('/onboarding', onboardingAccess);
+}
 
 if (isTest) {
   app

@@ -1,3 +1,4 @@
+import {cloneElement} from 'react';
 import Add from '@material-ui/icons/Add';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -20,6 +21,8 @@ import SnoozeIcon from '@material-ui/icons/Snooze';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import AlarmOffIcon from '@material-ui/icons/AlarmOff';
 import WarningIcon from '@material-ui/icons/Warning';
+import AccessibilityIcon from '@material-ui/icons/Accessibility';
+import ReplayIcon from '@material-ui/icons/Replay';
 
 const mappings: Record<string, JSX.Element> = {
   data: <Dashboard />,
@@ -44,13 +47,15 @@ const mappings: Record<string, JSX.Element> = {
   snooze: <SnoozeIcon />,
   cannotSnooze: <AlarmOffIcon />,
   warning: <WarningIcon htmlColor='orange' />,
+  person: <AccessibilityIcon />,
+  reset: <ReplayIcon />,
 };
 
 type IconProps = {
   icon: string;
-  color?: string;
+  htmlColor?: string;
 };
 
-export default function Icon ({icon, color}: IconProps): JSX.Element {
-  return mappings[icon];
+export default function Icon ({icon, htmlColor}: IconProps): JSX.Element {
+  return cloneElement(mappings[icon], {htmlColor})
 }

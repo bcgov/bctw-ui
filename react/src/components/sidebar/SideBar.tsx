@@ -1,7 +1,7 @@
-import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@material-ui/core';
+import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import clsx from 'clsx';
 import { RouteKey } from 'AppRouter';
-import { Icon } from 'components/common';
+import { Icon, Tooltip } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -10,14 +10,15 @@ import drawerStyles from './drawer_classes';
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
-  sidebarContent?: React.ReactNode; // what's displayed in the drawer below the sidebar's navigation section
+  // sidebarContent?: React.ReactNode; // what's displayed in the drawer below the sidebar's navigation section
   collapseAble: boolean;
 };
 
-export default function SideBar({ routes, sidebarContent, collapseAble }: SideBarProps): JSX.Element {
+export default function SideBar({ routes, collapseAble }: SideBarProps): JSX.Element {
   const classes = drawerStyles();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
   const [open, setOpen] = React.useState(false);
   const userChanges = useContext(UserContext);
@@ -30,6 +31,7 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
       if (userChanges?.ready) {
         const user = userChanges.user;
         setIsAdmin(user.role_type === 'administrator');
+        setIsOwner(user.is_owner);
       }
     };
     updateComponent();
@@ -38,7 +40,12 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
-      curRoutes.push(routes.find((r) => r.name === 'admin'));
+      curRoutes.push(routes.find((r) => r.name === 'user-admin'));
+      curRoutes.push(routes.find((r) => r.name === 'animal-access'));
+      curRoutes.push(routes.find((r) => r.name === 'handle-permission-request'));
+    }
+    if (isOwner /* && !isAdmin */) {
+      curRoutes.push(routes.find((r) => r.name === 'owner-access'));
     }
     setVisibleRoutes(curRoutes);
   };
@@ -50,11 +57,13 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
       case '/devices':
       case '/codes':
       case '/profile':
-      case '/admin':
-        handleSetVisible(['animals', 'codes', 'devices']);
+      case '/import':
+      case '/user-admin':
+      case '/animal-access':
+        handleSetVisible(['animals', 'codes', 'devices', 'import']);
         return;
     }
-  }, [location, isAdmin]); // only fire when these states change
+  }, [location, isAdmin, isOwner]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
@@ -83,25 +92,25 @@ export default function SideBar({ routes, sidebarContent, collapseAble }: SideBa
           </div>
         ) : null}
         <Divider />
-        <List>
-          {routesToShow.map((route: RouteKey, idx: number) => {
-            return (
-              <ListItem button={true} key={idx} {...{ component: Link, to: route.path }}>
-                {route.icon ? (
-                  <Tooltip title={route.title}>
+        <List component='nav'>
+          {routesToShow
+            .filter((r) => r.name !== 'notFound' && r.icon)
+            .map((route: RouteKey, idx: number) => {
+              return (
+                <Tooltip key={idx} title={route.title}>
+                  <ListItem button {...{ component: Link, to: route.path }}>
                     <ListItemIcon className={'sidebar-icon'}>
                       <Icon icon={route.icon} />
                     </ListItemIcon>
-                  </Tooltip>
-                ) : null}
-                <ListItemText className={'list-item-txt'} primary={route.title} />
-              </ListItem>
-            );
-          })}
+                    <ListItemText className={'list-item-txt'} primary={route.title} />
+                  </ListItem>
+                </Tooltip>
+              );
+            })}
         </List>
       </Drawer>
       <Divider />
-      <div>{sidebarContent}</div>
+      {/* <div>{sidebarContent}</div> */}
     </div>
   );
 }

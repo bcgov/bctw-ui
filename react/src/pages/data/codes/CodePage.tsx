@@ -1,12 +1,12 @@
 import { ButtonGroup, Typography } from '@material-ui/core';
 import { NotificationMessage } from 'components/common';
 import Button from 'components/form/Button';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import React, { useState } from 'react';
-import { CodeHeader, CodeHeaderInput, ICodeHeader } from 'types/code';
+import { CodeFormFields, CodeHeader, CodeHeaderInput, ICodeHeader } from 'types/code';
 import { formatAxiosError } from 'utils/common';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditCodeHeader from 'pages/data/codes/EditCodeHeader';
@@ -23,11 +23,11 @@ const CodePage: React.FC = () => {
 
   const onSuccess = (data): void => {
     if (data.errors.length) {
-      responseDispatch({ type: 'error', message: `${data.errors[0].error}` });
+      responseDispatch({ severity: 'error', message: `${data.errors[0].error}` });
       return;
     }
     const header = data.results[0];
-    responseDispatch({ type: 'success', message: `code header ${header.code_header_name} saved` });
+    responseDispatch({ severity: 'success', message: `code header ${header.code_header_name} saved` });
     // todo: invalidate code_header query?
   };
 
@@ -49,7 +49,7 @@ const CodePage: React.FC = () => {
   };
 
   const editProps = {
-    editableProps: S.editableProps,
+    editableProps: CodeFormFields.map(s => s.prop),
     editing: new CodeHeaderInput(),
     open: false,
     onSave: handleSave,
@@ -63,7 +63,7 @@ const CodePage: React.FC = () => {
         {isFetching || isLoading ? (
           <div>loading...</div>
         ) : isError ? (
-          <NotificationMessage type='error' message={formatAxiosError(error)} />
+          <NotificationMessage severity='error' message={formatAxiosError(error)} />
         ) : (
           <>
             <Typography align='center' variant='h6'>
@@ -79,7 +79,7 @@ const CodePage: React.FC = () => {
               })}
             </ButtonGroup>
             {codeHeader ? (
-              <Table
+              <DataTable
                 headers={props}
                 title={`${title} Codes`}
                 queryProps={{ query: bctwApi.useCodes, param: codeHeader?.type ?? 'region' }}

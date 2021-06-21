@@ -4,9 +4,11 @@ import Fade from '@material-ui/core/Fade';
 import modalStyles from 'components/modal/modal_styles';
 import { ModalProps } from 'components/component_interfaces';
 import { Icon } from 'components/common';
+import { removeProps } from 'utils/common';
 
 export default function Modal(props: ModalProps): JSX.Element {
   const { open, title, handleClose, children } = props;
+  const propsToPass = removeProps(props, ['handleClose']);
   // todo: merge styles
   const classes = modalStyles();
   return (
@@ -17,7 +19,7 @@ export default function Modal(props: ModalProps): JSX.Element {
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{ timeout: 500 }}
-      {...props}>
+      {...propsToPass}>
       <Fade in={open}>
         <div className={classes.paper}>
           <div className={classes.title}>

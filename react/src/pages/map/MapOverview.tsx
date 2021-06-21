@@ -10,7 +10,7 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
-import { eCritterPermission } from 'types/user';
+import { permissionCanModify } from 'types/permission';
 
 type CritterOverViewProps = ModalBaseProps & {
   type: BCTWType;
@@ -23,6 +23,7 @@ export default function MapOverview({ type, detail, open, handleClose }: Critter
   const [canEdit, setCanEdit] = useState<boolean>(false);
   const { critter_id, collar_id } = detail;
 
+  // fetch the data 
   const { data, error, isError, status, remove } =
     type === 'animal'
       ? bctwApi.useType<Animal>('animal', critter_id)
@@ -30,13 +31,13 @@ export default function MapOverview({ type, detail, open, handleClose }: Critter
 
   useEffect(() => {
     if (status === 'success') {
+      const canModify = permissionCanModify(data.permission_type);
+      setCanEdit(canModify);
       if (type === 'animal') {
         data.device_id = detail.device_id;
         setEditObj(data as Animal);
-        setCanEdit((data as Animal).permission_type === eCritterPermission.change);
       } else if (type === 'device') {
         setEditObj(data as Collar);
-        setCanEdit(true);
       }
     }
   }, [status]);
@@ -44,7 +45,7 @@ export default function MapOverview({ type, detail, open, handleClose }: Critter
   /**
    * fixme: when a new detail is selected, the old editobj is still in the query cache,
    * invalidating it doesn't seem to work. remove it instead.
-   */
+  */
   useDidMountEffect(() => {
     const update = (): void => {
       remove();

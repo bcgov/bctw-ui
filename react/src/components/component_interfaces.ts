@@ -1,4 +1,5 @@
 import { DialogProps } from '@material-ui/core';
+import { AlertProps } from '@material-ui/lab/Alert';
 import { IUpsertPayload } from 'api/api_interfaces';
 
 /**
@@ -35,7 +36,7 @@ type EditModalBaseProps<T> = ModalBaseProps & {
  * @param isCreatingNew boolean representing whether the modal is creating or editing T
  * @param validateFailed a function handled in the ModifyWrapper that can display notifications
 */
-type CritterCollarModalProps<T> = EditModalBaseProps<T> & {
+type EditorProps<T> = EditModalBaseProps<T> & {
   isCreatingNew?: boolean;
   validateFailed?: (errors: Record<string, unknown>) => void;
 };
@@ -60,13 +61,12 @@ type CheckBoxChangeHandler = (o: Record<string, boolean>) => void;
  * ex. many components on successful/failed API responses will 
  * pass this type to the ApiResponseContext to show the result
  */
-interface INotificationMessage {
+interface INotificationMessage extends Pick<AlertProps, 'severity'>  {
   message: string;
-  type: 'error' | 'success' | 'none';
 }
 
 export type {
-  CritterCollarModalProps,
+  EditorProps,
   ModalProps,
   ModalBaseProps,
   ExportImportProps,

@@ -30,8 +30,8 @@
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 5px 5px;
+  // align-items: center;
+  padding: 5px 20px;
 }
 
 .button-row {
@@ -43,7 +43,7 @@
 }
 
 .rootEditInput {
-  overflow-y: auto !important;
+  // overflow-y: auto !important;
 }
 
 .editSaveBtn {
@@ -63,18 +63,8 @@
   padding: 20px 20px;
 }
 
-.user-test-swap {
-  margin-top: 15px;
-}
-
 .user-input-grp {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 0px;
-
-  .MuiInputBase-input {
-    margin-bottom: 15px;
-  }
+  margin-top: 25px;
 }
 
 .admin-btn-row {
@@ -83,4 +73,17 @@
   width: 100%;
   padding: 0 5px;
   justify-content: flex-end;
+}
+
+// IMPORTER
+.import-setup {
+  display: flex;
+  flex-direction: row;
+
+  div {
+    margin-right: 20px;
+  }
+  h5 {
+    margin-bottom: 10px;
+  }
 }

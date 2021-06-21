@@ -3,7 +3,7 @@ import {
   TableCell,
   TableHead as MuiTableHead,
   TableRow,
-  TableSortLabel
+  TableSortLabel,
 } from '@material-ui/core';
 import { createHeadCell } from 'components/table/table_helpers';
 import { BCTW } from 'types/common_types';
@@ -41,7 +41,12 @@ export default function TableHead<T extends BCTW>(props: ITableHeadProps<T>): JS
             <TableCell padding='checkbox'>
               <Checkbox
                 color='primary'
-                indeterminate={numSelected > 0 && numSelected < rowCount}
+                /* 
+                  renders a dash when 'some' values are checked. disabling it 
+                  as it's not clear when there are multiple checked
+                  across different pages 
+                */ 
+                // indeterminate={numSelected > 0 && numSelected < rowCount}
                 checked={rowCount > 0 && numSelected === rowCount}
                 onChange={onSelectAllClick}
                 inputProps={{ 'aria-label': 'select all' }}
@@ -52,7 +57,6 @@ export default function TableHead<T extends BCTW>(props: ITableHeadProps<T>): JS
           {createHeadCell(headerData, headersToDisplay).map((headCell) => (
             <TableCell
               key={headCell.id as string}
-              // align={headCell.numeric ? 'right' : 'left'}
               align={'left'}
               padding={headCell.disablePadding ? 'none' : 'default'}
               sortDirection={orderBy === headCell.id ? order : false}>

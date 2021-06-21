@@ -3,6 +3,8 @@ import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';
 import { FormFieldObject } from 'types/form_types';
+import { eCritterPermission } from 'types/permission';
+import { getInvalidDate, isInvalidDate } from 'utils/time';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -50,6 +52,8 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   vendor_activation_status: boolean;
   // collars attached to a critter should includes this prop
   animal_id?: string;
+  // fetched collars should contain this
+  permission_type?: eCritterPermission;
 }
 
 // properties displayed on collar pages
@@ -86,7 +90,7 @@ export class Collar implements ICollar {
   purchase_comment: string;
   @Transform(v => v || -1, transformOpt) purchase_month: number;
   @Transform(v => v || -1, transformOpt) purchase_year: number;
-  @Transform(v => v || new Date(), transformOpt) retrieval_date: Date; // @Type(() => Date)
+  @Transform(v => v || getInvalidDate(), transformOpt) retrieval_date: Date;
   @Transform(v => v || false, transformOpt) retrieved: boolean;
   satellite_network: string;
   @Transform(v => v || false, transformOpt) vendor_activation_status: boolean;
@@ -94,12 +98,18 @@ export class Collar implements ICollar {
   user_comment: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
+  permission_type: eCritterPermission;
   @Expose() get identifier(): string { return 'collar_id' }
+  @Expose() get frequencyPadded(): string {
+    const freq = this.frequency.toString();
+    const numDecimalPlaces = freq.slice(freq.lastIndexOf('.') + 1).length;
+    const numToAdd = 3 - numDecimalPlaces + freq.length;
+    return freq.padEnd(numToAdd, '0');
+  }
 
-  // fixme: 
   constructor(collar_type?: eNewCollarType) {
-    this.retrieval_date = new Date();
-    this.malfunction_date = new Date();
+    this.retrieval_date = getInvalidDate()
+    this.malfunction_date = getInvalidDate();
     this.vendor_activation_status = false;
     this.device_id = 0;
     if (collar_type) {
@@ -115,6 +125,16 @@ export class Collar implements ICollar {
     }
     this.frequency = 0;
     this.device_id = 0;
+  }
+
+  toJSON(): Collar {
+    if (isInvalidDate(this.retrieval_date)) {
+      delete this.retrieval_date;
+    }
+    if (isInvalidDate(this.malfunction_date)) {
+      delete this.malfunction_date
+    }
+    return this;
   }
 
   formatPropAsHeader(str: string): string {
@@ -141,7 +161,7 @@ export class Collar implements ICollar {
   }
 }
 
-const collarFormFields: Record<string, FormFieldObject[]> = {
+const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   communicationFields: [
     { prop: 'device_type', isCode: true },
     { prop: 'satellite_network', isCode: true },
@@ -155,7 +175,7 @@ const collarFormFields: Record<string, FormFieldObject[]> = {
     { prop: 'dropoff_device_id' },
     { prop: 'dropoff_frequency' },
     { prop: 'dropoff_frequency_unit' },
-    { prop: 'implant_device_id' }
+    // { prop: 'implant_device_id' } // fixme:
   ],
   identifierFields: [
     { prop: 'device_id' },
@@ -170,7 +190,7 @@ const collarFormFields: Record<string, FormFieldObject[]> = {
   statusFields: [
     { prop: 'device_status', isCode: true },
     { prop: 'malfunction_date' },
-    { prop: 'malfunction_type' },
+    { prop: 'device_malfunction_type', isCode: true },
     { prop: 'device_deployment_status', isCode: true },
     { prop: 'retrieval_date', isDate: true },
     { prop: 'retrieved', isBool: true }

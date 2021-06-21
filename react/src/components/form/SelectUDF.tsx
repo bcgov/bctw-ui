@@ -49,7 +49,7 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
   return (
     <>
       {isError ? (
-        <NotificationMessage type='error' message={formatAxiosError(error as any)} />
+        <NotificationMessage severity='error' message={formatAxiosError(error as any)} />
       ) : isLoading || isFetching ? (
         <div>loading...</div>
       ) : (

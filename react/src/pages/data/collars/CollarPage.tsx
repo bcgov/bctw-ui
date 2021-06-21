@@ -1,5 +1,5 @@
 import Button from 'components/form/Button';
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { CollarStrings as S } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
@@ -15,49 +15,45 @@ import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
 export default function CollarPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
 
-  const [editObj, setEditObj] = useState<Collar>(new Collar());
-  const [collarsA, setCollarsA] = useState<Collar[]>([]);
-  const [collarsU, setCollarsU] = useState<Collar[]>([]);
+  const [editObj, setEditObj] = useState<Collar>({} as Collar);
   const [showImport, setShowImport] = useState<boolean>(false);
 
   // set editing object when table row is selected
   const handleSelect = (row: Collar): void => {
+    // console.log(`device_id: ${row.device_id} p: ${row.permission_type}`);
     setEditObj(row);
   };
 
   // pass as callback to table component to set export data when api returns collar data
-  const onNewData = (d: Collar[]): void => {
-    if (d.length && d[0].animal_id) {
-      setCollarsA(d);
-    } else {
-      setCollarsU(d);
-    }
-  };
+  // const onNewData = (d: Collar[]): void => {
+  //   if (d.length && d[0].animal_id) {
+  //     setCollarsA(d);
+  //   } else {
+  //     setCollarsU(d);
+  //   }
+  // };
 
   const editProps = {
-    editing: editObj,
+    editing: new Collar(),
     open: false,
     onSave: null,
     handleClose: null,
   };
 
-  const tableProps: ITableQueryProps<Collar> = {
-    query: bctwApi.useCollarType,
-    onNewData
-  };
+  const tableProps: ITableQueryProps<Collar> = { query: bctwApi.useCollarType, /* onNewData */ };
   
   return (
     <ManageLayout>
       <div className='container'>
         <RowSelectedProvider>
           <>
-            <Table
+            <DataTable
               headers={attachedCollarProps}
               title={S.assignedCollarsTableTitle}
               queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
               onSelect={handleSelect}
             />
-            <Table
+            <DataTable
               headers={collarPropsToDisplay}
               title={S.availableCollarsTableTitle}
               queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}

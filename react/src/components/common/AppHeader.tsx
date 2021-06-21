@@ -13,7 +13,7 @@ import { UserContext } from 'contexts/UserContext';
 import { User } from 'types/user';
 import { IconButton } from '@material-ui/core';
 import { AlertContext } from 'contexts/UserAlertContext';
-import UserAlert from 'pages/user/UserAlert';
+import UserAlert from 'pages/user/UserAlertPage';
 import Modal from 'components/modal/Modal';
 
 type AppheaderProps = {

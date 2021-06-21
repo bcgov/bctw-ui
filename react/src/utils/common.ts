@@ -39,6 +39,7 @@ const columnToHeader = (prop: string): string => {
   const asArr = prop
     .replaceAll('_', ' ')
     .replaceAll(' id', ' ID')
+    .replaceAll('wlh', 'WLH') // used frequently
     .split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
@@ -68,7 +69,10 @@ const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
 /**
  * formats an Axios error to a string
  */
-const formatAxiosError = (err: AxiosError): string => `${err.response?.data ?? err.message}`;
+const formatAxiosError = (err: AxiosError): string => {
+  const msg = err?.response?.data;
+  return `${msg ?? err.message}`;
+} ;
 
 export {
   columnToHeader,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LocationEvent } from 'types/location_event';
 import DateInput from 'components/form/Date';
-import TextField from 'components/form/Input';
+import TextField from 'components/form/TextInput';
 import { InputChangeHandler } from 'components/component_interfaces';
 import { getInputTypesOfT } from 'components/form/form_helpers';
 import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
@@ -19,7 +19,7 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
   const { event, handleChange } = props;
   const [useUTM, setUseUTM] = useState<string>('utm');
 
-  const formFields = getInputTypesOfT(event, Object.keys(event).map(p => ({prop: p})), []);
+  const formFields = getInputTypesOfT(event, Object.keys(event).map(p => ({prop: p as keyof LocationEvent})), []);
 
   // create the form inputs
   const longField = formFields.find((f) => f.key.includes('longitude'));
@@ -98,7 +98,6 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
           style={{ width: '100%' }}
           multiline={true}
           rows={2}
-          outline={true}
           key={commentField.key}
           propName={commentField.key}
           defaultValue={commentField.value as string}

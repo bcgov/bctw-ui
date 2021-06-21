@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx pm2@4.4.0 --no-daemon start js/server.js"
+    "start": "node js/server.js",
+    "dev": "node node_modules/nodemon/bin/nodemon.js node js/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +18,11 @@
     "helmet": "^3.21.2",
     "keycloak-connect": "^9.0.3",
     "morgan": "^1.9.1",
-    "multer": "^1.4.2"
+    "multer": "^1.4.2",
+    "pg": "^8.6.0",
+    "pug": "^3.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }

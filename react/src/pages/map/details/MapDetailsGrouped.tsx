@@ -176,8 +176,8 @@ type TableCellLinkProps = {
 // table cell component that contains 'button' to open map overview page when clicked
 function CellWithLink({ row, propName, onClickLink }: TableCellLinkProps): JSX.Element {
   return (
-    <TableCell className={row[propName] ? '' : 'map-details-cell-hover'} onClick={row[propName] ? null : onClickLink}>
-      <div onClick={row[propName] ? onClickLink : null} className={'map-details-clickable-cell map-details-cell-hover'}>
+    <TableCell className={row[propName] ? '' : 'cell-hover'} onClick={row[propName] ? null : onClickLink}>
+      <div onClick={row[propName] ? onClickLink : null} className={'clickable-cell cell-hover'}>
         {row[propName] ?? ''}
       </div>
     </TableCell>

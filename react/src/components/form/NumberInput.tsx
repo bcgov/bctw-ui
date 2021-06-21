@@ -4,7 +4,7 @@ import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common';
 import { useState } from 'react';
-import { inputPropsToRemove } from './Input';
+import { inputPropsToRemove } from 'components/form/TextInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
 
@@ -16,30 +16,42 @@ interface INumberInputProps extends StandardTextFieldProps {
 }
 
 export default function NumberField(props: INumberInputProps): JSX.Element {
-  const { changeHandler, propName, defaultValue, style, validate } = props;
+  const { changeHandler, propName, defaultValue, style, validate, required } = props;
+  /**
+   * consider -1 to be an invalid default value - probably used to make sure this
+   * @param propName renders a @function numberField but is actually null
+  */
+  const [val, setVal] = useState(defaultValue === -1 ? '' : defaultValue);
   const [err, setErr] = useState<string>('');
-  // consider -1 to be an invalid default value, as it was likely used to make sure this
-  // prop uses a number field but is actually null
-  const [val, setVal] = useState<number>(defaultValue === -1 ? undefined : defaultValue);
 
+  /**
+   * when default value is changed
+   * undefined values are sometimes cast to -1 to make sure the form compoent is
+   * rendered as a number input. h
+   */
   useEffect(() => {
-    const o = { [propName]: defaultValue, error: err };
-    changeHandler(o);
+    setVal(defaultValue === -1 ? '' : defaultValue);
+    handleIsRequired(defaultValue);
   }, [defaultValue]);
+
+  useDidMountEffect(() => {
+    callParentHandler();
+  }, [val, err]);
 
   // error handling triggered when val is changed
   useDidMountEffect(() => {
     let err = '';
-    if (isNaN(val)) {
-      changeHandler({ [propName]: val, error: err });
+    if (isNaN(val as number)) {
+      callParentHandler();
       return;
     } 
     else if (typeof validate === 'function') {
-      err = validate(val);
+      err = validate(val as number);
       setErr(err);
     }
-    changeHandler({ [propName]: val, error: err });
   }, [val]);
+
+  const callParentHandler = (): void => changeHandler({ [propName]: val, error: !!err });
 
   // will receive warnings if these are not deleted
   const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue']);
@@ -54,14 +66,22 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
     }
     const n = parseFloat(target);
     if (isNaN(n)) {
-      // note: setting val to undefined doesn't trigger useEffect
-      setVal(0);
+      // note: setting val to undefined won't update state properly
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setVal('' as any);
       setErr(FormStrings.validateNumber);
       return;
     }
     // parseFloat will remove the '.' if inputted individually.
     setVal(target[target.length - 1] === '.' ? target : n);
+    handleIsRequired(target);
   };
+
+  const handleIsRequired = (v: number): void => {
+    if (!v && required) {
+      setErr(FormStrings.isRequired);
+    }
+  }
 
   return (
     <TextField

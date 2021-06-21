@@ -1,4 +1,4 @@
-import Table from 'components/table/Table';
+import DataTable from 'components/table/DataTable';
 import { ITableQueryProps, ITableSortProp } from 'components/table/table_interfaces';
 
 export type IHistoryPageProps<T> = ITableQueryProps<T> & {
@@ -20,6 +20,6 @@ export default function HistoryPage<T>(props: IHistoryPageProps<T>): JSX.Element
   }
 
   return (
-    <Table headers={propsToDisplay} queryProps={tblProps}/>
+    <DataTable headers={propsToDisplay} queryProps={tblProps}/>
   );
 }

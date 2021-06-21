@@ -4,6 +4,12 @@ const formatDay = 'YYYY-MM-DD';
 const formatTime = 'YYYY-MM-DD HH:mm:ss';
 const formatLocal = 'dddd, MMMM D, YYYY h:mm A';
 
+// used when creating new objects that have a date property
+// use this as an arbitrary 'invalid date'
+const getInvalidDate = (): Date => new Date('1900-01-01');
+// 
+const isInvalidDate = (d: Date): boolean => typeof d?.getFullYear === 'function' && d.getFullYear() <= 1900;
+
 const getToday = (): string => dayjs().format(formatDay)
 const getNow = (): string => dayjs().format(formatTime)
 const asLocalTime = (dateStr: string): string => dayjs(dateStr).format('LLLL');
@@ -46,4 +52,6 @@ export {
   isDayjs,
   formatDateStr,
   formatWithUTCOffset,
+  getInvalidDate,
+  isInvalidDate,
 }

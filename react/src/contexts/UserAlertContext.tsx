@@ -3,6 +3,13 @@ import { useState, createContext, useEffect, useContext } from 'react';
 import { useQueryClient } from 'react-query';
 import { TelemetryAlert } from 'types/alert';
 
+/**
+ * Context that children components can listen to.
+ * Provides:
+ *  a) an array of @type {TelemetryAlert} applicable to the user
+ *  b) a method to invalidate the query (force refetch alerts) when an alert is updated
+ */
+
 export interface IAlertContext {
   alerts: TelemetryAlert[];
   invalidate: () => void;

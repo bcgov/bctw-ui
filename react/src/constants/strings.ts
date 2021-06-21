@@ -1,6 +1,4 @@
 const CritterStrings = {
-  importTitle: 'Bulk Import Animals',
-  // importText: 'Use this feature to add or update animals. "animal_id" AND "wlh_id" OR "critter_id" must be included for the importer to perform an update to an existing animal. If "device_id" is present, the importer will attempt to attach the collar to the device. The device must exist.',
   exportTitle: 'Bulk Export Animal Data',
   exportText: '',
   requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
@@ -12,9 +10,21 @@ const CritterStrings = {
   collarRemovalText: 'Are you sure you wish to unassign this device?',
 }
 
+const ImportSteps = [ 
+  'Download the template.',
+  'Paste the column headers into an Excel spreadsheet',
+  'Fill out the rows',
+  'Save the file as the CSV format',
+  'Click the upload button and select your CSV file',
+  'If there were errors during the upload, view them in the error table.',
+  'Fix the errors, re-download the file as a CSV and try the upload again',
+];
+
 const FileStrings = {
   collarTemplateName: 'BCTW_bulk_import_device_template.csv',
   animalTemplateName: 'BCTW_bulk_import_animal_template.csv',
+  bothTemplateName: 'BCTW_import_metadata_template.csv',
+  pointTemplateName: 'BCTW_import_historical_telemetry_template.csv',
   templateButtonText: 'Download Template',
 }
 
@@ -31,7 +41,6 @@ const CollarStrings = {
   assignedCollarsTableTitle: 'Assigned Devices',
   availableCollarsTableTitle: 'Unassigned Devices',
   editableProps: ['device_id', 'frequency', 'device_make', 'device_model', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
-  selectableProps: ['device_make', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
   requiredProps: ['device_id', 'device_make', 'frequency'],
   exportTitle: 'Bulk Export Device Data',
   exportText: '',
@@ -39,8 +48,6 @@ const CollarStrings = {
   addCollarTypeText: 'What type of device would you like to add?',
   addCollarVect: 'Vectronics Device',
   addCollarVHF: 'VHF Device',
-  importTitle: 'Bulk Import VHF Devices',
-  importText: 'Use this feature to add multiple new devices.',
   assignmentHistoryByAnimalTitle: 'History of Devices Assigned',
   assignmentHistoryByDeviceTitle: 'History of Animals Assigned',
   collarImportStartMsg: 'What do you want to do?',
@@ -56,7 +63,6 @@ const CodeStrings = {
   addHeaderTitle: 'Add A New Code Header',
   importTitle: 'Bulk Import Codes',
   importText: 'Use this feature to add multiple codes. Codes cannot be edited here. The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional.',
-  editableProps: ['code_header_name', 'code_header_title', 'code_header_description']
 }
 
 const MapStrings = {
@@ -101,6 +107,7 @@ const FormStrings = {
   emptySelectValue: 'Blank',
   validateNegativeLongitude: 'Longitude must be negative',
   validateNumber: 'Must be a number',
+  isRequired: 'field is required'
 }
 
 const UserAlertStrings = {
@@ -124,4 +131,5 @@ export {
   MapTileLayers,
   UserAlertStrings,
   WorkflowStrings,
+  ImportSteps,
 }
