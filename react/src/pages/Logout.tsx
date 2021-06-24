@@ -1,5 +1,6 @@
 const Logout = (): JSX.Element => {
-    window.location.href = "/logout/";
+    // NOTE: Keycloak's default logout handler does NOTsupport a trailing slash
+    window.location.href = "/logout";
     return (
         <div className='container'>
         </div>
