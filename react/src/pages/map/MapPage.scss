@@ -32,14 +32,13 @@ $appearAboveMap: 1001;
   transform: translate(-6px,40px) scale(1.5);
 }
 
-
 #map .leaflet-control-zoom.leaflet-control {
-  margin: 90px 0 0 16px;
+  margin: 25px 0 0 16px;
   transform: scale(1.50);
 }
 
 #map .leaflet-control-layers.leaflet-control {
-  margin: 28px 0 0 8px;
+  margin: 146px 0 0 8px;
   transform: scale(1) translate(1px,4px);
 }
 
@@ -52,6 +51,11 @@ $appearAboveMap: 1001;
   align-items: center;
   justify-content: space-between;
   padding: 0 1rem;
+
+  button {
+    margin-right: -10px;
+  }
+
 }
 
 .side-panel-toolbar-closed {
@@ -209,16 +213,22 @@ $appearAboveMap: 1001;
 }
 
 // toggles 3-2D
+/*
 .map-dimension-btn {
   top: 10px;
 }
+*/
 
 .map-toggle-pings-btn {
-  top: 240px;
+  top: 126px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 
 .map-toggle-tracks-btn {
-  top: 295px;
+  top: 173px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
 }
 
 .icon-on {
