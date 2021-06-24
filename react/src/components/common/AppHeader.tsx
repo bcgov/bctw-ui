@@ -20,13 +20,19 @@ type AppheaderProps = {
   children?: JSX.Element;
 };
 
-const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
+const AppHeader = (req, { children }: AppheaderProps): JSX.Element => {
   const useUser = useContext(UserContext);
   const [user, setUser] = useState<User>(null);
   const useAlert = useContext(AlertContext);
   const [alertCount, setAlertCount] = useState<number>(0);
   const [showAlerts, setShowAlerts] = useState<boolean>(false);
-  
+  let keyCloakAccessToken;
+  if (req.kauth) {
+    keyCloakAccessToken = req.kauth.grant.access_token.content;
+  } else {
+    keyCloakAccessToken = null;
+  }
+
   useEffect(() => {
     if (useUser.ready) {
       setUser(useUser.user);
@@ -93,7 +99,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                     size={1}
                   />
                 </IconButton>
-                <span>{user?.idir ?? 'Username'}</span>
+                <span>{keyCloakAccessToken?.firstname ?? 'Local'}</span>&nbsp;<span>{keyCloakAccessToken?.lastName ?? 'User'}</span>
               </div>
             </li>
             <li className={'logout'}>
