@@ -90,7 +90,7 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addBaseLayer(esriWorldTopo, 'ESRI World Topo');
 
   // Some BCGW Overlays
-  layerPicker.addOverlay(getTCL(), 'TRIM Countour Lines');
+  layerPicker.addOverlay(getTCL(), 'TRIM Contour Lines');
   layerPicker.addOverlay(getUWR(), 'Ungulate Winter Range');
   layerPicker.addOverlay(getCHL(), 'Cariboo Herd Boundaries');
 };
@@ -104,7 +104,7 @@ const initMap = (
   handleDeleteLine: () => void,
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
-  const layerPicker = L.control.layers(null ,null,{position: 'topleft'});
+  const layerPicker = L.control.layers(null, null, {position: 'topleft'});
   L.drawLocal.draw.toolbar.buttons.polyline = MapStrings.drawLineLabel;
   L.drawLocal.draw.toolbar.buttons.polygon = MapStrings.drawPolygonLabel;
   L.drawLocal.draw.toolbar.buttons.rectangle = MapStrings.drawRectangleLabel;
