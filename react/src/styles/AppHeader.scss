@@ -37,9 +37,15 @@
   text-decoration: none;
 }
 
-button.logout {
-  color: $appHeaderColor;
+.logout {
   font-size: 1rem;
+
+  a {
+    color: $appHeaderColor;
+    text-decoration: none;
+    font-weight: 400;
+  }
+
 }
 
 .profile-nav {
@@ -65,7 +71,7 @@ button.logout {
     border-right: 1px solid $appHeaderColor;
 
     span {
-      margin-left: 0.5rem;
+    /*  margin-left: 0.5rem; */
     }
   }
 
@@ -94,7 +100,7 @@ button.logout {
 
   li {
     display: inline-block;
-    margin-right: 1rem;
+    margin-right: 2rem;
   }
 }
 

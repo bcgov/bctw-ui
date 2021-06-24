@@ -26,7 +26,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   const useAlert = useContext(AlertContext);
   const [alertCount, setAlertCount] = useState<number>(0);
   const [showAlerts, setShowAlerts] = useState<boolean>(false);
-
+  
   useEffect(() => {
     if (useUser.ready) {
       setUser(useUser.user);
@@ -42,19 +42,24 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   return (
     <header className={'app-header'}>
       <div className={'container'}>
-        <Link to='/map' className={'brand'} color={'inherit'}>
+        <Link to='/' className={'brand'} color={'inherit'}>
           <img src={headerImage} width={155} height={52} alt={'Government of British Columbia'} />
           <p>BCTW</p>
         </Link>
         <nav className={'app-nav'}>
           <ul>
             <li>
-              <Link to='/map' color={'inherit'}>
+              <Link to='/home' color={'inherit'}>
                 Home
               </Link>
             </li>
             <li>
-              <Link to='/data' color={'inherit'}>
+              <Link to='/map' color={'inherit'}>
+                Map
+              </Link>
+            </li>
+            <li>
+              <Link to='/manage' color={'inherit'}>
                 Manage
               </Link>
             </li>
@@ -88,13 +93,13 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                     size={1}
                   />
                 </IconButton>
-                <span>{user?.idir ?? 'user name'}</span>
+                <span>{user?.idir ?? 'Username'}</span>
               </div>
             </li>
-            <li>
-              <Button className={'logout'} color='primary'>
-                Log out
-              </Button>
+            <li className={'logout'}>
+              <Link to='/logout' color={'inherit'}>
+                Logout
+              </Link>
             </li>
             <li>{children}</li>
           </ul>

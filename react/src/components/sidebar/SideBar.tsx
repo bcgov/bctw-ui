@@ -52,45 +52,23 @@ export default function SideBar({ routes, collapseAble }: SideBarProps): JSX.Ele
 
   useEffect(() => {
     switch (location.pathname) {
-      case '/data':
       case '/animals':
       case '/devices':
-      case '/codes':
-      case '/profile':
       case '/import':
-      case '/user-admin':
+      case '/owner-access':
+      case '/profile':
+      case '/handle-permission-request':
       case '/animal-access':
-        handleSetVisible(['animals', 'codes', 'devices', 'import']);
+      case '/user-admin':
+      case '/codes':
+        handleSetVisible(['animals', 'devices', 'import', 'animal_access', 'profile', 'codes']);
         return;
     }
   }, [location, isAdmin, isOwner]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
-    <div className={'sidebar'}>
-      <Drawer
-        variant='permanent'
-        className={clsx(classes.drawer, {
-          [classes.drawerOpen]: open,
-          [classes.drawerClose]: !open
-        })}
-        classes={{
-          paper: clsx({
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open
-          })
-        }}>
-        {collapseAble ? (
-          <div className={'side-panel-toolbar'}>
-            <IconButton onClick={handleDrawerOpen}>
-              {open ? (
-                <ChevronLeft className={'open-close'} htmlColor='white' />
-              ) : (
-                <ChevronRight className={'open-close'} htmlColor='white' />
-              )}
-            </IconButton>
-          </div>
-        ) : null}
+    <div className={'sidebar'} id="manage_sidebar">
         <Divider />
         <List component='nav'>
           {routesToShow
@@ -108,7 +86,6 @@ export default function SideBar({ routes, collapseAble }: SideBarProps): JSX.Ele
               );
             })}
         </List>
-      </Drawer>
       <Divider />
       {/* <div>{sidebarContent}</div> */}
     </div>

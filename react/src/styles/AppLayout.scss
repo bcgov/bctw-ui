@@ -41,8 +41,17 @@
     background-color: inherit;
   }
 
+  .MuiListItem-gutters {
+    padding-left: 10px;
+    padding-right: 20px;
+  }
+
+  .MuiListItemIcon-root {
+    min-width: 36px;
+  }
+
   .sidebar-icon svg {
-    fill: #ffffff;
+    fill: #ffffff; 
   }
 
   .open-close {
