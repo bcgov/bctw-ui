@@ -2,6 +2,7 @@ import CritterPage from 'pages/data/animals/CritterPage';
 import CodePage from 'pages/data/codes/CodePage';
 import CollarPage from 'pages/data/collars/CollarPage';
 import Home from 'pages/Home';
+import AddUser from 'pages/onboarding/AddUser'
 import MapPage from 'pages/map/MapPage';
 import Import from 'pages/data/bulk/Import';
 // import TerrainPage from 'pages/terrain/TerrainPage';
@@ -27,6 +28,7 @@ export type RouteKey = {
 
 const AppRoutes: RouteKey[] = [
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
+  { name: 'onboarding', path: '/onboarding', title: 'onboarding', component: AddUser, sort: 101 },
   { name: 'map', path: '/map', title: 'Map', component: MapPage, sort: 1, icon: 'map' },
   // { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 1, icon: 'terrain' },
   { name: 'animals', path: '/animals', title: 'Animals', component: CritterPage, sort: 2, icon: 'critter' },
@@ -39,7 +41,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'user-admin', path: '/user-admin', title: 'Users', component: UserAdminPage, sort: 9, icon: 'admin' },
   { name: 'codes', path: '/codes', title: 'Code Tables', component: CodePage, sort: 10, icon: 'code' },
   { name: 'logout', path: '/logout', title: 'Logout', component: Logout, sort: 99 },
-  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 100 }
+  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 100 },
 ];
 
 const AppRouter = (): JSX.Element => {
