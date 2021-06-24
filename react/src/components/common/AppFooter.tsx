@@ -1,5 +1,4 @@
 import 'styles/AppFooter.scss';
-// import { Link } from 'react-router-dom';
 
 const AppFooter = (): JSX.Element => {
   return (
@@ -10,7 +9,6 @@ const AppFooter = (): JSX.Element => {
           <li>Privacy</li>
           <li>Accessibility</li>
           <li>Copyright</li>
-          {/* <li><Link to='/data' color={'inherit'}>Manage</Link></li> */}
         </ul>
       </nav>
     </footer>

@@ -1,14 +1,14 @@
 @import 'colours.scss';
 
 .app-footer {
-  // border-top: 2px solid $BCgovGold;
+  border-top: 2px solid $BCgovGold;
   color: $appHeaderColor;
   background-color: $BCgovBlue;
   z-index: 1600;
-  font-size: 11px;
+  font-size: 13px;
 
   .ul-right {
-    padding: 4px 0;
+    padding: 10px 4px;
     display: flex;
     justify-content: flex-end;
   }
