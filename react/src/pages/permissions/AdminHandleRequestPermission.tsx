@@ -148,7 +148,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
         <NotificationMessage severity={'error'} message={formatAxiosError(error)} />
       ) : (
         <>
-          <Typography variant='h4'>Grant or deny owner permission requests</Typography>
+          <Typography variant='h4'>Grant or deny manager permission requests</Typography>
           {requests.length === 0 ? (
             <Typography>no pending requests</Typography>
           ) : (

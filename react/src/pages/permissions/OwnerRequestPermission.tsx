@@ -229,7 +229,7 @@ export default function OwnerRequestPermission(): JSX.Element {
           handleClose={(): void => setShowPickCritterModal(false)}
           onSave={handleCrittersSelected}
           alreadySelected={permission?.access?.map((a) => a.critter_id)}
-          filter={[eCritterPermission.owner]}
+          filter={[eCritterPermission.manager]}
           title={`Select Animals`}
           showSelectPermission={true}
           headersToShow={PermissionTableHeaders.filter(p => p !== 'permission_type')}

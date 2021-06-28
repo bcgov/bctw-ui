@@ -14,6 +14,9 @@ import { AxiosError } from 'axios';
 import { adminPermissionOptions } from 'types/permission';
 import { formatAxiosError } from 'utils/common';
 
+/**
+ * admin-access only page that allows an admin to grant user-critter permissions
+ */
 export default function GrantCritterAccessPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const [user, setUser] = useState<User>({} as User);
