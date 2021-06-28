@@ -194,7 +194,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
           </Select>
         </FormControl>
       ) : (
-        <div>unable to load dropdown</div>
+        <div>unable to load {codeHeader} codes</div>
       )}
     </>
   );

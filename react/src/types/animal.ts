@@ -3,7 +3,7 @@ import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { eCritterPermission } from 'types/permission';
 import { formatLatLong } from 'types/common_helpers';
-import { FormFieldObject } from 'types/form_types';
+import { eInputType, FormFieldObject } from 'types/form_types';
 
 const assignedCritterProps = ['animal_id', 'wlh_id', 'animal_status', 'device_id'];
 const unassignedCritterProps = ['animal_id', 'wlh_id', 'animal_status'];
@@ -191,73 +191,73 @@ export class Animal implements IAnimal {
 
 const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   associatedAnimalFields: [
-    { prop: 'associated_animal_id' },
-    { prop: 'associated_animal_relationship' /*, isCode: true */ }
+    { prop: 'associated_animal_id', type: eInputType.text },
+    { prop: 'associated_animal_relationship', type: eInputType.text /*, isCode: true */ }
   ],
   captureFields: [
-    { prop: 'capture_date', required: true, isDate: true },
-    { prop: 'capture_latitude' },
-    { prop: 'capture_longitude' },
-    { prop: 'capture_utm_zone' },
-    { prop: 'capture_utm_easting' },
-    { prop: 'capture_utm_northing' },
-    { prop: 'region', isCode: true /*, required: true */ },
-    { prop: 'recapture', isBool: true },
-    { prop: 'capture_comment' }
+    { prop: 'capture_date', required: true, type: eInputType.date },
+    { prop: 'capture_latitude', type: eInputType.number },
+    { prop: 'capture_longitude', type: eInputType.number },
+    { prop: 'capture_utm_zone', type: eInputType.number },
+    { prop: 'capture_utm_easting', type: eInputType.number },
+    { prop: 'capture_utm_northing', type: eInputType.number },
+    { prop: 'region', type: eInputType.code},
+    { prop: 'recapture', type: eInputType.check },
+    { prop: 'capture_comment', type: eInputType.text}
   ],
   characteristicsFields: [
-    { prop: 'animal_status', isCode: true, required: true },
-    { prop: 'species', isCode: true, required: true },
-    { prop: 'sex', isCode: true },
-    { prop: 'animal_colouration', isCode: true, codeName: 'colour'},
-    { prop: 'estimated_age' },
-    { prop: 'life_stage', isCode: true },
-    { prop: 'juvenile_at_heel', isCode: true }
+    { prop: 'animal_status', type: eInputType.code, required: true },
+    { prop: 'species', type: eInputType.code, required: true },
+    { prop: 'sex', type: eInputType.code },
+    { prop: 'animal_colouration', type: eInputType.code, codeName: 'colour'},
+    { prop: 'estimated_age', type: eInputType.number },
+    { prop: 'life_stage', type: eInputType.code },
+    { prop: 'juvenile_at_heel', type: eInputType.code }
   ],
   // to show in the animal metadata history window
   historyProps: [
-    { prop: 'animal_id' },
-    { prop: 'wlh_id' },
-    { prop: 'animal_status' },
-    { prop: 'juvenile_at_heel' },
-    { prop: 'region' },
-    { prop: 'population_unit' },
-    { prop: 'valid_from' },
-    { prop: 'valid_to' }
+    { prop: 'animal_id', type: eInputType.unknown},
+    { prop: 'wlh_id' , type: eInputType.unknown},
+    { prop: 'animal_status' , type: eInputType.unknown},
+    { prop: 'juvenile_at_heel' , type: eInputType.unknown},
+    { prop: 'region' , type: eInputType.unknown},
+    { prop: 'population_unit' , type: eInputType.unknown},
+    { prop: 'valid_from' , type: eInputType.unknown},
+    { prop: 'valid_to' , type: eInputType.unknown}
   ],
   identifierFields: [
-    { prop: 'wlh_id' },
-    { prop: 'animal_id' },
-    { prop: 'population_unit', isCode: true },
-    { prop: 'collective_unit' },
-    { prop: 'ear_tag_left_colour', isCode: true, codeName: 'colour' },
-    { prop: 'ear_tag_right_colour', isCode: true, codeName: 'colour'  },
-    { prop: 'ear_tag_id' },
+    { prop: 'wlh_id', type: eInputType.text},
+    { prop: 'animal_id', type: eInputType.text},
+    { prop: 'population_unit', type: eInputType.code },
+    { prop: 'collective_unit', type: eInputType.text },
+    { prop: 'ear_tag_left_colour', type: eInputType.code, codeName: 'colour' },
+    { prop: 'ear_tag_right_colour', type: eInputType.code, codeName: 'colour'  },
+    { prop: 'ear_tag_id', type: eInputType.text },
   ],
   mortalityFields: [
-    { prop: 'mortality_date', isDate: true /*, required: true */ },
-    { prop: 'mortality_latitude' }, 
-    { prop: 'mortality_longitude' },
-    { prop: 'mortality_utm_zone' },
-    { prop: 'mortality_utm_easting' },
-    { prop: 'mortality_utm_northing' },
-    { prop: 'proximate_cause_of_death', isCode: true },
-    { prop: 'ultimate_cause_of_death', isCode: true, codeName: 'proximate_cause_of_death' },
-    { prop: 'predator_species', /* isCode: true */ }, // todo:
-    { prop: 'mortality_comment' },
+    { prop: 'mortality_date', type: eInputType.date },
+    { prop: 'mortality_latitude', type: eInputType.date  }, 
+    { prop: 'mortality_longitude', type: eInputType.date  },
+    { prop: 'mortality_utm_zone', type: eInputType.date  },
+    { prop: 'mortality_utm_easting', type: eInputType.date  },
+    { prop: 'mortality_utm_northing', type: eInputType.date  },
+    { prop: 'proximate_cause_of_death', type: eInputType.code },
+    { prop: 'ultimate_cause_of_death', type: eInputType.code, codeName: 'proximate_cause_of_death' },
+    { prop: 'predator_species', type: eInputType.text /* isCode: true */ }, // todo:
+    { prop: 'mortality_comment', type: eInputType.text },
   ],
   releaseFields: [
-    { prop: 'release_date', isDate: true /*, required: true */ },
-    { prop: 'release_latitude' }, 
-    { prop: 'release_longitude' },
-    { prop: 'release_utm_zone' },
-    { prop: 'release_utm_easting' },
-    { prop: 'release_utm_northing' },
-    { prop: 'translocation' },
-    { prop: 'release_comment' },
+    { prop: 'release_date', type: eInputType.date },
+    { prop: 'release_latitude', type: eInputType.number }, 
+    { prop: 'release_longitude', type: eInputType.number },
+    { prop: 'release_utm_zone', type: eInputType.number },
+    { prop: 'release_utm_easting', type: eInputType.number },
+    { prop: 'release_utm_northing', type: eInputType.number },
+    { prop: 'translocation', type: eInputType.check },
+    { prop: 'release_comment', type: eInputType.text },
   ],
   userCommentField : [
-    { prop: 'user_comment' }
+    { prop: 'user_comment', type: eInputType.text }
   ]
 };
 

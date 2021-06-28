@@ -188,8 +188,10 @@ export default function DataTable<T extends BCTW>({
           <CircularProgress />
         ) : isError ? (
           <NotificationMessage severity='error' message={formatAxiosError(error)} />
+        ) : values.length === 0 ? (
+          <strong>updating...</strong>
         ) : (
-          'no data available'
+          <strong>no data available</strong>
         )}
       </TableCell>
     </TableRow>

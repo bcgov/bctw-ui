@@ -10,7 +10,7 @@ export const codeApi = (props: ApiProps) => {
     const url = createUrl({ api: 'get-code', query: `codeHeader=${codeHeader}`, page });
     // console.log(`requesting ${codeHeader} codes`);
     const { data } = await api.get(url);
-    return data[0];
+    return data;
   };
 
   const getCodeHeaders = async (): Promise<ICodeHeader[]> => {

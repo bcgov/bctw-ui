@@ -1,7 +1,7 @@
 import { Type, Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common';
 import { BCTW, BCTWBaseType } from 'types/common_types';
-import { FormFieldObject } from 'types/form_types';
+import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 
 export enum eUserRole {
@@ -45,9 +45,9 @@ export class User implements IUser {
 }
 
 export const userFormFields: FormFieldObject<User>[] = [
-  { prop: 'idir' },
-  { prop: 'bceid' },
-  { prop: 'email' },
+  { prop: 'idir', type: eInputType.text },
+  { prop: 'bceid', type: eInputType.text },
+  { prop: 'email', type: eInputType.text },
 ]
 
 export interface IUserCritterAccess {

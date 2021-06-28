@@ -1,13 +1,10 @@
 import { EditorProps } from 'components/component_interfaces';
-import { getInputTypesOfT } from 'components/form/form_helpers';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
-import { useState } from 'react';
 import { User, userFormFields } from 'types/user';
 import { MakeEditField } from 'components/form/create_form_components';
 import { formatLabel } from 'types/common_helpers';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { FormInputType } from 'types/form_types';
+import { eInputType } from 'types/form_types';
 
 /**
  * the edit user form, implemented in pags/admin/UserAdmin
@@ -15,11 +12,6 @@ import { FormInputType } from 'types/form_types';
  */
 export default function EditUser(props: EditorProps<User>): JSX.Element {
   const { editing } = props;
-  const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
-
-  useDidMountEffect(() => {
-    setInputTypes(getInputTypesOfT<User>(editing, userFormFields, []));
-  }, [editing]);
 
   return (
     <EditModal
@@ -33,9 +25,9 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
           return (
             <div className='container'>
               <form className='rootEditInput' autoComplete='off'>
-                {inputTypes
+                {userFormFields
                   .map((d) => {
-                    const { key, value } = d;
+                    const { prop } = d;
                     // const hasError = !!errors[key];
                     // console.log(hasError)
                     // return <TextField
@@ -50,9 +42,11 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
                     //   label={formatLabel(editing, key)}
                     // />
                     return MakeEditField({
-                      formType: d,
+                      prop,
+                      value: editing[prop],
+                      type: eInputType.text,
                       handleChange: handlerFromContext,
-                      label: formatLabel(editing, d.key),
+                      label: formatLabel(editing, prop),
                       required: true,
                     })
                   })}

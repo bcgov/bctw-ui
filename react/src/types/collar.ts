@@ -2,7 +2,7 @@ import { columnToHeader } from 'utils/common';
 import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';
-import { FormFieldObject } from 'types/form_types';
+import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { getInvalidDate, isInvalidDate } from 'utils/time';
 
@@ -163,40 +163,40 @@ export class Collar implements ICollar {
 
 const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   communicationFields: [
-    { prop: 'device_type', isCode: true },
-    { prop: 'satellite_network', isCode: true },
-    { prop: 'frequency' },
-    { prop: 'frequency_unit', isCode: true },
-    { prop: 'fix_rate' },
-    { prop: 'vendor_activation_status', isBool: true },
+    { prop: 'device_type', type: eInputType.code },
+    { prop: 'satellite_network', type: eInputType.code },
+    { prop: 'frequency', type: eInputType.number },
+    { prop: 'frequency_unit', type: eInputType.code },
+    { prop: 'fix_rate', type: eInputType.number },
+    { prop: 'vendor_activation_status', type: eInputType.check },
   ],
   deviceOptionFields: [
-    { prop: 'camera_device_id' },
-    { prop: 'dropoff_device_id' },
-    { prop: 'dropoff_frequency' },
-    { prop: 'dropoff_frequency_unit' },
+    { prop: 'camera_device_id', type: eInputType.number },
+    { prop: 'dropoff_device_id', type: eInputType.number },
+    { prop: 'dropoff_frequency', type: eInputType.number },
+    { prop: 'dropoff_frequency_unit', type: eInputType.number },
     // { prop: 'implant_device_id' } // fixme:
   ],
   identifierFields: [
-    { prop: 'device_id' },
-    { prop: 'device_make', isCode: true },
-    { prop: 'device_model' }
+    { prop: 'device_id', type: eInputType.number },
+    { prop: 'device_make', type: eInputType.code },
+    { prop: 'device_model', type: eInputType.code }
   ],
   purchaseFields: [
-    { prop: 'purchase_year' },
-    { prop: 'purchase_month' },
-    { prop: 'purchase_comment' }
+    { prop: 'purchase_year', type: eInputType.number },
+    { prop: 'purchase_month', type: eInputType.number },
+    { prop: 'purchase_comment', type: eInputType.number }
   ],
   statusFields: [
-    { prop: 'device_status', isCode: true },
-    { prop: 'malfunction_date' },
-    { prop: 'device_malfunction_type', isCode: true },
-    { prop: 'device_deployment_status', isCode: true },
-    { prop: 'retrieval_date', isDate: true },
-    { prop: 'retrieved', isBool: true }
+    { prop: 'device_status', type: eInputType.code },
+    { prop: 'malfunction_date', type: eInputType.date },
+    { prop: 'device_malfunction_type', type: eInputType.code },
+    { prop: 'device_deployment_status', type: eInputType.code },
+    { prop: 'retrieval_date', type: eInputType.date },
+    { prop: 'retrieved', type: eInputType.check}
   ],
   userCommentField: [
-    { prop: 'user_comment' }
+    { prop: 'user_comment', type: eInputType.text }
   ]
 }
 

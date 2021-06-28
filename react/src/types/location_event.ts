@@ -1,5 +1,6 @@
 import { columnToHeader } from 'utils/common';
 import { BCTW } from './common_types';
+import { eInputType, FormFieldObject } from './form_types';
 
 type LocationEventType = 'capture' | 'mortality' | 'release' | 'retrieval' | 'malfunction';
 interface IBaseLocationEvent {
@@ -35,6 +36,17 @@ class LocationEvent implements BCTW, IBaseLocationEvent {
   formatPropAsHeader(str: string): string {
     const withType = `${this.locationType}_${str}`.replace('utm', 'UTM');
     return columnToHeader(withType);
+  }
+  get formFields(): FormFieldObject<LocationEvent>[] {
+    return [
+      {prop: 'date', type: eInputType.date },
+      {prop: 'latitude', type: eInputType.number },
+      {prop: 'longitude', type: eInputType.number },
+      {prop: 'utm_easting', type: eInputType.number },
+      {prop: 'utm_northing', type: eInputType.number },
+      {prop: 'utm_zone', type: eInputType.number },
+      {prop: 'comment', type: eInputType.text},
+    ]
   }
 }
 
