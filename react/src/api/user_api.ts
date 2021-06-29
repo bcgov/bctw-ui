@@ -10,6 +10,16 @@ export const userApi = (props: ApiProps) => {
   const { api, testUser } = props;
 
   /**
+   * retrieves keycloak session data
+   */
+  const getSessionInfo = async (): Promise<User> => {
+    const url = createUrl({api: 'session-info'});
+    const { data } = await api.get(url);
+    console.log('retrieve session info', data);
+    return data;
+  }
+
+  /**
    * @param body a new or existing @type {User}
   */
   const addUser = async (body: User): Promise<User> => {
@@ -97,6 +107,7 @@ export const userApi = (props: ApiProps) => {
     getUsers,
     getUserAlerts,
     upsertUDF,
-    updateAlert
+    updateAlert,
+    getSessionInfo
   };
 };

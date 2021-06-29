@@ -60,14 +60,23 @@ var session = {
   store: memoryStore
 };
 
-
-
 const appendQueryToUrl = (url, query) => {
   if (!query) return url;
   return url.includes('?') ?
     url += `&${query}` :
     url += `?${query}`;
 };
+
+/**
+ * special endpoint that returns keycloak session info
+  */
+const retrieveSessionInfo = function (req, res, next) {
+  if (!isProd) {
+    return res.status(500).send('not in production, no session info available');
+  }
+  const data = req.kauth.grant.access_token.content;
+  res.status(200).send(data);
+}
 
 /* ## proxyApi
   The api is not exposed publicly. This service is protected
@@ -412,6 +421,7 @@ if (isTest) {
 } else if (isProd) {
   app
     .get('/', keycloak.protect(), pageHandler)
+    .get('/api/session-info', retrieveSessionInfo)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
     // bulk file import handlers

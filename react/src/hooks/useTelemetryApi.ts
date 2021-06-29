@@ -209,6 +209,13 @@ export const useTelemetryApi = () => {
   };
 
   /**
+   * @returns a keycloak information for the user
+   */
+  const useUserSessionInfo = (): UseQueryResult<User, AxiosError> => {
+    return useQuery<User, AxiosError>('user-session', () => userApi.getSessionInfo(), defaultQueryOptions);
+  };
+
+  /**
    * requires admin role
    * @returns a list of all users
    */
@@ -385,6 +392,7 @@ export const useTelemetryApi = () => {
     useUDF,
     usePermissionRequests,
     usePermissionHistory,
+    useUserSessionInfo,
     // mutations
     useMutateCodeHeader,
     useMutateBulkCsv,
