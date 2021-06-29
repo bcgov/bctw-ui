@@ -14,7 +14,7 @@ import { Animal } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
-import { IUserCritterAccess, User, UserCritterAccess } from 'types/user';
+import { IKeyCloakSessionInfo, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
   eCritterFetchType,
@@ -25,8 +25,6 @@ import {
   IUpsertPayload,
   IUserCritterPermissionInput
 } from 'api/api_interfaces';
-import { UserContext } from 'contexts/UserContext';
-import { useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { BCTW, BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
@@ -57,15 +55,12 @@ const useApi = (): AxiosInstance => {
 export const useTelemetryApi = () => {
   const api = useApi();
 
-  const userContext = useContext(UserContext);
-  const testUser = userContext.testUser;
-
-  const collarApi = collar_api({ api, testUser });
-  const critterApi = critter_api({ api, testUser });
-  const codeApi = code_api({ api, testUser });
+  const collarApi = collar_api({ api });
+  const critterApi = critter_api({ api });
+  const codeApi = code_api({ api });
   const bulkApi = bulk_api(api);
-  const mapApi = map_api({ api, testUser });
-  const userApi = user_api({ api, testUser });
+  const mapApi = map_api({ api });
+  const userApi = user_api({ api });
   const eventApi = event_api({ api });
   const permissionApi = permission_api({ api});
 
@@ -211,8 +206,8 @@ export const useTelemetryApi = () => {
   /**
    * @returns a keycloak information for the user
    */
-  const useUserSessionInfo = (): UseQueryResult<User, AxiosError> => {
-    return useQuery<User, AxiosError>('user-session', () => userApi.getSessionInfo(), defaultQueryOptions);
+  const useUserSessionInfo = (): UseQueryResult<IKeyCloakSessionInfo, AxiosError> => {
+    return useQuery<IKeyCloakSessionInfo, AxiosError>('user-session', () => userApi.getSessionInfo(), defaultQueryOptions);
   };
 
   /**

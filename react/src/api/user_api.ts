@@ -2,7 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
-import { IUser, User } from 'types/user';
+import { IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps } from 'api/api_interfaces';
 
@@ -11,8 +11,9 @@ export const userApi = (props: ApiProps) => {
 
   /**
    * retrieves keycloak session data
+   * note: in dev this will likely 404
    */
-  const getSessionInfo = async (): Promise<User> => {
+  const getSessionInfo = async (): Promise<IKeyCloakSessionInfo> => {
     const url = createUrl({api: 'session-info'});
     const { data } = await api.get(url);
     console.log('retrieve session info', data);

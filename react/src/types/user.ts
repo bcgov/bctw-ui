@@ -10,11 +10,19 @@ export enum eUserRole {
   observer = 'observer'
 }
 
+type KeyCloakDomainType = 'idir' | 'bceid';
+export interface IKeyCloakSessionInfo {
+  domain: KeyCloakDomainType;
+  username: string;
+  email: string;
+  family_name: string;
+  given_name: string;
+}
+
 export interface IUser extends BCTW, BCTWBaseType {
   id: number;
   idir: string;
   bceid: string;
-  email: string;
   // indicates if the user is considered the owner of at least one animal
   is_owner?: boolean; 
 }
@@ -25,7 +33,6 @@ export class User implements IUser {
   id: number;
   idir: string;
   bceid: string;
-  email: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   @Expose() get is_admin(): boolean {
@@ -47,7 +54,7 @@ export class User implements IUser {
 export const userFormFields: FormFieldObject<User>[] = [
   { prop: 'idir', type: eInputType.text },
   { prop: 'bceid', type: eInputType.text },
-  { prop: 'email', type: eInputType.text },
+  // { prop: 'email', type: eInputType.text },
 ]
 
 export interface IUserCritterAccess {

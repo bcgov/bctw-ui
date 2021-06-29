@@ -1,45 +1,40 @@
-import { useContext, useEffect, useState } from 'react';
-import Button from '@material-ui/core/Button';
-import { Link } from 'react-router-dom';
-
-// Icons
-import Icon from '@mdi/react';
-import { mdiAccountCircle, mdiAccountRemove, mdiProgressClock, mdiBell } from '@mdi/js';
-
-// Assets
 import 'styles/AppHeader.scss';
-import headerImage from 'assets/images/gov3_bc_logo.png';
-import { UserContext } from 'contexts/UserContext';
-import { User } from 'types/user';
+
 import { IconButton } from '@material-ui/core';
-import { AlertContext } from 'contexts/UserAlertContext';
-import UserAlert from 'pages/user/UserAlertPage';
+import { mdiAccountCircle, mdiAccountRemove, mdiBell, mdiProgressClock } from '@mdi/js';
+import Icon from '@mdi/react';
+import headerImage from 'assets/images/gov3_bc_logo.png';
 import Modal from 'components/modal/Modal';
+import { AlertContext } from 'contexts/UserAlertContext';
+import { UserContext } from 'contexts/UserContext';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import UserAlert from 'pages/user/UserAlertPage';
+import { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { IKeyCloakSessionInfo } from 'types/user';
 
 type AppheaderProps = {
   children?: JSX.Element;
 };
 
-const AppHeader = (req, { children }: AppheaderProps): JSX.Element => {
+const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
+  // load the contexts
   const useUser = useContext(UserContext);
-  const [user, setUser] = useState<User>(null);
   const useAlert = useContext(AlertContext);
+
+  const [session, setSession] = useState<IKeyCloakSessionInfo>(null);
   const [alertCount, setAlertCount] = useState<number>(0);
   const [showAlerts, setShowAlerts] = useState<boolean>(false);
-  let keyCloakAccessToken;
-  if (req.kauth) {
-    keyCloakAccessToken = req.kauth.grant.access_token.content;
-  } else {
-    keyCloakAccessToken = null;
-  }
 
-  useEffect(() => {
-    if (useUser.ready) {
-      setUser(useUser.user);
+  // when the UserContext is loaded, set the session info state 
+  useDidMountEffect(() => {
+    if (useUser.session) {
+      setSession(useUser.session);
     }
   }, [useUser]);
 
-  useEffect(() => {
+  // when the AlertContext is loaded, set the alert state
+  useDidMountEffect(() => {
     if (useAlert?.alerts?.length) {
       setAlertCount(useAlert.alerts.length);
     }
@@ -55,19 +50,13 @@ const AppHeader = (req, { children }: AppheaderProps): JSX.Element => {
         <nav className={'app-nav'}>
           <ul>
             <li>
-              <Link to='/home' color={'inherit'}>
-                Home
-              </Link>
+              <Link to='/home' color={'inherit'}>Home</Link>
             </li>
             <li>
-              <Link to='/map' color={'inherit'}>
-                Map
-              </Link>
+              <Link to='/map' color={'inherit'}>Map</Link>
             </li>
             <li>
-              <Link to='/manage' color={'inherit'}>
-                Manage
-              </Link>
+              <Link to='/manage' color={'inherit'}>Manage</Link>
             </li>
           </ul>
         </nav>
@@ -99,13 +88,11 @@ const AppHeader = (req, { children }: AppheaderProps): JSX.Element => {
                     size={1}
                   />
                 </IconButton>
-                <span>{keyCloakAccessToken?.firstname ?? 'Local'}</span>&nbsp;<span>{keyCloakAccessToken?.lastName ?? 'User'}</span>
+                <span>{session?.given_name?? 'Local'}</span>&nbsp;<span>{session?.family_name?? 'User'}</span>
               </div>
             </li>
             <li className={'logout'}>
-              <Link to='/logout' color={'inherit'}>
-                Logout
-              </Link>
+              <Link to='/logout' color={'inherit'}>Logout</Link>
             </li>
             <li>{children}</li>
           </ul>
