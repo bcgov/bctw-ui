@@ -46,9 +46,10 @@ import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 
-import MapIcon from '@material-ui/icons/Map';
-import LanguageIcon from '@material-ui/icons/Language';
-import Terrain from '../terrain/TerrainPage';
+// note: terrain page deprecated for now
+// import MapIcon from '@material-ui/icons/Map';
+// import LanguageIcon from '@material-ui/icons/Language';
+// import Terrain from '../terrain/TerrainPage';
 
 /**
   there are several forms of state in this page:
@@ -70,7 +71,7 @@ export default function MapPage(): JSX.Element {
   const mapRef = useRef<L.Map>(null);
 
   // The flag for which map is showing
-  const [map3D, setMap3D] = useState(false);
+  // const [map3D, setMap3D] = useState(false);
 
   // pings layer state
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
@@ -616,6 +617,7 @@ export default function MapPage(): JSX.Element {
   }, [unassignedPingsLayer]);
 
   // upon 3D -> 2D map, need to re-init
+  /*
   useDidMountEffect(() => {
     if (!map3D) {
       initMap(mapRef, drawnItems, selectedPingsLayer, handleDrawShape, handleDrawLine, handleDeleteLine);
@@ -623,6 +625,7 @@ export default function MapPage(): JSX.Element {
       toggleTracks(true);
     }
   }, [map3D]);
+  */
 
   // todo: move this to separate component / wrapper
   // resizable state & handlers
@@ -646,17 +649,18 @@ export default function MapPage(): JSX.Element {
     }
   };
 
-  return map3D ? (
-    <>
-      <Terrain />
-      <div
-        className={'map-icon map-dimension-btn icon-on'}
-        onClick={(): void => setMap3D((o) => !o)}
-        title={map3D ? 'Switch to 2D view' : 'Switch to 3D view'}>
-        <MapIcon />
-      </div>
-    </>
-  ) : (
+  // return map3D ? (
+  //   <>
+  //     <Terrain />
+  //     <div
+  //       className={'map-icon map-dimension-btn icon-on'}
+  //       onClick={(): void => setMap3D((o) => !o)}
+  //       title={map3D ? 'Switch to 2D view' : 'Switch to 3D view'}>
+  //       <MapIcon />
+  //     </div>
+  //   </>
+  // ) :
+  return (
     <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
       <MapFilters
         start={range.start}
