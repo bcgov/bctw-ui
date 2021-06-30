@@ -18,8 +18,8 @@ export default function OwnerLayout({ children }: IDefaultLayoutProps): JSX.Elem
 
   useEffect(() => {
     const updateComponent = (): void => {
-      const { ready, user } = userChanges;
-      if (ready && !user.is_owner) {
+      const { user } = userChanges;
+      if (user && !user?.is_owner) {
         // console.log('no owner access, rerouting to home')
         history.push('/home');
       }

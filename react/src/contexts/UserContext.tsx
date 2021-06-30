@@ -1,20 +1,17 @@
 import { IUserUpsertPayload } from 'api/user_api';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
 import { User, IKeyCloakSessionInfo } from 'types/user';
 
 export interface IUserContext {
-  session: IKeyCloakSessionInfo;
   user: User;
   error?: string;
-  ready?: boolean;
 }
 
 export const UserContext = createContext<IUserContext>({
-  session: null,
   user: null,
   error: null,
-  ready: false
 });
 
 export const UserContextDispatch = createContext(null);
@@ -29,8 +26,11 @@ export const UserContextDispatch = createContext(null);
  */
 export const UserStateContextProvider: React.FC = (props) => {
   const api = useTelemetryApi();
-  // instantiatethe context
-  const [userContext, setUserContext] = useState<IUserContext>({ ready: false, user: null, session: null});
+  // instantiate the context
+  const [userContext, setUserContext] = useState<IUserContext>({ user: null, error: null });
+  const [session, setSession] = useState<IKeyCloakSessionInfo>();
+  const [readyUser, setReadyUser] = useState(false);
+  const [readySession, setReadySession] = useState(false);
 
   // fetch the BCTW user specific data
   const { isError: isUserError, data: userData, status: userStatus, error: userError } = api.useUser();
@@ -48,21 +48,27 @@ export const UserStateContextProvider: React.FC = (props) => {
   // when the user data is fetched...
   useEffect(() => {
     if (userStatus === 'success') {
-      const { session } = userContext;
-      setUserContext({ ready: true, user: userData, session });
-      if (session) {
-        handleUserChanged(session);
-      }
+      setReadyUser(true);
+      setUserContext({ user: userData });
+    } else {
+      setReadyUser(false);
     } 
   }, [userStatus]);
 
   // when the session data is fetched
   useEffect(() => {
     if (sessionStatus === 'success') {
-      setUserContext({ ready: userContext.ready, session: sessionData, user: userContext.user });
-      handleUserChanged(sessionData);
+      setReadySession(true);
+      setSession(sessionData);
     }
   }, [sessionStatus]);
+
+  useDidMountEffect(() => {
+    // if both are ready, check if the user object needs to be updated
+    if (readySession && readyUser) {
+      handleUserChanged();
+    }
+  }, [readySession, readyUser])
 
   // when there was an error retrieving data
   useEffect(() => {
@@ -71,8 +77,7 @@ export const UserStateContextProvider: React.FC = (props) => {
       const error = err?.response?.data?.error;
       console.log('UserContext: failed to retrieve user or session info', error);
       const user = isUserError ? null : userContext.user;
-      const session = isSessionError ? null: userContext.session;
-      setUserContext({ ready: false, error, session, user })
+      setUserContext({ user, error })
     }
   }, [sessionError, userError])
 
@@ -82,11 +87,11 @@ export const UserStateContextProvider: React.FC = (props) => {
    * upsert them
    * fixme: should idir/bceid be updated?
    */
-  const handleUserChanged = async (session: IKeyCloakSessionInfo): Promise<void> => {
+  const handleUserChanged = async (): Promise<void> => {
     const { user } = userContext;
-    // if the user hasn't been retrieved yet, dont do anything
-    if (!user) {
-      console.log('UserContext: handleUserChanged: user info not ready')
+    // confirm valid state 
+    if (!session || !user) {
+      console.log('UserContext: handleUserChanged: session or user info not ready')
       return;
     }
     if (session.email === user.email && session.family_name === user.lastname && session.given_name === user.firstname) {
@@ -95,6 +100,7 @@ export const UserStateContextProvider: React.FC = (props) => {
       return;
     }
     const newUser = Object.assign({}, user);
+
     newUser.email = session.email;
     newUser.firstname = session.given_name;
     newUser.lastname = session.family_name;

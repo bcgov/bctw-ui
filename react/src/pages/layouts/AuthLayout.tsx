@@ -17,8 +17,8 @@ export default function AuthLayout({ children }: IDefaultLayoutProps): JSX.Eleme
 
   useEffect(() => {
     const updateComponent = (): void => {
-      const { ready, user } = userChanges;
-      if (ready && user.role_type !== eUserRole.administrator) {
+      const { user } = userChanges;
+      if (user && user?.role_type !== eUserRole.administrator) {
         history.push('/home');
       }
     };

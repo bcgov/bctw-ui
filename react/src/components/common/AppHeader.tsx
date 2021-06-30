@@ -11,7 +11,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import UserAlert from 'pages/user/UserAlertPage';
 import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { IKeyCloakSessionInfo } from 'types/user';
+import { User } from 'types/user';
 
 type AppheaderProps = {
   children?: JSX.Element;
@@ -22,14 +22,15 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   const useUser = useContext(UserContext);
   const useAlert = useContext(AlertContext);
 
-  const [session, setSession] = useState<IKeyCloakSessionInfo>(null);
+  const [ user, setUser ] = useState<User>();
   const [alertCount, setAlertCount] = useState<number>(0);
   const [showAlerts, setShowAlerts] = useState<boolean>(false);
 
   // when the UserContext is loaded, set the session info state 
   useDidMountEffect(() => {
-    if (useUser.session) {
-      setSession(useUser.session);
+    const { user } = useUser;
+    if (user) {
+      setUser(user);
     }
   }, [useUser]);
 
@@ -82,13 +83,13 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
               <div className={'username'}>
                 <IconButton component={Link} to='/profile'>
                   <Icon
-                    path={useUser.ready ? mdiAccountCircle : useUser.error ? mdiAccountRemove : mdiProgressClock}
+                    path={user ? mdiAccountCircle : useUser.error ? mdiAccountRemove : mdiProgressClock}
                     className={'icon'}
                     title='User Profile'
                     size={1}
                   />
                 </IconButton>
-                <span>{session?.given_name?? 'Local'}</span>&nbsp;<span>{session?.family_name?? 'User'}</span>
+                <span>{user?.firstname ?? 'Local'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span>
               </div>
             </li>
             <li className={'logout'}>

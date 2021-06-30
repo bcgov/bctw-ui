@@ -18,21 +18,21 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
   const [isOwner, setIsOwner] = useState<boolean>(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
   // const [open, setOpen] = React.useState(false);
-  const userChanges = useContext(UserContext);
+  const useUser = useContext(UserContext);
 
   // const handleDrawerOpen = (): void => setOpen((o) => !o);
 
   // enable user to see admin page if they have the role
   useEffect(() => {
     const updateComponent = (): void => {
-      if (userChanges?.ready) {
-        const user = userChanges.user;
+      const { user } = useUser;
+      if (user) {
         setIsAdmin(user.role_type === 'administrator');
         setIsOwner(user.is_owner);
       }
     };
     updateComponent();
-  }, [userChanges]);
+  }, [useUser]);
 
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));

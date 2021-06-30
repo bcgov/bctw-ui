@@ -68,10 +68,10 @@ export default function PickCritterPermissionModal({
 
   // if a user is not passed in as a prop, default the state to the current user
   useEffect(() => {
-    const u = !userToLoad && useUser.ready ? useUser.user : userToLoad;
+    const u = !userToLoad && useUser.user ? useUser.user : userToLoad;
     setUser(u);
     setPermissionsAccessible(useUser?.user?.is_admin ? adminPermissionOptions : ownerPermissionOptions);
-  }, [userToLoad, useUser.ready]);
+  }, [userToLoad, useUser]);
 
   // when the selected state changes, update the save button's disabled state
   useDidMountEffect(() => {
