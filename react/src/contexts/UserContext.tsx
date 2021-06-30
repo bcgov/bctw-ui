@@ -81,7 +81,7 @@ export const UserStateContextProvider: React.FC = (props) => {
   const handleUserChanged = async (session: IKeyCloakSessionInfo): Promise<void> => {
     const { user } = userContext;
     // if the user hasn't been retrieved yet, dont do anything
-    if (user) {
+    if (!user) {
       return;
     }
     if (session.email === user.email && session.family_name === user.lastname && session.given_name === user.firstname) {
