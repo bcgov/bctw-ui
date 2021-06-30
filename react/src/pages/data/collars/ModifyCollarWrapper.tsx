@@ -5,7 +5,7 @@ import ConfirmModal from 'components/modal/ConfirmModal';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { Collar } from 'types/collar';
 import { permissionCanModify } from 'types/permission';

@@ -8,11 +8,10 @@ import { LocationEvent } from 'types/location_event';
 import EditModal from '../common/EditModal';
 import { useState } from 'react';
 import LocationEventForm from './LocationEventForm';
-import { removeProps } from 'utils/common';
+import { removeProps, formatLabel } from 'utils/common_helpers';
 import MortalityEvent from 'types/mortality_event';
 import { IUpsertPayload } from 'api/api_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { formatLabel } from 'types/common_helpers';
 import { Tooltip } from 'components/common';
 
 type MortEventProps = ModalBaseProps & {

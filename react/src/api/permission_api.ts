@@ -2,12 +2,18 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 import {
-  IUserCritterPermissionInput,
-  IGrantCritterAccessResults,
   IBulkUploadResults,
   ApiProps
 } from 'api/api_interfaces';
-import { eCritterPermission, filterOutNonePermissions, IExecutePermissionRequest, IPermissionRequest, IPermissionRequestInput, PermissionRequest } from 'types/permission';
+import { eCritterPermission, filterOutNonePermissions, IExecutePermissionRequest, IPermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
+
+// what the API returns after saving user/animal permissions
+export interface IGrantCritterAccessResults {
+  assignment_id: string;
+  user_id: number;
+  animal_id: string;
+  valid_from: Date;
+}
 
 export const permissionApi = (props: ApiProps) => {
   const { api, testUser } = props;

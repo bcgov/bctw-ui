@@ -5,7 +5,7 @@ import { CodeFormFields, CodeHeaderInput } from 'types/code';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { CodeStrings as S } from 'constants/strings';
-import { removeProps } from 'utils/common';
+import { removeProps } from 'utils/common_helpers';
 
 export default function EditCodeHeader(props: EditorProps<CodeHeaderInput>): JSX.Element {
   const { editing } = props;

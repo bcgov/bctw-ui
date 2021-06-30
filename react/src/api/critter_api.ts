@@ -1,10 +1,10 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { Animal, IAnimal } from 'types/animal';
+import { Animal, eCritterFetchType, IAnimal } from 'types/animal';
 import { CollarHistory } from 'types/collar_history';
 import { linkCollarEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
 
-import { ApiProps, eCritterFetchType, IBulkUploadResults, ICollarLinkPayload, IDeleteType, IUpsertPayload } from './api_interfaces';
+import { ApiProps, IBulkUploadResults, ICollarLinkPayload, IDeleteType, IUpsertPayload } from './api_interfaces';
 
 export const critterApi = (props: ApiProps) => {
   const { api, testUser } = props;

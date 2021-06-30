@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
-import { formatAxiosError, removeProps } from 'utils/common';
+import { removeProps } from 'utils/common_helpers';
 import { SelectProps } from '@material-ui/core';
 import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { formatAxiosError } from 'utils/errors';
 
 type ISelectProps = SelectProps & {
   codeHeader: string;
@@ -16,6 +17,7 @@ type ISelectProps = SelectProps & {
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
   triggerReset?: boolean;
   addEmptyOption?: boolean;
+  propName?: string;
 };
 
 /**
@@ -27,6 +29,7 @@ type ISelectProps = SelectProps & {
  *   @param changeHandlerMultiple
  *   @param triggerReset unchecks all selected values
  *   @param addEmptyOption optionally add a 'blank' entry to end of select options
+ * @param propname use this field as the key if the code header isn't the same. ex - ear_tag_colour_id
 */
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
@@ -42,7 +45,8 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     triggerReset,
     className,
     style,
-    required
+    required,
+    propName
   } = props;
   const bctwApi = useTelemetryApi();
   const [value, setValue] = useState<string>(defaultValue);
@@ -128,11 +132,17 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
   // call the parent changeHandler
   const pushChange = (v: string): void => {
     const code = codes.find((c) => c.description === v)?.code ?? v;
-    const ret = { [codeHeader]: code, error: hasError };
+    const ret = { [getIdentifier()]: code, error: hasError };
     if (typeof changeHandler === 'function') {
       changeHandler(ret);
     }
   };
+
+  /**
+   * if @param codeHeader is not the same, use @param propName instead when
+   * pushing the changed value to the parent @param changeHandler
+   */
+  const getIdentifier = (): string =>  propName ? propName : codeHeader;
 
   const pushChangeMultiple = (selected: string[]): void => {
     const filtered = codes.filter((c) => selected.indexOf(c.description) !== -1);

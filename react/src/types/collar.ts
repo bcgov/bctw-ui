@@ -1,4 +1,4 @@
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';

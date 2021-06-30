@@ -5,25 +5,22 @@ import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
-import { userApi as user_api } from 'api/user_api';
-import { permissionApi as permission_api } from 'api/permission_api';
+import { IUserUpsertPayload, userApi as user_api } from 'api/user_api';
+import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
-import { Animal } from 'types/animal';
+import { Animal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CollarHistory } from 'types/collar_history';
 import { IKeyCloakSessionInfo, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
-  eCritterFetchType,
   IBulkUploadResults,
   ICollarLinkPayload,
   IDeleteType,
-  IGrantCritterAccessResults,
   IUpsertPayload,
-  IUserCritterPermissionInput
 } from 'api/api_interfaces';
 import { TelemetryAlert } from 'types/alert';
 import { BCTW, BCTWType } from 'types/common_types';
@@ -31,7 +28,7 @@ import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import MortalityEvent from 'types/mortality_event';
-import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, PermissionRequest } from 'types/permission';
+import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -352,8 +349,8 @@ export const useTelemetryApi = () => {
     useMutation<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
   
   /** add or update a user */
-  const useMutateUser = (config: UseMutationOptions<User, AxiosError, User>): UseMutationResult<User> =>
-    useMutation<User, AxiosError, User>((body) => userApi.addUser(body), config);
+  const useMutateUser = (config: UseMutationOptions<User, AxiosError, IUserUpsertPayload>): UseMutationResult<User> =>
+    useMutation<User, AxiosError, IUserUpsertPayload>((body) => userApi.addUser(body), config);
   
   /** see permission_api doc */ 
   const useMutateSubmitPermissionRequest = (config: UseMutationOptions<unknown, AxiosError, IPermissionRequestInput>): UseMutationResult<unknown> => 

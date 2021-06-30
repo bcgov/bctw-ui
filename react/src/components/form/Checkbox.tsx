@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Checkbox as MuiCheckbox, CheckboxProps } from '@material-ui/core/';
 import { FormControlLabel } from '@material-ui/core';
 import { CheckBoxChangeHandler } from 'components/component_interfaces';
-import { columnToHeader, removeProps } from 'utils/common';
+import { columnToHeader, removeProps } from 'utils/common_helpers';
 import { inputPropsToRemove } from 'components/form/TextInput';
 
 interface ICheckboxProps extends CheckboxProps {

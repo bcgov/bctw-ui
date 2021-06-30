@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { CollarHistory } from 'types/collar_history';
 import { canRemoveDeviceFromAnimal } from 'types/permission';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError } from 'utils/errors';
 import { getNow } from 'utils/time';
 import { IAssignmentHistoryProps } from './AssignmentHistory';
 

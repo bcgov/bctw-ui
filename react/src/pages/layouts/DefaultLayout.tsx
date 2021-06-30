@@ -17,7 +17,7 @@ type IDefaultLayoutProps = {
 export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.Element {
   const userChanges = useContext(UserContext);
   const useAlert = useContext(AlertContext);
-  const [err, setErr] = useState<AxiosError>(null);
+  const [err, setErr] = useState<string>(null);
   const [showAlerts, setShowAlerts] = useState<boolean>(false);
 
   useEffect(() => {
@@ -43,12 +43,9 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
     }
   }, [useAlert]);
 
-  if (err) {
-    // unauthorized
-    if (err.response?.status === 401) {
-      return <div>{err?.response?.data}</div>;
-    }
-    return <div>ERROR {err?.response?.data}</div>;
+  // user info could not be retrieved from API
+  if (err && !userChanges.user) {
+    return <div>ERROR {err}</div>;
   }
   // pass these props to the modal to 'force' the user to perform the alert action
   const disableCloseModalProps = {

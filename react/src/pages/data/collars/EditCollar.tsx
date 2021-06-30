@@ -7,7 +7,7 @@ import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
-import { formatLabel } from 'types/common_helpers';
+import { formatLabel } from 'utils/common_helpers';
 import { FormFieldObject } from 'types/form_types';
 import { permissionCanModify } from 'types/permission';
 

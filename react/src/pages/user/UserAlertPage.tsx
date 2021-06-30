@@ -10,7 +10,7 @@ import { UserAlertStrings } from 'constants/strings';
 import MortalityEventForm from 'pages/data/events/MortalityEventForm';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import MortalityEvent from 'types/mortality_event';

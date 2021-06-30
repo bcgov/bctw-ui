@@ -1,9 +1,15 @@
 import { Expose, Transform } from 'class-transformer';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToTimeStr } from 'utils/time';
 import { Animal } from './animal';
 import { BCTW, BCTWBaseType } from './common_types';
 import { IUserCritterAccessInput } from './user';
+
+// interface used to construct objects for updating/granting users access to animals
+export interface IUserCritterPermissionInput {
+  userId: number;
+  access: IUserCritterAccessInput[];
+}
 
 export enum eCritterPermission {
   // owner = 'owner', // renamed to manager

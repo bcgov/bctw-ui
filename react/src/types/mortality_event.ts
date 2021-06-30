@@ -1,4 +1,4 @@
-import { columnToHeader, omitNull } from 'utils/common';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { Animal } from './animal'
 import { Collar } from './collar'
 import { BCTW } from './common_types';

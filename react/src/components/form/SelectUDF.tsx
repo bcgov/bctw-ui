@@ -2,10 +2,11 @@ import 'styles/form.scss';
 import { FormControl, Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
 import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { formatAxiosError, removeProps } from 'utils/common';
+import { removeProps } from 'utils/common_helpers';
 import { SelectProps } from '@material-ui/core';
 import { eUDFType, IUDF } from 'types/udf';
 import { NotificationMessage } from 'components/common';
+import { formatAxiosError } from 'utils/errors';
 
 type ISelectProps = SelectProps & {
   udfType: eUDFType;

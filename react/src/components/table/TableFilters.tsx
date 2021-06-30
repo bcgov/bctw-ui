@@ -2,7 +2,7 @@ import { IconButton } from '@material-ui/core';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import TextField from 'components/form/TextInput';
 import { useMemo, useState } from 'react';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { ITableFilter } from './table_interfaces';
 import { Tooltip } from 'components/common';

@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import { createHeadCell } from 'components/table/table_helpers';
 import { BCTW } from 'types/common_types';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { ITableHeadProps } from './table_interfaces';
 
 export default function TableHead<T extends BCTW>(props: ITableHeadProps<T>): JSX.Element {

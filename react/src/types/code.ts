@@ -1,6 +1,6 @@
 import { BCTW, BCTWBaseType } from './common_types';
 import { Type } from 'class-transformer';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from './form_types';
 
 // used in select multiple component 

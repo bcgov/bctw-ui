@@ -1,8 +1,8 @@
-import { Point } from 'geojson';
-import { BCTW, BCTWBaseType } from './common_types';
-import { ITelemetryDetail } from './map';
 import { Type, Expose, Exclude } from 'class-transformer';
-import { formatLatLong } from './common_helpers';
+import { Point } from 'geojson';
+import { BCTW, BCTWBaseType } from 'types/common_types';
+import { ITelemetryDetail } from 'types/map';
+import { formatLatLong } from 'utils/common_helpers';
 
 /**
  * types used to bulk import historical telemetry

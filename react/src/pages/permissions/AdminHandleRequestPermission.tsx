@@ -9,14 +9,14 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { useState, useEffect } from 'react';
-import { getUniqueValuesOfT } from 'types/common_helpers';
+import { getUniqueValuesOfT } from 'utils/common_helpers';
 import {
   groupPermissionRequests,
   IExecutePermissionRequest,
   IGroupedRequest,
   ReasonsPermissionWasDenied
 } from 'types/permission';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError } from 'utils/errors';
 
 /**
  * page that an admin uses to grant or deny permission requests from owners

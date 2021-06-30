@@ -1,12 +1,19 @@
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { BCTW, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { eCritterPermission } from 'types/permission';
-import { formatLatLong } from 'types/common_helpers';
+import { formatLatLong } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from 'types/form_types';
 
 const assignedCritterProps = ['animal_id', 'wlh_id', 'animal_status', 'device_id'];
 const unassignedCritterProps = ['animal_id', 'wlh_id', 'animal_status'];
+
+// used in critter getters to specify collar attachment status
+export enum eCritterFetchType {
+  assigned = 'assigned',
+  unassigned = 'unassigned',
+  all = 'all'
+}
 
 /**
  * these properties are re-used in Telemetry classes (map.ts)

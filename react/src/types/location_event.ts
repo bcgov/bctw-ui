@@ -1,4 +1,4 @@
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { BCTW } from './common_types';
 import { eInputType, FormFieldObject } from './form_types';
 

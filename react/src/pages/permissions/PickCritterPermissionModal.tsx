@@ -6,10 +6,9 @@ import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useContext, useEffect, useState } from 'react';
-import { adminPermissionOptions, eCritterPermission, ownerPermissionOptions } from 'types/permission';
+import { adminPermissionOptions, eCritterPermission, IUserCritterPermissionInput, ownerPermissionOptions } from 'types/permission';
 import { IUserCritterAccessInput, PermissionTableHeaders, User, UserCritterAccess } from 'types/user';
 import { Select, MenuItem } from '@material-ui/core';
-import { IUserCritterPermissionInput } from 'api/api_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type PickCritterProps = ModalBaseProps & {

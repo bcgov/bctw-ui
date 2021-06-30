@@ -2,7 +2,7 @@ import { ICollarBase } from 'types/collar';
 import { BCTW } from 'types/common_types';
 import { Type, Expose } from 'class-transformer';
 import dayjs from 'dayjs';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 
 export interface ICollarHistory extends ICollarBase, BCTW {
   animal_id?: string; // the animal id (uuid key of animal table)

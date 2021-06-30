@@ -4,7 +4,7 @@ import SelectCode from './SelectCode';
 import DateInput from 'components/form/Date';
 import CheckBox from 'components/form/Checkbox';
 import React from 'react';
-import { columnToHeader, removeProps } from 'utils/common';
+import { columnToHeader, removeProps } from 'utils/common_helpers';
 import { eInputType } from 'types/form_types';
 
 type CreateInputBaseProps<T> = {
@@ -23,9 +23,10 @@ type CreateInputProps<T> = CreateInputBaseProps<T> & {
   span?: boolean;
 };
 
+// text and number field handler
 function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
   const { prop, type, value } = props;
-  // note: passing 'value' will have unintended effects
+  // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage']);
   const propName = prop as string;
   return typeof value === 'number' ? (
@@ -50,6 +51,7 @@ function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
   );
 }
 
+// date field handler
 function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
   return (
     <DateInput
@@ -63,6 +65,7 @@ function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: 
   );
 }
 
+// checkbox field handler
 function CreateEditCheckboxField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
   return (
     <CheckBox
@@ -76,6 +79,7 @@ function CreateEditCheckboxField<T>({ prop, value, handleChange, label, disabled
   );
 }
 
+// select component handler
 function CreateEditSelectField<T>({
   value,
   prop,
@@ -92,12 +96,13 @@ function CreateEditSelectField<T>({
       label={label}
       disabled={disabled}
       key={prop as string}
-      codeHeader={codeName ?? (prop as string)}
+      codeHeader={codeName ?? prop as string}
       defaultValue={value as string}
       changeHandler={handleChange}
       required={required}
       error={!!errorMessage?.length}
       className={'select-control-small'}
+      propName={codeName ? prop as string : undefined}
     />
   );
 }

@@ -7,7 +7,7 @@ import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
-import { formatLabel } from 'types/common_helpers';
+import { formatLabel } from 'utils/common_helpers';
 
 type LocationEventProps = {
   event: LocationEvent;

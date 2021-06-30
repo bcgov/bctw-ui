@@ -13,7 +13,7 @@ import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from './TablePaginate';
 import { NotificationMessage } from 'components/common';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError } from 'utils/errors';
 import { ICustomTableColumn, ITableFilter, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';

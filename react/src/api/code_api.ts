@@ -1,6 +1,12 @@
 import { createUrl } from 'api/api_helpers';
 import { ICode, ICodeHeader } from 'types/code';
-import { ApiProps, IBulkUploadResults, IGetCodeProps } from './api_interfaces';
+import { ApiProps, IBulkUploadResults } from './api_interfaces';
+
+// all code retrievals must provide the code_header.code_header_name as a parameter
+export interface IGetCodeProps {
+  page: number;
+  codeHeader: string;
+}
 
 export const codeApi = (props: ApiProps) => {
   const { api } = props;
