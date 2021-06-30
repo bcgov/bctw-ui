@@ -36,19 +36,23 @@ export const UserStateContextProvider: React.FC = (props) => {
   const { isError: isUserError, data: userData, status: userStatus, error: userError } = api.useUser();
   // fetch the keycloak session data
   const { isError: isSessionError, data: sessionData, status: sessionStatus, error: sessionError } = api.useUserSessionInfo();
-  // todo: setup the mutation for when there are keycloak object changes
+  // setup the mutation, used if the user row in the database is out of date
   const onSuccess = (v: User): void => {
-    console.log('new user object is', v);
+    console.log('UserContext: new user object is', v);
   }
   const onError = (e): void => {
-    console.log('error saving user', e)
+    console.log('UserContext: error saving user', e)
   }
   const { mutateAsync } = api.useMutateUser({onSuccess, onError });
 
   // when the user data is fetched...
   useEffect(() => {
     if (userStatus === 'success') {
-      setUserContext({ ready: true, user: userData, session: userContext.session });
+      const { session } = userContext;
+      setUserContext({ ready: true, user: userData, session });
+      if (session) {
+        handleUserChanged(session);
+      }
     } 
   }, [userStatus]);
 
@@ -65,7 +69,7 @@ export const UserStateContextProvider: React.FC = (props) => {
     if (sessionError || userError) {
       const err = isUserError ? userError : isSessionError ? sessionError : null;
       const error = err?.response?.data?.error;
-      console.log('failed to retrieve user or session info', error);
+      console.log('UserContext: failed to retrieve user or session info', error);
       const user = isUserError ? null : userContext.user;
       const session = isSessionError ? null: userContext.session;
       setUserContext({ ready: false, error, session, user })
@@ -82,9 +86,11 @@ export const UserStateContextProvider: React.FC = (props) => {
     const { user } = userContext;
     // if the user hasn't been retrieved yet, dont do anything
     if (!user) {
+      console.log('UserContext: handleUserChanged: user info not ready')
       return;
     }
     if (session.email === user.email && session.family_name === user.lastname && session.given_name === user.firstname) {
+      console.log('UserContext: handleUserchanged: keycloak info matches database record', user, session);
       // no updates required
       return;
     }
