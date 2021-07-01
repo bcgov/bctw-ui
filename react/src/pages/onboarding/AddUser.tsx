@@ -20,16 +20,22 @@ const AddUser = (): JSX.Element => {
   const useUser = useContext(UserContext);
 
   console.log(useUser);
-  const [userAccess,setUserAccess] = useState({});
+  const [userAccess,setUserAccess] = useState(null);
 
+  // TODO Exit out if userAccess already exists
   if (useUser.ready) {
     const base = getBaseUrl();
-    //TODO use axios to fetch 
     const domain = useUser.user.idir ? 'idir' : 'bceid'
     const user = useUser.user.idir ?
       useUser.user.idir :
       useUser.user.bceid
-    const url = `${base}/userAccess?user=${user}&domain=${domain}`
+    const url = `${base}/user-access?onboard-user=${user}&onboard-domain=${domain}&idir=${user}`
+    console.log('url',url)
+    axios(url).then((res:any) => {
+      console.log(res.data);
+    }).catch((err) => {
+      console.error('error',err);
+    })
     console.log('ready',url);
   }
 
