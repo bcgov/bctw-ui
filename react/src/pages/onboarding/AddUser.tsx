@@ -22,33 +22,34 @@ const AddUser = (): JSX.Element => {
   console.log(useUser);
   const [userAccess,setUserAccess] = useState(null);
 
-  // TODO Exit out if userAccess already exists
-  if (useUser.ready) {
+  if (useUser.ready && !userAccess) {
     const base = getBaseUrl();
     const domain = useUser.user.idir ? 'idir' : 'bceid'
     const user = useUser.user.idir ?
       useUser.user.idir :
       useUser.user.bceid
-    const url = `${base}/user-access?onboard-user=${user}&onboard-domain=${domain}&idir=${user}`
-    console.log('url',url)
+    /* This is the valid url */
+    const url = `${base}/user-access?onboard-user=${user}&onboard-domain=${domain}&idir=${user}`;
+
+    /* Testing a new user that hasn't applied yet */
+    // const url = `${base}/user-access?onboard-user=testing&onboard-domain=${domain}&idir=${user}`;
+
     axios(url).then((res:any) => {
-      console.log(res.data);
+      setUserAccess(res.data.access);
     }).catch((err) => {
       console.error('error',err);
     })
-    console.log('ready',url);
   }
 
   return (
     <div>
       {
-        useUser.ready ?
+        useUser.ready && userAccess ?
           <div>
-            <RequestUser/>
             <PendingUser/>
             <DeniedUser/>
           </div>
-        : ''
+        : <RequestUser/>
       }
     </div>
   )
