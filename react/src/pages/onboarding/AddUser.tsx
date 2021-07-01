@@ -23,7 +23,8 @@ const AddUser = (): JSX.Element => {
   const [userAccess,setUserAccess] = useState({});
 
   if (useUser.ready) {
-    console.log('ready');
+    const base = getBaseUrl();
+    console.log('ready',base);
   }
 
   return (
