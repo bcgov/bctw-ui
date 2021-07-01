@@ -43,14 +43,24 @@ const AddUser = (): JSX.Element => {
     })
   }
 
+  const containerStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: '100vw'
+  };
+
+  const onboardingStyle = {
+  };
+
   return (
-    <div>
+    <div style={containerStyle}>
       {
         useUser.ready && userAccess ?
           <div>
-            <ApprovedUser/>
-            <PendingUser/>
-            <DeniedUser/>
+            { userAccess == "granted" ? <ApprovedUser/> : ""}
+            { userAccess == "pending" ? <PendingUser/> : "" }
+            { userAccess == "denied" ? <DeniedUser/> : "" }
           </div>
         : <RequestUser/> // If here you're not in the system
       }
