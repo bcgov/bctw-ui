@@ -24,7 +24,13 @@ const AddUser = (): JSX.Element => {
 
   if (useUser.ready) {
     const base = getBaseUrl();
-    console.log('ready',base);
+    //TODO use axios to fetch 
+    const domain = useUser.user.idir ? 'idir' : 'bceid'
+    const user = useUser.user.idir ?
+      useUser.user.idir :
+      useUser.user.bceid
+    const url = `${base}/userAccess?user=${user}&domain=${domain}`
+    console.log('ready',url);
   }
 
   return (
