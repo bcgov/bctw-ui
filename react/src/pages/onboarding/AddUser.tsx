@@ -3,6 +3,7 @@ import { UserContext } from 'contexts/UserContext'
 import RequestUser from 'components/onboarding/Request';
 import PendingUser from 'components/onboarding/Pending';
 import DeniedUser from 'components/onboarding/Denied';
+import ApprovedUser from 'components/onboarding/Approved';
 import axios from 'axios';
 import { getBaseUrl } from 'api/api_helpers';
 import './AddUser.css';
@@ -28,6 +29,7 @@ const AddUser = (): JSX.Element => {
     const user = useUser.user.idir ?
       useUser.user.idir :
       useUser.user.bceid
+
     /* This is the valid url */
     const url = `${base}/user-access?onboard-user=${user}&onboard-domain=${domain}&idir=${user}`;
 
@@ -46,10 +48,11 @@ const AddUser = (): JSX.Element => {
       {
         useUser.ready && userAccess ?
           <div>
+            <ApprovedUser/>
             <PendingUser/>
             <DeniedUser/>
           </div>
-        : <RequestUser/>
+        : <RequestUser/> // If here you're not in the system
       }
     </div>
   )
