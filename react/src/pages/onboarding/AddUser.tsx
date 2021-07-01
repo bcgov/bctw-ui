@@ -1,7 +1,10 @@
+import { useState, createContext, useEffect, useContext } from 'react';
+import { UserContext } from 'contexts/UserContext'
 import RequestUser from 'components/onboarding/Request';
 import PendingUser from 'components/onboarding/Pending';
 import DeniedUser from 'components/onboarding/Denied';
 import './AddUser.css';
+
 
 /**
  * # AddUser
@@ -12,11 +15,19 @@ import './AddUser.css';
  * 3. Access denied
  */
 const AddUser = (): JSX.Element => {
+  const useUser = useContext(UserContext);
+
   return (
     <div>
-      <RequestUser/>
-      <PendingUser/>
-      <DeniedUser/>
+      {
+        useUser.ready ?
+          <div>
+            <RequestUser/>
+            <PendingUser/>
+            <DeniedUser/>
+          </div>
+        : ''
+      }
     </div>
   )
 }
