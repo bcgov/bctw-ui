@@ -3,6 +3,8 @@ import { UserContext } from 'contexts/UserContext'
 import RequestUser from 'components/onboarding/Request';
 import PendingUser from 'components/onboarding/Pending';
 import DeniedUser from 'components/onboarding/Denied';
+import axios from 'axios';
+import { getBaseUrl } from 'api/api_helpers';
 import './AddUser.css';
 
 
@@ -16,6 +18,13 @@ import './AddUser.css';
  */
 const AddUser = (): JSX.Element => {
   const useUser = useContext(UserContext);
+
+  console.log(useUser);
+  const [userAccess,setUserAccess] = useState({});
+
+  if (useUser.ready) {
+    console.log('ready');
+  }
 
   return (
     <div>
