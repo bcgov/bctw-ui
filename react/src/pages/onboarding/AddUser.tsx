@@ -11,11 +11,12 @@ import './AddUser.css';
 
 /**
  * # AddUser
- * This page displays one of three things depending on
+ * This page displays one of four things depending on
  * the status of the IDIR/BCeID user
  * 1. Application for access form
  * 2. Pending access approval/denial
  * 3. Access denied
+ * 4. Access approved
  */
 const AddUser = (): JSX.Element => {
   const useUser = useContext(UserContext);
@@ -56,7 +57,7 @@ const AddUser = (): JSX.Element => {
   return (
     <div style={containerStyle}>
       {
-        useUser.ready && userAccess ?
+        useUser.ready && userAccess ? // User is in the system
           <div>
             { userAccess == "granted" ? <ApprovedUser/> : ""}
             { userAccess == "pending" ? <PendingUser/> : "" }

@@ -1,0 +1,14 @@
+.approved-container {
+  display: flex;
+  max-width: 20rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-flow:wrap;
+}
+.icon {
+  width: 100%;
+}
+.description {
+  font-size: 14px;
+}
