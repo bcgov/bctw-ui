@@ -1,6 +1,6 @@
 .approved-container {
   display: flex;
-  max-width: 20rem;
+  max-width: 22rem;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -10,5 +10,5 @@
   width: 100%;
 }
 .description {
-  font-size: 14px;
+  font-size: 16px;
 }
