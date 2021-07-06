@@ -10,7 +10,7 @@ const ApprovedUser = (): JSX.Element => {
   };
 
   return (
-    <div className='approved-container'>
+    <div className='onboarding-container'>
       <div className='icon'>
         <Icon
           path={mdiCheckAll}

@@ -5,7 +5,7 @@ import './style.css';
 
 const PendingUser = (): JSX.Element => {
   return (
-    <div className='approved-container'>
+    <div className='onboarding-container'>
       <div className='icon'>
         <Icon
           path={mdiCheckBold}
