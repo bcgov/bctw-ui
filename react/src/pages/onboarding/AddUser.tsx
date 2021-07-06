@@ -59,7 +59,8 @@ const AddUser = (): JSX.Element => {
       {
         useUser.ready && userAccess ? // User is in the system
           <div>
-            { userAccess == "granted" ? <ApprovedUser/> : ""}
+            { userAccess == "granted" ? <PendingUser/> : "" }  {/*XXX for testing */}
+            {/* { userAccess == "granted" ? <ApprovedUser/> : ""} */}
             { userAccess == "pending" ? <PendingUser/> : "" }
             { userAccess == "denied" ? <DeniedUser/> : "" }
           </div>
