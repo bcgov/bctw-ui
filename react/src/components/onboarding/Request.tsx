@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState, useEffect } from "react";
 import {
   FormControl,
   TextField,
@@ -16,18 +17,49 @@ const RequestUser = (): JSX.Element => {
     maxWidth: '40rem'
   };
 
-  const [accessChosen, setAccessChosen] = React.useState('')
+  const [projectName, setProjectName] = useState('');
+  const [projectRole, setProjectRole] = useState('');
+  const [projectManager, setProjectManager] = useState('');
+  const [species, setSpecies] = useState('');
+  const [region, setRegion] = useState('');
+  const [populationUnit, setPopulationUnit] = useState('');
+  const [access, setAccess] = useState('');
+  const [description, setDescription] = useState('');
 
-  const accessChosenMe = (e) => {
-    setAccessChosen(e.target.value);
+  const [state, setState] = React.useState({
+    projectName: '',
+    projectRole: '',
+    projectManager: '',
+    species: '',
+    region:'',
+    populationUnit:'',
+    access:'',
+    description: ''
+  });
+
+  const accessChosen = (e) => {
+    setState({...state,access:e.target.value})
   }
 
   const clearForm = () => {
-    console.log('Clear form');
+    setState({
+      projectName: '',
+      projectRole: '',
+      projectManager: '',
+      species: '',
+      region:'',
+      populationUnit:'',
+      access:'',
+      description: ''
+    })
   }
 
   const submitForm = () => {
-    console.log('Submit form');
+    console.log(state);
+  }
+
+  const testing = (e) => {
+    console.log(this);
   }
 
   return (
@@ -36,7 +68,10 @@ const RequestUser = (): JSX.Element => {
       <div>You will need to provide some additional details before accessing this application. Complete the request details form below to obtain access.</div>
       <h3>Request Details</h3>
       <div>Complete the following information</div>
-      <TextField label='Project Name'></TextField>
+      <TextField
+        label='Project Name'
+        onChange={(e) => {setProjectName(e.target.value)}}
+      ></TextField>
       <TextField label='Role in Project'></TextField>
       <TextField label='Project Manager'></TextField>
       <TextField label='Target Species'></TextField>
@@ -46,8 +81,8 @@ const RequestUser = (): JSX.Element => {
       <FormControl>
         <InputLabel>Target Level of Access</InputLabel>
         <NativeSelect
-          onChange={accessChosenMe}
-          value={accessChosen}
+          onChange={accessChosen}
+          value={state.access}
         >
           <option value={''}></option>
           <option value={'administer'}>Administer</option>
