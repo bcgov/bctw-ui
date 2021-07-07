@@ -2,10 +2,9 @@ import React from 'react';
 import {
   FormControl,
   TextField,
-  Select,
   NativeSelect,
-  MenuItem,
-  InputLabel
+  InputLabel,
+  TextareaAutosize
 } from "@material-ui/core";
 
 
@@ -47,6 +46,10 @@ const RequestUser = (): JSX.Element => {
           <option value={'observer'}>Observer</option>
         </NativeSelect>
       </FormControl>
+
+      <TextareaAutosize
+        placeholder="Describe the reason for wanting access to this application"
+      ></TextareaAutosize>
 
 
     </div>
