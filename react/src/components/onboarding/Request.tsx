@@ -13,10 +13,18 @@ import {
 
 const RequestUser = (): JSX.Element => {
 
+  /**
+   * Would be nice if we could have all our styling inline Victor.
+   * Although if you wanna reuse elsewhere I'm not too worried about
+   * using a css file.
+   */
   const styleMeVictor = {
     maxWidth: '40rem'
   };
 
+  /**
+   * Here is all our form state.
+   */
   const [projectName, setProjectName] = useState('');
   const [projectRole, setProjectRole] = useState('');
   const [projectManager, setProjectManager] = useState('');
@@ -41,25 +49,24 @@ const RequestUser = (): JSX.Element => {
     setState({...state,access:e.target.value})
   }
 
+  /**
+   * ##clearForm
+   * Blank all our state
+   * **Currently this doesn't blank the form.**
+   */
   const clearForm = () => {
-    setState({
-      projectName: '',
-      projectRole: '',
-      projectManager: '',
-      species: '',
-      region:'',
-      populationUnit:'',
-      access:'',
-      description: ''
-    })
+      setProjectName('');
+      setProjectRole('');
+      setProjectManager('');
+      setSpecies('');
+      setRegion('');
+      setPopulationUnit('');
+      setAccess('');
+      setDescription('');
   }
 
   const submitForm = () => {
-    console.log(state);
-  }
-
-  const testing = (e) => {
-    console.log(this);
+    console.log(projectName);
   }
 
   return (
@@ -97,10 +104,10 @@ const RequestUser = (): JSX.Element => {
       ></TextareaAutosize>
 
       <ButtonGroup>
-        <Button
+        {/* <Button
           variant='contained'
           onClick={clearForm}
-        >Cancel</Button>
+        >Cancel</Button> */}
         <Button
           variant='contained'
           color='primary'
