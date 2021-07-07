@@ -4,7 +4,9 @@ import {
   TextField,
   NativeSelect,
   InputLabel,
-  TextareaAutosize
+  TextareaAutosize,
+  Button,
+  ButtonGroup
 } from "@material-ui/core";
 
 
@@ -18,6 +20,14 @@ const RequestUser = (): JSX.Element => {
 
   const accessChosenMe = (e) => {
     setAccessChosen(e.target.value);
+  }
+
+  const clearForm = () => {
+    console.log('Clear form');
+  }
+
+  const submitForm = () => {
+    console.log('Submit form');
   }
 
   return (
@@ -50,6 +60,18 @@ const RequestUser = (): JSX.Element => {
       <TextareaAutosize
         placeholder="Describe the reason for wanting access to this application"
       ></TextareaAutosize>
+
+      <ButtonGroup>
+        <Button
+          variant='contained'
+          onClick={clearForm}
+        >Cancel</Button>
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={submitForm}
+        >Submit</Button>
+      </ButtonGroup>
 
 
     </div>
