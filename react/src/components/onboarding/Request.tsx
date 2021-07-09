@@ -1,5 +1,5 @@
-import React from 'react';
-import { useState, useEffect } from "react";
+import { useState, useContext} from "react";
+import { UserContext } from 'contexts/UserContext'
 import {
   FormControl,
   TextField,
@@ -53,6 +53,8 @@ const RequestUser = (): JSX.Element => {
       setDescription('');
   }
 
+  const user =  useContext(UserContext);
+
   const submitForm = () => {
     const payload = {
       projectName,
@@ -62,7 +64,8 @@ const RequestUser = (): JSX.Element => {
       region,
       populationUnit,
       access,
-      description
+      description,
+      user: user.user
     }
     console.log(payload);
   }
