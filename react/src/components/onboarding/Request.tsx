@@ -48,9 +48,24 @@ const RequestUser = (): JSX.Element => {
       access,
       description
     }
-    console.log(payload);
     const url = createUrl({api: 'onboarding'});
-    console.log(url);
+
+    // XXX: This url doesn't work in development
+    // There is no keycloak in development duh!
+
+    const request = new Request(url,{
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {'content-Type': 'application/json'}
+    });
+
+    fetch(request)
+      .then((res) => {
+        console.log('Your request was sent successfully');
+      })
+      .catch((err) => {
+        console.error('Your request was not successfully',err);
+      });
   }
 
   return (
