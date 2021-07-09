@@ -1,5 +1,6 @@
 import { useState, useContext} from "react";
-import { UserContext } from 'contexts/UserContext'
+import { UserContext } from 'contexts/UserContext';
+import { createUrl } from 'api/api_helpers';
 import {
   FormControl,
   TextField,
@@ -54,6 +55,8 @@ const RequestUser = (): JSX.Element => {
       user: user.user
     }
     console.log(payload);
+    const url = createUrl({api: 'onboarding'});
+    console.log(url);
   }
 
   return (
