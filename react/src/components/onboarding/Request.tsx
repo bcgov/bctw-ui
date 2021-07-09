@@ -6,8 +6,7 @@ import {
   NativeSelect,
   InputLabel,
   TextareaAutosize,
-  Button,
-  ButtonGroup
+  Button
 } from "@material-ui/core";
 
 
@@ -35,11 +34,13 @@ const RequestUser = (): JSX.Element => {
   const [description, setDescription] = useState('');
 
 
-  const accessChosen = (e) => setAccess(e.target.value);
-
-
+  // Grab use information from keycloak
   const user =  useContext(UserContext);
 
+  /**
+   * ## submitForm
+   * Form payload and submit.
+   */
   const submitForm = () => {
     const payload = {
       projectName,
@@ -95,7 +96,7 @@ const RequestUser = (): JSX.Element => {
       <FormControl>
         <InputLabel>Target Level of Access</InputLabel>
         <NativeSelect
-          onChange={accessChosen}
+          onChange={(e) => {setAccess(e.target.value)}}
           value={access}
         >
           <option value={''}></option>
