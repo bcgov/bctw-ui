@@ -34,20 +34,8 @@ const RequestUser = (): JSX.Element => {
   const [access, setAccess] = useState('');
   const [description, setDescription] = useState('');
 
-  const [state, setState] = React.useState({
-    projectName: '',
-    projectRole: '',
-    projectManager: '',
-    species: '',
-    region:'',
-    populationUnit:'',
-    access:'',
-    description: ''
-  });
 
-  const accessChosen = (e) => {
-    setState({...state,access:e.target.value})
-  }
+  const accessChosen = (e) => setAccess(e.target.value);
 
   /**
    * ##clearForm
@@ -66,7 +54,17 @@ const RequestUser = (): JSX.Element => {
   }
 
   const submitForm = () => {
-    console.log(projectName);
+    const payload = {
+      projectName,
+      projectRole,
+      projectManager,
+      species,
+      region,
+      populationUnit,
+      access,
+      description
+    }
+    console.log(payload);
   }
 
   return (
@@ -89,7 +87,7 @@ const RequestUser = (): JSX.Element => {
         <InputLabel>Target Level of Access</InputLabel>
         <NativeSelect
           onChange={accessChosen}
-          value={state.access}
+          value={access}
         >
           <option value={''}></option>
           <option value={'administer'}>Administer</option>
