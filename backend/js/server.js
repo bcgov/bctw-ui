@@ -230,6 +230,7 @@ const authenticate = function (req, res, next) {
  * Check if the user is registerd in the database.
  * If yes.... Pass through.
  * Else... Direct to the onboarding page.
+ * TODO: Redirect to use new React page. 
  * @param req {object} Express request object
  * @param res {object} Express response object
  * @param next {function} Express function to continue on
@@ -268,6 +269,7 @@ const onboardingRedirect = async (req,res,next) => {
  * # onboarding
  * Accept requests for access to the site.
  * Send requests to product owner via email (CHES).
+ * TODO: Deprecate
  * @param req {object} Express request object
  * @param res {object} Express response object
  */
@@ -394,12 +396,12 @@ var app = express()
 
 if (isProd) {
   app
-    .get('/onboarding', keycloak.protect(), onboarding)
+    // .get('/onboarding', keycloak.protect(), onboarding)
     .post('/onboarding', keycloak.protect(), onboardingAccess)
     .all('*', keycloak.protect(), onboardingRedirect);
 } else{
   app
-    .get('/onboarding',  onboarding)
+    // .get('/onboarding',  onboarding)
     .post('/onboarding', onboardingAccess);
 }
 

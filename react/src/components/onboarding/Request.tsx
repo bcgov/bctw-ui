@@ -1,5 +1,4 @@
-import { useState, useContext} from "react";
-import { UserContext } from 'contexts/UserContext';
+import { useState } from "react";
 import { createUrl } from 'api/api_helpers';
 import {
   FormControl,
@@ -34,10 +33,6 @@ const RequestUser = (): JSX.Element => {
   const [access, setAccess] = useState('');
   const [description, setDescription] = useState('');
 
-
-  // Grab use information from keycloak
-  const user =  useContext(UserContext);
-
   /**
    * ## submitForm
    * Form payload and submit.
@@ -51,8 +46,7 @@ const RequestUser = (): JSX.Element => {
       region,
       populationUnit,
       access,
-      description,
-      user: user.user
+      description
     }
     console.log(payload);
     const url = createUrl({api: 'onboarding'});
