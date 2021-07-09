@@ -37,21 +37,6 @@ const RequestUser = (): JSX.Element => {
 
   const accessChosen = (e) => setAccess(e.target.value);
 
-  /**
-   * ##clearForm
-   * Blank all our state
-   * **Currently this doesn't blank the form.**
-   */
-  const clearForm = () => {
-      setProjectName('');
-      setProjectRole('');
-      setProjectManager('');
-      setSpecies('');
-      setRegion('');
-      setPopulationUnit('');
-      setAccess('');
-      setDescription('');
-  }
 
   const user =  useContext(UserContext);
 
@@ -104,17 +89,11 @@ const RequestUser = (): JSX.Element => {
         placeholder="Describe the reason for wanting access to this application"
       ></TextareaAutosize>
 
-      <ButtonGroup>
-        {/* <Button
-          variant='contained'
-          onClick={clearForm}
-        >Cancel</Button> */}
         <Button
           variant='contained'
           color='primary'
           onClick={submitForm}
         >Submit</Button>
-      </ButtonGroup>
 
 
     </div>
