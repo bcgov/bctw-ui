@@ -269,7 +269,7 @@ const onboardingRedirect = async (req,res,next) => {
  * # onboarding
  * Accept requests for access to the site.
  * Send requests to product owner via email (CHES).
- * TODO: Deprecate
+ * TODO: Deprecate, as this is now handled by React
  * @param req {object} Express request object
  * @param res {object} Express response object
  */
@@ -290,6 +290,8 @@ const onboarding = (req,res) => {
 
 const onboardingAccess = async (req,res) => {
   // This data will be inserted into the email
+  // TODO: This was insecure. Now go directly to the 
+  // Keycloak object to get this data:w
   const {user, domain, email, firstName, lastName, msg} = req.body;
 
   // Get all the environment variable dependencies
