@@ -61,15 +61,36 @@ const RequestUser = (): JSX.Element => {
       <div>You will need to provide some additional details before accessing this application. Complete the request details form below to obtain access.</div>
       <h3>Request Details</h3>
       <div>Complete the following information</div>
+
       <TextField
         label='Project Name'
         onChange={(e) => {setProjectName(e.target.value)}}
-      ></TextField>
-      <TextField label='Role in Project'></TextField>
-      <TextField label='Project Manager'></TextField>
-      <TextField label='Target Species'></TextField>
-      <TextField label='Region'></TextField>
-      <TextField label='Population Unit Name'></TextField>
+      />
+
+      <TextField
+        label='Role in Project'
+        onChange={(e) => {setProjectRole(e.target.value)}}
+      />
+
+      <TextField
+        label='Project Manager'
+        onChange={(e) => {setProjectManager(e.target.value)}}
+      />
+
+      <TextField
+        label='Target Species'
+        onChange={(e) => {setSpecies(e.target.value)}}
+      />
+
+      <TextField
+        label='Region'
+        onChange={(e) => {setRegion(e.target.value)}}
+      />
+
+      <TextField
+        label='Population Unit Name'
+        onChange={(e) => {setPopulationUnit(e.target.value)}}
+      />
 
       <FormControl>
         <InputLabel>Target Level of Access</InputLabel>
@@ -87,14 +108,14 @@ const RequestUser = (): JSX.Element => {
 
       <TextareaAutosize
         placeholder="Describe the reason for wanting access to this application"
-      ></TextareaAutosize>
+        onChange={(e) => {setDescription(e.target.value)}}
+      />
 
         <Button
           variant='contained'
           color='primary'
           onClick={submitForm}
         >Submit</Button>
-
 
     </div>
   )

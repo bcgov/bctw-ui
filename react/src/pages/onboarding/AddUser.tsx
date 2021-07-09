@@ -21,7 +21,6 @@ import './AddUser.css';
 const AddUser = (): JSX.Element => {
   const useUser = useContext(UserContext);
 
-  console.log(useUser);
   const [userAccess,setUserAccess] = useState(null);
 
   if (useUser.ready && !userAccess) {
