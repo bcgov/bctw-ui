@@ -293,6 +293,9 @@ const onboardingAccess = async (req,res) => {
   // TODO: This was insecure. Now go directly to the 
   // Keycloak object to get this data:w
   const {user, domain, email, firstName, lastName, msg} = req.body;
+  const data = req.kauth.grant.access_token.content;
+  console.log('keycloak data',data);
+  console.log('sent data',req.body);
 
   // Get all the environment variable dependencies
   const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
