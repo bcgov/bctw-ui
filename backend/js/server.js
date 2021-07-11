@@ -290,10 +290,10 @@ const onboarding = (req,res) => {
 
 const onboardingAccess = async (req,res) => {
   // This data will be inserted into the email
-  // TODO: This was insecure. Now go directly to the 
-  // Keycloak object to get this data:w
   const {user, domain, email, firstName, lastName, msg} = req.body;
   const data = req.kauth.grant.access_token.content;
+
+  // TODO: This has to be tested in dev unfortunately
   console.log('keycloak data',data);
   console.log('sent data',req.body);
 
