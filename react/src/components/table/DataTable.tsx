@@ -13,7 +13,7 @@ import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from './TablePaginate';
 import { NotificationMessage } from 'components/common';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError } from 'utils/errors';
 import { ICustomTableColumn, ITableFilter, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
@@ -188,8 +188,10 @@ export default function DataTable<T extends BCTW>({
           <CircularProgress />
         ) : isError ? (
           <NotificationMessage severity='error' message={formatAxiosError(error)} />
+        ) : values.length === 0 ? (
+          <strong>updating...</strong>
         ) : (
-          'no data available'
+          <strong>no data available</strong>
         )}
       </TableCell>
     </TableRow>

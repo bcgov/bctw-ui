@@ -1,16 +1,14 @@
 import { Paper } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
 import { MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT } from 'components/form/form_helpers';
 import { CollarStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
-import Modal from 'components/modal/Modal';
-import { formatLabel } from 'types/common_helpers';
-import { FormInputType } from 'types/form_types';
+import { formatLabel } from 'utils/common_helpers';
+import { FormFieldObject } from 'types/form_types';
 import { permissionCanModify } from 'types/permission';
 
 /**
@@ -25,17 +23,8 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
   // const title = isCreatingNew ? `Add a new ${collarType} collar` : `Editing device ${editing.device_id}`;
-  const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
 
-  useEffect(() => {
-    const ipt = getInputTypesOfT<Collar>(
-      editing,
-      allFields,
-      allFields.filter((f) => f.isCode).map((r) => r.prop)
-    );
-    setInputTypes(ipt);
-  }, [editing, newCollar]);
 
   const close = (): void => {
     setCollarType(eNewCollarType.Other);
@@ -55,27 +44,23 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     statusFields,
     userCommentField
   } = collarFormFields;
-  const allFields = [
-    ...communicationFields,
-    ...deviceOptionFields,
-    ...identifierFields,
-    ...purchaseFields,
-    ...statusFields,
-    ...userCommentField
-  ];
 
   const makeField = (
-    iType: FormInputType,
+    t: FormFieldObject<Collar>,
     handleChange: (v: Record<string, unknown>) => void,
   ): React.ReactNode => {
-    const isRequired = CS.requiredProps.includes(iType.key);
+    const { prop, type, codeName } = t;
+    const isRequired = CS.requiredProps.includes(prop);
     return MakeEditField({
-      formType: iType,
+      prop,
+      type,
+      value: editing[prop],
       handleChange,
       disabled: !canEdit,
       required: isRequired,
-      label: formatLabel(editing, iType.key),
-      span: true
+      label: formatLabel(editing, t.prop),
+      span: true,
+      codeName
     });
   };
 
@@ -136,39 +121,27 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                 {/* <h2>Device Details</h2> */}
                 <div className={'dlg-details-section'}>
                   <h3>Identifiers</h3>
-                  {inputTypes
-                    .filter((f) => identifierFields.map((x) => x.prop as string).includes(f.key))
-                    .map((d) => makeField(d, onChange))}
+                  {identifierFields.map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Device Status</h3>
-                  {inputTypes
-                    .filter((f) => statusFields.map((x) => x.prop as string).includes(f.key))
-                    .map((d) => makeField(d, onChange))}
+                  {statusFields.map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Satellite Network &amp; Beacon Frequency</h3>
-                  {inputTypes
-                    .filter((f) => communicationFields.map((x) => x.prop as string).includes(f.key))
-                    .map((d) => makeField(d, onChange))}
+                  {communicationFields.map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Comments About This Device</h3>
-                  {inputTypes
-                    .filter((f) => userCommentField.map((x) => x.prop as string).includes(f.key))
-                    .map((d) => makeField(d, onChange))}
+                  {userCommentField.map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Additional Device Sensors &amp; Features</h3>
-                  {inputTypes
-                    .filter((f) => deviceOptionFields.map((x) => x.prop as string).includes(f.key))
-                    .map((d) => makeField(d, onChange))}
+                  {deviceOptionFields.map((d) => makeField(d, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Purchase Details</h3>
-                  {inputTypes
-                    .filter((f) => purchaseFields.map((x) => x.prop as string).includes(f.key))
-                    .map((d) => makeField(d, onChange))}
+                  {purchaseFields.map((d) => makeField(d, onChange))}
                 </div>
                 {/* {!isCreatingNew && showAssignmentHistory ? (
                   <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>

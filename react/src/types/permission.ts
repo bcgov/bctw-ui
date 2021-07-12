@@ -1,12 +1,19 @@
 import { Expose, Transform } from 'class-transformer';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToTimeStr } from 'utils/time';
 import { Animal } from './animal';
 import { BCTW, BCTWBaseType } from './common_types';
 import { IUserCritterAccessInput } from './user';
 
+// interface used to construct objects for updating/granting users access to animals
+export interface IUserCritterPermissionInput {
+  userId: number;
+  access: IUserCritterAccessInput[];
+}
+
 export enum eCritterPermission {
-  owner = 'owner', // the user created this object
+  // owner = 'owner', // renamed to manager
+  manager = 'manager', // the user created this object
   editor = 'editor', // previously 'subowner'
   observer = 'observer', // previously 'view'
   none = 'none', // 
@@ -16,7 +23,7 @@ export enum eCritterPermission {
 // the 'stock' critter permission filter - filters out only animals with 'none' permissions
 // the endpoint to fetch critter permissions uses this as a default option
 const filterOutNonePermissions: eCritterPermission[] = [
-  eCritterPermission.owner,
+  eCritterPermission.manager,
   eCritterPermission.editor,
   eCritterPermission.observer,
 ];
@@ -154,11 +161,11 @@ export interface IExecutePermissionRequest extends Pick<IPermissionRequest, 'req
 
 /* permission-related helpers */
 const permissionCanModify = (p: eCritterPermission): boolean => {
-  return p === eCritterPermission.admin || p === eCritterPermission.editor || p === eCritterPermission.owner;
+  return p === eCritterPermission.admin || p === eCritterPermission.editor || p === eCritterPermission.manager;
 };
 
 const canRemoveDeviceFromAnimal = (p: eCritterPermission): boolean => {
-  return p === eCritterPermission.owner || p === eCritterPermission.admin;
+  return p === eCritterPermission.manager|| p === eCritterPermission.admin;
 };
 
 export {

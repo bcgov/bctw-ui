@@ -2,18 +2,16 @@ import { Paper } from '@material-ui/core';
 import ChangeContext from 'contexts/InputChangeContext';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { CreateEditCheckboxField, CreateEditDateField, MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT } from 'components/form/form_helpers';
 import { UserAlertStrings, WorkflowStrings } from 'constants/strings';
 import { TelemetryAlert } from 'types/alert';
 import { LocationEvent } from 'types/location_event';
 import EditModal from '../common/EditModal';
 import { useState } from 'react';
 import LocationEventForm from './LocationEventForm';
-import { removeProps } from 'utils/common';
+import { removeProps, formatLabel } from 'utils/common_helpers';
 import MortalityEvent from 'types/mortality_event';
 import { IUpsertPayload } from 'api/api_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { formatLabel } from 'types/common_helpers';
 import { Tooltip } from 'components/common';
 
 type MortEventProps = ModalBaseProps & {
@@ -35,20 +33,16 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
   const [locationEvent, setLocationEvent] = useState<LocationEvent>(new LocationEvent('mortality', alert.valid_from));
   const [isRetrieved, setIsRetrieved] = useState<boolean>(false);
 
-  const formFields = getInputTypesOfT<MortalityEvent>(
-    mortalityEvent,
-    mortalityEvent.editableProps.map((c) => ({ prop: c as keyof MortalityEvent})),
-    mortalityEvent.propsThatAreCodes
-  );
+  // const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.formFields);
   const required = true;
 
-  const deviceUnassignedField = formFields.find((f) => f.key === 'shouldUnattachDevice');
-  const retrievedField = formFields.find((f) => f.key === 'retrieved');
-  const retrievedDateField = formFields.find((f) => f.key === 'retrieval_date');
-  const animalStatusField = formFields.find((f) => f.key === 'animal_status');
-  const pcodField = formFields.find((f) => f.key === 'proximate_cause_of_death');
+  const deviceUnassignedField = mortalityEvent.formFields.find((f) => f.prop === 'shouldUnattachDevice');
+  const retrievedField = mortalityEvent.formFields.find((f) => f.prop === 'retrieved');
+  const retrievedDateField = mortalityEvent.formFields.find((f) => f.prop === 'retrieval_date');
+  const animalStatusField = mortalityEvent.formFields.find((f) => f.prop === 'animal_status');
+  const pcodField = mortalityEvent.formFields.find((f) => f.prop === 'proximate_cause_of_death');
+  const vasField = mortalityEvent.formFields.find((f) => f.prop === 'vendor_activation_status');
   // const pcodConfidenceValueField = formFields.find(f => f.key === 'pcod_confidence_value');
-  const vasField = formFields.find((f) => f.key === 'vendor_activation_status');
   // const deviceStatusFields = formFields.filter(f => ['device_status', 'device_deployment_status'].includes(f.key))
 
   /**
@@ -146,8 +140,10 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                     enterDelay={750}>
                     <div>
                       {CreateEditCheckboxField({
-                        formType: deviceUnassignedField,
-                        label: formatLabel(mortalityEvent, deviceUnassignedField.key),
+                        prop: deviceUnassignedField.prop,
+                        type: deviceUnassignedField.type,
+                        value: mortalityEvent[deviceUnassignedField.prop],
+                        label: formatLabel(mortalityEvent, deviceUnassignedField.prop),
                         handleChange: onChange
                       })}
                     </div>
@@ -166,8 +162,10 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                     enterDelay={750}>
                     <div>
                       {CreateEditCheckboxField({
-                        formType: retrievedField,
-                        label: formatLabel(mortalityEvent, retrievedField.key),
+                        prop: retrievedField.prop,
+                        type: retrievedField.type,
+                        value: mortalityEvent[retrievedField.prop],
+                        label: formatLabel(mortalityEvent, retrievedField.prop),
                         handleChange: onChange
                       })}
                     </div>
@@ -179,8 +177,10 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                     <div>
                       {retrievedDateField
                         ? CreateEditDateField({
-                          formType: retrievedDateField,
-                          label: formatLabel(mortalityEvent, retrievedDateField?.key),
+                          prop: retrievedDateField.prop,
+                          type: retrievedDateField.type,
+                          value: mortalityEvent[retrievedDateField.prop],
+                          label: formatLabel(mortalityEvent, retrievedDateField?.prop),
                           handleChange: onChange,
                           disabled: !isRetrieved
                         })
@@ -193,8 +193,10 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                     enterDelay={750}>
                     <div style={{ marginBottom: '10px' }}>
                       {CreateEditCheckboxField({
-                        formType: vasField,
-                        label: formatLabel(mortalityEvent, vasField.key),
+                        prop: vasField.prop,
+                        type: vasField.type,
+                        value: mortalityEvent[vasField.prop],
+                        label: formatLabel(mortalityEvent, vasField.prop),
                         handleChange: onChange
                       })}
                     </div>
@@ -211,11 +213,11 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                 <div className={'dlg-details-section'}>
                   <h3>Update Animal Details</h3>
                   {animalStatusField
-                    ? MakeEditField({ formType: animalStatusField, handleChange: onChange, required, errorMessage: '' })
+                    ? MakeEditField({ prop: animalStatusField.prop, type: animalStatusField.type, value: mortalityEvent[animalStatusField.prop], handleChange: onChange, required, errorMessage: '' })
                     : null}
                   <div style={{ marginBottom: '18px' }}>
                     {pcodField
-                      ? MakeEditField({ formType: pcodField, handleChange: onChange, required, errorMessage: '' })
+                      ? MakeEditField({ prop: pcodField.prop, type: pcodField.type, value: mortalityEvent[pcodField.prop], handleChange: onChange, required, errorMessage: '' })
                       : null}
                   </div>
                 </div>

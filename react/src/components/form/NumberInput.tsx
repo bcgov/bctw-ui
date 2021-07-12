@@ -2,7 +2,7 @@ import { StandardTextFieldProps, TextField } from '@material-ui/core';
 import { baseInputStyle } from 'components/component_constants';
 import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
-import { removeProps } from 'utils/common';
+import { removeProps } from 'utils/common_helpers';
 import { useState } from 'react';
 import { inputPropsToRemove } from 'components/form/TextInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';

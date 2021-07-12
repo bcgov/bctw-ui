@@ -2,9 +2,10 @@ import { IconButton } from '@material-ui/core';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import TextField from 'components/form/TextInput';
 import { useMemo, useState } from 'react';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { ITableFilter } from './table_interfaces';
+import { Tooltip } from 'components/common';
 
 type TextFilterProps = {
   rowCount: number;
@@ -92,9 +93,11 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
           />
         </div>
       ) : null}
-      <IconButton onClick={(): void => setShowFilter((o) => !o)} aria-label='filter list'>
-        <FilterListIcon htmlColor='#90caf9' />
-      </IconButton>
+      <Tooltip title={ `${showFilter ? 'Hide' : 'Show'} Filter Controls`} >
+        <IconButton onClick={(): void => setShowFilter((o) => !o)} aria-label='filter list'>
+          <FilterListIcon htmlColor='#90caf9' />
+        </IconButton>
+      </Tooltip>
     </>
   );
 }

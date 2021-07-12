@@ -1,9 +1,8 @@
 import { matchSorter } from 'match-sorter';
-import { getProperty } from 'utils/common';
+import { getProperty, countDecimals } from 'utils/common_helpers';
 import { Order, HeadCell } from 'components/table/table_interfaces';
 import { dateObjectToTimeStr } from 'utils/time';
 import { Icon } from 'components/common';
-import { countDecimals } from 'types/common_helpers';
 
 /**
  * converts an object to a list of HeadCells

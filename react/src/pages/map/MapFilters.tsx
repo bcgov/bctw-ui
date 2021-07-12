@@ -12,7 +12,7 @@ import SelectUDF from 'components/form/SelectUDF';
 import { eUDFType, IUDF, transformUdfToCodeFilter } from 'types/udf';
 import { Icon } from 'components/common';
 import { MapStrings } from 'constants/strings';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { CODE_FILTERS, DEVICE_STATUS_OPTIONS } from 'pages/map/map_constants';

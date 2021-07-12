@@ -2,7 +2,7 @@ import { StandardTextFieldProps, TextField as MuiTextField } from '@material-ui/
 import { baseInputStyle } from 'components/component_constants';
 import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
-import { removeProps } from 'utils/common';
+import { removeProps } from 'utils/common_helpers';
 import {useState} from 'react';
 import { mustBeEmail } from 'components/form/form_validators';
 import useDidMountEffect from 'hooks/useDidMountEffect';

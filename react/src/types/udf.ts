@@ -1,4 +1,4 @@
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { ICodeFilter } from './code';
 import { BCTW } from './common_types';
 import { Expose } from 'class-transformer';

@@ -2,14 +2,13 @@ import { Paper } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { MakeEditField } from 'components/form/create_form_components';
-import { getInputTypesOfT } from 'components/form/form_helpers';
 import { CritterStrings as CS } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import EditModal from 'pages/data/common/EditModal';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
-import { FormInputType } from 'types/form_types';
+import { FormFieldObject } from 'types/form_types';
 import { permissionCanModify } from 'types/permission';
 
 /**
@@ -22,32 +21,10 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const requiredFields = CS.requiredProps;
 
-  const [inputTypes, setInputTypes] = useState<FormInputType[]>([]);
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
   // const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
   // const [showReleaseWorkflow, setShowReleaseWorkflow] = useState<boolean>(false);
   // const [showMortalityWorkflow, setShowMortalityWorkflow] = useState<boolean>(false);
-
-  useEffect(() => {
-    const updateFields = (): void => {
-      const inputTypes = getInputTypesOfT<Animal>(
-        editing,
-        allFields,
-        allFields.filter((f) => f.isCode).map((a) => a.prop)
-      );
-      setInputTypes(inputTypes);
-    };
-    updateFields();
-  }, [editing]);
-
-  // const alert = new TelemetryAlert();
-  // {
-  //   alert.critter_id = editing.critter_id;
-  //   alert.collar_id = '12345';
-  //   alert.device_id = editing.device_id;
-  //   alert.wlh_id = editing.wlh_id;
-  //   alert.valid_from = editing.valid_from; // Does this make sense?
-  // }
 
   const {
     associatedAnimalFields,
@@ -59,28 +36,21 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
     userCommentField
   } = critterFormFields;
 
-  const allFields = [
-    ...associatedAnimalFields,
-    ...captureFields,
-    ...characteristicsFields,
-    ...identifierFields,
-    ...mortalityFields,
-    ...releaseFields,
-    ...userCommentField
-  ];
-
   const makeFormField = (
-    formType: FormInputType,
+    formType: FormFieldObject<Animal>,
     handleChange: (v: Record<string, unknown>) => void
   ): React.ReactNode => {
-    const { key } = formType;
+    const { prop, type, codeName } = formType;
     return MakeEditField({
-      formType,
+      type, 
+      prop,
+      value: editing[prop],
       handleChange,
       disabled: !canEdit,
-      required: requiredFields.includes(key),
-      label: editing.formatPropAsHeader(key),
+      required: requiredFields.includes(prop),
+      label: editing.formatPropAsHeader(prop),
       span: true,
+      codeName
     });
   };
 
@@ -137,45 +107,31 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                 {/* <h2>Animal Details</h2> */}
                 <div className={'dlg-details-section'}>
                   <h3>Identifiers</h3>
-                  {inputTypes
-                    .filter((f) => identifierFields.map((x) => x.prop as string).includes(f.key))
-                    .map((f) => makeFormField(f, onChange))}
+                  {identifierFields.map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Characteristics</h3>
-                  {inputTypes
-                    .filter((f) => characteristicsFields.map((x) => x.prop as string).includes(f.key))
-                    .map((formType) => makeFormField(formType, onChange))}
+                  {characteristicsFields.map((formType) => makeFormField(formType, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Association With Another Individual</h3>
-                  {inputTypes
-                    .filter((f) => associatedAnimalFields.map((x) => x.prop as string).includes(f.key))
-                    .map((f) => makeFormField(f, onChange))}
+                  {associatedAnimalFields.map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Comments About This Animal</h3>
-                  {inputTypes
-                    .filter((f) => userCommentField.map((x) => x.prop as string).includes(f.key))
-                    .map((f) => makeFormField(f, onChange))}
+                  {userCommentField.map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Latest Capture Details</h3>
-                  {inputTypes
-                    .filter((f) => captureFields.map((x) => x.prop as string).includes(f.key))
-                    .map((f) => makeFormField(f, onChange))}
+                  {captureFields.map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Latest Release Details</h3>
-                  {inputTypes
-                    .filter((f) => releaseFields.map((x) => x.prop as string).includes(f.key))
-                    .map((f) => makeFormField(f, onChange))}
+                  {releaseFields.map((f) => makeFormField(f, onChange))}
                 </div>
                 <div className={'dlg-details-section'}>
                   <h3>Mortality Details</h3>
-                  {inputTypes
-                    .filter((f) => mortalityFields.map((x) => x.prop as string).includes(f.key))
-                    .map((f) => makeFormField(f, onChange))}
+                  {mortalityFields.map((f) => makeFormField(f, onChange))}
                 </div>
                 {/* dont show assignment history for new critters */}
                 {!isCreatingNew ? (

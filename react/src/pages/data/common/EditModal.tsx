@@ -5,7 +5,7 @@ import ChangeContext from 'contexts/InputChangeContext';
 import React, { useEffect, useState } from 'react';
 import { Animal, critterFormFields } from 'types/animal';
 import { Collar } from 'types/collar';
-import { omitNull } from 'utils/common';
+import { omitNull } from 'utils/common_helpers';
 import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
 import { CollarStrings } from 'constants/strings';
 
@@ -37,6 +37,7 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param hideHIstory optionally hide the 'show history' button
  * @param showInFullScreen render as a modal or fullscreen dialog?
  * @param onReset a close handler since default handler is overwritten in AddEditViewer
+ * @param onSave the parent handler called when the save button is clicked
  * @param headerComponent 
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {

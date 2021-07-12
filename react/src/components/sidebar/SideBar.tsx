@@ -1,12 +1,9 @@
-import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
-import clsx from 'clsx';
+import { Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { RouteKey } from 'AppRouter';
 import { Icon, Tooltip } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, ChevronLeft } from '@material-ui/icons';
-import drawerStyles from './drawer_classes';
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
@@ -14,28 +11,28 @@ type SideBarProps = {
   collapseAble: boolean;
 };
 
-export default function SideBar({ routes, collapseAble }: SideBarProps): JSX.Element {
-  const classes = drawerStyles();
+export default function SideBar({ routes }: SideBarProps): JSX.Element {
+  // const classes = drawerStyles();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isOwner, setIsOwner] = useState<boolean>(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
-  const [open, setOpen] = React.useState(false);
-  const userChanges = useContext(UserContext);
+  // const [open, setOpen] = React.useState(false);
+  const useUser = useContext(UserContext);
 
-  const handleDrawerOpen = (): void => setOpen((o) => !o);
+  // const handleDrawerOpen = (): void => setOpen((o) => !o);
 
   // enable user to see admin page if they have the role
   useEffect(() => {
     const updateComponent = (): void => {
-      if (userChanges?.ready) {
-        const user = userChanges.user;
+      const { user } = useUser;
+      if (user) {
         setIsAdmin(user.role_type === 'administrator');
         setIsOwner(user.is_owner);
       }
     };
     updateComponent();
-  }, [userChanges]);
+  }, [useUser]);
 
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
@@ -69,23 +66,23 @@ export default function SideBar({ routes, collapseAble }: SideBarProps): JSX.Ele
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
     <div className={'sidebar'} id="manage_sidebar">
-        <Divider />
-        <List component='nav'>
-          {routesToShow
-            .filter((r) => r.name !== 'notFound' && r.icon)
-            .map((route: RouteKey, idx: number) => {
-              return (
-                <Tooltip key={idx} title={route.title}>
-                  <ListItem button {...{ component: Link, to: route.path }}>
-                    <ListItemIcon className={'sidebar-icon'}>
-                      <Icon icon={route.icon} />
-                    </ListItemIcon>
-                    <ListItemText className={'list-item-txt'} primary={route.title} />
-                  </ListItem>
-                </Tooltip>
-              );
-            })}
-        </List>
+      <Divider />
+      <List component='nav'>
+        {routesToShow
+          .filter((r) => r.name !== 'notFound' && r.icon)
+          .map((route: RouteKey, idx: number) => {
+            return (
+              <Tooltip key={idx} title={route.title}>
+                <ListItem button {...{ component: Link, to: route.path }}>
+                  <ListItemIcon className={'sidebar-icon'}>
+                    <Icon icon={route.icon} />
+                  </ListItemIcon>
+                  <ListItemText className={'list-item-txt'} primary={route.title} />
+                </ListItem>
+              </Tooltip>
+            );
+          })}
+      </List>
       <Divider />
       {/* <div>{sidebarContent}</div> */}
     </div>

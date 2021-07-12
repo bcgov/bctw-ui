@@ -1,7 +1,8 @@
-import { columnToHeader, omitNull } from 'utils/common';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { Animal } from './animal'
 import { Collar } from './collar'
 import { BCTW } from './common_types';
+import { eInputType, FormFieldObject } from './form_types';
 import { LocationEvent } from './location_event'
 
 interface IMortalityEvent extends 
@@ -57,13 +58,20 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
         return columnToHeader(s);
     }
   }
-
-  get editableProps(): string[] {
-    return Object.keys(this)?.filter(key => !['critter_id', 'collar_id', 'mortality_event'].includes(key))
-  }
-
-  get propsThatAreCodes(): string[] {
-    return ['animal_status', 'device_deployment_status', 'device_status', 'proximate_cause_of_death'];
+  get formFields(): FormFieldObject<MortalityEvent>[] {
+    return [
+      {prop: 'animal_status', type: eInputType.code },
+      {prop: 'proximate_cause_of_death', type: eInputType.text },
+      {prop: 'predator_species', type: eInputType.code },
+      {prop: 'proximate_cause_of_death', type: eInputType.code },
+      {prop: 'retrieved', type: eInputType.check },
+      {prop: 'retrieval_date', type: eInputType.date },
+      {prop: 'vendor_activation_status', type: eInputType.check },
+      {prop: 'device_deployment_status', type: eInputType.code },
+      {prop: 'device_status', type: eInputType.code },
+      {prop: 'pcod_confidence_value', type: eInputType.text },
+      {prop: 'shouldUnattachDevice', type: eInputType.check }
+    ]
   }
 
   // retrieve the animal metadata fields from the mortality event

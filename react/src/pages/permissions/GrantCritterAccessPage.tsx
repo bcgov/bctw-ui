@@ -9,11 +9,15 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useQueryClient } from 'react-query';
-import { IBulkUploadResults, IGrantCritterAccessResults, IUserCritterPermissionInput } from 'api/api_interfaces';
+import { IBulkUploadResults } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
-import { adminPermissionOptions } from 'types/permission';
-import { formatAxiosError } from 'utils/common';
+import { adminPermissionOptions, IUserCritterPermissionInput } from 'types/permission';
+import { formatAxiosError } from 'utils/errors';
+import { IGrantCritterAccessResults } from 'api/permission_api';
 
+/**
+ * admin-access only page that allows an admin to grant user-critter permissions
+ */
 export default function GrantCritterAccessPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const [user, setUser] = useState<User>({} as User);

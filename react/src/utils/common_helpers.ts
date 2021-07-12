@@ -1,16 +1,34 @@
-import { AxiosError } from "axios";
+import { BCTW } from 'types/common_types';
 
-/** 
- * @param {K} key
- * @param {T} object of type T
- * given a property name of an object T, return its type.
-  ex.
-    let x = { foo: 10, bar: "hello!" };
-    getProperty(x, "foo"); // number
-**/
-function getProperty<T, K extends keyof T>(obj: T, key: K): unknown {
-  return obj[key]; // Inferred type is T[K]
-}
+// returns the number of digits after the decimal in a float
+const countDecimals = (value: number): number => {
+  if (Math.floor(value) === value) return 0;
+  return value.toString().split('.')[1].length || 0;
+};
+
+// formats lat long nicely
+const formatLatLong = (lat: number, long: number): string => {
+  return `${lat.toFixed(2)}\xb0 ${long.toFixed(2)}\xb0`;
+};
+
+// formats UTM nicely
+const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
+
+// given a property of an object that extends the BCTW type, return a label string
+const formatLabel = <T extends BCTW>(o: T, key: string): string => o.formatPropAsHeader(key);
+
+/**
+ * given an array of type T, returns unique values of @param prop 
+*/
+const getUniqueValuesOfT = <T,>(arr: T[], prop: keyof T): string[] => {
+  const ret = [];
+  arr.forEach((p) => {
+    if (!ret.includes(p[prop])) {
+      ret.push(p[prop]);
+    }
+  });
+  return ret;
+};
 
 /**
  * shallow compare of objects for use in forms
@@ -66,19 +84,27 @@ const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
   return copyOfT;
 }
 
-/**
- * formats an Axios error to a string
- */
-const formatAxiosError = (err: AxiosError): string => {
-  const msg = err?.response?.data;
-  return `${msg ?? err.message}`;
-} ;
+/** 
+ * @param {K} key
+ * @param {T} object of type T
+ * given a property name of an object T, return its type.
+  ex.
+    let x = { foo: 10, bar: "hello!" };
+    getProperty(x, "foo"); // number
+**/
+function getProperty<T, K extends keyof T>(obj: T, key: K): unknown {
+  return obj[key]; // Inferred type is T[K]
+}
 
 export {
-  columnToHeader,
-  getProperty,
-  formatAxiosError,
+  countDecimals,
+  formatLatLong,
+  formatUTM,
+  formatLabel,
+  getUniqueValuesOfT,
   objectCompare,
+  columnToHeader,
   omitNull,
   removeProps,
+  getProperty
 };

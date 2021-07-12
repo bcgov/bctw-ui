@@ -1,5 +1,5 @@
 import { Type, Expose, Transform } from 'class-transformer';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { Animal, transformOpt } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTW } from 'types/common_types';

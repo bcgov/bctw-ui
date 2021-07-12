@@ -7,9 +7,10 @@ import download from 'downloadjs';
 import { eExportType, ExportQueryParams } from 'types/export';
 import { CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import { formatAxiosError, omitNull } from 'utils/common';
+import { omitNull } from 'utils/common_helpers';
 import { ITelemetryGroup, MapRange } from 'types/map';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { formatAxiosError } from 'utils/errors';
 
 type ImportProps = ModalBaseProps & {
   groupedAssignedPings: ITelemetryGroup[];

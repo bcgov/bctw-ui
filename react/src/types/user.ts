@@ -1,7 +1,7 @@
 import { Type, Expose } from 'class-transformer';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { BCTW, BCTWBaseType } from 'types/common_types';
-import { FormFieldObject } from 'types/form_types';
+import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 
 export enum eUserRole {
@@ -10,11 +10,28 @@ export enum eUserRole {
   observer = 'observer'
 }
 
-export interface IUser extends BCTW, BCTWBaseType {
+type KeyCloakDomainType = 'idir' | 'bceid';
+/**
+ * interface representing the keycloak object retrieved 
+ * in the UserContext.tsx
+ */
+export interface IKeyCloakSessionInfo {
+  domain: KeyCloakDomainType;
+  username: string;
+  email: string;
+  family_name: string;
+  given_name: string;
+}
+
+/**
+ * representation of the bctw.user table
+ */
+export interface IUser extends BCTW, BCTWBaseType, Pick<IKeyCloakSessionInfo, 'email'> {
   id: number;
   idir: string;
   bceid: string;
-  email: string;
+  firstname: string;
+  lastname: string;
   // indicates if the user is considered the owner of at least one animal
   is_owner?: boolean; 
 }
@@ -25,6 +42,8 @@ export class User implements IUser {
   id: number;
   idir: string;
   bceid: string;
+  firstname: string;
+  lastname: string;
   email: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
@@ -42,14 +61,26 @@ export class User implements IUser {
         return columnToHeader(str);
     }
   }
+
+  get formFields(): FormFieldObject<User>[] {
+    const ret: FormFieldObject<User>[] = [
+      { prop: 'email', type: eInputType.text },
+      { prop: 'firstname', type: eInputType.text },
+      { prop: 'lastname', type: eInputType.text }
+    ];
+    // a user should only have one of theses
+    if (this.idir) {
+      ret.unshift({prop: 'idir', type: eInputType.text })
+    } else if (this.bceid) {
+      ret.unshift({prop: 'bceid', type: eInputType.text })
+    }
+    return ret;
+  }
 }
 
-export const userFormFields: FormFieldObject<User>[] = [
-  { prop: 'idir' },
-  { prop: 'bceid' },
-  { prop: 'email' },
-]
-
+/**
+ * todo:
+ */
 export interface IUserCritterAccess {
   critter_id: string;
   animal_id: string;
@@ -62,9 +93,6 @@ export interface IUserCritterAccess {
   permission_type: eCritterPermission;
 }
 
-/**
- * note: the database uses animal id since the bctw.user_aniaml_assignment table hasn't been updated from animal_id -> critter_id.
-*/
 export interface IUserCritterAccessInput extends Partial<IUserCritterAccess> {
   critter_id: string;
   permission_type: eCritterPermission;

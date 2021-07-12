@@ -2,15 +2,14 @@ import { useState } from 'react';
 import { IconButton, Typography } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import OwnerLayout from 'pages/layouts/OwnerLayout';
-import { eCritterPermission, IPermissionRequestInput, OwnerHistoryFields, ownerPermissionOptions, PermissionRequestInput } from 'types/permission';
+import { eCritterPermission, IPermissionRequestInput, IUserCritterPermissionInput, OwnerHistoryFields, ownerPermissionOptions, PermissionRequestInput } from 'types/permission';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import TextField from 'components/form/TextInput';
 import EditTable, { EditTableRowAction } from 'components/table/EditTable';
 import Button from 'components/form/Button';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import { IUserCritterPermissionInput } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError } from 'utils/errors';
 import { Icon, NotificationMessage } from 'components/common';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -229,7 +228,7 @@ export default function OwnerRequestPermission(): JSX.Element {
           handleClose={(): void => setShowPickCritterModal(false)}
           onSave={handleCrittersSelected}
           alreadySelected={permission?.access?.map((a) => a.critter_id)}
-          filter={[eCritterPermission.owner]}
+          filter={[eCritterPermission.manager]}
           title={`Select Animals`}
           showSelectPermission={true}
           headersToShow={PermissionTableHeaders.filter(p => p !== 'permission_type')}

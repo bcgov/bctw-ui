@@ -2,7 +2,7 @@ import { Type, Expose } from 'class-transformer';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
 import { IAnimalTelemetryBase } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
-import { columnToHeader } from 'utils/common';
+import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
 import { BCTW, BCTWType } from './common_types';
 

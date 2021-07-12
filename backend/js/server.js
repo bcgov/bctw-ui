@@ -1,4 +1,4 @@
-/* Bare bones static file server */
+/* 'Bare bones'.strike() static file server */
 const pg = require('pg');
 const pug = require('pug');
 const axios = require('axios');
@@ -60,14 +60,45 @@ var session = {
   store: memoryStore
 };
 
-
-
 const appendQueryToUrl = (url, query) => {
   if (!query) return url;
   return url.includes('?') ?
     url += `&${query}` :
     url += `?${query}`;
 };
+
+/**
+ * the username and domain (ie whether the user authenticated with a BCEID vs an IDIR) 
+ * are stored in the keycloak object's @param preferred_username property. 
+ */
+const splitCredentials = (sessionObject) => {
+  const credentials = sessionObject.preferred_username.split('@');
+  if (!credentials.length) {
+    return {}
+  }
+  return { user: credentials[0], domain: credentials[1] };
+}
+
+/**
+ * endpoint that returns keycloak session info
+*/
+const retrieveSessionInfo = function (req, res, next) {
+  if (!isProd) {
+    return res.status(500).send('not in production, no session info available');
+  }
+  const data = req.kauth.grant.access_token.content;
+  if (!data) {
+    return res.status(500).send('unable to retrieve session info');
+  }
+  const { family_name, given_name, email } = data;
+  const ret = {
+    email,
+    family_name,
+    given_name,
+    ...splitCredentials(data)
+  }
+  res.status(200).send(ret);
+}
 
 /* ## proxyApi
   The api is not exposed publicly. This service is protected
@@ -87,9 +118,7 @@ const proxyApi = function (req, res, next) {
   // The domain and username
   let url;
   if (isProd) {
-    const cred = !isTest ? req.kauth.grant.access_token.content.preferred_username : 'test@idir';
-    const domain = cred.split('@')[1];
-    const user = cred.split('@')[0];
+    const { domain, user } = splitCredentials(req.kauth.grant.access_token.content);
     url = `${apiHost}:${apiPort}/${endpoint}`;
     if (req.params.endpointId) {
       url += `/${req.params.endpointId}`;
@@ -100,7 +129,7 @@ const proxyApi = function (req, res, next) {
     url = `${apiHost}:${apiPort}/${endpoint}?${query}&idir=user`;
   }
 
-  console.log(`url: ${url}, type: ${req.method}`);
+  // console.log(`url: ${url}, type: ${req.method}`);
   const errHandler = (err) => {
     console.error(err.response);
     res.status(500).json({ error: err.response.data });
@@ -191,39 +220,6 @@ const pageHandler = function (req, res, next) {
   return next();
 };
 
-/* ## authenticate
-  After keycloak has been authenticated we need to check if 
-  the account has access to the site.
-  If yes... Pass through.
-  If not... Redirect to access-denied page.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
-  @param next {function} Node/Express function for flow control
- */
-const authenticate = function (req, res, next) {
-  // Pass through if in dev or keycloak isn't configured yet
-  if (!isProd || !req.kauth.grant) {
-    return next();
-  }
-
-  /*
-    Check if keycloak user has access.
-    If something's wrong with the keycloak info... Don't crash the server.
-   */
-  try {
-    const domain = req.kauth.grant.access_token.content.preferred_username;
-    const user = domain.split('@')[0];
-    if (authorizedUsers.includes(user)) {
-      next(); // Authorized... pass through
-    } else {
-      res.render('denied', req); // Nope... Denied
-    }
-  } catch (err) { // Something's wrong with keycloak
-    console.error("Failed to authenticate:", err)
-    res.render('denied', req); // Denied
-  }
-};
-
 /**
  * # onboardingRedirect
  * If you get here you have a valid IDIR.
@@ -238,8 +234,7 @@ const authenticate = function (req, res, next) {
 const onboardingRedirect = async (req,res,next) => {
   // Collect all user data from the keycloak object
   const data = req.kauth.grant.access_token.content;
-  const domain = data.preferred_username.split('@')[1];
-  const user = data.preferred_username.split('@')[0];
+  const { user, domain } = splitCredentials(data);
   const email = data.email;
   const givenName = data.given_name;
   const familyName = data.family_name;
@@ -419,6 +414,7 @@ if (isTest) {
 } else if (isProd) {
   app
     .get('/', keycloak.protect(), pageHandler)
+    .get('/api/session-info', retrieveSessionInfo)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
     // bulk file import handlers

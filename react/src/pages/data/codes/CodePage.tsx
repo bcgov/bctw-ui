@@ -7,7 +7,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import React, { useState } from 'react';
 import { CodeFormFields, CodeHeader, CodeHeaderInput, ICodeHeader } from 'types/code';
-import { formatAxiosError } from 'utils/common';
+import { formatAxiosError } from 'utils/errors';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditCodeHeader from 'pages/data/codes/EditCodeHeader';
 import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';

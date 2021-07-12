@@ -1,6 +1,12 @@
 import { createUrl } from 'api/api_helpers';
 import { ICode, ICodeHeader } from 'types/code';
-import { ApiProps, IBulkUploadResults, IGetCodeProps } from './api_interfaces';
+import { ApiProps, IBulkUploadResults } from './api_interfaces';
+
+// all code retrievals must provide the code_header.code_header_name as a parameter
+export interface IGetCodeProps {
+  page: number;
+  codeHeader: string;
+}
 
 export const codeApi = (props: ApiProps) => {
   const { api } = props;
@@ -10,7 +16,7 @@ export const codeApi = (props: ApiProps) => {
     const url = createUrl({ api: 'get-code', query: `codeHeader=${codeHeader}`, page });
     // console.log(`requesting ${codeHeader} codes`);
     const { data } = await api.get(url);
-    return data[0];
+    return data;
   };
 
   const getCodeHeaders = async (): Promise<ICodeHeader[]> => {
