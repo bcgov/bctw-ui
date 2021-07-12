@@ -36,7 +36,18 @@ export default function UserProfile(): JSX.Element {
     <ManageLayout>
       <div style={{margin: '20px'}}>
         <Typography variant='h5'>
-          Your Role: <strong>{user.role_type}</strong>
+          <p>
+            Your Name: <strong>{user?.firstname ?? 'Local'}</strong>&nbsp;<strong>{user?.lastname ?? 'User'}</strong>
+          </p>
+          <p>
+            Your Username: <strong>{user?.idir ?? user?.bceid ?? 'Local Username'}</strong>
+          </p>
+          <p>
+            Your Email Address: <strong>{user?.email}</strong>
+          </p>
+          <p>
+            Your Role: <strong>{user.role_type}</strong>
+          </p>
         </Typography>
         <div style={{margin: '25px 0'}}>
           {user.formFields.map((p) => {
