@@ -247,9 +247,8 @@ const onboardingRedirect = async (req,res,next) => {
   // Is the current user registered: Boolean
   const registered = (idirs.includes(user)) ? true : false;
 
-  // Formulate the url and data to be sent to the onboarding page
-  let url = `/onboarding?user=${user}&domain=${domain}&email=${email}`;
-  url += `&given=${givenName}&family=${familyName}`;
+  // Formulate the url
+  let url = '/#/onboarding';
 
 
   if (registered) {
