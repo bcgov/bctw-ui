@@ -19,6 +19,7 @@ import './AddUser.css';
  * 4. Access approved
  */
 const AddUser = (): JSX.Element => {
+  // XXX: This is broken :(
   const useUser = useContext(UserContext);
 
   const [userAccess,setUserAccess] = useState(null);
