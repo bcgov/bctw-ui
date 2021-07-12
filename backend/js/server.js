@@ -246,6 +246,7 @@ const onboardingRedirect = async (req,res,next) => {
   const idirs = result.rows.map((row) => row.idir);
   // Is the current user registered: Boolean
   const registered = (idirs.includes(user)) ? true : false;
+  console.log('registered',registered);
 
   // Formulate the url
   let url = '/#/onboarding';
@@ -254,7 +255,8 @@ const onboardingRedirect = async (req,res,next) => {
   if (registered) {
     next(); // pass through
   } else {
-    res.redirect(url); // reject and go to the onboarding page
+    next();
+    // res.redirect(url); // reject and go to the onboarding page
   }
   client.release(); // Release database connection
 };
