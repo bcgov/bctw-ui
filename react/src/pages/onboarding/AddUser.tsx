@@ -23,7 +23,7 @@ const AddUser = (): JSX.Element => {
 
   const [userAccess,setUserAccess] = useState(null);
 
-  if (useUser.ready && !userAccess) {
+  if (useUser && !userAccess) {
     const base = getBaseUrl();
     const domain = useUser.user.idir ? 'idir' : 'bceid'
     const user = useUser.user.idir ?
@@ -56,7 +56,7 @@ const AddUser = (): JSX.Element => {
   return (
     <div style={containerStyle}>
       {
-        useUser.ready && userAccess ? // User is in the system
+        useUser && userAccess ? // User is in the system
           <div>
             {userAccess == "granted" ? <RequestUser/> : "" }  {/*XXX for testing */}
             {/* { userAccess == "granted" ? <ApprovedUser/> : ""} */}
