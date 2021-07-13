@@ -18,14 +18,33 @@ import './AddUser.css';
  * 3. Access denied
  * 4. Access approved
  */
+const base = getBaseUrl();
+
 const AddUser = (): JSX.Element => {
   // XXX: This is broken :(
-  const useUser = useContext(UserContext);
+  /**
+   *  Need to hit the /api/session-info end point instead
+   */
+  // const useUser = useContext(UserContext);
 
+  const [useUser, setUseUser] = useState(null);
+
+  const authUrl = `${base}/api/session-info`;
+
+  axios(authUrl).then((res:any) => {
+    setUseUser(res.data);
+    console.log('Got this from the session-info end point',res.data);
+  }).catch((err) => {
+    console.error('Could not get user keycloak info')
+  })
+  
   const [userAccess,setUserAccess] = useState(null);
 
+  /**
+   * If we have the user keycload data we can request
+   * access info from the database.
+   */
   if (useUser && !userAccess) {
-    const base = getBaseUrl();
     const domain = useUser.user.idir ? 'idir' : 'bceid'
     const user = useUser.user.idir ?
       useUser.user.idir :
@@ -39,8 +58,9 @@ const AddUser = (): JSX.Element => {
 
     axios(url).then((res:any) => {
       setUserAccess(res.data.access);
+      console.log('Got this from the user-access end point', res.data)
     }).catch((err) => {
-      console.error('error',err);
+      console.error('Could not get user access info',err);
     })
   }
 
