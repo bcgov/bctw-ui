@@ -34,6 +34,14 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
     }
   }, [useUser]);
 
+  const topNavStyle = {
+    display: user?.role_type ? 'inline' : 'none'
+  }
+
+  const noAccessTopNavStyle = {
+    display: user?.role_type ? 'none' : 'inline'
+  }
+
   // when the AlertContext is loaded, set the alert state
   useDidMountEffect(() => {
     if (useAlert?.alerts?.length) {
@@ -48,7 +56,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
           <img src={headerImage} width={155} height={52} alt={'Government of British Columbia'} />
           <p>BCTW</p>
         </Link>
-        <nav className={'app-nav'}>
+        <nav id={'top-nav'} className={'app-nav'} style={topNavStyle}>
           <ul>
             <li>
               <Link to='/home' color={'inherit'}>Home</Link>
@@ -58,6 +66,13 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
             </li>
             <li>
               <Link to='/manage' color={'inherit'}>Manage</Link>
+            </li>
+          </ul>
+        </nav>
+        <nav id={'no-access-top-nav'} className={'app-nav'} style={noAccessTopNavStyle}>
+          <ul>
+            <li>
+              <Link to='/onboarding' color={'inherit'}>Request Access</Link>
             </li>
           </ul>
         </nav>
@@ -93,7 +108,9 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
               </div>
             </li>
             <li className={'logout'}>
-              <Link to='/logout' color={'inherit'}>Logout</Link>
+              { /* XXX Victor test */}
+              <a href='/logout'><span color={'inherit'}>Logout1</span></a> &nbsp;
+              <Link to='/logout' color={'inherit'}>Logout2</Link>
             </li>
             <li>{children}</li>
           </ul>
