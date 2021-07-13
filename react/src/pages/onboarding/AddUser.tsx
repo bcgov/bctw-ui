@@ -26,10 +26,8 @@ const AddUser = (): JSX.Element => {
 
   if (useUser && !userAccess) {
     const base = getBaseUrl();
-    const domain = useUser.user.idir ? 'idir' : 'bceid'
-    const user = useUser.user.idir ?
-      useUser.user.idir :
-      useUser.user.bceid
+    const domain = useUser.user?.idir ? 'idir' : 'bceid'
+    const user = useUser.user?.idir ? useUser.user?.idir : useUser.user?.bceid
 
     /* This is the valid url */
     const url = `${base}/user-access?onboard-user=${user}&onboard-domain=${domain}&idir=${user}`;
