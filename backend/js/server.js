@@ -226,7 +226,6 @@ const pageHandler = function (req, res, next) {
  * Check if the user is registerd in the database.
  * If yes.... Pass through.
  * Else... Direct to the onboarding page.
- * TODO: Redirect to use new React page. 
  * @param req {object} Express request object
  * @param res {object} Express response object
  * @param next {function} Express function to continue on
