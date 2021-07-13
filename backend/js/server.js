@@ -255,34 +255,12 @@ const onboardingRedirect = async (req,res,next) => {
   if (registered) {
     next(); // pass through
   } else {
-    next();
-    // res.redirect(url); // reject and go to the onboarding page
+    // next();
+    res.redirect(url); // reject and go to the onboarding page
   }
   client.release(); // Release database connection
 };
 
-/**
- * # onboarding
- * Accept requests for access to the site.
- * Send requests to product owner via email (CHES).
- * TODO: Deprecate, as this is now handled by React
- * @param req {object} Express request object
- * @param res {object} Express response object
- */
-const onboarding = (req,res) => {
-  // Collect all user data from the keycloak object
-  let firstName
-  if (req.kauth.grant) {
-    const data = req.kauth.grant.access_token.content;
-    firstName = data.given_name;
-  } else {
-    firstName = '';
-  }
-
-  const template = pug.compileFile('onboarding/index.pug')
-  const html = template({firstName});
-  res.status(200).send(html);
-};
 
 const onboardingAccess = async (req,res) => {
   // This data will be inserted into the email
@@ -397,12 +375,10 @@ var app = express()
 
 if (isProd) {
   app
-    // .get('/onboarding', keycloak.protect(), onboarding)
     .post('/onboarding', keycloak.protect(), onboardingAccess)
     .all('*', keycloak.protect(), onboardingRedirect);
 } else{
   app
-    // .get('/onboarding',  onboarding)
     .post('/onboarding', onboardingAccess);
 }
 
