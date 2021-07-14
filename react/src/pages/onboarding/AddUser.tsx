@@ -31,12 +31,14 @@ const AddUser = (): JSX.Element => {
 
   const authUrl = `${base}/api/session-info`;
 
+  console.log('authUrl',authUrl);
+
   axios(authUrl).then((res:any) => {
     setUseUser(res.data);
     console.log('Got this from the session-info end point',res.data);
   }).catch((err) => {
     console.error('Could not get user keycloak info')
-  })
+  });
   
   const [userAccess,setUserAccess] = useState(null);
 
