@@ -261,6 +261,8 @@ const onboardingRedirect = async (req,res,next) => {
   } else {
     console.log('Not registered so redirecting')
     // next();
+    console.log('I hope this is not a redirecto to /onboarding');
+    console.log('request url:',req.url);
     res.redirect(url); // reject and go to the onboarding page
   }
   client.release(); // Release database connection
