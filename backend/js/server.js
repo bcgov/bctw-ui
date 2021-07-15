@@ -249,11 +249,14 @@ const onboardingRedirect = async (req,res,next) => {
 
   // Formulate the url
   let url = '/#/onboarding';
+  console.log('url redirect',url);
 
 
   if (registered) {
+    console.log('Registed so passing through')
     next(); // pass through
   } else {
+    console.log('Not registered so redirecting')
     // next();
     res.redirect(url); // reject and go to the onboarding page
   }
@@ -373,10 +376,12 @@ var app = express()
 
 
 if (isProd) {
+  console.log('this is prod');
   app
     .post('/onboarding', keycloak.protect(), onboardingAccess)
     .all('*', keycloak.protect(), onboardingRedirect);
 } else{
+  console.log('this is NOT prod!!!!!');
   app
     .post('/onboarding', onboardingAccess);
 }
