@@ -233,7 +233,9 @@ const pageHandler = function (req, res, next) {
 const onboardingRedirect = async (req,res,next) => {
   // Collect all user data from the keycloak object
   const data = req.kauth.grant.access_token.content;
+  console.log('data:',data)
   const { user, domain } = splitCredentials(data);
+  console.log('user:',user)
   const email = data.email;
   const givenName = data.given_name;
   const familyName = data.family_name;
@@ -243,6 +245,7 @@ const onboardingRedirect = async (req,res,next) => {
   const client = await pgPool.connect();
   const result = await client.query(sql);
   const idirs = result.rows.map((row) => row.idir);
+  console.log('idirs:',idirs)
   // Is the current user registered: Boolean
   const registered = (idirs.includes(user)) ? true : false;
   console.log('registered',registered);
