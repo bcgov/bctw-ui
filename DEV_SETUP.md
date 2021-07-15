@@ -43,7 +43,7 @@
 
 8. Open a Command Prompt.
 
-1. Connect to the Ubuntu WSL2 distribution:
+1. Connect to the Ubuntu 20.04 LTS distribution:
 ```
   wsl -d Ubuntu-20.04
 ```
@@ -55,12 +55,12 @@
 
 11. ***(One time)*** Install the required Node.js modules & dependencies:
 ```
-  npm install
+  npm i
 ```
 
 12. Use npm to start an instance of UI server:
 ```
-  npm run dev
+  npm run build
 ```
 The server is ready when you see the message "<something>".
 
