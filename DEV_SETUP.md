@@ -1,7 +1,7 @@
 # Windows Environment Setup #
 
 ### Prerequisites ###
-- Foundational prerequisites as per the BCTW-API project.
+- Windows 10 Pro or Enterprise
 
 ## Install dependencies ##
 
