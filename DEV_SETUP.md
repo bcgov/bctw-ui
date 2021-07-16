@@ -1,76 +1,83 @@
 # Windows Environment Setup #
 
 ### Prerequisites ###
+
 - Windows 10 Pro or Enterprise
 
-## Install dependencies ##
+### Outcomes ###
+
+- Ubuntu 20.04 LTS virtual Linux environment will be installed.
+- Your C: drive will be mounted as `/mnt/c/` within the virtual environment.
+- Node.js, Python, and build tools will be installed within the vrirtual environment (will not affect your Windows installation).
+- UI server will run from within the virtual environment, pulling files from `/mnt/c/<source_folder>/bctw-ui/`.
+- One click clean-up: to destroy entire setup, simply uninstall the "Ubuntu 20.04 LTS" app from Windows Settings.
+
+## Specify your IDIR for local dev environment (one time) ##
+
+1. Using a text editor (e.g. Notepad) create a new `.env.local` file in the ***bctw-ui/react*** directory with the following line:
+```
+  REACT_APP_IDIR=<your_idir>
+```
+
+## Install dependencies (one time) ##
 
 ### Ubuntu 20.04 LTS Linux distribution for WSL2 ###
 
-1. Download and install the Ubuntu 20.04 LTS Linux distribution for WSL2:
+2. Download and install the Ubuntu 20.04 LTS Linux distribution for WSL2:
 ``` 
   https://aka.ms/wslubuntu2004
 ```
 
-2. Double-click on the downloaded `.appx` file to install the component.
+3. Double-click on the downloaded `.appx` file to install the component.
 
-1. Create a new default user for the Ubuntu environment.
+4. Create a new default user for the Ubuntu environment.
 
 ### build-essential, Python, curl, and Node.js ###
 
-4. Update the package list in Ubuntu:
+5. Update the package list in Ubuntu:
 
 ```
   sudo apt-get update
 ```
 
-5. Download and install **build-essential**, **python**, **node**, and **npm**:
+6. Download and install **build-essential**, **python**, **node**, and **npm**:
 
 ```
   sudo apt-get install build-essential python nodejs npm -y
 ```
 
-6. Close the Command Prompt.
+## Install & Build required Node.js modules for UI server (one time) ##
 
-## Specify your IDIR for local dev environment ##
-
-7. create a new `.env.local` file in the ***bctw-ui/react*** directory with the following line:
+7. Switch to the **{source_folder}/bctw-ui/react/** directory, where `/mnt/c` represents your `C:` drive:
 ```
-  REACT_APP_IDIR=<your_idir>
+  cd /mnt/c/src/bctw-ui/react/
 ```
 
-## Install & Build required Node.js modules for UI server ##
-
-8. Open a Command Prompt.
-
-1. Connect to the Ubuntu 20.04 LTS distribution:
-```
-  wsl -d Ubuntu-20.04
-```
-
-10. Switch to the **{project_root}/bctw-ui/** directory using Linux parlance, where `/mnt/c` represents your `C:` drive:
-```
-  cd /mnt/c/Src/bctw-ui/
-```
-
-11. ***(One time)*** Install the required Node.js modules:
+8. Install the required Node.js modules:
 ```
   npm i
 ```
 
-12. ***(One time)*** Build the required Node.js modules:
+9. Build the required Node.js modules:
 ```
   npm run build
 ```
 
 ## Start the UI server ##
 
-13. Start the UI server:
+10. If a Linux shell is not already running, click on the Start Menu and run "Ubuntu 24.04 LTS".
+
+11. Switch to the **{source_folder}/bctw-ui/react/** directory:
+```
+  cd /mnt/c/src/bctw-ui/react/
+```
+
+12. Start the UI server:
 ```
   npm run start
 ```
 The server is starting up when you see the message:
 > Starting the deployment server...
 
-14. When the UI server is ready, your default browser will automatically open.
+13. When the UI server is ready, your default browser will automatically open.
 * Otherwise, manually navigate to `http://localhost:1111`.
