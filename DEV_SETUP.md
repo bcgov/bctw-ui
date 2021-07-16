@@ -39,7 +39,7 @@
   REACT_APP_IDIR=<your_idir>
 ```
 
-## Start the UI server ##
+## Install & Build required Node.js modules for UI server ##
 
 8. Open a Command Prompt.
 
@@ -48,20 +48,29 @@
   wsl -d Ubuntu-20.04
 ```
 
-10. Switch to the **bctw-ui/** directory using Linux parlance, where `/mnt/c` represents your `C:` drive:
+10. Switch to the **{project_root}/bctw-ui/** directory using Linux parlance, where `/mnt/c` represents your `C:` drive:
 ```
   cd /mnt/c/Src/bctw-ui/
 ```
 
-11. ***(One time)*** Install the required Node.js modules & dependencies:
+11. ***(One time)*** Install the required Node.js modules:
 ```
   npm i
 ```
 
-12. Use npm to start an instance of UI server:
+12. ***(One time)*** Build the required Node.js modules:
 ```
   npm run build
 ```
-The server is ready when you see the message "<something>".
 
-13. Open your browser and navigate to `http://localhost:1111`.
+## Start the UI server ##
+
+13. Start the UI server:
+```
+  npm run start
+```
+The server is starting up when you see the message:
+> Starting the deployment server...
+
+14. When the UI server is ready, your default browser will automatically open.
+* Otherwise, manually navigate to `http://localhost:1111`.
