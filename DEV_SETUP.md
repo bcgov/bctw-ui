@@ -48,9 +48,9 @@
   wsl -d Ubuntu-20.04
 ```
 
-10. Switch to the **{project_root}/bctw-ui/** directory using Linux parlance, where `/mnt/c` represents your `C:` drive:
+10. Switch to the **{project_root}/bctw-ui/react/** directory using Linux parlance, where `/mnt/c` represents your `C:` drive:
 ```
-  cd /mnt/c/Src/bctw-ui/
+  cd /mnt/c/Src/bctw-ui/react/
 ```
 
 11. ***(One time)*** Install the required Node.js modules:
