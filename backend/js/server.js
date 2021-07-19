@@ -273,7 +273,7 @@ const onboardingRedirect = async (req,res,next) => {
     // TODO: Test setting the url including the hash eg:  .url="/#/onboarding"
     // res.send('<html><body><script>window.location.href="/#/onboarding"</script></body></html>')
     res
-      .set('ready-for-onboarding','true')
+      .set({'ready-for-onboarding':'true'})
       .redirect(url); // reject and go to the onboarding page // XXX This causes an infinite redirect :(
   }
   client.release(); // Release database connection
