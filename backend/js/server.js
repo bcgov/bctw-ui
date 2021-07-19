@@ -264,7 +264,7 @@ const onboardingRedirect = async (req,res,next) => {
     console.log('I hope this is not a redirection to /onboarding');
     console.log('request url:',req.url);
 
-    console.log('my headers', req.get('ready-for-onboarding'));
+    console.log('my headers', JSON.stringify(req.headers));
 
     // res
     //   .set('ready-for-onboarding','true')
