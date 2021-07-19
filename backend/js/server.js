@@ -250,30 +250,13 @@ const onboardingRedirect = async (req,res,next) => {
   const registered = (idirs.includes(user)) ? true : false;
   console.log('registered',registered);
 
-  // Formulate the url
-  let url = '/#/onboarding';
-  console.log('url redirect',url);
-
 
   if (registered) {
     console.log('Registed so passing through')
     next(); // pass through
   } else {
-    console.log('Not registered so redirecting')
-    // next();
-    console.log('I hope this is not a redirection to /onboarding');
-    console.log('request url:',req.url);
-
-    console.log('my headers', JSON.stringify(req.headers));
-
-    // res
-    //   .set('ready-for-onboarding','true')
-    //   .send('<html><body><script>window.location.hash="/onboarding"</script></body></html>');
-    // TODO: If going to onboarding the pass through -> next()
-    // TODO: Test setting the url including the hash eg:  .url="/#/onboarding"
-    // res.send('<html><body><script>window.location.href="/#/onboarding"</script></body></html>')
-    res.set({'ready-for-onboarding':'true'});
-    res.redirect(url); // reject and go to the onboarding page // XXX This causes an infinite redirect :(
+    // Otherwise redirect to the onboarding page
+    res.redirect('/?page=onboarding'); 
   }
   client.release(); // Release database connection
 };
@@ -281,6 +264,7 @@ const onboardingRedirect = async (req,res,next) => {
 
 const onboardingAccess = async (req,res) => {
   // This data will be inserted into the email
+  // TODO: Get the below info from keycload. No longer passed through the body
   const {user, domain, email, firstName, lastName, msg} = req.body;
   const data = req.kauth.grant.access_token.content;
 
