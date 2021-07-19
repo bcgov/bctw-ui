@@ -264,11 +264,10 @@ const onboardingRedirect = async (req,res,next) => {
     console.log('I hope this is not a redirection to /onboarding');
     console.log('request url:',req.url);
 
-    console.log('headers', req.headers);
-    console.log('my header',req.headers['ready-for-onboarding']);
+    console.log('my headers', req.get('ready-for-onboarding'));
 
     res
-      .setHeader('ready-for-onboarding','true')
+      .set('ready-for-onboarding','true')
       .send('<html><body><script>window.location.hash="/onboarding"</script></body></html>');
     // TODO: If going to onboarding the pass through -> next()
     // TODO: Test setting the url including the hash eg:  .url="/#/onboarding"
