@@ -265,6 +265,7 @@ const onboardingRedirect = async (req,res,next) => {
     console.log('request url:',req.url);
 
     console.log('headers', req.headers);
+    console.log('my header',req.headers['ready-for-onboarding']);
 
     res
       .setHeader('ready-for-onboarding','true')
