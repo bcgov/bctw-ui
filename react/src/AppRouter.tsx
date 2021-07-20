@@ -9,7 +9,7 @@ import Import from 'pages/data/bulk/Import';
 import GrantCritterAccessPage from 'pages/permissions/GrantCritterAccessPage';
 import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch, BrowserRouter } from 'react-router-dom';
 // import { useHistory } from 'react-router-dom';
 import UserAdminPage from 'pages/admin/UserAdmin';
 import OwnerRequestPermission from 'pages/permissions/OwnerRequestPermission';
@@ -57,23 +57,25 @@ const AppRouter = (): JSX.Element => {
   */
 
   return (
-    <Switch>
-      <Redirect exact from='/' to='/home' />
-      <Redirect exact from='/manage' to='/animals' />
-      <Redirect exact from='/?onboarding=true' to='/onboarding' />
-      {AppRoutes.map((route: RouteKey, idx: number) => {
-        return (
-          <Route
-            key={idx}
-            path={route.path}
-            render={(): JSX.Element => {
-              const RouteComponent = route.component;
-              return <RouteComponent />;
-            }}
-          />
-        );
-      })}
-    </Switch>
+    <BrowserRouter>
+      <Switch>
+        <Redirect exact from='/' to='/home' />
+        <Redirect exact from='/manage' to='/animals' />
+        <Redirect exact from='/?onboarding=true' to='/onboarding' />
+        {AppRoutes.map((route: RouteKey, idx: number) => {
+          return (
+            <Route
+              key={idx}
+              path={route.path}
+              render={(): JSX.Element => {
+                const RouteComponent = route.component;
+                return <RouteComponent />;
+              }}
+            />
+          );
+        })}
+      </Switch>
+    </BrowserRouter>
   );
 };
 
