@@ -256,7 +256,7 @@ const onboardingRedirect = async (req,res,next) => {
     next(); // pass through
   } else {
     // Otherwise redirect to the onboarding page
-    console.log('parameters:',req.query)
+    console.log('parameters:',req.query.onboarding)
     console.log('url:',req.url)
     res.redirect('/?onboarding=true'); 
   }
