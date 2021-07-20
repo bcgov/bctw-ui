@@ -256,9 +256,13 @@ const onboardingRedirect = async (req,res,next) => {
     next(); // pass through
   } else {
     // Otherwise redirect to the onboarding page
+    if (req.query.onboarding) {
+      next(); // already heading to onboarding so pass through
+    } else {
+      res.redirect('/?onboarding=true'); 
+    }
     console.log('parameters:',req.query.onboarding)
     console.log('url:',req.url)
-    res.redirect('/?onboarding=true'); 
   }
   client.release(); // Release database connection
 };
