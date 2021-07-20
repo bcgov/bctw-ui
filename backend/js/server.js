@@ -251,11 +251,10 @@ const onboardingRedirect = async (req,res,next) => {
   console.log('registered',registered);
 
 
-  if (registered) {
+  if (registered) { // If registered
     console.log('Registed so passing through')
     next(); // pass through
-  } else {
-    // Otherwise redirect to the onboarding page
+  } else { // Otherwise redirect to the onboarding page
     if (req.query.onboarding) {
       next(); // already heading to onboarding so pass through
     } else {
