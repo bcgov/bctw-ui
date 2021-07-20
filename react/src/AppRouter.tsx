@@ -60,7 +60,7 @@ const AppRouter = (): JSX.Element => {
     <Switch>
       <Redirect exact from='/' to='/home' />
       <Redirect exact from='/manage' to='/animals' />
-      <Redirect exact from='/?page=onboarding' to='/onboarding' />
+      <Redirect exact from='/?onboarding=true' to='/onboarding' />
       {AppRoutes.map((route: RouteKey, idx: number) => {
         return (
           <Route
