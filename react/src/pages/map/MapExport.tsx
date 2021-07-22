@@ -122,7 +122,7 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
     setExportParams(n)
   }
 
-  const cellClass = 'cell-hover clickable-cell';
+  const cellClass = 'clickable-cell';
   return (
     <Modal open={open} handleClose={handleClose} title={'Export'}>
       <>

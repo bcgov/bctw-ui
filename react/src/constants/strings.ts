@@ -88,7 +88,7 @@ const MapStrings = {
   sexTooltip: 'sexTooltip',
   customAnimalGroupLabel: 'Custom Animal Group',
   customAnimalGroupLabelTooltip: 'customAnimalGroupLabelTooltip',
-  showOnlyCheckedLabel: 'Show Only Checked',
+  showOnlyCheckedLabel: 'Show Selected Records Only',
   showOnlyCheckedTooltip: 'showOnlyCheckedTooltip',
   toggleFixesLabel: 'Toggle fixes',
   toggleTracksLabel: 'Toggle tracks',

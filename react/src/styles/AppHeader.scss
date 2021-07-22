@@ -20,6 +20,7 @@
   display: flex;
   flex: 0 0 auto;
   align-items: center;
+  color: $appHeaderColor; 
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: 700;
@@ -27,9 +28,6 @@
   img {
     margin-right: 1.25rem;
     margin-bottom: 4px;
-  }
-  p {
-    color: $appHeaderColor; 
   }
 }
 

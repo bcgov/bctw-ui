@@ -225,7 +225,7 @@ export default function DataTable<T extends BCTW>({
   return (
     <TableContainer toolbar={renderToolbar()}>
       <>
-        <Table stickyHeader size='small'>
+        <Table stickyHeader>
           {data === undefined ? null : (
             <TableHead
               headersToDisplay={headerProps as string[]}
@@ -273,7 +273,7 @@ export default function DataTable<T extends BCTW>({
                         }
                         const { align, value } = formatTableCell(obj, k);
                         return (
-                          <TableCell key={`${k}${i}`} align={align}>
+                          <TableCell key={`${k}${i}`} align={'left'}>
                             {value}
                           </TableCell>
                         );

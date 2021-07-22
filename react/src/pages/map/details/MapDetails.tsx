@@ -1,3 +1,4 @@
+import { Box } from '@material-ui/core';
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { DetailsSortOption, ITelemetryPoint, ITelemetryGroup, OnPanelRowSelect, OnMapRowCellClick, OnlySelectedCritters, MapRange } from 'types/map';
@@ -97,33 +98,29 @@ export default function MapDetails({
 
   return (
     <>
-      <div className={'map-bottom-panel-title'}>
-        <Tooltip title={
-          <p>{MapStrings.showOnlyCheckedTooltip}</p>
-        } placement='left-start' enterDelay={750}>
-          <span>
-            <Checkbox
-              label={MapStrings.showOnlyCheckedLabel}
-              initialValue={false}
-              changeHandler={handleShowSelectedChecked}
-            />
-          </span>
-        </Tooltip>
-        <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
-      </div>
-      <MapDetailsGrouped
-        crittersSelected={crittersSelectedInMap}
-        pings={[...groupedPings, ...groupedUnassignedPings]}
-        handleShowOverview={handleShowOverview}
-        handleRowSelected={handleRowsChecked}
-      />
-      <MapExport
-        groupedAssignedPings={pingGroupChecked.length ? pingGroupChecked : groupedPings}
-        groupedUnassignedPings={groupedUnassignedPings}
-        open={showExportModal}
-        handleClose={(): void => setShowExportModal(false)}
-        range={timeRange}
-      />
+      <Box className={'map-detail-container'} display="flex" flexDirection="column">
+        <Box className={'map-detail-titlebar'} display="flex" justifyContent="flex-end" p={2}>
+          <Checkbox
+            label={MapStrings.showOnlyCheckedLabel}
+            initialValue={false}
+            changeHandler={handleShowSelectedChecked}
+          />
+          <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
+        </Box>
+        <MapDetailsGrouped
+          crittersSelected={crittersSelectedInMap}
+          pings={[...groupedPings, ...groupedUnassignedPings]}
+          handleShowOverview={handleShowOverview}
+          handleRowSelected={handleRowsChecked}
+        />
+        <MapExport
+          groupedAssignedPings={pingGroupChecked.length ? pingGroupChecked : groupedPings}
+          groupedUnassignedPings={groupedUnassignedPings}
+          open={showExportModal}
+          handleClose={(): void => setShowExportModal(false)}
+          range={timeRange}
+        />
+      </Box>
     </>
   );
 }

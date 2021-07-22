@@ -1,4 +1,4 @@
-import { Paper } from '@material-ui/core';
+import { Box, Container, Grid, Paper } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { MakeEditField } from 'components/form/create_form_components';
@@ -55,25 +55,42 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
   };
 
   const Header = (
-    <Paper className={'dlg-full-title'} elevation={3}>
+    <Container maxWidth="xl">
       {isCreatingNew ? (
-        <h1>Create an Animal</h1>
+      <Box pt={3}>
+        <Box component="h1" mt={0} mb={0}>
+          Add Animal
+        </Box>
+      </Box>
       ) : (
         <>
-          <h1>
-            WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '}
-            {editing?.animal_id ?? '-'}
-          </h1>
-          <div className={'dlg-full-sub'}>
-            <span className='span'>Species: {editing.species}</span>
-            <span className='span'>|</span>
-            <span className='span'>Device: {editing.device_id ?? 'Unassigned'}</span>
-            <span className='span'>|</span>
-            <span className='span'>BCTW ID: {editing.critter_id}</span>
-            <span className='span'>|</span>
-            <span className='span'>Permission: {editing.permission_type}</span>
-            <span className='button_span'>
-              <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
+          <Box display="flex" justifyContent="space-between" alignItems="top" pt={3}>
+            <Box>
+              <Box component="h1" mt={0} mb={1}>
+                WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '} {editing?.animal_id ?? '-'}
+              </Box>
+              <dl className="headergroup-dl">
+                <dd>Species:</dd>
+                <dt>{editing.species}</dt>
+                <dd>Device ID:</dd>
+                <dt>{editing.device_id ?? 'Unassigned'}</dt>
+                <dd>BCTW ID:</dd>
+                <dt>{editing.critter_id}</dt>
+                <dd>Permission:</dd>
+                <dt>{editing.permission_type}</dt>
+              </dl>
+
+              {/* <span className='button_span'>
+                {!isCreatingNew ? (
+                  <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
+                    Assign Animal to Device
+                  </Button>
+                ) : null}
+              </span> */}
+            </Box>
+
+            <Box>
+              <Button size="large" variant="outlined" color="default" className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
                 Device Assignment
               </Button>
               {/* note: add these when workflows completed  */}
@@ -86,11 +103,11 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
               <Button className='button' onClick={(): void => setShowMortalityWorkflow((o) => !o)}>
                 Mortality Event
               </Button> */}
-            </span>
-          </div>
+            </Box>
+          </Box>
         </>
       )}
-    </Paper>
+    </Container>
   );
 
   return (
@@ -103,65 +120,112 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
           };
           return (
             <>
-              <Paper elevation={0} className={'dlg-full-form'}>
-                {/* <h2>Animal Details</h2> */}
-                <div className={'dlg-details-section'}>
-                  <h3>Identifiers</h3>
-                  {identifierFields.map((f) => makeFormField(f, onChange))}
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Characteristics</h3>
-                  {characteristicsFields.map((formType) => makeFormField(formType, onChange))}
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Association With Another Individual</h3>
-                  {associatedAnimalFields.map((f) => makeFormField(f, onChange))}
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Comments About This Animal</h3>
-                  {userCommentField.map((f) => makeFormField(f, onChange))}
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Latest Capture Details</h3>
-                  {captureFields.map((f) => makeFormField(f, onChange))}
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Latest Release Details</h3>
-                  {releaseFields.map((f) => makeFormField(f, onChange))}
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Mortality Details</h3>
-                  {mortalityFields.map((f) => makeFormField(f, onChange))}
-                </div>
-                {/* dont show assignment history for new critters */}
-                {!isCreatingNew ? (
-                  <AssignmentHistory
-                    open={showAssignmentHistory}
-                    handleClose={(): void => setShowAssignmentHistory(false)}
-                    critter_id={editing.critter_id}
-                    permission_type={editing.permission_type}
-                  />
-                ) : null}
+              {/* <h2>Animal Details</h2> */}
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Identifiers</Box>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {identifierFields.map((f) => makeFormField(f, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
 
-                {/* {!isCreatingNew && showCaptureWorkflow ? (
-                  <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
-                    <CaptureWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
-                  </Modal>
-                ) : null}
-                {!isCreatingNew && showReleaseWorkflow ? (
-                  <Modal open={showReleaseWorkflow} handleClose={(): void => setShowReleaseWorkflow(false)}>
-                    <ReleaseWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
-                  </Modal>
-                ) : null}
-                {!isCreatingNew && showMortalityWorkflow ? (
-                  <MortalityEventForm
-                    alert={alert}
-                    open={showMortalityWorkflow}
-                    handleClose={(): void => setShowMortalityWorkflow(false)}
-                    handleSave={null}
-                  />
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Characteristics</Box>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {characteristicsFields.map((formType) => makeFormField(formType, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Association With Another Individual</Box>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {associatedAnimalFields.map((f) => makeFormField(f, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Comments About This Animal</Box>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {userCommentField.map((f) => makeFormField(f, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Latest Capture Details</Box>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {captureFields.map((f) => makeFormField(f, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Latest Release Details</Box>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {releaseFields.map((f) => makeFormField(f, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Mortality Details</Box>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {mortalityFields.map((f) => makeFormField(f, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+
+              {/* dont show assignment history for new critters */}
+              {!isCreatingNew ? (
+                <AssignmentHistory
+                  open={showAssignmentHistory}
+                  handleClose={(): void => setShowAssignmentHistory(false)}
+                  critter_id={editing.critter_id}
+                  permission_type={editing.permission_type}
+                />
+              ) : null}
+
+              {/* {!isCreatingNew && showCaptureWorkflow ? (
+                <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
+                  <CaptureWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                </Modal>
+              ) : null}
+              {!isCreatingNew && showReleaseWorkflow ? (
+                <Modal open={showReleaseWorkflow} handleClose={(): void => setShowReleaseWorkflow(false)}>
+                  <ReleaseWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                </Modal>
+              ) : null}
+              {!isCreatingNew && showMortalityWorkflow ? (
+                <MortalityEventForm
+                  alert={alert}
+                  open={showMortalityWorkflow}
+                  handleClose={(): void => setShowMortalityWorkflow(false)}
+                  handleSave={null}
+                />
                 ) : null} */}
-              </Paper>
             </>
           );
         }}

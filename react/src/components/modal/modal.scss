@@ -6,50 +6,6 @@
     max-width: 80%;
   }
 }
-.MuiDialog-paperFullScreen {
-  background-color: #f1f3f5 !important;
-}
-
-.dlg-full-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-}
-
-.dlg-full-title {
-  padding: 1rem 4rem;
-  h1 {
-    display: inline;
-    margin-right: 1rem;
-  }
-  h3 {
-    display: inline;
-    margin-right: 1rem;
-  }
-}
-
-.dlg-full-sub {
-  overflow-y: auto !important;
-  .span {
-    margin-right: 1rem;
-    font-size: larger;
-    color: #495057;
-  }
-  .button_span {
-    float:right;
-  }
-  .button {
-    margin-left: 0.5em;
-  }
-}
-
-.dlg-full-form {
-  margin-top: 5px;
-}
-
-.dlg-details-section {
-  padding: 0.5;
-}
 
 .MuiAppBar-positionFixed {
   position: relative !important;

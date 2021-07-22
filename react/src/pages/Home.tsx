@@ -15,6 +15,7 @@ const Home = (): JSX.Element => {
       <Typography paragraph>
         Use the <a href='https://catalogue.data.gov.bc.ca/dataset?q=wsi&download_audience=Public&sort=score+desc%2C+record_publish_date+desc'>DataBC Data Catalogue</a> to access publicly available telemetry data layers derived from the BC Telemetry Warehouse and Wildlife Species Inventory (SPI) database for desktop GIS analyses.
       </Typography>
+      
     </div>
   )
 }

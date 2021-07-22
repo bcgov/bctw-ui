@@ -1,3 +1,4 @@
+import Box from '@material-ui/core/Box';
 import Button from 'components/form/Button';
 import DataTable from 'components/table/DataTable';
 import { ITableQueryProps } from 'components/table/table_interfaces';
@@ -44,33 +45,44 @@ export default function CollarPage(): JSX.Element {
   
   return (
     <ManageLayout>
-      <div className='container'>
+
+        <Box className="manage-layout-titlebar">
+          <h1>Devices</h1>
+          <Box display="flex" alignItems="center">
+            <Box mr={1}>
+              <Button size="large" variant="contained" color="primary" onClick={(): void => setShowImport(o => !o)}>Import</Button>
+            </Box>
+            <ModifyCollarWrapper editing={editObj}>
+              <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
+                <EditCollar {...editProps} />
+              </AddEditViewer>
+            </ModifyCollarWrapper>
+          </Box>
+        </Box>
+        
         <RowSelectedProvider>
           <>
-            <DataTable
-              headers={attachedCollarProps}
-              title={S.assignedCollarsTableTitle}
-              queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
-              onSelect={handleSelect}
-            />
-            <DataTable
-              headers={collarPropsToDisplay}
-              title={S.availableCollarsTableTitle}
-              queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}
-              onSelect={handleSelect}
-            />
+            <Box mb={4}>
+              <DataTable
+                headers={attachedCollarProps}
+                title={S.assignedCollarsTableTitle}
+                queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
+                onSelect={handleSelect}
+              />
+            </Box>
+            <Box mb="3">
+              <DataTable
+                headers={collarPropsToDisplay}
+                title={S.availableCollarsTableTitle}
+                queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}
+                onSelect={handleSelect}
+              />
+            </Box>
           </>
         </RowSelectedProvider>
+
         <CollarImport open={showImport} handleClose={(): void => setShowImport(false)} />
-        <div className='button-row'>
-          <Button onClick={(): void => setShowImport(o => !o)}>Import</Button>
-          <ModifyCollarWrapper editing={editObj}>
-            <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
-              <EditCollar {...editProps} />
-            </AddEditViewer>
-          </ModifyCollarWrapper>
-        </div>
-      </div>
+
     </ManageLayout>
   );
 }

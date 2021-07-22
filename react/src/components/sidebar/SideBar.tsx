@@ -1,4 +1,4 @@
-import { Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Box, Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { RouteKey } from 'AppRouter';
 import { Icon, Tooltip } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
@@ -65,16 +65,16 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
-    <div className={'sidebar'} id="manage_sidebar">
-      <Divider />
-      <List component='nav'>
+    <Box className={'sidebar'} id="manage_sidebar" py={2} px={2}>
+
+      <List component='nav' color="primary">
         {routesToShow
           .filter((r) => r.name !== 'notFound' && r.icon)
           .map((route: RouteKey, idx: number) => {
             return (
               <Tooltip key={idx} title={route.title}>
-                <ListItem button {...{ component: Link, to: route.path }}>
-                  <ListItemIcon className={'sidebar-icon'}>
+                <ListItem className="side-bar-item" button {...{ component: Link, to: route.path }}>
+                  <ListItemIcon>
                     <Icon icon={route.icon} />
                   </ListItemIcon>
                   <ListItemText className={'list-item-txt'} primary={route.title} />
@@ -83,8 +83,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
             );
           })}
       </List>
-      <Divider />
       {/* <div>{sidebarContent}</div> */}
-    </div>
+    </Box>
   );
 }
