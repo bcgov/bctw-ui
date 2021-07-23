@@ -59,20 +59,20 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
         <nav id={'top-nav'} className={'app-nav'} style={topNavStyle}>
           <ul>
             <li>
-              <Link to='/home' color={'inherit'}>Home</Link>
+              <a href='/home' color={'inherit'}>Home</a>
             </li>
             <li>
-              <Link to='/map' color={'inherit'}>Map</Link>
+              <a href='/map' color={'inherit'}>Map</a>
             </li>
             <li>
-              <Link to='/manage' color={'inherit'}>Manage</Link>
+              <a href='/manage' color={'inherit'}>Manage</a>
             </li>
           </ul>
         </nav>
         <nav id={'no-access-top-nav'} className={'app-nav'} style={noAccessTopNavStyle}>
           <ul>
             <li>
-              <Link to='/onboarding' color={'inherit'}>Request Access</Link>
+              <a href='/onboarding' color={'inherit'}>Request Access</a>
             </li>
           </ul>
         </nav>
