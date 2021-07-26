@@ -1,4 +1,4 @@
-import { Button, Drawer, IconButton } from '@material-ui/core';
+import { Box, Button, Divider, Drawer, Grid, IconButton, Paper } from '@material-ui/core';
 import { Close, ArrowForward } from '@material-ui/icons';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -121,8 +121,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // creates select elements
   const createMultiSelects = (): React.ReactNode => {
     return CODE_FILTERS.map((cf, idx) => (
-      <div key={`${cf.header}-${idx}`}>
+      <Grid item sm={12} key={`${cf.header}-${idx}`}>
         <SelectCode
+          fullWidth
           multiple
           label={cf.label ?? columnToHeader(cf.header)}
           codeHeader={cf.header}
@@ -131,7 +132,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           triggerReset={reset}
           addEmptyOption={true}
         />
-      </div>
+      </Grid>
     ));
   };
 
@@ -167,70 +168,80 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   return (
-    <div className={'side-panel'}>
-      <Drawer
-        variant='permanent'
-        className={clsx(classes.drawer, {
-          [classes.drawerOpen]: open,
-          [classes.drawerClose]: !open
-        })}
-        classes={{
-          paper: clsx({
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open
-          })
-        }}>
-        <div className={open ? 'side-panel-toolbar' : 'side-panel-toolbar-closed'}>
-          {open ? <h3>Filters</h3> : null}
-          <IconButton onClick={handleDrawerOpen}>
-            {open ? <Close /> : <ArrowForward htmlColor={'#ffffff'} />}
-          </IconButton>
-        </div>
+    <Box
+      className={clsx(classes.drawer, {
+        [classes.drawerOpen]: open,
+        [classes.drawerClose]: !open
+      })}>
+      <Box className="side-panel-content">
+        <Box display="flex" justifyContent="space-between" alignItems="center" px={3}>
+          <h2>Filters</h2>
+          <Box className="drawer-toggle-button">
+            <IconButton color="primary" onClick={handleDrawerOpen}>
+              {open ? <Close /> : <ArrowForward />}
+            </IconButton>
+          </Box>
+        </Box>
         {open ? (
           <>
-            <div className='side-panel-body'>
-              <div className={'side-panel-dates'}>
-                {/* render the date pickers */}
-                {/* <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
-                <DateInput
-                  propName='tstart'
-                  label={MapStrings.startDateLabel}
-                  defaultValue={new Date(start)}
-                  changeHandler={(e): void => setStart(e['tstart'] as string)}
-                  maxDate={new Date(end)}
-                />
-                {/* </Tooltip> */}
-                {/* <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
-                <DateInput
-                  propName='tend'
-                  label={MapStrings.endDateLabel}
-                  defaultValue={new Date(end)}
-                  changeHandler={(e): void => setEnd(e['tend'] as string)}
-                  minDate={new Date(start)}
-                />
-                {/* </Tooltip> */}
-              </div>
-              <Tooltip
-                title={
-                  <>
-                    <p><b><em>{MapStrings.assignmentStatusOptionA}</em></b>{MapStrings.assignmentStatusTooltip1}</p>
-                    <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
-                    <p>{MapStrings.assignmentStatusTooltip3}</p>
-                  </>
-                }
-                placement='right-start'
-                enterDelay={750}>
-                <div>
-                  {/* render the unassigned/assigned data points selector */}
-                  <MultiSelect
-                    label={MapStrings.assignmentStatusLabel}
-                    data={DEVICE_STATUS_OPTIONS}
-                    changeHandler={props.onShowUnassignedDevices}
+            <Box p={3} pt={0}>
+
+              {/* render the date pickers */}
+              <Box mb={2}>
+                <Grid container spacing={2}>
+                  <Grid item sm={6}>
+                  {/* <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
+                  <DateInput
+                    fullWidth
+                    propName='tstart'
+                    label={MapStrings.startDateLabel}
+                    defaultValue={new Date(start)}
+                    changeHandler={(e): void => setStart(e['tstart'] as string)}
+                    maxDate={new Date(end)}
                   />
-                </div>
-              </Tooltip>
-              <div>
-                {/* render the last pings/ last 10 fixes checkboxes */}
+                  {/* </Tooltip> */}
+                  </Grid>
+                  <Grid item sm={6}>
+                  {/* <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
+                  <DateInput
+                    fullWidth
+                    propName='tend'
+                    label={MapStrings.endDateLabel}
+                    defaultValue={new Date(end)}
+                    changeHandler={(e): void => setEnd(e['tend'] as string)}
+                    minDate={new Date(start)}
+                  />
+                  {/* </Tooltip> */}
+                  </Grid>
+                </Grid>
+              </Box>
+
+              {/* render the unassigned/assigned data points selector */}
+              <Box mb={2}>
+                <Grid container spacing={2}>
+                  <Grid item sm={12}>
+                    <Tooltip
+                      title={
+                        <>
+                          <p><b><em>{MapStrings.assignmentStatusOptionA}</em></b>{MapStrings.assignmentStatusTooltip1}</p>
+                          <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
+                          <p>{MapStrings.assignmentStatusTooltip3}</p>
+                        </>
+                      }
+                      placement='right-start'
+                      enterDelay={750}>
+                      <MultiSelect
+                        label={MapStrings.assignmentStatusLabel}
+                        data={DEVICE_STATUS_OPTIONS}
+                        changeHandler={props.onShowUnassignedDevices}
+                      />
+                    </Tooltip>
+                  </Grid>
+                </Grid>
+              </Box>
+
+              {/* render the last pings/ last 10 fixes checkboxes */}
+              <Box mb={2}>
                 <Tooltip title={<p>{MapStrings.lastKnownLocationTooltip}</p>} placement='right-start' enterDelay={750}>
                   <span>
                     <Checkbox
@@ -251,55 +262,77 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     />
                   </span>
                 </Tooltip>
-              </div>
+              </Box>
+
               {/* render the device list selector */}
-              <Tooltip
-                title={<p>{MapStrings.deviceListTooltip}</p>}
-                placement='right-start'
-                enterDelay={750}>
-                <div>
-                  <AutoComplete
-                    label={MapStrings.deviceListLabel}
-                    data={createDeviceList()}
-                    changeHandler={handleChangeDeviceList}
-                    triggerReset={reset}
-                  />
-                </div>
-              </Tooltip>
+              <Box mb={2}>
+                <Grid container spacing={2}>
+                  <Grid item sm={12}>
+                    <Tooltip
+                      title={<p>{MapStrings.deviceListTooltip}</p>}
+                      placement='right-start'
+                      enterDelay={750}>
+                      <div>
+                        <AutoComplete
+                          label={MapStrings.deviceListLabel}
+                          data={createDeviceList()}
+                          changeHandler={handleChangeDeviceList}
+                          triggerReset={reset}
+                        />
+                      </div>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
+              </Box>
+
               {/* render the other select filter components */}
-              {createMultiSelects()}
+              <Box mb={2}>
+                <Grid container spacing={2}>
+                  {createMultiSelects()}
+                </Grid>
+              </Box>
+
               {/* render the custom animal set component */}
-              <Tooltip
-                title={<p>{MapStrings.customAnimalGroupLabelTooltip}</p>}
-                placement='right-start'
-                enterDelay={750}>
-                <div className={'side-panel-udf'}>
-                  <SelectUDF
-                    triggerReset={reset}
-                    udfType={eUDFType.critter_group}
-                    label={MapStrings.customAnimalGroupLabel}
-                    changeHandler={handleChangeUDF}
-                  />
-                  <IconButton onClick={props.onClickEditUdf}>
-                    <Icon icon='edit' />
-                  </IconButton>
-                </div>
-              </Tooltip>
-              <hr />
-              <div className={'side-btns'}>
+              <Box mb={2}>
+                <Grid container spacing={2}>
+                  <Grid item sm={12}>
+                    <Tooltip
+                      title={<p>{MapStrings.customAnimalGroupLabelTooltip}</p>}
+                      placement='right-start'
+                      enterDelay={750}>
+                      <div className={'side-panel-udf'}>
+                        <SelectUDF
+                          triggerReset={reset}
+                          udfType={eUDFType.critter_group}
+                          label={MapStrings.customAnimalGroupLabel}
+                          changeHandler={handleChangeUDF}
+                        />
+                        <IconButton onClick={props.onClickEditUdf}>
+                          <Icon icon='edit' />
+                        </IconButton>
+                      </div>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
+              </Box>
+
+              <Divider></Divider>
+
+              <Box className={'form-buttons'} display="flex" justifyContent="flex-end" py={3}>
                 <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>
                   Apply Filters
                 </Button>
-                <Button variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
+                <Button color="primary" variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
                   Reset
                 </Button>
-              </div>
-            </div>
+              </Box>
+
+            </Box>
           </>
         ) : (
           <></>
         )}
-      </Drawer>
-    </div>
+      </Box>
+    </Box>
   );
 }

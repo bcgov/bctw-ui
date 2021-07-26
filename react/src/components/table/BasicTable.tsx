@@ -42,7 +42,7 @@ export default function BasicTable<T>({
 
   return (
     <TableContainer>
-      <Table className={'table'} size='small'>
+      <Table className={'table'}>
         {data === undefined ? null : (
           <TableHead
             headersToDisplay={headerProps}

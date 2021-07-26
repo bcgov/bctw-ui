@@ -46,58 +46,13 @@ $appearAboveMap: 1001;
 // filter panel
 //
 
-.side-panel-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem;
-
-  button {
-    margin-right: -10px;
-  }
-
-}
-
-.side-panel-toolbar-closed {
-  margin: 0 auto;
-}
-
-.side-panel {
-  border-right: 2px solid #000;
+.side-panel-content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 28rem;
   overflow-y: auto;
-
-  div {
-    margin-bottom: 0.5rem;
-  }
-  // defaults to 0, cuts off header
-  .MuiDrawer-paper {
-    top:inherit;
-  }
-  .MuiDrawer-paperAnchorDockedLeft {
-    border: none;
-  }
-}
-
-.side-panel-dates {
-  .MuiFormControl-root.MuiTextField-root:nth-child(odd) {
-    margin-right: 0.5rem;
-  }
-}
-
-.side-btns {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-
-  button {
-    margin-right: 10px;
-  }
-}
-
-.side-panel-body {
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
 }
 
 .side-panel-udf {
@@ -116,33 +71,38 @@ $appearAboveMap: 1001;
   font-size: 14px;
 }
 
-// 
-//  bottom panel
-// 
-
-.bottom-panel {
-  bottom: 0;
+// Map Bottom Panel
+.map-bottom-panel {
+  display: flex;
+  flex-direction: column;
   position: absolute;
+  bottom: 0;
   width: 100%;
-  background-color: #ffffff;
 
-  .MuiPaper-elevation1 {
+  .MuiTableContainer-root {
     box-shadow: none;
   }
-  .MuiTableContainer-root {
-    overflow-x: hidden;
-  }
+
   #drag {
-    height: 4px;
-    background-color: #808080;
+    height: 15px;
+    background: #eeeeee;
+    border-top: 1px solid #999999;
     cursor: n-resize;
   }
 }
 
-
-.bottom-tbl {
-  height: 80%;
+// Map Details
+.map-detail-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
+
+.map-detail-table-container {
+  flex: 1 1 auto;
+  overflow-x: hidden;
+}
+
 
 // must be at least this index to appear for full-screen dialog
 .appear-above-map {
@@ -159,35 +119,6 @@ $appearAboveMap: 1001;
   button {
     height: 50%;
   }
-}
-
-.map-bottom-panel-row {
-  width: 100%;
-  td > .MuiTableCell-root, .MuiTableCell-body {
-    border-bottom: 1px solid #000;
-    font-family: inherit;
-  }
-}
-
-// map details parent table box
-.MuiBox-root-21 {
-  padding: 5px !important;
-}
-
-// the bottom panel table cell that opens the overview modal when clicked
-.clickable-cell {
-  color: rgb(58, 164, 255) !important;
-  font-weight: 500;
-  text-decoration: underline;
-}
-
-.cell-hover {
-  cursor: pointer;
-}
-
-// hover effect when selecting a point / drawing a shape in map
-.bottom-panel-row-is-map-selected {
-  background-color: $BCgovGold;
 }
 
 //

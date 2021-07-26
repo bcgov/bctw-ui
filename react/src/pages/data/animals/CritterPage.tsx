@@ -1,3 +1,4 @@
+import Box from '@material-ui/core/Box';
 import DataTable from 'components/table/DataTable';
 import { CritterStrings as CS, FileStrings } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
@@ -49,34 +50,40 @@ export default function CritterPage(): JSX.Element {
 
   return (
     <ManageLayout>
-      <div className='container'>
+
+        <Box className="manage-layout-titlebar">
+          <h1>Animals</h1>
+          <Box display="flex" alignItems="center">
+            {/* <ExportImportViewer {...exportProps} /> */}
+            <ModifyCritterWrapper editing={editObj}>
+              <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
+                <EditCritter {...editProps} />
+              </AddEditViewer>
+            </ModifyCritterWrapper>
+          </Box>
+        </Box>
+
         <RowSelectedProvider>
           <>
-            <DataTable
-              headers={assignedCritterProps}
-              title={CS.assignedTableTitle}
-              queryProps={{ query: bctwApi.useAssignedCritters}}
-              onSelect={handleSelect}
-            />
-            <DataTable
-              headers={unassignedCritterProps}
-              title={CS.unassignedTableTitle}
-              queryProps={{ query: bctwApi.useUnassignedCritters}}
-              onSelect={handleSelect}
-            />
+            <Box mb={4}>
+              <DataTable
+                headers={assignedCritterProps}
+                title={CS.assignedTableTitle}
+                queryProps={{ query: bctwApi.useAssignedCritters}}
+                onSelect={handleSelect}
+              />
+            </Box>
+            <Box mb={4}>
+              <DataTable
+                headers={unassignedCritterProps}
+                title={CS.unassignedTableTitle}
+                queryProps={{ query: bctwApi.useUnassignedCritters}}
+                onSelect={handleSelect}
+              />
+            </Box>
           </>
         </RowSelectedProvider>
-        <div className='button-row'>
-          {/* <ExportImportViewer {...exportProps} /> */}
-          {/* render empty div to push add/edit viewer buttons to right */}
-          <div></div> 
-          <ModifyCritterWrapper editing={editObj}>
-            <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
-              <EditCritter {...editProps} />
-            </AddEditViewer>
-          </ModifyCritterWrapper>
-        </div>
-      </div>
+
     </ManageLayout>
   );
 }

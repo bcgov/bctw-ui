@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
+import Box from '@material-ui/core/Box';
 import Button from 'components/form/Button';
 import { BCTW } from 'types/common_types';
 import { IUpsertPayload } from 'api/api_interfaces';
 import { IEditModalProps } from 'pages/data/common/EditModal';
 import { EditorProps } from 'components/component_interfaces';
+
+import { Icon } from 'components/common';
+import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 
 export type IAddEditProps<T> = {
   cannotEdit?: boolean;
@@ -105,18 +110,21 @@ export default function AddEditViewer<T extends BCTW>(props: IAddEditProps<T>): 
     <>
       {/* clone child EditModal component to pass additional props */}
       {React.cloneElement(children, editorProps)}
-      <div>
+      <Box className="button-bar">
+
+        {/* render add button */}
+        {disableAdd ? null : <Button size="large" variant="contained" color="primary" startIcon={<AddOutlinedIcon />} onClick={handleClickAdd}>{`Add ${addText ?? ''}`}</Button>}
+
+        {/* render edit button */}
+        <Button size="large" variant="outlined" color="primary" {...editBtnProps}>{` ${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}</Button>
+
         {/* render delete button */}
         {enableDelete() ? (
-          <Button color='secondary' disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
+          <Button size="large" variant="outlined" color="primary" startIcon={<DeleteOutlineOutlinedIcon />} disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
             {`Delete ${deleteText ?? ''}`}
           </Button>
         ) : null}
-        {/* render add button */}
-        {disableAdd ? null : <Button onClick={handleClickAdd}>{`Add ${addText ?? ''}`}</Button>}
-        {/* render edit button */}
-        <Button {...editBtnProps}>{` ${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}</Button>
-      </div>
+      </Box>
     </>
   );
 }

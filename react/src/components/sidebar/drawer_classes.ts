@@ -3,9 +3,11 @@ import { makeStyles } from "@material-ui/core";
 const drawerWidth = '28rem'; // 448px 
 const useStyles = makeStyles((theme) => ({
   drawer: {
+    position: 'relative',
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    borderRight: '1px solid #999999'
   },
   drawerOpen: {
     width: drawerWidth,
@@ -13,17 +15,23 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     }),
-    backgroundColor: '#ffffff'
+    '& .drawer-toggle-button': {
+      marginRight: '-0.5rem'
+    }
   },
   drawerClose: {
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     }),
-    overflowX: 'hidden',
-    paddingTop: 2,
-    width: theme.spacing(7) + 1,
-    backgroundColor: '#003366'
+    width: '3.5rem',
+    padding: '0 important',
+    '& .drawer-toggle-button': {
+      marginRight: '-1.25rem'
+    },
+    '& .side-panel-content': {
+      overflow: 'hidden'
+    }
   }
 }));
 

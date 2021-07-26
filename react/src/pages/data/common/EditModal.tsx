@@ -14,7 +14,51 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
 import Modal from 'components/modal/Modal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Paper } from '@material-ui/core';
+
+import PropTypes from 'prop-types';
+import AppBar from '@material-ui/core/AppBar';
+import Box from '@material-ui/core/Box';
+import Container from '@material-ui/core/Container';
+import Divider from '@material-ui/core/Divider';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import { classicNameResolver } from 'typescript';
+
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: any) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -61,6 +105,11 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>(null);
   const [errors, setErrors] = useState<Record<string, boolean>>(Object.assign({}));
+  
+  const [value, setValue] = React.useState(0);
+  const handleSwitch = (event: React.ChangeEvent<{1}>, newValue: number) => {
+    setValue(newValue);
+  };
 
   // set the history query status
   useEffect(() => {
@@ -150,24 +199,61 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
           <HistoryPage {...historyParams} />
         </Modal>
       ) : null}
+
       <form className={'rootEditInput'} autoComplete={'off'}>
-        <Paper style={{ padding: '1rem' }} elevation={1}>
-          {headerComponent}
-          <div style={{ display: 'flex', justifyContent:'flex-end' }}>
-            {/* show history button */}
-            {disableHistory ? null : (
-              <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button>
-            )}
-            {/* save button */}
-            {hideSave ? null : (
-              <Button className='editSaveBtn' onClick={handleSave} disabled={!canSave}>
-                save
-              </Button>
-            )}
-          </div>
-          {children}
-        </Paper>
+
+        {headerComponent}
+
+        <Container maxWidth="xl">
+          <Box py={3}>
+
+            <Box mb={4}>
+              <Tabs value={value} onChange={handleSwitch} aria-label="simple tabs example"
+                indicatorColor="primary"
+                textColor="primary">
+                <Tab label="Details" {...a11yProps(0)} />
+                <Tab label="History" {...a11yProps(1)} />
+              </Tabs>
+            </Box>
+
+            <TabPanel value={value} index={0}>
+              <Paper>
+                {children}
+
+                <Box my={1} mx={3}>
+                  <Divider></Divider>
+                </Box>
+
+                <Box p={3}>
+                  <Box display="flex" justifyContent="flex-end" className='form-buttons'>
+                    {/* show history button */}
+                    {/* {disableHistory ? null : (
+                      <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button>
+                    )} */}
+                    {/* save button */}
+                    {hideSave ? null : (
+                      <Button size="large" color="primary" onClick={handleSave} disabled={!canSave}>
+                        Save
+                      </Button>
+                    )}
+                    <Button size="large" variant="outlined" color="primary">
+                      Cancel and Exit
+                    </Button>
+                  </Box>
+                </Box>
+              </Paper>
+
+            </TabPanel>
+
+            <TabPanel value={value} index={1}>
+              <HistoryPage {...historyParams} />
+            </TabPanel>
+
+          </Box>
+        </Container>
+
       </form>
+
     </ChangeContext.Provider>
   );
 

@@ -1,5 +1,5 @@
 import { ITelemetryDetail, ITelemetryGroup, OnMapRowCellClick, TelemetryDetail } from 'types/map';
-import { TableRow, TableCell, TableBody, Table, TableContainer, Paper, Checkbox } from '@material-ui/core';
+import { Box, TableRow, TableCell, TableBody, Table, TableContainer, Paper, Checkbox } from '@material-ui/core';
 import { getComparator } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
@@ -83,7 +83,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
 
   return (
-    <TableContainer component={Paper} className={'bottom-tbl'}>
+    <TableContainer component={Paper} className={'map-detail-table-container'}>
       <Table stickyHeader size='small'>
         {pings && pings.length ? (
           <TableHead
@@ -140,15 +140,16 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
   return (
     <TableRow
       hover={!isSelectedInMap}
-      className={`map-bottom-panel-row ${isSelectedInMap ? 'bottom-panel-row-is-map-selected' : ''}`}>
+      className={`map-bottom-panel-row ${isSelectedInMap ? 'row-selected' : ''}`}>
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
-      <TableCell
-        style={{
-          width: '5%',
-          backgroundColor: parseAnimalColour(row.map_colour).fillColor
-        }}></TableCell>
+      <TableCell>
+        <Box className='colour-swatch'
+          style={{ width: '32px', height: '32px', border: '1px solid #999999',
+          backgroundColor: parseAnimalColour(row.map_colour).fillColor}}>
+        </Box>
+      </TableCell>
       {row.critter_id ? (
         <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
       ) : (
@@ -177,7 +178,7 @@ type TableCellLinkProps = {
 function CellWithLink({ row, propName, onClickLink }: TableCellLinkProps): JSX.Element {
   return (
     <TableCell className={row[propName] ? '' : 'cell-hover'} onClick={row[propName] ? null : onClickLink}>
-      <div onClick={row[propName] ? onClickLink : null} className={'clickable-cell cell-hover'}>
+      <div onClick={row[propName] ? onClickLink : null} className={'cell-clickable'}>
         {row[propName] ?? ''}
       </div>
     </TableCell>

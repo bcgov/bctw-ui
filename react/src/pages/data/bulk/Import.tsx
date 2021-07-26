@@ -207,7 +207,7 @@ export default function Import<T>(): JSX.Element {
                 {/* render the download template button */}
                 if (index === 0 && importType) {
                   return (
-                    <li onClick={downloadTemplate} className={'cell-hover clickable-cell'}>
+                    <li onClick={downloadTemplate} className={'cell-clickable'}>
                       {step}
                     </li>
                   );

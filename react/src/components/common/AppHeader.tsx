@@ -35,11 +35,11 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   }, [useUser]);
 
   const topNavStyle = {
-    display: user?.role_type ? 'inline' : 'none'
+    display: user?.role_type ? 'inline' : 'inline'
   }
 
   const noAccessTopNavStyle = {
-    display: user?.role_type ? 'none' : 'inline'
+    display: user?.role_type ? 'inline' : 'inline'
   }
 
   // when the AlertContext is loaded, set the alert state
@@ -54,7 +54,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
       <div className={'container'}>
         <Link to='/' className={'brand'} color={'inherit'}>
           <img src={headerImage} width={155} height={52} alt={'Government of British Columbia'} />
-          <p>BCTW</p>
+          BCTW
         </Link>
         <nav id={'top-nav'} className={'app-nav'} style={topNavStyle}>
           <ul>

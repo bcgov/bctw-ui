@@ -1,7 +1,10 @@
-import { makeStyles, Toolbar, Typography, lighten } from '@material-ui/core';
+import { makeStyles, Box, Toolbar, Typography, lighten } from '@material-ui/core';
 import clsx from 'clsx';
 import TableFilter from './TableFilters';
 import { ITableFilter } from './table_interfaces';
+
+import { Icon } from 'components/common';
+import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
@@ -12,14 +15,20 @@ const useToolbarStyles = makeStyles((theme) => ({
     theme.palette.type === 'light'
       ? {
           color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85)
+          //backgroundColor: lighten(theme.palette.primary.light, 0.85)
         }
       : {
           color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark
+          //backgroundColor: theme.palette.primary.dark
         },
-  title: {
-    flex: '1 1 100%'
+
+  toolbarInner: {
+    paddingRight: theme.spacing(2),
+    paddingLeft: theme.spacing(2)
+  },
+  
+  toolbarTitle: {
+    fontWeight: 700,
   }
 }));
 
@@ -36,20 +45,20 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
   const { numSelected, title } = props;
 
   return (
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0
-      })}>
-      {numSelected > 0 ? (
-        <Typography className={classes.title} color='inherit' variant='subtitle1' component='div'>
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography className={classes.title} variant='h6' id='tableTitle' component='div'>
-          {title ?? ''}
-        </Typography>
-      )}
-      <TableFilter {...props} />
+    <Toolbar disableGutters>
+      <Box className={classes.toolbarInner} display="flex" alignItems="center" justifyContent="space-between" width="100%">
+        <Box className={classes.toolbarTitle}>
+          {title ?? ''} &nbsp;
+          {numSelected > 0 ? (
+            <span>({numSelected} selected)</span>
+          ) : (
+            <span>{''}</span>
+          )}
+        </Box>
+        <Box>
+          <TableFilter {...props} />
+        </Box>
+      </Box>
     </Toolbar>
   );
 }

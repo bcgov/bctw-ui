@@ -4,7 +4,7 @@ const appTheme = createMuiTheme({
     // https://material-ui.com/customization/palette/
     primary: {
       light: '#5469a4',
-      main: '#223f75', // BC ID: corporate blue
+      main: '#003366', // BC ID: corporate blue
       dark: '#001949',
       contrastText: '#ffffff'
     },
@@ -15,6 +15,11 @@ const appTheme = createMuiTheme({
       contrastText: '#000000'
     }
   },
+
+  typography: {
+    fontFamily: ['BCSans', 'Verdana', 'Arial', 'sans-serif'].join(',')
+  },
+
   overrides: {
     MuiTypography: {
       // https://material-ui.com/api/typography/
@@ -25,6 +30,7 @@ const appTheme = createMuiTheme({
       h5: { fontSize: '1.25rem' },
       h6: { fontSize: '1rem' }
     },
+
     MuiCircularProgress: {
       // https://material-ui.com/api/circular-progress/
       root: {
@@ -37,10 +43,66 @@ const appTheme = createMuiTheme({
         marginTop: '-30px'
       }
     },
+
+    MuiButton: {
+      root: {
+        textTransform: 'none',
+        letterSpacing: 0
+      }
+    },
+
     MuiContainer: {
       // https://material-ui.com/api/container/
       root: {
         maxWidth: 'xl'
+      }
+    },
+
+    MuiInputBase: {
+      root: {
+        background: '#ffffff'
+      }
+    },
+
+    MuiInputLabel: {
+      outlined: {
+        background: '#ffffff'
+      },
+      shrink: {
+        background: '#ffffff'
+      }
+    },
+
+    MuiTouchRipple: {
+      root: {
+        display: 'none'
+      }
+    },
+
+    MuiTab: {
+      root: {
+        minWidth: '100px !important',
+        textTransform: 'none',
+        letterSpacing: 0,
+        fontWeight: 700
+      }
+    },
+
+    MuiTableCell: {
+      root: {
+        fontFamily: ['BCSans', 'Noto Sans', 'Verdana', 'Arial', 'sans-serif'].join(','),
+      }
+    },
+
+    MuiTableRow: {
+      root: {
+        '&.Mui-selected': {
+          backgroundColor: '#daedff',
+          color: '#ffffff'
+        },
+        '&.Mui-selected:hover': {
+          backgroundColor: '#daedff'
+        }
       }
     }
   }

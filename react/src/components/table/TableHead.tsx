@@ -64,7 +64,7 @@ export default function TableHead<T extends BCTW>(props: ITableHeadProps<T>): JS
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}>
-                <strong>{formatHeader(headCell.label)}</strong>
+                {formatHeader(headCell.label)}
                 {orderBy === headCell.id ? (
                   <span className={'visuallyHidden'}>
                     {order === 'desc' ? 'sorted descending' : 'sorted ascending'}

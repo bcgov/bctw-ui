@@ -4,7 +4,7 @@ import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet/dist/leaflet.css';
 
-import { CircularProgress } from '@material-ui/core';
+import { Box, CircularProgress, Paper } from '@material-ui/core';
 import pointsWithinPolygon from '@turf/points-within-polygon';
 import dayjs from 'dayjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -693,9 +693,9 @@ export default function MapPage(): JSX.Element {
           </div>
         */}
 
-        <div
+        <Paper square 
           style={{ height: bottomPanelHeight }}
-          className={`bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}>
+          className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}>
           <div onMouseDown={onDown} id='drag'></div>
           <MapDetails
             pings={[...pings]}
@@ -708,7 +708,7 @@ export default function MapPage(): JSX.Element {
             setShowExportModal={setShowExportModal}
             timeRange={range}
           />
-        </div>
+        </Paper>
         {selectedDetail ? (
           <MapOverView
             open={showOverviewModal}

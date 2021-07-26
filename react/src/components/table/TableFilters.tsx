@@ -1,4 +1,5 @@
-import { IconButton } from '@material-ui/core';
+import { Box, IconButton, makeStyles, ThemeProvider } from '@material-ui/core';
+import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import TextField from 'components/form/TextInput';
 import { useMemo, useState } from 'react';
@@ -33,6 +34,7 @@ function TextFilter({
   };
   return (
     <TextField
+      className="table-filter-input"
       defaultValue={value}
       changeHandler={handleChange}
       label={'Search'}
@@ -81,23 +83,25 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
     []
   );
 
+
   return (
     <>
       {showFilter ? (
-        <div style={{ display: 'flex', flexDirection: 'row', maxWidth: '350px' }}>
-          <MultiSelect renderValue={(v: string[]): string => `${v.length} selected`} label={'Columns'} data={selectOptions} changeHandler={handleSelect} />
-          <div style={{width: '10px'}}></div>
+        <Box display="flex" alignItems="center" width="100%">
           <TextFilter
             rowCount={rowCount}
             setGlobalFilter={handleTextChange}
           />
-        </div>
+          <MultiSelect renderValue={(v: string[]): string => `${v.length} selected`} label={'Filter Columns'} data={selectOptions} changeHandler={handleSelect} />
+        </Box>
       ) : null}
-      <Tooltip title={ `${showFilter ? 'Hide' : 'Show'} Filter Controls`} >
+
+      {/* <Tooltip title={ `${showFilter ? 'Hide' : 'Show'} Filter Controls`} >
         <IconButton onClick={(): void => setShowFilter((o) => !o)} aria-label='filter list'>
           <FilterListIcon htmlColor='#90caf9' />
         </IconButton>
-      </Tooltip>
+      </Tooltip> */}
+
     </>
   );
 }

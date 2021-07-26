@@ -19,27 +19,97 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-// TODO: Refactor Overrides w/o using !important
-.MuiTableCell-root,
-.MuiButton-label {
-  font-family: $fontFamily;
+fieldset {
+  border: none;
 }
 
-.MuiButton-label {
-  letter-spacing: 0;
-  text-transform: none;
+.legend {
+  float: left;
+  margin-bottom: 1rem;
+  font-weight: 700;
 }
 
-:focus {
-  outline: 3px solid cornflowerblue;
+.fieldset-form {
+  flex: 1 1 auto;
 }
 
-[class^="MuiButton"] {
-  &:focus {
-    outline: 3px solid cornflowerblue;
+// Button Bar 
+.button-bar {
+  button + button {
+    margin-left: 0.5rem;
   }
 }
 
-.MuiTouchRipple-root {
-  display: none;
+// Form 
+.form-buttons {
+  button {
+    min-width: 100px;
+  }
+
+  button + button {
+    margin-left: 0.5rem;
+  }
+}
+
+// Full Screen Dialog
+.MuiDialog-paperFullScreen {
+  background: #f1f3f5 !important;
+}
+
+// Header Group
+.headergroup-dl {
+  margin: 0;
+
+  dd, dt {
+    display: inline-block;
+    position: relative;
+    margin: 0;
+  }
+
+  dt + dd {
+    &:before {
+      content: '|';
+      display: inline-block;
+      margin: 0 0.5rem;
+    }
+  }
+
+  dd {
+    margin-right: 0.5rem;
+  }
+}
+
+// Table Filters
+.table-filter-input {
+  width: 20rem;
+}
+
+.table-filter-select {
+  width: 15rem;
+  max-width: 15rem;
+}
+
+// Table
+.row-selected {
+  background-color: #daedff;
+}
+
+.cell-clickable {
+  color: #1A5A96;
+  cursor: pointer;
+  text-decoration: underline
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #ffffff;
+}
+
+// Manage Layout
+.manage-layout-titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }

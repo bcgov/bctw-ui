@@ -8,62 +8,25 @@
 .app-body {
   position: relative;
   flex: 1 1 auto;
-  overflow: hidden;
 }
 
 .app-body__inner {
-  position: absolute;
+  position: relative;
   display: flex;
   width: 100%;
   height: 100%;
 }
 
 #map-view {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: row;
   flex: 1 1 auto;
 }
 
-.test-panel {
-  width: 20rem;
-  background: #ffffff;
-}
-
 .sidebar {
-  flex: 0 0 auto;
-  color: #ffffff;
-  background-color: $BCgovBlue;
-
-  .MuiDrawer-paper {
-    top: inherit;
-  }
-  .MuiPaper-root {
-    background-color: inherit;
-  }
-
-  .MuiListItem-gutters {
-    padding-left: 10px;
-    padding-right: 20px;
-  }
-
-  .MuiListItemIcon-root {
-    min-width: 36px;
-  }
-
-  .sidebar-icon svg {
-    fill: #ffffff; 
-  }
-
-  .open-close {
-    margin-right: 5px;
-  }
-
-  .list-item-txt { 
-    color: #ffffff;
-  }
-}
-
-// content next to sidebar
-.content-main {
-  padding: 1rem;
+  flex: 0 0 15rem;
+  border-right: 1px solid #cccccc;
 }
