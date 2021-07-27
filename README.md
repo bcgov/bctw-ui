@@ -8,4 +8,4 @@ Front-end (scientist-facing) interface for the BC Telemetry Warehouse.
 
 See `DEV_SETUP.md`.
 
-## Setting up the webhook
+## Setting up the webhook for real
