@@ -1,5 +1,5 @@
 import { Box, IconButton, makeStyles, ThemeProvider } from '@material-ui/core';
-import { Theme } from '@material-ui/core/styles/createMuiTheme';
+import { Theme } from '@material-ui/core/styles/createTheme';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import TextField from 'components/form/TextInput';
 import { useMemo, useState } from 'react';
