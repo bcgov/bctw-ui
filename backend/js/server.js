@@ -417,7 +417,7 @@ if (isTest) {
 // Remaining server configuration
 app
   .use(express['static'](path.join(__dirname, '../../react/build')))
-  .get('*', notFound);
+  // .get('*', notFound);
 
 // Start server
 http.createServer(app).listen(8080);
