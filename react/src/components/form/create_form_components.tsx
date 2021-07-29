@@ -108,7 +108,7 @@ function CreateEditSelectField<T>({
 }
 
 /**
- * the "master" form component handler.
+ * the "main" form component handler.
  * depending on the @param formType.type, creates the component using the above functions
  * @returns {JSX.Element}
  */
