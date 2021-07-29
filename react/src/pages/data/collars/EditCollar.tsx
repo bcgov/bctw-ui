@@ -387,7 +387,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
               </Box>
 
               <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Purchase Details</Box>
+                <Box component="legend" className={'legend'}>Warranty & Activation Details</Box>
 
                 <Box className="fieldset-form">
                   {/* <Grid container spacing={3}>

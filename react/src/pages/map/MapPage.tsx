@@ -4,7 +4,8 @@ import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet/dist/leaflet.css';
 
-import { Box, CircularProgress, Paper } from '@material-ui/core';
+import { CircularProgress, Paper } from '@material-ui/core';
+import { mdiDragHorizontalVariant } from '@mdi/js';
 import pointsWithinPolygon from '@turf/points-within-polygon';
 import dayjs from 'dayjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -18,6 +19,7 @@ import {
   groupFilters,
   splitPings,
   getUniqueCritterIDsFromSelectedPings} from 'pages/map/map_helpers';
+import Icon from '@mdi/react';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
 import React, { useEffect, useRef, useState } from 'react';
@@ -696,7 +698,16 @@ export default function MapPage(): JSX.Element {
         <Paper square 
           style={{ height: bottomPanelHeight }}
           className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}>
-          <div onMouseDown={onDown} id='drag'></div>
+          <div onMouseDown={onDown} id='drag'>
+            <div id='drag-icon'>
+              <Icon
+                path={mdiDragHorizontalVariant}
+                className={'icon'}
+                title='Drag to resize'
+                size={1}
+              />
+            </div>
+          </div>
           <MapDetails
             pings={[...pings]}
             unassignedPings={showUnassignedLayers ? [...unassignedPings] : []}

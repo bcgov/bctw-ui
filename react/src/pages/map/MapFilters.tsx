@@ -50,6 +50,13 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const [isLatestPing, setIsLatestPing] = useState<boolean>(false);
   const [isLastFixes, setIsLastFixes] = useState<boolean>(false);
 
+  const orLabelStyle = {
+    color: '#6d6d6d',
+    display: 'flex',
+    fontSize: '13px',
+    justifyContent: 'center'
+  }
+
   // keep track of how many filters are currently set
   useEffect(() => {
     setNumFiltersSelected(filters.length);
@@ -190,28 +197,28 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={6}>
-                  {/* <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
-                  <DateInput
-                    fullWidth
-                    propName='tstart'
-                    label={MapStrings.startDateLabel}
-                    defaultValue={new Date(start)}
-                    changeHandler={(e): void => setStart(e['tstart'] as string)}
-                    maxDate={new Date(end)}
-                  />
-                  {/* </Tooltip> */}
+                    {/* <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
+                    <DateInput
+                      fullWidth
+                      propName='tstart'
+                      label={MapStrings.startDateLabel}
+                      defaultValue={new Date(start)}
+                      changeHandler={(e): void => setStart(e['tstart'] as string)}
+                      maxDate={new Date(end)}
+                    />
+                    {/* </Tooltip> */}
                   </Grid>
                   <Grid item sm={6}>
-                  {/* <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
-                  <DateInput
-                    fullWidth
-                    propName='tend'
-                    label={MapStrings.endDateLabel}
-                    defaultValue={new Date(end)}
-                    changeHandler={(e): void => setEnd(e['tend'] as string)}
-                    minDate={new Date(start)}
-                  />
-                  {/* </Tooltip> */}
+                    {/* <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
+                    <DateInput
+                      fullWidth
+                      propName='tend'
+                      label={MapStrings.endDateLabel}
+                      defaultValue={new Date(end)}
+                      changeHandler={(e): void => setEnd(e['tend'] as string)}
+                      minDate={new Date(start)}
+                    />
+                    {/* </Tooltip> */}
                   </Grid>
                 </Grid>
               </Box>
@@ -292,6 +299,12 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 </Grid>
               </Box>
 
+              <Box mb={2}>
+                <div style={orLabelStyle}>
+                  &mdash; Or &mdash;
+                </div>
+              </Box>
+
               {/* render the custom animal set component */}
               <Box mb={2}>
                 <Grid container spacing={2}>
@@ -316,7 +329,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 </Grid>
               </Box>
 
-              <Divider></Divider>
+              <Divider />
 
               <Box className={'form-buttons'} display="flex" justifyContent="flex-end" py={3}>
                 <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>

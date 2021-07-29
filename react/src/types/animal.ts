@@ -46,9 +46,10 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
   capture_utm_northing: number;
   capture_utm_zone: number;
   animal_colouration: string;
-  ear_tag_id: string;
   ear_tag_left_colour: string;
+  ear_tag_left_id: string;
   ear_tag_right_colour: string;
+  ear_tag_right_id: string;
   estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
@@ -96,9 +97,10 @@ export class Animal implements IAnimal {
   @Transform((v) => v || -1, transformOpt) capture_utm_zone: number;
   collective_unit: string;
   animal_colouration: string;
-  ear_tag_id: string;
   ear_tag_left_colour: string;
+  ear_tag_left_id: string;
   ear_tag_right_colour: string;
+  ear_tag_right_id: string;
   @Transform((value) => value || -1, transformOpt) estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
@@ -239,7 +241,8 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'collective_unit', type: eInputType.text },
     { prop: 'ear_tag_left_colour', type: eInputType.code, codeName: 'colour' },
     { prop: 'ear_tag_right_colour', type: eInputType.code, codeName: 'colour'  },
-    { prop: 'ear_tag_id', type: eInputType.text },
+    { prop: 'ear_tag_left_id', type: eInputType.text },
+    { prop: 'ear_tag_right_id', type: eInputType.text },
   ],
   mortalityFields: [
     { prop: 'mortality_date', type: eInputType.date },

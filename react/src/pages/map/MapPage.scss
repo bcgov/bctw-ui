@@ -84,11 +84,18 @@ $appearAboveMap: 1001;
   }
 
   #drag {
-    height: 15px;
+    height: 24px !important;
     background: #eeeeee;
     border-top: 1px solid #999999;
     cursor: n-resize;
   }
+
+  #drag-icon {
+    margin-left: auto;
+    margin-right: auto;
+    width: 24px;
+  }
+
 }
 
 // Map Details
