@@ -400,6 +400,9 @@ if (isProd) {
     .post('/onboarding', onboardingAccess);
 }
 
+
+console.log("************* This is new!! ***************")
+
 if (isTest) {
   app
     .post('/api/import-csv', upload.single('csv'), pageHandler)
