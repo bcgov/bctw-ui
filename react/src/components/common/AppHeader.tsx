@@ -1,17 +1,17 @@
 import 'styles/AppHeader.scss';
 
-import { IconButton } from '@material-ui/core';
-import { mdiAccountCircle, mdiAccountRemove, mdiBell, mdiProgressClock } from '@mdi/js';
-import Icon from '@mdi/react';
-import headerImage from 'assets/images/gov3_bc_logo.png';
-import Modal from 'components/modal/Modal';
-import { AlertContext } from 'contexts/UserAlertContext';
-import { UserContext } from 'contexts/UserContext';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import UserAlert from 'pages/user/UserAlertPage';
+import { mdiAccountCircle, mdiAccountRemove, mdiBell, mdiHelpCircle, mdiProgressClock } from '@mdi/js';
 import { useContext, useState } from 'react';
+import { AlertContext } from 'contexts/UserAlertContext';
+import { IconButton } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { User } from 'types/user';
+import { UserContext } from 'contexts/UserContext';
+import headerImage from 'assets/images/gov3_bc_logo.png';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import Icon from '@mdi/react';
+import Modal from 'components/modal/Modal';
+import UserAlert from 'pages/user/UserAlertPage';
 
 type AppheaderProps = {
   children?: JSX.Element;
@@ -22,7 +22,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   const useUser = useContext(UserContext);
   const useAlert = useContext(AlertContext);
 
-  const [ user, setUser ] = useState<User>();
+  const [user, setUser] = useState<User>();
   const [alertCount, setAlertCount] = useState<number>(0);
   const [showAlerts, setShowAlerts] = useState<boolean>(false);
 
@@ -34,12 +34,14 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
     }
   }, [useUser]);
 
+  // toggle top navigation menu
   const topNavStyle = {
-    display: user?.role_type ? 'inline' : 'inline'
+    display: user?.role_type ? 'inline' : 'none'
   }
 
-  const noAccessTopNavStyle = {
-    display: user?.role_type ? 'inline' : 'inline'
+  // toggle request access menu
+  const requestAccessTopNavStyle = {
+    display: user?.role_type ? 'none' : 'inline'
   }
 
   // when the AlertContext is loaded, set the alert state
@@ -69,7 +71,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
             </li>
           </ul>
         </nav>
-        <nav id={'no-access-top-nav'} className={'app-nav'} style={noAccessTopNavStyle}>
+        <nav id={'no-access-top-nav'} className={'app-nav'} style={requestAccessTopNavStyle}>
           <ul>
             <li>
               <a href='/onboarding' color={'inherit'}>Request Access</a>
@@ -107,10 +109,21 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                 <span>{user?.firstname ?? 'Local'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span>
               </div>
             </li>
+            <li className={'help'}>
+              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/'>
+                <IconButton>
+                  <Icon
+                    path={mdiHelpCircle}
+                    className={'icon'}
+                    title='Help'
+                    size={1}
+                  />
+                </IconButton>
+              </a>
+              <span><a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/'><span color={'inherit'}>Help</span></a></span>
+            </li>
             <li className={'logout'}>
-              { /* XXX Victor test */}
-              <a href='/logout'><span color={'inherit'}>Logout1</span></a> &nbsp;
-              <Link to='/logout' color={'inherit'}>Logout2</Link>
+              <span><a href='/logout'><span color={'inherit'}>Logout</span></a></span>
             </li>
             <li>{children}</li>
           </ul>
