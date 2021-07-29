@@ -38,8 +38,58 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   doc.classList.add('appear-above-map');
 };
 
-// The BCGW URL
+// URL for BC Geographic Warehouse
 const bcgw = 'http://openmaps.gov.bc.ca/geo/pub/ows';
+
+// caribou herd boundaries
+const getCHB = () => {
+  return L.tileLayer.wms(bcgw, {
+    layers: 'WHSE_WILDLIFE_INVENTORY.GCPB_CARIBOU_POPULATION_SP',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.6
+  });
+};
+
+// ENV regional boundaries
+const getERB = () => {
+  return L.tileLayer.wms(bcgw, {
+    layers: 'WHSE_ADMIN_BOUNDARIES.EADM_WLAP_REGION_BND_AREA_SVW',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.6
+  });
+};
+
+// parks and protected areas
+const getPPA = () => {
+  return L.tileLayer.wms(bcgw, {
+    layers: 'WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.6
+  });
+};
+
+// wildlife habitat areas
+const getWHA = () => {
+  return L.tileLayer.wms(bcgw, {
+    layers: 'WHSE_WILDLIFE_MANAGEMENT.WCP_WILDLIFE_HABITAT_AREA_POLY',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.6
+  });
+};
+
+// wildlife magement units
+const getWMU = () => {
+  return L.tileLayer.wms(bcgw, {
+    layers: 'WHSE_WILDLIFE_MANAGEMENT.WAA_WILDLIFE_MGMT_UNITS_SVW',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.6
+  });
+};
 
 // TRIM contour lines
 const getTCL = () => {
@@ -55,16 +105,6 @@ const getTCL = () => {
 const getUWR = () => {
   return L.tileLayer.wms(bcgw, {
     layers: 'WHSE_WILDLIFE_MANAGEMENT.WCP_UNGULATE_WINTER_RANGE_SP',
-    format: 'image/png',
-    transparent: true,
-    opacity: 0.6
-  });
-};
-
-// caribou herd locations
-const getCHL = () => {
-  return L.tileLayer.wms(bcgw, {
-    layers: 'WHSE_WILDLIFE_INVENTORY.GCPB_CARIBOU_POPULATION_SP',
     format: 'image/png',
     transparent: true,
     opacity: 0.6
@@ -89,10 +129,14 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addBaseLayer(bcGovBaseLayer, 'BC Government');
   layerPicker.addBaseLayer(esriWorldTopo, 'ESRI World Topo');
 
-  // Some BCGW Overlays
-  layerPicker.addOverlay(getTCL(), 'TRIM Contour Lines');
+  // overlays from BCGW
+  layerPicker.addOverlay(getCHB(), 'Cariboo Herd Boundaries');
+  layerPicker.addOverlay(getERB(), 'ENV Regional Boundaries');
+  layerPicker.addOverlay(getPPA(), 'Parks & Protected Areas');
+  //layerPicker.addOverlay(getTCL(), 'TRIM Contour Lines');
+  layerPicker.addOverlay(getWHA(), 'Wildlife Habitat Areas');
+  layerPicker.addOverlay(getWMU(), 'Wildlife Management Units');
   layerPicker.addOverlay(getUWR(), 'Ungulate Winter Range');
-  layerPicker.addOverlay(getCHL(), 'Cariboo Herd Boundaries');
 };
 
 const initMap = (

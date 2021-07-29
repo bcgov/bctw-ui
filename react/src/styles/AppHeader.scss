@@ -35,49 +35,6 @@
   text-decoration: none;
 }
 
-.logout {
-  font-size: 1rem;
-
-  a {
-    color: $appHeaderColor;
-    text-decoration: none;
-    font-weight: 400;
-  }
-
-}
-
-.profile-nav {
-  color: $appHeaderColor;
-
-  ul {
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-  }
-
-  li {
-    display: inline-block;
-  }
-
-  .username {
-    display: flex;
-    align-items: center;
-    margin-right: 0.75rem;
-    padding-right: 1rem;
-    border-right: 1px solid $appHeaderColor;
-
-    span {
-    /*  margin-left: 0.5rem; */
-    }
-  }
-
-  .icon {
-    color: $appHeaderColor;
-  }
-}
-
 .app-nav {
   margin-right: auto;
   margin-left: 3rem;
@@ -99,6 +56,60 @@
   li {
     display: inline-block;
     margin-right: 2rem;
+  }
+}
+
+.profile-nav {
+  color: $appHeaderColor;
+
+  ul {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+
+  li {
+    display: inline-block;
+  }
+
+  .icon {
+    color: $appHeaderColor;
+  }
+
+  .username {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    margin-right: 0.75rem;
+    padding-right: 0.8rem;
+    /* border-right: 1px solid $appHeaderColor; */
+  }
+
+  .help {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    margin-right: 0.75rem;
+    padding-right: 1rem;
+    /* border-right: 1px solid $appHeaderColor; */
+
+    a {
+      color: $appHeaderColor;
+      text-decoration: none;
+      font-weight: 400;
+    }
+  }
+  
+  .logout {
+    font-size: 1rem;
+
+    a {
+      color: $appHeaderColor;
+      text-decoration: none;
+      font-weight: 400;
+    }
   }
 }
 
