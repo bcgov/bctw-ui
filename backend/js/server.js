@@ -356,11 +356,21 @@ const onboardingAccess = async (req,res) => {
 
 /* ## denied
   The route to the denied service page
+  TODO: Deprecate as all remaining traffic goes to React.
   @param req {object} Node/Express request object
   @param res {object} Node/Express response object
 */
 const denied = function (req, res) {
   res.render('denied', req);
+}
+
+/* ## devServerRedirect
+  Redirect traffic to the React dev server 
+  @param _ {object} Node/Express request object
+  @param res {object} Node/Express response object
+*/
+const devServerRedirect = function (_, res) {
+  res.redirect('locahost:1111');
 }
 
 // use enhanced logging in non-production environments
@@ -390,6 +400,9 @@ if (isProd) {
     .post('/onboarding', onboardingAccess);
 }
 
+
+console.log("************* This is new!! ***************")
+
 if (isTest) {
   app
     .post('/api/import-csv', upload.single('csv'), pageHandler)
@@ -414,10 +427,16 @@ if (isTest) {
     .get('/', pageHandler)
 }
 
-// Remaining server configuration
+// Static assets 
 app
-  .use(express['static'](path.join(__dirname, '../../react/build')))
-  // .get('*', notFound);
+  .use(express['static'](path.join(__dirname, '../../react/build')));
+
+// All remaining requests go to React
+if (isProd) {
+  app.get('*', __dirname + '../../build/index.html');
+} else {
+  app.get('*', devServerRedirect);
+}
 
 // Start server
 http.createServer(app).listen(8080);
