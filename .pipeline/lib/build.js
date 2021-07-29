@@ -15,7 +15,7 @@ module.exports = (settings) => {
     'param':{
       'NAME': phases[phase].name,
       'GIT_REPO_URL': oc.git.http_url,
-      'GIT_REF': 'master',
+      'GIT_REF': 'main',
       'OUTPUT_IMAGE_TAG': options.env || 'latest'
     }
   }));
