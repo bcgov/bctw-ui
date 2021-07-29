@@ -356,6 +356,7 @@ const onboardingAccess = async (req,res) => {
 
 /* ## denied
   The route to the denied service page
+  TODO: Deprecate as all remaining traffic goes to React.
   @param req {object} Node/Express request object
   @param res {object} Node/Express response object
 */
@@ -365,10 +366,10 @@ const denied = function (req, res) {
 
 /* ## devServerRedirect
   Redirect traffic to the React dev server 
-  @param req {object} Node/Express request object
+  @param _ {object} Node/Express request object
   @param res {object} Node/Express response object
 */
-const devServerRedirect = function (req, res) {
+const devServerRedirect = function (_, res) {
   res.redirect('locahost:1111');
 }
 
