@@ -71,7 +71,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
             </li>
           </ul>
         </nav>
-        <nav id={'no-access-top-nav'} className={'app-nav'} style={requestAccessTopNavStyle}>
+        <nav id={'request-access-top-nav'} className={'app-nav'} style={requestAccessTopNavStyle}>
           <ul>
             <li>
               <a href='/onboarding' color={'inherit'}>Request Access</a>

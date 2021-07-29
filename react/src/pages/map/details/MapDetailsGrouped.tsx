@@ -25,12 +25,15 @@ type GroupedCheckedStatus = {
 
 const rows_to_render = [
   'Colour',
+  'Species',
+  'Population Unit',
+  'Collective Unit',
   'WLH ID',
-  'animal_id',
-  'device_id',
+  'Animal ID',
+  'Device ID',
   'Frequency (MHz)',
-  'capture_date',
-  'Last Transmission'
+  'Capture Date',
+  'Last Transmission Date'
 ];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
@@ -150,6 +153,9 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
           backgroundColor: parseAnimalColour(row.map_colour).fillColor}}>
         </Box>
       </TableCell>
+      <TableCell>{row.species}</TableCell>
+      <TableCell>{row.population_unit}</TableCell>
+      <TableCell>{row.collective_unit}</TableCell>
       {row.critter_id ? (
         <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
       ) : (
