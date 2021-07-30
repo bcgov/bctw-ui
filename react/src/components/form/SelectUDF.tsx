@@ -52,7 +52,7 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
       {isError ? (
         <NotificationMessage severity='error' message={formatAxiosError(error as any)} />
       ) : isLoading || isFetching ? (
-        <div>loading...</div>
+        <div>Please wait...</div>
       ) : (
         <FormControl size='small' variant={'outlined'} className={'udf-select-control'}>
           <InputLabel>{label}</InputLabel>

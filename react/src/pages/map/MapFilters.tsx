@@ -301,7 +301,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
               <Box mb={2}>
                 <div style={orLabelStyle}>
-                  &mdash; Or &mdash;
+                  &mdash; or &mdash;
                 </div>
               </Box>
 

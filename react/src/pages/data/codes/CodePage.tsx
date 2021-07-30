@@ -61,7 +61,7 @@ const CodePage: React.FC = () => {
     <ManageLayout>
       <div className='container'>
         {isFetching || isLoading ? (
-          <div>loading...</div>
+          <div>Please wait...</div>
         ) : isError ? (
           <NotificationMessage severity='error' message={formatAxiosError(error)} />
         ) : (

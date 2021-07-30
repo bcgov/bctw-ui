@@ -162,7 +162,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       {isError ? (
         <NotificationMessage severity='error' message={formatAxiosError(error)} />
       ) : isLoading || isFetching ? (
-        <div>loading...</div>
+        <div>Please wait...</div>
       ) : codes && codes.length ? (
         <FormControl error={hasError} style={style} size='small' variant={'outlined'} className={className ?? 'select-control'}>
           <InputLabel>{label}</InputLabel>

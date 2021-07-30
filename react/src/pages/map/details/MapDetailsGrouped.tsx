@@ -33,7 +33,7 @@ const rows_to_render = [
   'Device ID',
   'Frequency (MHz)',
   'Capture Date',
-  'Last Transmission Date'
+  'Last Transmit Date'
 ];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
