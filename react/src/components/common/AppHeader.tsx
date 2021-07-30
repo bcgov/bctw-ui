@@ -110,7 +110,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
               </div>
             </li>
             <li className={'help'}>
-              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/'>
+              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/' target='_blank'>
                 <IconButton>
                   <Icon
                     path={mdiHelpCircle}
@@ -120,7 +120,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                   />
                 </IconButton>
               </a>
-              <span><a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/'><span color={'inherit'}>Help</span></a></span>
+              <span><a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/' target='_blank'><span color={'inherit'}>Help</span></a></span>
             </li>
             <li className={'logout'}>
               <span><a href='/logout'><span color={'inherit'}>Logout</span></a></span>
