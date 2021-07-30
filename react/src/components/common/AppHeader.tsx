@@ -54,7 +54,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   return (
     <header className={'app-header'}>
       <div className={'container'}>
-        <Link to='/' className={'brand'} color={'inherit'}>
+        <Link to='/home' className={'brand'} color={'inherit'}>
           <img src={headerImage} width={155} height={52} alt={'Government of British Columbia'} />
           BCTW
         </Link>
