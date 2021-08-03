@@ -67,7 +67,8 @@ const collarPropsToDisplay = [
 ];
 
 // for attached collars, also display...
-const attachedCollarProps = ['(WLH_ID/Animal ID)', ...collarPropsToDisplay];
+// const attachedCollarProps = ['(WLH_ID/Animal ID)', '(WLH_ID)', '(Animal_ID)', ...collarPropsToDisplay];
+const attachedCollarProps = ['WLH_ID', 'Animal_ID', ...collarPropsToDisplay];
 export class Collar implements ICollar {
   collar_id: string;
   @Transform(v => v || 0, transformOpt) camera_device_id: number;
@@ -113,7 +114,7 @@ export class Collar implements ICollar {
     this.vendor_activation_status = false;
     this.device_id = 0;
     if (collar_type) {
-      switch(collar_type) {
+      switch (collar_type) {
         case eNewCollarType.VHF:
           this.device_make = 'ATS';
           this.device_type = 'VHF';
@@ -139,18 +140,18 @@ export class Collar implements ICollar {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'device_deployment_status':
-        return columnToHeader(str.replace('device_', ''))
-      case 'frequency':
-        return 'Beacon Frequency'
       case 'camera_device_id':
         return 'Camera Module ID';
+      case 'device_deployment_status':
+        return columnToHeader(str.replace('device_', ''))
       case 'dropoff_device_id':
         return 'Drop-off Module ID'
       case 'dropoff_frequency':
         return 'Drop-off Module Frequency'
       case 'dropoff_frequency_unit':
         return 'Drop-off Module Frequency Unit'
+      case 'frequency':
+        return 'Beacon Frequency'
       case 'implant_device_id':
         return 'Implant Module ID'
       case 'vendor_activation_status':
@@ -193,7 +194,7 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'device_malfunction_type', type: eInputType.code },
     { prop: 'device_deployment_status', type: eInputType.code },
     { prop: 'retrieval_date', type: eInputType.date },
-    { prop: 'retrieved', type: eInputType.check}
+    { prop: 'retrieved', type: eInputType.check }
   ],
   userCommentField: [
     { prop: 'user_comment', type: eInputType.text }
