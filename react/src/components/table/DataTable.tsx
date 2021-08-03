@@ -189,9 +189,9 @@ export default function DataTable<T extends BCTW>({
         ) : isError ? (
           <NotificationMessage severity='error' message={formatAxiosError(error)} />
         ) : values.length === 0 ? (
-          <strong>updating...</strong>
+          <strong>Loading...</strong>
         ) : (
-          <strong>no data available</strong>
+          <strong>No data available</strong>
         )}
       </TableCell>
     </TableRow>
