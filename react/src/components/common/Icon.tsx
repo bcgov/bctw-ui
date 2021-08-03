@@ -1,54 +1,50 @@
-import {cloneElement} from 'react';
-import Add from '@material-ui/icons/Add';
-import ArrowUpward from '@material-ui/icons/ArrowUpward';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import HomeIcon from '@material-ui/icons/Home';
-import Remove from '@material-ui/icons/Remove';
-import Grain from '@material-ui/icons/Grain';
-import Terrain from '@material-ui/icons/Terrain'
-import Dashboard from '@material-ui/icons/Dashboard';
-import Pets from '@material-ui/icons/Pets'
-import Devices from '@material-ui/icons/Devices';
-import BarChart from '@material-ui/icons/BarChart';
-import PersonIcon from '@material-ui/icons/Person';
-import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
-import DoneIcon from '@material-ui/icons/Done';
-import CloseIcon from '@material-ui/icons/Close';
-import ErrorIcon from '@material-ui/icons/Error';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import EditIcon from '@material-ui/icons/Edit';
-import SnoozeIcon from '@material-ui/icons/Snooze';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
-import AlarmOffIcon from '@material-ui/icons/AlarmOff';
-import WarningIcon from '@material-ui/icons/Warning';
 import AccessibilityIcon from '@material-ui/icons/Accessibility';
+import Add from '@material-ui/icons/Add';
+import AlarmOffIcon from '@material-ui/icons/AlarmOff';
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import ArrowUpward from '@material-ui/icons/ArrowUpward';
+import CloseIcon from '@material-ui/icons/Close';
+import CodeIcon from '@material-ui/icons/Code';
+import Dashboard from '@material-ui/icons/Dashboard';
+import DoneIcon from '@material-ui/icons/Done';
+import EditIcon from '@material-ui/icons/Edit';
+import ErrorIcon from '@material-ui/icons/Error';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
+import HomeIcon from '@material-ui/icons/Home';
+import PersonIcon from '@material-ui/icons/Person';
+import Pets from '@material-ui/icons/Pets'
+import Remove from '@material-ui/icons/Remove';
+import RouterIcon from '@material-ui/icons/Router';
 import ReplayIcon from '@material-ui/icons/Replay';
+import ShareIcon from '@material-ui/icons/Share';
+import SnoozeIcon from '@material-ui/icons/Snooze';
+import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import WarningIcon from '@material-ui/icons/Warning';
+import { cloneElement } from 'react';
 
 const mappings: Record<string, JSX.Element> = {
-  data: <Dashboard />,
-  map: <Grain />,
-  terrain: <Terrain />,
-  home: <HomeIcon />,
-  remove: <Remove />,
-  plus: <Add />,
-  critter: <Pets/>,
-  collar: <Devices/>,
-  code: <BarChart/>,
-  'arrow-up': <ArrowUpward />,
   'arrow-down': <ArrowDownward />,
-  profile: <PersonIcon />,
+  'arrow-up': <ArrowUpward />,
   admin: <SupervisorAccountIcon />,
-  done: <DoneIcon />,
-  close: <CloseIcon />,
-  filter: <FilterListIcon />,
-  error: <ErrorIcon htmlColor='orange'/>,
-  edit: <EditIcon />,
-  copy: <FileCopyIcon />,
-  snooze: <SnoozeIcon />,
+  animals: <Pets />,
   cannotSnooze: <AlarmOffIcon />,
-  warning: <WarningIcon htmlColor='orange' />,
+  close: <CloseIcon />,
+  code: <CodeIcon />,
+  devices: <RouterIcon />,
+  copy: <FileCopyIcon />,
+  data: <Dashboard />,
+  done: <DoneIcon />,
+  edit: <EditIcon />,
+  error: <ErrorIcon htmlColor='orange' />,
+  home: <HomeIcon />,
   person: <AccessibilityIcon />,
+  plus: <Add />,
+  profile: <PersonIcon />,
+  remove: <Remove />,
   reset: <ReplayIcon />,
+  share: <ShareIcon />,
+  snooze: <SnoozeIcon />,
+  warning: <WarningIcon htmlColor='orange' />,
 };
 
 type IconProps = {
@@ -56,6 +52,6 @@ type IconProps = {
   htmlColor?: string;
 };
 
-export default function Icon ({icon, htmlColor}: IconProps): JSX.Element {
-  return cloneElement(mappings[icon], {htmlColor})
+export default function Icon({ icon, htmlColor }: IconProps): JSX.Element {
+  return cloneElement(mappings[icon], { htmlColor })
 }
