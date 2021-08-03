@@ -1,15 +1,15 @@
 import * as L from 'leaflet';
-import length from '@turf/length';
+import { FeatureLayer } from 'esri-leaflet';
 import LabeledMarker from 'leaflet-labeled-circle';
-import dayjs from 'dayjs';
-import { formatLocal } from 'utils/time';
-import { MAP_COLOURS } from 'pages/map/map_helpers';
 import React, { MutableRefObject } from 'react';
-import { MapTileLayers } from 'constants/strings';
+import dayjs from 'dayjs';
+import length from '@turf/length';
 import { ITelemetryPoint, TelemetryDetail } from 'types/map';
-import { plainToClass } from 'class-transformer';
+import { MAP_COLOURS } from 'pages/map/map_helpers';
 import { MapStrings } from 'constants/strings';
-import { Map } from '@material-ui/icons';
+import { MapTileLayers } from 'constants/strings';
+import { formatLocal } from 'utils/time';
+import { plainToClass } from 'class-transformer';
 
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
@@ -38,22 +38,20 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   doc.classList.add('appear-above-map');
 };
 
-// URL for BC Geographic Warehouse
-const bcgw = 'http://openmaps.gov.bc.ca/geo/pub/ows';
-
 // caribou herd boundaries
 const getCHB = () => {
-  return L.tileLayer.wms(bcgw, {
-    layers: 'WHSE_WILDLIFE_INVENTORY.GCPB_CARIBOU_POPULATION_SP',
-    format: 'image/png',
-    transparent: true,
-    opacity: 0.6
+  const fl = new FeatureLayer({
+    url: 'https://services6.arcgis.com/ubm4tcTYICKBpist/arcgis/rest/services/Caribou_BC/FeatureServer/0'
   });
+  return fl as L.TileLayer;
 };
+
+// URL for BC Geographic Warehouse
+const bcgw_url = 'http://openmaps.gov.bc.ca/geo/pub/ows';
 
 // ENV regional boundaries
 const getERB = () => {
-  return L.tileLayer.wms(bcgw, {
+  return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_ADMIN_BOUNDARIES.EADM_WLAP_REGION_BND_AREA_SVW',
     format: 'image/png',
     transparent: true,
@@ -63,7 +61,7 @@ const getERB = () => {
 
 // parks and protected areas
 const getPPA = () => {
-  return L.tileLayer.wms(bcgw, {
+  return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW',
     format: 'image/png',
     transparent: true,
@@ -73,7 +71,7 @@ const getPPA = () => {
 
 // wildlife habitat areas
 const getWHA = () => {
-  return L.tileLayer.wms(bcgw, {
+  return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_WILDLIFE_MANAGEMENT.WCP_WILDLIFE_HABITAT_AREA_POLY',
     format: 'image/png',
     transparent: true,
@@ -83,7 +81,7 @@ const getWHA = () => {
 
 // wildlife magement units
 const getWMU = () => {
-  return L.tileLayer.wms(bcgw, {
+  return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_WILDLIFE_MANAGEMENT.WAA_WILDLIFE_MGMT_UNITS_SVW',
     format: 'image/png',
     transparent: true,
@@ -93,7 +91,7 @@ const getWMU = () => {
 
 // TRIM contour lines
 const getTCL = () => {
-  return L.tileLayer.wms(bcgw, {
+  return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_BASEMAPPING.TRIM_CONTOUR_LINES',
     format: 'image/png',
     transparent: true,
@@ -103,7 +101,7 @@ const getTCL = () => {
 
 // ungulate winter ranges
 const getUWR = () => {
-  return L.tileLayer.wms(bcgw, {
+  return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_WILDLIFE_MANAGEMENT.WCP_UNGULATE_WINTER_RANGE_SP',
     format: 'image/png',
     transparent: true,
@@ -130,7 +128,7 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
   layerPicker.addBaseLayer(esriWorldTopo, 'ESRI World Topo');
 
   // overlays from BCGW
-  layerPicker.addOverlay(getCHB(), 'Cariboo Herd Boundaries');
+  layerPicker.addOverlay(getCHB(), 'Caribou Herd Boundaries');
   layerPicker.addOverlay(getERB(), 'ENV Regional Boundaries');
   layerPicker.addOverlay(getPPA(), 'Parks & Protected Areas');
   //layerPicker.addOverlay(getTCL(), 'TRIM Contour Lines');
@@ -148,7 +146,7 @@ const initMap = (
   handleDeleteLine: () => void,
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
-  const layerPicker = L.control.layers(null, null, {position: 'topleft'});
+  const layerPicker = L.control.layers(null, null, { position: 'topleft' });
   L.drawLocal.draw.toolbar.buttons.polyline = MapStrings.drawLineLabel;
   L.drawLocal.draw.toolbar.buttons.polygon = MapStrings.drawPolygonLabel;
   L.drawLocal.draw.toolbar.buttons.rectangle = MapStrings.drawRectangleLabel;
@@ -166,7 +164,7 @@ const initMap = (
     },
     edit: {
       featureGroup: drawnItems
-    }, 
+    },
   });
 
   mapRef.current.addControl(drawControl);

@@ -23,6 +23,7 @@
     "class-transformer": "^0.3.1",
     "dayjs": "^1.10.4",
     "downloadjs": "^1.4.7",
+    "esri-leaflet": "^3.0.0",
     "leaflet": "^1.7.1",
     "leaflet-draw": "^1.0.4",
     "leaflet-labeled-circle": "^1.0.3",
