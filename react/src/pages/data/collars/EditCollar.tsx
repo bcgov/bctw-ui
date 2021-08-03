@@ -1,37 +1,32 @@
-import { EditorProps } from 'components/component_interfaces';
-import { MakeEditField } from 'components/form/create_form_components';
-import { CollarStrings as CS } from 'constants/strings';
-import ChangeContext from 'contexts/InputChangeContext';
-import EditModal from 'pages/data/common/EditModal';
-import { useState } from 'react';
-import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
-import { formatLabel } from 'utils/common_helpers';
-import { FormFieldObject } from 'types/form_types';
-import { permissionCanModify } from 'types/permission';
-
-import PropTypes from 'prop-types';
 import Box from '@material-ui/core/Box';
+import Button from 'components/form/Button';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import ChangeContext from 'contexts/InputChangeContext';
 import Checkbox from '@material-ui/core/Checkbox';
 import Container from '@material-ui/core/Container';
 import Divider from '@material-ui/core/Divider';
+import EditModal from 'pages/data/common/EditModal';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormHelperText from '@material-ui/core/FormHelperText'
 import Grid from '@material-ui/core/Grid';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
-import Paper from '@material-ui/core/Paper';
+import MalfunctionEventForm from '../events/MalfunctionEventForm';
 import MenuItem from '@material-ui/core/MenuItem';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Modal from 'components/modal/Modal';
+import RetrievalEventForm from '../events/RetrievalEventForm';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-
+import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
+import { CollarStrings as CS } from 'constants/strings';
+import { EditorProps } from 'components/component_interfaces';
+import { FormFieldObject } from 'types/form_types';
 import { Icon } from 'components/common';
-import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
-
+import { MakeEditField } from 'components/form/create_form_components';
+import { formatLabel } from 'utils/common_helpers';
+import { permissionCanModify } from 'types/permission';
+import { useState } from 'react';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -79,7 +74,8 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
 
   // const title = isCreatingNew ? `Add a new ${collarType} collar` : `Editing device ${editing.device_id}`;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
-
+  const [showRetrievalWorkflow, setShowRetrievalWorkflow] = useState<boolean>(false);
+  const [showMalfunctionWorkflow, setShowMalfunctionWorkflow] = useState<boolean>(false);
 
   const close = (): void => {
     setCollarType(eNewCollarType.Other);
@@ -97,6 +93,8 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     identifierFields,
     purchaseFields,
     statusFields,
+    retrievalFields,
+    malfunctionFields,
     userCommentField
   } = collarFormFields;
 
@@ -152,7 +150,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
               <dd>Permission:</dd>
               <dt>{editing.permission_type}</dt>
             </dl>
-
             {/* <span className='button_span'>
               {!isCreatingNew ? (
                 <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
@@ -183,7 +180,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
               <Box component="fieldset" p={3}>
                 {/* <h2>Device Details</h2> */}
                 <Box component="legend" className={'legend'}>Identifiers</Box>
-
                 <Box className="fieldset-form">
                   {/* <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} lg={2}>
@@ -193,30 +189,24 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                       <TextField fullWidth size="small" variant="outlined" label="Device Make"></TextField>
                     </Grid>
                   </Grid> */}
-
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       {identifierFields.map((d) => makeField(d, onChange))}
                     </Grid>
                   </Grid>
-
                 </Box>
               </Box>
-
               <Box py={1} px={3}>
                 <Divider></Divider>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Device Status</Box>
-
                 <Box className="fieldset-form">
                   {/* <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} lg={2}>
                     <FormControl fullWidth variant="outlined" size="small">
                       <InputLabel htmlFor="age-native-simple">Status</InputLabel>
-                      <Select
-                      >
+                      <Select>
                         <MenuItem value={10}>Ten</MenuItem>
                         <MenuItem value={20}>Twenty</MenuItem>
                         <MenuItem value={30}>Thirty</MenuItem>
@@ -226,8 +216,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                     <Grid item xs={12} sm={6} lg={2}>
                       <FormControl fullWidth variant="outlined" size="small">
                         <InputLabel htmlFor="age-native-simple">Deployment Status</InputLabel>
-                        <Select
-                        >
+                        <Select>
                           <MenuItem value={10}>Ten</MenuItem>
                           <MenuItem value={20}>Twenty</MenuItem>
                           <MenuItem value={30}>Thirty</MenuItem>
@@ -244,8 +233,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                     <Grid item xs={12} sm={6} lg={2}>
                       <FormControl fullWidth variant="outlined" size="small">
                           <InputLabel htmlFor="age-native-simple">Type of Malfunction</InputLabel>
-                          <Select
-                          >
+                          <Select>
                             <MenuItem value={10}>Ten</MenuItem>
                             <MenuItem value={20}>Twenty</MenuItem>
                             <MenuItem value={30}>Thirty</MenuItem>
@@ -253,7 +241,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                         </FormControl>
                     </Grid>
                   </Grid> */}
-
                   <Box mt={1}>
                     {/* <Grid container spacing={3}>
                       <Grid item xs={12}>
@@ -269,31 +256,25 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                         ></TextField>
                       </Grid>
                     </Grid> */}
-
                     <Grid container spacing={3}>
                       <Grid item xs={12}>
                         {statusFields.map((d) => makeField(d, onChange))}
                       </Grid>
                     </Grid>
-
                   </Box>
                 </Box>
               </Box>
-
               <Box py={1} px={3}>
                 <Divider></Divider>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Satellite Network and Beacon Frequency</Box>
-
                 <Box className="fieldset-form">
                   {/* <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} lg={2}>
                     <FormControl fullWidth variant="outlined" size="small">
                       <InputLabel htmlFor="age-native-simple">Device Type</InputLabel>
-                      <Select
-                      >
+                      <Select>
                         <MenuItem value={10}>Ten</MenuItem>
                         <MenuItem value={20}>Twenty</MenuItem>
                         <MenuItem value={30}>Thirty</MenuItem>
@@ -303,8 +284,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                     <Grid item xs={12} sm={6} lg={2}>
                       <FormControl fullWidth variant="outlined" size="small">
                         <InputLabel htmlFor="age-native-simple">Satellite Network</InputLabel>
-                        <Select
-                        >
+                        <Select>
                           <MenuItem value={10}>Ten</MenuItem>
                           <MenuItem value={20}>Twenty</MenuItem>
                           <MenuItem value={30}>Thirty</MenuItem>
@@ -317,8 +297,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                     <Grid item xs={12} sm={4} lg={2}>
                       <FormControl fullWidth variant="outlined" size="small">
                           <InputLabel htmlFor="age-native-simple">Frequency Units</InputLabel>
-                          <Select
-                          >
+                          <Select>
                             <MenuItem value={10}>Ten</MenuItem>
                             <MenuItem value={20}>Twenty</MenuItem>
                             <MenuItem value={30}>Thirty</MenuItem>
@@ -329,7 +308,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                       <TextField type="number" fullWidth size="small" variant="outlined" label="Fix Rate"></TextField>
                     </Grid>
                   </Grid> */}
-
                   <Box mt={1}>
                     {/* <Grid container spacing={3}>
                       <Grid item xs={12}>
@@ -338,26 +316,19 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                         </Box>
                       </Grid>
                     </Grid> */}
-
                   </Box>
-                  
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       {communicationFields.map((d) => makeField(d, onChange))}
                     </Grid>
                   </Grid>
-
                 </Box>
-
               </Box>
-
               <Box py={1} px={3}>
                 <Divider></Divider>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Additional Device Sensors and Beacons</Box>
-
                 <Box className="fieldset-form">
                   {/* <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} lg={2}>
@@ -373,7 +344,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                       <TextField fullWidth size="small" variant="outlined" label="Drop-off Freqency Unit"></TextField>
                     </Grid>
                   </Grid> */}
-
                   <Grid container spacing={3}>
                       <Grid item xs={12}>
                         {deviceOptionFields.map((d) => makeField(d, onChange))}
@@ -381,14 +351,11 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               <Box py={1} px={3}>
                 <Divider></Divider>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Warranty & Activation Details</Box>
-
                 <Box className="fieldset-form">
                   {/* <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} md={2}>
@@ -402,7 +369,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                       <TextField fullWidth size="small" variant="outlined" label="Purchase Comments"></TextField>
                     </Grid>
                   </Grid> */}
-                
                   <Grid container spacing={3}>
                       <Grid item xs={12}>
                         {purchaseFields.map((d) => makeField(d, onChange))}
@@ -410,11 +376,41 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               <Box py={1} px={3}>
                 <Divider></Divider>
               </Box>
-
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Retrieval Details</Box>
+                <Button size="large" color="default" className='button' onClick={(): void => setShowRetrievalWorkflow((o) => !o)}>
+                  Add Retrieval Event
+                </Button>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {retrievalFields.map((d) => makeField(d, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+              <Box py={1} px={3}>
+                <Divider></Divider>
+              </Box>
+              <Box component="fieldset" p={3}>
+                <Box component="legend" className={'legend'}>Malfunction Details</Box>
+                <Button size="large" color="default" className='button' onClick={(): void => setShowMalfunctionWorkflow((o) => !o)}>
+                  Add Malfunction Event
+                </Button>
+                <Box className="fieldset-form">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {malfunctionFields.map((d) => makeField(d, onChange))}
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+              <Box py={1} px={3}>
+                <Divider></Divider>
+              </Box>
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Comments About this Device</Box>
                 <Box className="fieldset-form">
@@ -423,7 +419,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                       <TextField fullWidth multiline size="small" variant="outlined" label="Comments"></TextField>
                     </Grid>
                   </Grid> */}
-
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       {userCommentField.map((d) => makeField(d, onChange))}
@@ -431,7 +426,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               {/* {!isCreatingNew && showAssignmentHistory ? (
                 <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
                   <AssignmentHistory
@@ -443,6 +437,28 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                   />
                 </Modal>
               ) : null} */}
+              { /* retrieval workflow */ }
+              {!isCreatingNew && showRetrievalWorkflow ? (
+                <Modal open={showRetrievalWorkflow} handleClose={(): void => setShowRetrievalWorkflow(false)}>
+                  <RetrievalEventForm
+                    device_id={editing.device_id}
+                    handleClose={(): void => setShowRetrievalWorkflow(false)}
+                    handleSave={null}
+                    open={showRetrievalWorkflow}
+                  />
+                </Modal>
+              ) : null}
+              { /* malfunction workflow */ }
+              {!isCreatingNew && showMalfunctionWorkflow ? (
+                <Modal open={showMalfunctionWorkflow} handleClose={(): void => setShowMalfunctionWorkflow(false)}>
+                  <MalfunctionEventForm
+                    device_id={editing.device_id}
+                    handleClose={(): void => setShowMalfunctionWorkflow(false)}
+                    handleSave={null}
+                    open={showMalfunctionWorkflow}
+                  />
+                </Modal>
+              ) : null}
             </>
           );
         }}

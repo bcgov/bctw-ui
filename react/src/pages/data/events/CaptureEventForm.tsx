@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react';
-import DataTable from 'components/table/DataTable';
 import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
-import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction';
+import { useEffect, useState } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { WorkflowStrings } from 'constants/strings';
 
-type IMortalityWorkflowProps = {
-  animalId: string;
-  canEdit: boolean; // passed to child PerformAssignmentAction component
+type ICaptureWorkflowProps = {
+  open;
+  handleClose;
+  handleSave; 
+  animal_id: string;
 };
 
 /**
  * fixme: todo: very incomplete
 */
-export default function MortalityWorkflow(props: IMortalityWorkflowProps): JSX.Element {
-  const { animalId } = props;
+export default function CaptureEventForm(props: ICaptureWorkflowProps): JSX.Element {
+  const { animal_id } = props;
   const bctwApi = useTelemetryApi();
   const [isDeviceAttached, setIsDeviceAttached] = useState<string>(null);
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
@@ -32,7 +32,7 @@ export default function MortalityWorkflow(props: IMortalityWorkflowProps): JSX.E
 
   return (
     <>
-      <h3>{WorkflowStrings.releaseWorkflowTitle}</h3>
+      <h3>{WorkflowStrings.captureWorkflowTitle}</h3>
     </>
   );
 }

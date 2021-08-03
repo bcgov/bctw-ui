@@ -30,11 +30,13 @@ const FileStrings = {
 
 const WorkflowStrings = {
   captureWorkflowTitle: 'Capture Event Workflow',
-  releaseWorkflowTitle: 'Release Event Workflow',
-  mortalityWorkflowTitle: 'Mortality Event Workflow',
-  mortalityUnassignDeviceTooltip: 'If you unassign the device, no new telemetry from this device will be connected to this animal.',
-  locationEventCoordTypeUTM: 'Use UTM',
   locationEventCoordTypeLat: 'Use Lat/Long',
+  locationEventCoordTypeUTM: 'Use UTM',
+  malfunctionWorkflowTitle: 'Malfunction Event Workflow',
+  mortalityUnassignDeviceTooltip: 'If you unassign the device, no new telemetry from this device will be connected to this animal.',
+  mortalityWorkflowTitle: 'Mortality Event Workflow',
+  releaseWorkflowTitle: 'Release Event Workflow',
+  retrievalWorkflowTitle: 'Retrieval Event Workflow',
 }
 
 const CollarStrings = {

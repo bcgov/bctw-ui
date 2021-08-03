@@ -190,11 +190,15 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   ],
   statusFields: [
     { prop: 'device_status', type: eInputType.code },
+  ],
+  retrievalFields: [
+    { prop: 'retrieval_date', type: eInputType.date },
+    { prop: 'retrieved', type: eInputType.check }
+  ],
+  malfunctionFields: [
     { prop: 'malfunction_date', type: eInputType.date },
     { prop: 'device_malfunction_type', type: eInputType.code },
     { prop: 'device_deployment_status', type: eInputType.code },
-    { prop: 'retrieval_date', type: eInputType.date },
-    { prop: 'retrieved', type: eInputType.check }
   ],
   userCommentField: [
     { prop: 'user_comment', type: eInputType.text }

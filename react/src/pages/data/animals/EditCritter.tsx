@@ -1,30 +1,34 @@
-import { Box, Container, Grid, Paper } from '@material-ui/core';
-import { EditorProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
-import { MakeEditField } from 'components/form/create_form_components';
-import { CritterStrings as CS } from 'constants/strings';
-import ChangeContext from 'contexts/InputChangeContext';
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
+import Button from 'components/form/Button';
+import CaptureEventForm from '../events/CaptureEventForm';
+import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
-import { useState } from 'react';
+import Modal from 'components/modal/Modal';
+import MortalityEventForm from '../events/MortalityEventForm';
+import ReleaseEventForm from '../events/ReleaseEventForm';
 import { Animal, critterFormFields } from 'types/animal';
+import { Box, Container, Grid } from '@material-ui/core';
+import { CritterStrings as CS } from 'constants/strings';
+import { EditorProps } from 'components/component_interfaces';
 import { FormFieldObject } from 'types/form_types';
+import { MakeEditField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
+import { useState } from 'react';
 
 /**
  * the main animal form
  * todo: complete capture/release/mortality workflows -> uncomment when complete
 */
 export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
-  const { isCreatingNew, editing } = props;
 
+  const { isCreatingNew, editing } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const requiredFields = CS.requiredProps;
 
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
-  // const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
-  // const [showReleaseWorkflow, setShowReleaseWorkflow] = useState<boolean>(false);
-  // const [showMortalityWorkflow, setShowMortalityWorkflow] = useState<boolean>(false);
+  const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
+  const [showMortalityWorkflow, setShowMortalityWorkflow] = useState<boolean>(false);
+  const [showReleaseWorkflow, setShowReleaseWorkflow] = useState<boolean>(false);
 
   const {
     associatedAnimalFields,
@@ -42,7 +46,7 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
   ): React.ReactNode => {
     const { prop, type, codeName } = formType;
     return MakeEditField({
-      type, 
+      type,
       prop,
       value: editing[prop],
       handleChange,
@@ -57,11 +61,11 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
   const Header = (
     <Container maxWidth="xl">
       {isCreatingNew ? (
-      <Box pt={3}>
-        <Box component="h1" mt={0} mb={0}>
-          Add Animal
+        <Box pt={3}>
+          <Box component="h1" mt={0} mb={0}>
+            Add Animal
+          </Box>
         </Box>
-      </Box>
       ) : (
         <>
           <Box display="flex" justifyContent="space-between" alignItems="top" pt={3}>
@@ -79,7 +83,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                 <dd>Permission:</dd>
                 <dt>{editing.permission_type}</dt>
               </dl>
-
               {/* <span className='button_span'>
                 {!isCreatingNew ? (
                   <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
@@ -88,21 +91,10 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                 ) : null}
               </span> */}
             </Box>
-
             <Box>
               <Button size="large" variant="outlined" color="default" className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
                 Device Assignment
               </Button>
-              {/* note: add these when workflows completed  */}
-              {/* <Button className='button' onClick={(): void => setShowCaptureWorkflow((o) => !o)}>
-                Capture Event
-              </Button>
-              <Button className='button' onClick={(): void => setShowReleaseWorkflow((o) => !o)}>
-                Release Event
-              </Button>
-              <Button className='button' onClick={(): void => setShowMortalityWorkflow((o) => !o)}>
-                Mortality Event
-              </Button> */}
             </Box>
           </Box>
         </>
@@ -131,7 +123,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Characteristics</Box>
                 <Box className="fieldset-form">
@@ -142,7 +133,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Association With Another Individual</Box>
                 <Box className="fieldset-form">
@@ -153,7 +143,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Comments About This Animal</Box>
                 <Box className="fieldset-form">
@@ -164,9 +153,11 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Latest Capture Details</Box>
+                <Button size="large" color="default" className='button' onClick={(): void => setShowCaptureWorkflow((o) => !o)}>
+                  Add Capture Event
+                </Button>
                 <Box className="fieldset-form">
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
@@ -175,9 +166,11 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Latest Release Details</Box>
+                <Button size="large" color="default" className='button' onClick={(): void => setShowReleaseWorkflow((o) => !o)}>
+                  Add Release Event
+                </Button>
                 <Box className="fieldset-form">
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
@@ -186,9 +179,11 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Mortality Details</Box>
+                <Button size="large" color="default" className='button' onClick={(): void => setShowMortalityWorkflow((o) => !o)}>
+                  Record Mortality Details
+                </Button>
                 <Box className="fieldset-form">
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
@@ -197,7 +192,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                   </Grid>
                 </Box>
               </Box>
-
               {/* dont show assignment history for new critters */}
               {!isCreatingNew ? (
                 <AssignmentHistory
@@ -207,25 +201,40 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                   permission_type={editing.permission_type}
                 />
               ) : null}
-
-              {/* {!isCreatingNew && showCaptureWorkflow ? (
+              { /* capture workflow */ }
+              {!isCreatingNew && showCaptureWorkflow ? (
                 <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
-                  <CaptureWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                  <CaptureEventForm
+                    animal_id={editing.critter_id}
+                    handleClose={(): void => setShowCaptureWorkflow(false)}
+                    handleSave={null}
+                    open={showCaptureWorkflow}
+                  />
                 </Modal>
               ) : null}
+              { /* mortality workflow */ }
+              {!isCreatingNew && showMortalityWorkflow ? (
+                { /*
+                <Modal open={showMortalityflow} handleClose={(): void => setShowMortalityWorkflow(false)}>
+                  <MortalityEventForm
+                    open={showMortalityWorkflow}
+                    handleClose={(): void => setShowMortalityWorkflow(false)}
+                    handleSave={null}
+                  />
+                </Modal>
+                */ }
+              ) : null}
+              { /* release workflow */ }
               {!isCreatingNew && showReleaseWorkflow ? (
                 <Modal open={showReleaseWorkflow} handleClose={(): void => setShowReleaseWorkflow(false)}>
-                  <ReleaseWorkflow animalId={editing.critter_id} canEdit={canEdit} {...props} />
+                  <ReleaseEventForm
+                    animal_id={editing.critter_id}
+                    handleClose={(): void => setShowReleaseWorkflow(false)}
+                    handleSave={null}
+                    open={showReleaseWorkflow}
+                  />
                 </Modal>
               ) : null}
-              {!isCreatingNew && showMortalityWorkflow ? (
-                <MortalityEventForm
-                  alert={alert}
-                  open={showMortalityWorkflow}
-                  handleClose={(): void => setShowMortalityWorkflow(false)}
-                  handleSave={null}
-                />
-                ) : null} */}
             </>
           );
         }}
