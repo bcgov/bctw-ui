@@ -54,10 +54,10 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   return (
     <header className={'app-header'}>
       <div className={'container'}>
-        <Link to='/home' className={'brand'} color={'inherit'}>
+        <a href='/home' className={'brand'} color={'inherit'}>
           <img src={headerImage} width={155} height={52} alt={'Government of British Columbia'} />
           BCTW
-        </Link>
+        </a>
         <nav id={'top-nav'} className={'app-nav'} style={topNavStyle}>
           <ul>
             <li>
@@ -106,7 +106,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                     size={1}
                   />
                 </IconButton>
-                <span>{user?.firstname ?? 'Local'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span>
+                <span>{user?.firstname ?? 'Guest'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span>
               </div>
             </li>
             <li className={'help'}>
