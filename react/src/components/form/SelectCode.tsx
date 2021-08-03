@@ -81,7 +81,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       setCodes(data);
       // if a default was set (a code description, update the value to its actual value)
       // pass false as second param to not update the modals 'is saveable property'
-      const found = data.find((d) => d.description === defaultValue);
+      const found = data.find((d) => d?.description === defaultValue);
       setValue(found?.description ?? '');
     };
     updateOptions();
@@ -131,7 +131,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
 
   // call the parent changeHandler
   const pushChange = (v: string): void => {
-    const code = codes.find((c) => c.description === v)?.code ?? v;
+    const code = codes.find((c) => c?.description === v)?.code ?? v;
     const ret = { [getIdentifier()]: code, error: hasError };
     if (typeof changeHandler === 'function') {
       changeHandler(ret);
@@ -142,10 +142,10 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
    * if @param codeHeader is not the same, use @param propName instead when
    * pushing the changed value to the parent @param changeHandler
    */
-  const getIdentifier = (): string =>  propName ? propName : codeHeader;
+  const getIdentifier = (): string => propName ? propName : codeHeader;
 
   const pushChangeMultiple = (selected: string[]): void => {
-    const filtered = codes.filter((c) => selected.indexOf(c.description) !== -1);
+    const filtered = codes.filter((c) => selected.indexOf(c?.description) !== -1);
     const ret = filtered.map((c) => {
       /// return a combination of the original code and the value
       /// why? these are most likely to be used in client side filtering
@@ -189,15 +189,15 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
             {codes.map((c: ICode) => {
               if (!multiple) {
                 return (
-                  <MenuItem key={c.id} value={c.description}>
-                    {c.description}
+                  <MenuItem key={c?.id} value={c?.description}>
+                    {c?.description}
                   </MenuItem>
                 );
               }
               return (
-                <MenuItem key={c.id} value={c.description}>
-                  <Checkbox size='small' color='primary' checked={values.indexOf(c.description) !== -1} />
-                  {c.description}
+                <MenuItem key={c?.id} value={c?.description}>
+                  <Checkbox size='small' color='primary' checked={values.indexOf(c?.description) !== -1} />
+                  {c?.description}
                 </MenuItem>
               );
             })}
