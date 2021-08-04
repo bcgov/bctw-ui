@@ -33,16 +33,16 @@ const AppRoutes: RouteKey[] = [
   // { name: 'terrain', path: '/terrain', title: 'Terrain Viewer', component: TerrainPage, sort: 2 },
   { name: 'animals', path: '/animals', title: 'Animals', component: CritterPage, sort: 10, icon: 'animals' },
   { name: 'devices', path: '/devices', title: 'Devices', component: CollarPage, sort: 11, icon: 'devices' },
-  { name: 'profile', path: '/profile', title: 'My Profile', component: UserProfile, sort: 12, icon: 'profile' },
-  { name: 'owner-access', path: '/owner-access', title: 'Delegation', component: OwnerRequestPermission, sort: 13, icon: 'share' },
+  { name: 'owner-access', path: '/owner-access', title: 'Delegation', component: OwnerRequestPermission, sort: 12, icon: 'share' },
+  { name: 'profile', path: '/profile', title: 'My Profile', component: UserProfile, sort: 13, icon: 'profile' },
   { name: 'import', path: '/import', title: 'Bulk Import', component: Import, sort: 14, icon: 'arrow-up' },
   { name: 'user-admin', path: '/user-admin', title: 'Users', component: UserAdminPage, sort: 100, icon: 'admin' },
   { name: 'handle-permission-request', path: '/handle-permission-request', title: 'Onboarding Requests', component: AdminHandleRequestPermissionPage, sort: 101, icon: 'edit' },
   { name: 'animal-access', path: '/animal-access', title: 'Set Animal Manager', component: GrantCritterAccessPage, sort: 102, icon: 'person' },
   { name: 'codes', path: '/codes', title: 'Code Tables', component: CodePage, sort: 103, icon: 'code' },
-  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 200 },
-  // { name: 'logout', path: '/logout', title: 'Logout', component: Logout, sort: 201 },
-  { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: AddUser, sort: 202 },
+  // { name: 'logout', path: '/logout', title: 'Logout', component: Logout, sort: 200 },
+  { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: AddUser, sort: 201 },
+  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 404 },
 ];
 
 const AppRouter = (): JSX.Element => {
