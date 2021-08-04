@@ -382,7 +382,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Retrieval Details</Box>
                 <Button size="large" color="default" className='button' onClick={(): void => setShowRetrievalWorkflow((o) => !o)}>
-                  Add Retrieval Event
+                  Record Retrieval Details
                 </Button>
                 <Box className="fieldset-form">
                   <Grid container spacing={3}>
@@ -398,7 +398,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
               <Box component="fieldset" p={3}>
                 <Box component="legend" className={'legend'}>Malfunction Details</Box>
                 <Button size="large" color="default" className='button' onClick={(): void => setShowMalfunctionWorkflow((o) => !o)}>
-                  Add Malfunction Event
+                  Record Malfunction Details
                 </Button>
                 <Box className="fieldset-form">
                   <Grid container spacing={3}>
