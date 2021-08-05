@@ -420,7 +420,8 @@ if (isTest) {
 
 // Static assets 
 app
-  .use(express['static'](path.join(__dirname, '../../react/build')));
+  .use(express['static'](path.join(__dirname, '../../react/build')))
+  .get('*', notFound);
 
 // All remaining requests go to React
 //if (isProd) {
