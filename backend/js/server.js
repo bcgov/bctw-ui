@@ -408,7 +408,7 @@ if (isTest) {
   app
     .post('/api/import-csv', upload.single('csv'), pageHandler)
     .post('/api/import-xml', upload.array('xml'), pageHandler)
-    .post('/api/:endpoint', proxyApi)
+    .post('/api/:endpoint', proxyApi);
     // Use keycloak authentication only in Production
 } else if (isProd) {
   console.log('express() -- isProd?', isProd);
@@ -422,12 +422,12 @@ if (isTest) {
     .post('/api/import-xml', upload.array('xml'), keycloak.protect(), pageHandler)
     .post('/api/:endpoint', keycloak.protect(), proxyApi)
     // delete handlers
-    .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
+    .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi);
 } else {
-  console.log('express() -- neither isTest or IsProd');
+  console.log('express() -- neither isTest or IsProd')
   app
     .get('/api/:endpoint', proxyApi)
-    .get('/', pageHandler)
+    .get('/', pageHandler);
 }
 
 // Static assets 
@@ -436,11 +436,14 @@ app
   // .get('*', notFound);
 
 // All remaining requests go to React
-// if (isProd) {
-  app.get('*', __dirname + '../../build/index.html');
-// } else {
-//   app.get('*', devServerRedirect);
-// }
+if (isProd) {
+  // app.get('*', __dirname + '../../build/index.html'); // <-- Error: Route.get() requires a callback function but got a [object String]
+  app
+    .get('*', pageHandler);
+} else {
+  app
+    .get('*', devServerRedirect);
+}
 
 // Start server
 http.createServer(app).listen(8080);
