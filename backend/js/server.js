@@ -167,11 +167,11 @@ const proxyApi = function (req, res, next) {
 /**
   * csv files can only be imported one at a time
  */
-const handleFile = function(file) {
+const handleFile = function (file) {
   if (file) {
     const form = new FormData();
     form.append('csv', file.buffer, file.originalname);
-    return { form, config: { headers: form.getHeaders() }}
+    return { form, config: { headers: form.getHeaders() } }
   }
 }
 
@@ -183,7 +183,7 @@ const handleFiles = function (files) {
     const form = new FormData();
     files.forEach(f => form.append(f.fieldname, f.buffer, f.originalname));
     // Axios will throw if posting the form as an array, specify the json option to stringify it
-    return { form, config: { headers: form.getHeaders(), options: { json: true}}}
+    return { form, config: { headers: form.getHeaders(), options: { json: true } } }
   }
 }
 
@@ -196,7 +196,7 @@ const gardenGate = function (req, res, next) {
   if (keycloak.checkSso()) {
     return next();
   } else {
-    console.log("User NOT authenticated; denying access")
+    console.log('User NOT authenticated; denying access');
     return res.status(404).send('<p>Error: You must be authenticated to use this application.</p>');
   }
 };
@@ -217,6 +217,7 @@ const notFound = function (req, res) {
   @param next {function} Node/Express function for flow control
  */
 const pageHandler = function (req, res, next) {
+  console.log('pageHandler() -- CALLED');
   return next();
 };
 
@@ -230,12 +231,14 @@ const pageHandler = function (req, res, next) {
  * @param res {object} Express response object
  * @param next {function} Express function to continue on
  */
-const onboardingRedirect = async (req,res,next) => {
+const onboardingRedirect = async (req, res, next) => {
+
+  console.log('onboardingRedirect() -- START')
   // Collect all user data from the keycloak object
   const data = req.kauth.grant.access_token.content;
-  console.log('data:',data)
+  console.log('onboardingRedirect() -- data:', data)
   const { user, domain } = splitCredentials(data);
-  console.log('user:',user)
+  console.log('onboardingRedirect() -- user:', user)
   const email = data.email;
   const givenName = data.given_name;
   const familyName = data.family_name;
@@ -245,37 +248,39 @@ const onboardingRedirect = async (req,res,next) => {
   const client = await pgPool.connect();
   const result = await client.query(sql);
   const idirs = result.rows.map((row) => row.idir);
-  console.log('idirs:',idirs)
+  console.log('onboardingRedirect() -- Registered IDIRs in BCTW:', idirs)
   // Is the current user registered: Boolean
   const registered = (idirs.includes(user)) ? true : false;
-  console.log('registered',registered);
+  console.log('onboardingRedirect() -- User is registered?', registered);
 
-  console.log('url', req.url);
+  console.log('onboardingRedirect() -- URL requested: ', req.url);
   if (registered) { // If registered
-    console.log('Registed so passing through')
+    console.log('onboardingRedirect() -- User is registered; passing through')
     next(); // pass through
   } else { // Otherwise redirect to the onboarding page
     if (req.url.match(/\/onboarding/)) {
+      console.log('onboardingRedirect() -- Onboarding URL requested; passing through')
       next(); // already heading to onboarding so pass through
     } else {
-      res.redirect('/onboarding'); 
+      console.log('onboardingRedirect() -- User is NOT registered; directing to /onboarding')
+      res.redirect('/onboarding');
     }
-    console.log('parameters:',req.query.onboarding)
-    console.log('url:',req.url)
+    console.log('onboardingRedirect() -- Query parameters supplied: ', req.query.onboarding)
+    // console.log('url:', req.url)
   }
   client.release(); // Release database connection
+  console.log('onboardingRedirect() -- END')
 };
 
-
-const onboardingAccess = async (req,res) => {
+const onboardingAccess = async (req, res) => {
   // This data will be inserted into the email
   // TODO: Get the below info from keycload. No longer passed through the body
-  const {user, domain, email, firstName, lastName, msg} = req.body;
+  const { user, domain, email, firstName, lastName, msg } = req.body;
   const data = req.kauth.grant.access_token.content;
 
   // TODO: This has to be tested in dev unfortunately
-  console.log('keycloak data',data);
-  console.log('sent data',req.body);
+  console.log('keycloak data', data);
+  console.log('sent data', req.body);
 
   // Get all the environment variable dependencies
   const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
@@ -286,19 +291,19 @@ const onboardingAccess = async (req,res) => {
   const toEmail = process.env.BCTW_CHES_TO_EMAIL.split(',');
 
   // Create the authorization hash
-  const prehash = Buffer.from(`${username}:${password}`,'utf8')
+  const prehash = Buffer.from(`${username}:${password}`, 'utf8')
     .toString('base64');
   const hash = `Basic ${prehash}`;
 
   const tokenParcel = await axios.post(
     tokenUrl,
     'grant_type=client_credentials',
-    {headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": hash
-    }
-  });
-
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": hash
+      }
+    });
 
   const pretoken = tokenParcel.data.access_token;
   if (!pretoken) return res.status(500).send('Authentication failed');
@@ -309,16 +314,14 @@ const onboardingAccess = async (req,res) => {
       Access to the BC Telemetry Warehouse has be requested by
       <b>${domain}</b> user <b>${firstName} ${lastName}</b>. Username is <b>${user}</b>.
     </div>
-    <br>
+    <br />
     <div>
       <u>Provided reason is as follows</u>:
     </div>
-
     <div style="padding=10px; color: #626262;">
       ${msg}
     </div>
-    <br>
-    
+    <br />
     <div style="border-width: 1px; border-color: #626262; border-style: solid none none none;">
       <a href="mailto:${email}">${email}</a>.
     </div>
@@ -352,7 +355,6 @@ const onboardingAccess = async (req,res) => {
     res.status(500).send('Email failed');
   })
 };
-
 
 /* ## denied
   The route to the denied service page
@@ -388,28 +390,28 @@ var app = express()
   .use(gardenGate) // Keycloak Gate
   .get('/denied', denied);
 
-
 if (isProd) {
   console.log('this is prod');
   app
     .post('/onboarding', keycloak.protect(), onboardingAccess)
     .all('*', keycloak.protect(), onboardingRedirect);
-} else{
+} else {
   console.log('this is NOT prod!!!!!');
   app
     .post('/onboarding', onboardingAccess);
 }
 
-
-console.log("************* This is new!! ***************")
+console.log('************* This is new!!! ***************');
 
 if (isTest) {
+  console.log('express() -- isTest?', isTest);
   app
     .post('/api/import-csv', upload.single('csv'), pageHandler)
     .post('/api/import-xml', upload.array('xml'), pageHandler)
     .post('/api/:endpoint', proxyApi)
-// Use keycloak authentication only in Production
+    // Use keycloak authentication only in Production
 } else if (isProd) {
+  console.log('express() -- isProd?', isProd);
   app
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/session-info', retrieveSessionInfo)
@@ -422,6 +424,7 @@ if (isTest) {
     // delete handlers
     .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
 } else {
+  console.log('express() -- neither isTest or IsProd');
   app
     .get('/api/:endpoint', proxyApi)
     .get('/', pageHandler)
@@ -429,15 +432,15 @@ if (isTest) {
 
 // Static assets 
 app
-  .use(express['static'](path.join(__dirname, '../../react/build')))
-  .get('*', notFound);
+  .use(express['static'](path.join(__dirname, '../../react/build')));
+  // .get('*', notFound);
 
 // All remaining requests go to React
-//if (isProd) {
-//  app.get('*', __dirname + '../../build/index.html');
-//} else {
-//  app.get('*', devServerRedirect);
-//}
+// if (isProd) {
+  app.get('*', __dirname + '../../build/index.html');
+// } else {
+//   app.get('*', devServerRedirect);
+// }
 
 // Start server
 http.createServer(app).listen(8080);
