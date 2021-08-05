@@ -201,6 +201,15 @@ const gardenGate = function (req, res, next) {
   }
 };
 
+/* ## notFound
+  Catch-all router for any request that does not have an endpoint defined.
+  @param req {object} Node/Express request object
+  @param res {object} Node/Express response object
+ */
+const notFound = function (req, res) {
+  return res.status(404).send('<p>Sorry... You must be lost &#x2639;.</p>');
+};
+
 /* ## pageHandler
   Pass-through function for Express.
   @param req {object} Node/Express request object
