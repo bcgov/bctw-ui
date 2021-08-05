@@ -423,11 +423,11 @@ app
   .use(express['static'](path.join(__dirname, '../../react/build')));
 
 // All remaining requests go to React
-if (isProd) {
-  app.get('*', __dirname + '../../build/index.html');
-} else {
-  app.get('*', devServerRedirect);
-}
+//if (isProd) {
+//  app.get('*', __dirname + '../../build/index.html');
+//} else {
+//  app.get('*', devServerRedirect);
+//}
 
 // Start server
 http.createServer(app).listen(8080);
