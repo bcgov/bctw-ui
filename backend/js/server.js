@@ -205,7 +205,7 @@ const gardenGate = function (req, res, next) {
   @param res {object} Node/Express response object
  */
 const notFound = function (req, res) {
-  return res.status(404).send('<p>Sorry... You must be lost &#x2639;.</p>');
+  return res.status(404).send('<p>Express server.js says: : Sorry, but you must be lost.</p>');
 };
 
 /* ## pageHandler
@@ -436,8 +436,9 @@ app
 // All remaining requests go to React
 if (isProd) {
   // app.get('*', __dirname + '../../build/index.html'); // <-- Error: Route.get() requires a callback function but got a [object String]
+  console.log('express() -- passing page request to React')
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname + '../../build/index.html'));
+    res.sendFile(path.join(__dirname + '../../../react/build/index.html'));
   });
 } else {
   app
