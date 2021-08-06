@@ -1,4 +1,4 @@
-@import 'colours.scss';
+@import "colours.scss";
 
 .app-header {
   border-bottom: 2px solid $BCgovGold;
@@ -20,7 +20,7 @@
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  color: $appHeaderColor; 
+  color: $appHeaderColor;
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: 700;
@@ -85,6 +85,12 @@
     margin-right: 0.75rem;
     padding-right: 0.8rem;
     /* border-right: 1px solid $appHeaderColor; */
+
+    a {
+      color: $appHeaderColor;
+      text-decoration: none;
+      font-weight: 400;
+    }
   }
 
   .help {
@@ -101,7 +107,7 @@
       font-weight: 400;
     }
   }
-  
+
   .logout {
     font-size: 1rem;
 
