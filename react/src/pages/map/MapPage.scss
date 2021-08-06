@@ -1,4 +1,4 @@
-@import 'styles/colours.scss';
+@import "styles/colours.scss";
 $appearAboveMap: 1001;
 
 .map-container {
@@ -29,17 +29,17 @@ $appearAboveMap: 1001;
 }
 
 #map .leaflet-draw.leaflet-control {
-  transform: translate(-6px,40px) scale(1.5);
+  transform: translate(-6px, 40px) scale(1.5);
 }
 
 #map .leaflet-control-zoom.leaflet-control {
   margin: 25px 0 0 16px;
-  transform: scale(1.50);
+  transform: scale(1.5);
 }
 
 #map .leaflet-control-layers.leaflet-control {
   margin: 146px 0 0 8px;
-  transform: scale(1) translate(1px,4px);
+  transform: scale(1) translate(1px, 4px);
 }
 
 //
@@ -62,7 +62,7 @@ $appearAboveMap: 1001;
   align-items: flex-start;
 }
 
-/// fixed popup
+// fixed popup
 #popup {
   position: absolute;
   background-color: $BCgovGold;
@@ -73,10 +73,11 @@ $appearAboveMap: 1001;
 
 // Map Bottom Panel
 .map-bottom-panel {
+  bottom: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   position: absolute;
-  bottom: 0;
   width: 100%;
 
   .MuiTableContainer-root {
@@ -88,7 +89,7 @@ $appearAboveMap: 1001;
     background: #eeeeee;
     border-top: 1px solid #999999;
     cursor: n-resize;
-    user-select: none
+    user-select: none;
   }
 
   #drag-icon {
@@ -96,7 +97,6 @@ $appearAboveMap: 1001;
     margin-right: auto;
     width: 24px;
   }
-
 }
 
 // Map Details
@@ -110,7 +110,6 @@ $appearAboveMap: 1001;
   flex: 1 1 auto;
   overflow-x: hidden;
 }
-
 
 // must be at least this index to appear for full-screen dialog
 .appear-above-map {
@@ -131,7 +130,7 @@ $appearAboveMap: 1001;
 
 //
 // map page html icons
-// 
+//
 
 // the leaflet icon that is always hidden
 .marker-popup {
@@ -177,5 +176,5 @@ $appearAboveMap: 1001;
 
 .icon-off {
   color: $appHeaderColor;
-  background-color:#BEBEBE;
+  background-color: #bebebe;
 }
