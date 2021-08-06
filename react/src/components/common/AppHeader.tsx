@@ -106,7 +106,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                     size={1}
                   />
                 </IconButton>
-                <span>{user?.firstname ?? 'Guest'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span>
+                <span><a href='/profile'><span color={'inherit'}>{user?.firstname ?? 'Guest'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span></a></span>
               </div>
             </li>
             <li className={'help'}>
