@@ -314,10 +314,24 @@ const onboardingAccess = async (req, res) => {
     </div>
     <br />
     <div>
+      <u>Details</u>:
+    </div>
+    <p>
+      Access type: <b>${accessType}</b><br />
+      Population Unit: <b>${populationUnit}</b><br />
+      Project Manager: <b>${projectManager}</b><br />
+      Project Name: <b>${projectName}</b><br />
+      Project Role: <b>${projectRole}</b><br />
+      Region: <b>${region}</b><br />
+      Text Message Number: <b>${textMessageNumber}</b><br />
+      Species: <b>${species}</b><br />
+    </p>
+    <br />
+    <div>
       <u>Provided reason is as follows</u>:
     </div>
     <div style="padding=10px; color: #626262;">
-      ${msg}
+      ${reason}
     </div>
     <br />
     <div style="border-width: 1px; border-color: #626262; border-style: solid none none none;">
