@@ -428,14 +428,12 @@ if (isTest) {
     .get('/', pageHandler);
 }
 
-// Static assets 
+// handle static assets 
 app
   .use(express['static'](path.join(__dirname, '../../react/build')));
-// .get('*', notFound);
 
-// All remaining requests go to React
+// pass all remaning requests (i.e. not defined in Express) to React
 if (isProd) {
-  // app.get('*', __dirname + '../../build/index.html'); // <-- Error: Route.get() requires a callback function but got a [object String]
   console.log('express() -- passing page request to React')
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname + '../../../react/build/index.html'));
@@ -445,5 +443,5 @@ if (isProd) {
     .get('*', devServerRedirect);
 }
 
-// Start server
+// start Express server on port 8080
 http.createServer(app).listen(8080);
