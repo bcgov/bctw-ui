@@ -3,18 +3,17 @@ import AdminHandleRequestPermissionPage from 'pages/permissions/AdminHandleReque
 import CodePage from 'pages/data/codes/CodePage';
 import CollarPage from 'pages/data/collars/CollarPage';
 import CritterPage from 'pages/data/animals/CritterPage';
+import GrantCritterAccessPage from 'pages/permissions/GrantCritterAccessPage';
 import Home from 'pages/Home';
 import Import from 'pages/data/bulk/Import';
 // import Logout from 'pages/Logout';
 import MapPage from 'pages/map/MapPage';
-import GrantCritterAccessPage from 'pages/permissions/GrantCritterAccessPage';
-// import TerrainPage from 'pages/terrain/TerrainPage';
 import OwnerRequestPermission from 'pages/permissions/OwnerRequestPermission';
+// import TerrainPage from 'pages/terrain/TerrainPage';
 import UserAdminPage from 'pages/admin/UserAdmin';
 import UserProfile from 'pages/user/UserProfile';
-
 import { FunctionComponent } from 'react';
-import { Redirect, Route, Switch, BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 // import { useHistory } from 'react-router-dom';
 
 export type RouteKey = {
@@ -42,7 +41,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'codes', path: '/codes', title: 'Code Tables', component: CodePage, sort: 103, icon: 'code' },
   // { name: 'logout', path: '/logout', title: 'Logout', component: Logout, sort: 200 },
   { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: AddUser, sort: 201 },
-  { name: 'notFound', path: '/*', title: 'Not Found', component: (): JSX.Element => <div>page not found!</div>, sort: 404 },
+  { name: 'notFound', path: '/*', title: 'React: Not Found', component: (): JSX.Element => <div>React AppRouter.tsx says: Page not found!</div>, sort: 404 },
 ];
 
 const AppRouter = (): JSX.Element => {
