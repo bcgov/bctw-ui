@@ -62,9 +62,7 @@ var session = {
 
 const appendQueryToUrl = (url, query) => {
   if (!query) return url;
-  return url.includes('?') ?
-    url += `&${query}` :
-    url += `?${query}`;
+  return url.includes('?') ? url += `&${query}` : url += `?${query}`;
 };
 
 /**
@@ -409,7 +407,7 @@ if (isTest) {
     .post('/api/import-csv', upload.single('csv'), pageHandler)
     .post('/api/import-xml', upload.array('xml'), pageHandler)
     .post('/api/:endpoint', proxyApi);
-    // Use keycloak authentication only in Production
+  // Use keycloak authentication only in Production
 } else if (isProd) {
   console.log('express() -- isProd?', isProd);
   app
@@ -433,13 +431,14 @@ if (isTest) {
 // Static assets 
 app
   .use(express['static'](path.join(__dirname, '../../react/build')));
-  // .get('*', notFound);
+// .get('*', notFound);
 
 // All remaining requests go to React
 if (isProd) {
   // app.get('*', __dirname + '../../build/index.html'); // <-- Error: Route.get() requires a callback function but got a [object String]
-  app
-    .get('*', pageHandler);
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '../../build/index.html'));
+  });
 } else {
   app
     .get('*', devServerRedirect);
