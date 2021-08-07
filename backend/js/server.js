@@ -234,7 +234,7 @@ const onboardingRedirect = async (req, res, next) => {
   console.log('onboardingRedirect() -- START')
   // Collect all user data from the keycloak object
   const data = req.kauth.grant.access_token.content;
-  console.log('onboardingRedirect() -- data:', data)
+//  console.log('onboardingRedirect() -- data:', data)
   const { user, domain } = splitCredentials(data);
   console.log('onboardingRedirect() -- user:', user)
   const email = data.email;
@@ -246,7 +246,7 @@ const onboardingRedirect = async (req, res, next) => {
   const client = await pgPool.connect();
   const result = await client.query(sql);
   const idirs = result.rows.map((row) => row.idir);
-  console.log('onboardingRedirect() -- Registered IDIRs in BCTW:', idirs)
+//  console.log('onboardingRedirect() -- Registered IDIRs in BCTW:', idirs)
   // Is the current user registered: Boolean
   const registered = (idirs.includes(user)) ? true : false;
   console.log('onboardingRedirect() -- User is registered?', registered);
@@ -272,8 +272,24 @@ const onboardingRedirect = async (req, res, next) => {
 
 const onboardingAccess = async (req, res) => {
   // This data will be inserted into the email
-  // TODO: Get the below info from keycload. No longer passed through the body
-  const { user, domain, email, firstName, lastName, msg } = req.body;
+  // TODO: Get the below info from Keycloak. (i.e. no longer passed through body)
+  const {
+    user,
+    domain,
+    email,
+    firstName,
+    lastName,
+    accessType,
+    populationUnit,
+    projectManager,
+    projectName,
+    projectRole,
+    reason,
+    region,
+    species,
+    textMessageNumber,
+  } = req.body;
+
   const data = req.kauth.grant.access_token.content;
 
   // TODO: This has to be tested in dev unfortunately
@@ -323,8 +339,8 @@ const onboardingAccess = async (req, res) => {
       Project Name: <b>${projectName}</b><br />
       Project Role: <b>${projectRole}</b><br />
       Region: <b>${region}</b><br />
-      Text Message Number: <b>${textMessageNumber}</b><br />
       Species: <b>${species}</b><br />
+      Text Message Number: <b>${textMessageNumber}</b><br />
     </p>
     <br />
     <div>
