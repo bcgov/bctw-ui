@@ -96,18 +96,18 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                 </div>
               </li>
             ) : null}
-            <li>
-              <div className={'username'}>
-                <IconButton component={Link} to='/profile'>
-                  <Icon
-                    path={user ? mdiAccountCircle : useUser.error ? mdiAccountRemove : mdiProgressClock}
-                    className={'icon'}
-                    title='User Profile'
-                    size={1}
-                  />
+            <li className={'username'}>
+              <a href='/profile'>
+                <IconButton>
+                    <Icon
+                      path={user ? mdiAccountCircle : useUser.error ? mdiAccountRemove : mdiProgressClock}
+                      className={'icon'}
+                      title='User Profile'
+                      size={1}
+                    />
                 </IconButton>
-                <span><a href='/profile'><span color={'inherit'}>{user?.firstname ?? 'Guest'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span></a></span>
-              </div>
+              </a>
+              <a href='/profile'><span color={'inherit'}>{user?.firstname ?? 'Guest'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span></a>
             </li>
             <li className={'help'}>
               <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/' target='_blank'>
@@ -120,7 +120,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                   />
                 </IconButton>
               </a>
-              <span><a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/' target='_blank'><span color={'inherit'}>Help</span></a></span>
+              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/' target='_blank'><span color={'inherit'}>Help</span></a>
             </li>
             <li className={'logout'}>
               <span><a href='/logout'><span color={'inherit'}>Logout</span></a></span>
