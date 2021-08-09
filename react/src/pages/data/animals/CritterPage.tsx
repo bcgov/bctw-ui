@@ -8,7 +8,7 @@ import EditCritter from 'pages/data/animals/EditCritter';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { Animal, assignedCritterProps, unassignedCritterProps } from 'types/animal';
+import { Animal, assignedAnimalProps, unassignedAnimalProps } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import download from 'downloadjs';
 
@@ -67,7 +67,7 @@ export default function CritterPage(): JSX.Element {
           <>
             <Box mb={4}>
               <DataTable
-                headers={assignedCritterProps}
+                headers={assignedAnimalProps}
                 title={CS.assignedTableTitle}
                 queryProps={{ query: bctwApi.useAssignedCritters}}
                 onSelect={handleSelect}
@@ -75,7 +75,7 @@ export default function CritterPage(): JSX.Element {
             </Box>
             <Box mb={4}>
               <DataTable
-                headers={unassignedCritterProps}
+                headers={unassignedAnimalProps}
                 title={CS.unassignedTableTitle}
                 queryProps={{ query: bctwApi.useUnassignedCritters}}
                 onSelect={handleSelect}

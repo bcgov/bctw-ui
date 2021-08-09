@@ -5,8 +5,8 @@ import { eCritterPermission } from 'types/permission';
 import { formatLatLong } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from 'types/form_types';
 
-const assignedCritterProps = ['animal_id', 'wlh_id', 'animal_status', 'device_id'];
-const unassignedCritterProps = ['animal_id', 'wlh_id', 'animal_status'];
+const assignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'animal_id', 'wlh_id', 'animal_status', 'device_id', 'frequency'];
+const unassignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'animal_id', 'wlh_id', 'animal_status'];
 
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
@@ -46,11 +46,10 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
   capture_utm_northing: number;
   capture_utm_zone: number;
   animal_colouration: string;
-  ear_tag_id: string; // TODO: to be removed
   ear_tag_left_colour: string;
-// TODO: ear_tag_left_id: string;
+  ear_tag_left_id: string;
   ear_tag_right_colour: string;
-// TODO: ear_tag_right_id: string;
+  ear_tag_right_id: string;
   estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
@@ -100,9 +99,9 @@ export class Animal implements IAnimal {
   animal_colouration: string;
   ear_tag_id: string; // TODO: to be removed
   ear_tag_left_colour: string;
-  // TODO: ear_tag_left_id: string;
+  ear_tag_left_id: string;
   ear_tag_right_colour: string;
-  // TODO: ear_tag_right_id: string;
+  ear_tag_right_id: string;
   @Transform((value) => value || -1, transformOpt) estimated_age: number;
   juvenile_at_heel: string;
   life_stage: string;
@@ -212,48 +211,47 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'capture_utm_zone', type: eInputType.number },
     { prop: 'capture_utm_easting', type: eInputType.number },
     { prop: 'capture_utm_northing', type: eInputType.number },
-    { prop: 'region', type: eInputType.code},
+    { prop: 'region', type: eInputType.code },
     { prop: 'recapture', type: eInputType.check },
-    { prop: 'capture_comment', type: eInputType.text}
+    { prop: 'capture_comment', type: eInputType.text }
   ],
   characteristicsFields: [
     { prop: 'animal_status', type: eInputType.code, required: true },
     { prop: 'species', type: eInputType.code, required: true },
     { prop: 'sex', type: eInputType.code },
-    { prop: 'animal_colouration', type: eInputType.code, codeName: 'colour'},
+    { prop: 'animal_colouration', type: eInputType.code, codeName: 'colour' },
     { prop: 'estimated_age', type: eInputType.number },
     { prop: 'life_stage', type: eInputType.code },
     { prop: 'juvenile_at_heel', type: eInputType.code }
   ],
   // to show in the animal metadata history window
   historyProps: [
-    { prop: 'animal_id', type: eInputType.unknown},
-    { prop: 'wlh_id' , type: eInputType.unknown},
-    { prop: 'animal_status' , type: eInputType.unknown},
-    { prop: 'juvenile_at_heel' , type: eInputType.unknown},
-    { prop: 'region' , type: eInputType.unknown},
-    { prop: 'population_unit' , type: eInputType.unknown},
-    { prop: 'valid_from' , type: eInputType.unknown},
-    { prop: 'valid_to' , type: eInputType.unknown}
+    { prop: 'animal_id', type: eInputType.unknown },
+    { prop: 'wlh_id', type: eInputType.unknown },
+    { prop: 'animal_status', type: eInputType.unknown },
+    { prop: 'juvenile_at_heel', type: eInputType.unknown },
+    { prop: 'region', type: eInputType.unknown },
+    { prop: 'population_unit', type: eInputType.unknown },
+    { prop: 'valid_from', type: eInputType.unknown },
+    { prop: 'valid_to', type: eInputType.unknown }
   ],
   identifierFields: [
-    { prop: 'wlh_id', type: eInputType.text},
-    { prop: 'animal_id', type: eInputType.text},
+    { prop: 'wlh_id', type: eInputType.text },
+    { prop: 'animal_id', type: eInputType.text },
     { prop: 'population_unit', type: eInputType.code },
     { prop: 'collective_unit', type: eInputType.text },
     { prop: 'ear_tag_left_colour', type: eInputType.code, codeName: 'colour' },
-    { prop: 'ear_tag_right_colour', type: eInputType.code, codeName: 'colour'  },
-    { prop: 'ear_tag_id', type: eInputType.text },  // TODO: to be removed
-    // TODO { prop: 'ear_tag_left_id', type: eInputType.text },
-    // TODO { prop: 'ear_tag_right_id', type: eInputType.text },
+    { prop: 'ear_tag_right_colour', type: eInputType.code, codeName: 'colour' },
+    { prop: 'ear_tag_left_id', type: eInputType.text },
+    { prop: 'ear_tag_right_id', type: eInputType.text },
   ],
   mortalityFields: [
     { prop: 'mortality_date', type: eInputType.date },
-    { prop: 'mortality_latitude', type: eInputType.date  }, 
-    { prop: 'mortality_longitude', type: eInputType.date  },
-    { prop: 'mortality_utm_zone', type: eInputType.date  },
-    { prop: 'mortality_utm_easting', type: eInputType.date  },
-    { prop: 'mortality_utm_northing', type: eInputType.date  },
+    { prop: 'mortality_latitude', type: eInputType.date },
+    { prop: 'mortality_longitude', type: eInputType.date },
+    { prop: 'mortality_utm_zone', type: eInputType.date },
+    { prop: 'mortality_utm_easting', type: eInputType.date },
+    { prop: 'mortality_utm_northing', type: eInputType.date },
     { prop: 'proximate_cause_of_death', type: eInputType.code },
     { prop: 'ultimate_cause_of_death', type: eInputType.code, codeName: 'proximate_cause_of_death' },
     { prop: 'predator_species', type: eInputType.text /* isCode: true */ }, // todo:
@@ -261,7 +259,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   ],
   releaseFields: [
     { prop: 'release_date', type: eInputType.date },
-    { prop: 'release_latitude', type: eInputType.number }, 
+    { prop: 'release_latitude', type: eInputType.number },
     { prop: 'release_longitude', type: eInputType.number },
     { prop: 'release_utm_zone', type: eInputType.number },
     { prop: 'release_utm_easting', type: eInputType.number },
@@ -269,9 +267,9 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'translocation', type: eInputType.check },
     { prop: 'release_comment', type: eInputType.text },
   ],
-  userCommentField : [
+  userCommentField: [
     { prop: 'user_comment', type: eInputType.text }
   ]
 };
 
-export { unassignedCritterProps, assignedCritterProps, critterFormFields, transformOpt };
+export { unassignedAnimalProps, assignedAnimalProps, critterFormFields, transformOpt };

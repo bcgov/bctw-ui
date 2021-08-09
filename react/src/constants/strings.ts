@@ -1,13 +1,13 @@
 const CritterStrings = {
-  exportTitle: 'Bulk Export Animal Data',
-  exportText: '',
-  requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
-  collarAssignmentTitle: 'Assign a device',
-  assignCollarBtnText: 'assign selected device',
-  assignedTableTitle: 'Animals Attached To A Device',
-  unassignedTableTitle: 'Animals Without A Device',
-  collarRemovalTitle: 'Confirm device unassignment',
+  assignCollarBtnText: 'Assign Selected Device',
+  assignedTableTitle: 'Animals Attached to a Device',
+  collarAssignmentTitle: 'Assign a Device',
   collarRemovalText: 'Are you sure you wish to unassign this device?',
+  collarRemovalTitle: 'Confirm Device Unassignment',
+  exportText: '',
+  exportTitle: 'Bulk Export Animal Data',
+  requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
+  unassignedTableTitle: 'Animals Without a Device',
 }
 
 const ImportSteps = [ 
