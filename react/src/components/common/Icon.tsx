@@ -11,6 +11,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import ErrorIcon from '@material-ui/icons/Error';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import HomeIcon from '@material-ui/icons/Home';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import PersonIcon from '@material-ui/icons/Person';
 import Pets from '@material-ui/icons/Pets'
 import Remove from '@material-ui/icons/Remove';
@@ -19,6 +20,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import ShareIcon from '@material-ui/icons/Share';
 import SnoozeIcon from '@material-ui/icons/Snooze';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import WarningIcon from '@material-ui/icons/Warning';
 import { cloneElement } from 'react';
 
@@ -38,12 +40,14 @@ const mappings: Record<string, JSX.Element> = {
   error: <ErrorIcon htmlColor='orange' />,
   home: <HomeIcon />,
   person: <AccessibilityIcon />,
+  personAdd: <PersonAddIcon />,
   plus: <Add />,
   profile: <PersonIcon />,
   remove: <Remove />,
   reset: <ReplayIcon />,
   share: <ShareIcon />,
   snooze: <SnoozeIcon />,
+  vpnKey: <VpnKeyIcon />,
   warning: <WarningIcon htmlColor='orange' />,
 };
 

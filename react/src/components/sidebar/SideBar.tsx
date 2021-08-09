@@ -37,12 +37,14 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
-      curRoutes.push(routes.find((r) => r.name === 'user-admin'));
-      curRoutes.push(routes.find((r) => r.name === 'animal-access'));
-      curRoutes.push(routes.find((r) => r.name === 'handle-permission-request'));
+      curRoutes.push(routes.find((r) => r.name === 'animal-manager'));
+      curRoutes.push(routes.find((r) => r.name === 'codes'));
+      curRoutes.push(routes.find((r) => r.name === 'delegation-requests'));
+      // curRoutes.push(routes.find((r) => r.name === 'onboarding-requests'));
+      curRoutes.push(routes.find((r) => r.name === 'users'));
     }
-    if (isOwner /* && !isAdmin */) {
-      curRoutes.push(routes.find((r) => r.name === 'owner-access'));
+    if (isOwner) {
+      curRoutes.push(routes.find((r) => r.name === 'delegation'));
     }
     setVisibleRoutes(curRoutes);
   };
@@ -50,17 +52,16 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
   useEffect(() => {
     switch (location.pathname) {
       case '/animals':
-      case '/devices':
-      case '/import':
-      case '/owner-access':
-      case '/profile':
-      case '/handle-permission-request':
-      case '/animal-access':
-      case '/user-admin':
+      case '/animal-manager':
       case '/codes':
-        handleSetVisible(['animals', 'devices', 'import', 'animal_access', 'profile', 'codes']);
-        return;
+      case '/devices':
+      case '/delegation':
+      case '/delegation-requests':
+      case '/import':
+      case '/onboarding-requests':
+      case '/profile':
     }
+    handleSetVisible(['animals', 'devices', 'import', 'profile']);
   }, [location, isAdmin, isOwner]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
