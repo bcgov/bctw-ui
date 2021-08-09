@@ -7,7 +7,7 @@ import { LocationEvent } from './location_event'
 
 interface IMortalityEvent extends 
   Pick<Animal, 'critter_id' | 'animal_status' | 'proximate_cause_of_death' | 'predator_species' >,
-  Pick<Collar, 'collar_id' | 'device_id' | 'retrieved' | 'retrieval_date' | 'vendor_activation_status' | 'device_deployment_status' | 'device_status'> {
+  Pick<Collar, 'collar_id' | 'device_id' | 'retrieved' | 'retrieval_date' | 'activation_status' | 'device_deployment_status' | 'device_status'> {
   shouldUnattachDevice: boolean;
 }
 
@@ -21,7 +21,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
   retrieved: boolean;
   shouldUnattachDevice: boolean;
   retrieval_date: Date;
-  vendor_activation_status: boolean;
+  activation_status: boolean;
   device_deployment_status: string;
   device_status: string;
   location_event: LocationEvent;
@@ -33,7 +33,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     this.device_id = deviceId;
     this.retrieval_date = new Date();
     this.retrieved = false;
-    this.vendor_activation_status = true;
+    this.activation_status = true;
     // workflow defaulted fields
     this.shouldUnattachDevice = false;
     this.device_status = 'Mortality';
@@ -46,7 +46,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     switch(s) {
       case 'retrieved':
         return 'Has Device Been Retrieved?'
-      case 'vendor_activation_status':
+      case 'activation_status':
         return 'Is Device Still Active With Vendor?';
       case 'pcod_predator_species':
         return 'PCOD Predator Species';
@@ -66,7 +66,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
       {prop: 'proximate_cause_of_death', type: eInputType.code },
       {prop: 'retrieved', type: eInputType.check },
       {prop: 'retrieval_date', type: eInputType.date },
-      {prop: 'vendor_activation_status', type: eInputType.check },
+      {prop: 'activation_status', type: eInputType.check },
       {prop: 'device_deployment_status', type: eInputType.code },
       {prop: 'device_status', type: eInputType.code },
       {prop: 'pcod_confidence_value', type: eInputType.text },
@@ -97,7 +97,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     c.device_id = this.device_id;
     c.retrieval_date = this.retrieval_date;
     c.retrieved = this.retrieved;
-    c.vendor_activation_status = this.vendor_activation_status;
+    c.activation_status = this.activation_status;
     c.device_status = this.device_status;
     c.device_deployment_status = this.device_deployment_status;
     delete c.malfunction_date;

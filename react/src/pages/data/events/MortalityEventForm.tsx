@@ -41,7 +41,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
   const retrievedDateField = mortalityEvent.formFields.find((f) => f.prop === 'retrieval_date');
   const animalStatusField = mortalityEvent.formFields.find((f) => f.prop === 'animal_status');
   const pcodField = mortalityEvent.formFields.find((f) => f.prop === 'proximate_cause_of_death');
-  const vasField = mortalityEvent.formFields.find((f) => f.prop === 'vendor_activation_status');
+  const vasField = mortalityEvent.formFields.find((f) => f.prop === 'activation_status');
   // const pcodConfidenceValueField = formFields.find(f => f.key === 'pcod_confidence_value');
   // const deviceStatusFields = formFields.filter(f => ['device_status', 'device_deployment_status'].includes(f.key))
 

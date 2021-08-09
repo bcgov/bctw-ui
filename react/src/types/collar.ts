@@ -28,6 +28,8 @@ export interface ICollarTelemetryBase extends ICollarBase {
 }
 
 export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
+  activation_comment: string;
+  activation_status: boolean;
   collar_transaction_id: string;
   camera_device_id: number;
   device_deployment_status: string;
@@ -38,18 +40,16 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   dropoff_device_id: number;
   dropoff_frequency: number;
   dropoff_frequency_unit: string;
+  first_activation_month: number;
+  first_activation_year: number;
   fix_rate: number;
   fix_success_rate: number;
   frequency_unit: string;
   malfunction_date: Date;
-  purchase_comment: string;
-  purchase_month: number;
-  purchase_year: number;
   retrieval_date: Date;
   retrieved: boolean;
   satellite_network: string;
   user_comment: string;
-  vendor_activation_status: boolean;
   // collars attached to a critter should includes this prop
   animal_id?: string;
   // fetched collars should contain this
@@ -70,6 +70,9 @@ const collarPropsToDisplay = [
 // const attachedCollarProps = ['(WLH_ID/Animal ID)', '(WLH_ID)', '(Animal_ID)', ...collarPropsToDisplay];
 const attachedCollarProps = ['WLH_ID', 'Animal_ID', ...collarPropsToDisplay];
 export class Collar implements ICollar {
+  activation_comment: string;
+  @Transform(v => v || false, transformOpt) activation_status: boolean;
+  animal_id?: string;
   collar_id: string;
   @Transform(v => v || 0, transformOpt) camera_device_id: number;
   collar_transaction_id: string;
@@ -83,35 +86,32 @@ export class Collar implements ICollar {
   @Transform(v => v || -1, transformOpt) dropoff_device_id: number;
   @Transform(v => v || -1, transformOpt) dropoff_frequency: number;
   dropoff_frequency_unit: string;
+  @Transform(v => v || -1, transformOpt) first_activation_month: number;
+  @Transform(v => v || -1, transformOpt) first_activation_year: number;
   fix_rate: number;
   fix_success_rate: number;
   @Transform(v => v || -1, transformOpt) frequency: number;
   frequency_unit: string;
   @Type(() => Date) malfunction_date: Date;
-  purchase_comment: string;
-  @Transform(v => v || -1, transformOpt) purchase_month: number;
-  @Transform(v => v || -1, transformOpt) purchase_year: number;
+  permission_type: eCritterPermission;
   @Transform(v => v || getInvalidDate(), transformOpt) retrieval_date: Date;
   @Transform(v => v || false, transformOpt) retrieved: boolean;
   satellite_network: string;
-  @Transform(v => v || false, transformOpt) vendor_activation_status: boolean;
-  animal_id?: string;
   user_comment: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
-  permission_type: eCritterPermission;
-  @Expose() get identifier(): string { return 'collar_id' }
   @Expose() get frequencyPadded(): string {
     const freq = this.frequency.toString();
     const numDecimalPlaces = freq.slice(freq.lastIndexOf('.') + 1).length;
     const numToAdd = 3 - numDecimalPlaces + freq.length;
     return freq.padEnd(numToAdd, '0');
   }
+  @Expose() get identifier(): string { return 'collar_id' }
 
   constructor(collar_type?: eNewCollarType) {
     this.retrieval_date = getInvalidDate()
     this.malfunction_date = getInvalidDate();
-    this.vendor_activation_status = false;
+    this.activation_status = false;
     this.device_id = 0;
     if (collar_type) {
       switch (collar_type) {
@@ -154,7 +154,7 @@ export class Collar implements ICollar {
         return 'Beacon Frequency'
       case 'implant_device_id':
         return 'Implant Module ID'
-      case 'vendor_activation_status':
+      case 'activation_status':
         return 'Is device active with vendor?'
       default:
         return columnToHeader(str);
@@ -169,7 +169,7 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'frequency', type: eInputType.number },
     { prop: 'frequency_unit', type: eInputType.code },
     { prop: 'fix_rate', type: eInputType.number },
-    { prop: 'vendor_activation_status', type: eInputType.check },
+    { prop: 'activation_status', type: eInputType.check },
   ],
   deviceOptionFields: [
     { prop: 'camera_device_id', type: eInputType.number },
@@ -183,10 +183,10 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'device_make', type: eInputType.code },
     { prop: 'device_model', type: eInputType.code }
   ],
-  purchaseFields: [
-    { prop: 'purchase_year', type: eInputType.number },
-    { prop: 'purchase_month', type: eInputType.number },
-    { prop: 'purchase_comment', type: eInputType.number }
+  activationFields: [
+    { prop: 'first_activation_year', type: eInputType.number },
+    { prop: 'first_activation_month', type: eInputType.number },
+    { prop: 'activation_comment', type: eInputType.number }
   ],
   statusFields: [
     { prop: 'device_status', type: eInputType.code },

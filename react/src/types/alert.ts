@@ -14,9 +14,9 @@ enum eAlertType {
 
 // props inherited from BCTW types
 type TelemetryAlertCollar = Pick<Collar, | 'collar_id' | 'device_id' | 'device_status'
-| 'device_deployment_status' | 'retrieval_date' | 'retrieved' | 'vendor_activation_status'>;
+  | 'device_deployment_status' | 'retrieval_date' | 'retrieved' | 'activation_status'>;
 type TelemetryAlertAnimal = Pick<Animal, | 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id'
-| 'mortality_date' | 'mortality_latitude' | 'mortality_longitude' | 'mortality_utm_easting' | 'mortality_utm_northing' | 'mortality_utm_zone' >;
+  | 'mortality_date' | 'mortality_latitude' | 'mortality_longitude' | 'mortality_utm_easting' | 'mortality_utm_northing' | 'mortality_utm_zone'>;
 
 interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar {
   alert_id: number;
@@ -28,6 +28,7 @@ interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar {
 }
 
 export class TelemetryAlert implements ITelemetryAlert, BCTW {
+  activation_status: boolean;
   alert_id: number;
   alert_type: eAlertType;
   @Type(() => Date) valid_from: Date;
@@ -41,7 +42,6 @@ export class TelemetryAlert implements ITelemetryAlert, BCTW {
   device_deployment_status: string;
   @Transform((v) => v || new Date(), transformOpt) retrieval_date: Date;
   @Transform((v) => v || false, transformOpt) retrieved: boolean;
-  vendor_activation_status: boolean;
   critter_id: string;
   animal_id: string;
   wlh_id: string;

@@ -91,7 +91,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     communicationFields,
     deviceOptionFields,
     identifierFields,
-    purchaseFields,
+    activationFields,
     statusFields,
     retrievalFields,
     malfunctionFields,
@@ -371,7 +371,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                   </Grid> */}
                   <Grid container spacing={3}>
                       <Grid item xs={12}>
-                        {purchaseFields.map((d) => makeField(d, onChange))}
+                        {activationFields.map((d) => makeField(d, onChange))}
                       </Grid>
                   </Grid>
                 </Box>
