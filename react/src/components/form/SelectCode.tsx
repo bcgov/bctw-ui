@@ -75,7 +75,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
         return;
       }
       // add an empty option to beginning, use ' ' as sometimes the value is defaulted to ''
-      if (addEmptyOption && data.findIndex((d) => d.id === 0) === -1) {
+      if (addEmptyOption && data.findIndex((d) => d?.id === 0) === -1) {
         data.push({ id: 0, code: '', description: FormStrings.emptySelectValue });
       }
       setCodes(data);
