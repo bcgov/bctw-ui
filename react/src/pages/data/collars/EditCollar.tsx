@@ -95,7 +95,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     statusFields,
     retrievalFields,
     malfunctionFields,
-    userCommentField
+    deviceCommentField
   } = collarFormFields;
 
   const makeField = (
@@ -421,7 +421,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                   </Grid> */}
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
-                      {userCommentField.map((d) => makeField(d, onChange))}
+                      {deviceCommentField.map((d) => makeField(d, onChange))}
                     </Grid>
                   </Grid>
                 </Box>

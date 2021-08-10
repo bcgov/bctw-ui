@@ -49,7 +49,7 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   retrieval_date: Date;
   retrieved: boolean;
   satellite_network: string;
-  user_comment: string;
+  device_comment: string;
   // collars attached to a critter should includes this prop
   animal_id?: string;
   // fetched collars should contain this
@@ -97,7 +97,7 @@ export class Collar implements ICollar {
   @Transform(v => v || getInvalidDate(), transformOpt) retrieval_date: Date;
   @Transform(v => v || false, transformOpt) retrieved: boolean;
   satellite_network: string;
-  user_comment: string;
+  device_comment: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
   @Expose() get frequencyPadded(): string {
@@ -200,8 +200,8 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'device_malfunction_type', type: eInputType.code },
     { prop: 'device_deployment_status', type: eInputType.code },
   ],
-  userCommentField: [
-    { prop: 'user_comment', type: eInputType.text }
+  deviceCommentField: [
+    { prop: 'device_comment', type: eInputType.text }
   ]
 }
 
