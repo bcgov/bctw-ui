@@ -37,7 +37,7 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
     identifierFields,
     mortalityFields,
     releaseFields,
-    userCommentField
+    animalCommentField
   } = critterFormFields;
 
   const makeFormField = (
@@ -148,7 +148,7 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
                 <Box className="fieldset-form">
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
-                      {userCommentField.map((f) => makeFormField(f, onChange))}
+                      {animalCommentField.map((f) => makeFormField(f, onChange))}
                     </Grid>
                   </Grid>
                 </Box>

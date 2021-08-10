@@ -35,8 +35,8 @@ interface IOptionallyAttachedDevice {
   device_id?: number;
 }
 export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOptionallyAttachedDevice {
-  critter_id: string;
-  critter_transaction_id: string;
+  animal_colouration: string;
+  animal_comment: string;
   associated_animal_id: string;
   associated_animal_relationship: string;
   capture_comment: string;
@@ -45,7 +45,8 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
   capture_utm_easting: number;
   capture_utm_northing: number;
   capture_utm_zone: number;
-  animal_colouration: string;
+  critter_id: string;
+  critter_transaction_id: string;
   ear_tag_left_colour: string;
   ear_tag_left_id: string;
   ear_tag_right_colour: string;
@@ -60,9 +61,9 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
+  permission_type?: eCritterPermission; // critters should contain this
   predator_species: string;
   proximate_cause_of_death: string;
-  ultimate_cause_of_death: string;
   recapture: boolean;
   region: string;
   release_comment: string;
@@ -74,9 +75,7 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
   release_utm_zone: number;
   sex: string;
   translocation: boolean;
-  user_comment: string;
-  // fetched critters should contain this
-  permission_type?: eCritterPermission;
+  ultimate_cause_of_death: string;
 }
 
 const transformOpt = { toClassOnly: true };
@@ -130,7 +129,7 @@ export class Animal implements IAnimal {
   species: string;
   @Transform((v) => v || false, transformOpt) translocation: boolean;
   wlh_id: string;
-  user_comment: string;
+  animal_comment: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
   permission_type: eCritterPermission;
@@ -267,8 +266,8 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'translocation', type: eInputType.check },
     { prop: 'release_comment', type: eInputType.text },
   ],
-  userCommentField: [
-    { prop: 'user_comment', type: eInputType.text }
+  animalCommentField: [
+    { prop: 'animal_comment', type: eInputType.text }
   ]
 };
 
