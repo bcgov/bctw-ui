@@ -5,7 +5,7 @@ import { eCritterPermission } from 'types/permission';
 import { formatLatLong } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from 'types/form_types';
 
-const assignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+const assignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
 const unassignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'wlh_id', 'animal_id', 'animal_status'];
 
 // used in critter getters to specify collar attachment status
