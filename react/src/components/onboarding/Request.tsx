@@ -66,18 +66,18 @@ const RequestUser = (): JSX.Element => {
   }
 
   return (
-    <div className='container' style={styleMeVictor}>
-      <h2>Request Access</h2>
-      <div>
-        <p>
-          You will need to provide some additional details before accessing this application. Complete the request details form below to obtain access.
-        </p>
-      </div>
-      <h3>Request Details</h3>
-      <div>
-        <span>Complete the following information:</span>
-      </div>
+    <Box px={4} py={3}>
       <Box className="fieldset-form">
+        <h1>Request Access</h1>
+        <div>
+          <p>
+            You will need to provide some additional details before accessing this application. Complete the request details form below to obtain access.
+          </p>
+        </div>
+        <h3>Request Details</h3>
+        <div>
+          <span>Complete the following information:</span>
+        </div>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <TextField label='Project Name' onChange={(e) => { setProjectName(e.target.value) }} size='small' variant={'outlined'} />
@@ -120,7 +120,7 @@ const RequestUser = (): JSX.Element => {
           </Grid>
         </Grid>
       </Box>
-    </div>
+    </Box>
   )
 }
 
