@@ -94,7 +94,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     activationFields,
     statusFields,
     retrievalFields,
-    malfunctionFields,
+    malfunctionOfflineFields,
     deviceCommentField
   } = collarFormFields;
 
@@ -396,14 +396,14 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                 <Divider></Divider>
               </Box>
               <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Malfunction Details</Box>
+                <Box component="legend" className={'legend'}>Malfunction & Offline Details</Box>
                 <Button size="large" color="default" className='button' onClick={(): void => setShowMalfunctionWorkflow((o) => !o)}>
-                  Record Malfunction Details
+                  Record Malfunction & Offline Details
                 </Button>
                 <Box className="fieldset-form">
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
-                      {malfunctionFields.map((d) => makeField(d, onChange))}
+                      {malfunctionOfflineFields.map((d) => makeField(d, onChange))}
                     </Grid>
                   </Grid>
                 </Box>

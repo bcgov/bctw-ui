@@ -22,19 +22,20 @@ export interface ICollarBase {
   collar_id: string;
 }
 export interface ICollarTelemetryBase extends ICollarBase {
-  frequency: number;
-  device_status;
   device_id: number;
+  device_status;
+  frequency: number;
 }
 
 export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   activation_comment: string;
   activation_status: boolean;
-  collar_transaction_id: string;
+  animal_id?: string; // collars attached to a critter should includes this prop
   camera_device_id: number;
+  collar_transaction_id: string;
+  device_comment: string;
   device_deployment_status: string;
   device_make: string;
-  device_malfunction_type: string;
   device_model: string;
   device_type: string;
   dropoff_device_id: number;
@@ -42,18 +43,19 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   dropoff_frequency_unit: string;
   first_activation_month: number;
   first_activation_year: number;
-  fix_rate: number;
+  fix_interval: number;
+  fix_interval_unit: string;
+  // fix_rate: number;
   fix_success_rate: number;
   frequency_unit: string;
   malfunction_date: Date;
+  malfunction_type: string;
+  offline_date: Date;
+  offline_type: string;
+  permission_type?: eCritterPermission; // fetched collars should contain this
   retrieval_date: Date;
   retrieved: boolean;
   satellite_network: string;
-  device_comment: string;
-  // collars attached to a critter should includes this prop
-  animal_id?: string;
-  // fetched collars should contain this
-  permission_type?: eCritterPermission;
 }
 
 // properties displayed on collar pages
@@ -79,7 +81,6 @@ export class Collar implements ICollar {
   device_id: number;
   device_deployment_status: string;
   device_make: string;
-  device_malfunction_type: string;
   device_model: string;
   device_status: string;
   device_type: string;
@@ -88,11 +89,16 @@ export class Collar implements ICollar {
   dropoff_frequency_unit: string;
   @Transform(v => v || -1, transformOpt) first_activation_month: number;
   @Transform(v => v || -1, transformOpt) first_activation_year: number;
-  fix_rate: number;
+  fix_interval: number;
+  fix_interval_unit: string;
+  // fix_rate: number;
   fix_success_rate: number;
   @Transform(v => v || -1, transformOpt) frequency: number;
   frequency_unit: string;
   @Type(() => Date) malfunction_date: Date;
+  malfunction_type: string;
+  @Type(() => Date) offline_date: Date;
+  offline_type: string;
   permission_type: eCritterPermission;
   @Transform(v => v || getInvalidDate(), transformOpt) retrieval_date: Date;
   @Transform(v => v || false, transformOpt) retrieved: boolean;
@@ -111,6 +117,7 @@ export class Collar implements ICollar {
   constructor(collar_type?: eNewCollarType) {
     this.retrieval_date = getInvalidDate()
     this.malfunction_date = getInvalidDate();
+    this.offline_date = getInvalidDate();
     this.activation_status = false;
     this.device_id = 0;
     if (collar_type) {
@@ -135,11 +142,16 @@ export class Collar implements ICollar {
     if (isInvalidDate(this.malfunction_date)) {
       delete this.malfunction_date
     }
+    if (isInvalidDate(this.offline_date)) {
+      delete this.offline_date
+    }
     return this;
   }
 
   formatPropAsHeader(str: string): string {
     switch (str) {
+      case 'activation_status':
+        return 'Is device active with vendor?'
       case 'camera_device_id':
         return 'Camera Module ID';
       case 'device_deployment_status':
@@ -154,8 +166,6 @@ export class Collar implements ICollar {
         return 'Beacon Frequency'
       case 'implant_device_id':
         return 'Implant Module ID'
-      case 'activation_status':
-        return 'Is device active with vendor?'
       default:
         return columnToHeader(str);
     }
@@ -168,8 +178,9 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'satellite_network', type: eInputType.code },
     { prop: 'frequency', type: eInputType.number },
     { prop: 'frequency_unit', type: eInputType.code },
-    { prop: 'fix_rate', type: eInputType.number },
-    { prop: 'activation_status', type: eInputType.check },
+    { prop: 'fix_interval', type: eInputType.number },
+    { prop: 'fix_interval_unit', type: eInputType.code },
+    // { prop: 'fix_rate', type: eInputType.number },
   ],
   deviceOptionFields: [
     { prop: 'camera_device_id', type: eInputType.number },
@@ -184,6 +195,7 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'device_model', type: eInputType.code }
   ],
   activationFields: [
+    { prop: 'activation_status', type: eInputType.check },
     { prop: 'first_activation_year', type: eInputType.number },
     { prop: 'first_activation_month', type: eInputType.number },
     { prop: 'activation_comment', type: eInputType.number }
@@ -195,10 +207,12 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'retrieval_date', type: eInputType.date },
     { prop: 'retrieved', type: eInputType.check }
   ],
-  malfunctionFields: [
-    { prop: 'malfunction_date', type: eInputType.date },
-    { prop: 'device_malfunction_type', type: eInputType.code },
+  malfunctionOfflineFields: [
     { prop: 'device_deployment_status', type: eInputType.code },
+    { prop: 'malfunction_date', type: eInputType.date },
+    { prop: 'malfunction_type', type: eInputType.code },
+    { prop: 'offline_date', type: eInputType.date },
+    { prop: 'offline_type', type: eInputType.code },
   ],
   deviceCommentField: [
     { prop: 'device_comment', type: eInputType.text }

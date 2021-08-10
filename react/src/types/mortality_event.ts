@@ -101,6 +101,7 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
     c.device_status = this.device_status;
     c.device_deployment_status = this.device_deployment_status;
     delete c.malfunction_date;
+    delete c.offline_date;
     delete c.frequency;
     return omitNull(c);
   }
