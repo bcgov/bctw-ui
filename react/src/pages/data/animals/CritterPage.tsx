@@ -52,7 +52,7 @@ export default function CritterPage(): JSX.Element {
     <ManageLayout>
 
         <Box className="manage-layout-titlebar">
-          <h1>Animals</h1>
+          <h1>My Animals</h1>
           <Box display="flex" alignItems="center">
             {/* <ExportImportViewer {...exportProps} /> */}
             <ModifyCritterWrapper editing={editObj}>
