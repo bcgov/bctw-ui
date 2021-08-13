@@ -110,7 +110,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
               <a href='/profile'><span color={'inherit'}>{user?.firstname ?? 'Guest'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span></a>
             </li>
             <li className={'help'}>
-              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/' target='_blank'>
+              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation' target='_blank'>
                 <IconButton>
                   <Icon
                     path={mdiHelpCircle}
@@ -120,7 +120,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                   />
                 </IconButton>
               </a>
-              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/' target='_blank'><span color={'inherit'}>Help</span></a>
+              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation' target='_blank'><span color={'inherit'}>Help</span></a>
             </li>
             <li className={'logout'}>
               <span><a href='/logout'><span color={'inherit'}>Logout</span></a></span>

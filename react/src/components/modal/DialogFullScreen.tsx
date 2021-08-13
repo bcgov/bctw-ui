@@ -67,7 +67,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
               color="primary"
               disableElevation
               startIcon={<HelpIcon />}
-              onClick={(e): void => {window.open('https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/')}}>
+              onClick={(e): void => {window.open('https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation')}}>
                 Help
             </Button>
           </Toolbar>
