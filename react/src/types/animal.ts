@@ -52,7 +52,8 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOpti
   ear_tag_right_colour: string;
   ear_tag_right_id: string;
   estimated_age: number;
-  juvenile_at_heel: string;
+  juvenile_at_heel: boolean;
+  juvenile_at_heel_count: number;
   life_stage: string;
   mortality_comment: string;
   mortality_date: Date;
@@ -102,7 +103,8 @@ export class Animal implements IAnimal {
   ear_tag_right_colour: string;
   ear_tag_right_id: string;
   @Transform((value) => value || -1, transformOpt) estimated_age: number;
-  juvenile_at_heel: string;
+  juvenile_at_heel: boolean;
+  @Transform((value) => value || -1, transformOpt) juvenile_at_heel_count: number;
   life_stage: string;
   map_colour: string;
   mortality_comment: string;
@@ -177,21 +179,26 @@ export class Animal implements IAnimal {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'critter_id':
-        return 'BCTW ID';
-      case 'wlh_id':
-        return 'WLH ID';
       case 'associated_animal_relationship':
         return 'Associated Relationship';
-      case 'juvenile_at_heel':
-        return 'Juvenile at Heel?';
-      // used in bottom map details
-      case 'mortalityCoords':
       case 'captureCoords':
         return 'Coordinates (Lat/Long)';
-      case 'mortalityUTM':
       case 'captureUTM':
         return 'UTM';
+      case 'collective_unit':
+        return 'Collective Unit Name';
+      case 'critter_id':
+        return 'BCTW ID';
+      case 'juvenile_at_heel':
+        return 'Juvenile at Heel?';
+      case 'mortalityCoords':
+        return 'Coordinates (Lat/Long)';
+      case 'mortalityUTM':
+        return 'UTM';
+      case 'population_unit':
+        return 'Population Unit Name';
+      case 'wlh_id':
+        return 'WLH ID';
       default:
         return columnToHeader(str);
     }
@@ -221,18 +228,59 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'animal_colouration', type: eInputType.code, codeName: 'colour' },
     { prop: 'estimated_age', type: eInputType.number },
     { prop: 'life_stage', type: eInputType.code },
-    { prop: 'juvenile_at_heel', type: eInputType.code }
+    { prop: 'juvenile_at_heel', type: eInputType.code },
+    { prop: 'juvenile_at_heel_count', type: eInputType.number }
   ],
   // to show in the animal metadata history window
   historyProps: [
+    { prop: 'animal_colouration', type: eInputType.unknown },
+    { prop: 'animal_comment', type: eInputType.unknown },
     { prop: 'animal_id', type: eInputType.unknown },
-    { prop: 'wlh_id', type: eInputType.unknown },
     { prop: 'animal_status', type: eInputType.unknown },
+    { prop: 'associated_animal_id', type: eInputType.unknown },
+    { prop: 'associated_animal_relationship', type: eInputType.unknown },
+    { prop: 'capture_comment', type: eInputType.unknown },
+    { prop: 'capture_date', required: true, type: eInputType.unknown },
+    { prop: 'capture_latitude', type: eInputType.unknown },
+    { prop: 'capture_longitude', type: eInputType.unknown },
+    { prop: 'capture_utm_easting', type: eInputType.unknown },
+    { prop: 'capture_utm_northing', type: eInputType.unknown },
+    { prop: 'capture_utm_zone', type: eInputType.unknown },
+    { prop: 'collective_unit', type: eInputType.unknown },
+    { prop: 'ear_tag_left_colour', type: eInputType.unknown },
+    { prop: 'ear_tag_left_id', type: eInputType.unknown },
+    { prop: 'ear_tag_right_colour', type: eInputType.unknown },
+    { prop: 'ear_tag_right_id', type: eInputType.unknown },
+    { prop: 'estimated_age', type: eInputType.unknown },
     { prop: 'juvenile_at_heel', type: eInputType.unknown },
-    { prop: 'region', type: eInputType.unknown },
+    { prop: 'juvenile_at_heel_count', type: eInputType.unknown },
+    { prop: 'life_stage', type: eInputType.unknown },
+    { prop: 'mortality_comment', type: eInputType.unknown },
+    { prop: 'mortality_date', type: eInputType.unknown },
+    { prop: 'mortality_latitude', type: eInputType.unknown },
+    { prop: 'mortality_longitude', type: eInputType.unknown },
+    { prop: 'mortality_utm_easting', type: eInputType.unknown },
+    { prop: 'mortality_utm_northing', type: eInputType.unknown },
+    { prop: 'mortality_utm_zone', type: eInputType.unknown },
     { prop: 'population_unit', type: eInputType.unknown },
+    { prop: 'predator_species', type: eInputType.unknown },
+    { prop: 'proximate_cause_of_death', type: eInputType.unknown },
+    { prop: 'recapture', type: eInputType.unknown },
+    { prop: 'region', type: eInputType.unknown },
+    { prop: 'release_comment', type: eInputType.unknown },
+    { prop: 'release_date', type: eInputType.unknown },
+    { prop: 'release_latitude', type: eInputType.unknown },
+    { prop: 'release_longitude', type: eInputType.unknown },
+    { prop: 'release_utm_easting', type: eInputType.unknown },
+    { prop: 'release_utm_northing', type: eInputType.unknown },
+    { prop: 'release_utm_zone', type: eInputType.unknown },
+    { prop: 'sex', type: eInputType.unknown },
+    { prop: 'species', type: eInputType.unknown },
+    { prop: 'translocation', type: eInputType.unknown },
+    { prop: 'ultimate_cause_of_death', type: eInputType.unknown },
     { prop: 'valid_from', type: eInputType.unknown },
-    { prop: 'valid_to', type: eInputType.unknown }
+    { prop: 'valid_to', type: eInputType.unknown },
+    { prop: 'wlh_id', type: eInputType.unknown }
   ],
   identifierFields: [
     { prop: 'wlh_id', type: eInputType.text },
@@ -242,7 +290,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'ear_tag_left_colour', type: eInputType.code, codeName: 'colour' },
     { prop: 'ear_tag_right_colour', type: eInputType.code, codeName: 'colour' },
     { prop: 'ear_tag_left_id', type: eInputType.text },
-    { prop: 'ear_tag_right_id', type: eInputType.text },
+    { prop: 'ear_tag_right_id', type: eInputType.text }
   ],
   mortalityFields: [
     { prop: 'mortality_date', type: eInputType.date },
@@ -254,7 +302,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'proximate_cause_of_death', type: eInputType.code },
     { prop: 'ultimate_cause_of_death', type: eInputType.code, codeName: 'proximate_cause_of_death' },
     { prop: 'predator_species', type: eInputType.text /* isCode: true */ }, // todo:
-    { prop: 'mortality_comment', type: eInputType.text },
+    { prop: 'mortality_comment', type: eInputType.text }
   ],
   releaseFields: [
     { prop: 'release_date', type: eInputType.date },
@@ -264,7 +312,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'release_utm_easting', type: eInputType.number },
     { prop: 'release_utm_northing', type: eInputType.number },
     { prop: 'translocation', type: eInputType.check },
-    { prop: 'release_comment', type: eInputType.text },
+    { prop: 'release_comment', type: eInputType.text }
   ],
   animalCommentField: [
     { prop: 'animal_comment', type: eInputType.text }
