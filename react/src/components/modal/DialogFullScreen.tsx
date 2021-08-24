@@ -5,7 +5,6 @@ import Container from '@material-ui/core/Container';
 import Dialog from '@material-ui/core/Dialog';
 import Fade from '@material-ui/core/Fade';
 import Toolbar from '@material-ui/core/Toolbar';
-import { Theme } from '@material-ui/core/styles/createTheme';
 import { TransitionProps } from '@material-ui/core/transitions';
 import { ModalProps } from 'components/component_interfaces';
 import './modal.scss';
@@ -14,9 +13,8 @@ import ArrowBack from '@material-ui/icons/ArrowBack';
 import HelpIcon from '@material-ui/icons/Help';
 
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { classicNameResolver } from 'typescript';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   fsDialogHeader: {
     height: '70px',
   },
@@ -57,7 +55,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
               color="primary"
               disableElevation
               startIcon={<ArrowBack />}
-              onClick={(e): void => handleClose(false)}>
+              onClick={(): void => handleClose(false)}>
                 Cancel and Exit
             </Button>
             <Button
@@ -67,7 +65,8 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
               color="primary"
               disableElevation
               startIcon={<HelpIcon />}
-              onClick={(e): void => {window.open('https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation')}}>
+              // fixme: hardcoded url bad, move to .env file
+              onClick={(): void => {window.open('https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation')}}>
                 Help
             </Button>
           </Toolbar>

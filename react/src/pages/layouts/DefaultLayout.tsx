@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import { useState, useEffect, useContext } from 'react';
 import { UserContext } from 'contexts/UserContext';
 import { AlertContext } from 'contexts/UserAlertContext';
@@ -34,9 +33,11 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
     if (useAlert?.alerts?.length) {
       const isCriticalToUpdate = useAlert.alerts.some((a) => !a.isSnoozed && a.snoozesAvailable === 0);
       if (isCriticalToUpdate) {
+        // eslint-disable-next-line no-console
         console.log('at least one alert is critical, force open alert dialog');
         setShowAlerts(true);
       } else {
+        // eslint-disable-next-line no-console
         console.log('no alerts in crital state, hide alert dialog');
         setShowAlerts(false);
       }

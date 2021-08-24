@@ -1,4 +1,3 @@
-import { ICollarLinkPayload } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { INotificationMessage } from 'components/component_interfaces';
 import Button from 'components/form/Button';
@@ -10,7 +9,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ShowCollarAssignModal from 'pages/data/animals/AssignNewCollar';
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { CollarHistory } from 'types/collar_history';
+import { CollarHistory, ICollarLinkPayload } from 'types/collar_history';
 import { canRemoveDeviceFromAnimal } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
 import { getNow } from 'utils/time';
@@ -101,12 +100,10 @@ export default function PerformAssignmentAction({
     const now = getNow();
     const payload: ICollarLinkPayload = {
       isLink: isAssign,
-      data: {
-        collar_id,
-        animal_id: critter_id
-      }
+      data: { collar_id, critter_id }
     };
     if (isAssign) {
+      // todo:
       // if attaching the collar, set the start of the animal/device relationship to now
       payload.data.valid_from = now;
     } else {

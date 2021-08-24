@@ -50,40 +50,38 @@ export default function CritterPage(): JSX.Element {
 
   return (
     <ManageLayout>
-
-        <Box className="manage-layout-titlebar">
-          <h1>My Animals</h1>
-          <Box display="flex" alignItems="center">
-            {/* <ExportImportViewer {...exportProps} /> */}
-            <ModifyCritterWrapper editing={editObj}>
-              <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
-                <EditCritter {...editProps} />
-              </AddEditViewer>
-            </ModifyCritterWrapper>
-          </Box>
+      <Box className='manage-layout-titlebar'>
+        <h1>My Animals</h1>
+        <Box display='flex' alignItems='center'>
+          {/* <ExportImportViewer {...exportProps} /> */}
+          <ModifyCritterWrapper editing={editObj}>
+            <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
+              <EditCritter {...editProps} />
+            </AddEditViewer>
+          </ModifyCritterWrapper>
         </Box>
+      </Box>
 
-        <RowSelectedProvider>
-          <>
-            <Box mb={4}>
-              <DataTable
-                headers={assignedAnimalProps}
-                title={CS.assignedTableTitle}
-                queryProps={{ query: bctwApi.useAssignedCritters}}
-                onSelect={handleSelect}
-              />
-            </Box>
-            <Box mb={4}>
-              <DataTable
-                headers={unassignedAnimalProps}
-                title={CS.unassignedTableTitle}
-                queryProps={{ query: bctwApi.useUnassignedCritters}}
-                onSelect={handleSelect}
-              />
-            </Box>
-          </>
-        </RowSelectedProvider>
-
+      <RowSelectedProvider>
+        <>
+          <Box mb={4}>
+            <DataTable
+              headers={assignedAnimalProps}
+              title={CS.assignedTableTitle}
+              queryProps={{ query: bctwApi.useAssignedCritters }}
+              onSelect={handleSelect}
+            />
+          </Box>
+          <Box mb={4}>
+            <DataTable
+              headers={unassignedAnimalProps}
+              title={CS.unassignedTableTitle}
+              queryProps={{ query: bctwApi.useUnassignedCritters }}
+              onSelect={handleSelect}
+            />
+          </Box>
+        </>
+      </RowSelectedProvider>
     </ManageLayout>
   );
 }

@@ -3,7 +3,6 @@ import { UserContext } from 'contexts/UserContext';
 import { PermissionTableHeaders, User } from 'types/user';
 import { Typography } from '@material-ui/core';
 import DataTable from 'components/table/DataTable';
-import TextField from 'components/form/TextInput';
 import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';

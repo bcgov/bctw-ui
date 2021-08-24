@@ -129,7 +129,14 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     }
   };
 
-  // call the parent changeHandler
+  /**
+   * calls the parent changeHandler function
+   * passing an object in the form of 
+   * {
+   *   [propName]: code,
+   *   error: bool
+   * }
+   */
   const pushChange = (v: string): void => {
     const code = codes.find((c) => c?.description === v)?.code ?? v;
     const ret = { [getIdentifier()]: code, error: hasError };

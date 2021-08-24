@@ -5,8 +5,8 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Select,
-  TableCell} from '@material-ui/core';
+  Select 
+} from '@material-ui/core';
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { UserContext } from 'contexts/UserContext';
 import Modal from 'components/modal/Modal';

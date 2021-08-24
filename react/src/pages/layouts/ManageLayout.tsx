@@ -1,10 +1,9 @@
 import { AppRoutes } from 'AppRouter';
-import { Theme } from '@material-ui/core/styles/createTheme';
-import { makeStyles, ThemeProvider } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import SideBar from 'components/sidebar/SideBar';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   manageLayoutSidebar: {
     flexBasis: '10rem'
   },

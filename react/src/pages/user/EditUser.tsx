@@ -15,7 +15,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
   const { editing } = props;
 
   const onSave = (b: User): void => {
-    // todo implement save
+    // todo: fixme: implement save
     console.log('save user', b);
   }
 

@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
 import Box from '@material-ui/core/Box';
-import Button from 'components/form/Button';
-import { BCTW } from 'types/common_types';
-import { IUpsertPayload } from 'api/api_interfaces';
-import { IEditModalProps } from 'pages/data/common/EditModal';
-import { EditorProps } from 'components/component_interfaces';
-
-import { Icon } from 'components/common';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
+import { IUpsertPayload } from 'api/api_interfaces';
+import { EditorProps } from 'components/component_interfaces';
+import Button from 'components/form/Button';
+import { IEditModalProps } from 'pages/data/common/EditModal';
+import React, { useState } from 'react';
+import { BCTW } from 'types/common_types';
 
 export type IAddEditProps<T> = {
   cannotEdit?: boolean;

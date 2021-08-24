@@ -4,7 +4,6 @@ import { mdiAccountCircle, mdiAccountRemove, mdiBell, mdiHelpCircle, mdiProgress
 import { useContext, useState } from 'react';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { IconButton } from '@material-ui/core';
-import { Link } from 'react-router-dom';
 import { User } from 'types/user';
 import { UserContext } from 'contexts/UserContext';
 import headerImage from 'assets/images/gov3_bc_logo.png';
@@ -99,17 +98,18 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
             <li className={'username'}>
               <a href='/profile'>
                 <IconButton>
-                    <Icon
-                      path={user ? mdiAccountCircle : useUser.error ? mdiAccountRemove : mdiProgressClock}
-                      className={'icon'}
-                      title='User Profile'
-                      size={1}
-                    />
+                  <Icon
+                    path={user ? mdiAccountCircle : useUser.error ? mdiAccountRemove : mdiProgressClock}
+                    className={'icon'}
+                    title='User Profile'
+                    size={1}
+                  />
                 </IconButton>
               </a>
               <a href='/profile'><span color={'inherit'}>{user?.firstname ?? 'Guest'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span></a>
             </li>
             <li className={'help'}>
+              {/* fixme: more hardcoded urls */}
               <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation' target='_blank'>
                 <IconButton>
                   <Icon

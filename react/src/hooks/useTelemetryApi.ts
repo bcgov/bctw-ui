@@ -5,6 +5,7 @@ import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
+import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { IUserUpsertPayload, userApi as user_api } from 'api/user_api';
 import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
@@ -13,12 +14,11 @@ import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryR
 import { Animal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
-import { CollarHistory } from 'types/collar_history';
+import { CollarHistory, ICollarLinkPayload } from 'types/collar_history';
 import { IKeyCloakSessionInfo, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
   IBulkUploadResults,
-  ICollarLinkPayload,
   IDeleteType,
   IUpsertPayload,
 } from 'api/api_interfaces';
@@ -60,6 +60,7 @@ export const useTelemetryApi = () => {
   const userApi = user_api({ api });
   const eventApi = event_api({ api });
   const permissionApi = permission_api({ api});
+  const attachmentApi = attachment_api({ api});
 
   const defaultQueryOptions = { refetchOnWindowFocus: false };
 
@@ -169,9 +170,9 @@ export const useTelemetryApi = () => {
     return useQuery<ICodeHeader[], AxiosError>('codeHeaders', () => codeApi.getCodeHeaders(), codeOptions);
   };
 
-  /**
-   * @param critterId serial integer of the critter to be fetched (not animal_id)
-  */
+  /** 
+   * given @param critter_id, retrieve it's device attachment history 
+   */
   const useCollarAssignmentHistory = (
     page: number,
     critterId: number,
@@ -179,13 +180,13 @@ export const useTelemetryApi = () => {
   ): UseQueryResult<CollarHistory[]> => {
     return useQuery<CollarHistory[], AxiosError>(
       ['collarAssignmentHistory', critterId],
-      () => collarApi.getCollarAssignmentHistory(critterId),
+      () => attachmentApi.getCollarAssignmentHistory(critterId),
       { ...config }
     );
   };
 
   /**
-   * @returns a list of collars represnting the audit history of @param collarId
+   * @returns a list of collars representing the audit history of @param collarId
   */
   const useCollarHistory = (page: number, collarId: string, config?: Record<string, unknown>): UseQueryResult => {
     return useQuery<Collar[], AxiosError>(['collarHistory', collarId], () => collarApi.getCollarHistory(collarId), {
@@ -309,7 +310,7 @@ export const useTelemetryApi = () => {
   const useMutateLinkCollar = (
     config: UseMutationOptions<CollarHistory, AxiosError, ICollarLinkPayload>
   ): UseMutationResult =>
-    useMutation<CollarHistory, AxiosError, ICollarLinkPayload>((link) => critterApi.linkCollar(link), config);
+    useMutation<CollarHistory, AxiosError, ICollarLinkPayload>((link) => attachmentApi.linkCollar(link), config);
 
   /** upload a single .csv file to add or update codes/code headers, critters, or collars */
   const useMutateBulkCsv = <T>(

@@ -16,17 +16,6 @@ interface IUpsertPayload<T> {
   body: T;
 }
 
-// used to construct objects for removing or attaching a collar device to a critter
-interface ICollarLinkPayload {
-  isLink: boolean;
-  data: {
-    animal_id: string;
-    collar_id: string;
-    valid_from?: Date | string;
-    valid_to?: Date | string;
-  };
-}
-
 // what an error looks like when performing a bulk import
 interface IBulkUploadError {
   error: string;
@@ -50,7 +39,6 @@ export type {
   ApiProps,
   IBulkUploadError,
   IBulkUploadResults,
-  ICollarLinkPayload,
   IUpsertPayload,
   IDeleteType
 };

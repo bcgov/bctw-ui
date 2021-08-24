@@ -14,9 +14,9 @@ enum eAlertType {
 
 // props inherited from BCTW types
 type TelemetryAlertCollar = Pick<Collar, | 'collar_id' | 'device_id' | 'device_status'
-  | 'device_deployment_status' | 'retrieval_date' | 'retrieved' | 'activation_status'>;
+| 'device_deployment_status' | 'retrieval_date' | 'retrieved' | 'activation_status'>;
 type TelemetryAlertAnimal = Pick<Animal, | 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id'
-  | 'mortality_date' | 'mortality_latitude' | 'mortality_longitude' | 'mortality_utm_easting' | 'mortality_utm_northing' | 'mortality_utm_zone'>;
+| 'mortality_date' | 'mortality_latitude' | 'mortality_longitude' | 'mortality_utm_easting' | 'mortality_utm_northing' | 'mortality_utm_zone'>;
 
 interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar {
   alert_id: number;

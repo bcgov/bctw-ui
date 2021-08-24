@@ -1,11 +1,15 @@
-import { linkCollarEndpoint, upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
+import { upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { createUrl } from 'api/api_helpers';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import MortalityEvent from 'types/mortality_event';
-import { getNow } from 'utils/time';
 
-import { ApiProps, IBulkUploadResults, ICollarLinkPayload } from './api_interfaces';
+import { ApiProps, IBulkUploadResults } from './api_interfaces';
+
+/**
+ * API for handling workflow event like forms
+ * todo: fixme: complete this
+ */
 
 export const eventApi = (props: ApiProps) => {
   const { api } = props;
@@ -38,7 +42,7 @@ export const eventApi = (props: ApiProps) => {
     // const body: ICollarLinkPayload = {
     //   isLink: false,
     //   data: {
-    //     animal_id: animal.critter_id,
+    //     critter_id: animal.critter_id,
     //     collar_id: device.collar_id,
     //     valid_to: getNow()
     //   }

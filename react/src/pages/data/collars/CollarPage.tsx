@@ -45,44 +45,44 @@ export default function CollarPage(): JSX.Element {
   
   return (
     <ManageLayout>
-
-        <Box className="manage-layout-titlebar">
-          <h1>My Devices</h1>
-          <Box display="flex" alignItems="center">
-            <Box mr={1}>
-              <Button size="large" variant="contained" color="primary" onClick={(): void => setShowImport(o => !o)}>Import</Button>
-            </Box>
-            <ModifyCollarWrapper editing={editObj}>
-              <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
-                <EditCollar {...editProps} />
-              </AddEditViewer>
-            </ModifyCollarWrapper>
+      <Box className='manage-layout-titlebar'>
+        <h1>My Devices</h1>
+        <Box display='flex' alignItems='center'>
+          <Box mr={1}>
+            <Button size='large' variant='contained' color='primary' onClick={(): void => setShowImport((o) => !o)}>
+              Import
+            </Button>
           </Box>
+          <ModifyCollarWrapper editing={editObj}>
+            <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
+              <EditCollar {...editProps} />
+            </AddEditViewer>
+          </ModifyCollarWrapper>
         </Box>
-        
-        <RowSelectedProvider>
-          <>
-            <Box mb={4}>
-              <DataTable
-                headers={attachedCollarProps}
-                title={S.assignedCollarsTableTitle}
-                queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
-                onSelect={handleSelect}
-              />
-            </Box>
-            <Box mb="3">
-              <DataTable
-                headers={collarPropsToDisplay}
-                title={S.availableCollarsTableTitle}
-                queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}
-                onSelect={handleSelect}
-              />
-            </Box>
-          </>
-        </RowSelectedProvider>
+      </Box>
 
-        <CollarImport open={showImport} handleClose={(): void => setShowImport(false)} />
+      <RowSelectedProvider>
+        <>
+          <Box mb={4}>
+            <DataTable
+              headers={attachedCollarProps}
+              title={S.assignedCollarsTableTitle}
+              queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
+              onSelect={handleSelect}
+            />
+          </Box>
+          <Box mb='3'>
+            <DataTable
+              headers={collarPropsToDisplay}
+              title={S.availableCollarsTableTitle}
+              queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}
+              onSelect={handleSelect}
+            />
+          </Box>
+        </>
+      </RowSelectedProvider>
 
+      <CollarImport open={showImport} handleClose={(): void => setShowImport(false)} />
     </ManageLayout>
   );
 }

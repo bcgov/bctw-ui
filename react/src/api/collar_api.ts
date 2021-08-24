@@ -1,7 +1,6 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollar, Collar } from 'types/collar';
-import { ICollarHistory, CollarHistory } from 'types/collar_history';
 import { upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps, IBulkUploadResults, IUpsertPayload } from './api_interfaces';
 
@@ -20,14 +19,6 @@ export const collarApi = (props: ApiProps) => {
     // console.log('get assigned collars')
     const { data } = await api.get(createUrl({ api: 'get-assigned-collars', page, testUser}));
     return _handleGetResults(data);
-  };
-
-  const getCollarAssignmentHistory = async (critterId: number, page = 1): Promise<CollarHistory[]> => {
-    const url = createUrl({ api: `get-assignment-history/${critterId}`, page, testUser });
-    // console.log(`requesting collar/critter assignment history`);
-    const { data } = await api.get(url);
-    const results = data.map((json: ICollarHistory) => plainToClass(CollarHistory, json));
-    return results;
   };
 
   // a list of changes made to a collar, vs collar/critter attachment history above
@@ -49,7 +40,6 @@ export const collarApi = (props: ApiProps) => {
     getAvailableCollars,
     getAssignedCollars,
     getCollarHistory,
-    getCollarAssignmentHistory,
     upsertCollar,
   }
 }
