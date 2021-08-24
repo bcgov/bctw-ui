@@ -50,6 +50,14 @@ export class User implements IUser {
   @Expose() get is_admin(): boolean {
     return this.role_type === eUserRole.administrator;
   }
+  /**
+   * gets either the IDIR or BCEID, whichever is present
+   * todo: need a better name? cannot use "identifier" as
+   * it conflicts with the table row identifier property
+   */
+  @Expose() get uid(): string {
+    return this.idir ?? this.bceid;
+  }
 
   formatPropAsHeader(str: string): string {
     switch (str) {

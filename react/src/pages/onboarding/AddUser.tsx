@@ -1,5 +1,4 @@
-import { useState, createContext, useEffect, useContext } from 'react';
-import { UserContext } from 'contexts/UserContext'
+import { useState } from 'react';
 import RequestUser from 'components/onboarding/Request';
 import PendingUser from 'components/onboarding/Pending';
 import DeniedUser from 'components/onboarding/Denied';

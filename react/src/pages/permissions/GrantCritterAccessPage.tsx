@@ -35,7 +35,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
     } else {
       responseDispatch({
         severity: 'success',
-        message: `animal access granted for users: ${user.idir}`
+        message: `animal access granted for users: ${user.uid}`
       });
       queryClient.invalidateQueries('critterAccess');
     }
@@ -72,7 +72,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
         <PickCritterPermissionModal
           open={showModal}
           handleClose={(): void => setShowModal(false)}
-          title={`Modifying ${user?.idir ?? 'user'}'s Animal Access`}
+          title={`Modifying ${user?.uid?? 'user'}'s Animal Access`}
           onSave={handleSave}
           filter={adminPermissionOptions}
           alreadySelected={[]}

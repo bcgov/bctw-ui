@@ -40,7 +40,7 @@ export default function UserProfile(): JSX.Element {
             Your Name: <strong>{user?.firstname ?? 'Local'}</strong>&nbsp;<strong>{user?.lastname ?? 'User'}</strong>
           </p>
           <p>
-            Your Username: <strong>{user?.idir ?? user?.bceid ?? 'Local Username'}</strong>
+            Your Username: <strong>{user?.uid?? 'Local Username'}</strong>
           </p>
           <p>
             Your Email Address: <strong>{user?.email}</strong>
@@ -49,7 +49,7 @@ export default function UserProfile(): JSX.Element {
             Your Role: <strong>{user.role_type}</strong>
           </p>
         </Typography>
-        <div style={{margin: '25px 0'}}>
+        {/* <div style={{margin: '25px 0'}}>
           {user.formFields.map((p) => {
             const { prop } = p;
             return (
@@ -62,7 +62,7 @@ export default function UserProfile(): JSX.Element {
               />
             );
           })}
-        </div>
+        </div> */}
         <DataTable
           headers={PermissionTableHeaders}
           title='Animals you have access to:'

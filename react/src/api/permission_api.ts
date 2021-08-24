@@ -47,7 +47,7 @@ export const permissionApi = (props: ApiProps) => {
       return null;
     }
     const filtersAsString = filter.join(',');
-    const url = createUrl({ api: `get-critter-access/${user.idir}`, query: `filters=${filtersAsString}`, page });
+    const url = createUrl({ api: `get-critter-access/${user.uid}`, query: `filters=${filtersAsString}`, page });
     const { data } = await api.get(url);
     const converted = data.map((json: IUserCritterAccess[]) => plainToClass(UserCritterAccess, json));
     return converted;
