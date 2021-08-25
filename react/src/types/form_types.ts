@@ -4,6 +4,7 @@ export enum eInputType {
   check = 'check',
   unknown = 'unknown',
   date = 'date',
+  time = 'time',
   code = 'code'
 }
 

@@ -23,9 +23,17 @@ export interface BCTWBaseType {
   updated_by_user_id?: number;
   valid_from: Date;
   valid_to: Date; // a null value in this column indicates the 'current' record
+  owned_by_user_id?: boolean; // base types may include this
 }
 
 /**
  * defines the main object types that have metadata in BCTW
  */
 export type BCTWType = 'animal' | 'device'
+
+/**
+ * extend a type, optionally including props
+ */
+export type PartialPick<T, K extends keyof T> = {
+  [P in K]?: T[P];
+};

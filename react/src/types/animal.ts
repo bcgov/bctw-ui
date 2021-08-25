@@ -1,9 +1,10 @@
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTW, BCTWBaseType } from 'types/common_types';
+import { BCTW, BCTWBaseType, PartialPick } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { eCritterPermission } from 'types/permission';
 import { formatLatLong } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from 'types/form_types';
+import { Collar } from './collar';
 
 const assignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
 const unassignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'wlh_id', 'animal_id', 'animal_status'];
@@ -16,70 +17,75 @@ export enum eCritterFetchType {
 }
 
 /**
- * these properties are re-used in Telemetry classes (map.ts)
+ * Animal properties that are re-used in Telemetry classes (map.ts)
  */
 export interface IAnimalTelemetryBase {
-  species: string;
-  wlh_id: string;
-  map_colour: string;
   animal_id: string;
-  animal_status: string;
-  population_unit: string;
+  animal_status: string; // code
   capture_date: Date;
-  collective_unit: string;
+  collective_unit: string; // fixme: what is this
+  map_colour: string; // code
+  species: string; // code
+  population_unit: string; // code
+  wlh_id: string;
 }
 
-// animals attached to devices should have these properties
-interface IOptionallyAttachedDevice {
-  collar_id?: string;
-  device_id?: number;
-}
-export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, IOptionallyAttachedDevice {
+export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, PartialPick<Collar, 'collar_id' | 'device_id'> {
   animal_colouration: string;
   animal_comment: string;
   associated_animal_id: string;
-  associated_animal_relationship: string;
+  associated_animal_relationship: string; // code
+
   capture_comment: string;
+  capture_time: Date; // todo:
   capture_latitude: number;
   capture_longitude: number;
   capture_utm_easting: number;
   capture_utm_northing: number;
   capture_utm_zone: number;
+
   critter_id: string;
   critter_transaction_id: string;
-  ear_tag_left_colour: string;
-  ear_tag_left_id: string;
-  ear_tag_right_colour: string;
+  ear_tag_left_id: string; 
   ear_tag_right_id: string;
+  ear_tag_left_colour: string; // code
+  ear_tag_right_colour: string; // code
   estimated_age: number;
-  juvenile_at_heel: boolean;
+  juvenile_at_heel: string; // code
   juvenile_at_heel_count: number;
   life_stage: string;
+
   mortality_comment: string;
   mortality_date: Date;
+  mortality_time: Date; // todo:
   mortality_latitude: number;
   mortality_longitude: number;
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
+
   permission_type?: eCritterPermission; // critters should contain this
-  predator_species: string;
-  proximate_cause_of_death: string;
-  recapture: boolean;
-  region: string;
+  predator_species: string; // special species code fixme:
+  proximate_cause_of_death: string; // code
+  recapture: boolean; // what is this?
+  region: string; // code
+
   release_comment: string;
   release_date: Date;
+  release_time: Date; // todo:
   release_latitude: number;
   release_longitude: number;
   release_utm_easting: number;
   release_utm_northing: number;
   release_utm_zone: number;
+
   sex: string;
   translocation: boolean;
-  ultimate_cause_of_death: string;
+  ultimate_cause_of_death: string; // code
 }
 
 const transformOpt = { toClassOnly: true };
+
 
 export class Animal implements IAnimal {
   critter_id: string;
@@ -87,9 +93,10 @@ export class Animal implements IAnimal {
   animal_id: string;
   animal_status: string;
   associated_animal_id: string;
-  associated_animal_relationship: string;
+  associated_animal_relationship: string; 
   capture_comment: string;
   @Type(() => Date) capture_date: Date;
+  @Type(() => Date) capture_time: Date;
   @Transform((v) => v || -1, transformOpt) capture_latitude: number;
   @Transform((v) => v || -1, transformOpt) capture_longitude: number;
   @Transform((v) => v || -1, transformOpt) capture_utm_easting: number;
@@ -97,18 +104,18 @@ export class Animal implements IAnimal {
   @Transform((v) => v || -1, transformOpt) capture_utm_zone: number;
   collective_unit: string;
   animal_colouration: string;
-  ear_tag_id: string; // TODO: to be removed
-  ear_tag_left_colour: string;
   ear_tag_left_id: string;
-  ear_tag_right_colour: string;
   ear_tag_right_id: string;
+  ear_tag_left_colour: string;
+  ear_tag_right_colour: string;
   @Transform((value) => value || -1, transformOpt) estimated_age: number;
-  juvenile_at_heel: boolean;
+  juvenile_at_heel: string;
   @Transform((value) => value || -1, transformOpt) juvenile_at_heel_count: number;
   life_stage: string;
   map_colour: string;
   mortality_comment: string;
   @Type(() => Date) mortality_date: Date;
+  @Type(() => Date) mortality_time: Date;
   @Transform((v) => v || -1, transformOpt) mortality_latitude: number;
   @Transform((v) => v || -1, transformOpt) mortality_longitude: number;
   @Transform((v) => v || -1, transformOpt) mortality_utm_easting: number;
@@ -117,18 +124,22 @@ export class Animal implements IAnimal {
   predator_species: string;
   proximate_cause_of_death: string;
   ultimate_cause_of_death: string;
-  @Transform((v) => v || '', transformOpt) population_unit: string;
+  // @Transform((v) => v || '', transformOpt) population_unit: string;
+  population_unit: string;
+  // fixme: dont transform booleans?
   @Transform((v) => v || false, transformOpt) recapture: boolean;
   region: string;
   release_comment: string;
+  @Type(() => Date) release_date: Date;
+  @Type(() => Date) release_time: Date;
   @Transform((v) => v || -1, transformOpt) release_latitude: number;
   @Transform((v) => v || -1, transformOpt) release_longitude: number;
   @Transform((v) => v || -1, transformOpt) release_utm_easting: number;
   @Transform((v) => v || -1, transformOpt) release_utm_northing: number;
   @Transform((v) => v || -1, transformOpt) release_utm_zone: number;
-  @Type(() => Date) release_date: Date;
   sex: string;
   species: string;
+  // fixme: dont transform booleans?
   @Transform((v) => v || false, transformOpt) translocation: boolean;
   wlh_id: string;
   animal_comment: string;
@@ -205,90 +216,40 @@ export class Animal implements IAnimal {
   }
 }
 
+// todo: handle required
 const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   associatedAnimalFields: [
     { prop: 'associated_animal_id', type: eInputType.text },
-    { prop: 'associated_animal_relationship', type: eInputType.text /*, isCode: true */ }
+    { prop: 'associated_animal_relationship', type: eInputType.code }
   ],
   captureFields: [
-    { prop: 'capture_date', required: true, type: eInputType.date },
+    { prop: 'capture_date', type: eInputType.date, required: true, },
     { prop: 'capture_latitude', type: eInputType.number },
     { prop: 'capture_longitude', type: eInputType.number },
     { prop: 'capture_utm_zone', type: eInputType.number },
     { prop: 'capture_utm_easting', type: eInputType.number },
     { prop: 'capture_utm_northing', type: eInputType.number },
-    { prop: 'region', type: eInputType.code },
-    { prop: 'recapture', type: eInputType.check },
+    { prop: 'recapture', type: eInputType.check }, // fixme: make code??
     { prop: 'capture_comment', type: eInputType.text }
   ],
   characteristicsFields: [
     { prop: 'animal_status', type: eInputType.code, required: true },
     { prop: 'species', type: eInputType.code, required: true },
     { prop: 'sex', type: eInputType.code },
-    { prop: 'animal_colouration', type: eInputType.code, codeName: 'colour' },
+    { prop: 'animal_colouration', type: eInputType.text },
     { prop: 'estimated_age', type: eInputType.number },
     { prop: 'life_stage', type: eInputType.code },
     { prop: 'juvenile_at_heel', type: eInputType.code },
     { prop: 'juvenile_at_heel_count', type: eInputType.number }
   ],
-  // to show in the animal metadata history window
-  historyProps: [
-    { prop: 'animal_colouration', type: eInputType.unknown },
-    { prop: 'animal_comment', type: eInputType.unknown },
-    { prop: 'animal_id', type: eInputType.unknown },
-    { prop: 'animal_status', type: eInputType.unknown },
-    { prop: 'associated_animal_id', type: eInputType.unknown },
-    { prop: 'associated_animal_relationship', type: eInputType.unknown },
-    { prop: 'capture_comment', type: eInputType.unknown },
-    { prop: 'capture_date', required: true, type: eInputType.unknown },
-    { prop: 'capture_latitude', type: eInputType.unknown },
-    { prop: 'capture_longitude', type: eInputType.unknown },
-    { prop: 'capture_utm_easting', type: eInputType.unknown },
-    { prop: 'capture_utm_northing', type: eInputType.unknown },
-    { prop: 'capture_utm_zone', type: eInputType.unknown },
-    { prop: 'collective_unit', type: eInputType.unknown },
-    { prop: 'ear_tag_left_colour', type: eInputType.unknown },
-    { prop: 'ear_tag_left_id', type: eInputType.unknown },
-    { prop: 'ear_tag_right_colour', type: eInputType.unknown },
-    { prop: 'ear_tag_right_id', type: eInputType.unknown },
-    { prop: 'estimated_age', type: eInputType.unknown },
-    { prop: 'juvenile_at_heel', type: eInputType.unknown },
-    { prop: 'juvenile_at_heel_count', type: eInputType.unknown },
-    { prop: 'life_stage', type: eInputType.unknown },
-    { prop: 'mortality_comment', type: eInputType.unknown },
-    { prop: 'mortality_date', type: eInputType.unknown },
-    { prop: 'mortality_latitude', type: eInputType.unknown },
-    { prop: 'mortality_longitude', type: eInputType.unknown },
-    { prop: 'mortality_utm_easting', type: eInputType.unknown },
-    { prop: 'mortality_utm_northing', type: eInputType.unknown },
-    { prop: 'mortality_utm_zone', type: eInputType.unknown },
-    { prop: 'population_unit', type: eInputType.unknown },
-    { prop: 'predator_species', type: eInputType.unknown },
-    { prop: 'proximate_cause_of_death', type: eInputType.unknown },
-    { prop: 'recapture', type: eInputType.unknown },
-    { prop: 'region', type: eInputType.unknown },
-    { prop: 'release_comment', type: eInputType.unknown },
-    { prop: 'release_date', type: eInputType.unknown },
-    { prop: 'release_latitude', type: eInputType.unknown },
-    { prop: 'release_longitude', type: eInputType.unknown },
-    { prop: 'release_utm_easting', type: eInputType.unknown },
-    { prop: 'release_utm_northing', type: eInputType.unknown },
-    { prop: 'release_utm_zone', type: eInputType.unknown },
-    { prop: 'sex', type: eInputType.unknown },
-    { prop: 'species', type: eInputType.unknown },
-    { prop: 'translocation', type: eInputType.unknown },
-    { prop: 'ultimate_cause_of_death', type: eInputType.unknown },
-    { prop: 'valid_from', type: eInputType.unknown },
-    { prop: 'valid_to', type: eInputType.unknown },
-    { prop: 'wlh_id', type: eInputType.unknown }
-  ],
   identifierFields: [
     { prop: 'wlh_id', type: eInputType.text },
     { prop: 'animal_id', type: eInputType.text },
+    { prop: 'region', type: eInputType.code },
     { prop: 'population_unit', type: eInputType.code },
-    { prop: 'collective_unit', type: eInputType.text },
-    { prop: 'ear_tag_left_colour', type: eInputType.code, codeName: 'colour' },
-    { prop: 'ear_tag_right_colour', type: eInputType.code, codeName: 'colour' },
+    // { prop: 'collective_unit', type: eInputType.text }, // todo:
+    { prop: 'ear_tag_left_colour', type: eInputType.text },
+    { prop: 'ear_tag_right_colour', type: eInputType.text },
     { prop: 'ear_tag_left_id', type: eInputType.text },
     { prop: 'ear_tag_right_id', type: eInputType.text }
   ],
@@ -300,8 +261,8 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'mortality_utm_easting', type: eInputType.date },
     { prop: 'mortality_utm_northing', type: eInputType.date },
     { prop: 'proximate_cause_of_death', type: eInputType.code },
-    { prop: 'ultimate_cause_of_death', type: eInputType.code, codeName: 'proximate_cause_of_death' },
-    { prop: 'predator_species', type: eInputType.text /* isCode: true */ }, // todo:
+    { prop: 'ultimate_cause_of_death', type: eInputType.code },
+    { prop: 'predator_species', type: eInputType.code },
     { prop: 'mortality_comment', type: eInputType.text }
   ],
   releaseFields: [

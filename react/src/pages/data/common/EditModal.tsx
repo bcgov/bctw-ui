@@ -118,13 +118,13 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
         setHistoryParams({
           query: bctwApi.useCritterHistory,
           param: editing.critter_id,
-          propsToDisplay: critterFormFields.historyProps.map((p) => p.prop)
+          propsToDisplay: Object.keys(editing) // critterFormFields.historyProps.map((p) => p.prop)
         });
       } else if (editing instanceof Collar) {
         setHistoryParams({
           query: bctwApi.useCollarHistory,
           param: editing.collar_id,
-          propsToDisplay: [...CollarStrings.editableProps, ...['valid_from', 'valid_to']]
+          propsToDisplay: Object.keys(editing) // [...CollarStrings.editableProps, ...['valid_from', 'valid_to']]
         });
       }
     };
