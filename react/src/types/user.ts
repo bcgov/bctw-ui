@@ -24,6 +24,11 @@ export interface IKeyCloakSessionInfo {
 }
 
 /**
+ * the 'access' column in the bctw."user" table
+ */
+export type OnboardingAccess = 'pending' | 'granted' | 'denied';
+
+/**
  * representation of the bctw.user table
  */
 export interface IUser extends BCTW, BCTWBaseType, Pick<IKeyCloakSessionInfo, 'email'> {
@@ -34,6 +39,7 @@ export interface IUser extends BCTW, BCTWBaseType, Pick<IKeyCloakSessionInfo, 'e
   lastname: string;
   // indicates if the user is considered the owner of at least one animal
   is_owner?: boolean; 
+  access: OnboardingAccess;
 }
 
 export class User implements IUser {
@@ -45,6 +51,7 @@ export class User implements IUser {
   firstname: string;
   lastname: string;
   email: string;
+  access: OnboardingAccess;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   @Expose() get is_admin(): boolean {
