@@ -7,7 +7,6 @@ import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
-import { formatLabel } from 'utils/common_helpers';
 
 type LocationEventProps = {
   event: LocationEvent;
@@ -35,7 +34,7 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
     <>
       <DateInput
         propName={dateField.prop}
-        label={formatLabel(event, dateField.prop)}
+        label={event.formatPropAsHeader(dateField.prop)}
         defaultValue={event[dateField.prop] as Date}
         {...baseInputProps}
       />
@@ -62,7 +61,7 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
       <div style={{ marginTop: '20px', height: '120px' }}>
         {useUTM === 'utm' ? (
           utmFields.map((f) => {
-            const numberProps = { ...baseInputProps, label: formatLabel(event, f.prop), propName: f.prop};
+            const numberProps = { ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop};
             if (f.prop === 'utm_easting') {
               numberProps['validate'] = (v: number): string => mustBeXDigits(v, 6);
             } else if (f.prop === 'utm_northing') {
@@ -80,11 +79,11 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
           })
         ) : (
           <>
-            <NumberInput propName={latField.prop } {...baseInputProps} label={formatLabel(event, latField.prop )} />
+            <NumberInput propName={latField.prop } {...baseInputProps} label={event.formatPropAsHeader(latField.prop )} />
             <NumberInput
               propName={longField.prop }
               {...baseInputProps}
-              label={formatLabel(event, longField.prop )}
+              label={event.formatPropAsHeader(longField.prop )}
               validate={mustBeNegativeNumber}
             />
           </>
@@ -98,7 +97,7 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
           key={commentField.prop }
           propName={commentField.prop }
           defaultValue={event[commentField.prop] as string}
-          label={formatLabel(event, commentField.prop)}
+          label={event.formatPropAsHeader(commentField.prop)}
           changeHandler={handleChange}
         />
       </div>

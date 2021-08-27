@@ -1,20 +1,3 @@
-// BCTW metadata classes (ex. Animal, Collar) inherit this interface
-export type BCTW = {
-  // formats a class property as a table header cell or label
-  formatPropAsHeader?: (str: string) => string;
-  /**
-   * some classes will use this before posting to API
-   * ex. to remove unwanted properties that should not be preserved 
-   */
-  toJSON?: () => unknown;
-  /**
-   * used in tables to identify unique rows
-   * seen in classes that use class-transformer to convert JSON
-   * from the API into an instance of class T
-   */
-  identifier?: string; 
-}
-
 // most BCTW database tables contain these columns for transactional history
 export interface BCTWBaseType {
   created_at?: Date;
@@ -24,6 +7,27 @@ export interface BCTWBaseType {
   valid_from: Date;
   valid_to: Date; // a null value in this column indicates the 'current' record
   owned_by_user_id?: boolean; // base types may include this
+}
+
+/**
+ * almost any BCTW class that is displayed on in a data table or sent to the API is derived 
+ * from this base class
+ */
+export abstract class BCTWBase {
+  error: boolean;
+  // formats a class property as a table header cell or label
+  abstract formatPropAsHeader(k: keyof BCTWBase): string;
+  /**
+   * optionally called before posting to API
+   * ex. to remove unwanted properties that should not be preserved 
+   */
+  abstract toJSON(): BCTWBase;
+  /**
+   * used in tables to identify unique rows
+   * seen in classes that use class-transformer to convert JSON
+   * from the API into an instance of class T
+   */
+  abstract get identifier(): string;
 }
 
 /**

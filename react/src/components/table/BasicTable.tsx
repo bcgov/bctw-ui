@@ -4,15 +4,16 @@ import { formatTableCell, getComparator, stableSort } from 'components/table/tab
 import { IPlainTableProps, Order } from 'components/table/table_interfaces';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
+import { BCTWBase } from 'types/common_types';
 
 /**
  * A table that expects the data to be provided.
  */
-export type BasicTableProps<T> = IPlainTableProps<T> & {
+export type BasicTableProps<T extends BCTWBase> = IPlainTableProps<T> & {
   data: T[];
   rowIdentifier: keyof T;
 };
-export default function BasicTable<T>({
+export default function BasicTable<T extends BCTWBase>({
   headers,
   data,
   onSelect,

@@ -2,7 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToTimeStr } from 'utils/time';
 import { Animal } from './animal';
-import { BCTW, BCTWBaseType } from './common_types';
+import { BCTWBase, BCTWBaseType } from './common_types';
 import { IUserCritterAccessInput } from './user';
 
 // interface used to construct objects for updating/granting users access to animals
@@ -71,7 +71,7 @@ export interface IPermissionRequest extends
 }
 
 export type PermissionRequestStatus = 'approved' | 'denied' | 'pending' | 'unknown';
-export class PermissionRequest implements BCTW, IPermissionRequest {
+export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
   animal_id: string;
   wlh_id: string;
   species: string;
@@ -101,12 +101,11 @@ export class PermissionRequest implements BCTW, IPermissionRequest {
         return 'unknown';
     }
   }
-  @Expose() get identifier(): string {
-    return 'request_id';
-  }
-  formatPropAsHeader(str: string): string {
+  @Expose() get identifier(): string { return 'request_id' }
+  formatPropAsHeader(str: keyof PermissionRequest): string {
     return columnToHeader(str);
   }
+  toJSON(): PermissionRequest { return this }
 }
 
 // note: new way to create 'typeable' list of fields

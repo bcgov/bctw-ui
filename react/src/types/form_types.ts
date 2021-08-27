@@ -20,3 +20,6 @@ export type FormFieldObject<T> = {
   required?: boolean;
   span?: boolean;
 };
+
+// spread in form field constructors to make a field required
+export const isRequired = { required: true};

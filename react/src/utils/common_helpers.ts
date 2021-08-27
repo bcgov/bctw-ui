@@ -1,5 +1,3 @@
-import { BCTW } from 'types/common_types';
-
 // returns the number of digits after the decimal in a float
 const countDecimals = (value: number): number => {
   if (Math.floor(value) === value) return 0;
@@ -13,9 +11,6 @@ const formatLatLong = (lat: number, long: number): string => {
 
 // formats UTM nicely
 const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
-
-// given a property of an object that extends the BCTW type, return a label string
-const formatLabel = <T extends BCTW>(o: T, key: string): string => o.formatPropAsHeader(key);
 
 /**
  * given an array of type T, returns unique values of @param prop 
@@ -35,6 +30,7 @@ const getUniqueValuesOfT = <T,>(arr: T[], prop: keyof T): string[] => {
  * values can only be primitive types
  * @param o1 the new object  
  * @param o2 the original object
+ * todo: deprecated?
  */
 const objectCompare = (o1: Record<string, unknown>, o2: Record<string, unknown>): boolean => {
   for (const key of Object.keys(o1)) {
@@ -100,7 +96,6 @@ export {
   countDecimals,
   formatLatLong,
   formatUTM,
-  formatLabel,
   getUniqueValuesOfT,
   objectCompare,
   columnToHeader,

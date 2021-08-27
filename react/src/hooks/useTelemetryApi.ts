@@ -23,7 +23,7 @@ import {
   IUpsertPayload,
 } from 'api/api_interfaces';
 import { TelemetryAlert } from 'types/alert';
-import { BCTW, BCTWType } from 'types/common_types';
+import { BCTWBase, BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
@@ -244,7 +244,7 @@ export const useTelemetryApi = () => {
   /** default type getter for animals or collars
    * @returns
    */
-  const useType = <T extends BCTW>(type: BCTWType, id: string): UseQueryResult<T> => {
+  const useType = <T extends BCTWBase>(type: BCTWType, id: string): UseQueryResult<T> => {
     return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions
     });

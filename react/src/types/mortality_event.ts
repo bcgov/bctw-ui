@@ -1,7 +1,7 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { Animal } from './animal'
 import { Collar } from './collar'
-import { BCTW } from './common_types';
+import { BCTWBase } from './common_types';
 import { eInputType, FormFieldObject } from './form_types';
 import { LocationEvent } from './location_event'
 
@@ -11,7 +11,7 @@ interface IMortalityEvent extends
   shouldUnattachDevice: boolean;
 }
 
-export default class MortalityEvent implements IMortalityEvent, BCTW {
+export default class MortalityEvent extends BCTWBase implements IMortalityEvent {
   critter_id: string;
   animal_status: string;
   proximate_cause_of_death: string;
@@ -27,7 +27,10 @@ export default class MortalityEvent implements IMortalityEvent, BCTW {
   location_event: LocationEvent;
   pcod_confidence_value: string; // todo:
 
+  get identifier(): keyof MortalityEvent { return 'critter_id' }
+
   constructor(critterId: string, collarId: string, deviceId: number) {
+    super();
     this.critter_id = critterId;
     this.collar_id = collarId;
     this.device_id = deviceId;

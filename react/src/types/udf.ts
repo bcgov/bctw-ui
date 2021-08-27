@@ -1,7 +1,7 @@
 import { columnToHeader } from 'utils/common_helpers';
 import { ICodeFilter } from './code';
-import { BCTW } from './common_types';
 import { Expose } from 'class-transformer';
+import { BCTWBase } from './common_types';
 
 export enum eUDFType {
   critter_group = 'critter_group'
@@ -21,7 +21,7 @@ export interface IUDF extends IUDFInput {
   changed?: boolean;
 }
 
-export class UDF implements IUDF, BCTW {
+export class UDF extends BCTWBase implements IUDF {
   type: eUDFType;
   key: string;
   value: string[];
@@ -33,6 +33,9 @@ export class UDF implements IUDF, BCTW {
   }
   formatPropAsHeader(str: string):string {
     return columnToHeader(str);
+  }
+  toJSON(): UDF {
+    return this;
   }
 }
 

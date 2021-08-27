@@ -1,6 +1,6 @@
 import { Type, Expose, Exclude } from 'class-transformer';
 import { Point } from 'geojson';
-import { BCTW, BCTWBaseType } from 'types/common_types';
+import { BCTWBaseType } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
 import { formatLatLong } from 'utils/common_helpers';
 
@@ -30,7 +30,7 @@ export class HistoricalTelemetryInput implements IHistoricalTelemetryInput, BCTW
  * The only difference being that lat/long are converted to the Postgres geometry type
  */
 export interface IHistoricalTelemetry
-  extends Omit<IHistoricalTelemetryInput, 'latitude' | 'longitude'>, BCTW, BCTWBaseType {
+  extends Omit<IHistoricalTelemetryInput, 'latitude' | 'longitude'>,  BCTWBaseType {
   geom: Point;
 }
 

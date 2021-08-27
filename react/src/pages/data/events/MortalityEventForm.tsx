@@ -8,7 +8,7 @@ import { LocationEvent } from 'types/location_event';
 import EditModal from '../common/EditModal';
 import { useState } from 'react';
 import LocationEventForm from './LocationEventForm';
-import { removeProps, formatLabel } from 'utils/common_helpers';
+import { removeProps } from 'utils/common_helpers';
 import MortalityEvent from 'types/mortality_event';
 import { IUpsertPayload } from 'api/api_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -143,7 +143,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                         prop: deviceUnassignedField.prop,
                         type: deviceUnassignedField.type,
                         value: mortalityEvent[deviceUnassignedField.prop],
-                        label: formatLabel(mortalityEvent, deviceUnassignedField.prop),
+                        label: mortalityEvent.formatPropAsHeader(deviceUnassignedField.prop),
                         handleChange: onChange
                       })}
                     </div>
@@ -165,7 +165,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                         prop: retrievedField.prop,
                         type: retrievedField.type,
                         value: mortalityEvent[retrievedField.prop],
-                        label: formatLabel(mortalityEvent, retrievedField.prop),
+                        label: mortalityEvent.formatPropAsHeader(retrievedField.prop),
                         handleChange: onChange
                       })}
                     </div>
@@ -180,7 +180,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                           prop: retrievedDateField.prop,
                           type: retrievedDateField.type,
                           value: mortalityEvent[retrievedDateField.prop],
-                          label: formatLabel(mortalityEvent, retrievedDateField?.prop),
+                          label: mortalityEvent.formatPropAsHeader(retrievedDateField?.prop),
                           handleChange: onChange,
                           disabled: !isRetrieved
                         })
@@ -196,7 +196,7 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                         prop: vasField.prop,
                         type: vasField.type,
                         value: mortalityEvent[vasField.prop],
-                        label: formatLabel(mortalityEvent, vasField.prop),
+                        label: mortalityEvent.formatPropAsHeader(vasField.prop),
                         handleChange: onChange
                       })}
                     </div>

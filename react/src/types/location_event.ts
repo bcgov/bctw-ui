@@ -1,5 +1,5 @@
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTW } from './common_types';
+import { BCTWBase } from './common_types';
 import { eInputType, FormFieldObject } from './form_types';
 
 type LocationEventType = 'capture' | 'mortality' | 'release' | 'retrieval' | 'malfunction';
@@ -14,7 +14,7 @@ interface IBaseLocationEvent {
   utm_zone: number;
 }
 
-class LocationEvent implements BCTW, IBaseLocationEvent {
+class LocationEvent extends BCTWBase implements IBaseLocationEvent {
   locationType: LocationEventType;
   date: Date;
   comment: string;
@@ -23,7 +23,10 @@ class LocationEvent implements BCTW, IBaseLocationEvent {
   utm_easting: number;
   utm_northing: number;
   utm_zone: number;
+  get identifier(): keyof LocationEvent { return 'locationType' }
+
   constructor(type: LocationEventType, d: Date) {
+    super();
     this.locationType = type;
     this.utm_easting = 0;
     this.utm_northing = 0;
@@ -33,7 +36,10 @@ class LocationEvent implements BCTW, IBaseLocationEvent {
     this.date = d ?? new Date();
     this.comment = '';
   }
-  formatPropAsHeader(str: string): string {
+
+  toJSON(): LocationEvent { return this }
+
+  formatPropAsHeader(str: keyof LocationEvent): string {
     const withType = `${this.locationType}_${str}`.replace('utm', 'UTM');
     return columnToHeader(withType);
   }

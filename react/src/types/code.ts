@@ -1,4 +1,4 @@
-import { BCTW, BCTWBaseType } from './common_types';
+import { BCTWBase, BCTWBaseType } from './common_types';
 import { Type } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from './form_types';
@@ -40,11 +40,15 @@ interface ICodeHeader {
 }
 
 // represents the objects retrieved from the database
-export class CodeHeader implements BCTW, ICodeHeader {
+export class CodeHeader extends BCTWBase implements ICodeHeader {
   id: number;
   type: string
   title: string;
   description: string;
+
+  toJSON(): CodeHeader { return this }
+
+  get identifier(): keyof CodeHeader { return 'id' }
 
   formatPropAsHeader(str: string): string {
     return columnToHeader(str);
@@ -52,19 +56,27 @@ export class CodeHeader implements BCTW, ICodeHeader {
 }
 
 // represents what a code header should look like when sending to api
-export class CodeHeaderInput implements BCTW, BCTWBaseType {
+export class CodeHeaderInput extends BCTWBase implements  BCTWBaseType {
   code_category_id: number;
   code_header_name: string;
   code_header_title: string;
   code_header_description: string;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
+  get identifier(): keyof CodeHeaderInput {
+    return 'code_header_name';
+  }
 
   constructor() {
+    super();
     this.code_category_id = 1; // the bctw code category
     this.code_header_name = '';
     this.code_header_title = '';
     this.code_header_description = '';
+  }
+
+  toJSON(): CodeHeaderInput {
+    return this;
   }
 
   formatPropAsHeader(str: string): string {

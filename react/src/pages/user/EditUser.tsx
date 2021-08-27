@@ -3,7 +3,6 @@ import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { User } from 'types/user';
 import { MakeEditField } from 'components/form/create_form_components';
-import { formatLabel } from 'utils/common_helpers';
 import { eInputType } from 'types/form_types';
 
 /**
@@ -40,7 +39,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
                       value: editing[prop],
                       type: eInputType.text,
                       handleChange: handlerFromContext,
-                      label: formatLabel(editing, prop),
+                      label: editing.formatPropAsHeader(prop),
                       required: true
                     })
                   })}

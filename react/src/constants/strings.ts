@@ -6,7 +6,6 @@ const CritterStrings = {
   collarRemovalTitle: 'Confirm Device Unassignment',
   exportText: '',
   exportTitle: 'Bulk Export Animal Data',
-  requiredProps: ['animal_id', 'wlh_id', 'species', 'region'],
   unassignedTableTitle: 'Animals Without a Device',
 }
 
@@ -43,7 +42,6 @@ const CollarStrings = {
   assignedCollarsTableTitle: 'Assigned Devices',
   availableCollarsTableTitle: 'Unassigned Devices',
   editableProps: ['device_id', 'frequency', 'device_make', 'device_model', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
-  requiredProps: ['device_id', 'device_make', 'frequency'],
   exportTitle: 'Bulk Export Device Data',
   exportText: '',
   addCollarTypeTitle: 'Select Device Type',

@@ -1,6 +1,6 @@
 import { Type, Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTW, BCTWBaseType } from 'types/common_types';
+import { BCTWBase, BCTWBaseType } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 
@@ -31,18 +31,20 @@ export type OnboardingAccess = 'pending' | 'granted' | 'denied';
 /**
  * representation of the bctw.user table
  */
-export interface IUser extends BCTW, BCTWBaseType, Pick<IKeyCloakSessionInfo, 'email'> {
+export interface IUser extends BCTWBaseType, Pick<IKeyCloakSessionInfo, 'email'> {
   id: number;
   idir: string;
   bceid: string;
   firstname: string;
   lastname: string;
+  access: OnboardingAccess;
+  role_type: eUserRole;
   // indicates if the user is considered the owner of at least one animal
   is_owner?: boolean; 
-  access: OnboardingAccess;
+  phone: string;
 }
 
-export class User implements IUser {
+export class User extends BCTWBase implements IUser {
   role_type: eUserRole;
   is_owner: boolean;
   id: number;
@@ -50,6 +52,7 @@ export class User implements IUser {
   bceid: string;
   firstname: string;
   lastname: string;
+  phone: string;
   email: string;
   access: OnboardingAccess;
   @Type(() => Date)valid_from: Date;
@@ -64,6 +67,11 @@ export class User implements IUser {
    */
   @Expose() get uid(): string {
     return this.idir ?? this.bceid;
+  }
+  get identifier(): string { return 'id' }
+
+  toJSON(): User {
+    return this;
   }
 
   formatPropAsHeader(str: string): string {
@@ -113,7 +121,7 @@ export interface IUserCritterAccessInput extends Partial<IUserCritterAccess> {
   permission_type: eCritterPermission;
 }
 
-export class UserCritterAccess implements IUserCritterAccess {
+export class UserCritterAccess extends BCTWBase implements IUserCritterAccess {
   critter_id: string;
   animal_id: string;
   wlh_id: string;
@@ -128,6 +136,8 @@ export class UserCritterAccess implements IUserCritterAccess {
   @Expose() get name(): string {
     return this.animal_id ?? this.wlh_id;
   }
+  toJSON(): UserCritterAccess { return this }
+  formatPropAsHeader(str: keyof UserCritterAccess): string { return columnToHeader(str)}
 }
 
 const TestUCA = new UserCritterAccess();

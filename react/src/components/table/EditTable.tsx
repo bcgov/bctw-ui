@@ -1,7 +1,7 @@
 import Button from 'components/form/Button';
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { Icon } from 'components/common';
-import { BCTW } from 'types/common_types';
+// import { BCTWBase } from 'types/common_types';
 import { IPlainTableProps } from 'components/table/table_interfaces';
 import './table.scss';
 import TableContainer from './TableContainer';
@@ -35,7 +35,7 @@ type EditTableProps<T> = IPlainTableProps<T> & EditTableVisibilityProps & {
  * @param onRowModified - call parent handler with the row clicked and @type {EditTableRowAction}
  * @param onSave - calls parent handler when save button clicked
  */
-export default function EditTable<T extends BCTW>(props: EditTableProps<T>): JSX.Element {
+export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
   const {
     canSave,
     headers,

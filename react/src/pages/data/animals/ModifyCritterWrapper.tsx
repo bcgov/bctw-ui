@@ -63,7 +63,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     const { body } = a;
     const formatted = body.toJSON();
     console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
-    await saveMutation({ body: formatted});
+    // await saveMutation({ body: formatted});
   } 
 
   const deleteCritter = async (critterId: string): Promise<void> => {

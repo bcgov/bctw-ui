@@ -24,7 +24,6 @@ import { EditorProps } from 'components/component_interfaces';
 import { FormFieldObject } from 'types/form_types';
 import { Icon } from 'components/common';
 import { MakeEditField } from 'components/form/create_form_components';
-import { formatLabel } from 'utils/common_helpers';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 
@@ -102,16 +101,15 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     t: FormFieldObject<Collar>,
     handleChange: (v: Record<string, unknown>) => void,
   ): React.ReactNode => {
-    const { prop, type, codeName } = t;
-    const isRequired = CS.requiredProps.includes(prop);
+    const { prop, type, codeName, required } = t;
     return MakeEditField({
       prop,
       type,
       value: editing[prop],
       handleChange,
       disabled: !canEdit,
-      required: isRequired,
-      label: formatLabel(editing, t.prop),
+      required,
+      label: editing.formatPropAsHeader(t.prop),
       span: true,
       codeName
     });

@@ -1,9 +1,9 @@
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTW, BCTWBaseType, PartialPick } from 'types/common_types';
+import { BCTWBase, BCTWBaseType, PartialPick } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { eCritterPermission } from 'types/permission';
 import { formatLatLong } from 'utils/common_helpers';
-import { eInputType, FormFieldObject } from 'types/form_types';
+import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { Collar } from './collar';
 
 const assignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
@@ -30,7 +30,7 @@ export interface IAnimalTelemetryBase {
   wlh_id: string;
 }
 
-export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, PartialPick<Collar, 'collar_id' | 'device_id'> {
+export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase, PartialPick<Collar, 'collar_id' | 'device_id'> {
   animal_colouration: string;
   animal_comment: string;
   associated_animal_id: string;
@@ -87,7 +87,7 @@ export interface IAnimal extends BCTW, BCTWBaseType, IAnimalTelemetryBase, Parti
 const transformOpt = { toClassOnly: true };
 
 
-export class Animal implements IAnimal {
+export class Animal extends BCTWBase implements IAnimal {
   critter_id: string;
   critter_transaction_id: string;
   animal_id: string;
@@ -124,10 +124,8 @@ export class Animal implements IAnimal {
   predator_species: string;
   proximate_cause_of_death: string;
   ultimate_cause_of_death: string;
-  // @Transform((v) => v || '', transformOpt) population_unit: string;
   population_unit: string;
-  // fixme: dont transform booleans?
-  @Transform((v) => v || false, transformOpt) recapture: boolean;
+  recapture: boolean;
   region: string;
   release_comment: string;
   @Type(() => Date) release_date: Date;
@@ -139,8 +137,7 @@ export class Animal implements IAnimal {
   @Transform((v) => v || -1, transformOpt) release_utm_zone: number;
   sex: string;
   species: string;
-  // fixme: dont transform booleans?
-  @Transform((v) => v || false, transformOpt) translocation: boolean;
+  translocation: boolean;
   wlh_id: string;
   animal_comment: string;
   @Type(() => Date) valid_from: Date;
@@ -148,7 +145,7 @@ export class Animal implements IAnimal {
   permission_type: eCritterPermission;
   device_id?: number;
   collar_id?: string;
-  @Expose() get identifier(): string {
+  @Expose() get identifier(): keyof Animal {
     return 'critter_id';
   }
   @Expose() get name(): string {
@@ -177,6 +174,7 @@ export class Animal implements IAnimal {
   }
 
   constructor(aid?: string, status?: string, sp?: string, wlhid?: string) {
+    super();
     this.animal_id = aid ?? '';
     this.animal_status = status ?? '';
     this.species = sp ?? '';
@@ -185,10 +183,11 @@ export class Animal implements IAnimal {
 
   toJSON(): Animal {
     delete this.map_colour;
+    delete this.error;
     return this;
   }
 
-  formatPropAsHeader(str: string): string {
+  formatPropAsHeader(str: keyof Animal): string {
     switch (str) {
       case 'associated_animal_relationship':
         return 'Associated Relationship';
@@ -216,25 +215,24 @@ export class Animal implements IAnimal {
   }
 }
 
-// todo: handle required
 const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   associatedAnimalFields: [
     { prop: 'associated_animal_id', type: eInputType.text },
     { prop: 'associated_animal_relationship', type: eInputType.code }
   ],
   captureFields: [
-    { prop: 'capture_date', type: eInputType.date, required: true, },
+    { prop: 'capture_date', type: eInputType.date, ...isRequired},
     { prop: 'capture_latitude', type: eInputType.number },
     { prop: 'capture_longitude', type: eInputType.number },
     { prop: 'capture_utm_zone', type: eInputType.number },
     { prop: 'capture_utm_easting', type: eInputType.number },
     { prop: 'capture_utm_northing', type: eInputType.number },
-    { prop: 'recapture', type: eInputType.check }, // fixme: make code??
+    { prop: 'recapture', type: eInputType.check },
     { prop: 'capture_comment', type: eInputType.text }
   ],
   characteristicsFields: [
-    { prop: 'animal_status', type: eInputType.code, required: true },
-    { prop: 'species', type: eInputType.code, required: true },
+    { prop: 'animal_status', type: eInputType.code, ...isRequired },
+    { prop: 'species', type: eInputType.code, ...isRequired },
     { prop: 'sex', type: eInputType.code },
     { prop: 'animal_colouration', type: eInputType.text },
     { prop: 'estimated_age', type: eInputType.number },
@@ -244,7 +242,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   ],
   identifierFields: [
     { prop: 'wlh_id', type: eInputType.text },
-    { prop: 'animal_id', type: eInputType.text },
+    { prop: 'animal_id', type: eInputType.text, ...isRequired },
     { prop: 'region', type: eInputType.code },
     { prop: 'population_unit', type: eInputType.code },
     // { prop: 'collective_unit', type: eInputType.text }, // todo:

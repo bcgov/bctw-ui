@@ -1,7 +1,7 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollarHistory, CollarHistory, ICollarLinkPayload } from 'types/collar_history';
-import { linkCollarEndpoint } from 'api/api_endpoint_urls';
+import { getCollarAssignmentHistoryEndpoint, linkCollarEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps } from 'api/api_interfaces';
 
 /**
@@ -13,7 +13,7 @@ export const attachmentApi = (props: ApiProps) => {
 
   /** given a critter_id, retrieve it's device attachment history */
   const getCollarAssignmentHistory = async (critterId: number, page = 1): Promise<CollarHistory[]> => {
-    const url = createUrl({ api: `get-assignment-history/${critterId}`, page });
+    const url = createUrl({ api: `${getCollarAssignmentHistoryEndpoint}/${critterId}`, page });
     // console.log(`requesting collar/critter assignment history`);
     const { data } = await api.get(url);
     const results = data.map((json: ICollarHistory) => plainToClass(CollarHistory, json));

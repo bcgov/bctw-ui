@@ -1,5 +1,5 @@
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTW, BCTWBaseType } from 'types/common_types';
+import { BCTWBase, BCTWBaseType } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { transformOpt } from 'types/animal';
 import { eInputType, FormFieldObject } from 'types/form_types';
@@ -27,7 +27,8 @@ export interface ICollarTelemetryBase extends ICollarBase {
   frequency: number;
 }
 
-export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
+// export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
+export interface ICollar extends ICollarTelemetryBase, BCTWBaseType {
   activation_comment: string;
   activation_status: boolean;
   animal_id?: string; // collars attached to a critter should includes this prop
@@ -45,11 +46,10 @@ export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
   first_activation_year: number;
   fix_interval: number;
   fix_interval_unit: string;
-  // fix_rate: number;
   fix_success_rate: number;
   frequency_unit: string;
   malfunction_date: Date;
-  malfunction_type: string;
+  device_malfunction_type: string;
   offline_date: Date;
   offline_type: string;
   permission_type?: eCritterPermission; // fetched collars should contain this
@@ -71,9 +71,9 @@ const collarPropsToDisplay = [
 // for attached collars, also display...
 // const attachedCollarProps = ['(WLH_ID/Animal ID)', '(WLH_ID)', '(Animal_ID)', ...collarPropsToDisplay];
 const attachedCollarProps = ['WLH_ID', 'Animal_ID', ...collarPropsToDisplay];
-export class Collar implements ICollar {
+export class Collar extends BCTWBase implements ICollar  {
   activation_comment: string;
-  @Transform(v => v || false, transformOpt) activation_status: boolean;
+  activation_status: boolean;
   animal_id?: string;
   collar_id: string;
   @Transform(v => v || 0, transformOpt) camera_device_id: number;
@@ -91,17 +91,16 @@ export class Collar implements ICollar {
   @Transform(v => v || -1, transformOpt) first_activation_year: number;
   fix_interval: number;
   fix_interval_unit: string;
-  // fix_rate: number;
   fix_success_rate: number;
   @Transform(v => v || -1, transformOpt) frequency: number;
   frequency_unit: string;
   @Type(() => Date) malfunction_date: Date;
-  malfunction_type: string;
+  device_malfunction_type: string;
   @Type(() => Date) offline_date: Date;
   offline_type: string;
   permission_type: eCritterPermission;
   @Transform(v => v || getInvalidDate(), transformOpt) retrieval_date: Date;
-  @Transform(v => v || false, transformOpt) retrieved: boolean;
+  retrieved: boolean;
   satellite_network: string;
   device_comment: string;
   @Type(() => Date) valid_from: Date;
@@ -115,6 +114,7 @@ export class Collar implements ICollar {
   @Expose() get identifier(): string { return 'collar_id' }
 
   constructor(collar_type?: eNewCollarType) {
+    super();
     this.retrieval_date = getInvalidDate()
     this.malfunction_date = getInvalidDate();
     this.offline_date = getInvalidDate();
@@ -145,16 +145,18 @@ export class Collar implements ICollar {
     if (isInvalidDate(this.offline_date)) {
       delete this.offline_date
     }
+    delete this.error;
     return this;
   }
 
-  formatPropAsHeader(str: string): string {
+  formatPropAsHeader(str: keyof Collar): string {
     switch (str) {
       case 'activation_status':
         return 'Is device active with vendor?'
       case 'camera_device_id':
         return 'Camera Module ID';
       case 'device_deployment_status':
+      case 'device_malfunction_type':
         return columnToHeader(str.replace('device_', ''))
       case 'dropoff_device_id':
         return 'Drop-off Module ID'
@@ -164,8 +166,8 @@ export class Collar implements ICollar {
         return 'Drop-off Module Frequency Unit'
       case 'frequency':
         return 'Beacon Frequency'
-      case 'implant_device_id':
-        return 'Implant Module ID'
+      // case 'implant_device_id':
+        // return 'Implant Module ID'
       default:
         return columnToHeader(str);
     }
@@ -179,15 +181,13 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'frequency', type: eInputType.number },
     { prop: 'frequency_unit', type: eInputType.code },
     { prop: 'fix_interval', type: eInputType.number },
-    { prop: 'fix_interval_unit', type: eInputType.code },
-    // { prop: 'fix_rate', type: eInputType.number },
+    { prop: 'fix_interval_unit', type: eInputType.code }, //fixme: what code header name is this?
   ],
   deviceOptionFields: [
     { prop: 'camera_device_id', type: eInputType.number },
     { prop: 'dropoff_device_id', type: eInputType.number },
     { prop: 'dropoff_frequency', type: eInputType.number },
-    { prop: 'dropoff_frequency_unit', type: eInputType.number },
-    // { prop: 'implant_device_id' } // fixme:
+    { prop: 'dropoff_frequency_unit', type: eInputType.code, codeName: 'frequency_unit' },
   ],
   identifierFields: [
     { prop: 'device_id', type: eInputType.number },
@@ -210,7 +210,7 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   malfunctionOfflineFields: [
     { prop: 'device_deployment_status', type: eInputType.code },
     { prop: 'malfunction_date', type: eInputType.date },
-    { prop: 'malfunction_type', type: eInputType.code },
+    { prop: 'device_malfunction_type', type: eInputType.code },
     { prop: 'offline_date', type: eInputType.date },
     { prop: 'offline_type', type: eInputType.code },
   ],

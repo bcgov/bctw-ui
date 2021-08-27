@@ -17,7 +17,7 @@ import { formatAxiosError } from 'utils/errors';
 import { ICustomTableColumn, ITableFilter, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
-import { BCTW } from 'types/common_types';
+import { BCTWBase } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -28,7 +28,7 @@ const DISABLE_PAGINATION = true;
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
  */
-export default function DataTable<T extends BCTW>({
+export default function DataTable<T extends BCTWBase>({
   customColumns,
   headers,
   queryProps,
@@ -244,7 +244,7 @@ export default function DataTable<T extends BCTW>({
             {(values && values.length === 0) || isFetching || isLoading || isError
               ? renderNoData()
               : stableSort(perPage(), getComparator(order, orderBy)).map(
-                (obj: BCTW, prop: number) => {
+                (obj: BCTWBase, prop: number) => {
                   const isRowSelected = isSelected(obj[rowIdentifier]);
                   return (
                     <TableRow
@@ -280,7 +280,7 @@ export default function DataTable<T extends BCTW>({
                       })}
                       {/* render additional columns from props */}
                       {customColumns
-                        ? customColumns.map((c: ICustomTableColumn<BCTW>) => {
+                        ? customColumns.map((c: ICustomTableColumn<BCTWBase>) => {
                           const colComponent = c.column(obj, prop);
                           return <TableCell key={`add-col-${prop}`}>{colComponent}</TableCell>;
                         })

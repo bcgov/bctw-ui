@@ -1,6 +1,5 @@
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
-import { BCTW } from 'types/common_types';
 
 type Order = 'asc' | 'desc';
 
@@ -27,7 +26,7 @@ type ITableQuery<T> = (
  * @param query - the bctwApi hook 
  * @param onNewData handler to call when new data is loaded
  */
-interface ITableQueryProps<T extends BCTW> {
+interface ITableQueryProps<T> {
   defaultSort?: ITableSortProp<T>;
   param?: unknown;
   // query: ITableQuery<T>

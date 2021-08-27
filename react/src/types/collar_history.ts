@@ -1,8 +1,9 @@
 import { ICollarBase } from 'types/collar';
-import { BCTW } from 'types/common_types';
+import { BCTWBase } from 'types/common_types';
 import { Type, Expose } from 'class-transformer';
 import dayjs from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
+// todo: extend dates from base class
 
 // used to construct objects for removing or attaching a collar device to a critter
 export interface ICollarLinkPayload {
@@ -16,7 +17,7 @@ export interface ICollarLinkPayload {
 }
 
 // animal/device attachment history
-export interface ICollarHistory extends ICollarBase, BCTW {
+export interface ICollarHistory extends ICollarBase {
   critter_id?: string;
   assignment_id: string; // unique identifier of the animal/device relationship
   device_make: string;
@@ -24,13 +25,17 @@ export interface ICollarHistory extends ICollarBase, BCTW {
   valid_to: Date;
 }
 
-export class CollarHistory implements ICollarHistory {
+export class CollarHistory extends BCTWBase implements ICollarHistory {
   collar_id: string;
   assignment_id: string;
   device_make: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
   @Expose() get identifier(): string { return 'assignment_id' }
+
+  toJSON(): CollarHistory {
+    return this;
+  }
 
   formatPropAsHeader(str: string): string {
     switch (str) {

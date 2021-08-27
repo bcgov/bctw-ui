@@ -8,7 +8,6 @@ import MortalityEventForm from '../events/MortalityEventForm';
 import ReleaseEventForm from '../events/ReleaseEventForm';
 import { Animal, critterFormFields } from 'types/animal';
 import { Box, Container, Grid } from '@material-ui/core';
-import { CritterStrings as CS } from 'constants/strings';
 import { EditorProps } from 'components/component_interfaces';
 import { FormFieldObject } from 'types/form_types';
 import { MakeEditField } from 'components/form/create_form_components';
@@ -23,7 +22,6 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
 
   const { isCreatingNew, editing } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
-  const requiredFields = CS.requiredProps;
 
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
   const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
@@ -44,14 +42,14 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
     formType: FormFieldObject<Animal>,
     handleChange: (v: Record<string, unknown>) => void
   ): React.ReactNode => {
-    const { prop, type, codeName } = formType;
+    const { prop, type, codeName, required } = formType;
     return MakeEditField({
       type,
       prop,
       value: editing[prop],
       handleChange,
       disabled: !canEdit,
-      required: requiredFields.includes(prop),
+      required,
       label: editing.formatPropAsHeader(prop),
       span: true,
       codeName

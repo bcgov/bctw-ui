@@ -2,7 +2,7 @@ import { Type, Expose, Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { Animal, transformOpt } from 'types/animal';
 import { Collar } from 'types/collar';
-import { BCTW } from 'types/common_types';
+import { BCTWBase } from 'types/common_types';
 import dayjs, { Dayjs } from 'dayjs';
 import { formatDay, formatTime } from 'utils/time';
 
@@ -27,7 +27,7 @@ interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar {
   snooze_count: number;
 }
 
-export class TelemetryAlert implements ITelemetryAlert, BCTW {
+export class TelemetryAlert extends BCTWBase implements ITelemetryAlert {
   activation_status: boolean;
   alert_id: number;
   alert_type: eAlertType;
@@ -104,13 +104,17 @@ export class TelemetryAlert implements ITelemetryAlert, BCTW {
   }
 
   // for saving
-  toJSON(): Record<string, unknown> {
+  toJSON(): TelemetryAlert {
     return {
       alert_id: this.alert_id,
       valid_to: this.valid_to === null ? null : dayjs().subtract(1, 'hour').format(formatTime),
       snooze_count: this.snooze_count,
       snoozed_to: this.snoozed_to === null ? null : dayjs(this.snoozed_to).format(formatTime)
-    };
+    } as unknown as TelemetryAlert;
+  }
+
+  formatPropAsHeader(str: keyof TelemetryAlert): string {
+    return columnToHeader(str);
   }
 }
 
