@@ -1,10 +1,10 @@
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBase, BCTWBaseType } from 'types/common_types';
+import { BCTWBase, BCTWBaseType, PartialPick, transformOpt } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
-import { transformOpt } from 'types/animal';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { getInvalidDate, isInvalidDate } from 'utils/time';
+import { Animal } from './animal';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -28,7 +28,7 @@ export interface ICollarTelemetryBase extends ICollarBase {
 }
 
 // export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
-export interface ICollar extends ICollarTelemetryBase, BCTWBaseType {
+export interface ICollar extends ICollarTelemetryBase, BCTWBaseType, PartialPick<Animal, 'wlh_id' | 'animal_id'> {
   activation_comment: string;
   activation_status: boolean;
   animal_id?: string; // collars attached to a critter should includes this prop
@@ -58,23 +58,11 @@ export interface ICollar extends ICollarTelemetryBase, BCTWBaseType {
   satellite_network: string;
 }
 
-// properties displayed on collar pages
-const collarPropsToDisplay = [
-  'device_id',
-  'device_status',
-  'frequency',
-  'device_type',
-  'device_make',
-  'device_model',
-];
+type CollarProps = keyof ICollar;
 
-// for attached collars, also display...
-// const attachedCollarProps = ['(WLH_ID/Animal ID)', '(WLH_ID)', '(Animal_ID)', ...collarPropsToDisplay];
-const attachedCollarProps = ['WLH_ID', 'Animal_ID', ...collarPropsToDisplay];
 export class Collar extends BCTWBase implements ICollar  {
   activation_comment: string;
   activation_status: boolean;
-  animal_id?: string;
   collar_id: string;
   @Transform(v => v || 0, transformOpt) camera_device_id: number;
   collar_transaction_id: string;
@@ -105,6 +93,10 @@ export class Collar extends BCTWBase implements ICollar  {
   device_comment: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
+
+  animal_id?: string;
+  wlh_id?: string;
+
   @Expose() get frequencyPadded(): string {
     const freq = this.frequency.toString();
     const numDecimalPlaces = freq.slice(freq.lastIndexOf('.') + 1).length;
@@ -172,6 +164,14 @@ export class Collar extends BCTWBase implements ICollar  {
         return columnToHeader(str);
     }
   }
+
+  static get propsToDisplay(): CollarProps[] {
+    return [ 'device_id', 'device_status', 'frequency', 'device_type', 'device_make', 'device_model' ];
+  }
+  // for attached collars, also display...
+  static get attachedPropsToDisplay(): CollarProps[] {
+    return [...Collar.propsToDisplay, 'wlh_id', 'animal_id', ];
+  }
 }
 
 const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
@@ -219,8 +219,4 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   ]
 }
 
-export {
-  collarFormFields,
-  attachedCollarProps,
-  collarPropsToDisplay,
-};
+export { collarFormFields };

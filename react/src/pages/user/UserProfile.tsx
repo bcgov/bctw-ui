@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'contexts/UserContext';
-import { PermissionTableHeaders, User } from 'types/user';
+import { User, UserCritterAccess } from 'types/user';
 import { Typography } from '@material-ui/core';
 import DataTable from 'components/table/DataTable';
 import { Animal } from 'types/animal';
@@ -63,7 +63,7 @@ export default function UserProfile(): JSX.Element {
           })}
         </div> */}
         <DataTable
-          headers={PermissionTableHeaders}
+          headers={UserCritterAccess.propsToDisplay}
           title='Animals you have access to:'
           queryProps={tableProps}
         />

@@ -1,8 +1,10 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { ICollarHistory, CollarHistory, ICollarLinkPayload } from 'types/collar_history';
-import { getCollarAssignmentHistoryEndpoint, linkCollarEndpoint } from 'api/api_endpoint_urls';
+import { ICollarHistory, CollarHistory, IAttachDeviceProps, IRemoveDeviceProps } from 'types/collar_history';
+import { attachDeviceEndpoint, getCollarAssignmentHistoryEndpoint, removeDeviceEndpoint, updateDatalifeEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps } from 'api/api_interfaces';
+import { IChangeDataLifeProps } from 'types/data_life';
+import { useQueryClient } from 'react-query';
 
 /**
  * api for animal/device relationship endpoints
@@ -10,6 +12,12 @@ import { ApiProps } from 'api/api_interfaces';
 
 export const attachmentApi = (props: ApiProps) => {
   const { api } = props;
+  const queryClient = useQueryClient();
+
+  // todo: test
+  const invalidateQueries = (): void => {
+    queryClient.invalidateQueries('collarAssignmentHistory');
+  }
 
   /** given a critter_id, retrieve it's device attachment history */
   const getCollarAssignmentHistory = async (critterId: number, page = 1): Promise<CollarHistory[]> => {
@@ -17,22 +25,36 @@ export const attachmentApi = (props: ApiProps) => {
     // console.log(`requesting collar/critter assignment history`);
     const { data } = await api.get(url);
     const results = data.map((json: ICollarHistory) => plainToClass(CollarHistory, json));
+    // console.log(results);
     return results;
   };
 
-  /** 
-   * attach or remove a device from an animal 
-   * todo: fixme: support provided valid_from / valid_to inputs
-   */
-  const linkCollar = async (body: ICollarLinkPayload): Promise<CollarHistory> => {
-    const url = createUrl({ api: linkCollarEndpoint });
-    // console.log(`posting ${link}: ${JSON.stringify(body.data)}`);
+  const attachDevice = async (body: IAttachDeviceProps): Promise<CollarHistory> => {
+    const url = createUrl({ api: attachDeviceEndpoint});
+    // console.log(`posting ${url}: ${JSON.stringify(body)}`);
     const { data } = await api.post(url, body);
-    return plainToClass(CollarHistory, data[0]);
-  };
+    return plainToClass(CollarHistory, data);
+  }
+
+  const removeDevice = async (body: IRemoveDeviceProps): Promise<CollarHistory> => {
+    const url = createUrl({ api: removeDeviceEndpoint});
+    // console.log(`posting ${url}: ${JSON.stringify(body)}`);
+    const { data } = await api.post(url, body);
+    return plainToClass(CollarHistory, data);
+  }
+
+  const updateAttachmentDataLife = async (body: IChangeDataLifeProps): Promise<CollarHistory> => {
+    const url = createUrl({ api: updateDatalifeEndpoint});
+    // console.log(`posting ${url}: ${JSON.stringify(body)}`);
+    const { data } = await api.post(url, body);
+    invalidateQueries();
+    return plainToClass(CollarHistory, data);
+  }
 
   return {
     getCollarAssignmentHistory,
-    linkCollar,
+    attachDevice,
+    removeDevice,
+    updateAttachmentDataLife,
   };
 };

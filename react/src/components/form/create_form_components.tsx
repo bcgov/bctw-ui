@@ -27,7 +27,7 @@ type CreateInputProps<T> = CreateInputBaseProps<T> & {
 function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
   const { prop, type, value } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
-  const propsToPass = removeProps(props, ['value', 'errorMessage']);
+  const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
   const propName = prop as string;
   return typeof value === 'number' ? (
     <NumberField

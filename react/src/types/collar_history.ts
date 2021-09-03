@@ -1,48 +1,75 @@
-import { ICollarBase } from 'types/collar';
-import { BCTWBase } from 'types/common_types';
+import { Collar } from 'types/collar';
+import { BCTWBase, BCTWBaseType } from 'types/common_types';
 import { Type, Expose } from 'class-transformer';
 import dayjs from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
-// todo: extend dates from base class
+import { IDataLifeStartProps, IDataLifeEndProps } from './data_life';
+import { isDev } from 'api/api_helpers';
 
-// used to construct objects for removing or attaching a collar device to a critter
-export interface ICollarLinkPayload {
-  isLink: boolean;
-  data: {
-    critter_id: string;
-    collar_id: string;
-    valid_from?: Date | string;
-    valid_to?: Date | string;
-  };
-}
 
-// animal/device attachment history
-export interface ICollarHistory extends ICollarBase {
-  critter_id?: string;
-  assignment_id: string; // unique identifier of the animal/device relationship
-  device_make: string;
-  valid_from: Date;
-  valid_to: Date;
-}
-
-export class CollarHistory extends BCTWBase implements ICollarHistory {
+// passed to the API when attaching a device to an animal
+export interface IAttachDeviceProps extends IDataLifeStartProps, IDataLifeEndProps {
   collar_id: string;
+  critter_id: string;
+}
+
+// passed to the API when removing a device from an animal
+export interface IRemoveDeviceProps extends Required<IDataLifeEndProps> {
   assignment_id: string;
+}
+
+export interface ICollarHistory extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'frequency'>,
+  Pick<BCTWBaseType, 'valid_from' | 'valid_to'> {
+  assignment_id: string;
+  critter_id: string;
+  attachment_start: Date;
+  attachment_end: Date;
+}
+
+// used in the class to get a type safe array of valid keys
+type CollarProps = keyof ICollarHistory;
+
+/**
+ * represents an device attachment to an animal.
+ */
+export class CollarHistory extends BCTWBase implements ICollarHistory {
+  assignment_id: string; // primary key of the collar_animal_assignment table
+  collar_id: string;
+  critter_id: string;
+  device_id: number;
   device_make: string;
-  @Type(() => Date) valid_from: Date;
-  @Type(() => Date) valid_to: Date;
+  frequency: number;
+  @Type(() => Date) valid_from: Date; // data_life_start
+  @Type(() => Date) valid_to: Date; // data_life_end
+  @Type(() => Date) attachment_start: Date;
+  @Type(() => Date) attachment_end: Date;
   @Expose() get identifier(): string { return 'assignment_id' }
 
   toJSON(): CollarHistory {
     return this;
   }
 
-  formatPropAsHeader(str: string): string {
+  // note: endpoint for retrieving collar history displays additional collar/animal properties
+  // fixme: split these classes?
+  // type safe properties to display in tables
+  static get propsToDisplay(): CollarProps[] {
+    const props: CollarProps[] = ['device_id', 'device_make', 'attachment_start', 'valid_from', 'valid_to', 'attachment_end'];
+    if (isDev()) {
+      props.unshift('assignment_id');
+    }
+    return props;
+  }
+
+  formatPropAsHeader(str: keyof this): string {
     switch (str) {
       case this.identifier:
         return 'Assignment ID';
+      case 'valid_from':
+        return 'Data Life Start';
+      case 'valid_to':
+        return 'Data Life End';
       default:
-        return columnToHeader(str);
+        return columnToHeader(str as string);
     }
   }
 }

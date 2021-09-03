@@ -4,7 +4,6 @@ import CaptureEventForm from '../events/CaptureEventForm';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import Modal from 'components/modal/Modal';
-import MortalityEventForm from '../events/MortalityEventForm';
 import ReleaseEventForm from '../events/ReleaseEventForm';
 import { Animal, critterFormFields } from 'types/animal';
 import { Box, Container, Grid } from '@material-ui/core';

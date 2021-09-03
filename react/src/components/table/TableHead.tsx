@@ -58,7 +58,7 @@ export default function TableHead<T extends BCTWBase>(props: ITableHeadProps<T>)
             <TableCell
               key={headCell.id as string}
               align={'left'}
-              padding={headCell.disablePadding ? 'none' : 'default'}
+              padding={headCell.disablePadding ? 'none' : 'normal'}
               sortDirection={orderBy === headCell.id ? order : false}>
               <TableSortLabel
                 active={orderBy === headCell.id}

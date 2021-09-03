@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { IconButton, Typography } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import OwnerLayout from 'pages/layouts/OwnerLayout';
-import { eCritterPermission, IPermissionRequestInput, IUserCritterPermissionInput, OwnerHistoryFields, ownerPermissionOptions, PermissionRequestInput } from 'types/permission';
+import { eCritterPermission, IPermissionRequestInput, IUserCritterPermissionInput, ownerPermissionOptions, PermissionRequest, PermissionRequestInput } from 'types/permission';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import TextField from 'components/form/TextInput';
 import EditTable, { EditTableRowAction } from 'components/table/EditTable';
@@ -14,10 +14,10 @@ import { Icon, NotificationMessage } from 'components/common';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import DataTable from 'components/table/DataTable';
-import { IUserCritterAccessInput, PermissionTableHeaders } from 'types/user';
+import { IUserCritterAccessInput, UserCritterAccess } from 'types/user';
 
 /**
- *
+ * Page that allows an owner to submit a request to grant other users animal permissions 
 */
 export default function OwnerRequestPermission(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -231,7 +231,7 @@ export default function OwnerRequestPermission(): JSX.Element {
           filter={[eCritterPermission.manager]}
           title={`Select Animals`}
           showSelectPermission={true}
-          headersToShow={PermissionTableHeaders.filter(p => p !== 'permission_type')}
+          headersToShow={UserCritterAccess.propsToDisplay.filter((p: keyof UserCritterAccess) => p !== 'permission_type')}
         />
         {
           error ? (
@@ -245,7 +245,7 @@ export default function OwnerRequestPermission(): JSX.Element {
         }
         <DataTable
           title={'Successful Permission History (approved by an administrator)'}
-          headers={OwnerHistoryFields}
+          headers={PermissionRequest.ownerHistoryPropsToDisplay}
           queryProps={{ query: bctwApi.usePermissionHistory}}
         />
       </>

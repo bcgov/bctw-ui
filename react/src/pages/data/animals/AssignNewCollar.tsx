@@ -2,36 +2,57 @@ import { useState } from 'react';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';
 import DataTable from 'components/table/DataTable';
-import { collarPropsToDisplay, Collar, eCollarAssignedStatus } from 'types/collar';
+import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CritterStrings as CS } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import DataLifeInputForm from 'components/form/DataLifeInputForm';
+import { IAttachDeviceProps } from 'types/collar_history';
+import { Animal } from 'types/animal';
+import { DataLifeInput } from 'types/data_life';
 
-type IAssignNewCollarModal = {
+type IAssignNewCollarModal = Pick<Animal, 'critter_id'> & {
   show: boolean;
   onClose: (close: boolean) => void;
-  onSave: (collar_id: string) => void;
+  onSave: (obj: IAttachDeviceProps ) => void;
+  dli: DataLifeInput;
 };
 
 /**
- * displays collars that can be assigned to this critter
- * @param {onSave} - parent component {PerformAssignment} handles this
+ * Displays devices that can be assigned to this animal
+ * accessed from @function PerformAssignmentAction component
+ * @param {onSave} - parent component {PerformAssignment} handles this.
  * collar row must be selected in order to enable the save button
  */
-export default function AssignNewCollarModal({ show, onClose, onSave }: IAssignNewCollarModal): JSX.Element {
-  const [collarId, setCollarId] = useState<string>('');
+export default function AssignNewCollarModal({ critter_id, dli, onClose, show, onSave }: IAssignNewCollarModal): JSX.Element {
   const bctwApi = useTelemetryApi();
-  const handleSelect = (row: Collar): void => setCollarId(row.collar_id);
+
+  const [collarId, setCollarId] = useState<string>('');
+  const [ DLInput ] = useState<DataLifeInput>(dli);
+
+  const handleSelectDevice = (row: Collar): void => setCollarId(row.collar_id);
+
+  const handleSave = (): void => {
+    const body: IAttachDeviceProps = {
+      critter_id,
+      collar_id: collarId,
+      // formats the datetime properties
+      ...dli.toPartialAttachDeviceJSON()
+    }
+    onSave(body);
+  }
 
   return (
     <>
       <Modal open={show} handleClose={onClose}>
         <DataTable
-          headers={collarPropsToDisplay}
+          headers={Collar.propsToDisplay}
           title={CS.collarAssignmentTitle}
           queryProps={{ query: bctwApi.useCollarType, param: eCollarAssignedStatus.Available }}
-          onSelect={handleSelect}
+          onSelect={handleSelectDevice}
         />
-        <Button disabled={collarId === ''} onClick={(): void => onSave(collarId)}>
+        {/* disable editing of end of the attachment when attaching the device */}
+        <DataLifeInputForm dli={DLInput} enableEditStart={true} enableEditEnd={false} />
+        <Button disabled={collarId === ''} onClick={handleSave}>
           {CS.assignCollarBtnText}
         </Button>
       </Modal>

@@ -14,7 +14,8 @@ import {
   groupPermissionRequests,
   IExecutePermissionRequest,
   IGroupedRequest,
-  ReasonsPermissionWasDenied
+  permissionDeniedReasons,
+  PermissionWasDeniedReason
 } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
 
@@ -29,7 +30,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
   const [isGrant, setIsGrant] = useState(false);
-  const [denyReason, setDenyReason] = useState(ReasonsPermissionWasDenied[0]);
+  const [denyReason, setDenyReason] = useState<PermissionWasDeniedReason>('Not given');
   const [selectedRequestID, setSelectedRequestID] = useState<number>();
 
   useEffect(() => {
@@ -110,9 +111,9 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
         variant={'outlined'}
         value={denyReason}
         style={{width: '80%', marginBottom: '10px'}}
-        onChange={(e):void => setDenyReason(e.target.value as string)}
+        onChange={(e):void => setDenyReason(e.target.value as PermissionWasDeniedReason)}
       >
-        {ReasonsPermissionWasDenied.map((reason, idx) => {
+        {permissionDeniedReasons.map((reason, idx) => {
           return (
             <MenuItem key={idx} value={reason} >
               {reason}
@@ -124,7 +125,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
       <TextField
         style={{marginTop: '5px'}}
         propName={'deny'}
-        changeHandler={(v: {deny: string}): void => setDenyReason(v['deny'])}
+        changeHandler={(v: {deny: string}): void => setDenyReason(v['deny'] as PermissionWasDeniedReason)}
         defaultValue={''}
         placeholder={'Enter Reason'}
       />

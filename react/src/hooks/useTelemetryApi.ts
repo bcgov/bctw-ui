@@ -14,7 +14,7 @@ import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryR
 import { Animal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
-import { CollarHistory, ICollarLinkPayload } from 'types/collar_history';
+import { CollarHistory, IAttachDeviceProps, IRemoveDeviceProps } from 'types/collar_history';
 import { IKeyCloakSessionInfo, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
@@ -29,6 +29,7 @@ import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import MortalityEvent from 'types/mortality_event';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
+import { IChangeDataLifeProps } from 'types/data_life';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -306,11 +307,23 @@ export const useTelemetryApi = () => {
   ): UseMutationResult<IBulkUploadResults<Animal>> =>
     useMutation<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>((critter) => critterApi.upsertCritter(critter), config);
 
-  /** attach or remove a device from an animal */
-  const useMutateLinkCollar = (
-    config: UseMutationOptions<CollarHistory, AxiosError, ICollarLinkPayload>
+  /** attaches a device from an animal */
+  const useMutateAttachDevice = (
+    config: UseMutationOptions<CollarHistory, AxiosError, IAttachDeviceProps>
   ): UseMutationResult =>
-    useMutation<CollarHistory, AxiosError, ICollarLinkPayload>((link) => attachmentApi.linkCollar(link), config);
+    useMutation<CollarHistory, AxiosError, IAttachDeviceProps>((link) => attachmentApi.attachDevice(link), config);
+
+  /** removes a device from an animal */
+  const useMutateRemoveDevice = (
+    config: UseMutationOptions<CollarHistory, AxiosError, IRemoveDeviceProps>
+  ): UseMutationResult =>
+    useMutation<CollarHistory, AxiosError, IRemoveDeviceProps>((link) => attachmentApi.removeDevice(link), config);
+
+  /** updates the data life of an animal/device attachment */
+  const useMutateEditDataLife = (
+    config: UseMutationOptions<CollarHistory, AxiosError, IChangeDataLifeProps>
+  ): UseMutationResult =>
+    useMutation<CollarHistory, AxiosError, IChangeDataLifeProps>((dl) => attachmentApi.updateAttachmentDataLife(dl), config);
 
   /** upload a single .csv file to add or update codes/code headers, critters, or collars */
   const useMutateBulkCsv = <T>(
@@ -392,7 +405,9 @@ export const useTelemetryApi = () => {
     useMutateBulkXml,
     useMutateCollar,
     useMutateCritter,
-    useMutateLinkCollar,
+    useMutateAttachDevice,
+    useMutateRemoveDevice,
+    useMutateEditDataLife,
     useMutateGrantCritterAccess,
     useMutateUDF,
     useMutateUser,

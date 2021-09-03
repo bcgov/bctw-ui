@@ -1,8 +1,8 @@
 import { Type, Expose, Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
-import { Animal, transformOpt } from 'types/animal';
+import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
-import { BCTWBase } from 'types/common_types';
+import { BCTWBase, transformOpt } from 'types/common_types';
 import dayjs, { Dayjs } from 'dayjs';
 import { formatDay, formatTime } from 'utils/time';
 

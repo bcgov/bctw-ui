@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 
 const formatDay = 'YYYY-MM-DD';
-const formatTime = 'YYYY-MM-DD HH:mm:ss';
+const formatTime = 'YYYY-MM-DD HH:mm';
+const format24Hour = 'HH:mm:ss';
 const formatLocal = 'dddd, MMMM D, YYYY h:mm A';
 
 // used when creating new objects that have a date property
@@ -47,6 +48,7 @@ export {
   formatDay,
   formatLocal,
   formatTime,
+  format24Hour,
   getNow,
   getToday,
   isDayjs,

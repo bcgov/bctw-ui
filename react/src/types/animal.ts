@@ -1,13 +1,11 @@
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBase, BCTWBaseType, PartialPick } from 'types/common_types';
+import { BCTWBase, BCTWBaseType, PartialPick, transformOpt } from 'types/common_types';
 import { Type, Expose, Transform } from 'class-transformer';
 import { eCritterPermission } from 'types/permission';
 import { formatLatLong } from 'utils/common_helpers';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { Collar } from './collar';
 
-const assignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
-const unassignedAnimalProps = ['species', 'population_unit', 'collective_unit', 'wlh_id', 'animal_id', 'animal_status'];
 
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
@@ -30,7 +28,8 @@ export interface IAnimalTelemetryBase {
   wlh_id: string;
 }
 
-export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase, PartialPick<Collar, 'collar_id' | 'device_id'> {
+export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase, 
+  PartialPick<Collar, 'collar_id' | 'device_id' | 'frequency'> {
   animal_colouration: string;
   animal_comment: string;
   associated_animal_id: string;
@@ -83,8 +82,7 @@ export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase, PartialPick
   translocation: boolean;
   ultimate_cause_of_death: string; // code
 }
-
-const transformOpt = { toClassOnly: true };
+type AnimalProps = keyof IAnimal;
 
 
 export class Animal extends BCTWBase implements IAnimal {
@@ -145,6 +143,8 @@ export class Animal extends BCTWBase implements IAnimal {
   permission_type: eCritterPermission;
   device_id?: number;
   collar_id?: string;
+  frequency?: number;
+
   @Expose() get identifier(): keyof Animal {
     return 'critter_id';
   }
@@ -213,6 +213,12 @@ export class Animal extends BCTWBase implements IAnimal {
         return columnToHeader(str);
     }
   }
+  static get assignedProps(): AnimalProps[] {
+    return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
+  }
+  static get unassignedProps(): AnimalProps[] {
+    return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'animal_status'];
+  } 
 }
 
 const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
@@ -278,4 +284,4 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   ]
 };
 
-export { unassignedAnimalProps, assignedAnimalProps, critterFormFields, transformOpt };
+export { critterFormFields };

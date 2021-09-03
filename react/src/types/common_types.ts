@@ -41,3 +41,11 @@ export type BCTWType = 'animal' | 'device'
 export type PartialPick<T, K extends keyof T> = {
   [P in K]?: T[P];
 };
+
+
+/**
+ * used with transforming types from the API
+ * generally only care about object received from API -> instance of UI class
+ * ex. nulls can be transformed to a boolean or number
+ */
+export const transformOpt = { toClassOnly: true };

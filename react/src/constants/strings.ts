@@ -2,7 +2,7 @@ const CritterStrings = {
   assignCollarBtnText: 'Assign Selected Device',
   assignedTableTitle: 'Animals Attached to a Device',
   collarAssignmentTitle: 'Assign a Device',
-  collarRemovalText: 'Are you sure you wish to unassign this device?',
+  collarRemovalText: (deviceid: number, make: string): string => `Are you sure you wish to remove ${make} device ${deviceid}?`,
   collarRemovalTitle: 'Confirm Device Unassignment',
   exportText: '',
   exportTitle: 'Bulk Export Animal Data',
@@ -121,6 +121,10 @@ const UserAlertStrings = {
   mortalityFormTitle: 'Mortality Event',
 }
 
+const DataLifeStrings = {
+  editWarning: 'Warning: data life fields can only be modified once'
+}
+
 export {
   CodeStrings,
   CollarStrings,
@@ -132,4 +136,5 @@ export {
   UserAlertStrings,
   WorkflowStrings,
   ImportSteps,
+  DataLifeStrings,
 }

@@ -20,7 +20,7 @@ import { IGrantCritterAccessResults } from 'api/permission_api';
  */
 export default function GrantCritterAccessPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
-  const [user, setUser] = useState<User>({} as User);
+  const [user, setUser] = useState<User>(new User());
   const [showModal, setShowModal] = useState<boolean>(false);
   const responseDispatch = useResponseDispatch();
   const queryClient = useQueryClient();
@@ -61,9 +61,10 @@ export default function GrantCritterAccessPage(): JSX.Element {
         {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
         <Typography variant='body2' component='p'>A user has access to devices through the user-animal association.</Typography>
         <DataTable
-          headers={['id', 'idir', 'bceid', 'role_type', 'is_owner']}
+          headers={User.propsToDisplay}
           title='Users'
           queryProps={tableProps}
+          // when a row is selected from the data table, set the current user
           onSelect={(u: User): void => setUser(u)}
         />
         <div className={'button-row'}>
@@ -72,7 +73,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
         <PickCritterPermissionModal
           open={showModal}
           handleClose={(): void => setShowModal(false)}
-          title={`Modifying ${user?.uid?? 'user'}'s Animal Access`}
+          title={`Modifying ${user.uid}'s Animal Access`}
           onSave={handleSave}
           filter={adminPermissionOptions}
           alreadySelected={[]}

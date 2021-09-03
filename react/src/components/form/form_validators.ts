@@ -10,5 +10,4 @@ const mustBeEmail = (email: string): string => {
   return re.test(String(email).toLowerCase()) ? '' : 'Must be a valid email';
 }
 
-
 export { mustBeNegativeNumber, mustBeXDigits, mustBeEmail };

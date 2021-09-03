@@ -7,7 +7,7 @@ import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useContext, useEffect, useState } from 'react';
 import { adminPermissionOptions, eCritterPermission, IUserCritterPermissionInput, ownerPermissionOptions } from 'types/permission';
-import { IUserCritterAccessInput, PermissionTableHeaders, User, UserCritterAccess } from 'types/user';
+import { IUserCritterAccessInput, User, UserCritterAccess } from 'types/user';
 import { Select, MenuItem } from '@material-ui/core';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
@@ -36,7 +36,6 @@ type SelectedUserCritterAccessInput = IUserCritterAccessInput & {
  * @param filter fetch only @type {eCritterPermission}
  * @param showSelectPermission if true, adds a select dropdown component containing the different @type {eCritterPermission} options
  * @param userToLoad unless specified, loads permissions for the current user
- * @param headersToShow headers to display in the permission table modal
 */
 export default function PickCritterPermissionModal({
   open,
@@ -47,7 +46,6 @@ export default function PickCritterPermissionModal({
   alreadySelected,
   showSelectPermission,
   userToLoad,
-  headersToShow = PermissionTableHeaders
 }: PickCritterProps): JSX.Element {
   const useUser = useContext(UserContext);
   const bctwApi = useTelemetryApi();
@@ -152,6 +150,7 @@ export default function PickCritterPermissionModal({
   /** 
    * adds a select dropdown component as the last table row that
    * allows the user to select a permission type for the animal row
+   * fixme: todo: way too many re-renders on selection of row OR dropdown!
   */
   const newColumn = (row: UserCritterAccess): JSX.Element => {
     const access = accessTypes.find((cp) => cp.critter_id === row.critter_id);
@@ -192,7 +191,7 @@ export default function PickCritterPermissionModal({
   return (
     <Modal open={open} handleClose={beforeClose}>
       <DataTable
-        headers={headersToShow}
+        headers={UserCritterAccess.propsToDisplay}
         title={title}
         queryProps={tableProps}
         onSelectMultiple={handleSelect}

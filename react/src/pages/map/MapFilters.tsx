@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Drawer, Grid, IconButton, Paper } from '@material-ui/core';
+import { Box, Button, Divider, Grid, IconButton } from '@material-ui/core';
 import { Close, ArrowForward } from '@material-ui/icons';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';

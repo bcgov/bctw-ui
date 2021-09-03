@@ -3,11 +3,10 @@ import { EditModalBaseProps, ModalBaseProps } from 'components/component_interfa
 import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import React, { useEffect, useState } from 'react';
-import { Animal, critterFormFields } from 'types/animal';
+import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
 import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
-import { CollarStrings } from 'constants/strings';
 
 import HistoryPage from './HistoryPage';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -15,27 +14,22 @@ import FullScreenDialog from 'components/modal/DialogFullScreen';
 import Modal from 'components/modal/Modal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
-import PropTypes from 'prop-types';
-import AppBar from '@material-ui/core/AppBar';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { classicNameResolver } from 'typescript';
 
 
 interface TabPanelProps {
   children?: React.ReactNode;
-  index: any;
-  value: any;
+  index: number;
+  value: unknown;
 }
 
-function TabPanel(props: TabPanelProps) {
+const TabPanel = (props: TabPanelProps): JSX.Element  => {
   const { children, value, index, ...other } = props;
-
   return (
     <div
       role="tabpanel"
@@ -53,7 +47,10 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-function a11yProps(index: any) {
+/**
+ * fixme: what is an ally?
+ */
+const a11yProps = (index: number): Record<string, string> => {
   return {
     id: `simple-tab-${index}`,
     'aria-controls': `simple-tabpanel-${index}`,
@@ -70,10 +67,9 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
 };
 
 /**
- * a component that wraps a form and handles:
+ * Component that wraps a form and handles:
  * - opening/closing of the modal.
  * - whether the form can be saved
- *
  * - uses the ChangeContext provider to force child form components to pass their changeHandlers to this component so that [canSave] can be determined
  * @param children child form component
  * @param isCreatingNew true when 'Add' is selected from data management
@@ -107,7 +103,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const [errors, setErrors] = useState<Record<string, boolean>>(Object.assign({}));
   
   const [value, setValue] = React.useState(0);
-  const handleSwitch = (event: React.ChangeEvent<{1}>, newValue: number) => {
+  const handleSwitch = (event: React.ChangeEvent<{1}>, newValue: number): void => {
     setValue(newValue);
   };
 
@@ -118,13 +114,13 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
         setHistoryParams({
           query: bctwApi.useCritterHistory,
           param: editing.critter_id,
-          propsToDisplay: Object.keys(editing) // critterFormFields.historyProps.map((p) => p.prop)
+          propsToDisplay: Object.keys(editing) // show all Animal properties
         });
       } else if (editing instanceof Collar) {
         setHistoryParams({
           query: bctwApi.useCollarHistory,
           param: editing.collar_id,
-          propsToDisplay: Object.keys(editing) // [...CollarStrings.editableProps, ...['valid_from', 'valid_to']]
+          propsToDisplay: Object.keys(editing) // show all Device properties
         });
       }
     };
@@ -146,8 +142,6 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     }
     update();
   }, [errors])
-
-  const displayHistory = (): void => setShowHistory((o) => !o);
 
   const handleSave = (): void => {
     // use Object.assign to preserve class methods
@@ -194,25 +188,26 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
      */
     <ChangeContext.Provider value={handleChange}>
       {/* the history modal */}
-      {showHistory ? (
+      {!disableHistory && showHistory ? (
         <Modal open={showHistory} handleClose={(): void => setShowHistory(false)}>
           <HistoryPage {...historyParams} />
         </Modal>
       ) : null}
 
       <form className={'rootEditInput'} autoComplete={'off'}>
-
         {headerComponent}
 
-        <Container maxWidth="xl">
+        <Container maxWidth='xl'>
           <Box py={3}>
-
             <Box mb={4}>
-              <Tabs value={value} onChange={handleSwitch} aria-label="simple tabs example"
-                indicatorColor="primary"
-                textColor="primary">
-                <Tab label="Details" {...a11yProps(0)} />
-                <Tab label="History" {...a11yProps(1)} />
+              <Tabs
+                value={value}
+                onChange={handleSwitch}
+                aria-label='simple tabs example'
+                indicatorColor='primary'
+                textColor='primary'>
+                <Tab label='Details' {...a11yProps(0)} />
+                {!disableHistory ? <Tab label='History' {...a11yProps(1)} /> : null}
               </Tabs>
             </Box>
 
@@ -225,35 +220,28 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
                 </Box>
 
                 <Box p={3}>
-                  <Box display="flex" justifyContent="flex-end" className='form-buttons'>
-                    {/* show history button */}
-                    {/* {disableHistory ? null : (
-                      <Button onClick={displayHistory}>{`${showHistory ? 'hide' : 'show'} history`}</Button>
-                    )} */}
+                  <Box display='flex' justifyContent='flex-end' className='form-buttons'>
+
                     {/* save button */}
                     {hideSave ? null : (
-                      <Button size="large" color="primary" onClick={handleSave} disabled={!canSave}>
+                      <Button size='large' color='primary' onClick={handleSave} disabled={!canSave}>
                         Save
                       </Button>
                     )}
-                    <Button size="large" variant="outlined" color="primary">
+                    <Button size='large' variant='outlined' color='primary' onClick={(): void => handleClose(false)}>
                       Cancel and Exit
                     </Button>
                   </Box>
                 </Box>
               </Paper>
-
             </TabPanel>
 
             <TabPanel value={value} index={1}>
               <HistoryPage {...historyParams} />
             </TabPanel>
-
           </Box>
         </Container>
-
       </form>
-
     </ChangeContext.Provider>
   );
 

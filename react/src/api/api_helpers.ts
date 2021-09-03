@@ -15,27 +15,30 @@ const getBaseUrl = (): string => {
   return url;
 }
 
-const appendQueryToUrl = (url: string, query: string): string => {
+const _appendQueryToUrl = (url: string, query: string): string => {
   if (!query) return url;
   return url.includes('?') ?
     url += `&${query}` :
     url += `?${query}`;
 };
 
+/**
+ * todo: doc 
+ */
 const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
   const baseUrl = getBaseUrl();
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
-    url = appendQueryToUrl(url, query);
+    url = _appendQueryToUrl(url, query);
   }
   if (!IS_PROD) {
-    url = appendQueryToUrl(url, `idir=${process.env.REACT_APP_IDIR}`);
+    url = _appendQueryToUrl(url, `idir=${process.env.REACT_APP_IDIR}`);
   }
   if (page) {
-    url = appendQueryToUrl(url, `page=${page}`)
+    url = _appendQueryToUrl(url, `page=${page}`)
   }
   if (testUser) {
-    url = appendQueryToUrl(url, `testUser=${testUser}`)
+    url = _appendQueryToUrl(url, `testUser=${testUser}`)
     // console.log(`retrieving url with testuser ${testUser}`);
   }
   return url;
@@ -50,8 +53,13 @@ const createFormData = (name: string, files: FileList): FormData => {
   return formData;
 }
 
+const isDev = (): boolean => {
+  return process?.env?.NODE_ENV === 'development';
+}
+
 export {
   getBaseUrl,
   createUrl,
   createFormData,
+  isDev,
 }

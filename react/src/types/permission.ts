@@ -20,6 +20,11 @@ export enum eCritterPermission {
   admin = 'admin' // technically not an option
 }
 
+export type PermissionRequestStatus = 'approved' | 'denied' | 'pending' | 'unknown';
+
+export type PermissionWasDeniedReason = 'Not given' | 'Add other reasons here...';
+export const permissionDeniedReasons: PermissionWasDeniedReason[] = ['Not given', 'Add other reasons here...'];
+
 // the 'stock' critter permission filter - filters out only animals with 'none' permissions
 // the endpoint to fetch critter permissions uses this as a default option
 const filterOutNonePermissions: eCritterPermission[] = [
@@ -68,9 +73,11 @@ export interface IPermissionRequest extends
   permission_type: eCritterPermission;
   was_granted: boolean;
   was_denied_reason: string;
+  status: PermissionRequestStatus;
 }
 
-export type PermissionRequestStatus = 'approved' | 'denied' | 'pending' | 'unknown';
+type PermissionRequestProps = keyof IPermissionRequest;
+
 export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
   animal_id: string;
   wlh_id: string;
@@ -88,7 +95,9 @@ export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
   was_granted: boolean;
   was_denied_reason: string;
   valid_to: Date;
-  @Expose() get status(): PermissionRequestStatus {
+  status: PermissionRequestStatus;
+
+  get permissionStatus(): PermissionRequestStatus {
     if (this.valid_to === null) {
       return 'pending';
     } 
@@ -106,23 +115,15 @@ export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
     return columnToHeader(str);
   }
   toJSON(): PermissionRequest { return this }
+
+  // used in OwnerRequestPermission
+  static get ownerHistoryPropsToDisplay(): PermissionRequestProps[] {
+    return [ 'wlh_id', 'animal_id', 'species', 'requested_date',
+      'requested_for_name', 'requested_for_email',
+      'permission_type', 'status', 'was_denied_reason' ];
+  }
 }
 
-// note: new way to create 'typeable' list of fields
-// used in OwnerRequestPermission
-const NewPermRequest = new PermissionRequest();
-const OwnerHistoryFields: (keyof typeof NewPermRequest)[] = [
-  'wlh_id', 'animal_id', 'species', 'requested_date',
-  'requested_for_name', 'requested_for_email',
-  'permission_type', 'status', 'was_denied_reason',
-];
-
-
-// strings that an admin can choose from for default 'im denying this permission because...'
-const ReasonsPermissionWasDenied = [
-  'Not given',
-  'Add other reasons here...',
-];
 
 /**
  * the requests view splits one permission request into multiple rows
@@ -174,6 +175,4 @@ export {
   canRemoveDeviceFromAnimal,
   filterOutNonePermissions,
   groupPermissionRequests,
-  OwnerHistoryFields,
-  ReasonsPermissionWasDenied
 };

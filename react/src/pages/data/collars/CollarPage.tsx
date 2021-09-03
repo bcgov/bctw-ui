@@ -8,7 +8,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCollar from 'pages/data/collars/EditCollar';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { collarPropsToDisplay, Collar, eCollarAssignedStatus, attachedCollarProps } from 'types/collar';
+import { Collar, eCollarAssignedStatus } from 'types/collar';
 import AddEditViewer from '../common/AddEditViewer';
 import CollarImport from 'pages/data/collars/CollarImport';
 import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
@@ -65,7 +65,7 @@ export default function CollarPage(): JSX.Element {
         <>
           <Box mb={4}>
             <DataTable
-              headers={attachedCollarProps}
+              headers={Collar.attachedPropsToDisplay}
               title={S.assignedCollarsTableTitle}
               queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
               onSelect={handleSelect}
@@ -73,7 +73,7 @@ export default function CollarPage(): JSX.Element {
           </Box>
           <Box mb='3'>
             <DataTable
-              headers={collarPropsToDisplay}
+              headers={Collar.propsToDisplay}
               title={S.availableCollarsTableTitle}
               queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}
               onSelect={handleSelect}

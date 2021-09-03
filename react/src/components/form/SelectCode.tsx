@@ -56,6 +56,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
 
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
+    'propName',
     'addEmptyOption',
     'codeHeader',
     'changeHandler',

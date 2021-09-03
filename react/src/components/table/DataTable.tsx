@@ -181,23 +181,23 @@ export default function DataTable<T extends BCTWBase>({
     setFilter(filter);
   };
 
-  const renderNoData = (): JSX.Element => (
+  const NoData = (): JSX.Element => (
     <TableRow>
       <TableCell>
         {isFetching || isLoading ? (
           <CircularProgress />
         ) : isError ? (
           <NotificationMessage severity='error' message={formatAxiosError(error)} />
-        ) : values.length === 0 ? (
-          <strong>Loading...</strong>
-        ) : (
+        ) : isSuccess && data.length === 0 ? (
           <strong>No data available</strong>
+        ) : (
+          <strong>Loading...</strong>
         )}
       </TableCell>
     </TableRow>
   );
 
-  const renderToolbar = (): JSX.Element =>
+  const Toolbar = (): JSX.Element =>
     <TableToolbar
       rowCount={values.length}
       numSelected={selected.length}
@@ -223,7 +223,7 @@ export default function DataTable<T extends BCTWBase>({
   };
 
   return (
-    <TableContainer toolbar={renderToolbar()}>
+    <TableContainer toolbar={Toolbar()}>
       <>
         <Table stickyHeader>
           {data === undefined ? null : (
@@ -242,7 +242,7 @@ export default function DataTable<T extends BCTWBase>({
           )}
           <TableBody>
             {(values && values.length === 0) || isFetching || isLoading || isError
-              ? renderNoData()
+              ? NoData()
               : stableSort(perPage(), getComparator(order, orderBy)).map(
                 (obj: BCTWBase, prop: number) => {
                   const isRowSelected = isSelected(obj[rowIdentifier]);
@@ -271,7 +271,7 @@ export default function DataTable<T extends BCTWBase>({
                         if (!k) {
                           return null;
                         }
-                        const { align, value } = formatTableCell(obj, k);
+                        const { value } = formatTableCell(obj, k);
                         return (
                           <TableCell key={`${k}${i}`} align={'left'}>
                             {value}

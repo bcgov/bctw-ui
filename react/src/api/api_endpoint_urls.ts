@@ -6,7 +6,9 @@ const importCSVEndpoint = 'import-csv';
 const importXMLEndpoint = 'import-xml';
 const exportEndpoint = 'export';
 const getCollarAssignmentHistoryEndpoint = 'get-assignment-history';
-const linkCollarEndpoint = 'change-animal-collar';
+const attachDeviceEndpoint = 'attach-device';
+const removeDeviceEndpoint = 'unattach-device';
+const updateDatalifeEndpoint = 'update-data-life';
 const upsertCritterEndpoint = 'upsert-animal';
 const upsertDeviceEndpoint = 'upsert-collar';
 const upsertAlertEndpoint = 'update-user-alert';
@@ -16,7 +18,9 @@ export {
   importXMLEndpoint,
   exportEndpoint,
   getCollarAssignmentHistoryEndpoint,
-  linkCollarEndpoint,
+  attachDeviceEndpoint,
+  removeDeviceEndpoint,
+  updateDatalifeEndpoint,
   upsertAlertEndpoint,
   upsertCritterEndpoint,
   upsertDeviceEndpoint,

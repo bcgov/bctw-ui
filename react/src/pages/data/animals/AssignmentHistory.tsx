@@ -6,43 +6,69 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { CollarStrings } from 'constants/strings';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { Modal } from 'components/common';
-import { eCritterPermission } from 'types/permission';
+import { eCritterPermission, permissionCanModify } from 'types/permission';
+import Button from 'components/form/Button';
+import EditDataLifeModal from 'components/form/EditDataLifeModal';
 
-export type IAssignmentHistoryProps = Pick<ModalBaseProps, 'open' | 'handleClose'> & {
+export type IAssignmentHistoryPageProps = Pick<ModalBaseProps, 'open' | 'handleClose'> & {
   critter_id: string;
-  permission_type: eCritterPermission; 
+  permission_type: eCritterPermission;
 };
 
 /**
- * displays a table with collar history and collar assign/unassign handling components
- * todo: properly enable assignment to animal from edit device
-*/
-export default function AssignmentHistory(props: IAssignmentHistoryProps): JSX.Element {
-  const { critter_id, open, handleClose } = props;
+ * modal component that contains data table that displays device attachment history
+ * controls visibility of @function PerformAssignmentAction component
+ * accessed from @function EditCritter main page
+ */
+export default function AssignmentHistory(props: IAssignmentHistoryPageProps): JSX.Element {
+  const { critter_id, open, handleClose, permission_type } = props;
   const bctwApi = useTelemetryApi();
-  const [attachedCollarID, setAttachedCollarID] = useState<string>('');
+  const [currentAttachment, setCurrentAttached] = useState<CollarHistory>(new CollarHistory());
+  const [selectedAttachment, setSelectedAttachment] = useState<CollarHistory>(new CollarHistory());
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
+  const [showEditDL, setShowEditDL] = useState<boolean>(false);
 
   const onNewData = (d: CollarHistory[]): void => {
     setCollarHistory(d);
   };
 
   useEffect(() => {
-    if (history?.length) {
+    if (history.length) {
       const attachment = hasCollarCurrentlyAssigned(history);
-      setAttachedCollarID(attachment?.collar_id);
+      // console.log('found current device attachment', attachment);
+      setCurrentAttached(attachment);
     }
   }, [history]);
+
+  /**
+   * Custom column button component passed to device assignment history data table.
+   * When the 'selected' attachment is selected clicking the button,
+   * toggle the display of the @function EditDataLifeModal
+   */
+  const EditDatalifeColumn = (row: CollarHistory): JSX.Element => {
+    const handleClick = async (): Promise<void> => {
+      await setSelectedAttachment(row);
+      setShowEditDL(() => !showEditDL);
+    }
+    return <Button disabled={!permissionCanModify(permission_type)} onClick={handleClick}>Edit Data Life</Button>;
+  };
 
   return (
     <Modal open={open} handleClose={handleClose}>
       <DataTable
         title={CollarStrings.assignmentHistoryByAnimalTitle}
-        headers={['device_id', 'device_make', 'valid_from', 'valid_to']}
+        headers={CollarHistory.propsToDisplay}
         queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
         paginate={history?.length >= 10}
+        customColumns={[{ column: EditDatalifeColumn, header: (): JSX.Element => <b>Modify Data Life</b> }]}
       />
-      <PerformAssignmentAction collar_id={attachedCollarID} {...props} />
+      <PerformAssignmentAction current_attachment={currentAttachment} {...props} />
+      <EditDataLifeModal
+        attachment={selectedAttachment}
+        handleClose={(): void => setShowEditDL(false)}
+        open={showEditDL}
+        permission_type={permission_type}
+      />
     </Modal>
   );
 }
