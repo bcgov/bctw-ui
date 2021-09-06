@@ -13,7 +13,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
 import { IBulkUploadResults } from 'api/api_interfaces';
-import MortalityEvent from 'types/mortality_event';
+import MortalityEvent from 'types/events/mortality_event';
 
 export default function AlertPage(): JSX.Element {
   const bctwApi = useTelemetryApi();

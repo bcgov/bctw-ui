@@ -2,7 +2,7 @@ import { upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_ur
 import { createUrl } from 'api/api_helpers';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
-import MortalityEvent from 'types/mortality_event';
+import MortalityEvent from 'types/events/mortality_event';
 
 import { ApiProps, IBulkUploadResults } from './api_interfaces';
 

@@ -4,6 +4,7 @@ export enum eInputType {
   check = 'check',
   unknown = 'unknown',
   date = 'date',
+  datetime = 'datetime', // todo:
   time = 'time',
   code = 'code'
 }

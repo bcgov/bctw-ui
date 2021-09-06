@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LocationEvent } from 'types/location_event';
+import { LocationEvent } from 'types/events/location_event';
 import DateInput from 'components/form/Date';
 import TextField from 'components/form/TextInput';
 import { InputChangeHandler } from 'components/component_interfaces';
@@ -7,6 +7,7 @@ import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
+import { FormFieldObject } from 'types/form_types';
 
 type LocationEventProps = {
   event: LocationEvent;
@@ -18,11 +19,12 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
   const [useUTM, setUseUTM] = useState<string>('utm');
 
   // create the form inputs
-  const longField = event.formFields.find((f) => f.prop === 'longitude');
-  const latField = event.formFields.find((f) => f.prop === 'latitude');
-  const utmFields = event.formFields.filter((f) => f.prop.includes('utm'));
-  const dateField = event.formFields.find((f) => f.prop === 'date');
-  const commentField = event.formFields.find((f) => f.prop === 'comment');
+  const fields = event.fields;
+  const latField = fields.latlon[0];
+  const longField = fields.latlon[1];
+  const utmFields = fields.utm as FormFieldObject<LocationEvent>[];
+  const dateField = fields.date as FormFieldObject<LocationEvent>;
+  const commentField = fields.comment as FormFieldObject<LocationEvent>;
 
   const changeCoordinateType = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.value;
@@ -34,8 +36,8 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
     <>
       <DateInput
         propName={dateField.prop}
-        label={event.formatPropAsHeader(dateField.prop)}
-        defaultValue={event[dateField.prop] as Date}
+        label={event.formatPropAsHeader('date')}
+        defaultValue={event.date.toDate()} // todo: 
         {...baseInputProps}
       />
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}

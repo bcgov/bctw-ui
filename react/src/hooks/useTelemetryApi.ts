@@ -27,7 +27,7 @@ import { BCTWBase, BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
-import MortalityEvent from 'types/mortality_event';
+import MortalityEvent from 'types/events/mortality_event';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { IChangeDataLifeProps } from 'types/data_life';
 

@@ -1,3 +1,4 @@
+
 // most BCTW database tables contain these columns for transactional history
 export interface BCTWBaseType {
   created_at?: Date;
@@ -28,6 +29,10 @@ export abstract class BCTWBase {
    * from the API into an instance of class T
    */
   abstract get identifier(): string;
+}
+
+export abstract class BCTWEvent {
+  abstract formatPropAsHeader(k: keyof BCTWEvent): string;
 }
 
 /**
