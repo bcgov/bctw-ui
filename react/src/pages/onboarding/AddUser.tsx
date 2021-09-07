@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import axios, { AxiosError, AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import RequestUser from 'components/onboarding/Request';
 import PendingUser from 'components/onboarding/Pending';
 import DeniedUser from 'components/onboarding/Denied';
 import ApprovedUser from 'components/onboarding/Approved';
 import { getBaseUrl } from 'api/api_helpers';
-// import { userApi } from 'api/user_api';
-import { IUserUpsertPayload, userApi as user_api } from 'api/user_api';
+import { userApi as user_api } from 'api/user_api';
 import './AddUser.css';
 
 /**
@@ -38,24 +37,6 @@ const base = getBaseUrl();
 const AddUser = (): JSX.Element => {
   const api = useApi();
   const userApi = user_api({ api });
-  // XXX: This is broken :(
-  /**
-   *  Need to hit the /api/session-info end point instead
-   */
-  // const useUser = useContext(UserContext);
-
-  // const [useUser, setUseUser] = useState(null);
-
-  // const authUrl = `${base}/api/session-info`;
-
-  // console.log('authUrl',authUrl);
-
-  // axios(authUrl).then((res:any) => {
-  //   setUseUser(res.data);
-  //   console.log('Got this from the session-info end point',res.data);
-  // }).catch((err) => {
-  //   console.error('Could not get user keycloak info')
-  // });
   
   const [userAccess,setUserAccess] = useState(null);
 
@@ -66,32 +47,6 @@ const AddUser = (): JSX.Element => {
         if (!res.error) setUserAccess(res.access) ;
       });
   }
-
-  /**
-   * If we have the user keycload data we can request
-   * access info from the database.
-   */
-  // if (userAccess) {
-  //   console.log(userAccess);
-  //   return;
-    // const domain = useUser.user.idir ? 'idir' : 'bceid'
-    // const user = useUser.user.idir ?
-    //   useUser.user.idir :
-    //   useUser.user.bceid
-
-    /* This is the valid url */
-    // const url = `${base}/user-access?onboard-user=${user}&onboard-domain=${domain}&idir=${user}`;
-
-    /* Testing a new user that hasn't applied yet */
-    // const url = `${base}/user-access?onboard-user=testing&onboard-domain=${domain}&idir=${user}`;
-
-    // axios(url).then((res:any) => {
-    //   setUserAccess(res.data.access);
-    //   console.log('Got this from the user-access end point', res.data)
-    // }).catch((err) => {
-    //   console.error('Could not get user access info',err);
-    // })
-  // }
 
   const containerStyle = {
     display: 'flex',
