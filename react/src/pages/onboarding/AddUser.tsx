@@ -43,7 +43,6 @@ const AddUser = (): JSX.Element => {
   if (!userAccess) {
     userApi.getUser()
       .then((res) => {
-        console.log(res);
         if (!res.error) setUserAccess(res.access) ;
       });
   }
