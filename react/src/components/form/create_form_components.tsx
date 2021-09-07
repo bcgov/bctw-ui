@@ -2,10 +2,13 @@ import TextField from 'components/form/TextInput';
 import NumberField from 'components/form/NumberInput';
 import SelectCode from './SelectCode';
 import DateInput from 'components/form/Date';
+import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
 import React from 'react';
 import { columnToHeader, removeProps } from 'utils/common_helpers';
-import { eInputType } from 'types/form_types';
+import { eInputType, FormFieldObject } from 'types/form_types';
+import { BCTWEvent } from 'types/common_types';
+import dayjs from 'dayjs';
 
 type CreateInputBaseProps<T> = {
   value: unknown;
@@ -65,6 +68,20 @@ function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: 
   );
 }
 
+// datetime field handler
+function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
+  return (
+    <DateTimeInput
+      propName={prop as string}
+      label={label}
+      defaultValue={dayjs(value as Date)}
+      changeHandler={handleChange}
+      disabled={disabled}
+      key={`input-dt-${prop}`}
+    />
+  );
+}
+
 // checkbox field handler
 function CreateEditCheckboxField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
   return (
@@ -96,13 +113,13 @@ function CreateEditSelectField<T>({
       label={label}
       disabled={disabled}
       key={prop as string}
-      codeHeader={codeName ?? prop as string}
+      codeHeader={codeName ?? (prop as string)}
       defaultValue={value as string}
       changeHandler={handleChange}
       required={required}
       error={!!errorMessage?.length}
       className={'select-control-small'}
-      propName={codeName ? prop as string : undefined}
+      propName={codeName ? (prop as string) : undefined}
     />
   );
 }
@@ -129,6 +146,8 @@ function MakeEditField<T>({
   let Comp: React.ReactNode;
   if (inputType === eInputType.check) {
     Comp = CreateEditCheckboxField(toPass);
+  } else if (inputType === eInputType.datetime) {
+    Comp = CreateEditDateTimeField(toPass);
   } else if (inputType === eInputType.date) {
     Comp = CreateEditDateField(toPass);
   } else if (inputType === eInputType.code) {
@@ -147,4 +166,42 @@ function MakeEditField<T>({
   );
 }
 
-export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, MakeEditField };
+function FormFromFormfield<T extends BCTWEvent>(
+  obj: T,
+  formField: FormFieldObject<T>,
+  handleChange: (v: Record<string, unknown>) => void,
+  disabled = false,
+  span = false
+): React.ReactNode {
+  const { type, prop, required, codeName } = formField;
+  const toPass = {
+    prop,
+    type,
+    value: obj[prop],
+    handleChange,
+    label: obj.formatPropAsHeader(prop as any),
+    disabled,
+    required,
+    codeName
+  };
+  let Comp: React.ReactNode;
+  if (type === eInputType.check) {
+    Comp = CreateEditCheckboxField(toPass);
+  } else if (type === eInputType.date) {
+    Comp = CreateEditDateField(toPass);
+  } else if (type === eInputType.code) {
+    Comp = CreateEditSelectField(toPass);
+  } else if (type === eInputType.text || type === eInputType.number) {
+    Comp = CreateEditTextField(toPass);
+  }
+  return Comp;
+}
+
+export {
+  CreateEditTextField,
+  CreateEditDateField,
+  CreateEditCheckboxField,
+  CreateEditSelectField,
+  MakeEditField,
+  FormFromFormfield
+};

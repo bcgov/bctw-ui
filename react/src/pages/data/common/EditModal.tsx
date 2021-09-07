@@ -7,6 +7,7 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
 import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
+import { EditTabPanel, a11yProps } from 'pages/data/common/EditModalComponents';
 
 import HistoryPage from './HistoryPage';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -21,45 +22,10 @@ import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: unknown;
-}
-
-const TabPanel = (props: TabPanelProps): JSX.Element  => {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-/**
- * fixme: what is an ally?
- */
-const a11yProps = (index: number): Record<string, string> => {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
   hideSave?: boolean;
+  disableTabs?: boolean;
   disableHistory?: boolean;
   showInFullScreen?: boolean;
   onReset?: () => void;
@@ -78,7 +44,7 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param showInFullScreen render as a modal or fullscreen dialog?
  * @param onReset a close handler since default handler is overwritten in AddEditViewer
  * @param onSave the parent handler called when the save button is clicked
- * @param headerComponent 
+ * @param headerComponent
  */
 export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -93,7 +59,8 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     headerComponent,
     disableHistory = false,
     hideSave = false,
-    showInFullScreen = true,
+    disableTabs = false,
+    showInFullScreen = true
   } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
@@ -101,9 +68,9 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>(null);
   const [errors, setErrors] = useState<Record<string, boolean>>(Object.assign({}));
-  
+
   const [value, setValue] = React.useState(0);
-  const handleSwitch = (event: React.ChangeEvent<{1}>, newValue: number): void => {
+  const handleSwitch = (event: React.ChangeEvent<{ 1 }>, newValue: number): void => {
     setValue(newValue);
   };
 
@@ -137,11 +104,11 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   // if the error state changes, update the save status
   useDidMountEffect(() => {
     const update = (): void => {
-      const cs = Object.values(errors).filter(e => !!e);
-      setCanSave(cs.length === 0)
-    }
+      const cs = Object.values(errors).filter((e) => !!e);
+      setCanSave(cs.length === 0);
+    };
     update();
-  }, [errors])
+  }, [errors]);
 
   const handleSave = (): void => {
     // use Object.assign to preserve class methods
@@ -156,8 +123,8 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     // console.log(newProp);
     // update the error state
     const key: string = Object.keys(newProp)[0];
-    const newErrors = Object.assign(errors, {[key]: newProp.error});
-    setErrors({...newErrors});
+    const newErrors = Object.assign(errors, { [key]: newProp.error });
+    setErrors({ ...newErrors });
     // update the editing state
     const modified = { ...newObj, ...newProp };
     setNewObj(modified);
@@ -199,19 +166,20 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
 
         <Container maxWidth='xl'>
           <Box py={3}>
-            <Box mb={4}>
-              <Tabs
-                value={value}
-                onChange={handleSwitch}
-                aria-label='simple tabs example'
-                indicatorColor='primary'
-                textColor='primary'>
-                <Tab label='Details' {...a11yProps(0)} />
-                {!disableHistory ? <Tab label='History' {...a11yProps(1)} /> : null}
-              </Tabs>
-            </Box>
-
-            <TabPanel value={value} index={0}>
+            {disableTabs ? null : (
+              <Box mb={4}>
+                <Tabs
+                  value={value}
+                  onChange={handleSwitch}
+                  aria-label='simple tabs example'
+                  indicatorColor='primary'
+                  textColor='primary'>
+                  <Tab label='Details' {...a11yProps(0)} />
+                  {!disableHistory ? <Tab label='History' {...a11yProps(1)} /> : null}
+                </Tabs>
+              </Box>
+            )}
+            <EditTabPanel value={value} index={0}>
               <Paper>
                 {children}
 
@@ -221,7 +189,6 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
 
                 <Box p={3}>
                   <Box display='flex' justifyContent='flex-end' className='form-buttons'>
-
                     {/* save button */}
                     {hideSave ? null : (
                       <Button size='large' color='primary' onClick={handleSave} disabled={!canSave}>
@@ -234,11 +201,11 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
                   </Box>
                 </Box>
               </Paper>
-            </TabPanel>
+            </EditTabPanel>
 
-            <TabPanel value={value} index={1}>
+            <EditTabPanel value={value} index={1}>
               <HistoryPage {...historyParams} />
-            </TabPanel>
+            </EditTabPanel>
           </Box>
         </Container>
       </form>

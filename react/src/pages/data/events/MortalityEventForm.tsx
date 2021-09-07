@@ -1,19 +1,20 @@
-import { Paper } from '@material-ui/core';
-import ChangeContext from 'contexts/InputChangeContext';
+import { Box } from '@material-ui/core';
+import { IUpsertPayload } from 'api/api_interfaces';
 import { ModalBaseProps } from 'components/component_interfaces';
-import { CreateEditCheckboxField, CreateEditDateField, MakeEditField } from 'components/form/create_form_components';
-import { UserAlertStrings, WorkflowStrings } from 'constants/strings';
+import { CreateEditCheckboxField, CreateEditDateField, FormFromFormfield } from 'components/form/create_form_components';
+import { UserAlertStrings } from 'constants/strings';
+import ChangeContext from 'contexts/InputChangeContext';
+import dayjs from 'dayjs';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { useState } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { LocationEvent } from 'types/events/location_event';
-import EditModal from '../common/EditModal';
-import { useState } from 'react';
-import LocationEventForm from './LocationEventForm';
-import { removeProps } from 'utils/common_helpers';
 import MortalityEvent from 'types/events/mortality_event';
-import { IUpsertPayload } from 'api/api_interfaces';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Tooltip } from 'components/common';
-import dayjs from 'dayjs';
+import { removeProps } from 'utils/common_helpers';
+
+import EditModal from 'pages/data//common/EditModal';
+import { FormPart } from 'pages/data//common/EditModalComponents';
+import LocationEventForm from 'pages/data/events/LocationEventForm';
 
 type MortEventProps = ModalBaseProps & {
   alert: TelemetryAlert;
@@ -31,19 +32,14 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
   const [mortalityEvent, setMortalityEvent] = useState<MortalityEvent>(
     new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id)
   );
-  const [locationEvent, setLocationEvent] = useState<LocationEvent>(new LocationEvent('mortality', dayjs(alert.valid_from)));
+  const [locationEvent, setLocationEvent] = useState<LocationEvent>(
+    new LocationEvent('mortality', dayjs(alert.valid_from))
+  );
   const [isRetrieved, setIsRetrieved] = useState<boolean>(false);
 
   // const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.formFields);
-  const required = true;
-
-  // const retrievedField = mortalityEvent.formFields.find((f) => f.prop === 'retrieved');
-  // const retrievedDateField = mortalityEvent.formFields.find((f) => f.prop === 'retrieval_date');
-  // const animalStatusField = mortalityEvent.formFields.find((f) => f.prop === 'animal_status');
-  // const pcodField = mortalityEvent.formFields.find((f) => f.prop === 'proximate_cause_of_death');
-  // const vasField = mortalityEvent.formFields.find((f) => f.prop === 'activation_status');
-  // const pcodConfidenceValueField = formFields.find(f => f.key === 'pcod_confidence_value');
-  // const deviceStatusFields = formFields.filter(f => ['device_status', 'device_deployment_status'].includes(f.key))
+  // const required = true;
+  const { fields } = mortalityEvent;
 
   /**
    * break the MortalityEvent into collar/critter specific properties
@@ -66,26 +62,27 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
     setLocationEvent(new LocationEvent('mortality', dayjs(alert.valid_from)));
   }, [alert]);
 
-  // fixme: why 
+  // fixme: why
   // if (!animalStatusField) {
   //   return <div>oops..</div>;
   // }
 
   const Header = (
-    <Paper className={'dlg-full-title'} elevation={3}>
-      <h1>{UserAlertStrings.mortalityFormTitle} </h1>
-      <div className={'dlg-full-sub'}>
-        <span className='span'>WLH ID: {alert.wlh_id}</span>
-        {alert.animal_id ? (
-          <>
-            <span className='span'>|</span>
-            <span className='span'>Animal ID: {alert.animal_id}</span>
-          </>
-        ) : null}
-        <span className='span'>|</span>
-        <span className='span'>Device: {alert.device_id}</span>
-      </div>
-    </Paper>
+    <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
+      <Box>
+        <Box component='h1' mt={0} mb={1}>
+          {UserAlertStrings.mortalityFormTitle}
+        </Box>
+        <dl className='headergroup-dl'>
+          <dd>WLH ID:</dd>
+          <dt>{alert.wlh_id}</dt>
+          <dd>Animal ID:</dd>
+          <dt>{alert.animal_id}</dt>
+          <dd>Device:</dd>
+          <dt>{alert.device_id}</dt>
+        </dl>
+      </Box>
+    </Box>
   );
 
   return (
@@ -94,9 +91,9 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
       handleClose={handleClose}
       onSave={onSave}
       editing={mortalityEvent}
-      // hasErrors={(): boolean => objHasErrors(errors)}
       open={open}
       headerComponent={Header}
+      disableTabs={true}
       disableHistory={true}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
@@ -128,106 +125,54 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
             handlerFromContext(l, true);
           };
 
+          // const tooltipProps: Pick<TooltipProps, 'placement' | 'enterDelay'> = { placement: 'right', enterDelay: 750 };
+
           return (
             <>
-              {/* form body */}
-              <Paper elevation={0} className={'dlg-full-form'}>
-                {/* <Paper elevation={3} className={'dlg-full-body-details'}> */}
-                <div className={'dlg-details-section'}>
-                  <h3>Update Assignment Details</h3>
-                  <Tooltip
-                    title={<p>{WorkflowStrings.mortalityUnassignDeviceTooltip}</p>}
-                    placement='right'
-                    enterDelay={750}>
-                    <div>
-                      {CreateEditCheckboxField({
-                        prop: mortalityEvent.fields.shouldUnattachDevice.prop,
-                        type: mortalityEvent.fields.shouldUnattachDevice.type,
-                        value: mortalityEvent.shouldUnattachDevice,
-                        label: mortalityEvent.formatPropAsHeader('shouldUnattachDevice'),
-                        handleChange: onChange
-                      })}
-                    </div>
-                  </Tooltip>
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Update Device Details</h3>
-                  <Tooltip
-                    title={
-                      <p>
-                        If <strong>checked</strong>, <i>Device Deployment Status</i> will be automatically set to{' '}
-                        <em>"Not Deployed"</em>.
-                      </p>
-                    }
-                    placement='right'
-                    enterDelay={750}>
-                    <div>
-                      {CreateEditCheckboxField({
-                        prop: mortalityEvent.fields.retrieved.prop,
-                        type: mortalityEvent.fields.retrieved.type,
-                        value: mortalityEvent.retrieved,
-                        label: mortalityEvent.formatPropAsHeader('retrieved'),
-                        handleChange: onChange
-                      })}
-                    </div>
-                  </Tooltip>
-                  <Tooltip
-                    title={<p>TODO: If <strong>checked</strong>then...</p>}
-                    placement='right'
-                    enterDelay={750}>
-                    <div>
-                      {/* {retrievedDateField ?  */}
-                      {CreateEditDateField({
-                          prop: mortalityEvent.fields.retrieval_date.prop,
-                          type: mortalityEvent.fields.retrieval_date.type,
-                          value: mortalityEvent.retrieval_date,
-                          label: mortalityEvent.formatPropAsHeader('retrieval_date'),
-                          handleChange: onChange,
-                          disabled: !isRetrieved
-                        })}
-                        {/* : null} */}
-                    </div>
-                  </Tooltip>
-                  <Tooltip
-                    title={<p>TODO: If <strong>checked</strong>then...</p>}
-                    placement='right'
-                    enterDelay={750}>
-                    <div style={{ marginBottom: '10px' }}>
-                      {CreateEditCheckboxField({
-                        prop: mortalityEvent.fields.activation_status.prop,
-                        type: mortalityEvent.fields.activation_status.type,
-                        value: mortalityEvent.activation_status,
-                        label: mortalityEvent.formatPropAsHeader('activation_status'),
-                        handleChange: onChange
-                      })}
-                    </div>
-                  </Tooltip>
-                  {/* deviceStatusFields.map((formType) => {
-                      return MakeEditField({
-                        formType,
-                        handleChange: onChange,
-                        required,
-                        errorMessage: !!errors[formType.key] && (errors[formType.key]),
-                      });
-                    }) */}
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Update Animal Details</h3>
-                  {/* {animalStatusField ?  */}
-                  {MakeEditField({ prop: mortalityEvent.fields.animal_status.prop, type: mortalityEvent.fields.animal_status.type, value: mortalityEvent.animal_status, handleChange: onChange, required, errorMessage: '' })}
-                    {/* : null} */}
-                  <div style={{ marginBottom: '18px' }}>
-                    {/* {pcodField ?  */}
-                   {MakeEditField({ prop: mortalityEvent.fields.proximate_cause_of_death.prop, 
-                   type: mortalityEvent.fields.proximate_cause_of_death.type, value: mortalityEvent.proximate_cause_of_death, handleChange: onChange, required, errorMessage: '' })}
-                      {/* : null} */}
-                  </div>
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Mortality Event Details &amp; Comment</h3>
-                  <LocationEventForm event={locationEvent} handleChange={onChangeLocationProp} />
-                </div>
-              </Paper>
+              {FormPart('Update Assignment Details', [
+                CreateEditCheckboxField({
+                  prop: mortalityEvent.fields.shouldUnattachDevice.prop,
+                  type: mortalityEvent.fields.shouldUnattachDevice.type,
+                  value: mortalityEvent.shouldUnattachDevice,
+                  label: mortalityEvent.formatPropAsHeader('shouldUnattachDevice'),
+                  handleChange: onChange
+                })
+              ])}
+              {FormPart('Update Device Details', [
+                CreateEditCheckboxField({
+                  prop: fields.retrieved.prop,
+                  type: fields.retrieved.type,
+                  value: mortalityEvent.retrieved,
+                  label: mortalityEvent.formatPropAsHeader('retrieved'),
+                  handleChange: onChange
+                }),
+                CreateEditDateField({
+                  prop: fields.retrieval_date.prop,
+                  type: fields.retrieval_date.type,
+                  value: mortalityEvent.retrieval_date,
+                  label: mortalityEvent.formatPropAsHeader('retrieval_date'),
+                  handleChange: onChange,
+                  disabled: !isRetrieved
+                }),
+                CreateEditCheckboxField({
+                  prop: fields.activation_status.prop,
+                  type: fields.activation_status.type,
+                  value: mortalityEvent.activation_status,
+                  label: mortalityEvent.formatPropAsHeader('activation_status'),
+                  handleChange: onChange
+                })
+              ])}
+              {FormPart('Update Animal Details', [
+                FormFromFormfield(mortalityEvent, fields.animal_status, onChange),
+                FormFromFormfield(mortalityEvent, fields.proximate_cause_of_death, onChange)
+              ])}
+              {FormPart('Mortality Event Details', [
+                FormFromFormfield(mortalityEvent, fields.animal_status, onChange),
+                FormFromFormfield(mortalityEvent, fields.proximate_cause_of_death, onChange)
+              ])}
+              {FormPart('', [
+                <LocationEventForm event={locationEvent} handleChange={onChangeLocationProp} />
+              ])}
             </>
           );
         }}

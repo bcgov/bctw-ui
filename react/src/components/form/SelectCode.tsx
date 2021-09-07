@@ -137,6 +137,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
    *   [propName]: code,
    *   error: bool
    * }
+   * fixme: this is pushing the code, why not the id?
    */
   const pushChange = (v: string): void => {
     const code = codes.find((c) => c?.description === v)?.code ?? v;
