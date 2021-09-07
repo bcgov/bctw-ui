@@ -237,6 +237,7 @@ const onboardingRedirect = async (req, res, next) => {
 //  console.log('onboardingRedirect() -- data:', data)
   const { user, domain } = splitCredentials(data);
   console.log('onboardingRedirect() -- user:', user)
+  // TODO: Get credential info from the 'getUser() function'
   const email = data.email;
   const givenName = data.given_name;
   const familyName = data.family_name;

@@ -1,12 +1,28 @@
 import { useState } from 'react';
+import axios, { AxiosError, AxiosInstance } from 'axios';
+import { useMemo } from 'react';
 import RequestUser from 'components/onboarding/Request';
 import PendingUser from 'components/onboarding/Pending';
 import DeniedUser from 'components/onboarding/Denied';
 import ApprovedUser from 'components/onboarding/Approved';
-import axios from 'axios';
 import { getBaseUrl } from 'api/api_helpers';
+// import { userApi } from 'api/user_api';
+import { IUserUpsertPayload, userApi as user_api } from 'api/user_api';
 import './AddUser.css';
 
+/**
+ * Returns an instance of axios with baseURL set.
+ *
+ * @return {AxiosInstance}
+ */
+const useApi = (): AxiosInstance => {
+  const instance = useMemo(() => {
+    return axios.create({
+      baseURL: getBaseUrl()
+    });
+  }, []);
+  return instance;
+};
 
 /**
  * # AddUser
@@ -20,50 +36,62 @@ import './AddUser.css';
 const base = getBaseUrl();
 
 const AddUser = (): JSX.Element => {
+  const api = useApi();
+  const userApi = user_api({ api });
   // XXX: This is broken :(
   /**
    *  Need to hit the /api/session-info end point instead
    */
   // const useUser = useContext(UserContext);
 
-  const [useUser, setUseUser] = useState(null);
+  // const [useUser, setUseUser] = useState(null);
 
-  const authUrl = `${base}/api/session-info`;
+  // const authUrl = `${base}/api/session-info`;
 
-  console.log('authUrl',authUrl);
+  // console.log('authUrl',authUrl);
 
-  axios(authUrl).then((res:any) => {
-    setUseUser(res.data);
-    console.log('Got this from the session-info end point',res.data);
-  }).catch((err) => {
-    console.error('Could not get user keycloak info')
-  });
+  // axios(authUrl).then((res:any) => {
+  //   setUseUser(res.data);
+  //   console.log('Got this from the session-info end point',res.data);
+  // }).catch((err) => {
+  //   console.error('Could not get user keycloak info')
+  // });
   
   const [userAccess,setUserAccess] = useState(null);
+
+  if (!userAccess) {
+    userApi.getUser()
+      .then((res) => {
+        console.log(res);
+        if (!res.error) setUserAccess(res.access) ;
+      });
+  }
 
   /**
    * If we have the user keycload data we can request
    * access info from the database.
    */
-  if (useUser && !userAccess) {
-    const domain = useUser.user.idir ? 'idir' : 'bceid'
-    const user = useUser.user.idir ?
-      useUser.user.idir :
-      useUser.user.bceid
+  // if (userAccess) {
+  //   console.log(userAccess);
+  //   return;
+    // const domain = useUser.user.idir ? 'idir' : 'bceid'
+    // const user = useUser.user.idir ?
+    //   useUser.user.idir :
+    //   useUser.user.bceid
 
     /* This is the valid url */
-    const url = `${base}/user-access?onboard-user=${user}&onboard-domain=${domain}&idir=${user}`;
+    // const url = `${base}/user-access?onboard-user=${user}&onboard-domain=${domain}&idir=${user}`;
 
     /* Testing a new user that hasn't applied yet */
     // const url = `${base}/user-access?onboard-user=testing&onboard-domain=${domain}&idir=${user}`;
 
-    axios(url).then((res:any) => {
-      setUserAccess(res.data.access);
-      console.log('Got this from the user-access end point', res.data)
-    }).catch((err) => {
-      console.error('Could not get user access info',err);
-    })
-  }
+    // axios(url).then((res:any) => {
+    //   setUserAccess(res.data.access);
+    //   console.log('Got this from the user-access end point', res.data)
+    // }).catch((err) => {
+    //   console.error('Could not get user access info',err);
+    // })
+  // }
 
   const containerStyle = {
     display: 'flex',
@@ -72,13 +100,13 @@ const AddUser = (): JSX.Element => {
     minWidth: '100vw'
   };
 
-  const onboardingStyle = {
-  };
+  // const onboardingStyle = {
+  // };
 
   return (
     <div style={containerStyle}>
       {
-        useUser && userAccess ? // User is in the system
+        userAccess ? // User is in the system
           <div>
             {/* userAccess == "granted" ? <RequestUser/> : "" */}  {/*XXX for testing */}
             { userAccess == "granted" ? <ApprovedUser/> : ""}
