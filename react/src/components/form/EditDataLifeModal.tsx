@@ -30,8 +30,10 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   const [dli, setDli] = useState<DataLifeInput>(new DataLifeInput(attachment));
 
   useDidMountEffect(() => {
-    // console.log('new attachment provided to DL modal', attachment.assignment_id)
-    setDli(new DataLifeInput(attachment));
+    if (attachment) {
+      // console.log('new attachment provided to DL modal', attachment.assignment_id)
+      setDli(new DataLifeInput(attachment));
+    }
   }, [attachment]);
 
   // must be defined before mutation declarations
@@ -69,7 +71,7 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
           disableEditActual={true} // always disable editing the actual start/end fields in this modal
           enableEditStart={true} 
           // can only edit the end fields if this attachment is expired
-          enableEditEnd={!!attachment.valid_to} 
+          enableEditEnd={!!attachment.data_life_end} 
           // admin privileged users can always edit DL dates
           disableDLStart={isAdmin ? false : !new DataLifeInput(attachment).canChangeDLStart}
           disableDLEnd={isAdmin ? false : !new DataLifeInput(attachment).canChangeDLEnd}

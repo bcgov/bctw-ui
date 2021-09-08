@@ -4,7 +4,7 @@ export enum eInputType {
   check = 'check',
   unknown = 'unknown',
   date = 'date',
-  datetime = 'datetime', // todo:
+  datetime = 'datetime',
   time = 'time',
   code = 'code'
 }
@@ -20,6 +20,7 @@ export type FormFieldObject<T> = {
   codeName?: string;
   required?: boolean;
   span?: boolean;
+  disabled?: boolean; // todo:
 };
 
 // spread in form field constructors to make a field required

@@ -1,25 +1,32 @@
+import { getCritterEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
 import { createUrl } from 'api/api_helpers';
+import { ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { plainToClass } from 'class-transformer';
-import { Animal, eCritterFetchType, IAnimal } from 'types/animal';
-import { upsertCritterEndpoint } from 'api/api_endpoint_urls';
+import { Animal, AttachedAnimal, eCritterFetchType, IAnimal, IAttachedAnimal } from 'types/animal';
 
-import { ApiProps, IBulkUploadResults, IDeleteType, IUpsertPayload } from './api_interfaces';
+// fixme: type apis
+// type APICall<T> = (...args: unknown[]) => T | T[];
+// type API = Record<string, APICall<unknown>>;
 
 export const critterApi = (props: ApiProps) => {
   const { api, testUser } = props;
 
-  const _GET_CRITTER_API = 'get-animals';
-  const _handleGetResults = (data: IAnimal[]): Animal[] => {
-    const results = data.map((json: IAnimal) => plainToClass(Animal, json));
+  const _handleGetResults = (
+    data: IAnimal[] | IAttachedAnimal[],
+    type: eCritterFetchType
+  ): Animal[] | AttachedAnimal[] => {
+    const results = data.map((json: IAnimal) =>
+      type === eCritterFetchType.assigned ? plainToClass(AttachedAnimal, json) : plainToClass(Animal, json)
+    );
     return results;
-  }
+  };
 
-  const getCritters = async (page = 1, critterType: eCritterFetchType): Promise<Animal[]> => {
-    const url = createUrl({ api: _GET_CRITTER_API, query: `critterType=${critterType}`, page, testUser });
+  const getCritters = async (page = 1, critterType: eCritterFetchType): Promise<Animal[] | AttachedAnimal[]> => {
+    const url = createUrl({ api: getCritterEndpoint, query: `critterType=${critterType}`, page, testUser });
     // console.log(`requesting assigned critters page: ${page}`);
     const { data } = await api.get(url);
-    return _handleGetResults(data);
-  }
+    return _handleGetResults(data, critterType);
+  };
 
   const upsertCritter = async (payload: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
     const { body } = payload;
@@ -27,28 +34,17 @@ export const critterApi = (props: ApiProps) => {
     // const critters = body.map(a => serialize(a))
     const { data } = await api.post(url, body);
     return data;
-  }
-
-  // also handles deletes for collars
-  const deleteType = async ({objType, id}: IDeleteType): Promise<boolean> => {
-    const url = createUrl({ api: `${objType}/${id}` });
-    const { status, data } = await api.delete(url);
-    if (status === 200) {
-      return true;
-    }
-    return data;
-  }
+  };
 
   const getCritterHistory = async (page: number, id: string): Promise<Animal[]> => {
-    const url = createUrl({ api: `get-animal-history/${id}`, page, testUser});
+    const url = createUrl({ api: `get-animal-history/${id}`, page, testUser });
     const { data } = await api.get(url);
     return data.map((json: IAnimal[]) => plainToClass(Animal, json));
-  }
+  };
 
   return {
-    deleteType,
     getCritters,
     getCritterHistory,
     upsertCritter,
-  }
-}
+  };
+};

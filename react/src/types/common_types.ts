@@ -1,17 +1,25 @@
+import dayjs, { Dayjs } from 'dayjs';
 
+export interface BCTWValidDates {
+  valid_from: Date | Dayjs;
+  valid_to: Date | Dayjs; // a null value in this column indicates the 'current' record
+}
 // most BCTW database tables contain these columns for transactional history
-export interface BCTWBaseType {
+export interface BCTWBaseType extends BCTWValidDates {
   created_at?: Date;
   created_by_user_id?: number;
   updated_at?: Date;
   updated_by_user_id?: number;
-  valid_from: Date;
-  valid_to: Date; // a null value in this column indicates the 'current' record
   owned_by_user_id?: boolean; // base types may include this
 }
 
 /**
- * almost any BCTW class that is displayed on in a data table or sent to the API is derived 
+ * similar to the @type {Code}, currently just a string alias
+ */
+export type uuid = string;
+
+/**
+ * almost any BCTW class that is displayed on in a data table or sent to the API is derived
  * from this base class
  */
 export abstract class BCTWBase {
@@ -20,7 +28,7 @@ export abstract class BCTWBase {
   abstract formatPropAsHeader(k: keyof BCTWBase): string;
   /**
    * optionally called before posting to API
-   * ex. to remove unwanted properties that should not be preserved 
+   * ex. to remove unwanted properties that should not be preserved
    */
   abstract toJSON(): BCTWBase;
   /**
@@ -31,14 +39,10 @@ export abstract class BCTWBase {
   abstract get identifier(): string;
 }
 
-export abstract class BCTWEvent {
-  abstract formatPropAsHeader(k: keyof BCTWEvent): string;
-}
-
 /**
  * defines the main object types that have metadata in BCTW
  */
-export type BCTWType = 'animal' | 'device'
+export type BCTWType = 'animal' | 'device';
 
 /**
  * extend a type, optionally including props
@@ -47,10 +51,13 @@ export type PartialPick<T, K extends keyof T> = {
   [P in K]?: T[P];
 };
 
-
 /**
  * used with transforming types from the API
  * generally only care about object received from API -> instance of UI class
  * ex. nulls can be transformed to a boolean or number
  */
-export const transformOpt = { toClassOnly: true };
+const transformOpt = { toClassOnly: true };
+const nullToNumber = (v: number | null): number => (typeof v === 'number' ? v : -1);
+const nullToDayjs = (v: Date | null): Dayjs => dayjs(v);
+
+export { nullToDayjs, nullToNumber, transformOpt };

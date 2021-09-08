@@ -1,17 +1,17 @@
-import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBase, BCTWBaseType, PartialPick, transformOpt } from 'types/common_types';
-import { Type, Expose, Transform } from 'class-transformer';
-import { eCritterPermission } from 'types/permission';
-import { formatLatLong } from 'utils/common_helpers';
+import { Transform, Type } from 'class-transformer';
+import { Dayjs } from 'dayjs';
+import { Code } from 'types/code';
+import { BCTWBase, BCTWBaseType, nullToDayjs, nullToNumber, transformOpt, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
-import { Collar } from './collar';
+import { eCritterPermission } from 'types/permission';
+import { columnToHeader, formatLatLong } from 'utils/common_helpers';
+import { ICollarHistory } from './collar_history';
 
 
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
   assigned = 'assigned',
-  unassigned = 'unassigned',
-  all = 'all'
+  unassigned = 'unassigned'
 }
 
 /**
@@ -19,44 +19,41 @@ export enum eCritterFetchType {
  */
 export interface IAnimalTelemetryBase {
   animal_id: string;
-  animal_status: string; // code
-  capture_date: Date;
+  animal_status: Code;
+  capture_date: Dayjs|Date;
   collective_unit: string; // fixme: what is this
-  map_colour: string; // code
-  species: string; // code
-  population_unit: string; // code
+  map_colour: Code;
+  species: Code;
+  population_unit: Code;
   wlh_id: string;
 }
 
-export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase, 
-  PartialPick<Collar, 'collar_id' | 'device_id' | 'frequency'> {
-  animal_colouration: string;
+export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase {
+  animal_colouration: Code;
   animal_comment: string;
   associated_animal_id: string;
-  associated_animal_relationship: string; // code
+  associated_animal_relationship: Code;
 
   capture_comment: string;
-  capture_time: Date; // todo:
   capture_latitude: number;
   capture_longitude: number;
   capture_utm_easting: number;
   capture_utm_northing: number;
   capture_utm_zone: number;
 
-  critter_id: string;
-  critter_transaction_id: string;
+  critter_id: uuid;
+  critter_transaction_id: uuid;
   ear_tag_left_id: string; 
   ear_tag_right_id: string;
-  ear_tag_left_colour: string; // code
-  ear_tag_right_colour: string; // code
+  ear_tag_left_colour: string;
+  ear_tag_right_colour: string;
   estimated_age: number;
-  juvenile_at_heel: string; // code
+  juvenile_at_heel: Code;
   juvenile_at_heel_count: number;
-  life_stage: string;
+  life_stage: Code;
 
   mortality_comment: string;
-  mortality_date: Date;
-  mortality_time: Date; // todo:
+  mortality_date: Dayjs;
   mortality_latitude: number;
   mortality_longitude: number;
   mortality_utm_easting: number;
@@ -64,42 +61,41 @@ export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase,
   mortality_utm_zone: number;
 
   permission_type?: eCritterPermission; // critters should contain this
-  predator_species: string; // special species code fixme:
-  proximate_cause_of_death: string; // code
-  recapture: boolean; // what is this?
-  region: string; // code
+  predator_species: Code;
+  proximate_cause_of_death: Code;
+  recapture: boolean;
+  region: Code;
 
   release_comment: string;
-  release_date: Date;
-  release_time: Date; // todo:
+  release_date: Dayjs;
   release_latitude: number;
   release_longitude: number;
   release_utm_easting: number;
   release_utm_northing: number;
   release_utm_zone: number;
 
-  sex: string;
+  sex: Code;
   translocation: boolean;
-  ultimate_cause_of_death: string; // code
+  ultimate_cause_of_death: Code;
 }
+
+// used to get type-safe lists of keys
 type AnimalProps = keyof IAnimal;
 
-
 export class Animal extends BCTWBase implements IAnimal {
-  critter_id: string;
-  critter_transaction_id: string;
+  critter_id: uuid;
+  critter_transaction_id: uuid;
   animal_id: string;
-  animal_status: string;
+  animal_status: Code;
   associated_animal_id: string;
-  associated_animal_relationship: string; 
+  associated_animal_relationship: Code; 
   capture_comment: string;
-  @Type(() => Date) capture_date: Date;
-  @Type(() => Date) capture_time: Date;
-  @Transform((v) => v || -1, transformOpt) capture_latitude: number;
-  @Transform((v) => v || -1, transformOpt) capture_longitude: number;
-  @Transform((v) => v || -1, transformOpt) capture_utm_easting: number;
-  @Transform((v) => v || -1, transformOpt) capture_utm_northing: number;
-  @Transform((v) => v || -1, transformOpt) capture_utm_zone: number;
+  @Transform(nullToDayjs) capture_date: Dayjs;
+  @Transform(nullToNumber, transformOpt) capture_latitude: number;
+  @Transform(nullToNumber, transformOpt) capture_longitude: number;
+  @Transform(nullToNumber, transformOpt) capture_utm_easting: number;
+  @Transform(nullToNumber, transformOpt) capture_utm_northing: number;
+  @Transform(nullToNumber, transformOpt) capture_utm_zone: number;
   collective_unit: string;
   animal_colouration: string;
   ear_tag_left_id: string;
@@ -107,67 +103,66 @@ export class Animal extends BCTWBase implements IAnimal {
   ear_tag_left_colour: string;
   ear_tag_right_colour: string;
   @Transform((value) => value || -1, transformOpt) estimated_age: number;
-  juvenile_at_heel: string;
+  juvenile_at_heel: Code;
   @Transform((value) => value || -1, transformOpt) juvenile_at_heel_count: number;
-  life_stage: string;
-  map_colour: string;
+  life_stage: Code;
+  map_colour: Code;
   mortality_comment: string;
-  @Type(() => Date) mortality_date: Date;
-  @Type(() => Date) mortality_time: Date;
-  @Transform((v) => v || -1, transformOpt) mortality_latitude: number;
-  @Transform((v) => v || -1, transformOpt) mortality_longitude: number;
-  @Transform((v) => v || -1, transformOpt) mortality_utm_easting: number;
-  @Transform((v) => v || -1, transformOpt) mortality_utm_northing: number;
-  @Transform((v) => v || -1, transformOpt) mortality_utm_zone: number;
-  predator_species: string;
-  proximate_cause_of_death: string;
-  ultimate_cause_of_death: string;
-  population_unit: string;
+  @Transform(nullToDayjs) mortality_date: Dayjs;
+  @Transform(nullToNumber, transformOpt) mortality_latitude: number;
+  @Transform(nullToNumber, transformOpt) mortality_longitude: number;
+  @Transform(nullToNumber, transformOpt) mortality_utm_easting: number;
+  @Transform(nullToNumber, transformOpt) mortality_utm_northing: number;
+  @Transform(nullToNumber, transformOpt) mortality_utm_zone: number;
+  predator_species: Code;
+  proximate_cause_of_death: Code;
+  ultimate_cause_of_death: Code;
+  population_unit: Code;
   recapture: boolean;
-  region: string;
+  region: Code;
   release_comment: string;
-  @Type(() => Date) release_date: Date;
-  @Type(() => Date) release_time: Date;
-  @Transform((v) => v || -1, transformOpt) release_latitude: number;
-  @Transform((v) => v || -1, transformOpt) release_longitude: number;
-  @Transform((v) => v || -1, transformOpt) release_utm_easting: number;
-  @Transform((v) => v || -1, transformOpt) release_utm_northing: number;
-  @Transform((v) => v || -1, transformOpt) release_utm_zone: number;
-  sex: string;
-  species: string;
+  @Transform(nullToDayjs) release_date: Dayjs;
+  @Transform(nullToNumber, transformOpt) release_latitude: number;
+  @Transform(nullToNumber, transformOpt) release_longitude: number;
+  @Transform(nullToNumber, transformOpt) release_utm_easting: number;
+  @Transform(nullToNumber, transformOpt) release_utm_northing: number;
+  @Transform(nullToNumber, transformOpt) release_utm_zone: number;
+  sex: Code;
+  species: Code;
   translocation: boolean;
   wlh_id: string;
   animal_comment: string;
+  // fixme: ...usercritter access needs update
+  // @Transform(nullToDayjs) valid_from: Dayjs;
+  // @Transform(nullToDayjs) valid_to: Dayjs;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
-  permission_type: eCritterPermission;
-  device_id?: number;
-  collar_id?: string;
-  frequency?: number;
 
-  @Expose() get identifier(): keyof Animal {
+  permission_type: eCritterPermission;
+
+  get identifier(): keyof Animal {
     return 'critter_id';
   }
-  @Expose() get name(): string {
+  get name(): string {
     return this.wlh_id ?? this.animal_id;
   }
-  @Expose() get mortalityCoords(): string {
+  get mortalityCoords(): string {
     return this.mortality_latitude && this.mortality_longitude
       ? formatLatLong(this.mortality_latitude, this.mortality_longitude)
       : '';
   }
-  @Expose() get mortalityUTM(): string {
+  get mortalityUTM(): string {
     if (this.mortality_utm_zone && this.mortality_utm_easting && this.mortality_utm_northing) {
       return `${this.mortality_utm_zone}/${this.mortality_utm_easting}/${this.mortality_utm_northing}`;
     }
     return '';
   }
-  @Expose() get captureCoords(): string {
+  get captureCoords(): string {
     return this.capture_latitude && this.capture_longitude
       ? formatLatLong(this.capture_latitude, this.capture_longitude)
       : '';
   }
-  @Expose() get captureUTM(): string {
+  get captureUTM(): string {
     return this.capture_utm_zone && this.capture_utm_easting && this.capture_utm_northing
       ? `${this.capture_utm_zone}/${this.capture_utm_easting}/${this.capture_utm_northing}`
       : '';
@@ -181,6 +176,7 @@ export class Animal extends BCTWBase implements IAnimal {
     this.wlh_id = wlhid ?? '';
   }
 
+  // todo: all date fields to str
   toJSON(): Animal {
     delete this.map_colour;
     delete this.error;
@@ -213,12 +209,30 @@ export class Animal extends BCTWBase implements IAnimal {
         return columnToHeader(str);
     }
   }
-  static get assignedProps(): AnimalProps[] {
-    return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
-  }
-  static get unassignedProps(): AnimalProps[] {
+  static get animalProps(): AnimalProps[] {
     return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'animal_status'];
   } 
+}
+
+// animals attached to devices should have additional properties
+export interface IAttachedAnimal extends IAnimal, ICollarHistory {}
+
+type AttachedAnimalProps = keyof IAttachedAnimal;
+export class AttachedAnimal extends Animal implements IAttachedAnimal {
+  assignment_id: uuid;
+  collar_id: uuid;
+  device_id: number;
+  device_make: Code;
+  frequency: number;
+  
+  attachment_start: Dayjs;
+  data_life_start: Dayjs;
+  data_life_end: Dayjs;
+  attachment_end: Dayjs;
+
+  static get attachedProps(): AttachedAnimalProps[] {
+    return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
+  }
 }
 
 const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
@@ -227,7 +241,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'associated_animal_relationship', type: eInputType.code }
   ],
   captureFields: [
-    { prop: 'capture_date', type: eInputType.date, ...isRequired},
+    { prop: 'capture_date', type: eInputType.datetime, ...isRequired},
     { prop: 'capture_latitude', type: eInputType.number },
     { prop: 'capture_longitude', type: eInputType.number },
     { prop: 'capture_utm_zone', type: eInputType.number },
@@ -258,7 +272,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'ear_tag_right_id', type: eInputType.text }
   ],
   mortalityFields: [
-    { prop: 'mortality_date', type: eInputType.date },
+    { prop: 'mortality_date', type: eInputType.datetime },
     { prop: 'mortality_latitude', type: eInputType.date },
     { prop: 'mortality_longitude', type: eInputType.date },
     { prop: 'mortality_utm_zone', type: eInputType.date },
@@ -270,7 +284,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'mortality_comment', type: eInputType.text }
   ],
   releaseFields: [
-    { prop: 'release_date', type: eInputType.date },
+    { prop: 'release_date', type: eInputType.datetime },
     { prop: 'release_latitude', type: eInputType.number },
     { prop: 'release_longitude', type: eInputType.number },
     { prop: 'release_utm_zone', type: eInputType.number },

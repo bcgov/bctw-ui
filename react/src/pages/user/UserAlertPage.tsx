@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { CircularProgress, IconButton, TableHead } from '@material-ui/core';
-import { TelemetryAlert } from 'types/alert';
+import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@material-ui/core';
 import { dateObjectToTimeStr } from 'utils/time';
@@ -14,14 +14,16 @@ import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import MortalityEvent from 'types/events/mortality_event';
+import { columnToHeader } from 'utils/common_helpers';
 
 export default function AlertPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const useAlerts = useContext(AlertContext);
-  const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
+  // todo: add other alert types
+  const [alerts, setAlerts] = useState<(MortalityAlert)[]>([]);
   // alert selected in table
-  const [selectedAlert, setSelectedAlert] = useState<TelemetryAlert>(null);
+  const [selectedAlert, setSelectedAlert] = useState<TelemetryAlert|MortalityAlert>(null);
   // display status of the modal that the user can perform the alert update from. ex - mortality
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
   // display status of the modal that requires the user to confirm the 'snooze alert' action
@@ -30,7 +32,9 @@ export default function AlertPage(): JSX.Element {
 
   useEffect(() => {
     const update = (): void => {
-      setAlerts(useAlerts?.alerts);
+      const alerts = useAlerts.alerts;
+      console.log('alerts loaded', alerts);
+      setAlerts(alerts);
     };
     update();
   }, [useAlerts]);
@@ -39,6 +43,7 @@ export default function AlertPage(): JSX.Element {
     responseDispatch({ severity: 'success', message: `telemetry alert saved` });
   };
 
+  // todo: move this to the event form and pass callback to this.
   const onMortalitySaved = async (data: IBulkUploadResults<unknown>): Promise<void> => {
     // console.log('data returned from mortality alert context', data);
     const { errors, results } = data;
@@ -109,12 +114,7 @@ export default function AlertPage(): JSX.Element {
   };
 
   const propsToShow = [
-    'WLH ID',
-    'animal_id',
-    'device_id',
-    'device_make',
-    'alert_type',
-    'valid_from',
+    ...MortalityAlert.displayableMortalityAlertProps,
     'update',
     'Snooze Status',
     'Snooze Action'
@@ -134,9 +134,8 @@ export default function AlertPage(): JSX.Element {
             <Table>
               <TableHead>
                 <TableRow>
-                  {propsToShow.map((str, idx) => {
-                    return <TableCell key={idx}>{TelemetryAlert.formatPropAsHeader(str)}</TableCell>;
-                  })}
+                  {/* fixme: proper header */}
+                  {propsToShow.map((str, idx) => (<TableCell key={idx}>{columnToHeader(str)}</TableCell>))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -200,7 +199,8 @@ export default function AlertPage(): JSX.Element {
       />
       {selectedAlert ? (
         <MortalityEventForm
-          alert={selectedAlert}
+          critter={null} // fixme:
+          alert={selectedAlert as MortalityAlert}
           open={showUpdateModal}
           handleClose={(): void => setShowUpdateModal(false)}
           handleSave={handleSave}

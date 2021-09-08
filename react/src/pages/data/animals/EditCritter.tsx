@@ -2,7 +2,7 @@ import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
-import { Animal, critterFormFields } from 'types/animal';
+import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
 import { Box, ButtonProps, Container } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
 import { FormFieldObject } from 'types/form_types';
@@ -14,11 +14,13 @@ import { FormPart } from '../common/EditModalComponents';
 /**
  * the main animal form
  * todo: complete capture/release/mortality workflows -> uncomment when complete
+ * todo: for new animals, hide all workflow fields?
  */
-export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
+export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
+  const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
   // const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
   // const [showMortalityWorkflow, setShowMortalityWorkflow] = useState<boolean>(false);
@@ -71,7 +73,7 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
               <dd>Species:</dd>
               <dt>{editing.species}</dt>
               <dd>Device ID:</dd>
-              <dt>{editing.device_id ?? 'Unassigned'}</dt>
+              <dt>{isAttached ? (editing as AttachedAnimal).device_id : 'Unassigned'}</dt>
               <dd>BCTW ID:</dd>
               <dt>{editing.critter_id}</dt>
               <dd>Permission:</dd>

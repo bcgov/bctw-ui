@@ -1,4 +1,4 @@
-import { Animal } from 'types/animal';
+import { Animal, AttachedAnimal } from 'types/animal';
 import { cloneElement, useState, useEffect } from 'react';
 import { permissionCanModify  } from 'types/permission';
 import { useQueryClient } from 'react-query';
@@ -10,7 +10,7 @@ import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 
 type IModifyWrapperProps = {
-  editing: Animal;
+  editing: Animal | AttachedAnimal;
   children: JSX.Element;
 };
 
@@ -24,9 +24,9 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const queryClient = useQueryClient();
 
   const { editing, children } = props;
-  const [canEdit, setCanEdit] = useState<boolean>(false);
-  const [hasCollar, setHasCollar] = useState<boolean>(false);
-  const [show, setShow] = useState<boolean>(false);
+  const [canEdit, setCanEdit] = useState(false);
+  const [hasCollar, setHasCollar] = useState(false);
+  const [show, setShow] = useState(false);
 
   // must be defined before mutation declarations
   const onSaveSuccess = async (data: IBulkUploadResults<Animal>): Promise<void> => {
@@ -76,14 +76,14 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
 
   useEffect(() => {
     const upd = (): void => {
-      setHasCollar(!!editing?.device_id)
+      setHasCollar(props.editing instanceof AttachedAnimal)
       setCanEdit(permissionCanModify(editing?.permission_type));
     }
     upd();
   }, [editing]);
 
   const deleteMessage = ():string => {
-    const base = hasCollar ? `CAREFUL! Performing this action will remove the collar ${editing?.device_id} from this animal. ` : '';
+    const base = hasCollar ? `CAREFUL! Performing this action will remove the collar ${(editing as AttachedAnimal)?.device_id} from this animal. ` : '';
     return `${base}This will prevent other users from seeing this critter. Are you sure you want to delete ${editing?.name}?`
   }
 

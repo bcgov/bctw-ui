@@ -7,7 +7,7 @@ import CheckBox from 'components/form/Checkbox';
 import React from 'react';
 import { columnToHeader, removeProps } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from 'types/form_types';
-import { BCTWEvent } from 'types/common_types';
+import { BCTWEvent } from 'types/events/event';
 import dayjs from 'dayjs';
 
 type CreateInputBaseProps<T> = {

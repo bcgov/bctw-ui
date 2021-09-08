@@ -22,7 +22,7 @@ import {
   IDeleteType,
   IUpsertPayload,
 } from 'api/api_interfaces';
-import { TelemetryAlert } from 'types/alert';
+import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { BCTWBase, BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
@@ -33,7 +33,6 @@ import { IChangeDataLifeProps } from 'types/data_life';
 
 /**
  * Returns an instance of axios with baseURL set.
- *
  * @return {AxiosInstance}
  */
 const useApi = (): AxiosInstance => {
@@ -47,7 +46,6 @@ const useApi = (): AxiosInstance => {
 
 /**
  * Returns a set of supported api methods.
- *
  * @return {object} object whose properties are supported api methods.
  */
 export const useTelemetryApi = () => {
@@ -236,8 +234,8 @@ export const useTelemetryApi = () => {
   /**
    * @returns
    */
-  const useAlert = (): UseQueryResult<TelemetryAlert[]> => {
-    return useQuery<TelemetryAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), {
+  const useAlert = (): UseQueryResult<MortalityAlert[]> => {
+    return useQuery<MortalityAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), {
       ...defaultQueryOptions
     });
   };
@@ -348,7 +346,7 @@ export const useTelemetryApi = () => {
 
   /** delete a critter or device */
   const useDelete = (config: UseMutationOptions<boolean, AxiosError, IDeleteType>): UseMutationResult<boolean> =>
-    useMutation<boolean, AxiosError, IDeleteType>((body) => critterApi.deleteType(body), config);
+    useMutation<boolean, AxiosError, IDeleteType>((body) => bulkApi.deleteType(body), config);
 
   /** save user defined animal groups */
   const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDFInput[]>): UseMutationResult<IUDF[]> =>

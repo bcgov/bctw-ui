@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { LocationEvent } from 'types/events/location_event';
-import DateInput from 'components/form/Date';
 import TextField from 'components/form/TextInput';
 import { InputChangeHandler } from 'components/component_interfaces';
 import { Box, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
@@ -8,6 +7,7 @@ import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
 import { FormFieldObject } from 'types/form_types';
+import DateTimeInput from 'components/form/DateTimeInput';
 
 type LocationEventProps = {
   event: LocationEvent;
@@ -31,14 +31,19 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
     setUseUTM(val);
   };
 
+  const changeDT = (v): void => {
+    console.log(v);
+  };
+
   const baseInputProps = { changeHandler: handleChange, required: true };
   return (
     <>
-      <DateInput
+      <DateTimeInput
         propName={dateField.prop}
         label={event.formatPropAsHeader('date')}
-        defaultValue={event.date.toDate()} // todo:
-        {...baseInputProps}
+        defaultValue={event.date}
+        changeHandler={changeDT}
+        // {...baseInputProps}
       />
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}
       <RadioGroup row aria-label='position' name='position' value={useUTM} onChange={changeCoordinateType}>
@@ -55,11 +60,11 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
           labelPlacement='start'
         />
       </RadioGroup>
-      {/* <div style={{ marginTop: '20px', height: '120px' }}> */}
       <Box>
         {useUTM === 'utm' ? (
           utmFields.map((f) => {
             const numberProps = { ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop };
+            // custom form validation
             if (f.prop === 'utm_easting') {
               numberProps['validate'] = (v: number): string => mustBeXDigits(v, 6);
             } else if (f.prop === 'utm_northing') {
@@ -92,7 +97,7 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
           rows={2}
           key={commentField.prop}
           propName={commentField.prop}
-          defaultValue={event[commentField.prop] as string}
+          defaultValue={event.comment}
           label={event.formatPropAsHeader(commentField.prop)}
           changeHandler={handleChange}
         />

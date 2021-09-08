@@ -61,7 +61,7 @@ export class User extends BCTWBase implements IUser {
   access: OnboardingAccess;
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
-  @Expose() get is_admin(): boolean {
+  get is_admin(): boolean {
     return this.role_type === eUserRole.administrator;
   }
   static get propsToDisplay(): UserProps[] {
@@ -122,6 +122,7 @@ export class UserCritterAccess extends BCTWBase implements IUserCritterAccess {
   animal_id: string;
   wlh_id: string;
   species: string;
+  // fixme: dayjs
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   device_id: number;

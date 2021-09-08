@@ -8,6 +8,7 @@ import { StandardTextFieldProps } from '@material-ui/core/TextField';
 type DateTimeChangeOutput = Record<string, string>;
 
 // todo: convert to Dayjs
+// todo: handle invalid dayjs
 export type DateInputProps = StandardTextFieldProps & {
   propName: string;
   label: string;

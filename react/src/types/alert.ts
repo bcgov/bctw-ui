@@ -1,10 +1,14 @@
-import { Type, Expose, Transform } from 'class-transformer';
-import { columnToHeader } from 'utils/common_helpers';
+import { Type } from 'class-transformer';
+import dayjs, { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
-import { BCTWBase, transformOpt } from 'types/common_types';
-import dayjs, { Dayjs } from 'dayjs';
+import { BCTWBase, BCTWValidDates, uuid } from 'types/common_types';
+import { columnToHeader } from 'utils/common_helpers';
 import { formatDay, formatTime } from 'utils/time';
+
+import { Code } from './code';
+import { DataLife } from './data_life';
+import { LocationEvent } from './events/location_event';
 
 // possible types of telemetry alerts
 enum eAlertType {
@@ -12,59 +16,36 @@ enum eAlertType {
   mortality = 'mortality'
 }
 
-// props inherited from BCTW types
-type TelemetryAlertCollar = Pick<Collar, | 'collar_id' | 'device_id' | 'device_status'
-| 'device_deployment_status' | 'retrieval_date' | 'retrieved' | 'activation_status'>;
-type TelemetryAlertAnimal = Pick<Animal, | 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id'
-| 'mortality_date' | 'mortality_latitude' | 'mortality_longitude' | 'mortality_utm_easting' | 'mortality_utm_northing' | 'mortality_utm_zone'>;
-
-interface ITelemetryAlert extends TelemetryAlertAnimal, TelemetryAlertCollar {
+interface ITelemetryAlert extends BCTWValidDates {
   alert_id: number;
   alert_type: eAlertType;
-  valid_from: Date;
-  valid_to: Date;
   snoozed_to: Date;
   snooze_count: number;
 }
 
+type AlertProp = keyof ITelemetryAlert;
+
 export class TelemetryAlert extends BCTWBase implements ITelemetryAlert {
-  activation_status: boolean;
   alert_id: number;
   alert_type: eAlertType;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
   @Type(() => Date) snoozed_to: Date;
   snooze_count: number;
-  collar_id: string;
-  device_id: number;
-  device_make: string;
-  device_status: string;
-  device_deployment_status: string;
-  @Transform((v) => v || new Date(), transformOpt) retrieval_date: Date;
-  @Transform((v) => v || false, transformOpt) retrieved: boolean;
-  critter_id: string;
-  animal_id: string;
-  wlh_id: string;
-  animal_status: string;
-  @Transform((v) => v || new Date(), transformOpt) mortality_date: Date;
-  mortality_latitude: number;
-  mortality_longitude: number;
-  mortality_utm_easting: number;
-  mortality_utm_northing: number;
-  mortality_utm_zone: number;
-  @Expose() get isSnoozed(): boolean {
+
+  get isSnoozed(): boolean {
     return dayjs().isBefore(dayjs(this.snoozed_to));
   }
-  @Expose() get identifier(): string {
+  get identifier(): string {
     return 'alert_id';
   }
-  @Expose() get snoozesMax(): number {
+  get snoozesMax(): number {
     return 3;
   }
-  @Expose() get snoozesAvailable(): number {
+  get snoozesAvailable(): number {
     return this.snoozesMax - this.snooze_count;
   }
-  @Expose() get snoozeStatus(): string {
+  get snoozeStatus(): string {
     const usedSofar = `(${this.snooze_count} used)`;
     if (this.isSnoozed) {
       return `snoozed until ${dayjs(this.snoozed_to).format(formatDay)} ${usedSofar}`;
@@ -72,7 +53,7 @@ export class TelemetryAlert extends BCTWBase implements ITelemetryAlert {
       return `${this.snoozesAvailable} snoozes available ${usedSofar}`;
     }
   }
-  @Expose() get formatAlert(): string {
+  get formatAlert(): string {
     switch (this.alert_type) {
       case eAlertType.mortality:
         return 'Potential Mortality';
@@ -83,7 +64,7 @@ export class TelemetryAlert extends BCTWBase implements ITelemetryAlert {
     }
   }
 
-  static formatPropAsHeader(str: string): string {
+  formatPropAsHeader(str: keyof TelemetryAlert): string {
     switch (str) {
       case 'valid_from':
         return 'Notification Time';
@@ -113,9 +94,47 @@ export class TelemetryAlert extends BCTWBase implements ITelemetryAlert {
     } as unknown as TelemetryAlert;
   }
 
-  formatPropAsHeader(str: keyof TelemetryAlert): string {
-    return columnToHeader(str);
+  static get displayableAlertProps(): AlertProp[] {
+    return ['alert_type'];
   }
+}
+
+// props that any mortality event or alert should have.
+export interface IMortalityAlert extends 
+  Pick<Collar, | 'collar_id' | 'device_id' | 'device_make'>,
+  Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id'>,
+  DataLife {}
+
+type MortalityAlertProp = keyof IMortalityAlert;
+/**
+ * the mortality event is unique in that it is the only workflow that is both triggered from
+ * an alert and a workflow (ex. it can be initiated from the animal metadata page)
+ */
+export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
+  collar_id: uuid;
+  device_id: number;
+  device_make: Code;
+
+  critter_id: uuid;
+  animal_id: string;
+  animal_status: Code;
+  wlh_id: string;
+  mortality_event: LocationEvent;
+
+  attachment_start: Dayjs;
+  data_life_start: Dayjs;
+  data_life_end: Dayjs;
+  attachment_end: Dayjs;
+
+  static get displayableMortalityAlertProps(): (AlertProp|MortalityAlertProp)[] {
+    return ['wlh_id', 'animal_id', 'device_id', 'device_make', ...TelemetryAlert.displayableAlertProps, 'valid_from'];
+  }
+
+  formatPropAsHeader(s: AlertProp | string): string {
+    return super.formatPropAsHeader(s as AlertProp);
+  }
+
+  // todo: cast to a mortality event class
 }
 
 export type { eAlertType, ITelemetryAlert };

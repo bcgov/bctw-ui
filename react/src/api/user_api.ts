@@ -1,6 +1,6 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { TelemetryAlert } from 'types/alert';
+import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
@@ -62,13 +62,14 @@ export const userApi = (props: ApiProps) => {
 
   /**
    * @returns {TelemetryAlert[]} that the user has access to (through their critters)
+   * todo: support different alert types
    */
-  const getUserAlerts = async (): Promise<TelemetryAlert[]> => {
+  const getUserAlerts = async (): Promise<MortalityAlert[]> => {
     const url = createUrl({ api: 'get-user-alerts' });
     const { data } = await api.get(url);
     // console.log('user alerts fetched', data);
     if (data && Array.isArray(data)) {
-      const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
+      const converted = data?.map((json) => plainToClass(MortalityAlert, json));
       return converted;
     }
     return [];

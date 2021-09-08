@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Grid, IconButton } from '@material-ui/core';
+import { Box, Button, Divider, Grid, IconButton, TooltipProps } from '@material-ui/core';
 import { Close, ArrowForward } from '@material-ui/icons';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -174,6 +174,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     });
   };
 
+  const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
+    enterDelay: 750,
+    placement: 'right-start'
+  }
+
   return (
     <Box
       className={clsx(classes.drawer, {
@@ -197,7 +202,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={6}>
-                    {/* <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
+                    {/* <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} */}
                     <DateInput
                       fullWidth
                       propName='tstart'
@@ -209,7 +214,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     {/* </Tooltip> */}
                   </Grid>
                   <Grid item sm={6}>
-                    {/* <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} placement='right-start' enterDelay={750}> */}
+                    {/* <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} */}
                     <DateInput
                       fullWidth
                       propName='tend'
@@ -227,29 +232,28 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={12}>
-                    <Tooltip
+                    {/* fixme: tooltip wrapping multiselect broken */}
+                    {/* <Tooltip
                       title={
                         <>
                           <p><b><em>{MapStrings.assignmentStatusOptionA}</em></b>{MapStrings.assignmentStatusTooltip1}</p>
                           <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
                           <p>{MapStrings.assignmentStatusTooltip3}</p>
                         </>
-                      }
-                      placement='right-start'
-                      enterDelay={750}>
-                      <MultiSelect
-                        label={MapStrings.assignmentStatusLabel}
-                        data={DEVICE_STATUS_OPTIONS}
-                        changeHandler={props.onShowUnassignedDevices}
-                      />
-                    </Tooltip>
+                      } {...ttProps}> */}
+                    <MultiSelect
+                      label={MapStrings.assignmentStatusLabel}
+                      data={DEVICE_STATUS_OPTIONS}
+                      changeHandler={props.onShowUnassignedDevices}
+                    />
+                    {/* </Tooltip> */}
                   </Grid>
                 </Grid>
               </Box>
 
               {/* render the last pings/ last 10 fixes checkboxes */}
               <Box mb={2}>
-                <Tooltip title={<p>{MapStrings.lastKnownLocationTooltip}</p>} placement='right-start' enterDelay={750}>
+                <Tooltip title={<p>{MapStrings.lastKnownLocationTooltip}</p>} {...ttProps}>
                   <span>
                     <Checkbox
                       label={MapStrings.lastKnownLocationLabel}
@@ -259,7 +263,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     />
                   </span>
                 </Tooltip>
-                <Tooltip title={<p>{MapStrings.lastFixesTooltip}</p>} placement='right-start' enterDelay={750}>
+                <Tooltip title={<p>{MapStrings.lastFixesTooltip}</p>} {...ttProps}>
                   <span>
                     <Checkbox
                       label={MapStrings.lastFixesLabel}
@@ -275,10 +279,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={12}>
-                    <Tooltip
-                      title={<p>{MapStrings.deviceListTooltip}</p>}
-                      placement='right-start'
-                      enterDelay={750}>
+                    <Tooltip title={<p>{MapStrings.deviceListTooltip}</p>} {...ttProps}>
                       <div>
                         <AutoComplete
                           label={MapStrings.deviceListLabel}
@@ -310,9 +311,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 <Grid container spacing={2}>
                   <Grid item sm={12}>
                     <Tooltip
-                      title={<p>{MapStrings.customAnimalGroupLabelTooltip}</p>}
-                      placement='right-start'
-                      enterDelay={750}>
+                      title={<p>{MapStrings.customAnimalGroupLabelTooltip}</p>} {...ttProps}>
                       <div className={'side-panel-udf'}>
                         <SelectUDF
                           triggerReset={reset}

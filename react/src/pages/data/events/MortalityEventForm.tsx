@@ -7,7 +7,7 @@ import ChangeContext from 'contexts/InputChangeContext';
 import dayjs from 'dayjs';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useState } from 'react';
-import { TelemetryAlert } from 'types/alert';
+import { MortalityAlert } from 'types/alert';
 import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { removeProps } from 'utils/common_helpers';
@@ -15,10 +15,12 @@ import { removeProps } from 'utils/common_helpers';
 import EditModal from 'pages/data//common/EditModal';
 import { FormPart } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
+import { AttachedAnimal } from 'types/animal';
 
 type MortEventProps = ModalBaseProps & {
-  alert: TelemetryAlert;
+  critter: AttachedAnimal;
   handleSave: (event: MortalityEvent) => void;
+  alert?: MortalityAlert;
 };
 
 /**
@@ -167,10 +169,6 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
                 FormFromFormfield(mortalityEvent, fields.proximate_cause_of_death, onChange)
               ])}
               {FormPart('Mortality Event Details', [
-                FormFromFormfield(mortalityEvent, fields.animal_status, onChange),
-                FormFromFormfield(mortalityEvent, fields.proximate_cause_of_death, onChange)
-              ])}
-              {FormPart('', [
                 <LocationEventForm event={locationEvent} handleChange={onChangeLocationProp} />
               ])}
             </>

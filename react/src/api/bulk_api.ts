@@ -1,13 +1,13 @@
 import { createUrl } from 'api/api_helpers';
 import { AxiosInstance } from 'axios';
 import { plainToClass } from 'class-transformer';
-import { Animal } from 'types/animal';
+import { AttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWBase, BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { exportEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
 
-import { IBulkUploadResults } from './api_interfaces';
+import { IBulkUploadResults, IDeleteType } from './api_interfaces';
 
 export const bulkApi = (api: AxiosInstance) => {
 
@@ -27,8 +27,19 @@ export const bulkApi = (api: AxiosInstance) => {
   const getType = async <T extends BCTWBase, >(type: BCTWType, id: string): Promise<T> => {
     const url = createUrl({ api: `${type}/${id}`});
     const { data } = await api.get(url);
-    return data.map(json => type === 'animal' ? plainToClass(Animal, json) : plainToClass(Collar, json))[0];
+    console.log(data);
+    return data.map(json => type === 'animal' ? plainToClass(AttachedAnimal, json) : plainToClass(Collar, json))[0];
   }
+
+  // handles deletes for animals/collars
+  const deleteType = async ({ objType, id }: IDeleteType): Promise<boolean> => {
+    const url = createUrl({ api: `${objType}/${id}` });
+    const { status, data } = await api.delete(url);
+    if (status === 200) {
+      return true;
+    }
+    return data;
+  };
 
   const getExportData = async (body: ExportQueryParams): Promise<string[]> => {
     const url = createUrl({ api: exportEndpoint})
@@ -38,6 +49,7 @@ export const bulkApi = (api: AxiosInstance) => {
   }
 
   return {
+    deleteType,
     getExportData,
     getType,
     uploadCsv,

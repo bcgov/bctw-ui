@@ -1,48 +1,44 @@
 import { Collar } from 'types/collar';
-import { BCTWBase, BCTWBaseType } from 'types/common_types';
-import { Type, Expose } from 'class-transformer';
-import dayjs from 'dayjs';
+import { BCTWBase, nullToDayjs, uuid } from 'types/common_types';
+import { Expose, Transform } from 'class-transformer';
+import dayjs, { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
-import { IDataLifeStartProps, IDataLifeEndProps } from './data_life';
+import { DataLife, IDataLifeStartProps, IDataLifeEndProps } from 'types/data_life';
 import { isDev } from 'api/api_helpers';
-
+import { Code } from 'types/code';
+import { Animal } from './animal';
 
 // passed to the API when attaching a device to an animal
-export interface IAttachDeviceProps extends IDataLifeStartProps, IDataLifeEndProps {
-  collar_id: string;
-  critter_id: string;
+export interface IAttachDeviceProps extends IDataLifeStartProps, IDataLifeEndProps,
+  Pick<Animal, 'critter_id'>, Pick<Collar, 'collar_id'> { }
+
+export interface ICollarHistory extends
+  Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'frequency'>, DataLife,
+  Pick<Animal, 'critter_id'> {
+  assignment_id: uuid;
 }
 
 // passed to the API when removing a device from an animal
-export interface IRemoveDeviceProps extends Required<IDataLifeEndProps> {
-  assignment_id: string;
-}
+export interface IRemoveDeviceProps extends Required<IDataLifeEndProps>, Pick<ICollarHistory, 'assignment_id'> { }
 
-export interface ICollarHistory extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'frequency'>,
-  Pick<BCTWBaseType, 'valid_from' | 'valid_to'> {
-  assignment_id: string;
-  critter_id: string;
-  attachment_start: Date;
-  attachment_end: Date;
-}
-
-// used in the class to get a type safe array of valid keys
-type CollarProps = keyof ICollarHistory;
+// used to get type safe array of keys
+type CollarHistoryProps = keyof ICollarHistory;
 
 /**
  * represents an device attachment to an animal.
  */
 export class CollarHistory extends BCTWBase implements ICollarHistory {
-  assignment_id: string; // primary key of the collar_animal_assignment table
-  collar_id: string;
-  critter_id: string;
+  assignment_id: uuid; // primary key of the collar_animal_assignment table
+  collar_id: uuid;
+  critter_id: uuid;
   device_id: number;
-  device_make: string;
+  device_make: Code;
   frequency: number;
-  @Type(() => Date) valid_from: Date; // data_life_start
-  @Type(() => Date) valid_to: Date; // data_life_end
-  @Type(() => Date) attachment_start: Date;
-  @Type(() => Date) attachment_end: Date;
+  @Transform(nullToDayjs) data_life_start: Dayjs; 
+  @Transform(nullToDayjs) data_life_end: Dayjs;
+  @Transform(nullToDayjs) attachment_start: Dayjs;
+  @Transform(nullToDayjs) attachment_end: Dayjs;
+
   @Expose() get identifier(): string { return 'assignment_id' }
 
   toJSON(): CollarHistory {
@@ -50,24 +46,19 @@ export class CollarHistory extends BCTWBase implements ICollarHistory {
   }
 
   // note: endpoint for retrieving collar history displays additional collar/animal properties
-  // fixme: split these classes?
   // type safe properties to display in tables
-  static get propsToDisplay(): CollarProps[] {
-    const props: CollarProps[] = ['device_id', 'device_make', 'attachment_start', 'valid_from', 'valid_to', 'attachment_end'];
+  static get propsToDisplay(): CollarHistoryProps[] {
+    const props: CollarHistoryProps[] = ['device_id', 'device_make', 'attachment_start', 'data_life_start', 'data_life_end', 'attachment_end'];
     if (isDev()) {
       props.unshift('assignment_id');
     }
     return props;
   }
 
-  formatPropAsHeader(str: keyof this): string {
+  formatPropAsHeader(str: keyof CollarHistory): string {
     switch (str) {
       case this.identifier:
         return 'Assignment ID';
-      case 'valid_from':
-        return 'Data Life Start';
-      case 'valid_to':
-        return 'Data Life End';
       default:
         return columnToHeader(str as string);
     }
@@ -82,10 +73,10 @@ export class CollarHistory extends BCTWBase implements ICollarHistory {
 export const hasCollarCurrentlyAssigned = (history: CollarHistory[]): CollarHistory | undefined => {
   const currentlyAssigned = history?.filter((h) => {
     // a null valid_to is considered valid - as in it has no expiry
-    if(!dayjs(h.valid_to).isValid()) {
+    if (!h.data_life_end.isValid()) {
       return true;
     }
-    return dayjs().isBefore(h.valid_to);
+    return dayjs().isBefore(h.data_life_end);
   });
   return currentlyAssigned.length ? currentlyAssigned[0] : undefined;
 }

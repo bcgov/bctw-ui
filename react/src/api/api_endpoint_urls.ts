@@ -12,12 +12,14 @@ const updateDatalifeEndpoint = 'update-data-life';
 const upsertCritterEndpoint = 'upsert-animal';
 const upsertDeviceEndpoint = 'upsert-collar';
 const upsertAlertEndpoint = 'update-user-alert';
+const getCritterEndpoint = 'get-animals';
 
 export {
   importCSVEndpoint,
   importXMLEndpoint,
   exportEndpoint,
   getCollarAssignmentHistoryEndpoint,
+  getCritterEndpoint,
   attachDeviceEndpoint,
   removeDeviceEndpoint,
   updateDatalifeEndpoint,

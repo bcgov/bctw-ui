@@ -1,8 +1,9 @@
 import { matchSorter } from 'match-sorter';
 import { getProperty, countDecimals } from 'utils/common_helpers';
 import { Order, HeadCell } from 'components/table/table_interfaces';
-import { dateObjectToTimeStr } from 'utils/time';
+import { dateObjectToTimeStr, formatTime } from 'utils/time';
 import { Icon } from 'components/common';
+import { isDayjs } from 'dayjs';
 
 /**
  * converts an object to a list of HeadCells
@@ -71,21 +72,25 @@ interface ICellFormat {
  *
  * @param obj object being displayed
  * @param key the property to render in this table cell
+ * todo: ...not using align just return value?
  */
+const align: Pick<ICellFormat, 'align'> = {align: 'left'};
 function formatTableCell<T>(obj: T, key: string): ICellFormat {
   const value = obj[key];
   if (typeof value === 'boolean') {
-    return { align: 'center', value: <Icon icon={value ? 'done' : 'close'} /> };
+    return { ...align, value: <Icon icon={value ? 'done' : 'close'} /> };
   }
   if (typeof value?.getMonth === 'function') {
-    return { align: 'right', value: dateObjectToTimeStr(value) };
+    return { ...align, value: dateObjectToTimeStr(value) };
+  } else if (isDayjs(value)) {
+    return { ...align, value: value.isValid() ? value.format(formatTime) : ''}
   } else if (typeof value === 'number') {
     const formatted = countDecimals(value) > 2 ? value.toFixed(2) : value;
-    return { align: 'right', value: formatted };
+    return { ...align, value: formatted };
   } else if (typeof value === 'string') {
-    return { align: 'center', value };
+    return { ...align, value };
   }
-  return { align: 'left', value };
+  return { ...align, value };
 }
 
 /**

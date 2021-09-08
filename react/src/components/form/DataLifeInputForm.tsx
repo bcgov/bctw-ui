@@ -23,8 +23,9 @@ type DataLifeInputProps = {
   onChange?: (d: DTimeChangeOutput) => void;
 };
 
-// todo: doc
+// returns the first key of a DTimeChangeOutput object ex. { data_life_start : 'bill' } // 'name' 
 const getFirstKey = (d: DTimeChangeOutput): string => Object.keys(d)[0];
+// returns the first value of a DTimeChangeOutput object
 const getFirstValue = (d: DTimeChangeOutput): Dayjs => Object.values(d)[0];
 
 /**

@@ -8,6 +8,8 @@ import { DateInputProps } from 'components/form/Date';
 export type DTimeChangeOutput = Record<string, Dayjs>;
 
 type DateTimeInputProps = Omit<DateInputProps, 'defaultValue' | 'minDate' | 'maxDate'> & {
+  // fixme: why does typing this break things
+  // fixme: alignment / size 
   changeHandler: (v: DTimeChangeOutput) => void;
   defaultValue: Dayjs;
   minDate?: Dayjs;
@@ -15,8 +17,7 @@ type DateTimeInputProps = Omit<DateInputProps, 'defaultValue' | 'minDate' | 'max
 };
 
 export default function DateTimeInput(props: DateTimeInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
-  // console.log(defaultValue)
+  const { required, defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
   const [selectedTime, setSelectedTime] = useState<Dayjs>(defaultValue?.isValid() ? defaultValue : null);
 
   const handleChangeTime = (d: Dayjs): void => {
@@ -40,6 +41,7 @@ export default function DateTimeInput(props: DateTimeInputProps): JSX.Element {
         onChange={handleChangeTime}
         minDate={minDate}
         maxDate={maxDate}
+        required={required}
       />
     </MuiPickersUtilsProvider>
   );

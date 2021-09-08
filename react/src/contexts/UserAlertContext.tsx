@@ -1,17 +1,18 @@
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
 import { useQueryClient } from 'react-query';
-import { TelemetryAlert } from 'types/alert';
+import { MortalityAlert, TelemetryAlert } from 'types/alert';
 
 /**
  * Context that children components can listen to.
  * Provides:
  *  a) an array of @type {TelemetryAlert} applicable to the user
  *  b) a method to invalidate the query (force refetch alerts) when an alert is updated
+ * todo: support other alert types
  */
 
 export interface IAlertContext {
-  alerts: TelemetryAlert[];
+  alerts: MortalityAlert[];
   invalidate: () => void;
   error: string;
 }

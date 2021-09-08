@@ -1,10 +1,14 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { Animal } from 'types/animal';
-import { Collar } from 'types/collar';
-import { BCTWEvent } from 'types/common_types';
+import { Collar, ICollar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
 import dayjs, { Dayjs } from 'dayjs';
+import { getEndOfPreviousDay } from 'utils/time';
+import { BCTWEvent } from 'types/events/event';
+import { IMortalityAlert } from 'types/alert';
+import { uuid } from 'types/common_types';
+import { Code } from 'types/code';
 
 /**
  * todo:
@@ -18,15 +22,14 @@ import dayjs, { Dayjs } from 'dayjs';
     * show predator_species code  
  */
 
-interface IMortalityEvent
-  extends Pick<Animal, 'critter_id' | 'animal_status' | 'proximate_cause_of_death' | 'predator_species'>,
-  Pick<Collar, | 'collar_id' | 'device_id' | 'retrieved' | 'retrieval_date' | 'activation_status'
-  | 'device_deployment_status'
-  | 'device_status'> {
+interface IMortalityEvent extends IMortalityAlert, 
+  Pick<Animal, 'proximate_cause_of_death' | 'predator_species'>,
+  Pick<Collar, 'retrieved' | 'retrieval_date' | 'activation_status'| 'device_status' | 'device_deployment_status'> {
   shouldUnattachDevice: boolean;
+  predator_known: boolean; // todo: need to save this?
 }
 
-type MortalityEventProps = keyof IMortalityEvent;
+type MortalityEventProp = keyof IMortalityEvent;
 
 // code fields that are defaulted in this workflow
 type MortalityDeviceStatus = 'Mortality';
@@ -34,40 +37,46 @@ type MortalityDeploymentStatus = 'Not Deployed'
 type MortalityAnimalStatus = 'Potential Mortality';
 
 export default class MortalityEvent extends BCTWEvent implements IMortalityEvent {
-  animal_status: MortalityAnimalStatus;
-  proximate_cause_of_death: string;
-  predator_species: string;
-  retrieved: boolean; // note: could be moved to retrieval workflow?
-  retrieval_date: Date;
+  // collar_id: uuid;
+  // device_id: number;
+  device_make: Code;
+  retrieved: boolean;
+  retrieval_date: Dayjs;
   activation_status: boolean;
+  device_condition: Code;
   device_deployment_status: MortalityDeploymentStatus;
   device_status: MortalityDeviceStatus;
-  location_event: LocationEvent;
-  pcod_confidence_value: string; // todo:
 
-  // workflow related fields
-  shouldUnattachDevice: boolean;
-
-  // new fields
-  mortality_investigation: string; // code
+  // critter_id: uuid;
+  animal_id: string;
+  animal_status: MortalityAnimalStatus;
+  wlh_id: string;
+  predator_known: boolean;
+  predator_species: string;
+  proximate_cause_of_death: string;
+  // todo: new fields
+  mortality_investigation: Code;
   mortality_record: boolean;
   captivity_status: boolean; 
-  mortality_captivity_status: string; // code. enable if captivity_status ^ true
-  device_condition: string // code
-  predator_known: boolean; // todo: not stored? -> expose predator_species
+  mortality_captivity_status: Code; // enable if captivity_status ^ true
+  pcod_confidence_value: string; // todo: ???? 
 
-  // get identifier(): keyof MortalityEvent {
-  //   return 'critter_id';
+  attachment_start: Dayjs;
+  data_life_start: Dayjs;
+  data_life_end: Dayjs;
+  attachment_end: Dayjs;
+
+  location_event: LocationEvent;
+  shouldUnattachDevice: boolean;
+
+  // todo:
+  // static get requiredFields(): MortalityEventProp[] {
+  //   return ['device_id'] //todo:
   // }
 
-  static get requiredFields(): MortalityEventProps[] {
-    return ['device_id'] //todo:
-  }
-
-  constructor(public critter_id: string, public collar_id: string, public device_id: number) {
-    // todo: default dates ???
-    super();
-    this.retrieval_date = new Date();
+  constructor(public critter_id: uuid, public collar_id: uuid, public device_id: number) {
+    super('mortality');
+    this.retrieval_date = getEndOfPreviousDay(); // note: defaulted to one day prior at 23:59:59
     this.retrieved = false;
     this.activation_status = true;
 
@@ -92,21 +101,23 @@ export default class MortalityEvent extends BCTWEvent implements IMortalityEvent
         return 'PCOD Confidence Value';
       case 'shouldUnattachDevice':
         return 'Unassign device from animal?';
+      case 'proximate_cause_of_death':
+        return 'Proximate COD';
       default:
         return columnToHeader(s);
     }
   }
 
-  fields: Record<MortalityEventProps, FormFieldObject<MortalityEvent>> = { 
+  // fixme Record<string should be keyof MortalityEvent...but ts looks for all props :[
+  fields: Record<string, FormFieldObject<MortalityEvent>> = { 
     collar_id: { prop: 'collar_id', type: eInputType.unknown},
     critter_id: { prop: 'critter_id', type: eInputType.unknown},
     device_id: { prop: 'device_id', type: eInputType.unknown},
-
     animal_status: { prop: 'animal_status', type: eInputType.code },
     proximate_cause_of_death: { prop: 'proximate_cause_of_death', type: eInputType.code },
     predator_species: { prop: 'predator_species', type: eInputType.code },
     retrieved: { prop: 'retrieved', type: eInputType.check },
-    retrieval_date: { prop: 'retrieval_date', type: eInputType.date },
+    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime},
     activation_status: { prop: 'activation_status', type: eInputType.check },
     device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
     device_status: { prop: 'device_status', type: eInputType.code },

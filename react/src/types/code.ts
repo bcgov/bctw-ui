@@ -3,6 +3,9 @@ import { Type } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from './form_types';
 
+// just an string alias, but makes it clearer in other types when a value is a code
+type Code = string;
+
 // used in select multiple component 
 interface ICodeFilter {
   code_header: string;
@@ -97,4 +100,5 @@ export type {
   ICodeFilter,
   IGroupedCodeFilter,
   ICodeHeader,
+  Code,
 };

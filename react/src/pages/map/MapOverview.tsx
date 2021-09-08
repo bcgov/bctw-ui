@@ -6,7 +6,7 @@ import ModifyCritterWrapper from 'pages/data/animals/ModifyCritterWrapper';
 import EditCollar from 'pages/data/collars/EditCollar';
 import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
 import { useEffect, useState } from 'react';
-import { Animal } from 'types/animal';
+import { Animal, AttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
@@ -34,7 +34,7 @@ export default function MapOverview({ type, detail, open, handleClose }: Critter
       const canModify = permissionCanModify(data.permission_type);
       setCanEdit(canModify);
       if (type === 'animal') {
-        data.device_id = detail.device_id;
+        (data as AttachedAnimal).device_id = detail.device_id;
         setEditObj(data as Animal);
       } else if (type === 'device') {
         setEditObj(data as Collar);

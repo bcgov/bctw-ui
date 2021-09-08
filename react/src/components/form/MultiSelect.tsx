@@ -19,6 +19,10 @@ type ISelectMultipleProps<T extends ISelectMultipleData> = SelectProps & {
 
 const selectAll = { id: -1, value: 'Select All', default: false };
 
+/**
+ * a multi-select dropdown component. unlike the @function SelectCode component,
+ * @param data must be provided  
+ */
 export default function MultiSelect<T extends ISelectMultipleData>(props: ISelectMultipleProps<T>): JSX.Element {
   const { label, data, triggerReset, changeHandler, renderTypeLabel } = props;
   const getDefaults = (): unknown[] => data.filter((d) => d.default).map((o) => o.value);
@@ -59,7 +63,7 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: ISelec
           transformOrigin: { vertical: 'top', horizontal: 'left' },
           getContentAnchorEl: null
         }}
-        // fixme: not sure why the input prop is required to have the 'notch' wide enough
+        // fixme: why is the input prop is required to have the 'notch' wide enough
         // to not cover the label. works fine in SelectCode without this??
         input={<OutlinedInput labelWidth={label.length * 7} />}
         style={props.style}
