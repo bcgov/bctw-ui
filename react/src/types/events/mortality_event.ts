@@ -10,10 +10,11 @@ import { IMortalityAlert } from 'types/alert';
 import { uuid } from 'types/common_types';
 import { Code } from 'types/code';
 import { UserAlertStrings } from 'constants/strings';
+import { CollarHistory } from 'types/collar_history';
+import { DataLife } from 'types/data_life';
 
 /**
  * todo:
- * expose data life - end dates editable
  * add captivity_status - its own event?? (bool)
  * triggered upon selecting a predation value from PCOD:
     * add bool predator_known
@@ -23,14 +24,15 @@ import { UserAlertStrings } from 'constants/strings';
 interface IMortalityEvent
   extends IMortalityAlert,
     Pick<Animal, 'proximate_cause_of_death' | 'predator_species'>,
-    Pick<Collar, 'retrieved' | 'retrieval_date' | 'activation_status' | 'device_status' | 'device_deployment_status'> {
+    Pick<Collar, 'retrieved' | 'retrieval_date' | 'activation_status' | 'device_status' | 'device_deployment_status'>,
+    Pick<CollarHistory, 'assignment_id'>,
+    DataLife 
+    {
   shouldUnattachDevice: boolean;
   predator_known: boolean;
   mortality_investigation: Code;
   mortality_record: boolean;
 }
-
-// export type MortalityEventProp = keyof IMortalityEvent;
 
 // used to create forms without having to use all event props 
 type MortalityFormField = {
@@ -53,6 +55,8 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   device_condition: Code;
   device_deployment_status: MortalityDeploymentStatus;
   device_status: MortalityDeviceStatus;
+
+  assignment_id: uuid;
 
   critter_id: uuid;
   animal_id: string;
@@ -101,10 +105,22 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     return UserAlertStrings.mortalityFormTitle;
   }
 
+  // used for datalife related things
+  // todo: improve instantiation of this :[
+  getCollarHistory(): CollarHistory {
+    const ch = new CollarHistory();
+    ch.assignment_id = this.assignment_id;
+    ch.data_life_start = dayjs(this.data_life_start);
+    ch.data_life_end = dayjs(this.data_life_end);
+    ch.attachment_start = dayjs(this.attachment_start);
+    ch.attachment_end = dayjs(this.attachment_end);
+    ch.device_id = this.device_id;
+    ch.device_make = this.device_make;
+    return ch;
+  }
+
   formatPropAsHeader(s: keyof MortalityEvent): string {
     switch (s) {
-      case 'mortality_investigation':
-        return 'Was a mortality investigation undertaken?';
       case 'mortality_record':
         return 'Was the Wildlife Health Group mortality form completed?';
       case 'retrieved':
@@ -126,7 +142,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
 
   fields: MortalityFormField = {
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
-    mortality_investigation: {prop: 'mortality_investigation', type: eInputType.code },
+    mortality_investigation: {prop: 'mortality_investigation', type: eInputType.code, long_label: 'Was a mortality investigation undertaken?' },
     mortality_record: {prop: 'mortality_record', type: eInputType.check },
     animal_status: { prop: 'animal_status', type: eInputType.code },
     proximate_cause_of_death: { prop: 'proximate_cause_of_death', type: eInputType.code },

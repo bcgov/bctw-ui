@@ -21,6 +21,7 @@ export type FormFieldObject<T> = {
   required?: boolean;
   span?: boolean;
   disabled?: boolean; // todo:
+  long_label?: string;
 };
 
 // spread in form field constructors to make a field required

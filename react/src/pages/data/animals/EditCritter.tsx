@@ -33,7 +33,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const [event, updateEvent] = useState(new MortalityEvent()); //fixme: type this
 
   // when workflow button is clicked, update the event type
-  useDidMountEffect(() => {
+  useDidMountEffect( async() => {
     // update the event instance
     updateEvent(() => {
       let e;
@@ -53,6 +53,14 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
       setShowWorkflowForm(o => !o);
     }
   }, [event]);
+
+  const handleOpenWorkflow = (e: EventType): void => {
+    if (workflowType === e) {
+      setShowWorkflowForm(o => !o);
+    } else {
+      setWorkflowType(e)
+    }
+  }
 
   const {
     associatedAnimalFields,
@@ -149,7 +157,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormPart(
                 'Latest Capture Details',
                 captureFields.map((f) => makeFormField(f, onChange)),
-                <Button {...btnProps} onClick={(): void => setWorkflowType('capture')}>
+                <Button {...btnProps} onClick={(): void => handleOpenWorkflow('capture')}>
                   Add Capture Event
                 </Button>
               )}
@@ -157,14 +165,14 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormPart(
                 'Latest Release Details',
                 releaseFields.map((f) => makeFormField(f, onChange)),
-                <Button {...btnProps} onClick={(): void => setWorkflowType('mortality')}>
+                <Button {...btnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
                   Add Release Event
                 </Button>
               )}
               {FormPart(
                 'Mortality Details',
                 mortalityFields.map((f) => makeFormField(f, onChange)),
-                <Button {...btnProps} onClick={(): void => setWorkflowType('mortality')}>
+                <Button {...btnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
                   Record Mortality Details
                 </Button>
               )}

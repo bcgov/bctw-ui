@@ -52,7 +52,7 @@ const EditHeader = <T,>({title, headers, obj, format}: EditHeaderProps<T>): JSX.
 };
 
 const FormPart = (header: string, children: React.ReactNode[], btn?: React.ReactNode): JSX.Element => (
-  <Box component='fieldset' p={3}>
+  <Box component='fieldset' p={2}>
     {header ? (
       <Box component='legend' className={'legend'}>
         {header}

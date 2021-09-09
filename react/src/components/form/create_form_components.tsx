@@ -180,7 +180,7 @@ function FormFromFormfield<T extends BCTWEvent<T>>(
     type,
     value: obj[prop],
     handleChange,
-    label: obj.formatPropAsHeader(prop as any),
+    label: obj.formatPropAsHeader(prop),
     disabled,
     required,
     codeName

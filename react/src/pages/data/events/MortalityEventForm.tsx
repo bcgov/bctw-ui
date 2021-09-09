@@ -1,10 +1,5 @@
 import { IUpsertPayload } from 'api/api_interfaces';
-import { ModalBaseProps } from 'components/component_interfaces';
-import {
-  CreateEditCheckboxField,
-  CreateEditDateField,
-  FormFromFormfield
-} from 'components/form/create_form_components';
+import { FormFromFormfield } from 'components/form/create_form_components';
 import dayjs from 'dayjs';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useState } from 'react';
@@ -13,6 +8,11 @@ import MortalityEvent from 'types/events/mortality_event';
 
 import { FormPart } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
+import EditDataLifeModal from 'components/form/EditDataLifeModal';
+import { eCritterPermission } from 'types/permission';
+import Button from 'components/form/Button';
+import { Box } from '@material-ui/core';
+import { formatTime } from 'utils/time';
 
 type MortEventProps = {
   event: MortalityEvent;
@@ -28,6 +28,7 @@ type MortEventProps = {
 export default function MortalityEventForm({ event, handleSave }: MortEventProps): JSX.Element {
   const [errors, setErrors] = useState({});
   const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
+  const [showDLForm, setShowDLForm] = useState(false);
   const [locationEvent, setLocationEvent] = useState<LocationEvent>(
     new LocationEvent('mortality', dayjs()) // fixme: alert.valid_from
   );
@@ -54,54 +55,48 @@ export default function MortalityEventForm({ event, handleSave }: MortEventProps
   }, [isRetrieved]);
 
   const onChange = (v) => {
-    console.log(v);
+    // console.log(v);
   };
 
-  // const headerProps ={title: UserAlertStrings.mortalityFormTitle, props: mortality.headerProps, obj: mortality }
   const { fields } = mortality;
   if (!fields) {
     return null;
   }
+
   return (
     <>
-      {FormPart('Update Assignment Details', [
-        CreateEditCheckboxField({
-          prop: fields.shouldUnattachDevice.prop,
-          type: fields.shouldUnattachDevice.type,
-          value: mortality.shouldUnattachDevice,
-          label: mortality.formatPropAsHeader('shouldUnattachDevice'),
-          handleChange: onChange
-        })
+      {FormPart('Assignment Details', [
+        <Box display='flex' justifyContent='space-between'>
+          <span>Data Life Start: {dayjs(mortality.data_life_start).format(formatTime)}</span>
+          <Button onClick={(): void => setShowDLForm((o) => !o)}>Edit Data Life</Button>
+        </Box>,
+        FormFromFormfield(mortality, fields.shouldUnattachDevice, onChange),
+        // label rly long
+        <Box display='flex' justifyContent='space-between' pt={2}>
+          <span>{fields.mortality_investigation.long_label}</span>
+          {FormFromFormfield(mortality, fields.mortality_investigation, onChange)}
+        </Box>,
+        <div></div>, //todo: divify form component function
+        FormFromFormfield(mortality, fields.mortality_record, onChange)
       ])}
       {FormPart('Update Device Details', [
-        CreateEditCheckboxField({
-          prop: fields.retrieved.prop,
-          type: fields.retrieved.type,
-          value: mortality.retrieved,
-          label: mortality.formatPropAsHeader('retrieved'),
-          handleChange: onChange
-        }),
-        CreateEditDateField({
-          prop: fields.retrieval_date.prop,
-          type: fields.retrieval_date.type,
-          value: mortality.retrieval_date,
-          label: mortality.formatPropAsHeader('retrieval_date'),
-          handleChange: onChange,
-          disabled: !isRetrieved
-        }),
-        CreateEditCheckboxField({
-          prop: fields.activation_status.prop,
-          type: fields.activation_status.type,
-          value: mortality.activation_status,
-          label: mortality.formatPropAsHeader('activation_status'),
-          handleChange: onChange
-        })
+        FormFromFormfield(mortality, fields.retrieved, onChange),
+        FormFromFormfield(mortality, fields.retrieval_date, onChange, !isRetrieved),
+        FormFromFormfield(mortality, fields.activation_status, onChange)
       ])}
       {FormPart('Update Animal Details', [
         FormFromFormfield(mortality, fields.animal_status, onChange),
         FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange)
       ])}
       {FormPart('Mortality Event Details', [<LocationEventForm event={locationEvent} handleChange={onChange} />])}
+      {/* fixme: ...existing propsa don't support disabling fields*/}
+      <EditDataLifeModal
+        attachment={mortality.getCollarHistory()}
+        handleClose={(): void => setShowDLForm(false)}
+        open={showDLForm}
+        // fixme:
+        permission_type={eCritterPermission.editor}
+      />
     </>
   );
 }
