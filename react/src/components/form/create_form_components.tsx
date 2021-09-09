@@ -128,6 +128,7 @@ function CreateEditSelectField<T>({
  * the "main" form component handler.
  * depending on the @param formType.type, creates the component using the above functions
  * @returns {JSX.Element}
+ * todo: deprecate this to function below
  */
 function MakeEditField<T>({
   prop,
@@ -166,7 +167,7 @@ function MakeEditField<T>({
   );
 }
 
-function FormFromFormfield<T extends BCTWEvent>(
+function FormFromFormfield<T extends BCTWEvent<T>>(
   obj: T,
   formField: FormFieldObject<T>,
   handleChange: (v: Record<string, unknown>) => void,

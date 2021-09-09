@@ -2,10 +2,11 @@ import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWEvent } from 'types/events/event';
+import { BCTWEvent, EventType } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 
-export default class CaptureEvent extends BCTWEvent {
+export default class CaptureEvent implements BCTWEvent<CaptureEvent> {
+  event_type: EventType;
   collar_id: uuid;
   device_id: number;
   device_make: Code;
@@ -19,7 +20,7 @@ export default class CaptureEvent extends BCTWEvent {
   location_event: LocationEvent;
 
   constructor() {
-    super('capture');
+    this.event_type = 'capture';
   }
 
   formatPropAsHeader(s: string): string {
@@ -27,6 +28,12 @@ export default class CaptureEvent extends BCTWEvent {
       default:
         return columnToHeader(s);
     }
+  }
+  getHeaderProps(): (keyof CaptureEvent)[] {
+    return ['device_id']
+  }
+  getHeaderTitle(): string {
+    return 'capture event '
   }
 
   toJSON(): CaptureEvent {

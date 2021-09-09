@@ -21,8 +21,13 @@ const EditTabPanel = (props: TabPanelProps): JSX.Element => {
   );
 };
 
-// todo:
-const EditHeader = (title: string): JSX.Element => {
+type EditHeaderProps<T> = {
+  title: string,
+  headers: (keyof T)[],
+  obj: T
+  format: (k: keyof T) => string;
+}
+const EditHeader = <T,>({title, headers, obj, format}: EditHeaderProps<T>): JSX.Element => {
   return (
     <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
       <Box>
@@ -30,6 +35,14 @@ const EditHeader = (title: string): JSX.Element => {
           {title}
         </Box>
         <dl className='headergroup-dl'>
+          {headers.map((p) => {
+            return (
+              <>
+                <dd>{format(p)}:</dd>
+                <dt>{obj[p]}</dt>
+              </>
+            )
+          })}
         </dl>
       </Box>
       <Box>

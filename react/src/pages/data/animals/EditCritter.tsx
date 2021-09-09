@@ -10,7 +10,7 @@ import { MakeEditField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { FormPart } from '../common/EditModalComponents';
-import { BCTWEvent, EventType } from 'types/events/event';
+import { EventType } from 'types/events/event';
 import EventWrapper from '../events/EventWrapper';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import MortalityEvent from 'types/events/mortality_event';
@@ -30,7 +30,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
   const [workflowType, setWorkflowType] = useState<EventType>('unknown');
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
-  const [event, updateEvent] = useState<BCTWEvent>(new MortalityEvent());
+  const [event, updateEvent] = useState(new MortalityEvent()); //fixme: type this
 
   // when workflow button is clicked, update the event type
   useDidMountEffect(() => {

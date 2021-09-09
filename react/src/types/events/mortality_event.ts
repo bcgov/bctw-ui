@@ -5,10 +5,11 @@ import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
 import dayjs, { Dayjs } from 'dayjs';
 import { getEndOfPreviousDay } from 'utils/time';
-import { BCTWEvent } from 'types/events/event';
+import { BCTWEvent, EventType } from 'types/events/event';
 import { IMortalityAlert } from 'types/alert';
 import { uuid } from 'types/common_types';
 import { Code } from 'types/code';
+import { UserAlertStrings } from 'constants/strings';
 
 /**
  * todo:
@@ -29,7 +30,7 @@ interface IMortalityEvent
   mortality_record: boolean;
 }
 
-// type MortalityEventProp = keyof IMortalityEvent;
+// export type MortalityEventProp = keyof IMortalityEvent;
 
 // used to create forms without having to use all event props 
 type MortalityFormField = {
@@ -41,7 +42,8 @@ type MortalityDeviceStatus = 'Mortality';
 type MortalityDeploymentStatus = 'Not Deployed';
 type MortalityAnimalStatus = 'Potential Mortality';
 
-export default class MortalityEvent extends BCTWEvent implements IMortalityEvent {
+export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMortalityEvent {
+  event_type: EventType;
   collar_id: uuid;
   device_id: number;
   device_make: Code;
@@ -77,7 +79,7 @@ export default class MortalityEvent extends BCTWEvent implements IMortalityEvent
   shouldUnattachDevice: boolean;
 
   constructor() {
-    super('mortality');
+    this.event_type = 'mortality';
     this.retrieval_date = getEndOfPreviousDay(); // note: defaulted
     this.retrieved = false;
     this.activation_status = true;
@@ -89,6 +91,14 @@ export default class MortalityEvent extends BCTWEvent implements IMortalityEvent
     this.animal_status = 'Potential Mortality';
     this.shouldUnattachDevice = false;
     this.location_event = new LocationEvent('mortality', dayjs());
+  }
+
+  getHeaderProps(): (keyof MortalityEvent)[] {
+    return ['wlh_id', 'animal_id', 'device_id'];
+  }
+
+  getHeaderTitle(): string {
+    return UserAlertStrings.mortalityFormTitle;
   }
 
   formatPropAsHeader(s: keyof MortalityEvent): string {
