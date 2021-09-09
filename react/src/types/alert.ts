@@ -6,9 +6,9 @@ import { BCTWBase, BCTWValidDates, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { formatDay, formatTime } from 'utils/time';
 
-import { Code } from './code';
-import { DataLife } from './data_life';
-import { LocationEvent } from './events/location_event';
+import { Code } from 'types/code';
+import { DataLife } from 'types/data_life';
+import MortalityEvent from 'types/events/mortality_event';
 
 // possible types of telemetry alerts
 enum eAlertType {
@@ -84,7 +84,6 @@ export class TelemetryAlert extends BCTWBase implements ITelemetryAlert {
     return this;
   }
 
-  // for saving
   toJSON(): TelemetryAlert {
     return {
       alert_id: this.alert_id,
@@ -119,7 +118,6 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   animal_id: string;
   animal_status: Code;
   wlh_id: string;
-  mortality_event: LocationEvent;
 
   attachment_start: Dayjs;
   data_life_start: Dayjs;
@@ -134,7 +132,11 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
     return super.formatPropAsHeader(s as AlertProp);
   }
 
-  // todo: cast to a mortality event class
+  toMortalityEvent(): MortalityEvent {
+    const n = new MortalityEvent();
+    Object.assign(n, this);
+    return n;
+  }
 }
 
 export type { eAlertType, ITelemetryAlert };

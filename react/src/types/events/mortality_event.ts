@@ -1,6 +1,6 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { Animal } from 'types/animal';
-import { Collar, ICollar } from 'types/collar';
+import { Collar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
 import dayjs, { Dayjs } from 'dayjs';
@@ -12,33 +12,38 @@ import { Code } from 'types/code';
 
 /**
  * todo:
- * expose data life, attachment dates - only end dates editable
- * question - 'was a mortality investigation undertaken? -> mortality_investigation (code)
- * question 'Was the Wildlife Health Group mortality form completed?' -> mortality_record (bool)
- * add captivity_status - its own event if it's to be used elsewhere? (bool)
- * add device_condition (code)
- * event triggered upon selecting a predation value from PCOD:
+ * expose data life - end dates editable
+ * add captivity_status - its own event?? (bool)
+ * triggered upon selecting a predation value from PCOD:
     * add bool predator_known
-    * show predator_species code  
+    * show predator_species code
  */
 
-interface IMortalityEvent extends IMortalityAlert, 
-  Pick<Animal, 'proximate_cause_of_death' | 'predator_species'>,
-  Pick<Collar, 'retrieved' | 'retrieval_date' | 'activation_status'| 'device_status' | 'device_deployment_status'> {
+interface IMortalityEvent
+  extends IMortalityAlert,
+    Pick<Animal, 'proximate_cause_of_death' | 'predator_species'>,
+    Pick<Collar, 'retrieved' | 'retrieval_date' | 'activation_status' | 'device_status' | 'device_deployment_status'> {
   shouldUnattachDevice: boolean;
-  predator_known: boolean; // todo: need to save this?
+  predator_known: boolean;
+  mortality_investigation: Code;
+  mortality_record: boolean;
 }
 
-type MortalityEventProp = keyof IMortalityEvent;
+// type MortalityEventProp = keyof IMortalityEvent;
 
-// code fields that are defaulted in this workflow
+// used to create forms without having to use all event props 
+type MortalityFormField = {
+  [Property in keyof MortalityEvent]+?: FormFieldObject<MortalityEvent>;
+};
+
+// codes defaulted in this workflow
 type MortalityDeviceStatus = 'Mortality';
-type MortalityDeploymentStatus = 'Not Deployed'
+type MortalityDeploymentStatus = 'Not Deployed';
 type MortalityAnimalStatus = 'Potential Mortality';
 
 export default class MortalityEvent extends BCTWEvent implements IMortalityEvent {
-  // collar_id: uuid;
-  // device_id: number;
+  collar_id: uuid;
+  device_id: number;
   device_make: Code;
   retrieved: boolean;
   retrieval_date: Dayjs;
@@ -47,20 +52,22 @@ export default class MortalityEvent extends BCTWEvent implements IMortalityEvent
   device_deployment_status: MortalityDeploymentStatus;
   device_status: MortalityDeviceStatus;
 
-  // critter_id: uuid;
+  critter_id: uuid;
   animal_id: string;
   animal_status: MortalityAnimalStatus;
   wlh_id: string;
-  predator_known: boolean;
   predator_species: string;
   proximate_cause_of_death: string;
+
   // todo: new fields
+  captivity_status: boolean;
   mortality_investigation: Code;
   mortality_record: boolean;
-  captivity_status: boolean; 
-  mortality_captivity_status: Code; // enable if captivity_status ^ true
-  pcod_confidence_value: string; // todo: ???? 
+  mortality_captivity_status: Code; // enable if captivity_status true
+  pcod_confidence_value: string; // ????
+  predator_known: boolean;
 
+  // data life
   attachment_start: Dayjs;
   data_life_start: Dayjs;
   data_life_end: Dayjs;
@@ -69,14 +76,10 @@ export default class MortalityEvent extends BCTWEvent implements IMortalityEvent
   location_event: LocationEvent;
   shouldUnattachDevice: boolean;
 
-  // todo:
-  // static get requiredFields(): MortalityEventProp[] {
-  //   return ['device_id'] //todo:
-  // }
-
-  constructor(public critter_id: uuid, public collar_id: uuid, public device_id: number) {
+  // constructor(public critter_id: uuid, public collar_id: uuid, public device_id: number) {
+  constructor() {
     super('mortality');
-    this.retrieval_date = getEndOfPreviousDay(); // note: defaulted to one day prior at 23:59:59
+    this.retrieval_date = getEndOfPreviousDay(); // note: defaulted
     this.retrieved = false;
     this.activation_status = true;
 
@@ -91,6 +94,10 @@ export default class MortalityEvent extends BCTWEvent implements IMortalityEvent
 
   formatPropAsHeader(s: keyof MortalityEvent): string {
     switch (s) {
+      case 'mortality_investigation':
+        return 'Was a mortality investigation undertaken?';
+      case 'mortality_record':
+        return 'Was the Wildlife Health Group mortality form completed?';
       case 'retrieved':
         return 'Has Device Been Retrieved?';
       case 'activation_status':
@@ -108,22 +115,21 @@ export default class MortalityEvent extends BCTWEvent implements IMortalityEvent
     }
   }
 
-  // fixme Record<string should be keyof MortalityEvent...but ts looks for all props :[
-  fields: Record<string, FormFieldObject<MortalityEvent>> = { 
-    collar_id: { prop: 'collar_id', type: eInputType.unknown},
-    critter_id: { prop: 'critter_id', type: eInputType.unknown},
-    device_id: { prop: 'device_id', type: eInputType.unknown},
+  fields: MortalityFormField = {
+    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
+    mortality_investigation: {prop: 'mortality_investigation', type: eInputType.code },
+    mortality_record: {prop: 'mortality_record', type: eInputType.check },
     animal_status: { prop: 'animal_status', type: eInputType.code },
     proximate_cause_of_death: { prop: 'proximate_cause_of_death', type: eInputType.code },
     predator_species: { prop: 'predator_species', type: eInputType.code },
     retrieved: { prop: 'retrieved', type: eInputType.check },
-    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime},
+    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime },
     activation_status: { prop: 'activation_status', type: eInputType.check },
     device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
     device_status: { prop: 'device_status', type: eInputType.code },
+    device_condition: {prop: 'device_condition', type: eInputType.code },
     // pcod_confidence_value: { prop: 'pcod_confidence_value', type: eInputType.text },
-    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
-  }
+  };
 
   // retrieve the animal metadata fields from the mortality event
   get getCritter(): Animal {

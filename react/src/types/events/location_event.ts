@@ -1,12 +1,9 @@
 import dayjs, { Dayjs } from 'dayjs';
-// import { columnToHeader } from 'utils/common_helpers';
-// import { BCTWEvent } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
+import { EventType } from 'types/events/event';
 
-export type LocationEventType = 'capture' | 'mortality' | 'release' | 'retrieval' | 'malfunction';
-interface IBaseLocationEvent {
-  // location_type: LocationEventType;
+interface ILocationEvent {
   date: Dayjs;
   comment: string;
   latitude: number;
@@ -16,7 +13,7 @@ interface IBaseLocationEvent {
   utm_zone: number;
 }
 
-export class LocationEvent implements IBaseLocationEvent {
+export class LocationEvent implements ILocationEvent {
   comment: string;
   latitude: number;
   longitude: number;
@@ -24,7 +21,7 @@ export class LocationEvent implements IBaseLocationEvent {
   utm_northing: number;
   utm_zone: number;
 
-  constructor(private location_type: LocationEventType, public date: Dayjs = dayjs()) {
+  constructor(private location_type: EventType, public date: Dayjs = dayjs()) {
     this.utm_easting = 0;
     this.utm_northing = 0;
     this.utm_zone = 0;
@@ -33,6 +30,7 @@ export class LocationEvent implements IBaseLocationEvent {
     this.comment = '';
   }
 
+  // todo: could use template literal type?
   toJSON(): Record<string, unknown> {
     const o = {};
     for (const k in this) {

@@ -7,7 +7,6 @@ import ChangeContext from 'contexts/InputChangeContext';
 import dayjs from 'dayjs';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useState } from 'react';
-import { MortalityAlert } from 'types/alert';
 import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { removeProps } from 'utils/common_helpers';
@@ -15,12 +14,10 @@ import { removeProps } from 'utils/common_helpers';
 import EditModal from 'pages/data//common/EditModal';
 import { FormPart } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
-import { AttachedAnimal } from 'types/animal';
 
 type MortEventProps = ModalBaseProps & {
-  critter: AttachedAnimal;
+  event: MortalityEvent;
   handleSave: (event: MortalityEvent) => void;
-  alert?: MortalityAlert;
 };
 
 /**
@@ -29,14 +26,14 @@ type MortEventProps = ModalBaseProps & {
  * not savable when on display
  * errors
  */
-export default function MortalityEventForm({ alert, open, handleClose, handleSave }: MortEventProps): JSX.Element {
+export default function MortalityEventForm({ event, open, handleClose, handleSave }: MortEventProps): JSX.Element {
   const [errors, setErrors] = useState({});
-  const [mortalityEvent, setMortalityEvent] = useState<MortalityEvent>(
-    new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id)
-  );
+  const [mortalityEvent, setMortalityEvent] = useState<MortalityEvent>(event);
   const [locationEvent, setLocationEvent] = useState<LocationEvent>(
-    new LocationEvent('mortality', dayjs(alert.valid_from))
+    new LocationEvent('mortality', dayjs()) // fixme: alert.valid_from
   );
+
+  console.log('event', event);
   const [isRetrieved, setIsRetrieved] = useState<boolean>(false);
 
   // const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.formFields);
@@ -59,15 +56,10 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
     // todo: delete this field on-save if disabled?
   }, [isRetrieved]);
 
-  useDidMountEffect(() => {
-    setMortalityEvent(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id));
-    setLocationEvent(new LocationEvent('mortality', dayjs(alert.valid_from)));
-  }, [alert]);
-
-  // fixme: why
-  // if (!animalStatusField) {
-  //   return <div>oops..</div>;
-  // }
+  // useDidMountEffect(() => {
+  //   setMortalityEvent(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id));
+  //   setLocationEvent(new LocationEvent('mortality', dayjs(alert.valid_from)));
+  // }, [alert]);
 
   const Header = (
     <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
@@ -77,11 +69,11 @@ export default function MortalityEventForm({ alert, open, handleClose, handleSav
         </Box>
         <dl className='headergroup-dl'>
           <dd>WLH ID:</dd>
-          <dt>{alert.wlh_id}</dt>
+          <dt>{event.wlh_id}</dt>
           <dd>Animal ID:</dd>
-          <dt>{alert.animal_id}</dt>
+          <dt>{event.animal_id}</dt>
           <dd>Device:</dd>
-          <dt>{alert.device_id}</dt>
+          <dt>{event.device_id}</dt>
         </dl>
       </Box>
     </Box>

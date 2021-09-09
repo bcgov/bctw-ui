@@ -7,28 +7,29 @@ import { dateObjectToTimeStr } from 'utils/time';
 import { Icon } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { UserAlertStrings } from 'constants/strings';
-import MortalityEventForm from 'pages/data/events/MortalityEventForm';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
-import { IBulkUploadResults } from 'api/api_interfaces';
-import MortalityEvent from 'types/events/mortality_event';
 import { columnToHeader } from 'utils/common_helpers';
+import EventWrapper from 'pages/data/events/EventWrapper';
 
+/**
+ * modal component that shows current alerts
+ * todo: add support for other alert types
+ */
 export default function AlertPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
   const useAlerts = useContext(AlertContext);
-  // todo: add other alert types
-  const [alerts, setAlerts] = useState<(MortalityAlert)[]>([]);
-  // alert selected in table
-  const [selectedAlert, setSelectedAlert] = useState<TelemetryAlert|MortalityAlert>(null);
-  // display status of the modal that the user can perform the alert update from. ex - mortality
-  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
-  // display status of the modal that requires the user to confirm the 'snooze alert' action
-  const [showSnoozeModal, setShowSnoozeModal] = useState<boolean>(false);
-  const [snoozeMessage, setSnoozeMessage] = useState<string>('');
+
+  const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
+  const [selectedAlert, setSelectedAlert] = useState<TelemetryAlert | MortalityAlert>(null);
+  // display status of the modal that the user can perform the alert update from
+  const [showEventModal, setShowEventModal] = useState(false);
+  // display status of the modal that requires the user to confirm snoozing
+  const [showSnoozeModal, setShowSnoozeModal] = useState(false);
+  const [snoozeMessage, setSnoozeMessage] = useState('');
 
   useEffect(() => {
     const update = (): void => {
@@ -39,55 +40,26 @@ export default function AlertPage(): JSX.Element {
     update();
   }, [useAlerts]);
 
-  const onAlertSaved = async (): Promise<void> => {
+  const onSuccess = async (): Promise<void> => {
     responseDispatch({ severity: 'success', message: `telemetry alert saved` });
   };
 
-  // todo: move this to the event form and pass callback to this.
-  const onMortalitySaved = async (data: IBulkUploadResults<unknown>): Promise<void> => {
-    // console.log('data returned from mortality alert context', data);
-    const { errors, results } = data;
-    if (errors.length) {
-      responseDispatch({ severity: 'error', message: `${errors.map((e) => e.error)}` });
-    } else if (results.length) {
-      responseDispatch({ severity: 'success', message: 'mortality event saved!' });
-      // console.log(selectedAlert);
-      // expire the telemetry alert
-      const a = Object.assign(new TelemetryAlert(), selectedAlert);
-      a.expireAlert(); // updates the expiry date
-      await updateAlert(a);
-    }
-  };
+  const onError = (error: AxiosError): void =>
+    responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
-  const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
+  // setup the mutation to update the alert status
+  const { mutateAsync, isLoading } = bctwApi.useMutateUserAlert({ onSuccess, onError });
 
-  // setup the mutations
-  const { mutateAsync: saveAlert, isLoading: isSavingAlert } = bctwApi.useMutateUserAlert({
-    onSuccess: onAlertSaved,
-    onError
-  });
-  const { mutateAsync: saveMortality } = bctwApi.useMutateMortalityEvent({ onSuccess: onMortalitySaved, onError });
-
+  // alert is selected in table
   const handleSelectRow = (aid: number): void => {
     const selected = alerts.find((a) => a.alert_id === aid);
     setSelectedAlert(selected);
   };
 
-  /**
-   * performs metadata updates of collar/critter
-   */
-  const handleSave = async (event: MortalityEvent): Promise<void> => {
-    if (event) {
-      await saveMortality(event);
-    }
-  };
-
-  /**
-   * posts the updated alert to API
-   */
+  // post the updated alert
   const updateAlert = async (alert: TelemetryAlert): Promise<void> => {
     console.log('saving this alert', alert.toJSON());
-    await saveAlert([alert]);
+    await mutateAsync([alert]);
     // trigger the alert context to refetch
     useAlerts.invalidate();
   };
@@ -95,17 +67,17 @@ export default function AlertPage(): JSX.Element {
   // user selected to take action on the alert, show the update modal
   const editAlert = (row: TelemetryAlert): void => {
     setSelectedAlert(row);
-    setShowUpdateModal(true);
+    setShowEventModal(true);
   };
 
-  // show the modal that requires the user to confirm the snooze action
+  // make user confirm the snooze action
   const handleClickSnooze = (alert: TelemetryAlert): void => {
     setSnoozeMessage(UserAlertStrings.snoozeConfirmation(alert.snoozesMax - alert.snooze_count));
     setSelectedAlert(alert);
     setShowSnoozeModal(true);
   };
 
-  // when the snooze action is confirmed, update the snooze and call {updateAlert}
+  // when the snooze action is confirmed, update the snooze and save the alert
   const handleConfirmSnooze = async (): Promise<void> => {
     const snoozed = Object.assign(new TelemetryAlert(), selectedAlert);
     snoozed.performSnooze();
@@ -113,29 +85,41 @@ export default function AlertPage(): JSX.Element {
     setShowSnoozeModal(false);
   };
 
-  const propsToShow = [
-    ...MortalityAlert.displayableMortalityAlertProps,
-    'update',
-    'Snooze Status',
-    'Snooze Action'
-  ];
+  /**
+   * note: is this still the correct alert context
+   * handler for when the eventwrapper saves the event
+   * update/expire the alert
+   */
+  const handleEventSaved = async (): Promise<void> => {
+    console.log(selectedAlert);
+    if (!selectedAlert) {
+      return;
+    }
+    // selectedAlert.expireAlert();
+    // await updateAlert(selectedAlert);
+  };
+
+  const propsToShow = [...MortalityAlert.displayableMortalityAlertProps, 'update', 'Snooze Status', 'Snooze Action'];
 
   if (!alerts?.length) {
     return <div>no alerts</div>;
   }
 
+  // todo: use existing table
   return (
     <div className={'container'}>
       <Box p={1}>
-        {isSavingAlert ? (
+        {/* is the alert being updated? */}
+        {isLoading ? (
           <CircularProgress />
         ) : (
-          <TableContainer component={Paper} style={{padding: '3px'}}>
+          <TableContainer component={Paper} style={{ padding: '3px' }}>
             <Table>
               <TableHead>
                 <TableRow>
-                  {/* fixme: proper header */}
-                  {propsToShow.map((str, idx) => (<TableCell key={idx}>{columnToHeader(str)}</TableCell>))}
+                  {propsToShow.map((str, idx) => (
+                    <TableCell key={idx}>{columnToHeader(str)}</TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -198,12 +182,11 @@ export default function AlertPage(): JSX.Element {
         open={showSnoozeModal}
       />
       {selectedAlert ? (
-        <MortalityEventForm
-          critter={null} // fixme:
-          alert={selectedAlert as MortalityAlert}
-          open={showUpdateModal}
-          handleClose={(): void => setShowUpdateModal(false)}
-          handleSave={handleSave}
+        <EventWrapper
+          eventType={'mortality'}
+          event={(selectedAlert as MortalityAlert).toMortalityEvent()}
+          showEvent={showEventModal}
+          onEventSaved={handleEventSaved}
         />
       ) : null}
     </div>

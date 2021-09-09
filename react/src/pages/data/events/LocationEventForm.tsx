@@ -43,7 +43,6 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
         label={event.formatPropAsHeader('date')}
         defaultValue={event.date}
         changeHandler={changeDT}
-        // {...baseInputProps}
       />
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}
       <RadioGroup row aria-label='position' name='position' value={useUTM} onChange={changeCoordinateType}>
