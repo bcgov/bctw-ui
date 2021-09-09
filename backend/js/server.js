@@ -464,15 +464,19 @@ app
   .use(express['static'](path.join(__dirname, '../../react/build')));
 
 // pass all remaning requests (i.e. not defined in Express) to React
-if (isProd) {
-  console.log('express() -- passing page request to React')
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname + '../../../react/build/index.html'));
-  });
-} else {
-  app
-    .get('*', devServerRedirect);
-}
+// if (isProd) {
+//   console.log('express() -- passing page request to React')
+//   app.get('*', (req, res) => {
+//     // XXX: This is causing all assets to get the index.html
+//     res.sendFile(path.join(__dirname + '../../../react/build/index.html'));
+//   });
+// } else {
+//   app
+//     .get('*', devServerRedirect);
+// }
+
+// For testing development purposes
+if (!isProd) app.get('*', devServerRedirect);
 
 // start Express server on port 8080
 http.createServer(app).listen(8080);
