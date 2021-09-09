@@ -258,7 +258,7 @@ const onboardingRedirect = async (req, res, next) => {
     next(); // pass through
   } else { // Otherwise redirect to the onboarding page
     // XXX: This is causing all assets to get the index.html
-    if (req.url.match(/\/onboarding/) || req.url.match(/\/static/)) {
+    if (req.url.match(/\/onboarding/) || req.url.match(/\/static/) || req.url.match(/\/Reflect/)) {
       console.log('onboardingRedirect() -- Onboarding URL requested; passing through')
       next(); // already heading to onboarding so pass through
     } else {
