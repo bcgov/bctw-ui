@@ -1,24 +1,26 @@
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
+import { ModalBaseProps } from 'components/component_interfaces';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { BCTWEvent, EventType } from 'types/events/event';
 import MortalityEvent from 'types/events/mortality_event';
 import { formatAxiosError } from 'utils/errors';
+import CaptureEventForm from './CaptureEventForm';
 import MortalityEventForm from './MortalityEventForm';
+import ReleaseEventForm from './ReleaseEventForm';
 
-type EventWrapperProps = {
+type EventWrapperProps = ModalBaseProps & {
   event: BCTWEvent;
   eventType: EventType;
   onEventSaved?: () => void; // to notify alert that event was saved
-  showEvent: boolean;
 };
 
 /**
  * wraps all of the event pages.
  * handles saving
  */
-export default function EventWrapper({ event, eventType, onEventSaved, showEvent }: EventWrapperProps): JSX.Element {
+export default function EventWrapper({ event, eventType, onEventSaved, open, handleClose }: EventWrapperProps): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
@@ -51,14 +53,21 @@ export default function EventWrapper({ event, eventType, onEventSaved, showEvent
   };
 
   switch (eventType) {
-    default:
+    case 'release':
+      return <ReleaseEventForm />;
+    case 'capture':
+      return <CaptureEventForm />;
+    case 'mortality':
       return (
         <MortalityEventForm
           event={event as MortalityEvent}
-          open={showEvent}
-          handleClose={(): void => console.log('i want to close')}
+          open={open}
+          handleClose={handleClose}
           handleSave={handleSave}
         />
       );
+    case 'unknown':
+    default:
+      return <></>
   }
 }

@@ -10,21 +10,49 @@ import { MakeEditField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { FormPart } from '../common/EditModalComponents';
+import { BCTWEvent, EventType } from 'types/events/event';
+import EventWrapper from '../events/EventWrapper';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import MortalityEvent from 'types/events/mortality_event';
+import CaptureEvent from 'types/events/capture_event';
 
 /**
  * the main animal form
- * todo: complete capture/release/mortality workflows -> uncomment when complete
  * todo: for new animals, hide all workflow fields?
+ * todo: disable editing all workflow fields
+ * bug: cant save?
  */
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
   const isAttached = editing instanceof AttachedAnimal;
-  const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
-  // const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
-  // const [showMortalityWorkflow, setShowMortalityWorkflow] = useState<boolean>(false);
-  // const [showReleaseWorkflow, setShowReleaseWorkflow] = useState<boolean>(false);
+  const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
+  const [workflowType, setWorkflowType] = useState<EventType>('unknown');
+  const [showWorkflowForm, setShowWorkflowForm] = useState(false);
+  const [event, updateEvent] = useState<BCTWEvent>(new MortalityEvent());
+
+  // when workflow button is clicked, update the event type
+  useDidMountEffect(() => {
+    // update the event instance
+    updateEvent(() => {
+      let e;
+      if (workflowType === 'capture') {
+        e = new CaptureEvent();
+      } else { // default for now
+        e = new MortalityEvent();
+      }
+      const o = Object.assign(e, editing);
+      return o;
+    })
+  }, [workflowType])
+
+  useDidMountEffect(() => {
+    if (event) {
+      console.log('event updated', event, !open);
+      setShowWorkflowForm(o => !o);
+    }
+  }, [event]);
 
   const {
     associatedAnimalFields,
@@ -121,21 +149,22 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormPart(
                 'Latest Capture Details',
                 captureFields.map((f) => makeFormField(f, onChange)),
-                <Button {...btnProps} onClick={(): void => console.log('todo: capture')}>
+                <Button {...btnProps} onClick={(): void => setWorkflowType('capture')}>
                   Add Capture Event
                 </Button>
               )}
+              {/* fixme: defaulting to mortality for now */}
               {FormPart(
                 'Latest Release Details',
                 releaseFields.map((f) => makeFormField(f, onChange)),
-                <Button {...btnProps} onClick={(): void => console.log('todo: release')}>
+                <Button {...btnProps} onClick={(): void => setWorkflowType('mortality')}>
                   Add Release Event
                 </Button>
               )}
               {FormPart(
                 'Mortality Details',
                 mortalityFields.map((f) => makeFormField(f, onChange)),
-                <Button {...btnProps} onClick={(): void => console.log('todo: mort')}>
+                <Button {...btnProps} onClick={(): void => setWorkflowType('mortality')}>
                   Record Mortality Details
                 </Button>
               )}
@@ -148,6 +177,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                   permission_type={editing.permission_type}
                 />
               ) : null}
+              <EventWrapper eventType={workflowType} open={showWorkflowForm} event={event} handleClose={(): void => setShowWorkflowForm(false)}/>
             </>
           );
         }}

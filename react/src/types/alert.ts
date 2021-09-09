@@ -133,9 +133,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   }
 
   toMortalityEvent(): MortalityEvent {
-    const n = new MortalityEvent();
-    Object.assign(n, this);
-    return n;
+    return Object.assign(new MortalityEvent(), this);
   }
 }
 

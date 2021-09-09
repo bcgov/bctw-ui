@@ -28,17 +28,20 @@ type MortEventProps = ModalBaseProps & {
  */
 export default function MortalityEventForm({ event, open, handleClose, handleSave }: MortEventProps): JSX.Element {
   const [errors, setErrors] = useState({});
-  const [mortalityEvent, setMortalityEvent] = useState<MortalityEvent>(event);
+  const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
   const [locationEvent, setLocationEvent] = useState<LocationEvent>(
     new LocationEvent('mortality', dayjs()) // fixme: alert.valid_from
   );
 
-  console.log('event', event);
+  useDidMountEffect(() => {
+    setMortalityEvent(event);
+  }, [event]);
+
+  // console.log('event', event);
   const [isRetrieved, setIsRetrieved] = useState<boolean>(false);
 
   // const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.formFields);
   // const required = true;
-  const { fields } = mortalityEvent;
 
   /**
    * break the MortalityEvent into collar/critter specific properties
@@ -55,11 +58,6 @@ export default function MortalityEventForm({ event, open, handleClose, handleSav
     // trigger re-render of retrieved_date field
     // todo: delete this field on-save if disabled?
   }, [isRetrieved]);
-
-  // useDidMountEffect(() => {
-  //   setMortalityEvent(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id));
-  //   setLocationEvent(new LocationEvent('mortality', dayjs(alert.valid_from)));
-  // }, [alert]);
 
   const Header = (
     <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
@@ -84,7 +82,7 @@ export default function MortalityEventForm({ event, open, handleClose, handleSav
       showInFullScreen={false}
       handleClose={handleClose}
       onSave={onSave}
-      editing={mortalityEvent}
+      editing={event}
       open={open}
       headerComponent={Header}
       disableTabs={true}
@@ -120,15 +118,19 @@ export default function MortalityEventForm({ event, open, handleClose, handleSav
           };
 
           // const tooltipProps: Pick<TooltipProps, 'placement' | 'enterDelay'> = { placement: 'right', enterDelay: 750 };
+          const { fields } = mortality;
+          if (!fields) {
+            return null;
+          }
 
           return (
             <>
               {FormPart('Update Assignment Details', [
                 CreateEditCheckboxField({
-                  prop: mortalityEvent.fields.shouldUnattachDevice.prop,
-                  type: mortalityEvent.fields.shouldUnattachDevice.type,
-                  value: mortalityEvent.shouldUnattachDevice,
-                  label: mortalityEvent.formatPropAsHeader('shouldUnattachDevice'),
+                  prop: fields.shouldUnattachDevice.prop,
+                  type: fields.shouldUnattachDevice.type,
+                  value: mortality.shouldUnattachDevice,
+                  label: mortality.formatPropAsHeader('shouldUnattachDevice'),
                   handleChange: onChange
                 })
               ])}
@@ -136,29 +138,29 @@ export default function MortalityEventForm({ event, open, handleClose, handleSav
                 CreateEditCheckboxField({
                   prop: fields.retrieved.prop,
                   type: fields.retrieved.type,
-                  value: mortalityEvent.retrieved,
-                  label: mortalityEvent.formatPropAsHeader('retrieved'),
+                  value: mortality.retrieved,
+                  label: mortality.formatPropAsHeader('retrieved'),
                   handleChange: onChange
                 }),
                 CreateEditDateField({
                   prop: fields.retrieval_date.prop,
                   type: fields.retrieval_date.type,
-                  value: mortalityEvent.retrieval_date,
-                  label: mortalityEvent.formatPropAsHeader('retrieval_date'),
+                  value: mortality.retrieval_date,
+                  label: mortality.formatPropAsHeader('retrieval_date'),
                   handleChange: onChange,
                   disabled: !isRetrieved
                 }),
                 CreateEditCheckboxField({
                   prop: fields.activation_status.prop,
                   type: fields.activation_status.type,
-                  value: mortalityEvent.activation_status,
-                  label: mortalityEvent.formatPropAsHeader('activation_status'),
+                  value: mortality.activation_status,
+                  label: mortality.formatPropAsHeader('activation_status'),
                   handleChange: onChange
                 })
               ])}
               {FormPart('Update Animal Details', [
-                FormFromFormfield(mortalityEvent, fields.animal_status, onChange),
-                FormFromFormfield(mortalityEvent, fields.proximate_cause_of_death, onChange)
+                FormFromFormfield(mortality, fields.animal_status, onChange),
+                FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange)
               ])}
               {FormPart('Mortality Event Details', [
                 <LocationEventForm event={locationEvent} handleChange={onChangeLocationProp} />

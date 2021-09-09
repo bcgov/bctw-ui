@@ -76,7 +76,6 @@ export default class MortalityEvent extends BCTWEvent implements IMortalityEvent
   location_event: LocationEvent;
   shouldUnattachDevice: boolean;
 
-  // constructor(public critter_id: uuid, public collar_id: uuid, public device_id: number) {
   constructor() {
     super('mortality');
     this.retrieval_date = getEndOfPreviousDay(); // note: defaulted

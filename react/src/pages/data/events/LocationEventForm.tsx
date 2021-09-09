@@ -61,8 +61,8 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
       </RadioGroup>
       <Box>
         {useUTM === 'utm' ? (
-          utmFields.map((f) => {
-            const numberProps = { ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop };
+          utmFields.map((f, idx) => {
+            const numberProps = { ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop, key: `${f.prop}-${idx}` };
             // custom form validation
             if (f.prop === 'utm_easting') {
               numberProps['validate'] = (v: number): string => mustBeXDigits(v, 6);

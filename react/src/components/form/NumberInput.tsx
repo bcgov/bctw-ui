@@ -8,6 +8,9 @@ import { inputPropsToRemove } from 'components/form/TextInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
 
+/**
+ * bug: why is key not being passed????????
+ */
 interface INumberInputProps extends StandardTextFieldProps {
   propName: string;
   changeHandler: InputChangeHandler;

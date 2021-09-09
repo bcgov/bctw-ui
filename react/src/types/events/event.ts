@@ -1,4 +1,4 @@
-export type EventType = 'mortality' | 'release' | 'capture';
+export type EventType = 'mortality' | 'release' | 'capture' | 'unknown';
 
 export abstract class BCTWEvent {
   // derived must implement

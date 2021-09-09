@@ -185,7 +185,8 @@ export default function AlertPage(): JSX.Element {
         <EventWrapper
           eventType={'mortality'}
           event={(selectedAlert as MortalityAlert).toMortalityEvent()}
-          showEvent={showEventModal}
+          open={showEventModal}
+          handleClose={(): void => setShowEventModal(false)}
           onEventSaved={handleEventSaved}
         />
       ) : null}

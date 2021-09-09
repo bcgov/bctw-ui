@@ -1,6 +1,3 @@
-import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
-import { useEffect, useState } from 'react';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { WorkflowStrings } from 'constants/strings';
 
 type ICaptureWorkflowProps = {
@@ -11,24 +8,8 @@ type ICaptureWorkflowProps = {
 };
 
 /**
- * fixme: todo: very incomplete
 */
-export default function CaptureEventForm(props: ICaptureWorkflowProps): JSX.Element {
-  const { animal_id } = props;
-  const bctwApi = useTelemetryApi();
-  const [isDeviceAttached, setIsDeviceAttached] = useState<string>(null);
-  const [history, setCollarHistory] = useState<CollarHistory[]>([]);
-
-  const onNewData = (d: CollarHistory[]): void => {
-    setCollarHistory(d);
-  };
-
-  useEffect(() => {
-    if (history?.length) {
-      const attachment = hasCollarCurrentlyAssigned(history);
-      setIsDeviceAttached(attachment?.collar_id);
-    }
-  }, [history]);
+export default function CaptureEventForm(): JSX.Element {
 
   return (
     <>
