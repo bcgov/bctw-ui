@@ -257,7 +257,8 @@ const onboardingRedirect = async (req, res, next) => {
     console.log('onboardingRedirect() -- User is registered; passing through')
     next(); // pass through
   } else { // Otherwise redirect to the onboarding page
-    if (req.url.match(/\/onboarding/)) {
+    // XXX: This is causing all assets to get the index.html
+    if (req.url.match(/\/onboarding/) || req.url.match(/\/static/)) {
       console.log('onboardingRedirect() -- Onboarding URL requested; passing through')
       next(); // already heading to onboarding so pass through
     } else {
@@ -467,7 +468,6 @@ app
 if (isProd) {
   console.log('express() -- passing page request to React')
   app.get('*', (req, res) => {
-    // XXX: This is causing all assets to get the index.html
     res.sendFile(path.join(__dirname + '../../../react/build/index.html'));
   });
 } else {
