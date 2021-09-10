@@ -5,8 +5,9 @@ import { Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import useFormHasError from 'hooks/useFormHasError';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { BCTWEvent, EventType } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { EditHeader } from '../common/EditModalComponents';
@@ -34,6 +35,14 @@ export default function EventWrapper<E>({
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
+  const [canSave, setCanSave] = useState(false);
+  const [hasErr, checkHasErr] = useFormHasError();
+
+  useEffect(() => {
+    // console.log('event wrapper error status', hasErr);
+    setCanSave(!hasErr);
+  }, [hasErr])
+
   const handleEventSaved = async (data: IBulkUploadResults<unknown>): Promise<void> => {
     // console.log('data returned from mortality alert context', data);
     const { errors, results } = data;
@@ -56,24 +65,29 @@ export default function EventWrapper<E>({
   const { mutateAsync: saveMortality } = bctwApi.useMutateMortalityEvent({ onSuccess: handleEventSaved });
 
   // performs metadata updates of collar/critter
-  const handleSave = async (event): Promise<void> => {
-    if (event) {
-      await saveMortality(event);
-    }
+  const handleSave = async (): Promise<void> => {
+    console.log(event);
+    // if (event) {
+    //   await saveMortality(event);
+    // }
   };
+
+  const handleChildFormUpdated = (v: Record<string, unknown>): void => {
+    checkHasErr(v);
+  }
 
   let Comp: React.ReactNode;
   switch (eventType) {
     case 'release':
-      // return <ReleaseEventForm />;
       Comp = <ReleaseEventForm />;
       break;
     case 'capture':
-      // return <CaptureEventForm />;
       Comp = <CaptureEventForm />;
       break;
     case 'mortality':
-      Comp = <MortalityEventForm event={event as any} handleSave={handleSave} />;
+      Comp = (
+        <MortalityEventForm handleFormChange={handleChildFormUpdated} event={event as any}/>
+      );
       break;
     case 'unknown':
     default:
@@ -92,7 +106,6 @@ export default function EventWrapper<E>({
 
         <Container maxWidth='xl'>
           <Box py={3}>
-            {/* <EditTabPanel value={value} index={0}> */}
             <Paper>
               {Comp}
 
@@ -102,7 +115,7 @@ export default function EventWrapper<E>({
 
               <Box p={3}>
                 <Box display='flex' justifyContent='flex-end' className='form-buttons'>
-                  <Button size='large' color='primary' onClick={handleSave} /*disabled={!canSave}*/>
+                  <Button size='large' color='primary' onClick={handleSave} disabled={!canSave}>
                     Save
                   </Button>
                   <Button size='large' variant='outlined' color='primary' onClick={(): void => handleClose(false)}>
@@ -111,55 +124,9 @@ export default function EventWrapper<E>({
                 </Box>
               </Box>
             </Paper>
-            {/* </EditTabPanel> */}
           </Box>
         </Container>
       </form>
     </Modal>
   );
-
-  //   <EditModal<R>
-  //     showInFullScreen={false}
-  //     handleClose={handleClose}
-  //     onSave={handleSave}
-  //     editing={event}
-  //     open={open}
-  //     headerComponent={
-  //       <EditHeader<E>
-  //         title={event.getHeaderTitle()}
-  //         headers={event.displayProps}
-  //         // fixme:
-  //         obj={event as any}
-  //         format={event.formatPropAsHeader}
-  //       />
-  //     }
-  //     disableTabs={true}
-  //     disableHistory={true}>
-
-  //     <ChangeContext.Consumer>
-  //       {(handlerFromContext): JSX.Element => {
-  //         // override the modal's onChange function
-  //         const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
-  //           handlerFromContext(v, modifyCanSave);
-  //         };
-  //         switch (eventType) {
-  //           case 'release':
-  //             return <ReleaseEventForm />;
-  //           case 'capture':
-  //             return <CaptureEventForm />;
-  //           case 'mortality':
-  //             return (
-  //               <MortalityEventForm
-  //                 event={event as any}
-  //                 handleSave={handleSave}
-  //               />
-  //             );
-  //           case 'unknown':
-  //           default:
-  //             return <></>;
-  //         }
-  //       }}
-  //     </ChangeContext.Consumer>
-  //   </EditModal>
-  // );
 }

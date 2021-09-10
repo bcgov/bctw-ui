@@ -41,8 +41,7 @@ export class LocationEvent implements ILocationEvent {
   }
 
   formatPropAsHeader(str: keyof LocationEvent): string {
-    const withType = `${this.location_type}_${str}`.replace('utm', 'UTM');
-    return columnToHeader(withType);
+    return columnToHeader(str.replace('utm', 'UTM'))
   }
 
   get fields(): Record<string, FormFieldObject<LocationEvent> | FormFieldObject<LocationEvent>[]> {

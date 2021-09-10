@@ -126,14 +126,14 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
         return 'Has Device Been Retrieved?';
       case 'activation_status':
         return 'Is Device Still Active With Vendor?';
-      case 'predator_species':
-        return 'PCOD Predator Species';
+      case 'predator_known':
+        return 'Is the predator known?'
       case 'pcod_confidence_value':
         return 'PCOD Confidence Value';
       case 'shouldUnattachDevice':
         return 'Unassign device from animal?';
       case 'proximate_cause_of_death':
-        return 'Proximate COD';
+        return 'PCOD';
       default:
         return columnToHeader(s);
     }
@@ -144,6 +144,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     mortality_investigation: {prop: 'mortality_investigation', type: eInputType.code, long_label: 'Was a mortality investigation undertaken?' },
     mortality_record: {prop: 'mortality_record', type: eInputType.check },
     animal_status: { prop: 'animal_status', type: eInputType.code },
+    predator_known: { prop: 'predator_known', type: eInputType.check },
     proximate_cause_of_death: { prop: 'proximate_cause_of_death', type: eInputType.code },
     predator_species: { prop: 'predator_species', type: eInputType.code },
     retrieved: { prop: 'retrieved', type: eInputType.check },
@@ -151,7 +152,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     activation_status: { prop: 'activation_status', type: eInputType.check },
     device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
     device_status: { prop: 'device_status', type: eInputType.code },
-    device_condition: {prop: 'device_condition', type: eInputType.code },
+    device_condition: {prop: 'device_condition', type: eInputType.code, required: true },
     // pcod_confidence_value: { prop: 'pcod_confidence_value', type: eInputType.text },
   };
 

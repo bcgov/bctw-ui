@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { LocationEvent } from 'types/events/location_event';
 import TextField from 'components/form/TextInput';
-import { InputChangeHandler } from 'components/component_interfaces';
 import { Box, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
@@ -11,12 +10,11 @@ import DateTimeInput from 'components/form/DateTimeInput';
 
 type LocationEventProps = {
   event: LocationEvent;
-  handleChange: InputChangeHandler;
+  notifyChange: (v: Record<keyof LocationEvent, unknown>) => void;
 };
 
-export default function LocationEventForm(props: LocationEventProps): JSX.Element {
-  const { event, handleChange } = props;
-  const [useUTM, setUseUTM] = useState<string>('utm');
+export default function LocationEventForm({event, notifyChange }: LocationEventProps): JSX.Element {
+  const [useUTM, setUseUTM] = useState('utm');
 
   // create the form inputs
   const fields = event.fields;
@@ -26,23 +24,27 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
   const dateField = fields.date as FormFieldObject<LocationEvent>;
   const commentField = fields.comment as FormFieldObject<LocationEvent>;
 
+  // radio button control on whether to show UTM or lat long fields
   const changeCoordinateType = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const val = event.target.value;
-    setUseUTM(val);
+    setUseUTM(event.target.value);
   };
 
-  const changeDT = (v): void => {
-    console.log(v);
-  };
+  const changeHandler = (v: Record<keyof LocationEvent, unknown>): void => {
+    const key = Object.keys(v)[0];
+    const value = Object.values(v)[0];
+    event[key] = value;
+    // notify parent that the location event changed
+    notifyChange(v);
+  }
 
-  const baseInputProps = { changeHandler: handleChange, required: true };
+  const baseInputProps = { changeHandler, required: true };
   return (
     <>
       <DateTimeInput
         propName={dateField.prop}
         label={event.formatPropAsHeader('date')}
         defaultValue={event.date}
-        changeHandler={changeDT}
+        changeHandler={(v): void => changeHandler(v)}
       />
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}
       <RadioGroup row aria-label='position' name='position' value={useUTM} onChange={changeCoordinateType}>
@@ -98,7 +100,7 @@ export default function LocationEventForm(props: LocationEventProps): JSX.Elemen
           propName={commentField.prop}
           defaultValue={event.comment}
           label={event.formatPropAsHeader(commentField.prop)}
-          changeHandler={handleChange}
+          changeHandler={changeHandler}
         />
       </Box>
     </>

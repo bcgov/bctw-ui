@@ -172,7 +172,7 @@ function FormFromFormfield<T extends BCTWEvent<T>>(
   formField: FormFieldObject<T>,
   handleChange: (v: Record<string, unknown>) => void,
   disabled = false,
-  span = false
+  displayBlock = false
 ): React.ReactNode {
   const { type, prop, required, codeName } = formField;
   const toPass = {
@@ -189,13 +189,15 @@ function FormFromFormfield<T extends BCTWEvent<T>>(
   if (type === eInputType.check) {
     Comp = CreateEditCheckboxField(toPass);
   } else if (type === eInputType.date) {
-    Comp = CreateEditDateField(toPass);
+    Comp = CreateEditDateTimeField(toPass);
+  } else if (type === eInputType.datetime) {
+    Comp = CreateEditDateTimeField(toPass);
   } else if (type === eInputType.code) {
     Comp = CreateEditSelectField(toPass);
   } else if (type === eInputType.text || type === eInputType.number) {
     Comp = CreateEditTextField(toPass);
   }
-  return Comp;
+  return displayBlock ? <div>{Comp}</div> : Comp;
 }
 
 export {

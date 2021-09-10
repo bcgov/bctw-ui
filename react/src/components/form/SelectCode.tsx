@@ -101,7 +101,8 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
   }, [defaultValue]);
 
   // call the parent change handler when the selected value or error status changes
-  useDidMountEffect(() => {
+  // use useEffect to ensure parent is notified when the code is required and empty
+  useEffect(() => {
     pushChange(value);
   }, [value, hasError])
 
@@ -137,7 +138,6 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
    *   [propName]: code,
    *   error: bool
    * }
-   * fixme: this is pushing the code, why not the id?
    */
   const pushChange = (v: string): void => {
     const code = codes.find((c) => c?.description === v)?.code ?? v;

@@ -22,6 +22,7 @@ import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { BCTWBaseType } from 'types/common_types';
+import useFormHasError from 'hooks/useFormHasError';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -65,10 +66,10 @@ export default function EditModal<T extends BCTWBaseType<T>>(props: IEditModalPr
   } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
+  const [hasErr, checkHasErr] = useFormHasError();
   const [newObj, setNewObj] = useState<T>(Object.assign({}, editing));
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
-  const [errors, setErrors] = useState<Record<string, boolean>>(Object.assign({}));
 
   const [value, setValue] = React.useState(0);
   const handleSwitch = (event: React.ChangeEvent<{ 1 }>, newValue: number): void => {
@@ -104,12 +105,8 @@ export default function EditModal<T extends BCTWBaseType<T>>(props: IEditModalPr
 
   // if the error state changes, update the save status
   useDidMountEffect(() => {
-    const update = (): void => {
-      const cs = Object.values(errors).filter((e) => !!e);
-      setCanSave(cs.length === 0);
-    };
-    update();
-  }, [errors]);
+    setCanSave(!hasErr);
+  }, [hasErr]);
 
   const handleSave = (): void => {
     // use Object.assign to preserve class methods
@@ -121,15 +118,10 @@ export default function EditModal<T extends BCTWBaseType<T>>(props: IEditModalPr
 
   // triggered on a form input change, newProp will be an object with a single key and value
   const handleChange = (newProp: Record<string, unknown>): void => {
-    // console.log(newProp);
-    // update the error state
-    const key: string = Object.keys(newProp)[0];
-    const newErrors = Object.assign(errors, { [key]: newProp.error });
-    setErrors({ ...newErrors });
-    // update the editing state
+    checkHasErr(newProp);
     const modified = { ...newObj, ...newProp };
     setNewObj(modified);
-    // todo: determine if object has actually changed from original
+    // todo: determine if object has changed from original
     // const og = { [key]: editing[key] ?? '' };
     // const isSame = objectCompare(newProp, og);
     // setCanSave(isChange && !isSame);
