@@ -153,6 +153,9 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
     device_status: { prop: 'device_status', type: eInputType.code },
     device_condition: {prop: 'device_condition', type: eInputType.code, required: true },
+    captivity_status: { prop: 'captivity_status', type: eInputType.check, long_label: 'Animal is or has been part of a captivity program' },
+    // todo: codename 
+    mortality_captivity_status: { prop: 'mortality_captivity_status', type: eInputType.code, long_label: 'Did the mortality occur when animal was in the wild (natural range) or in captivity?' },
     // pcod_confidence_value: { prop: 'pcod_confidence_value', type: eInputType.text },
   };
 
