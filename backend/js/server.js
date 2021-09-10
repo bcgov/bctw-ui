@@ -237,17 +237,13 @@ const onboardingRedirect = async (req, res, next) => {
 //  console.log('onboardingRedirect() -- data:', data)
   const { user, domain } = splitCredentials(data);
   console.log('onboardingRedirect() -- user:', user)
-  // TODO: Get credential info from the 'getUser() function'
-  const email = data.email;
-  const givenName = data.given_name;
-  const familyName = data.family_name;
 
   // Get a list of all allowed users
   const sql = 'select idir from bctw.user'
   const client = await pgPool.connect();
   const result = await client.query(sql);
   const idirs = result.rows.map((row) => row.idir);
-//  console.log('onboardingRedirect() -- Registered IDIRs in BCTW:', idirs)
+
   // Is the current user registered: Boolean
   const registered = (idirs.includes(user)) ? true : false;
   console.log('onboardingRedirect() -- User is registered?', registered);
@@ -257,7 +253,7 @@ const onboardingRedirect = async (req, res, next) => {
     console.log('onboardingRedirect() -- User is registered; passing through')
     next(); // pass through
   } else { // Otherwise redirect to the onboarding page
-    // XXX: This is causing all assets to get the index.html
+    // Allow static assets to pass through as well
     if (req.url.match(/\/onboarding/) || req.url.match(/\/static/) || req.url.match(/\/Reflect/)) {
       console.log('onboardingRedirect() -- Onboarding URL requested; passing through')
       next(); // already heading to onboarding so pass through
@@ -266,7 +262,6 @@ const onboardingRedirect = async (req, res, next) => {
       res.redirect('/onboarding');
     }
     console.log('onboardingRedirect() -- Query parameters supplied: ', req.query.onboarding)
-    // console.log('url:', req.url)
   }
   client.release(); // Release database connection
   console.log('onboardingRedirect() -- END')
@@ -274,7 +269,6 @@ const onboardingRedirect = async (req, res, next) => {
 
 const onboardingAccess = async (req, res) => {
   // This data will be inserted into the email
-  // TODO: Get the below info from Keycloak. (i.e. no longer passed through body)
   const {
     user,
     domain,
