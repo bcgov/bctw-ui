@@ -6,7 +6,7 @@ import { EditorProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { IEditModalProps } from 'pages/data/common/EditModal';
 import React, { useState } from 'react';
-import { BCTWBase } from 'types/common_types';
+import { BCTWBaseType } from 'types/common_types';
 
 export type IAddEditProps<T> = {
   cannotEdit?: boolean;
@@ -24,7 +24,7 @@ export type IAddEditProps<T> = {
 };
 
 /**
- * component that handles the modal show/hide functionality of the childEditComponent
+ * handles the show/hide functionality of the childEditComponent
  * used on main data pages (critter/collar)
  * @param cannotEdit permission to edit?
  * @param children child component that handles the editing, {EditModal} ** must be only one child
@@ -35,7 +35,7 @@ export type IAddEditProps<T> = {
  * @param onDelete
  * @param editButton optional - used in map overview screens
  **/
-export default function AddEditViewer<T extends BCTWBase>(props: IAddEditProps<T>): JSX.Element {
+export default function AddEditViewer<T extends BCTWBaseType<T>>(props: IAddEditProps<T>): JSX.Element {
   const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);

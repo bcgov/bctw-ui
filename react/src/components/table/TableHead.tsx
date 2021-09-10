@@ -6,11 +6,11 @@ import {
   TableSortLabel,
 } from '@material-ui/core';
 import { createHeadCell } from 'components/table/table_helpers';
-import { BCTWBase } from 'types/common_types';
+import { BCTWBaseType } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { ITableHeadProps } from './table_interfaces';
+import { HeadCell, ITableHeadProps } from './table_interfaces';
 
-export default function TableHead<T extends BCTWBase>(props: ITableHeadProps<T>): JSX.Element {
+export default function TableHead<T extends BCTWBaseType<T>>(props: ITableHeadProps<T>): JSX.Element {
   const {
     customHeaders,
     order,
@@ -29,8 +29,8 @@ export default function TableHead<T extends BCTWBase>(props: ITableHeadProps<T>)
   };
 
   // use default formatter if T doesnt implement its own version
-  const formatHeader = (cell: string): string =>
-    typeof headerData.formatPropAsHeader === 'function' ? headerData.formatPropAsHeader(cell as keyof BCTWBase) : columnToHeader(cell);
+  const formatHeader = (cell: keyof T): string =>
+    typeof headerData.formatPropAsHeader === 'function' ? headerData.formatPropAsHeader(cell) : columnToHeader(cell as string);
 
   return (
     <MuiTableHead>
@@ -54,7 +54,7 @@ export default function TableHead<T extends BCTWBase>(props: ITableHeadProps<T>)
             </TableCell>
           ) : null}
           {/* render the rest of the header row */}
-          {createHeadCell(headerData, headersToDisplay).map((headCell) => (
+          {createHeadCell(headerData, headersToDisplay).map((headCell: HeadCell<T>) => (
             <TableCell
               key={headCell.id as string}
               align={'left'}
@@ -64,7 +64,7 @@ export default function TableHead<T extends BCTWBase>(props: ITableHeadProps<T>)
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}>
-                {formatHeader(headCell.label)}
+                {formatHeader(headCell.id)}
                 {orderBy === headCell.id ? (
                   <span className={'visuallyHidden'}>
                     {order === 'desc' ? 'sorted descending' : 'sorted ascending'}

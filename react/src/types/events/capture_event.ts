@@ -29,7 +29,7 @@ export default class CaptureEvent implements BCTWEvent<CaptureEvent> {
         return columnToHeader(s);
     }
   }
-  getHeaderProps(): (keyof CaptureEvent)[] {
+  get displayProps(): (keyof CaptureEvent)[] {
     return ['device_id']
   }
   getHeaderTitle(): string {

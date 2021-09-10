@@ -21,6 +21,7 @@ import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import { BCTWBaseType } from 'types/common_types';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -46,7 +47,7 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param onSave the parent handler called when the save button is clicked
  * @param headerComponent
  */
-export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
+export default function EditModal<T extends BCTWBaseType<T>>(props: IEditModalProps<T>): JSX.Element {
   const bctwApi = useTelemetryApi();
   const {
     children,
@@ -66,7 +67,7 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
   const [canSave, setCanSave] = useState<boolean>(false);
   const [newObj, setNewObj] = useState<T>(Object.assign({}, editing));
   const [showHistory, setShowHistory] = useState<boolean>(false);
-  const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>(null);
+  const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
   const [errors, setErrors] = useState<Record<string, boolean>>(Object.assign({}));
 
   const [value, setValue] = React.useState(0);
@@ -81,13 +82,13 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
         setHistoryParams({
           query: bctwApi.useCritterHistory,
           param: editing.critter_id,
-          propsToDisplay: Object.keys(editing) // show all Animal properties
+          propsToDisplay: (editing.displayProps) // show all Animal properties
         });
       } else if (editing instanceof Collar) {
         setHistoryParams({
           query: bctwApi.useCollarHistory,
           param: editing.collar_id,
-          propsToDisplay: Object.keys(editing) // show all Device properties
+          propsToDisplay: (editing.displayProps) // show all Device properties
         });
       }
     };

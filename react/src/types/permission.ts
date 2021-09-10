@@ -2,7 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToTimeStr } from 'utils/time';
 import { Animal } from './animal';
-import { BCTWBase, BCTWBaseType } from './common_types';
+import { BCTWBaseType, BCTWValidDates } from './common_types';
 import { IUserCritterAccessInput } from './user';
 
 // interface used to construct objects for updating/granting users access to animals
@@ -61,7 +61,7 @@ export class PermissionRequestInput implements IPermissionRequestInput {
  * b) what an owner sees in the request history table (some fields)
 */
 export interface IPermissionRequest extends 
-  Pick<Animal, 'animal_id' | 'wlh_id' | 'species'>, Pick<BCTWBaseType, 'valid_to'> {
+  Pick<Animal, 'animal_id' | 'wlh_id' | 'species'>, Pick<BCTWValidDates, 'valid_to'> {
   request_id: number;
   requested_by: string; // idir or bceid
   requested_by_email: string;
@@ -76,9 +76,9 @@ export interface IPermissionRequest extends
   status: PermissionRequestStatus;
 }
 
-type PermissionRequestProps = keyof IPermissionRequest;
+// type PermissionRequestProps = keyof IPermissionRequest;
 
-export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
+export class PermissionRequest implements  IPermissionRequest, BCTWBaseType<PermissionRequest> {
   animal_id: string;
   wlh_id: string;
   species: string;
@@ -96,6 +96,10 @@ export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
   was_denied_reason: string;
   valid_to: Date;
   status: PermissionRequestStatus;
+
+  get displayProps(): (keyof PermissionRequest)[] {
+    return []
+  }
 
   get permissionStatus(): PermissionRequestStatus {
     if (this.valid_to === null) {
@@ -116,8 +120,7 @@ export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
   }
   toJSON(): PermissionRequest { return this }
 
-  // used in OwnerRequestPermission
-  static get ownerHistoryPropsToDisplay(): PermissionRequestProps[] {
+  static get ownerHistoryPropsToDisplay(): (keyof PermissionRequest)[] {
     return [ 'wlh_id', 'animal_id', 'species', 'requested_date',
       'requested_for_name', 'requested_for_email',
       'permission_type', 'status', 'was_denied_reason' ];

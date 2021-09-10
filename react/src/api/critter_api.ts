@@ -18,7 +18,7 @@ export const critterApi = (props: ApiProps) => {
     const results = data.map((json: IAnimal) =>
       type === eCritterFetchType.assigned ? plainToClass(AttachedAnimal, json) : plainToClass(Animal, json)
     );
-    return results;
+    return type === eCritterFetchType.assigned ? results as AttachedAnimal[] : results as Animal[];
   };
 
   const getCritters = async (page = 1, critterType: eCritterFetchType): Promise<Animal[] | AttachedAnimal[]> => {

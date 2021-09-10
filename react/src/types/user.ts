@@ -1,6 +1,6 @@
 import { Type, Expose } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBase, BCTWBaseType } from 'types/common_types';
+import { BCTWBaseType } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { Animal } from './animal';
@@ -33,7 +33,7 @@ export type OnboardingAccess = 'pending' | 'granted' | 'denied';
 /**
  * representation of the bctw.user table
  */
-export interface IUser extends BCTWBaseType, Pick<IKeyCloakSessionInfo, 'email'> {
+export interface IUser extends Pick<IKeyCloakSessionInfo, 'email'> {
   id: number;
   idir: string;
   bceid: string;
@@ -47,8 +47,8 @@ export interface IUser extends BCTWBaseType, Pick<IKeyCloakSessionInfo, 'email'>
 }
 
 // used in the class to get a type safe array of valid keys
-type UserProps = keyof IUser;
-export class User extends BCTWBase implements IUser {
+// type UserProps = keyof IUser;
+export class User implements BCTWBaseType<User>, IUser {
   role_type: eUserRole;
   is_owner: boolean;
   id: number;
@@ -64,7 +64,7 @@ export class User extends BCTWBase implements IUser {
   get is_admin(): boolean {
     return this.role_type === eUserRole.administrator;
   }
-  static get propsToDisplay(): UserProps[] {
+  get displayProps(): (keyof User)[] {
     return ['id', 'idir', 'bceid', 'role_type', 'is_owner'];
 
   }
@@ -115,9 +115,8 @@ export interface IUserCritterAccessInput extends
   Partial<Omit<IUserCritterAccess, 'critter_id' | 'permission_type'>>, 
   Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> {}
 
-type UserCritterAcessProps = keyof IUserCritterAccessInput;
 
-export class UserCritterAccess extends BCTWBase implements IUserCritterAccess {
+export class UserCritterAccess implements IUserCritterAccess, BCTWBaseType<UserCritterAccess> {
   critter_id: string;
   animal_id: string;
   wlh_id: string;
@@ -138,7 +137,11 @@ export class UserCritterAccess extends BCTWBase implements IUserCritterAccess {
   formatPropAsHeader(str: keyof UserCritterAccess): string { return columnToHeader(str) }
 
   // displayed as fields 'user/critter permission' table modals
-  static get propsToDisplay(): UserCritterAcessProps[] {
+  static get propsToDisplay(): (keyof UserCritterAccess)[] {
     return ['wlh_id', 'animal_id', 'species', 'device_id', 'device_make', 'frequency', 'permission_type'];
   }
+  get displayProps(): (keyof UserCritterAccess)[] {
+    return UserCritterAccess.propsToDisplay;
+  }
+
 }

@@ -54,7 +54,7 @@ export default function CritterPage(): JSX.Element {
         <Box display='flex' alignItems='center'>
           {/* <ExportImportViewer {...exportProps} /> */}
           <ModifyCritterWrapper editing={editObj}>
-            <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
+            <AddEditViewer<AttachedAnimal> editing={editObj as AttachedAnimal} empty={new AttachedAnimal()}>
               <EditCritter {...editProps} />
             </AddEditViewer>
           </ModifyCritterWrapper>
@@ -66,7 +66,7 @@ export default function CritterPage(): JSX.Element {
         <>
           <Box mb={4}>
             <DataTable
-              headers={AttachedAnimal.attachedProps}
+              headers={AttachedAnimal.attachedCritterDisplayProps}
               title={CS.assignedTableTitle}
               queryProps={{ query: bctwApi.useAssignedCritters }}
               onSelect={handleSelectAttached}
@@ -74,7 +74,7 @@ export default function CritterPage(): JSX.Element {
           </Box>
           <Box mb={4}>
             <DataTable
-              headers={Animal.animalProps}
+              headers={new Animal().displayProps}
               title={CS.unassignedTableTitle}
               queryProps={{ query: bctwApi.useUnassignedCritters }}
               onSelect={handleSelectUnattached}

@@ -2,7 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Code } from 'types/code';
-import { BCTWBase, BCTWBaseType, nullToDayjs, nullToNumber, PartialPick, transformOpt, uuid } from 'types/common_types';
+import { BCTWBaseType, nullToDayjs, nullToNumber, PartialPick, transformOpt, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
@@ -29,7 +29,7 @@ export interface ICollarTelemetryBase extends ICollarBase {
 }
 
 // export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
-export interface ICollar extends ICollarTelemetryBase, BCTWBaseType, PartialPick<Animal, 'wlh_id' | 'animal_id'> {
+export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_id' | 'animal_id'> {
   activation_comment: string;
   activation_status: boolean;
   animal_id?: string; // collars attached to a critter should includes this prop
@@ -59,9 +59,7 @@ export interface ICollar extends ICollarTelemetryBase, BCTWBaseType, PartialPick
   satellite_network: Code;
 }
 
-type CollarProps = keyof ICollar;
-
-export class Collar extends BCTWBase implements ICollar  {
+export class Collar implements BCTWBaseType<Collar>, ICollar  {
   activation_comment: string;
   activation_status: boolean;
   collar_id: uuid;
@@ -108,7 +106,7 @@ export class Collar extends BCTWBase implements ICollar  {
 
   // fixme: 
   constructor(collar_type?: eNewCollarType) {
-    super();
+    // super();
     this.activation_status = false;
     this.device_id = 0;
     if (collar_type) {
@@ -137,7 +135,7 @@ export class Collar extends BCTWBase implements ICollar  {
     if (!this.offline_date.isValid()) {
       delete this.offline_date
     }
-    delete this.error;
+    // delete this.error;
     return this;
   }
 
@@ -165,12 +163,16 @@ export class Collar extends BCTWBase implements ICollar  {
     }
   }
 
-  static get propsToDisplay(): CollarProps[] {
+  static get propsToDisplay(): (keyof Collar)[] {
     return [ 'device_id', 'device_status', 'frequency', 'device_type', 'device_make', 'device_model' ];
   }
   // for attached collars, also display...
-  static get attachedPropsToDisplay(): CollarProps[] {
+  static get attachedPropsToDisplay(): (keyof Collar)[] {
     return [...Collar.propsToDisplay, 'wlh_id', 'animal_id', ];
+  }
+
+  get displayProps(): (keyof Collar)[] {
+    return this.animal_id ? Collar.attachedPropsToDisplay : Collar.propsToDisplay;
   }
 }
 

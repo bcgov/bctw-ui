@@ -23,11 +23,10 @@ import { DataLife } from 'types/data_life';
 
 interface IMortalityEvent
   extends IMortalityAlert,
-    Pick<Animal, 'proximate_cause_of_death' | 'predator_species'>,
-    Pick<Collar, 'retrieved' | 'retrieval_date' | 'activation_status' | 'device_status' | 'device_deployment_status'>,
-    Pick<CollarHistory, 'assignment_id'>,
-    DataLife 
-    {
+  Pick<Animal, 'proximate_cause_of_death' | 'predator_species'>,
+  Pick<Collar, 'retrieved' | 'retrieval_date' | 'activation_status' | 'device_status' | 'device_deployment_status'>,
+  Pick<CollarHistory, 'assignment_id'>,
+  DataLife {
   shouldUnattachDevice: boolean;
   predator_known: boolean;
   mortality_investigation: Code;
@@ -97,7 +96,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     this.location_event = new LocationEvent('mortality', dayjs());
   }
 
-  getHeaderProps(): (keyof MortalityEvent)[] {
+  get displayProps(): (keyof MortalityEvent)[] {
     return ['wlh_id', 'animal_id', 'device_id'];
   }
 

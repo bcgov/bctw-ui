@@ -1,5 +1,5 @@
 import { Collar } from 'types/collar';
-import { BCTWBase, nullToDayjs, uuid } from 'types/common_types';
+import { BCTWBaseType, nullToDayjs, uuid } from 'types/common_types';
 import { Expose, Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
@@ -21,13 +21,10 @@ export interface ICollarHistory extends
 // passed to the API when removing a device from an animal
 export interface IRemoveDeviceProps extends Required<IDataLifeEndProps>, Pick<ICollarHistory, 'assignment_id'> { }
 
-// used to get type safe array of keys
-type CollarHistoryProps = keyof ICollarHistory;
-
 /**
  * represents an device attachment to an animal.
  */
-export class CollarHistory extends BCTWBase implements ICollarHistory {
+export class CollarHistory implements BCTWBaseType<CollarHistory>, ICollarHistory {
   assignment_id: uuid; // primary key of the collar_animal_assignment table
   collar_id: uuid;
   critter_id: uuid;
@@ -47,12 +44,16 @@ export class CollarHistory extends BCTWBase implements ICollarHistory {
 
   // note: endpoint for retrieving collar history displays additional collar/animal properties
   // type safe properties to display in tables
-  static get propsToDisplay(): CollarHistoryProps[] {
-    const props: CollarHistoryProps[] = ['device_id', 'device_make', 'attachment_start', 'data_life_start', 'data_life_end', 'attachment_end'];
+  static get propsToDisplay(): (keyof CollarHistory)[] {
+    const props: (keyof CollarHistory)[] = ['device_id', 'device_make', 'attachment_start', 'data_life_start', 'data_life_end', 'attachment_end'];
     if (isDev()) {
       props.unshift('assignment_id');
     }
     return props;
+  }
+
+  get displayProps(): (keyof CollarHistory)[] {
+    return CollarHistory.propsToDisplay;
   }
 
   formatPropAsHeader(str: keyof CollarHistory): string {

@@ -1,12 +1,14 @@
+import { Box, Container, Divider, Paper } from '@material-ui/core';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
+import { Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
+import Button from 'components/form/Button';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import ChangeContext from 'contexts/InputChangeContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import React from 'react';
 import { BCTWEvent, EventType } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
-import EditModal from '../common/EditModal';
 import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
 import MortalityEventForm from './MortalityEventForm';
@@ -60,61 +62,104 @@ export default function EventWrapper<E>({
     }
   };
 
-  // let ChildForm: React.ReactNode;
+  let Comp: React.ReactNode;
+  switch (eventType) {
+    case 'release':
+      // return <ReleaseEventForm />;
+      Comp = <ReleaseEventForm />;
+      break;
+    case 'capture':
+      // return <CaptureEventForm />;
+      Comp = <CaptureEventForm />;
+      break;
+    case 'mortality':
+      Comp = <MortalityEventForm event={event as any} handleSave={handleSave} />;
+      break;
+    case 'unknown':
+    default:
+      Comp = <></>;
+  }
 
   return (
-    <EditModal<BCTWEvent<E>>
-      showInFullScreen={false}
-      handleClose={handleClose}
-      onSave={handleSave}
-      editing={event}
-      open={open}
-      headerComponent={
+    <Modal open={open} handleClose={handleClose}>
+      <form className={'rootEditInput'} autoComplete={'off'}>
         <EditHeader<E>
           title={event.getHeaderTitle()}
-          headers={event.getHeaderProps()}
-          // fixme:
+          headers={event.displayProps}
           obj={event as any}
           format={event.formatPropAsHeader}
         />
-      }
-      disableTabs={true}
-      disableHistory={true}>
-      <ChangeContext.Consumer>
-        {(handlerFromContext): JSX.Element => {
-          // override the modal's onChange function
-          const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
-            // if (v) {
-            //   setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
-            // }
-            // // update the disabled status of the retrieved_date field
-            // if (Object.keys(v).includes('retrieved')) {
-            //   setIsRetrieved(v.retrieved as boolean);
-            // }
-            handlerFromContext(v, modifyCanSave);
-          };
-          // const { fields } = mortality;
-          // if (!fields) {
-          //   return null;
-          // }
-          switch (eventType) {
-            case 'release':
-              return <ReleaseEventForm />;
-            case 'capture':
-              return <CaptureEventForm />;
-            case 'mortality':
-              return (
-                <MortalityEventForm
-                  event={event as any}
-                  handleSave={handleSave}
-                />
-              );
-            case 'unknown':
-            default:
-              return <></>;
-          }
-        }}
-      </ChangeContext.Consumer>
-    </EditModal>
+
+        <Container maxWidth='xl'>
+          <Box py={3}>
+            {/* <EditTabPanel value={value} index={0}> */}
+            <Paper>
+              {Comp}
+
+              <Box my={1} mx={3}>
+                <Divider></Divider>
+              </Box>
+
+              <Box p={3}>
+                <Box display='flex' justifyContent='flex-end' className='form-buttons'>
+                  <Button size='large' color='primary' onClick={handleSave} /*disabled={!canSave}*/>
+                    Save
+                  </Button>
+                  <Button size='large' variant='outlined' color='primary' onClick={(): void => handleClose(false)}>
+                    Cancel and Exit
+                  </Button>
+                </Box>
+              </Box>
+            </Paper>
+            {/* </EditTabPanel> */}
+          </Box>
+        </Container>
+      </form>
+    </Modal>
   );
+
+  //   <EditModal<R>
+  //     showInFullScreen={false}
+  //     handleClose={handleClose}
+  //     onSave={handleSave}
+  //     editing={event}
+  //     open={open}
+  //     headerComponent={
+  //       <EditHeader<E>
+  //         title={event.getHeaderTitle()}
+  //         headers={event.displayProps}
+  //         // fixme:
+  //         obj={event as any}
+  //         format={event.formatPropAsHeader}
+  //       />
+  //     }
+  //     disableTabs={true}
+  //     disableHistory={true}>
+
+  //     <ChangeContext.Consumer>
+  //       {(handlerFromContext): JSX.Element => {
+  //         // override the modal's onChange function
+  //         const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
+  //           handlerFromContext(v, modifyCanSave);
+  //         };
+  //         switch (eventType) {
+  //           case 'release':
+  //             return <ReleaseEventForm />;
+  //           case 'capture':
+  //             return <CaptureEventForm />;
+  //           case 'mortality':
+  //             return (
+  //               <MortalityEventForm
+  //                 event={event as any}
+  //                 handleSave={handleSave}
+  //               />
+  //             );
+  //           case 'unknown':
+  //           default:
+  //             return <></>;
+  //         }
+  //       }}
+  //     </ChangeContext.Consumer>
+  //   </EditModal>
+  // );
 }

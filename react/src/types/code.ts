@@ -20,8 +20,6 @@ interface ICodeFilter {
 interface IGroupedCodeFilter {
   code_header: string;
   descriptions: string[];
-  // codes: string[];
-  // ids: number[];
 }
 
 /// represents a code and code header coming from backend
@@ -33,8 +31,6 @@ interface ICode {
   code_header_title?: string;
 }
 
-// interface ICodeInput { }
-
 interface ICodeHeader {
   id: number;
   type: string
@@ -42,12 +38,25 @@ interface ICodeHeader {
   description: string;
 }
 
+// fixme:
+// export class Code implements BCTWBaseType<Code>, ICode {
+//   id: number;
+//   code: string;
+//   description: string;
+//   long_description?: string;
+//   code_header_title?: string;
+// }
+
 // represents the objects retrieved from the database
 export class CodeHeader extends BCTWBase implements ICodeHeader {
   id: number;
   type: string
   title: string;
   description: string;
+
+  static getProps(): (keyof ICode)[] {
+    return ['id', 'code', 'description', 'long_description'];
+  }
 
   toJSON(): CodeHeader { return this }
 
@@ -59,7 +68,7 @@ export class CodeHeader extends BCTWBase implements ICodeHeader {
 }
 
 // represents what a code header should look like when sending to api
-export class CodeHeaderInput extends BCTWBase implements  BCTWBaseType {
+export class CodeHeaderInput implements BCTWBaseType<CodeHeaderInput> {
   code_category_id: number;
   code_header_name: string;
   code_header_title: string;
@@ -70,8 +79,11 @@ export class CodeHeaderInput extends BCTWBase implements  BCTWBaseType {
     return 'code_header_name';
   }
 
+  get displayProps(): (keyof CodeHeaderInput)[] {
+    return [];
+  }
+
   constructor() {
-    super();
     this.code_category_id = 1; // the bctw code category
     this.code_header_name = '';
     this.code_header_title = '';

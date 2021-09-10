@@ -1,7 +1,6 @@
 import Button from 'components/form/Button';
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { Icon } from 'components/common';
-// import { BCTWBase } from 'types/common_types';
 import { IPlainTableProps } from 'components/table/table_interfaces';
 import './table.scss';
 import TableContainer from './TableContainer';
@@ -18,10 +17,11 @@ type EditTableVisibilityProps = {
   showReset?: boolean;
 };
 
-type EditTableProps<T> = IPlainTableProps<T> & EditTableVisibilityProps & {
+type EditTableProps<T> = Omit<IPlainTableProps<T>, 'headers'> & EditTableVisibilityProps & {
   canSave: boolean;
   columns: ((d: T) => JSX.Element)[];
   data: T[];
+  headers: string[];
   onRowModified: (n: T, action: EditTableRowAction) => void;
   onSave: () => void;
   saveButtonText?: string;

@@ -157,7 +157,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
               columns={[RequestID, RequestedBy, Emails, AnimalID, WLHID, Perm, Comment, GrantPermission]}
               canSave={false}
               hideSave={true}
-              data={requests as unknown[]}
+              data={requests as unknown[]} // fixme: wat
               headers={headers}
               onSave={null}
               onRowModified={(u): void => handleShowConfirm(u as IGroupedRequest, false)}

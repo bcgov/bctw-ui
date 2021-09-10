@@ -47,7 +47,8 @@ function TextFilter({
 
 type TableFilterProps<T> = {
   rowCount: number;
-  filterableProperties: string[];
+  // filterableProperties: string[];
+  filterableProperties: (keyof T)[];
   onChangeFilter: (filter: ITableFilter) => void;
 };
 
@@ -61,7 +62,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
 
   const handleSelect = (v: ISelectMultipleData[]): void => {
     const values = v.map(item => item.value as keyof T);
-    setSelectedOption(values as any)
+    setSelectedOption(values as string[]);
   };
 
   const handleTextChange = (value: string): void => {
@@ -77,7 +78,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         return {
           id: i,
           value: f,
-          displayLabel: columnToHeader(f)
+          displayLabel: columnToHeader(f as string)
         } as ISelectMultipleData;
       }),
     []

@@ -4,7 +4,7 @@ import { IAnimalTelemetryBase } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
-import { BCTWBase, BCTWType } from './common_types';
+import { BCTWBaseType, BCTWType } from './common_types';
 
 interface MapRange {
   start: string;
@@ -59,7 +59,7 @@ interface ITelemetryGroup {
 }
 
 // represents the jsonb object in the get_telemetry pg function
-export class TelemetryDetail extends BCTWBase implements ITelemetryDetail {
+export class TelemetryDetail implements ITelemetryDetail, BCTWBaseType<TelemetryDetail>  {
   critter_id: string;
   species: string;
   wlh_id: string;
@@ -93,6 +93,10 @@ export class TelemetryDetail extends BCTWBase implements ITelemetryDetail {
 
   toJSON(): TelemetryDetail { return this; }
   get identifier(): keyof TelemetryDetail{ return 'device_id'}
+
+  get displayProps(): (keyof TelemetryDetail)[] {
+    return [];
+  }
 
   formatPropAsHeader(str: string): string {
     return columnToHeader(str);

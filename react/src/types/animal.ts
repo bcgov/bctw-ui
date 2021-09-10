@@ -1,7 +1,7 @@
 import { Transform, Type } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { BCTWBase, BCTWBaseType, nullToDayjs, nullToNumber, transformOpt, uuid } from 'types/common_types';
+import { BaseTimestamps, BCTWBaseType, nullToDayjs, nullToNumber, transformOpt, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader, formatLatLong } from 'utils/common_helpers';
@@ -28,7 +28,7 @@ export interface IAnimalTelemetryBase {
   wlh_id: string;
 }
 
-export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase {
+export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   animal_colouration: Code;
   animal_comment: string;
   associated_animal_id: string;
@@ -79,10 +79,8 @@ export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase {
   ultimate_cause_of_death: Code;
 }
 
-// used to get type-safe lists of keys
-type AnimalProps = keyof IAnimal;
 
-export class Animal extends BCTWBase implements IAnimal {
+export class Animal implements BCTWBaseType<Animal>, IAnimal {
   critter_id: uuid;
   critter_transaction_id: uuid;
   animal_id: string;
@@ -169,7 +167,7 @@ export class Animal extends BCTWBase implements IAnimal {
   }
 
   constructor(aid?: string, status?: string, sp?: string, wlhid?: string) {
-    super();
+    // super();
     this.animal_id = aid ?? '';
     this.animal_status = status ?? '';
     this.species = sp ?? '';
@@ -179,7 +177,7 @@ export class Animal extends BCTWBase implements IAnimal {
   // todo: all date fields to str
   toJSON(): Animal {
     delete this.map_colour;
-    delete this.error;
+    // delete this.error;
     return this;
   }
 
@@ -209,16 +207,15 @@ export class Animal extends BCTWBase implements IAnimal {
         return columnToHeader(str);
     }
   }
-  static get animalProps(): AnimalProps[] {
-    return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'animal_status'];
-  } 
+  get displayProps(): (keyof Animal)[] {
+    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'animal_status'];
+  }
 }
 
 // animals attached to devices should have additional properties
 export interface IAttachedAnimal extends IAnimal, ICollarHistory {}
 
-type AttachedAnimalProps = keyof IAttachedAnimal;
-export class AttachedAnimal extends Animal implements IAttachedAnimal {
+export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBaseType<AttachedAnimal> {
   assignment_id: uuid;
   collar_id: uuid;
   device_id: number;
@@ -230,8 +227,9 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal {
   data_life_end: Dayjs;
   attachment_end: Dayjs;
 
-  static get attachedProps(): AttachedAnimalProps[] {
-    return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
+  // con't overide since this class is inherited
+  static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
+    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
   }
 }
 

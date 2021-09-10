@@ -11,13 +11,13 @@ import { isDayjs } from 'dayjs';
  * @param propsToDisplay the object's properties that should be displayed in the table
  * @return {HeadCell<T>[]}
  */
-function createHeadCell<T>(obj: T, propsToDisplay: string[]): HeadCell<T>[] {
-  return propsToDisplay.map((k) => {
+function createHeadCell<T>(obj: T, propsToDisplay: (keyof T)[]): HeadCell<T>[] {
+  return propsToDisplay.map(k => {
     const isNumber = typeof getProperty(obj, k as keyof T) === 'number';
     return {
       disablePadding: false,
       id: k as keyof T,
-      label: k,
+      // label: k,
       numeric: isNumber
     };
   });
@@ -66,7 +66,7 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
 
 interface ICellFormat {
   align: 'inherit' | 'left' | 'center' | 'right' | 'justify';
-  value: string | number | JSX.Element;
+  value: unknown;
 }
 /**
  *
@@ -75,13 +75,13 @@ interface ICellFormat {
  * todo: ...not using align just return value?
  */
 const align: Pick<ICellFormat, 'align'> = {align: 'left'};
-function formatTableCell<T>(obj: T, key: string): ICellFormat {
-  const value = obj[key];
+function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
+  const value: unknown = obj[key];
   if (typeof value === 'boolean') {
     return { ...align, value: <Icon icon={value ? 'done' : 'close'} /> };
   }
-  if (typeof value?.getMonth === 'function') {
-    return { ...align, value: dateObjectToTimeStr(value) };
+  if (typeof (value as Date)?.getMonth === 'function') {
+    return { ...align, value: dateObjectToTimeStr(value as Date) };
   } else if (isDayjs(value)) {
     return { ...align, value: value.isValid() ? value.format(formatTime) : ''}
   } else if (typeof value === 'number') {

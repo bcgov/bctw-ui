@@ -4,13 +4,20 @@ export interface BCTWValidDates {
   valid_from: Date | Dayjs;
   valid_to: Date | Dayjs; // a null value in this column indicates the 'current' record
 }
-// most BCTW database tables contain these columns for transactional history
-export interface BCTWBaseType extends BCTWValidDates {
+
+// most database tables contain these columns for transactional history
+export interface BaseTimestamps extends PartialPick<BCTWValidDates, 'valid_from' | 'valid_to'> {
   created_at?: Date;
   created_by_user_id?: number;
   updated_at?: Date;
   updated_by_user_id?: number;
+}
+export interface BCTWBaseType<T> extends BaseTimestamps {
   owned_by_user_id?: boolean; // base types may include this
+
+  formatPropAsHeader(k: keyof T): string;
+  get displayProps(): (keyof T)[];
+  get identifier(): string;
 }
 
 /**

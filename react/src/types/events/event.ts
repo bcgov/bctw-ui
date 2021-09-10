@@ -1,8 +1,11 @@
-export type EventType = 'mortality' | 'release' | 'capture' | 'unknown';
-export interface BCTWEvent<T> {
-  event_type: EventType;
+import { BCTWBaseType } from 'types/common_types';
 
-  formatPropAsHeader(k: keyof T): string;
-  getHeaderTitle(): string;
-  getHeaderProps(): (keyof T)[];
+export type EventType = 'mortality' | 'release' | 'capture' | 'unknown';
+/**
+ * 
+ */
+export interface BCTWEvent<T> extends Omit<BCTWBaseType<T>, 'identifier'> {
+  event_type: EventType;
+  getHeaderTitle(): string; // | React.ReactNode;
+  get displayProps(): (keyof T)[];
 }

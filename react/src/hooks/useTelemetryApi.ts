@@ -11,7 +11,7 @@ import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
-import { Animal, eCritterFetchType } from 'types/animal';
+import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CollarHistory, IAttachDeviceProps, IRemoveDeviceProps } from 'types/collar_history';
@@ -23,7 +23,7 @@ import {
   IUpsertPayload,
 } from 'api/api_interfaces';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
-import { BCTWBase, BCTWType } from 'types/common_types';
+import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
@@ -122,8 +122,8 @@ export const useTelemetryApi = () => {
   /**
    *  retrieves critters that have a collar assigned
   */
-  const useAssignedCritters = (page: number): UseQueryResult<Animal[]> => {
-    return useQuery<Animal[], AxiosError>(
+  const useAssignedCritters = (page: number): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+    return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
       ['critters_assigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.assigned),
       critterOptions
@@ -133,8 +133,8 @@ export const useTelemetryApi = () => {
   /**
    * retrieves critters not assigned to a collar
   */
-  const useUnassignedCritters = (page: number): UseQueryResult<Animal[]> =>
-    useQuery<Animal[], AxiosError>(
+  const useUnassignedCritters = (page: number): UseQueryResult<Animal[] | AttachedAnimal[]> =>
+    useQuery<Animal[] | AttachedAnimal[], AxiosError>(
       ['critters_unassigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned),
       critterOptions
@@ -243,7 +243,7 @@ export const useTelemetryApi = () => {
   /** default type getter for animals or collars
    * @returns
    */
-  const useType = <T extends BCTWBase>(type: BCTWType, id: string): UseQueryResult<T> => {
+  const useType = <T>(type: BCTWType, id: string): UseQueryResult<T> => {
     return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions
     });
@@ -252,7 +252,7 @@ export const useTelemetryApi = () => {
   /**
    * 
   */
-  const useUDF = (type: eUDFType): UseQueryResult<IUDF[]> => {
+  const useUDF = (type: eUDFType): UseQueryResult<IUDF[], AxiosError> => {
     return useQuery<IUDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), {
       ...defaultQueryOptions /*, ...{refetchOnMount: true} */
     });

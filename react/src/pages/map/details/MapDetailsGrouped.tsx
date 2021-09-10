@@ -90,7 +90,8 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
       <Table stickyHeader size='small'>
         {pings && pings.length ? (
           <TableHead
-            headersToDisplay={[...rows_to_render, `Point Count (${totalPointCount()})`]}
+            // fixme: convert to basic table
+            headersToDisplay={[...rows_to_render, `Point Count (${totalPointCount()})`] as any}
             headerData={plainToClass(TelemetryDetail, pings[0].features[0].properties) as TelemetryDetail}
             numSelected={checkedGroups.length}
             order={order}
