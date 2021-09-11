@@ -40,6 +40,7 @@
     "tokml": "^0.4.0"
   },
   "devDependencies": {
+    "@types/esri-leaflet": "^2.1.9",
     "@types/geojson": "^7946.0.7",
     "@types/jest": "^26.0.15",
     "@types/leaflet": "^1.7.0",
@@ -52,8 +53,8 @@
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
     "eslint": "^7.16.0",
-    "typescript": "^4.3.4",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "typescript": "^4.3.4"
   },
   "scripts": {
     "start": "PORT=1111 react-scripts start",

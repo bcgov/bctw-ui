@@ -1,9 +1,9 @@
 import { createUrl } from 'api/api_helpers';
 import { AxiosInstance } from 'axios';
 import { plainToClass } from 'class-transformer';
-import { AttachedAnimal } from 'types/animal';
+import { AttachedAnimal, IAttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
-import { BCTWBase, BCTWType } from 'types/common_types';
+import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { exportEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
 
@@ -28,7 +28,7 @@ export const bulkApi = (api: AxiosInstance) => {
     const url = createUrl({ api: `${type}/${id}`});
     const { data } = await api.get(url);
     console.log(data);
-    return data.map(json => type === 'animal' ? plainToClass(AttachedAnimal, json) : plainToClass(Collar, json))[0];
+    return data.map((json: IAttachedAnimal) => type === 'animal' ? plainToClass(AttachedAnimal, json) : plainToClass(Collar, json))[0];
   }
 
   // handles deletes for animals/collars

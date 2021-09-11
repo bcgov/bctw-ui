@@ -120,7 +120,7 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
       {hideAll ? null : (
         <div className={'side-btns'}>
           {hideAdd ? null : (
-            <Button onClick={(): void => onRowModified(null, 'add')} color='primary' variant='outlined'>
+            <Button onClick={(): void => onRowModified({} as T, 'add')} color='primary' variant='outlined'>
               Add Row
             </Button>
           )}

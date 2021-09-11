@@ -10,7 +10,7 @@ type ListProps = {
  * can be either plain strings or components
 */
 const List = ({ values }: ListProps): JSX.Element => {
-  const MakeListItem = (v: unknown, i: number): JSX.Element => (
+  const MakeListItem = (v: string | JSX.Element, i: number): JSX.Element => (
     <ListItem dense key={`li-${i}`}>
       {v}
     </ListItem>

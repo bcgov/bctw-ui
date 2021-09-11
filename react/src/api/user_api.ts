@@ -1,6 +1,6 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { MortalityAlert, TelemetryAlert } from 'types/alert';
+import { ITelemetryAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
@@ -83,7 +83,7 @@ export const userApi = (props: ApiProps) => {
     const url = createUrl({ api: upsertAlertEndpoint });
     const { data } = await api.post(url, body);
     if (data && data.length) {
-      const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
+      const converted = data?.map((json: ITelemetryAlert) => plainToClass(TelemetryAlert, json));
       return converted;
     }
     return [];

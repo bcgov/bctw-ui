@@ -78,7 +78,7 @@ export interface IPermissionRequest extends
 
 // type PermissionRequestProps = keyof IPermissionRequest;
 
-export class PermissionRequest implements  IPermissionRequest, BCTWBaseType<PermissionRequest> {
+export class PermissionRequest implements IPermissionRequest, BCTWBaseType<PermissionRequest> {
   animal_id: string;
   wlh_id: string;
   species: string;
@@ -139,7 +139,7 @@ export interface IGroupedRequest {
 }
 
 const groupPermissionRequests = (r: PermissionRequest[]): IGroupedRequest[] => {
-  const result = [];
+  const result: IGroupedRequest[] = [];
   r.forEach(req => {
     const id = req.request_id;
     const found = result.find(f => f.id === id);

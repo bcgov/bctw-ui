@@ -18,6 +18,7 @@ import {
   PermissionWasDeniedReason
 } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
+import { AxiosError } from 'axios';
 
 /**
  * page that an admin uses to grant or deny permission requests from owners
@@ -41,7 +42,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   // set permission request state on fetch
   useDidMountEffect(() => {
-    if (status === 'success') {
+    if (status === 'success' && data) {
       // console.log('permission requests retrieved', data);
       setRequests(groupPermissionRequests(data));
     } else {
@@ -55,8 +56,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     responseDispatch({ severity: 'success', message: 'permission request handled succssfully' });
   };
 
-  const onError = (err): void => {
-    // console.error(err);
+  const onError = (err: AxiosError): void => {
     responseDispatch({ severity: 'error', message: formatAxiosError(err) });
   };
 
@@ -64,6 +64,9 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   // submit the POST request when the grant/deny is confirmed in modal
   const handleGrantOrDenyPermission = async (): Promise<void> => {
+    if (!selectedRequestID) {
+      return;
+    }
     const body: IExecutePermissionRequest = {
       request_id: selectedRequestID,
       is_grant: isGrant,
@@ -125,7 +128,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
       <TextField
         style={{marginTop: '5px'}}
         propName={'deny'}
-        changeHandler={(v: {deny: string}): void => setDenyReason(v['deny'] as PermissionWasDeniedReason)}
+        changeHandler={(v: Record<string, unknown>): void => setDenyReason(v['deny'] as PermissionWasDeniedReason)}
         defaultValue={''}
         placeholder={'Enter Reason'}
       />
@@ -157,9 +160,9 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
               columns={[RequestID, RequestedBy, Emails, AnimalID, WLHID, Perm, Comment, GrantPermission]}
               canSave={false}
               hideSave={true}
-              data={requests as unknown[]} // fixme: wat
+              data={requests}
               headers={headers}
-              onSave={null}
+              onSave={(): void => { /* do nothing */ }}
               onRowModified={(u): void => handleShowConfirm(u as IGroupedRequest, false)}
               hideAdd={true}
               hideEdit={true}
