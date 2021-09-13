@@ -3,17 +3,17 @@
 import axios, { AxiosResponse } from 'axios';
 
 interface smsResponse {
-    "id": String,
-    "reference": String,
+    "id": string,
+    "reference": string,
     "content": {
-        "body": String,
-        "from_number": String
+        "body": string,
+        "from_number": string
     },
-    "uri": String,
+    "uri": string,
     "template": {
-        "id": String,
-        "version": Number,
-        "uri": String
+        "id": string,
+        "version": number,
+        "uri": string
     }
 }
 
@@ -58,7 +58,7 @@ const sendSmsMortality = async (phoneNumber) => {
 
     console.log("sendMortalitySMS: smsPayload = %j", smsPayload);
     console.log("sendMortalitySMS: making call to API");
-    let result: AxiosResponse = await axios.post(
+    const result: AxiosResponse = await axios.post(
         gcNotifySmsEndpoint,
         smsPayload,
         {
@@ -69,7 +69,7 @@ const sendSmsMortality = async (phoneNumber) => {
         }
     );
 
-    let post: smsResponse = result.data;
+    const post: smsResponse = result.data;
     console.log("sendMortalitySMS: response = %j", post);
 
 }
