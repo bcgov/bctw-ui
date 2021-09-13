@@ -20,7 +20,7 @@ export enum eNewCollarType {
   Vect = 'Vectronics'
 }
 export interface ICollarBase {
-  collar_id: uuid;
+  readonly collar_id: uuid;
 }
 export interface ICollarTelemetryBase extends ICollarBase {
   device_id: number;
@@ -40,6 +40,7 @@ export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_
   device_make: Code;
   device_model: string;
   device_type: Code;
+  device_condition: Code;
   dropoff_device_id: number;
   dropoff_frequency: number;
   dropoff_frequency_unit: Code;
@@ -62,7 +63,7 @@ export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_
 export class Collar implements BCTWBaseType<Collar>, ICollar  {
   activation_comment: string;
   activation_status: boolean;
-  collar_id: uuid;
+  readonly collar_id: uuid;
   @Transform(nullToNumber, transformOpt) camera_device_id: number;
   collar_transaction_id: uuid;
   device_id: number;
@@ -70,6 +71,7 @@ export class Collar implements BCTWBaseType<Collar>, ICollar  {
   device_make: Code;
   device_model: string;
   device_status: Code;
+  device_condition: Code;
   device_type: Code;
   @Transform(nullToNumber, transformOpt) dropoff_device_id: number;
   @Transform(nullToNumber, transformOpt) dropoff_frequency: number;
@@ -106,7 +108,6 @@ export class Collar implements BCTWBaseType<Collar>, ICollar  {
 
   // fixme: 
   constructor(collar_type?: eNewCollarType) {
-    // super();
     this.activation_status = false;
     this.device_id = 0;
     if (collar_type) {
@@ -135,7 +136,6 @@ export class Collar implements BCTWBaseType<Collar>, ICollar  {
     if (!this.offline_date.isValid()) {
       delete this.offline_date
     }
-    // delete this.error;
     return this;
   }
 

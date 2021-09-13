@@ -26,8 +26,8 @@ export interface IRemoveDeviceProps extends Required<IDataLifeEndProps>, Pick<IC
  */
 export class CollarHistory implements BCTWBaseType<CollarHistory>, ICollarHistory {
   assignment_id: uuid; // primary key of the collar_animal_assignment table
-  collar_id: uuid;
-  critter_id: uuid;
+  readonly collar_id: uuid;
+  readonly critter_id: uuid;
   device_id: number;
   device_make: Code;
   frequency: number;

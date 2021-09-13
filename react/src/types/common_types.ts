@@ -12,6 +12,7 @@ export interface BaseTimestamps extends PartialPick<BCTWValidDates, 'valid_from'
   updated_at?: Date;
   updated_by_user_id?: number;
 }
+// todo: re-add tojson?
 export interface BCTWBaseType<T> extends BaseTimestamps {
   owned_by_user_id?: boolean; // base types may include this
 

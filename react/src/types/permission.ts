@@ -1,8 +1,8 @@
 import { Expose, Transform } from 'class-transformer';
+import { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
-import { dateObjectToTimeStr } from 'utils/time';
 import { Animal } from './animal';
-import { BCTWBaseType, BCTWValidDates } from './common_types';
+import { BCTWBaseType, BCTWValidDates, nullToDayjs } from './common_types';
 import { IUserCritterAccessInput } from './user';
 
 // interface used to construct objects for updating/granting users access to animals
@@ -49,7 +49,7 @@ export interface IPermissionRequestInput {
 }
 
 export class PermissionRequestInput implements IPermissionRequestInput {
-  request_id: number;
+  readonly request_id: number;
   user_email_list: string[];
   critter_permissions_list: IUserCritterAccessInput[];
   request_comment: string;
@@ -62,11 +62,11 @@ export class PermissionRequestInput implements IPermissionRequestInput {
 */
 export interface IPermissionRequest extends 
   Pick<Animal, 'animal_id' | 'wlh_id' | 'species'>, Pick<BCTWValidDates, 'valid_to'> {
-  request_id: number;
+  readonly request_id: number;
   requested_by: string; // idir or bceid
   requested_by_email: string;
   requested_by_name: string;
-  requested_date: Date;
+  requested_date: Dayjs;
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
@@ -86,15 +86,14 @@ export class PermissionRequest implements IPermissionRequest, BCTWBaseType<Permi
   requested_by: string;
   requested_by_email: string;
   requested_by_name: string;
-  // todo: all dates should do this?
-  @Transform((t) => dateObjectToTimeStr(t)) requested_date: Date;
+  @Transform(nullToDayjs) requested_date: Dayjs;
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
   permission_type: eCritterPermission;
   was_granted: boolean;
   was_denied_reason: string;
-  valid_to: Date;
+  @Transform(nullToDayjs) valid_to: Dayjs;
   status: PermissionRequestStatus;
 
   get displayProps(): (keyof PermissionRequest)[] {

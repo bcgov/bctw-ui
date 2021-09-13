@@ -11,6 +11,7 @@ import { DataLifeInput, IChangeDataLifeProps } from 'types/data_life';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
 import { eCritterPermission } from 'types/permission';
+import { isDev } from 'api/api_helpers';
 
 type EditDataLifeModalProps = ModalBaseProps & {
   attachment: CollarHistory;
@@ -55,6 +56,12 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
     handleClose(false);
   };
 
+  const getTitle = (): string => {
+    return `Edit Data Life for ${attachment.device_make} Device ${attachment.device_id}` + isDev()
+      ? `id: ${attachment.assignment_id}`
+      : '';
+  };
+
   // setup mutation to save the modified data life
   const { mutateAsync } = bctwApi.useMutateEditDataLife({ onSuccess, onError });
   const isAdmin = permission_type === eCritterPermission.admin;
@@ -63,15 +70,15 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
     <Modal
       open={open}
       handleClose={handleClose}
-      title={`Edit Data Life for ${attachment.device_make} Device ${attachment.device_id}`}>
+      title={getTitle()}>
       <div>
         {/* enable data life end fields only if the current attachment is expired/invalid */}
         <DataLifeInputForm
           onChange={(): void => setCanSave(true)}
           disableEditActual={true} // always disable editing the actual start/end fields in this modal
-          enableEditStart={true} 
+          enableEditStart={true}
           // can only edit the end fields if this attachment is expired
-          enableEditEnd={!!attachment.data_life_end} 
+          enableEditEnd={!!attachment.data_life_end}
           // admin privileged users can always edit DL dates
           disableDLStart={isAdmin ? false : !new DataLifeInput(attachment).canChangeDLStart}
           disableDLEnd={isAdmin ? false : !new DataLifeInput(attachment).canChangeDLEnd}
@@ -79,8 +86,12 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
         />
         {/* the save button */}
         <Box display='flex' justifyContent='flex-end'>
-          <Button size='large' onClick={(): void => handleClose(false)}>Cancel</Button>
-          <Button disabled={!canSave} size='large' color='primary' onClick={handleSave}>Save</Button>
+          <Button size='large' onClick={(): void => handleClose(false)}>
+            Cancel
+          </Button>
+          <Button disabled={!canSave} size='large' color='primary' onClick={handleSave}>
+            Save
+          </Button>
         </Box>
       </div>
     </Modal>

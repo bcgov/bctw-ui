@@ -1,7 +1,7 @@
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
 import { useQueryClient } from 'react-query';
-import { MortalityAlert, TelemetryAlert } from 'types/alert';
+import { MortalityAlert } from 'types/alert';
 
 /**
  * Context that children components can listen to.

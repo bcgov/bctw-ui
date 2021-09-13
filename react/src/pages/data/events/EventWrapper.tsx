@@ -1,11 +1,10 @@
 import { Box, Container, Divider, Paper } from '@material-ui/core';
-import { IBulkUploadResults } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import useFormHasError from 'hooks/useFormHasError';
+import useFormHasError, { InboundObj } from 'hooks/useFormHasError';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { BCTWEvent, EventType } from 'types/events/event';
@@ -43,21 +42,22 @@ export default function EventWrapper<E>({
     setCanSave(!hasErr);
   }, [hasErr])
 
-  const handleEventSaved = async (data: IBulkUploadResults<unknown>): Promise<void> => {
-    // console.log('data returned from mortality alert context', data);
-    const { errors, results } = data;
-    if (errors.length) {
-      responseDispatch({ severity: 'error', message: `${errors.map((e) => e.error)}` });
-    } else if (results.length) {
-      responseDispatch({ severity: 'success', message: 'mortality event saved!' });
-      // expire the telemetry alert
-      if (typeof onEventSaved === 'function') {
-        onEventSaved();
-      }
+  const handleEventSaved = async (): Promise<void> => {
+    if (typeof onEventSaved === 'function') {
+      onEventSaved();
     }
+    // todo: handle response
+    // console.log('data returned from mortality alert context', data);
+    // const { errors, results } = data;
+    // if (errors.length) {
+    //   responseDispatch({ severity: 'error', message: `${errors.map((e) => e.error)}` });
+    // } else if (results.length) {
+    //   responseDispatch({ severity: 'success', message: 'mortality event saved!' });
+    //   // expire the telemetry alert
+    // }
   };
 
-  const onError = (e: AxiosError) => {
+  const onError = (e: AxiosError): void => {
     console.log('error saving event', formatAxiosError(e));
   };
 
@@ -66,14 +66,21 @@ export default function EventWrapper<E>({
 
   // performs metadata updates of collar/critter
   const handleSave = async (): Promise<void> => {
-    console.log(event);
-    // if (event) {
-    //   await saveMortality(event);
-    // }
+    switch(event.event_type) {
+      case 'mortality':
+      default:
+        saveMortality(event);
+    }
   };
 
-  const handleChildFormUpdated = (v: Record<string, unknown>): void => {
+  const handleChildFormUpdated = (v: InboundObj): void => {
     checkHasErr(v);
+    const k = Object.keys(v)[0];
+    // console.log(event[k])
+    if (k && k !== 'displayProps') {
+      event[k] = Object.values(v)[0];
+    }
+    // console.log(event[k])
   }
 
   let Comp: React.ReactNode;

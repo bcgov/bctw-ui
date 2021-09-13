@@ -1,10 +1,10 @@
-import { Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
-import { BCTWBase, BCTWValidDates, uuid } from 'types/common_types';
+import { BCTWBase, BCTWValidDates, nullToDayjs, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { formatDay, formatTime } from 'utils/time';
+import { formatDay, formatT } from 'utils/time';
 
 import { Code } from 'types/code';
 import { DataLife } from 'types/data_life';
@@ -19,7 +19,7 @@ enum eAlertType {
 interface ITelemetryAlert extends BCTWValidDates {
   alert_id: number;
   alert_type: eAlertType;
-  snoozed_to: Date;
+  snoozed_to: Dayjs;
   snooze_count: number;
 }
 
@@ -28,9 +28,9 @@ type AlertProp = keyof ITelemetryAlert;
 export class TelemetryAlert extends BCTWBase implements ITelemetryAlert {
   alert_id: number;
   alert_type: eAlertType;
-  @Type(() => Date) valid_from: Date;
-  @Type(() => Date) valid_to: Date;
-  @Type(() => Date) snoozed_to: Date;
+  @Transform(nullToDayjs) valid_from: Dayjs;
+  @Transform(nullToDayjs) valid_to: Dayjs;
+  @Transform(nullToDayjs) snoozed_to: Dayjs;
   snooze_count: number;
 
   get isSnoozed(): boolean {
@@ -75,21 +75,23 @@ export class TelemetryAlert extends BCTWBase implements ITelemetryAlert {
 
   performSnooze(): TelemetryAlert {
     this.snooze_count++;
-    const curSnooze: Dayjs = dayjs(this.snoozed_to ?? dayjs());
-    this.snoozed_to = curSnooze.add(1, 'day').toDate();
+    const curSnooze = this.snoozed_to ?? dayjs();
+    this.snoozed_to = curSnooze.add(1, 'day');
     return this;
   }
+
   expireAlert(): TelemetryAlert {
-    this.valid_to = new Date();
+    this.valid_to = dayjs();
     return this;
   }
 
   toJSON(): TelemetryAlert {
     return {
       alert_id: this.alert_id,
-      valid_to: this.valid_to === null ? null : dayjs().subtract(1, 'hour').format(formatTime),
+      // note: so that it's removed from list?
+      valid_to: this.valid_to === null ? null : formatT(dayjs().subtract(1, 'hour')),
       snooze_count: this.snooze_count,
-      snoozed_to: this.snoozed_to === null ? null : dayjs(this.snoozed_to).format(formatTime)
+      snoozed_to: this.snoozed_to === null ? null : formatT(this.snoozed_to),
     } as unknown as TelemetryAlert;
   }
 

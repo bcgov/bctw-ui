@@ -7,6 +7,8 @@ export type InboundObj = {
   error?: boolean;
 };
 
+export type FormChangeEvent = {(v: InboundObj): void}
+
 /**
  * hook that can be used in forms to determine if any of the child input components have errors
  * @returns a boolean set to true if there are errors,

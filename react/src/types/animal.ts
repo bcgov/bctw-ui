@@ -41,7 +41,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   capture_utm_northing: number;
   capture_utm_zone: number;
 
-  critter_id: uuid;
+  readonly critter_id: uuid;
   critter_transaction_id: uuid;
   ear_tag_left_id: string; 
   ear_tag_right_id: string;
@@ -59,10 +59,16 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
+  mortality_record: boolean;
+  mortality_investigation: Code;
+  captivity_status: boolean;
+  mortality_captivity_status: Code;
 
   permission_type?: eCritterPermission; // critters should contain this
   predator_species: Code;
   proximate_cause_of_death: Code;
+  ucod_confidence: Code;
+  pcod_confidence: Code;
   recapture: boolean;
   region: Code;
 
@@ -81,7 +87,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 
 
 export class Animal implements BCTWBaseType<Animal>, IAnimal {
-  critter_id: uuid;
+  readonly critter_id: uuid;
   critter_transaction_id: uuid;
   animal_id: string;
   animal_status: Code;
@@ -114,6 +120,8 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   @Transform(nullToNumber, transformOpt) mortality_utm_zone: number;
   predator_species: Code;
   proximate_cause_of_death: Code;
+  ucod_confidence: Code;
+  pcod_confidence: Code;
   ultimate_cause_of_death: Code;
   population_unit: Code;
   recapture: boolean;
@@ -130,11 +138,13 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   translocation: boolean;
   wlh_id: string;
   animal_comment: string;
-  // fixme: ...usercritter access needs update
-  // @Transform(nullToDayjs) valid_from: Dayjs;
-  // @Transform(nullToDayjs) valid_to: Dayjs;
-  @Type(() => Date) valid_from: Date;
-  @Type(() => Date) valid_to: Date;
+  @Transform(nullToDayjs) valid_from: Dayjs;
+  @Transform(nullToDayjs) valid_to: Dayjs;
+
+  mortality_record: boolean;
+  mortality_investigation: Code;
+  captivity_status: boolean;
+  mortality_captivity_status: Code;
 
   permission_type: eCritterPermission;
 
@@ -167,7 +177,6 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   }
 
   constructor(aid?: string, status?: string, sp?: string, wlhid?: string) {
-    // super();
     this.animal_id = aid ?? '';
     this.animal_status = status ?? '';
     this.species = sp ?? '';
@@ -177,7 +186,6 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   // todo: all date fields to str
   toJSON(): Animal {
     delete this.map_colour;
-    // delete this.error;
     return this;
   }
 

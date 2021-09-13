@@ -1,38 +1,28 @@
+import { Box } from '@material-ui/core';
 import { FormFromFormfield } from 'components/form/create_form_components';
-import dayjs from 'dayjs';
+import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { useState } from 'react';
-import { LocationEvent } from 'types/events/location_event';
-import MortalityEvent from 'types/events/mortality_event';
-
+import { FormChangeEvent } from 'hooks/useFormHasError';
 import { FormPart } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
-import EditDataLifeModal from 'components/form/EditDataLifeModal';
-import { eCritterPermission } from 'types/permission';
-import Button from 'components/form/Button';
-import { Box } from '@material-ui/core';
-import { formatTime } from 'utils/time';
+import { useState } from 'react';
+import { DataLifeInput } from 'types/data_life';
+import { LocationEvent } from 'types/events/location_event';
+import MortalityEvent from 'types/events/mortality_event';
+import CaptivityStatusForm from './CaptivityStatusForm';
 import { boxProps } from './EventComponents';
 
 type MortEventProps = {
   event: MortalityEvent;
-  handleFormChange: (v: Record<string, unknown>) => void;
+  handleFormChange: FormChangeEvent;
 };
 
 /**
  * todo: saving
-   * break the event into collar/critter/attachment? specific properties
  * where to retrieve critter permission? (used for data life)
  */
 export default function MortalityEventForm({ event, handleFormChange}: MortEventProps): JSX.Element {
   const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
-  const [showDLForm, setShowDLForm] = useState(false);
-
-  // fixme: should default to alert.valid_from
-  // instiantiate when the event is created instead of here?
-  const [locationEvent] = useState<LocationEvent>(
-    new LocationEvent('mortality', dayjs()) 
-  );
 
   useDidMountEffect(() => {
     setMortalityEvent(event);
@@ -42,6 +32,7 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
   const [isRetrieved, setIsRetrieved] = useState(false);
   const [isPredation, setIsPredation] = useState(false);
   const [isPredatorKnown, setIsPredatorKnown] = useState(false);
+  const [requiredDLProps, setReqiredDLProps] = useState<(keyof DataLifeInput)[]>([]);
 
   // workflow logic
   const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
@@ -60,6 +51,11 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
     if (key === 'predator_known') {
       setIsPredatorKnown(value as boolean);
     }
+    // make attachment end state required if user is removing device
+    if (key === 'shouldUnattachDevice') {
+      // console.log(v)
+      setReqiredDLProps( value ? ['attachment_end'] : []);
+    }
   };
 
   // when the location event form changes, also notify wrapper about errors
@@ -74,12 +70,10 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
 
   return (
     <>
-      {/*  */}
+      {/* assignment & data life fields */}
       {FormPart('Assignment Details', [
-        <Box {...boxProps}>
-          <span>Data Life Start: {dayjs(mortality.data_life_start).format(formatTime)}</span>
-          <Button onClick={(): void => setShowDLForm((o) => !o)}>Edit Data Life</Button>
-        </Box>,
+        FormFromFormfield(mortality, fields.shouldUnattachDevice, onChange, false, true),
+        <DataLifeInputForm dli={mortality.getDatalife()} enableEditEnd={true} enableEditStart={false} onChange={handleFormChange} propsRequired={requiredDLProps}/>,
         <Box {...boxProps} pt={2}>
           <span>{fields.mortality_investigation.long_label}</span>
           {FormFromFormfield(mortality, fields.mortality_investigation, onChange)}
@@ -88,14 +82,14 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
       ])}
       {/* device status fields */}
       {FormPart('Update Device Details', [
-        FormFromFormfield(mortality, fields.shouldUnattachDevice, onChange, false, true),
         FormFromFormfield(mortality, fields.activation_status, onChange, false, true),
         <Box {...boxProps}>
           {FormFromFormfield(mortality, fields.retrieved, onChange)}
           {FormFromFormfield(mortality, fields.retrieval_date, onChange, !isRetrieved)}
         </Box>,
         FormFromFormfield(mortality, fields.device_status, onChange),
-        FormFromFormfield(mortality, fields.device_condition, onChange)
+        FormFromFormfield(mortality, fields.device_condition, onChange),
+        FormFromFormfield(mortality, fields.device_deployment_status, onChange)
       ])}
       {/* critter status fields */}
       {FormPart('Update Animal Details', [
@@ -106,16 +100,9 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
           {FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)} 
         </Box>,
       ])}
+      <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />
       {/* location fields */}
-      {FormPart('Mortality Event Details', [<LocationEventForm event={locationEvent} notifyChange={onChangeLocationProp} />])}
-      {/* fixme: ...existing DL modal don't support disabling fields*/}
-      <EditDataLifeModal
-        attachment={mortality.getCollarHistory()}
-        handleClose={(): void => setShowDLForm(false)}
-        open={showDLForm}
-        // fixme: where to get permission
-        permission_type={eCritterPermission.editor}
-      />
+      {FormPart('Mortality Event Details', [<LocationEventForm event={mortality.location_event} notifyChange={onChangeLocationProp} />])}
     </>
   );
 }

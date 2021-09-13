@@ -2,6 +2,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { EventType } from 'types/events/event';
+import { formatTime } from 'utils/time';
 
 interface ILocationEvent {
   date: Dayjs;
@@ -31,11 +32,12 @@ export class LocationEvent implements ILocationEvent {
   }
 
   // todo: could use template literal type?
+  // todo: wipe lat/long if useUtm?
   toJSON(): Record<string, unknown> {
     const o = {};
     for (const k in this) {
       const key = `${this.location_type}_${k}`;
-      o[key] = this[k];
+      o[key] = k === 'date' ? this.date.format(formatTime) : this[k];
     }
     return o;
   }

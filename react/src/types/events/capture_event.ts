@@ -2,7 +2,7 @@ import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWEvent, EventType } from 'types/events/event';
+import { BCTWEvent, EventType, OptionalAnimal, OptionalDevice } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 
 export default class CaptureEvent implements BCTWEvent<CaptureEvent> {
@@ -36,7 +36,11 @@ export default class CaptureEvent implements BCTWEvent<CaptureEvent> {
     return 'capture event '
   }
 
-  toJSON(): CaptureEvent {
-    return this;
+  getAnimal(): OptionalAnimal {
+    return {};
+  }
+
+  getDevice(): OptionalDevice {
+    return {};
   }
 }

@@ -9,6 +9,7 @@ import { columnToHeader, removeProps } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { BCTWEvent } from 'types/events/event';
 import dayjs from 'dayjs';
+import { FormChangeEvent } from 'hooks/useFormHasError';
 
 type CreateInputBaseProps<T> = {
   value: unknown;
@@ -170,7 +171,7 @@ function MakeEditField<T>({
 function FormFromFormfield<T extends BCTWEvent<T>>(
   obj: T,
   formField: FormFieldObject<T>,
-  handleChange: (v: Record<string, unknown>) => void,
+  handleChange: FormChangeEvent,
   disabled = false,
   displayBlock = false
 ): React.ReactNode {

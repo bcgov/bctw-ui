@@ -45,8 +45,10 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
 
   // when the AlertContext is loaded, set the alert state
   useDidMountEffect(() => {
-    if (useAlert?.alerts?.length) {
-      setAlertCount(useAlert.alerts.length);
+    const { alerts } = useAlert;
+    setAlertCount(alerts.length);
+    if (!alerts.length) {
+      setShowAlerts(false);
     }
   }, [useAlert]);
 

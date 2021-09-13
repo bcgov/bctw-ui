@@ -1,5 +1,6 @@
 import { Box } from '@material-ui/core';
 import { FormFromFormfield } from 'components/form/create_form_components';
+import { FormChangeEvent } from 'hooks/useFormHasError';
 import MortalityEvent from 'types/events/mortality_event';
 import { FormPart } from '../common/EditModalComponents';
 import { boxProps } from './EventComponents';
@@ -11,18 +12,15 @@ import { boxProps } from './EventComponents';
  */
 type CaptivityStatusFormProps = {
   event: MortalityEvent;
+  handleFormChange: FormChangeEvent;
 };
 
-export default function CaptivityStatusForm({ event }: CaptivityStatusFormProps): JSX.Element {
+export default function CaptivityStatusForm({ event, handleFormChange }: CaptivityStatusFormProps): JSX.Element {
   const { fields } = event;
 
   if (!fields) {
     return null;
   }
-
-  const onChange = (v): void => {
-    console.log(v);
-  };
 
   return (
     <>
@@ -30,11 +28,11 @@ export default function CaptivityStatusForm({ event }: CaptivityStatusFormProps)
         <Box {...boxProps}>
           <span>{fields.captivity_status.long_label}</span>
           {/* captivity_status is always disabled in mortality workflow */}
-          {FormFromFormfield(event, fields.captivity_status, onChange, true)}
+          {FormFromFormfield(event, fields.captivity_status, handleFormChange, true)}
         </Box>,
         <Box {...boxProps}>
           <span>{fields.mortality_captivity_status.long_label}</span>
-          {FormFromFormfield(event, fields.mortality_captivity_status, onChange)}
+          {FormFromFormfield(event, fields.mortality_captivity_status, handleFormChange)}
         </Box>
       ])}
     </>

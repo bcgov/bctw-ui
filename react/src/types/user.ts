@@ -1,10 +1,11 @@
-import { Type, Expose } from 'class-transformer';
+import { Type, Expose, Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBaseType } from 'types/common_types';
+import { BCTWBaseType, nullToDayjs } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { Animal } from './animal';
 import { Collar } from './collar';
+import { Dayjs } from 'dayjs';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -59,6 +60,7 @@ export class User implements BCTWBaseType<User>, IUser {
   phone: string;
   email: string;
   access: OnboardingAccess;
+  // fixme: dayjs
   @Type(() => Date)valid_from: Date;
   @Type(() => Date)valid_to: Date;
   get is_admin(): boolean {
@@ -121,9 +123,8 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBaseType<UserC
   animal_id: string;
   wlh_id: string;
   species: string;
-  // fixme: dayjs
-  @Type(() => Date)valid_from: Date;
-  @Type(() => Date)valid_to: Date;
+  @Transform(nullToDayjs) valid_from: Dayjs;
+  @Transform(nullToDayjs) valid_to: Dayjs;
   device_id: number;
   frequency: number;
   device_make: string;

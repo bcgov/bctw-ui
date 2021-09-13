@@ -357,8 +357,8 @@ export const useTelemetryApi = () => {
     useMutation<TelemetryAlert[], AxiosError, TelemetryAlert[]>((body) => userApi.updateAlert(body), config);
   
   /** POST a mortality event form */
-  const useMutateMortalityEvent = (config: UseMutationOptions<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>): UseMutationResult<IBulkUploadResults<unknown>> =>
-    useMutation<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
+  const useMutateMortalityEvent = (config: UseMutationOptions<void, AxiosError, MortalityEvent>): UseMutationResult<void> =>
+    useMutation<void, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
   
   /** add or update a user */
   const useMutateUser = (config: UseMutationOptions<User, AxiosError, IUserUpsertPayload>): UseMutationResult<User> =>

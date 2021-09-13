@@ -3,7 +3,7 @@ import { CircularProgress, IconButton, TableHead } from '@material-ui/core';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@material-ui/core';
-import { dateObjectToTimeStr } from 'utils/time';
+import { formatT } from 'utils/time';
 import { Icon } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { UserAlertStrings } from 'constants/strings';
@@ -91,12 +91,12 @@ export default function AlertPage(): JSX.Element {
    * update/expire the alert
    */
   const handleEventSaved = async (): Promise<void> => {
-    console.log(selectedAlert);
+    console.log('workflow saved, UserAlertPage handleEventSaved called with event', selectedAlert);
     if (!selectedAlert) {
       return;
     }
-    // selectedAlert.expireAlert();
-    // await updateAlert(selectedAlert);
+    selectedAlert.expireAlert();
+    await updateAlert(selectedAlert);
   };
 
   const propsToShow = [...MortalityAlert.displayableMortalityAlertProps, 'update', 'Snooze Status', 'Snooze Action'];
@@ -143,7 +143,7 @@ export default function AlertPage(): JSX.Element {
                       <TableCell style={{ color: 'red' }}>
                         <strong>{a.formatAlert}</strong>
                       </TableCell>
-                      <TableCell>{dateObjectToTimeStr(a.valid_from)}</TableCell>
+                      <TableCell>{formatT(a.valid_from)}</TableCell>
                       <TableCell>
                         <IconButton onClick={(): void => editAlert(a)}>
                           <Icon icon='edit' />
