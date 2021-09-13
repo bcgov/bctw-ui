@@ -1,3 +1,4 @@
+import Button from 'components/form/Button';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'contexts/UserContext';
 import { User, UserCritterAccess } from 'types/user';
@@ -7,6 +8,7 @@ import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
+import { sendSmsMortality } from 'utils/gcNotify';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
@@ -23,7 +25,7 @@ export default function UserProfile(): JSX.Element {
   }, [useUser]);
 
   if (!user) {
-    return <div>loading user information</div>;
+    return <div>Loading user information...</div>;
   }
 
   const tableProps: ITableQueryProps<Animal> = {
@@ -36,16 +38,22 @@ export default function UserProfile(): JSX.Element {
       <div style={{margin: '20px'}}>
         <Typography variant='h5'>
           <p>
-            Your Name: <strong>{user?.firstname ?? 'Local'}</strong>&nbsp;<strong>{user?.lastname ?? 'User'}</strong>
+            Your Name: <strong>{user.firstname ?? 'Local'}</strong>&nbsp;<strong>{user.lastname ?? 'User'}</strong>
           </p>
           <p>
-            Your Username: <strong>{user?.uid?? 'Local Username'}</strong>
+            Your Username: <strong>{user.uid?? 'Local Username'}</strong>
           </p>
           <p>
-            Your Email Address: <strong>{user?.email}</strong>
+            Your Email Address: <strong>{user.email}</strong>
           </p>
           <p>
             Your Role: <strong>{user.role_type}</strong>
+          </p>
+          <p>
+            Your Phone Number: <strong>{user.phone}</strong>
+            <Button size="large" color="default" className='button' onClick={(e) => sendSmsMortality(user.phone)}>
+              Send test SMS
+            </Button>
           </p>
         </Typography>
         {/* <div style={{margin: '25px 0'}}>
