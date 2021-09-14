@@ -116,7 +116,7 @@ function CreateEditSelectField<T>({
       disabled={disabled}
       key={prop as string}
       codeHeader={codeName ?? (prop as string)}
-      defaultValue={value as string}
+      defaultValue={value as string ?? ''}
       changeHandler={handleChange}
       required={required}
       error={!!errorMessage?.length}
@@ -185,7 +185,8 @@ function FormFromFormfield<T extends BCTWEvent<T>>(
     label: obj.formatPropAsHeader(prop),
     disabled,
     required,
-    codeName
+    codeName,
+    key: `${type}-${prop}`
   };
   let Comp: React.ReactNode;
   if (type === eInputType.check) {

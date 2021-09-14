@@ -139,22 +139,27 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
           return (
             <>
               {FormPart(
+                'cr-ids',
                 'Identifiers',
                 identifierFields.map((f) => makeFormField(f, onChange))
               )}
               {FormPart(
+                'cr-chars',
                 'Characteristics',
                 characteristicsFields.map((f) => makeFormField(f, onChange))
               )}
               {FormPart(
+                'cr-asoc',
                 'Association With Another Individual',
                 associatedAnimalFields.map((f) => makeFormField(f, onChange))
               )}
               {FormPart(
+                'cr-comm',
                 'Comments About This Animal',
                 animalCommentField.map((f) => makeFormField(f, onChange))
               )}
               {FormPart(
+                'cr-cap',
                 'Latest Capture Details',
                 captureFields.map((f) => makeFormField(f, onChange)),
                 <Button {...btnProps} onClick={(): void => handleOpenWorkflow('capture')}>
@@ -163,6 +168,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               )}
               {/* fixme: defaulting to mortality for now */}
               {FormPart(
+                'cr-rel',
                 'Latest Release Details',
                 releaseFields.map((f) => makeFormField(f, onChange)),
                 <Button {...btnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
@@ -170,6 +176,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 </Button>
               )}
               {FormPart(
+                'cr-mort',
                 'Mortality Details',
                 mortalityFields.map((f) => makeFormField(f, onChange)),
                 <Button {...btnProps} onClick={(): void => handleOpenWorkflow('mortality')}>

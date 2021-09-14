@@ -7,10 +7,11 @@ import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
 import { FormFieldObject } from 'types/form_types';
 import DateTimeInput from 'components/form/DateTimeInput';
+import { FormChangeEvent, InboundObj } from 'hooks/useFormHasError';
 
 type LocationEventProps = {
   event: LocationEvent;
-  notifyChange: (v: Record<keyof LocationEvent, unknown>) => void;
+  notifyChange: FormChangeEvent;
 };
 
 export default function LocationEventForm({event, notifyChange }: LocationEventProps): JSX.Element {
@@ -29,7 +30,7 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
     setUseUTM(event.target.value);
   };
 
-  const changeHandler = (v: Record<keyof LocationEvent, unknown>): void => {
+  const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];
     const value = Object.values(v)[0];
     event[key] = value;
@@ -64,7 +65,7 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
       <Box>
         {useUTM === 'utm' ? (
           utmFields.map((f, idx) => {
-            const numberProps = { ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop, key: `${f.prop}-${idx}` };
+            const numberProps = {key: `loc-num-${idx}`, ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop};
             // custom form validation
             if (f.prop === 'utm_easting') {
               numberProps['validate'] = (v: number): string => mustBeXDigits(v, 6);
@@ -74,7 +75,7 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
             return f.prop === 'utm_zone' ? (
               <NumberInput {...numberProps} />
             ) : (
-              <span className={'edit-form-field-span'}>
+              <span className={'edit-form-field-span'} key={`event-span-wrap-${idx}`}>
                 <NumberInput {...numberProps} />
               </span>
             );

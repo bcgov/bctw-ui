@@ -24,7 +24,7 @@ export default function CaptivityStatusForm({ event, handleFormChange }: Captivi
 
   return (
     <>
-      {FormPart('Captivity Details', [
+      {FormPart('ev-capt','Captivity Details', [
         <Box {...boxProps}>
           <span>{fields.captivity_status.long_label}</span>
           {/* captivity_status is always disabled in mortality workflow */}

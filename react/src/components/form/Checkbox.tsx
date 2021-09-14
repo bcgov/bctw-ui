@@ -25,7 +25,9 @@ export default function Checkbox(props: ICheckboxProps): JSX.Element {
 
   // rerender if the default was changed
   useEffect(() => {
-    setChecked(initialValue);
+    if (initialValue !== undefined) {
+      setChecked(initialValue);
+    }
   }, [initialValue]);
 
   // passing props that dont belong in dom is throwing errors

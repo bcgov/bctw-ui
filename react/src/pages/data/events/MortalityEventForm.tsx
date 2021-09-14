@@ -71,7 +71,7 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
   return (
     <>
       {/* assignment & data life fields */}
-      {FormPart('Assignment Details', [
+      {FormPart('mort-ad', 'Assignment Details', [
         FormFromFormfield(mortality, fields.shouldUnattachDevice, onChange, false, true),
         <DataLifeInputForm dli={mortality.getDatalife()} enableEditEnd={true} enableEditStart={false} onChange={handleFormChange} propsRequired={requiredDLProps}/>,
         <Box {...boxProps} pt={2}>
@@ -81,7 +81,7 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
         FormFromFormfield(mortality, fields.mortality_record, onChange, false, true)
       ])}
       {/* device status fields */}
-      {FormPart('Update Device Details', [
+      {FormPart('mort-dvc', 'Update Device Details', [
         FormFromFormfield(mortality, fields.activation_status, onChange, false, true),
         <Box {...boxProps}>
           {FormFromFormfield(mortality, fields.retrieved, onChange)}
@@ -92,7 +92,7 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
         FormFromFormfield(mortality, fields.device_deployment_status, onChange)
       ])}
       {/* critter status fields */}
-      {FormPart('Update Animal Details', [
+      {FormPart('mort-critter', 'Update Animal Details', [
         FormFromFormfield(mortality, fields.animal_status, onChange, false, true),
         <Box {...boxProps} pt={2}>
           {FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange)} 
@@ -102,7 +102,7 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
       ])}
       <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />
       {/* location fields */}
-      {FormPart('Mortality Event Details', [<LocationEventForm event={mortality.location_event} notifyChange={onChangeLocationProp} />])}
+      {FormPart('mort-loc', 'Mortality Event Details', [<LocationEventForm event={mortality.location_event} notifyChange={onChangeLocationProp} />])}
     </>
   );
 }

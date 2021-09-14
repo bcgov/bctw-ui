@@ -35,12 +35,12 @@ const EditHeader = <T,>({ title, headers, obj, format }: EditHeaderProps<T>): JS
           {title}
         </Box>
         <dl className='headergroup-dl'>
-          {headers.map((p) => {
+          {headers.map((p, idx: number) => {
             return (
-              <>
+              <Box key={`header-${idx}`} display='inline' mr={2}>
                 <dd>{format(p)}:</dd>
                 <dt>{obj[p]}</dt>
-              </>
+              </Box>
             );
           })}
         </dl>
@@ -50,7 +50,7 @@ const EditHeader = <T,>({ title, headers, obj, format }: EditHeaderProps<T>): JS
   );
 };
 
-const FormPart = (header: string, children: React.ReactNode[], btn?: React.ReactNode): JSX.Element => (
+const FormPart = (key: string, header: string, children: React.ReactNode[], btn?: React.ReactNode): JSX.Element => (
   <Box component='fieldset' p={2}>
     {header ? (
       <Box component='legend' className={'legend'}>
@@ -61,7 +61,9 @@ const FormPart = (header: string, children: React.ReactNode[], btn?: React.React
     <Box className='fieldset-form'>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          {children.map((c) => c)}
+          {children.map((c, idx) => (
+            <span key={`${key}-${idx}`}>{c}</span>
+          ))}
         </Grid>
       </Grid>
     </Box>
