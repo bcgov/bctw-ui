@@ -30,6 +30,7 @@ export default function UserProfile(): JSX.Element {
 
   function sendTestSms(phoneNumber) {
     alert('Test SMS will be sent to: ' + phoneNumber);
+    console.log('Sending test SMS to ' + phoneNumber);
     sendSmsMortality(phoneNumber);
   }
 
