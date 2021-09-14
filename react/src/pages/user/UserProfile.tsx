@@ -41,16 +41,16 @@ export default function UserProfile(): JSX.Element {
             Your Name: <strong>{user.firstname ?? 'Local'}</strong>&nbsp;<strong>{user.lastname ?? 'User'}</strong>
           </p>
           <p>
-            Your Username: <strong>{user.uid?? 'Local Username'}</strong>
-          </p>
-          <p>
-            Your Email Address: <strong>{user.email}</strong>
+            Your username: <strong>{user.uid?? 'Local Username'}</strong>
           </p>
           <p>
             Your Role: <strong>{user.role_type}</strong>
           </p>
           <p>
-            Your Phone Number: <strong>{user.phone}</strong>
+            Your email address: <strong>{user.email}</strong>
+          </p>
+          <p>
+            Your phone number: <strong>{user.phone}</strong>
             <Button size="large" color="default" className='button' onClick={(e) => sendSmsMortality(user.phone)}>
               Send test SMS
             </Button>
