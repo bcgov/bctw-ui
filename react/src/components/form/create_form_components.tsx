@@ -8,7 +8,7 @@ import React from 'react';
 import { columnToHeader, removeProps } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { BCTWEvent } from 'types/events/event';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { FormChangeEvent } from 'hooks/useFormHasError';
 
 type CreateInputBaseProps<T> = {
@@ -57,11 +57,12 @@ function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
 
 // date field handler
 function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
+  console.log('CreateEditDateField fix me: date -> dayjs')
   return (
     <DateInput
       propName={prop as string}
       label={label}
-      defaultValue={value as Date}
+      defaultValue={value as Dayjs}
       changeHandler={handleChange}
       disabled={disabled}
       key={`input-date-${prop}`}

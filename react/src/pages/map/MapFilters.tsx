@@ -18,6 +18,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { CODE_FILTERS, DEVICE_STATUS_OPTIONS } from 'pages/map/map_constants';
 import { Tooltip } from 'components/common';
 import DateInput from 'components/form/Date';
+import dayjs from 'dayjs';
 
 type MapFiltersProps = {
   start: string;
@@ -207,9 +208,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                       fullWidth
                       propName='tstart'
                       label={MapStrings.startDateLabel}
-                      defaultValue={new Date(start)}
+                      defaultValue={dayjs(start)}
                       changeHandler={(e): void => setStart(e['tstart'] as string)}
-                      maxDate={new Date(end)}
+                      maxDate={dayjs(end)}
                     />
                     {/* </Tooltip> */}
                   </Grid>
@@ -219,9 +220,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                       fullWidth
                       propName='tend'
                       label={MapStrings.endDateLabel}
-                      defaultValue={new Date(end)}
+                      defaultValue={dayjs(end)}
                       changeHandler={(e): void => setEnd(e['tend'] as string)}
-                      minDate={new Date(start)}
+                      minDate={dayjs(start)}
                     />
                     {/* </Tooltip> */}
                   </Grid>
