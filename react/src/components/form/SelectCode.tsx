@@ -95,9 +95,15 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     }
   }, [triggerReset]);
 
-  // when default value changed, call reset handler
+  /**
+   * selecting a value pushes change to the parent, which may in turn upate the defaultvalue
+   * to avoid value being reset, check the new default is not the same as value
+   */
   useDidMountEffect(() => {
-    reset();
+    const match = data.find((d) => d?.description === defaultValue);
+    if (match && match.description !== value) {
+      reset();
+    }
   }, [defaultValue]);
 
   // call the parent change handler when the selected value or error status changes

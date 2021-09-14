@@ -30,11 +30,11 @@ export interface ICollarTelemetryBase extends ICollarBase {
 
 // export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
 export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_id' | 'animal_id'> {
-  activation_comment: string;
+  activation_comment: string; // fixme: missing?
   activation_status: boolean;
   animal_id?: string; // collars attached to a critter should includes this prop
   camera_device_id: number;
-  collar_transaction_id: uuid;
+  readonly collar_transaction_id: uuid;
   device_comment: string;
   device_deployment_status: Code;
   device_make: Code;
@@ -47,8 +47,8 @@ export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_
   first_activation_month: number;
   first_activation_year: number;
   fix_interval: number;
-  fix_interval_unit: Code;
-  fix_success_rate: number;
+  fix_interval_unit: Code; // fixme: is now fix_interval_rate?
+  fix_success_rate: number; // fixme: removed?
   frequency_unit: Code;
   malfunction_date: Dayjs;
   device_malfunction_type: Code;
@@ -65,7 +65,7 @@ export class Collar implements BCTWBaseType<Collar>, ICollar  {
   activation_status: boolean;
   readonly collar_id: uuid;
   @Transform(nullToNumber, transformOpt) camera_device_id: number;
-  collar_transaction_id: uuid;
+  readonly collar_transaction_id: uuid;
   device_id: number;
   device_deployment_status: Code;
   device_make: Code;

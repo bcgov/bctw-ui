@@ -42,7 +42,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   capture_utm_zone: number;
 
   readonly critter_id: uuid;
-  critter_transaction_id: uuid;
+  readonly critter_transaction_id: uuid;
   ear_tag_left_id: string; 
   ear_tag_right_id: string;
   ear_tag_left_colour: string;
@@ -65,6 +65,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   mortality_captivity_status: Code;
 
   permission_type?: eCritterPermission; // critters should contain this
+  predator_known: boolean;
   predator_species: Code;
   proximate_cause_of_death: Code;
   ucod_confidence: Code;
@@ -88,7 +89,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 
 export class Animal implements BCTWBaseType<Animal>, IAnimal {
   readonly critter_id: uuid;
-  critter_transaction_id: uuid;
+  readonly critter_transaction_id: uuid;
   animal_id: string;
   animal_status: Code;
   associated_animal_id: string;
@@ -118,6 +119,7 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   @Transform(nullToNumber, transformOpt) mortality_utm_easting: number;
   @Transform(nullToNumber, transformOpt) mortality_utm_northing: number;
   @Transform(nullToNumber, transformOpt) mortality_utm_zone: number;
+  predator_known: boolean;
   predator_species: Code;
   proximate_cause_of_death: Code;
   ucod_confidence: Code;
@@ -279,11 +281,11 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   ],
   mortalityFields: [
     { prop: 'mortality_date', type: eInputType.datetime },
-    { prop: 'mortality_latitude', type: eInputType.date },
-    { prop: 'mortality_longitude', type: eInputType.date },
-    { prop: 'mortality_utm_zone', type: eInputType.date },
-    { prop: 'mortality_utm_easting', type: eInputType.date },
-    { prop: 'mortality_utm_northing', type: eInputType.date },
+    { prop: 'mortality_latitude', type: eInputType.number },
+    { prop: 'mortality_longitude', type: eInputType.number },
+    { prop: 'mortality_utm_zone', type: eInputType.number },
+    { prop: 'mortality_utm_easting', type: eInputType.number },
+    { prop: 'mortality_utm_northing', type: eInputType.number },
     { prop: 'proximate_cause_of_death', type: eInputType.code },
     { prop: 'ultimate_cause_of_death', type: eInputType.code },
     { prop: 'predator_species', type: eInputType.code },

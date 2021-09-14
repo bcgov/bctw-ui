@@ -19,6 +19,7 @@ export interface ICollarHistory extends
 }
 
 // passed to the API when removing a device from an animal
+// note: data_life_end must be provided for the attachment to be considered over
 export interface IRemoveDeviceProps extends Required<IDataLifeEndProps>, Pick<ICollarHistory, 'assignment_id'> { }
 
 /**

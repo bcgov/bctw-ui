@@ -3,7 +3,7 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
-import { eventApi as event_api } from 'api/event_api';
+import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { IUserUpsertPayload, userApi as user_api } from 'api/user_api';
@@ -357,8 +357,8 @@ export const useTelemetryApi = () => {
     useMutation<TelemetryAlert[], AxiosError, TelemetryAlert[]>((body) => userApi.updateAlert(body), config);
   
   /** POST a mortality event form */
-  const useMutateMortalityEvent = (config: UseMutationOptions<void, AxiosError, MortalityEvent>): UseMutationResult<void> =>
-    useMutation<void, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
+  const useMutateMortalityEvent = (config: UseMutationOptions<true, AxiosError, MortalityEvent>): UseMutationResult<WorkflowAPIResponse> =>
+    useMutation<WorkflowAPIResponse, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
   
   /** add or update a user */
   const useMutateUser = (config: UseMutationOptions<User, AxiosError, IUserUpsertPayload>): UseMutationResult<User> =>

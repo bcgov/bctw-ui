@@ -26,3 +26,12 @@ export type FormFieldObject<T> = {
 
 // spread in form field constructors to make a field required
 export const isRequired = { required: true};
+
+// what a form component passes when it's changed
+// ex: {name: 'bill', error: false}
+export type InboundObj = {
+  [key: string]: unknown;
+  error?: boolean;
+};
+
+export type FormChangeEvent = {(v: InboundObj): void}

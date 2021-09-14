@@ -2,7 +2,7 @@ import { Box } from '@material-ui/core';
 import { FormFromFormfield } from 'components/form/create_form_components';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { FormChangeEvent } from 'hooks/useFormHasError';
+import { FormChangeEvent } from 'types/form_types';
 import { FormPart } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
 import { useState } from 'react';
@@ -18,10 +18,8 @@ type MortEventProps = {
 };
 
 /**
- * todo: saving
- * where to retrieve critter permission? (used for data life)
  */
-export default function MortalityEventForm({ event, handleFormChange}: MortEventProps): JSX.Element {
+export default function MortalityEventForm({ event, handleFormChange }: MortEventProps): JSX.Element {
   const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
 
   useDidMountEffect(() => {
@@ -36,8 +34,8 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
 
   // workflow logic
   const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
-    handleFormChange(v)
-    const key = (Object.keys(v)[0]) as keyof MortalityEvent;
+    handleFormChange(v);
+    const key = Object.keys(v)[0] as keyof MortalityEvent;
     const value = Object.values(v)[0];
     if (key === 'retrieved') {
       setIsRetrieved(value as boolean);
@@ -54,14 +52,14 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
     // make attachment end state required if user is removing device
     if (key === 'shouldUnattachDevice') {
       // console.log(v)
-      setReqiredDLProps( value ? ['attachment_end'] : []);
+      setReqiredDLProps(value ? ['attachment_end'] : []);
     }
   };
 
   // when the location event form changes, also notify wrapper about errors
   const onChangeLocationProp = (v: Record<keyof LocationEvent, unknown>): void => {
-    handleFormChange(v)
-  }
+    handleFormChange(v);
+  };
 
   const { fields } = mortality;
   if (!fields) {
@@ -73,7 +71,14 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
       {/* assignment & data life fields */}
       {FormPart('mort-ad', 'Assignment Details', [
         FormFromFormfield(mortality, fields.shouldUnattachDevice, onChange, false, true),
-        <DataLifeInputForm dli={mortality.getDatalife()} enableEditEnd={true} enableEditStart={false} onChange={handleFormChange} propsRequired={requiredDLProps}/>,
+        <DataLifeInputForm
+          dli={mortality.getDatalife()}
+          enableEditEnd={true}
+          enableEditStart={false}
+          onChange={handleFormChange}
+          propsRequired={requiredDLProps}
+          message={<div>{fields.shouldUnattachDevice.long_label}</div>}
+        />,
         <Box {...boxProps} pt={2}>
           <span>{fields.mortality_investigation.long_label}</span>
           {FormFromFormfield(mortality, fields.mortality_investigation, onChange)}
@@ -93,16 +98,16 @@ export default function MortalityEventForm({ event, handleFormChange}: MortEvent
       ])}
       {/* critter status fields */}
       {FormPart('mort-critter', 'Update Animal Details', [
-        FormFromFormfield(mortality, fields.animal_status, onChange, false, true),
-        <Box {...boxProps} pt={2}>
-          {FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange)} 
-          {FormFromFormfield(mortality, fields.predator_known, onChange, !isPredation)}
-          {FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)} 
-        </Box>,
+        FormFromFormfield(mortality, fields.animal_status, onChange),
+        FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange),
+        FormFromFormfield(mortality, fields.predator_known, onChange, !isPredation),
+        FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)
       ])}
       <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />
       {/* location fields */}
-      {FormPart('mort-loc', 'Mortality Event Details', [<LocationEventForm event={mortality.location_event} notifyChange={onChangeLocationProp} />])}
+      {FormPart('mort-loc', 'Mortality Event Details', [
+        <LocationEventForm event={mortality.location_event} notifyChange={onChangeLocationProp} />
+      ])}
     </>
   );
 }

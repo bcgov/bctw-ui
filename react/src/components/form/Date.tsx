@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import { formatDay } from 'utils/time';
 import { StandardTextFieldProps } from '@material-ui/core/TextField';
-import { FormChangeEvent } from 'hooks/useFormHasError';
+import { FormChangeEvent } from 'types/form_types';
 
 export type DateInputProps = StandardTextFieldProps & {
   propName: string;

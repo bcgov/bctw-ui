@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { LocationEvent } from 'types/events/location_event';
+import { LocationEvent, eLocationPositionType } from 'types/events/location_event';
 import TextField from 'components/form/TextInput';
 import { Box, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
-import { FormFieldObject } from 'types/form_types';
+import { FormChangeEvent, FormFieldObject, InboundObj } from 'types/form_types';
 import DateTimeInput from 'components/form/DateTimeInput';
-import { FormChangeEvent, InboundObj } from 'hooks/useFormHasError';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type LocationEventProps = {
   event: LocationEvent;
@@ -15,7 +15,7 @@ type LocationEventProps = {
 };
 
 export default function LocationEventForm({event, notifyChange }: LocationEventProps): JSX.Element {
-  const [useUTM, setUseUTM] = useState('utm');
+  const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
 
   // create the form inputs
   const fields = event.fields;
@@ -26,8 +26,10 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
   const commentField = fields.comment as FormFieldObject<LocationEvent>;
 
   // radio button control on whether to show UTM or lat long fields
-  const changeCoordinateType = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setUseUTM(event.target.value);
+  const changeCoordinateType = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const ct = e.target.value as eLocationPositionType;
+    event.coordinate_type = ct;
+    setShowUtm(ct);
   };
 
   const changeHandler = (v: InboundObj): void => {
@@ -37,6 +39,11 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
     // notify parent that the location event changed
     notifyChange(v);
   }
+
+  // notify parent error handler that required errors need to update when utm/lat long is changed
+  useDidMountEffect(() => {
+    notifyChange({'reset': true})
+  }, [showUtm]);
 
   const baseInputProps = { changeHandler, required: true };
   return (
@@ -48,7 +55,7 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
         changeHandler={(v): void => changeHandler(v)}
       />
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}
-      <RadioGroup row aria-label='position' name='position' value={useUTM} onChange={changeCoordinateType}>
+      <RadioGroup row aria-label='position' name='position' value={showUtm} onChange={changeCoordinateType}>
         <FormControlLabel
           value={'utm'}
           control={<Radio color='primary' />}
@@ -56,14 +63,14 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
           labelPlacement='start'
         />
         <FormControlLabel
-          value={'coords'}
+          value={'coord'}
           control={<Radio color='primary' />}
           label={WorkflowStrings.locationEventCoordTypeLat}
           labelPlacement='start'
         />
       </RadioGroup>
       <Box>
-        {useUTM === 'utm' ? (
+        {showUtm === 'utm' ? (
           utmFields.map((f, idx) => {
             const numberProps = {key: `loc-num-${idx}`, ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop};
             // custom form validation

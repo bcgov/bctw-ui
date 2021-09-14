@@ -6,10 +6,9 @@ import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
 import React from 'react';
 import { columnToHeader, removeProps } from 'utils/common_helpers';
-import { eInputType, FormFieldObject } from 'types/form_types';
+import { eInputType, FormChangeEvent, FormFieldObject } from 'types/form_types';
 import { BCTWEvent } from 'types/events/event';
 import dayjs, { Dayjs } from 'dayjs';
-import { FormChangeEvent } from 'hooks/useFormHasError';
 
 type CreateInputBaseProps<T> = {
   value: unknown;

@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import DateTimeInput  from 'components/form/DateTimeInput';
+import React, { useState } from 'react';
+import DateTimeInput from 'components/form/DateTimeInput';
 import { Box, Typography } from '@material-ui/core';
 import { DataLifeStrings } from 'constants/strings';
 import { DataLifeInput } from 'types/data_life';
 import { Dayjs } from 'dayjs';
-import { FormChangeEvent, InboundObj } from 'hooks/useFormHasError';
+import { FormChangeEvent, InboundObj } from 'types/form_types';
 
 /**
- * @param dli instance of @type {DataLifeIinput} 
+ * @param dli instance of @type {DataLifeIinput}
  * @param disableEditActual always disable the attachment start/end fields
  * @param enableEditStart @param enableEditEndenable whether or not to enable the start / end fields
  * @param disableDLStart @param disableDLEnd explicity disable only the data life fields
@@ -23,9 +23,10 @@ type DataLifeInputProps = {
   disableEditActual?: boolean;
   propsRequired?: (keyof DataLifeInput)[];
   onChange?: FormChangeEvent;
+  message?: React.ReactNode;
 };
 
-// returns the first key ex. { data_life_start : 'bill' } // 'data_life_start' 
+// returns the first key ex. { data_life_start : 'bill' } // 'data_life_start'
 const getFirstKey = (d: InboundObj): string => Object.keys(d)[0];
 const getFirstValue = (d: InboundObj): unknown => Object.values(d)[0];
 
@@ -33,7 +34,17 @@ const getFirstValue = (d: InboundObj): unknown => Object.values(d)[0];
  * todo: time validation if same date?
  */
 export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Element {
-  const { dli, disableEditActual, enableEditStart, enableEditEnd, onChange, disableDLEnd, disableDLStart, propsRequired } = props;
+  const {
+    dli,
+    disableEditActual,
+    enableEditStart,
+    enableEditEnd,
+    onChange,
+    disableDLEnd,
+    disableDLStart,
+    propsRequired,
+    message
+  } = props;
   const [minDate, setMinDate] = useState<Dayjs>(dli.attachment_start);
   const [maxDate, setMaxDate] = useState<Dayjs>(dli.attachment_end);
 
@@ -42,37 +53,39 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
   const handleDateOrTimeChange = (d): void => {
     const k = getFirstKey(d);
     const v = getFirstValue(d) as Dayjs;
-    dli[k] = v;
-    if (k === 'attachment_start') {
-      setMinDate(v);
-    } else if (k === 'attachment_end') {
-      setMaxDate(v);
+    if (v) {
+      dli[k] = v;
+      if (k === 'attachment_start') {
+        setMinDate(v);
+      } else if (k === 'attachment_end') {
+        setMaxDate(v);
+      }
+      // update state to show warning if data life was modified
+      if (k.indexOf('data_') !== -1) {
+        setIsModified(true);
+      }
     }
     // call parent change handler if it exists
     if (typeof onChange === 'function') {
       onChange(d);
-    }
-    // update state to show warning if data life was modified
-    if (k.indexOf('data_') !== -1) {
-      setIsModified(true);
     }
   };
 
   return (
     <Box paddingBottom={2}>
       {/* if data life has been modified - show a warning */}
-      <Box height={35} display='flex' justifyContent={'center'}>
-        {isModified ? (<Typography color={'error'}>{DataLifeStrings.editWarning}</Typography>) : null}
+      <Box height={35} display='flex' flexDirection={'column'} alignItems={'center'}>
+        {message}
+        {isModified ? <Typography color={'error'}>{DataLifeStrings.editWarning}</Typography> : null}
       </Box>
       <Box>
         {/* attachment start field */}
-        
         <DateTimeInput
           propName='attachment_start'
           changeHandler={handleDateOrTimeChange}
           label='Attachment Start'
           defaultValue={dli.attachment_start}
-          disabled={!enableEditStart|| disableEditActual}
+          disabled={!enableEditStart || disableEditActual}
           required={propsRequired?.includes('attachment_start')}
         />
         <Box component={'span'} m={1} />
@@ -99,16 +112,14 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
         />
         <Box component={'span'} m={1} />
         {/* attachment end field */}
-        {/* <FormControl error={true} > */}
         <DateTimeInput
           propName='attachment_end'
           changeHandler={handleDateOrTimeChange}
           label='Attachment End'
           defaultValue={dli.attachment_end}
-          disabled={!enableEditEnd|| disableEditActual}
+          disabled={!enableEditEnd || disableEditActual}
           required={propsRequired?.includes('attachment_end')}
         />
-        {/* </FormControl> */}
       </Box>
     </Box>
   );
