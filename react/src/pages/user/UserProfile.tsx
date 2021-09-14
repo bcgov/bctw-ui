@@ -28,6 +28,11 @@ export default function UserProfile(): JSX.Element {
     return <div>Loading user information...</div>;
   }
 
+  function sendTestSms(phoneNumber) {
+    alert('Test SMS will be sent to: ' + phoneNumber);
+    sendSmsMortality(phoneNumber);
+  }
+
   const tableProps: ITableQueryProps<Animal> = {
     query: bctwApi.useCritterAccess,
     param: { user }
@@ -50,8 +55,8 @@ export default function UserProfile(): JSX.Element {
             Your email address: <strong>{user.email}</strong>
           </p>
           <p>
-            Your phone number: <strong>{user.phone}</strong>
-            <Button size="large" color="default" className='button' onClick={(e) => sendSmsMortality(user.phone)}>
+            Your phone number: <strong>{user.phone ?? 'No number on file'}</strong> &nbsp; &nbsp; 
+            <Button size="large" color="default" className='button' onClick={() => sendTestSms(user.phone)}>
               Send test SMS
             </Button>
           </p>

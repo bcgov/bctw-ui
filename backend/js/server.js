@@ -248,7 +248,7 @@ const onboardingRedirect = async (req, res, next) => {
   const registered = (idirs.includes(user)) ? true : false;
   console.log('onboardingRedirect() -- User is registered?', registered);
 
-  console.log('onboardingRedirect() -- URL requested: ', req.url);
+  console.log('onboardingRedirect() -- URL requested:', req.url);
   if (registered) { // If registered
     console.log('onboardingRedirect() -- User is registered; passing through')
     next(); // pass through
