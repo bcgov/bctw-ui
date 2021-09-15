@@ -5,8 +5,8 @@ export const ApiResponseContext = createContext<INotificationMessage>(null);
 export const ApiResponseDispatch = createContext(null);
 
 /**
- * fixme: change the name of this, since it really is just a 
- * context that any child component can use to show a notification
+ * fixme: change the name of this, since it's actually a context 
+ * that any child component can use to show a notification
 */
 
 const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => {
@@ -14,7 +14,7 @@ const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => 
   const [state, dispatch] = useState<INotificationMessage>(null);
 
   const clearNotif = (): void => dispatch(null);
-  const notifDisplayTime = 6000;
+  const notifDisplayTime = 10000;
 
   // automatically clear the notification after timer elapsed
   useEffect(() => {

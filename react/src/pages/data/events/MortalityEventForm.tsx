@@ -10,7 +10,7 @@ import { DataLifeInput } from 'types/data_life';
 import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptivityStatusForm from './CaptivityStatusForm';
-import { boxProps } from './EventComponents';
+import { boxProps, checkBoxWithLabel } from './EventComponents';
 
 type MortEventProps = {
   event: MortalityEvent;
@@ -51,7 +51,6 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
     }
     // make attachment end state required if user is removing device
     if (key === 'shouldUnattachDevice') {
-      // console.log(v)
       setReqiredDLProps(value ? ['attachment_end'] : []);
     }
   };
@@ -75,20 +74,23 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
           dli={mortality.getDatalife()}
           enableEditEnd={true}
           enableEditStart={false}
+          // fixme: :(
+          disableDLEnd={true}
           onChange={handleFormChange}
           propsRequired={requiredDLProps}
-          message={<div>{fields.shouldUnattachDevice.long_label}</div>}
+          message={<div style={{color: 'darkorange', marginBottom: '5px'}}>{fields.shouldUnattachDevice.long_label}</div>} // todo:
+          displayInRows={true}
         />,
-        <Box {...boxProps} pt={2}>
-          <span>{fields.mortality_investigation.long_label}</span>
+        <Box {...checkBoxWithLabel}>
           {FormFromFormfield(mortality, fields.mortality_investigation, onChange)}
+          <span>{fields.mortality_investigation.long_label}</span>
         </Box>,
         FormFromFormfield(mortality, fields.mortality_record, onChange, false, true)
       ])}
       {/* device status fields */}
       {FormPart('mort-dvc', 'Update Device Details', [
         FormFromFormfield(mortality, fields.activation_status, onChange, false, true),
-        <Box {...boxProps}>
+        <Box {...boxProps} mb={1}>
           {FormFromFormfield(mortality, fields.retrieved, onChange)}
           {FormFromFormfield(mortality, fields.retrieval_date, onChange, !isRetrieved)}
         </Box>,
@@ -100,8 +102,10 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
       {FormPart('mort-critter', 'Update Animal Details', [
         FormFromFormfield(mortality, fields.animal_status, onChange),
         FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange),
-        FormFromFormfield(mortality, fields.predator_known, onChange, !isPredation),
-        FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)
+        <Box {...boxProps} mt={2}>
+          {FormFromFormfield(mortality, fields.predator_known, onChange, !isPredation)}
+          {FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)}
+        </Box>
       ])}
       <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />
       {/* location fields */}

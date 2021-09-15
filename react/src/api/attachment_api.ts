@@ -1,6 +1,6 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { ICollarHistory, CollarHistory, IAttachDeviceProps, IRemoveDeviceProps } from 'types/collar_history';
+import { ICollarHistory, CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { attachDeviceEndpoint, getCollarAssignmentHistoryEndpoint, removeDeviceEndpoint, updateDatalifeEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps } from 'api/api_interfaces';
 import { IChangeDataLifeProps } from 'types/data_life';
@@ -29,14 +29,14 @@ export const attachmentApi = (props: ApiProps) => {
     return results;
   };
 
-  const attachDevice = async (body: IAttachDeviceProps): Promise<CollarHistory> => {
+  const attachDevice = async (body: AttachDeviceInput): Promise<CollarHistory> => {
     const url = createUrl({ api: attachDeviceEndpoint});
     // console.log(`posting ${url}: ${JSON.stringify(body)}`);
     const { data } = await api.post(url, body);
     return plainToClass(CollarHistory, data);
   }
 
-  const removeDevice = async (body: IRemoveDeviceProps): Promise<CollarHistory> => {
+  const removeDevice = async (body: RemoveDeviceInput): Promise<CollarHistory> => {
     const url = createUrl({ api: removeDeviceEndpoint});
     // console.log(`posting ${url}: ${JSON.stringify(body)}`);
     const { data } = await api.post(url, body);

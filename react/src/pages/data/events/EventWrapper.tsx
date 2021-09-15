@@ -14,6 +14,7 @@ import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
 import MortalityEventForm from './MortalityEventForm';
 import ReleaseEventForm from './ReleaseEventForm';
+import MortalityEvent from 'types/events/mortality_event';
 
 type EventWrapperProps<T> = ModalBaseProps & {
   event: BCTWEvent<T>;
@@ -62,15 +63,12 @@ export default function EventWrapper<E>({
   };
 
   // setup save mutation
-  const { mutateAsync: saveMortality, isLoading } = bctwApi.useMutateMortalityEvent({ onSuccess, onError });
+  const { mutateAsync: saveEvent, isLoading } = bctwApi.useMutateMortalityEvent({ onSuccess, onError });
 
   // performs metadata updates of collar/critter
   const handleSave = async (): Promise<void> => {
-    switch (event.event_type) {
-      case 'mortality':
-      default:
-        saveMortality(event);
-    }
+    // fixme: typing event to specific
+    saveEvent(event as BCTWEvent<unknown>);
   };
 
   const handleChildFormUpdated = (v: InboundObj): void => {
@@ -92,7 +90,8 @@ export default function EventWrapper<E>({
       Comp = <CaptureEventForm />;
       break;
     case 'mortality':
-      Comp = <MortalityEventForm handleFormChange={handleChildFormUpdated} event={event as any} />;
+      // fixme: typing event to specific
+      Comp = <MortalityEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as MortalityEvent} />;
       break;
     case 'unknown':
     default:

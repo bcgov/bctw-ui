@@ -6,14 +6,14 @@ import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CritterStrings as CS } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
-import { IAttachDeviceProps } from 'types/collar_history';
+import { AttachDeviceInput } from 'types/collar_history';
 import { Animal } from 'types/animal';
 import { DataLifeInput } from 'types/data_life';
 
 type IAssignNewCollarModal = Pick<Animal, 'critter_id'> & {
   show: boolean;
   onClose: (close: boolean) => void;
-  onSave: (obj: IAttachDeviceProps ) => void;
+  onSave: (obj: AttachDeviceInput ) => void;
   dli: DataLifeInput;
 };
 
@@ -32,7 +32,7 @@ export default function AssignNewCollarModal({ critter_id, dli, onClose, show, o
   const handleSelectDevice = (row: Collar): void => setCollarId(row.collar_id);
 
   const handleSave = (): void => {
-    const body: IAttachDeviceProps = {
+    const body: AttachDeviceInput = {
       critter_id,
       collar_id: collarId,
       // formats the datetime properties

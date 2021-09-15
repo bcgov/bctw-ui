@@ -57,9 +57,10 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   };
 
   const getTitle = (): string => {
-    return `Edit Data Life for ${attachment.device_make} Device ${attachment.device_id}` + isDev()
-      ? `id: ${attachment.assignment_id}`
-      : '';
+    const s = `Edit Data Life for ${attachment.device_make} Device ${attachment.device_id}`; 
+    return + isDev()
+      ? `${s} assignment ID: ${attachment.assignment_id}`
+      : s;
   };
 
   // setup mutation to save the modified data life

@@ -10,7 +10,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AssignNewCollarModal from 'pages/data/animals/AssignNewCollar';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { CollarHistory, IRemoveDeviceProps } from 'types/collar_history';
+import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { DataLifeInput } from 'types/data_life';
 import { canRemoveDeviceFromAnimal } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
@@ -125,7 +125,7 @@ export default function PerformAssignmentAction({
   };
 
   const handleConfirmRemoveDevice = (): void => {
-    const body: IRemoveDeviceProps = {
+    const body: RemoveDeviceInput = {
       assignment_id: current_attachment.assignment_id,
       ...dli.toRemoveDeviceJSON()
     }

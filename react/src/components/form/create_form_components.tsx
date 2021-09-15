@@ -4,7 +4,7 @@ import SelectCode from './SelectCode';
 import DateInput from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
-import React from 'react';
+import { ReactNode } from 'react';
 import { columnToHeader, removeProps } from 'utils/common_helpers';
 import { eInputType, FormChangeEvent, FormFieldObject } from 'types/form_types';
 import { BCTWEvent } from 'types/events/event';
@@ -142,10 +142,10 @@ function MakeEditField<T>({
   errorMessage = '',
   required = false,
   span = false
-}: CreateInputProps<T>): React.ReactNode {
+}: CreateInputProps<T>): ReactNode {
   const inputType = type;
   const toPass = { prop, type, value, handleChange, label, disabled, errorMessage, required, codeName };
-  let Comp: React.ReactNode;
+  let Comp: ReactNode;
   if (inputType === eInputType.check) {
     Comp = CreateEditCheckboxField(toPass);
   } else if (inputType === eInputType.datetime) {
@@ -170,11 +170,14 @@ function MakeEditField<T>({
 
 function FormFromFormfield<T extends BCTWEvent<T>>(
   obj: T,
-  formField: FormFieldObject<T>,
+  formField: FormFieldObject<T> | undefined,
   handleChange: FormChangeEvent,
   disabled = false,
   displayBlock = false
-): React.ReactNode {
+): ReactNode {
+  if (formField === undefined) {
+    return null;
+  }
   const { type, prop, required, codeName } = formField;
   const toPass = {
     prop,
@@ -187,7 +190,7 @@ function FormFromFormfield<T extends BCTWEvent<T>>(
     codeName,
     key: `${type}-${prop}`
   };
-  let Comp: React.ReactNode;
+  let Comp: ReactNode;
   if (type === eInputType.check) {
     Comp = CreateEditCheckboxField(toPass);
   } else if (type === eInputType.date) {

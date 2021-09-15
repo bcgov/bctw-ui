@@ -99,7 +99,7 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
           </>
         )}
       </Box>
-      <Box marginTop={5}>
+      <Box marginTop={2}>
         <TextField
           style={{ width: '100%' }}
           multiline={true}

@@ -1,6 +1,6 @@
 import dayjs, {Dayjs, isDayjs} from 'dayjs';
 import { formatTime } from 'utils/time';
-import { CollarHistory, IAttachDeviceProps, IRemoveDeviceProps } from './collar_history';
+import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from './collar_history';
 
 /**
  * the attachment attachment start and data life start date time props
@@ -71,7 +71,7 @@ export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
   }
 
   // must get assignment_id elsewhere
-  toRemoveDeviceJSON(): Omit<IRemoveDeviceProps, 'assignment_id'> {
+  toRemoveDeviceJSON(): Omit<RemoveDeviceInput, 'assignment_id'> {
     return {
       attachment_end: this.attachment_end.format(formatTime),
       data_life_end: this.data_life_end.format(formatTime),
@@ -79,7 +79,7 @@ export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
   }
 
   // must provide critter/collar ids separarately
-  toPartialAttachDeviceJSON(): Omit<IAttachDeviceProps, 'collar_id' | 'critter_id'> {
+  toPartialAttachDeviceJSON(): Omit<AttachDeviceInput, 'collar_id' | 'critter_id'> {
     return {
       attachment_start: this.attachment_start.format(formatTime),
       data_life_start: this.data_life_start.format(formatTime),

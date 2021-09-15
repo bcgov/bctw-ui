@@ -5,6 +5,7 @@ import { DataLifeStrings } from 'constants/strings';
 import { DataLifeInput } from 'types/data_life';
 import { Dayjs } from 'dayjs';
 import { FormChangeEvent, InboundObj } from 'types/form_types';
+import { DateInputProps } from './Date';
 
 /**
  * @param dli instance of @type {DataLifeIinput}
@@ -24,6 +25,7 @@ type DataLifeInputProps = {
   propsRequired?: (keyof DataLifeInput)[];
   onChange?: FormChangeEvent;
   message?: React.ReactNode;
+  displayInRows?: boolean;
 };
 
 // returns the first key ex. { data_life_start : 'bill' } // 'data_life_start'
@@ -43,15 +45,16 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
     disableDLEnd,
     disableDLStart,
     propsRequired,
-    message
+    message,
+    displayInRows
   } = props;
   const [minDate, setMinDate] = useState<Dayjs>(dli.attachment_start);
   const [maxDate, setMaxDate] = useState<Dayjs>(dli.attachment_end);
 
   const [isModified, setIsModified] = useState<boolean>(false);
 
-  // fixme:
   const handleDateOrTimeChange = (d): void => {
+    console.log(d)
     const k = getFirstKey(d);
     const v = getFirstValue(d) as Dayjs;
     dli[k] = v;
@@ -61,8 +64,10 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
       setMaxDate(v);
     }
     // update state to show warning if data life was modified
-    if (k.indexOf('data_') !== -1) {
-      setIsModified(true);
+    // todo: check prop doesn't match attachment timestamp
+    if (k.indexOf('data_') !== -1 && v) {
+      // fixme:
+      // setIsModified(true);
     }
     // call parent change handler if it exists
     if (typeof onChange === 'function') {
@@ -70,54 +75,61 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
     }
   };
 
+  const DTPRops: Pick<DateInputProps, 'changeHandler' | 'margin'> = {
+    changeHandler: handleDateOrTimeChange,
+    margin: 'dense'
+  };
+
   return (
     <Box paddingBottom={2}>
       {/* if data life has been modified - show a warning */}
-      <Box height={35} display='flex' flexDirection={'column'} alignItems={'center'}>
-        {message}
-        {isModified ? <Typography color={'error'}>{DataLifeStrings.editWarning}</Typography> : null}
-      </Box>
+      {displayInRows ? <>{message ?? null}</> : (
+        <Box height={35} display='flex' flexDirection={'column'} alignItems={'center'}>
+          {message}
+          {isModified ? <Typography color={'error'}>{DataLifeStrings.editWarning}</Typography> : null}
+        </Box>
+      )}
       <Box>
         {/* attachment start field */}
         <DateTimeInput
           propName='attachment_start'
-          changeHandler={handleDateOrTimeChange}
           label='Attachment Start'
           defaultValue={dli.attachment_start}
           disabled={!enableEditStart || disableEditActual}
           required={propsRequired?.includes('attachment_start')}
+          {...DTPRops}
         />
         <Box component={'span'} m={1} />
         {/* data life start field */}
         <DateTimeInput
           propName='data_life_start'
-          changeHandler={handleDateOrTimeChange}
           label='Data Life Start'
           defaultValue={dli.data_life_start}
           disabled={!enableEditStart || disableDLStart}
           minDate={minDate}
           required={propsRequired?.includes('data_life_start')}
+          {...DTPRops}
         />
-        <Box component={'span'} m={1} />
+        {displayInRows ? <Box></Box> : <Box component={'span'} m={1} />}
         {/* data life end field */}
         <DateTimeInput
           propName='data_life_end'
-          changeHandler={handleDateOrTimeChange}
           label='Data Life End'
           defaultValue={dli.data_life_end}
           disabled={!enableEditEnd || disableDLEnd}
           maxDate={maxDate}
           required={propsRequired?.includes('data_life_end')}
+          {...DTPRops}
         />
         <Box component={'span'} m={1} />
         {/* attachment end field */}
         <DateTimeInput
           propName='attachment_end'
-          changeHandler={handleDateOrTimeChange}
           label='Attachment End'
           defaultValue={dli.attachment_end}
           disabled={!enableEditEnd || disableEditActual}
           required={propsRequired?.includes('attachment_end')}
+          {...DTPRops}
         />
       </Box>
     </Box>

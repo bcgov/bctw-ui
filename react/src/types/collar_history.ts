@@ -8,19 +8,21 @@ import { isDev } from 'api/api_helpers';
 import { Code } from 'types/code';
 import { Animal } from './animal';
 
-// passed to the API when attaching a device to an animal
-export interface IAttachDeviceProps extends IDataLifeStartProps, IDataLifeEndProps,
-  Pick<Animal, 'critter_id'>, Pick<Collar, 'collar_id'> { }
-
 export interface ICollarHistory extends
   Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'frequency'>, DataLife,
   Pick<Animal, 'critter_id'> {
   assignment_id: uuid;
 }
 
+// passed to the API when attaching a device to an animal
+export type AttachDeviceInput = Pick<Animal, 'critter_id'> & Pick<Collar, 'collar_id'> &
+{ [Property in keyof IDataLifeStartProps]: string } &
+{ [Property in keyof IDataLifeEndProps]: string };
+
 // passed to the API when removing a device from an animal
 // note: data_life_end must be provided for the attachment to be considered over
-export interface IRemoveDeviceProps extends Required<IDataLifeEndProps>, Pick<ICollarHistory, 'assignment_id'> { }
+export type RemoveDeviceInput = Pick<ICollarHistory, 'assignment_id'> &
+{ [Property in keyof Required<IDataLifeEndProps>]: string };
 
 /**
  * represents an device attachment to an animal.

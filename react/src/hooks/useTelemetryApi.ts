@@ -14,7 +14,7 @@ import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryR
 import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
-import { CollarHistory, IAttachDeviceProps, IRemoveDeviceProps } from 'types/collar_history';
+import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
@@ -27,9 +27,9 @@ import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
-import MortalityEvent from 'types/events/mortality_event';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { IChangeDataLifeProps } from 'types/data_life';
+import { BCTWEvent } from 'types/events/event';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -307,15 +307,15 @@ export const useTelemetryApi = () => {
 
   /** attaches a device from an animal */
   const useMutateAttachDevice = (
-    config: UseMutationOptions<CollarHistory, AxiosError, IAttachDeviceProps>
+    config: UseMutationOptions<CollarHistory, AxiosError, AttachDeviceInput>
   ): UseMutationResult =>
-    useMutation<CollarHistory, AxiosError, IAttachDeviceProps>((link) => attachmentApi.attachDevice(link), config);
+    useMutation<CollarHistory, AxiosError, AttachDeviceInput>((link) => attachmentApi.attachDevice(link), config);
 
   /** removes a device from an animal */
   const useMutateRemoveDevice = (
-    config: UseMutationOptions<CollarHistory, AxiosError, IRemoveDeviceProps>
+    config: UseMutationOptions<CollarHistory, AxiosError, RemoveDeviceInput>
   ): UseMutationResult =>
-    useMutation<CollarHistory, AxiosError, IRemoveDeviceProps>((link) => attachmentApi.removeDevice(link), config);
+    useMutation<CollarHistory, AxiosError, RemoveDeviceInput>((link) => attachmentApi.removeDevice(link), config);
 
   /** updates the data life of an animal/device attachment */
   const useMutateEditDataLife = (
@@ -357,8 +357,8 @@ export const useTelemetryApi = () => {
     useMutation<TelemetryAlert[], AxiosError, TelemetryAlert[]>((body) => userApi.updateAlert(body), config);
   
   /** POST a mortality event form */
-  const useMutateMortalityEvent = (config: UseMutationOptions<true, AxiosError, MortalityEvent>): UseMutationResult<WorkflowAPIResponse> =>
-    useMutation<WorkflowAPIResponse, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
+  const useMutateMortalityEvent = <T>(config: UseMutationOptions<WorkflowAPIResponse, AxiosError, BCTWEvent<T>>): UseMutationResult<WorkflowAPIResponse, AxiosError, BCTWEvent<T>> =>
+    useMutation<WorkflowAPIResponse, AxiosError,  BCTWEvent<T>>((body) => eventApi.saveEvent(body), config);
   
   /** add or update a user */
   const useMutateUser = (config: UseMutationOptions<User, AxiosError, IUserUpsertPayload>): UseMutationResult<User> =>
@@ -382,7 +382,6 @@ export const useTelemetryApi = () => {
     usePings,
     useUnassignedPings,
     useCollarType,
-    // useAllCritters,
     useAssignedCritters,
     useUnassignedCritters,
     useCritterHistory,

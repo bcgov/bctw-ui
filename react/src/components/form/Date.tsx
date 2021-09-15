@@ -5,6 +5,7 @@ import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import { formatDay } from 'utils/time';
 import { StandardTextFieldProps } from '@material-ui/core/TextField';
 import { FormChangeEvent } from 'types/form_types';
+import { PropTypes } from '@material-ui/core';
 
 export type DateInputProps = StandardTextFieldProps & {
   propName: string;
@@ -13,6 +14,7 @@ export type DateInputProps = StandardTextFieldProps & {
   changeHandler: FormChangeEvent;
   minDate?: Dayjs;
   maxDate?: Dayjs;
+  margin?: PropTypes.Margin;
 };
 
 export default function DateInput(props: DateInputProps): JSX.Element {
