@@ -23,16 +23,15 @@ export default function DateTimeInput(props: DateInputProps): JSX.Element {
     changeHandler(t);
   };
 
-  // trigger error status on check when required prop changes
-  // pass undefined as a value
-  // fixme: wiping state when we dont want to
+  // trigger error status check when required prop changes
   useEffect(() => {
+    if (typeof required !== 'boolean') {
+      return;
+    }
     const isErr = checkForErr(selectedTime);
     setHasError(isErr);
-    const e = {[propName]: isErr ? undefined : selectedTime, error: isErr};
-    console.log(e)
-    changeHandler(e);
-  }, [ required])
+    changeHandler({[propName]: selectedTime, error: isErr});
+  }, [required])
 
   return (
     <MuiPickersUtilsProvider utils={DayjsUtils}>

@@ -50,20 +50,19 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
 
   const [isModified, setIsModified] = useState<boolean>(false);
 
+  // fixme:
   const handleDateOrTimeChange = (d): void => {
     const k = getFirstKey(d);
     const v = getFirstValue(d) as Dayjs;
-    if (v) {
-      dli[k] = v;
-      if (k === 'attachment_start') {
-        setMinDate(v);
-      } else if (k === 'attachment_end') {
-        setMaxDate(v);
-      }
-      // update state to show warning if data life was modified
-      if (k.indexOf('data_') !== -1) {
-        setIsModified(true);
-      }
+    dli[k] = v;
+    if (k === 'attachment_start') {
+      setMinDate(v);
+    } else if (k === 'attachment_end') {
+      setMaxDate(v);
+    }
+    // update state to show warning if data life was modified
+    if (k.indexOf('data_') !== -1) {
+      setIsModified(true);
     }
     // call parent change handler if it exists
     if (typeof onChange === 'function') {

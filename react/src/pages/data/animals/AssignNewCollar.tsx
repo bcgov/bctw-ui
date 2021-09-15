@@ -36,7 +36,7 @@ export default function AssignNewCollarModal({ critter_id, dli, onClose, show, o
       critter_id,
       collar_id: collarId,
       // formats the datetime properties
-      ...dli.toPartialAttachDeviceJSON()
+      ...DLInput.toPartialAttachDeviceJSON()
     }
     onSave(body);
   }

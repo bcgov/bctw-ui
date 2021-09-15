@@ -29,10 +29,9 @@ export const eventApi = (props: ApiProps) => {
 
     if (event.shouldUnattachDevice ) {
       const attachment = event.getAttachment();
-      const { assignment_id, attachment_end, data_life_end} = attachment;
       const url = createUrl({ api: removeDeviceEndpoint});
       try {
-        const { data } = await api.post(url, {assignment_id, attachment_end: dayjs(attachment_end).toDate(), data_life_end: dayjs(data_life_end).toDate()});
+        const { data } = await api.post(url, attachment);
         console.log('removed device successfully', data);
       } catch (err) {
         console.error(`${eventErr(event.event_type)} caught exception removing device', ${formatAxiosError(err)}`);
