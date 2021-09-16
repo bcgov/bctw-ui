@@ -32,11 +32,12 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
   const [isPredatorKnown, setIsPredatorKnown] = useState(false);
   const [requiredDLProps, setReqiredDLProps] = useState<(keyof DataLifeInput)[]>([]);
 
-  // workflow logic
+  // form component changes can trigger mortality specific business logic
   const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
     handleFormChange(v);
     const key = Object.keys(v)[0] as keyof MortalityEvent;
     const value = Object.values(v)[0];
+    // retrieved checkbox state enables/disables the retrieval date datetime picker
     if (key === 'retrieved') {
       setIsRetrieved(value as boolean);
     }
@@ -68,29 +69,19 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
   return (
     <>
       {/* assignment & data life fields */}
-      {FormPart('mort-ad', 'Assignment Details', [
+      {FormPart('mort-ad', 'Device Details', [
         FormFromFormfield(mortality, fields.shouldUnattachDevice, onChange, false, true),
         <DataLifeInputForm
           dli={mortality.getDatalife()}
-          enableEditEnd={true}
+          // only allow data life end dates changes if the device is being removed
+          enableEditEnd={requiredDLProps.length !== 0}
           enableEditStart={false}
-          // fixme: :(
-          disableDLEnd={true}
           onChange={handleFormChange}
           propsRequired={requiredDLProps}
           message={<div style={{color: 'darkorange', marginBottom: '5px'}}>{fields.shouldUnattachDevice.long_label}</div>} // todo:
           displayInRows={true}
         />,
-        <Box {...checkBoxWithLabel}>
-          {FormFromFormfield(mortality, fields.mortality_investigation, onChange)}
-          <span>{fields.mortality_investigation.long_label}</span>
-        </Box>,
-        FormFromFormfield(mortality, fields.mortality_record, onChange, false, true)
-      ])}
-      {/* device status fields */}
-      {FormPart('mort-dvc', 'Update Device Details', [
-        FormFromFormfield(mortality, fields.activation_status, onChange, false, true),
-        <Box {...boxProps} mb={1}>
+        <Box {...boxProps}>
           {FormFromFormfield(mortality, fields.retrieved, onChange)}
           {FormFromFormfield(mortality, fields.retrieval_date, onChange, !isRetrieved)}
         </Box>,
@@ -99,17 +90,27 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
         FormFromFormfield(mortality, fields.device_deployment_status, onChange)
       ])}
       {/* critter status fields */}
-      {FormPart('mort-critter', 'Update Animal Details', [
-        FormFromFormfield(mortality, fields.animal_status, onChange),
-        FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange),
+      {FormPart('mort-critter', 'Animal Details', [
+        <Box {...checkBoxWithLabel}>
+          {FormFromFormfield(mortality, fields.mortality_investigation, onChange)}
+          <span>{fields.mortality_investigation.long_label}</span>
+        </Box>,
+        FormFromFormfield(mortality, fields.mortality_record, onChange, false, true),
+        FormFromFormfield(mortality, fields.activation_status, onChange, false, true),
+        <Box {...boxProps} mt={2}>
+          {FormFromFormfield(mortality, fields.animal_status, onChange)}
+          {FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange)}
+        </Box>,
         <Box {...boxProps} mt={2}>
           {FormFromFormfield(mortality, fields.predator_known, onChange, !isPredation)}
           {FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)}
+        </Box>,
+        <Box {...boxProps} mt={2}>
+          {<CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />}
         </Box>
       ])}
-      <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />
       {/* location fields */}
-      {FormPart('mort-loc', 'Mortality Event Details', [
+      {FormPart('mort-loc', 'Event Details', [
         <LocationEventForm event={mortality.location_event} notifyChange={onChangeLocationProp} />
       ])}
     </>

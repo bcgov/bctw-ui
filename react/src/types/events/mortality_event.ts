@@ -9,15 +9,25 @@ import { BCTWEvent, eventToJSON, EventType, OptionalAnimal, OptionalDevice } fro
 import { IMortalityAlert } from 'types/alert';
 import { uuid } from 'types/common_types';
 import { Code } from 'types/code';
-import { UserAlertStrings } from 'constants/strings';
+import { EventFormStrings } from 'constants/strings';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { DataLife, DataLifeInput } from 'types/data_life';
 
+export type MortalityDeviceEventProps = Pick<Collar, 
+| 'device_id'
+| 'device_make'
+| 'retrieved'
+| 'retrieval_date'
+| 'activation_status'
+| 'device_condition'
+| 'device_status'
+| 'device_deployment_status'>;
+
 /**
  */
-interface IMortalityEvent
-  extends IMortalityAlert, Pick<
-  Animal,
+export interface IMortalityEvent
+  extends MortalityDeviceEventProps, IMortalityAlert,
+  Pick< Animal,
   | 'proximate_cause_of_death'
   | 'predator_species'
   | 'pcod_confidence'
@@ -32,15 +42,7 @@ interface IMortalityEvent
   | 'mortality_record'
   | 'mortality_captivity_status'
   >,
-  Pick<Collar,
-  | 'retrieved'
-  | 'retrieval_date'
-  | 'activation_status'
-  | 'device_condition'
-  | 'device_status'
-  | 'device_deployment_status'
-  >,
-  Pick<CollarHistory, 'assignment_id'>,
+  Readonly<Pick<CollarHistory, 'assignment_id'>>,
   DataLife {
   shouldUnattachDevice: boolean;
   predator_known: boolean;
@@ -56,7 +58,7 @@ export type MortalityFormField = {
 
 // codes defaulted in this workflow
 type MortalityDeviceStatus = 'Mortality';
-type MortalityDeploymentStatus = 'Not Deployed';
+export type DeploymentStatusNotDeployed = 'Not Deployed';
 type MortalityAnimalStatus = 'Potential Mortality';
 
 export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMortalityEvent {
@@ -68,7 +70,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   retrieval_date: Dayjs;
   activation_status: boolean;
   device_condition: Code;
-  device_deployment_status: MortalityDeploymentStatus;
+  device_deployment_status: DeploymentStatusNotDeployed;
   device_status: MortalityDeviceStatus;
   // attachment props
   readonly assignment_id: uuid;
@@ -98,9 +100,9 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
 
   // todo: need to fetch captivity_status
   constructor() {
-    // console.log('im a constructor');
     this.event_type = 'mortality';
-    this.retrieval_date = getEndOfPreviousDay(); // note: defaulted
+    // note: defaulted to end of previous day (business requirement)
+    this.retrieval_date = getEndOfPreviousDay();
     this.retrieved = false;
     this.activation_status = true;
     // workflow defaulted fields
@@ -118,20 +120,24 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   }
 
   getHeaderTitle(): string {
-    return UserAlertStrings.mortalityFormTitle;
+    return EventFormStrings.mortalityFormTitle;
   }
 
-  // used for datalife related things
-  // todo: fixme: improve or remove this
+  /**
+   * used to create the data life form.
+   * since only animals with existing attachments can be edited,
+   * attachment end / data end dates will be null.
+   * default them to now for this workflow
+   * fixme: improve DLI so it can be instantiated without a collar history
+   */
   getCollarHistory(): CollarHistory {
+    const now = dayjs();
     const ch = new CollarHistory();
     ch.assignment_id = this.assignment_id;
-    ch.data_life_start = dayjs(this.data_life_start);
-    ch.data_life_end = dayjs(this.data_life_end);
     ch.attachment_start = dayjs(this.attachment_start);
-    ch.attachment_end = dayjs(this.attachment_end);
-    ch.device_id = this.device_id;
-    ch.device_make = this.device_make;
+    ch.data_life_start = dayjs(this.data_life_start);
+    ch.data_life_end = now;
+    ch.attachment_end = now;
     return ch;
   }
 
@@ -147,9 +153,9 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
       case 'mortality_record':
         return 'Was the Wildlife Health Group mortality form completed?';
       case 'retrieved':
-        return 'Has Device Been Retrieved?';
+        return 'Was the device retrieved?';
       case 'activation_status':
-        return 'Is Device Still Active With Vendor?';
+        return 'Is device still active with vendor?';
       case 'predator_known':
         return 'Is the predator known?';
       case 'shouldUnattachDevice':
@@ -161,12 +167,11 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     }
   }
 
-  // todo: missing ucod?
   fields: MortalityFormField = {
     shouldUnattachDevice: {
       prop: 'shouldUnattachDevice',
       type: eInputType.check,
-      long_label: 'Note: data life will only be be saved if the device is being removed'
+      long_label: 'Note: data life can only be edited if the device is being removed'
     },
     mortality_investigation: {
       prop: 'mortality_investigation',
@@ -189,7 +194,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   };
 
   // retrieve the animal metadata fields from the mortality event
-  // todo: predator_known, ucod?
+  // todo: ucod?
   getAnimal(): OptionalAnimal {
     const props: (keyof IAttachedAnimal)[] = [
       'critter_id',
@@ -238,8 +243,4 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     };
     return ret;
   }
-  
-  // todo:
-  // getDataLife(): void {
-  // }
 }

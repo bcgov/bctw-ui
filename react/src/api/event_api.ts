@@ -76,6 +76,8 @@ export const eventApi = (props: ApiProps) => {
       }
     }
 
+    // todo: check each event implements function
+
     const critter = event.getAnimal();
     if (critter) {
       const s = await _saveAnimal(critter, event.event_type);

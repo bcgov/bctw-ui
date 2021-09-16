@@ -118,7 +118,11 @@ const UserAlertStrings = {
     return `There are ${remainingCount} snoozes remaining. Are you sure you want to snooze the alert until tomorrow?`;
   },
   noMoreSnoozes: 'Maximum number of snoozes performed, you must perform the alert update',
+}
+
+const EventFormStrings = {
   mortalityFormTitle: 'Mortality Event',
+  retrievalFormTitle: 'Retrieval Event',
 }
 
 const DataLifeStrings = {
@@ -129,6 +133,7 @@ export {
   CodeStrings,
   CollarStrings,
   CritterStrings,
+  EventFormStrings,
   FileStrings,
   FormStrings,
   MapStrings,

@@ -1,7 +1,8 @@
 import { BoxProps } from '@material-ui/core';
 
-const boxProps: Pick<BoxProps, 'display' | 'justifyContent'> = {
+const boxProps: Pick<BoxProps, 'display' | 'justifyContent' | 'marginBottom'> = {
   display: 'flex',
+  marginBottom: '4px',
   // justifyContent: 'space-between'
 };
 

@@ -99,11 +99,11 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
           </>
         )}
       </Box>
-      <Box marginTop={2}>
+      <Box marginTop={1}>
         <TextField
           style={{ width: '100%' }}
           multiline={true}
-          rows={2}
+          rows={1}
           key={commentField.prop}
           propName={commentField.prop}
           defaultValue={event.comment}

@@ -6,7 +6,7 @@ import { BCTWEvent, EventType, OptionalAnimal, OptionalDevice } from 'types/even
 import { LocationEvent } from 'types/events/location_event';
 
 export default class CaptureEvent implements BCTWEvent<CaptureEvent> {
-  event_type: EventType;
+  readonly event_type: EventType;
   collar_id: uuid;
   device_id: number;
   device_make: Code;

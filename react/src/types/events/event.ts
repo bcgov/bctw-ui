@@ -12,14 +12,13 @@ export type OptionalDevice = { [Property in keyof Collar]+?: Collar[Property] };
  * interface that BCTW event/workflows implement
  */
 export interface BCTWEvent<T> extends Omit<BCTWBaseType<T>, 'identifier'> {
-  event_type: EventType;
+  readonly event_type: EventType;
   // headers displayed in the workflow modal title
   getHeaderTitle(): string;
   get displayProps(): (keyof T)[];
-  // events must implement these functions
-  getAnimal(): OptionalAnimal;
-  getDevice(): OptionalDevice;
-  // optional methods to extend if the workflow needs to save specific properties
+  // methods the workflow needs to save specific properties
+  getAnimal?(): OptionalAnimal;
+  getDevice?(): OptionalDevice;
   getAttachment?(): void;
   getDataLife?(): void;
 }

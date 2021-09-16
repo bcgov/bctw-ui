@@ -11,7 +11,7 @@ export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
   const bctwApi = useTelemetryApi();
 
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User>({} as User);
 
   // set the user state when the context is updated
   useEffect(() => {
