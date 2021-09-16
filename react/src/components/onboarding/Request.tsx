@@ -46,12 +46,20 @@ const UserAccessRequest = (): JSX.Element => {
       textMessageNumber
     }
 
-    const url = createUrl({ api: 'onboarding' });
-
     // XXX: This url doesn't work in development
     // There is no keycloak in development duh!
 
+    // const url = createUrl({ api: 'onboarding' });
+
+    // copied from api_helpers.ts, without the the /api
+    const IS_PROD = +(window.location.port) === 1111 ? false : true;
+    const h1 = window.location.protocol;
+    const h2 = window.location.hostname;
+    const h3 = IS_PROD ? window.location.port : 3000;
+    const url = `${h1}//${h2}:${h3}`;
+  
     console.log('POSTing to this URL:', url);
+
     const request = new Request(url, {
       method: 'POST',
       body: JSON.stringify(payload),

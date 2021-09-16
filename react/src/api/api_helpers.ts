@@ -27,6 +27,7 @@ const _appendQueryToUrl = (url: string, query: string): string => {
  */
 const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
   const baseUrl = getBaseUrl();
+  console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
     url = _appendQueryToUrl(url, query);
@@ -39,8 +40,9 @@ const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
   }
   if (testUser) {
     url = _appendQueryToUrl(url, `testUser=${testUser}`)
-    // console.log(`retrieving url with testuser ${testUser}`);
+    // console.log('retrieving url with testuser ${testUser}');
   }
+  console.log('createURL() -- final created URL:', url)
   return url;
 }
 
