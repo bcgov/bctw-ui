@@ -2,7 +2,7 @@ import { Box } from '@material-ui/core';
 import { FormFromFormfield } from 'components/form/create_form_components';
 import { eInputType, FormChangeEvent } from 'types/form_types';
 import MortalityEvent, { MortalityFormField } from 'types/events/mortality_event';
-import { checkBoxWithLabel } from './EventComponents';
+import { boxRowProps } from './EventComponents';
 import { EventFormStrings } from 'constants/strings';
 /**
  *
@@ -28,16 +28,10 @@ export default function CaptivityStatusForm({ event, handleFormChange }: Captivi
     }
   };
   return (
-    <Box>
-      <Box {...checkBoxWithLabel}>
-        {/* captivity_status is always disabled in mortality workflow */}
-        {FormFromFormfield(event, captivityFields.captivity_status, handleFormChange, true)}
-        {/* <span>{captivityFields.captivity_status.long_label}</span> */}
-      </Box>
-      <Box {...checkBoxWithLabel} mt={2}>
-        {FormFromFormfield(event, captivityFields.mortality_captivity_status, handleFormChange)}
-        {/* <span>{captivityFields.mortality_captivity_status.long_label}</span> */}
-      </Box>
+    <Box {...boxRowProps} mt={2}>
+      {/* captivity_status is always disabled in mortality workflow */}
+      {FormFromFormfield(event, captivityFields.captivity_status, handleFormChange, true)}
+      {FormFromFormfield(event, captivityFields.mortality_captivity_status, handleFormChange)}
     </Box>
   );
 }

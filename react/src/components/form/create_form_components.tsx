@@ -4,7 +4,7 @@ import SelectCode from './SelectCode';
 import DateInput from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
-import { ReactNode } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import { eInputType, FormChangeEvent, FormFieldObject } from 'types/form_types';
 import dayjs, { Dayjs } from 'dayjs';
@@ -28,7 +28,7 @@ type CreateInputProps<T> = CreateInputBaseProps<T> & {
 };
 
 // text and number field handler
-function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
+function CreateEditTextField<T>(props: CreateInputProps<T>): ReactElement {
   const { prop, type, value } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
@@ -56,7 +56,7 @@ function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
 }
 
 // date field handler
-function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
+function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): ReactElement {
   return (
     <DateInput
       propName={prop as string}
@@ -70,7 +70,7 @@ function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: 
 }
 
 // datetime field handler
-function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
+function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): ReactElement {
   return (
     <DateTimeInput
       propName={prop as string}
@@ -84,7 +84,7 @@ function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled
 }
 
 // checkbox field handler
-function CreateEditCheckboxField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
+function CreateEditCheckboxField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): ReactElement {
   return (
     <CheckBox
       changeHandler={handleChange}
@@ -107,7 +107,7 @@ function CreateEditSelectField<T>({
   errorMessage,
   label,
   codeName
-}: CreateInputProps<T>): JSX.Element {
+}: CreateInputProps<T>): ReactElement {
   return (
     <SelectCode
       style={{ width: '200px', marginRight: '10px' }}
@@ -126,7 +126,7 @@ function CreateEditSelectField<T>({
 }
 
 // returns the funtion to create the form component based on input type
-const getInputFnFromType = (inputType: eInputType): ((props: unknown) => JSX.Element) => {
+const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement ) => {
   switch (inputType) {
     case eInputType.check:
       return CreateEditCheckboxField;
@@ -166,14 +166,16 @@ function FormFromFormfield<T extends BCTWFormat<T>>(
     codeName,
     key: `${type}-${prop}`
   };
-  const Comp = getInputFnFromType(type)(toPass);
-  // if (tooltip) {
-  //   Comp = (
-  //     <Tooltip title={tooltip} placement={'right-end'} enterDelay={750}>
-  //       {Comp}
-  //     </Tooltip>
-  //   );
-  // }
+  let Comp = getInputFnFromType(type)(toPass);
+
+  if (tooltip) {
+    Comp = (
+      <Tooltip title={tooltip} placement={'right-end'} enterDelay={750}>
+        {/* note: wrapping tooltip child in div fixes the forward refs error */}
+        <div>{Comp}</div>
+      </Tooltip>
+    );
+  }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
 

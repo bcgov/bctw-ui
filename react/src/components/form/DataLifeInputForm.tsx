@@ -54,7 +54,6 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
   const [isModified, setIsModified] = useState<boolean>(false);
 
   const handleDateOrTimeChange = (d): void => {
-    console.log(d)
     const k = getFirstKey(d);
     const v = getFirstValue(d) as Dayjs;
     dli[k] = v;

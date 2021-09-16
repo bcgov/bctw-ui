@@ -10,7 +10,7 @@ import { DataLifeInput } from 'types/data_life';
 import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptivityStatusForm from './CaptivityStatusForm';
-import { boxProps, checkBoxWithLabel } from './EventComponents';
+import { boxProps } from './EventComponents';
 
 type MortEventProps = {
   event: MortalityEvent;
@@ -91,10 +91,8 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
       ])}
       {/* critter status fields */}
       {FormPart('mort-critter', 'Animal Details', [
-        <Box {...checkBoxWithLabel}>
-          {FormFromFormfield(mortality, fields.mortality_investigation, onChange)}
-          {/* <span>{fields.mortality_investigation.long_label}</span> */}
-        </Box>,
+        // todo: add bool was mortality invest taken?
+        FormFromFormfield(mortality, fields.mortality_investigation, onChange),
         FormFromFormfield(mortality, fields.mortality_record, onChange, false, true),
         FormFromFormfield(mortality, fields.activation_status, onChange, false, true),
         <Box {...boxProps} mt={2}>
@@ -105,9 +103,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
           {FormFromFormfield(mortality, fields.predator_known, onChange, !isPredation)}
           {FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)}
         </Box>,
-        <Box {...boxProps} mt={2}>
-          {<CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />}
-        </Box>
+        <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />
       ])}
       {/* location fields */}
       {FormPart('mort-loc', 'Event Details', [
