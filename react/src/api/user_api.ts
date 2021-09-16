@@ -23,7 +23,8 @@ export const userApi = (props: ApiProps) => {
   const getSessionInfo = async (): Promise<IKeyCloakSessionInfo> => {
     const url = createUrl({ api: 'session-info' });
     const { data } = await api.get(url);
-    console.log('retrieve session info', data);
+    console.log('retrieve session info');
+    // console.log('retrieve session info', data);
     return data;
   };
 

@@ -95,7 +95,8 @@ export const UserStateContextProvider: React.FC = (props) => {
       return;
     }
     if (session.email === user.email && session.family_name === user.lastname && session.given_name === user.firstname) {
-      console.log('UserContext: handleUserchanged: keycloak info matches database record', user, session);
+      console.log('UserContext: handleUserchanged: keycloak info matches database record');
+      // console.log('UserContext: handleUserchanged: keycloak info matches database record', user, session);
       // no updates required
       return;
     }

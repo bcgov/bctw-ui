@@ -256,7 +256,7 @@ const onboardingRedirect = async (req, res, next) => {
       console.log('onboardingRedirect() -- User is NOT registered; redirecting to /onboarding')
       res.redirect('/onboarding');
     }
-    console.log('onboardingRedirect() -- Query parameters supplied: ', req.query.onboarding)
+    console.log('onboardingRedirect() -- Query parameters supplied:', req.query.onboarding)
   }
   client.release(); // Release database connection
 };
