@@ -56,9 +56,10 @@ const UserAccessRequest = (): JSX.Element => {
     const h1 = window.location.protocol;
     const h2 = window.location.hostname;
     const h3 = IS_PROD ? window.location.port : 3000;
-    const url = `${h1}//${h2}:${h3}`;
+    const url = `${h1}//${h2}:${h3}/onboarding`;
   
-    console.log('POSTing to this URL:', url);
+    console.log('submitRequest() -- POSTing to this URL:', url);
+    console.log('submitRequest() -- Payload:', JSON.stringify(payload));
 
     const request = new Request(url, {
       method: 'POST',
@@ -68,10 +69,10 @@ const UserAccessRequest = (): JSX.Element => {
 
     fetch(request)
       .then((res) => {
-        console.log('Your request was sent successfully:', res);
+        console.log('submitRequest() -- Request sent successfully:', res);
       })
       .catch((err) => {
-        console.error('Your request was NOT sent successfully:', err);
+        console.error('submitRequest() -- Request could not be sent:', err);
       });
 
   }
