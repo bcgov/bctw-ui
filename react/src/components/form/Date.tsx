@@ -18,7 +18,7 @@ export type DateInputProps = StandardTextFieldProps & {
 };
 
 export default function DateInput(props: DateInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
+  const { defaultValue, label, changeHandler, propName, minDate, maxDate, margin } = props;
   const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultValue.isValid() ? dayjs(defaultValue) : null);
 
   const handleDateChange = (djs: Dayjs | null): void => {
@@ -39,7 +39,7 @@ export default function DateInput(props: DateInputProps): JSX.Element {
         variant='dialog'
         // a plain empty string renders as today?
         format={dayjs.isDayjs(selectedDate) ? selectedDate.format('YYYY/MM/DD') : ' '}
-        margin='normal'
+        margin={margin ?? 'none'}
         label={label}
         value={selectedDate}
         onChange={handleDateChange}

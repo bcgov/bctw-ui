@@ -2,7 +2,7 @@ import { Box } from '@material-ui/core';
 import { FormFromFormfield } from 'components/form/create_form_components';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { FormChangeEvent } from 'types/form_types';
+import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
 import { FormPart } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
 import { useState } from 'react';
@@ -35,8 +35,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
   // form component changes can trigger mortality specific business logic
   const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
     handleFormChange(v);
-    const key = Object.keys(v)[0] as keyof MortalityEvent;
-    const value = Object.values(v)[0];
+    const [key, value] = parseFormChangeResult<MortalityEvent>(v);
     // retrieved checkbox state enables/disables the retrieval date datetime picker
     if (key === 'retrieved') {
       setIsRetrieved(value as boolean);
@@ -69,7 +68,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
   return (
     <>
       {/* assignment & data life fields */}
-      {FormPart('mort-ad', 'Device Details', [
+      {FormPart('mort-device', 'Device Details', [
         FormFromFormfield(mortality, fields.shouldUnattachDevice, onChange, false, true),
         <DataLifeInputForm
           dli={mortality.getDatalife()}

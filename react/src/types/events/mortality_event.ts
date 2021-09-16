@@ -168,16 +168,12 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   }
 
   fields: MortalityFormField = {
-    shouldUnattachDevice: {
-      prop: 'shouldUnattachDevice',
-      type: eInputType.check,
-      tooltip: EventFormStrings.device.should_unattach
-    },
     mortality_investigation: {
       prop: 'mortality_investigation',
       type: eInputType.code,
       tooltip: EventFormStrings.animal.mort_investigation
     },
+    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
     mortality_record: { prop: 'mortality_record', type: eInputType.check },
     animal_status: { prop: 'animal_status', type: eInputType.code },
     predator_known: { prop: 'predator_known', type: eInputType.check },
@@ -190,7 +186,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     device_status: { prop: 'device_status', type: eInputType.code },
     device_condition: { prop: 'device_condition', type: eInputType.code, required: true },
     pcod_confidence: { prop: 'pcod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
-    ucod_confidence: { prop: 'ucod_confidence', type: eInputType.code, codeName: 'cod_confidence' }
+    ucod_confidence: { prop: 'ucod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
   };
 
   // retrieve the animal metadata fields from the mortality event

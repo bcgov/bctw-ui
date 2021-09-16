@@ -3,12 +3,12 @@ import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
-import { Box, ButtonProps, Container } from '@material-ui/core';
+import { Box, Container } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
 import { FormFromFormfield } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
-import { FormPart } from '../common/EditModalComponents';
+import { editEventBtnProps, FormPart } from '../common/EditModalComponents';
 import { EventType } from 'types/events/event';
 import EventWrapper from '../events/EventWrapper';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -116,7 +116,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
           const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
             handlerFromContext(v, modifyCanSave);
           };
-          const btnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'default', className: 'button' };
           return (
             <>
               {FormPart(
@@ -142,8 +141,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormPart(
                 'cr-cap',
                 'Latest Capture Details',
-                captureFields.map((f) => FormFromFormfield(editing, f, onChange)),
-                <Button {...btnProps} onClick={(): void => handleOpenWorkflow('capture')}>
+                captureFields.map((f) => FormFromFormfield(editing, f, onChange, true)),
+                <Button {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('capture')}>
                   Add Capture Event
                 </Button>
               )}
@@ -151,8 +150,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormPart(
                 'cr-rel',
                 'Latest Release Details',
-                releaseFields.map((f) => FormFromFormfield(editing, f, onChange)),
-                <Button {...btnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
+                releaseFields.map((f) => FormFromFormfield(editing, f, onChange, true)),
+                <Button {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
                   Add Release Event
                 </Button>
               )}
@@ -160,7 +159,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 'cr-mort',
                 'Mortality Details',
                 mortalityFields.map((f) => FormFromFormfield(editing, f, onChange, true)),
-                <Button {...btnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
+                <Button disabled={!isAttached} {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
                   Record Mortality Details
                 </Button>
               )}

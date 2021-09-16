@@ -170,7 +170,7 @@ function FormFromFormfield<T extends BCTWFormat<T>>(
 
   if (tooltip) {
     Comp = (
-      <Tooltip title={tooltip} placement={'right-end'} enterDelay={750}>
+      <Tooltip title={tooltip} placement={'right-end'} enterDelay={600}>
         {/* note: wrapping tooltip child in div fixes the forward refs error */}
         <div>{Comp}</div>
       </Tooltip>

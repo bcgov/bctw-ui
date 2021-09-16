@@ -39,8 +39,8 @@ const WorkflowStrings = {
 }
 
 const CollarStrings = {
-  assignedCollarsTableTitle: 'Assigned Devices',
-  availableCollarsTableTitle: 'Unassigned Devices',
+  assignedCollarsTableTitle: 'Attached Devices',
+  availableCollarsTableTitle: 'Unattached Devices',
   editableProps: ['device_id', 'frequency', 'device_make', 'device_model', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
   exportTitle: 'Bulk Export Device Data',
   exportText: '',

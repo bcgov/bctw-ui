@@ -1,4 +1,4 @@
-import { Box, Grid } from '@material-ui/core';
+import { Box, ButtonProps, Grid } from '@material-ui/core';
 import React from 'react';
 
 interface TabPanelProps {
@@ -77,4 +77,6 @@ const a11yProps = (index: number): Record<string, string> => {
   };
 };
 
-export { EditHeader, EditTabPanel, FormPart, a11yProps };
+const editEventBtnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'default', className: 'button' };
+
+export { EditHeader, EditTabPanel, FormPart, a11yProps, editEventBtnProps };

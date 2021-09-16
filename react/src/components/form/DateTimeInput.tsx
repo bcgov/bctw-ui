@@ -7,8 +7,9 @@ import { DateInputProps } from 'components/form/Date';
 import { FormControl } from '@material-ui/core';
 
 // fixme: alignment / size
+// todo: merge with plain date component
 export default function DateTimeInput(props: DateInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName, minDate, maxDate, required } = props;
+  const { defaultValue, label, changeHandler, propName, minDate, maxDate, required, margin } = props;
   const [selectedTime, setSelectedTime] = useState<Dayjs | null>(defaultValue?.isValid() ? defaultValue : null);
 
   const checkForErr = (d: Dayjs | null): boolean => required && (!d || !d?.isValid());
@@ -45,7 +46,7 @@ export default function DateTimeInput(props: DateInputProps): JSX.Element {
           size={'small'}
           clearable={true}
           format={dayjs.isDayjs(selectedTime) ? selectedTime.format(formatTime) : ' '}
-          margin='normal'
+          margin={margin ?? 'none'}
           label={label}
           value={selectedTime}
           onChange={handleChangeTime}

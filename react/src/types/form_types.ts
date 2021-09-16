@@ -37,3 +37,15 @@ export type InboundObj = {
 };
 
 export type FormChangeEvent = {(v: InboundObj): void}
+
+/**
+ * form change events pass an object with:
+ * a) a keyof T / value
+ * b) error: boolean
+ * @returns the keyof T / value record
+ */
+export const parseFormChangeResult= <T>(changed: InboundObj): [keyof T, unknown] => {
+  const key = Object.keys(changed)[0] as keyof T;
+  const value = Object.values(changed)[0];
+  return [key, value];
+}

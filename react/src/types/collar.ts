@@ -194,7 +194,7 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   identifierFields: [
     { prop: 'device_id', type: eInputType.number },
     { prop: 'device_make', type: eInputType.code },
-    { prop: 'device_model', type: eInputType.code }
+    { prop: 'device_model', type: eInputType.text }
   ],
   activationFields: [
     { prop: 'activation_status', type: eInputType.check },

@@ -2,9 +2,7 @@ import Box from '@material-ui/core/Box';
 import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import Container from '@material-ui/core/Container';
-import Divider from '@material-ui/core/Divider';
 import EditModal from 'pages/data/common/EditModal';
-import Grid from '@material-ui/core/Grid';
 import MalfunctionEventForm from '../events/MalfunctionEventForm';
 import Modal from 'components/modal/Modal';
 import RetrievalEventForm from '../events/RetrievalEventForm';
@@ -13,6 +11,7 @@ import { EditorProps } from 'components/component_interfaces';
 import { FormFromFormfield } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
+import { editEventBtnProps, FormPart } from '../common/EditModalComponents';
 
 /**
  * todo: reimplement auto defaulting of fields based on collar type select
@@ -26,7 +25,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
   // const title = isCreatingNew ? `Add a new ${collarType} collar` : `Editing device ${editing.device_id}`;
-  const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
   const [showRetrievalWorkflow, setShowRetrievalWorkflow] = useState<boolean>(false);
   const [showMalfunctionWorkflow, setShowMalfunctionWorkflow] = useState<boolean>(false);
 
@@ -106,120 +104,52 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
           };
           return (
             <>
-              <Box component="fieldset" p={3}>
-                {/* <h2>Device Details</h2> */}
-                <Box component="legend" className={'legend'}>Identifiers</Box>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {identifierFields.map((d) => FormFromFormfield(editing, d, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box py={1} px={3}>
-                <Divider></Divider>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Device Status</Box>
-                <Box className="fieldset-form">
-                  <Box mt={1}>
-                    <Grid container spacing={3}>
-                      <Grid item xs={12}>
-                        {statusFields.map((d) => FormFromFormfield(editing, d, onChange))}
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Box>
-              </Box>
-              <Box py={1} px={3}>
-                <Divider></Divider>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Satellite Network and Beacon Frequency</Box>
-                <Box className="fieldset-form">
-                  
-                  <Box mt={1}>
-                    
-                  </Box>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {communicationFields.map((d) => FormFromFormfield(editing, d, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box py={1} px={3}>
-                <Divider></Divider>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Additional Device Sensors and Beacons</Box>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {deviceOptionFields.map((d) => FormFromFormfield(editing, d, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box py={1} px={3}>
-                <Divider></Divider>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Warranty & Activation Details</Box>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {activationFields.map((d) => FormFromFormfield(editing, d, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box py={1} px={3}>
-                <Divider></Divider>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Retrieval Details</Box>
-                <Button size="large" color="default" className='button' onClick={(): void => setShowRetrievalWorkflow((o) => !o)}>
+              {FormPart(
+                'device-ids',
+                'Identifiers',
+                identifierFields.map((f) => FormFromFormfield(editing, f, onChange))
+              )}
+              {FormPart(
+                'device-status',
+                'Device Status',
+                statusFields.map((f) => FormFromFormfield(editing, f, onChange))
+              )}
+              {FormPart(
+                'device-sat',
+                'Satellite Network and Beacon Frequency',
+                communicationFields.map((f) => FormFromFormfield(editing, f, onChange))
+              )}
+              {FormPart(
+                'device-add',
+                'Additional Device Sensors and Beacons',
+                activationFields.map((f) => FormFromFormfield(editing, f, onChange))
+              )}
+              {FormPart(
+                'device-activ',
+                'Warranty & Activation Details',
+                deviceOptionFields.map((f) => FormFromFormfield(editing, f, onChange))
+              )}
+              {FormPart(
+                'device-ret',
+                'Record Retrieval Details',
+                retrievalFields.map((f) => FormFromFormfield(editing, f, onChange)),
+                <Button {...editEventBtnProps} onClick={(): void => setShowRetrievalWorkflow((o) => !o)}>
                   Record Retrieval Details
                 </Button>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {retrievalFields.map((d) => FormFromFormfield(editing, d, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box py={1} px={3}>
-                <Divider></Divider>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Malfunction & Offline Details</Box>
-                <Button size="large" color="default" className='button' onClick={(): void => setShowMalfunctionWorkflow((o) => !o)}>
+              )}
+              {FormPart(
+                'device-malf',
+                'Record Malfunction & Offline Details',
+                malfunctionOfflineFields.map((f) => FormFromFormfield(editing, f, onChange)),
+                <Button {...editEventBtnProps} onClick={(): void => setShowMalfunctionWorkflow((o) => !o)}>
                   Record Malfunction & Offline Details
                 </Button>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {malfunctionOfflineFields.map((d) => FormFromFormfield(editing, d, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box py={1} px={3}>
-                <Divider></Divider>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Comments About this Device</Box>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {deviceCommentField.map((d) => FormFromFormfield(editing, d, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
+              )}
+              {FormPart(
+                'device-comment',
+                'Comments About this Device',
+                deviceCommentField.map((f) => FormFromFormfield(editing, f, onChange))
+              )}
               {/* {!isCreatingNew && showAssignmentHistory ? (
                 <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
                   <AssignmentHistory
@@ -232,7 +162,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                 </Modal>
               ) : null} */}
               { /* retrieval workflow */ }
-              {!isCreatingNew && showRetrievalWorkflow ? (
+              {/* {!isCreatingNew && showRetrievalWorkflow ? (
                 <Modal open={showRetrievalWorkflow} handleClose={(): void => setShowRetrievalWorkflow(false)}>
                   <RetrievalEventForm
                     device_id={editing.device_id}
@@ -241,7 +171,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                     open={showRetrievalWorkflow}
                   />
                 </Modal>
-              ) : null}
+              ) : null} */}
               { /* malfunction workflow */ }
               {!isCreatingNew && showMalfunctionWorkflow ? (
                 <Modal open={showMalfunctionWorkflow} handleClose={(): void => setShowMalfunctionWorkflow(false)}>

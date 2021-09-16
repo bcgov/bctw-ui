@@ -2,7 +2,7 @@ import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWEvent, EventType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { BCTWEvent, EventType, OptionalDevice } from 'types/events/event';
 import { IMortalityEvent, MortalityDeviceEventProps } from 'types/events/mortality_event';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
@@ -37,6 +37,7 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
   retrieved: boolean;
   // retrieved is not a code -_-
   // todo: display as checkbox if retrieved is no??
+  // todo: need to preserve is_retrievable?
   is_retrievable: boolean;
   // required if retrieved, cannot be earlier than capture/mort/malf date
   retrieval_date: Dayjs; 
@@ -87,20 +88,13 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
     retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime },
     device_condition: { prop: 'device_condition', type: eInputType.code, required: true },
     device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
-    shouldUnattachDevice: {
-      prop: 'shouldUnattachDevice',
-      type: eInputType.check
-    },
+    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
     // todo: long text
     retrieval_comment: { prop: 'retrieval_comment', type: eInputType.text },
   };
 
   getHeaderTitle(): string {
     return EventFormStrings.titles.retrievalTitle;
-  }
-
-  getAnimal(): OptionalAnimal {
-    return {};
   }
 
   getDevice(): OptionalDevice {
