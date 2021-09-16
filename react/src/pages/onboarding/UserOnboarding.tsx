@@ -1,13 +1,13 @@
-import { useState } from 'react';
 import axios, { AxiosInstance } from 'axios';
-import { useMemo } from 'react';
-import RequestUser from 'components/onboarding/Request';
-import PendingUser from 'components/onboarding/Pending';
-import DeniedUser from 'components/onboarding/Denied';
-import ApprovedUser from 'components/onboarding/Approved';
+import UserAccessRequest from 'components/onboarding/Request';
+import UserAccessPending from 'components/onboarding/Pending';
+import UserAccessDenied from 'components/onboarding/Denied';
+import UserAccessApproved from 'components/onboarding/Approved';
 import { getBaseUrl } from 'api/api_helpers';
 import { userApi as user_api } from 'api/user_api';
-import './AddUser.css';
+import { useMemo } from 'react';
+import { useState } from 'react';
+import './UserOnboarding.css';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -24,7 +24,7 @@ const useApi = (): AxiosInstance => {
 };
 
 /**
- * # AddUser
+ * # UserOnboarding
  * This page displays one of four things depending on
  * the status of the IDIR/BCeID user
  * 1. Application for access form
@@ -34,16 +34,16 @@ const useApi = (): AxiosInstance => {
  */
 const base = getBaseUrl();
 
-const AddUser = (): JSX.Element => {
+const UserOnboarding = (): JSX.Element => {
   const api = useApi();
   const userApi = user_api({ api });
-  
-  const [userAccess,setUserAccess] = useState(null);
+
+  const [userAccess, setUserAccess] = useState(null);
 
   if (!userAccess) {
     userApi.getUser()
       .then((res) => {
-        if (!res.error) setUserAccess(res.access) ;
+        if (!res.error) setUserAccess(res.access);
       });
   }
 
@@ -54,22 +54,20 @@ const AddUser = (): JSX.Element => {
     minWidth: '100vw'
   };
 
-  // const onboardingStyle = {
-  // };
-
   return (
     <div style={containerStyle}>
       {
         userAccess ? // User is in the system
           <div>
-            {/* userAccess == "granted" ? <RequestUser/> : "" */}  {/*XXX for testing */}
-            { userAccess == "granted" ? <ApprovedUser/> : ""}
-            { userAccess == "pending" ? <PendingUser/> : "" }
-            { userAccess == "denied" ? <DeniedUser/> : "" }
+            {userAccess == "granted" ? <UserAccessRequest /> : ""}
+            {/* {userAccess == "granted" ? <UserAccessApproved /> : ""} */}
+            {userAccess == "pending" ? <UserAccessPending /> : ""}
+            {userAccess == "denied" ? <UserAccessDenied /> : ""}
           </div>
-        : <RequestUser/> // If here you're not in the system
+          : <UserAccessRequest /> // If here you're not in the system
       }
     </div>
   )
 }
-export default AddUser;
+
+export default UserOnboarding;

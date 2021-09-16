@@ -1,17 +1,15 @@
-/* 'Bare bones'.strike() static file server */
-const pg = require('pg');
-const pug = require('pug');
 const axios = require('axios');
-const path = require('path')
 const cors = require('cors');
-const FormData = require('form-data');
-const http = require('http');
-const morgan = require('morgan');
-const multer = require('multer');
-const helmet = require('helmet');
 const express = require('express');
 const expressSession = require('express-session');
+const helmet = require('helmet');
+const formData = require('form-data');
+const http = require('http');
 const keycloakConnect = require('keycloak-connect');
+const morgan = require('morgan');
+const multer = require('multer');
+const path = require('path')
+const pg = require('pg');
 
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
@@ -167,7 +165,7 @@ const proxyApi = function (req, res, next) {
  */
 const handleFile = function (file) {
   if (file) {
-    const form = new FormData();
+    const form = new formData();
     form.append('csv', file.buffer, file.originalname);
     return { form, config: { headers: form.getHeaders() } }
   }
@@ -178,7 +176,7 @@ const handleFile = function (file) {
 */
 const handleFiles = function (files) {
   if (files && files.length) {
-    const form = new FormData();
+    const form = new formData();
     files.forEach(f => form.append(f.fieldname, f.buffer, f.originalname));
     // Axios will throw if posting the form as an array, specify the json option to stringify it
     return { form, config: { headers: form.getHeaders(), options: { json: true } } }
@@ -231,10 +229,8 @@ const pageHandler = function (req, res, next) {
  */
 const onboardingRedirect = async (req, res, next) => {
 
-  console.log('onboardingRedirect() -- START')
   // Collect all user data from the keycloak object
   const data = req.kauth.grant.access_token.content;
-//  console.log('onboardingRedirect() -- data:', data)
   const { user, domain } = splitCredentials(data);
   console.log('onboardingRedirect() -- user:', user)
 
@@ -250,24 +246,24 @@ const onboardingRedirect = async (req, res, next) => {
 
   console.log('onboardingRedirect() -- URL requested:', req.url);
   if (registered) { // If registered
-    console.log('onboardingRedirect() -- User is registered; passing through')
     next(); // pass through
   } else { // Otherwise redirect to the onboarding page
     // Allow static assets to pass through as well
     if (req.url.match(/\/onboarding/) || req.url.match(/\/static/) || req.url.match(/\/Reflect/)) {
-      console.log('onboardingRedirect() -- Onboarding URL requested; passing through')
-      next(); // already heading to onboarding so pass through
+      console.log('onboardingRedirect() -- Onboarding URL requested')
+      next();
     } else {
-      console.log('onboardingRedirect() -- User is NOT registered; directing to /onboarding')
+      console.log('onboardingRedirect() -- User is NOT registered; redirecting to /onboarding')
       res.redirect('/onboarding');
     }
     console.log('onboardingRedirect() -- Query parameters supplied: ', req.query.onboarding)
   }
   client.release(); // Release database connection
-  console.log('onboardingRedirect() -- END')
 };
 
-const onboardingAccess = async (req, res) => {
+const handleUserAccessRequest = async (req, res) => {
+  console.log('handleUserAccessRequest() -- /onboarding called as a POST');
+
   // This data will be inserted into the email
   const {
     user,
@@ -289,8 +285,8 @@ const onboardingAccess = async (req, res) => {
   const data = req.kauth.grant.access_token.content;
 
   // TODO: This has to be tested in dev unfortunately
-  console.log('keycloak data', data);
-  console.log('sent data', req.body);
+  console.log('handleUserAccessRequest() -- keycloak data', data);
+  console.log('handleUserAccessRequest() -- sent data', req.body);
 
   // Get all the environment variable dependencies
   const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
@@ -301,8 +297,7 @@ const onboardingAccess = async (req, res) => {
   const toEmail = process.env.BCTW_CHES_TO_EMAIL.split(',');
 
   // Create the authorization hash
-  const prehash = Buffer.from(`${username}:${password}`, 'utf8')
-    .toString('base64');
+  const prehash = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
   const hash = `Basic ${prehash}`;
 
   const tokenParcel = await axios.post(
@@ -315,9 +310,12 @@ const onboardingAccess = async (req, res) => {
       }
     });
 
+  console.log('get token...');
+
   const pretoken = tokenParcel.data.access_token;
   if (!pretoken) return res.status(500).send('Authentication failed');
   const token = `Bearer ${pretoken}`;
+  console.log('token obtained:', token);
 
   const emailMessage = `
     <div>
@@ -364,6 +362,8 @@ const onboardingAccess = async (req, res) => {
     delayTS: 0
   }
 
+  console.log('POSTing email message to CHES...');
+
   axios.post(
     apiUrl,
     emailPayload,
@@ -374,8 +374,10 @@ const onboardingAccess = async (req, res) => {
       }
     }
   ).then((response) => {
+    console.log('... SUCCESS');
     res.status(200).send('Email was sent');
   }).catch((error) => {
+    console.log('... FAIL');
     res.status(500).send('Email failed');
   })
 };
@@ -415,27 +417,23 @@ var app = express()
   .get('/denied', denied);
 
 if (isProd) {
-  console.log('this is prod');
+  console.log('Environment -- isProd?', isProd);
   app
-    .post('/onboarding', keycloak.protect(), onboardingAccess)
+    .post('/onboarding', keycloak.protect(), handleUserAccessRequest)
     .all('*', keycloak.protect(), onboardingRedirect);
 } else {
-  console.log('this is NOT prod!!!!!');
+  console.log('Environment -- isTest?', isTest);
   app
-    .post('/onboarding', onboardingAccess);
+    .post('/onboarding', handleUserAccessRequest);
 }
 
-console.log('************* This is new!!! ***************');
-
 if (isTest) {
-  console.log('express() -- isTest?', isTest);
   app
     .post('/api/import-csv', upload.single('csv'), pageHandler)
     .post('/api/import-xml', upload.array('xml'), pageHandler)
     .post('/api/:endpoint', proxyApi);
   // Use keycloak authentication only in Production
 } else if (isProd) {
-  console.log('express() -- isProd?', isProd);
   app
     .get('/', keycloak.protect(), pageHandler)
     .get('/api/session-info', retrieveSessionInfo)

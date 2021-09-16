@@ -3,7 +3,7 @@ import { mdiCheckBold, mdiCloseBox } from '@mdi/js';
 import { IconButton } from '@material-ui/core';
 import './style.css';
 
-const PendingUser = (): JSX.Element => {
+const UserAccessPending = (): JSX.Element => {
   return (
     <div className='onboarding-container'>
       <div className='icon'>
@@ -31,4 +31,4 @@ const PendingUser = (): JSX.Element => {
     </div>
   )
 }
-export default PendingUser;
+export default UserAccessPending;

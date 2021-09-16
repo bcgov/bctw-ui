@@ -3,7 +3,7 @@ import { mdiAlertCircleOutline, mdiCloseBox } from '@mdi/js';
 import { IconButton } from '@material-ui/core';
 import './style.css';
 
-const DeniedUser = (): JSX.Element => {
+const UserAccessDenied = (): JSX.Element => {
   return (
     <div className='onboarding-container'>
       <div className='icon'>
@@ -31,4 +31,4 @@ const DeniedUser = (): JSX.Element => {
     </div>
   )
 }
-export default DeniedUser;
+export default UserAccessDenied;

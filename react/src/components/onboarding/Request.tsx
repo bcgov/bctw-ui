@@ -5,7 +5,7 @@ import { Button, FormControl, InputLabel, NativeSelect, OutlinedInput, TextField
 import { createUrl } from 'api/api_helpers';
 import { useState } from "react";
 
-const RequestUser = (): JSX.Element => {
+const UserAccessRequest = (): JSX.Element => {
 
   /**
    * Would be nice if we could have all our styling inline Victor.
@@ -33,7 +33,7 @@ const RequestUser = (): JSX.Element => {
    * ## submitForm
    * Form payload and submit.
    */
-  const submitForm = () => {
+  const submitRequest = () => {
     const payload = {
       accessType,
       populationUnit,
@@ -45,24 +45,27 @@ const RequestUser = (): JSX.Element => {
       species,
       textMessageNumber
     }
+
     const url = createUrl({ api: 'onboarding' });
 
     // XXX: This url doesn't work in development
     // There is no keycloak in development duh!
 
+    console.log('POSTing to this URL:', url);
     const request = new Request(url, {
       method: 'POST',
       body: JSON.stringify(payload),
-      headers: { 'content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' }
     });
 
     fetch(request)
       .then((res) => {
-        console.log('Your request was sent successfully');
+        console.log('Your request was sent successfully:', res);
       })
       .catch((err) => {
-        console.error('Your request was not successfully', err);
+        console.error('Your request was NOT sent successfully:', err);
       });
+
   }
 
   return (
@@ -116,7 +119,7 @@ const RequestUser = (): JSX.Element => {
             <TextField label='Mobile Number to Receive Text Messages' onChange={(e) => { setTextMessageNumber(e.target.value) }} variant={'outlined'} />
           </Grid>
           <Grid item xs={12}>
-              <Button variant='contained' color='primary' onClick={submitForm}>Submit</Button>
+              <Button variant='contained' color='primary' onClick={submitRequest}>Submit</Button>
           </Grid>
         </Grid>
       </Box>
@@ -124,4 +127,4 @@ const RequestUser = (): JSX.Element => {
   )
 }
 
-export default RequestUser;
+export default UserAccessRequest;

@@ -3,7 +3,7 @@ import { mdiCheckAll, mdiLogin, mdiCloseBox } from '@mdi/js';
 import { IconButton } from '@material-ui/core';
 import './style.css';
 
-const ApprovedUser = (): JSX.Element => {
+const UserAccessApproved = (): JSX.Element => {
   const logOut = () => {
     // TODO: Find keycloak logout functionality
     console.log('log out')
@@ -46,4 +46,4 @@ const ApprovedUser = (): JSX.Element => {
     </div>
   )
 }
-export default ApprovedUser;
+export default UserAccessApproved;

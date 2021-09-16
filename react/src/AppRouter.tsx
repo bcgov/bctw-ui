@@ -1,4 +1,3 @@
-import AddUser from 'pages/onboarding/AddUser'
 import AdminHandleRequestPermissionPage from 'pages/permissions/AdminHandleRequestPermission';
 import CodePage from 'pages/data/codes/CodePage';
 import CollarPage from 'pages/data/collars/CollarPage';
@@ -10,6 +9,7 @@ import MapPage from 'pages/map/MapPage';
 import OwnerRequestPermission from 'pages/permissions/OwnerRequestPermission';
 // import TerrainPage from 'pages/terrain/TerrainPage';
 import UserAdminPage from 'pages/admin/UserAdmin';
+import UserOnboarding from 'pages/onboarding/UserOnboarding'
 import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
@@ -39,7 +39,7 @@ const AppRoutes: RouteKey[] = [
   // { name: 'onboarding-requests', path: '/onboarding-requests', title: 'Onboarding Requests', component: OnboardingRequestsPage, sort: 102, icon: 'personAdd' },
   { name: 'animal-manager', path: '/animal-manager', title: 'Set Animal Manager', component: GrantCritterAccessPage, sort: 103, icon: 'vpnKey' },
   { name: 'codes', path: '/codes', title: 'Code Tables', component: CodePage, sort: 104, icon: 'code' },
-  { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: AddUser, sort: 201 },
+  { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: UserOnboarding, sort: 201 },
   { name: 'notFound', path: '/*', title: 'React: Not Found', component: (): JSX.Element => <div>React AppRouter.tsx says: Page not found!</div>, sort: 404 },
 ];
 
