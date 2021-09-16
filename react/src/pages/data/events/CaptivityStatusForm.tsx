@@ -3,10 +3,10 @@ import { FormFromFormfield } from 'components/form/create_form_components';
 import { eInputType, FormChangeEvent } from 'types/form_types';
 import MortalityEvent, { MortalityFormField } from 'types/events/mortality_event';
 import { checkBoxWithLabel } from './EventComponents';
+import { EventFormStrings } from 'constants/strings';
 /**
  *
  * todo: handle more than just a mortality event
- * todo: move long_label to tooltip?
  */
 type CaptivityStatusFormProps = {
   event: MortalityEvent;
@@ -18,13 +18,13 @@ export default function CaptivityStatusForm({ event, handleFormChange }: Captivi
     captivity_status: {
       prop: 'captivity_status',
       type: eInputType.check,
-      long_label: 'Animal is or has been part of a captivity program'
+      tooltip: <p>{EventFormStrings.animal.captivity}</p>
     },
     mortality_captivity_status: {
       prop: 'mortality_captivity_status',
       type: eInputType.code,
       codeName: 'mortality_habitat',
-      long_label: 'Where did the mortality occur?'
+      tooltip: <p>{EventFormStrings.animal.mort_captivity_status}</p>
     }
   };
   return (
@@ -32,11 +32,11 @@ export default function CaptivityStatusForm({ event, handleFormChange }: Captivi
       <Box {...checkBoxWithLabel}>
         {/* captivity_status is always disabled in mortality workflow */}
         {FormFromFormfield(event, captivityFields.captivity_status, handleFormChange, true)}
-        <span>{captivityFields.captivity_status.long_label}</span>
+        {/* <span>{captivityFields.captivity_status.long_label}</span> */}
       </Box>
       <Box {...checkBoxWithLabel} mt={2}>
         {FormFromFormfield(event, captivityFields.mortality_captivity_status, handleFormChange)}
-        <span>{captivityFields.mortality_captivity_status.long_label}</span>
+        {/* <span>{captivityFields.mortality_captivity_status.long_label}</span> */}
       </Box>
     </Box>
   );

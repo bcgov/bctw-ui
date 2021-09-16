@@ -5,10 +5,11 @@ import DateInput from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
 import { ReactNode } from 'react';
-import { columnToHeader, removeProps } from 'utils/common_helpers';
+import { removeProps } from 'utils/common_helpers';
 import { eInputType, FormChangeEvent, FormFieldObject } from 'types/form_types';
-import { BCTWEvent } from 'types/events/event';
 import dayjs, { Dayjs } from 'dayjs';
+import { BCTWFormat } from 'types/common_types';
+import { Tooltip } from 'components/common'
 
 type CreateInputBaseProps<T> = {
   value: unknown;
@@ -56,7 +57,6 @@ function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
 
 // date field handler
 function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
-  console.log('CreateEditDateField fix me: date -> dayjs')
   return (
     <DateInput
       propName={prop as string}
@@ -115,7 +115,7 @@ function CreateEditSelectField<T>({
       disabled={disabled}
       key={prop as string}
       codeHeader={codeName ?? (prop as string)}
-      defaultValue={value as string ?? ''}
+      defaultValue={(value as string) ?? ''}
       changeHandler={handleChange}
       required={required}
       error={!!errorMessage?.length}
@@ -125,50 +125,26 @@ function CreateEditSelectField<T>({
   );
 }
 
-/**
- * the "main" form component handler.
- * depending on the @param formType.type, creates the component using the above functions
- * @returns {JSX.Element}
- * todo: deprecate this to function below
- */
-function MakeEditField<T>({
-  prop,
-  type,
-  value,
-  handleChange,
-  codeName,
-  label = columnToHeader(prop as string),
-  disabled = false,
-  errorMessage = '',
-  required = false,
-  span = false
-}: CreateInputProps<T>): ReactNode {
-  const inputType = type;
-  const toPass = { prop, type, value, handleChange, label, disabled, errorMessage, required, codeName };
-  let Comp: ReactNode;
-  if (inputType === eInputType.check) {
-    Comp = CreateEditCheckboxField(toPass);
-  } else if (inputType === eInputType.datetime) {
-    Comp = CreateEditDateTimeField(toPass);
-  } else if (inputType === eInputType.date) {
-    Comp = CreateEditDateField(toPass);
-  } else if (inputType === eInputType.code) {
-    Comp = CreateEditSelectField(toPass);
-  } else if (inputType === eInputType.text || inputType === eInputType.number) {
-    Comp = CreateEditTextField(toPass);
+// returns the funtion to create the form component based on input type
+const getInputFnFromType = (inputType: eInputType): ((props: unknown) => JSX.Element) => {
+  switch (inputType) {
+    case eInputType.check:
+      return CreateEditCheckboxField;
+    case eInputType.datetime:
+      return CreateEditDateTimeField;
+    case eInputType.date:
+      return CreateEditDateField;
+    case eInputType.code:
+      return CreateEditSelectField;
+    default:
+      return CreateEditTextField;
   }
-  return span ? (
-    <span key={`span-${prop}`} className={'edit-form-field-span'}>
-      {Comp}
-    </span>
-  ) : (
-    <div key={prop as string} className={'edit-form-field'}>
-      {Comp}
-    </div>
-  );
-}
+};
 
-function FormFromFormfield<T extends BCTWEvent<T>>(
+/**
+ * the "main" form component creation handler.
+ */
+function FormFromFormfield<T extends BCTWFormat<T>>(
   obj: T,
   formField: FormFieldObject<T> | undefined,
   handleChange: FormChangeEvent,
@@ -178,7 +154,7 @@ function FormFromFormfield<T extends BCTWEvent<T>>(
   if (formField === undefined) {
     return null;
   }
-  const { type, prop, required, codeName } = formField;
+  const { type, prop, required, codeName, tooltip } = formField;
   const toPass = {
     prop,
     type,
@@ -190,26 +166,15 @@ function FormFromFormfield<T extends BCTWEvent<T>>(
     codeName,
     key: `${type}-${prop}`
   };
-  let Comp: ReactNode;
-  if (type === eInputType.check) {
-    Comp = CreateEditCheckboxField(toPass);
-  } else if (type === eInputType.date) {
-    Comp = CreateEditDateTimeField(toPass);
-  } else if (type === eInputType.datetime) {
-    Comp = CreateEditDateTimeField(toPass);
-  } else if (type === eInputType.code) {
-    Comp = CreateEditSelectField(toPass);
-  } else if (type === eInputType.text || type === eInputType.number) {
-    Comp = CreateEditTextField(toPass);
-  }
+  const Comp = getInputFnFromType(type)(toPass);
+  // if (tooltip) {
+  //   Comp = (
+  //     <Tooltip title={tooltip} placement={'right-end'} enterDelay={750}>
+  //       {Comp}
+  //     </Tooltip>
+  //   );
+  // }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
 
-export {
-  CreateEditTextField,
-  CreateEditDateField,
-  CreateEditCheckboxField,
-  CreateEditSelectField,
-  MakeEditField,
-  FormFromFormfield
-};
+export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, FormFromFormfield };

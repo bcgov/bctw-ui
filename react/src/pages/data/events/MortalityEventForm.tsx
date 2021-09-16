@@ -78,7 +78,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
           enableEditStart={false}
           onChange={handleFormChange}
           propsRequired={requiredDLProps}
-          message={<div style={{color: 'darkorange', marginBottom: '5px'}}>{fields.shouldUnattachDevice.long_label}</div>} // todo:
+          message={<div style={{color: 'darkorange', marginBottom: '5px'}}> Note: data life can only be edited if the device is being removed</div>} // todo:
           displayInRows={true}
         />,
         <Box {...boxProps}>
@@ -93,7 +93,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
       {FormPart('mort-critter', 'Animal Details', [
         <Box {...checkBoxWithLabel}>
           {FormFromFormfield(mortality, fields.mortality_investigation, onChange)}
-          <span>{fields.mortality_investigation.long_label}</span>
+          {/* <span>{fields.mortality_investigation.long_label}</span> */}
         </Box>,
         FormFromFormfield(mortality, fields.mortality_record, onChange, false, true),
         FormFromFormfield(mortality, fields.activation_status, onChange, false, true),

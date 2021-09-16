@@ -2,8 +2,7 @@ import { EditorProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { User } from 'types/user';
-import { MakeEditField } from 'components/form/create_form_components';
-import { eInputType } from 'types/form_types';
+import { FormFromFormfield } from 'components/form/create_form_components';
 
 /**
  * the edit user form, implemented in pags/admin/UserAdmin
@@ -16,7 +15,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
   const onSave = (b: User): void => {
     // todo: fixme: implement save
     console.log('save user', b);
-  }
+  };
 
   return (
     <EditModal
@@ -31,18 +30,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
           return (
             <div className='container'>
               <form className='rootEditInput' autoComplete='off'>
-                {editing.formFields
-                  .map((d) => {
-                    const { prop } = d;
-                    return MakeEditField({
-                      prop,
-                      value: editing[prop],
-                      type: eInputType.text,
-                      handleChange: handlerFromContext,
-                      label: editing.formatPropAsHeader(prop),
-                      required: true
-                    })
-                  })}
+                {editing.formFields.map((d) => FormFromFormfield(editing, d, handlerFromContext))}
               </form>
             </div>
           );

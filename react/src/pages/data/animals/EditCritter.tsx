@@ -5,8 +5,7 @@ import EditModal from 'pages/data/common/EditModal';
 import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
 import { Box, ButtonProps, Container } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
-import { FormFieldObject } from 'types/form_types';
-import { MakeEditField } from 'components/form/create_form_components';
+import { FormFromFormfield } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { FormPart } from '../common/EditModalComponents';
@@ -72,24 +71,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     animalCommentField
   } = critterFormFields;
 
-  const makeFormField = (
-    formType: FormFieldObject<Animal>,
-    handleChange: (v: Record<string, unknown>) => void
-  ): React.ReactNode => {
-    const { prop, type, codeName, required } = formType;
-    return MakeEditField({
-      type,
-      prop,
-      value: editing[prop],
-      handleChange,
-      disabled: !canEdit,
-      required,
-      label: editing.formatPropAsHeader(prop),
-      span: true,
-      codeName
-    });
-  };
-
   const Header = (
     <Container maxWidth='xl'>
       {isCreatingNew ? (
@@ -141,27 +122,27 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormPart(
                 'cr-ids',
                 'Identifiers',
-                identifierFields.map((f) => makeFormField(f, onChange))
+                identifierFields.map((f) => FormFromFormfield(editing, f, onChange))
               )}
               {FormPart(
                 'cr-chars',
                 'Characteristics',
-                characteristicsFields.map((f) => makeFormField(f, onChange))
+                characteristicsFields.map((f) => FormFromFormfield(editing, f, onChange))
               )}
               {FormPart(
                 'cr-asoc',
                 'Association With Another Individual',
-                associatedAnimalFields.map((f) => makeFormField(f, onChange))
+                associatedAnimalFields.map((f) => FormFromFormfield(editing, f, onChange))
               )}
               {FormPart(
                 'cr-comm',
                 'Comments About This Animal',
-                animalCommentField.map((f) => makeFormField(f, onChange))
+                animalCommentField.map((f) => FormFromFormfield(editing, f, onChange))
               )}
               {FormPart(
                 'cr-cap',
                 'Latest Capture Details',
-                captureFields.map((f) => makeFormField(f, onChange)),
+                captureFields.map((f) => FormFromFormfield(editing, f, onChange)),
                 <Button {...btnProps} onClick={(): void => handleOpenWorkflow('capture')}>
                   Add Capture Event
                 </Button>
@@ -170,7 +151,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormPart(
                 'cr-rel',
                 'Latest Release Details',
-                releaseFields.map((f) => makeFormField(f, onChange)),
+                releaseFields.map((f) => FormFromFormfield(editing, f, onChange)),
                 <Button {...btnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
                   Add Release Event
                 </Button>
@@ -178,7 +159,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormPart(
                 'cr-mort',
                 'Mortality Details',
-                mortalityFields.map((f) => makeFormField(f, onChange)),
+                mortalityFields.map((f) => FormFromFormfield(editing, f, onChange, true)),
                 <Button {...btnProps} onClick={(): void => handleOpenWorkflow('mortality')}>
                   Record Mortality Details
                 </Button>

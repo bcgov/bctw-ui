@@ -96,7 +96,7 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
   };
 
   getHeaderTitle(): string {
-    return EventFormStrings.retrievalFormTitle;
+    return EventFormStrings.titles.retrievalTitle;
   }
 
   getAnimal(): OptionalAnimal {

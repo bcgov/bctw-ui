@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export enum eInputType {
   text = 'text',
   number = 'number',
@@ -21,7 +23,7 @@ export type FormFieldObject<T> = {
   required?: boolean;
   span?: boolean;
   disabled?: boolean; // todo:
-  long_label?: string;
+  tooltip?: ReactNode;
 };
 
 // spread in form field constructors to make a field required

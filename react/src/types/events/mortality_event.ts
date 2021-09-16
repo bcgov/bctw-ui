@@ -120,7 +120,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   }
 
   getHeaderTitle(): string {
-    return EventFormStrings.mortalityFormTitle;
+    return EventFormStrings.titles.mortalityTitle;
   }
 
   /**
@@ -151,15 +151,15 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
       case 'mortality_captivity_status':
         return 'captivity status';
       case 'mortality_record':
-        return 'Was the Wildlife Health Group mortality form completed?';
+        return EventFormStrings.animal.mort_wildlife;
       case 'retrieved':
-        return 'Was the device retrieved?';
+        return EventFormStrings.device.was_retrieved;
       case 'activation_status':
-        return 'Is device still active with vendor?';
+        return EventFormStrings.device.vendor_activation;
       case 'predator_known':
-        return 'Is the predator known?';
+        return EventFormStrings.animal.mort_predator;
       case 'shouldUnattachDevice':
-        return 'Unassign device from animal?';
+        return EventFormStrings.device.should_unattach;
       case 'proximate_cause_of_death':
         return 'PCOD';
       default:
@@ -171,12 +171,12 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     shouldUnattachDevice: {
       prop: 'shouldUnattachDevice',
       type: eInputType.check,
-      long_label: 'Note: data life can only be edited if the device is being removed'
+      tooltip: EventFormStrings.device.should_unattach
     },
     mortality_investigation: {
       prop: 'mortality_investigation',
       type: eInputType.code,
-      long_label: 'Was a mortality investigation undertaken?'
+      tooltip: EventFormStrings.animal.mort_investigation
     },
     mortality_record: { prop: 'mortality_record', type: eInputType.check },
     animal_status: { prop: 'animal_status', type: eInputType.code },

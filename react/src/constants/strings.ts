@@ -121,8 +121,22 @@ const UserAlertStrings = {
 }
 
 const EventFormStrings = {
-  mortalityFormTitle: 'Mortality Event',
-  retrievalFormTitle: 'Retrieval Event',
+  titles: {
+    mortalityTitle: 'Mortality Event',
+    retrievalTitle: 'Retrieval Event',
+  },
+  animal: {
+    mort_captivity_status: 'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?',
+    mort_investigation: 'Was a mortality investigation undertaken?',
+    mort_wildlife: 'Was the Wildlife Health Group mortality form completed?',
+    mort_predator: 'Is the predator species or genus known?',
+    captivity: 'Animal is or has been part of a captivity program',
+  },
+  device: {
+    should_unattach: 'Unassign device from animal?',
+    vendor_activation: 'Is device still active with vendor?',
+    was_retrieved: 'Was the device retrieved?',
+  }
 }
 
 const DataLifeStrings = {
