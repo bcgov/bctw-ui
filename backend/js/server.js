@@ -318,6 +318,7 @@ const handleUserAccessRequest = async (req, res) => {
 
   const pretoken = tokenParcel.data.access_token;
   if (!pretoken) return res.status(500).send('Authentication failed');
+  const token = `Bearer ${pretoken}`;
   console.log('handleUserAccessRequest() -- token obtained:', token);
 
   const emailMessage = `
