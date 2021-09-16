@@ -285,8 +285,8 @@ const handleUserAccessRequest = async (req, res) => {
   const data = req.kauth.grant.access_token.content;
 
   // TODO: This has to be tested in dev unfortunately
-  console.log('handleUserAccessRequest() -- keycloak data', data);
-  console.log('handleUserAccessRequest() -- sent data', req.body);
+  // console.log('handleUserAccessRequest() -- Keycloak data', data);
+  // console.log('handleUserAccessRequest() -- message contents', req.body);
 
   // Get all the environment variable dependencies
   const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
@@ -296,6 +296,12 @@ const handleUserAccessRequest = async (req, res) => {
   const fromEmail = process.env.BCTW_CHES_FROM_EMAIL;
   const toEmail = process.env.BCTW_CHES_TO_EMAIL.split(',');
 
+  console.log('handleUserAccessRequest() -- CHES token URL:', tokenUrl);
+  console.log('handleUserAccessRequest() -- CHES API URL:', apiUrl);
+  console.log('handleUserAccessRequest() -- CHES username:', username);
+  console.log('handleUserAccessRequest() -- CHES fromEmail:', fromEmail);
+  console.log('handleUserAccessRequest() -- CHES toEmail:', toEmail);
+  
   // Create the authorization hash
   const prehash = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
   const hash = `Basic ${prehash}`;
@@ -310,12 +316,9 @@ const handleUserAccessRequest = async (req, res) => {
       }
     });
 
-  console.log('get token...');
-
   const pretoken = tokenParcel.data.access_token;
   if (!pretoken) return res.status(500).send('Authentication failed');
-  const token = `Bearer ${pretoken}`;
-  console.log('token obtained:', token);
+  console.log('handleUserAccessRequest() -- token obtained:', token);
 
   const emailMessage = `
     <div>
@@ -346,8 +349,7 @@ const handleUserAccessRequest = async (req, res) => {
     <br />
     <div style="border-width: 1px; border-color: #626262; border-style: solid none none none;">
       <a href="mailto:${email}">${email}</a>.
-    </div>
-  `
+    </div>`
 
   const emailPayload = {
     subject: 'Access request for the BC Telemetry Warehouse',
@@ -362,7 +364,8 @@ const handleUserAccessRequest = async (req, res) => {
     delayTS: 0
   }
 
-  console.log('POSTing email message to CHES...');
+  console.log('handleUserAccessReques() -- CHES email payload', emailPayload);
+  console.log('handleUserAccessReques() -- POSTing email message to CHES...');
 
   axios.post(
     apiUrl,
@@ -374,10 +377,10 @@ const handleUserAccessRequest = async (req, res) => {
       }
     }
   ).then((response) => {
-    console.log('... SUCCESS');
+    console.log('handleUserAccessReques() -- OK', response)
     res.status(200).send('Email was sent');
   }).catch((error) => {
-    console.log('... FAIL');
+    console.log('handleUserAccessReques() -- ERROR', error)
     res.status(500).send('Email failed');
   })
 };
