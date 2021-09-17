@@ -1,7 +1,7 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { BaseTimestamps, BCTWBaseType, nullToDayjs, nullToNumber, transformOpt, uuid } from 'types/common_types';
+import { BaseTimestamps, BCTWBaseType, nullToDayjs, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader, formatLatLong } from 'utils/common_helpers';
@@ -96,29 +96,29 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   associated_animal_relationship: Code; 
   capture_comment: string;
   @Transform(nullToDayjs) capture_date: Dayjs;
-  @Transform(nullToNumber, transformOpt) capture_latitude: number;
-  @Transform(nullToNumber, transformOpt) capture_longitude: number;
-  @Transform(nullToNumber, transformOpt) capture_utm_easting: number;
-  @Transform(nullToNumber, transformOpt) capture_utm_northing: number;
-  @Transform(nullToNumber, transformOpt) capture_utm_zone: number;
+  capture_latitude: number;
+  capture_longitude: number;
+  capture_utm_easting: number;
+  capture_utm_northing: number;
+  capture_utm_zone: number;
   collective_unit: string;
   animal_colouration: string;
   ear_tag_left_id: string;
   ear_tag_right_id: string;
   ear_tag_left_colour: string;
   ear_tag_right_colour: string;
-  @Transform((value) => value || -1, transformOpt) estimated_age: number;
+  estimated_age: number;
   juvenile_at_heel: Code;
-  @Transform((value) => value || -1, transformOpt) juvenile_at_heel_count: number;
+  juvenile_at_heel_count: number;
   life_stage: Code;
   map_colour: Code;
   mortality_comment: string;
   @Transform(nullToDayjs) mortality_date: Dayjs;
-  @Transform(nullToNumber, transformOpt) mortality_latitude: number;
-  @Transform(nullToNumber, transformOpt) mortality_longitude: number;
-  @Transform(nullToNumber, transformOpt) mortality_utm_easting: number;
-  @Transform(nullToNumber, transformOpt) mortality_utm_northing: number;
-  @Transform(nullToNumber, transformOpt) mortality_utm_zone: number;
+  mortality_latitude: number;
+  mortality_longitude: number;
+  mortality_utm_easting: number;
+  mortality_utm_northing: number;
+  mortality_utm_zone: number;
   predator_known: boolean;
   predator_species: Code;
   proximate_cause_of_death: Code;
@@ -130,11 +130,11 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   region: Code;
   release_comment: string;
   @Transform(nullToDayjs) release_date: Dayjs;
-  @Transform(nullToNumber, transformOpt) release_latitude: number;
-  @Transform(nullToNumber, transformOpt) release_longitude: number;
-  @Transform(nullToNumber, transformOpt) release_utm_easting: number;
-  @Transform(nullToNumber, transformOpt) release_utm_northing: number;
-  @Transform(nullToNumber, transformOpt) release_utm_zone: number;
+  release_latitude: number;
+  release_longitude: number;
+  release_utm_easting: number;
+  release_utm_northing: number;
+  release_utm_zone: number;
   sex: Code;
   species: Code;
   translocation: boolean;
@@ -176,13 +176,6 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
     return this.capture_utm_zone && this.capture_utm_easting && this.capture_utm_northing
       ? `${this.capture_utm_zone}/${this.capture_utm_easting}/${this.capture_utm_northing}`
       : '';
-  }
-
-  constructor(aid?: string, status?: string, sp?: string, wlhid?: string) {
-    this.animal_id = aid ?? '';
-    this.animal_status = status ?? '';
-    this.species = sp ?? '';
-    this.wlh_id = wlhid ?? '';
   }
 
   // todo: all date fields to str
@@ -302,7 +295,7 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'release_comment', type: eInputType.text }
   ],
   animalCommentField: [
-    { prop: 'animal_comment', type: eInputType.text }
+    { prop: 'animal_comment', type: eInputType.multiline },
   ]
 };
 

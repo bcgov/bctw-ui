@@ -9,7 +9,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
 
 /**
- * bug: why is key not being passed????????
+ * 
  */
 interface INumberInputProps extends StandardTextFieldProps {
   changeHandler: InputChangeHandler;
@@ -20,20 +20,12 @@ interface INumberInputProps extends StandardTextFieldProps {
 
 export default function NumberField(props: INumberInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, validate, required } = props;
-  /**
-   * consider -1 to be an invalid default value - probably used to make sure this
-   * @param propName renders a @function numberField but is actually null
-  */
-  const [val, setVal] = useState(defaultValue === -1 ? '' : defaultValue);
+
+  const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : '');
   const [err, setErr] = useState<string>('');
 
-  /**
-   * when default value is changed
-   * undefined values are sometimes cast to -1 to make sure the form compoent is
-   * rendered as a number input. h
-   */
   useEffect(() => {
-    setVal(defaultValue === -1 ? '' : defaultValue);
+    setVal(typeof defaultValue === 'number' ? defaultValue : '');
     handleIsRequired(defaultValue);
   }, [defaultValue]);
 
@@ -41,8 +33,8 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
     callParentHandler();
   }, [val, err]);
 
-  // error handling triggered when val is changed
-  useDidMountEffect(() => {
+  // only update the parent when blur event is triggered, reducing rerenders
+  const handleBlur = (): void => {
     let err = '';
     if (isNaN(val as number)) {
       callParentHandler();
@@ -52,7 +44,8 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
       err = validate(val as number);
       setErr(err);
     }
-  }, [val]);
+    callParentHandler();
+  }
 
   const callParentHandler = (): void => changeHandler({ [propName]: val, error: !!err });
 
@@ -62,16 +55,14 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
   const handleChange = (event): void => {
     setErr('')
     const target = event.target.value;
-    // allow the negative sign at the start of input
+    // allow the - sign at the start of input
     if (target === '-') {
       setVal(target);
       return;
     }
     const n = parseFloat(target);
     if (isNaN(n)) {
-      // note: setting val to undefined won't update state properly
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setVal('' as any);
+      setVal('');
       setErr(FormStrings.validateNumber);
       return;
     }
@@ -93,9 +84,8 @@ export default function NumberField(props: INumberInputProps): JSX.Element {
       value={val}
       style={style ?? baseInputStyle}
       onChange={handleChange}
+      onBlur={handleBlur}
       helperText={err}
-      // todo: style the error 
-      // FormHelperTextProps={{variant: 'outlined'}}
       error={!!err}
       {...propsToPass}
     />

@@ -10,6 +10,7 @@ import { eInputType, FormChangeEvent, FormFieldObject } from 'types/form_types';
 import dayjs, { Dayjs } from 'dayjs';
 import { BCTWFormat } from 'types/common_types';
 import { Tooltip } from 'components/common'
+import { InputProps } from '@material-ui/core';
 
 type CreateInputBaseProps<T> = {
   value: unknown;
@@ -18,7 +19,7 @@ type CreateInputBaseProps<T> = {
   handleChange: (v: Record<string, unknown>) => void;
 };
 
-type CreateInputProps<T> = CreateInputBaseProps<T> & {
+type CreateInputProps<T> = CreateInputBaseProps<T> & Pick<InputProps, 'rows' | 'multiline'> & {
   codeName?: string;
   label?: string;
   disabled?: boolean;
@@ -53,6 +54,11 @@ function CreateEditTextField<T>(props: CreateInputProps<T>): ReactElement {
       {...propsToPass}
     />
   );
+}
+
+function CreateEditMultilineTextField<T>(props: CreateInputProps<T>): ReactElement {
+  const newProps = Object.assign({multiline: true, rows: 1}, props);
+  return CreateEditTextField(newProps);
 }
 
 // date field handler
@@ -136,6 +142,8 @@ const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactEl
       return CreateEditDateField;
     case eInputType.code:
       return CreateEditSelectField;
+    case eInputType.multiline:
+      return CreateEditMultilineTextField;
     default:
       return CreateEditTextField;
   }

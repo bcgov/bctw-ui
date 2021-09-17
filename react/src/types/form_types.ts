@@ -8,7 +8,8 @@ export enum eInputType {
   date = 'date',
   datetime = 'datetime',
   time = 'time',
-  code = 'code'
+  code = 'code',
+  multiline = 'multiline',
 }
 
 /**

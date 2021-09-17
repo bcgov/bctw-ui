@@ -68,7 +68,6 @@ export type PartialPick<T, K extends keyof T> = {
  * ex. nulls can be transformed to a boolean or number
  */
 const transformOpt = { toClassOnly: true };
-const nullToNumber = (v: number | null): number => (typeof v === 'number' ? v : -1);
 const nullToDayjs = (v: Date | null): Dayjs => dayjs(v);
 
-export { nullToDayjs, nullToNumber, transformOpt };
+export { nullToDayjs, transformOpt };
