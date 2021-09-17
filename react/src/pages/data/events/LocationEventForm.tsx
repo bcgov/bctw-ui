@@ -14,7 +14,7 @@ type LocationEventProps = {
   notifyChange: FormChangeEvent;
 };
 
-export default function LocationEventForm({event, notifyChange }: LocationEventProps): JSX.Element {
+export default function LocationEventForm({ event, notifyChange }: LocationEventProps): JSX.Element {
   const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
 
   // create the form inputs
@@ -38,11 +38,11 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
     event[key] = value;
     // notify parent that the location event changed
     notifyChange(v);
-  }
+  };
 
   // notify parent error handler that required errors need to update when utm/lat long is changed
   useDidMountEffect(() => {
-    notifyChange({'reset': true})
+    notifyChange({ reset: true });
   }, [showUtm]);
 
   const baseInputProps = { changeHandler, required: true };
@@ -72,7 +72,14 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
       <Box>
         {showUtm === 'utm' ? (
           utmFields.map((f, idx) => {
-            const numberProps = {key: `loc-num-${idx}`, ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop};
+            const val = event[f.prop] as number;
+            const numberProps = {
+              ...baseInputProps,
+              defaultValue: val,
+              key: `loc-num-${idx}`,
+              label: event.formatPropAsHeader(f.prop),
+              propName: f.prop
+            };
             // custom form validation
             if (f.prop === 'utm_easting') {
               numberProps['validate'] = (v: number): string => mustBeXDigits(v, 6);
@@ -89,17 +96,23 @@ export default function LocationEventForm({event, notifyChange }: LocationEventP
           })
         ) : (
           <>
-            <NumberInput propName={latField.prop} {...baseInputProps} label={event.formatPropAsHeader(latField.prop)} />
             <NumberInput
-              propName={longField.prop}
+              propName={latField.prop}
+              {...baseInputProps}
+              label={event.formatPropAsHeader(latField.prop)}
+              defaultValue={event[longField.prop]}
+            />
+            <NumberInput
               {...baseInputProps}
               label={event.formatPropAsHeader(longField.prop)}
+              defaultValue={event[longField.prop]}
+              propName={longField.prop}
               validate={mustBeNegativeNumber}
             />
           </>
         )}
       </Box>
-      <Box marginTop={1}>
+      <Box marginTop={2}>
         <TextField
           style={{ width: '100%' }}
           multiline={true}

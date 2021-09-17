@@ -12,9 +12,9 @@ import { FormStrings } from 'constants/strings';
  * bug: why is key not being passed????????
  */
 interface INumberInputProps extends StandardTextFieldProps {
-  propName: string;
   changeHandler: InputChangeHandler;
   defaultValue?: number;
+  propName: string;
   validate?: (v: number) => string;
 }
 

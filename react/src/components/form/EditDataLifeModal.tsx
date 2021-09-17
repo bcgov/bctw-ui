@@ -28,12 +28,12 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   const responseDispatch = useResponseDispatch();
 
   const [canSave, setCanSave] = useState<boolean>(false);
-  const [dli, setDli] = useState<DataLifeInput>(new DataLifeInput(attachment));
+  const [dli, setDli] = useState<DataLifeInput>(attachment.createDataLife());
 
   useDidMountEffect(() => {
     if (attachment) {
       // console.log('new attachment provided to DL modal', attachment.assignment_id)
-      setDli(new DataLifeInput(attachment));
+      setDli(attachment.createDataLife());
     }
   }, [attachment]);
 
@@ -73,19 +73,18 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
       handleClose={handleClose}
       title={getTitle()}>
       <div>
-        {/* enable data life end fields only if the current attachment is expired/invalid */}
         <DataLifeInputForm
           onChange={(): void => setCanSave(true)}
-          disableEditActual={true} // always disable editing the actual start/end fields in this modal
+          // always disable editing the actual start/end fields in this modal
+          disableEditActual={true}
           enableEditStart={true}
-          // can only edit the end fields if this attachment is expired
-          enableEditEnd={!!attachment.data_life_end}
+          // can only edit the end fields if this attachment is expired, (not null or invalid)
+          enableEditEnd={attachment?.data_life_end?.isValid()}
           // admin privileged users can always edit DL dates
-          disableDLStart={isAdmin ? false : !new DataLifeInput(attachment).canChangeDLStart}
-          disableDLEnd={isAdmin ? false : !new DataLifeInput(attachment).canChangeDLEnd}
+          disableDLStart={isAdmin ? false : !dli.canChangeDLStart}
+          disableDLEnd={isAdmin ? false : !dli.canChangeDLEnd}
           dli={dli}
         />
-        {/* the save button */}
         <Box display='flex' justifyContent='flex-end'>
           <Button size='large' onClick={(): void => handleClose(false)}>
             Cancel

@@ -3,7 +3,7 @@ import { BCTWBaseType, nullToDayjs, uuid } from 'types/common_types';
 import { Expose, Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
-import { DataLife, IDataLifeStartProps, IDataLifeEndProps } from 'types/data_life';
+import { DataLife, IDataLifeStartProps, IDataLifeEndProps, DataLifeInput } from 'types/data_life';
 import { isDev } from 'api/api_helpers';
 import { Code } from 'types/code';
 import { Animal } from './animal';
@@ -67,7 +67,11 @@ export class CollarHistory implements BCTWBaseType<CollarHistory>, ICollarHistor
         return columnToHeader(str as string);
     }
   }
+  createDataLife(): DataLifeInput {
+    return new DataLifeInput(this.attachment_start, this.data_life_start, this.data_life_end, this.attachment_end);
+  }
 }
+
 
 /**
  * @returns a boolean indicating if the @param history contains a

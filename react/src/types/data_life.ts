@@ -36,24 +36,8 @@ export interface IChangeDataLifeProps extends
  * figure out a way to deal with how the fields are valid_from vs. data_life_start etc.
  */
 export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
-  attachment_end: Dayjs;
-  attachment_start: Dayjs;
-  data_life_end: Dayjs;
-  data_life_start: Dayjs;
 
-  /** 
-   * if @param history is provided, default timestamps to it's values
-   * otherwise, optionally pass @param defaultStart to default start timestamps to now
-   * ex. used when assigning a new device
-  */
-  constructor(history?: CollarHistory, defaultStart = false) {
-    // console.log(history)
-    const d = dayjs();
-    this.attachment_start = history ? history.attachment_start : defaultStart ? d : null;
-    this.data_life_start = history ? history.data_life_start : defaultStart ? d : null;
-    this.attachment_end = history ? history.attachment_end : null;
-    this.data_life_end = history ? history.data_life_end: null;
-  }
+  constructor(public attachment_start: Dayjs, public data_life_start: Dayjs, public data_life_end: Dayjs, public attachment_end: Dayjs) {}
 
   // data life properties can only be changed if user is an admin or they haven't been modified before
   get canChangeDLStart(): boolean {

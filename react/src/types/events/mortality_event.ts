@@ -97,6 +97,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   readonly event_type: EventType;
   location_event: LocationEvent;
   shouldUnattachDevice: boolean;
+  wasInvestigated: boolean;
 
   // todo: need to fetch captivity_status
   constructor() {
@@ -111,6 +112,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     this.device_deployment_status = 'Not Deployed';
     this.animal_status = 'Potential Mortality';
     this.shouldUnattachDevice = false;
+    this.wasInvestigated = false;
     this.predator_known = false;
     this.location_event = new LocationEvent('mortality', dayjs());
   }
@@ -128,28 +130,19 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
    * since only animals with existing attachments can be edited,
    * attachment end / data end dates will be null.
    * default them to now for this workflow
-   * fixme: improve DLI so it can be instantiated without a collar history
    */
-  getCollarHistory(): CollarHistory {
-    const now = dayjs();
-    const ch = new CollarHistory();
-    ch.assignment_id = this.assignment_id;
-    ch.attachment_start = dayjs(this.attachment_start);
-    ch.data_life_start = dayjs(this.data_life_start);
-    ch.data_life_end = now;
-    ch.attachment_end = now;
-    return ch;
-  }
-
   getDatalife(): DataLifeInput {
-    const dl = new DataLifeInput(this.getCollarHistory());
-    return dl;
+    const now = dayjs();
+    // fixme: these are strings initially
+    return new DataLifeInput(dayjs(this.attachment_start), dayjs(this.data_life_start), now, now);
   }
 
   formatPropAsHeader(s: keyof MortalityEvent): string {
     switch (s) {
       case 'mortality_captivity_status':
         return 'captivity status';
+      case 'wasInvestigated': 
+        return EventFormStrings.animal.mort_investigation;
       case 'mortality_record':
         return EventFormStrings.animal.mort_wildlife;
       case 'retrieved':
@@ -168,11 +161,8 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   }
 
   fields: MortalityFormField = {
-    mortality_investigation: {
-      prop: 'mortality_investigation',
-      type: eInputType.code,
-      tooltip: EventFormStrings.animal.mort_investigation
-    },
+    mortality_investigation: { prop: 'mortality_investigation', type: eInputType.code },
+    wasInvestigated: {prop: 'wasInvestigated', type: eInputType.check},
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
     mortality_record: { prop: 'mortality_record', type: eInputType.check },
     animal_status: { prop: 'animal_status', type: eInputType.code },
@@ -206,6 +196,10 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
       'mortality_record'
     ];
     const ret = eventToJSON(props, this);
+    // todo: better way to wipe disabled fields?
+    if (!this.wasInvestigated) {
+      delete ret.mortality_investigation;
+    }
     const loc = this.location_event.toJSON();
     return omitNull({ ...ret, ...loc }) as OptionalAnimal;
   }
@@ -224,6 +218,8 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
     const ret = eventToJSON(props, this);
     if (this.retrieved) {
       ret.retrieval_date = this.retrieval_date.format(formatTime);
+    } else {
+      delete ret.retrieval_date;
     }
     return omitNull(ret) as OptionalDevice;
   }

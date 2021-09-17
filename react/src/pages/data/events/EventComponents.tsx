@@ -1,9 +1,9 @@
 import { BoxProps } from '@material-ui/core';
 
-const boxProps: Pick<BoxProps, 'display' | 'justifyContent' | 'marginBottom'> = {
-  display: 'flex',
-  marginBottom: '4px',
-};
+// const boxProps: Pick<BoxProps, 'display' | 'justifyContent' | 'marginBottom'> = {
+//   display: 'flex',
+//   marginBottom: '12px',
+// };
 
 const boxRowProps:  Pick<BoxProps, 'display' | 'alignItems' | 'flexDirection'> = {
   display: 'flex',
@@ -11,4 +11,4 @@ const boxRowProps:  Pick<BoxProps, 'display' | 'alignItems' | 'flexDirection'> =
   alignItems: 'center',
 }
 
-export { boxProps, boxRowProps };
+export { boxRowProps };

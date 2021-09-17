@@ -4,7 +4,6 @@ import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { Box } from '@material-ui/core';
 import { FormFromFormfield } from 'components/form/create_form_components';
-import { boxProps } from './EventComponents';
 import { FormPart } from '../common/EditModalComponents';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
 
@@ -45,7 +44,7 @@ export default function RetrievalEventForm({event, handleFormChange}: RetrievalE
   return (
     <>
       {FormPart('retrieval-device', 'Device Details', [
-        <Box {...boxProps}>
+        <Box>
           {FormFromFormfield(retrieval, fields.retrieved, onChange)}
           {FormFromFormfield(retrieval, fields.retrieval_date, onChange, !isRetrieved)}
         </Box>,

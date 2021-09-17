@@ -30,11 +30,11 @@ export class LocationEvent implements ILocationEvent {
   utm_zone: number;
 
   constructor(private location_type: EventType, public date: Dayjs = dayjs()) {
-    this.utm_easting = 0;
-    this.utm_northing = 0;
-    this.utm_zone = 0;
-    this.latitude = 0;
-    this.longitude = 0;
+    this.utm_easting = -1;
+    this.utm_northing = -1;
+    this.utm_zone = -1;
+    this.latitude = -1;
+    this.longitude = -1;
     this.comment = '';
     this.coordinate_type = eLocationPositionType.utm
   }

@@ -10,7 +10,6 @@ import { DataLifeInput } from 'types/data_life';
 import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptivityStatusForm from './CaptivityStatusForm';
-import { boxProps } from './EventComponents';
 
 type MortEventProps = {
   event: MortalityEvent;
@@ -27,6 +26,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
   }, [event]);
 
   // business logic workflow state
+  const [wasInvestigated, setWasInvestigated] = useState(false);
   const [isRetrieved, setIsRetrieved] = useState(false);
   const [isPredation, setIsPredation] = useState(false);
   const [isPredatorKnown, setIsPredatorKnown] = useState(false);
@@ -53,6 +53,9 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
     if (key === 'shouldUnattachDevice') {
       setReqiredDLProps(value ? ['attachment_end'] : []);
     }
+    if (key === 'wasInvestigated') {
+      setWasInvestigated(value as boolean);
+    }
   };
 
   // when the location event form changes, also notify wrapper about errors
@@ -77,10 +80,10 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
           enableEditStart={false}
           onChange={handleFormChange}
           propsRequired={requiredDLProps}
-          message={<div style={{color: 'darkorange', marginBottom: '5px'}}> Note: data life can only be edited if the device is being removed</div>} // todo:
+          message={<div style={{color: 'darkorange', marginBottom: '6px'}}> Note: data life can only be edited if the device is being removed</div>} // todo:
           displayInRows={true}
         />,
-        <Box {...boxProps}>
+        <Box mb={2}>
           {FormFromFormfield(mortality, fields.retrieved, onChange)}
           {FormFromFormfield(mortality, fields.retrieval_date, onChange, !isRetrieved)}
         </Box>,
@@ -90,15 +93,17 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
       ])}
       {/* critter status fields */}
       {FormPart('mort-critter', 'Animal Details', [
-        // todo: add bool was mortality invest taken?
-        FormFromFormfield(mortality, fields.mortality_investigation, onChange),
+        <Box mt={2}>
+          {FormFromFormfield(mortality, fields.wasInvestigated, onChange)}
+          {FormFromFormfield(mortality, fields.mortality_investigation, onChange, !wasInvestigated)}
+        </Box>,
         FormFromFormfield(mortality, fields.mortality_record, onChange, false, true),
         FormFromFormfield(mortality, fields.activation_status, onChange, false, true),
-        <Box {...boxProps} mt={2}>
+        <Box mt={2}>
           {FormFromFormfield(mortality, fields.animal_status, onChange)}
           {FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange)}
         </Box>,
-        <Box {...boxProps} mt={2}>
+        <Box mt={2}>
           {FormFromFormfield(mortality, fields.predator_known, onChange, !isPredation)}
           {FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)}
         </Box>,
