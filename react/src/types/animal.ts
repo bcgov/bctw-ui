@@ -234,6 +234,10 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBaseT
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
     return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
   }
+
+  formatPropAsHeader(str: keyof Animal): string {
+    return super.formatPropAsHeader(str)
+  }
 }
 
 const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {

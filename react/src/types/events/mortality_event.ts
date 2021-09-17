@@ -1,5 +1,5 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { Animal, IAttachedAnimal } from 'types/animal';
+import { Animal, AttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
@@ -182,7 +182,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   // retrieve the animal metadata fields from the mortality event
   // todo: ucod?
   getAnimal(): OptionalAnimal {
-    const props: (keyof IAttachedAnimal)[] = [
+    const props: (keyof AttachedAnimal)[] = [
       'critter_id',
       'animal_status',
       'predator_known',

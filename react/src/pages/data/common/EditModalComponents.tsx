@@ -1,8 +1,8 @@
 import { Box, ButtonProps, Grid } from '@material-ui/core';
-import React from 'react';
+import { ReactNode } from 'react';
 
 interface TabPanelProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
   index: number;
   value: unknown;
 }
@@ -22,12 +22,14 @@ const EditTabPanel = (props: TabPanelProps): JSX.Element => {
 };
 
 type EditHeaderProps<T> = {
-  title: string;
+  title: ReactNode;
   headers: (keyof T)[];
   obj: T;
   format: (k: keyof T) => string;
+  btn?: ReactNode;
 };
-const EditHeader = <T,>({ title, headers, obj, format }: EditHeaderProps<T>): JSX.Element => {
+
+const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>): JSX.Element => {
   return (
     <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
       <Box>
@@ -45,12 +47,12 @@ const EditHeader = <T,>({ title, headers, obj, format }: EditHeaderProps<T>): JS
           })}
         </dl>
       </Box>
-      <Box></Box>
+      <Box>{btn}</Box>
     </Box>
   );
 };
 
-const FormPart = (key: string, header: string, children: React.ReactNode[], btn?: React.ReactNode): JSX.Element => (
+const FormSection = (key: string, header: string, children: ReactNode[], btn?: ReactNode): JSX.Element => (
   <Box component='fieldset' p={2}>
     {header ? (
       <Box component='legend' className={'legend'}>
@@ -59,7 +61,7 @@ const FormPart = (key: string, header: string, children: React.ReactNode[], btn?
       </Box>
     ) : null}
     <Box className='fieldset-form'>
-      <Grid container spacing={3}>
+      <Grid container spacing={1}>
         <Grid item xs={12}>
           {children.map((c, idx) => (
             <span key={`${key}-${idx}`}>{c}</span>
@@ -79,4 +81,4 @@ const a11yProps = (index: number): Record<string, string> => {
 
 const editEventBtnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'default', className: 'button' };
 
-export { EditHeader, EditTabPanel, FormPart, a11yProps, editEventBtnProps };
+export { EditHeader, EditTabPanel, FormSection, a11yProps, editEventBtnProps };

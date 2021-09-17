@@ -8,14 +8,18 @@ import Modal from 'components/modal/Modal';
 import RetrievalEventForm from '../events/RetrievalEventForm';
 import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import { EditorProps } from 'components/component_interfaces';
-import { FormFromFormfield } from 'components/form/create_form_components';
+import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
-import { editEventBtnProps, FormPart } from '../common/EditModalComponents';
+import { editEventBtnProps, FormSection } from '../common/EditModalComponents';
+import RetrievalEvent from 'types/events/retrieval_event';
+import { EventType } from 'types/events/event';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import EventWrapper from '../events/EventWrapper';
 
 /**
  * todo: reimplement auto defaulting of fields based on collar type select
-*/
+ */
 export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   const { isCreatingNew, editing } = props;
 
@@ -28,14 +32,42 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   const [showRetrievalWorkflow, setShowRetrievalWorkflow] = useState<boolean>(false);
   const [showMalfunctionWorkflow, setShowMalfunctionWorkflow] = useState<boolean>(false);
 
+  const [workflowType, setWorkflowType] = useState<EventType>('unknown');
+  const [showWorkflowForm, setShowWorkflowForm] = useState(false);
+  const [event, updateEvent] = useState(new RetrievalEvent()); //fixme: type this
+
   const close = (): void => {
     setCollarType(eNewCollarType.Other);
   };
 
-  // const handleChooseCollarType = (type: eNewCollarType): void => {
-  //   setCollarType(type);
-  //   setNewCollar(new Collar(type));
-  // };
+  useDidMountEffect(async () => {
+    updateEvent(() => {
+      let e;
+      if (workflowType === 'retrieval') {
+        e = new RetrievalEvent();
+      } else {
+        e = new RetrievalEvent();
+      }
+      const o = Object.assign(e, editing);
+      return o;
+    });
+  }, [workflowType]);
+
+  // show the workflow form when a new event object is created
+  useDidMountEffect(() => {
+    if (event) {
+      console.log('event updated', event, !open);
+      setShowWorkflowForm((o) => !o);
+    }
+  }, [event]);
+
+  const handleOpenWorkflow = (e: EventType): void => {
+    if (workflowType === e) {
+      setShowWorkflowForm((o) => !o);
+    } else {
+      setWorkflowType(e);
+    }
+  };
 
   const {
     communicationFields,
@@ -47,6 +79,11 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     malfunctionOfflineFields,
     deviceCommentField
   } = collarFormFields;
+
+  // const handleChooseCollarType = (type: eNewCollarType): void => {
+  //   setCollarType(type);
+  //   setNewCollar(new Collar(type));
+  // };
 
   // render the choose collar type form if the add button was clicked
   // const ChooseCollarType = (
@@ -60,20 +97,20 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   // );
 
   const Header = (
-    <Container maxWidth="xl">
+    <Container maxWidth='xl'>
       {isCreatingNew ? (
         <Box pt={3}>
-          <Box component="h1" mt={0} mb={0}>
+          <Box component='h1' mt={0} mb={0}>
             Add Device
           </Box>
         </Box>
       ) : (
         <>
           <Box pt={3}>
-            <Box component="h1" mt={0} mb={1}>
+            <Box component='h1' mt={0} mb={1}>
               Device ID: {editing.device_id}
             </Box>
-            <dl className="headergroup-dl">
+            <dl className='headergroup-dl'>
               <dd>Frequency:</dd>
               <dt>{editing?.frequency ? editing.frequencyPadded : '-'} MHz</dt>
               <dd>Deployment Status:</dd>
@@ -104,75 +141,53 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
           };
           return (
             <>
-              {FormPart(
+              {FormSection(
                 'device-ids',
                 'Identifiers',
-                identifierFields.map((f) => FormFromFormfield(editing, f, onChange))
+                identifierFields.map((f) => CreateFormField(editing, f, onChange))
               )}
-              {FormPart(
+              {FormSection(
                 'device-status',
                 'Device Status',
-                statusFields.map((f) => FormFromFormfield(editing, f, onChange))
+                statusFields.map((f) => CreateFormField(editing, f, onChange))
               )}
-              {FormPart(
+              {FormSection(
                 'device-sat',
                 'Satellite Network and Beacon Frequency',
-                communicationFields.map((f) => FormFromFormfield(editing, f, onChange))
+                communicationFields.map((f) => CreateFormField(editing, f, onChange))
               )}
-              {FormPart(
+              {FormSection(
                 'device-add',
                 'Additional Device Sensors and Beacons',
-                activationFields.map((f) => FormFromFormfield(editing, f, onChange))
+                activationFields.map((f) => CreateFormField(editing, f, onChange))
               )}
-              {FormPart(
+              {FormSection(
                 'device-activ',
                 'Warranty & Activation Details',
-                deviceOptionFields.map((f) => FormFromFormfield(editing, f, onChange))
+                deviceOptionFields.map((f) => CreateFormField(editing, f, onChange))
               )}
-              {FormPart(
+              {FormSection(
                 'device-ret',
                 'Record Retrieval Details',
-                retrievalFields.map((f) => FormFromFormfield(editing, f, onChange)),
-                <Button {...editEventBtnProps} onClick={(): void => setShowRetrievalWorkflow((o) => !o)}>
+                retrievalFields.map((f) => CreateFormField(editing, f, onChange)),
+                <Button {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('retrieval')}>
                   Record Retrieval Details
                 </Button>
               )}
-              {FormPart(
+              {FormSection(
                 'device-malf',
                 'Record Malfunction & Offline Details',
-                malfunctionOfflineFields.map((f) => FormFromFormfield(editing, f, onChange)),
+                malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange)),
                 <Button {...editEventBtnProps} onClick={(): void => setShowMalfunctionWorkflow((o) => !o)}>
                   Record Malfunction & Offline Details
                 </Button>
               )}
-              {FormPart(
+              {FormSection(
                 'device-comment',
                 'Comments About this Device',
-                deviceCommentField.map((f) => FormFromFormfield(editing, f, onChange))
+                deviceCommentField.map((f) => CreateFormField(editing, f, onChange))
               )}
-              {/* {!isCreatingNew && showAssignmentHistory ? (
-                <Modal open={showAssignmentHistory} handleClose={(): void => setShowAssignmentHistory(false)}>
-                  <AssignmentHistory
-                    assignAnimalToDevice={true}
-                    critter_id=''
-                    deviceId={editing.collar_id}
-                    canEdit={true}
-                    {...props}
-                  />
-                </Modal>
-              ) : null} */}
-              { /* retrieval workflow */ }
-              {/* {!isCreatingNew && showRetrievalWorkflow ? (
-                <Modal open={showRetrievalWorkflow} handleClose={(): void => setShowRetrievalWorkflow(false)}>
-                  <RetrievalEventForm
-                    device_id={editing.device_id}
-                    handleClose={(): void => setShowRetrievalWorkflow(false)}
-                    handleSave={null}
-                    open={showRetrievalWorkflow}
-                  />
-                </Modal>
-              ) : null} */}
-              { /* malfunction workflow */ }
+              {/* malfunction workflow */}
               {!isCreatingNew && showMalfunctionWorkflow ? (
                 <Modal open={showMalfunctionWorkflow} handleClose={(): void => setShowMalfunctionWorkflow(false)}>
                   <MalfunctionEventForm
@@ -183,6 +198,12 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                   />
                 </Modal>
               ) : null}
+              <EventWrapper
+                eventType={workflowType}
+                open={showWorkflowForm}
+                event={event}
+                handleClose={(): void => setShowWorkflowForm(false)}
+              />
             </>
           );
         }}

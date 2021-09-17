@@ -1,9 +1,9 @@
 import { Box } from '@material-ui/core';
-import { FormFromFormfield } from 'components/form/create_form_components';
+import { CreateFormField } from 'components/form/create_form_components';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
-import { FormPart } from 'pages/data//common/EditModalComponents';
+import { FormSection } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
 import { useState } from 'react';
 import { DataLifeInput } from 'types/data_life';
@@ -71,8 +71,8 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
   return (
     <>
       {/* assignment & data life fields */}
-      {FormPart('mort-device', 'Device Details', [
-        FormFromFormfield(mortality, fields.shouldUnattachDevice, onChange, false, true),
+      {FormSection('mort-device', 'Device Details', [
+        CreateFormField(mortality, fields.shouldUnattachDevice, onChange, false, true),
         <DataLifeInputForm
           dli={mortality.getDatalife()}
           // only allow data life end dates changes if the device is being removed
@@ -80,37 +80,41 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
           enableEditStart={false}
           onChange={handleFormChange}
           propsRequired={requiredDLProps}
-          message={<div style={{color: 'darkorange', marginBottom: '6px'}}> Note: data life can only be edited if the device is being removed</div>} // todo:
+          message={
+            <div style={{ color: 'darkorange', marginBottom: '6px' }}>
+              Data life can only be edited if the device is being removed from the animal
+            </div>
+          }
           displayInRows={true}
         />,
         <Box mb={2}>
-          {FormFromFormfield(mortality, fields.retrieved, onChange)}
-          {FormFromFormfield(mortality, fields.retrieval_date, onChange, !isRetrieved)}
+          {CreateFormField(mortality, fields.retrieved, onChange)}
+          {CreateFormField(mortality, fields.retrieval_date, onChange, !isRetrieved)}
         </Box>,
-        FormFromFormfield(mortality, fields.device_status, onChange),
-        FormFromFormfield(mortality, fields.device_condition, onChange),
-        FormFromFormfield(mortality, fields.device_deployment_status, onChange)
+        CreateFormField(mortality, fields.device_status, onChange),
+        CreateFormField(mortality, fields.device_condition, onChange),
+        CreateFormField(mortality, fields.device_deployment_status, onChange)
       ])}
       {/* critter status fields */}
-      {FormPart('mort-critter', 'Animal Details', [
+      {FormSection('mort-critter', 'Animal Details', [
         <Box mt={2}>
-          {FormFromFormfield(mortality, fields.wasInvestigated, onChange)}
-          {FormFromFormfield(mortality, fields.mortality_investigation, onChange, !wasInvestigated)}
+          {CreateFormField(mortality, fields.wasInvestigated, onChange)}
+          {CreateFormField(mortality, fields.mortality_investigation, onChange, !wasInvestigated)}
         </Box>,
-        FormFromFormfield(mortality, fields.mortality_record, onChange, false, true),
-        FormFromFormfield(mortality, fields.activation_status, onChange, false, true),
+        CreateFormField(mortality, fields.mortality_record, onChange, false, true),
+        CreateFormField(mortality, fields.activation_status, onChange, false, true),
         <Box mt={2}>
-          {FormFromFormfield(mortality, fields.animal_status, onChange)}
-          {FormFromFormfield(mortality, fields.proximate_cause_of_death, onChange)}
+          {CreateFormField(mortality, fields.animal_status, onChange)}
+          {CreateFormField(mortality, fields.proximate_cause_of_death, onChange)}
         </Box>,
         <Box mt={2}>
-          {FormFromFormfield(mortality, fields.predator_known, onChange, !isPredation)}
-          {FormFromFormfield(mortality, fields.predator_species, onChange, !isPredatorKnown)}
+          {CreateFormField(mortality, fields.predator_known, onChange, !isPredation)}
+          {CreateFormField(mortality, fields.predator_species, onChange, !isPredatorKnown)}
         </Box>,
         <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />
       ])}
       {/* location fields */}
-      {FormPart('mort-loc', 'Event Details', [
+      {FormSection('mort-loc', 'Event Details', [
         <LocationEventForm event={mortality.location_event} notifyChange={onChangeLocationProp} />
       ])}
     </>

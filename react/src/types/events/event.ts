@@ -2,7 +2,7 @@ import { AttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWBaseType } from 'types/common_types';
 
-export type EventType = 'mortality' | 'release' | 'capture' | 'unknown';
+export type EventType = 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 // make all properties optional
 // todo: make critter_id etc required
 export type OptionalAnimal = { [Property in keyof AttachedAnimal]+?: AttachedAnimal[Property] };

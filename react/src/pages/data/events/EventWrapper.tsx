@@ -15,6 +15,8 @@ import CaptureEventForm from './CaptureEventForm';
 import MortalityEventForm from './MortalityEventForm';
 import ReleaseEventForm from './ReleaseEventForm';
 import MortalityEvent from 'types/events/mortality_event';
+import RetrievalEventForm from './RetrievalEventForm';
+import RetrievalEvent from 'types/events/retrieval_event';
 
 type EventWrapperProps<T> = ModalBaseProps & {
   event: BCTWEvent<T>;
@@ -90,8 +92,10 @@ export default function EventWrapper<E>({
       Comp = <CaptureEventForm />;
       break;
     case 'mortality':
-      // fixme: typing event to specific
       Comp = <MortalityEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as MortalityEvent} />;
+      break;
+    case 'retrieval': 
+      Comp = <RetrievalEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as RetrievalEvent} />;
       break;
     case 'unknown':
     default:
@@ -100,9 +104,9 @@ export default function EventWrapper<E>({
 
   return (
     <Modal open={open} handleClose={handleClose}>
-      <form className={'rootEditInput'} autoComplete={'off'}>
+      <form className={'event-modal'} autoComplete={'off'}>
         <EditHeader<E>
-          title={event.getHeaderTitle()}
+          title={event?.getHeaderTitle()}
           headers={event.displayProps}
           obj={event as any}
           format={event.formatPropAsHeader}

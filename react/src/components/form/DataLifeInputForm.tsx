@@ -6,6 +6,7 @@ import { DataLifeInput } from 'types/data_life';
 import { Dayjs } from 'dayjs';
 import { FormChangeEvent, InboundObj } from 'types/form_types';
 import { DateInputProps } from './Date';
+import { Tooltip } from 'components/common';
 
 /**
  * @param dli instance of @type {DataLifeIinput}
@@ -79,12 +80,11 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
     margin: 'dense'
   };
 
-  return (
-    <Box paddingBottom={2}>
-      {/* if data life has been modified - show a warning */}
-      {displayInRows ? <>{message ?? null}</> : (
+  const Body = (
+    <Box paddingBottom={2} id='hi'>
+      {/* if data life has been modified and display is not row format - show a warning */}
+      {displayInRows ? null : (
         <Box height={35} display='flex' flexDirection={'column'} alignItems={'center'}>
-          {message}
           {isModified ? <Typography color={'error'}>{DataLifeStrings.editWarning}</Typography> : null}
         </Box>
       )}
@@ -132,5 +132,13 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
         />
       </Box>
     </Box>
+  );
+
+  return message ? (
+    <Tooltip placement='top-end' enterDelay={750} title={message}>
+      {Body}
+    </Tooltip>
+  ) : (
+    Body
   );
 }

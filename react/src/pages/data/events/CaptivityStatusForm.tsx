@@ -1,5 +1,5 @@
 import { Box } from '@material-ui/core';
-import { FormFromFormfield } from 'components/form/create_form_components';
+import { CreateFormField } from 'components/form/create_form_components';
 import { eInputType, FormChangeEvent } from 'types/form_types';
 import MortalityEvent, { MortalityFormField } from 'types/events/mortality_event';
 import { boxRowProps } from './EventComponents';
@@ -30,8 +30,8 @@ export default function CaptivityStatusForm({ event, handleFormChange }: Captivi
   return (
     <Box {...boxRowProps} mt={2}>
       {/* captivity_status is always disabled in mortality workflow */}
-      {FormFromFormfield(event, captivityFields.captivity_status, handleFormChange, true)}
-      {FormFromFormfield(event, captivityFields.mortality_captivity_status, handleFormChange)}
+      {CreateFormField(event, captivityFields.captivity_status, handleFormChange, true)}
+      {CreateFormField(event, captivityFields.mortality_captivity_status, handleFormChange)}
     </Box>
   );
 }

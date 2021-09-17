@@ -111,7 +111,6 @@ export default function EditModal<T extends BCTWBaseType<T>>(props: IEditModalPr
   const handleSave = (): void => {
     // use Object.assign to preserve class methods
     const body = omitNull(Object.assign(editing, newObj));
-    // console.log(JSON.stringify(body, null, 2));
     const toSave: IUpsertPayload<T> = { body };
     onSave(toSave);
   };
@@ -154,7 +153,7 @@ export default function EditModal<T extends BCTWBaseType<T>>(props: IEditModalPr
         </Modal>
       ) : null}
 
-      <form className={'rootEditInput'} autoComplete={'off'}>
+      <form autoComplete={'off'}>
         {headerComponent}
 
         <Container maxWidth='xl'>

@@ -152,7 +152,7 @@ const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactEl
 /**
  * the "main" form component creation handler.
  */
-function FormFromFormfield<T extends BCTWFormat<T>>(
+function CreateFormField<T extends BCTWFormat<T>>(
   obj: T,
   formField: FormFieldObject<T> | undefined,
   handleChange: FormChangeEvent,
@@ -187,4 +187,4 @@ function FormFromFormfield<T extends BCTWFormat<T>>(
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
 
-export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, FormFromFormfield };
+export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, CreateFormField };

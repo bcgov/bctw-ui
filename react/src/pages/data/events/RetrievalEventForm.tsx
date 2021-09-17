@@ -3,8 +3,8 @@ import RetrievalEvent from 'types/events/retrieval_event';
 import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { Box } from '@material-ui/core';
-import { FormFromFormfield } from 'components/form/create_form_components';
-import { FormPart } from '../common/EditModalComponents';
+import { CreateFormField } from 'components/form/create_form_components';
+import { FormSection } from '../common/EditModalComponents';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
 
 type RetrievalEventProps = {
@@ -19,6 +19,7 @@ export default function RetrievalEventForm({event, handleFormChange}: RetrievalE
   const [retrieval, setRetrieval] = useState<RetrievalEvent>(event);
 
   useDidMountEffect(() => {
+    console.log('new retrieval event', event)
     setRetrieval(retrieval);
   }, [retrieval]);
 
@@ -43,16 +44,16 @@ export default function RetrievalEventForm({event, handleFormChange}: RetrievalE
 
   return (
     <>
-      {FormPart('retrieval-device', 'Device Details', [
+      {FormSection('retrieval-device', 'Device Details', [
         <Box>
-          {FormFromFormfield(retrieval, fields.retrieved, onChange)}
-          {FormFromFormfield(retrieval, fields.retrieval_date, onChange, !isRetrieved)}
+          {CreateFormField(retrieval, fields.retrieved, onChange)}
+          {CreateFormField(retrieval, fields.retrieval_date, onChange, !isRetrieved)}
         </Box>,
-        FormFromFormfield(retrieval, fields.shouldUnattachDevice, onChange, false, true),
-        FormFromFormfield(retrieval, fields.device_condition, onChange),
-        FormFromFormfield(retrieval, fields.device_deployment_status, onChange),
-        FormFromFormfield(retrieval, fields.activation_status, onChange, false, true),
-        FormFromFormfield(retrieval, fields.retrieval_comment, onChange),
+        CreateFormField(retrieval, fields.shouldUnattachDevice, onChange, false, true),
+        CreateFormField(retrieval, fields.device_condition, onChange),
+        CreateFormField(retrieval, fields.device_deployment_status, onChange),
+        CreateFormField(retrieval, fields.activation_status, onChange, false, true),
+        CreateFormField(retrieval, fields.retrieval_comment, onChange),
         // <DataLifeInputForm
         //   dli={retrieval.getDatalife()}
         //   // only allow data life end dates changes if the device is being removed

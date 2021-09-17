@@ -2,7 +2,7 @@ import { EditorProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { User } from 'types/user';
-import { FormFromFormfield } from 'components/form/create_form_components';
+import { CreateFormField } from 'components/form/create_form_components';
 
 /**
  * the edit user form, implemented in pags/admin/UserAdmin
@@ -29,8 +29,8 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
         {(handlerFromContext): React.ReactNode => {
           return (
             <div className='container'>
-              <form className='rootEditInput' autoComplete='off'>
-                {editing.formFields.map((d) => FormFromFormfield(editing, d, handlerFromContext))}
+              <form autoComplete='off'>
+                {editing.formFields.map((d) => CreateFormField(editing, d, handlerFromContext))}
               </form>
             </div>
           );
