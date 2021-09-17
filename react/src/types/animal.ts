@@ -242,7 +242,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBaseT
   }
 }
 
-const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
+export const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   associatedAnimalFields: [
     { prop: 'associated_animal_id', type: eInputType.text },
     { prop: 'associated_animal_relationship', type: eInputType.code }
@@ -278,8 +278,6 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'ear_tag_left_id', type: eInputType.text },
     { prop: 'ear_tag_right_id', type: eInputType.text }
   ],
-  // todo: make these retrievable from workflow
-  // todo: add mort workflow fields
   mortalityFields: [
     { prop: 'mortality_date', type: eInputType.datetime },
     { prop: 'mortality_latitude', type: eInputType.number },
@@ -287,11 +285,16 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'mortality_utm_zone', type: eInputType.number },
     { prop: 'mortality_utm_easting', type: eInputType.number },
     { prop: 'mortality_utm_northing', type: eInputType.number },
+    { prop: 'mortality_comment', type: eInputType.text },
     { prop: 'proximate_cause_of_death', type: eInputType.code },
-    { prop: 'ultimate_cause_of_death', type: eInputType.code },
+    { prop: 'ultimate_cause_of_death', type: eInputType.code, codeName: 'proximate_cause_of_death' },
+    { prop: 'pcod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
+    { prop: 'ucod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
     { prop: 'predator_species_pcod', type: eInputType.code, codeName: 'predator_species' },
     { prop: 'predator_species_ucod', type: eInputType.code, codeName: 'predator_species' },
-    { prop: 'mortality_comment', type: eInputType.text }
+    { prop: 'mortality_investigation', type: eInputType.code },
+    { prop: 'mortality_report', type: eInputType.check },
+    { prop: 'predator_known', type: eInputType.check },
   ],
   releaseFields: [
     { prop: 'release_date', type: eInputType.datetime },
@@ -308,4 +311,5 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
   ]
 };
 
-export { critterFormFields };
+// fixme: improve typing :[
+export const animalMortFieldMap = new Map<keyof Animal, FormFieldObject<any>>(critterFormFields.mortalityFields.map(f => [f.prop, f]));

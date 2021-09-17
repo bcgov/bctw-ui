@@ -90,7 +90,8 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
           {CreateFormField(mortality, fields.device_status, onChange)}
           {CreateFormField(mortality, fields.device_condition, onChange)}
           {CreateFormField(mortality, fields.device_deployment_status, onChange)}
-        </Box>
+        </Box>,
+        CreateFormField(mortality, fields.activation_status, onChange, false, true)
       ])}
       {/* critter status fields */}
       {FormSection('mort-critter', 'Animal Details', [
@@ -99,7 +100,6 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
           {CreateFormField(mortality, fields.mortality_investigation, onChange, !wasInvestigated)}
         </Box>,
         CreateFormField(mortality, fields.mortality_report, onChange, false, true),
-        CreateFormField(mortality, fields.activation_status, onChange, false, true),
         <Box mt={1}>
           {CreateFormField(mortality, fields.animal_status, onChange)}
           {CreateFormField(mortality, fields.proximate_cause_of_death, onChange)}
@@ -107,10 +107,12 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
         <Box mt={1} {...boxSpreadRowProps}>
           {CreateFormField(mortality, fields.predator_known, onChange, !isPredation)}
           {CreateFormField(mortality, fields.predator_species_pcod, onChange, !isPredatorKnown)}
+          {CreateFormField(mortality, fields.pcod_confidence, onChange, !isPredatorKnown)}
         </Box>,
         <Box mt={1} {...boxSpreadRowProps}>
           {CreateFormField(mortality, fields.isUCODSpeciesKnown, onChange, !isPredatorKnown)}
-          {CreateFormField(mortality, fields.predator_species_ucod, onChange, !isPredatorKnown && !isUCODKnown)}
+          {CreateFormField(mortality, fields.predator_species_ucod, onChange, !(isPredatorKnown && isUCODKnown))}
+          {CreateFormField(mortality, fields.ucod_confidence, onChange, !(isPredatorKnown && isUCODKnown))}
         </Box>,
         <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} />
       ])}

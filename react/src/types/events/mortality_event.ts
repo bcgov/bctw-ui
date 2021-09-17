@@ -1,5 +1,5 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Animal, AttachedAnimal, animalMortFieldMap } from 'types/animal';
 import { Collar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
@@ -151,32 +151,37 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
         return 'Predator UCOD';
       case 'predator_species_pcod':
         return 'Predator PCOD';
+      case 'pcod_confidence':
+      case 'ucod_confidence':
+        return 'Confidence';
       default:
         return columnToHeader(s);
     }
   }
 
   fields: MortalityFormField = {
+    activation_status: { prop: 'activation_status', type: eInputType.check },
+    animal_status: { prop: 'animal_status', type: eInputType.code },
+    // animal_status: animalMortFieldMap.get('animal_status'),
     data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
-    mortality_investigation: { prop: 'mortality_investigation', type: eInputType.code },
+    device_condition: { prop: 'device_condition', type: eInputType.code, required: true },
+    device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
+    device_status: { prop: 'device_status', type: eInputType.code },
+    mortality_investigation: animalMortFieldMap.get('mortality_investigation'),
+    mortality_report: animalMortFieldMap.get('mortality_report'),
+    predator_known: animalMortFieldMap.get('predator_known'),
+    predator_species_pcod: animalMortFieldMap.get('predator_species_pcod'),
+    predator_species_ucod: animalMortFieldMap.get('predator_species_ucod'),
+    retrieved: { prop: 'retrieved', type: eInputType.check },
+    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime },
+    pcod_confidence: animalMortFieldMap.get('pcod_confidence'),
+    ucod_confidence: animalMortFieldMap.get('ucod_confidence'),
+    proximate_cause_of_death: animalMortFieldMap.get('proximate_cause_of_death'),
+    ultimate_cause_of_death: animalMortFieldMap.get('ultimate_cause_of_death'),
+    // workflow-specific
     wasInvestigated: {prop: 'wasInvestigated', type: eInputType.check},
     isUCODSpeciesKnown: {prop: 'isUCODSpeciesKnown', type: eInputType.check},
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
-    mortality_report: { prop: 'mortality_report', type: eInputType.check },
-    animal_status: { prop: 'animal_status', type: eInputType.code },
-    predator_known: { prop: 'predator_known', type: eInputType.check },
-    proximate_cause_of_death: { prop: 'proximate_cause_of_death', type: eInputType.code },
-    ultimate_cause_of_death: { prop: 'ultimate_cause_of_death', type: eInputType.code, codeName: 'proximate_cause_of_death' },
-    predator_species_pcod: { prop: 'predator_species_pcod', type: eInputType.code, codeName: 'predator_species' },
-    predator_species_ucod: { prop: 'predator_species_ucod', type: eInputType.code, codeName: 'predator_species' },
-    retrieved: { prop: 'retrieved', type: eInputType.check },
-    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime },
-    activation_status: { prop: 'activation_status', type: eInputType.check },
-    device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
-    device_status: { prop: 'device_status', type: eInputType.code },
-    device_condition: { prop: 'device_condition', type: eInputType.code, required: true },
-    pcod_confidence: { prop: 'pcod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
-    ucod_confidence: { prop: 'ucod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
   };
 
   // retrieve the animal metadata fields from the mortality event
@@ -190,17 +195,23 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
       'predator_species_ucod',
       'proximate_cause_of_death',
       'ultimate_cause_of_death',
-      'ucod_confidence',
       'pcod_confidence',
+      'ucod_confidence',
       'captivity_status',
       'mortality_investigation',
+      'mortality_report',
       'mortality_captivity_status',
-      'mortality_report'
     ];
     const ret = eventToJSON(props, this);
     // todo: better way to wipe disabled fields?
     if (!this.wasInvestigated) {
       delete ret.mortality_investigation;
+    }
+    if (!this.predator_known) {
+      delete ret.predator_species_pcod;
+      delete ret.predator_species_ucod;
+      delete ret.pcod_confidence;
+      delete ret.ucod_confidence;
     }
     const loc = this.location_event.toJSON();
     return omitNull({ ...ret, ...loc }) as OptionalAnimal;
