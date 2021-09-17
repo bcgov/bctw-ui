@@ -18,7 +18,7 @@ const isTest = process.env.TEST === 'true';
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
 
-// Set up the database pool
+// set up the database pool
 const pgPool = new pg.Pool({
   user: process.env.POSTGRES_USER,
   database: process.env.POSTGRES_DB,
@@ -28,12 +28,14 @@ const pgPool = new pg.Pool({
   max: 10,
 });
 
+// use Express memory store for session and Keycloak object
 var memoryStore = new expressSession.MemoryStore();
 
-const storage = multer.memoryStorage()
+// multer configuration for handling bulk imports
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Keycloak config object (deprecates use of keycloak.json)
+// create a Keycloak config object (deprecates use of keycloak.json)
 // see: https://wjw465150.gitbooks.io/keycloak-documentation/content/securing_apps/topics/oidc/nodejs-adapter.html
 var keyCloakConfig = {
   authServerUrl: process.env.KEYCLOAK_SERVER_URL,
@@ -47,6 +49,7 @@ var keycloak = new keycloakConnect({
   store: memoryStore
 }, keyCloakConfig);
 
+// set up the session
 var session = {
   cookie: {
     maxAge: 24 * 60 * 60 * 1000, // 1,000 days
@@ -58,78 +61,84 @@ var session = {
   store: memoryStore
 };
 
-const appendQueryToUrl = (url, query) => {
-  if (!query) return url;
-  return url.includes('?') ? url += `&${query}` : url += `?${query}`;
+// TODO: move into separate package?
+// creates a well-formed URL with query string given a parameter
+const appendQueryToUrl = (url, parameter) => {
+  if (!parameter) return url;
+  return url.includes('?') ? url += `&${parameter}` : url += `?${parameter}`;
 };
 
-/**
- * the username and domain (ie whether the user authenticated with a BCEID vs an IDIR) 
- * are stored in the keycloak object's @param preferred_username property. 
- */
+// TODO: move into separate package?
+// split out the username and  domain ('user@idir' or 'user@bceid') from Keycloak preferred_username
 const splitCredentials = (sessionObject) => {
   const credentials = sessionObject.preferred_username.split('@');
   if (!credentials.length) {
-    return {}
+    return {};
   }
   return { user: credentials[0], domain: credentials[1] };
 }
 
-/**
- * endpoint that returns keycloak session info
-*/
+// TODO: move into separate package?
+// endpoint that returns Keycloak session information
 const retrieveSessionInfo = function (req, res, next) {
   if (!isProd) {
-    return res.status(500).send('not in production, no session info available');
+    return res.status(500).send('Keycloak session info available: not PROD environment');
   }
+  // get contents of the current Keycloak access token
   const data = req.kauth.grant.access_token.content;
   if (!data) {
-    return res.status(500).send('unable to retrieve session info');
+    return res.status(500).send('Error: Unable to retrieve Keycloak session information');
   }
   const { family_name, given_name, email } = data;
-  const ret = {
+  const sessionInfo = {
     email,
     family_name,
     given_name,
     ...splitCredentials(data)
   }
-  res.status(200).send(ret);
+  res.status(200).send(sessionInfo);
 }
 
-/* ## proxyApi
-  The api is not exposed publicly. This service is protected
-  by Keycloak. So forward all authenticated traffic.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
-  @param next {function} Node/Express function for flow control
- */
+// TODO: move into separate package?
+// Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
-  const endpoint = req.params.endpoint; // The url
 
-  // The parameter string
-  const query = Object.keys(req.query).map((key) => {
+  // URL of the endpoint being targeted
+  const endpoint = req.params.endpoint;
+
+  // create a string of key-value pairs from the parameters passed
+  const parameters = Object.keys(req.query).map((key) => {
     return `${key}=${req.query[key]}`;
   }).join('&');
 
-  // The domain and username
   let url;
   if (isProd) {
+
+    // split out the domain and username of logged-in user
     const { domain, user } = splitCredentials(req.kauth.grant.access_token.content);
+
+    // build up URL from ENV variables and targeted endpoint
     url = `${apiHost}:${apiPort}/${endpoint}`;
+
+    // if endpointId is known, append to URL
     if (req.params.endpointId) {
       url += `/${req.params.endpointId}`;
     }
-    url = appendQueryToUrl(url, query);
+
+    // add parameters and username to URL
+    url = appendQueryToUrl(url, parameters);
     url = appendQueryToUrl(url, `${domain}=${user}`)
+
   } else {
-    url = `${apiHost}:${apiPort}/${endpoint}?${query}&idir=user`;
+    // connect to API without using Keycloak authentication
+    url = `${apiHost}:${apiPort}/${endpoint}?${parameters}&idir=user`;
   }
 
-  // console.log(`url: ${url}, type: ${req.method}`);
   const errHandler = (err) => {
     console.error(err.response);
     res.status(500).json({ error: err.response.data });
   }
+
   const successHandler = (response) => res.json(response.data);
 
   if (req.method === 'POST') {
@@ -256,13 +265,11 @@ const onboardingRedirect = async (req, res, next) => {
       console.log('onboardingRedirect() -- User is NOT registered; redirecting to /onboarding')
       res.redirect('/onboarding');
     }
-    console.log('onboardingRedirect() -- Query parameters supplied:', req.query.onboarding)
   }
   client.release(); // Release database connection
 };
 
 const handleUserAccessRequest = async (req, res) => {
-  console.log('handleUserAccessRequest() -- /onboarding called as a POST');
 
   // This data will be inserted into the email
   const {
@@ -301,7 +308,7 @@ const handleUserAccessRequest = async (req, res) => {
   console.log('handleUserAccessRequest() -- CHES username:', username);
   console.log('handleUserAccessRequest() -- CHES fromEmail:', fromEmail);
   console.log('handleUserAccessRequest() -- CHES toEmail:', toEmail);
-  
+
   // Create the authorization hash
   const prehash = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
   const hash = `Basic ${prehash}`;
@@ -311,15 +318,15 @@ const handleUserAccessRequest = async (req, res) => {
     'grant_type=client_credentials',
     {
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": hash
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: hash
       }
     });
 
   const pretoken = tokenParcel.data.access_token;
   if (!pretoken) return res.status(500).send('Authentication failed');
   const token = `Bearer ${pretoken}`;
-  console.log('handleUserAccessRequest() -- token obtained:', token);
+  console.log('handleUserAccessRequest() -- bearer token obtained');
 
   const emailMessage = `
     <div>
@@ -365,9 +372,7 @@ const handleUserAccessRequest = async (req, res) => {
     delayTS: 0
   }
 
-  console.log('handleUserAccessReques() -- CHES email payload', emailPayload);
-  console.log('handleUserAccessReques() -- POSTing email message to CHES...');
-
+  console.log('handleUserAccessRequest() -- POSTing to CHES', emailPayload);
   axios.post(
     apiUrl,
     emailPayload,
@@ -378,7 +383,7 @@ const handleUserAccessRequest = async (req, res) => {
       }
     }
   ).then((response) => {
-    console.log('handleUserAccessReques() -- OK', response)
+    console.log('handleUserAccessReques() -- OK')
     res.status(200).send('Email was sent');
   }).catch((error) => {
     console.log('handleUserAccessReques() -- ERROR', error)
