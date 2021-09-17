@@ -1,4 +1,5 @@
 import { Box, ButtonProps, Grid } from '@material-ui/core';
+import { formatTableCell } from 'components/table/table_helpers';
 import { ReactNode } from 'react';
 
 interface TabPanelProps {
@@ -38,10 +39,11 @@ const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>
         </Box>
         <dl className='headergroup-dl'>
           {headers.map((p, idx: number) => {
+            const { value } = formatTableCell<T>(obj, p)
             return (
               <Box key={`header-${idx}`} display='inline' mr={2}>
                 <dd>{format(p)}:</dd>
-                <dt>{obj[p]}</dt>
+                <dt>{value}</dt>
               </Box>
             );
           })}
@@ -55,7 +57,7 @@ const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>
 const FormSection = (key: string, header: string, children: ReactNode[], btn?: ReactNode): JSX.Element => (
   <Box component='fieldset' p={2}>
     {header ? (
-      <Box component='legend' className={'legend'}>
+      <Box component='legend' className={'legend'} mb={1} mt={1}>
         {header}
         {btn}
       </Box>

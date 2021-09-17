@@ -8,13 +8,15 @@ import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_valida
 import { FormChangeEvent, FormFieldObject, InboundObj } from 'types/form_types';
 import DateTimeInput from 'components/form/DateTimeInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { ReactNode } from 'react';
 
 type LocationEventProps = {
   event: LocationEvent;
   notifyChange: FormChangeEvent;
+  children?: ReactNode;
 };
 
-export default function LocationEventForm({ event, notifyChange }: LocationEventProps): JSX.Element {
+export default function LocationEventForm({ event, notifyChange, children }: LocationEventProps): JSX.Element {
   const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
 
   // create the form inputs
@@ -54,6 +56,8 @@ export default function LocationEventForm({ event, notifyChange }: LocationEvent
         defaultValue={event.date}
         changeHandler={(v): void => changeHandler(v)}
       />
+      {/* optionally render children below the date component */}
+      {children}
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}
       <RadioGroup row aria-label='position' name='position' value={showUtm} onChange={changeCoordinateType}>
         <FormControlLabel

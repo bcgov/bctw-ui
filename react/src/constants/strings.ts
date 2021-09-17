@@ -129,7 +129,8 @@ const EventFormStrings = {
     mort_captivity_status: 'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?',
     mort_investigation: 'Was a mortality investigation undertaken?',
     mort_wildlife: 'Was the Wildlife Health Group mortality form completed?',
-    mort_predator: 'Is the predator species or genus known?',
+    mort_predator_pcod: 'Is the PCOD predator species known?',
+    mort_predator_ucod: 'Is the UCOD predator species known?',
     captivity: 'Animal is or has been part of a captivity program',
   },
   device: {

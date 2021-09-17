@@ -54,6 +54,9 @@ export class LocationEvent implements ILocationEvent {
   }
 
   formatPropAsHeader(str: keyof LocationEvent): string {
+    if (['date', 'comment'].includes(str)) {
+      return columnToHeader(`${this.location_type}_${str}`);
+    }
     return columnToHeader(str.replace('utm', 'UTM'))
   }
 

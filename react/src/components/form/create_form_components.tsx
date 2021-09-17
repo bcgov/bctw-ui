@@ -76,7 +76,7 @@ function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: 
 }
 
 // datetime field handler
-function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): ReactElement {
+function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled, required }: CreateInputProps<T>): ReactElement {
   return (
     <DateTimeInput
       propName={prop as string}
@@ -85,6 +85,7 @@ function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled
       changeHandler={handleChange}
       disabled={disabled}
       key={`input-dt-${prop}`}
+      required={required}
     />
   );
 }

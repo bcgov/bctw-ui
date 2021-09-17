@@ -1,4 +1,4 @@
-import dayjs, {Dayjs, isDayjs} from 'dayjs';
+import { Dayjs, isDayjs} from 'dayjs';
 import { formatTime } from 'utils/time';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from './collar_history';
 

@@ -29,7 +29,7 @@ export interface IAnimalTelemetryBase {
 }
 
 export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
-  animal_colouration: Code;
+  animal_colouration: string;
   animal_comment: string;
   associated_animal_id: string;
   associated_animal_relationship: Code;
@@ -59,14 +59,15 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
-  mortality_record: boolean;
+  mortality_report: boolean;
   mortality_investigation: Code;
   captivity_status: boolean;
   mortality_captivity_status: Code;
 
   permission_type?: eCritterPermission; // critters should contain this
   predator_known: boolean;
-  predator_species: Code;
+  predator_species_pcod: Code;
+  predator_species_ucod: Code;
   proximate_cause_of_death: Code;
   ucod_confidence: Code;
   pcod_confidence: Code;
@@ -120,7 +121,8 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   mortality_utm_northing: number;
   mortality_utm_zone: number;
   predator_known: boolean;
-  predator_species: Code;
+  predator_species_pcod: Code;
+  predator_species_ucod: Code;
   proximate_cause_of_death: Code;
   ucod_confidence: Code;
   pcod_confidence: Code;
@@ -143,7 +145,7 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
   @Transform(nullToDayjs) valid_from: Dayjs;
   @Transform(nullToDayjs) valid_to: Dayjs;
 
-  mortality_record: boolean;
+  mortality_report: boolean;
   mortality_investigation: Code;
   captivity_status: boolean;
   mortality_captivity_status: Code;
@@ -276,6 +278,8 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'ear_tag_left_id', type: eInputType.text },
     { prop: 'ear_tag_right_id', type: eInputType.text }
   ],
+  // todo: make these retrievable from workflow
+  // todo: add mort workflow fields
   mortalityFields: [
     { prop: 'mortality_date', type: eInputType.datetime },
     { prop: 'mortality_latitude', type: eInputType.number },
@@ -285,7 +289,8 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'mortality_utm_northing', type: eInputType.number },
     { prop: 'proximate_cause_of_death', type: eInputType.code },
     { prop: 'ultimate_cause_of_death', type: eInputType.code },
-    { prop: 'predator_species', type: eInputType.code },
+    { prop: 'predator_species_pcod', type: eInputType.code, codeName: 'predator_species' },
+    { prop: 'predator_species_ucod', type: eInputType.code, codeName: 'predator_species' },
     { prop: 'mortality_comment', type: eInputType.text }
   ],
   releaseFields: [
