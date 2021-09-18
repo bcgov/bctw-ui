@@ -25,7 +25,7 @@ interface ITelemetryAlert extends BCTWValidDates {
 
 type AlertProp = keyof ITelemetryAlert;
 
-export class TelemetryAlert extends BCTWBase implements ITelemetryAlert, DataLife {
+export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITelemetryAlert> {
   alert_id: number;
   alert_type: eAlertType;
   @Transform(nullToDayjs) valid_from: Dayjs;
@@ -38,6 +38,9 @@ export class TelemetryAlert extends BCTWBase implements ITelemetryAlert, DataLif
   @Transform(nullToDayjs) data_life_start: Dayjs;
   @Transform(nullToDayjs) data_life_end: Dayjs;
 
+  get displayProps(): (keyof ITelemetryAlert)[] {
+    return [];
+  }
   get isSnoozed(): boolean {
     return dayjs().isBefore(dayjs(this.snoozed_to));
   }

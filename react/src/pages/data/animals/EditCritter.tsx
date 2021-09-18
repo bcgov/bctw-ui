@@ -9,7 +9,7 @@ import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
-import { EventType } from 'types/events/event';
+import { WorkflowType } from 'types/events/event';
 import EventWrapper from '../events/EventWrapper';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import MortalityEvent from 'types/events/mortality_event';
@@ -26,7 +26,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
 
   const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
-  const [workflowType, setWorkflowType] = useState<EventType>('unknown');
+  const [workflowType, setWorkflowType] = useState<WorkflowType>('unknown');
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
   const [event, updateEvent] = useState(new MortalityEvent()); //fixme: type this
 
@@ -60,7 +60,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
    * if a workflow button is clicked and the event type is the same, open or close the workflow modal. 
    * otherwise, update the workflow type which will trigger the modal state
    */
-  const handleOpenWorkflow = (e: EventType): void => {
+  const handleOpenWorkflow = (e: WorkflowType): void => {
     if (workflowType === e) {
       setShowWorkflowForm((o) => !o);
     } else {

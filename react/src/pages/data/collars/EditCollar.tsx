@@ -13,7 +13,7 @@ import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { editEventBtnProps, FormSection } from '../common/EditModalComponents';
 import RetrievalEvent from 'types/events/retrieval_event';
-import { EventType } from 'types/events/event';
+import { WorkflowType } from 'types/events/event';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import EventWrapper from '../events/EventWrapper';
 
@@ -32,7 +32,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   const [showRetrievalWorkflow, setShowRetrievalWorkflow] = useState<boolean>(false);
   const [showMalfunctionWorkflow, setShowMalfunctionWorkflow] = useState<boolean>(false);
 
-  const [workflowType, setWorkflowType] = useState<EventType>('unknown');
+  const [workflowType, setWorkflowType] = useState<WorkflowType>('unknown');
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
   const [event, updateEvent] = useState(new RetrievalEvent()); //fixme: type this
 
@@ -61,7 +61,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
     }
   }, [event]);
 
-  const handleOpenWorkflow = (e: EventType): void => {
+  const handleOpenWorkflow = (e: WorkflowType): void => {
     if (workflowType === e) {
       setShowWorkflowForm((o) => !o);
     } else {

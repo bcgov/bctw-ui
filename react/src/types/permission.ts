@@ -2,7 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
 import { Animal } from './animal';
-import { BCTWBaseType, BCTWValidDates, nullToDayjs } from './common_types';
+import { BCTWBase, BCTWValidDates, nullToDayjs } from './common_types';
 import { IUserCritterAccessInput } from './user';
 
 // interface used to construct objects for updating/granting users access to animals
@@ -78,7 +78,7 @@ export interface IPermissionRequest extends
 
 // type PermissionRequestProps = keyof IPermissionRequest;
 
-export class PermissionRequest implements IPermissionRequest, BCTWBaseType<PermissionRequest> {
+export class PermissionRequest implements IPermissionRequest, BCTWBase<PermissionRequest> {
   animal_id: string;
   wlh_id: string;
   species: string;

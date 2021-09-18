@@ -17,7 +17,7 @@ import { formatAxiosError } from 'utils/errors';
 import { ICustomTableColumn, ITableFilter, ITableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
-import { BCTWBaseType } from 'types/common_types';
+import { BCTWBase } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -28,7 +28,7 @@ const DISABLE_PAGINATION = true;
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
  */
-export default function DataTable<T extends BCTWBaseType<T>>({
+export default function DataTable<T extends BCTWBase<T>>({
   customColumns,
   headers,
   queryProps,

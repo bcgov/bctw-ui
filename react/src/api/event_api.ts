@@ -2,7 +2,7 @@
 import { removeDeviceEndpoint, upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { createUrl } from 'api/api_helpers';
 import { AxiosError } from 'axios';
-import { BCTWEvent, EventType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
 import MortalityEvent from 'types/events/mortality_event';
 import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, ApiProps } from './api_interfaces';
@@ -23,7 +23,7 @@ export const eventApi = (props: ApiProps) => {
    * the collar
    * fixme: if a later api post fails...how to handle form?
    */
-  const eventErr = (ev: EventType): string => `${ev} saving workflow:`;
+  const eventErr = (ev: WorkflowType): string => `${ev} saving workflow:`;
 
   const _handleBulkResults = (data: IBulkUploadResults<unknown>): WorkflowAPIResponse => {
     const { errors } = data;
@@ -33,7 +33,7 @@ export const eventApi = (props: ApiProps) => {
     return true;
   };
 
-  const _saveAnimal = async (critter: OptionalAnimal, type: EventType): Promise<WorkflowAPIResponse> => {
+  const _saveAnimal = async (critter: OptionalAnimal, type: WorkflowType): Promise<WorkflowAPIResponse> => {
     console.log(critter);
     const url = createUrl({ api: upsertCritterEndpoint });
     try {
@@ -46,7 +46,7 @@ export const eventApi = (props: ApiProps) => {
     }
   };
 
-  const _saveDevice = async (device: OptionalDevice, type: EventType): Promise<WorkflowAPIResponse> => {
+  const _saveDevice = async (device: OptionalDevice, type: WorkflowType): Promise<WorkflowAPIResponse> => {
     console.log(device);
     const url = createUrl({ api: upsertDeviceEndpoint });
     try {
@@ -59,7 +59,7 @@ export const eventApi = (props: ApiProps) => {
     }
   };
 
-  const saveEvent = async <T>(event: BCTWEvent<T>): Promise<true | WorkflowAPIResponse> => {
+  const saveEvent = async <T extends BCTWWorkflow<T>>(event: T): Promise<true | WorkflowAPIResponse> => {
     if (event.getDataLife) {
       // todo:
       console.error('not implemented');

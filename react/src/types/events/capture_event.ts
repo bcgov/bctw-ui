@@ -2,11 +2,11 @@ import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWEvent, EventType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 
-export default class CaptureEvent implements BCTWEvent<CaptureEvent> {
-  readonly event_type: EventType;
+export default class CaptureEvent implements BCTWWorkflow<CaptureEvent> {
+  readonly event_type: WorkflowType;
   collar_id: uuid;
   device_id: number;
   device_make: Code;

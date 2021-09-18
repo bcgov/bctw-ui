@@ -21,7 +21,7 @@ export interface IUDF extends IUDFInput {
   changed?: boolean;
 }
 
-export class UDF extends BCTWBase implements IUDF {
+export class UDF implements IUDF, BCTWBase<IUDF> {
   type: eUDFType;
   key: string;
   value: string[];
@@ -36,6 +36,9 @@ export class UDF extends BCTWBase implements IUDF {
   }
   toJSON(): UDF {
     return this;
+  }
+  get displayProps(): (keyof IUDF)[] {
+    return [];
   }
 }
 

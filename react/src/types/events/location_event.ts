@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { EventType } from 'types/events/event';
+import { WorkflowType } from 'types/events/event';
 import { formatTime } from 'utils/time';
 
 export enum eLocationPositionType {
@@ -29,7 +29,7 @@ export class LocationEvent implements ILocationEvent {
   utm_northing: number;
   utm_zone: number;
 
-  constructor(private location_type: EventType, public date: Dayjs = dayjs()) {
+  constructor(private location_type: WorkflowType, public date: Dayjs = dayjs()) {
     this.coordinate_type = eLocationPositionType.utm
   }
 

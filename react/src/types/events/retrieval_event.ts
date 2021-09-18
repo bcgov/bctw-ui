@@ -2,7 +2,7 @@ import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWEvent, EventType, OptionalDevice } from 'types/events/event';
+import { WorkflowType, OptionalDevice, BCTWWorkflow } from 'types/events/event';
 import { IMortalityEvent, MortalityDeviceEventProps } from 'types/events/mortality_event';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
@@ -12,8 +12,7 @@ import { EventFormStrings } from 'constants/strings';
 import { eInputType, FormFieldObject } from 'types/form_types';
 
 // require dates to enforce retrieval min date
-interface IRetrievalEvent
-  extends 
+interface IRetrievalEvent extends 
   Omit<MortalityDeviceEventProps, 'device_status'>,
   Pick<IMortalityEvent, 'assignment_id' | 'shouldUnattachDevice'>,
   Readonly<Pick<Collar, 'malfunction_date'>>,
@@ -26,8 +25,8 @@ export type RetrievalFormField = {
   [Property in keyof RetrievalEvent]+?: FormFieldObject<RetrievalEvent>;
 };
 
-export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetrievalEvent {
-  readonly event_type: EventType;
+export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<RetrievalEvent>{
+  readonly event_type: WorkflowType;
   // device props
   readonly collar_id: uuid;
   readonly device_id: number;
@@ -77,7 +76,7 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
         return columnToHeader(s);
     }
   }
-  get displayProps(): (keyof RetrievalEvent)[] {
+  get displayProps(): (keyof IRetrievalEvent)[] {
     return ['wlh_id', 'animal_id', 'device_id'];
   }
 

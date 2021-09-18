@@ -21,7 +21,7 @@ import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { BCTWBaseType } from 'types/common_types';
+import { BCTWBase } from 'types/common_types';
 import useFormHasError from 'hooks/useFormHasError';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
@@ -48,7 +48,7 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param onSave the parent handler called when the save button is clicked
  * @param headerComponent
  */
-export default function EditModal<T extends BCTWBaseType<T>>(props: IEditModalProps<T>): JSX.Element {
+export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<T>): JSX.Element {
   const bctwApi = useTelemetryApi();
   const {
     children,
