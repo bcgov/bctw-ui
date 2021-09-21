@@ -1,6 +1,6 @@
 import { Box, ButtonProps, Grid } from '@material-ui/core';
 import { formatTableCell } from 'components/table/table_helpers';
-import { ReactNode } from 'react';
+import { ReactNode, ReactElement } from 'react';
 
 interface TabPanelProps {
   children?: ReactNode;
@@ -8,6 +8,7 @@ interface TabPanelProps {
   value: unknown;
 }
 
+/** used in the Edit modal to toggle the display of the edit form and history page components */
 const EditTabPanel = (props: TabPanelProps): JSX.Element => {
   const { children, value, index, ...other } = props;
   return (
@@ -30,6 +31,9 @@ type EditHeaderProps<T> = {
   btn?: ReactNode;
 };
 
+/**
+ * edit modals can generate the header component using this function
+ */
 const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>): JSX.Element => {
   return (
     <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
@@ -54,8 +58,12 @@ const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>
   );
 };
 
-const FormSection = (key: string, header: string, children: ReactNode[], btn?: ReactNode): JSX.Element => (
-  <Box component='fieldset' p={2}>
+/**
+ * creates a section of a form 
+ * todo: pass disabled status to all children through this component?
+ */
+const FormSection = (key: string, header: string, children: ReactNode[], btn?: ReactNode, disabled = false): JSX.Element => (
+  <Box component='fieldset' p={2}  style={{opacity: disabled ? 0.3 : 1}}>
     {header ? (
       <Box component='legend' className={'legend'} mb={1} mt={1}>
         {header}

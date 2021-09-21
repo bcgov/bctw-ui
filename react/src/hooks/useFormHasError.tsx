@@ -13,6 +13,7 @@ export default function useFormHasError(): [boolean, (r: Record<string, unknown>
 
   useEffect(() => {
     const numErrs = Object.keys(errors).length;
+    // eslint-disable-next-line no-console
     // console.log(`useFormHasError state updated, ${numErrs} errors ${JSON.stringify(errors)}`);
     setErrorsExist(numErrs > 0);
   }, [errors]);

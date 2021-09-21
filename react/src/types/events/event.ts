@@ -24,6 +24,9 @@ interface IBCTWWorkflow {
   getDataLife?(): void;
   // multiple events implement this 
   shouldUnattachDevice?: boolean;
+  // must implement this to determine how the workflow should be saved
+  shouldSaveAnimal: boolean;
+  shouldSaveDevice: boolean;
 }
 
 export type BCTWWorkflow<T> = IBCTWWorkflow & BCTWFormat<T>
@@ -44,8 +47,12 @@ export const eventToJSON = <T>(keys: string[], event: T): Record<string, unknown
   return ret;
 };
 
-/** used to create new workflow events and not have properties overwritten */
-export const editObjectToEvent = <T, E extends T>(editing: E, workflow: T, toRemove: (keyof T)[]): T => {
+/** used to create new workflow events and not have properties overwritten 
+ * @param editing - the original object, usually an @type {Animal} or @type {Collar}
+ * @param workflow - instance of the workflow event 
+ * @param toRemove - keys of the @param editing type that shouldn't end up in the workflow instance
+*/
+export const editObjectToEvent = <WF, E>(editing: E, workflow: WF, toRemove: (keyof E)[]): WF => {
   for (let index = 0; index < toRemove.length; index++) {
     delete editing[toRemove[index]]
   }

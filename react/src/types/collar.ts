@@ -57,6 +57,7 @@ export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_
   permission_type?: eCritterPermission; // fetched collars should contain this
   retrieval_date: Dayjs;
   retrieved: boolean;
+  retrieval_comment: string;
   satellite_network: Code;
 }
 
@@ -90,6 +91,7 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   permission_type: eCritterPermission;
   @Transform(nullToDayjs) retrieval_date: Dayjs;
   retrieved: boolean;
+  retrieval_comment: string;
   satellite_network: Code;
   device_comment: string;
   @Transform(nullToDayjs) valid_from: Dayjs;

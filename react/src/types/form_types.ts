@@ -13,6 +13,15 @@ export enum eInputType {
 }
 
 /**
+ * 
+ */
+export type FormBaseProps = {
+  changeHandler: FormChangeEvent;
+  propName: string;
+  label?: string;
+}
+
+/**
  * used to assist defining form types for null property values
  * ex. a device retrieved date could be null, but it should be rendered
  * in a form as a date input
@@ -37,6 +46,9 @@ export type InboundObj = {
   error?: boolean;
 };
 
+/**
+ * 
+ */
 export type FormChangeEvent = {(v: InboundObj): void}
 
 /**

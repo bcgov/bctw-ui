@@ -11,9 +11,10 @@ import { EventFormStrings } from 'constants/strings';
 type CaptivityStatusFormProps = {
   event: MortalityEvent;
   handleFormChange: FormChangeEvent;
+  disabled?: boolean;
 };
 
-export default function CaptivityStatusForm({ event, handleFormChange }: CaptivityStatusFormProps): JSX.Element {
+export default function CaptivityStatusForm({ event, handleFormChange, disabled = false }: CaptivityStatusFormProps): JSX.Element {
   const captivityFields: Required<Pick<MortalityFormField, 'captivity_status' | 'mortality_captivity_status'>> = {
     captivity_status: {
       prop: 'captivity_status',
@@ -31,7 +32,7 @@ export default function CaptivityStatusForm({ event, handleFormChange }: Captivi
     <Box {...boxSpreadRowProps} mt={1}>
       {/* captivity_status is always disabled in mortality workflow */}
       {CreateFormField(event, captivityFields.captivity_status, handleFormChange, true)}
-      {CreateFormField(event, captivityFields.mortality_captivity_status, handleFormChange)}
+      {CreateFormField(event, captivityFields.mortality_captivity_status, handleFormChange, disabled)}
     </Box>
   );
 }

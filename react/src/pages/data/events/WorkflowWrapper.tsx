@@ -7,7 +7,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { BCTWWorkflow, WorkflowType } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { EditHeader } from '../common/EditModalComponents';
@@ -17,6 +17,7 @@ import ReleaseEventForm from './ReleaseEventForm';
 import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEventForm from './RetrievalEventForm';
 import RetrievalEvent from 'types/events/retrieval_event';
+import ConfirmModal from 'components/modal/ConfirmModal';
 
 type WorkflowWrapperProps<T extends BCTWWorkflow<T>> = ModalBaseProps & {
   event: T;
@@ -40,9 +41,11 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr] = useFormHasError();
+  //
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState<ReactNode>(null);
 
   useEffect(() => {
-    // console.log('event wrapper error status', hasErr);
     setCanSave(!hasErr);
   }, [hasErr]);
 
@@ -52,7 +55,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     } else {
       // console.log('sucess!!', e);
       responseDispatch({ severity: 'success', message: 'mortality event saved!' });
-      // expire the telemetry alert
+      // if the parent implements this, call it on successful save. 
+      // Ex. UserAlertPage component will expire the telemetry alert
       if (typeof onEventSaved === 'function') {
         onEventSaved();
       }
@@ -82,6 +86,17 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     // console.log(event[k])
   };
 
+  const handleShowExitWorkflow = (message: ReactNode): void => {
+    setConfirmMessage(message);
+    setShowConfirmModal((o) => !o);
+  };
+
+  const handleExitWorkflow = (): void => {
+    console.log('exiting workflow early!');
+    saveEvent(event);
+    setShowConfirmModal(false);
+  };
+
   let Comp: React.ReactNode;
   switch (eventType) {
     case 'release':
@@ -91,10 +106,18 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       Comp = <CaptureEventForm />;
       break;
     case 'mortality':
-      Comp = <MortalityEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as MortalityEvent} />;
+      Comp = (
+        <MortalityEventForm
+          handleExitEarly={handleShowExitWorkflow}
+          handleFormChange={handleChildFormUpdated}
+          event={event as unknown as MortalityEvent}
+        />
+      );
       break;
-    case 'retrieval': 
-      Comp = <RetrievalEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as RetrievalEvent} />;
+    case 'retrieval':
+      Comp = (
+        <RetrievalEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as RetrievalEvent} />
+      );
       break;
     case 'unknown':
     default:
@@ -122,7 +145,13 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
               <Box p={3}>
                 <Box display='flex' justifyContent='flex-end' className='form-buttons'>
-                  {isLoading ? <CircularProgress /> : <Button size='large' color='primary' onClick={handleSave} disabled={!canSave}>Save</Button>}
+                  {isLoading ? (
+                    <CircularProgress />
+                  ) : (
+                    <Button size='large' color='primary' onClick={handleSave} disabled={!canSave}>
+                      Save
+                    </Button>
+                  )}
                   <Button size='large' variant='outlined' color='primary' onClick={(): void => handleClose(false)}>
                     Cancel and Exit
                   </Button>
@@ -132,6 +161,12 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
           </Box>
         </Container>
       </form>
+      <ConfirmModal
+        message={confirmMessage}
+        handleClickYes={handleExitWorkflow}
+        open={showConfirmModal}
+        handleClose={(): void => setShowConfirmModal(false)}
+      />
     </Modal>
   );
 }

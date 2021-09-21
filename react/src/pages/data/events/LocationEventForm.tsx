@@ -9,14 +9,17 @@ import { FormChangeEvent, FormFieldObject, InboundObj } from 'types/form_types';
 import DateTimeInput from 'components/form/DateTimeInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { ReactNode } from 'react';
+import { boxSpreadRowProps } from './EventComponents';
 
 type LocationEventProps = {
   event: LocationEvent;
   notifyChange: FormChangeEvent;
   children?: ReactNode;
+  childNextToDate?: ReactNode;
+  disabled?: boolean;
 };
 
-export default function LocationEventForm({ event, notifyChange, children }: LocationEventProps): JSX.Element {
+export default function LocationEventForm({ event, notifyChange, children, childNextToDate, disabled = false}: LocationEventProps): JSX.Element {
   const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
 
   // create the form inputs
@@ -47,26 +50,33 @@ export default function LocationEventForm({ event, notifyChange, children }: Loc
     notifyChange({ reset: true });
   }, [showUtm]);
 
-  const baseInputProps = { changeHandler, required: true };
+  const baseInputProps = { changeHandler, required: true, disabled };
   return (
     <>
-      <DateTimeInput
-        propName={dateField.prop}
-        label={event.formatPropAsHeader('date')}
-        defaultValue={event.date}
-        changeHandler={(v): void => changeHandler(v)}
-      />
+      <Box {...boxSpreadRowProps} mb={1}>
+        {childNextToDate}
+        <DateTimeInput
+          propName={dateField.prop}
+          label={event.formatPropAsHeader('date')}
+          defaultValue={event.date}
+          changeHandler={(v): void => changeHandler(v)}
+          disabled={disabled}
+        />
+      </Box>
       {/* optionally render children below the date component */}
       {children}
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}
-      <RadioGroup row aria-label='position' name='position' value={showUtm} onChange={changeCoordinateType}>
+      {/* todo: use new radio component  */}
+      <RadioGroup  row aria-label='position' name='position' value={showUtm} onChange={changeCoordinateType}>
         <FormControlLabel
+          disabled={disabled}
           value={'utm'}
           control={<Radio color='primary' />}
           label={WorkflowStrings.locationEventCoordTypeUTM}
           labelPlacement='start'
         />
         <FormControlLabel
+          disabled={disabled}
           value={'coord'}
           control={<Radio color='primary' />}
           label={WorkflowStrings.locationEventCoordTypeLat}
@@ -125,6 +135,7 @@ export default function LocationEventForm({ event, notifyChange, children }: Loc
           propName={commentField.prop}
           defaultValue={event.comment}
           label={event.formatPropAsHeader(commentField.prop)}
+          disabled={disabled}
           changeHandler={changeHandler}
         />
       </Box>

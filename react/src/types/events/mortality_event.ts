@@ -12,7 +12,8 @@ import { Code } from 'types/code';
 import { EventFormStrings } from 'constants/strings';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 
-export type MortalityDeviceEventProps = Pick<Collar, 
+export type MortalityDeviceEventProps = Pick<
+Collar,
 | 'device_id'
 | 'device_make'
 | 'retrieved'
@@ -20,9 +21,11 @@ export type MortalityDeviceEventProps = Pick<Collar,
 | 'activation_status'
 | 'device_condition'
 | 'device_status'
-| 'device_deployment_status'>;
+| 'device_deployment_status'
+>;
 
-export type MortalityAnimalEventProps = Pick<Animal, 
+export type MortalityAnimalEventProps = Pick<
+Animal,
 | 'proximate_cause_of_death'
 | 'ultimate_cause_of_death'
 | 'predator_species_pcod'
@@ -43,11 +46,8 @@ export type MortalityAnimalEventProps = Pick<Animal,
 export interface IMortalityEvent
   extends MortalityDeviceEventProps,
   MortalityAnimalEventProps,
-  Omit<IMortalityAlert, 'data_life_start'| 'attachment_end'>,
-  Readonly<Pick<CollarHistory, 'assignment_id'>> {
-  shouldUnattachDevice: boolean;
-}
-
+  Omit<IMortalityAlert, 'data_life_start' | 'attachment_end'>,
+  Readonly<Pick<CollarHistory, 'assignment_id'>> {}
 // used to create forms without having to use all event props
 // +? makes the property optional
 export type MortalityFormField = {
@@ -57,10 +57,20 @@ export type MortalityFormField = {
 // codes defaulted in this workflow
 type MortalityDeviceStatus = 'Mortality';
 export type DeploymentStatusNotDeployed = 'Not Deployed';
-type MortalityAnimalStatus = 'Potential Mortality';
+export type MortalityAnimalStatus = 'Mortality' | 'Alive';
 
-// todo: add pcod/ucod_confidence
+/**
+ * todo: captivity status?
+ */
 export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMortalityEvent {
+  // event specific props - not saved. used to enable/disable fields
+  readonly event_type: WorkflowType;
+  shouldUnattachDevice: boolean;
+  shouldSaveAnimal: boolean;
+  shouldSaveDevice: boolean;
+  wasInvestigated: boolean;
+  isUCODSpeciesKnown: boolean;
+  onlySaveAnimalStatus: boolean;
   // device props
   readonly collar_id: uuid;
   readonly device_id: number;
@@ -74,7 +84,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   // attachment props
   readonly assignment_id: uuid;
   data_life_end: Dayjs;
-  attachment_start: Dayjs; // fixme: the capture date?
+  attachment_start: Dayjs;
   // critter props
   readonly critter_id: uuid;
   readonly animal_id: string;
@@ -88,21 +98,20 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   pcod_confidence: Code;
   mortality_investigation: Code;
   mortality_report: boolean;
-  captivity_status: boolean;
+  readonly captivity_status: boolean; // cannot be changed
   mortality_captivity_status: Code;
   predator_known: boolean;
   readonly capture_date: Dayjs;
   location_event: LocationEvent;
-  // event specific props - not saved. used to enable/disable fields
-  readonly event_type: WorkflowType;
-  shouldUnattachDevice: boolean;
-  wasInvestigated: boolean;
-  isUCODSpeciesKnown: boolean;
 
-  // todo: need to fetch captivity_status
   constructor() {
     this.event_type = 'mortality';
-    // note: retrieval date is defaulted to end of previous day (business requirement)
+    this.shouldSaveAnimal = true;
+    this.shouldSaveDevice = true;
+    this.shouldUnattachDevice = false;
+    this.onlySaveAnimalStatus = false;
+
+    // retrieval date is defaulted to end of previous day (business requirement)
     this.retrieval_date = getEndOfPreviousDay();
     this.retrieved = false;
     this.activation_status = true;
@@ -110,8 +119,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.shouldUnattachDevice = false;
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
-    this.animal_status = 'Potential Mortality';
-    this.shouldUnattachDevice = false;
+    this.animal_status = 'Mortality';
     this.wasInvestigated = false;
     this.predator_known = false;
     this.location_event = new LocationEvent('mortality', dayjs());
@@ -129,7 +137,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     switch (s) {
       case 'attachment_start':
         return 'Capture Date';
-      case 'wasInvestigated': 
+      case 'wasInvestigated':
         return EventFormStrings.animal.mort_investigation;
       case 'mortality_report':
         return EventFormStrings.animal.mort_wildlife;
@@ -139,7 +147,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
         return EventFormStrings.device.vendor_activation;
       case 'predator_known':
         return EventFormStrings.animal.mort_predator_pcod;
-      case 'isUCODSpeciesKnown': 
+      case 'isUCODSpeciesKnown':
         return EventFormStrings.animal.mort_predator_ucod;
       case 'shouldUnattachDevice':
         return EventFormStrings.device.should_unattach;
@@ -179,30 +187,34 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     proximate_cause_of_death: animalMortFieldMap.get('proximate_cause_of_death'),
     ultimate_cause_of_death: animalMortFieldMap.get('ultimate_cause_of_death'),
     // workflow-specific
-    wasInvestigated: {prop: 'wasInvestigated', type: eInputType.check},
-    isUCODSpeciesKnown: {prop: 'isUCODSpeciesKnown', type: eInputType.check},
-    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
+    wasInvestigated: { prop: 'wasInvestigated', type: eInputType.check },
+    isUCODSpeciesKnown: { prop: 'isUCODSpeciesKnown', type: eInputType.check },
+    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check }
   };
 
   // retrieve the animal metadata fields from the mortality event
-  // todo: inherit from ^
   getAnimal(): OptionalAnimal {
-    const props: (keyof AttachedAnimal)[] = [
-      'critter_id',
-      'animal_status',
-      'predator_known',
-      'predator_species_pcod',
-      'predator_species_ucod',
-      'proximate_cause_of_death',
-      'ultimate_cause_of_death',
-      'pcod_confidence',
-      'ucod_confidence',
-      'captivity_status',
-      'mortality_investigation',
-      'mortality_report',
-      'mortality_captivity_status',
-    ];
+    const props: (keyof AttachedAnimal)[] = this.onlySaveAnimalStatus
+      ? ['critter_id', 'animal_status']
+      : [
+        'critter_id',
+        'animal_status',
+        'predator_known',
+        'predator_species_pcod',
+        'predator_species_ucod',
+        'proximate_cause_of_death',
+        'ultimate_cause_of_death',
+        'pcod_confidence',
+        'ucod_confidence',
+        'captivity_status',
+        'mortality_investigation',
+        'mortality_report',
+        'mortality_captivity_status'
+      ];
     const ret = eventToJSON(props, this);
+    if (this.onlySaveAnimalStatus) {
+      return ret;
+    }
     // todo: better way to wipe disabled fields?
     if (!this.wasInvestigated) {
       delete ret.mortality_investigation;
@@ -213,8 +225,8 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       delete ret.pcod_confidence;
       delete ret.ucod_confidence;
     }
-    const loc = this.location_event.toJSON();
-    return omitNull({ ...ret, ...loc }) as OptionalAnimal;
+    const locationFields = this.location_event.toJSON();
+    return omitNull({ ...ret, ...locationFields }) as OptionalAnimal;
   }
 
   // retrieve the collar metadata fields from the event

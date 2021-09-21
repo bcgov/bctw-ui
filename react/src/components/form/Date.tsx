@@ -4,14 +4,11 @@ import dayjs, { Dayjs } from 'dayjs';
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import { formatDay } from 'utils/time';
 import { StandardTextFieldProps } from '@material-ui/core/TextField';
-import { FormChangeEvent } from 'types/form_types';
+import { FormBaseProps } from 'types/form_types';
 import { PropTypes } from '@material-ui/core';
 
-export type DateInputProps = StandardTextFieldProps & {
-  propName: string;
-  label: string;
+export type DateInputProps = FormBaseProps & StandardTextFieldProps & {
   defaultValue: Dayjs;
-  changeHandler: FormChangeEvent;
   minDate?: Dayjs;
   maxDate?: Dayjs;
   margin?: PropTypes.Margin;

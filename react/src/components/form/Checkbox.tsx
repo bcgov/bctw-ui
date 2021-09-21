@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Checkbox as MuiCheckbox, CheckboxProps } from '@material-ui/core/';
 import { FormControlLabel } from '@material-ui/core';
-import { CheckBoxChangeHandler } from 'components/component_interfaces';
 import { columnToHeader, removeProps } from 'utils/common_helpers';
 import { inputPropsToRemove } from 'components/form/TextInput';
+import { FormBaseProps } from 'types/form_types';
 
-interface ICheckboxProps extends CheckboxProps {
+type ICheckboxProps = Omit<FormBaseProps, 'changeHandler' | 'propName'> & CheckboxProps & {
   initialValue: boolean;
   label: string;
   propName?: string;
-  changeHandler: CheckBoxChangeHandler;
+  changeHandler: (o: Record<string, boolean>) => void;
 }
+
 export default function Checkbox(props: ICheckboxProps): JSX.Element {
   const { initialValue, label, changeHandler, propName } = props;
 

@@ -40,13 +40,14 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
 
   useDidMountEffect(async () => {
     updateEvent(() => {
-      let e;
+      let e, o;
       if (workflowType === 'retrieval') {
         e = new RetrievalEvent();
+        o = editObjectToEvent(Object.assign({}, editing), e, ['retrieved', 'retrieval_date', 'device_deployment_status']);
       } else {
         e = new RetrievalEvent();
+        o = {};
       }
-      const o = editObjectToEvent(Object.assign({}, editing), e, ['retrieved', 'retrieval_date', 'device_deployment_status']);
       return o;
     });
   }, [workflowType]);

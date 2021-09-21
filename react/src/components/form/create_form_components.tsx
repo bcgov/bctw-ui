@@ -1,7 +1,7 @@
 import TextField from 'components/form/TextInput';
 import NumberField from 'components/form/NumberInput';
 import SelectCode from './SelectCode';
-import DateInput from 'components/form/Date';
+import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
 import { ReactElement, ReactNode } from 'react';
@@ -16,16 +16,19 @@ type CreateInputBaseProps<T> = {
   value: unknown;
   prop: keyof T;
   type: eInputType;
-  handleChange: (v: Record<string, unknown>) => void;
+  handleChange: FormChangeEvent;
 };
 
-type CreateInputProps<T> = CreateInputBaseProps<T> & Pick<InputProps, 'rows' | 'multiline'> & {
+type CreateInputProps<T> = CreateInputBaseProps<T> 
+& Pick<InputProps, 'rows' | 'multiline'> 
+& Pick<DateInputProps, 'minDate' |'maxDate'> & {
   codeName?: string;
   label?: string;
   disabled?: boolean;
   errorMessage?: string;
   required?: boolean;
   span?: boolean;
+  inputProps: Record<string, unknown>;
 };
 
 // text and number field handler
@@ -76,7 +79,7 @@ function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: 
 }
 
 // datetime field handler
-function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled, required }: CreateInputProps<T>): ReactElement {
+function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled, required, minDate, maxDate}: CreateInputProps<T>): ReactElement {
   return (
     <DateTimeInput
       propName={prop as string}
@@ -86,7 +89,8 @@ function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled
       disabled={disabled}
       key={`input-dt-${prop}`}
       required={required}
-      rows={3}
+      minDate={minDate}
+      maxDate={maxDate}
     />
   );
 }
@@ -158,8 +162,10 @@ function CreateFormField<T extends BCTWFormat<T>>(
   obj: T,
   formField: FormFieldObject<T> | undefined,
   handleChange: FormChangeEvent,
+  // todo: move disabled into inputProps
   disabled = false,
-  displayBlock = false
+  displayBlock = false,
+  inputProps?: { [Property in keyof CreateInputProps<T>]+?: unknown }
 ): ReactNode {
   if (formField === undefined) {
     return null;
@@ -174,7 +180,8 @@ function CreateFormField<T extends BCTWFormat<T>>(
     disabled,
     required,
     codeName,
-    key: `${type}-${prop}`
+    key: `${type}-${prop}`,
+    ...inputProps
   };
   let Comp = getInputFnFromType(type)(toPass);
 

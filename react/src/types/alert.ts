@@ -9,6 +9,7 @@ import { formatDay, formatT } from 'utils/time';
 import { Code } from 'types/code';
 import { DataLife } from 'types/data_life';
 import MortalityEvent from 'types/events/mortality_event';
+import { editObjectToEvent } from './events/event';
 
 // possible types of telemetry alerts
 enum eAlertType {
@@ -143,7 +144,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   }
 
   toMortalityEvent(): MortalityEvent {
-    return Object.assign(new MortalityEvent(), this);
+    return editObjectToEvent(Object.assign({}, this),  new MortalityEvent(), ['animal_status']);
   }
 }
 

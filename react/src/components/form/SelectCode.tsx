@@ -147,10 +147,10 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
    */
   const pushChange = (v: string): void => {
     const codeObj = codes.find((c) => c?.description === v);
-    if (!codeObj) {
+    if (!codeObj && !hasError) {
       return;
     }
-    const ret = { [getIdentifier()]: codeObj.code, error: hasError };
+    const ret = { [getIdentifier()]: codeObj?.code, error: hasError };
     if (typeof changeHandler === 'function') {
       changeHandler(ret);
     }

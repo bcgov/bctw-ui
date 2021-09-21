@@ -1,24 +1,22 @@
 import { StandardTextFieldProps, TextField } from '@material-ui/core';
 import { baseInputStyle } from 'components/component_constants';
-import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import { useState } from 'react';
 import { inputPropsToRemove } from 'components/form/TextInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
+import { FormBaseProps } from 'types/form_types';
+
+type NumberInputProps = FormBaseProps & StandardTextFieldProps & {
+  defaultValue?: number;
+  validate?: (v: number) => string;
+}
 
 /**
  * 
  */
-interface INumberInputProps extends StandardTextFieldProps {
-  changeHandler: InputChangeHandler;
-  defaultValue?: number;
-  propName: string;
-  validate?: (v: number) => string;
-}
-
-export default function NumberField(props: INumberInputProps): JSX.Element {
+export default function NumberField(props: NumberInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, validate, required } = props;
 
   const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : '');

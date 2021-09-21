@@ -78,7 +78,7 @@ export const eventApi = (props: ApiProps) => {
 
   const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
     //
-    if (event.shouldUnattachDevice && typeof event.getAttachment === 'function') {
+    if (typeof event.getAttachment === 'function' && event.shouldUnattachDevice) {
       const attachment = event.getAttachment();
       const s = await _addOrRemoveDevice(attachment as RemoveDeviceInput, false); 
       if (typeof s !== 'boolean') {
@@ -86,7 +86,7 @@ export const eventApi = (props: ApiProps) => {
       }
     }
     //
-    if (typeof event.getAnimal === 'function') {
+    if (typeof event.getAnimal === 'function' && event.shouldSaveAnimal) {
       const critter = event.getAnimal();
       if (critter) {
         const s = await _saveAnimal(critter, event.event_type);
@@ -96,7 +96,7 @@ export const eventApi = (props: ApiProps) => {
       }
     }
     //
-    if (typeof event.getDevice === 'function') {
+    if (typeof event.getDevice === 'function' && event.shouldSaveDevice) {
       const device = event.getDevice();
       if (device) {
         const s = _saveDevice(device, event.event_type);

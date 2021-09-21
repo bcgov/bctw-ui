@@ -9,7 +9,7 @@ import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
-import { WorkflowType } from 'types/events/event';
+import { editObjectToEvent, WorkflowType } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import MortalityEvent from 'types/events/mortality_event';
@@ -36,14 +36,14 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
    */
   useDidMountEffect(async () => {
     updateEvent(() => {
-      let e;
+      let e, o;
       if (workflowType === 'capture') {
         e = new CaptureEvent();
+        o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['species', 'translocation', 'recapture']);
       } else {
-        // default for now
         e = new MortalityEvent();
+        o = editObjectToEvent(Object.assign({}, editing) as AttachedAnimal, e, ['animal_status']);
       }
-      const o = Object.assign(e, editing);
       return o;
     });
   }, [workflowType]);

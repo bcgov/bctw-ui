@@ -1,16 +1,14 @@
 import { StandardTextFieldProps, TextField as MuiTextField } from '@material-ui/core';
 import { baseInputStyle } from 'components/component_constants';
-import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import {useState} from 'react';
 import { mustBeEmail } from 'components/form/form_validators';
 import { FormStrings } from 'constants/strings';
+import { FormBaseProps } from 'types/form_types';
 
-type TextInputProps = StandardTextFieldProps & {
-  propName: string;
+type TextInputProps = FormBaseProps & StandardTextFieldProps & {
   defaultValue: string;
-  changeHandler: InputChangeHandler;
 }
 
 export const inputPropsToRemove = ['propName', 'changeHandler', 'validate', 'errorMessage', 'handleChange', 'formType', 'defaultValue']

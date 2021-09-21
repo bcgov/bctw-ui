@@ -3,24 +3,22 @@ import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { BCTWWorkflow, eventToJSON, WorkflowType, OptionalDevice } from 'types/events/event';
-import { IMortalityEvent, MortalityDeviceEventProps } from 'types/events/mortality_event';
+import { MortalityDeviceEventProps } from 'types/events/mortality_event';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
 import { DataLife } from 'types/data_life';
 import { EventFormStrings } from 'constants/strings';
 import { eInputType, FormFieldObject } from 'types/form_types';
-import { RemoveDeviceInput } from 'types/collar_history';
+import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 
 // require dates to enforce retrieval min date
 interface IRetrievalEvent extends 
   Omit<MortalityDeviceEventProps, 'device_status'>,
-  Pick<IMortalityEvent, 'assignment_id' | 'shouldUnattachDevice'>,
-  Readonly<Pick<Collar, 'malfunction_date'>>,
+  Pick<CollarHistory, 'assignment_id'>,
+  Readonly<Pick<Collar, 'malfunction_date' | 'retrieval_comment'>>,
   Readonly<Pick<Animal, 'capture_date' | 'mortality_date' | 'wlh_id' | 'animal_id'>>,
-  DataLife {
-  retrieval_comment: string
-}
+  DataLife { }
 
 export type RetrievalFormField = {
   [Property in keyof RetrievalEvent]+?: FormFieldObject<RetrievalEvent>;
@@ -28,6 +26,9 @@ export type RetrievalFormField = {
 
 export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<RetrievalEvent>{
   readonly event_type: WorkflowType;
+  shouldUnattachDevice: boolean;
+  readonly shouldSaveAnimal = false;
+  readonly shouldSaveDevice = true;
   // device props
   readonly collar_id: uuid;
   readonly device_id: number;
@@ -54,7 +55,6 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
   attachment_end: Dayjs;
 
   readonly assignment_id: uuid;
-  shouldUnattachDevice: boolean;
 
   readonly animal_id: string;
   readonly wlh_id: string;

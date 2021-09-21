@@ -34,7 +34,7 @@ export default function AlertPage(): JSX.Element {
   useEffect(() => {
     const update = (): void => {
       const alerts = useAlerts.alerts;
-      console.log('alerts loaded', alerts);
+      // console.log('alerts loaded', alerts);
       setAlerts(alerts);
     };
     update();

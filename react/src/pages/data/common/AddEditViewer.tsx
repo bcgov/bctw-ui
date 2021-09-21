@@ -5,7 +5,7 @@ import { IUpsertPayload } from 'api/api_interfaces';
 import { EditorProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { IEditModalProps } from 'pages/data/common/EditModal';
-import React, { useState } from 'react';
+import {cloneElement, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
 
 export type IAddEditProps<T> = {
@@ -98,8 +98,8 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
   if (editBtn) {
     return (
       <>
-        {React.cloneElement(children, editorProps)}
-        {React.cloneElement(editBtn, editBtnProps)}
+        {cloneElement(children, editorProps)}
+        {cloneElement(editBtn, editBtnProps)}
       </>
     );
   }
@@ -107,7 +107,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
   return (
     <>
       {/* clone child EditModal component to pass additional props */}
-      {React.cloneElement(children, editorProps)}
+      {cloneElement(children, editorProps)}
       <Box className="button-bar">
 
         {/* render add button */}

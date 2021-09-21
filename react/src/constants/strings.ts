@@ -36,6 +36,7 @@ const WorkflowStrings = {
   mortalityWorkflowTitle: 'Mortality Event Workflow',
   releaseWorkflowTitle: 'Release Event Workflow',
   retrievalWorkflowTitle: 'Retrieval Event Workflow',
+  mortalityExitEarly: 'You have set the animal mortality status to Alive. Do you wish to exit the workflow now?',
 }
 
 const CollarStrings = {
@@ -124,6 +125,7 @@ const EventFormStrings = {
   titles: {
     mortalityTitle: 'Mortality Event',
     retrievalTitle: 'Retrieval Event',
+    captureTitle: 'Capture Event',
   },
   animal: {
     mort_captivity_status: 'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?',
