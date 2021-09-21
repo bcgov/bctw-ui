@@ -8,7 +8,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
-import { BCTWEvent, EventType } from 'types/events/event';
+import { BCTWWorkflow, WorkflowType } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
@@ -18,9 +18,9 @@ import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEventForm from './RetrievalEventForm';
 import RetrievalEvent from 'types/events/retrieval_event';
 
-type WorkflowWrapperProps<T> = ModalBaseProps & {
-  event: BCTWEvent<T>;
-  eventType: EventType;
+type WorkflowWrapperProps<T extends BCTWWorkflow<T>> = ModalBaseProps & {
+  event: T;
+  eventType: WorkflowType;
   onEventSaved?: () => void; // to notify alert that event was saved
 };
 
@@ -28,13 +28,13 @@ type WorkflowWrapperProps<T> = ModalBaseProps & {
  * wraps all of the event pages.
  * handles saving
  */
-export default function WorkflowWrapper<E>({
+export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   event,
   eventType,
   onEventSaved,
   open,
   handleClose
-}: WorkflowWrapperProps<E>): JSX.Element {
+}: WorkflowWrapperProps<T>): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
@@ -65,12 +65,11 @@ export default function WorkflowWrapper<E>({
   };
 
   // setup save mutation
-  const { mutateAsync: saveEvent, isLoading } = bctwApi.useMutateMortalityEvent({ onSuccess, onError });
+  const { mutateAsync: saveEvent, isLoading } = bctwApi.useMutateWorkflowEvent<T>({ onSuccess, onError });
 
   // performs metadata updates of collar/critter
   const handleSave = async (): Promise<void> => {
-    // fixme: typing event to specific
-    saveEvent(event as BCTWEvent<unknown>);
+    saveEvent(event);
   };
 
   const handleChildFormUpdated = (v: InboundObj): void => {
@@ -105,7 +104,7 @@ export default function WorkflowWrapper<E>({
   return (
     <Modal open={open} handleClose={handleClose}>
       <form className={'event-modal'} autoComplete={'off'}>
-        <EditHeader<E>
+        <EditHeader<T>
           title={event?.getHeaderTitle()}
           headers={event.displayProps}
           obj={event as any}

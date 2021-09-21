@@ -1,9 +1,9 @@
-import { BCTWBase, BCTWBaseType } from './common_types';
+import { BCTWBase } from './common_types';
 import { Type } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { eInputType, FormFieldObject } from './form_types';
 
-// just an string alias, but makes it clearer in other types when a value is a code
+// just a string alias, but makes it clearer in other types when property should be a code
 type Code = string;
 
 // used in select multiple component 
@@ -48,11 +48,15 @@ interface ICodeHeader {
 // }
 
 // represents the objects retrieved from the database
-export class CodeHeader extends BCTWBase implements ICodeHeader {
+export class CodeHeader implements BCTWBase<CodeHeader>, ICodeHeader {
   id: number;
   type: string
   title: string;
   description: string;
+
+  get displayProps(): (keyof CodeHeader)[] {
+    return [];
+  }
 
   static getProps(): (keyof ICode)[] {
     return ['id', 'code', 'description', 'long_description'];
@@ -68,7 +72,7 @@ export class CodeHeader extends BCTWBase implements ICodeHeader {
 }
 
 // represents what a code header should look like when sending to api
-export class CodeHeaderInput implements BCTWBaseType<CodeHeaderInput> {
+export class CodeHeaderInput implements BCTWBase<CodeHeaderInput> {
   code_category_id: number;
   code_header_name: string;
   code_header_title: string;

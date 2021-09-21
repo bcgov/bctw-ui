@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { BaseTimestamps, BCTWBaseType, nullToDayjs, uuid } from 'types/common_types';
+import { BaseTimestamps, BCTWBase, nullToDayjs, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader, formatLatLong } from 'utils/common_helpers';
@@ -88,7 +88,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 }
 
 
-export class Animal implements BCTWBaseType<Animal>, IAnimal {
+export class Animal implements BCTWBase<Animal>, IAnimal {
   readonly critter_id: uuid;
   readonly critter_transaction_id: uuid;
   animal_id: string;
@@ -220,7 +220,7 @@ export class Animal implements BCTWBaseType<Animal>, IAnimal {
 // animals attached to devices should have additional properties
 export interface IAttachedAnimal extends IAnimal, ICollarHistory {}
 
-export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBaseType<AttachedAnimal> {
+export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<AttachedAnimal> {
   assignment_id: uuid;
   collar_id: uuid;
   device_id: number;

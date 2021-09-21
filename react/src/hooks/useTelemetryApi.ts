@@ -29,7 +29,7 @@ import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { IChangeDataLifeProps } from 'types/data_life';
-import { BCTWEvent } from 'types/events/event';
+import { BCTWWorkflow } from 'types/events/event';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -357,8 +357,8 @@ export const useTelemetryApi = () => {
     useMutation<TelemetryAlert[], AxiosError, TelemetryAlert[]>((body) => userApi.updateAlert(body), config);
   
   /** POST a mortality event form */
-  const useMutateMortalityEvent = <T>(config: UseMutationOptions<WorkflowAPIResponse, AxiosError, BCTWEvent<T>>): UseMutationResult<WorkflowAPIResponse, AxiosError, BCTWEvent<T>> =>
-    useMutation<WorkflowAPIResponse, AxiosError,  BCTWEvent<T>>((body) => eventApi.saveEvent(body), config);
+  const useMutateWorkflowEvent = <T extends BCTWWorkflow<T>>(config: UseMutationOptions<WorkflowAPIResponse, AxiosError, T>): UseMutationResult<WorkflowAPIResponse, AxiosError, T> =>
+    useMutation<WorkflowAPIResponse, AxiosError, T>((body) => eventApi.saveEvent<T>(body), config);
   
   /** add or update a user */
   const useMutateUser = (config: UseMutationOptions<User, AxiosError, IUserUpsertPayload>): UseMutationResult<User> =>
@@ -410,7 +410,7 @@ export const useTelemetryApi = () => {
     useMutateUser,
     useDelete,
     useMutateUserAlert,
-    useMutateMortalityEvent,
+    useMutateWorkflowEvent,
     useMutateSubmitPermissionRequest,
     useMutateTakeActionOnPermissionRequest,
   };

@@ -5,7 +5,7 @@ import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
 import dayjs, { Dayjs } from 'dayjs';
 import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
-import { BCTWEvent, eventToJSON, EventType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { BCTWWorkflow, eventToJSON, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
 import { IMortalityAlert } from 'types/alert';
 import { uuid } from 'types/common_types';
 import { Code } from 'types/code';
@@ -60,7 +60,7 @@ export type DeploymentStatusNotDeployed = 'Not Deployed';
 type MortalityAnimalStatus = 'Potential Mortality';
 
 // todo: add pcod/ucod_confidence
-export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMortalityEvent {
+export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMortalityEvent {
   // device props
   readonly collar_id: uuid;
   readonly device_id: number;
@@ -94,7 +94,7 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   readonly capture_date: Dayjs;
   location_event: LocationEvent;
   // event specific props - not saved. used to enable/disable fields
-  readonly event_type: EventType;
+  readonly event_type: WorkflowType;
   shouldUnattachDevice: boolean;
   wasInvestigated: boolean;
   isUCODSpeciesKnown: boolean;

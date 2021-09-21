@@ -2,7 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Code } from 'types/code';
-import { BCTWBaseType, nullToDayjs, PartialPick, uuid } from 'types/common_types';
+import { BCTWBase, nullToDayjs, PartialPick, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
@@ -60,7 +60,7 @@ export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_
   satellite_network: Code;
 }
 
-export class Collar implements BCTWBaseType<Collar>, ICollar  {
+export class Collar implements BCTWBase<Collar>, ICollar  {
   activation_comment: string;
   activation_status: boolean;
   readonly collar_id: uuid;

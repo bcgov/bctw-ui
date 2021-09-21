@@ -1,5 +1,5 @@
 import { Collar } from 'types/collar';
-import { BCTWBaseType, nullToDayjs, uuid } from 'types/common_types';
+import { BCTWBase, nullToDayjs, uuid } from 'types/common_types';
 import { Expose, Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
@@ -27,7 +27,7 @@ export type RemoveDeviceInput = Pick<ICollarHistory, 'assignment_id'> &
 /**
  * represents an device attachment to an animal.
  */
-export class CollarHistory implements BCTWBaseType<CollarHistory>, ICollarHistory {
+export class CollarHistory implements BCTWBase<CollarHistory>, ICollarHistory {
   assignment_id: uuid; // primary key of the collar_animal_assignment table
   readonly collar_id: uuid;
   readonly critter_id: uuid;

@@ -3,7 +3,7 @@ import { attachDeviceEndpoint, removeDeviceEndpoint, upsertCritterEndpoint, upse
 import { createUrl } from 'api/api_helpers';
 import { AxiosError } from 'axios';
 import { RemoveDeviceInput } from 'types/collar_history';
-import { BCTWEvent, EventType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, ApiProps } from './api_interfaces';
 
@@ -24,7 +24,7 @@ export const eventApi = (props: ApiProps) => {
    * the collar
    * fixme: if a later api post fails...how to handle form?
    */
-  const eventErr = (ev: EventType): string => `${ev} saving workflow:`;
+  const eventErr = (ev: WorkflowType): string => `${ev} saving workflow:`;
 
   const _handleBulkResults = (data: IBulkUploadResults<unknown>): WorkflowAPIResponse => {
     const { errors } = data;
@@ -34,7 +34,7 @@ export const eventApi = (props: ApiProps) => {
     return true;
   };
 
-  const _saveAnimal = async (critter: OptionalAnimal, type: EventType): Promise<WorkflowAPIResponse> => {
+  const _saveAnimal = async (critter: OptionalAnimal, type: WorkflowType): Promise<WorkflowAPIResponse> => {
     console.log('workflow event animal', critter);
     // return true;
     const url = createUrl({ api: upsertCritterEndpoint });
@@ -48,7 +48,7 @@ export const eventApi = (props: ApiProps) => {
     }
   };
 
-  const _saveDevice = async (device: OptionalDevice, type: EventType): Promise<WorkflowAPIResponse> => {
+  const _saveDevice = async (device: OptionalDevice, type: WorkflowType): Promise<WorkflowAPIResponse> => {
     console.log('workflow event device', device);
     // return true;
     const url = createUrl({ api: upsertDeviceEndpoint });
@@ -76,7 +76,7 @@ export const eventApi = (props: ApiProps) => {
     }
   }
 
-  const saveEvent = async <T>(event: BCTWEvent<T>): Promise<true | WorkflowAPIResponse> => {
+  const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
     //
     if (event.shouldUnattachDevice && typeof event.getAttachment === 'function') {
       const attachment = event.getAttachment();

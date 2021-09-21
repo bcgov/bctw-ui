@@ -1,6 +1,6 @@
 import { Type, Expose, Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBaseType, nullToDayjs } from 'types/common_types';
+import { BCTWBase, nullToDayjs } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { Animal } from './animal';
@@ -49,7 +49,7 @@ export interface IUser extends Pick<IKeyCloakSessionInfo, 'email'> {
 
 // used in the class to get a type safe array of valid keys
 // type UserProps = keyof IUser;
-export class User implements BCTWBaseType<User>, IUser {
+export class User implements BCTWBase<User>, IUser {
   role_type: eUserRole;
   is_owner: boolean;
   id: number;
@@ -118,7 +118,7 @@ export interface IUserCritterAccessInput extends
   Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> {}
 
 
-export class UserCritterAccess implements IUserCritterAccess, BCTWBaseType<UserCritterAccess> {
+export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritterAccess> {
   critter_id: string;
   animal_id: string;
   wlh_id: string;

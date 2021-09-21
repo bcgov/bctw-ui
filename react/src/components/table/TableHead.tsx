@@ -6,11 +6,11 @@ import {
   TableSortLabel,
 } from '@material-ui/core';
 import { createHeadCell } from 'components/table/table_helpers';
-import { BCTWBaseType } from 'types/common_types';
+import { BCTWBase } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { HeadCell, ITableHeadProps } from './table_interfaces';
 
-export default function TableHead<T extends BCTWBaseType<T>>(props: ITableHeadProps<T>): JSX.Element {
+export default function TableHead<T extends BCTWBase<T>>(props: ITableHeadProps<T>): JSX.Element {
   const {
     customHeaders,
     order,
