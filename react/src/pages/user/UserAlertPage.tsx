@@ -12,7 +12,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
 import { columnToHeader } from 'utils/common_helpers';
-import EventWrapper from 'pages/data/events/EventWrapper';
+import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
 
 /**
  * modal component that shows current alerts
@@ -182,7 +182,7 @@ export default function AlertPage(): JSX.Element {
         open={showSnoozeModal}
       />
       {selectedAlert ? (
-        <EventWrapper
+        <WorkflowWrapper
           eventType={'mortality'}
           event={(selectedAlert as MortalityAlert).toMortalityEvent()}
           open={showEventModal}

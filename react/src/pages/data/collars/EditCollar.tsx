@@ -5,7 +5,6 @@ import Container from '@material-ui/core/Container';
 import EditModal from 'pages/data/common/EditModal';
 import MalfunctionEventForm from '../events/MalfunctionEventForm';
 import Modal from 'components/modal/Modal';
-import RetrievalEventForm from '../events/RetrievalEventForm';
 import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
@@ -13,9 +12,9 @@ import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { editEventBtnProps, FormSection } from '../common/EditModalComponents';
 import RetrievalEvent from 'types/events/retrieval_event';
-import { EventType } from 'types/events/event';
+import { editObjectToEvent, EventType } from 'types/events/event';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import EventWrapper from '../events/EventWrapper';
+import WorkflowWrapper from '../events/WorkflowWrapper';
 
 /**
  * todo: reimplement auto defaulting of fields based on collar type select
@@ -29,8 +28,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
   // const title = isCreatingNew ? `Add a new ${collarType} collar` : `Editing device ${editing.device_id}`;
-  const [showRetrievalWorkflow, setShowRetrievalWorkflow] = useState<boolean>(false);
-  const [showMalfunctionWorkflow, setShowMalfunctionWorkflow] = useState<boolean>(false);
+  const [showMalfunctionWorkflow, setShowMalfunctionWorkflow] = useState(false);
 
   const [workflowType, setWorkflowType] = useState<EventType>('unknown');
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
@@ -48,7 +46,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
       } else {
         e = new RetrievalEvent();
       }
-      const o = Object.assign(e, editing);
+      const o = editObjectToEvent(Object.assign({}, editing), e, ['retrieved', 'retrieval_date', 'device_deployment_status']);
       return o;
     });
   }, [workflowType]);
@@ -198,7 +196,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                   />
                 </Modal>
               ) : null}
-              <EventWrapper
+              <WorkflowWrapper
                 eventType={workflowType}
                 open={showWorkflowForm}
                 event={event}

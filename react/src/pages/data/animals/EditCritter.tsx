@@ -10,7 +10,7 @@ import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
 import { EventType } from 'types/events/event';
-import EventWrapper from '../events/EventWrapper';
+import WorkflowWrapper from '../events/WorkflowWrapper';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
@@ -185,7 +185,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     critter_id={editing.critter_id}
                     permission_type={editing.permission_type}
                   />
-                  <EventWrapper
+                  <WorkflowWrapper
                     eventType={workflowType}
                     open={showWorkflowForm}
                     event={event}

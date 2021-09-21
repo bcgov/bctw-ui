@@ -1,5 +1,6 @@
 import { AttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
+import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWBaseType } from 'types/common_types';
 
 export type EventType = 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
@@ -19,8 +20,10 @@ export interface BCTWEvent<T> extends Omit<BCTWBaseType<T>, 'identifier'> {
   // methods the workflow needs to save specific properties
   getAnimal?(): OptionalAnimal;
   getDevice?(): OptionalDevice;
-  getAttachment?(): void;
+  getAttachment?(): AttachDeviceInput | RemoveDeviceInput;
   getDataLife?(): void;
+  // multiple events implement this 
+  shouldUnattachDevice?: boolean;
 }
 
 /**
@@ -38,3 +41,11 @@ export const eventToJSON = <T>(keys: string[], event: T): Record<string, unknown
   }
   return ret;
 };
+
+/** used to create new workflow events and not have properties overwritten */
+export const editObjectToEvent = <T, E extends T>(editing: E, workflow: T, toRemove: (keyof T)[]): T => {
+  for (let index = 0; index < toRemove.length; index++) {
+    delete editing[toRemove[index]]
+  }
+  return Object.assign(workflow, editing);
+}

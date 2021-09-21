@@ -137,6 +137,7 @@ const EventFormStrings = {
     should_unattach: 'Unassign device from animal?',
     vendor_activation: 'Is device still active with vendor?',
     was_retrieved: 'Was the device retrieved?',
+    activation_warning: 'contact the vendor to deactivate device to avoid fees',
   }
 }
 

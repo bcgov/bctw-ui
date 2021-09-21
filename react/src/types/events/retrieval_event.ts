@@ -1,15 +1,16 @@
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
-import { columnToHeader } from 'utils/common_helpers';
-import { BCTWEvent, EventType, OptionalDevice } from 'types/events/event';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
+import { BCTWEvent, eventToJSON, EventType, OptionalDevice } from 'types/events/event';
 import { IMortalityEvent, MortalityDeviceEventProps } from 'types/events/mortality_event';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
-import { getEndOfPreviousDay } from 'utils/time';
+import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
 import { DataLife } from 'types/data_life';
 import { EventFormStrings } from 'constants/strings';
 import { eInputType, FormFieldObject } from 'types/form_types';
+import { RemoveDeviceInput } from 'types/collar_history';
 
 // require dates to enforce retrieval min date
 interface IRetrievalEvent
@@ -33,7 +34,7 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
   readonly device_id: number;
   readonly device_make: Code;
   activation_status: boolean;
-  readonly malfunction_date: Dayjs;
+  readonly malfunction_date: Dayjs; // fixme: use this for min date
   retrieved: boolean;
   // retrieved is not a code -_-
   // todo: display as checkbox if retrieved is no??
@@ -45,7 +46,6 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
   device_deployment_status: Code; 
   //required ...always?
   device_condition: Code; 
-  // fixme: DNE in collar table 
   retrieval_comment: string;
 
   // data life
@@ -62,9 +62,8 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
   readonly capture_date: Dayjs;
   readonly mortality_date: Dayjs;
 
-
   constructor() {
-    this.event_type = 'capture';
+    this.event_type = 'retrieval';
     this.retrieved = true;
     this.retrieval_date = getEndOfPreviousDay();
     this.shouldUnattachDevice = false;
@@ -73,6 +72,8 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
 
   formatPropAsHeader(s: string): string {
     switch (s) {
+      case 'shouldUnattachDevice':
+        return EventFormStrings.device.should_unattach;
       default:
         return columnToHeader(s);
     }
@@ -87,10 +88,10 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
     is_retrievable: { prop: 'is_retrievable', type: eInputType.check },
     retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime },
     device_condition: { prop: 'device_condition', type: eInputType.code, required: true },
-    device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
+    device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code, required: true },
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
-    // todo: long text
-    retrieval_comment: { prop: 'retrieval_comment', type: eInputType.text },
+    retrieval_comment: { prop: 'retrieval_comment', type: eInputType.multiline},
+    data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
   };
 
   getHeaderTitle(): string {
@@ -98,6 +99,30 @@ export default class RetrievalEvent implements BCTWEvent<RetrievalEvent>, IRetri
   }
 
   getDevice(): OptionalDevice {
-    return {};
+    const props: (keyof RetrievalEvent)[] = [
+      'activation_status',
+      'retrieval_comment',
+      'retrieved',
+      'retrieval_date',
+      'device_deployment_status',
+      'device_condition',
+    ];
+    const ret = eventToJSON(props, this);
+    if (this.retrieved) {
+      ret.retrieval_date = this.retrieval_date.format(formatTime);
+    } else {
+      delete ret.retrieval_date;
+    }
+    return omitNull(ret);
+  }
+
+  getAttachment(): RemoveDeviceInput {
+    const { assignment_id, data_life_end } = this;
+    const ret: RemoveDeviceInput = {
+      assignment_id,
+      data_life_end: formatT(data_life_end),
+      attachment_end: formatT(data_life_end)
+    };
+    return ret;
   }
 }

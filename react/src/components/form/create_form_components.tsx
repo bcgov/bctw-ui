@@ -57,7 +57,7 @@ function CreateEditTextField<T>(props: CreateInputProps<T>): ReactElement {
 }
 
 function CreateEditMultilineTextField<T>(props: CreateInputProps<T>): ReactElement {
-  const newProps = Object.assign({multiline: true, rows: 1}, props);
+  const newProps = Object.assign({multiline: true, rows: 1, style: { width: '100%'}}, props);
   return CreateEditTextField(newProps);
 }
 
@@ -86,6 +86,7 @@ function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled
       disabled={disabled}
       key={`input-dt-${prop}`}
       required={required}
+      rows={3}
     />
   );
 }

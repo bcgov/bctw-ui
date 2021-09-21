@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import { removeDeviceEndpoint, upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
+import { attachDeviceEndpoint, removeDeviceEndpoint, upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { createUrl } from 'api/api_helpers';
 import { AxiosError } from 'axios';
+import { RemoveDeviceInput } from 'types/collar_history';
 import { BCTWEvent, EventType, OptionalAnimal, OptionalDevice } from 'types/events/event';
-import MortalityEvent from 'types/events/mortality_event';
 import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, ApiProps } from './api_interfaces';
 
@@ -13,6 +13,7 @@ import { IBulkUploadResults, ApiProps } from './api_interfaces';
 
 export type WorkflowAPIResponse = true | AxiosError;
 
+// todo: handle query invalidation - 
 export const eventApi = (props: ApiProps) => {
   const { api } = props;
 
@@ -34,7 +35,8 @@ export const eventApi = (props: ApiProps) => {
   };
 
   const _saveAnimal = async (critter: OptionalAnimal, type: EventType): Promise<WorkflowAPIResponse> => {
-    console.log(critter);
+    console.log('workflow event animal', critter);
+    // return true;
     const url = createUrl({ api: upsertCritterEndpoint });
     try {
       const { data } = await api.post(url, critter);
@@ -47,7 +49,8 @@ export const eventApi = (props: ApiProps) => {
   };
 
   const _saveDevice = async (device: OptionalDevice, type: EventType): Promise<WorkflowAPIResponse> => {
-    console.log(device);
+    console.log('workflow event device', device);
+    // return true;
     const url = createUrl({ api: upsertDeviceEndpoint });
     try {
       const { data } = await api.post(url, device);
@@ -59,40 +62,50 @@ export const eventApi = (props: ApiProps) => {
     }
   };
 
+  const _addOrRemoveDevice = async (attachment: RemoveDeviceInput, isAdding: boolean): Promise<WorkflowAPIResponse> => {
+    console.log('workflow event add or attach event', attachment)
+    // return true;
+    const url = createUrl({ api: isAdding ? attachDeviceEndpoint : removeDeviceEndpoint });
+    try {
+      const { data } = await api.post(url, attachment);
+      console.log('device add/remove status', data);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`error adding/removing device', ${formatAxiosError(err)}`);
+      return err;
+    }
+  }
+
   const saveEvent = async <T>(event: BCTWEvent<T>): Promise<true | WorkflowAPIResponse> => {
-    if (event.getDataLife) {
-      // todo:
-      console.error('not implemented');
-    }
-    if (event instanceof MortalityEvent && event.shouldUnattachDevice) {
+    //
+    if (event.shouldUnattachDevice && typeof event.getAttachment === 'function') {
       const attachment = event.getAttachment();
-      const url = createUrl({ api: removeDeviceEndpoint });
-      try {
-        const { data } = await api.post(url, attachment);
-        console.log('removed device successfully', data);
-      } catch (err) {
-        console.error(`${eventErr(event.event_type)} error removing device', ${formatAxiosError(err)}`);
-        return err;
-      }
-    }
-
-    // todo: check each event implements function
-
-    const critter = event.getAnimal();
-    if (critter) {
-      const s = await _saveAnimal(critter, event.event_type);
+      const s = await _addOrRemoveDevice(attachment as RemoveDeviceInput, false); 
       if (typeof s !== 'boolean') {
         return s;
       }
     }
-
-    const device = event.getDevice();
-    if (device) {
-      const s = _saveDevice(device, event.event_type);
-      if (typeof s !== 'boolean') {
-        return s;
+    //
+    if (typeof event.getAnimal === 'function') {
+      const critter = event.getAnimal();
+      if (critter) {
+        const s = await _saveAnimal(critter, event.event_type);
+        if (typeof s !== 'boolean') {
+          return s;
+        }
       }
     }
+    //
+    if (typeof event.getDevice === 'function') {
+      const device = event.getDevice();
+      if (device) {
+        const s = _saveDevice(device, event.event_type);
+        if (typeof s !== 'boolean') {
+          return s;
+        }
+      }
+    }
+
     return true;
   };
 

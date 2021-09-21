@@ -18,7 +18,7 @@ import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEventForm from './RetrievalEventForm';
 import RetrievalEvent from 'types/events/retrieval_event';
 
-type EventWrapperProps<T> = ModalBaseProps & {
+type WorkflowWrapperProps<T> = ModalBaseProps & {
   event: BCTWEvent<T>;
   eventType: EventType;
   onEventSaved?: () => void; // to notify alert that event was saved
@@ -28,13 +28,13 @@ type EventWrapperProps<T> = ModalBaseProps & {
  * wraps all of the event pages.
  * handles saving
  */
-export default function EventWrapper<E>({
+export default function WorkflowWrapper<E>({
   event,
   eventType,
   onEventSaved,
   open,
   handleClose
-}: EventWrapperProps<E>): JSX.Element {
+}: WorkflowWrapperProps<E>): JSX.Element {
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 

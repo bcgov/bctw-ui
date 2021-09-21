@@ -30,6 +30,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
   const [isPredation, setIsPredation] = useState(false);
   const [isPredatorKnown, setIsPredatorKnown] = useState(false);
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
+  const [ucodDisabled, setUcodDisabled] = useState(true);
   const [isUCODKnown, setIsUCODKnown] = useState(false);
 
   // form component changes can trigger mortality specific business logic
@@ -40,6 +41,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
     if (key === 'retrieved') {
       setIsRetrieved(value as boolean);
     } else if (key === 'proximate_cause_of_death') {
+      setUcodDisabled(false); // enable ucod when a proximate cause is chosen
       // value could be undefined ex. when a code is not selected
       if ((value as string)?.toLowerCase()?.includes('pred')) {
         setIsPredation(true);
@@ -47,7 +49,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
     } else if (key === 'predator_known') {
       setIsPredatorKnown(value as boolean);
     } else if (key === 'shouldUnattachDevice') {
-    // make attachment end state required if user is removing device
+      // make attachment end state required if user is removing device
       setIsBeingUnattached(value as boolean);
     } else if (key === 'wasInvestigated') {
       setWasInvestigated(value as boolean);
@@ -103,6 +105,7 @@ export default function MortalityEventForm({ event, handleFormChange }: MortEven
         <Box mt={1}>
           {CreateFormField(mortality, fields.animal_status, onChange)}
           {CreateFormField(mortality, fields.proximate_cause_of_death, onChange)}
+          {CreateFormField(mortality, fields.ultimate_cause_of_death, onChange, ucodDisabled)}
         </Box>,
         <Box mt={1} {...boxSpreadRowProps}>
           {CreateFormField(mortality, fields.predator_known, onChange, !isPredation)}

@@ -86,9 +86,9 @@ export default class MortalityEvent implements BCTWEvent<MortalityEvent>, IMorta
   ultimate_cause_of_death: Code;
   ucod_confidence: Code;
   pcod_confidence: Code;
-  captivity_status: boolean;
   mortality_investigation: Code;
   mortality_report: boolean;
+  captivity_status: boolean;
   mortality_captivity_status: Code;
   predator_known: boolean;
   readonly capture_date: Dayjs;

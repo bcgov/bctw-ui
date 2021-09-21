@@ -1,4 +1,4 @@
-import { createUrl } from 'api/api_helpers';
+import { createUrl, isDev } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ITelemetryAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
@@ -21,6 +21,11 @@ export const userApi = (props: ApiProps) => {
    * the error/404 screen if the user info is not able to be retrieved
    */
   const getSessionInfo = async (): Promise<IKeyCloakSessionInfo> => {
+    if (isDev()) {
+      // eslint-disable-next-line no-console
+      console.error('keycloak session info not retrievable in dev, note that UserContext.session object will be invalid');
+      return null;
+    }
     const url = createUrl({ api: 'session-info' });
     const { data } = await api.get(url);
     console.log('retrieve session info', data);
