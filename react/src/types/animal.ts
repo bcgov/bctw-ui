@@ -6,7 +6,6 @@ import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
-import { OptionalAnimal } from './events/event';
 
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
@@ -241,7 +240,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   }
 }
 
-export const critterFormFields: Record<string, FormFieldObject<OptionalAnimal>[]> = {
+export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
   associatedAnimalFields: [
     { prop: 'associated_animal_id', type: eInputType.text },
     { prop: 'associated_animal_relationship', type: eInputType.code }
@@ -254,7 +253,8 @@ export const critterFormFields: Record<string, FormFieldObject<OptionalAnimal>[]
     { prop: 'capture_utm_easting', type: eInputType.number },
     { prop: 'capture_utm_northing', type: eInputType.number },
     { prop: 'recapture', type: eInputType.check },
-    { prop: 'capture_comment', type: eInputType.text }
+    { prop: 'capture_comment', type: eInputType.text },
+    { prop: 'captivity_status', type: eInputType.check },
   ],
   characteristicsFields: [
     { prop: 'animal_status', type: eInputType.code, ...isRequired },
@@ -286,8 +286,7 @@ export const critterFormFields: Record<string, FormFieldObject<OptionalAnimal>[]
     { prop: 'mortality_utm_northing', type: eInputType.number },
     { prop: 'mortality_comment', type: eInputType.text },
     { prop: 'proximate_cause_of_death', type: eInputType.code },
-    // fixme: is this it's own code?
-    { prop: 'ultimate_cause_of_death', type: eInputType.code, codeName: 'proximate_cause_of_death' },
+    { prop: 'ultimate_cause_of_death', type: eInputType.code },
     { prop: 'pcod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
     { prop: 'ucod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
     { prop: 'predator_species_pcod', type: eInputType.code, codeName: 'predator_species' },
@@ -311,18 +310,9 @@ export const critterFormFields: Record<string, FormFieldObject<OptionalAnimal>[]
   ],
 };
 
-// basically a 'flatteneed' critterFormFields array
-const _animalFormFields = (): FormFieldObject<OptionalAnimal>[] => {
+// a 'flatteneed' critterFormFields array
+export const getAnimalFormFields = (): FormFieldObject<Partial<Animal>>[] => {
   return Object
     .values(critterFormFields)
     .reduce((previous, current) => ([ ...previous, ...current ]), []);
 };
-
-/**
- * a Map version of the flattened critterFormFields object 
- * used in forms
- * todo: make fields not optional
- */
-export const animalFormFields = new Map<keyof OptionalAnimal, FormFieldObject<OptionalAnimal>>(
-  _animalFormFields().map((f) => [f.prop, f])
-);

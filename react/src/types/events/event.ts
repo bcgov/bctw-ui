@@ -1,5 +1,5 @@
-import { AttachedAnimal } from 'types/animal';
-import { Collar } from 'types/collar';
+import { Animal, getAnimalFormFields, IAnimal } from 'types/animal';
+import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat} from 'types/common_types';
 import { FormFieldObject } from 'types/form_types';
@@ -7,13 +7,13 @@ import { FormFieldObject } from 'types/form_types';
 export type WorkflowType = 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 // make all properties optional
 // todo: make critter_id etc required
-export type OptionalAnimal = { [Property in keyof AttachedAnimal]+?: AttachedAnimal[Property] };
-export type OptionalDevice = { [Property in keyof Collar]+?: Collar[Property] };
+export type OptionalAnimal = { [Property in keyof IAnimal]+?: IAnimal[Property] };
+export type OptionalDevice = { [Property in keyof ICollar]+?: ICollar[Property] };
 
 // 
-export type WorkflowFormField = 
-  { [Property in keyof OptionalAnimal]: FormFieldObject<OptionalAnimal>; } & 
-  { [Property in keyof OptionalDevice]: FormFieldObject<OptionalDevice> };
+export type WorkflowFormField = FormFieldObject<Partial<Collar> & Partial<Animal>>;
+const allFields: WorkflowFormField[] = [...getDeviceFormFields(), ...getAnimalFormFields()];
+export const wfFields = new Map(allFields?.map(f => [f.prop, f])); 
 
 /**
  * interface that BCTW workflows implement

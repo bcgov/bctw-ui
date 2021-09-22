@@ -38,6 +38,7 @@ export type FormFieldObject<T> = {
 
 // spread in form field constructors to make a field required
 export const isRequired = { required: true};
+export const isDisabled = { disabled: true};
 
 // what a form component passes when it's changed
 // ex: {name: 'bill', error: false}
@@ -62,3 +63,8 @@ export const parseFormChangeResult= <T>(changed: InboundObj): [keyof T, unknown]
   const value = Object.values(changed)[0];
   return [key, value];
 }
+
+/**
+ * todo:
+ */
+export type Overlap<T, U> = { [K in keyof T & keyof U]: U[K] };

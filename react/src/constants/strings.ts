@@ -32,10 +32,19 @@ const WorkflowStrings = {
     coordTypeLatLong: 'Use Lat/Long',
     coordTypeUTM: 'Use UTM',
   },
+  captivity: {
+    captivity: 'Animal is or has been part of a captivity program',
+    isCaptive: 'Is the animal in a captivity program?',
+    mort_captivity_status: 'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?',
+  },
   mortality: {
     unassignDeviceTooltip: 'If you unassign the device, no new telemetry from this device will be connected to this animal.',
     workflowTitle: 'Mortality Event Workflow',
     exitEarly: 'You have set the animal mortality status to Alive. Do you wish to exit the workflow now?',
+    mort_investigation: 'Was a mortality investigation undertaken?',
+    mort_wildlife: 'Was the Wildlife Health Group mortality form completed?',
+    mort_predator_pcod: 'Is the PCOD predator species known?',
+    mort_predator_ucod: 'Is the UCOD predator species known?',
   },
   release: {
     workflowTitle: 'Release Event Workflow',
@@ -45,7 +54,7 @@ const WorkflowStrings = {
   },
   capture: {
     workflowTitle: 'Capture Event Workflow',
-    isCaptive: 'Is the animal in a captivity program?',
+    isRecapture: 'Is this a recapture?',
     whatSpecies: 'What species did you capture?',
     isTransloc: 'Is this animal being translocated to a different location?',
     associated: 'Is this animal is associated with another marked animal?',
@@ -57,6 +66,12 @@ const WorkflowStrings = {
   },
   malfunction: {
     workflowTitle: 'Malfunction Event Workflow',
+  },
+  device: {
+    should_unattach: 'Unassign device from animal?',
+    vendor_activation: 'Is device still active with vendor?',
+    was_retrieved: 'Was the device retrieved?',
+    activation_warning: 'contact the vendor to deactivate device to avoid fees',
   }
 }
 
@@ -142,28 +157,6 @@ const UserAlertStrings = {
   noMoreSnoozes: 'Maximum number of snoozes performed, you must perform the alert update',
 }
 
-const EventFormStrings = {
-  titles: {
-    mortalityTitle: 'Mortality Event',
-    retrievalTitle: 'Retrieval Event',
-    captureTitle: 'Capture Event',
-  },
-  animal: {
-    mort_captivity_status: 'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?',
-    mort_investigation: 'Was a mortality investigation undertaken?',
-    mort_wildlife: 'Was the Wildlife Health Group mortality form completed?',
-    mort_predator_pcod: 'Is the PCOD predator species known?',
-    mort_predator_ucod: 'Is the UCOD predator species known?',
-    captivity: 'Animal is or has been part of a captivity program',
-  },
-  device: {
-    should_unattach: 'Unassign device from animal?',
-    vendor_activation: 'Is device still active with vendor?',
-    was_retrieved: 'Was the device retrieved?',
-    activation_warning: 'contact the vendor to deactivate device to avoid fees',
-  }
-}
-
 const DataLifeStrings = {
   editWarning: 'Warning: data life fields can only be modified once'
 }
@@ -172,7 +165,6 @@ export {
   CodeStrings,
   CollarStrings,
   CritterStrings,
-  EventFormStrings,
   FileStrings,
   FormStrings,
   MapStrings,

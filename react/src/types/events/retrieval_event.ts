@@ -8,9 +8,9 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
 import { DataLife } from 'types/data_life';
-import { EventFormStrings } from 'constants/strings';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
+import { WorkflowStrings } from 'constants/strings';
 
 // require dates to enforce retrieval min date
 interface IRetrievalEvent extends 
@@ -72,7 +72,7 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
   formatPropAsHeader(s: string): string {
     switch (s) {
       case 'shouldUnattachDevice':
-        return EventFormStrings.device.should_unattach;
+        return WorkflowStrings.device.should_unattach;
       default:
         return columnToHeader(s);
     }
@@ -94,7 +94,7 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
   };
 
   getWorkflowTitle(): string {
-    return EventFormStrings.titles.retrievalTitle;
+    return WorkflowStrings.retrieval.workflowTitle;
   }
 
   getDevice(): OptionalDevice {

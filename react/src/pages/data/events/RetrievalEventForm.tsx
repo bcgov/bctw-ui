@@ -5,8 +5,8 @@ import { Box } from '@material-ui/core';
 import { CreateFormField } from 'components/form/create_form_components';
 import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';
-import { EventFormStrings } from 'constants/strings';
 import dayjs, { Dayjs } from 'dayjs';
+import { WorkflowStrings } from 'constants/strings';
 
 type RetrievalEventProps = {
   event: RetrievalEvent;
@@ -67,18 +67,18 @@ export default function RetrievalEventForm({event, handleFormChange}: RetrievalE
       {FormSection('retrieval-device', 'Device Details', [
         <Box {...boxSpreadRowProps} mb={1}>
           {CreateFormField(retrieval, fields.retrieved, onChange)}
-          {CreateFormField(retrieval, fields.retrieval_date, onChange, !isRetrieved, false, {minDate: minRetrievalDate} )}
+          {CreateFormField(retrieval, fields.retrieval_date, onChange, {disabled: !isRetrieved, minDate: minRetrievalDate}, false)}
         </Box>,
         <Box {...boxSpreadRowProps} mb={1}>
-          {CreateFormField(retrieval, fields.shouldUnattachDevice, onChange, false, true)}
-          {CreateFormField(retrieval, {...fields.data_life_end, required: isBeingUnattached }, onChange, !isBeingUnattached)}
+          {CreateFormField(retrieval, fields.shouldUnattachDevice, onChange, {}, true)}
+          {CreateFormField(retrieval, {...fields.data_life_end, required: isBeingUnattached }, onChange, {disabled: !isBeingUnattached})}
         </Box>,
         <Box {...boxSpreadRowProps} mb={1}>
           {CreateFormField(retrieval, fields.device_condition, onChange)}
           {CreateFormField(retrieval, fields.device_deployment_status, onChange)}
         </Box>,
         <Box {...boxSpreadRowProps} mb={1}>
-          {CreateFormField(retrieval, {...fields.activation_status, tooltip: <p><span style={{color: 'orangered'}}>Reminder: </span>{`${EventFormStrings.device.activation_warning}`}</p>}, onChange, false, true)}
+          {CreateFormField(retrieval, {...fields.activation_status, tooltip: <p><span style={{color: 'orangered'}}>Reminder: </span>{`${WorkflowStrings.device.activation_warning}`}</p>}, onChange, {}, true)}
         </Box>,
         CreateFormField(retrieval, fields.retrieval_comment, onChange),
       ])}

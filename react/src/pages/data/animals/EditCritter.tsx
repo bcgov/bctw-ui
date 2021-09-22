@@ -14,7 +14,7 @@ import WorkflowWrapper from '../events/WorkflowWrapper';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
-import { InboundObj } from 'types/form_types';
+import { InboundObj, isDisabled } from 'types/form_types';
 
 /**
  * the main animal form
@@ -147,7 +147,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                   {FormSection(
                     'cr-cap',
                     'Latest Capture Details',
-                    captureFields.map((f) => CreateFormField(editing, f, onChange, true)),
+                    captureFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled} )),
                     <Button 
                       disabled={!isAttached}
                       {...editEventBtnProps}
@@ -159,7 +159,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                   {FormSection(
                     'cr-rel',
                     'Latest Release Details',
-                    releaseFields.map((f) => CreateFormField(editing, f, onChange, true)),
+                    releaseFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
                     <Button 
                       disabled={!isAttached}
                       {...editEventBtnProps} 
@@ -170,7 +170,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                   {FormSection(
                     'cr-mort',
                     'Mortality Details',
-                    mortalityFields.map((f) => CreateFormField(editing, f, onChange, true)),
+                    mortalityFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
                     <Button
                       disabled={!isAttached}
                       {...editEventBtnProps}

@@ -6,7 +6,7 @@ import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
 import { ReactElement, ReactNode } from 'react';
 import { removeProps } from 'utils/common_helpers';
-import { eInputType, FormChangeEvent, FormFieldObject } from 'types/form_types';
+import { eInputType, FormChangeEvent, FormFieldObject, Overlap } from 'types/form_types';
 import dayjs, { Dayjs } from 'dayjs';
 import { BCTWFormat } from 'types/common_types';
 import { Tooltip } from 'components/common'
@@ -158,14 +158,12 @@ const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactEl
 /**
  * the "main" form component creation handler.
  */
-function CreateFormField<T extends BCTWFormat<T>>(
+function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   obj: T,
-  formField: FormFieldObject<T> | undefined,
+  formField: FormFieldObject<U> | undefined,
   handleChange: FormChangeEvent,
-  // todo: move disabled into inputProps
-  disabled = false,
+  inputProps?: { [Property in keyof CreateInputProps<T>]+?: unknown },
   displayBlock = false,
-  inputProps?: { [Property in keyof CreateInputProps<T>]+?: unknown }
 ): ReactNode {
   if (formField === undefined) {
     return null;
@@ -174,10 +172,10 @@ function CreateFormField<T extends BCTWFormat<T>>(
   const toPass = {
     prop,
     type,
-    value: obj[prop],
+    // fixme: why wont this type if U overlaps T?
+    value: obj[prop as keyof T],
     handleChange,
-    label: obj.formatPropAsHeader(prop),
-    disabled,
+    label: obj.formatPropAsHeader(prop as keyof T),
     required,
     codeName,
     key: `${type}-${prop}`,

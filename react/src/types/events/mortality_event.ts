@@ -9,9 +9,9 @@ import { BCTWWorkflow, eventToJSON, WorkflowType, OptionalAnimal, OptionalDevice
 import { IMortalityAlert } from 'types/alert';
 import { uuid } from 'types/common_types';
 import { Code } from 'types/code';
-import { EventFormStrings } from 'constants/strings';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { DataLife } from 'types/data_life';
+import { WorkflowStrings } from 'constants/strings';
 
 export type MortalityDeviceEventProps = Pick<
 Collar,
@@ -118,7 +118,6 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.shouldSaveDevice = true;
     this.shouldUnattachDevice = false;
     this.onlySaveAnimalStatus = false;
-
     // retrieval date is defaulted to end of previous day (business requirement)
     this.retrieval_date = getEndOfPreviousDay();
     this.retrieved = false;
@@ -138,7 +137,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   }
 
   getWorkflowTitle(): string {
-    return EventFormStrings.titles.mortalityTitle;
+    return WorkflowStrings.mortality.workflowTitle;
   }
 
   formatPropAsHeader(s: keyof MortalityEvent): string {
@@ -146,19 +145,19 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       case 'attachment_start':
         return 'Capture Date';
       case 'wasInvestigated':
-        return EventFormStrings.animal.mort_investigation;
+        return WorkflowStrings.mortality.mort_investigation;
       case 'mortality_report':
-        return EventFormStrings.animal.mort_wildlife;
+        return WorkflowStrings.mortality.mort_wildlife;
       case 'retrieved':
-        return EventFormStrings.device.was_retrieved;
+        return WorkflowStrings.device.was_retrieved;
       case 'activation_status':
-        return EventFormStrings.device.vendor_activation;
+        return WorkflowStrings.device.vendor_activation;
       case 'predator_known':
-        return EventFormStrings.animal.mort_predator_pcod;
+        return WorkflowStrings.mortality.mort_predator_pcod;
       case 'isUCODSpeciesKnown':
-        return EventFormStrings.animal.mort_predator_ucod;
+        return WorkflowStrings.mortality.mort_predator_ucod;
       case 'shouldUnattachDevice':
-        return EventFormStrings.device.should_unattach;
+        return WorkflowStrings.device.should_unattach;
       case 'proximate_cause_of_death':
         return 'PCOD';
       case 'ultimate_cause_of_death':

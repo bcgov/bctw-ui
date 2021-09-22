@@ -5,8 +5,8 @@ import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON } from 'types/e
 import { LocationEvent } from 'types/events/location_event';
 import { Animal } from 'types/animal';
 import { IDataLifeStartProps } from 'types/data_life';
-import { EventFormStrings } from 'constants/strings';
 import { FormFieldObject } from 'types/form_types';
+import { WorkflowStrings } from 'constants/strings';
 
 type CaptureAnimalEventProps = Pick<Animal, 
 | 'animal_id'
@@ -71,8 +71,12 @@ export default class CaptureEvent implements CaptureAnimalEventProps, IDataLifeS
     this.location_event = new LocationEvent('capture', dayjs());
   }
 
-  formatPropAsHeader(s: string): string {
+  formatPropAsHeader(s: keyof CaptureEvent): string {
     switch (s) {
+      case 'captivity_status':
+        return WorkflowStrings.captivity.isCaptive;
+      case 'associated_animal_relationship':
+        return 'Associated Relationship';
       default:
         return columnToHeader(s);
     }
@@ -81,25 +85,13 @@ export default class CaptureEvent implements CaptureAnimalEventProps, IDataLifeS
     return ['wlh_id', 'animal_id'];
   }
   getWorkflowTitle(): string {
-    return EventFormStrings.titles.mortalityTitle;
+    return WorkflowStrings.capture.workflowTitle;
   }
 
   getAnimal(): OptionalAnimal {
     const props: (keyof Animal)[] =
       [
         'critter_id',
-        'animal_status',
-        'predator_known',
-        'predator_species_pcod',
-        'predator_species_ucod',
-        'proximate_cause_of_death',
-        'ultimate_cause_of_death',
-        'pcod_confidence',
-        'ucod_confidence',
-        'captivity_status',
-        'mortality_investigation',
-        'mortality_report',
-        'mortality_captivity_status'
       ];
     const ret = eventToJSON(props, this);
     return omitNull({ ...ret, ...this.location_event.toJSON()});

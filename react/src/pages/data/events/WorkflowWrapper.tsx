@@ -18,6 +18,7 @@ import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEventForm from './RetrievalEventForm';
 import RetrievalEvent from 'types/events/retrieval_event';
 import ConfirmModal from 'components/modal/ConfirmModal';
+import CaptureEvent from 'types/events/capture_event';
 
 type WorkflowWrapperProps<T extends BCTWWorkflow<T>> = ModalBaseProps & {
   event: T;
@@ -55,7 +56,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     } else {
       // console.log('sucess!!', e);
       responseDispatch({ severity: 'success', message: 'mortality event saved!' });
-      // if the parent implements this, call it on successful save. 
+      // if the parent implements this, call it on successful save.
       // Ex. UserAlertPage component will expire the telemetry alert
       if (typeof onEventSaved === 'function') {
         onEventSaved();
@@ -103,13 +104,19 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       Comp = <ReleaseEventForm />;
       break;
     case 'capture':
-      Comp = <CaptureEventForm />;
+      Comp = (
+        <CaptureEventForm 
+          event={event as unknown as CaptureEvent}
+          handleFormChange={handleChildFormUpdated}
+        />
+      );
       break;
     case 'mortality':
       Comp = (
         <MortalityEventForm
           handleExitEarly={handleShowExitWorkflow}
           handleFormChange={handleChildFormUpdated}
+          // fixme: fff
           event={event as unknown as MortalityEvent}
         />
       );
