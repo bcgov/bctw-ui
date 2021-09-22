@@ -61,7 +61,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
         {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
         <Typography variant='body2' component='p'>A user has access to devices through the user-animal association.</Typography>
         <DataTable
-          headers={User.propsToDisplay}
+          headers={user.displayProps}
           title='Users'
           queryProps={tableProps}
           // when a row is selected from the data table, set the current user

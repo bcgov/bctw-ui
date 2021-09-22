@@ -19,6 +19,7 @@ import { filterOutNonePermissions } from 'types/permission';
 import PickCritterPermissionModal from 'pages/permissions/PickCritterPermissionModal';
 import EditTable, { EditTableRowAction } from 'components/table/EditTable';
 import { plainToClass } from 'class-transformer';
+import { InboundObj } from 'types/form_types';
 
 export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -85,8 +86,8 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     setUdfs([...udfs, dup]);
   };
 
-  // when user changes the group name textfield
-  const handleChangeName = (v: Record<string, string | number | boolean>, udf: IUDF): void => {
+  // when the group name textfield is modified, update the udf and allow the form to be saved
+  const handleChangeName = (v: InboundObj, udf: IUDF): void => {
     const newKey = v['group'] as string;
     if (!newKey) {
       return;

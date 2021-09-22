@@ -1,8 +1,8 @@
 import { Expose, Transform } from 'class-transformer';
+import { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
-import { dateObjectToTimeStr } from 'utils/time';
 import { Animal } from './animal';
-import { BCTWBase, BCTWBaseType } from './common_types';
+import { BCTWBase, BCTWValidDates, nullToDayjs } from './common_types';
 import { IUserCritterAccessInput } from './user';
 
 // interface used to construct objects for updating/granting users access to animals
@@ -49,7 +49,7 @@ export interface IPermissionRequestInput {
 }
 
 export class PermissionRequestInput implements IPermissionRequestInput {
-  request_id: number;
+  readonly request_id: number;
   user_email_list: string[];
   critter_permissions_list: IUserCritterAccessInput[];
   request_comment: string;
@@ -61,12 +61,12 @@ export class PermissionRequestInput implements IPermissionRequestInput {
  * b) what an owner sees in the request history table (some fields)
 */
 export interface IPermissionRequest extends 
-  Pick<Animal, 'animal_id' | 'wlh_id' | 'species'>, Pick<BCTWBaseType, 'valid_to'> {
-  request_id: number;
+  Pick<Animal, 'animal_id' | 'wlh_id' | 'species'>, Pick<BCTWValidDates, 'valid_to'> {
+  readonly request_id: number;
   requested_by: string; // idir or bceid
   requested_by_email: string;
   requested_by_name: string;
-  requested_date: Date;
+  requested_date: Dayjs;
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
@@ -76,9 +76,9 @@ export interface IPermissionRequest extends
   status: PermissionRequestStatus;
 }
 
-type PermissionRequestProps = keyof IPermissionRequest;
+// type PermissionRequestProps = keyof IPermissionRequest;
 
-export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
+export class PermissionRequest implements IPermissionRequest, BCTWBase<PermissionRequest> {
   animal_id: string;
   wlh_id: string;
   species: string;
@@ -86,16 +86,19 @@ export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
   requested_by: string;
   requested_by_email: string;
   requested_by_name: string;
-  // todo: all dates should do this?
-  @Transform((t) => dateObjectToTimeStr(t)) requested_date: Date;
+  @Transform(nullToDayjs) requested_date: Dayjs;
   request_comment: string;
   requested_for_email: string;
   requested_for_name: string;
   permission_type: eCritterPermission;
   was_granted: boolean;
   was_denied_reason: string;
-  valid_to: Date;
+  @Transform(nullToDayjs) valid_to: Dayjs;
   status: PermissionRequestStatus;
+
+  get displayProps(): (keyof PermissionRequest)[] {
+    return []
+  }
 
   get permissionStatus(): PermissionRequestStatus {
     if (this.valid_to === null) {
@@ -116,8 +119,7 @@ export class PermissionRequest extends BCTWBase implements  IPermissionRequest {
   }
   toJSON(): PermissionRequest { return this }
 
-  // used in OwnerRequestPermission
-  static get ownerHistoryPropsToDisplay(): PermissionRequestProps[] {
+  static get ownerHistoryPropsToDisplay(): (keyof PermissionRequest)[] {
     return [ 'wlh_id', 'animal_id', 'species', 'requested_date',
       'requested_for_name', 'requested_for_email',
       'permission_type', 'status', 'was_denied_reason' ];
@@ -136,7 +138,7 @@ export interface IGroupedRequest {
 }
 
 const groupPermissionRequests = (r: PermissionRequest[]): IGroupedRequest[] => {
-  const result = [];
+  const result: IGroupedRequest[] = [];
   r.forEach(req => {
     const id = req.request_id;
     const found = result.find(f => f.id === id);

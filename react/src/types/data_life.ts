@@ -1,6 +1,6 @@
-import dayjs, {Dayjs, isDayjs} from 'dayjs';
+import { Dayjs, isDayjs} from 'dayjs';
 import { formatTime } from 'utils/time';
-import { CollarHistory, IAttachDeviceProps, IRemoveDeviceProps } from './collar_history';
+import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from './collar_history';
 
 /**
  * the attachment attachment start and data life start date time props
@@ -19,6 +19,10 @@ export interface IDataLifeEndProps {
   data_life_end?: Dayjs | string;
 }
 
+// DL type with all props required
+export type DataLife = IDataLifeStartProps & Required<IDataLifeEndProps> & {
+}
+
 // passed to the API when changing the data life of an existing or past device attachment
 export interface IChangeDataLifeProps extends 
   Pick<CollarHistory, 'assignment_id'>, 
@@ -32,23 +36,8 @@ export interface IChangeDataLifeProps extends
  * figure out a way to deal with how the fields are valid_from vs. data_life_start etc.
  */
 export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
-  attachment_end: Dayjs;
-  attachment_start: Dayjs;
-  data_life_end: Dayjs;
-  data_life_start: Dayjs;
 
-  /** 
-   * if @param history is provided, default timestamps to it's values
-   * otherwise, optionally pass @param defaultStart to default start timestamps to now
-   * ex. used when assigning a new device
-  */
-  constructor(history?: CollarHistory, defaultStart = false) {
-    const d = dayjs();
-    this.attachment_start = history ? dayjs(history.attachment_start) : defaultStart ? d : null;
-    this.attachment_end = history ? dayjs(history.attachment_end) : null;
-    this.data_life_start = history ? dayjs(history.valid_from) : defaultStart ? d : null;
-    this.data_life_end = history ? dayjs(history.valid_to) : null;
-  }
+  constructor(public attachment_start: Dayjs, public data_life_start: Dayjs, public data_life_end: Dayjs, public attachment_end: Dayjs) {}
 
   // data life properties can only be changed if user is an admin or they haven't been modified before
   get canChangeDLStart(): boolean {
@@ -66,7 +55,7 @@ export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
   }
 
   // must get assignment_id elsewhere
-  toRemoveDeviceJSON(): Omit<IRemoveDeviceProps, 'assignment_id'> {
+  toRemoveDeviceJSON(): Omit<RemoveDeviceInput, 'assignment_id'> {
     return {
       attachment_end: this.attachment_end.format(formatTime),
       data_life_end: this.data_life_end.format(formatTime),
@@ -74,7 +63,7 @@ export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
   }
 
   // must provide critter/collar ids separarately
-  toPartialAttachDeviceJSON(): Omit<IAttachDeviceProps, 'collar_id' | 'critter_id'> {
+  toPartialAttachDeviceJSON(): Omit<AttachDeviceInput, 'collar_id' | 'critter_id'> {
     return {
       attachment_start: this.attachment_start.format(formatTime),
       data_life_start: this.data_life_start.format(formatTime),

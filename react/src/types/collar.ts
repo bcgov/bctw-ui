@@ -1,10 +1,11 @@
-import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBase, BCTWBaseType, PartialPick, transformOpt } from 'types/common_types';
-import { Type, Expose, Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
+import { Dayjs } from 'dayjs';
+import { Animal } from 'types/animal';
+import { Code } from 'types/code';
+import { BCTWBase, nullToDayjs, PartialPick, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
-import { getInvalidDate, isInvalidDate } from 'utils/time';
-import { Animal } from './animal';
+import { columnToHeader } from 'utils/common_helpers';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -19,80 +20,82 @@ export enum eNewCollarType {
   Vect = 'Vectronics'
 }
 export interface ICollarBase {
-  collar_id: string;
+  readonly collar_id: uuid;
 }
 export interface ICollarTelemetryBase extends ICollarBase {
   device_id: number;
-  device_status;
+  device_status: Code;
   frequency: number;
 }
 
 // export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
-export interface ICollar extends ICollarTelemetryBase, BCTWBaseType, PartialPick<Animal, 'wlh_id' | 'animal_id'> {
-  activation_comment: string;
+export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_id' | 'animal_id'> {
+  activation_comment: string; // fixme: missing?
   activation_status: boolean;
   animal_id?: string; // collars attached to a critter should includes this prop
   camera_device_id: number;
-  collar_transaction_id: string;
+  readonly collar_transaction_id: uuid;
   device_comment: string;
-  device_deployment_status: string;
-  device_make: string;
+  device_deployment_status: Code;
+  device_make: Code;
   device_model: string;
-  device_type: string;
+  device_type: Code;
+  device_condition: Code;
   dropoff_device_id: number;
   dropoff_frequency: number;
-  dropoff_frequency_unit: string;
+  dropoff_frequency_unit: Code;
   first_activation_month: number;
   first_activation_year: number;
   fix_interval: number;
-  fix_interval_unit: string;
-  fix_success_rate: number;
-  frequency_unit: string;
-  malfunction_date: Date;
-  device_malfunction_type: string;
-  offline_date: Date;
+  fix_interval_unit: Code; // fixme: is now fix_interval_rate?
+  fix_success_rate: number; // fixme: removed?
+  frequency_unit: Code;
+  malfunction_date: Dayjs;
+  device_malfunction_type: Code;
+  offline_date: Dayjs;
   offline_type: string;
   permission_type?: eCritterPermission; // fetched collars should contain this
-  retrieval_date: Date;
+  retrieval_date: Dayjs;
   retrieved: boolean;
-  satellite_network: string;
+  retrieval_comment: string;
+  satellite_network: Code;
 }
 
-type CollarProps = keyof ICollar;
-
-export class Collar extends BCTWBase implements ICollar  {
+export class Collar implements BCTWBase<Collar>, ICollar  {
   activation_comment: string;
   activation_status: boolean;
-  collar_id: string;
-  @Transform(v => v || 0, transformOpt) camera_device_id: number;
-  collar_transaction_id: string;
+  readonly collar_id: uuid;
+  camera_device_id: number;
+  readonly collar_transaction_id: uuid;
   device_id: number;
-  device_deployment_status: string;
-  device_make: string;
+  device_deployment_status: Code;
+  device_make: Code;
   device_model: string;
-  device_status: string;
-  device_type: string;
-  @Transform(v => v || -1, transformOpt) dropoff_device_id: number;
-  @Transform(v => v || -1, transformOpt) dropoff_frequency: number;
-  dropoff_frequency_unit: string;
-  @Transform(v => v || -1, transformOpt) first_activation_month: number;
-  @Transform(v => v || -1, transformOpt) first_activation_year: number;
+  device_status: Code;
+  device_condition: Code;
+  device_type: Code;
+  dropoff_device_id: number;
+  dropoff_frequency: number;
+  dropoff_frequency_unit: Code;
+  first_activation_month: number;
+  first_activation_year: number;
   fix_interval: number;
-  fix_interval_unit: string;
+  fix_interval_unit: Code;
   fix_success_rate: number;
-  @Transform(v => v || -1, transformOpt) frequency: number;
-  frequency_unit: string;
-  @Type(() => Date) malfunction_date: Date;
-  device_malfunction_type: string;
-  @Type(() => Date) offline_date: Date;
+  frequency: number;
+  frequency_unit: Code;
+  @Transform(nullToDayjs) malfunction_date: Dayjs;
+  device_malfunction_type: Code;
+  @Transform(nullToDayjs) offline_date: Dayjs;
   offline_type: string;
   permission_type: eCritterPermission;
-  @Transform(v => v || getInvalidDate(), transformOpt) retrieval_date: Date;
+  @Transform(nullToDayjs) retrieval_date: Dayjs;
   retrieved: boolean;
-  satellite_network: string;
+  retrieval_comment: string;
+  satellite_network: Code;
   device_comment: string;
-  @Type(() => Date) valid_from: Date;
-  @Type(() => Date) valid_to: Date;
+  @Transform(nullToDayjs) valid_from: Dayjs;
+  @Transform(nullToDayjs) valid_to: Dayjs;
 
   animal_id?: string;
   wlh_id?: string;
@@ -105,11 +108,8 @@ export class Collar extends BCTWBase implements ICollar  {
   }
   @Expose() get identifier(): string { return 'collar_id' }
 
+  // fixme: 
   constructor(collar_type?: eNewCollarType) {
-    super();
-    this.retrieval_date = getInvalidDate()
-    this.malfunction_date = getInvalidDate();
-    this.offline_date = getInvalidDate();
     this.activation_status = false;
     this.device_id = 0;
     if (collar_type) {
@@ -127,17 +127,17 @@ export class Collar extends BCTWBase implements ICollar  {
     this.device_id = 0;
   }
 
+  // todo: dayjs to formatted string
   toJSON(): Collar {
-    if (isInvalidDate(this.retrieval_date)) {
+    if (!this.retrieval_date.isValid()) {
       delete this.retrieval_date;
     }
-    if (isInvalidDate(this.malfunction_date)) {
+    if (!this.malfunction_date.isValid()) {
       delete this.malfunction_date
     }
-    if (isInvalidDate(this.offline_date)) {
+    if (!this.offline_date.isValid()) {
       delete this.offline_date
     }
-    delete this.error;
     return this;
   }
 
@@ -165,16 +165,20 @@ export class Collar extends BCTWBase implements ICollar  {
     }
   }
 
-  static get propsToDisplay(): CollarProps[] {
+  static get propsToDisplay(): (keyof Collar)[] {
     return [ 'device_id', 'device_status', 'frequency', 'device_type', 'device_make', 'device_model' ];
   }
   // for attached collars, also display...
-  static get attachedPropsToDisplay(): CollarProps[] {
+  static get attachedPropsToDisplay(): (keyof Collar)[] {
     return [...Collar.propsToDisplay, 'wlh_id', 'animal_id', ];
+  }
+
+  get displayProps(): (keyof Collar)[] {
+    return this.animal_id ? Collar.attachedPropsToDisplay : Collar.propsToDisplay;
   }
 }
 
-const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
+export const collarFormFields: Record<string, FormFieldObject<Partial<Collar>>[]> = {
   communicationFields: [
     { prop: 'device_type', type: eInputType.code },
     { prop: 'satellite_network', type: eInputType.code },
@@ -192,7 +196,7 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   identifierFields: [
     { prop: 'device_id', type: eInputType.number },
     { prop: 'device_make', type: eInputType.code },
-    { prop: 'device_model', type: eInputType.code }
+    { prop: 'device_model', type: eInputType.text }
   ],
   activationFields: [
     { prop: 'activation_status', type: eInputType.check },
@@ -202,16 +206,17 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   ],
   statusFields: [
     { prop: 'device_status', type: eInputType.code },
+    { prop: 'device_condition', type: eInputType.code, required: true },
   ],
   retrievalFields: [
-    { prop: 'retrieval_date', type: eInputType.date },
+    { prop: 'retrieval_date', type: eInputType.datetime },
     { prop: 'retrieved', type: eInputType.check }
   ],
   malfunctionOfflineFields: [
     { prop: 'device_deployment_status', type: eInputType.code },
-    { prop: 'malfunction_date', type: eInputType.date },
+    { prop: 'malfunction_date', type: eInputType.datetime },
     { prop: 'device_malfunction_type', type: eInputType.code },
-    { prop: 'offline_date', type: eInputType.date },
+    { prop: 'offline_date', type: eInputType.datetime },
     { prop: 'offline_type', type: eInputType.code },
   ],
   deviceCommentField: [
@@ -219,4 +224,8 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   ]
 }
 
-export { collarFormFields };
+export const getDeviceFormFields = (): FormFieldObject<Partial<Collar>>[] => {
+  return Object
+    .values(collarFormFields)
+    .reduce((previous, current) => ([ ...previous, ...current ]) , []);
+};

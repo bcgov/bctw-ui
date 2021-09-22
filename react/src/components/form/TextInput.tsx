@@ -1,22 +1,19 @@
 import { StandardTextFieldProps, TextField as MuiTextField } from '@material-ui/core';
 import { baseInputStyle } from 'components/component_constants';
-import { InputChangeHandler } from 'components/component_interfaces';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import {useState} from 'react';
 import { mustBeEmail } from 'components/form/form_validators';
-import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
+import { FormBaseProps } from 'types/form_types';
 
-interface ITextInputProps extends StandardTextFieldProps {
-  propName: string;
+type TextInputProps = FormBaseProps & StandardTextFieldProps & {
   defaultValue: string;
-  changeHandler: InputChangeHandler;
 }
 
 export const inputPropsToRemove = ['propName', 'changeHandler', 'validate', 'errorMessage', 'handleChange', 'formType', 'defaultValue']
 
-export default function TextField(props: ITextInputProps): JSX.Element {
+export default function TextField(props: TextInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, required } = props;
   const [val, setVal] = useState<string>(defaultValue ?? '');
   const [err, setErr] = useState<string>('');
@@ -28,10 +25,10 @@ export default function TextField(props: ITextInputProps): JSX.Element {
     handleIsRequired(n);
   }, [defaultValue]);
 
-  // pass changes to parent handler when the value or error status changes
-  useDidMountEffect(() => {
+  // pass changes to parent handler when focus is lost
+  const handleBlur = ():void => {
     callParentHandler();
-  }, [val, err])
+  }
 
   const handleChange = (event): void => {
     const target = event.target.value;
@@ -67,6 +64,7 @@ export default function TextField(props: ITextInputProps): JSX.Element {
       size={'small'}
       style={style ?? baseInputStyle}
       value={val}
+      onBlur={handleBlur}
       onChange={handleChange}
       {...propsToPass}
       error={!!err}

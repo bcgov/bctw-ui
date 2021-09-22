@@ -1,31 +1,72 @@
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import Button from 'components/form/Button';
-import CaptureEventForm from '../events/CaptureEventForm';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
-import Modal from 'components/modal/Modal';
-import ReleaseEventForm from '../events/ReleaseEventForm';
-import { Animal, critterFormFields } from 'types/animal';
-import { Box, Container, Grid } from '@material-ui/core';
+import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
+import { Box, Container } from '@material-ui/core';
 import { EditorProps } from 'components/component_interfaces';
-import { FormFieldObject } from 'types/form_types';
-import { MakeEditField } from 'components/form/create_form_components';
+import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
+import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
+import { editObjectToEvent, WorkflowType } from 'types/events/event';
+import WorkflowWrapper from '../events/WorkflowWrapper';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import MortalityEvent from 'types/events/mortality_event';
+import CaptureEvent from 'types/events/capture_event';
+import { InboundObj, isDisabled } from 'types/form_types';
 
 /**
  * the main animal form
- * todo: complete capture/release/mortality workflows -> uncomment when complete
-*/
-export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
-
+ * bug: cant save?
+ */
+export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
-  const [showAssignmentHistory, setShowAssignmentHistory] = useState<boolean>(false);
-  const [showCaptureWorkflow, setShowCaptureWorkflow] = useState<boolean>(false);
-  const [showMortalityWorkflow, setShowMortalityWorkflow] = useState<boolean>(false);
-  const [showReleaseWorkflow, setShowReleaseWorkflow] = useState<boolean>(false);
+  const isAttached = editing instanceof AttachedAnimal;
+  const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
+  const [workflowType, setWorkflowType] = useState<WorkflowType>('unknown');
+  const [showWorkflowForm, setShowWorkflowForm] = useState(false);
+  const [event, updateEvent] = useState(new MortalityEvent()); //fixme: type this
+
+  /**
+   * when a workflow button is clicked, update the event type
+   * binding all properties of the @var editing to the event
+   */
+  useDidMountEffect(async () => {
+    updateEvent(() => {
+      let e, o;
+      if (workflowType === 'capture') {
+        e = new CaptureEvent();
+        o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['species', 'translocation', 'recapture']);
+      } else {
+        e = new MortalityEvent();
+        o = editObjectToEvent(Object.assign({}, editing) as AttachedAnimal, e, ['animal_status']);
+      }
+      return o;
+    });
+  }, [workflowType]);
+
+  // show the workflow form when a new event object is created
+  useDidMountEffect(() => {
+    if (event) {
+      console.log('event updated', event, !open);
+      setShowWorkflowForm((o) => !o);
+    }
+  }, [event]);
+
+  /**
+   * if a workflow button is clicked and the event type is the same, open or close the workflow modal. 
+   * otherwise, update the workflow type which will trigger the modal state
+   */
+  const handleOpenWorkflow = (e: WorkflowType): void => {
+    if (workflowType === e) {
+      setShowWorkflowForm((o) => !o);
+    } else {
+      setWorkflowType(e);
+    }
+  };
 
   const {
     associatedAnimalFields,
@@ -37,64 +78,35 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
     animalCommentField
   } = critterFormFields;
 
-  const makeFormField = (
-    formType: FormFieldObject<Animal>,
-    handleChange: (v: Record<string, unknown>) => void
-  ): React.ReactNode => {
-    const { prop, type, codeName, required } = formType;
-    return MakeEditField({
-      type,
-      prop,
-      value: editing[prop],
-      handleChange,
-      disabled: !canEdit,
-      required,
-      label: editing.formatPropAsHeader(prop),
-      span: true,
-      codeName
-    });
-  };
-
   const Header = (
-    <Container maxWidth="xl">
+    <Container maxWidth='xl'>
       {isCreatingNew ? (
         <Box pt={3}>
-          <Box component="h1" mt={0} mb={0}>
+          <Box component='h1' mt={0} mb={0}>
             Add Animal
           </Box>
         </Box>
       ) : (
-        <>
-          <Box display="flex" justifyContent="space-between" alignItems="top" pt={3}>
-            <Box>
-              <Box component="h1" mt={0} mb={1}>
-                WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '} {editing?.animal_id ?? '-'}
-              </Box>
-              <dl className="headergroup-dl">
-                <dd>Species:</dd>
-                <dt>{editing.species}</dt>
-                <dd>Device ID:</dd>
-                <dt>{editing.device_id ?? 'Unassigned'}</dt>
-                <dd>BCTW ID:</dd>
-                <dt>{editing.critter_id}</dt>
-                <dd>Permission:</dd>
-                <dt>{editing.permission_type}</dt>
-              </dl>
-              {/* <span className='button_span'>
-                {!isCreatingNew ? (
-                  <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
-                    Assign Animal to Device
-                  </Button>
-                ) : null}
-              </span> */}
-            </Box>
-            <Box>
-              <Button size="large" variant="outlined" color="default" className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
-                Device Assignment
-              </Button>
-            </Box>
-          </Box>
-        </>
+        <EditHeader<AttachedAnimal>
+          title={
+            <>
+              WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '} {editing?.animal_id ?? '-'}
+            </>
+          }
+          headers={['species', 'device_id', 'permission_type']}
+          format={(editing as AttachedAnimal).formatPropAsHeader}
+          obj={editing as AttachedAnimal}
+          btn={
+            <Button
+              size='large'
+              variant='outlined'
+              color='default'
+              className='button'
+              onClick={(): void => setShowAssignmentHistory((o) => !o)}>
+              Device Assignment
+            </Button>
+          }
+        />
       )}
     </Container>
   );
@@ -104,133 +116,82 @@ export default function EditCritter(props: EditorProps<Animal>): JSX.Element {
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
-          const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
+          const onChange = (v: InboundObj, modifyCanSave = true): void => {
             handlerFromContext(v, modifyCanSave);
           };
           return (
             <>
-              {/* <h2>Animal Details</h2> */}
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Identifiers</Box>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {identifierFields.map((f) => makeFormField(f, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Characteristics</Box>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {characteristicsFields.map((formType) => makeFormField(formType, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Association With Another Individual</Box>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {associatedAnimalFields.map((f) => makeFormField(f, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Comments About This Animal</Box>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {animalCommentField.map((f) => makeFormField(f, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Latest Capture Details</Box>
-                <Button size="large" color="default" className='button' onClick={(): void => setShowCaptureWorkflow((o) => !o)}>
-                  Add Capture Event
-                </Button>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {captureFields.map((f) => makeFormField(f, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Latest Release Details</Box>
-                <Button size="large" color="default" className='button' onClick={(): void => setShowReleaseWorkflow((o) => !o)}>
-                  Add Release Event
-                </Button>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {releaseFields.map((f) => makeFormField(f, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              <Box component="fieldset" p={3}>
-                <Box component="legend" className={'legend'}>Mortality Details</Box>
-                <Button size="large" color="default" className='button' onClick={(): void => setShowMortalityWorkflow((o) => !o)}>
-                  Record Mortality Details
-                </Button>
-                <Box className="fieldset-form">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      {mortalityFields.map((f) => makeFormField(f, onChange))}
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Box>
-              {/* dont show assignment history for new critters */}
+              {FormSection(
+                'cr-ids',
+                'Identifiers',
+                identifierFields.map((f) => CreateFormField(editing, f, onChange))
+              )}
+              {FormSection(
+                'cr-chars',
+                'Characteristics',
+                characteristicsFields.map((f) => CreateFormField(editing, f, onChange))
+              )}
+              {FormSection(
+                'cr-asoc',
+                'Association With Another Individual',
+                associatedAnimalFields.map((f) => CreateFormField(editing, f, onChange))
+              )}
+              {FormSection(
+                'cr-comm',
+                'Comments About This Animal',
+                animalCommentField.map((f) => CreateFormField(editing, f, onChange))
+              )}
+              {/* hide all workflow related fields when creating a new animal */}
               {!isCreatingNew ? (
-                <AssignmentHistory
-                  open={showAssignmentHistory}
-                  handleClose={(): void => setShowAssignmentHistory(false)}
-                  critter_id={editing.critter_id}
-                  permission_type={editing.permission_type}
-                />
-              ) : null}
-              { /* capture workflow */ }
-              {!isCreatingNew && showCaptureWorkflow ? (
-                <Modal open={showCaptureWorkflow} handleClose={(): void => setShowCaptureWorkflow(false)}>
-                  <CaptureEventForm
-                    animal_id={editing.critter_id}
-                    handleClose={(): void => setShowCaptureWorkflow(false)}
-                    handleSave={null}
-                    open={showCaptureWorkflow}
+                <>
+                  {FormSection(
+                    'cr-cap',
+                    'Latest Capture Details',
+                    captureFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled} )),
+                    <Button 
+                      disabled={!isAttached}
+                      {...editEventBtnProps}
+                      onClick={(): void => handleOpenWorkflow('capture')}>
+                      Add Capture Event
+                    </Button>
+                  )}
+                  {/* fixme: defaulting to mortality for now */}
+                  {FormSection(
+                    'cr-rel',
+                    'Latest Release Details',
+                    releaseFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
+                    <Button 
+                      disabled={!isAttached}
+                      {...editEventBtnProps} 
+                      onClick={(): void => handleOpenWorkflow('mortality')}>
+                      Add Release Event
+                    </Button>
+                  )}
+                  {FormSection(
+                    'cr-mort',
+                    'Mortality Details',
+                    mortalityFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
+                    <Button
+                      disabled={!isAttached}
+                      {...editEventBtnProps}
+                      onClick={(): void => handleOpenWorkflow('mortality')}>
+                      Record Mortality Details
+                    </Button>
+                  )}
+                  {/* also hide device assignment history for new critters */}
+                  <AssignmentHistory
+                    open={showAssignmentHistory}
+                    handleClose={(): void => setShowAssignmentHistory(false)}
+                    critter_id={editing.critter_id}
+                    permission_type={editing.permission_type}
                   />
-                </Modal>
-              ) : null}
-              { /* mortality workflow */ }
-              {!isCreatingNew && showMortalityWorkflow ? (
-                { /*
-                <Modal open={showMortalityflow} handleClose={(): void => setShowMortalityWorkflow(false)}>
-                  <MortalityEventForm
-                    open={showMortalityWorkflow}
-                    handleClose={(): void => setShowMortalityWorkflow(false)}
-                    handleSave={null}
+                  <WorkflowWrapper
+                    eventType={workflowType}
+                    open={showWorkflowForm}
+                    event={event}
+                    handleClose={(): void => setShowWorkflowForm(false)}
                   />
-                </Modal>
-                */ }
-              ) : null}
-              { /* release workflow */ }
-              {!isCreatingNew && showReleaseWorkflow ? (
-                <Modal open={showReleaseWorkflow} handleClose={(): void => setShowReleaseWorkflow(false)}>
-                  <ReleaseEventForm
-                    animal_id={editing.critter_id}
-                    handleClose={(): void => setShowReleaseWorkflow(false)}
-                    handleSave={null}
-                    open={showReleaseWorkflow}
-                  />
-                </Modal>
+                </>
               ) : null}
             </>
           );

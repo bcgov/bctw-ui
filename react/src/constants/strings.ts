@@ -28,19 +28,56 @@ const FileStrings = {
 }
 
 const WorkflowStrings = {
-  captureWorkflowTitle: 'Capture Event Workflow',
-  locationEventCoordTypeLat: 'Use Lat/Long',
-  locationEventCoordTypeUTM: 'Use UTM',
-  malfunctionWorkflowTitle: 'Malfunction Event Workflow',
-  mortalityUnassignDeviceTooltip: 'If you unassign the device, no new telemetry from this device will be connected to this animal.',
-  mortalityWorkflowTitle: 'Mortality Event Workflow',
-  releaseWorkflowTitle: 'Release Event Workflow',
-  retrievalWorkflowTitle: 'Retrieval Event Workflow',
+  location: {
+    coordTypeLatLong: 'Use Lat/Long',
+    coordTypeUTM: 'Use UTM',
+  },
+  captivity: {
+    captivity: 'Animal is or has been part of a captivity program',
+    isCaptive: 'Is the animal in a captivity program?',
+    mort_captivity_status: 'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?',
+  },
+  mortality: {
+    unassignDeviceTooltip: 'If you unassign the device, no new telemetry from this device will be connected to this animal.',
+    workflowTitle: 'Mortality Event Workflow',
+    exitEarly: 'You have set the animal mortality status to Alive. Do you wish to exit the workflow now?',
+    mort_investigation: 'Was a mortality investigation undertaken?',
+    mort_wildlife: 'Was the Wildlife Health Group mortality form completed?',
+    mort_predator_pcod: 'Is the PCOD predator species known?',
+    mort_predator_ucod: 'Is the UCOD predator species known?',
+  },
+  release: {
+    workflowTitle: 'Release Event Workflow',
+    areUpdates: 'Are there updates to the animal identifiers or characteristics?',
+    isNewDevice: 'Are you replacing the original device with a new device?',
+    deviceRemovedNotif: 'The previous device has been unassigned from this animal, you must assign a new device to the animal',
+  },
+  capture: {
+    workflowTitle: 'Capture Event Workflow',
+    isRecapture: 'Is this a recapture?',
+    whatSpecies: 'What species did you capture?',
+    isTransloc: 'Is this animal being translocated to a different location?',
+    associated: 'Is this animal is associated with another marked animal?',
+    associatedID: 'What is the associated animal’s WLHID?',
+    associatedRel: 'What is the relationship of the individual to the captured individual?',
+  },
+  retrieval: {
+    workflowTitle: 'Retrieval Event Workflow',
+  },
+  malfunction: {
+    workflowTitle: 'Malfunction Event Workflow',
+  },
+  device: {
+    should_unattach: 'Unassign device from animal?',
+    vendor_activation: 'Is device still active with vendor?',
+    was_retrieved: 'Was the device retrieved?',
+    activation_warning: 'contact the vendor to deactivate device to avoid fees',
+  }
 }
 
 const CollarStrings = {
-  assignedCollarsTableTitle: 'Assigned Devices',
-  availableCollarsTableTitle: 'Unassigned Devices',
+  assignedCollarsTableTitle: 'Attached Devices',
+  availableCollarsTableTitle: 'Unattached Devices',
   editableProps: ['device_id', 'frequency', 'device_make', 'device_model', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
   exportTitle: 'Bulk Export Device Data',
   exportText: '',
@@ -118,7 +155,6 @@ const UserAlertStrings = {
     return `There are ${remainingCount} snoozes remaining. Are you sure you want to snooze the alert until tomorrow?`;
   },
   noMoreSnoozes: 'Maximum number of snoozes performed, you must perform the alert update',
-  mortalityFormTitle: 'Mortality Event',
 }
 
 const DataLifeStrings = {

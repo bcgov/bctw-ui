@@ -1,106 +1,144 @@
 import React, { useState } from 'react';
-import { LocationEvent } from 'types/location_event';
-import DateInput from 'components/form/Date';
+import { LocationEvent, eLocationPositionType } from 'types/events/location_event';
 import TextField from 'components/form/TextInput';
-import { InputChangeHandler } from 'components/component_interfaces';
-import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
+import { Box, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
+import { FormChangeEvent, FormFieldObject, InboundObj } from 'types/form_types';
+import DateTimeInput from 'components/form/DateTimeInput';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { ReactNode } from 'react';
+import { boxSpreadRowProps } from './EventComponents';
 
 type LocationEventProps = {
   event: LocationEvent;
-  handleChange: InputChangeHandler;
+  notifyChange: FormChangeEvent;
+  children?: ReactNode;
+  childNextToDate?: ReactNode;
+  disabled?: boolean;
 };
 
-export default function LocationEventForm(props: LocationEventProps): JSX.Element {
-  const { event, handleChange } = props;
-  const [useUTM, setUseUTM] = useState<string>('utm');
+export default function LocationEventForm({ event, notifyChange, children, childNextToDate, disabled = false}: LocationEventProps): JSX.Element {
+  const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
 
   // create the form inputs
-  const longField = event.formFields.find((f) => f.prop === 'longitude');
-  const latField = event.formFields.find((f) => f.prop === 'latitude');
-  const utmFields = event.formFields.filter((f) => f.prop.includes('utm'));
-  const dateField = event.formFields.find((f) => f.prop === 'date');
-  const commentField = event.formFields.find((f) => f.prop === 'comment');
+  const fields = event.fields;
+  const latField = fields.latlon[0];
+  const longField = fields.latlon[1];
+  const utmFields = fields.utm as FormFieldObject<LocationEvent>[];
+  const dateField = fields.date as FormFieldObject<LocationEvent>;
+  const commentField = fields.comment as FormFieldObject<LocationEvent>;
 
-  const changeCoordinateType = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const val = event.target.value;
-    setUseUTM(val);
-  }
+  // radio button control on whether to show UTM or lat long fields
+  const changeCoordinateType = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const ct = e.target.value as eLocationPositionType;
+    event.coordinate_type = ct;
+    setShowUtm(ct);
+  };
 
-  const baseInputProps = { changeHandler: handleChange, required: true };
+  const changeHandler = (v: InboundObj): void => {
+    const key = Object.keys(v)[0];
+    const value = Object.values(v)[0];
+    event[key] = value;
+    // notify parent that the location event changed
+    notifyChange(v);
+  };
+
+  // notify parent error handler that required errors need to update when utm/lat long is changed
+  useDidMountEffect(() => {
+    notifyChange({ reset: true });
+  }, [showUtm]);
+
+  const baseInputProps = { changeHandler, required: true, disabled };
   return (
     <>
-      <DateInput
-        propName={dateField.prop}
-        label={event.formatPropAsHeader(dateField.prop)}
-        defaultValue={event[dateField.prop] as Date}
-        {...baseInputProps}
-      />
+      <Box {...boxSpreadRowProps} mb={1}>
+        {childNextToDate}
+        <DateTimeInput
+          propName={dateField.prop}
+          label={event.formatPropAsHeader('date')}
+          defaultValue={event.date}
+          changeHandler={(v): void => changeHandler(v)}
+          disabled={disabled}
+        />
+      </Box>
+      {/* optionally render children below the date component */}
+      {children}
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}
-      <RadioGroup
-        row
-        aria-label='position'
-        name='position'
-        value={useUTM}
-        onChange={changeCoordinateType}>
+      {/* todo: use new radio component  */}
+      <RadioGroup  row aria-label='position' name='position' value={showUtm} onChange={changeCoordinateType}>
         <FormControlLabel
+          disabled={disabled}
           value={'utm'}
           control={<Radio color='primary' />}
-          label={WorkflowStrings.locationEventCoordTypeUTM}
+          label={WorkflowStrings.location.coordTypeUTM}
           labelPlacement='start'
         />
         <FormControlLabel
-          value={'coords'}
+          disabled={disabled}
+          value={'coord'}
           control={<Radio color='primary' />}
-          label={WorkflowStrings.locationEventCoordTypeLat}
+          label={WorkflowStrings.location.coordTypeLatLong}
           labelPlacement='start'
         />
       </RadioGroup>
-      <div style={{ marginTop: '20px', height: '120px' }}>
-        {useUTM === 'utm' ? (
-          utmFields.map((f) => {
-            const numberProps = { ...baseInputProps, label: event.formatPropAsHeader(f.prop), propName: f.prop};
+      <Box>
+        {showUtm === 'utm' ? (
+          utmFields.map((f, idx) => {
+            const val = event[f.prop] as number;
+            const numberProps = {
+              ...baseInputProps,
+              defaultValue: val,
+              key: `loc-num-${idx}`,
+              label: event.formatPropAsHeader(f.prop),
+              propName: f.prop
+            };
+            // custom form validation
             if (f.prop === 'utm_easting') {
               numberProps['validate'] = (v: number): string => mustBeXDigits(v, 6);
             } else if (f.prop === 'utm_northing') {
               numberProps['validate'] = (v: number): string => mustBeXDigits(v, 7);
             }
             return f.prop === 'utm_zone' ? (
-              <div>
-                <NumberInput {...numberProps} />
-              </div>
+              <NumberInput {...numberProps} />
             ) : (
-              <span className={'edit-form-field-span'}>
+              <span className={'edit-form-field-span'} key={`event-span-wrap-${idx}`}>
                 <NumberInput {...numberProps} />
               </span>
             );
           })
         ) : (
           <>
-            <NumberInput propName={latField.prop } {...baseInputProps} label={event.formatPropAsHeader(latField.prop )} />
             <NumberInput
-              propName={longField.prop }
+              propName={latField.prop}
               {...baseInputProps}
-              label={event.formatPropAsHeader(longField.prop )}
+              label={event.formatPropAsHeader(latField.prop)}
+              defaultValue={event[longField.prop]}
+            />
+            <NumberInput
+              {...baseInputProps}
+              label={event.formatPropAsHeader(longField.prop)}
+              defaultValue={event[longField.prop]}
+              propName={longField.prop}
               validate={mustBeNegativeNumber}
             />
           </>
         )}
-      </div>
-      <div>
+      </Box>
+      <Box marginTop={2}>
         <TextField
           style={{ width: '100%' }}
           multiline={true}
-          rows={2}
-          key={commentField.prop }
-          propName={commentField.prop }
-          defaultValue={event[commentField.prop] as string}
+          rows={1}
+          key={commentField.prop}
+          propName={commentField.prop}
+          defaultValue={event.comment}
           label={event.formatPropAsHeader(commentField.prop)}
-          changeHandler={handleChange}
+          disabled={disabled}
+          changeHandler={changeHandler}
         />
-      </div>
+      </Box>
     </>
   );
 }

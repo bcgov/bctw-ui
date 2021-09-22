@@ -1,6 +1,6 @@
 import Box from '@material-ui/core/Box';
 import DataTable from 'components/table/DataTable';
-import { CritterStrings as CS, FileStrings } from 'constants/strings';
+import { CritterStrings as CS } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
@@ -8,30 +8,36 @@ import EditCritter from 'pages/data/animals/EditCritter';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { Animal } from 'types/animal';
+import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
-import download from 'downloadjs';
+// import download from 'downloadjs';
 
 export default function CritterPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
 
-  const [editObj, setEditObj] = useState<Animal>({} as Animal);
+  const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
 
   // for exporting state
   // const [critterA, setCrittersA] = useState<Animal[]>([]);
   // const [critterU, setCrittersU] = useState<Animal[]>([]);
 
-  const handleSelect = (row: Animal): void => {
+  const handleSelectAttached = (row: AttachedAnimal): void => {
     setEditObj(row);
   };
+
+  const handleSelectUnattached = (row: Animal): void => {
+    setEditObj(row);
+  }
 
   // set the export state when table loads
   // const onNewData = (d: Animal[]): void => (d.length && d[0].device_id ? setCrittersA(d) : setCrittersU(d));
 
   // pass this function to the import modal to allow user to download animal csv bulk import
+  /*
   const handleDownloadTemplate = (): void => {
     download(Object.keys(new Animal()).join(), FileStrings.animalTemplateName, '');
   }
+  */
 
   // props to be passed to the edit modal component
   const editProps = {
@@ -41,13 +47,6 @@ export default function CritterPage(): JSX.Element {
     handleClose: null,
   };
 
-  // const exportProps: IImportExportProps<Animal> = {
-  //   eMsg: CS.exportText,
-  //   eTitle: CS.exportTitle,
-  //   downloadTemplate: handleDownloadTemplate,
-  //   data: []
-  // };
-
   return (
     <ManageLayout>
       <Box className='manage-layout-titlebar'>
@@ -55,29 +54,30 @@ export default function CritterPage(): JSX.Element {
         <Box display='flex' alignItems='center'>
           {/* <ExportImportViewer {...exportProps} /> */}
           <ModifyCritterWrapper editing={editObj}>
-            <AddEditViewer<Animal> editing={editObj} empty={new Animal()}>
+            <AddEditViewer<AttachedAnimal> editing={editObj as AttachedAnimal} empty={new AttachedAnimal()}>
               <EditCritter {...editProps} />
             </AddEditViewer>
           </ModifyCritterWrapper>
         </Box>
       </Box>
 
+      {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
       <RowSelectedProvider>
         <>
           <Box mb={4}>
             <DataTable
-              headers={Animal.assignedProps}
+              headers={AttachedAnimal.attachedCritterDisplayProps}
               title={CS.assignedTableTitle}
               queryProps={{ query: bctwApi.useAssignedCritters }}
-              onSelect={handleSelect}
+              onSelect={handleSelectAttached}
             />
           </Box>
           <Box mb={4}>
             <DataTable
-              headers={Animal.unassignedProps}
+              headers={new Animal().displayProps}
               title={CS.unassignedTableTitle}
               queryProps={{ query: bctwApi.useUnassignedCritters }}
-              onSelect={handleSelect}
+              onSelect={handleSelectUnattached}
             />
           </Box>
         </>

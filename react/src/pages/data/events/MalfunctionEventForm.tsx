@@ -32,7 +32,7 @@ export default function MalfunctionEventForm(props: IMalfunctionWorkflowProps): 
 
   return (
     <>
-      <h3>{WorkflowStrings.malfunctionWorkflowTitle}</h3>
+      <h3>{WorkflowStrings.malfunction.workflowTitle}</h3>
     </>
   );
 }

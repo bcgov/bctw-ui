@@ -1,235 +1,160 @@
-import { Paper } from '@material-ui/core';
-import ChangeContext from 'contexts/InputChangeContext';
-import { ModalBaseProps } from 'components/component_interfaces';
-import { CreateEditCheckboxField, CreateEditDateField, MakeEditField } from 'components/form/create_form_components';
-import { UserAlertStrings, WorkflowStrings } from 'constants/strings';
-import { TelemetryAlert } from 'types/alert';
-import { LocationEvent } from 'types/location_event';
-import EditModal from '../common/EditModal';
-import { useState } from 'react';
-import LocationEventForm from './LocationEventForm';
-import { removeProps } from 'utils/common_helpers';
-import MortalityEvent from 'types/mortality_event';
-import { IUpsertPayload } from 'api/api_interfaces';
+import { Box } from '@material-ui/core';
+import { CreateFormField } from 'components/form/create_form_components';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Tooltip } from 'components/common';
+import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
+import { FormSection } from 'pages/data//common/EditModalComponents';
+import LocationEventForm from 'pages/data/events/LocationEventForm';
+import { ReactNode, useState } from 'react';
+import { LocationEvent } from 'types/events/location_event';
+import MortalityEvent from 'types/events/mortality_event';
+import CaptivityStatusForm from './CaptivityStatusForm';
+import { boxSpreadRowProps } from './EventComponents';
+import Radio from 'components/form/Radio';
+import { WorkflowStrings } from 'constants/strings';
+import { wfFields } from 'types/events/event';
 
-type MortEventProps = ModalBaseProps & {
-  alert: TelemetryAlert;
-  handleSave: (event: MortalityEvent) => void;
+type MortEventProps = {
+  event: MortalityEvent;
+  handleFormChange: FormChangeEvent;
+  handleExitEarly: (message: ReactNode) => void;
 };
 
 /**
- * todo: unassign device?
- * missing pcod fields?
- * not savable when on display
- * errors
  */
-export default function MortalityEventForm({ alert, open, handleClose, handleSave }: MortEventProps): JSX.Element {
-  const [errors, setErrors] = useState({});
-  const [mortalityEvent, setMortalityEvent] = useState<MortalityEvent>(
-    new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id)
-  );
-  const [locationEvent, setLocationEvent] = useState<LocationEvent>(new LocationEvent('mortality', alert.valid_from));
-  const [isRetrieved, setIsRetrieved] = useState<boolean>(false);
+export default function MortalityEventForm({ event, handleFormChange, handleExitEarly }: MortEventProps): JSX.Element {
+  const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
+  // business logic workflow state
+  const [wasInvestigated, setWasInvestigated] = useState(false);
+  const [isRetrieved, setIsRetrieved] = useState(false);
+  const [isPredation, setIsPredation] = useState(false);
+  const [isPredatorKnown, setIsPredatorKnown] = useState(false);
+  const [isBeingUnattached, setIsBeingUnattached] = useState(false);
+  const [ucodDisabled, setUcodDisabled] = useState(true);
+  const [isUCODKnown, setIsUCODKnown] = useState(false);
+  // setting animal_status to alive disables the form.
+  const [critterIsAlive, setCritterIsAlive] = useState(false);
 
-  // const formFields = getInputTypesOfT<MortalityEvent>(mortalityEvent, mortalityEvent.formFields);
-  const required = true;
+  useDidMountEffect(() => {
+    setMortalityEvent(event);
+  }, [event]);
 
-  const deviceUnassignedField = mortalityEvent.formFields.find((f) => f.prop === 'shouldUnattachDevice');
-  const retrievedField = mortalityEvent.formFields.find((f) => f.prop === 'retrieved');
-  const retrievedDateField = mortalityEvent.formFields.find((f) => f.prop === 'retrieval_date');
-  const animalStatusField = mortalityEvent.formFields.find((f) => f.prop === 'animal_status');
-  const pcodField = mortalityEvent.formFields.find((f) => f.prop === 'proximate_cause_of_death');
-  const vasField = mortalityEvent.formFields.find((f) => f.prop === 'activation_status');
-  // const pcodConfidenceValueField = formFields.find(f => f.key === 'pcod_confidence_value');
-  // const deviceStatusFields = formFields.filter(f => ['device_status', 'device_deployment_status'].includes(f.key))
+  // if critter is marked as alive, workflow wrapper will show exit workflow prompt
+  useDidMountEffect(() => {
+    // event.animal_status = critterIsAlive ? 'Alive' : 'Mortality';
+    event.onlySaveAnimalStatus = critterIsAlive;
+    if (critterIsAlive) {
+      event.shouldSaveDevice = false;
+      event.shouldUnattachDevice = false;
+      handleExitEarly(<p>{WorkflowStrings.mortality.exitEarly}</p>);
+    } else {
+      event.shouldSaveDevice = true;
+    }
+  }, [critterIsAlive]);
 
-  /**
-   * break the MortalityEvent into collar/critter specific properties
-   * before passing to the parent save handler
-   * @param payload the save payload passed from the {EditModal}
-   */
-  const onSave = async (payload: IUpsertPayload<MortalityEvent>): Promise<void> => {
-    const { body } = payload;
-    body.location_event = locationEvent;
-    await handleSave(body);
-    handleClose(false);
+  // form component changes can trigger mortality specific business logic
+  const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
+    handleFormChange(v);
+    const [key, value] = parseFormChangeResult<MortalityEvent>(v);
+    // retrieved checkbox state enables/disables the retrieval date datetime picker
+    if (key === 'retrieved') {
+      setIsRetrieved(value as boolean);
+    } else if (key === 'proximate_cause_of_death') {
+      setUcodDisabled(false); // enable ucod when a proximate cause is chosen
+      // value could be undefined ex. when a code is not selected
+      if ((value as string)?.toLowerCase()?.includes('pred')) {
+        setIsPredation(true);
+      }
+    } else if (key === 'predator_known') {
+      setIsPredatorKnown(value as boolean);
+    } else if (key === 'shouldUnattachDevice') {
+      // make attachment end state required if user is removing device
+      setIsBeingUnattached(value as boolean);
+    } else if (key === 'wasInvestigated') {
+      setWasInvestigated(value as boolean);
+    } else if (key === 'isUCODSpeciesKnown') {
+      setIsUCODKnown(value as boolean);
+    } else if (key === 'animal_status') {
+      if (value === 'Mortality' || value === 'Alive') {
+        setCritterIsAlive(value === 'Alive');
+      }
+    }
   };
-  useDidMountEffect(() => {
-    // trigger re-render of retrieved_date field
-    // todo: delete this field on-save if disabled?
-  }, [isRetrieved]);
 
-  useDidMountEffect(() => {
-    setMortalityEvent(new MortalityEvent(alert.critter_id, alert.collar_id, alert.device_id));
-    setLocationEvent(new LocationEvent('mortality', alert.valid_from));
-  }, [alert]);
+  // when the location event form changes, also notify wrapper about errors
+  const onChangeLocationProp = (v: Record<keyof LocationEvent, unknown>): void => {
+    handleFormChange(v);
+  };
 
-  if (!animalStatusField) {
-    return <div>oops..</div>;
+  const fields = mortality.fields;
+
+  if (!fields || !wfFields) {
+    return null;
   }
 
-  const Header = (
-    <Paper className={'dlg-full-title'} elevation={3}>
-      <h1>{UserAlertStrings.mortalityFormTitle} </h1>
-      <div className={'dlg-full-sub'}>
-        <span className='span'>WLH ID: {alert.wlh_id}</span>
-        {alert.animal_id ? (
-          <>
-            <span className='span'>|</span>
-            <span className='span'>Animal ID: {alert.animal_id}</span>
-          </>
-        ) : null}
-        <span className='span'>|</span>
-        <span className='span'>Device: {alert.device_id}</span>
-      </div>
-    </Paper>
-  );
-
+  const isDisabled ={ disabled: critterIsAlive };
   return (
-    <EditModal<MortalityEvent>
-      showInFullScreen={false}
-      handleClose={handleClose}
-      onSave={onSave}
-      editing={mortalityEvent}
-      // hasErrors={(): boolean => objHasErrors(errors)}
-      open={open}
-      headerComponent={Header}
-      disableHistory={true}>
-      <ChangeContext.Consumer>
-        {(handlerFromContext): JSX.Element => {
-          // override the modal's onChange function
-          const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
-            if (v) {
-              setErrors((o) => removeProps(o, [Object.keys(v)[0]]));
-            }
-            // update the disabled status of the retrieved_date field
-            if (Object.keys(v).includes('retrieved')) {
-              setIsRetrieved(v.retrieved as boolean);
-            }
-            handlerFromContext(v, modifyCanSave);
-          };
-
-          const onChangeLocationProp = (v: Record<string, unknown>): void => {
-            // when switching coordinate types...dont make form savable
-            if (Object.values(v).includes(undefined)) {
-              return;
-            }
-            // the property name will be the 'key' of the first key in Object.values
-            const justProp = { [Object.keys(v)[0]]: v.error };
-            const newErrors = Object.assign(errors, justProp);
-            setErrors(newErrors);
-
-            const l = Object.assign(locationEvent, v);
-            setLocationEvent(l);
-            // fixme: passing the entire object?
-            handlerFromContext(l, true);
-          };
-
-          return (
+    <>
+      {FormSection('mort-a-st', event.formatPropAsHeader('animal_status'), [
+        <Radio
+          propName={wfFields.get('animal_status').prop}
+          changeHandler={onChange}
+          defaultSelectedValue={'Mortality'}
+          values={(['Mortality', 'Alive']).map((p) => ({ label: p, value: p }))}
+        />
+      ])}
+      {FormSection('mort-device', 'Event Details', [
+        // location events, nesting some other components inside
+        <LocationEventForm
+          disabled={critterIsAlive}
+          event={mortality.location_event}
+          notifyChange={onChangeLocationProp}
+          childNextToDate={CreateFormField(mortality, wfFields.get('device_status'), onChange, isDisabled)}
+          children={
             <>
-              {/* form body */}
-              <Paper elevation={0} className={'dlg-full-form'}>
-                {/* <Paper elevation={3} className={'dlg-full-body-details'}> */}
-                <div className={'dlg-details-section'}>
-                  <h3>Update Assignment Details</h3>
-                  <Tooltip
-                    title={<p>{WorkflowStrings.mortalityUnassignDeviceTooltip}</p>}
-                    placement='right'
-                    enterDelay={750}>
-                    <div>
-                      {CreateEditCheckboxField({
-                        prop: deviceUnassignedField.prop,
-                        type: deviceUnassignedField.type,
-                        value: mortalityEvent[deviceUnassignedField.prop],
-                        label: mortalityEvent.formatPropAsHeader(deviceUnassignedField.prop),
-                        handleChange: onChange
-                      })}
-                    </div>
-                  </Tooltip>
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Update Device Details</h3>
-                  <Tooltip
-                    title={
-                      <p>
-                        If <strong>checked</strong>, <i>Device Deployment Status</i> will be automatically set to{' '}
-                        <em>"Not Deployed"</em>.
-                      </p>
-                    }
-                    placement='right'
-                    enterDelay={750}>
-                    <div>
-                      {CreateEditCheckboxField({
-                        prop: retrievedField.prop,
-                        type: retrievedField.type,
-                        value: mortalityEvent[retrievedField.prop],
-                        label: mortalityEvent.formatPropAsHeader(retrievedField.prop),
-                        handleChange: onChange
-                      })}
-                    </div>
-                  </Tooltip>
-                  <Tooltip
-                    title={<p>TODO: If <strong>checked</strong>then...</p>}
-                    placement='right'
-                    enterDelay={750}>
-                    <div>
-                      {retrievedDateField
-                        ? CreateEditDateField({
-                          prop: retrievedDateField.prop,
-                          type: retrievedDateField.type,
-                          value: mortalityEvent[retrievedDateField.prop],
-                          label: mortalityEvent.formatPropAsHeader(retrievedDateField?.prop),
-                          handleChange: onChange,
-                          disabled: !isRetrieved
-                        })
-                        : null}
-                    </div>
-                  </Tooltip>
-                  <Tooltip
-                    title={<p>TODO: If <strong>checked</strong>then...</p>}
-                    placement='right'
-                    enterDelay={750}>
-                    <div style={{ marginBottom: '10px' }}>
-                      {CreateEditCheckboxField({
-                        prop: vasField.prop,
-                        type: vasField.type,
-                        value: mortalityEvent[vasField.prop],
-                        label: mortalityEvent.formatPropAsHeader(vasField.prop),
-                        handleChange: onChange
-                      })}
-                    </div>
-                  </Tooltip>
-                  {/* deviceStatusFields.map((formType) => {
-                      return MakeEditField({
-                        formType,
-                        handleChange: onChange,
-                        required,
-                        errorMessage: !!errors[formType.key] && (errors[formType.key]),
-                      });
-                    }) */}
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Update Animal Details</h3>
-                  {animalStatusField
-                    ? MakeEditField({ prop: animalStatusField.prop, type: animalStatusField.type, value: mortalityEvent[animalStatusField.prop], handleChange: onChange, required, errorMessage: '' })
-                    : null}
-                  <div style={{ marginBottom: '18px' }}>
-                    {pcodField
-                      ? MakeEditField({ prop: pcodField.prop, type: pcodField.type, value: mortalityEvent[pcodField.prop], handleChange: onChange, required, errorMessage: '' })
-                      : null}
-                  </div>
-                </div>
-                <div className={'dlg-details-section'}>
-                  <h3>Mortality Event Details &amp; Comment</h3>
-                  <LocationEventForm event={locationEvent} handleChange={onChangeLocationProp} />
-                </div>
-              </Paper>
+              {/* device retrieval */}
+              <Box mb={1} {...boxSpreadRowProps}>
+                {CreateFormField(mortality, wfFields.get('retrieved'), onChange, isDisabled)}
+                {CreateFormField(mortality, { ...wfFields.get('retrieval_date'), required: isRetrieved }, onChange, {disabled: !isRetrieved || critterIsAlive})}
+              </Box>
+              {/* data life / remove device */}
+              <Box mb={1} {...boxSpreadRowProps}>
+                {CreateFormField(mortality, {...fields.shouldUnattachDevice}, onChange, isDisabled)}
+                {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {disabled: !isBeingUnattached || critterIsAlive})}
+              </Box>
             </>
-          );
-        }}
-      </ChangeContext.Consumer>
-    </EditModal>
+          }
+        />,
+        <Box mt={2}>
+          {/* device status */}
+          {CreateFormField(mortality, wfFields.get('device_condition'), onChange, isDisabled)}
+          {CreateFormField(mortality, wfFields.get('device_deployment_status'), onChange, isDisabled)}
+        </Box>,
+        CreateFormField(mortality, wfFields.get('activation_status'), onChange, isDisabled, true)
+      ], null, critterIsAlive)}
+
+      {/* critter status fields */}
+      {FormSection('mort-critter', 'Animal Details', [
+        <Box {...boxSpreadRowProps}>
+          {CreateFormField(mortality, {...fields.wasInvestigated} , onChange, isDisabled)}
+          {CreateFormField(mortality, wfFields.get('mortality_investigation'), onChange, {disabled:!wasInvestigated || critterIsAlive})}
+        </Box>,
+        CreateFormField(mortality, wfFields.get('mortality_report'), onChange, isDisabled, true),
+        <Box mt={1}>
+          {CreateFormField(mortality, wfFields.get('proximate_cause_of_death'), onChange, isDisabled)}
+          {CreateFormField(mortality, wfFields.get('ultimate_cause_of_death'), onChange, {disabled: ucodDisabled || critterIsAlive})}
+        </Box>,
+        <Box mt={1} {...boxSpreadRowProps}>
+          {CreateFormField(mortality, wfFields.get('predator_known'), onChange, {disabled: !isPredation || critterIsAlive})}
+          {CreateFormField(mortality, wfFields.get('predator_species_pcod'), onChange, {disabled: !isPredatorKnown || critterIsAlive})}
+          {CreateFormField(mortality, wfFields.get('pcod_confidence'), onChange, {disabled: !isPredatorKnown || critterIsAlive})}
+        </Box>,
+        <Box mt={1} {...boxSpreadRowProps}>
+          {CreateFormField(mortality, {...fields.isUCODSpeciesKnown}, onChange, {disabled: !isPredatorKnown || critterIsAlive})}
+          {CreateFormField(mortality, wfFields.get('predator_species_ucod'), onChange, {disabled: !(isPredatorKnown && isUCODKnown) || critterIsAlive})}
+          {CreateFormField(mortality, wfFields.get('ucod_confidence'), onChange, {disabled: !(isPredatorKnown && isUCODKnown) || critterIsAlive})}
+        </Box>,
+        <CaptivityStatusForm event={mortality} handleFormChange={handleFormChange} disabled={critterIsAlive} />
+      ], null, critterIsAlive)}
+    </>
   );
 }

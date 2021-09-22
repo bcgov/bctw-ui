@@ -9,18 +9,18 @@ import { BCTWBase } from 'types/common_types';
 /**
  * A table that expects the data to be provided.
  */
-export type BasicTableProps<T extends BCTWBase> = IPlainTableProps<T> & {
+export type BasicTableProps<T> = IPlainTableProps<T> & {
   data: T[];
   rowIdentifier: keyof T;
 };
-export default function BasicTable<T extends BCTWBase>({
+
+export default function BasicTable<T extends BCTWBase<T>>({
   headers,
   data,
   onSelect,
   rowIdentifier
 }: BasicTableProps<T>): JSX.Element {
   const [selected, setSelected] = useState<T>();
-  const headerProps = headers ?? Object.keys((data && data[0]) ?? []);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>();
 
@@ -46,7 +46,7 @@ export default function BasicTable<T extends BCTWBase>({
       <Table className={'table'}>
         {data === undefined ? null : (
           <TableHead
-            headersToDisplay={headerProps}
+            headersToDisplay={headers}
             headerData={data && data[0]}
             isMultiSelect={false}
             numSelected={selected ? 1 : 0}
@@ -72,7 +72,7 @@ export default function BasicTable<T extends BCTWBase>({
                 tabIndex={-1}
                 key={`row${prop}`}
                 selected={isRowSelected}>
-                {headerProps.map((k: string, i: number) => {
+                {headers.map((k, i) => {
                   if (!k) {
                     return null;
                   }

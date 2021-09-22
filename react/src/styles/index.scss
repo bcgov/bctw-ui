@@ -25,7 +25,6 @@ fieldset {
 
 .legend {
   float: left;
-  margin-bottom: 1rem;
   font-weight: 700;
 }
 
@@ -59,6 +58,7 @@ fieldset {
 // Header Group
 .headergroup-dl {
   margin: 0;
+  margin-left: 0.5rem;
 
   dd, dt {
     display: inline-block;

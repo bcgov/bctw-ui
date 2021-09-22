@@ -1,12 +1,9 @@
-import { Box, IconButton, makeStyles, ThemeProvider } from '@material-ui/core';
-import { Theme } from '@material-ui/core/styles/createTheme';
+import { Box } from '@material-ui/core';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import TextField from 'components/form/TextInput';
 import { useMemo, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import { ITableFilter } from './table_interfaces';
-import { Tooltip } from 'components/common';
 
 type TextFilterProps = {
   rowCount: number;
@@ -47,7 +44,8 @@ function TextFilter({
 
 type TableFilterProps<T> = {
   rowCount: number;
-  filterableProperties: string[];
+  // filterableProperties: string[];
+  filterableProperties: (keyof T)[];
   onChangeFilter: (filter: ITableFilter) => void;
 };
 
@@ -61,7 +59,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
 
   const handleSelect = (v: ISelectMultipleData[]): void => {
     const values = v.map(item => item.value as keyof T);
-    setSelectedOption(values as any)
+    setSelectedOption(values as string[]);
   };
 
   const handleTextChange = (value: string): void => {
@@ -77,7 +75,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         return {
           id: i,
           value: f,
-          displayLabel: columnToHeader(f)
+          displayLabel: columnToHeader(f as string)
         } as ISelectMultipleData;
       }),
     []

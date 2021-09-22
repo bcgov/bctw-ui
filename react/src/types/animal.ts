@@ -1,17 +1,16 @@
-import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBase, BCTWBaseType, PartialPick, transformOpt } from 'types/common_types';
-import { Type, Expose, Transform } from 'class-transformer';
-import { eCritterPermission } from 'types/permission';
-import { formatLatLong } from 'utils/common_helpers';
+import { Transform } from 'class-transformer';
+import { Dayjs } from 'dayjs';
+import { Code } from 'types/code';
+import { BaseTimestamps, BCTWBase, nullToDayjs, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
-import { Collar } from './collar';
-
+import { eCritterPermission } from 'types/permission';
+import { columnToHeader } from 'utils/common_helpers';
+import { ICollarHistory } from './collar_history';
 
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
   assigned = 'assigned',
-  unassigned = 'unassigned',
-  all = 'all'
+  unassigned = 'unassigned'
 }
 
 /**
@@ -19,171 +18,169 @@ export enum eCritterFetchType {
  */
 export interface IAnimalTelemetryBase {
   animal_id: string;
-  animal_status: string; // code
-  capture_date: Date;
+  animal_status: Code;
+  capture_date: Dayjs | Date;
   collective_unit: string; // fixme: what is this
-  map_colour: string; // code
-  species: string; // code
-  population_unit: string; // code
+  map_colour: Code;
+  species: Code;
+  population_unit: Code;
   wlh_id: string;
 }
 
-export interface IAnimal extends BCTWBaseType, IAnimalTelemetryBase, 
-  PartialPick<Collar, 'collar_id' | 'device_id' | 'frequency'> {
+export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   animal_colouration: string;
   animal_comment: string;
   associated_animal_id: string;
-  associated_animal_relationship: string; // code
+  associated_animal_relationship: Code;
 
   capture_comment: string;
-  capture_time: Date; // todo:
   capture_latitude: number;
   capture_longitude: number;
   capture_utm_easting: number;
   capture_utm_northing: number;
   capture_utm_zone: number;
 
-  critter_id: string;
-  critter_transaction_id: string;
-  ear_tag_left_id: string; 
+  readonly critter_id: uuid;
+  readonly critter_transaction_id: uuid;
+  ear_tag_left_id: string;
   ear_tag_right_id: string;
-  ear_tag_left_colour: string; // code
-  ear_tag_right_colour: string; // code
+  ear_tag_left_colour: string;
+  ear_tag_right_colour: string;
   estimated_age: number;
-  juvenile_at_heel: string; // code
+  juvenile_at_heel: Code;
   juvenile_at_heel_count: number;
-  life_stage: string;
+  life_stage: Code;
 
   mortality_comment: string;
-  mortality_date: Date;
-  mortality_time: Date; // todo:
+  mortality_date: Dayjs;
   mortality_latitude: number;
   mortality_longitude: number;
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
+  mortality_report: boolean;
+  mortality_investigation: Code;
+  captivity_status: boolean;
+  mortality_captivity_status: Code;
 
   permission_type?: eCritterPermission; // critters should contain this
-  predator_species: string; // special species code fixme:
-  proximate_cause_of_death: string; // code
-  recapture: boolean; // what is this?
-  region: string; // code
+  predator_known: boolean;
+  predator_species_pcod: Code;
+  predator_species_ucod: Code;
+  proximate_cause_of_death: Code;
+  ucod_confidence: Code;
+  pcod_confidence: Code;
+  recapture: boolean;
+  region: Code;
 
   release_comment: string;
-  release_date: Date;
-  release_time: Date; // todo:
+  release_date: Dayjs;
   release_latitude: number;
   release_longitude: number;
   release_utm_easting: number;
   release_utm_northing: number;
   release_utm_zone: number;
 
-  sex: string;
+  sex: Code;
   translocation: boolean;
-  ultimate_cause_of_death: string; // code
+  ultimate_cause_of_death: Code;
 }
-type AnimalProps = keyof IAnimal;
 
-
-export class Animal extends BCTWBase implements IAnimal {
-  critter_id: string;
-  critter_transaction_id: string;
+export class Animal implements BCTWBase<Animal>, IAnimal {
+  readonly critter_id: uuid;
+  readonly critter_transaction_id: uuid;
   animal_id: string;
-  animal_status: string;
+  animal_status: Code;
   associated_animal_id: string;
-  associated_animal_relationship: string; 
+  associated_animal_relationship: Code;
   capture_comment: string;
-  @Type(() => Date) capture_date: Date;
-  @Type(() => Date) capture_time: Date;
-  @Transform((v) => v || -1, transformOpt) capture_latitude: number;
-  @Transform((v) => v || -1, transformOpt) capture_longitude: number;
-  @Transform((v) => v || -1, transformOpt) capture_utm_easting: number;
-  @Transform((v) => v || -1, transformOpt) capture_utm_northing: number;
-  @Transform((v) => v || -1, transformOpt) capture_utm_zone: number;
+  @Transform(nullToDayjs) capture_date: Dayjs;
+  capture_latitude: number;
+  capture_longitude: number;
+  capture_utm_easting: number;
+  capture_utm_northing: number;
+  capture_utm_zone: number;
   collective_unit: string;
   animal_colouration: string;
   ear_tag_left_id: string;
   ear_tag_right_id: string;
   ear_tag_left_colour: string;
   ear_tag_right_colour: string;
-  @Transform((value) => value || -1, transformOpt) estimated_age: number;
-  juvenile_at_heel: string;
-  @Transform((value) => value || -1, transformOpt) juvenile_at_heel_count: number;
-  life_stage: string;
-  map_colour: string;
+  estimated_age: number;
+  juvenile_at_heel: Code;
+  juvenile_at_heel_count: number;
+  life_stage: Code;
+  map_colour: Code;
   mortality_comment: string;
-  @Type(() => Date) mortality_date: Date;
-  @Type(() => Date) mortality_time: Date;
-  @Transform((v) => v || -1, transformOpt) mortality_latitude: number;
-  @Transform((v) => v || -1, transformOpt) mortality_longitude: number;
-  @Transform((v) => v || -1, transformOpt) mortality_utm_easting: number;
-  @Transform((v) => v || -1, transformOpt) mortality_utm_northing: number;
-  @Transform((v) => v || -1, transformOpt) mortality_utm_zone: number;
-  predator_species: string;
-  proximate_cause_of_death: string;
-  ultimate_cause_of_death: string;
-  population_unit: string;
+  @Transform(nullToDayjs) mortality_date: Dayjs;
+  mortality_latitude: number;
+  mortality_longitude: number;
+  mortality_utm_easting: number;
+  mortality_utm_northing: number;
+  mortality_utm_zone: number;
+  predator_known: boolean;
+  predator_species_pcod: Code;
+  predator_species_ucod: Code;
+  proximate_cause_of_death: Code;
+  ucod_confidence: Code;
+  pcod_confidence: Code;
+  ultimate_cause_of_death: Code;
+  population_unit: Code;
   recapture: boolean;
-  region: string;
+  region: Code;
   release_comment: string;
-  @Type(() => Date) release_date: Date;
-  @Type(() => Date) release_time: Date;
-  @Transform((v) => v || -1, transformOpt) release_latitude: number;
-  @Transform((v) => v || -1, transformOpt) release_longitude: number;
-  @Transform((v) => v || -1, transformOpt) release_utm_easting: number;
-  @Transform((v) => v || -1, transformOpt) release_utm_northing: number;
-  @Transform((v) => v || -1, transformOpt) release_utm_zone: number;
-  sex: string;
-  species: string;
+  @Transform(nullToDayjs) release_date: Dayjs;
+  release_latitude: number;
+  release_longitude: number;
+  release_utm_easting: number;
+  release_utm_northing: number;
+  release_utm_zone: number;
+  sex: Code;
+  species: Code;
   translocation: boolean;
   wlh_id: string;
   animal_comment: string;
-  @Type(() => Date) valid_from: Date;
-  @Type(() => Date) valid_to: Date;
-  permission_type: eCritterPermission;
-  device_id?: number;
-  collar_id?: string;
-  frequency?: number;
+  @Transform(nullToDayjs) valid_from: Dayjs;
+  @Transform(nullToDayjs) valid_to: Dayjs;
 
-  @Expose() get identifier(): keyof Animal {
+  mortality_report: boolean;
+  mortality_investigation: Code;
+  captivity_status: boolean;
+  mortality_captivity_status: Code;
+
+  permission_type: eCritterPermission;
+
+  get identifier(): keyof Animal {
     return 'critter_id';
   }
-  @Expose() get name(): string {
+  get name(): string {
     return this.wlh_id ?? this.animal_id;
   }
-  @Expose() get mortalityCoords(): string {
-    return this.mortality_latitude && this.mortality_longitude
-      ? formatLatLong(this.mortality_latitude, this.mortality_longitude)
-      : '';
-  }
-  @Expose() get mortalityUTM(): string {
-    if (this.mortality_utm_zone && this.mortality_utm_easting && this.mortality_utm_northing) {
-      return `${this.mortality_utm_zone}/${this.mortality_utm_easting}/${this.mortality_utm_northing}`;
-    }
-    return '';
-  }
-  @Expose() get captureCoords(): string {
-    return this.capture_latitude && this.capture_longitude
-      ? formatLatLong(this.capture_latitude, this.capture_longitude)
-      : '';
-  }
-  @Expose() get captureUTM(): string {
-    return this.capture_utm_zone && this.capture_utm_easting && this.capture_utm_northing
-      ? `${this.capture_utm_zone}/${this.capture_utm_easting}/${this.capture_utm_northing}`
-      : '';
-  }
+  // get mortalityCoords(): string {
+  //   return this.mortality_latitude && this.mortality_longitude
+  //     ? formatLatLong(this.mortality_latitude, this.mortality_longitude)
+  //     : '';
+  // }
+  // get mortalityUTM(): string {
+  //   if (this.mortality_utm_zone && this.mortality_utm_easting && this.mortality_utm_northing) {
+  //     return `${this.mortality_utm_zone}/${this.mortality_utm_easting}/${this.mortality_utm_northing}`;
+  //   }
+  //   return '';
+  // }
+  // get captureCoords(): string {
+  //   return this.capture_latitude && this.capture_longitude
+  //     ? formatLatLong(this.capture_latitude, this.capture_longitude)
+  //     : '';
+  // }
+  // get captureUTM(): string {
+  //   return this.capture_utm_zone && this.capture_utm_easting && this.capture_utm_northing
+  //     ? `${this.capture_utm_zone}/${this.capture_utm_easting}/${this.capture_utm_northing}`
+  //     : '';
+  // }
 
-  constructor(aid?: string, status?: string, sp?: string, wlhid?: string) {
-    super();
-    this.animal_id = aid ?? '';
-    this.animal_status = status ?? '';
-    this.species = sp ?? '';
-    this.wlh_id = wlhid ?? '';
-  }
-
+  // todo: all date fields to str
   toJSON(): Animal {
     delete this.map_colour;
-    delete this.error;
     return this;
   }
 
@@ -191,20 +188,20 @@ export class Animal extends BCTWBase implements IAnimal {
     switch (str) {
       case 'associated_animal_relationship':
         return 'Associated Relationship';
-      case 'captureCoords':
-        return 'Coordinates (Lat/Long)';
-      case 'captureUTM':
-        return 'UTM';
+      // case 'captureCoords':
+      //   return 'Coordinates (Lat/Long)';
+      // case 'captureUTM':
+      //   return 'UTM';
       case 'collective_unit':
         return 'Collective Unit Name';
       case 'critter_id':
         return 'BCTW ID';
       case 'juvenile_at_heel':
         return 'Juvenile at Heel?';
-      case 'mortalityCoords':
-        return 'Coordinates (Lat/Long)';
-      case 'mortalityUTM':
-        return 'UTM';
+      // case 'mortalityCoords':
+      //   return 'Coordinates (Lat/Long)';
+      // case 'mortalityUTM':
+      //   return 'UTM';
       case 'population_unit':
         return 'Population Unit Name';
       case 'wlh_id':
@@ -213,28 +210,51 @@ export class Animal extends BCTWBase implements IAnimal {
         return columnToHeader(str);
     }
   }
-  static get assignedProps(): AnimalProps[] {
-    return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
+  get displayProps(): (keyof Animal)[] {
+    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'animal_status'];
   }
-  static get unassignedProps(): AnimalProps[] {
-    return ['species', 'population_unit', /* 'collective_unit', */ 'wlh_id', 'animal_id', 'animal_status'];
-  } 
 }
 
-const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
+// animals attached to devices should have additional properties
+export interface IAttachedAnimal extends IAnimal, ICollarHistory {}
+
+export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<AttachedAnimal> {
+  assignment_id: uuid;
+  collar_id: uuid;
+  device_id: number;
+  device_make: Code;
+  frequency: number;
+
+  attachment_start: Dayjs;
+  data_life_start: Dayjs;
+  data_life_end: Dayjs;
+  attachment_end: Dayjs;
+
+  // con't overide since this class is inherited
+  static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
+    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
+  }
+
+  formatPropAsHeader(str: keyof Animal): string {
+    return super.formatPropAsHeader(str);
+  }
+}
+
+export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
   associatedAnimalFields: [
     { prop: 'associated_animal_id', type: eInputType.text },
     { prop: 'associated_animal_relationship', type: eInputType.code }
   ],
   captureFields: [
-    { prop: 'capture_date', type: eInputType.date, ...isRequired},
+    { prop: 'capture_date', type: eInputType.datetime, ...isRequired },
     { prop: 'capture_latitude', type: eInputType.number },
     { prop: 'capture_longitude', type: eInputType.number },
     { prop: 'capture_utm_zone', type: eInputType.number },
     { prop: 'capture_utm_easting', type: eInputType.number },
     { prop: 'capture_utm_northing', type: eInputType.number },
     { prop: 'recapture', type: eInputType.check },
-    { prop: 'capture_comment', type: eInputType.text }
+    { prop: 'capture_comment', type: eInputType.text },
+    { prop: 'captivity_status', type: eInputType.check },
   ],
   characteristicsFields: [
     { prop: 'animal_status', type: eInputType.code, ...isRequired },
@@ -258,19 +278,25 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'ear_tag_right_id', type: eInputType.text }
   ],
   mortalityFields: [
-    { prop: 'mortality_date', type: eInputType.date },
-    { prop: 'mortality_latitude', type: eInputType.date },
-    { prop: 'mortality_longitude', type: eInputType.date },
-    { prop: 'mortality_utm_zone', type: eInputType.date },
-    { prop: 'mortality_utm_easting', type: eInputType.date },
-    { prop: 'mortality_utm_northing', type: eInputType.date },
+    { prop: 'mortality_date', type: eInputType.datetime },
+    { prop: 'mortality_latitude', type: eInputType.number },
+    { prop: 'mortality_longitude', type: eInputType.number },
+    { prop: 'mortality_utm_zone', type: eInputType.number },
+    { prop: 'mortality_utm_easting', type: eInputType.number },
+    { prop: 'mortality_utm_northing', type: eInputType.number },
+    { prop: 'mortality_comment', type: eInputType.text },
     { prop: 'proximate_cause_of_death', type: eInputType.code },
     { prop: 'ultimate_cause_of_death', type: eInputType.code },
-    { prop: 'predator_species', type: eInputType.code },
-    { prop: 'mortality_comment', type: eInputType.text }
+    { prop: 'pcod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
+    { prop: 'ucod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
+    { prop: 'predator_species_pcod', type: eInputType.code, codeName: 'predator_species' },
+    { prop: 'predator_species_ucod', type: eInputType.code, codeName: 'predator_species' },
+    { prop: 'mortality_investigation', type: eInputType.code },
+    { prop: 'mortality_report', type: eInputType.check },
+    { prop: 'predator_known', type: eInputType.check }
   ],
   releaseFields: [
-    { prop: 'release_date', type: eInputType.date },
+    { prop: 'release_date', type: eInputType.datetime },
     { prop: 'release_latitude', type: eInputType.number },
     { prop: 'release_longitude', type: eInputType.number },
     { prop: 'release_utm_zone', type: eInputType.number },
@@ -280,8 +306,13 @@ const critterFormFields: Record<string, FormFieldObject<Animal>[]> = {
     { prop: 'release_comment', type: eInputType.text }
   ],
   animalCommentField: [
-    { prop: 'animal_comment', type: eInputType.text }
-  ]
+    { prop: 'animal_comment', type: eInputType.multiline }
+  ],
 };
 
-export { critterFormFields };
+// a 'flatteneed' critterFormFields array
+export const getAnimalFormFields = (): FormFieldObject<Partial<Animal>>[] => {
+  return Object
+    .values(critterFormFields)
+    .reduce((previous, current) => ([ ...previous, ...current ]), []);
+};

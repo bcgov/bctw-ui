@@ -1,8 +1,9 @@
 import { matchSorter } from 'match-sorter';
 import { getProperty, countDecimals } from 'utils/common_helpers';
 import { Order, HeadCell } from 'components/table/table_interfaces';
-import { dateObjectToTimeStr } from 'utils/time';
+import { dateObjectToTimeStr, formatTime } from 'utils/time';
 import { Icon } from 'components/common';
+import { isDayjs } from 'dayjs';
 
 /**
  * converts an object to a list of HeadCells
@@ -10,13 +11,13 @@ import { Icon } from 'components/common';
  * @param propsToDisplay the object's properties that should be displayed in the table
  * @return {HeadCell<T>[]}
  */
-function createHeadCell<T>(obj: T, propsToDisplay: string[]): HeadCell<T>[] {
-  return propsToDisplay.map((k) => {
+function createHeadCell<T>(obj: T, propsToDisplay: (keyof T)[]): HeadCell<T>[] {
+  return propsToDisplay.map(k => {
     const isNumber = typeof getProperty(obj, k as keyof T) === 'number';
     return {
       disablePadding: false,
       id: k as keyof T,
-      label: k,
+      // label: k,
       numeric: isNumber
     };
   });
@@ -65,27 +66,31 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
 
 interface ICellFormat {
   align: 'inherit' | 'left' | 'center' | 'right' | 'justify';
-  value: string | number | JSX.Element;
+  value: unknown;
 }
 /**
  *
  * @param obj object being displayed
  * @param key the property to render in this table cell
+ * todo: ...not using align just return value?
  */
-function formatTableCell<T>(obj: T, key: string): ICellFormat {
-  const value = obj[key];
+const align: Pick<ICellFormat, 'align'> = {align: 'left'};
+function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
+  const value: unknown = obj[key];
   if (typeof value === 'boolean') {
-    return { align: 'center', value: <Icon icon={value ? 'done' : 'close'} /> };
+    return { ...align, value: <Icon icon={value ? 'done' : 'close'} /> };
   }
-  if (typeof value?.getMonth === 'function') {
-    return { align: 'right', value: dateObjectToTimeStr(value) };
+  if (typeof (value as Date)?.getMonth === 'function') {
+    return { ...align, value: dateObjectToTimeStr(value as Date) };
+  } else if (isDayjs(value)) {
+    return { ...align, value: value.isValid() ? value.format(formatTime) : ''}
   } else if (typeof value === 'number') {
     const formatted = countDecimals(value) > 2 ? value.toFixed(2) : value;
-    return { align: 'right', value: formatted };
+    return { ...align, value: formatted };
   } else if (typeof value === 'string') {
-    return { align: 'center', value };
+    return { ...align, value };
   }
-  return { align: 'left', value };
+  return { ...align, value };
 }
 
 /**

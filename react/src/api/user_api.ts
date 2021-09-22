@@ -1,6 +1,6 @@
-import { createUrl } from 'api/api_helpers';
+import { createUrl, isDev } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { TelemetryAlert } from 'types/alert';
+import { ITelemetryAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
@@ -21,6 +21,11 @@ export const userApi = (props: ApiProps) => {
    * the error/404 screen if the user info is not able to be retrieved
    */
   const getSessionInfo = async (): Promise<IKeyCloakSessionInfo> => {
+    if (isDev()) {
+      // eslint-disable-next-line no-console
+      console.error('keycloak session info not retrievable in dev, note that UserContext.session object will be invalid');
+      return null;
+    }
     const url = createUrl({ api: 'session-info' });
     const { data } = await api.get(url);
     console.log('retrieve session info');
@@ -63,13 +68,14 @@ export const userApi = (props: ApiProps) => {
 
   /**
    * @returns {TelemetryAlert[]} that the user has access to (through their critters)
+   * todo: support different alert types
    */
-  const getUserAlerts = async (): Promise<TelemetryAlert[]> => {
+  const getUserAlerts = async (): Promise<MortalityAlert[]> => {
     const url = createUrl({ api: 'get-user-alerts' });
     const { data } = await api.get(url);
     // console.log('user alerts fetched', data);
     if (data && Array.isArray(data)) {
-      const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
+      const converted = data?.map((json) => plainToClass(MortalityAlert, json));
       return converted;
     }
     return [];
@@ -83,7 +89,7 @@ export const userApi = (props: ApiProps) => {
     const url = createUrl({ api: upsertAlertEndpoint });
     const { data } = await api.post(url, body);
     if (data && data.length) {
-      const converted = data?.map((json) => plainToClass(TelemetryAlert, json));
+      const converted = data?.map((json: ITelemetryAlert) => plainToClass(TelemetryAlert, json));
       return converted;
     }
     return [];

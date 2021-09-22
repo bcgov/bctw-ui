@@ -5,12 +5,13 @@ import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import dayjs from 'dayjs';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AssignNewCollarModal from 'pages/data/animals/AssignNewCollar';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { CollarHistory, IRemoveDeviceProps } from 'types/collar_history';
+import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { DataLifeInput } from 'types/data_life';
 import { canRemoveDeviceFromAnimal } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
@@ -45,7 +46,7 @@ export default function PerformAssignmentAction({
    * if there is no attachment, pass true as second param of DataLifeInput constructor to 
    * default the start datetimes to now
    */
-  const [dli, setDli] = useState<DataLifeInput>(new DataLifeInput(null, true));
+  const [dli, setDli] = useState<DataLifeInput>(new DataLifeInput(dayjs(), dayjs(), null, null));
 
   /**
    * users with admin/owner permission can attach/unattach devices
@@ -63,8 +64,10 @@ export default function PerformAssignmentAction({
 
   useDidMountEffect(() => {
     // console.log(`perm: ${permission_type}, islink : ${isLink}`);
-    setIsLink(!!current_attachment?.collar_id);
-    setDli(new DataLifeInput(current_attachment));
+    if (current_attachment) {
+      setIsLink(!!current_attachment?.collar_id);
+      setDli(current_attachment.createDataLife());
+    }
   }, [current_attachment]);
 
   // for critters with no device history, attachment effect above will not occur,
@@ -125,7 +128,7 @@ export default function PerformAssignmentAction({
   };
 
   const handleConfirmRemoveDevice = (): void => {
-    const body: IRemoveDeviceProps = {
+    const body: RemoveDeviceInput = {
       assignment_id: current_attachment.assignment_id,
       ...dli.toRemoveDeviceJSON()
     }

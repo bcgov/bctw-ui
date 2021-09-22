@@ -52,7 +52,7 @@ interface ICustomTableColumn<T> {
 */
 
 type IPlainTableProps<T> = {
-  headers?: string[];
+  headers: (keyof T)[];
   title?: string;
   onSelect?: (row: T) => void;
 }
@@ -74,7 +74,7 @@ type ITableProps<T> = IPlainTableProps<T> & {
 interface HeadCell<T> {
   disablePadding: boolean;
   id: keyof T;
-  label: string;
+  // label: keyof T;
   numeric: boolean;
 }
 
@@ -92,7 +92,7 @@ interface HeadCell<T> {
 interface ITableHeadProps<T> {
   customHeaders: ((row: T, idx: number) => JSX.Element)[];
   headerData: T;
-  headersToDisplay: string[];
+  headersToDisplay: (keyof T)[];
   isMultiSelect: boolean;
   numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;

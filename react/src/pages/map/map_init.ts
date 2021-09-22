@@ -43,7 +43,7 @@ const getCHB = () => {
   const fl = new FeatureLayer({
     url: 'https://services6.arcgis.com/ubm4tcTYICKBpist/arcgis/rest/services/Caribou_BC/FeatureServer/0'
   });
-  return fl as L.TileLayer;
+  return fl as unknown as L.TileLayer;
 };
 
 // URL for BC Geographic Warehouse

@@ -7,6 +7,7 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
 import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
+import { EditTabPanel, a11yProps } from 'pages/data/common/EditModalComponents';
 
 import HistoryPage from './HistoryPage';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -20,46 +21,13 @@ import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: unknown;
-}
-
-const TabPanel = (props: TabPanelProps): JSX.Element  => {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-/**
- * fixme: what is an ally?
- */
-const a11yProps = (index: number): Record<string, string> => {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
+import { BCTWBase } from 'types/common_types';
+import useFormHasError from 'hooks/useFormHasError';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
   hideSave?: boolean;
+  disableTabs?: boolean;
   disableHistory?: boolean;
   showInFullScreen?: boolean;
   onReset?: () => void;
@@ -78,9 +46,9 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param showInFullScreen render as a modal or fullscreen dialog?
  * @param onReset a close handler since default handler is overwritten in AddEditViewer
  * @param onSave the parent handler called when the save button is clicked
- * @param headerComponent 
+ * @param headerComponent
  */
-export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
+export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<T>): JSX.Element {
   const bctwApi = useTelemetryApi();
   const {
     children,
@@ -93,17 +61,18 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
     headerComponent,
     disableHistory = false,
     hideSave = false,
-    showInFullScreen = true,
+    disableTabs = false,
+    showInFullScreen = true
   } = props;
 
   const [canSave, setCanSave] = useState<boolean>(false);
+  const [hasErr, checkHasErr] = useFormHasError();
   const [newObj, setNewObj] = useState<T>(Object.assign({}, editing));
   const [showHistory, setShowHistory] = useState<boolean>(false);
-  const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>(null);
-  const [errors, setErrors] = useState<Record<string, boolean>>(Object.assign({}));
-  
+  const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
+
   const [value, setValue] = React.useState(0);
-  const handleSwitch = (event: React.ChangeEvent<{1}>, newValue: number): void => {
+  const handleSwitch = (event: React.ChangeEvent<{ 1 }>, newValue: number): void => {
     setValue(newValue);
   };
 
@@ -114,13 +83,13 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
         setHistoryParams({
           query: bctwApi.useCritterHistory,
           param: editing.critter_id,
-          propsToDisplay: Object.keys(editing) // show all Animal properties
+          propsToDisplay: (editing.displayProps) // show all Animal properties
         });
       } else if (editing instanceof Collar) {
         setHistoryParams({
           query: bctwApi.useCollarHistory,
           param: editing.collar_id,
-          propsToDisplay: Object.keys(editing) // show all Device properties
+          propsToDisplay: (editing.displayProps) // show all Device properties
         });
       }
     };
@@ -136,32 +105,22 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
 
   // if the error state changes, update the save status
   useDidMountEffect(() => {
-    const update = (): void => {
-      const cs = Object.values(errors).filter(e => !!e);
-      setCanSave(cs.length === 0)
-    }
-    update();
-  }, [errors])
+    setCanSave(!hasErr);
+  }, [hasErr]);
 
   const handleSave = (): void => {
     // use Object.assign to preserve class methods
     const body = omitNull(Object.assign(editing, newObj));
-    // console.log(JSON.stringify(body, null, 2));
     const toSave: IUpsertPayload<T> = { body };
     onSave(toSave);
   };
 
   // triggered on a form input change, newProp will be an object with a single key and value
   const handleChange = (newProp: Record<string, unknown>): void => {
-    // console.log(newProp);
-    // update the error state
-    const key: string = Object.keys(newProp)[0];
-    const newErrors = Object.assign(errors, {[key]: newProp.error});
-    setErrors({...newErrors});
-    // update the editing state
+    checkHasErr(newProp);
     const modified = { ...newObj, ...newProp };
     setNewObj(modified);
-    // todo: determine if object has actually changed from original
+    // todo: determine if object has changed from original
     // const og = { [key]: editing[key] ?? '' };
     // const isSame = objectCompare(newProp, og);
     // setCanSave(isChange && !isSame);
@@ -194,24 +153,25 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
         </Modal>
       ) : null}
 
-      <form className={'rootEditInput'} autoComplete={'off'}>
+      <form autoComplete={'off'}>
         {headerComponent}
 
         <Container maxWidth='xl'>
           <Box py={3}>
-            <Box mb={4}>
-              <Tabs
-                value={value}
-                onChange={handleSwitch}
-                aria-label='simple tabs example'
-                indicatorColor='primary'
-                textColor='primary'>
-                <Tab label='Details' {...a11yProps(0)} />
-                {!disableHistory ? <Tab label='History' {...a11yProps(1)} /> : null}
-              </Tabs>
-            </Box>
-
-            <TabPanel value={value} index={0}>
+            {disableTabs ? null : (
+              <Box mb={4}>
+                <Tabs
+                  value={value}
+                  onChange={handleSwitch}
+                  aria-label='simple tabs example'
+                  indicatorColor='primary'
+                  textColor='primary'>
+                  <Tab label='Details' {...a11yProps(0)} />
+                  {!disableHistory ? <Tab label='History' {...a11yProps(1)} /> : null}
+                </Tabs>
+              </Box>
+            )}
+            <EditTabPanel value={value} index={0}>
               <Paper>
                 {children}
 
@@ -221,7 +181,6 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
 
                 <Box p={3}>
                   <Box display='flex' justifyContent='flex-end' className='form-buttons'>
-
                     {/* save button */}
                     {hideSave ? null : (
                       <Button size='large' color='primary' onClick={handleSave} disabled={!canSave}>
@@ -234,11 +193,11 @@ export default function EditModal<T>(props: IEditModalProps<T>): JSX.Element {
                   </Box>
                 </Box>
               </Paper>
-            </TabPanel>
+            </EditTabPanel>
 
-            <TabPanel value={value} index={1}>
+            <EditTabPanel value={value} index={1}>
               <HistoryPage {...historyParams} />
-            </TabPanel>
+            </EditTabPanel>
           </Box>
         </Container>
       </form>

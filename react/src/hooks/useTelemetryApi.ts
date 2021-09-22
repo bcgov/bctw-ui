@@ -3,7 +3,7 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
-import { eventApi as event_api } from 'api/event_api';
+import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { IUserUpsertPayload, userApi as user_api } from 'api/user_api';
@@ -11,10 +11,10 @@ import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
-import { Animal, eCritterFetchType } from 'types/animal';
+import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
-import { CollarHistory, IAttachDeviceProps, IRemoveDeviceProps } from 'types/collar_history';
+import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
@@ -22,18 +22,17 @@ import {
   IDeleteType,
   IUpsertPayload,
 } from 'api/api_interfaces';
-import { TelemetryAlert } from 'types/alert';
-import { BCTWBase, BCTWType } from 'types/common_types';
+import { MortalityAlert, TelemetryAlert } from 'types/alert';
+import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
-import MortalityEvent from 'types/mortality_event';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { IChangeDataLifeProps } from 'types/data_life';
+import { BCTWWorkflow } from 'types/events/event';
 
 /**
  * Returns an instance of axios with baseURL set.
- *
  * @return {AxiosInstance}
  */
 const useApi = (): AxiosInstance => {
@@ -47,7 +46,6 @@ const useApi = (): AxiosInstance => {
 
 /**
  * Returns a set of supported api methods.
- *
  * @return {object} object whose properties are supported api methods.
  */
 export const useTelemetryApi = () => {
@@ -124,8 +122,8 @@ export const useTelemetryApi = () => {
   /**
    *  retrieves critters that have a collar assigned
   */
-  const useAssignedCritters = (page: number): UseQueryResult<Animal[]> => {
-    return useQuery<Animal[], AxiosError>(
+  const useAssignedCritters = (page: number): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+    return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
       ['critters_assigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.assigned),
       critterOptions
@@ -135,8 +133,8 @@ export const useTelemetryApi = () => {
   /**
    * retrieves critters not assigned to a collar
   */
-  const useUnassignedCritters = (page: number): UseQueryResult<Animal[]> =>
-    useQuery<Animal[], AxiosError>(
+  const useUnassignedCritters = (page: number): UseQueryResult<Animal[] | AttachedAnimal[]> =>
+    useQuery<Animal[] | AttachedAnimal[], AxiosError>(
       ['critters_unassigned', page],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned),
       critterOptions
@@ -236,8 +234,8 @@ export const useTelemetryApi = () => {
   /**
    * @returns
    */
-  const useAlert = (): UseQueryResult<TelemetryAlert[]> => {
-    return useQuery<TelemetryAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), {
+  const useAlert = (): UseQueryResult<MortalityAlert[]> => {
+    return useQuery<MortalityAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), {
       ...defaultQueryOptions
     });
   };
@@ -245,7 +243,7 @@ export const useTelemetryApi = () => {
   /** default type getter for animals or collars
    * @returns
    */
-  const useType = <T extends BCTWBase>(type: BCTWType, id: string): UseQueryResult<T> => {
+  const useType = <T>(type: BCTWType, id: string): UseQueryResult<T> => {
     return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions
     });
@@ -254,7 +252,7 @@ export const useTelemetryApi = () => {
   /**
    * 
   */
-  const useUDF = (type: eUDFType): UseQueryResult<IUDF[]> => {
+  const useUDF = (type: eUDFType): UseQueryResult<IUDF[], AxiosError> => {
     return useQuery<IUDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), {
       ...defaultQueryOptions /*, ...{refetchOnMount: true} */
     });
@@ -309,15 +307,15 @@ export const useTelemetryApi = () => {
 
   /** attaches a device from an animal */
   const useMutateAttachDevice = (
-    config: UseMutationOptions<CollarHistory, AxiosError, IAttachDeviceProps>
+    config: UseMutationOptions<CollarHistory, AxiosError, AttachDeviceInput>
   ): UseMutationResult =>
-    useMutation<CollarHistory, AxiosError, IAttachDeviceProps>((link) => attachmentApi.attachDevice(link), config);
+    useMutation<CollarHistory, AxiosError, AttachDeviceInput>((link) => attachmentApi.attachDevice(link), config);
 
   /** removes a device from an animal */
   const useMutateRemoveDevice = (
-    config: UseMutationOptions<CollarHistory, AxiosError, IRemoveDeviceProps>
+    config: UseMutationOptions<CollarHistory, AxiosError, RemoveDeviceInput>
   ): UseMutationResult =>
-    useMutation<CollarHistory, AxiosError, IRemoveDeviceProps>((link) => attachmentApi.removeDevice(link), config);
+    useMutation<CollarHistory, AxiosError, RemoveDeviceInput>((link) => attachmentApi.removeDevice(link), config);
 
   /** updates the data life of an animal/device attachment */
   const useMutateEditDataLife = (
@@ -348,7 +346,7 @@ export const useTelemetryApi = () => {
 
   /** delete a critter or device */
   const useDelete = (config: UseMutationOptions<boolean, AxiosError, IDeleteType>): UseMutationResult<boolean> =>
-    useMutation<boolean, AxiosError, IDeleteType>((body) => critterApi.deleteType(body), config);
+    useMutation<boolean, AxiosError, IDeleteType>((body) => bulkApi.deleteType(body), config);
 
   /** save user defined animal groups */
   const useMutateUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDFInput[]>): UseMutationResult<IUDF[]> =>
@@ -359,8 +357,8 @@ export const useTelemetryApi = () => {
     useMutation<TelemetryAlert[], AxiosError, TelemetryAlert[]>((body) => userApi.updateAlert(body), config);
   
   /** POST a mortality event form */
-  const useMutateMortalityEvent = (config: UseMutationOptions<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>): UseMutationResult<IBulkUploadResults<unknown>> =>
-    useMutation<IBulkUploadResults<unknown>, AxiosError, MortalityEvent>((body) => eventApi.saveMortalityEvent(body), config);
+  const useMutateWorkflowEvent = <T extends BCTWWorkflow<T>>(config: UseMutationOptions<WorkflowAPIResponse, AxiosError, T>): UseMutationResult<WorkflowAPIResponse, AxiosError, T> =>
+    useMutation<WorkflowAPIResponse, AxiosError, T>((body) => eventApi.saveEvent<T>(body), config);
   
   /** add or update a user */
   const useMutateUser = (config: UseMutationOptions<User, AxiosError, IUserUpsertPayload>): UseMutationResult<User> =>
@@ -384,7 +382,6 @@ export const useTelemetryApi = () => {
     usePings,
     useUnassignedPings,
     useCollarType,
-    // useAllCritters,
     useAssignedCritters,
     useUnassignedCritters,
     useCritterHistory,
@@ -413,7 +410,7 @@ export const useTelemetryApi = () => {
     useMutateUser,
     useDelete,
     useMutateUserAlert,
-    useMutateMortalityEvent,
+    useMutateWorkflowEvent,
     useMutateSubmitPermissionRequest,
     useMutateTakeActionOnPermissionRequest,
   };

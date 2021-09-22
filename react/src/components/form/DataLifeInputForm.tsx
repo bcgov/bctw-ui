@@ -1,12 +1,15 @@
-import { useState } from 'react';
-import DateTimeInput, { DTimeChangeOutput } from 'components/form/DateTimeInput';
+import React, { useState } from 'react';
+import DateTimeInput from 'components/form/DateTimeInput';
 import { Box, Typography } from '@material-ui/core';
 import { DataLifeStrings } from 'constants/strings';
 import { DataLifeInput } from 'types/data_life';
 import { Dayjs } from 'dayjs';
+import { FormChangeEvent, InboundObj } from 'types/form_types';
+import { DateInputProps } from './Date';
+import { Tooltip } from 'components/common';
 
 /**
- * @param dli instance of @type {DataLifeIinput} 
+ * @param dli instance of @type {DataLifeIinput}
  * @param disableEditActual always disable the attachment start/end fields
  * @param enableEditStart @param enableEditEndenable whether or not to enable the start / end fields
  * @param disableDLStart @param disableDLEnd explicity disable only the data life fields
@@ -20,18 +23,32 @@ type DataLifeInputProps = {
   disableDLStart?: boolean;
   disableDLEnd?: boolean;
   disableEditActual?: boolean;
-  onChange?: (d: DTimeChangeOutput) => void;
+  propsRequired?: (keyof DataLifeInput)[];
+  onChange?: FormChangeEvent;
+  message?: React.ReactNode;
+  displayInRows?: boolean;
 };
 
-// todo: doc
-const getFirstKey = (d: DTimeChangeOutput): string => Object.keys(d)[0];
-const getFirstValue = (d: DTimeChangeOutput): Dayjs => Object.values(d)[0];
+// returns the first key ex. { data_life_start : 'bill' } // 'data_life_start'
+const getFirstKey = (d: InboundObj): string => Object.keys(d)[0];
+const getFirstValue = (d: InboundObj): unknown => Object.values(d)[0];
 
 /**
  * todo: time validation if same date?
  */
 export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Element {
-  const { dli, disableEditActual, enableEditStart, enableEditEnd, onChange, disableDLEnd, disableDLStart } = props;
+  const {
+    dli,
+    disableEditActual,
+    enableEditStart,
+    enableEditEnd,
+    onChange,
+    disableDLEnd,
+    disableDLStart,
+    propsRequired,
+    message,
+    displayInRows
+  } = props;
   const [minDate, setMinDate] = useState<Dayjs>(dli.attachment_start);
   const [maxDate, setMaxDate] = useState<Dayjs>(dli.attachment_end);
 
@@ -39,68 +56,89 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
 
   const handleDateOrTimeChange = (d): void => {
     const k = getFirstKey(d);
-    const v = getFirstValue(d);
+    const v = getFirstValue(d) as Dayjs;
     dli[k] = v;
     if (k === 'attachment_start') {
       setMinDate(v);
     } else if (k === 'attachment_end') {
       setMaxDate(v);
     }
+    // update state to show warning if data life was modified
+    // todo: check prop doesn't match attachment timestamp
+    if (k.indexOf('data_') !== -1 && v) {
+      // fixme:
+      // setIsModified(true);
+    }
     // call parent change handler if it exists
     if (typeof onChange === 'function') {
       onChange(d);
     }
-    // update state to show warning if data life was modified
-    if (k.indexOf('data_') !== -1) {
-      setIsModified(true);
-    }
   };
 
-  return (
-    <Box paddingBottom={2}>
-      {/* if data life has been modified - show a warning */}
-      <Box height={35} display='flex' justifyContent={'center'}>
-        {isModified ? (<Typography color={'error'}>{DataLifeStrings.editWarning}</Typography>) : null}
-      </Box>
+  const DTPRops: Pick<DateInputProps, 'changeHandler' | 'margin'> = {
+    changeHandler: handleDateOrTimeChange,
+    margin: 'dense'
+  };
+
+  const Body = (
+    <Box paddingBottom={2} id='hi'>
+      {/* if data life has been modified and display is not row format - show a warning */}
+      {displayInRows ? null : (
+        <Box height={35} display='flex' flexDirection={'column'} alignItems={'center'}>
+          {isModified ? <Typography color={'error'}>{DataLifeStrings.editWarning}</Typography> : null}
+        </Box>
+      )}
       <Box>
         {/* attachment start field */}
         <DateTimeInput
           propName='attachment_start'
-          changeHandler={handleDateOrTimeChange}
           label='Attachment Start'
           defaultValue={dli.attachment_start}
-          disabled={!enableEditStart|| disableEditActual}
+          disabled={!enableEditStart || disableEditActual}
+          required={propsRequired?.includes('attachment_start')}
+          {...DTPRops}
         />
         <Box component={'span'} m={1} />
         {/* data life start field */}
         <DateTimeInput
           propName='data_life_start'
-          changeHandler={handleDateOrTimeChange}
           label='Data Life Start'
           defaultValue={dli.data_life_start}
           disabled={!enableEditStart || disableDLStart}
           minDate={minDate}
+          required={propsRequired?.includes('data_life_start')}
+          {...DTPRops}
         />
-        <Box component={'span'} m={1} />
+        {displayInRows ? <Box></Box> : <Box component={'span'} m={1} />}
         {/* data life end field */}
         <DateTimeInput
           propName='data_life_end'
-          changeHandler={handleDateOrTimeChange}
           label='Data Life End'
           defaultValue={dli.data_life_end}
           disabled={!enableEditEnd || disableDLEnd}
           maxDate={maxDate}
+          required={propsRequired?.includes('data_life_end')}
+          {...DTPRops}
         />
         <Box component={'span'} m={1} />
         {/* attachment end field */}
         <DateTimeInput
           propName='attachment_end'
-          changeHandler={handleDateOrTimeChange}
           label='Attachment End'
           defaultValue={dli.attachment_end}
-          disabled={!enableEditEnd|| disableEditActual}
+          disabled={!enableEditEnd || disableEditActual}
+          required={propsRequired?.includes('attachment_end')}
+          {...DTPRops}
         />
       </Box>
     </Box>
+  );
+
+  return message ? (
+    <Tooltip placement='top-end' enterDelay={750} title={message}>
+      {Body}
+    </Tooltip>
+  ) : (
+    Body
   );
 }

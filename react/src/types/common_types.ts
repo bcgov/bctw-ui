@@ -1,51 +1,57 @@
-// most BCTW database tables contain these columns for transactional history
-export interface BCTWBaseType {
+import dayjs, { Dayjs } from 'dayjs';
+
+export interface BCTWValidDates {
+  valid_from: Date | Dayjs;
+  // a null valid_to indicates the 'current' record
+  valid_to: Date | Dayjs; 
+}
+
+// most database tables contain these columns for transactional history
+export interface BaseTimestamps extends PartialPick<BCTWValidDates, 'valid_from' | 'valid_to'> {
   created_at?: Date;
   created_by_user_id?: number;
   updated_at?: Date;
   updated_by_user_id?: number;
-  valid_from: Date;
-  valid_to: Date; // a null value in this column indicates the 'current' record
-  owned_by_user_id?: boolean; // base types may include this
+}
+
+// extended for types / classes that implement formatters
+export type BCTWFormat<T> = {
+  formatPropAsHeader(k: keyof T): string;
+  get displayProps(): (keyof T)[];
 }
 
 /**
- * almost any BCTW class that is displayed on in a data table or sent to the API is derived 
- * from this base class
+ * extended primarily by other types/classes that are used in table components
  */
-export abstract class BCTWBase {
-  error: boolean;
-  // formats a class property as a table header cell or label
-  abstract formatPropAsHeader(k: keyof BCTWBase): string;
-  /**
-   * optionally called before posting to API
-   * ex. to remove unwanted properties that should not be preserved 
-   */
-  abstract toJSON(): BCTWBase;
-  /**
-   * used in tables to identify unique rows
-   * seen in classes that use class-transformer to convert JSON
-   * from the API into an instance of class T
-   */
-  abstract get identifier(): string;
+export interface BCTWBase<T> extends BaseTimestamps, BCTWFormat<T> {
+  // Animal/Collar types may include this
+  owned_by_user_id?: boolean;
+  // used in tables to identify unique rows
+  get identifier(): string;
 }
+
+/**
+ * similar to the @type {Code}, currently just a string alias
+ */
+export type uuid = string;
 
 /**
  * defines the main object types that have metadata in BCTW
+ * todo: deprecate this :[
  */
-export type BCTWType = 'animal' | 'device'
+export type BCTWType = 'animal' | 'device';
 
-/**
- * extend a type, optionally including props
- */
+// optionally extend keys from a type
 export type PartialPick<T, K extends keyof T> = {
   [P in K]?: T[P];
 };
-
 
 /**
  * used with transforming types from the API
  * generally only care about object received from API -> instance of UI class
  * ex. nulls can be transformed to a boolean or number
  */
-export const transformOpt = { toClassOnly: true };
+const transformOpt = { toClassOnly: true };
+const nullToDayjs = (v: Date | null): Dayjs => dayjs(v);
+
+export { nullToDayjs, transformOpt };

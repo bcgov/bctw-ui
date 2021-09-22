@@ -59,7 +59,7 @@ interface ITelemetryGroup {
 }
 
 // represents the jsonb object in the get_telemetry pg function
-export class TelemetryDetail extends BCTWBase implements ITelemetryDetail {
+export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDetail>  {
   critter_id: string;
   species: string;
   wlh_id: string;
@@ -93,6 +93,10 @@ export class TelemetryDetail extends BCTWBase implements ITelemetryDetail {
 
   toJSON(): TelemetryDetail { return this; }
   get identifier(): keyof TelemetryDetail{ return 'device_id'}
+
+  get displayProps(): (keyof TelemetryDetail)[] {
+    return [];
+  }
 
   formatPropAsHeader(str: string): string {
     return columnToHeader(str);

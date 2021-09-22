@@ -31,3 +31,11 @@
   flex-direction: row;
   justify-content: center;
 }
+
+// for event modals
+.event-modal {
+  .MuiBox-root {
+    padding-top: 0;
+    padding-bottom: 0.2rem;
+  }
+}

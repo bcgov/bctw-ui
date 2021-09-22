@@ -50,11 +50,6 @@ type ExportImportProps = ModalBaseProps & {
   downloadTemplate?: () => void;
 };
 
-/**
- * handlers for form components
- */
-type InputChangeHandler = (o: Record<string, string | number | boolean>) => void;
-type CheckBoxChangeHandler = (o: Record<string, boolean>) => void;
 
 /**
  * interface for the Notifaction component
@@ -72,6 +67,4 @@ export type {
   ExportImportProps,
   EditModalBaseProps,
   INotificationMessage,
-  CheckBoxChangeHandler,
-  InputChangeHandler,
 };

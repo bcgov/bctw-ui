@@ -4,29 +4,27 @@ import dayjs, { Dayjs } from 'dayjs';
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import { formatDay } from 'utils/time';
 import { StandardTextFieldProps } from '@material-ui/core/TextField';
+import { FormBaseProps } from 'types/form_types';
+import { PropTypes } from '@material-ui/core';
 
-type DateTimeChangeOutput = Record<string, string>;
-
-// todo: convert to Dayjs
-export type DateInputProps = StandardTextFieldProps & {
-  propName: string;
-  label: string;
-  defaultValue: Date;
-  changeHandler: (v: DateTimeChangeOutput) => void;
-  minDate?: Date;
-  maxDate?: Date;
+export type DateInputProps = FormBaseProps & StandardTextFieldProps & {
+  defaultValue: Dayjs;
+  minDate?: Dayjs;
+  maxDate?: Dayjs;
+  margin?: PropTypes.Margin;
 };
 
 export default function DateInput(props: DateInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultValue ? dayjs(defaultValue) : undefined);
+  const { defaultValue, label, changeHandler, propName, minDate, maxDate, margin } = props;
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultValue.isValid() ? dayjs(defaultValue) : null);
 
-  const handleDateChange = (date: Dayjs | null): void => {
-    setSelectedDate(date);
-    if (date) {
-      changeHandler({ [propName]: date.format(formatDay) });
+  const handleDateChange = (djs: Dayjs | null): void => {
+    setSelectedDate(djs);
+    if (djs) {
+      changeHandler({ [propName]: djs.format(formatDay) });
     }
   };
+
   return (
     <MuiPickersUtilsProvider utils={DayjsUtils}>
       <DatePicker
@@ -38,7 +36,7 @@ export default function DateInput(props: DateInputProps): JSX.Element {
         variant='dialog'
         // a plain empty string renders as today?
         format={dayjs.isDayjs(selectedDate) ? selectedDate.format('YYYY/MM/DD') : ' '}
-        margin='normal'
+        margin={margin ?? 'none'}
         label={label}
         value={selectedDate}
         onChange={handleDateChange}

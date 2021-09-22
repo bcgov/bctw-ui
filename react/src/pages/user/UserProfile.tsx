@@ -4,7 +4,6 @@ import { UserContext } from 'contexts/UserContext';
 import { User, UserCritterAccess } from 'types/user';
 import { Typography } from '@material-ui/core';
 import DataTable from 'components/table/DataTable';
-import { Animal } from 'types/animal';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
@@ -14,7 +13,7 @@ export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
   const bctwApi = useTelemetryApi();
 
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User>({} as User);
 
   // set the user state when the context is updated
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function UserProfile(): JSX.Element {
     sendSmsMortality(phoneNumber);
   }
 
-  const tableProps: ITableQueryProps<Animal> = {
+  const tableProps: ITableQueryProps<UserCritterAccess> = {
     query: bctwApi.useCritterAccess,
     param: { user }
   };

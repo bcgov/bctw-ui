@@ -15,9 +15,8 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import ManageLayout from 'pages/layouts/ManageLayout';
 
 const CodePage: React.FC = () => {
-  const [codeHeader, setCodeHeader] = useState<CodeHeader>(new CodeHeader());
+  const [header, setHeader] = useState('animal_status');
   const [title, setTitle] = useState<string>('');
-  const props = ['id', 'code', 'description', 'long_description'];
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
@@ -32,7 +31,8 @@ const CodePage: React.FC = () => {
   };
 
   const handleClick = (c: CodeHeader): void => {
-    setCodeHeader(c);
+    // setCodeHeader(c);
+    setHeader(c.type);
     setTitle(c.title);
   };
 
@@ -49,12 +49,12 @@ const CodePage: React.FC = () => {
   };
 
   const editProps = {
-    editableProps: CodeFormFields.map(s => s.prop),
+    editableProps: CodeFormFields.map((s) => s.prop),
     editing: new CodeHeaderInput(),
     open: false,
     onSave: handleSave,
     selectableProps: [],
-    handleClose: null,
+    handleClose: null
   };
 
   return (
@@ -78,16 +78,16 @@ const CodePage: React.FC = () => {
                 );
               })}
             </ButtonGroup>
-            {codeHeader ? (
-              <DataTable
-                headers={props}
-                title={`${title} Codes`}
-                queryProps={{ query: bctwApi.useCodes, param: codeHeader?.type ?? 'region' }}
-                onSelect={null}
-              />
-            ) : (
-              <div></div>
-            )}
+            <DataTable
+              // fixme: code is not a codeheader
+              headers={CodeHeader.getProps() as any}
+              title={`${title} Codes`}
+              queryProps={{
+                query: bctwApi.useCodes,
+                param: header,
+                // onNewData: (v): void => console.log(JSON.stringify(v[0]), null)
+              }}
+            />
             <div className='button-row'>
               <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
               <AddEditViewer<CodeHeaderInput>

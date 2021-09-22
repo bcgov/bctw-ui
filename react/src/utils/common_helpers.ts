@@ -16,10 +16,12 @@ const formatUTM = (zone: number, easting: number, northing: number): string => `
  * given an array of type T, returns unique values of @param prop 
 */
 const getUniqueValuesOfT = <T,>(arr: T[], prop: keyof T): string[] => {
-  const ret = [];
+  const ret: string[] = [];
   arr.forEach((p) => {
-    if (!ret.includes(p[prop])) {
-      ret.push(p[prop]);
+    // fixme: always string?
+    const value = p[prop] as unknown as string;
+    if (!ret.includes(value)) {
+      ret.push(value);
     }
   });
   return ret;

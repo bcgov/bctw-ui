@@ -11,6 +11,7 @@ import { DataLifeInput, IChangeDataLifeProps } from 'types/data_life';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
 import { eCritterPermission } from 'types/permission';
+import { isDev } from 'api/api_helpers';
 
 type EditDataLifeModalProps = ModalBaseProps & {
   attachment: CollarHistory;
@@ -27,11 +28,13 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   const responseDispatch = useResponseDispatch();
 
   const [canSave, setCanSave] = useState<boolean>(false);
-  const [dli, setDli] = useState<DataLifeInput>(new DataLifeInput(attachment));
+  const [dli, setDli] = useState<DataLifeInput>(attachment.createDataLife());
 
   useDidMountEffect(() => {
-    // console.log('new attachment provided to DL modal', attachment.assignment_id)
-    setDli(new DataLifeInput(attachment));
+    if (attachment) {
+      // console.log('new attachment provided to DL modal', attachment.assignment_id)
+      setDli(attachment.createDataLife());
+    }
   }, [attachment]);
 
   // must be defined before mutation declarations
@@ -53,6 +56,13 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
     handleClose(false);
   };
 
+  const getTitle = (): string => {
+    const s = `Edit Data Life for ${attachment.device_make} Device ${attachment.device_id}`; 
+    return + isDev()
+      ? `${s} assignment ID: ${attachment.assignment_id}`
+      : s;
+  };
+
   // setup mutation to save the modified data life
   const { mutateAsync } = bctwApi.useMutateEditDataLife({ onSuccess, onError });
   const isAdmin = permission_type === eCritterPermission.admin;
@@ -61,24 +71,27 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
     <Modal
       open={open}
       handleClose={handleClose}
-      title={`Edit Data Life for ${attachment.device_make} Device ${attachment.device_id}`}>
+      title={getTitle()}>
       <div>
-        {/* enable data life end fields only if the current attachment is expired/invalid */}
         <DataLifeInputForm
           onChange={(): void => setCanSave(true)}
-          disableEditActual={true} // always disable editing the actual start/end fields in this modal
-          enableEditStart={true} 
-          // can only edit the end fields if this attachment is expired
-          enableEditEnd={!!attachment.valid_to} 
+          // always disable editing the actual start/end fields in this modal
+          disableEditActual={true}
+          enableEditStart={true}
+          // can only edit the end fields if this attachment is expired, (not null or invalid)
+          enableEditEnd={attachment?.data_life_end?.isValid()}
           // admin privileged users can always edit DL dates
-          disableDLStart={isAdmin ? false : !new DataLifeInput(attachment).canChangeDLStart}
-          disableDLEnd={isAdmin ? false : !new DataLifeInput(attachment).canChangeDLEnd}
+          disableDLStart={isAdmin ? false : !dli.canChangeDLStart}
+          disableDLEnd={isAdmin ? false : !dli.canChangeDLEnd}
           dli={dli}
         />
-        {/* the save button */}
         <Box display='flex' justifyContent='flex-end'>
-          <Button size='large' onClick={(): void => handleClose(false)}>Cancel</Button>
-          <Button disabled={!canSave} size='large' color='primary' onClick={handleSave}>Save</Button>
+          <Button size='large' onClick={(): void => handleClose(false)}>
+            Cancel
+          </Button>
+          <Button disabled={!canSave} size='large' color='primary' onClick={handleSave}>
+            Save
+          </Button>
         </Box>
       </div>
     </Modal>

@@ -1,6 +1,6 @@
 import 'styles/form.scss';
 import { FormControl, Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
@@ -95,13 +95,20 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     }
   }, [triggerReset]);
 
-  // when default value changed, call reset handler
+  /**
+   * selecting a value pushes change to the parent, which may in turn upate the defaultvalue
+   * to avoid value being reset, check the new default is not the same as value
+   */
   useDidMountEffect(() => {
-    reset();
+    const match = data.find((d) => d?.description === defaultValue);
+    if (match && match.description !== value) {
+      reset();
+    }
   }, [defaultValue]);
 
   // call the parent change handler when the selected value or error status changes
-  useDidMountEffect(() => {
+  // use useEffect to ensure parent is notified when the code is required and empty
+  useEffect(() => {
     pushChange(value);
   }, [value, hasError])
 
@@ -139,8 +146,11 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
    * }
    */
   const pushChange = (v: string): void => {
-    const code = codes.find((c) => c?.description === v)?.code ?? v;
-    const ret = { [getIdentifier()]: code, error: hasError };
+    const codeObj = codes.find((c) => c?.description === v);
+    if (!codeObj && !hasError) {
+      return;
+    }
+    const ret = { [getIdentifier()]: codeObj?.code, error: hasError };
     if (typeof changeHandler === 'function') {
       changeHandler(ret);
     }

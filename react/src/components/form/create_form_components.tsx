@@ -1,30 +1,38 @@
 import TextField from 'components/form/TextInput';
 import NumberField from 'components/form/NumberInput';
 import SelectCode from './SelectCode';
-import DateInput from 'components/form/Date';
+import DateInput, { DateInputProps } from 'components/form/Date';
+import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
-import React from 'react';
-import { columnToHeader, removeProps } from 'utils/common_helpers';
-import { eInputType } from 'types/form_types';
+import { ReactElement, ReactNode } from 'react';
+import { removeProps } from 'utils/common_helpers';
+import { eInputType, FormChangeEvent, FormFieldObject, Overlap } from 'types/form_types';
+import dayjs, { Dayjs } from 'dayjs';
+import { BCTWFormat } from 'types/common_types';
+import { Tooltip } from 'components/common'
+import { InputProps } from '@material-ui/core';
 
 type CreateInputBaseProps<T> = {
   value: unknown;
   prop: keyof T;
   type: eInputType;
-  handleChange: (v: Record<string, unknown>) => void;
+  handleChange: FormChangeEvent;
 };
 
-type CreateInputProps<T> = CreateInputBaseProps<T> & {
+type CreateInputProps<T> = CreateInputBaseProps<T> 
+& Pick<InputProps, 'rows' | 'multiline'> 
+& Pick<DateInputProps, 'minDate' |'maxDate'> & {
   codeName?: string;
   label?: string;
   disabled?: boolean;
   errorMessage?: string;
   required?: boolean;
   span?: boolean;
+  inputProps: Record<string, unknown>;
 };
 
 // text and number field handler
-function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
+function CreateEditTextField<T>(props: CreateInputProps<T>): ReactElement {
   const { prop, type, value } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
@@ -51,13 +59,18 @@ function CreateEditTextField<T>(props: CreateInputProps<T>): JSX.Element {
   );
 }
 
+function CreateEditMultilineTextField<T>(props: CreateInputProps<T>): ReactElement {
+  const newProps = Object.assign({multiline: true, rows: 1, style: { width: '100%'}}, props);
+  return CreateEditTextField(newProps);
+}
+
 // date field handler
-function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
+function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): ReactElement {
   return (
     <DateInput
       propName={prop as string}
       label={label}
-      defaultValue={value as Date}
+      defaultValue={value as Dayjs}
       changeHandler={handleChange}
       disabled={disabled}
       key={`input-date-${prop}`}
@@ -65,8 +78,25 @@ function CreateEditDateField<T>({ prop, value, handleChange, label, disabled }: 
   );
 }
 
+// datetime field handler
+function CreateEditDateTimeField<T>({ prop, value, handleChange, label, disabled, required, minDate, maxDate}: CreateInputProps<T>): ReactElement {
+  return (
+    <DateTimeInput
+      propName={prop as string}
+      label={label}
+      defaultValue={dayjs(value as Date)}
+      changeHandler={handleChange}
+      disabled={disabled}
+      key={`input-dt-${prop}`}
+      required={required}
+      minDate={minDate}
+      maxDate={maxDate}
+    />
+  );
+}
+
 // checkbox field handler
-function CreateEditCheckboxField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): JSX.Element {
+function CreateEditCheckboxField<T>({ prop, value, handleChange, label, disabled }: CreateInputProps<T>): ReactElement {
   return (
     <CheckBox
       changeHandler={handleChange}
@@ -89,62 +119,79 @@ function CreateEditSelectField<T>({
   errorMessage,
   label,
   codeName
-}: CreateInputProps<T>): JSX.Element {
+}: CreateInputProps<T>): ReactElement {
   return (
     <SelectCode
       style={{ width: '200px', marginRight: '10px' }}
       label={label}
       disabled={disabled}
       key={prop as string}
-      codeHeader={codeName ?? prop as string}
-      defaultValue={value as string}
+      codeHeader={codeName ?? (prop as string)}
+      defaultValue={(value as string) ?? ''}
       changeHandler={handleChange}
       required={required}
       error={!!errorMessage?.length}
       className={'select-control-small'}
-      propName={codeName ? prop as string : undefined}
+      propName={codeName ? (prop as string) : undefined}
     />
   );
 }
 
-/**
- * the "main" form component handler.
- * depending on the @param formType.type, creates the component using the above functions
- * @returns {JSX.Element}
- */
-function MakeEditField<T>({
-  prop,
-  type,
-  value,
-  handleChange,
-  codeName,
-  label = columnToHeader(prop as string),
-  disabled = false,
-  errorMessage = '',
-  required = false,
-  span = false
-}: CreateInputProps<T>): React.ReactNode {
-  const inputType = type;
-  const toPass = { prop, type, value, handleChange, label, disabled, errorMessage, required, codeName };
-  let Comp: React.ReactNode;
-  if (inputType === eInputType.check) {
-    Comp = CreateEditCheckboxField(toPass);
-  } else if (inputType === eInputType.date) {
-    Comp = CreateEditDateField(toPass);
-  } else if (inputType === eInputType.code) {
-    Comp = CreateEditSelectField(toPass);
-  } else if (inputType === eInputType.text || inputType === eInputType.number) {
-    Comp = CreateEditTextField(toPass);
+// returns the funtion to create the form component based on input type
+const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement ) => {
+  switch (inputType) {
+    case eInputType.check:
+      return CreateEditCheckboxField;
+    case eInputType.datetime:
+      return CreateEditDateTimeField;
+    case eInputType.date:
+      return CreateEditDateField;
+    case eInputType.code:
+      return CreateEditSelectField;
+    case eInputType.multiline:
+      return CreateEditMultilineTextField;
+    default:
+      return CreateEditTextField;
   }
-  return span ? (
-    <span key={`span-${prop}`} className={'edit-form-field-span'}>
-      {Comp}
-    </span>
-  ) : (
-    <div key={prop as string} className={'edit-form-field'}>
-      {Comp}
-    </div>
-  );
+};
+
+/**
+ * the "main" form component creation handler.
+ */
+function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
+  obj: T,
+  formField: FormFieldObject<U> | undefined,
+  handleChange: FormChangeEvent,
+  inputProps?: { [Property in keyof CreateInputProps<T>]+?: unknown },
+  displayBlock = false,
+): ReactNode {
+  if (formField === undefined) {
+    return null;
+  }
+  const { type, prop, required, codeName, tooltip } = formField;
+  const toPass = {
+    prop,
+    type,
+    // fixme: why wont this type if U overlaps T?
+    value: obj[prop as keyof T],
+    handleChange,
+    label: obj.formatPropAsHeader(prop as keyof T),
+    required,
+    codeName,
+    key: `${type}-${prop}`,
+    ...inputProps
+  };
+  let Comp = getInputFnFromType(type)(toPass);
+
+  if (tooltip) {
+    Comp = (
+      <Tooltip title={tooltip} placement={'right-end'} enterDelay={600}>
+        {/* note: wrapping tooltip child in div fixes the forward refs error */}
+        <div>{Comp}</div>
+      </Tooltip>
+    );
+  }
+  return displayBlock ? <div>{Comp}</div> : Comp;
 }
 
-export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, MakeEditField };
+export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, CreateFormField };

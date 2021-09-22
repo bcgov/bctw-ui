@@ -102,7 +102,7 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
       return { 
         type: 'Feature',
         id: i,
-        geometry: (d as any).geom,
+        geometry: d.geom,
         properties: withoutGeom 
       }
     })

@@ -44,7 +44,7 @@ export const permissionApi = (props: ApiProps) => {
     filter: eCritterPermission[] = filterOutNonePermissions
   ): Promise<UserCritterAccess[]> => {
     if (!user) {
-      return null;
+      return [];
     }
     const filtersAsString = filter.join(',');
     const url = createUrl({ api: `get-critter-access/${user.uid}`, query: `filters=${filtersAsString}`, page });
@@ -62,7 +62,7 @@ export const permissionApi = (props: ApiProps) => {
   */
   const getPermissionRequest = async (): Promise<PermissionRequest[]> => {
     const { data } = await api.get(createUrl({ api: `permission-request`}));
-    const converted = data.map(d => plainToClass(PermissionRequest, d));
+    const converted = data.map((d: IPermissionRequest) => plainToClass(PermissionRequest, d));
     return converted;
   }
 
@@ -76,7 +76,7 @@ export const permissionApi = (props: ApiProps) => {
   */
   const getPermissionHistory = async (page = 1): Promise<PermissionRequest[]> => {
     const { data } = await api.get(createUrl({ api: `permission-history`, page}));
-    const converted = data.map(d => plainToClass(PermissionRequest, d));
+    const converted = data.map((d: IPermissionRequest) => plainToClass(PermissionRequest, d));
     return converted;
   }
 

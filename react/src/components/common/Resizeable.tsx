@@ -12,15 +12,15 @@ type IResizableProps = {
  * @returns 
  */
 export default function Resizable(props: IResizableProps): JSX.Element {
-  const {direction, baseHeight, baseWidth} = props;
+  const {direction, baseHeight} = props;
   const [height, setHeight] = useState<number>(baseHeight);
-  const [width, setWidth] = useState<number>(baseHeight);
+  // const [width, setWidth] = useState<number>(baseHeight);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const onMove = (e: React.MouseEvent): void => {
     if (isDragging && direction === 'horizontal') {
       const mpv = document.getElementById('map-view');
-      const offset = mpv.offsetHeight-e.clientY;
+      const offset = (mpv?.offsetHeight ?? 0)-e.clientY;
       setHeight(offset);
     }
   }

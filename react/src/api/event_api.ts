@@ -1,57 +1,113 @@
-import { upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
+/* eslint-disable no-console */
+import { attachDeviceEndpoint, removeDeviceEndpoint, upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { createUrl } from 'api/api_helpers';
-import { Animal } from 'types/animal';
-import { Collar } from 'types/collar';
-import MortalityEvent from 'types/mortality_event';
-
-import { ApiProps, IBulkUploadResults } from './api_interfaces';
+import { AxiosError } from 'axios';
+import { RemoveDeviceInput } from 'types/collar_history';
+import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { formatAxiosError } from 'utils/errors';
+import { IBulkUploadResults, ApiProps } from './api_interfaces';
 
 /**
- * API for handling workflow event like forms
- * todo: fixme: complete this
+ * API for saving workflow events @type {EventType}
  */
 
+export type WorkflowAPIResponse = true | AxiosError;
+
+// todo: handle query invalidation - 
 export const eventApi = (props: ApiProps) => {
   const { api } = props;
 
   /**
-    * when a mortality event form is saved, there are multipe objects that need to be updated.
-    * a) the animal table
-    * b) the collar table
-    * c) if the device is marked as retrieved, the collar may need to be unlinked from the animal
-    * d) if the user accessed the mortality event from a telemetry alert, the alert needs
-       to be expired
-  */
-  const saveMortalityEvent = async (event: MortalityEvent): Promise<IBulkUploadResults<unknown>> => {
-    const e = event.toJSON();
-    // console.log(event, e)
-    const device: Collar = e.getCollar;
-    // console.log(JSON.stringify(device, null, 2))
-    const animal: Animal = e.getCritter;
-    // console.log(JSON.stringify(animal, null, 2))
-    const isUnlinking: boolean = e.shouldUnattachDevice;
-    const {data: dResults } = await api.post(createUrl({api: upsertDeviceEndpoint}), device);
-    const {data: aResults } = await api.post(createUrl({api: upsertCritterEndpoint}), animal)
-    const errors = [...dResults.errors, ...aResults.errors];
-    const results = [...dResults.results, ...aResults.results];
-    if (isUnlinking) {
-      console.log(' todo: unlink collar assignment!')
+   * when an event form is saved, there are potentiall multiple post requests that need to be handled
+   * if the device is marked as retrieved, the device may need to be removed
+   * the animal
+   * the collar
+   * fixme: if a later api post fails...how to handle form?
+   */
+  const eventErr = (ev: WorkflowType): string => `${ev} saving workflow:`;
+
+  const _handleBulkResults = (data: IBulkUploadResults<unknown>): WorkflowAPIResponse => {
+    const { errors } = data;
+    if (errors?.length) {
+      return { message: errors[0].error, isAxiosError: true } as AxiosError;
     }
-    return { errors, results }; 
+    return true;
+  };
 
-    // const body: ICollarLinkPayload = {
-    //   isLink: false,
-    //   data: {
-    //     critter_id: animal.critter_id,
-    //     collar_id: device.collar_id,
-    //     valid_to: getNow()
-    //   }
-    // }
-    // const linkResults = await api.post(createUrl({ api: linkCollarEndpoint}), body);
+  const _saveAnimal = async (critter: OptionalAnimal, type: WorkflowType): Promise<WorkflowAPIResponse> => {
+    console.log('workflow event animal', critter);
+    // return true;
+    const url = createUrl({ api: upsertCritterEndpoint });
+    try {
+      const { data } = await api.post(url, critter);
+      console.log('saving animal results', data);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`${eventErr(type)} error saving animal', ${formatAxiosError(err)}`);
+      return err;
+    }
+  };
 
+  const _saveDevice = async (device: OptionalDevice, type: WorkflowType): Promise<WorkflowAPIResponse> => {
+    console.log('workflow event device', device);
+    // return true;
+    const url = createUrl({ api: upsertDeviceEndpoint });
+    try {
+      const { data } = await api.post(url, device);
+      console.log('saving device results', data);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`${eventErr(type)} error saving device', ${formatAxiosError(err)}`);
+      return err;
+    }
+  };
+
+  const _addOrRemoveDevice = async (attachment: RemoveDeviceInput, isAdding: boolean): Promise<WorkflowAPIResponse> => {
+    console.log('workflow event add or attach event', attachment)
+    // return true;
+    const url = createUrl({ api: isAdding ? attachDeviceEndpoint : removeDeviceEndpoint });
+    try {
+      const { data } = await api.post(url, attachment);
+      console.log('device add/remove status', data);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`error adding/removing device', ${formatAxiosError(err)}`);
+      return err;
+    }
   }
 
-  return {
-    saveMortalityEvent,
-  }
-}
+  const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
+    //
+    if (typeof event.getAttachment === 'function' && event.shouldUnattachDevice) {
+      const attachment = event.getAttachment();
+      const s = await _addOrRemoveDevice(attachment as RemoveDeviceInput, false); 
+      if (typeof s !== 'boolean') {
+        return s;
+      }
+    }
+    //
+    if (typeof event.getAnimal === 'function' && event.shouldSaveAnimal) {
+      const critter = event.getAnimal();
+      if (critter) {
+        const s = await _saveAnimal(critter, event.event_type);
+        if (typeof s !== 'boolean') {
+          return s;
+        }
+      }
+    }
+    //
+    if (typeof event.getDevice === 'function' && event.shouldSaveDevice) {
+      const device = event.getDevice();
+      if (device) {
+        const s = _saveDevice(device, event.event_type);
+        if (typeof s !== 'boolean') {
+          return s;
+        }
+      }
+    }
+
+    return true;
+  };
+
+  return { saveEvent };
+};

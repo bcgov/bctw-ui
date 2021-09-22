@@ -28,7 +28,7 @@ const DISABLE_PAGINATION = true;
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
  */
-export default function DataTable<T extends BCTWBase>({
+export default function DataTable<T extends BCTWBase<T>>({
   customColumns,
   headers,
   queryProps,
@@ -93,6 +93,7 @@ export default function DataTable<T extends BCTWBase>({
       }
       const newV = [];
       // update the values state
+      // bug: code page, when new values are found they shouldn't be pushed to existing ones!
       data.forEach((d) => {
         const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
@@ -203,18 +204,18 @@ export default function DataTable<T extends BCTWBase>({
       numSelected={selected.length}
       title={title}
       onChangeFilter={handleFilter}
-      filterableProperties={headers ?? Object.keys((data && data[0]) ?? [])}
+      filterableProperties={headers}
     />
 
-  const getHeaderProps = (): string[] => headers ?? Object.keys((data && data[0]) ?? []);
-  const headerProps = useMemo(() => getHeaderProps(), []);
+  // todo: why using memo for this?
+  const headerProps = useMemo(() => headers, []);
    
   // called in the render function
   // determines which values to render, based on page and filters applied
   const perPage = (): T[] => {
     const results =
       filter && filter.term
-        ? fuzzySearchMutipleWords(values, filter.keys && filter.keys.length ? filter.keys : headerProps, filter.term)
+        ? fuzzySearchMutipleWords(values, filter.keys && filter.keys.length ? filter.keys : (headerProps as string[]), filter.term)
         : values;
     const start = (rowsPerPage + page - rowsPerPage - 1) * rowsPerPage;
     const end = rowsPerPage * page - 1;
@@ -228,7 +229,7 @@ export default function DataTable<T extends BCTWBase>({
         <Table stickyHeader>
           {data === undefined ? null : (
             <TableHead
-              headersToDisplay={headerProps as string[]}
+              headersToDisplay={headerProps}
               headerData={data && data[0]}
               isMultiSelect={isMultiSelect}
               numSelected={selected.length}
@@ -244,7 +245,7 @@ export default function DataTable<T extends BCTWBase>({
             {(values && values.length === 0) || isFetching || isLoading || isError
               ? NoData()
               : stableSort(perPage(), getComparator(order, orderBy)).map(
-                (obj: BCTWBase, prop: number) => {
+                (obj, prop: number) => {
                   const isRowSelected = isSelected(obj[rowIdentifier]);
                   return (
                     <TableRow
@@ -267,7 +268,7 @@ export default function DataTable<T extends BCTWBase>({
                         </TableCell>
                       ) : null}
                       {/* render main columns from data fetched from api */}
-                      {headerProps.map((k: string, i: number) => {
+                      {headerProps.map((k, i) => {
                         if (!k) {
                           return null;
                         }
@@ -280,7 +281,7 @@ export default function DataTable<T extends BCTWBase>({
                       })}
                       {/* render additional columns from props */}
                       {customColumns
-                        ? customColumns.map((c: ICustomTableColumn<BCTWBase>) => {
+                        ? customColumns.map((c: ICustomTableColumn<T>) => {
                           const colComponent = c.column(obj, prop);
                           return <TableCell key={`add-col-${prop}`}>{colComponent}</TableCell>;
                         })
