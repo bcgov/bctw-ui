@@ -1,9 +1,10 @@
 import 'styles/form.scss';
 
 import { Box, Grid } from '@material-ui/core';
-import { Button, FormControl, InputLabel, NativeSelect, OutlinedInput, TextField, TextareaAutosize } from "@material-ui/core";
-import { createUrl } from 'api/api_helpers';
-import { useState } from "react";
+import { Button, FormControl, InputLabel, NativeSelect, TextField, TextareaAutosize } from "@material-ui/core";
+import { User } from 'types/user';
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from 'contexts/UserContext';
 
 const UserAccessRequest = (): JSX.Element => {
 
@@ -20,6 +21,10 @@ const UserAccessRequest = (): JSX.Element => {
    * Here is all our form state.
    */
   const [accessType, setAccessType] = useState('');
+  const [domain, setDomain] = useState('');
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [populationUnit, setPopulationUnit] = useState('');
   const [projectManager, setProjectManager] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -28,6 +33,28 @@ const UserAccessRequest = (): JSX.Element => {
   const [region, setRegion] = useState('');
   const [species, setSpecies] = useState('');
   const [textMessageNumber, setTextMessageNumber] = useState('');
+  const [username, setUserName] = useState('');
+
+  const useUser = useContext(UserContext);
+  const [user, setUser] = useState<User>(null);
+
+  // set the user state when the context is updated
+  useEffect(() => {
+    const { user } = useUser;
+    if (user) {
+      setUser(user)
+    }
+  }, [useUser]);
+
+  if (!user) {
+    return <div>Loading user information...</div>;
+  }
+
+  setDomain(user.idir);
+  setEmail(user.email);
+  setFirstName(user.firstname);
+  setLastName(user.lastname);
+  setUserName(user.uid);
 
   /**
    * ## submitForm
@@ -36,6 +63,10 @@ const UserAccessRequest = (): JSX.Element => {
   const submitRequest = () => {
     const payload = {
       accessType,
+      domain,
+      emailAddress: email,
+      firstName,
+      lastName,
       populationUnit,
       projectManager,
       projectName,
@@ -43,7 +74,17 @@ const UserAccessRequest = (): JSX.Element => {
       reason,
       region,
       species,
-      textMessageNumber
+      textMessageNumber,
+      username
+      // accessType,
+      // populationUnit,
+      // projectManager,
+      // projectName,
+      // projectRole,
+      // reason,
+      // region,
+      // species,
+      // textMessageNumber
     }
 
     // XXX: This url doesn't work in development
@@ -57,7 +98,7 @@ const UserAccessRequest = (): JSX.Element => {
     const h2 = window.location.hostname;
     const h3 = IS_PROD ? window.location.port : 3000;
     const url = `${h1}//${h2}:${h3}/onboarding`;
-  
+
     console.log('submitRequest() -- POSTing to this URL:', url);
     console.log('submitRequest() -- Payload:', JSON.stringify(payload));
 
@@ -91,6 +132,18 @@ const UserAccessRequest = (): JSX.Element => {
           <span>Complete the following information:</span>
         </div>
         <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField label='Your Name' size='small' variant={'outlined'} inputProps={{ readOnly: true }}>${firstName} ${lastName}</TextField>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField label='Authentication Method' size='small' variant={'outlined'} inputProps={{ readOnly: true }}>${domain}</TextField>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField label='Username' size='small' variant={'outlined'} inputProps={{ readOnly: true }}>${username}</TextField>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField label='Email addresss' size='small' variant={'outlined'} inputProps={{ readOnly: true }}>${email}</TextField>
+          </Grid>
           <Grid item xs={12}>
             <TextField label='Project Name' onChange={(e) => { setProjectName(e.target.value) }} size='small' variant={'outlined'} />
           </Grid>
@@ -128,7 +181,7 @@ const UserAccessRequest = (): JSX.Element => {
             <TextField label='Mobile Number to Receive Text Messages' onChange={(e) => { setTextMessageNumber(e.target.value) }} variant={'outlined'} />
           </Grid>
           <Grid item xs={12}>
-              <Button variant='contained' color='primary' onClick={submitRequest}>Submit</Button>
+            <Button variant='contained' color='primary' onClick={submitRequest}>Submit</Button>
           </Grid>
         </Grid>
       </Box>
