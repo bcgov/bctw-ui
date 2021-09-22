@@ -28,15 +28,36 @@ const FileStrings = {
 }
 
 const WorkflowStrings = {
-  captureWorkflowTitle: 'Capture Event Workflow',
-  locationEventCoordTypeLat: 'Use Lat/Long',
-  locationEventCoordTypeUTM: 'Use UTM',
-  malfunctionWorkflowTitle: 'Malfunction Event Workflow',
-  mortalityUnassignDeviceTooltip: 'If you unassign the device, no new telemetry from this device will be connected to this animal.',
-  mortalityWorkflowTitle: 'Mortality Event Workflow',
-  releaseWorkflowTitle: 'Release Event Workflow',
-  retrievalWorkflowTitle: 'Retrieval Event Workflow',
-  mortalityExitEarly: 'You have set the animal mortality status to Alive. Do you wish to exit the workflow now?',
+  location: {
+    coordTypeLatLong: 'Use Lat/Long',
+    coordTypeUTM: 'Use UTM',
+  },
+  mortality: {
+    unassignDeviceTooltip: 'If you unassign the device, no new telemetry from this device will be connected to this animal.',
+    workflowTitle: 'Mortality Event Workflow',
+    exitEarly: 'You have set the animal mortality status to Alive. Do you wish to exit the workflow now?',
+  },
+  release: {
+    workflowTitle: 'Release Event Workflow',
+    areUpdates: 'Are there updates to the animal identifiers or characteristics?',
+    isNewDevice: 'Are you replacing the original device with a new device?',
+    deviceRemovedNotif: 'The previous device has been unassigned from this animal, you must assign a new device to the animal',
+  },
+  capture: {
+    workflowTitle: 'Capture Event Workflow',
+    isCaptive: 'Is the animal in a captivity program?',
+    whatSpecies: 'What species did you capture?',
+    isTransloc: 'Is this animal being translocated to a different location?',
+    associated: 'Is this animal is associated with another marked animal?',
+    associatedID: 'What is the associated animal’s WLHID?',
+    associatedRel: 'What is the relationship of the individual to the captured individual?',
+  },
+  retrieval: {
+    workflowTitle: 'Retrieval Event Workflow',
+  },
+  malfunction: {
+    workflowTitle: 'Malfunction Event Workflow',
+  }
 }
 
 const CollarStrings = {

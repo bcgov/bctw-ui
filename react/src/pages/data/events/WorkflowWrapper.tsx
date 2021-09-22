@@ -128,7 +128,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     <Modal open={open} handleClose={handleClose}>
       <form className={'event-modal'} autoComplete={'off'}>
         <EditHeader<T>
-          title={event?.getHeaderTitle()}
+          title={event?.getWorkflowTitle()}
           headers={event.displayProps}
           obj={event as any}
           format={event.formatPropAsHeader}

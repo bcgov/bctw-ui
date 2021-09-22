@@ -6,6 +6,7 @@ import { BCTWBase, nullToDayjs, PartialPick, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
+import { OptionalDevice } from './events/event';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -178,7 +179,7 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   }
 }
 
-const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
+export const collarFormFields: Record<string, FormFieldObject<OptionalDevice>[]> = {
   communicationFields: [
     { prop: 'device_type', type: eInputType.code },
     { prop: 'satellite_network', type: eInputType.code },
@@ -206,6 +207,7 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   ],
   statusFields: [
     { prop: 'device_status', type: eInputType.code },
+    { prop: 'device_condition', type: eInputType.code, required: true },
   ],
   retrievalFields: [
     { prop: 'retrieval_date', type: eInputType.datetime },
@@ -223,4 +225,12 @@ const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   ]
 }
 
-export { collarFormFields };
+const _collarFormFields = (): FormFieldObject<OptionalDevice>[] => {
+  return Object
+    .values(collarFormFields)
+    .reduce((previous, current) => ([ ...previous, ...current ]) , []);
+};
+
+export const deviceFormFields = new Map<keyof OptionalDevice, FormFieldObject<OptionalDevice>>(
+  _collarFormFields().map((f) => [f.prop, f])
+);

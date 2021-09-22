@@ -13,7 +13,7 @@ export default function CaptureEventForm(): JSX.Element {
 
   return (
     <>
-      <h3>{WorkflowStrings.captureWorkflowTitle}</h3>
+      <h3>{WorkflowStrings.capture.workflowTitle}</h3>
     </>
   );
 }

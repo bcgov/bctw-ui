@@ -93,7 +93,7 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
     data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
   };
 
-  getHeaderTitle(): string {
+  getWorkflowTitle(): string {
     return EventFormStrings.titles.retrievalTitle;
   }
 

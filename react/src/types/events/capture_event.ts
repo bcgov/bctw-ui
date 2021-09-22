@@ -1,11 +1,12 @@
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { columnToHeader } from 'utils/common_helpers';
-import { BCTWWorkflow, WorkflowType, OptionalAnimal } from 'types/events/event';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
+import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { Animal } from 'types/animal';
 import { IDataLifeStartProps } from 'types/data_life';
 import { EventFormStrings } from 'constants/strings';
+import { FormFieldObject } from 'types/form_types';
 
 type CaptureAnimalEventProps = Pick<Animal, 
 | 'animal_id'
@@ -15,11 +16,27 @@ type CaptureAnimalEventProps = Pick<Animal,
 | 'translocation'
 | 'associated_animal_id'
 | 'associated_animal_relationship'
+| 'region'
+| 'population_unit'
+| 'captivity_status'
 >;
 
+type ReleaseAnimalProps = Pick<Animal,
+| 'ear_tag_left_id'
+| 'ear_tag_right_id'
+| 'ear_tag_left_colour'
+| 'ear_tag_right_colour'
+| 'juvenile_at_heel'
+| 'juvenile_at_heel_count'
+| 'animal_colouration'
+| 'life_stage'
+>;
+
+export type CaptureFormField = {
+  [Property in keyof CaptureEvent]+?: FormFieldObject<CaptureEvent>;
+};
 /**
  * todo:
- * capture location
  * if translocation, enable release fields
  * add captivity component
  * isassociated ? enable association fields
@@ -42,12 +59,16 @@ export default class CaptureEvent implements CaptureAnimalEventProps, IDataLifeS
   recapture: boolean;
   translocation: boolean;
   associated_animal_id: string;
-  associated_animal_relationship: Code;
+  associated_animal_relationship: Code; // required if associated_animal_id populated
+  region: Code; // enabled when animal is translocated
+  population_unit: Code; // enabled when animal is translocated
+  captivity_status: boolean;
 
   constructor() {
     this.event_type = 'capture';
     this.recapture = false;
     this.translocation = false;
+    this.location_event = new LocationEvent('capture', dayjs());
   }
 
   formatPropAsHeader(s: string): string {
@@ -59,11 +80,29 @@ export default class CaptureEvent implements CaptureAnimalEventProps, IDataLifeS
   get displayProps(): (keyof CaptureEvent)[] {
     return ['wlh_id', 'animal_id'];
   }
-  getHeaderTitle(): string {
+  getWorkflowTitle(): string {
     return EventFormStrings.titles.mortalityTitle;
   }
 
   getAnimal(): OptionalAnimal {
-    return {};
+    const props: (keyof Animal)[] =
+      [
+        'critter_id',
+        'animal_status',
+        'predator_known',
+        'predator_species_pcod',
+        'predator_species_ucod',
+        'proximate_cause_of_death',
+        'ultimate_cause_of_death',
+        'pcod_confidence',
+        'ucod_confidence',
+        'captivity_status',
+        'mortality_investigation',
+        'mortality_report',
+        'mortality_captivity_status'
+      ];
+    const ret = eventToJSON(props, this);
+    return omitNull({ ...ret, ...this.location_event.toJSON()});
   }
+
 }

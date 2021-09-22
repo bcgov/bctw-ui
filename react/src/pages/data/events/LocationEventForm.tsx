@@ -72,14 +72,14 @@ export default function LocationEventForm({ event, notifyChange, children, child
           disabled={disabled}
           value={'utm'}
           control={<Radio color='primary' />}
-          label={WorkflowStrings.locationEventCoordTypeUTM}
+          label={WorkflowStrings.location.coordTypeUTM}
           labelPlacement='start'
         />
         <FormControlLabel
           disabled={disabled}
           value={'coord'}
           control={<Radio color='primary' />}
-          label={WorkflowStrings.locationEventCoordTypeLat}
+          label={WorkflowStrings.location.coordTypeLatLong}
           labelPlacement='start'
         />
       </RadioGroup>

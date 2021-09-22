@@ -1,16 +1,17 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { Animal, AttachedAnimal, animalMortFieldMap } from 'types/animal';
+import { Animal, AttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
 import dayjs, { Dayjs } from 'dayjs';
 import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
-import { BCTWWorkflow, eventToJSON, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { BCTWWorkflow, eventToJSON, WorkflowType, OptionalAnimal, OptionalDevice, IBCTWWorkflow } from 'types/events/event';
 import { IMortalityAlert } from 'types/alert';
 import { uuid } from 'types/common_types';
 import { Code } from 'types/code';
 import { EventFormStrings } from 'constants/strings';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
+import { DataLife } from 'types/data_life';
 
 export type MortalityDeviceEventProps = Pick<
 Collar,
@@ -43,21 +44,28 @@ Animal,
 | 'mortality_captivity_status'
 >;
 
+type MortalitySpecificProps = Pick<IBCTWWorkflow, 'shouldUnattachDevice'> & 
+Pick<DataLife, 'data_life_end'> & {
+  wasInvestigated: boolean;
+  isUCODSpeciesKnown: boolean;
+  onlySaveAnimalStatus: boolean;
+}
+
 export interface IMortalityEvent
   extends MortalityDeviceEventProps,
   MortalityAnimalEventProps,
   Omit<IMortalityAlert, 'data_life_start' | 'attachment_end'>,
-  Readonly<Pick<CollarHistory, 'assignment_id'>> {}
-// used to create forms without having to use all event props
-// +? makes the property optional
-export type MortalityFormField = {
-  [Property in keyof MortalityEvent]+?: FormFieldObject<MortalityEvent>;
-};
+  Readonly<Pick<CollarHistory, 'assignment_id'>>,
+  MortalitySpecificProps {}
 
 // codes defaulted in this workflow
 type MortalityDeviceStatus = 'Mortality';
 export type DeploymentStatusNotDeployed = 'Not Deployed';
 export type MortalityAnimalStatus = 'Mortality' | 'Alive';
+
+// export type MortalityFormField = {
+//   [Property in keyof MortalityEvent]+?: FormFieldObject<MortalityEvent>;
+// };
 
 /**
  * todo: captivity status?
@@ -129,7 +137,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     return ['wlh_id', 'animal_id', 'device_id', 'attachment_start'];
   }
 
-  getHeaderTitle(): string {
+  getWorkflowTitle(): string {
     return EventFormStrings.titles.mortalityTitle;
   }
 
@@ -167,26 +175,8 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     }
   }
 
-  fields: MortalityFormField = {
-    activation_status: { prop: 'activation_status', type: eInputType.check },
-    animal_status: { prop: 'animal_status', type: eInputType.code },
-    // animal_status: animalMortFieldMap.get('animal_status'),
+  fields: { [Property in keyof MortalitySpecificProps]+?: FormFieldObject<MortalitySpecificProps>; } = {
     data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
-    device_condition: { prop: 'device_condition', type: eInputType.code, required: true },
-    device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code },
-    device_status: { prop: 'device_status', type: eInputType.code },
-    mortality_investigation: animalMortFieldMap.get('mortality_investigation'),
-    mortality_report: animalMortFieldMap.get('mortality_report'),
-    predator_known: animalMortFieldMap.get('predator_known'),
-    predator_species_pcod: animalMortFieldMap.get('predator_species_pcod'),
-    predator_species_ucod: animalMortFieldMap.get('predator_species_ucod'),
-    retrieved: { prop: 'retrieved', type: eInputType.check },
-    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime },
-    pcod_confidence: animalMortFieldMap.get('pcod_confidence'),
-    ucod_confidence: animalMortFieldMap.get('ucod_confidence'),
-    proximate_cause_of_death: animalMortFieldMap.get('proximate_cause_of_death'),
-    ultimate_cause_of_death: animalMortFieldMap.get('ultimate_cause_of_death'),
-    // workflow-specific
     wasInvestigated: { prop: 'wasInvestigated', type: eInputType.check },
     isUCODSpeciesKnown: { prop: 'isUCODSpeciesKnown', type: eInputType.check },
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check }
@@ -226,7 +216,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       delete ret.ucod_confidence;
     }
     const locationFields = this.location_event.toJSON();
-    return omitNull({ ...ret, ...locationFields }) as OptionalAnimal;
+    return omitNull({ ...ret, ...locationFields });
   }
 
   // retrieve the collar metadata fields from the event

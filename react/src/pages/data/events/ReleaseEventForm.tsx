@@ -12,7 +12,7 @@ type IReleaseWorkflowProps = {
 export default function ReleaseEventForm(): JSX.Element {
   return (
     <>
-      <h3>{WorkflowStrings.releaseWorkflowTitle}</h3>
+      <h3>{WorkflowStrings.release.workflowTitle}</h3>
     </>
   );
 }

@@ -2,6 +2,7 @@ import { AttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat} from 'types/common_types';
+import { FormFieldObject } from 'types/form_types';
 
 export type WorkflowType = 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 // make all properties optional
@@ -9,13 +10,18 @@ export type WorkflowType = 'mortality' | 'release' | 'capture' | 'retrieval' | '
 export type OptionalAnimal = { [Property in keyof AttachedAnimal]+?: AttachedAnimal[Property] };
 export type OptionalDevice = { [Property in keyof Collar]+?: Collar[Property] };
 
+// 
+export type WorkflowFormField = 
+  { [Property in keyof OptionalAnimal]: FormFieldObject<OptionalAnimal>; } & 
+  { [Property in keyof OptionalDevice]: FormFieldObject<OptionalDevice> };
+
 /**
  * interface that BCTW workflows implement
  */
-interface IBCTWWorkflow {
+export interface IBCTWWorkflow {
   readonly event_type: WorkflowType;
   // headers displayed in the workflow modal title
-  getHeaderTitle(): string;
+  getWorkflowTitle(): string;
   // get displayProps(): (keyof T)[];
   // methods the workflow needs to save specific properties
   getAnimal?(): OptionalAnimal;
