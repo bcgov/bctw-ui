@@ -294,25 +294,25 @@ const handleUserAccessRequest = async (req, res) => {
   // console.log('handleUserAccessRequest() -- message contents', req.body);
 
   // Get all the environment variable dependencies
-  const tokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
-  const apiUrl = `${process.env.BCTW_CHES_API_URL}/api/v1/email`;
-  const username = process.env.BCTW_CHES_USERNAME;
-  const password = process.env.BCTW_CHES_PASSWORD;
-  const fromEmail = process.env.BCTW_CHES_FROM_EMAIL;
-  const toEmail = process.env.BCTW_CHES_TO_EMAIL.split(',');
+  const chesTokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
+  const chesApiUrl = `${process.env.BCTW_CHES_API_URL}/api/v1/email`;
+  const chesUsername = process.env.BCTW_CHES_USERNAME;
+  const chesPassword = process.env.BCTW_CHES_PASSWORD;
+  const chesFromEmail = process.env.BCTW_CHES_FROM_EMAIL;
+  const chesToEmail = process.env.BCTW_CHES_TO_EMAIL.split(',');
 
-  console.log('handleUserAccessRequest() -- CHES token URL:', tokenUrl);
-  console.log('handleUserAccessRequest() -- CHES API URL:', apiUrl);
-  console.log('handleUserAccessRequest() -- CHES username:', username);
-  console.log('handleUserAccessRequest() -- CHES fromEmail:', fromEmail);
-  console.log('handleUserAccessRequest() -- CHES toEmail:', toEmail);
+  console.log('handleUserAccessRequest() -- CHES token URL:', chesTokenUrl);
+  console.log('handleUserAccessRequest() -- CHES API URL:', chesApiUrl);
+  console.log('handleUserAccessRequest() -- CHES username:', chesUsername);
+  console.log('handleUserAccessRequest() -- CHES fromEmail:', chesFromEmail);
+  console.log('handleUserAccessRequest() -- CHES toEmail:', chesToEmail);
 
   // Create the authorization hash
-  const prehash = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
+  const prehash = Buffer.from(`${chesUsername}:${chesPassword}`, 'utf8').toString('base64');
   const hash = `Basic ${prehash}`;
 
   const tokenParcel = await axios.post(
-    tokenUrl,
+    chesTokenUrl,
     'grant_type=client_credentials',
     {
       headers: {
@@ -363,8 +363,8 @@ const handleUserAccessRequest = async (req, res) => {
     encoding: 'utf-8',
     bodyType: 'html',
     body: emailMessage,
-    from: fromEmail,
-    to: toEmail,
+    from: chesFromEmail,
+    to: chesToEmail,
     cc: [],
     bcc: [],
     delayTS: 0
@@ -372,7 +372,7 @@ const handleUserAccessRequest = async (req, res) => {
 
   console.log('handleUserAccessRequest() -- POSTing to CHES', emailPayload);
   axios.post(
-    apiUrl,
+    chesApiUrl,
     emailPayload,
     {
       headers: {
