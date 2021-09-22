@@ -69,13 +69,13 @@ const appendQueryToUrl = (url, parameter) => {
 };
 
 // TODO: move into separate package?
-// split out the username and  domain ('user@idir' or 'user@bceid') from Keycloak preferred_username
+// split out the username and  domain ('username@idir' or 'username@bceid') from Keycloak preferred_username
 const splitCredentials = (sessionObject) => {
   const credentials = sessionObject.preferred_username.split('@');
   if (!credentials.length) {
     return {};
   }
-  return { user: credentials[0], domain: credentials[1] };
+  return { username: credentials[0], domain: credentials[1] };
 }
 
 // TODO: move into separate package?
@@ -115,7 +115,7 @@ const proxyApi = function (req, res, next) {
   if (isProd) {
 
     // split out the domain and username of logged-in user
-    const { domain, user } = splitCredentials(req.kauth.grant.access_token.content);
+    const { domain, username } = splitCredentials(req.kauth.grant.access_token.content);
 
     // build up URL from ENV variables and targeted endpoint
     url = `${apiHost}:${apiPort}/${endpoint}`;
@@ -127,7 +127,7 @@ const proxyApi = function (req, res, next) {
 
     // add parameters and username to URL
     url = appendQueryToUrl(url, parameters);
-    url = appendQueryToUrl(url, `${domain}=${user}`)
+    url = appendQueryToUrl(url, `${domain}=${username}`)
 
   } else {
     // connect to API without using Keycloak authentication
@@ -240,8 +240,8 @@ const onboardingRedirect = async (req, res, next) => {
 
   // Collect all user data from the keycloak object
   const data = req.kauth.grant.access_token.content;
-  const { user, domain } = splitCredentials(data);
-  console.log('onboardingRedirect() -- user:', user)
+  const { username, domain } = splitCredentials(data);
+  console.log('onboardingRedirect() -- user:', username)
 
   // Get a list of all allowed users
   const sql = 'select idir from bctw.user'
@@ -250,10 +250,8 @@ const onboardingRedirect = async (req, res, next) => {
   const idirs = result.rows.map((row) => row.idir);
 
   // Is the current user registered: Boolean
-  const registered = (idirs.includes(user)) ? true : false;
-  console.log('onboardingRedirect() -- User is registered?', registered);
+  const registered = (idirs.includes(username)) ? true : false;
 
-  console.log('onboardingRedirect() -- URL requested:', req.url);
   if (registered) { // If registered
     next(); // pass through
   } else { // Otherwise redirect to the onboarding page
@@ -273,12 +271,11 @@ const handleUserAccessRequest = async (req, res) => {
 
   // This data will be inserted into the email
   const {
-    user,
+    accessType,
     domain,
     email,
     firstName,
     lastName,
-    accessType,
     populationUnit,
     projectManager,
     projectName,
@@ -287,6 +284,7 @@ const handleUserAccessRequest = async (req, res) => {
     region,
     species,
     textMessageNumber,
+    username,
   } = req.body;
 
   const data = req.kauth.grant.access_token.content;
@@ -331,7 +329,7 @@ const handleUserAccessRequest = async (req, res) => {
   const emailMessage = `
     <div>
       Access to the BC Telemetry Warehouse has be requested by
-      <b>${domain}</b> user <b>${firstName} ${lastName}</b>. Username is <b>${user}</b>.
+      <b>${domain}</b> user <b>${firstName} ${lastName}</b>. Username is <b>${username}</b>.
     </div>
     <br />
     <div>
