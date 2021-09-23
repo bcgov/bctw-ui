@@ -143,11 +143,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                 identifierFields.map((f) => CreateFormField(editing, f, onChange))
               )}
               {FormSection(
-                'device-status',
-                'Device Status',
-                statusFields.map((f) => CreateFormField(editing, f, onChange))
-              )}
-              {FormSection(
                 'device-sat',
                 'Satellite Network and Beacon Frequency',
                 communicationFields.map((f) => CreateFormField(editing, f, onChange))
@@ -161,6 +156,11 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                 'device-activ',
                 'Warranty & Activation Details',
                 deviceOptionFields.map((f) => CreateFormField(editing, f, onChange))
+              )}
+              {FormSection(
+                'device-status',
+                'Device Status',
+                statusFields.map((f) => CreateFormField(editing, f, onChange))
               )}
               {!isCreatingNew ? (
                 <>

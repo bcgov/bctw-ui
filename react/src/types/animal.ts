@@ -259,7 +259,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
   characteristicsFields: [
     { prop: 'animal_status', type: eInputType.code, ...isRequired },
     { prop: 'species', type: eInputType.code, ...isRequired },
-    { prop: 'sex', type: eInputType.code },
+    { prop: 'sex', type: eInputType.code, ...isRequired },
     { prop: 'animal_colouration', type: eInputType.text },
     { prop: 'estimated_age', type: eInputType.number },
     { prop: 'life_stage', type: eInputType.code },
@@ -269,8 +269,8 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
   identifierFields: [
     { prop: 'wlh_id', type: eInputType.text },
     { prop: 'animal_id', type: eInputType.text, ...isRequired },
-    { prop: 'region', type: eInputType.code },
-    { prop: 'population_unit', type: eInputType.code },
+    { prop: 'region', type: eInputType.code, ...isRequired },
+    { prop: 'population_unit', type: eInputType.code, ...isRequired },
     // { prop: 'collective_unit', type: eInputType.text }, // todo:
     { prop: 'ear_tag_left_colour', type: eInputType.text },
     { prop: 'ear_tag_right_colour', type: eInputType.text },

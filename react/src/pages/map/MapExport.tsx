@@ -11,6 +11,7 @@ import { omitNull } from 'utils/common_helpers';
 import { ITelemetryGroup, MapRange } from 'types/map';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
+import Button from 'components/form/Button';
 
 type ImportProps = ModalBaseProps & {
   groupedAssignedPings: ITelemetryGroup[];
@@ -122,33 +123,61 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
     setExportParams(n)
   }
 
-  const cellClass = 'clickable-cell';
+  const cellClass = 'cell-border-right';
+
   return (
     <Modal open={open} handleClose={handleClose} title={'Export'}>
       <>
         {isLoading ? <CircularProgress /> : null}
-        <p><b>{critter_ids.length}</b> unique animals selected. <b>{collar_ids.length}</b> unique devices selected</p>
-        <Typography variant='h5'>Export the history for:</Typography>
-        <TableContainer component={Paper} style={{marginTop:'10px'}}>
+        <p>
+          <b>{critter_ids.length}</b> unique {critter_ids.length == 1 ? 'animal' : 'animals'} selected.<br />
+          <b>{collar_ids.length}</b> unique {collar_ids.length == 1 ? 'device' : 'devices'}  selected.<br />
+        </p>
+        <h4>Export history for:</h4>
+        <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><Typography style={{fontWeight: 'bold'}}>{range.start} to {range.end}</Typography></TableCell>
-                <TableCell><Typography style={{fontWeight: 'bold'}}>All time</Typography></TableCell>
+                <TableCell className={cellClass}><Typography style={{ fontWeight: 'bold' }}>{range.start} to {range.end}</Typography></TableCell>
+                <TableCell><Typography style={{ fontWeight: 'bold' }}>All Time</Typography></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.animal, 'selected')}>Animal metadata</TableCell>
-                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.animal, 'all')}>Animal metadata</TableCell>
+                <TableCell className={cellClass}>
+                  <Button onClick={(): void => clickExport(eExportType.animal, 'selected')}>
+                    Animal Metadata
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button onClick={(): void => clickExport(eExportType.animal, 'all')}>
+                    Animal Metadata
+                  </Button>
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.collar, 'selected')}>Device metadata</TableCell>
-                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.collar, 'all')}>Device metadata</TableCell>
+                <TableCell className={cellClass}>
+                  <Button onClick={(): void => clickExport(eExportType.collar, 'selected')}>
+                    Device Metadata
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button onClick={(): void => clickExport(eExportType.collar, 'all')}>
+                    Device Metadata
+                  </Button>
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.movement, 'selected')}>Movement</TableCell>
-                <TableCell className={cellClass} onClick={(): void => clickExport(eExportType.movement, 'all')}>Movement</TableCell> 
+                <TableCell className={cellClass}>
+                  <Button onClick={(): void => clickExport(eExportType.movement, 'selected')}>
+                    Location Data
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button onClick={(): void => clickExport(eExportType.movement, 'all')}>
+                    Location Data
+                  </Button>
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

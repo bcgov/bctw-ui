@@ -210,6 +210,7 @@ export const collarFormFields: Record<string, FormFieldObject<Partial<Collar>>[]
   ],
   statusFields: [
     { prop: 'device_status', type: eInputType.code },
+    { prop: 'device_deployment_status', type: eInputType.code, required: true },
     { prop: 'device_condition', type: eInputType.code, required: true },
   ],
   retrievalFields: [
@@ -218,7 +219,6 @@ export const collarFormFields: Record<string, FormFieldObject<Partial<Collar>>[]
     { prop: 'retrieval_comment', type: eInputType.multiline},
   ],
   malfunctionOfflineFields: [
-    { prop: 'device_deployment_status', type: eInputType.code, required: true },
     { prop: 'malfunction_date', type: eInputType.datetime },
     { prop: 'device_malfunction_type', type: eInputType.code },
     { prop: 'offline_date', type: eInputType.datetime },
