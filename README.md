@@ -12,5 +12,6 @@ See `DEV_SETUP.md`.
 
 ```bash
 cd bctw-ui/.pipeline
+npm i (one time)
 npm run build -- --env=dev
 ```
