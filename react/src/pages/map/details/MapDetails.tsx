@@ -1,4 +1,4 @@
-import { Box, TooltipProps } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { DetailsSortOption, ITelemetryPoint, ITelemetryGroup, OnPanelRowSelect, OnMapRowCellClick, OnlySelectedCritters, MapRange } from 'types/map';
@@ -96,24 +96,17 @@ export default function MapDetails({
     handleShowOnlySelected({show: isChecked, critter_ids: pingGroupChecked.map(g => g.critter_id)});
   }
 
-  const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
-    enterDelay: 750,
-    placement: 'left-start'
-  }
-
   return (
     <>
       <Box className={'map-detail-container'} display="flex" flexDirection="column">
         <Box className={'map-detail-titlebar'} display="flex" justifyContent="flex-end" p={2}>
-          <Tooltip title={<p>{MapStrings.showOnlyCheckedTooltip}</p>} {...ttProps}>
-            <div>
-              <Checkbox
-                label={MapStrings.showOnlyCheckedLabel}
-                initialValue={false}
-                changeHandler={handleShowSelectedChecked}
-              />
-            </div>
-            </Tooltip>
+          <Tooltip inline={true} placement='left-start' title={<p>{MapStrings.showOnlyCheckedTooltip}</p>}>
+            <Checkbox
+              label={MapStrings.showOnlyCheckedLabel}
+              initialValue={false}
+              changeHandler={handleShowSelectedChecked}
+            />
+          </Tooltip>
           <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
         </Box>
         <MapDetailsGrouped

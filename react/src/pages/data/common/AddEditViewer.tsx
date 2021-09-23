@@ -5,7 +5,7 @@ import { EditorProps } from 'components/component_interfaces';
 import { IEditModalProps } from 'pages/data/common/EditModal';
 import { cloneElement, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
-import { Box, Button, TooltipProps } from '@material-ui/core';
+import { Box, Button, ButtonProps }  from '@material-ui/core';
 import { Tooltip } from 'components/common';
 
 export type IAddEditProps<T> = {
@@ -45,11 +45,6 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
   const [isCreatingNew, setIsCreatingNew] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
-    enterDelay: 750,
-    placement: 'right-start'
-  }
-
   const handleClickAdd = (): void => {
     setIsCreatingNew(true);
     setEditObj(empty);
@@ -85,7 +80,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
 
   // override the open/close handlers and props of the child EditModal component
   const editorProps: Pick<IEditModalProps<T>, 'editing' | 'open' | 'onSave' | 'handleClose' | 'disableHistory'>
-    & Pick<EditorProps<T>, 'isCreatingNew'> = {
+  & Pick<EditorProps<T>, 'isCreatingNew'> = {
     // if this is a new instance - pass an empty object
     editing: isCreatingNew ? empty : editObj,
     // required in EditX components (ex. EditCritter)
@@ -112,28 +107,28 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
     );
   }
 
+  const btnProps: Pick<ButtonProps, 'size' | 'variant' | 'color'> = {size:'large', variant:'outlined', color:'primary'}
   return (
     <>
       {/* clone child EditModal component to pass additional props */}
       {cloneElement(children, editorProps)}
       <Box className="button-bar">
-
         {/* render add button */}
         {disableAdd ? null :
-        <Tooltip title={addTooltip ?? ''} {...ttProps}>
-            <Button size="large" variant="contained" color="primary" startIcon={<AddOutlinedIcon />} onClick={handleClickAdd}>{`Add ${addText ?? ''}`}</Button>
+          <Tooltip title={addTooltip ?? ''} inline={true}>
+            <Button {...btnProps} variant='contained' startIcon={<AddOutlinedIcon />} onClick={handleClickAdd}>{`Add ${addText ?? ''}`}</Button>
           </Tooltip>
         }
 
         {/* render edit button */}
-        <Tooltip title={editTooltip ?? ''} {...ttProps}>
-          <Button size="large" variant="outlined" color="primary" {...editBtnProps}>{` ${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}</Button>
+        <Tooltip title={editTooltip ?? ''} inline={true}>
+          <Button {...btnProps} {...editBtnProps}>{` ${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}</Button>
         </Tooltip>
 
         {/* render delete button */}
         {enableDelete() ? (
-          <Tooltip title={deleteTooltip ?? ''} {...ttProps}>
-            <Button size="large" variant="outlined" color="primary" startIcon={<DeleteOutlineOutlinedIcon />} disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
+          <Tooltip title={deleteTooltip ?? ''} inline={true}>
+            <Button {...btnProps} startIcon={<DeleteOutlineOutlinedIcon />} disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
               {`Delete ${deleteText ?? ''}`}
             </Button>
           </Tooltip>

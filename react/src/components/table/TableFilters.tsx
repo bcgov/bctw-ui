@@ -1,11 +1,10 @@
-import { Box, TooltipProps } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import TextField from 'components/form/TextInput';
 import { useMemo, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
 import { FormStrings } from 'constants/strings';
-import { Tooltip } from 'components/common';
 
 type TextFilterProps = {
   rowCount: number;
@@ -13,11 +12,6 @@ type TextFilterProps = {
   setGlobalFilter: (filter: string) => void;
   disabled?: boolean;
 };
-
-const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
-  enterDelay: 750,
-  placement: 'right-start'
-}
 
 /**
  * the text input search/filter component

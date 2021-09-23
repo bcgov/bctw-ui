@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Grid, IconButton, TooltipProps } from '@material-ui/core';
+import { Box, Button, Divider, Grid, IconButton } from '@material-ui/core';
 import { Close, ArrowForward } from '@material-ui/icons';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -130,19 +130,17 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const createMultiSelects = (): React.ReactNode => {
     return CODE_FILTERS.map((cf, idx) => (
       <Grid item sm={12} key={`${cf.header}-${idx}`}>
-        <Tooltip title={<p>{MapStrings.codeFiltersTooltips[cf.header]}</p>} {...ttProps}>
-          <div>
-            <SelectCode
-              fullWidth
-              multiple
-              label={cf.label ?? columnToHeader(cf.header)}
-              codeHeader={cf.header}
-              changeHandler={null}
-              changeHandlerMultiple={(codes): void => changeFilter(codes, cf.header)}
-              triggerReset={reset}
-              addEmptyOption={true}
-            />
-          </div>
+        <Tooltip title={<p>{MapStrings.codeFiltersTooltips[cf.header]}</p>}>
+          <SelectCode
+            fullWidth
+            multiple
+            label={cf.label ?? columnToHeader(cf.header)}
+            codeHeader={cf.header}
+            changeHandler={null}
+            changeHandlerMultiple={(codes): void => changeFilter(codes, cf.header)}
+            triggerReset={reset}
+            addEmptyOption={true}
+          />
         </Tooltip>
       </Grid>
     ));
@@ -179,11 +177,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     });
   };
 
-  const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
-    enterDelay: 750,
-    placement: 'right-start'
-  }
-
   return (
     <Box
       className={clsx(classes.drawer, {
@@ -207,31 +200,27 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={6}>
-                    <Tooltip title={<p>{MapStrings.startDateTooltip}</p>} {...ttProps}>
-                      <div>
-                        <DateInput
-                          fullWidth
-                          propName='tstart'
-                          label={MapStrings.startDateLabel}
-                          defaultValue={dayjs(start)}
-                          changeHandler={(e): void => setStart(e['tstart'] as string)}
-                          maxDate={dayjs(end)}
-                        />
-                      </div>
+                    <Tooltip title={<p>{MapStrings.startDateTooltip}</p>}>
+                      <DateInput
+                        fullWidth
+                        propName='tstart'
+                        label={MapStrings.startDateLabel}
+                        defaultValue={dayjs(start)}
+                        changeHandler={(e): void => setStart(e['tstart'] as string)}
+                        maxDate={dayjs(end)}
+                      />
                     </Tooltip>
                   </Grid>
                   <Grid item sm={6}>
-                    <Tooltip title={<p>{MapStrings.endDateTooltip}</p>} {...ttProps}>
-                      <div>
-                        <DateInput
-                          fullWidth
-                          propName='tend'
-                          label={MapStrings.endDateLabel}
-                          defaultValue={dayjs(end)}
-                          changeHandler={(e): void => setEnd(e['tend'] as string)}
-                          minDate={dayjs(start)}
-                        />
-                      </div>
+                    <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
+                      <DateInput
+                        fullWidth
+                        propName='tend'
+                        label={MapStrings.endDateLabel}
+                        defaultValue={dayjs(end)}
+                        changeHandler={(e): void => setEnd(e['tend'] as string)}
+                        minDate={dayjs(start)}
+                      />
                     </Tooltip>
                   </Grid>
                 </Grid>
@@ -248,14 +237,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                           <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
                           <p>{MapStrings.assignmentStatusTooltip3}</p>
                         </>
-                      } {...ttProps}>
+                      } >
                       <div>
                         <MultiSelect
                           label={MapStrings.assignmentStatusLabel}
                           data={DEVICE_STATUS_OPTIONS}
                           changeHandler={props.onShowUnassignedDevices}
                         />
-                    </div>
+                      </div>
                     </Tooltip>
                   </Grid>
                 </Grid>
@@ -263,25 +252,21 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
               {/* render the last pings/ last 10 fixes checkboxes */}
               <Box mb={2}>
-                <Tooltip title={<p>{MapStrings.lastKnownLocationTooltip}</p>} {...ttProps}>
-                  <span>
-                    <Checkbox
-                      label={MapStrings.lastKnownLocationLabel}
-                      initialValue={isLatestPing}
-                      changeHandler={(): void => setIsLatestPing((o) => !o)}
-                      disabled={isLastFixes}
-                    />
-                  </span>
+                <Tooltip inline={true} title={<p>{MapStrings.lastKnownLocationTooltip}</p>}>
+                  <Checkbox
+                    label={MapStrings.lastKnownLocationLabel}
+                    initialValue={isLatestPing}
+                    changeHandler={(): void => setIsLatestPing((o) => !o)}
+                    disabled={isLastFixes}
+                  />
                 </Tooltip>
-                <Tooltip title={<p>{MapStrings.lastFixesTooltip}</p>} {...ttProps}>
-                  <span>
-                    <Checkbox
-                      label={MapStrings.lastFixesLabel}
-                      initialValue={isLastFixes}
-                      changeHandler={(): void => setIsLastFixes((o) => !o)}
-                      disabled={isLatestPing}
-                    />
-                  </span>
+                <Tooltip inline={true} title={<p>{MapStrings.lastFixesTooltip}</p>}>
+                  <Checkbox
+                    label={MapStrings.lastFixesLabel}
+                    initialValue={isLastFixes}
+                    changeHandler={(): void => setIsLastFixes((o) => !o)}
+                    disabled={isLatestPing}
+                  />
                 </Tooltip>
               </Box>
 
@@ -289,15 +274,13 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={12}>
-                    <Tooltip title={<p>{MapStrings.deviceListTooltip}</p>} {...ttProps}>
-                      <div>
-                        <AutoComplete
-                          label={MapStrings.deviceListLabel}
-                          data={createDeviceList()}
-                          changeHandler={handleChangeDeviceList}
-                          triggerReset={reset}
-                        />
-                      </div>
+                    <Tooltip title={<p>{MapStrings.deviceListTooltip}</p>}>
+                      <AutoComplete
+                        label={MapStrings.deviceListLabel}
+                        data={createDeviceList()}
+                        changeHandler={handleChangeDeviceList}
+                        triggerReset={reset}
+                      />
                     </Tooltip>
                   </Grid>
                 </Grid>
@@ -321,7 +304,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 <Grid container spacing={2}>
                   <Grid item sm={12}>
                     <Tooltip
-                      title={<p>{MapStrings.customAnimalGroupTooltip}</p>} {...ttProps}>
+                      title={<p>{MapStrings.customAnimalGroupTooltip}</p>}>
                       <div className={'side-panel-udf'}>
                         <SelectUDF
                           triggerReset={reset}
