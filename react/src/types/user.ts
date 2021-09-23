@@ -140,7 +140,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
 
   // displayed as fields 'user/critter permission' table modals
   static get propsToDisplay(): (keyof UserCritterAccess)[] {
-    return ['wlh_id', 'animal_id', 'species', 'device_id', 'frequency', 'device_type', 'device_make', 'permission_type'];
+    return ['permission_type', 'wlh_id', 'animal_id', 'species', 'device_id', 'frequency', 'device_type', 'device_make'];
   }
   get displayProps(): (keyof UserCritterAccess)[] {
     return UserCritterAccess.propsToDisplay;
