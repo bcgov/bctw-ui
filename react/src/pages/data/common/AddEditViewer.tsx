@@ -1,12 +1,12 @@
-import Box from '@material-ui/core/Box';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import { IUpsertPayload } from 'api/api_interfaces';
 import { EditorProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
 import { IEditModalProps } from 'pages/data/common/EditModal';
-import {cloneElement, useState } from 'react';
+import { cloneElement, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
+import { Box, Button, TooltipProps } from '@material-ui/core';
+import { Tooltip } from 'components/common';
 
 export type IAddEditProps<T> = {
   cannotEdit?: boolean;
@@ -21,6 +21,9 @@ export type IAddEditProps<T> = {
   editText?: string;
   addText?: string
   deleteText?: string;
+  editTooltip?: string;
+  addTooltip?: string;
+  deleteTooltip?: string;
 };
 
 /**
@@ -36,11 +39,16 @@ export type IAddEditProps<T> = {
  * @param editButton optional - used in map overview screens
  **/
 export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProps<T>): JSX.Element {
-  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText } = props;
+  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText, editTooltip, addTooltip, deleteTooltip } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isCreatingNew, setIsCreatingNew] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
+    enterDelay: 750,
+    placement: 'right-start'
+  }
 
   const handleClickAdd = (): void => {
     setIsCreatingNew(true);
@@ -70,14 +78,14 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
       onSave(p)
     }
   }
-  
+
   const handleClose = (): void => {
     setShowModal(false);
   };
 
   // override the open/close handlers and props of the child EditModal component
-  const editorProps: Pick<IEditModalProps<T>, 'editing' |'open' | 'onSave' | 'handleClose' | 'disableHistory'>
-  & Pick<EditorProps<T>, 'isCreatingNew'> = {
+  const editorProps: Pick<IEditModalProps<T>, 'editing' | 'open' | 'onSave' | 'handleClose' | 'disableHistory'>
+    & Pick<EditorProps<T>, 'isCreatingNew'> = {
     // if this is a new instance - pass an empty object
     editing: isCreatingNew ? empty : editObj,
     // required in EditX components (ex. EditCritter)
@@ -111,16 +119,24 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
       <Box className="button-bar">
 
         {/* render add button */}
-        {disableAdd ? null : <Button size="large" variant="contained" color="primary" startIcon={<AddOutlinedIcon />} onClick={handleClickAdd}>{`Add ${addText ?? ''}`}</Button>}
+        {disableAdd ? null :
+        <Tooltip title={addTooltip ?? ''} {...ttProps}>
+            <Button size="large" variant="contained" color="primary" startIcon={<AddOutlinedIcon />} onClick={handleClickAdd}>{`Add ${addText ?? ''}`}</Button>
+          </Tooltip>
+        }
 
         {/* render edit button */}
-        <Button size="large" variant="outlined" color="primary" {...editBtnProps}>{` ${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}</Button>
+        <Tooltip title={editTooltip ?? ''} {...ttProps}>
+          <Button size="large" variant="outlined" color="primary" {...editBtnProps}>{` ${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}</Button>
+        </Tooltip>
 
         {/* render delete button */}
         {enableDelete() ? (
-          <Button size="large" variant="outlined" color="primary" startIcon={<DeleteOutlineOutlinedIcon />} disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
-            {`Delete ${deleteText ?? ''}`}
-          </Button>
+          <Tooltip title={deleteTooltip ?? ''} {...ttProps}>
+            <Button size="large" variant="outlined" color="primary" startIcon={<DeleteOutlineOutlinedIcon />} disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
+              {`Delete ${deleteText ?? ''}`}
+            </Button>
+          </Tooltip>
         ) : null}
       </Box>
     </>

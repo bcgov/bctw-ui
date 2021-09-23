@@ -43,7 +43,7 @@ export interface IUser extends Pick<IKeyCloakSessionInfo, 'email'> {
   access: OnboardingStatus;
   role_type: eUserRole;
   // indicates if the user is considered the owner of at least one animal
-  is_owner?: boolean; 
+  is_owner?: boolean;
   phone: string;
 }
 
@@ -61,8 +61,8 @@ export class User implements BCTWBase<User>, IUser {
   email: string;
   access: OnboardingStatus;
   error: string;
-  @Type(() => Date)valid_from: Date;
-  @Type(() => Date)valid_to: Date;
+  @Type(() => Date) valid_from: Date;
+  @Type(() => Date) valid_to: Date;
   get is_admin(): boolean {
     return this.role_type === eUserRole.administrator;
   }
@@ -84,11 +84,11 @@ export class User implements BCTWBase<User>, IUser {
 
   formatPropAsHeader(str: string): string {
     switch (str) {
-      case 'idir': 
+      case 'idir':
       case 'id':
       case 'bceid':
         return str.toUpperCase();
-      default: 
+      default:
         return columnToHeader(str);
     }
   }
@@ -101,9 +101,9 @@ export class User implements BCTWBase<User>, IUser {
     ];
     // a user should only have one of theses
     if (this.idir) {
-      ret.unshift({prop: 'idir', type: eInputType.text })
+      ret.unshift({ prop: 'idir', type: eInputType.text })
     } else if (this.bceid) {
-      ret.unshift({prop: 'bceid', type: eInputType.text })
+      ret.unshift({ prop: 'bceid', type: eInputType.text })
     }
     return ret;
   }
@@ -111,11 +111,11 @@ export class User implements BCTWBase<User>, IUser {
 
 export interface IUserCritterAccess extends Required<Pick<Animal, 'permission_type'>>,
   Pick<Animal, 'critter_id' | 'animal_id' | 'species' | 'wlh_id' | 'valid_from' | 'valid_to'>,
-  Pick<Collar, 'device_id' | 'device_make' | 'frequency'> {}
+  Pick<Collar, 'device_id' | 'device_make' | 'device_type' | 'frequency'> { }
 
-export interface IUserCritterAccessInput extends 
-  Partial<Omit<IUserCritterAccess, 'critter_id' | 'permission_type'>>, 
-  Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> {}
+export interface IUserCritterAccessInput extends
+  Partial<Omit<IUserCritterAccess, 'critter_id' | 'permission_type'>>,
+  Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> { }
 
 
 export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritterAccess> {
@@ -126,6 +126,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   @Transform(nullToDayjs) valid_from: Dayjs;
   @Transform(nullToDayjs) valid_to: Dayjs;
   device_id: number;
+  device_type: string;
   frequency: number;
   device_make: string;
   permission_type: eCritterPermission;
@@ -139,7 +140,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
 
   // displayed as fields 'user/critter permission' table modals
   static get propsToDisplay(): (keyof UserCritterAccess)[] {
-    return ['wlh_id', 'animal_id', 'species', 'device_id', 'device_make', 'frequency', 'permission_type'];
+    return ['wlh_id', 'animal_id', 'species', 'device_id', 'frequency', 'device_type', 'device_make', 'permission_type'];
   }
   get displayProps(): (keyof UserCritterAccess)[] {
     return UserCritterAccess.propsToDisplay;

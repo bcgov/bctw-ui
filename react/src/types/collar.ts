@@ -166,7 +166,7 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   }
 
   static get propsToDisplay(): (keyof Collar)[] {
-    return [ 'device_id', 'device_status', 'frequency', 'device_type', 'device_make', 'device_model' ];
+    return [ 'device_id', 'device_status', 'frequency', 'device_type', 'device_make', 'activation_status', 'device_model' ];
   }
   // for attached collars, also display...
   static get attachedPropsToDisplay(): (keyof Collar)[] {

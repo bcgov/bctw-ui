@@ -2,7 +2,7 @@ import Button from 'components/form/Button';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'contexts/UserContext';
 import { User, UserCritterAccess } from 'types/user';
-import { Typography } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import DataTable from 'components/table/DataTable';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -40,13 +40,16 @@ export default function UserProfile(): JSX.Element {
 
   return (
     <ManageLayout>
+      <Box className='manage-layout-titlebar'>
+      <h1>My Profile</h1>
+      </Box>
       <div style={{margin: '20px'}}>
-        <Typography variant='h5'>
+        <Typography>
           <p>
             Your Name: <strong>{user.firstname ?? 'Local'}</strong>&nbsp;<strong>{user.lastname ?? 'User'}</strong>
           </p>
           <p>
-            Your username: <strong>{user.uid?? 'Local Username'}</strong>
+            Your username: <strong>{user.identifier}\{user.uid?? 'Local Username'}</strong>
           </p>
           <p>
             Your Role: <strong>{user.role_type}</strong>

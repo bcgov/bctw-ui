@@ -176,6 +176,7 @@ export default function Import<T>(): JSX.Element {
 
   return (
     <ManageLayout>
+      <h1>Data Import</h1>
       <div className='container'>
         {/* save progress indicator */}
         {isLoading ? (
@@ -184,7 +185,6 @@ export default function Import<T>(): JSX.Element {
             <CircularProgress />
           </div>
         ) : null}
-        <h2>Bulk Import Data</h2>
         {/* import type options and instructions */}
         <div className={'import-setup'}>
           <div className={'import-choice'}>

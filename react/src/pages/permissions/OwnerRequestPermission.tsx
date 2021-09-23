@@ -199,7 +199,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   return (
     <OwnerLayout>
       <>
-        <Typography variant='h4'>Grant animal permissions to other users</Typography>
+        <h1>Delegation</h1>
         <Typography>Submit a new permission request. Start by:</Typography>
         <ol>
           <li>Enter a valid email address of the user you wish to give access to</li>

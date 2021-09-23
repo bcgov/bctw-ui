@@ -7,6 +7,7 @@ const CritterStrings = {
   exportText: '',
   exportTitle: 'Bulk Export Animal Data',
   unassignedTableTitle: 'Animals Without a Device',
+  addTooltip: 'TODO: addTooltip'
 }
 
 const ImportSteps = [ 
@@ -104,9 +105,9 @@ const CodeStrings = {
 
 const MapStrings = {
   startDateLabel: 'Start Date',
-  startDateTooltip: 'startDateTooltip',
+  startDateTooltip: 'TODO: startDateTooltip',
   endDateLabel: 'End Date',
-  endDateTooltip: 'endDateTooltip',
+  endDateTooltip: 'TODO: endDateTooltip',
   assignmentStatusLabel: 'Device Assignment Status',
   assignmentStatusOptionA: 'Assigned Devices',
   assignmentStatusOptionU: 'Unassigned Devices',
@@ -114,19 +115,24 @@ const MapStrings = {
   assignmentStatusTooltip2: ': show device telemetry that does not have an animal attached.',
   assignmentStatusTooltip3: 'To attach a device, click Manage from the top navigation bar and edit an animal.',  
   lastKnownLocationLabel: 'Last Known Location',
-  lastKnownLocationTooltip: 'lastKnownLocationTooltip',
+  lastKnownLocationTooltip: 'TODO: lastKnownLocationTooltip',
   lastFixesLabel: 'Last 10 Fixes',
-  lastFixesTooltip: 'lastFixesTooltip',
+  lastFixesTooltip: 'TODO: lastFixesTooltip',
   deviceListLabel: 'Device List',
-  deviceListTooltip: 'deviceListTooltip',
-  speciesTooltip: 'speciesTooltip',
-  animalStatusTooltip: 'animalStatusTooltip',
-  deviceStatusTooltip: 'deviceStatusTooltip',
-  sexTooltip: 'sexTooltip',
+  deviceListTooltip: 'TODO: deviceListTooltip',
+  codeFiltersTooltips: {
+    species: 'TODO: codeFiltersTooltips.species',
+    animal_status: 'TODO: codeFiltersTooltips.animal_status',
+    device_status: 'TODO: codeFiltersTooltips.device_status',
+    sex: 'TODO: codeFiltersTooltips.sex',
+    population_unit: 'TODO: codeFiltersTooltips.population_unit',
+  },
+  collectiveUnitLabel: 'Collective Unit',
+  collectiveUnitTooltip: 'TODO: collectiveUnitTooltip',
   customAnimalGroupLabel: 'Custom Animal Group',
-  customAnimalGroupLabelTooltip: 'customAnimalGroupLabelTooltip',
+  customAnimalGroupTooltip: 'TODO: customAnimalGroupTooltip',
   showOnlyCheckedLabel: 'Show Selected Records Only',
-  showOnlyCheckedTooltip: 'showOnlyCheckedTooltip',
+  showOnlyCheckedTooltip: 'TODO: showOnlyCheckedTooltip',
   toggleFixesLabel: 'Toggle fixes',
   toggleTracksLabel: 'Toggle tracks',
   drawLineLabel: 'Measure distance',
@@ -144,7 +150,8 @@ const FormStrings = {
   emptySelectValue: 'Blank',
   validateNegativeLongitude: 'Longitude must be negative',
   validateNumber: 'Must be a number',
-  isRequired: 'field is required'
+  isRequired: 'field is required',
+  filterColumnsLabel: 'Search Columns',
 }
 
 const UserAlertStrings = {
