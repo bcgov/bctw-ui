@@ -27,7 +27,7 @@ const _appendQueryToUrl = (url: string, query: string): string => {
  */
 const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
   const baseUrl = getBaseUrl();
-  console.log('createURL() -- base URL:', baseUrl)
+  // console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
     url = _appendQueryToUrl(url, query);
@@ -42,7 +42,7 @@ const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
     url = _appendQueryToUrl(url, `testUser=${testUser}`)
     // console.log('retrieving url with testuser ${testUser}');
   }
-  console.log('createURL() -- final created URL:', url)
+  // console.log('createURL() -- final created URL:', url)
   return url;
 }
 
@@ -59,9 +59,15 @@ const isDev = (): boolean => {
   return process?.env?.NODE_ENV === 'development';
 }
 
+// for testing form handlers
+async function sleep(ms: number): Promise<void> {
+  await new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export {
   getBaseUrl,
   createUrl,
   createFormData,
   isDev,
+  sleep,
 }

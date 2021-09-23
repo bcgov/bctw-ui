@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import RetrievalEvent from 'types/events/retrieval_event';
-import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
+import { parseFormChangeResult } from 'types/form_types';
 import { Box } from '@material-ui/core';
 import { CreateFormField } from 'components/form/create_form_components';
 import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { WorkflowStrings } from 'constants/strings';
+import { wfFields, WorkflowFormProps } from 'types/events/event';
 
-type RetrievalEventProps = {
+type RetrievalEventProps = WorkflowFormProps & {
   event: RetrievalEvent;
-  handleFormChange: FormChangeEvent;
 };
 
 /**
@@ -20,29 +20,13 @@ export default function RetrievalEventForm({event, handleFormChange}: RetrievalE
 
   useEffect(() => {
     setRetrieval(retrieval);
-    determineMinRetrievalDate();
+    setMinRetrievalDate(retrieval.determineMinRetrievalDate());
   }, [retrieval]);
 
   const [isRetrieved, setIsRetrieved] = useState(true);
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
   const [minRetrievalDate, setMinRetrievalDate] = useState<Dayjs>(retrieval.retrieval_date);
 
-  /**
-   * retrieval date minimum must be the latest of the malfunction/capture/mortality dates
-   */
-  const determineMinRetrievalDate = (): void => {
-    const { capture_date, malfunction_date, mortality_date } = retrieval;
-    const dates: Dayjs[] = [capture_date, malfunction_date, mortality_date]
-      .map(d => d ? dayjs(d) : null)
-      .filter(d => d)
-      .sort((a, b) => a.isBefore(b) ? 1 : 0);
-    if (dates.length) {
-      const minDate = dates[dates.length -1];
-      // eslint-disable-next-line no-console
-      // console.log('min retrieval date determined', minDate);
-      setMinRetrievalDate(minDate);
-    }
-  }
 
   // form component changes can trigger mortality specific business logic
   const onChange = (v: Record<keyof RetrievalEvent, unknown>): void => {
@@ -58,29 +42,29 @@ export default function RetrievalEventForm({event, handleFormChange}: RetrievalE
   };
 
   const { fields } = retrieval;
-  if (!fields) {
-    return null;
+  if (!fields || !wfFields) {
+    return <p>unable to load retrieval workflow</p>;
   }
 
   return (
     <>
       {FormSection('retrieval-device', 'Device Details', [
         <Box {...boxSpreadRowProps} mb={1}>
-          {CreateFormField(retrieval, fields.retrieved, onChange)}
-          {CreateFormField(retrieval, fields.retrieval_date, onChange, {disabled: !isRetrieved, minDate: minRetrievalDate}, false)}
+          {CreateFormField(retrieval, wfFields.get('retrieved'), onChange)}
+          {CreateFormField(retrieval, wfFields.get('retrieval_date'), onChange, {disabled: !isRetrieved, minDate: minRetrievalDate}, false)}
         </Box>,
-        <Box {...boxSpreadRowProps} mb={1}>
+        <Box {...boxSpreadRowProps} mb={2}>
           {CreateFormField(retrieval, fields.shouldUnattachDevice, onChange, {}, true)}
           {CreateFormField(retrieval, {...fields.data_life_end, required: isBeingUnattached }, onChange, {disabled: !isBeingUnattached})}
         </Box>,
         <Box {...boxSpreadRowProps} mb={1}>
-          {CreateFormField(retrieval, fields.device_condition, onChange)}
-          {CreateFormField(retrieval, fields.device_deployment_status, onChange)}
+          {CreateFormField(retrieval, wfFields.get('device_condition'), onChange)}
+          {CreateFormField(retrieval, wfFields.get('device_deployment_status'), onChange)}
         </Box>,
         <Box {...boxSpreadRowProps} mb={1}>
-          {CreateFormField(retrieval, {...fields.activation_status, tooltip: <p><span style={{color: 'orangered'}}>Reminder: </span>{`${WorkflowStrings.device.activation_warning}`}</p>}, onChange, {}, true)}
+          {CreateFormField(retrieval, {...wfFields.get('activation_status'), tooltip: <p><span style={{color: 'orangered'}}>Reminder: </span>{`${WorkflowStrings.device.activation_warning}`}</p>}, onChange, {}, true)}
         </Box>,
-        CreateFormField(retrieval, fields.retrieval_comment, onChange),
+        CreateFormField(retrieval, wfFields.get('retrieval_comment'), onChange),
       ])}
     </>
   );

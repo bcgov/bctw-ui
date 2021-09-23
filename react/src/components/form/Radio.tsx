@@ -4,7 +4,7 @@ import { FormBaseProps } from 'types/form_types';
 
 type RadioProps = FormBaseProps & {
   defaultSelectedValue: string;
-  values: { value: string; label: string }[];
+  values: { value: string; label: string, disabled?: boolean }[];
 };
 
 export default function RadioField({
@@ -26,7 +26,7 @@ export default function RadioField({
       {label ? ( <FormLabel>{label}</FormLabel>) : null}
       <RadioGroup row aria-label='position' name='position' value={selectedValue} onChange={handleSelect}>
         {values.map((v) => {
-          const { label, value } = v;
+          const { label, value, disabled = false } = v;
           return (
             <FormControlLabel
               key={`radio-${label}`}
@@ -34,6 +34,7 @@ export default function RadioField({
               control={<Radio color='primary' />}
               label={label}
               labelPlacement='start'
+              disabled={disabled}
             />
           );
         })}

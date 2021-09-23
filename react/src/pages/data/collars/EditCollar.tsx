@@ -3,8 +3,6 @@ import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import Container from '@material-ui/core/Container';
 import EditModal from 'pages/data/common/EditModal';
-import MalfunctionEventForm from '../events/MalfunctionEventForm';
-import Modal from 'components/modal/Modal';
 import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
@@ -15,6 +13,8 @@ import RetrievalEvent from 'types/events/retrieval_event';
 import { editObjectToEvent, WorkflowType } from 'types/events/event';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import WorkflowWrapper from '../events/WorkflowWrapper';
+import { isDisabled } from 'types/form_types';
+import MalfunctionEvent from 'types/events/malfunction_event';
 
 /**
  * todo: reimplement auto defaulting of fields based on collar type select
@@ -26,9 +26,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   const [collarType, setCollarType] = useState<eNewCollarType>(eNewCollarType.Other);
   const [newCollar, setNewCollar] = useState<Collar>(editing);
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
-
-  // const title = isCreatingNew ? `Add a new ${collarType} collar` : `Editing device ${editing.device_id}`;
-  const [showMalfunctionWorkflow, setShowMalfunctionWorkflow] = useState(false);
 
   const [workflowType, setWorkflowType] = useState<WorkflowType>('unknown');
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
@@ -44,9 +41,9 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
       if (workflowType === 'retrieval') {
         e = new RetrievalEvent();
         o = editObjectToEvent(Object.assign({}, editing), e, ['retrieved', 'retrieval_date', 'device_deployment_status']);
-      } else {
-        e = new RetrievalEvent();
-        o = {};
+      } else if (workflowType === 'malfunction') {
+        e = new MalfunctionEvent();
+        o = editObjectToEvent(Object.assign({}, editing), e, ['device_status', 'device_condition', 'device_deployment_status']);
       }
       return o;
     });
@@ -55,7 +52,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
   // show the workflow form when a new event object is created
   useDidMountEffect(() => {
     if (event) {
-      console.log('event updated', event, !open);
+      // console.log('event updated', event, !open);
       setShowWorkflowForm((o) => !o);
     }
   }, [event]);
@@ -165,46 +162,37 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                 'Warranty & Activation Details',
                 deviceOptionFields.map((f) => CreateFormField(editing, f, onChange))
               )}
-              {FormSection(
-                'device-ret',
-                'Record Retrieval Details',
-                retrievalFields.map((f) => CreateFormField(editing, f, onChange)),
-                <Button {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('retrieval')}>
-                  Record Retrieval Details
-                </Button>
-              )}
-              {FormSection(
-                'device-malf',
-                'Record Malfunction & Offline Details',
-                malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange)),
-                <Button {...editEventBtnProps} onClick={(): void => setShowMalfunctionWorkflow((o) => !o)}>
-                  Record Malfunction & Offline Details
-                </Button>
-              )}
-              {FormSection(
-                'device-comment',
-                'Comments About this Device',
-                deviceCommentField.map((f) => CreateFormField(editing, f, onChange))
-              )}
-              {/* malfunction workflow */}
-              {!isCreatingNew && showMalfunctionWorkflow ? (
-                <Modal open={showMalfunctionWorkflow} handleClose={(): void => setShowMalfunctionWorkflow(false)}>
-                  <MalfunctionEventForm
-                    device_id={editing.device_id}
-                    handleClose={(): void => setShowMalfunctionWorkflow(false)}
-                    handleSave={null}
-                    open={showMalfunctionWorkflow}
+              {!isCreatingNew ? (
+                <>
+                  {FormSection(
+                    'device-ret',
+                    'Record Retrieval Details',
+                    retrievalFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
+                    <Button {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('retrieval')}>
+                      Record Retrieval Details
+                    </Button>
+                  )}
+                  {FormSection(
+                    'device-malf',
+                    'Record Malfunction & Offline Details',
+                    malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
+                    <Button {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('malfunction')}>
+                      Record Malfunction & Offline Details
+                    </Button>
+                  )}
+                  {FormSection(
+                    'device-comment',
+                    'Comments About this Device',
+                    deviceCommentField.map((f) => CreateFormField(editing, f, onChange))
+                  )}
+                  <WorkflowWrapper
+                    open={showWorkflowForm}
+                    event={event}
+                    handleClose={(): void => setShowWorkflowForm(false)}
                   />
-                </Modal>
-              ) : null}
-              <WorkflowWrapper
-                eventType={workflowType}
-                open={showWorkflowForm}
-                event={event}
-                handleClose={(): void => setShowWorkflowForm(false)}
-              />
+                </> ) : null }
             </>
-          );
+          )
         }}
       </ChangeContext.Consumer>
     </EditModal>

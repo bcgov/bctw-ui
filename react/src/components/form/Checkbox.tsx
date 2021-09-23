@@ -46,7 +46,7 @@ export default function Checkbox(props: ICheckboxProps): JSX.Element {
             {...propsToPass}
           />
         }
-        label={columnToHeader(label)}
+        label={label}
       />
     </>
   );

@@ -5,7 +5,7 @@ import { WorkflowType } from 'types/events/event';
 import { formatTime } from 'utils/time';
 
 export enum eLocationPositionType {
-  utm  = 'utm',
+  utm = 'utm',
   coord = 'coord'
 }
 
@@ -21,7 +21,6 @@ interface ILocationEvent {
 }
 
 export class LocationEvent implements ILocationEvent {
-  coordinate_type: eLocationPositionType;
   comment: string;
   latitude: number;
   longitude: number;
@@ -29,15 +28,16 @@ export class LocationEvent implements ILocationEvent {
   utm_northing: number;
   utm_zone: number;
 
-  constructor(private location_type: WorkflowType, public date: Dayjs = dayjs()) {
-    this.coordinate_type = eLocationPositionType.utm
-  }
+  constructor(
+    private location_type: WorkflowType,
+    public date: Dayjs = dayjs(),
+    public coordinate_type = eLocationPositionType.utm
+  ) {}
 
-  private readonly utm_keys: (keyof this)[] = ['utm_easting', 'utm_northing', 'utm_zone'];
-  private readonly coord_keys: (keyof this)[] = ['latitude', 'longitude'];
-  private readonly json_keys: (keyof this)[]= [...this.utm_keys, ...this.coord_keys, 'comment', 'date'];
+  private utm_keys: (keyof this)[] = ['utm_easting', 'utm_northing', 'utm_zone'];
+  private coord_keys: (keyof this)[] = ['latitude', 'longitude'];
+  private json_keys: (keyof this)[] = [...this.utm_keys, ...this.coord_keys, 'comment', 'date'];
 
-  // todo: could use template literal type?
   toJSON(): Record<string, unknown> {
     const o = {};
     for (let i = 0; i < this.json_keys.length; i++) {
@@ -57,7 +57,7 @@ export class LocationEvent implements ILocationEvent {
     if (['date', 'comment'].includes(str)) {
       return columnToHeader(`${this.location_type}_${str}`);
     }
-    return columnToHeader(str.replace('utm', 'UTM'))
+    return columnToHeader(str.replace('utm', 'UTM'));
   }
 
   get fields(): Record<string, FormFieldObject<LocationEvent> | FormFieldObject<LocationEvent>[]> {

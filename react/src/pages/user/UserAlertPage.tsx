@@ -183,7 +183,6 @@ export default function AlertPage(): JSX.Element {
       />
       {selectedAlert ? (
         <WorkflowWrapper
-          eventType={'mortality'}
           event={(selectedAlert as MortalityAlert).toMortalityEvent()}
           open={showEventModal}
           handleClose={(): void => setShowEventModal(false)}

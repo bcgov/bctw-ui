@@ -112,7 +112,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 // props that any mortality event or alert should have.
 export interface IMortalityAlert extends 
   Pick<Collar, | 'collar_id' | 'device_id' | 'device_make'>,
-  Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id'>,
+  Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id' | 'captivity_status'>,
   DataLife {}
 
 type MortalityAlertProp = keyof IMortalityAlert;
@@ -128,6 +128,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   critter_id: uuid;
   animal_id: string;
   animal_status: Code;
+  captivity_status: boolean;
   wlh_id: string;
 
   attachment_start: Dayjs;
@@ -144,6 +145,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   }
 
   toMortalityEvent(): MortalityEvent {
+    // don't preserve animal status from the alert.
     return editObjectToEvent(Object.assign({}, this),  new MortalityEvent(), ['animal_status']);
   }
 }

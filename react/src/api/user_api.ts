@@ -23,7 +23,7 @@ export const userApi = (props: ApiProps) => {
   const getSessionInfo = async (): Promise<IKeyCloakSessionInfo> => {
     if (isDev()) {
       // eslint-disable-next-line no-console
-      console.error('keycloak session info not retrievable in dev, note that UserContext.session object will be invalid');
+      console.error('keycloak session info not retrievable in dev, UserContext.session object will be invalid');
       return null;
     }
     const url = createUrl({ api: 'session-info' });

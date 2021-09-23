@@ -7,6 +7,7 @@ import { Animal } from 'types/animal';
 import { IDataLifeStartProps } from 'types/data_life';
 import { FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
+import { AttachDeviceInput } from 'types/collar_history';
 
 type CaptureAnimalEventProps = Pick<Animal, 
 | 'animal_id'
@@ -21,27 +22,14 @@ type CaptureAnimalEventProps = Pick<Animal,
 | 'captivity_status'
 >;
 
-type ReleaseAnimalProps = Pick<Animal,
-| 'ear_tag_left_id'
-| 'ear_tag_right_id'
-| 'ear_tag_left_colour'
-| 'ear_tag_right_colour'
-| 'juvenile_at_heel'
-| 'juvenile_at_heel_count'
-| 'animal_colouration'
-| 'life_stage'
->;
-
 export type CaptureFormField = {
   [Property in keyof CaptureEvent]+?: FormFieldObject<CaptureEvent>;
 };
 /**
  * todo:
  * if translocation, enable release fields
- * add captivity component
- * isassociated ? enable association fields
+ * capture date / data life ??!?
  */
-
 export default class CaptureEvent implements CaptureAnimalEventProps, IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
   // workflow props
   readonly event_type: WorkflowType;
@@ -90,11 +78,18 @@ export default class CaptureEvent implements CaptureAnimalEventProps, IDataLifeS
 
   getAnimal(): OptionalAnimal {
     const props: (keyof Animal)[] =
-      [
-        'critter_id',
-      ];
+      ['critter_id', 'recapture', 'translocation', 'associated_animal_id',
+        'associated_animal_relationship', 'region', 'population_unit', 'captivity_status'];
     const ret = eventToJSON(props, this);
+    if (!ret.associated_animal_id) {
+      delete ret.associated_animal_relationship
+    }
     return omitNull({ ...ret, ...this.location_event.toJSON()});
+  }
+
+  // todo:
+  getAttachment(): AttachDeviceInput {
+    return null;
   }
 
 }

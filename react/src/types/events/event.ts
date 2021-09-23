@@ -1,10 +1,18 @@
+import { ReactNode } from 'react';
 import { Animal, getAnimalFormFields, IAnimal } from 'types/animal';
 import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat} from 'types/common_types';
-import { FormFieldObject } from 'types/form_types';
+import { FormChangeEvent, FormFieldObject } from 'types/form_types';
 
-export type WorkflowType = 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
+export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
+
+export type WorkflowFormProps = {
+  // event: unknown; //fixme:
+  handleFormChange: FormChangeEvent;
+  handleExitEarly?: (message: ReactNode) => void;
+}
+
 // make all properties optional
 // todo: make critter_id etc required
 export type OptionalAnimal = { [Property in keyof IAnimal]+?: IAnimal[Property] };

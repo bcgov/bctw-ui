@@ -8,7 +8,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ReactNode, useEffect, useState } from 'react';
-import { BCTWWorkflow, WorkflowType } from 'types/events/event';
+import { BCTWWorkflow } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
@@ -19,20 +19,22 @@ import RetrievalEventForm from './RetrievalEventForm';
 import RetrievalEvent from 'types/events/retrieval_event';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import CaptureEvent from 'types/events/capture_event';
+import ReleaseEvent from 'types/events/release_event';
+import MalfunctionEvent from 'types/events/malfunction_event';
+import MalfunctionEventForm from './MalfunctionEventForm';
 
 type WorkflowWrapperProps<T extends BCTWWorkflow<T>> = ModalBaseProps & {
   event: T;
-  eventType: WorkflowType;
-  onEventSaved?: () => void; // to notify alert that event was saved
+  onEventSaved?: (e: BCTWWorkflow<T>) => void; // to notify alert that event was saved
 };
 
 /**
  * wraps all of the event pages.
  * handles saving
+ * todo: Reset event on closing
  */
 export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   event,
-  eventType,
   onEventSaved,
   open,
   handleClose
@@ -55,18 +57,20 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       responseDispatch({ severity: 'error', message: formatAxiosError(e as AxiosError) });
     } else {
       // console.log('sucess!!', e);
-      responseDispatch({ severity: 'success', message: 'mortality event saved!' });
+      responseDispatch({ severity: 'success', message: `${event.event_type} workflow form saved!` });
       // if the parent implements this, call it on successful save.
       // Ex. UserAlertPage component will expire the telemetry alert
       if (typeof onEventSaved === 'function') {
-        onEventSaved();
+        onEventSaved(event);
+      } else {
+        handleClose(false)
       }
     }
   };
 
   const onError = (e: AxiosError): void => {
     console.log('error saving event', formatAxiosError(e));
-    responseDispatch({ severity: 'success', message: 'mortality event saved!' });
+    responseDispatch({ severity: 'success', message: `error saving ${event.event_type} workflow: ${formatAxiosError(e)}` });
   };
 
   // setup save mutation
@@ -77,6 +81,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     saveEvent(event);
   };
 
+  // update the event when form components change
   const handleChildFormUpdated = (v: InboundObj): void => {
     checkHasErr(v);
     const k = Object.keys(v)[0];
@@ -87,21 +92,36 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     // console.log(event[k])
   };
 
+  /**
+   * some forms have actions that when triggered, should show a confirmation modal to
+   * exist the workflow 'early'. this modal exists here
+   */
   const handleShowExitWorkflow = (message: ReactNode): void => {
     setConfirmMessage(message);
     setShowConfirmModal((o) => !o);
   };
 
+  /**
+   * when 'yes' is selected to confirm the early exit of the workflow, perform the save
+   * workflows that use this behavior 
+   */
   const handleExitWorkflow = (): void => {
     console.log('exiting workflow early!');
     saveEvent(event);
     setShowConfirmModal(false);
   };
 
+  // fixme: fff typing
   let Comp: React.ReactNode;
-  switch (eventType) {
+  const { event_type } = event;
+  switch (event_type) {
     case 'release':
-      Comp = <ReleaseEventForm />;
+      Comp = (
+        <ReleaseEventForm
+          event={event as unknown as ReleaseEvent}
+          handleFormChange={handleChildFormUpdated}
+        />
+      );
       break;
     case 'capture':
       Comp = (
@@ -116,7 +136,6 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
         <MortalityEventForm
           handleExitEarly={handleShowExitWorkflow}
           handleFormChange={handleChildFormUpdated}
-          // fixme: fff
           event={event as unknown as MortalityEvent}
         />
       );
@@ -126,9 +145,14 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
         <RetrievalEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as RetrievalEvent} />
       );
       break;
+    case 'malfunction':
+      Comp = (
+        <MalfunctionEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as MalfunctionEvent} />
+      );
+      break;
     case 'unknown':
     default:
-      Comp = <></>;
+      Comp = <>error: unable to determine workflow form type</>;
   }
 
   return (

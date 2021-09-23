@@ -1,25 +1,24 @@
 import { Box } from '@material-ui/core';
 import { CreateFormField } from 'components/form/create_form_components';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
+import { parseFormChangeResult } from 'types/form_types';
 import { FormSection } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptivityStatusForm from './CaptivityStatusForm';
 import { boxSpreadRowProps } from './EventComponents';
 import Radio from 'components/form/Radio';
 import { WorkflowStrings } from 'constants/strings';
-import { wfFields } from 'types/events/event';
+import { wfFields, WorkflowFormProps } from 'types/events/event';
 
-type MortEventProps = {
+type MortEventProps = WorkflowFormProps & {
   event: MortalityEvent;
-  handleFormChange: FormChangeEvent;
-  handleExitEarly: (message: ReactNode) => void;
 };
 
 /**
+ * todo: dont hardcode radio values, retrieve from code somehow
  */
 export default function MortalityEventForm({ event, handleFormChange, handleExitEarly }: MortEventProps): JSX.Element {
   const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
@@ -40,11 +39,12 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
 
   // if critter is marked as alive, workflow wrapper will show exit workflow prompt
   useDidMountEffect(() => {
-    // event.animal_status = critterIsAlive ? 'Alive' : 'Mortality';
     event.onlySaveAnimalStatus = critterIsAlive;
     if (critterIsAlive) {
+      // update these props to indicate that device/attachment should not be saved
       event.shouldSaveDevice = false;
       event.shouldUnattachDevice = false;
+      // call the exite early handler from WorkflowWrapper, passing the confirmation message
       handleExitEarly(<p>{WorkflowStrings.mortality.exitEarly}</p>);
     } else {
       event.shouldSaveDevice = true;
@@ -57,7 +57,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     const [key, value] = parseFormChangeResult<MortalityEvent>(v);
     // retrieved checkbox state enables/disables the retrieval date datetime picker
     if (key === 'retrieved') {
-      setIsRetrieved(value as boolean);
+      setIsRetrieved(!!value);
     } else if (key === 'proximate_cause_of_death') {
       setUcodDisabled(false); // enable ucod when a proximate cause is chosen
       // value could be undefined ex. when a code is not selected
@@ -65,14 +65,14 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
         setIsPredation(true);
       }
     } else if (key === 'predator_known') {
-      setIsPredatorKnown(value as boolean);
+      setIsPredatorKnown(!!value);
     } else if (key === 'shouldUnattachDevice') {
       // make attachment end state required if user is removing device
-      setIsBeingUnattached(value as boolean);
+      setIsBeingUnattached(!!value);
     } else if (key === 'wasInvestigated') {
-      setWasInvestigated(value as boolean);
+      setWasInvestigated(!!value);
     } else if (key === 'isUCODSpeciesKnown') {
-      setIsUCODKnown(value as boolean);
+      setIsUCODKnown(!!value);
     } else if (key === 'animal_status') {
       if (value === 'Mortality' || value === 'Alive') {
         setCritterIsAlive(value === 'Alive');

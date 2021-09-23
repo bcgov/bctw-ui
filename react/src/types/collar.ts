@@ -50,10 +50,12 @@ export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_
   fix_interval_unit: Code; // fixme: is now fix_interval_rate?
   fix_success_rate: number; // fixme: removed?
   frequency_unit: Code;
+  malfunction_comment: string;
   malfunction_date: Dayjs;
   device_malfunction_type: Code;
   offline_date: Dayjs;
   offline_type: string;
+  offline_comment: string;
   permission_type?: eCritterPermission; // fetched collars should contain this
   retrieval_date: Dayjs;
   retrieved: boolean;
@@ -84,10 +86,12 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   fix_success_rate: number;
   frequency: number;
   frequency_unit: Code;
+  malfunction_comment: string;
   @Transform(nullToDayjs) malfunction_date: Dayjs;
   device_malfunction_type: Code;
   @Transform(nullToDayjs) offline_date: Dayjs;
   offline_type: string;
+  offline_comment: string;
   permission_type: eCritterPermission;
   @Transform(nullToDayjs) retrieval_date: Dayjs;
   retrieved: boolean;
@@ -209,15 +213,18 @@ export const collarFormFields: Record<string, FormFieldObject<Partial<Collar>>[]
     { prop: 'device_condition', type: eInputType.code, required: true },
   ],
   retrievalFields: [
+    { prop: 'retrieved', type: eInputType.check },
     { prop: 'retrieval_date', type: eInputType.datetime },
-    { prop: 'retrieved', type: eInputType.check }
+    { prop: 'retrieval_comment', type: eInputType.multiline},
   ],
   malfunctionOfflineFields: [
-    { prop: 'device_deployment_status', type: eInputType.code },
+    { prop: 'device_deployment_status', type: eInputType.code, required: true },
     { prop: 'malfunction_date', type: eInputType.datetime },
     { prop: 'device_malfunction_type', type: eInputType.code },
     { prop: 'offline_date', type: eInputType.datetime },
     { prop: 'offline_type', type: eInputType.code },
+    { prop: 'offline_comment', type: eInputType.multiline},
+    { prop: 'malfunction_comment', type: eInputType.multiline},
   ],
   deviceCommentField: [
     { prop: 'device_comment', type: eInputType.text }

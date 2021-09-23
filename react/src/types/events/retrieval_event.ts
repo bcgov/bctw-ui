@@ -1,4 +1,4 @@
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
@@ -12,7 +12,6 @@ import { eInputType, FormFieldObject } from 'types/form_types';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { WorkflowStrings } from 'constants/strings';
 
-// require dates to enforce retrieval min date
 interface IRetrievalEvent extends 
   Omit<MortalityDeviceEventProps, 'device_status'>,
   Pick<CollarHistory, 'assignment_id'>,
@@ -24,6 +23,11 @@ export type RetrievalFormField = {
   [Property in keyof RetrievalEvent]+?: FormFieldObject<RetrievalEvent>;
 };
 
+/**
+ * retrieved is not a code
+ * todo: display as checkbox if retrieved is no??
+ * todo: need to preserve is_retrievable?
+ */
 export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<RetrievalEvent>{
   readonly event_type: WorkflowType;
   shouldUnattachDevice: boolean;
@@ -36,9 +40,6 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
   activation_status: boolean;
   readonly malfunction_date: Dayjs; // fixme: use this for min date
   retrieved: boolean;
-  // retrieved is not a code -_-
-  // todo: display as checkbox if retrieved is no??
-  // todo: need to preserve is_retrievable?
   is_retrievable: boolean;
   // required if retrieved, cannot be earlier than capture/mort/malf date
   retrieval_date: Dayjs; 
@@ -81,15 +82,27 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
     return ['wlh_id', 'animal_id', 'device_id'];
   }
 
+  /**
+   * retrieval date minimum is assigned to the latest of malfunction/capture/mortality dates
+   */
+  determineMinRetrievalDate = (): Dayjs => {
+    const { capture_date, malfunction_date, mortality_date } = this;
+    const dates: Dayjs[] = [capture_date, malfunction_date, mortality_date]
+      .map(d => d ? dayjs(d) : null)
+      .filter(d => d)
+      .sort((a, b) => a.isBefore(b) ? 1 : 0);
+    if (dates.length) {
+      const minDate = dates[dates.length -1];
+      // eslint-disable-next-line no-console
+      // console.log('min retrieval date determined', minDate);
+      return minDate;
+    }
+    return null;
+  }
+
   fields: RetrievalFormField = {
-    activation_status: { prop: 'activation_status', type: eInputType.check },
-    retrieved: { prop: 'retrieved', type: eInputType.check },
     is_retrievable: { prop: 'is_retrievable', type: eInputType.check },
-    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime },
-    device_condition: { prop: 'device_condition', type: eInputType.code, required: true },
-    device_deployment_status: { prop: 'device_deployment_status', type: eInputType.code, required: true },
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
-    retrieval_comment: { prop: 'retrieval_comment', type: eInputType.multiline},
     data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
   };
 

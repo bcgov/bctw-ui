@@ -15,6 +15,7 @@ import { WorkflowStrings } from 'constants/strings';
 
 export type MortalityDeviceEventProps = Pick<
 Collar,
+| 'collar_id'
 | 'device_id'
 | 'device_make'
 | 'retrieved'
@@ -27,14 +28,13 @@ Collar,
 
 export type MortalityAnimalEventProps = Pick<
 Animal,
+| 'critter_id'
 | 'proximate_cause_of_death'
 | 'ultimate_cause_of_death'
 | 'predator_species_pcod'
 | 'predator_species_ucod'
 | 'pcod_confidence'
 | 'ucod_confidence'
-| 'critter_id'
-| 'capture_date'
 | 'animal_id'
 | 'wlh_id'
 | 'predator_known'
@@ -63,12 +63,8 @@ type MortalityDeviceStatus = 'Mortality';
 export type DeploymentStatusNotDeployed = 'Not Deployed';
 export type MortalityAnimalStatus = 'Mortality' | 'Alive';
 
-// export type MortalityFormField = {
-//   [Property in keyof MortalityEvent]+?: FormFieldObject<MortalityEvent>;
-// };
-
 /**
- * todo: captivity status?
+ * fixme: todo: when a device removal is performed...what happens in the ui?
  */
 export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMortalityEvent {
   // event specific props - not saved. used to enable/disable fields
@@ -174,6 +170,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     }
   }
 
+  // mortality event specific fields
   fields: { [Property in keyof MortalitySpecificProps]+?: FormFieldObject<MortalitySpecificProps>; } = {
     data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
     wasInvestigated: { prop: 'wasInvestigated', type: eInputType.check },
