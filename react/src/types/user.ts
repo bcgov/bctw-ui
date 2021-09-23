@@ -119,6 +119,7 @@ export interface IUserCritterAccessInput extends
 
 
 export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritterAccess> {
+  permission_type: eCritterPermission;
   critter_id: string;
   animal_id: string;
   wlh_id: string;
@@ -129,7 +130,6 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   device_type: string;
   frequency: number;
   device_make: string;
-  permission_type: eCritterPermission;
   @Expose() get identifier(): string { return 'critter_id' }
   @Expose() get name(): string {
     return this.animal_id ?? this.wlh_id;
