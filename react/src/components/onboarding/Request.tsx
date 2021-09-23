@@ -50,11 +50,11 @@ const UserAccessRequest = (): JSX.Element => {
     return <div>Loading user information...</div>;
   }
 
-  setDomain(user.idir);
-  setEmail(user.email);
-  setFirstName(user.firstname);
-  setLastName(user.lastname);
-  setUserName(user.uid);
+  setDomain(user?.identifier ? user.identifier : 'Domain');
+  setEmail(user?.email ? user.email : 'no_email@gov.bc.ca');
+  setFirstName(user?.firstname ? user.firstname : 'First');
+  setLastName(user?.lastname ? user.lastname : 'Last');
+  setUserName(user?.uid ? user.uid : 'test_user');
 
   /**
    * ## submitForm
