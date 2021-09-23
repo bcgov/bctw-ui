@@ -100,11 +100,13 @@ export default function MapDetails({
     <>
       <Box className={'map-detail-container'} display="flex" flexDirection="column">
         <Box className={'map-detail-titlebar'} display="flex" justifyContent="flex-end" p={2}>
-          <Checkbox
-            label={MapStrings.showOnlyCheckedLabel}
-            initialValue={false}
-            changeHandler={handleShowSelectedChecked}
-          />
+          <Tooltip inline={true} placement='left-start' title={<p>{MapStrings.showOnlyCheckedTooltip}</p>}>
+            <Checkbox
+              label={MapStrings.showOnlyCheckedLabel}
+              initialValue={false}
+              changeHandler={handleShowSelectedChecked}
+            />
+          </Tooltip>
           <Button color='primary' onClick={(): void => setShowExportModal(true)} variant='outlined'>Export</Button>
         </Box>
         <MapDetailsGrouped

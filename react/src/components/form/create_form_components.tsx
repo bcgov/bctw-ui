@@ -186,8 +186,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   if (tooltip) {
     Comp = (
       <Tooltip title={tooltip} placement={'right-end'} enterDelay={600}>
-        {/* note: wrapping tooltip child in div fixes the forward refs error */}
-        <div>{Comp}</div>
+        {Comp}
       </Tooltip>
     );
   }

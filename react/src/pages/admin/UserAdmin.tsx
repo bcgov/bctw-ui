@@ -50,7 +50,7 @@ export default function UserAdminPage(): JSX.Element {
   return (
     <AuthLayout>
       <div className='container'>
-        <Typography variant='h4' component='div'>Modify users</Typography>
+        <h1>BCTW Users</h1>
         {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
         <DataTable
           headers={['id', 'idir', 'bceid', 'email', 'role_type']}

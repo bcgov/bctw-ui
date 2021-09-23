@@ -5,7 +5,7 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Select 
+  Select
 } from '@material-ui/core';
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { UserContext } from 'contexts/UserContext';
@@ -167,15 +167,14 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
       changeHandler={(v): void => handleChangeName(v, u)}
       propName={'group'}
       defaultValue={u.key}
-      required={true}/>
+      required={true} />
   )
- 
 
   // renders a plain table cell 
   const renderNumCrittersSelected = (u: UDF): JSX.Element => <>{u?.value?.length}</>
 
   const handleRowModified = (u: UDF, action: EditTableRowAction): void => {
-    switch(action) {
+    switch (action) {
       case 'add':
         addRow();
         break;
@@ -192,9 +191,8 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
 
   const headers = ['Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate'];
   return (
-    <Modal open={open} handleClose={onClose}>
+    <Modal open={open} title='Custom Animal Group' handleClose={onClose}>
       {isLoading ? <CircularProgress /> : null}
-
       <EditTable
         canSave={canSave}
         columns={[
@@ -207,7 +205,6 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
         onRowModified={handleRowModified}
         onSave={handleSave}
       />
-
       {currentUdf ? (
         <PickCritterPermissionModal
           open={showCritterSelection}

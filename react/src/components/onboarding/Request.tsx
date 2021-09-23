@@ -21,10 +21,6 @@ const UserAccessRequest = (): JSX.Element => {
    * Here is all our form state.
    */
   const [accessType, setAccessType] = useState('');
-  const [domain, setDomain] = useState('');
-  const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [populationUnit, setPopulationUnit] = useState('');
   const [projectManager, setProjectManager] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -33,10 +29,15 @@ const UserAccessRequest = (): JSX.Element => {
   const [region, setRegion] = useState('');
   const [species, setSpecies] = useState('');
   const [textMessageNumber, setTextMessageNumber] = useState('');
-  const [username, setUserName] = useState('');
 
   const useUser = useContext(UserContext);
   const [user, setUser] = useState<User>(null);
+
+  const domain = user?.identifier ? user.identifier : 'unknown';
+  const email = user?.email ? user.email : 'noreply@gov.bc.ca';
+  const firstName = user?.firstname ? user.firstname : 'Unknown';
+  const lastName = user?.lastname ? user.lastname : 'User';
+  const username = user?.uid ? user.uid : 'unknown';
 
   // set the user state when the context is updated
   useEffect(() => {
@@ -47,14 +48,8 @@ const UserAccessRequest = (): JSX.Element => {
   }, [useUser]);
 
   if (!user) {
-    return <div>Loading user information...</div>;
+    return <div>Loading...</div>;
   }
-
-  setDomain(user.idir);
-  setEmail(user.email);
-  setFirstName(user.firstname);
-  setLastName(user.lastname);
-  setUserName(user.uid);
 
   /**
    * ## submitForm
@@ -64,7 +59,7 @@ const UserAccessRequest = (): JSX.Element => {
     const payload = {
       accessType,
       domain,
-      emailAddress: email,
+      email,
       firstName,
       lastName,
       populationUnit,
@@ -76,15 +71,6 @@ const UserAccessRequest = (): JSX.Element => {
       species,
       textMessageNumber,
       username
-      // accessType,
-      // populationUnit,
-      // projectManager,
-      // projectName,
-      // projectRole,
-      // reason,
-      // region,
-      // species,
-      // textMessageNumber
     }
 
     // XXX: This url doesn't work in development
@@ -127,22 +113,27 @@ const UserAccessRequest = (): JSX.Element => {
             You will need to provide some additional details before accessing this application. Complete the request details form below to obtain access.
           </p>
         </div>
+        Email: {email}<br />
+        First Name: {firstName}<br />
+        Last Name: {lastName}<br />
+        Domain: {domain}<br />
+        Username: {username}<br />
         <h3>Request Details</h3>
         <div>
           <span>Complete the following information:</span>
         </div>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <TextField label='Your Name' size='small' variant={'outlined'} inputProps={{ readOnly: true }}>${firstName} ${lastName}</TextField>
+            <TextField label='Your Name' size='small' variant={'outlined'} value={user?.firstname + " " + user?.lastname} disabled />
           </Grid>
           <Grid item xs={12}>
-            <TextField label='Authentication Method' size='small' variant={'outlined'} inputProps={{ readOnly: true }}>${domain}</TextField>
+            <TextField label='Authentication Method' size='small' variant={'outlined'} value={user?.identifier} disabled />
           </Grid>
           <Grid item xs={12}>
-            <TextField label='Username' size='small' variant={'outlined'} inputProps={{ readOnly: true }}>${username}</TextField>
+            <TextField label='Username' size='small' variant={'outlined'} value={username} disabled />
           </Grid>
           <Grid item xs={12}>
-            <TextField label='Email addresss' size='small' variant={'outlined'} inputProps={{ readOnly: true }}>${email}</TextField>
+            <TextField label='Email addresss' size='small' variant={'outlined'} value={email} disabled />
           </Grid>
           <Grid item xs={12}>
             <TextField label='Project Name' onChange={(e) => { setProjectName(e.target.value) }} size='small' variant={'outlined'} />

@@ -57,7 +57,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
   return (
     <AuthLayout>
       <div className='container'>
-        <Typography variant='h4' component='div'>Modify user animal access</Typography>
+        <h1>Set Animal Manager</h1>
         {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
         <Typography variant='body2' component='p'>A user has access to devices through the user-animal association.</Typography>
         <DataTable

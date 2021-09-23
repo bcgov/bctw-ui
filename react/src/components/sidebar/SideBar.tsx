@@ -38,7 +38,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
       curRoutes.push(routes.find((r) => r.name === 'animal-manager'));
-      curRoutes.push(routes.find((r) => r.name === 'codes'));
+      // curRoutes.push(routes.find((r) => r.name === 'codes'));
       curRoutes.push(routes.find((r) => r.name === 'delegation-requests'));
       // curRoutes.push(routes.find((r) => r.name === 'onboarding-requests'));
       curRoutes.push(routes.find((r) => r.name === 'users'));

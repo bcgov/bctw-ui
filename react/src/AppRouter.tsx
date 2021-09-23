@@ -38,7 +38,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'users', path: '/users', title: 'BCTW Users', component: UserAdminPage, sort: 101, icon: 'admin' },
   // { name: 'onboarding-requests', path: '/onboarding-requests', title: 'Onboarding Requests', component: OnboardingRequestsPage, sort: 102, icon: 'personAdd' },
   { name: 'animal-manager', path: '/animal-manager', title: 'Set Animal Manager', component: GrantCritterAccessPage, sort: 103, icon: 'vpnKey' },
-  { name: 'codes', path: '/codes', title: 'Code Tables', component: CodePage, sort: 104, icon: 'code' },
+  // { name: 'codes', path: '/codes', title: 'Code Tables', component: CodePage, sort: 104, icon: 'code' },
   { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: UserOnboarding, sort: 201 },
   { name: 'notFound', path: '/*', title: 'React: Not Found', component: (): JSX.Element => <div>React AppRouter.tsx says: Page not found!</div>, sort: 404 },
 ];
