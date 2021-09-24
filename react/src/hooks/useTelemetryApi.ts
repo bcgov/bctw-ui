@@ -28,7 +28,7 @@ import { ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
-import { IChangeDataLifeProps } from 'types/data_life';
+import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow } from 'types/events/event';
 
 /**
@@ -319,9 +319,9 @@ export const useTelemetryApi = () => {
 
   /** updates the data life of an animal/device attachment */
   const useMutateEditDataLife = (
-    config: UseMutationOptions<CollarHistory, AxiosError, IChangeDataLifeProps>
+    config: UseMutationOptions<CollarHistory, AxiosError, ChangeDataLifeInput>
   ): UseMutationResult =>
-    useMutation<CollarHistory, AxiosError, IChangeDataLifeProps>((dl) => attachmentApi.updateAttachmentDataLife(dl), config);
+    useMutation<CollarHistory, AxiosError, ChangeDataLifeInput>((dl) => attachmentApi.updateAttachmentDataLife(dl), config);
 
   /** upload a single .csv file to add or update codes/code headers, critters, or collars */
   const useMutateBulkCsv = <T>(

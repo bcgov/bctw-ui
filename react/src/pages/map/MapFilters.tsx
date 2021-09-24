@@ -255,6 +255,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 <Tooltip inline={true} title={<p>{MapStrings.lastKnownLocationTooltip}</p>}>
                   <Checkbox
                     label={MapStrings.lastKnownLocationLabel}
+                    propName={MapStrings.lastKnownLocationLabel}
                     initialValue={isLatestPing}
                     changeHandler={(): void => setIsLatestPing((o) => !o)}
                     disabled={isLastFixes}
@@ -262,6 +263,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 </Tooltip>
                 <Tooltip inline={true} title={<p>{MapStrings.lastFixesTooltip}</p>}>
                   <Checkbox
+                    propName={MapStrings.lastFixesLabel}
                     label={MapStrings.lastFixesLabel}
                     initialValue={isLastFixes}
                     changeHandler={(): void => setIsLastFixes((o) => !o)}

@@ -5,7 +5,6 @@ import {
   makeStyles,
   createStyles
 } from '@material-ui/core';
-import { ReactNode } from 'react';
 import { removeProps } from 'utils/common_helpers';
 
 const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
@@ -24,7 +23,6 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 type TooltipProps = MuiTooltipProps & {
-  children: ReactNode;
   nestedClass?: string;
   inline?: boolean;
 };
@@ -38,7 +36,7 @@ type TooltipProps = MuiTooltipProps & {
 export default function Tooltip(props: TooltipProps): JSX.Element {
   const classes = useStyles();
   return (
-    <MuiTooltip className={classes.tooltip} {...ttProps} {...removeProps(props, ['children'])}>
+    <MuiTooltip className={classes.tooltip} {...ttProps} {...removeProps(props, ['inline'])}>
       <div style={{ display: props.inline ? 'inline' : 'block' }}
         className={props.nestedClass}>
         {props.children}

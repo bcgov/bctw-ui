@@ -7,7 +7,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import Button from './Button';
 import { Box } from '@material-ui/core';
-import { DataLifeInput, IChangeDataLifeProps } from 'types/data_life';
+import { DataLifeInput, ChangeDataLifeInput } from 'types/data_life';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
 import { eCritterPermission } from 'types/permission';
@@ -48,7 +48,7 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   };
 
   const handleSave = async (): Promise<void> => {
-    const body: IChangeDataLifeProps = {
+    const body: ChangeDataLifeInput = {
       assignment_id: attachment.assignment_id,
       ...dli.toPartialEditDatalifeJSON()
     };

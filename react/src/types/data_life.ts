@@ -24,7 +24,7 @@ export type DataLife = IDataLifeStartProps & Required<IDataLifeEndProps> & {
 }
 
 // passed to the API when changing the data life of an existing or past device attachment
-export interface IChangeDataLifeProps extends 
+export interface ChangeDataLifeInput extends 
   Pick<CollarHistory, 'assignment_id'>, 
   Pick<IDataLifeStartProps, 'data_life_start'>,
   Pick<IDataLifeEndProps, 'data_life_end'>{ }
@@ -71,7 +71,7 @@ export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
   }
 
   // must get assignment id elsewhere
-  toPartialEditDatalifeJSON(): Omit<IChangeDataLifeProps, 'assignment_id'> {
+  toPartialEditDatalifeJSON(): Omit<ChangeDataLifeInput, 'assignment_id'> {
     return {
       data_life_start: this.data_life_start.format(formatTime),
       data_life_end: this.data_life_end.format(formatTime)

@@ -1,4 +1,7 @@
+import { BaseTextFieldProps } from "@material-ui/core";
 import { ReactNode } from "react";
+
+export type KeyType = string | number | symbol;
 
 export enum eInputType {
   text = 'text',
@@ -15,10 +18,9 @@ export enum eInputType {
 /**
  * 
  */
-export type FormBaseProps = {
+export type FormBaseProps = Pick<BaseTextFieldProps, 'label'> & {
   changeHandler: FormChangeEvent;
-  propName: string;
-  label?: string;
+  propName: KeyType;
 }
 
 /**
@@ -26,13 +28,12 @@ export type FormBaseProps = {
  * ex. a device retrieved date could be null, but it should be rendered
  * in a form as a date input
  */
-export type FormFieldObject<T> = {
+export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled'| 'required'> & {
   prop: keyof T;
+  // prop: KeyType;
   type: eInputType;
   codeName?: string;
-  required?: boolean;
   span?: boolean;
-  disabled?: boolean; // todo:
   tooltip?: ReactNode;
 };
 

@@ -3,7 +3,7 @@ import { plainToClass } from 'class-transformer';
 import { ICollarHistory, CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { attachDeviceEndpoint, getCollarAssignmentHistoryEndpoint, removeDeviceEndpoint, updateDatalifeEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps } from 'api/api_interfaces';
-import { IChangeDataLifeProps } from 'types/data_life';
+import { ChangeDataLifeInput } from 'types/data_life';
 import { useQueryClient } from 'react-query';
 
 /**
@@ -43,7 +43,7 @@ export const attachmentApi = (props: ApiProps) => {
     return plainToClass(CollarHistory, data);
   }
 
-  const updateAttachmentDataLife = async (body: IChangeDataLifeProps): Promise<CollarHistory> => {
+  const updateAttachmentDataLife = async (body: ChangeDataLifeInput): Promise<CollarHistory> => {
     const url = createUrl({ api: updateDatalifeEndpoint});
     // console.log(`posting ${url}: ${JSON.stringify(body)}`);
     const { data } = await api.post(url, body);

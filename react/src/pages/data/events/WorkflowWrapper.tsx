@@ -29,9 +29,11 @@ type WorkflowWrapperProps<T extends BCTWWorkflow<T>> = ModalBaseProps & {
 };
 
 /**
- * wraps all of the event pages.
- * handles saving
- * todo: Reset event on closing
+ * wraps all of the workflow components.
+ * handles:
+    * modal state
+    * saving
+ * todo: Reset event on closing/saving modal
  */
 export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   event,
@@ -111,48 +113,25 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     setShowConfirmModal(false);
   };
 
-  // fixme: fff typing
-  let Comp: React.ReactNode;
-  const { event_type } = event;
-  switch (event_type) {
-    case 'release':
-      Comp = (
-        <ReleaseEventForm
-          event={event as unknown as ReleaseEvent}
-          handleFormChange={handleChildFormUpdated}
-        />
-      );
-      break;
-    case 'capture':
-      Comp = (
-        <CaptureEventForm 
-          event={event as unknown as CaptureEvent}
-          handleFormChange={handleChildFormUpdated}
-        />
-      );
-      break;
-    case 'mortality':
-      Comp = (
-        <MortalityEventForm
-          handleExitEarly={handleShowExitWorkflow}
-          handleFormChange={handleChildFormUpdated}
-          event={event as unknown as MortalityEvent}
-        />
-      );
-      break;
-    case 'retrieval':
-      Comp = (
-        <RetrievalEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as RetrievalEvent} />
-      );
-      break;
-    case 'malfunction':
-      Comp = (
-        <MalfunctionEventForm handleFormChange={handleChildFormUpdated} event={event as unknown as MalfunctionEvent} />
-      );
-      break;
-    case 'unknown':
-    default:
-      Comp = <>error: unable to determine workflow form type</>;
+  /** 
+   * based on the event class, render the workflow form
+   * fixme: not very typescripty
+   */
+  const determineWorkflow = (): JSX.Element => {
+    const props = { handleFormChange: handleChildFormUpdated, handleExitEarly: handleExitWorkflow };
+
+    if (event instanceof ReleaseEvent) {
+      return <ReleaseEventForm {...props} event={event} />;
+    } else if (event instanceof CaptureEvent) {
+      return <CaptureEventForm {...props} event={event} />;
+    } else if (event instanceof MortalityEvent) {
+      return <MortalityEventForm {...props} event={event} />;
+    } else if (event instanceof RetrievalEvent) {
+      return <RetrievalEventForm {...props} event={event} />;
+    } else if (event instanceof MalfunctionEvent) {
+      return <MalfunctionEventForm {...props} event={event} />;
+    }
+    return <div>error: unable to determine workflow form type</div>
   }
 
   return (
@@ -168,8 +147,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
         <Container maxWidth='xl'>
           <Box py={3}>
             <Paper>
-              {Comp}
-
+              {determineWorkflow()}
               <Box my={1} mx={3}>
                 <Divider></Divider>
               </Box>

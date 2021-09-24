@@ -39,7 +39,6 @@ export default function EditCodeHeader(props: EditorProps<CodeHeaderInput>): JSX
                       defaultValue={value as string}
                       type={d.type}
                       label={new CodeHeaderInput().formatPropAsHeader(key)}
-                      disabled={false}
                       changeHandler={onChange}
                       required={true}
                       error={hasError}

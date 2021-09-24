@@ -35,7 +35,7 @@ export default function TextField(props: TextInputProps): JSX.Element {
     setErr('');
     setVal(target);
 
-    if (propName.toLowerCase().includes('email')) {
+    if (String(propName).toLowerCase().includes('email')) {
       handleChangeEmail(target);
       return;
     } 

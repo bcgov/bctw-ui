@@ -9,13 +9,10 @@ import { Dayjs } from 'dayjs';
 import { WorkflowStrings } from 'constants/strings';
 import { wfFields, WorkflowFormProps } from 'types/events/event';
 
-type RetrievalEventProps = WorkflowFormProps & {
-  event: RetrievalEvent;
-};
-
 /**
+ *
 */
-export default function RetrievalEventForm({event, handleFormChange}: RetrievalEventProps): JSX.Element {
+export default function RetrievalEventForm({event, handleFormChange}: WorkflowFormProps<RetrievalEvent>): JSX.Element {
   const [retrieval, setRetrieval] = useState<RetrievalEvent>(event);
 
   useEffect(() => {

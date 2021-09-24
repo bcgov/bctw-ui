@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 type SnackbarWrapperProps = {
   children: JSX.Element;
 }
-export default function SnackbarWrapper(props: SnackbarWrapperProps): JSX.Element {
+export default function SnackbarWrapper({children}: SnackbarWrapperProps): JSX.Element {
   const responseState = useResponseState();
   const [showToast, setShowToast] = useState<boolean>(false);
 
@@ -24,7 +24,7 @@ export default function SnackbarWrapper(props: SnackbarWrapperProps): JSX.Elemen
 
   return (
     <>
-      {props.children}
+      {children}
       <Toast severity={responseState?.severity} show={showToast} message={responseState?.message} onClose={(): void => setShowToast(false)} />
     </>
   )

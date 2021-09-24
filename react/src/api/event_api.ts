@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
-import { attachDeviceEndpoint, removeDeviceEndpoint, upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
+import { attachDeviceEndpoint, removeDeviceEndpoint, updateDatalifeEndpoint, upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { createUrl, sleep } from 'api/api_helpers';
 import { AxiosError } from 'axios';
 import { RemoveDeviceInput } from 'types/collar_history';
+import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, ApiProps } from './api_interfaces';
@@ -78,7 +79,28 @@ export const eventApi = (props: ApiProps) => {
     }
   }
 
+  const _updateDataLife = async(dli: ChangeDataLifeInput): Promise<WorkflowAPIResponse> => {
+    console.log('workflow event update data life', dli);
+    return;
+    const url = createUrl({ api: updateDatalifeEndpoint});
+    try {
+      const { data } = await api.post(url, dli);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`error updating data life', ${formatAxiosError(err)}`);
+      return err;
+    }
+  }
+
   const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
+    // capture events can change the data life start
+    if (typeof event.getDataLife === 'function') {
+      const dli = event.getDataLife();
+      const s = await _updateDataLife(dli);
+      if (typeof s !== 'boolean') {
+        return s;
+      }
+    }
     //
     if (typeof event.getAttachment === 'function' && event.shouldUnattachDevice) {
       const attachment = event.getAttachment();

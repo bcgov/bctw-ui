@@ -182,7 +182,7 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   }
 }
 
-export const collarFormFields: Record<string, FormFieldObject<Partial<Collar>>[]> = {
+export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   communicationFields: [
     { prop: 'device_type', type: eInputType.code },
     { prop: 'satellite_network', type: eInputType.code },
@@ -231,7 +231,8 @@ export const collarFormFields: Record<string, FormFieldObject<Partial<Collar>>[]
   ]
 }
 
-export const getDeviceFormFields = (): FormFieldObject<Partial<Collar>>[] => {
+// flattened version of all available collarfields
+export const getDeviceFormFields = (): FormFieldObject<Collar>[] => {
   return Object
     .values(collarFormFields)
     .reduce((previous, current) => ([ ...previous, ...current ]) , []);

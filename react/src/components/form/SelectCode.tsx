@@ -1,6 +1,6 @@
 import 'styles/form.scss';
-import { FormControl, Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
-import { useState, useEffect } from 'react';
+import { FormControl, Select, InputLabel, MenuItem, Checkbox, FormHelperText } from '@material-ui/core';
+import { useState, useEffect, ReactNode } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
@@ -87,6 +87,15 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     };
     updateOptions();
   }, [isSuccess]);
+
+  useEffect(() => {
+    // console.log(`${codeHeader} is required. ${value}`);
+    if (required && !value) {
+      setHasError(true);
+    } else {
+      setHasError(false)
+    }
+  }, [required])
 
   // when the parent component forces a reset
   useEffect(() => {
@@ -182,26 +191,25 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
       ) : isLoading || isFetching ? (
         <div>Please wait...</div>
       ) : codes && codes.length ? (
-        <FormControl error={hasError} style={style} size='small' variant={'outlined'} className={className ?? 'select-control'}>
+        <FormControl error={hasError} style={style} size='small' variant={'outlined'} className={`select-control ${hasError ? 'input-error' : ''}`}>
           <InputLabel>{label}</InputLabel>
           <Select
-            className={className}
             MenuProps={{
               anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
               transformOrigin: { vertical: 'top', horizontal: 'left' },
               getContentAnchorEl: null
             }}
             label={label}
-            variant={'outlined'}
             value={multiple ? values : value}
             onChange={multiple ? handleChangeMultiple : handleChange}
-            renderValue={(selected: string | string[]): string => {
+
+            renderValue={(selected: string | string[]): ReactNode => {
               if (multiple) {
                 // remove empty string values
                 const l = (selected as string[]).filter((a) => a);
                 return l.length > 4 ? `${l.length} selected` : l.join(', ');
               }
-              return selected as string;
+              return <span>{selected}</span>;
             }}
             {...propsToPass}>
             {codes.map((c: ICode) => {

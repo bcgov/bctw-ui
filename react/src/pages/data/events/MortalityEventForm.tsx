@@ -13,7 +13,7 @@ import Radio from 'components/form/Radio';
 import { WorkflowStrings } from 'constants/strings';
 import { wfFields, WorkflowFormProps } from 'types/events/event';
 
-type MortEventProps = WorkflowFormProps & {
+type MortEventProps = WorkflowFormProps<MortalityEvent> & {
   event: MortalityEvent;
 };
 

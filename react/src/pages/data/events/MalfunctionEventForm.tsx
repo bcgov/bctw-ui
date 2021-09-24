@@ -12,14 +12,11 @@ import { LocationEvent } from 'types/events/location_event';
 import Radio from 'components/form/Radio';
 import { Code } from 'types/code';
 
-type MalfunctionEventProps = WorkflowFormProps & {
-  event: MalfunctionEvent;
-};
-
 /**
- * fixme: todo: very incomplete
+ * todo: 
+ * 
  */
-export default function MalfunctionEventForm({ event, handleFormChange }: MalfunctionEventProps): JSX.Element {
+export default function MalfunctionEventForm({ event, handleFormChange }: WorkflowFormProps<MalfunctionEvent>): JSX.Element {
   const [malfunction, updateEvent] = useState<MalfunctionEvent>(event);
   const [deviceStatus, setDeviceStatus] = useState<Code>(malfunction.device_status);
 

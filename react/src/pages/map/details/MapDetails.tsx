@@ -102,6 +102,7 @@ export default function MapDetails({
         <Box className={'map-detail-titlebar'} display="flex" justifyContent="flex-end" p={2}>
           <Tooltip inline={true} placement='left-start' title={<p>{MapStrings.showOnlyCheckedTooltip}</p>}>
             <Checkbox
+              propName={MapStrings.showOnlyCheckedLabel}
               label={MapStrings.showOnlyCheckedLabel}
               initialValue={false}
               changeHandler={handleShowSelectedChecked}

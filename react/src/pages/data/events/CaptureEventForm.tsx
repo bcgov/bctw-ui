@@ -12,20 +12,18 @@ import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
 import CaptivityStatusForm from './CaptivityStatusForm';
 import { Tooltip } from 'components/common';
-
-type CaptureEventProps = WorkflowFormProps & {
-  event: CaptureEvent;
-};
+import OkayModal from 'components/modal/OkayModal';
 
 /**
  * todo: deal with data life
  * devices not assigned here?
  */
-export default function CaptureEventForm({ event, handleFormChange }: CaptureEventProps): JSX.Element {
-  const [capture, setCaptureEvent] = useState<CaptureEvent>(event);
+export default function CaptureEventForm({ event, handleFormChange }: WorkflowFormProps<CaptureEvent>): JSX.Element {
+  const [capture, setCaptureEvent] = useState(event);
 
   const [isTransloc, setIsTransloc] = useState(false);
   const [hasAssociation, setHasAssociation] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
 
   useDidMountEffect(() => {
     setCaptureEvent(event);
@@ -36,6 +34,9 @@ export default function CaptureEventForm({ event, handleFormChange }: CaptureEve
     const [key, value] = parseFormChangeResult<CaptureEvent>(v);
     if (key === 'translocation') {
       setIsTransloc(!!value);
+      if (value) {
+        setShowNotif(true);
+      }
     } else if (key === 'associated_animal_id') {
       setHasAssociation(!!(value as string).length);
     }
@@ -70,14 +71,15 @@ export default function CaptureEventForm({ event, handleFormChange }: CaptureEve
         </Box>,
         <CaptivityStatusForm event={capture} handleFormChange={handleFormChange} />,
         <Box {...boxSpreadRowProps} mt={1}>
-          {<span>{WorkflowStrings.capture.associated}</span>}
+          {<span style={{marginRight: '0.5rem'}}>{WorkflowStrings.capture.associated}</span>}
           {CreateFormField(capture, wfFields.get('associated_animal_id'), onChange)}
         </Box>,
         <Box {...boxSpreadRowProps} mt={1}>
           {<span>{WorkflowStrings.capture.associatedID}</span>}
           {CreateFormField(capture, {...wfFields.get('associated_animal_relationship'), required: hasAssociation}, onChange, {disabled: !hasAssociation})}
-        </Box>,
+        </Box>
       ])}
+      <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>{WorkflowStrings.capture.translocNotif}</OkayModal>
     </>
   );
 }

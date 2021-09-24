@@ -82,7 +82,7 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
     return ['device_id'];
   }
   getWorkflowTitle(): string {
-    return WorkflowStrings.release.workflowTitle;
+    return WorkflowStrings.malfunction.workflowTitle;
   }
 
   getDevice(): OptionalDevice{

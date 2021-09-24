@@ -12,14 +12,10 @@ import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
 
-type ReleaseEventProps = WorkflowFormProps & {
-  event: ReleaseEvent;
-};
-
 /**
  * todo: 
 */
-export default function ReleaseEventForm({event, handleFormChange }: ReleaseEventProps): JSX.Element {
+export default function ReleaseEventForm({event, handleFormChange }: WorkflowFormProps<ReleaseEvent>): JSX.Element {
   const [release, updateEvent] = useState<ReleaseEvent>(event);
 
   const [hasBabies, setHasBabies] = useState(false);

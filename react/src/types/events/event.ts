@@ -3,12 +3,13 @@ import { Animal, getAnimalFormFields, IAnimal } from 'types/animal';
 import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat} from 'types/common_types';
+import { ChangeDataLifeInput } from 'types/data_life';
 import { FormChangeEvent, FormFieldObject } from 'types/form_types';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 
-export type WorkflowFormProps = {
-  // event: unknown; //fixme:
+export type WorkflowFormProps<T extends IBCTWWorkflow> = {
+  event: T
   handleFormChange: FormChangeEvent;
   handleExitEarly?: (message: ReactNode) => void;
 }
@@ -35,7 +36,7 @@ export interface IBCTWWorkflow {
   getAnimal?(): OptionalAnimal;
   getDevice?(): OptionalDevice;
   getAttachment?(): AttachDeviceInput | RemoveDeviceInput;
-  getDataLife?(): void;
+  getDataLife?(): ChangeDataLifeInput;
   // multiple events implement this 
   shouldUnattachDevice?: boolean;
   // must implement this to determine how the workflow should be saved
