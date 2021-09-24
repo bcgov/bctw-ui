@@ -27,7 +27,7 @@ const _appendQueryToUrl = (url: string, query: string): string => {
 /**
  * todo: doc 
  */
-const createUrl = ({api, query, page, testUser, noApiPrefix}: CreateUrlParams): string => {
+const createUrl = ({ api, query, page, testUser, noApiPrefix }: CreateUrlParams): string => {
   const baseUrl = getBaseUrl(noApiPrefix);
   // console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;

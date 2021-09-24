@@ -426,6 +426,7 @@ var app = express()
 if (isProd) {
   console.log('Environment -- isProd?', isProd);
   app
+    .get('/api/session-info', retrieveSessionInfo)
     .post('/onboarding', keycloak.protect(), handleUserAccessRequest)
     .all('*', keycloak.protect(), onboardingRedirect);
 } else {
@@ -443,7 +444,7 @@ if (isTest) {
 } else if (isProd) {
   app
     .get('/', keycloak.protect(), pageHandler)
-    .get('/api/session-info', retrieveSessionInfo)
+    // .get('/api/session-info', retrieveSessionInfo)
     .get('/api/:endpoint', keycloak.protect(), proxyApi)
     .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
     // bulk file import handlers
