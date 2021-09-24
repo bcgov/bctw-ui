@@ -4,13 +4,15 @@ interface CreateUrlParams {
   query?: string;
   page?: number;
   testUser?: string;
+  noApiPrefix?: boolean;
 }
 
-const getBaseUrl = (): string => {
+const getBaseUrl = (noApiPrefix?: boolean): string => {
   const h1 = window.location.protocol;
   const h2 = window.location.hostname;
   const h3 = IS_PROD ? window.location.port : 3000;
-  const h4 = IS_PROD ? '/api' : '';
+  let h4 = '';
+  if (!noApiPrefix) h4 = IS_PROD ? '/api' : '';
   const url = `${h1}//${h2}:${h3}${h4}`;
   return url;
 }
@@ -25,9 +27,9 @@ const _appendQueryToUrl = (url: string, query: string): string => {
 /**
  * todo: doc 
  */
-const createUrl = ({api, query, page, testUser}: CreateUrlParams): string => {
-  const baseUrl = getBaseUrl();
-  // console.log('createURL() -- base URL:', baseUrl)
+const createUrl = ({api, query, page, testUser, noApiPrefix}: CreateUrlParams): string => {
+  const baseUrl = getBaseUrl(noApiPrefix);
+  console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
     url = _appendQueryToUrl(url, query);
