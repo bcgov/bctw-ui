@@ -5,12 +5,14 @@ import { useState, createContext, useEffect, useContext } from 'react';
 import { User, IKeyCloakSessionInfo } from 'types/user';
 
 export interface IUserContext {
-  user: User;
+  user?: User;
+  session?: IKeyCloakSessionInfo;
   error?: string;
 }
 
 export const UserContext = createContext<IUserContext>({
   user: null,
+  session: null,
   error: null,
 });
 
@@ -27,7 +29,7 @@ export const UserContextDispatch = createContext(null);
 export const UserStateContextProvider: React.FC = (props) => {
   const api = useTelemetryApi();
   // instantiate the context
-  const [userContext, setUserContext] = useState<IUserContext>({ user: null, error: null });
+  const [userContext, setUserContext] = useState<IUserContext>({ user: null, session: null, error: null });
   const [session, setSession] = useState<IKeyCloakSessionInfo>();
   const [readyUser, setReadyUser] = useState(false);
   const [readySession, setReadySession] = useState(false);
@@ -60,6 +62,7 @@ export const UserStateContextProvider: React.FC = (props) => {
     if (sessionStatus === 'success') {
       setReadySession(true);
       setSession(sessionData);
+      setUserContext({ session: sessionData });
     }
   }, [sessionStatus]);
 
@@ -102,6 +105,7 @@ export const UserStateContextProvider: React.FC = (props) => {
     }
     const newUser = Object.assign({}, user);
 
+    // create new user in user table with role 'newUser' using Keycloak information
     newUser.email = session.email;
     newUser.firstname = session.given_name;
     newUser.lastname = session.family_name;
@@ -124,4 +128,5 @@ const useUserContextDispatch = () => {
   const context = useContext(UserContextDispatch);
   return context;
 }
+
 export { useUserContextDispatch }
