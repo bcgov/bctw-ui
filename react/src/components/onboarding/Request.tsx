@@ -2,9 +2,10 @@ import 'styles/form.scss';
 
 import { Box, Grid } from '@material-ui/core';
 import { Button, FormControl, InputLabel, NativeSelect, TextField, TextareaAutosize } from "@material-ui/core";
-import { User } from 'types/user';
+import { IKeyCloakSessionInfo } from 'types/user';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'contexts/UserContext';
+import { createUrl } from 'api/api_helpers';
 
 const UserAccessRequest = (): JSX.Element => {
 
@@ -30,26 +31,26 @@ const UserAccessRequest = (): JSX.Element => {
   const [species, setSpecies] = useState('');
   const [textMessageNumber, setTextMessageNumber] = useState('');
 
-  const useUser = useContext(UserContext);
-  const [user, setUser] = useState<User>(null);
+  const useKeycloakUser = useContext(UserContext);
+  const [keycloakUser, setKeycloakUser] = useState<IKeyCloakSessionInfo>(null);
 
-  const domain = user?.identifier ? user.identifier : 'unknown';
-  const email = user?.email ? user.email : 'noreply@gov.bc.ca';
-  const firstName = user?.firstname ? user.firstname : 'Unknown';
-  const lastName = user?.lastname ? user.lastname : 'User';
-  const username = user?.uid ? user.uid : 'unknown';
+  const domain = keycloakUser?.domain ? keycloakUser.domain : 'domain';
+  const email = keycloakUser?.email ? keycloakUser.email : 'email@address.com';
+  const firstName = keycloakUser?.given_name ? keycloakUser.given_name : 'given_Name';
+  const lastName = keycloakUser?.family_name ? keycloakUser.family_name : 'last_Name';
+  const username = keycloakUser?.username ? keycloakUser.username : 'username';
 
-  // set the user state when the context is updated
+  // as user is not onboarded, use Keycloak user details instead of from local database
   useEffect(() => {
-    const { user } = useUser;
-    if (user) {
-      setUser(user)
+    const { session } = useKeycloakUser;
+    if (session) {
+      setKeycloakUser(session)
     }
-  }, [useUser]);
+  }, [useKeycloakUser]);
 
-  if (!user) {
-    return <div>Loading...</div>;
-  }
+  // if (!keycloakUser) {
+  //   return <div>Loading...</div>;
+  // }
 
   /**
    * ## submitForm
@@ -73,17 +74,14 @@ const UserAccessRequest = (): JSX.Element => {
       username
     }
 
-    // XXX: This url doesn't work in development
-    // There is no keycloak in development duh!
+    const url = createUrl({ api: 'onboarding', noApiPrefix: true });
 
-    // const url = createUrl({ api: 'onboarding' });
-
-    // copied from api_helpers.ts, without the the /api
-    const IS_PROD = +(window.location.port) === 1111 ? false : true;
-    const h1 = window.location.protocol;
-    const h2 = window.location.hostname;
-    const h3 = IS_PROD ? window.location.port : 3000;
-    const url = `${h1}//${h2}:${h3}/onboarding`;
+    // // copied from api_helpers.ts, without the the /api
+    // const IS_PROD = +(window.location.port) === 1111 ? false : true;
+    // const h1 = window.location.protocol;
+    // const h2 = window.location.hostname;
+    // const h3 = IS_PROD ? window.location.port : 3000;
+    // const url = `${h1}//${h2}:${h3}/onboarding`;
 
     console.log('submitRequest() -- POSTing to this URL:', url);
     console.log('submitRequest() -- Payload:', JSON.stringify(payload));
@@ -124,10 +122,10 @@ const UserAccessRequest = (): JSX.Element => {
         </div>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <TextField label='Your Name' size='small' variant={'outlined'} value={user?.firstname + " " + user?.lastname} disabled />
+            <TextField label='Your Name' size='small' variant={'outlined'} value={firstName + " " + lastName} disabled />
           </Grid>
           <Grid item xs={12}>
-            <TextField label='Authentication Method' size='small' variant={'outlined'} value={user?.identifier} disabled />
+            <TextField label='Identity Type' size='small' variant={'outlined'} value={domain} disabled />
           </Grid>
           <Grid item xs={12}>
             <TextField label='Username' size='small' variant={'outlined'} value={username} disabled />
