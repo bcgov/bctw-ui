@@ -1,4 +1,3 @@
-import { IUserUpsertPayload } from 'api/user_api';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
@@ -109,12 +108,8 @@ export const UserStateContextProvider: React.FC = (props) => {
     newUser.email = session.email;
     newUser.firstname = session.given_name;
     newUser.lastname = session.family_name;
-    const payload: IUserUpsertPayload = {
-      user: newUser,
-      role: user.role_type
-    }
-    console.log(`keycloak session object has new info, upserting new user ${JSON.stringify(payload)}`);
-    await mutateAsync(payload);
+    console.log(`keycloak session object has new info, upserting new user ${JSON.stringify(newUser)}`);
+    await mutateAsync(newUser);
   }
 
   return (

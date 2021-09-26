@@ -1,11 +1,12 @@
-import { Type, Expose, Transform } from 'class-transformer';
-import { columnToHeader } from 'utils/common_helpers';
-import { BCTWBase, nullToDayjs } from 'types/common_types';
+import { Transform } from 'class-transformer';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
+import { BCTWBase, BCTWValidDates, nullToDayjs } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { Animal } from './animal';
 import { Collar } from './collar';
 import { Dayjs } from 'dayjs';
+import { eventToJSON } from './events/event';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -30,7 +31,8 @@ export interface IKeyCloakSessionInfo {
 /**
  * the 'access' column in the bctw."user" table
  */
-export type onboardingStatus = 'pending' | 'granted' | 'denied';
+export type OnboardingStatus = 'pending' | 'granted' | 'denied';
+export type DomainType = 'bceid' | 'idir';
 
 /**
  * representation of the bctw.user table
@@ -41,16 +43,24 @@ export interface IUser extends Pick<IKeyCloakSessionInfo, 'email'> {
   bceid: string;
   firstname: string;
   lastname: string;
-  access: onboardingStatus;
+  access: OnboardingStatus;
   role_type: eUserRole;
   // indicates if the user is considered the owner of at least one animal
   is_owner?: boolean;
+  email: string;
   phone: string;
+}
+
+export interface IOnboardUser extends
+  Pick<IUser, 'id' | 'firstname' | 'lastname' | 'email' | 'phone' | 'access' | 'role_type'> {
+  domain: DomainType;
+  identifier: string;
+  reason: string;
 }
 
 // used in the class to get a type safe array of valid keys
 // type UserProps = keyof IUser;
-export class User implements BCTWBase<User>, IUser {
+export class User implements BCTWBase<User>, IUser, BCTWValidDates {
   role_type: eUserRole;
   is_owner: boolean;
   id: number;
@@ -60,10 +70,10 @@ export class User implements BCTWBase<User>, IUser {
   lastname: string;
   phone: string;
   email: string;
-  access: onboardingStatus;
-  error: string;
-  @Type(() => Date) valid_from: Date;
-  @Type(() => Date) valid_to: Date;
+  access: OnboardingStatus;
+  @Transform(nullToDayjs) valid_from: Dayjs;
+  @Transform(nullToDayjs) valid_to: Dayjs;
+
   get is_admin(): boolean {
     return this.role_type === eUserRole.administrator;
   }
@@ -76,12 +86,25 @@ export class User implements BCTWBase<User>, IUser {
    * todo: need a better name? cannot use "identifier" as
    * it conflicts with the table row identifier property
    */
-  @Expose() get uid(): string {
+  get uid(): string {
     return this.idir ?? this.bceid ?? 'user';
   }
   get identifier(): string { return 'id' }
 
-  toJSON(): User { return this; }
+  toJSON(): Partial<User> {
+    const props: (keyof User)[] = [
+      'id', 'firstname', 'lastname', 'email',
+      'phone', 'access'
+    ];
+    if (this.idir) {
+      props.push('idir');
+
+    } else if (this.bceid) {
+      props.push('bceid');
+    }
+    const ret = eventToJSON(props, this);
+    return omitNull(ret);
+  }
 
   formatPropAsHeader(str: string): string {
     switch (str) {
@@ -131,8 +154,8 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   device_type: string;
   frequency: number;
   device_make: string;
-  @Expose() get identifier(): string { return 'critter_id' }
-  @Expose() get name(): string {
+  get identifier(): string { return 'critter_id' }
+  get name(): string {
     return this.animal_id ?? this.wlh_id;
   }
   toJSON(): UserCritterAccess { return this }

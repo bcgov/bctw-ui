@@ -2,14 +2,10 @@ import { createUrl, isDev } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ITelemetryAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
-import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
+import { IKeyCloakSessionInfo, IOnboardUser, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps } from 'api/api_interfaces';
 
-export interface IUserUpsertPayload {
-  user: User;
-  role: eUserRole;
-}
 
 export const userApi = (props: ApiProps) => {
   const { api, testUser } = props;
@@ -36,13 +32,25 @@ export const userApi = (props: ApiProps) => {
   /**
    * @param body a new or existing @type {User}
    */
-  const addUser = async (body: IUserUpsertPayload): Promise<User> => {
+  const addUser = async (body: User): Promise<User> => {
+    const ujson = body.toJSON();
     const url = createUrl({ api: 'add-user' });
-    const { data } = await api.post(url, body);
+    console.log('posting user', ujson)
+    const { data } = await api.post(url, ujson);
     const user = plainToClass(User, data);
     console.log('added new user', user);
     return user;
   };
+
+  /**
+   * from the request page 
+   */
+  const addNewUserRequest = async (body: IOnboardUser): Promise<IOnboardUser> => {
+    const url = createUrl({api: 'add-new-user'});
+    console.log('posting new user to be onboarded', body);
+    const { data } = await api.post(url, body);
+    return data;
+  }
 
   /**
    * used in the user context to retrieve the user info
@@ -124,6 +132,7 @@ export const userApi = (props: ApiProps) => {
     getUserAlerts,
     upsertUDF,
     updateAlert,
-    getSessionInfo
+    getSessionInfo,
+    addNewUserRequest
   };
 };

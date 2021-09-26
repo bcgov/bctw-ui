@@ -6,7 +6,7 @@ import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
-import { IUserUpsertPayload, userApi as user_api } from 'api/user_api';
+import { userApi as user_api } from 'api/user_api';
 import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
@@ -15,7 +15,7 @@ import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar } from 'types/collar';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
-import { IKeyCloakSessionInfo, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
+import { IKeyCloakSessionInfo, IOnboardUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
 import {
   IBulkUploadResults,
@@ -364,8 +364,12 @@ export const useTelemetryApi = () => {
     useMutation<WorkflowAPIResponse, AxiosError, T>((body) => eventApi.saveEvent<T>(body), config);
   
   /** add or update a user */
-  const useMutateUser = (config: UseMutationOptions<User, AxiosError, IUserUpsertPayload>): UseMutationResult<User> =>
-    useMutation<User, AxiosError, IUserUpsertPayload>((body) => userApi.addUser(body), config);
+  const useMutateUser = (config: UseMutationOptions<User, AxiosError, User>): UseMutationResult<User, AxiosError> =>
+    useMutation<User, AxiosError, User>((body) => userApi.addUser(body), config);
+
+  /** add a new user that hasn't been onboarded */
+  const useMutateAddUserRequest = (config: UseMutationOptions<IOnboardUser, AxiosError, IOnboardUser>): UseMutationResult<IOnboardUser, AxiosError> =>
+    useMutation<IOnboardUser, AxiosError, IOnboardUser>((body) => userApi.addNewUserRequest(body), config);
   
   /** see permission_api doc */ 
   const useMutateSubmitPermissionRequest = (config: UseMutationOptions<unknown, AxiosError, IPermissionRequestInput>): UseMutationResult<unknown> => 
@@ -417,5 +421,6 @@ export const useTelemetryApi = () => {
     useMutateWorkflowEvent,
     useMutateSubmitPermissionRequest,
     useMutateTakeActionOnPermissionRequest,
+    useMutateAddUserRequest
   };
 };

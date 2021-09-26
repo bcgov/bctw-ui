@@ -3,11 +3,9 @@ import 'styles/form.scss';
 import { Box, Button, FormControl, Grid, InputLabel, NativeSelect, TextField, TextareaAutosize } from "@material-ui/core";
 import { useContext, useEffect, useState } from 'react';
 import { createUrl } from 'api/api_helpers';
-import { IUserUpsertPayload } from 'api/user_api';
-import { IUpsertPayload } from 'api/api_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { eUserRole, IKeyCloakSessionInfo, User } from 'types/user';
+import { DomainType, eUserRole, IKeyCloakSessionInfo, IOnboardUser } from 'types/user';
 
 const UserAccessRequest = (): JSX.Element => {
 
@@ -35,28 +33,29 @@ const UserAccessRequest = (): JSX.Element => {
 
   const useKeycloakUser = useContext(UserContext);
   const [keycloakUser, setKeycloakUser] = useState<IKeyCloakSessionInfo>(null);
+  const [domain, setDomain] = useState<DomainType>('idir');
 
   // create access request stub
-  const onSuccess = (u: User): void => {
+  const onSuccess = (u: IOnboardUser): void => {
     console.log('UserOnboarding: Request: new user object is', u);
   }
   const onError = (e): void => {
     console.log('UserOnboarding: Request: error saving new user object', e)
   }
   const api = useTelemetryApi();
-  const { mutateAsync: saveMutation } = api.useMutateUser({ onSuccess, onError });
+  const { mutateAsync: saveMutation } = api.useMutateAddUserRequest({ onSuccess, onError });
 
-  const domain = keycloakUser?.domain ? keycloakUser.domain : 'domain';
-  const email = keycloakUser?.email ? keycloakUser.email : 'email@address.com';
-  const firstName = keycloakUser?.given_name ? keycloakUser.given_name : 'given_Name';
-  const lastName = keycloakUser?.family_name ? keycloakUser.family_name : 'last_Name';
-  const username = keycloakUser?.username ? keycloakUser.username : 'username';
+  const email = keycloakUser?.email ?? 'email@address.com';
+  const firstName = keycloakUser?.given_name ?? 'given_Name';
+  const lastName = keycloakUser?.family_name ?? 'last_Name';
+  const username = keycloakUser?.username ?? 'username';
 
   // as user is not onboarded, use Keycloak user details instead of from local database
   useEffect(() => {
     const { session } = useKeycloakUser;
     if (session) {
       setKeycloakUser(session)
+      setDomain(session.domain);
     }
   }, [useKeycloakUser]);
 
@@ -104,10 +103,7 @@ const UserAccessRequest = (): JSX.Element => {
         console.log('UserOnboarding: Request: submitRequest: populating new user object');
 
         // create a new User object
-        const newUser = new User();
-
-        // set username as IDIR or BCeID, as appropriate
-        domain === "idir" ? newUser.idir = username : newUser.bceid = username;
+        const newUser: IOnboardUser = {} as IOnboardUser;
 
         // use enumerated role types
         switch (accessType.toLowerCase()) {
@@ -132,28 +128,18 @@ const UserAccessRequest = (): JSX.Element => {
         }
 
         // set remaining object attributes
+        newUser.domain = domain;
+        newUser.identifier = username;
         newUser.email = email;
         newUser.firstname = firstName;
         newUser.lastname = lastName;
         newUser.phone = textMessageNumber;
-
-        // set this user as 'access pending'
+        newUser.reason = reason;
         newUser.access = 'pending';
 
         // upsert the new user into the database        
-        const payload: IUpsertPayload<User> = {
-          body: newUser
-        }
         console.log(`UserOnboarding: Request: submitRequest: Upserting new user ${JSON.stringify(payload)}`);
-        await saveMutation(payload.body);
-
-        // const payload: IUserUpsertPayload = {
-        //   user: newUser,
-        //   role: newUser.role_type
-        // }
-        // console.log(`UserOnboarding: Request: submitRequest: Upserting new user ${JSON.stringify(payload)}`);
-        // await saveMutation(payload);
-
+        await saveMutation(newUser);
       })
 
       // email could not be sent to CHES

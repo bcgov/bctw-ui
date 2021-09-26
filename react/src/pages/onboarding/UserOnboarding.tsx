@@ -1,27 +1,10 @@
-import axios, { AxiosInstance } from 'axios';
 import UserAccessRequest from 'components/onboarding/Request';
 import UserAccessPending from 'components/onboarding/Pending';
 import UserAccessDenied from 'components/onboarding/Denied';
-import UserAccessApproved from 'components/onboarding/Approved';
-import { getBaseUrl } from 'api/api_helpers';
-import { userApi as user_api } from 'api/user_api';
-import { useMemo } from 'react';
 import { useState } from 'react';
-import './UserOnboarding.css';
-
-/**
- * Returns an instance of axios with baseURL set.
- *
- * @return {AxiosInstance}
- */
-const useApi = (): AxiosInstance => {
-  const instance = useMemo(() => {
-    return axios.create({
-      baseURL: getBaseUrl()
-    });
-  }, []);
-  return instance;
-};
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { OnboardingStatus } from 'types/user';
 
 /**
  * # UserOnboarding
@@ -32,24 +15,20 @@ const useApi = (): AxiosInstance => {
  * 3. Access denied
  * 4. Access approved
  */
-const base = getBaseUrl();
 
 const UserOnboarding = (): JSX.Element => {
-  const api = useApi();
-  const userApi = user_api({ api });
+  const api = useTelemetryApi();
+  const { data, status } = api.useUser();
 
-  const [userAccess, setUserAccess] = useState(null);
-  const [userEmail, setUserEmail] = useState(null);
+  const [userAccess, setUserAccess] = useState<OnboardingStatus | null>(null);
+  const [userEmail, setUserEmail] = useState('');
 
-  if (!userAccess) {
-    userApi.getUser()
-      .then((res) => {
-        if (!res.error) {
-            setUserEmail(res.email);
-            setUserAccess(res.access);
-        }
-      });
-  }
+  useDidMountEffect(() => {
+    if (status === 'success') {
+      setUserEmail(data.email);
+      setUserAccess(data.access);
+    }
+  }, [data])
 
   const containerStyle = {
     display: 'flex',
@@ -61,16 +40,16 @@ const UserOnboarding = (): JSX.Element => {
   return (
     <div style={containerStyle}>
       <div>
-        User's email is: {userEmail}
-        User's access is: {userAccess}
+        <p>User's email is: {userEmail}</p>
+        <p>User's access is: {userAccess}</p>
       </div>
       {
         userAccess ? // User is in the system
           <div>
             {/* {userAccess == "granted" ? <UserAccessApproved /> : ""} */}
-            {userAccess === "granted" ? <UserAccessRequest /> : ""}
-            {userAccess === "pending" ? <UserAccessPending /> : ""}
-            {userAccess === "denied" ? <UserAccessDenied /> : ""}
+            {userAccess === 'granted' ? <UserAccessRequest /> : ''}
+            {userAccess === 'pending' ? <UserAccessPending /> : ''}
+            {userAccess === 'denied' ? <UserAccessDenied /> : ''}
           </div>
           : <UserAccessRequest /> // If here you're not in the system
       }
