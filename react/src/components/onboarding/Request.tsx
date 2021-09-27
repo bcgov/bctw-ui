@@ -8,8 +8,6 @@ import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { eUserRole, IKeyCloakSessionInfo, User } from 'types/user';
 
-declare const newUser: User;
-
 const UserAccessRequest = (): JSX.Element => {
 
   /**
@@ -61,9 +59,10 @@ const UserAccessRequest = (): JSX.Element => {
     }
   }, [useKeycloakUser]);
 
-  // if (!keycloakUser) {
-  //   return <div>Loading...</div>;
-  // }
+  // feedback to user while page is loading
+  if (!keycloakUser) {
+    return <div>Loading...</div>;
+  }
 
   /**
    * ## submitForm
@@ -103,6 +102,9 @@ const UserAccessRequest = (): JSX.Element => {
         // create new user in user table with role 'newUser' using Keycloak information
         console.log('UserOnboarding: Request: submitRequest: populating new user object');
 
+        // create a new User object
+        const newUser = new User();
+
         // set username as IDIR or BCeID, as appropriate
         domain === "idir" ? newUser.idir = username : newUser.bceid = username;
 
@@ -134,7 +136,7 @@ const UserAccessRequest = (): JSX.Element => {
         newUser.lastname = lastName;
         newUser.phone = textMessageNumber;
 
-        // set this user as 'access: pending'
+        // set this user as 'access pending'
         newUser.access = 'pending';
 
         // upsert the new user into the database
