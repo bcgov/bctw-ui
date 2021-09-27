@@ -1,12 +1,12 @@
 import { useState } from 'react';
+import { IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import DataTable from 'components/table/DataTable';
-import { User } from 'types/user';
 import { ITableQueryProps } from 'components/table/table_interfaces';
-import AuthLayout from 'pages/layouts/AuthLayout';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
+import AuthLayout from 'pages/layouts/AuthLayout';
+import { User } from 'types/user';
 import EditUser from 'pages/user/EditUser';
-import { IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 
 /**
  * page for user admin. requires admin user role.  
@@ -32,7 +32,7 @@ export default function UserAdminPage(): JSX.Element {
   }
 
   // setup the mutations
-  const { mutateAsync: saveMutation } = bctwApi.useDelete({ onSuccess: onSaveSuccess, onError });
+  const { mutateAsync: saveMutation } = bctwApi.useMutateUser({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
   const saveUser = async (u: IUpsertPayload<User>): Promise<void> => {
@@ -52,7 +52,7 @@ export default function UserAdminPage(): JSX.Element {
         <h1>BCTW Users</h1>
         {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
         <DataTable
-          headers={['id', 'idir', 'bceid', 'email', 'role_type']}
+          headers={['id', 'access', 'role_type', 'idir', 'bceid', 'firstname', 'lastname', 'email']}
           title='Users'
           queryProps={tableProps}
           onSelect={handleTableRowSelect}
@@ -65,4 +65,5 @@ export default function UserAdminPage(): JSX.Element {
       </div>
     </AuthLayout>
   );
+
 }
