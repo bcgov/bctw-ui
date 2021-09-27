@@ -1,11 +1,14 @@
 import 'styles/form.scss';
 
-import { Box, Grid } from '@material-ui/core';
-import { Button, FormControl, InputLabel, NativeSelect, TextField, TextareaAutosize } from "@material-ui/core";
-import { IKeyCloakSessionInfo } from 'types/user';
+import { Box, Button, FormControl, Grid, InputLabel, NativeSelect, TextField, TextareaAutosize } from "@material-ui/core";
 import { useContext, useEffect, useState } from 'react';
-import { UserContext } from 'contexts/UserContext';
 import { createUrl } from 'api/api_helpers';
+import { IUserUpsertPayload } from 'api/user_api';
+import { UserContext } from 'contexts/UserContext';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { eUserRole, IKeyCloakSessionInfo, User } from 'types/user';
+
+declare const newUser: User;
 
 const UserAccessRequest = (): JSX.Element => {
 
@@ -34,6 +37,16 @@ const UserAccessRequest = (): JSX.Element => {
   const useKeycloakUser = useContext(UserContext);
   const [keycloakUser, setKeycloakUser] = useState<IKeyCloakSessionInfo>(null);
 
+  // create access request stub
+  const onSuccess = (v: User): void => {
+    console.log('UserContext: new user object is', v);
+  }
+  const onError = (e): void => {
+    console.log('UserContext: error saving user', e)
+  }
+  const api = useTelemetryApi();
+  const { mutateAsync } = api.useMutateUser({ onSuccess, onError });
+
   const domain = keycloakUser?.domain ? keycloakUser.domain : 'domain';
   const email = keycloakUser?.email ? keycloakUser.email : 'email@address.com';
   const firstName = keycloakUser?.given_name ? keycloakUser.given_name : 'given_Name';
@@ -57,6 +70,7 @@ const UserAccessRequest = (): JSX.Element => {
    * Form payload and submit.
    */
   const submitRequest = () => {
+
     const payload = {
       accessType,
       domain,
@@ -75,16 +89,7 @@ const UserAccessRequest = (): JSX.Element => {
     }
 
     const url = createUrl({ api: 'onboarding', noApiPrefix: true });
-
-    // // copied from api_helpers.ts, without the the /api
-    // const IS_PROD = +(window.location.port) === 1111 ? false : true;
-    // const h1 = window.location.protocol;
-    // const h2 = window.location.hostname;
-    // const h3 = IS_PROD ? window.location.port : 3000;
-    // const url = `${h1}//${h2}:${h3}/onboarding`;
-
-    console.log('submitRequest() -- POSTing to this URL:', url);
-    console.log('submitRequest() -- Payload:', JSON.stringify(payload));
+    console.log('submitRequest() -- Payload to CHES:', JSON.stringify(payload));
 
     const request = new Request(url, {
       method: 'POST',
@@ -93,11 +98,58 @@ const UserAccessRequest = (): JSX.Element => {
     });
 
     fetch(request)
-      .then((res) => {
-        console.log('submitRequest() -- Request sent successfully:', res);
+      .then(async (res) => {
+
+        // create new user in user table with role 'newUser' using Keycloak information
+        console.log('UserOnboarding: Request: submitRequest: populating new user object');
+
+        // set username as IDIR or BCeID, as appropriate
+        domain === "idir" ? newUser.idir = username : newUser.bceid = username;
+
+        // use enumerated role types
+        switch (accessType) {
+          case 'administrator':
+            console.log('UserOnboarding: Request: submitRequest: role = administrator');
+            newUser.role_type = eUserRole.administrator;
+            break;
+          case 'manager':
+            console.log('UserOnboarding: Request: submitRequest: role = owner');
+            newUser.role_type = eUserRole.owner;
+            break;
+          case 'editor':
+            console.log('UserOnboarding: Request: submitRequest: role = editor');
+            newUser.role_type = eUserRole.editor;
+            break;
+          case 'observer':
+            console.log('UserOnboarding: Request: submitRequest: role = observer');
+            newUser.role_type = eUserRole.observer;
+            break;
+          default:
+            console.log('UserOnboarding: Request: submitRequest: warning NO ROLE');
+        }
+
+        // set remaining object attributes
+        newUser.email = email;
+        newUser.firstname = firstName;
+        newUser.lastname = lastName;
+        newUser.phone = textMessageNumber;
+
+        // set this user as 'access: pending'
+        newUser.access = 'pending';
+
+        // upsert the new user into the database
+        const payload: IUserUpsertPayload = {
+          user: newUser,
+          role: newUser.role_type
+        }
+        console.log(`UserOnboarding: Request: submitRequest: Upserting new user ${JSON.stringify(payload)}`);
+        await mutateAsync(payload);
+
       })
+
+      // email could not be sent to CHES
       .catch((err) => {
-        console.error('submitRequest() -- Request could not be sent:', err);
+        console.error('submitRequest() -- Onboarding email COULD NOT be sent:', err);
       });
 
   }

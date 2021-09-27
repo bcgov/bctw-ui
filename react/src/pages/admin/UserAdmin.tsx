@@ -3,7 +3,6 @@ import DataTable from 'components/table/DataTable';
 import { User } from 'types/user';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
-import { Typography } from '@material-ui/core';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditUser from 'pages/user/EditUser';
@@ -59,7 +58,7 @@ export default function UserAdminPage(): JSX.Element {
           onSelect={handleTableRowSelect}
         />
         <div className={'button-row'}>
-          <AddEditViewer<User> editText={'User' }addText={'User'} editing={userModified} empty={new User()} onSave={saveUser} onDelete={deleteUser}>
+          <AddEditViewer<User> editText={'User'} addText={'User'} editing={userModified} empty={new User()} onSave={saveUser} onDelete={deleteUser}>
             <EditUser editing={new User()} open={false} onSave={null} handleClose={null} />
           </AddEditViewer>
         </div>

@@ -9,6 +9,7 @@ import { Dayjs } from 'dayjs';
 
 export enum eUserRole {
   administrator = 'administrator',
+  editor = 'editor',
   owner = 'owner',
   observer = 'observer'
 }
@@ -29,7 +30,7 @@ export interface IKeyCloakSessionInfo {
 /**
  * the 'access' column in the bctw."user" table
  */
-export type OnboardingStatus = 'pending' | 'granted' | 'denied';
+export type onboardingStatus = 'pending' | 'granted' | 'denied';
 
 /**
  * representation of the bctw.user table
@@ -40,7 +41,7 @@ export interface IUser extends Pick<IKeyCloakSessionInfo, 'email'> {
   bceid: string;
   firstname: string;
   lastname: string;
-  access: OnboardingStatus;
+  access: onboardingStatus;
   role_type: eUserRole;
   // indicates if the user is considered the owner of at least one animal
   is_owner?: boolean;
@@ -59,7 +60,7 @@ export class User implements BCTWBase<User>, IUser {
   lastname: string;
   phone: string;
   email: string;
-  access: OnboardingStatus;
+  access: onboardingStatus;
   error: string;
   @Type(() => Date) valid_from: Date;
   @Type(() => Date) valid_to: Date;
