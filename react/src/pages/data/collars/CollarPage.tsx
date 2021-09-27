@@ -1,14 +1,13 @@
 import Box from '@material-ui/core/Box';
 import Button from 'components/form/Button';
 import DataTable from 'components/table/DataTable';
-import { ITableQueryProps } from 'components/table/table_interfaces';
 import { CollarStrings as S } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCollar from 'pages/data/collars/EditCollar';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { Collar, eCollarAssignedStatus } from 'types/collar';
+import { AttachedCollar, Collar } from 'types/collar';
 import AddEditViewer from '../common/AddEditViewer';
 import CollarImport from 'pages/data/collars/CollarImport';
 import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
@@ -16,14 +15,18 @@ import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
 export default function CollarPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
 
-  const [editObj, setEditObj] = useState<Collar>({} as Collar);
+  const [editObj, setEditObj] = useState<Collar | AttachedCollar>({} as Collar);
   const [showImport, setShowImport] = useState<boolean>(false);
 
   // set editing object when table row is selected
-  const handleSelect = (row: Collar): void => {
+  const handleSelectUnattached = (row: Collar): void => {
     // console.log(`device_id: ${row.device_id} p: ${row.permission_type}`);
     setEditObj(row);
   };
+
+  const handleSelectAttached = (row: AttachedCollar): void => {
+    setEditObj(row);
+  }
 
   // pass as callback to table component to set export data when api returns collar data
   // const onNewData = (d: Collar[]): void => {
@@ -41,8 +44,6 @@ export default function CollarPage(): JSX.Element {
     handleClose: null,
   };
 
-  const tableProps: ITableQueryProps<Collar> = { query: bctwApi.useCollarType, /* onNewData */ };
-  
   return (
     <ManageLayout>
       <Box className='manage-layout-titlebar'>
@@ -54,7 +55,7 @@ export default function CollarPage(): JSX.Element {
             </Button>
           </Box>
           <ModifyCollarWrapper editing={editObj}>
-            <AddEditViewer<Collar> editing={editObj} empty={new Collar()}>
+            <AddEditViewer<AttachedCollar> editing={editObj as AttachedCollar} empty={new AttachedCollar()}>
               <EditCollar {...editProps} />
             </AddEditViewer>
           </ModifyCollarWrapper>
@@ -65,18 +66,18 @@ export default function CollarPage(): JSX.Element {
         <>
           <Box mb={4}>
             <DataTable
-              headers={Collar.attachedPropsToDisplay}
+              headers={AttachedCollar.attachedDevicePropsToDisplay}
               title={S.assignedCollarsTableTitle}
-              queryProps={{ ...tableProps, param: eCollarAssignedStatus.Assigned }}
-              onSelect={handleSelect}
+              queryProps={{query: bctwApi.useAttachedDevices}}
+              onSelect={handleSelectAttached}
             />
           </Box>
           <Box mb='3'>
             <DataTable
               headers={Collar.propsToDisplay}
               title={S.availableCollarsTableTitle}
-              queryProps={{ ...tableProps, param: eCollarAssignedStatus.Available }}
-              onSelect={handleSelect}
+              queryProps={{query: bctwApi.useUnattachedDevices}}
+              onSelect={handleSelectUnattached}
             />
           </Box>
         </>

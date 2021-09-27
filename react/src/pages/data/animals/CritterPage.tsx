@@ -40,11 +40,12 @@ export default function CritterPage(): JSX.Element {
   */
 
   // props to be passed to the edit modal component
+  // most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
     editing: new Animal(),
-    open: false, // overwritten in {AddEditViewer}
-    onSave: null, // save handler is overwritten in {ModifyCritterWrappper}
-    handleClose: null,
+    open: false,
+    onSave: (): void => { /* do nothing */ },
+    handleClose: (): void => { /* do nothing */ },
   };
 
   return (

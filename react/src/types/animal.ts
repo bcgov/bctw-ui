@@ -6,6 +6,7 @@ import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
+import { DataLife } from './data_life';
 
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
@@ -216,7 +217,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
 }
 
 // animals attached to devices should have additional properties
-export interface IAttachedAnimal extends IAnimal, ICollarHistory {}
+export interface IAttachedAnimal extends IAnimal, ICollarHistory, DataLife {}
 
 export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<AttachedAnimal> {
   assignment_id: uuid;

@@ -3,15 +3,14 @@ import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import Container from '@material-ui/core/Container';
 import EditModal from 'pages/data/common/EditModal';
-import { Collar, collarFormFields, eNewCollarType } from 'types/collar';
+import { AttachedCollar, Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { editEventBtnProps, FormSection } from '../common/EditModalComponents';
 import RetrievalEvent from 'types/events/retrieval_event';
-import { editObjectToEvent, WorkflowType } from 'types/events/event';
-import useDidMountEffect from 'hooks/useDidMountEffect';
+import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import { isDisabled } from 'types/form_types';
 import MalfunctionEvent from 'types/events/malfunction_event';
@@ -19,51 +18,52 @@ import MalfunctionEvent from 'types/events/malfunction_event';
 /**
  * todo: reimplement auto defaulting of fields based on collar type select
  */
-export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
+export default function EditCollar(props: EditorProps<Collar | AttachedCollar>): JSX.Element {
   const { isCreatingNew, editing } = props;
+
+  const isAttached = editing instanceof AttachedCollar;
 
   // set the collar type when add collar is selected
   const [collarType, setCollarType] = useState<eNewCollarType>(eNewCollarType.Other);
   const [newCollar, setNewCollar] = useState<Collar>(editing);
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
-  const [workflowType, setWorkflowType] = useState<WorkflowType>('unknown');
+  // const [workflowType, setWorkflowType] = useState<WorkflowType>('unknown');
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
-  const [event, updateEvent] = useState(new RetrievalEvent()); //fixme: type this
+  const [event, updateEvent] = useState(new MalfunctionEvent());
 
   const close = (): void => {
     setCollarType(eNewCollarType.Other);
   };
 
-  useDidMountEffect(async () => {
-    updateEvent(() => {
-      let e, o;
-      if (workflowType === 'retrieval') {
-        e = new RetrievalEvent();
-        o = editObjectToEvent(Object.assign({}, editing), e, ['retrieved', 'retrieval_date', 'device_deployment_status']);
-      } else if (workflowType === 'malfunction') {
-        e = new MalfunctionEvent();
-        o = editObjectToEvent(Object.assign({}, editing), e, ['device_status', 'device_condition', 'device_deployment_status']);
-      }
+  const createEvent = (type: WorkflowType): MalfunctionEvent | RetrievalEvent => {
+    let e, o;
+    if (type === 'retrieval') {
+      e = new RetrievalEvent();
+      o = editObjectToEvent(Object.assign({}, editing), e, ['retrieved', 'retrieval_date', 'device_deployment_status']);
       return o;
-    });
-  }, [workflowType]);
-
-  // show the workflow form when a new event object is created
-  useDidMountEffect(() => {
-    if (event) {
-      // console.log('event updated', event, !open);
-      setShowWorkflowForm((o) => !o);
+    } else if (type === 'malfunction') {
+      e = new MalfunctionEvent(editing instanceof AttachedCollar ? editing.last_transmission_date : null);
+      o = editObjectToEvent(Object.assign({}, editing), e, ['device_status', 'device_condition', 'device_deployment_status']);
     }
-  }, [event]);
+    return o;
+  };
 
   const handleOpenWorkflow = (e: WorkflowType): void => {
-    if (workflowType === e) {
-      setShowWorkflowForm((o) => !o);
-    } else {
-      setWorkflowType(e);
-    }
+    const event = createEvent(e);
+    updateEvent(event as any);
+    setShowWorkflowForm((o) => !o);
   };
+
+  const handleWorkflowSaved = async(e: IBCTWWorkflow): Promise<void> => {
+    await setShowWorkflowForm(false);
+    if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved) {
+      // console.log('im supposed to show the retrieval form', e);
+      const retrievalWF = editObjectToEvent(e, new RetrievalEvent(), ['event_type']);
+      await updateEvent(retrievalWF as any); // fixme: 
+      await setShowWorkflowForm(o => !o);
+    }
+  }
 
   const {
     communicationFields,
@@ -114,13 +114,6 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
               <dd>Permission:</dd>
               <dt>{editing.permission_type}</dt>
             </dl>
-            {/* <span className='button_span'>
-              {!isCreatingNew ? (
-                <Button className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
-                  Assign Animal to Device
-                </Button>
-              ) : null}
-            </span> */}
           </Box>
         </>
       )}
@@ -162,13 +155,19 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                 'Device Status',
                 statusFields.map((f) => CreateFormField(editing, f, onChange))
               )}
+              {/**
+               * hide the workflow related fields entirely when creating a new collar
+               * note: disable the workflow event buttons for unattached devices as
+               * last transmission date is not received for unattached
+              */
+              }
               {!isCreatingNew ? (
                 <>
                   {FormSection(
                     'device-ret',
                     'Record Retrieval Details',
                     retrievalFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
-                    <Button {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('retrieval')}>
+                    <Button disabled={!isAttached} {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('retrieval')}>
                       Record Retrieval Details
                     </Button>
                   )}
@@ -176,7 +175,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                     'device-malf',
                     'Record Malfunction & Offline Details',
                     malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
-                    <Button {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('malfunction')}>
+                    <Button disabled={!isAttached} {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('malfunction')}>
                       Record Malfunction & Offline Details
                     </Button>
                   )}
@@ -189,6 +188,7 @@ export default function EditCollar(props: EditorProps<Collar>): JSX.Element {
                     open={showWorkflowForm}
                     event={event}
                     handleClose={(): void => setShowWorkflowForm(false)}
+                    onEventSaved={handleWorkflowSaved}
                   />
                 </> ) : null }
             </>

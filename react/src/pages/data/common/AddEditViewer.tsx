@@ -42,8 +42,8 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
   const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText, editTooltip, addTooltip, deleteTooltip } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
-  const [isCreatingNew, setIsCreatingNew] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleClickAdd = (): void => {
     setIsCreatingNew(true);

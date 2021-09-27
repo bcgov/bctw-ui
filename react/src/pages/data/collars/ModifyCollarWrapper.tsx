@@ -7,12 +7,12 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
-import { Collar } from 'types/collar';
+import { AttachedCollar, Collar } from 'types/collar';
 import { permissionCanModify } from 'types/permission';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type IModifyWrapperProps = {
-  editing: Collar;
+  editing: AttachedCollar | Collar;
   children: JSX.Element;
 };
 
@@ -69,7 +69,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   };
 
   const createDeleteMessage = (): string => {
-    const base = editing?.animal_id
+    const base = editing instanceof AttachedCollar
       ? `CAREFUL! An animal is attached to this collar. `
       : '';
     return `${base}Deleting this collar will prevent other users from accessing it. Are you sure you want to delete it?`;

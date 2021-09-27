@@ -1,3 +1,4 @@
+import { isDayjs } from 'dayjs';
 import { ReactNode } from 'react';
 import { Animal, getAnimalFormFields, IAnimal } from 'types/animal';
 import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
@@ -5,6 +6,7 @@ import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat} from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { FormChangeEvent, FormFieldObject } from 'types/form_types';
+import { formatTime } from 'utils/time';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 
@@ -31,7 +33,6 @@ export interface IBCTWWorkflow {
   readonly event_type: WorkflowType;
   // headers displayed in the workflow modal title
   getWorkflowTitle(): string;
-  // get displayProps(): (keyof T)[];
   // methods the workflow needs to save specific properties
   getAnimal?(): OptionalAnimal;
   getDevice?(): OptionalDevice;
@@ -56,7 +57,12 @@ export const eventToJSON = <T>(keys: string[], event: T): Record<string, unknown
   const entries = Object.entries(event);
   for (const [key, value] of entries) {
     if (keys.includes(key)) {
-      ret[key] = value;
+      // todo: move to parent json formatter?
+      if (isDayjs(value)) {
+        ret[key] = value.format(formatTime);
+      } else {
+        ret[key] = value;
+      }
     }
   }
   return ret;

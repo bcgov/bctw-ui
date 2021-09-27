@@ -118,7 +118,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
    * fixme: not very typescripty
    */
   const determineWorkflow = (): JSX.Element => {
-    const props = { handleFormChange: handleChildFormUpdated, handleExitEarly: handleExitWorkflow };
+    const props = { handleFormChange: handleChildFormUpdated, handleExitEarly: handleShowExitWorkflow};
 
     if (event instanceof ReleaseEvent) {
       return <ReleaseEventForm {...props} event={event} />;

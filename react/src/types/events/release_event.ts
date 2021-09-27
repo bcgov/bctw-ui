@@ -9,6 +9,7 @@ import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { uuid } from 'types/common_types';
+import { Collar } from 'types/collar';
 
 type ReleaseAnimalProps = Pick<Animal,
 | 'ear_tag_left_id'
@@ -28,6 +29,7 @@ export type ReleaseFormField = {
 interface IReleaseEvent extends ReleaseAnimalProps,
   Readonly<Pick<CollarHistory, 'assignment_id'>>,
   Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
+  Pick<Collar, 'device_id' | 'collar_id'>,
   IDataLifeEndProps {}
 
 /**
@@ -57,6 +59,9 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   animal_colouration: string;
   life_stage: Code;
   species: Code;
+  //
+  readonly collar_id: uuid;
+  readonly device_id: number;
 
   constructor(private isTranslocated: boolean, loc = new LocationEvent('release', dayjs())) {
     this.event_type = 'release';

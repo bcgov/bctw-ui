@@ -13,7 +13,7 @@ import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
 import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
-import { Collar, eCollarAssignedStatus } from 'types/collar';
+import { AttachedCollar, Collar } from 'types/collar';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
 
@@ -105,17 +105,20 @@ export const useTelemetryApi = () => {
   /**
    * @param type the collar types to be fetched (assigned, unassigned)
    */
-  const useCollarType = (
-    page: number,
-    type: eCollarAssignedStatus,
-    config: Record<string, unknown>
-  ): UseQueryResult<Collar[]> => {
-    const callapi =
-      type === eCollarAssignedStatus.Assigned ? collarApi.getAssignedCollars : collarApi.getAvailableCollars;
-    return useQuery<Collar[], AxiosError>(['collartype', page, type], () => callapi(page), {
-      ...config,
-      ...defaultQueryOptions
-    });
+  const useAttachedDevices = (page: number): UseQueryResult<AttachedCollar[], AxiosError> => {
+    return useQuery<AttachedCollar[], AxiosError>(
+      ['collars_attached', page],
+      () => collarApi.getAssignedCollars(page),
+      critterOptions
+    );
+  };
+
+  const useUnattachedDevices = (page: number): UseQueryResult<Collar[], AxiosError> => {
+    return useQuery<Collar[], AxiosError>(
+      ['collars_unattached', page],
+      () => collarApi.getAvailableCollars(page),
+      critterOptions
+    );
   };
 
   const critterOptions = { ...defaultQueryOptions, keepPreviousData: true };
@@ -381,7 +384,8 @@ export const useTelemetryApi = () => {
     useUnassignedTracks,
     usePings,
     useUnassignedPings,
-    useCollarType,
+    useUnattachedDevices,
+    useAttachedDevices,
     useAssignedCritters,
     useUnassignedCritters,
     useCritterHistory,

@@ -47,7 +47,7 @@ export default function AssignNewCollarModal({ critter_id, dli, onClose, show, o
         <DataTable
           headers={Collar.propsToDisplay}
           title={CS.collarAssignmentTitle}
-          queryProps={{ query: bctwApi.useCollarType, param: eCollarAssignedStatus.Available }}
+          queryProps={{ query: bctwApi.useUnattachedDevices, param: eCollarAssignedStatus.Available }}
           onSelect={handleSelectDevice}
         />
         {/* disable editing of end of the attachment when attaching the device */}

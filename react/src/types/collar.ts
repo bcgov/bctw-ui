@@ -1,11 +1,12 @@
-import { Expose, Transform } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Code } from 'types/code';
-import { BCTWBase, nullToDayjs, PartialPick, uuid } from 'types/common_types';
+import { BCTWBase, nullToDayjs, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
+import { DataLife } from './data_life';
 
 // fetchable api collar types
 export enum eCollarAssignedStatus {
@@ -29,10 +30,9 @@ export interface ICollarTelemetryBase extends ICollarBase {
 }
 
 // export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
-export interface ICollar extends ICollarTelemetryBase, PartialPick<Animal, 'wlh_id' | 'animal_id'> {
-  activation_comment: string; // fixme: missing?
+export interface ICollar extends ICollarTelemetryBase {
+  activation_comment: string;
   activation_status: boolean;
-  animal_id?: string; // collars attached to a critter should includes this prop
   camera_device_id: number;
   readonly collar_transaction_id: uuid;
   device_comment: string;
@@ -101,16 +101,13 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   @Transform(nullToDayjs) valid_from: Dayjs;
   @Transform(nullToDayjs) valid_to: Dayjs;
 
-  animal_id?: string;
-  wlh_id?: string;
-
-  @Expose() get frequencyPadded(): string {
+  get frequencyPadded(): string {
     const freq = this.frequency.toString();
     const numDecimalPlaces = freq.slice(freq.lastIndexOf('.') + 1).length;
     const numToAdd = 3 - numDecimalPlaces + freq.length;
     return freq.padEnd(numToAdd, '0');
   }
-  @Expose() get identifier(): string { return 'collar_id' }
+  get identifier(): string { return 'collar_id' }
 
   // fixme: 
   constructor(collar_type?: eNewCollarType) {
@@ -172,15 +169,32 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   static get propsToDisplay(): (keyof Collar)[] {
     return [ 'device_id', 'device_status', 'frequency', 'device_type', 'device_make', 'activation_status', 'device_model' ];
   }
-  // for attached collars, also display...
-  static get attachedPropsToDisplay(): (keyof Collar)[] {
-    return [...Collar.propsToDisplay, 'wlh_id', 'animal_id', ];
-  }
 
   get displayProps(): (keyof Collar)[] {
-    return this.animal_id ? Collar.attachedPropsToDisplay : Collar.propsToDisplay;
+    return Collar.propsToDisplay;
   }
 }
+
+export interface IAttachedCollar extends ICollar, Pick<Animal, 'wlh_id' | 'animal_id' | 'critter_id'> {
+  last_transmission_date?: Dayjs; // present on attached devices
+}
+
+export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<AttachedCollar>, DataLife {
+  attachment_start: Dayjs;
+  data_life_start: Dayjs;
+  data_life_end: Dayjs;
+  attachment_end: Dayjs;
+  readonly wlh_id: string;
+  readonly animal_id: string;
+  readonly critter_id: string;
+  @Transform(nullToDayjs) last_transmission_date?: Dayjs;
+
+  // for attached collars, also display...
+  static get attachedDevicePropsToDisplay(): (keyof AttachedCollar)[] {
+    return [...super.propsToDisplay, 'wlh_id', 'animal_id' /* , 'last_transmission_date' */];
+  }
+}
+
 
 export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   communicationFields: [

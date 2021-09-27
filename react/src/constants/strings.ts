@@ -52,6 +52,7 @@ const WorkflowStrings = {
     areUpdates: 'Are there updates to the animal identifiers or characteristics?',
     shouldReviewNotif: 'Please review the entire metadata for this animal for updates not captured in this form',
     isNewDevice: 'Are you replacing the original device with a new device?',
+    removeDeviceAction: (device: number, aid: string, wlhid: string): string => `Warning: This action will remove device ${device} from animal ID ${aid} / WLH ID ${wlhid}. To attach a new device, visit the My Devices page.`,
     deviceRemovedNotif: 'The previous device has been unassigned from this animal, you must assign a new device to the animal',
   },
   capture: {
@@ -70,6 +71,11 @@ const WorkflowStrings = {
   malfunction: {
     workflowTitle: 'Malfunction Event Workflow',
     isMalfunction: 'Is this device malfunctioned or offline?',
+    lastTransmission: 'Defaults to the last transmission date for this device',
+    isActive: 'You have set the device status to Active. Do you wish to exit the workflow now?',
+    isRetrieved: 'Did you retrieve the device?',
+    wasRetrieved: 'If the device was retrieved, the retrieval workflow form will be opened after',
+
   },
   device: {
     should_unattach: 'Unassign device from animal?',

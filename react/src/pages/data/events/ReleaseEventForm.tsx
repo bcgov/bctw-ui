@@ -1,6 +1,7 @@
 import { Box } from '@material-ui/core';
 import Tooltip from 'components/common/Tooltip';
 import { CreateFormField } from 'components/form/create_form_components';
+import OkayModal from 'components/modal/OkayModal';
 import { WorkflowStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useState } from 'react';
@@ -20,6 +21,7 @@ export default function ReleaseEventForm({event, handleFormChange }: WorkflowFor
 
   const [hasBabies, setHasBabies] = useState(false);
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
   
   useDidMountEffect(() => {
     updateEvent(event);
@@ -32,6 +34,9 @@ export default function ReleaseEventForm({event, handleFormChange }: WorkflowFor
       setHasBabies(value === 'Y');
     } else if (key === 'shouldUnattachDevice') {
       setIsBeingUnattached(!!value);
+      if (value) {
+        setShowNotif(true);
+      }
     }
   };
 
@@ -46,7 +51,7 @@ export default function ReleaseEventForm({event, handleFormChange }: WorkflowFor
   }
 
   return (
-    FormSection('a', 'Release Details', [
+    FormSection('release-wf', 'Release Details', [
       <LocationEventForm
         event={release.location_event}
         notifyChange={onChangeLocationProp}
@@ -76,6 +81,7 @@ export default function ReleaseEventForm({event, handleFormChange }: WorkflowFor
         {CreateFormField(release, {...fields.shouldUnattachDevice, tooltip: <p>todo:</p> }, onChange)}
         {CreateFormField(release, {...fields.data_life_start, required: isBeingUnattached }, onChange, {disabled: !isBeingUnattached})}
       </Box>,
+      <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>{WorkflowStrings.release.removeDeviceAction(event.device_id, event.animal_id, event.wlh_id)}</OkayModal>
     ])
   );
 }

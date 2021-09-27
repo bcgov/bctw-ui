@@ -7,6 +7,7 @@ import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, ApiProps } from './api_interfaces';
+import { useQueryClient } from 'react-query';
 
 /**
  * API for saving workflow events @type {EventType}
@@ -17,8 +18,13 @@ export type WorkflowAPIResponse = true | AxiosError;
 // todo: handle query invalidation - 
 export const eventApi = (props: ApiProps) => {
   const { api } = props;
+  const queryClient = useQueryClient();
 
 
+  const invalidate = (): void => {
+    // invalidate everything
+    queryClient.invalidateQueries();
+  }
   /**
    * when an event form is saved, there are potentiall multiple post requests that need to be handled
    * if the device is marked as retrieved, the device may need to be removed
@@ -129,7 +135,7 @@ export const eventApi = (props: ApiProps) => {
         }
       }
     }
-
+    invalidate();
     return true;
   };
 

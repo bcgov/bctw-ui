@@ -19,7 +19,6 @@ import ReleaseEvent from 'types/events/release_event';
 
 /**
  * the main animal form
- * bug: cant save?
  */
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing } = props;

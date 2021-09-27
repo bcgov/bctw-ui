@@ -8,9 +8,10 @@ import { FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
-import { Collar } from 'types/collar';
+import { AttachedCollar, Collar } from 'types/collar';
 
-type MalfunctionDeviceProps = Pick<Collar,
+type MalfunctionDeviceProps = Pick<
+AttachedCollar,
 | 'collar_id'
 | 'device_id'
 | 'device_malfunction_type'
@@ -20,13 +21,16 @@ type MalfunctionDeviceProps = Pick<Collar,
 | 'offline_comment'
 | 'offline_date'
 | 'offline_type'
+| 'last_transmission_date'
+| 'retrieved'
 >;
 
 export type MalfunctionFormField = {
   [Property in keyof MalfunctionEvent]+?: FormFieldObject<MalfunctionEvent>;
 };
 
-interface IMalfunctionEvent extends MalfunctionDeviceProps,
+interface IMalfunctionEvent
+  extends MalfunctionDeviceProps,
   Readonly<Pick<CollarHistory, 'assignment_id'>>,
   Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
   IDataLifeEndProps {}
@@ -35,8 +39,6 @@ type MalfunctionDeviceStatus = 'Potential Malfunction';
 
 /**
  * todo:
- * prompt to exit early if user selects active for device status
- * populate malfunction date with last transmission date
  * data life / attachment end date
  * start retrieval workflow??
  */
@@ -48,30 +50,36 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
   location_event: LocationEvent;
   readonly assignment_id: uuid;
   shouldUnattachDevice: boolean;
+  onlySaveDeviceStatus: boolean;
   // data life end props
   attachment_end: Dayjs;
   data_life_end: Dayjs;
   // device props
   readonly collar_id: uuid;
   readonly device_id: number;
-  device_status: MalfunctionDeviceStatus; // fields below disabled while status = potential malfunction
-  device_malfunction_type: Code; // malfunction fields enabled if devuce_status -> malfunction
+  device_status: Code; // fields below disabled while status = potential malfunction
+  device_malfunction_type: Code; // fields enabled if devuce_status -> malfunction
   malfunction_comment: string;
   malfunction_date: Dayjs;
-  offline_date: Dayjs; // offline fields enabled if device_status -> offline
+  offline_date: Dayjs; // fields enabled if device_status -> offline
   offline_type: Code;
   offline_comment: string;
+  retrieved: boolean;
+  readonly last_transmission_date: Dayjs;
 
-  constructor() {
+  constructor(last_transmission = dayjs()) {
+    this.onlySaveDeviceStatus = false;
     this.event_type = 'malfunction';
-    this.location_event = new LocationEvent('malfunction', dayjs());
+    this.location_event = new LocationEvent('malfunction', last_transmission ?? dayjs());
     this.device_status = 'Potential Malfunction';
   }
 
   formatPropAsHeader(s: keyof MalfunctionEvent): string {
     switch (s) {
-      case 'shouldUnattachDevice': 
+      case 'shouldUnattachDevice':
         return WorkflowStrings.release.isNewDevice;
+      case 'retrieved':
+        return WorkflowStrings.malfunction.isRetrieved;
       case 'device_malfunction_type':
         return 'Malfunction Type';
       default:
@@ -85,17 +93,31 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
     return WorkflowStrings.malfunction.workflowTitle;
   }
 
-  getDevice(): OptionalDevice{
-    const props: (keyof Collar)[] =
-      [ 'collar_id', ];
-    const ret = eventToJSON(props, this);
-    return omitNull({ ...ret, ...this.location_event.toJSON()});
+  getDevice(): OptionalDevice {
+    if (this.onlySaveDeviceStatus) {
+      const { collar_id, device_status } = this;
+      return { collar_id, device_status };
+    }
+    const props: (keyof Collar)[] = [
+      'collar_id',
+      'device_status',
+      'retrieved'
+    ];
+    const locs = this.location_event.toJSON();
+    let ret;
+    // props will come from the location event as expected
+    if (this.device_status === 'Malfunction') {
+      props.push('device_malfunction_type');
+      ret = eventToJSON(props, this);
+    } // need to transform the location event props to offline
+    else if (this.device_status === 'Offline') {
+      props.push('offline_type');
+      ret = eventToJSON(props, this);
+      locs.offline_comment = locs.malfunction_comment;
+      locs.offline_date = locs.malfunction_date;
+      delete locs.malfunction_comment;
+      delete locs.malfunction_date;
+    }
+    return omitNull({...ret, ...locs})
   }
-  
-  fields: MalfunctionFormField = {
-
-  }
-
-  // getAttachment(): RemoveDeviceInput {
-  // }
 }
