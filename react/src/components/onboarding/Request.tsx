@@ -36,11 +36,11 @@ const UserAccessRequest = (): JSX.Element => {
   const [keycloakUser, setKeycloakUser] = useState<IKeyCloakSessionInfo>(null);
 
   // create access request stub
-  const onSuccess = (v: User): void => {
-    console.log('UserContext: new user object is', v);
+  const onSuccess = (u: User): void => {
+    console.log('UserOnboarding: Request: new user object is', u);
   }
   const onError = (e): void => {
-    console.log('UserContext: error saving user', e)
+    console.log('UserOnboarding: Request: error saving new user object', e)
   }
   const api = useTelemetryApi();
   const { mutateAsync } = api.useMutateUser({ onSuccess, onError });
@@ -59,10 +59,10 @@ const UserAccessRequest = (): JSX.Element => {
     }
   }, [useKeycloakUser]);
 
-  // feedback to user while page is loading
-  if (!keycloakUser) {
-    return <div>Loading...</div>;
-  }
+  // visual feedback to user while page is loading
+  // if (!keycloakUser) {
+  //   return <div>Loading...</div>;
+  // }
 
   /**
    * ## submitForm
@@ -109,7 +109,7 @@ const UserAccessRequest = (): JSX.Element => {
         domain === "idir" ? newUser.idir = username : newUser.bceid = username;
 
         // use enumerated role types
-        switch (accessType) {
+        switch (accessType.toLowerCase()) {
           case 'administrator':
             console.log('UserOnboarding: Request: submitRequest: role = administrator');
             newUser.role_type = eUserRole.administrator;
@@ -165,11 +165,6 @@ const UserAccessRequest = (): JSX.Element => {
             You will need to provide some additional details before accessing this application. Complete the request details form below to obtain access.
           </p>
         </div>
-        Email: {email}<br />
-        First Name: {firstName}<br />
-        Last Name: {lastName}<br />
-        Domain: {domain}<br />
-        Username: {username}<br />
         <h3>Request Details</h3>
         <div>
           <span>Complete the following information:</span>
@@ -210,10 +205,10 @@ const UserAccessRequest = (): JSX.Element => {
               <InputLabel>Target Level of Access</InputLabel>
               <NativeSelect onChange={(e) => { setAccessType(e.target.value) }} value={accessType} variant={'outlined'}>
                 <option value={''}></option>
-                <option value={'Administrator'}>Administrator</option>
-                <option value={'Manager'}>Manager</option>
-                <option value={'Editor'}>Editor</option>
-                <option value={'Observer'}>Observer</option>
+                <option value={'administrator'}>Administrator</option>
+                <option value={'manager'}>Manager</option>
+                <option value={'editor'}>Editor</option>
+                <option value={'observer'}>Observer</option>
               </NativeSelect>
             </FormControl>
           </Grid>
