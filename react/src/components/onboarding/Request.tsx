@@ -4,6 +4,7 @@ import { Box, Button, FormControl, Grid, InputLabel, NativeSelect, TextField, Te
 import { useContext, useEffect, useState } from 'react';
 import { createUrl } from 'api/api_helpers';
 import { IUserUpsertPayload } from 'api/user_api';
+import { IUpsertPayload } from 'api/api_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { eUserRole, IKeyCloakSessionInfo, User } from 'types/user';
@@ -43,7 +44,7 @@ const UserAccessRequest = (): JSX.Element => {
     console.log('UserOnboarding: Request: error saving new user object', e)
   }
   const api = useTelemetryApi();
-  const { mutateAsync } = api.useMutateUser({ onSuccess, onError });
+  const { mutateAsync: saveMutation } = api.useMutateUser({ onSuccess, onError });
 
   const domain = keycloakUser?.domain ? keycloakUser.domain : 'domain';
   const email = keycloakUser?.email ? keycloakUser.email : 'email@address.com';
@@ -139,13 +140,19 @@ const UserAccessRequest = (): JSX.Element => {
         // set this user as 'access pending'
         newUser.access = 'pending';
 
-        // upsert the new user into the database
-        const payload: IUserUpsertPayload = {
-          user: newUser,
-          role: newUser.role_type
+        // upsert the new user into the database        
+        const payload: IUpsertPayload<User> = {
+          body: newUser
         }
         console.log(`UserOnboarding: Request: submitRequest: Upserting new user ${JSON.stringify(payload)}`);
-        await mutateAsync(payload);
+        await saveMutation(payload.body);
+
+        // const payload: IUserUpsertPayload = {
+        //   user: newUser,
+        //   role: newUser.role_type
+        // }
+        // console.log(`UserOnboarding: Request: submitRequest: Upserting new user ${JSON.stringify(payload)}`);
+        // await saveMutation(payload);
 
       })
 
