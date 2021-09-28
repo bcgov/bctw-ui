@@ -56,13 +56,19 @@ const UserOnboarding = (): JSX.Element => {
 
   return (
     <div style={containerStyle}>
+      <div>
+        User is: {userApi.getUser()}
+      </div>
+      <div>
+        User's access is: {userAccess.toLower()}
+      </div>
       {
         userAccess ? // User is in the system
           <div>
-            {userAccess == "granted" ? <UserAccessRequest /> : ""}
             {/* {userAccess == "granted" ? <UserAccessApproved /> : ""} */}
-            {userAccess == "pending" ? <UserAccessPending /> : ""}
-            {userAccess == "denied" ? <UserAccessDenied /> : ""}
+            {userAccess.toLower() === "granted" ? <UserAccessRequest /> : ""}
+            {userAccess.toLower() === "pending" ? <UserAccessPending /> : ""}
+            {userAccess.toLower() === "denied" ? <UserAccessDenied /> : ""}
           </div>
           : <UserAccessRequest /> // If here you're not in the system
       }
