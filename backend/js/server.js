@@ -254,8 +254,8 @@ const onboardingRedirect = async (req, res, next) => {
 
   let registered = false;
 
-  if ("idir" === domain) {
     // check for user access given an IDIR
+    if (domain == "idir") {
     const sql = `
       SELECT idir, bceid, access
       FROM bctw.user
@@ -266,8 +266,8 @@ const onboardingRedirect = async (req, res, next) => {
     result.rowCount == 1 ? registered = true : registered = false;
     console.log('onboardingRedirect() -- access granted for IDIR ' + username + '? ' + registered)
 
-  } else if ("bceid" == domain) {
-    // check for user access given a BCeID
+  // check for user access given a BCeID
+  } else if (domain == "bceid") {
     const sql = `
       SELECT idir, bceid, access
       FROM bctw.user
@@ -281,20 +281,13 @@ const onboardingRedirect = async (req, res, next) => {
   }
 
   if (registered) {
-
-  // otherwise, redirect to the onboarding page
-  } else { 
-  
+    next(); // pass through
+  } else {  
     if (req.url.match(/\/onboarding/) || req.url.match(/\/static/) || req.url.match(/\/Reflect/)) {
-      // allow static assets to pass through as well
-      next();
-
+      next(); // allow static assets to pass through too
     } else {
-      //really redirect to onboarding
-      res.redirect('/onboarding');
-
+        res.redirect('/onboarding'); // otherwise, redirect to the onboarding page
     }
-  
   }
 
   // release database connection
@@ -363,7 +356,7 @@ const handleUserAccessRequest = async (req, res) => {
 
   const emailMessage = `
     <div>
-      Access to the BC Telemetry Warehouse has be requested by
+      Access to the BC Telemetry Warehouse has been requested by
       <b>${domain}</b> user <b>${firstName} ${lastName}</b>. Username is <b>${username}</b>.
     </div>
     <br />
