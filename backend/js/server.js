@@ -256,7 +256,7 @@ const onboardingRedirect = async (req, res, next) => {
 
   if ("idir" === domain) {
     // check for user access given an IDIR
-    const sql = 'select id from bctw.user where idir = ' + username + ' and access = "granted"';
+    const sql = 'select idir, bceid, access from bctw.user where idir = "' + username + '" and access = "granted"';
     const client = await pgPool.connect();
     const result = await client.query(sql);
     result.rowCount == 1 ? registered = true : registered = false;
@@ -264,7 +264,7 @@ const onboardingRedirect = async (req, res, next) => {
 
   } else if ("bceid" == domain) {
     // check for user access given a BCeID
-    const sql = 'select id from bctw.user where bceid = ' + username + ' and access = "granted"';
+    const sql = 'select idir, bceid, access from bctw.user where bceid = "' + username + '" and access = "granted"';
     const client = await pgPool.connect();
     const result = await client.query(sql);
     result.rowCount == 1 ? registered = true : registered = false;
