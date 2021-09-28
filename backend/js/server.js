@@ -254,17 +254,19 @@ const onboardingRedirect = async (req, res, next) => {
 
   let registered = false;
 
-    // check for user access given an IDIR
-    if (domain == "idir") {
-    const sql = `
-      SELECT idir, bceid, access
-      FROM bctw.user
-      WHERE idir = '${username}' AND access = 'granted'
-    `;
-    const client = await pgPool.connect();
-    const result = await client.query(sql);
-    result.rowCount == 1 ? registered = true : registered = false;
-    console.log('onboardingRedirect() -- access granted for IDIR ' + username + '? ' + registered)
+  // check for user access given an IDIR
+  if (domain == "idir") {
+  const sql = `
+    SELECT idir, bceid, access
+    FROM bctw.user
+    WHERE idir = '${username}' AND access = 'granted'
+  `;
+  const client = await pgPool.connect();
+  const result = await client.query(sql);
+  result.rowCount == 1 ? registered = true : registered = false;
+  client.release(); // release database connection
+
+  console.log('onboardingRedirect() -- access granted for IDIR ' + username + '? ' + registered)
 
   // check for user access given a BCeID
   } else if (domain == "bceid") {
@@ -276,6 +278,8 @@ const onboardingRedirect = async (req, res, next) => {
     const client = await pgPool.connect();
     const result = await client.query(sql);
     result.rowCount == 1 ? registered = true : registered = false;
+    client.release(); // release database connection
+
     console.log('onboardingRedirect() -- access granted for BCeID ' + username + '? ' + registered)
 
   }
@@ -289,9 +293,6 @@ const onboardingRedirect = async (req, res, next) => {
         res.redirect('/onboarding'); // otherwise, redirect to the onboarding page
     }
   }
-
-  // release database connection
-  client.release();
 
 };
 
