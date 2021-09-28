@@ -37,9 +37,10 @@ export const userApi = (props: ApiProps) => {
    * @param body a new or existing @type {User}
    */
   const addUser = async (body: IUserUpsertPayload): Promise<User> => {
-    const url = createUrl({ api: 'add-user' });
+    const url = createUrl({ api: 'add-user', noApiPrefix: true });
     const { data } = await api.post(url, body);
     const user = plainToClass(User, data);
+    console.log('added new user', user);
     return user;
   };
 
