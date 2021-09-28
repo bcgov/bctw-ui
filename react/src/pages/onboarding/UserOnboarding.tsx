@@ -39,13 +39,13 @@ const UserOnboarding = (): JSX.Element => {
   const userApi = user_api({ api });
 
   const [userAccess, setUserAccess] = useState(null);
-  const [userIdentifier, setUserIdentifier] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
 
   if (!userAccess) {
     userApi.getUser()
       .then((res) => {
         if (!res.error) {
-            setUserIdentifier(res.identifier);
+            setUserEmail(res.email);
             setUserAccess(res.access);
         }
       });
@@ -61,9 +61,7 @@ const UserOnboarding = (): JSX.Element => {
   return (
     <div style={containerStyle}>
       <div>
-        Username is: {userIdentifier}
-      </div>
-      <div>
+        User's email is: {userEmail}
         User's access is: {userAccess}
       </div>
       {

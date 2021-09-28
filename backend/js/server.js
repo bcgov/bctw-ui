@@ -243,28 +243,55 @@ const onboardingRedirect = async (req, res, next) => {
   const { username, domain } = splitCredentials(data);
   console.log('onboardingRedirect() -- user:', username)
 
-  // Get a list of all allowed users
-  const sql = 'select idir from bctw.user'
-  const client = await pgPool.connect();
-  const result = await client.query(sql);
-  const idirs = result.rows.map((row) => row.idir);
+//  // Get a list of all allowed users
+//  const sql = 'select idir from bctw.user'
+//  const client = await pgPool.connect();
+//  const result = await client.query(sql);
+//  const idirs = result.rows.map((row) => row.idir);
 
-  // Is the current user registered: Boolean
-  const registered = (idirs.includes(username)) ? true : false;
+//  // Is the current user registered: Boolean
+//  const registered = (idirs.includes(username)) ? true : false;
 
-  if (registered) { // If registered
-    next(); // pass through
-  } else { // Otherwise redirect to the onboarding page
-    // Allow static assets to pass through as well
-    if (req.url.match(/\/onboarding/) || req.url.match(/\/static/) || req.url.match(/\/Reflect/)) {
-      console.log('onboardingRedirect() -- Onboarding URL requested')
-      next();
-    } else {
-      console.log('onboardingRedirect() -- User is NOT registered; redirecting to /onboarding')
-      res.redirect('/onboarding');
-    }
+  let registered = false;
+
+  if ("idir" === domain) {
+    // check for user access given an IDIR
+    const sql = 'select id from bctw.user where idir = ' + username + ' and access = "granted"';
+    const client = await pgPool.connect();
+    const result = await client.query(sql);
+    result.rowCount == 1 ? registered = true : registered = false;
+    console.log('onboardingRedirect() -- access granted for IDIR ' + username + '? ' + registered)
+
+  } else if ("bceid" == domain) {
+    // check for user access given a BCeID
+    const sql = 'select id from bctw.user where bceid = ' + username + ' and access = "granted"';
+    const client = await pgPool.connect();
+    const result = await client.query(sql);
+    result.rowCount == 1 ? registered = true : registered = false;
+    console.log('onboardingRedirect() -- access granted for BCeID ' + username + '? ' + registered)
+
   }
-  client.release(); // Release database connection
+
+  if (registered) {
+
+  // otherwise, redirect to the onboarding page
+  } else { 
+  
+    if (req.url.match(/\/onboarding/) || req.url.match(/\/static/) || req.url.match(/\/Reflect/)) {
+      // allow static assets to pass through as well
+      next();
+
+    } else {
+      //really redirect to onboarding
+      res.redirect('/onboarding');
+
+    }
+  
+  }
+
+  // release database connection
+  client.release();
+
 };
 
 const handleUserAccessRequest = async (req, res) => {
