@@ -39,11 +39,15 @@ const UserOnboarding = (): JSX.Element => {
   const userApi = user_api({ api });
 
   const [userAccess, setUserAccess] = useState(null);
+  const [userIdentifier, setUserIdentifier] = useState(null);
 
   if (!userAccess) {
     userApi.getUser()
       .then((res) => {
-        if (!res.error) setUserAccess(res.access);
+        if (!res.error) {
+            setUserIdentifier(res.identifier);
+            setUserAccess(res.access);
+        }
       });
   }
 
@@ -57,18 +61,18 @@ const UserOnboarding = (): JSX.Element => {
   return (
     <div style={containerStyle}>
       <div>
-        User is: {userApi.getUser()}
+        Username is: {userIdentifier}
       </div>
       <div>
-        User's access is: {userAccess.toLower()}
+        User's access is: {userAccess}
       </div>
       {
         userAccess ? // User is in the system
           <div>
             {/* {userAccess == "granted" ? <UserAccessApproved /> : ""} */}
-            {userAccess.toLower() === "granted" ? <UserAccessRequest /> : ""}
-            {userAccess.toLower() === "pending" ? <UserAccessPending /> : ""}
-            {userAccess.toLower() === "denied" ? <UserAccessDenied /> : ""}
+            {userAccess === "granted" ? <UserAccessRequest /> : ""}
+            {userAccess === "pending" ? <UserAccessPending /> : ""}
+            {userAccess === "denied" ? <UserAccessDenied /> : ""}
           </div>
           : <UserAccessRequest /> // If here you're not in the system
       }
