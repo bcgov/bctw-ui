@@ -89,7 +89,7 @@ export default function Import<T>(): JSX.Element {
   const didImportHaveErrors = (): boolean => isSuccess && data.errors.length > 0;
 
   // setup the import mutation
-  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = bctwApi.useMutateBulkCsv({
+  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = bctwApi.useUploadCSV({
     onSuccess,
     onError
   });

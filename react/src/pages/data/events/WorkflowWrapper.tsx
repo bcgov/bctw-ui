@@ -76,7 +76,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   };
 
   // setup save mutation
-  const { mutateAsync: saveEvent, isLoading } = bctwApi.useMutateWorkflowEvent<T>({ onSuccess, onError });
+  const { mutateAsync: saveEvent, isLoading } = bctwApi.useSaveWorkflowEvent<T>({ onSuccess, onError });
 
   // performs metadata updates of collar/critter
   const handleSave = async (): Promise<void> => {

@@ -67,7 +67,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   };
 
   // setup the save mutation to save the UDF
-  const { mutateAsync, isLoading } = bctwApi.useMutateUDF({ onSuccess, onError });
+  const { mutateAsync, isLoading } = bctwApi.useSaveUDF({ onSuccess, onError });
 
   const addRow = (): void => {
     const curUdfs = [...udfs];

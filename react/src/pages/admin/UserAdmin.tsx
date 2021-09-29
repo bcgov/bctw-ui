@@ -32,7 +32,7 @@ export default function UserAdminPage(): JSX.Element {
   }
 
   // setup the mutations
-  const { mutateAsync: saveMutation } = bctwApi.useMutateUser({ onSuccess: onSaveSuccess, onError });
+  const { mutateAsync: saveMutation } = bctwApi.useSaveUser({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
   const saveUser = async (u: IUpsertPayload<User>): Promise<void> => {

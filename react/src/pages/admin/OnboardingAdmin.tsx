@@ -1,31 +1,59 @@
+import { useState } from 'react';
 import DataTable from 'components/table/DataTable';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import Button from 'components/form/Button';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AuthLayout from 'pages/layouts/AuthLayout';
-import { OnboardUser } from 'types/onboarding';
+import { HandleOnboardInput, OnboardUser } from 'types/onboarding';
+import ConfirmModal from 'components/modal/ConfirmModal';
+import { OnboardStrings } from 'constants/strings';
+import { formatAxiosError } from 'utils/errors';
+import { AxiosError } from 'axios';
 
 /**
- * page for user admin. requires admin user role.  
- * 
- * uses @component {EditUser}
+ *
  */
 export default function OnboardingAdminPage(): JSX.Element {
   const api = useTelemetryApi();
+  const [request, setRequest] = useState<OnboardUser | null>(null);
+  const [isGranting, setIsGranting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [msg, setMsg] = useState('');
+  const responseDispatch = useResponseDispatch();
 
-  const onSuccess = (): void => {
-    // todo:
-  }
+  const handleSelectRequest = (o: OnboardUser): void => {
+    setRequest(o);
+  };
 
-  const onError = (): void => {
-    // todo:
-  }
+  const onSuccess = (result: boolean): void => {
+    const message = result ? `user ${request.identifier} created successfully` : `onboarding request denied`;
+    responseDispatch({ severity: 'success', message });
+  };
+
+  const onError = (e: AxiosError): void => {
+    responseDispatch({ severity: 'error', message: formatAxiosError(e)});
+  };
 
   // setup the mutations
-  const { mutateAsync: saveMutation } = api.useMutateUser({ onSuccess: onSuccess, onError });
+  const { mutateAsync: saveMutation } = api.useHandleOnboardingRequest({ onSuccess: onSuccess, onError });
 
-  // const saveUser = async (u: IUpsertPayload<User>): Promise<void> => {
-  //   console.log('AdminPage: im saving a user', u);
-  //   await saveMutation(u.body)
-  // };
+  const grantOrDenyRequest = async (): Promise<void> => {
+    const { onboarding_id, role_type } = request;
+    const body: HandleOnboardInput = {
+      onboarding_id,
+      role_type,
+      access: isGranting ? 'granted' : 'denied'
+    };
+    // console.log(body)
+    saveMutation(body);
+  };
+
+  const handleClickGrantOrDeny = (b: boolean): void => {
+    const { identifier, role_type } = request;
+    setIsGranting(b);
+    setMsg(b ? OnboardStrings.confirmGrant(identifier, role_type) : OnboardStrings.denyGrant(identifier));
+    setShowConfirm((o) => !o);
+  };
 
   return (
     <AuthLayout>
@@ -33,16 +61,24 @@ export default function OnboardingAdminPage(): JSX.Element {
         <DataTable
           headers={new OnboardUser().displayProps}
           title='Pending BCTW onboarding requests'
-          queryProps={{query: api.useOnboardRequests}}
-          // onSelect={handleTableRowSelect}
+          queryProps={{ query: api.useOnboardRequests }}
+          onSelect={handleSelectRequest}
         />
-        {/* <div className={'button-row'}>
-          <AddEditViewer<User> editText={'User'} addText={'User'} editing={userModified} empty={new User()} onSave={saveUser} onDelete={deleteUser}>
-            <EditUser editing={new User()} open={false} onSave={null} handleClose={null} />
-          </AddEditViewer>
-        </div> */}
+        <div className={'button-row'}>
+          <Button color='primary' disabled={!request} onClick={(): void => handleClickGrantOrDeny(true)}>
+            Grant
+          </Button>
+          <Button color='secondary' disabled={!request} onClick={(): void => handleClickGrantOrDeny(false)}>
+            Deny
+          </Button>
+        </div>
       </div>
+      <ConfirmModal
+        open={showConfirm}
+        handleClickYes={(): Promise<void> => grantOrDenyRequest()}
+        handleClose={(): void => setShowConfirm(false)}
+        message={msg}
+      />
     </AuthLayout>
   );
-
 }

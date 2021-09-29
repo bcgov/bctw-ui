@@ -14,24 +14,18 @@ import { OnboardingStatus } from 'types/onboarding';
  * 2. Pending access approval/denial
  * 3. Access denied
  * 4. Access approved
- * 
- * 
- * todo: move this into a separate endpoint that:
-    * doesnt require authentication
-    * retrieves only onboarding status for the current user
-    * 
  */
 
 const UserOnboarding = (): JSX.Element => {
   const api = useTelemetryApi();
-  const { data, status } = api.useUser();
+  const { data, status } = api.useOnboardStatus();
 
   const [userAccess, setUserAccess] = useState<OnboardingStatus | null>(null);
-  const [userEmail, setUserEmail] = useState('');
+  // const [userEmail, setUserEmail] = useState('');
 
   useDidMountEffect(() => {
     if (status === 'success') {
-      setUserEmail(data.email);
+      // setUserEmail(data.email);
       setUserAccess(data.access);
     }
   }, [data])
@@ -45,10 +39,10 @@ const UserOnboarding = (): JSX.Element => {
 
   return (
     <div style={containerStyle}>
-      <div>
+      {/* <div>
         <p>User's email is: {userEmail}</p>
         <p>User's access is: {userAccess}</p>
-      </div>
+      </div> */}
       {
         userAccess ? // User is in the system
           <div>

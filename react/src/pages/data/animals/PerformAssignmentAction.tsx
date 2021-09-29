@@ -114,8 +114,8 @@ export default function PerformAssignmentAction({
   };
 
   // setup mutations to save the device attachment status
-  const { mutateAsync: saveAttachDevice } = bctwApi.useMutateAttachDevice({ onSuccess: onAttachSuccess, onError });
-  const { mutateAsync: saveRemoveDevice } = bctwApi.useMutateRemoveDevice({ onSuccess: onRemoveSuccess, onError });
+  const { mutateAsync: saveAttachDevice } = bctwApi.useAttachDevice({ onSuccess: onAttachSuccess, onError });
+  const { mutateAsync: saveRemoveDevice } = bctwApi.useRemoveDevice({ onSuccess: onRemoveSuccess, onError });
 
   /* if there is a collar attached and user clicks the remove button, show the confirmation window
     otherwise, show the list of devices the user has access to

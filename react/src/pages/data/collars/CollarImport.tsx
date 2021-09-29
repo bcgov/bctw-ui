@@ -71,13 +71,13 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   };
 
   // the bulk file handler mutation for importing .keyx files
-  const { mutateAsync: mutateKeyx, reset: resetKeyx, isLoading: isPostingKeyx } = bctwApi.useMutateBulkXml({
+  const { mutateAsync: mutateKeyx, reset: resetKeyx, isLoading: isPostingKeyx } = bctwApi.useUploadXML({
     onSuccess: onSuccessKeyx,
     onError
   });
 
   // the single file mutation for importing a single .csv file with metadata
-  const { mutateAsync: mutateCsv, reset: resetCsv, isLoading: isPostingCsv } = bctwApi.useMutateBulkCsv({
+  const { mutateAsync: mutateCsv, reset: resetCsv, isLoading: isPostingCsv } = bctwApi.useUploadCSV({
     onSuccess: onSuccessCsv,
     onError
   });

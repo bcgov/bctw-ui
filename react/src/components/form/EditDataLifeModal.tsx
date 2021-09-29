@@ -64,7 +64,7 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   };
 
   // setup mutation to save the modified data life
-  const { mutateAsync } = bctwApi.useMutateEditDataLife({ onSuccess, onError });
+  const { mutateAsync } = bctwApi.useEditDataLife({ onSuccess, onError });
   const isAdmin = permission_type === eCritterPermission.admin;
 
   return (

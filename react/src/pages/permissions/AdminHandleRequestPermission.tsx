@@ -60,7 +60,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     responseDispatch({ severity: 'error', message: formatAxiosError(err) });
   };
 
-  const { mutateAsync, isLoading } = bctwApi.useMutateTakeActionOnPermissionRequest({ onSuccess, onError });
+  const { mutateAsync, isLoading } = bctwApi.useTakeActionOnPermissionRequest({ onSuccess, onError });
 
   // submit the POST request when the grant/deny is confirmed in modal
   const handleGrantOrDenyPermission = async (): Promise<void> => {

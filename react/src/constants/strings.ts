@@ -1,3 +1,5 @@
+import { eUserRole } from 'types/user';
+
 const CritterStrings = {
   assignCollarBtnText: 'Assign Selected Device',
   assignedTableTitle: 'Animals Attached to a Device',
@@ -177,6 +179,11 @@ const DataLifeStrings = {
   editWarning: 'Warning: data life fields can only be modified once'
 }
 
+const OnboardStrings = {
+  confirmGrant: (username: string, permission: eUserRole): string => `Are you sure you want to grant ${username} the ${permission} role?`,
+  denyGrant: (username: string): string =>  `Are you sure you want to deny ${username} access to BCTW?`
+}
+
 export {
   CodeStrings,
   CollarStrings,
@@ -189,4 +196,5 @@ export {
   WorkflowStrings,
   ImportSteps,
   DataLifeStrings,
+  OnboardStrings,
 }

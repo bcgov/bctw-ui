@@ -50,7 +50,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   };
 
   // setup the mutation collar mutations
-  const { mutateAsync: saveMutation } = bctwApi.useMutateCollar({ onSuccess: onSaveSuccess, onError });
+  const { mutateAsync: saveMutation } = bctwApi.useSaveDevice({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
   const saveCollar = async (c: IUpsertPayload<Collar>): Promise<void> => {

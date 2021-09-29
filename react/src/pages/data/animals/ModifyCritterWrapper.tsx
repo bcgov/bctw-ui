@@ -56,7 +56,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   };
 
   // setup the mutations
-  const { mutateAsync: saveMutation } = bctwApi.useMutateCritter({ onSuccess: onSaveSuccess, onError });
+  const { mutateAsync: saveMutation } = bctwApi.useSaveAnimal({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
 
   const saveCritter = async (a: IUpsertPayload<Animal>): Promise<void> => {

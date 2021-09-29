@@ -36,7 +36,7 @@ const CodePage: React.FC = () => {
     setTitle(c.title);
   };
 
-  const { mutateAsync } = bctwApi.useMutateCodeHeader({ onSuccess });
+  const { mutateAsync } = bctwApi.useSaveCodeHeader({ onSuccess });
 
   const handleSave = async (p: IUpsertPayload<CodeHeaderInput>): Promise<IBulkUploadResults<ICodeHeader>> =>
     await mutateAsync(p.body);

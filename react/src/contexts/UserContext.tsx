@@ -44,7 +44,7 @@ export const UserStateContextProvider: React.FC = (props) => {
   const onError = (e): void => {
     console.log('UserContext: error saving user', e)
   }
-  const { mutateAsync } = api.useMutateUser({onSuccess, onError });
+  const { mutateAsync } = api.useSaveUser({onSuccess, onError });
 
   // when the user data is fetched...
   useEffect(() => {

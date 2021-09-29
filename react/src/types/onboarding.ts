@@ -13,6 +13,7 @@ export interface IOnboardUser {
   domain: KeyCloakDomainType;
   identifier: string; // todo: rename to username?
   reason: string;
+  access: OnboardingStatus;
 }
 
 export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnboardUser {

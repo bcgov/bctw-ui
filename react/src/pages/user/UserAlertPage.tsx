@@ -48,7 +48,7 @@ export default function AlertPage(): JSX.Element {
     responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutation to update the alert status
-  const { mutateAsync, isLoading } = bctwApi.useMutateUserAlert({ onSuccess, onError });
+  const { mutateAsync, isLoading } = bctwApi.useSaveUserAlert({ onSuccess, onError });
 
   // alert is selected in table
   const handleSelectRow = (aid: number): void => {

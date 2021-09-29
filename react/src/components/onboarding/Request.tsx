@@ -44,7 +44,7 @@ const UserAccessRequest = (): JSX.Element => {
     console.log('UserOnboarding: Request: error saving new user object', e)
   }
   const api = useTelemetryApi();
-  const { mutateAsync: saveMutation } = api.useMutateSubmitOnboardingRequest({ onSuccess, onError });
+  const { mutateAsync: saveMutation } = api.useSubmitOnboardingRequest({ onSuccess, onError });
 
   const email = keycloakUser?.email ?? 'email@address.com';
   const firstName = keycloakUser?.given_name ?? 'given_Name';

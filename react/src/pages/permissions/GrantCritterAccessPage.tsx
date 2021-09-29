@@ -46,7 +46,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
     responseDispatch({ severity: 'error', message: formatAxiosError(error) });
   }
 
-  const { mutateAsync } = bctwApi.useMutateGrantCritterAccess({ onSuccess, onError });
+  const { mutateAsync } = bctwApi.useGrantCritterAccess({ onSuccess, onError });
 
   const handleSave = async (body: IUserCritterPermissionInput): Promise<void> => {
     console.log(JSON.stringify(body, null, 2));

@@ -53,7 +53,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   }
 
   // setup the API call to POST the permission request
-  const { mutateAsync } = bctwApi.useMutateSubmitPermissionRequest({ onSuccess, onError });
+  const { mutateAsync } = bctwApi.useSubmitPermissionRequest({ onSuccess, onError });
 
   // set the selected permission state when saved from the picker modal
   const handleCrittersSelected = (ca: IUserCritterPermissionInput): void => {
