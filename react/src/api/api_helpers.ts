@@ -3,7 +3,6 @@ interface CreateUrlParams {
   api: string;
   query?: string;
   page?: number;
-  testUser?: string;
   noApiPrefix?: boolean;
 }
 
@@ -27,22 +26,18 @@ const _appendQueryToUrl = (url: string, query: string): string => {
 /**
  * todo: doc 
  */
-const createUrl = ({ api, query, page, testUser, noApiPrefix }: CreateUrlParams): string => {
+const createUrl = ({ api, query, page, noApiPrefix }: CreateUrlParams): string => {
   const baseUrl = getBaseUrl(noApiPrefix);
   // console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
     url = _appendQueryToUrl(url, query);
   }
-  if (!IS_PROD) {
-    url = _appendQueryToUrl(url, `idir=${process.env.REACT_APP_IDIR}`);
+  if (!IS_PROD) { // in dev, add domain and the user identifier to the query
+    url = _appendQueryToUrl(url, `${process.env.REACT_APP_DOMAIN}=${process.env.REACT_APP_IDENTIFIER}`);
   }
   if (page) {
     url = _appendQueryToUrl(url, `page=${page}`)
-  }
-  if (testUser) {
-    url = _appendQueryToUrl(url, `testUser=${testUser}`)
-    // console.log('retrieving url with testuser ${testUser}');
   }
   // console.log('createURL() -- final created URL:', url)
   return url;

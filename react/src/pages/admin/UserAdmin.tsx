@@ -50,9 +50,8 @@ export default function UserAdminPage(): JSX.Element {
     <AuthLayout>
       <div className='container'>
         <h1>BCTW Users</h1>
-        {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
         <DataTable
-          headers={['id', 'access', 'role_type', 'idir', 'bceid', 'firstname', 'lastname', 'email']}
+          headers={['id', 'role_type', 'idir', 'bceid', 'firstname', 'lastname', 'email']}
           title='Users'
           queryProps={tableProps}
           onSelect={handleTableRowSelect}

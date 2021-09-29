@@ -1,11 +1,12 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { IUserCritterAccess, User, UserCritterAccess } from 'types/user';
+import { User } from 'types/user';
 import {
   IBulkUploadResults,
   ApiProps
 } from 'api/api_interfaces';
 import { eCritterPermission, filterOutNonePermissions, IExecutePermissionRequest, IPermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
+import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 
 // what the API returns after saving user/animal permissions
 export interface IGrantCritterAccessResults {
@@ -16,7 +17,7 @@ export interface IGrantCritterAccessResults {
 }
 
 export const permissionApi = (props: ApiProps) => {
-  const { api, testUser } = props;
+  const { api } = props;
 
   /**
    * used in the admin page @file {permissions/GrantCritterAccessPage.tsx}
@@ -25,7 +26,7 @@ export const permissionApi = (props: ApiProps) => {
   const grantCritterAccessToUser = async (
     body: IUserCritterPermissionInput
   ): Promise<IBulkUploadResults<IGrantCritterAccessResults>> => {
-    const url = createUrl({ api: 'assign-critter-to-user', testUser });
+    const url = createUrl({ api: 'assign-critter-to-user' });
     const { data } = await api.post(url, [body]);
     const { results, errors } = data;
     return { results, errors };

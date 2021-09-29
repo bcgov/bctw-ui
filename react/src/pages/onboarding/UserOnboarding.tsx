@@ -4,7 +4,7 @@ import UserAccessDenied from 'components/onboarding/Denied';
 import { useState } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { OnboardingStatus } from 'types/user';
+import { OnboardingStatus } from 'types/onboarding';
 
 /**
  * # UserOnboarding
@@ -14,6 +14,12 @@ import { OnboardingStatus } from 'types/user';
  * 2. Pending access approval/denial
  * 3. Access denied
  * 4. Access approved
+ * 
+ * 
+ * todo: move this into a separate endpoint that:
+    * doesnt require authentication
+    * retrieves only onboarding status for the current user
+    * 
  */
 
 const UserOnboarding = (): JSX.Element => {

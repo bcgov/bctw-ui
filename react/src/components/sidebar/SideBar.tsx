@@ -7,20 +7,15 @@ import { Link, useLocation } from 'react-router-dom';
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
-  // sidebarContent?: React.ReactNode; // what's displayed in the drawer below the sidebar's navigation section
   collapseAble: boolean;
 };
 
 export default function SideBar({ routes }: SideBarProps): JSX.Element {
-  // const classes = drawerStyles();
   const location = useLocation();
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [isOwner, setIsOwner] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
-  // const [open, setOpen] = React.useState(false);
   const useUser = useContext(UserContext);
-
-  // const handleDrawerOpen = (): void => setOpen((o) => !o);
 
   // enable user to see admin page if they have the role
   useEffect(() => {
@@ -38,9 +33,8 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
       curRoutes.push(routes.find((r) => r.name === 'animal-manager'));
-      // curRoutes.push(routes.find((r) => r.name === 'codes'));
       curRoutes.push(routes.find((r) => r.name === 'delegation-requests'));
-      // curRoutes.push(routes.find((r) => r.name === 'onboarding-requests'));
+      curRoutes.push(routes.find((r) => r.name === 'onboarding-admin'));
       curRoutes.push(routes.find((r) => r.name === 'users'));
     }
     if (isOwner) {

@@ -2,13 +2,13 @@ import { createUrl, isDev } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ITelemetryAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
-import { IKeyCloakSessionInfo, IOnboardUser, IUser, User } from 'types/user';
+import { IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps } from 'api/api_interfaces';
 
 
 export const userApi = (props: ApiProps) => {
-  const { api, testUser } = props;
+  const { api } = props;
 
   /**
    * retrieves keycloak session data
@@ -43,20 +43,10 @@ export const userApi = (props: ApiProps) => {
   };
 
   /**
-   * from the request page 
-   */
-  const addNewUserRequest = async (body: IOnboardUser): Promise<IOnboardUser> => {
-    const url = createUrl({api: 'add-new-user'});
-    console.log('posting new user to be onboarded', body);
-    const { data } = await api.post(url, body);
-    return data;
-  }
-
-  /**
    * used in the user context to retrieve the user info
    */
   const getUser = async (): Promise<User> => {
-    const url = createUrl({ api: 'get-user', testUser });
+    const url = createUrl({ api: 'get-user' });
     const { data } = await api.get(url);
     const user = plainToClass(User, data);
     // console.log('fetched user info', user);
@@ -70,7 +60,7 @@ export const userApi = (props: ApiProps) => {
    * @returns {User[]} including their user role
    */
   const getUsers = async (page: number): Promise<User[]> => {
-    const url = createUrl({ api: 'get-users', testUser });
+    const url = createUrl({ api: 'get-users' });
     const { data } = await api.get(url);
     return data.map((json: IUser[]) => plainToClass(User, json));
   };
@@ -133,6 +123,5 @@ export const userApi = (props: ApiProps) => {
     upsertUDF,
     updateAlert,
     getSessionInfo,
-    addNewUserRequest
   };
 };

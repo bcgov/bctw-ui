@@ -5,7 +5,8 @@ import { useContext, useEffect, useState } from 'react';
 import { createUrl } from 'api/api_helpers';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { DomainType, eUserRole, IKeyCloakSessionInfo, IOnboardUser } from 'types/user';
+import { eUserRole, IKeyCloakSessionInfo, KeyCloakDomainType } from 'types/user';
+import { IOnboardUser, OnboardUser } from 'types/onboarding';
 
 const UserAccessRequest = (): JSX.Element => {
 
@@ -33,7 +34,7 @@ const UserAccessRequest = (): JSX.Element => {
 
   const useKeycloakUser = useContext(UserContext);
   const [keycloakUser, setKeycloakUser] = useState<IKeyCloakSessionInfo>(null);
-  const [domain, setDomain] = useState<DomainType>('idir');
+  const [domain, setDomain] = useState<KeyCloakDomainType>('idir');
 
   // create access request stub
   const onSuccess = (u: IOnboardUser): void => {
@@ -43,7 +44,7 @@ const UserAccessRequest = (): JSX.Element => {
     console.log('UserOnboarding: Request: error saving new user object', e)
   }
   const api = useTelemetryApi();
-  const { mutateAsync: saveMutation } = api.useMutateAddUserRequest({ onSuccess, onError });
+  const { mutateAsync: saveMutation } = api.useMutateSubmitOnboardingRequest({ onSuccess, onError });
 
   const email = keycloakUser?.email ?? 'email@address.com';
   const firstName = keycloakUser?.given_name ?? 'given_Name';
@@ -103,7 +104,7 @@ const UserAccessRequest = (): JSX.Element => {
         console.log('UserOnboarding: Request: submitRequest: populating new user object');
 
         // create a new User object
-        const newUser: IOnboardUser = {} as IOnboardUser;
+        const newUser = new OnboardUser();
 
         // use enumerated role types
         switch (accessType.toLowerCase()) {

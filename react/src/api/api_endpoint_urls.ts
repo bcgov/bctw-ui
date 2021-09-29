@@ -14,6 +14,10 @@ const upsertDeviceEndpoint = 'upsert-collar';
 const upsertAlertEndpoint = 'update-user-alert';
 const getCritterEndpoint = 'get-animals';
 
+const submitOnboardingRequest = 'submit-onboarding-request';
+const getOnboardingRequests = 'onboarding-requests';
+const handleOnboardingRequest = 'handle-onboarding-request';
+
 export {
   importCSVEndpoint,
   importXMLEndpoint,
@@ -26,4 +30,7 @@ export {
   upsertAlertEndpoint,
   upsertCritterEndpoint,
   upsertDeviceEndpoint,
+  submitOnboardingRequest,
+  getOnboardingRequests,
+  handleOnboardingRequest,
 }

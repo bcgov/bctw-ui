@@ -1,13 +1,14 @@
 import Button from 'components/form/Button';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'contexts/UserContext';
-import { User, UserCritterAccess } from 'types/user';
+import { User } from 'types/user';
 import { Box, Typography } from '@material-ui/core';
 import DataTable from 'components/table/DataTable';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { sendSmsMortality } from 'utils/gcNotify';
+import { UserCritterAccess } from 'types/animal_access';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);

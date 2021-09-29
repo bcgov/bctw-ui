@@ -9,7 +9,7 @@ import { Animal, AttachedAnimal, eCritterFetchType, IAnimal, IAttachedAnimal } f
 // type API = Record<string, APICall<unknown>>;
 
 export const critterApi = (props: ApiProps) => {
-  const { api, testUser } = props;
+  const { api } = props;
 
   const _handleGetResults = (
     data: IAnimal[] | IAttachedAnimal[],
@@ -22,7 +22,7 @@ export const critterApi = (props: ApiProps) => {
   };
 
   const getCritters = async (page = 1, critterType: eCritterFetchType): Promise<Animal[] | AttachedAnimal[]> => {
-    const url = createUrl({ api: getCritterEndpoint, query: `critterType=${critterType}`, page, testUser });
+    const url = createUrl({ api: getCritterEndpoint, query: `critterType=${critterType}`, page });
     // console.log(`requesting assigned critters page: ${page}`);
     const { data } = await api.get(url);
     return _handleGetResults(data, critterType);
@@ -30,14 +30,14 @@ export const critterApi = (props: ApiProps) => {
 
   const upsertCritter = async (payload: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
     const { body } = payload;
-    const url = createUrl({ api: upsertCritterEndpoint, testUser });
+    const url = createUrl({ api: upsertCritterEndpoint });
     // const critters = body.map(a => serialize(a))
     const { data } = await api.post(url, body);
     return data;
   };
 
   const getCritterHistory = async (page: number, id: string): Promise<Animal[]> => {
-    const url = createUrl({ api: `get-animal-history/${id}`, page, testUser });
+    const url = createUrl({ api: `get-animal-history/${id}`, page });
     const { data } = await api.get(url);
     return data.map((json: IAnimal[]) => plainToClass(Animal, json));
   };

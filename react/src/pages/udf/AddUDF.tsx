@@ -11,7 +11,7 @@ import { eUDFType, IUDF, UDF } from 'types/udf';
 import { UserContext } from 'contexts/UserContext';
 import Modal from 'components/modal/Modal';
 import TextField from 'components/form/TextInput';
-import { UserCritterAccess } from 'types/user';
+import { UserCritterAccess } from 'types/animal_access';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { useQueryClient } from 'react-query';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';

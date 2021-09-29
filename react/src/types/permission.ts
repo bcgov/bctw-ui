@@ -1,9 +1,9 @@
-import { Expose, Transform } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
-import { Animal } from './animal';
-import { BCTWBase, BCTWValidDates, nullToDayjs } from './common_types';
-import { IUserCritterAccessInput } from './user';
+import { Animal } from 'types/animal';
+import { BCTWBase, BCTWValidDates, nullToDayjs } from 'types/common_types';
+import { IUserCritterAccessInput } from 'types/animal_access';
 
 // interface used to construct objects for updating/granting users access to animals
 export interface IUserCritterPermissionInput {
@@ -76,7 +76,6 @@ export interface IPermissionRequest extends
   status: PermissionRequestStatus;
 }
 
-// type PermissionRequestProps = keyof IPermissionRequest;
 
 export class PermissionRequest implements IPermissionRequest, BCTWBase<PermissionRequest> {
   animal_id: string;
@@ -97,7 +96,7 @@ export class PermissionRequest implements IPermissionRequest, BCTWBase<Permissio
   status: PermissionRequestStatus;
 
   get displayProps(): (keyof PermissionRequest)[] {
-    return []
+    return [];
   }
 
   get permissionStatus(): PermissionRequestStatus {
@@ -113,10 +112,12 @@ export class PermissionRequest implements IPermissionRequest, BCTWBase<Permissio
         return 'unknown';
     }
   }
-  @Expose() get identifier(): string { return 'request_id' }
+  get identifier(): string { return 'request_id' }
+
   formatPropAsHeader(str: keyof PermissionRequest): string {
     return columnToHeader(str);
   }
+
   toJSON(): PermissionRequest { return this }
 
   static get ownerHistoryPropsToDisplay(): (keyof PermissionRequest)[] {

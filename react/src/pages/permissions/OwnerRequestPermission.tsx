@@ -14,7 +14,7 @@ import { Icon, NotificationMessage } from 'components/common';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import DataTable from 'components/table/DataTable';
-import { IUserCritterAccessInput, UserCritterAccess } from 'types/user';
+import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
 
 /**
  * Page that allows an owner to submit a request to grant other users animal permissions 

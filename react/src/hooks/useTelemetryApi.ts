@@ -4,6 +4,7 @@ import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
+import { onboardingApi as onboarding_api } from 'api/onboarding_api';
 import { mapApi as map_api } from 'api/map_api';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { userApi as user_api } from 'api/user_api';
@@ -15,7 +16,7 @@ import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar } from 'types/collar';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
-import { IKeyCloakSessionInfo, IOnboardUser, IUserCritterAccess, User, UserCritterAccess } from 'types/user';
+import { IKeyCloakSessionInfo, User } from 'types/user';
 
 import {
   IBulkUploadResults,
@@ -30,6 +31,8 @@ import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow } from 'types/events/event';
+import { IOnboardUser, HandleOnboardInput } from 'types/onboarding';
+import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -60,6 +63,7 @@ export const useTelemetryApi = () => {
   const eventApi = event_api({ api });
   const permissionApi = permission_api({ api});
   const attachmentApi = attachment_api({ api});
+  const onboardApi = onboarding_api({ api});
 
   const defaultQueryOptions = { refetchOnWindowFocus: false };
 
@@ -271,6 +275,11 @@ export const useTelemetryApi = () => {
     return useQuery<PermissionRequest[], AxiosError>(['getRequestHistory', page], () => permissionApi.getPermissionHistory(page), defaultQueryOptions);
   }
 
+  /** get onboard requests  */
+  const useOnboardRequests = (page: number): UseQueryResult<IOnboardUser[], AxiosError> => {
+    return useQuery<IOnboardUser[], AxiosError>(['getOnboardRequests', page], () => onboardApi.getOnboardingRequests(), defaultQueryOptions)
+  }
+
   /**
    *
    * mutations - post/delete requests
@@ -368,8 +377,12 @@ export const useTelemetryApi = () => {
     useMutation<User, AxiosError, User>((body) => userApi.addUser(body), config);
 
   /** add a new user that hasn't been onboarded */
-  const useMutateAddUserRequest = (config: UseMutationOptions<IOnboardUser, AxiosError, IOnboardUser>): UseMutationResult<IOnboardUser, AxiosError> =>
-    useMutation<IOnboardUser, AxiosError, IOnboardUser>((body) => userApi.addNewUserRequest(body), config);
+  const useMutateSubmitOnboardingRequest = (config: UseMutationOptions<IOnboardUser, AxiosError, IOnboardUser>): UseMutationResult<IOnboardUser, AxiosError> =>
+    useMutation<IOnboardUser, AxiosError, IOnboardUser>((body) => onboardApi.submitOnboardingRequest(body), config);
+  
+  /** grants or denies an onboarding request */
+  const useMutateHandleOnboardingRequest = (config: UseMutationOptions<boolean, AxiosError, HandleOnboardInput>): UseMutationResult<boolean, AxiosError> =>
+    useMutation<boolean, AxiosError, HandleOnboardInput >((body) => onboardApi.handleOnboardingRequest(body), config);
   
   /** see permission_api doc */ 
   const useMutateSubmitPermissionRequest = (config: UseMutationOptions<unknown, AxiosError, IPermissionRequestInput>): UseMutationResult<unknown> => 
@@ -404,6 +417,7 @@ export const useTelemetryApi = () => {
     usePermissionRequests,
     usePermissionHistory,
     useUserSessionInfo,
+    useOnboardRequests,
     // mutations
     useMutateCodeHeader,
     useMutateBulkCsv,
@@ -421,6 +435,7 @@ export const useTelemetryApi = () => {
     useMutateWorkflowEvent,
     useMutateSubmitPermissionRequest,
     useMutateTakeActionOnPermissionRequest,
-    useMutateAddUserRequest
+    useMutateSubmitOnboardingRequest,
+    useMutateHandleOnboardingRequest,
   };
 };

@@ -7,9 +7,10 @@ import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useContext, useEffect, useState } from 'react';
 import { adminPermissionOptions, eCritterPermission, IUserCritterPermissionInput, ownerPermissionOptions } from 'types/permission';
-import { IUserCritterAccessInput, User, UserCritterAccess } from 'types/user';
+import { User } from 'types/user';
 import { Select, MenuItem } from '@material-ui/core';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
 
 type PickCritterProps = ModalBaseProps & {
   alreadySelected: string[];
