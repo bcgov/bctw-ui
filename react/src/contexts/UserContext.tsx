@@ -1,18 +1,19 @@
+import { AxiosError } from 'axios';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
 import { User, IKeyCloakSessionInfo } from 'types/user';
 
 export interface IUserContext {
-  user?: User;
-  session?: IKeyCloakSessionInfo;
-  error?: string;
+  user   : User | null;
+  session: IKeyCloakSessionInfo | null;
+  error  : AxiosError | null;
 }
 
 export const UserContext = createContext<IUserContext>({
-  user: null,
+  user   : null,
   session: null,
-  error: null,
+  error  : null,
 });
 
 export const UserContextDispatch = createContext(null);
@@ -48,9 +49,10 @@ export const UserStateContextProvider: React.FC = (props) => {
 
   // when the user data is fetched...
   useEffect(() => {
+    // console.log('user fetching status', userStatus)
     if (userStatus === 'success') {
       setReadyUser(true);
-      setUserContext({ user: userData });
+      setUserContext(o => ({...o, user: userData }));
     } else {
       setReadyUser(false);
     } 
@@ -61,7 +63,7 @@ export const UserStateContextProvider: React.FC = (props) => {
     if (sessionStatus === 'success') {
       setReadySession(true);
       setSession(sessionData);
-      setUserContext({ session: sessionData });
+      setUserContext(o => ({ ...o, session: sessionData }));
     }
   }, [sessionStatus]);
 
@@ -72,16 +74,23 @@ export const UserStateContextProvider: React.FC = (props) => {
     }
   }, [readySession, readyUser])
 
-  // when there was an error retrieving data
+  // when there was an error fetching the user
   useEffect(() => {
-    if (sessionError || userError) {
-      const err = isUserError ? userError : isSessionError ? sessionError : null;
-      const error = err?.response?.data?.error;
-      console.log('UserContext: failed to retrieve user or session info', error);
-      const user = isUserError ? null : userContext.user;
-      setUserContext({ user, error })
+    if (userError) {
+      console.log('UserContext: failed to fetch user', userError);
+      const n = { user: null, error: userError }
+      setUserContext(o => ({...o, ...n}))
     }
-  }, [sessionError, userError])
+  }, [isUserError])
+
+  // when there was an error fetching the keycloak session
+  useEffect(() => {
+    if (sessionError) {
+      console.log('UserContext: failed to retrieve session', sessionError);
+      const n = { session: null, error: sessionError};
+      setUserContext(o => ({...o, ...n}))
+    }
+  }, [isSessionError])
 
   /**
    * keycloak session may be different/newer than what is persisted in the database.
@@ -102,14 +111,14 @@ export const UserStateContextProvider: React.FC = (props) => {
       // no updates required
       return;
     }
-    const newUser = Object.assign({}, user);
+    const updatedUser = Object.assign({}, user);
 
     // create new user in user table with role 'newUser' using Keycloak information
-    newUser.email = session.email;
-    newUser.firstname = session.given_name;
-    newUser.lastname = session.family_name;
-    console.log(`keycloak session object has new info, upserting new user ${JSON.stringify(newUser)}`);
-    await mutateAsync(newUser);
+    updatedUser.email = session.email;
+    updatedUser.firstname = session.given_name;
+    updatedUser.lastname = session.family_name;
+    console.log(`keycloak session object has new info, upserting new user ${JSON.stringify(updatedUser)}`);
+    await mutateAsync(updatedUser);
   }
 
   return (

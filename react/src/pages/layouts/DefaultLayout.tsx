@@ -3,6 +3,9 @@ import { UserContext } from 'contexts/UserContext';
 import { AlertContext } from 'contexts/UserAlertContext';
 import UserAlert from 'pages/user/UserAlertPage';
 import { Modal } from 'components/common';
+import { AxiosError } from 'axios';
+import { formatAxiosError } from 'utils/errors';
+import UserOnboarding from 'pages/onboarding/UserOnboarding';
 
 type IDefaultLayoutProps = {
   children: React.ReactNode;
@@ -14,40 +17,45 @@ type IDefaultLayoutProps = {
  * if there are alerts that require action
  */
 export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.Element {
-  const userChanges = useContext(UserContext);
+  const useUser = useContext(UserContext);
   const useAlert = useContext(AlertContext);
-  const [err, setErr] = useState<string>(null);
-  const [showAlerts, setShowAlerts] = useState<boolean>(false);
+  const [err, setErr] = useState<AxiosError | null>(null);
+  const [showAlerts, setShowAlerts] = useState(false);
 
   useEffect(() => {
     const updateComponent = (): void => {
-      const { error } = userChanges;
+      const { error } = useUser;
       if (error) {
         setErr(error);
       }
     };
     updateComponent();
-  }, [userChanges]);
+  }, [useUser]);
 
   useEffect(() => {
     if (useAlert?.alerts?.length) {
       const isCriticalToUpdate = useAlert.alerts.some((a) => !a.isSnoozed && a.snoozesAvailable === 0);
       if (isCriticalToUpdate) {
         // eslint-disable-next-line no-console
-        console.log('at least one alert is critical, force open alert dialog');
-        setShowAlerts(true);
+        // console.log('at least one alert is critical, force open alert dialog');
       } else {
         // eslint-disable-next-line no-console
-        console.log('no alerts in crital state, hide alert dialog');
-        setShowAlerts(false);
+        // console.log('no alerts in crital state, hide alert dialog');
       }
+      setShowAlerts(true);
     }
   }, [useAlert]);
 
-  // user info could not be retrieved from API
-  if (err && !userChanges.user) {
-    return <div>ERROR {err}</div>;
+  if (err) {
+    // user is unauthorized, redirect them to the onboarding page
+    if (err?.response?.status === 401) {
+      return <UserOnboarding/>
+    } else {
+      // render the error
+      return <div>ERROR {formatAxiosError(err)}</div>;
+    }
   }
+
   // pass these props to the modal to 'force' the user to perform the alert action
   const disableCloseModalProps = {
     disableBackdropClick: true,

@@ -457,7 +457,8 @@ if (isProd) {
   app
     .get('/api/session-info', retrieveSessionInfo)
     .post('/onboarding', keycloak.protect(), handleUserAccessRequest)
-    .all('*', keycloak.protect(), onboardingRedirect);
+    // .all('*', keycloak.protect(), onboardingRedirect);
+    .all('*', keycloak.protect(), pageHandler);
 } else {
   console.log('Environment -- isTest?', isTest);
   app
