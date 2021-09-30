@@ -131,12 +131,13 @@ const proxyApi = function (req, res, next) {
 
   } else {
     // connect to API without using Keycloak authentication
-    url = `${apiHost}:${apiPort}/${endpoint}?${parameters}&idir=user`;
+    url = `${apiHost}:${apiPort}/${endpoint}?${parameters}`;
   }
 
   const errHandler = (err) => {
-    console.error(err.response);
-    res.status(500).json({ error: err.response.data });
+    const { response } = err;
+    console.error(response);
+    res.status(response.status).json({ error: response.data });
   }
 
   const successHandler = (response) => res.json(response.data);
