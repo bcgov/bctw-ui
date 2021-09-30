@@ -11,7 +11,7 @@ import { userApi as user_api } from 'api/user_api';
 import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
-import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryResult } from 'react-query';
+import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar } from 'types/collar';
@@ -65,7 +65,7 @@ export const useTelemetryApi = () => {
   const attachmentApi = attachment_api({ api});
   const onboardApi = onboarding_api({ api});
 
-  const defaultQueryOptions = { refetchOnWindowFocus: false };
+  const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
 
   /**
    *
@@ -203,8 +203,8 @@ export const useTelemetryApi = () => {
   /**
    * @returns a user object, no parameters because it uses the keycloak object to pass idir
    */
-  const useUser = (): UseQueryResult<User, AxiosError> => {
-    return useQuery<User, AxiosError>('user', () => userApi.getUser(), defaultQueryOptions);
+  const useUser = (options = {}): UseQueryResult<User, AxiosError> => {
+    return useQuery<User, AxiosError>('user', () => userApi.getUser(), options);
   };
 
   /**

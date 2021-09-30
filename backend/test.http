@@ -21,6 +21,8 @@ content-type: application/json
   "nickname": "shimmer"
 }
 ]
+###
+http://localhost:8080/api/get-user?bceid=asdfd
 
 ###
 http://localhost:8080/api/get-last-pings

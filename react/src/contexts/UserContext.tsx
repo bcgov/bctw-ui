@@ -2,6 +2,7 @@ import { AxiosError } from 'axios';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
+import { UseQueryOptions } from 'react-query/types/react';
 import { User, IKeyCloakSessionInfo } from 'types/user';
 
 export interface IUserContext {
@@ -31,11 +32,11 @@ export const UserStateContextProvider: React.FC = (props) => {
   // instantiate the context
   const [userContext, setUserContext] = useState<IUserContext>({ user: null, session: null, error: null });
   const [session, setSession] = useState<IKeyCloakSessionInfo>();
-  const [readyUser, setReadyUser] = useState(false);
-  const [readySession, setReadySession] = useState(false);
 
+  // when fetching the user, only retry once in order to redirect invalid users to the onboarding pages 'faster'
+  const fetchUserOptions: Pick<UseQueryOptions, 'retry'> = { retry: 1 };
   // fetch the BCTW user specific data
-  const { isError: isUserError, data: userData, status: userStatus, error: userError } = api.useUser();
+  const { isError: isUserError, data: userData, status: userStatus, error: userError } = api.useUser(fetchUserOptions);
   // fetch the keycloak session data
   const { isError: isSessionError, data: sessionData, status: sessionStatus, error: sessionError } = api.useUserSessionInfo();
   // setup the mutation, used if the user row in the database is out of date
@@ -51,28 +52,28 @@ export const UserStateContextProvider: React.FC = (props) => {
   useEffect(() => {
     // console.log('user fetching status', userStatus)
     if (userStatus === 'success') {
-      setReadyUser(true);
       setUserContext(o => ({...o, user: userData }));
-    } else {
-      setReadyUser(false);
     } 
   }, [userStatus]);
 
   // when the session data is fetched
   useEffect(() => {
     if (sessionStatus === 'success') {
-      setReadySession(true);
       setSession(sessionData);
       setUserContext(o => ({ ...o, session: sessionData }));
     }
   }, [sessionStatus]);
 
+  /**
+   * if both are fetched successfully, check if the user object in the database should be updated 
+   * to reflect changes in the keycloak object
+   */
   useDidMountEffect(() => {
-    // if both are ready, check if the user object needs to be updated
-    if (readySession && readyUser) {
+    const { error, session, user } = userContext;
+    if (session && user && !error) {
       handleUserChanged();
     }
-  }, [readySession, readyUser])
+  }, [userContext])
 
   // when there was an error fetching the user
   useEffect(() => {
@@ -100,14 +101,8 @@ export const UserStateContextProvider: React.FC = (props) => {
    */
   const handleUserChanged = async (): Promise<void> => {
     const { user } = userContext;
-    // confirm valid state 
-    if (!session || !user) {
-      console.log('UserContext: handleUserChanged: session or user info not ready')
-      return;
-    }
     if (session.email === user.email && session.family_name === user.lastname && session.given_name === user.firstname) {
-      console.log('UserContext: handleUserchanged: keycloak info matches database record');
-      // console.log('UserContext: handleUserchanged: keycloak info matches database record', user, session);
+      // console.log('UserContext: handleUserchanged: keycloak info matches database record');
       // no updates required
       return;
     }

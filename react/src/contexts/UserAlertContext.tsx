@@ -9,6 +9,7 @@ import { MortalityAlert } from 'types/alert';
  *  a) an array of @type {TelemetryAlert} applicable to the user
  *  b) a method to invalidate the query (force refetch alerts) when an alert is updated
  * todo: support other alert types
+ * todo: nest this inside user alert context, if the user is invalid dont bother trying to fetch alerts
  */
 
 export interface IAlertContext {
