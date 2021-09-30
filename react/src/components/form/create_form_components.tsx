@@ -126,7 +126,7 @@ function CreateEditSelectField({
       changeHandler={handleChange}
       required={required}
       error={!!errorMessage?.length}
-      propName={codeName || undefined}
+      propName={String(prop)}
     />
   );
 }

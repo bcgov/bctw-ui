@@ -11,7 +11,6 @@ import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
-import useDidMountEffect from 'hooks/useDidMountEffect';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
 import { InboundObj, isDisabled } from 'types/form_types';
@@ -26,50 +25,35 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
 
   const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
-  const [workflowType, setWorkflowType] = useState<WorkflowType>('unknown');
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
-  //fixme: type this
-  const [event, updateEvent] = useState(new MortalityEvent());
+  const [event, updateEvent] = useState<CaptureEvent | ReleaseEvent | MortalityEvent>(new MortalityEvent());
 
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
    */
-  useDidMountEffect(async () => {
-    updateEvent(() => {
-      let e, o;
-      if (workflowType === 'capture') {
-        e = new CaptureEvent();
-        o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['species', 'translocation', 'recapture']);
-      } else if (workflowType === 'release') {
-        e = new ReleaseEvent(false);
-        o = editObjectToEvent(Object.assign({}, editing) as Animal, e, []);
-      } else if (workflowType === 'mortality') {
-        e = new MortalityEvent();
-        o = editObjectToEvent(Object.assign({}, editing) as AttachedAnimal, e, ['animal_status']);
-      }
-      return o;
-    });
-  }, [workflowType]);
-
-  // show the workflow form when a new event object is created
-  useDidMountEffect(() => {
-    if (event) {
-      // console.log('event updated', event.event_type,event);
-      setShowWorkflowForm((o) => !o);
+  const createEvent = (wfType: WorkflowType): CaptureEvent | ReleaseEvent | MortalityEvent => {
+    let e, o;
+    if (wfType === 'capture') {
+      e = new CaptureEvent();
+      o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['species', 'translocation', 'recapture']);
+    } else if (wfType === 'release') {
+      e = new ReleaseEvent(false);
+      o = editObjectToEvent(Object.assign({}, editing) as Animal, e, []);
+    } else if (wfType === 'mortality') {
+      e = new MortalityEvent();
+      o = editObjectToEvent(Object.assign({}, editing) as AttachedAnimal, e, ['animal_status']);
     }
-  }, [event]);
+    return o;
+  }
 
   /**
    * if a workflow button is clicked and the event type is the same, open or close the workflow modal. 
    * otherwise, update the workflow type which will trigger the modal state
    */
   const handleOpenWorkflow = (e: WorkflowType): void => {
-    if (workflowType === e) {
-      setShowWorkflowForm((o) => !o);
-    } else {
-      setWorkflowType(e);
-    }
+    updateEvent(createEvent(e));
+    setShowWorkflowForm((o) => !o);
   };
 
   /**
@@ -204,7 +188,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                   />
                   <WorkflowWrapper
                     open={showWorkflowForm}
-                    event={event}
+                    event={event as any}
                     handleClose={(): void => setShowWorkflowForm(false)}
                     onEventSaved={handleEventSaved}
                   />

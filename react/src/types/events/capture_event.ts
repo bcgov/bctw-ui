@@ -29,10 +29,8 @@ export type CaptureFormField = {
   [Property in keyof CaptureEvent]+?: FormFieldObject<CaptureEvent>;
 };
 /**
- * todo:
- * if translocation, enable release fields
  * capture date / data life ??!?
- * maybe assume data life is the capture date?
+ * assume data life is the capture date?
  */
 export default class CaptureEvent implements 
 CaptureAnimalEventProps, 
@@ -88,7 +86,10 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
   getAnimal(): OptionalAnimal {
     const props: (keyof Animal)[] =
       ['critter_id', 'recapture', 'translocation', 'associated_animal_id',
-        'associated_animal_relationship', 'region', 'population_unit', 'captivity_status'];
+        'associated_animal_relationship', 'captivity_status'];
+    if (this.translocation) {
+      props.push('region', 'population_unit')
+    }
     const ret = eventToJSON(props, this);
     if (!ret.associated_animal_id) {
       delete ret.associated_animal_relationship
@@ -96,6 +97,7 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
     return omitNull({ ...ret, ...this.location_event.toJSON()});
   }
 
+  // todo: should data life be updated??
   getDataLife(): ChangeDataLifeInput{
     if (!this.assignment_id|| !this.location_event.date) {
       console.error('cannot update data life in capture event, missing props', this);

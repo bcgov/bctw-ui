@@ -2,7 +2,6 @@ import dayjs, { Dayjs } from 'dayjs';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { WorkflowType } from 'types/events/event';
-import { formatTime } from 'utils/time';
 
 export enum eLocationPositionType {
   utm = 'utm',
@@ -41,14 +40,14 @@ export class LocationEvent implements ILocationEvent {
   toJSON(): Record<string, unknown> {
     const o = {};
     for (let i = 0; i < this.json_keys.length; i++) {
-      const cur = this.json_keys[i];
-      if (this.coordinate_type === 'utm' && this.coord_keys.includes(cur)) {
+      const value = this.json_keys[i];
+      if (this.coordinate_type === 'utm' && this.coord_keys.includes(value)) {
         continue;
-      } else if (this.coordinate_type === 'coord' && this.utm_keys.includes(cur)) {
+      } else if (this.coordinate_type === 'coord' && this.utm_keys.includes(value)) {
         continue;
       }
-      const key = `${this.location_type}_${cur}`;
-      o[key] = cur === 'date' ? this.date?.format(formatTime) : this[cur];
+      const key = `${this.location_type}_${value}`;
+      o[key] = this[value];
     }
     return o;
   }

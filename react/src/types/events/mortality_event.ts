@@ -201,14 +201,15 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     if (this.onlySaveAnimalStatus) {
       return ret;
     }
-    // todo: better way to wipe disabled fields?
     if (!this.wasInvestigated) {
       delete ret.mortality_investigation;
     }
     if (!this.predator_known) {
       delete ret.predator_species_pcod;
-      delete ret.predator_species_ucod;
       delete ret.pcod_confidence;
+    }
+    if (!this.isUCODSpeciesKnown) {
+      delete ret.predator_species_ucod;
       delete ret.ucod_confidence;
     }
     const locationFields = this.location_event.toJSON();

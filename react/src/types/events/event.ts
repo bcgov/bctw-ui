@@ -1,4 +1,3 @@
-import { isDayjs } from 'dayjs';
 import { ReactNode } from 'react';
 import { Animal, getAnimalFormFields, IAnimal } from 'types/animal';
 import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
@@ -6,7 +5,6 @@ import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat} from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { FormChangeEvent, FormFieldObject } from 'types/form_types';
-import { formatTime } from 'utils/time';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 
@@ -57,12 +55,7 @@ export const eventToJSON = <T>(keys: string[], event: T): Record<string, unknown
   const entries = Object.entries(event);
   for (const [key, value] of entries) {
     if (keys.includes(key)) {
-      // todo: move to parent json formatter?
-      if (isDayjs(value)) {
-        ret[key] = value.format(formatTime);
-      } else {
-        ret[key] = value;
-      }
+      ret[key] = value;
     }
   }
   return ret;
