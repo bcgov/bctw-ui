@@ -6,10 +6,17 @@ import { Collar } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { exportEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
+import { useQueryClient } from 'react-query';
 
 import { IBulkUploadResults, IDeleteType } from './api_interfaces';
 
 export const bulkApi = (api: AxiosInstance) => {
+  const queryClient = useQueryClient();
+
+  const invalidate = (): void => {
+    queryClient.invalidateQueries('critters_assigned');
+    queryClient.invalidateQueries('critters_unassigned');
+  }
 
   const uploadCsv = async <T,>(form: FormData): Promise<IBulkUploadResults<T>> => {
     const url = createUrl({ api: importCSVEndpoint});
@@ -35,6 +42,9 @@ export const bulkApi = (api: AxiosInstance) => {
   const deleteType = async ({ objType, id }: IDeleteType): Promise<boolean> => {
     const url = createUrl({ api: `${objType}/${id}` });
     const { status, data } = await api.delete(url);
+    if (objType === 'animal') {
+      invalidate();
+    }
     if (status === 200) {
       return true;
     }

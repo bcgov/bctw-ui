@@ -1,7 +1,6 @@
 import { Animal, AttachedAnimal } from 'types/animal';
 import { cloneElement, useState, useEffect } from 'react';
 import { permissionCanModify  } from 'types/permission';
-import { useQueryClient } from 'react-query';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
@@ -17,11 +16,11 @@ type IModifyWrapperProps = {
 /**
  * wraps child components to provide the actual POST request endpoints for the animal 
  * includes editing and deletes
+ * todo: similar to the map overview, load the critter details here
  */
 export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.Element {
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
-  const queryClient = useQueryClient();
 
   const { editing, children } = props;
   const [canEdit, setCanEdit] = useState(false);
@@ -36,28 +35,18 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     } else {
       const critter = results[0];
       responseDispatch({ severity: 'success', message: `${critter.animal_id} saved!` });
-      invalidateCritterQueries();
     }
   };
 
   const onDeleteSuccess = async (): Promise<void> => {
     responseDispatch({ severity: 'success', message: `critter deleted successfully` });
-    invalidateCritterQueries();
   };
 
   const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
-  // force refetch on critter queries
-  const invalidateCritterQueries = async (): Promise<void> => {
-    queryClient.invalidateQueries('critters_assigned');
-    queryClient.invalidateQueries('critters_unassigned');
-    queryClient.invalidateQueries('getType');
-    queryClient.invalidateQueries('pings');
-  };
-
   // setup the mutations
-  const { mutateAsync: saveMutation } = bctwApi.useSaveAnimal({ onSuccess: onSaveSuccess, onError });
-  const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
+  const { mutateAsync: saveMutation } = api.useSaveAnimal({ onSuccess: onSaveSuccess, onError });
+  const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: onDeleteSuccess, onError });
 
   const saveCritter = async (a: IUpsertPayload<Animal>): Promise<void> => {
     const { body } = a;

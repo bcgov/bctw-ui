@@ -1,5 +1,4 @@
 import { Box } from '@material-ui/core';
-import Tooltip from 'components/common/Tooltip';
 import { CreateFormField } from 'components/form/create_form_components';
 import OkayModal from 'components/modal/OkayModal';
 import { WorkflowStrings } from 'constants/strings';
@@ -14,15 +13,13 @@ import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
 
 /**
- * todo: 
-*/
-export default function ReleaseEventForm({event, handleFormChange }: WorkflowFormProps<ReleaseEvent>): JSX.Element {
+ * todo:
+ */
+export default function ReleaseEventForm({ event, handleFormChange }: WorkflowFormProps<ReleaseEvent>): JSX.Element {
   const [release, updateEvent] = useState<ReleaseEvent>(event);
-
-  const [hasBabies, setHasBabies] = useState(false);
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
-  
+
   useDidMountEffect(() => {
     updateEvent(event);
   }, [event]);
@@ -30,9 +27,7 @@ export default function ReleaseEventForm({event, handleFormChange }: WorkflowFor
   const onChange = (v: Record<keyof ReleaseEvent, unknown>): void => {
     handleFormChange(v);
     const [key, value] = parseFormChangeResult<ReleaseEvent>(v);
-    if (key === 'juvenile_at_heel') {
-      setHasBabies(value === 'Y');
-    } else if (key === 'shouldUnattachDevice') {
+    if (key === 'shouldUnattachDevice') {
       setIsBeingUnattached(!!value);
       if (value) {
         setShowNotif(true);
@@ -47,41 +42,28 @@ export default function ReleaseEventForm({event, handleFormChange }: WorkflowFor
 
   const { fields } = release;
   if (!fields || !wfFields) {
-    return <p>unable to load release workflow</p>
+    return <p>unable to load release workflow</p>;
   }
 
-  return (
-    FormSection('release-wf', 'Release Details', [
-      <LocationEventForm
-        event={release.location_event}
-        notifyChange={onChangeLocationProp}
-      />,
-      <Tooltip title={WorkflowStrings.release.shouldReviewNotif}>
-        <Box mt={2}>
-          <span>{WorkflowStrings.release.areUpdates}</span>
+  return FormSection('release-wf', 'Release Details', [
+    <LocationEventForm event={release.location_event} notifyChange={onChangeLocationProp} />,
+    <Box {...boxSpreadRowProps} mt={2}>
+      {CreateFormField(release, { ...fields.shouldUnattachDevice, tooltip: <p>todo:</p> }, onChange)}
+      {CreateFormField(release, { ...fields.data_life_start, required: isBeingUnattached }, onChange, {
+        disabled: !isBeingUnattached
+      })}
+    </Box>,
+    <>
+      {release.translocation && release.animal_status === 'In Translocation' ? (
+        <Box {...boxSpreadRowProps} mt={2}>
+          <h4>Update translocation details:</h4>
+          {CreateFormField(release, {...wfFields.get('region'), required: true}, onChange)}
+          {CreateFormField(release, {...wfFields.get('population_unit'), required: true}, onChange)}
         </Box>
-      </Tooltip>,
-      <Box {...boxSpreadRowProps} mt={1}>
-        {CreateFormField(release, wfFields.get('ear_tag_left_id'), onChange)}
-        {CreateFormField(release, wfFields.get('ear_tag_left_colour'), onChange)}
-      </Box>,
-      <Box {...boxSpreadRowProps} mt={1}>
-        {CreateFormField(release, wfFields.get('ear_tag_right_id'), onChange)}
-        {CreateFormField(release, wfFields.get('ear_tag_right_colour'), onChange)}
-      </Box>,
-      <Box {...boxSpreadRowProps} mt={1}>
-        {CreateFormField(release, wfFields.get('juvenile_at_heel'), onChange)}
-        {CreateFormField(release, wfFields.get('juvenile_at_heel_count'), onChange, {disabled: !hasBabies})}
-      </Box>,
-      <Box {...boxSpreadRowProps} mt={1}>
-        {CreateFormField(release, wfFields.get('animal_colouration'), onChange)}
-        {CreateFormField(release, wfFields.get('life_stage'), onChange)}
-      </Box>,
-      <Box {...boxSpreadRowProps} mt={2}>
-        {CreateFormField(release, {...fields.shouldUnattachDevice, tooltip: <p>todo:</p> }, onChange)}
-        {CreateFormField(release, {...fields.data_life_start, required: isBeingUnattached }, onChange, {disabled: !isBeingUnattached})}
-      </Box>,
-      <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>{WorkflowStrings.release.removeDeviceAction(event.device_id, event.animal_id, event.wlh_id)}</OkayModal>
-    ])
-  );
+      ) : null}
+    </>,
+    <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>
+      {WorkflowStrings.release.removeDeviceAction(event.device_id, event.animal_id, event.wlh_id)}
+    </OkayModal>
+  ]);
 }

@@ -5,7 +5,7 @@ import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON } from 'types/e
 import { LocationEvent } from 'types/events/location_event';
 import { Animal } from 'types/animal';
 import { ChangeDataLifeInput, IDataLifeStartProps } from 'types/data_life';
-import { FormFieldObject } from 'types/form_types';
+import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
@@ -25,6 +25,17 @@ type CaptureAnimalEventProps = Pick<Animal,
 | 'captivity_status'
 >;
 
+type ReleaseAnimalProps = Pick<Animal,
+| 'ear_tag_left_id'
+| 'ear_tag_right_id'
+| 'ear_tag_left_colour'
+| 'ear_tag_right_colour'
+| 'juvenile_at_heel'
+| 'juvenile_at_heel_count'
+| 'animal_colouration'
+| 'life_stage'
+>;
+
 export type CaptureFormField = {
   [Property in keyof CaptureEvent]+?: FormFieldObject<CaptureEvent>;
 };
@@ -33,7 +44,7 @@ export type CaptureFormField = {
  * assume data life is the capture date?
  */
 export default class CaptureEvent implements 
-CaptureAnimalEventProps, 
+CaptureAnimalEventProps, ReleaseAnimalProps,
 Readonly<Pick<CollarHistory, 'assignment_id'>>,
 IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
   // workflow props
@@ -42,6 +53,7 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
   readonly shouldSaveAnimal = true;
   isAssociated: boolean;
   location_event: LocationEvent;
+  isTranslocationComplete: boolean;
   // data life props
   readonly assignment_id: uuid;
   attachment_start: Dayjs;
@@ -58,11 +70,21 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
   region: Code; // enabled when animal is translocated
   population_unit: Code; // enabled when animal is translocated
   captivity_status: boolean;
+  // characteristic fields
+  ear_tag_left_id: string;
+  ear_tag_right_id: string;
+  ear_tag_left_colour: string;
+  ear_tag_right_colour: string;
+  juvenile_at_heel: Code;
+  juvenile_at_heel_count: number;
+  animal_colouration: string;
+  life_stage: Code;
 
   constructor() {
     this.event_type = 'capture';
     this.recapture = false;
     this.translocation = false;
+    this.isTranslocationComplete = true;
     this.location_event = new LocationEvent('capture', dayjs());
   }
 
@@ -72,6 +94,8 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
         return WorkflowStrings.captivity.isCaptive;
       case 'associated_animal_relationship':
         return 'Associated Relationship';
+      case 'isTranslocationComplete':
+        return WorkflowStrings.capture.isTranslocCompleted;
       default:
         return columnToHeader(s);
     }
@@ -85,12 +109,26 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
 
   getAnimal(): OptionalAnimal {
     const props: (keyof Animal)[] =
-      ['critter_id', 'recapture', 'translocation', 'associated_animal_id',
-        'associated_animal_relationship', 'captivity_status'];
-    if (this.translocation) {
-      props.push('region', 'population_unit')
+      ['critter_id', 'recapture', 'translocation', 'species',
+        'associated_animal_id', 'associated_animal_relationship', 'captivity_status', 
+        'ear_tag_left_colour', 'ear_tag_left_id', 'ear_tag_right_colour', 'ear_tag_right_id',
+        'juvenile_at_heel', 'juvenile_at_heel_count', 'animal_colouration', 'life_stage' ];
+    if (this.translocation ) {
+      // if the translocation is completed, save the new region/population unit.
+      // otherwise, need to update animal_status to 'in translocation';
+      if (this.isTranslocationComplete) {
+        props.push('region', 'population_unit')
+      } else {
+        props.push('animal_status');
+      }
     }
     const ret = eventToJSON(props, this);
+    if (!this.juvenile_at_heel) {
+      delete ret.juvenile_at_heel_count;
+    }
+    if (this.translocation && !this.isTranslocationComplete) {
+      ret['animal_status'] = 'In Translocation';
+    }
     if (!ret.associated_animal_id) {
       delete ret.associated_animal_relationship
     }
@@ -110,4 +148,7 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
     return ret;
   }
 
+  fields: CaptureFormField = {
+    isTranslocationComplete: { prop: 'isTranslocationComplete', type: eInputType.check },
+  }
 }

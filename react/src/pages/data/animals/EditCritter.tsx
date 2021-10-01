@@ -36,10 +36,10 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     let e, o;
     if (wfType === 'capture') {
       e = new CaptureEvent();
-      o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['species', 'translocation', 'recapture']);
+      o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['species', 'translocation', 'recapture', 'region', 'population_unit']);
     } else if (wfType === 'release') {
-      e = new ReleaseEvent(false);
-      o = editObjectToEvent(Object.assign({}, editing) as Animal, e, []);
+      e = new ReleaseEvent();
+      o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['region', 'population_unit']);
     } else if (wfType === 'mortality') {
       e = new MortalityEvent();
       o = editObjectToEvent(Object.assign({}, editing) as AttachedAnimal, e, ['animal_status']);
@@ -57,17 +57,23 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   };
 
   /**
-   * when a capture workflow is saved and translocate is true, show the release form
+   * when a capture workflow is saved, always show the release workflow unless a translocation is underway
    */
-  const handleEventSaved = async(e: IBCTWWorkflow): Promise<void> => {
+  const handleWorkflowSaved = async(e: IBCTWWorkflow): Promise<void> => {
     await setShowWorkflowForm(false);
-    if (e.event_type === 'capture' && e instanceof CaptureEvent && !!e.translocation) {
-      // console.log('capture form completed with translcoation = true, initiate release workflow');
-      const rwf = editObjectToEvent(e, new ReleaseEvent(true, e.location_event), ['event_type']);
-      // console.log(rwf);
-      // set the new event directly, triggering the display of the release form
-      await updateEvent(rwf as any);
-    }
+    if (e.event_type === 'capture' && e instanceof CaptureEvent) {
+      if (e.translocation && !e.isTranslocationComplete) {
+        // do nothing
+      }
+      else { // show the release form, populating the location and date fields
+        // note: bug: wipe 'fields' prop or the release form will have the capture fields
+        const rwf = editObjectToEvent(e, new ReleaseEvent(e.location_event), ['event_type', 'region', 'population_unit', 'fields']);
+        // set the new event directly, triggering the display of the release form
+        console.log(rwf)
+        await updateEvent(rwf as any);
+        await setShowWorkflowForm(o => !o);
+      }
+    } 
   }
 
   const {
@@ -190,7 +196,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     open={showWorkflowForm}
                     event={event as any}
                     handleClose={(): void => setShowWorkflowForm(false)}
-                    onEventSaved={handleEventSaved}
+                    onEventSaved={handleWorkflowSaved}
                   />
                 </>
               ) : null}

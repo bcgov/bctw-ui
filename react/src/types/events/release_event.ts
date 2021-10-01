@@ -11,22 +11,19 @@ import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 import { Collar } from 'types/collar';
 
-type ReleaseAnimalProps = Pick<Animal,
-| 'ear_tag_left_id'
-| 'ear_tag_right_id'
-| 'ear_tag_left_colour'
-| 'ear_tag_right_colour'
-| 'juvenile_at_heel'
-| 'juvenile_at_heel_count'
-| 'animal_colouration'
-| 'life_stage'
+type ReleaseProps = Pick<Animal,
+| 'species'
+| 'translocation'
+| 'region'
+| 'population_unit'
+| 'animal_status'
 >;
 
 export type ReleaseFormField = {
   [Property in keyof ReleaseEvent]+?: FormFieldObject<ReleaseEvent>;
 };
 
-interface IReleaseEvent extends ReleaseAnimalProps,
+interface IReleaseEvent extends ReleaseProps,
   Readonly<Pick<CollarHistory, 'assignment_id'>>,
   Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
   Pick<Collar, 'device_id' | 'collar_id'>,
@@ -34,7 +31,6 @@ interface IReleaseEvent extends ReleaseAnimalProps,
 
 /**
  * todo:
- * auto-populate release location to capture location unless translocation=true
  */
 export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<ReleaseEvent> {
   // workflow props
@@ -50,20 +46,16 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   // critter props
   readonly wlh_id: string;
   readonly animal_id: string;
-  ear_tag_left_id: string;
-  ear_tag_right_id: string;
-  ear_tag_left_colour: string;
-  ear_tag_right_colour: string;
-  juvenile_at_heel: Code;
-  juvenile_at_heel_count: number;
-  animal_colouration: string;
-  life_stage: Code;
-  species: Code;
+  readonly animal_status: Code;
+  readonly species: Code;
+  translocation: boolean;
+  region: Code;
+  population_unit: Code;
   //
   readonly collar_id: uuid;
   readonly device_id: number;
 
-  constructor(private isTranslocated: boolean, loc = new LocationEvent('release', dayjs())) {
+  constructor(loc = new LocationEvent('release', dayjs())) {
     this.event_type = 'release';
     // if a location event instance is provided, it will be of type 'capture'. update it
     this.location_event = Object.assign(loc, {location_type: 'release'});
@@ -79,21 +71,22 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     }
   }
   get displayProps(): (keyof ReleaseEvent)[] {
-    return ['wlh_id', 'animal_id'];
+    return ['species', 'wlh_id', 'animal_id', 'animal_status', 'translocation'];
   }
   getWorkflowTitle(): string {
     return WorkflowStrings.release.workflowTitle;
   }
 
   getAnimal(): OptionalAnimal {
-    const props: (keyof Animal)[] =
-      [ 'critter_id', 'ear_tag_left_colour', 'ear_tag_left_id', 'ear_tag_right_colour', 
-        'ear_tag_right_id', 'juvenile_at_heel', 'juvenile_at_heel_count', 'animal_colouration',
-        'life_stage'
-      ];
+    const props: (keyof Animal)[] = [ 'critter_id' ];
+    // if the critter was being translocated, preserve the region/population unit
+    if (this.translocation) {
+      props.push('region', 'population_unit');
+    }
     const ret = eventToJSON(props, this);
-    if (!this.juvenile_at_heel) {
-      delete ret.juvenile_at_heel_count;
+    // if translocation an the animal status was 'in translocation', revert it to alive.
+    if (this.translocation && this.animal_status === 'In Translocation') {
+      ret['animal_status'] = 'Alive';
     }
     return omitNull({ ...ret, ...this.location_event.toJSON()});
   }

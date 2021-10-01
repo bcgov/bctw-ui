@@ -55,6 +55,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
     setShowWorkflowForm((o) => !o);
   };
 
+  // if a malfunction event is saved and the device is retrieved, open the retrieval workflow
   const handleWorkflowSaved = async(e: IBCTWWorkflow): Promise<void> => {
     await setShowWorkflowForm(false);
     if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved) {
