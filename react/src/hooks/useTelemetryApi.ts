@@ -239,12 +239,12 @@ export const useTelemetryApi = () => {
   };
 
   /**
-   * @returns
+   * optionally provide the @param enabled to disable this query
    */
-  const useAlert = (): UseQueryResult<MortalityAlert[]> => {
-    return useQuery<MortalityAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), {
-      ...defaultQueryOptions
-    });
+  const useAlert = (options?: Pick<UseQueryOptions, 'enabled'>): UseQueryResult<MortalityAlert[]> => {
+    return useQuery<MortalityAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), 
+      { ...defaultQueryOptions, ...options }
+    );
   };
 
   /** default type getter for animals or collars

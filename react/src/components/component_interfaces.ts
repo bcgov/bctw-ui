@@ -8,7 +8,7 @@ import { IUpsertPayload } from 'api/api_interfaces';
  * @param handleClose parent handler when modal is closed
  * @param title modal title string
 */
-type ModalBaseProps = Pick<DialogProps, 'disableBackdropClick'> & {
+type ModalBaseProps = Pick<DialogProps, 'disableBackdropClick' | 'disableEscapeKeyDown'> & {
   open: boolean;
   handleClose: (v: boolean) => void;
   title?: string;

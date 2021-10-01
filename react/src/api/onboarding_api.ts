@@ -1,4 +1,4 @@
-import { createUrl } from 'api/api_helpers';
+import { createUrl, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ApiProps } from 'api/api_interfaces';
 import {
@@ -15,16 +15,18 @@ export const onboardingApi = (props: ApiProps) => {
   const queryClient = useQueryClient();
 
   const invalidate = (): void => {
+    queryClient.invalidateQueries('user');
     queryClient.invalidateQueries('getOnboardRequests');
+    queryClient.invalidateQueries('getOnboardStatus');
   };
   /**
    * from the requests page, when an unauthorized user submits a request
    * to be granted access to BCTW
    */
   const submitOnboardingRequest = async (body: IOnboardUser): Promise<IOnboardUser> => {
-    const url = createUrl({ api: submitURL });
     console.log('posting new user to be onboarded', body);
-    const { data } = await api.post(url, body);
+    const { data } = await postJSON(api, createUrl({ api: submitURL }), body);
+    invalidate()
     return data;
   };
 
@@ -53,8 +55,9 @@ export const onboardingApi = (props: ApiProps) => {
 
   /**
    * unauthorized endpoint that retrieves the current status of a non-existing user's onboard status
+   * returns null if api could not locate a status for this user
    */
-  const getOnboardStatus = async (): Promise<Pick<IOnboardUser, 'access'>> => {
+  const getOnboardStatus = async (): Promise<Pick<IOnboardUser, 'access'> | null> => {
     const { data } = await api.get(createUrl({ api: getCurrentOnboardStatus }));
     return data;
   };

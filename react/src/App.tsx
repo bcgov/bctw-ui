@@ -36,12 +36,12 @@ export default function App(): JSX.Element {
       {/* <ReactQueryDevtools initialIsOpen={false} />  */}
       <ResponseProvider>
         <ThemeProvider theme={appTheme}>
-          <AlertStateContextProvider>
-            <AlertContext.Consumer>
+          <UserStateContextProvider>
+            <UserContext.Consumer>
               {(): React.ReactNode => {
                 return (
-                  <UserStateContextProvider>
-                    <UserContext.Consumer>
+                  <AlertStateContextProvider>
+                    <AlertContext.Consumer>
                       {(): React.ReactNode => {
                         return (
                           <BrowserRouter>
@@ -61,12 +61,12 @@ export default function App(): JSX.Element {
                           </BrowserRouter>
                         );
                       }}
-                    </UserContext.Consumer>
-                  </UserStateContextProvider>
+                    </AlertContext.Consumer>
+                  </AlertStateContextProvider>
                 );
               }}
-            </AlertContext.Consumer>
-          </AlertStateContextProvider>
+            </UserContext.Consumer>
+          </UserStateContextProvider>
         </ThemeProvider>
       </ResponseProvider>
     </QueryClientProvider>

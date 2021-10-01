@@ -8,7 +8,7 @@ import { OnboardingStatus } from './onboarding';
 
 export enum eUserRole {
   administrator = 'administrator',
-  editor = 'editor',
+  // editor = 'editor',
   owner = 'owner',
   observer = 'observer'
 }

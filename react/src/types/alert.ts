@@ -45,7 +45,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
   get isSnoozed(): boolean {
     return dayjs().isBefore(dayjs(this.snoozed_to));
   }
-  get identifier(): string {
+  get identifier(): keyof TelemetryAlert {
     return 'alert_id';
   }
   get snoozesMax(): number {

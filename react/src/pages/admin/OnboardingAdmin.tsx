@@ -26,7 +26,7 @@ export default function OnboardingAdminPage(): JSX.Element {
   };
 
   const onSuccess = (result: boolean): void => {
-    const message = result ? `user ${request.identifier} created successfully` : `onboarding request denied`;
+    const message = result ? `user ${request.username} created successfully` : `onboarding request denied`;
     responseDispatch({ severity: 'success', message });
   };
 
@@ -46,12 +46,13 @@ export default function OnboardingAdminPage(): JSX.Element {
     };
     // console.log(body)
     saveMutation(body);
+    setShowConfirm(o => !o);
   };
 
   const handleClickGrantOrDeny = (b: boolean): void => {
-    const { identifier, role_type } = request;
+    const { username, role_type } = request;
     setIsGranting(b);
-    setMsg(b ? OnboardStrings.confirmGrant(identifier, role_type) : OnboardStrings.denyGrant(identifier));
+    setMsg(b ? OnboardStrings.confirmGrant(username, role_type) : OnboardStrings.denyGrant(username));
     setShowConfirm((o) => !o);
   };
 
@@ -65,10 +66,10 @@ export default function OnboardingAdminPage(): JSX.Element {
           onSelect={handleSelectRequest}
         />
         <div className={'button-row'}>
-          <Button color='primary' disabled={!request} onClick={(): void => handleClickGrantOrDeny(true)}>
+          <Button color='primary' disabled={!request || request?.access !== 'pending'} onClick={(): void => handleClickGrantOrDeny(true)}>
             Grant
           </Button>
-          <Button color='secondary' disabled={!request} onClick={(): void => handleClickGrantOrDeny(false)}>
+          <Button color='secondary' disabled={!request || request?.access !== 'pending'} onClick={(): void => handleClickGrantOrDeny(false)}>
             Deny
           </Button>
         </div>

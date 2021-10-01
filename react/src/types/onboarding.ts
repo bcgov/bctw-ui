@@ -11,7 +11,7 @@ export type OnboardingStatus = 'pending' | 'granted' | 'denied';
 export interface IOnboardUser {
   onboarding_id: number;
   domain: KeyCloakDomainType;
-  identifier: string; // todo: rename to username?
+  username: string;
   reason: string;
   access: OnboardingStatus;
 }
@@ -19,11 +19,15 @@ export interface IOnboardUser {
 export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnboardUser {
   readonly onboarding_id: number;
   domain: KeyCloakDomainType;
-  identifier: string;
+  username: string;
   reason: string;
 
   access: OnboardingStatus;
   role_type: eUserRole;
+
+  get identifier(): keyof OnboardUser {
+    return 'onboarding_id';
+  }
 
   formatPropAsHeader(s: keyof OnboardUser): string {
     return columnToHeader(s);
@@ -32,7 +36,7 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
   get displayProps(): (keyof OnboardUser)[] {
     const props: (keyof OnboardUser)[] = [
       'domain',
-      'identifier',
+      'username',
       'firstname',
       'lastname',
       'email',
