@@ -1,11 +1,12 @@
 import { OutlinedTextFieldProps, StandardTextFieldProps } from '@material-ui/core';
-import { Box, Button, FormControl, Grid, InputLabel, TextField, Select, MenuItem } from '@material-ui/core';
+import { Box, Button, Grid, TextField } from '@material-ui/core';
 import { useContext, useEffect, useState } from 'react';
 import { createUrl } from 'api/api_helpers';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { eUserRole, IKeyCloakSessionInfo, KeyCloakDomainType } from 'types/user';
 import { IOnboardUser, OnboardUser } from 'types/onboarding';
+import BasicSelect from 'components/form/BasicSelect';
 
 /**
  * where unauthorized users are directed to submit a request for access to BCTW
@@ -160,18 +161,13 @@ const UserAccessRequest = (): JSX.Element => {
             />
           </Grid>
           <Grid item xs={12}>
-            <FormControl className={'select-control-small'} variant={'outlined'}>
-              <InputLabel>Target Level of Access</InputLabel>
-              <Select
-                onChange={(e): void => setAccessType(e.target.value as eUserRole)}
-                value={accessType}
-                variant={'outlined'}
-                required={true}>
-                <MenuItem value={eUserRole.administrator}>Administrator</MenuItem>
-                {/* <MenuItem value={eUserRole.owner}>Owner</MenuItem> */}
-                <MenuItem value={eUserRole.observer}>Observer</MenuItem>
-              </Select>
-            </FormControl>
+            <BasicSelect
+              label={'Target Level of Access'}
+              handleChange={(e: string): void => setAccessType(e as eUserRole)}
+              defaultValue={accessType}
+              required={true}
+              values={['administrator', 'observer']}
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField

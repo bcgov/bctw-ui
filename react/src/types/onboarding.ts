@@ -4,14 +4,12 @@ import { columnToHeader } from 'utils/common_helpers';
 import { isDev } from 'api/api_helpers';
 
 /**
- * the 'access' column in the bctw."user" table
+ * the 'access' column in the bctw.onboarding table
  */
 export type OnboardingStatus = 'pending' | 'granted' | 'denied';
 //
 export interface IOnboardUser {
   onboarding_id: number;
-  domain: KeyCloakDomainType;
-  username: string;
   reason: string;
   access: OnboardingStatus;
 }
@@ -53,4 +51,4 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
 }
 
 // what an admin passes to the API to grant/deny an onboard request
-export type HandleOnboardInput = Pick<IOnboardUser, 'onboarding_id'> & Pick<IUser, 'role_type' | 'access'>;
+export type HandleOnboardInput = Pick<IOnboardUser, 'onboarding_id' | 'access'> & Pick<IUser, 'role_type'>;

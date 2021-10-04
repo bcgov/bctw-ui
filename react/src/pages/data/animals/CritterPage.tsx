@@ -10,10 +10,11 @@ import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
 import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
+import { QueryStatus } from 'react-query';
 // import download from 'downloadjs';
 
 export default function CritterPage(): JSX.Element {
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
 
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
 
@@ -21,13 +22,9 @@ export default function CritterPage(): JSX.Element {
   // const [critterA, setCrittersA] = useState<Animal[]>([]);
   // const [critterU, setCrittersU] = useState<Animal[]>([]);
 
-  const handleSelectAttached = (row: AttachedAnimal): void => {
+  const handleSelect = <T extends Animal>(row: T): void => {
     setEditObj(row);
   };
-
-  const handleSelectUnattached = (row: Animal): void => {
-    setEditObj(row);
-  }
 
   // set the export state when table loads
   // const onNewData = (d: Animal[]): void => (d.length && d[0].device_id ? setCrittersA(d) : setCrittersU(d));
@@ -42,11 +39,18 @@ export default function CritterPage(): JSX.Element {
   // props to be passed to the edit modal component
   // most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
-    editing: new Animal(),
+    editing: null,
     open: false,
     onSave: (): void => { /* do nothing */ },
     handleClose: (): void => { /* do nothing */ },
   };
+
+  const addEditProps = {
+    editing: new AttachedAnimal(),
+    empty: new AttachedAnimal(),
+    addTooltip: CS.addTooltip,
+    queryStatus: 'idle' as QueryStatus
+  }
 
   return (
     <ManageLayout>
@@ -55,7 +59,7 @@ export default function CritterPage(): JSX.Element {
         <Box display='flex' alignItems='center'>
           {/* <ExportImportViewer {...exportProps} /> */}
           <ModifyCritterWrapper editing={editObj}>
-            <AddEditViewer<AttachedAnimal> editing={editObj as AttachedAnimal} empty={new AttachedAnimal()} addTooltip={CS.addTooltip}>
+            <AddEditViewer<AttachedAnimal> {...addEditProps} >
               <EditCritter {...editProps} />
             </AddEditViewer>
           </ModifyCritterWrapper>
@@ -69,16 +73,16 @@ export default function CritterPage(): JSX.Element {
             <DataTable
               headers={AttachedAnimal.attachedCritterDisplayProps}
               title={CS.assignedTableTitle}
-              queryProps={{ query: bctwApi.useAssignedCritters }}
-              onSelect={handleSelectAttached}
+              queryProps={{ query: api.useAssignedCritters }}
+              onSelect={handleSelect}
             />
           </Box>
           <Box mb={4}>
             <DataTable
               headers={new Animal().displayProps}
               title={CS.unassignedTableTitle}
-              queryProps={{ query: bctwApi.useUnassignedCritters }}
-              onSelect={handleSelectUnattached}
+              queryProps={{ query: api.useUnassignedCritters }}
+              onSelect={handleSelect}
             />
           </Box>
         </>

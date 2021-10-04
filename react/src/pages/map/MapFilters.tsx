@@ -132,6 +132,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       <Grid item sm={12} key={`${cf.header}-${idx}`}>
         <Tooltip title={<p>{MapStrings.codeFiltersTooltips[cf.header]}</p>}>
           <SelectCode
+            propName={cf.header}
             fullWidth
             multiple
             label={cf.label ?? columnToHeader(cf.header)}

@@ -7,6 +7,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
+import { IAddEditProps } from '../common/AddEditViewer';
 
 type IModifyWrapperProps = {
   editing: Animal | AttachedAnimal;
@@ -14,21 +15,37 @@ type IModifyWrapperProps = {
 };
 
 /**
- * wraps child components to provide the actual POST request endpoints for the animal 
- * includes editing and deletes
- * todo: similar to the map overview, load the critter details here
+ * wraps child components to provide the GET/POST requests for the animal 
  */
 export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.Element {
   const api = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
   const { editing, children } = props;
+  // used in child AddEditViewer component to determine the add/edit button state (view/edit)
   const [canEdit, setCanEdit] = useState(false);
+  // used to determine the state of the delete modal
   const [hasCollar, setHasCollar] = useState(false);
-  const [show, setShow] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [animal, setAnimal] = useState<typeof editing>(editing);
+
+  // fetch the critter
+  const { data, status } = api.useType<Animal>('animal', editing.critter_id, {enabled: !!(editing.critter_id)})
+
+  /**
+   * note: if data has been previously fetched, 'status' will not be updated.
+   * in that case, check if @var data exists and call @function setAnimal
+   */
+  useEffect(() => {
+    if (data || status === 'success') {
+      setAnimal(data);
+    }
+    setHasCollar(editing instanceof AttachedAnimal)
+    setCanEdit(permissionCanModify(editing.permission_type));
+  }, [editing, status]);
 
   // must be defined before mutation declarations
-  const onSaveSuccess = async (data: IBulkUploadResults<Animal>): Promise<void> => {
+  const handleSaveResult = async (data: IBulkUploadResults<Animal>): Promise<void> => {
     const { errors, results } = data;
     if (errors.length) {
       responseDispatch({ severity: 'error', message: `${errors.map(e => e.error)}` });
@@ -38,17 +55,17 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     }
   };
 
-  const onDeleteSuccess = async (): Promise<void> => {
+  const handleDeleteResult = async (): Promise<void> => {
     responseDispatch({ severity: 'success', message: `critter deleted successfully` });
   };
 
   const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutations
-  const { mutateAsync: saveMutation } = api.useSaveAnimal({ onSuccess: onSaveSuccess, onError });
-  const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: onDeleteSuccess, onError });
+  const { mutateAsync: saveMutation } = api.useSaveAnimal({ onSuccess: handleSaveResult, onError });
+  const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: handleDeleteResult, onError });
 
-  const saveCritter = async (a: IUpsertPayload<Animal>): Promise<void> => {
+  const saveCritter = async (a: IUpsertPayload<Animal | AttachedAnimal>): Promise<void> => {
     const { body } = a;
     const formatted = body.toJSON();
     console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
@@ -63,46 +80,31 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     await deleteMutation(payload);
   };
 
-  useEffect(() => {
-    const upd = (): void => {
-      setHasCollar(props.editing instanceof AttachedAnimal)
-      setCanEdit(permissionCanModify(editing?.permission_type));
-    }
-    upd();
-  }, [editing]);
-
   const deleteMessage = ():string => {
     const base = hasCollar ? `CAREFUL! Performing this action will remove the collar ${(editing as AttachedAnimal)?.device_id} from this animal. ` : '';
     return `${base}This will prevent other users from seeing this critter. Are you sure you want to delete ${editing?.name}?`
   }
 
-  const handleDeleteButtonClicked = (): void => {
-    setShow(o=> !o);
-  }
-
   const handleConfirmDelete = (): void => {
     deleteCritter(editing?.critter_id)
-    setShow(false);
+    setShowConfirmDelete(false);
   }
   
-  const validateFailed = (errors: Record<string, unknown>): void => {
-    responseDispatch({ severity: 'error', message: `missing required fields: ${Object.keys(errors).join(', ')}` });
-  }
-
   // pass the permission_type down so the AddEditViewer can set the edit/view button status
-  const passTheseProps = {
+  const passTheseProps: Pick<IAddEditProps<Animal>, 'onDelete' | 'onSave' | 'cannotEdit' | 'editing' | 'queryStatus'> = {
     cannotEdit: !canEdit,
-    onDelete: handleDeleteButtonClicked,
+    onDelete: (): void => setShowConfirmDelete(o => !o),
     onSave: saveCritter,
-    validateFailed
+    editing: animal ?? editing,
+    queryStatus: status
   }
 
   return (
     <>
       <ConfirmModal
         handleClickYes={handleConfirmDelete}
-        handleClose={(): void => setShow(false)}
-        open={show}
+        handleClose={(): void => setShowConfirmDelete(false)}
+        open={showConfirmDelete}
         message={deleteMessage()}
         title={`Deleting ${editing?.name}`}
       />

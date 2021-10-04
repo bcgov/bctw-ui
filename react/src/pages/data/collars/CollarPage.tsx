@@ -19,14 +19,10 @@ export default function CollarPage(): JSX.Element {
   const [showImport, setShowImport] = useState<boolean>(false);
 
   // set editing object when table row is selected
-  const handleSelectUnattached = (row: Collar): void => {
+  const handleSelect = <T extends Collar,>(row: T): void => {
     // console.log(`device_id: ${row.device_id} p: ${row.permission_type}`);
     setEditObj(row);
   };
-
-  const handleSelectAttached = (row: AttachedCollar): void => {
-    setEditObj(row);
-  }
 
   // pass as callback to table component to set export data when api returns collar data
   // const onNewData = (d: Collar[]): void => {
@@ -40,8 +36,8 @@ export default function CollarPage(): JSX.Element {
   const editProps = {
     editing: new Collar(),
     open: false,
-    onSave: null,
-    handleClose: null,
+    onSave: (): void => { /* do nothing */ },
+    handleClose: (): void => { /* do nothing */ }
   };
 
   return (
@@ -55,7 +51,7 @@ export default function CollarPage(): JSX.Element {
             </Button>
           </Box>
           <ModifyCollarWrapper editing={editObj}>
-            <AddEditViewer<AttachedCollar> editing={editObj as AttachedCollar} empty={new AttachedCollar()}>
+            <AddEditViewer<AttachedCollar> queryStatus='success' editing={editObj as AttachedCollar} empty={new AttachedCollar()}>
               <EditCollar {...editProps} />
             </AddEditViewer>
           </ModifyCollarWrapper>
@@ -69,7 +65,7 @@ export default function CollarPage(): JSX.Element {
               headers={AttachedCollar.attachedDevicePropsToDisplay}
               title={S.assignedCollarsTableTitle}
               queryProps={{query: bctwApi.useAttachedDevices}}
-              onSelect={handleSelectAttached}
+              onSelect={handleSelect}
             />
           </Box>
           <Box mb='3'>
@@ -77,12 +73,11 @@ export default function CollarPage(): JSX.Element {
               headers={Collar.propsToDisplay}
               title={S.availableCollarsTableTitle}
               queryProps={{query: bctwApi.useUnattachedDevices}}
-              onSelect={handleSelectUnattached}
+              onSelect={handleSelect}
             />
           </Box>
         </>
       </RowSelectedProvider>
-
       <CollarImport open={showImport} handleClose={(): void => setShowImport(false)} />
     </ManageLayout>
   );

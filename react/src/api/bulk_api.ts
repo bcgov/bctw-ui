@@ -1,7 +1,7 @@
 import { createUrl } from 'api/api_helpers';
 import { AxiosInstance } from 'axios';
 import { plainToClass } from 'class-transformer';
-import { AttachedAnimal, IAttachedAnimal } from 'types/animal';
+import { AttachedAnimal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
@@ -13,9 +13,19 @@ import { IBulkUploadResults, IDeleteType } from './api_interfaces';
 export const bulkApi = (api: AxiosInstance) => {
   const queryClient = useQueryClient();
 
-  const invalidate = (): void => {
+  const invalidateCritters = (): void => {
     queryClient.invalidateQueries('critters_assigned');
     queryClient.invalidateQueries('critters_unassigned');
+  }
+
+  const invalidateDevices = (): void => {
+    queryClient.invalidateQueries('collartype');
+    queryClient.invalidateQueries('getType');
+  }
+
+  // todo:
+  const invalidateUsers = (): void => {
+    queryClient.invalidateQueries('all_users');
   }
 
   const uploadCsv = async <T,>(form: FormData): Promise<IBulkUploadResults<T>> => {
@@ -34,17 +44,18 @@ export const bulkApi = (api: AxiosInstance) => {
   const getType = async <T>(type: BCTWType, id: string): Promise<T> => {
     const url = createUrl({ api: `${type}/${id}`});
     const { data } = await api.get(url);
-    console.log(data);
-    return data.map((json: IAttachedAnimal) => type === 'animal' ? plainToClass(AttachedAnimal, json) : plainToClass(Collar, json))[0];
+    if (type === 'animal') {
+      return plainToClass(AttachedAnimal, data) as any;
+    } else {
+      return plainToClass(Collar, data) as any;
+    }
   }
 
   // handles deletes for animals/collars
   const deleteType = async ({ objType, id }: IDeleteType): Promise<boolean> => {
     const url = createUrl({ api: `${objType}/${id}` });
     const { status, data } = await api.delete(url);
-    if (objType === 'animal') {
-      invalidate();
-    }
+    objType === 'animal' ? invalidateCritters() : invalidateDevices();
     if (status === 200) {
       return true;
     }

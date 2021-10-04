@@ -43,14 +43,14 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param children child form component
  * @param isCreatingNew true when 'Add' is selected from data management
  * @param hideSave optionally hide save button
- * @param hideHIstory optionally hide the 'show history' button
+ * @param disableHistory the 'show history' button
  * @param showInFullScreen render as a modal or fullscreen dialog?
  * @param onReset a close handler since default handler is overwritten in AddEditViewer
  * @param onSave the parent handler called when the save button is clicked
  * @param headerComponent
  */
 export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<T>): JSX.Element {
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
   const {
     children,
     title,
@@ -86,13 +86,13 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     const updateParams = (): void => {
       if (editing instanceof Animal) {
         setHistoryParams({
-          query: bctwApi.useCritterHistory,
+          query: api.useCritterHistory,
           param: editing.critter_id,
           propsToDisplay: (editing.displayProps) // show all Animal properties
         });
       } else if (editing instanceof Collar) {
         setHistoryParams({
-          query: bctwApi.useCollarHistory,
+          query: api.useCollarHistory,
           param: editing.collar_id,
           propsToDisplay: (editing.displayProps) // show all Device properties
         });

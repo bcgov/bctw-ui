@@ -1,5 +1,5 @@
 import 'styles/form.scss';
-import { FormControl, Select, InputLabel, MenuItem, Checkbox, FormHelperText } from '@material-ui/core';
+import { FormControl, Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
 import { useState, useEffect, ReactNode } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
@@ -9,15 +9,14 @@ import { SelectProps } from '@material-ui/core';
 import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
+import { FormBaseProps } from 'types/form_types';
 
-type ISelectProps = SelectProps & {
+type CodeSelectProps = FormBaseProps & SelectProps & {
   codeHeader: string;
   defaultValue?: string;
-  changeHandler: (o: Record<string, unknown>) => void;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
   triggerReset?: boolean;
   addEmptyOption?: boolean;
-  propName?: string;
 };
 
 /**
@@ -33,7 +32,8 @@ type ISelectProps = SelectProps & {
 */
 
 // fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
-export default function SelectCode(props: ISelectProps): JSX.Element {
+// todo: add filter option
+export default function SelectCode(props: CodeSelectProps): JSX.Element {
   const {
     addEmptyOption,
     codeHeader,
@@ -43,7 +43,6 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
     label,
     multiple,
     triggerReset,
-    className,
     style,
     required,
     propName
@@ -109,7 +108,10 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
    * to avoid value being reset, check the new default is not the same as value
    */
   useDidMountEffect(() => {
-    const match = data.find((d) => d?.description === defaultValue);
+    if (!data?.length) {
+      return;
+    }
+    const match = data.find((d) => d.description === defaultValue);
     if (match && match.description !== value) {
       reset();
     }
@@ -169,7 +171,7 @@ export default function SelectCode(props: ISelectProps): JSX.Element {
    * if @param codeHeader is not the same, use @param propName instead when
    * pushing the changed value to the parent @param changeHandler
    */
-  const getIdentifier = (): string => propName ? propName : codeHeader;
+  const getIdentifier = (): string => String(propName ? propName : codeHeader);
 
   const pushChangeMultiple = (selected: string[]): void => {
     const filtered = codes.filter((c) => selected.indexOf(c?.description) !== -1);

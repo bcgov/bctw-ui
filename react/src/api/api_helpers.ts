@@ -1,5 +1,6 @@
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { isDayjs } from 'dayjs';
+import { omitNull } from 'utils/common_helpers';
 import { formatTime } from 'utils/time';
 
 const IS_PROD = +window.location.port === 1111 ? false : true;
@@ -80,14 +81,14 @@ const asJSON = <T>(o: T): T => {
       ret[key] = value;
     }
   }
-  return ret;
+  return omitNull(ret);
 };
 
-const postJSON =  async<T>(axios: AxiosInstance, url: string, body: T): Promise<AxiosResponse> => {
+const postJSON =  async<T>(api: AxiosInstance, url: string, body: T): Promise<AxiosResponse> => {
   const json = asJSON(body);
   // eslint-disable-next-line no-console
   console.log('json posted', json);
-  return axios.post(url, json);
+  return api.post(url, json);
 }
 
 export { asJSON, escapeRegex, getBaseUrl, createUrl, createFormData, isDev, sleep, postJSON };

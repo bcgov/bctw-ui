@@ -47,6 +47,8 @@ const useApi = (): AxiosInstance => {
   return instance;
 };
 
+type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
+
 /**
  * Returns a set of supported api methods.
  * @return {object} object whose properties are supported api methods.
@@ -241,7 +243,7 @@ export const useTelemetryApi = () => {
   /**
    * optionally provide the @param enabled to disable this query
    */
-  const useAlert = (options?: Pick<UseQueryOptions, 'enabled'>): UseQueryResult<MortalityAlert[]> => {
+  const useAlert = (options?: QueryEnabled): UseQueryResult<MortalityAlert[]> => {
     return useQuery<MortalityAlert[], AxiosError>(['userAlert'], () => userApi.getUserAlerts(), 
       { ...defaultQueryOptions, ...options }
     );
@@ -250,10 +252,10 @@ export const useTelemetryApi = () => {
   /** default type getter for animals or collars
    * @returns
    */
-  const useType = <T>(type: BCTWType, id: string): UseQueryResult<T> => {
-    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
-      ...defaultQueryOptions
-    });
+  const useType = <T>(type: BCTWType, id: string, options?: QueryEnabled): UseQueryResult<T> => {
+    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), 
+      { ...defaultQueryOptions, ...options }
+    );
   };
 
   /**

@@ -1,10 +1,5 @@
-import { Transform } from 'class-transformer';
-import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { BCTWBase, BCTWValidDates, nullToDayjs } from 'types/common_types';
-import { eInputType, FormFieldObject } from 'types/form_types';
-import { Dayjs } from 'dayjs';
-import { eventToJSON } from './events/event';
-import { OnboardingStatus } from './onboarding';
+import { columnToHeader } from 'utils/common_helpers';
+import { BCTWBase } from 'types/common_types';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -34,6 +29,8 @@ type UserBaseType = {
   email: string;
   phone: string;
   role_type: eUserRole;
+  domain: KeyCloakDomainType;
+  username: string;
 };
 
 // the "base" user class, extended by onboarding and bctw user classes
@@ -43,36 +40,34 @@ export class UserBase implements UserBaseType {
   email: string;
   phone: string;
   role_type: eUserRole;
+  domain: KeyCloakDomainType;
+  username: string;
 }
 
 export interface IUser extends UserBaseType {
   id: number;
   idir: string;
   bceid: string;
-  access: OnboardingStatus;
   // indicates if the user is considered the owner of at least one animal
   is_owner?: boolean;
 }
 
 /** 
  * the main user class representing a row in the bctw.user table 
- * todo: deprecate access, idir, bceid
+ * todo: deprecate idir, bceid
  */
-export class User extends UserBase implements BCTWBase<User>, IUser, BCTWValidDates {
+export class User extends UserBase implements BCTWBase<User>, IUser {
   is_owner: boolean;
   id: number;
   idir: string;
   bceid: string;
-  access: OnboardingStatus;
-  @Transform(nullToDayjs) valid_from: Dayjs;
-  @Transform(nullToDayjs) valid_to: Dayjs;
 
   get is_admin(): boolean {
     return this.role_type === eUserRole.administrator;
   }
 
   get displayProps(): (keyof User)[] {
-    return ['id', 'idir', 'bceid', 'role_type', 'is_owner'];
+    return ['id', 'username', 'idir', 'bceid', 'role_type', 'is_owner'];
   }
   /**
    * gets either the IDIR or BCEID, whichever is present
@@ -86,17 +81,6 @@ export class User extends UserBase implements BCTWBase<User>, IUser, BCTWValidDa
     return 'id';
   }
 
-  toJSON(): Partial<User> {
-    const props: (keyof User)[] = ['id', 'firstname', 'lastname', 'email', 'phone', 'access'];
-    if (this.idir) {
-      props.push('idir');
-    } else if (this.bceid) {
-      props.push('bceid');
-    }
-    const ret = eventToJSON(props, this);
-    return omitNull(ret);
-  }
-
   formatPropAsHeader(str: string): string {
     switch (str) {
       case 'idir':
@@ -106,20 +90,5 @@ export class User extends UserBase implements BCTWBase<User>, IUser, BCTWValidDa
       default:
         return columnToHeader(str);
     }
-  }
-
-  get formFields(): FormFieldObject<User>[] {
-    const ret: FormFieldObject<User>[] = [
-      { prop: 'email', type: eInputType.text },
-      { prop: 'firstname', type: eInputType.text },
-      { prop: 'lastname', type: eInputType.text }
-    ];
-    // a user should only have one of theses
-    if (this.idir) {
-      ret.unshift({ prop: 'idir', type: eInputType.text });
-    } else if (this.bceid) {
-      ret.unshift({ prop: 'bceid', type: eInputType.text });
-    }
-    return ret;
   }
 }

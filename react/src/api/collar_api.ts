@@ -3,9 +3,15 @@ import { plainToClass } from 'class-transformer';
 import { ICollar, Collar, AttachedCollar, IAttachedCollar, eCollarAssignedStatus } from 'types/collar';
 import { upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps, IBulkUploadResults, IUpsertPayload } from './api_interfaces';
+import { useQueryClient } from 'react-query';
 
 export const collarApi = (props: ApiProps) => {
   const { api } = props;
+  const queryClient = useQueryClient();
+
+  const invalidate = (): void => {
+    queryClient.invalidateQueries('collartype');
+  }
 
   const _handleGetResults = (
     data: IAttachedCollar[] | Collar[],
@@ -41,6 +47,7 @@ export const collarApi = (props: ApiProps) => {
     const { body } = payload;
     const url = createUrl({ api: upsertDeviceEndpoint });
     const { data } = await api.post(url, body);
+    invalidate();
     return data;
   };
 

@@ -132,22 +132,22 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {FormSection(
                 'cr-ids',
                 'Identifiers',
-                identifierFields.map((f) => CreateFormField(editing, f, onChange))
+                identifierFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {FormSection(
                 'cr-chars',
                 'Characteristics',
-                characteristicsFields.map((f) => CreateFormField(editing, f, onChange))
+                characteristicsFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {FormSection(
                 'cr-asoc',
                 'Association With Another Individual',
-                associatedAnimalFields.map((f) => CreateFormField(editing, f, onChange))
+                associatedAnimalFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {FormSection(
                 'cr-comm',
                 'Comments About This Animal',
-                animalCommentField.map((f) => CreateFormField(editing, f, onChange))
+                animalCommentField.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {/* hide all workflow related fields when creating a new animal */}
               {!isCreatingNew ? (

@@ -5,9 +5,24 @@ import { EditorProps } from 'components/component_interfaces';
 import { IEditModalProps } from 'pages/data/common/EditModal';
 import { cloneElement, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
-import { Box, Button, ButtonProps }  from '@material-ui/core';
+import { Box, Button, ButtonProps, CircularProgress }  from '@material-ui/core';
 import { Tooltip } from 'components/common';
+import { QueryStatus } from 'react-query';
 
+/**
+ * handles the show/hide functionality of the childEditComponent
+ * used on main data pages (critter/collar)
+ * @param cannotEdit permission to edit?
+ * @param children child component that handles the editing, {EditModal}
+ * @param disableAdd optional - hide add button
+ * @param disableEdit defaults to false
+ * @param editButton optional - used in map overview screens
+ * @param editing isntance of T passed to editor when edit button is clicked
+ * @param empty 'new' instance of T passed to editor when add button is clicked
+ * @param onDelete
+ * @param onSave
+ * @param queryStatus will render loading indicator if status is not set to 'success'
+ **/
 export type IAddEditProps<T> = {
   cannotEdit?: boolean;
   children: JSX.Element;
@@ -24,22 +39,11 @@ export type IAddEditProps<T> = {
   editTooltip?: string;
   addTooltip?: string;
   deleteTooltip?: string;
+  queryStatus: QueryStatus;
 };
 
-/**
- * handles the show/hide functionality of the childEditComponent
- * used on main data pages (critter/collar)
- * @param cannotEdit permission to edit?
- * @param children child component that handles the editing, {EditModal} ** must be only one child
- * @param disableAdd optional - hide add button
- * @param disableEdit defaults to false
- * @param editing isntance of T passed to editor when edit button is clicked
- * @param empty 'new' instance of T passed to editor when add button is clicked
- * @param onDelete
- * @param editButton optional - used in map overview screens
- **/
 export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProps<T>): JSX.Element {
-  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText, editTooltip, addTooltip, deleteTooltip } = props;
+  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText, editTooltip, addTooltip, deleteTooltip, queryStatus } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -106,8 +110,13 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
       </>
     );
   }
-
   const btnProps: Pick<ButtonProps, 'size' | 'variant' | 'color'> = {size:'large', variant:'outlined', color:'primary'}
+
+  if (queryStatus === 'error') {
+    return <p>error: unable to load</p>
+  } else if (queryStatus === 'loading') {
+    return <CircularProgress />
+  }
   return (
     <>
       {/* clone child EditModal component to pass additional props */}

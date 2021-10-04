@@ -1,14 +1,20 @@
-import { createUrl, isDev } from 'api/api_helpers';
+import { createUrl, isDev, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ITelemetryAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
-import { IKeyCloakSessionInfo, IUser, User } from 'types/user';
+import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps } from 'api/api_interfaces';
+import { useQueryClient } from 'react-query';
 
 
 export const userApi = (props: ApiProps) => {
   const { api } = props;
+  const queryClient = useQueryClient();
+
+  const invalidate = (): void => {
+    queryClient.invalidateQueries('all_users');
+  }
 
   /**
    * retrieves keycloak session data
@@ -24,22 +30,21 @@ export const userApi = (props: ApiProps) => {
     }
     const url = createUrl({ api: 'session-info' });
     const { data } = await api.get(url);
-    console.log('retrieve session info');
     // console.log('retrieve session info', data);
     return data;
   };
 
   /**
-   * @param body a new or existing @type {User}
+   * @param user a new or existing @type {User}
+   * fixme: defaulting role to 'observer'
    */
-  const addUser = async (body: User): Promise<User> => {
-    const ujson = body.toJSON();
-    const url = createUrl({ api: 'add-user' });
-    console.log('posting user', ujson)
-    const { data } = await api.post(url, ujson);
-    const user = plainToClass(User, data);
-    console.log('added new user', user);
-    return user;
+  const addUser = async (user: User): Promise<User> => {
+    // console.log('posting user', user)
+    const { data } = await postJSON(api, createUrl({ api: 'add-user' }), {user, role: eUserRole.observer});
+    const ret = plainToClass(User, data);
+    console.log('user upsert result:', ret);
+    invalidate();
+    return ret;
   };
 
   /**

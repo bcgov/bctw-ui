@@ -41,7 +41,7 @@ const CodePage: React.FC = () => {
   const handleSave = async (p: IUpsertPayload<CodeHeaderInput>): Promise<IBulkUploadResults<ICodeHeader>> =>
     await mutateAsync(p.body);
 
-  const { isFetching, isLoading, isError, error, data } = bctwApi.useCodeHeaders();
+  const { isFetching, isLoading, isError, error, data, status } = bctwApi.useCodeHeaders();
 
   const importProps = {
     iMsg: S.importText,
@@ -91,6 +91,7 @@ const CodePage: React.FC = () => {
             <div className='button-row'>
               <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
               <AddEditViewer<CodeHeaderInput>
+                queryStatus={status}
                 onSave={handleSave}
                 editing={new CodeHeaderInput()}
                 empty={Object.create({})}

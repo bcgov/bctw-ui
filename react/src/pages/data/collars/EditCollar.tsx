@@ -134,27 +134,27 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
               {FormSection(
                 'device-ids',
                 'Identifiers',
-                identifierFields.map((f) => CreateFormField(editing, f, onChange))
+                identifierFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {FormSection(
                 'device-sat',
                 'Satellite Network and Beacon Frequency',
-                communicationFields.map((f) => CreateFormField(editing, f, onChange))
+                communicationFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {FormSection(
                 'device-add',
                 'Additional Device Sensors and Beacons',
-                activationFields.map((f) => CreateFormField(editing, f, onChange))
+                activationFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {FormSection(
                 'device-activ',
                 'Warranty & Activation Details',
-                deviceOptionFields.map((f) => CreateFormField(editing, f, onChange))
+                deviceOptionFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {FormSection(
                 'device-status',
                 'Device Status',
-                statusFields.map((f) => CreateFormField(editing, f, onChange))
+                statusFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
               )}
               {/**
                * hide the workflow related fields entirely when creating a new collar
