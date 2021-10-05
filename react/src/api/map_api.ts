@@ -11,11 +11,11 @@ export const mapApi = (props: ApiProps) => {
     return data?.features;
   };
 
-  const getPingExtent = async (): Promise<any> => {
-    const url = createUrl({ api: 'get-ping-extent' });
-    const { data } = await api.get(url);
-    return data;
-  };
+  // const getPingExtent = async (): Promise<any> => {
+  //   const url = createUrl({ api: 'get-ping-extent' });
+  //   const { data } = await api.get(url);
+  //   return data;
+  // };
 
   const getPings = async (start: string, end: string, unassigned = false): Promise<ITelemetryPoint[]> => {
     const url = createUrl({ api: 'get-critters', query: `start=${start}&end=${end}&unassigned=${unassigned}` });
@@ -25,7 +25,7 @@ export const mapApi = (props: ApiProps) => {
 
   return {
     getPings,
-    getPingExtent,
+    // getPingExtent,
     getTracks
   };
 };

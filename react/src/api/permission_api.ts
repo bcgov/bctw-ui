@@ -34,7 +34,6 @@ export const permissionApi = (props: ApiProps) => {
 
   /**
    * @param user the @type {User} to retrieve the permissions for. 
-   * only passes the user's IDIR to the API (fixme: bceid support)
    * @param filter an optional @type {eCritterPermission[]}, which is defaulted to 
    * all permission types other than 'none' - aka backend will not return critters that 
    * the user does not have any permission to.
@@ -44,22 +43,26 @@ export const permissionApi = (props: ApiProps) => {
     user: User,
     filter: eCritterPermission[] = filterOutNonePermissions
   ): Promise<UserCritterAccess[]> => {
-    if (!user) {
+    if (!user?.username) {
+      // eslint-disable-next-line no-console
+      console.log(`unable to fetch user animal access, invalid user object ${JSON.stringify(user)}`);
       return [];
     }
     const filtersAsString = filter.join(',');
-    const url = createUrl({ api: `get-critter-access/${user.uid}`, query: `filters=${filtersAsString}`, page });
+    const { username } = user;
+    const url = createUrl({ api: `get-critter-access/${username}`, query: `filters=${filtersAsString}`, page });
     const { data } = await api.get(url);
-    const converted = data.map((json: IUserCritterAccess[]) => plainToClass(UserCritterAccess, json));
+    // may not be in an array if the user only has accesss to one animal
+    const d: IUserCritterAccess[] = !Array.isArray(data) ? [data] : data;
+    const converted: UserCritterAccess[] = d.map((json: IUserCritterAccess) => plainToClass(UserCritterAccess, json));
     return converted;
   };
 
   /**
-   * an endpoint that an admin access only page uses to display a list of active 
-   * permission requests. @returns {IPermissionRequest[]}, which queries from an view 
+   * admin only endpoint to display a list of active permission requests.
+   * @returns {IPermissionRequest[]}, which queries from an view 
    * that splits the email list and individual @type {IUserCritterAccessInput} 
    * into multiple rows.
-   * @param (none) - uses the user's IDIR only
   */
   const getPermissionRequest = async (): Promise<PermissionRequest[]> => {
     const { data } = await api.get(createUrl({ api: `permission-request`}));
@@ -68,12 +71,9 @@ export const permissionApi = (props: ApiProps) => {
   }
 
   /**
-   * an endpoint for an owner to view results successful permission requests
-   * that were granted.
-   * permission requests. @returns {PermissionRequest[]}, which queries 
-   * the API schemas user_animal_assignment_v view. Note: some fields
-   * will not be present! ex. request_id 
-   * @param (none) - uses the user's IDIR only
+   * an owner endpoint for viewing successful permission requests that were granted.
+   * @returns {PermissionRequest[]}, which queries the API schemas user_animal_assignment_v view. 
+   * Note: some fields will not be present ex. request_id 
   */
   const getPermissionHistory = async (page = 1): Promise<PermissionRequest[]> => {
     const { data } = await api.get(createUrl({ api: `permission-history`, page}));

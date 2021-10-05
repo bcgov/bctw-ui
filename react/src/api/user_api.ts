@@ -72,7 +72,6 @@ export const userApi = (props: ApiProps) => {
 
   /**
    * @returns {TelemetryAlert[]} that the user has access to (through their critters)
-   * todo: support different alert types
    */
   const getUserAlerts = async (): Promise<MortalityAlert[]> => {
     const url = createUrl({ api: 'get-user-alerts' });
@@ -110,8 +109,7 @@ export const userApi = (props: ApiProps) => {
   };
 
   /**
-   * currently replaces the user's existing UDFs with @param {IUDF[]}
-   * @returns
+   * replaces the user's existing UDFs with @param {IUDF[]}
    */
   const upsertUDF = async (udfs: IUDFInput[]): Promise<IUDF[]> => {
     const url = createUrl({ api: 'add-udf' });
