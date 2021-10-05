@@ -220,11 +220,8 @@ export const useTelemetryApi = () => {
    * requires admin role
    * @returns a list of all users
    */
-  const useUsers = (page: number): UseQueryResult => {
-    return useQuery<User[], AxiosError>('all_users', () => userApi.getUsers(page), {
-      ...defaultQueryOptions
-    });
-  };
+  const useUsers = (page: number): UseQueryResult => 
+    useQuery<User[], AxiosError>('all_users', () => userApi.getUsers(page), defaultQueryOptions);
 
   /**
    * @param user who to retrieve critter access for 
@@ -375,7 +372,7 @@ export const useTelemetryApi = () => {
   
   /** add or update a user */
   const useSaveUser = (config: UseMutationOptions<User, AxiosError, User>): UseMutationResult<User, AxiosError> =>
-    useMutation<User, AxiosError, User>((body) => userApi.addUser(body), config);
+    useMutation<User, AxiosError, User>((body,) => userApi.addUser(body), config);
 
   /** add a new user that hasn't been onboarded */
   const useSubmitOnboardingRequest = (config: UseMutationOptions<IOnboardUser, AxiosError, IOnboardUser>): UseMutationResult<IOnboardUser, AxiosError> =>

@@ -73,8 +73,13 @@ const escapeRegex = (str: string): string => {
 const asJSON = <T>(o: T): T => {
   const ret = {} as T;
   for (const [key, value] of Object.entries(o)) {
-    if (isDayjs(value)) {
-      ret[key] = value.format(formatTime);
+    if (key === 'error') {
+      // skip
+    }
+    else if (isDayjs(value) ) {
+      if (value.isValid()) {
+        ret[key] = value.format(formatTime);
+      }
     } else if (typeof value === 'string') {
       ret[key] = escapeRegex(value);
     } else {

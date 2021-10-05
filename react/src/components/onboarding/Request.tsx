@@ -6,13 +6,12 @@ import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { eUserRole, IKeyCloakSessionInfo, KeyCloakDomainType } from 'types/user';
 import { IOnboardUser, OnboardUser } from 'types/onboarding';
-import BasicSelect from 'components/form/BasicSelect';
 
 /**
  * where unauthorized users are directed to submit a request for access to BCTW
  */
 const UserAccessRequest = (): JSX.Element => {
-  const [accessType, setAccessType] = useState<eUserRole>(eUserRole.observer);
+  const accessType = eUserRole.observer;
   const [populationUnit, setPopulationUnit] = useState('');
   const [projectManager, setProjectManager] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -158,15 +157,6 @@ const UserAccessRequest = (): JSX.Element => {
               label='Population Unit Name'
               onChange={(e): void => setPopulationUnit(e.target.value)}
               {...textProps}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <BasicSelect
-              label={'Target Level of Access'}
-              handleChange={(e: string): void => setAccessType(e as eUserRole)}
-              defaultValue={accessType}
-              required={true}
-              values={['administrator', 'observer']}
             />
           </Grid>
           <Grid item xs={12}>

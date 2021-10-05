@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios';
+import { plainToClass } from 'class-transformer';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
@@ -94,29 +95,42 @@ export const UserStateContextProvider: React.FC = (props) => {
   }, [isSessionError])
 
   /**
-   * keycloak session may be different/newer than what is persisted in the database.
-   * when the context loads the user, check the fields are the same, if there are differences,
-   * upsert them
-   * fixme: should idir/bceid be updated?
+   * keycloak session may be different/newer than the database record.
+   * when the context loads the user:
+      * check the fields are the same
+      * if there are any differences, upsert them
    */
   const handleUserChanged = async (): Promise<void> => {
     const { user } = userContext;
     if (!user) {
       return;
     }
-    if (session.email === user.email && session.family_name === user.lastname && session.given_name === user.firstname) {
+    if (session.username === user.username
+      && session.email === user.email
+      && session.family_name === user.lastname
+      && session.given_name === user.firstname
+    ) {
       // console.log('UserContext: handleUserchanged: keycloak info matches database record');
       // no updates required
       return;
     }
-    const updatedUser = Object.assign({}, user);
-
-    // create new user in user table with role 'newUser' using Keycloak information
-    updatedUser.email = session.email;
-    updatedUser.firstname = session.given_name;
-    updatedUser.lastname = session.family_name;
-    console.log(`keycloak session object has new info, upserting new user ${JSON.stringify(updatedUser)}`);
-    await mutateAsync(updatedUser);
+    // update entry in bctw.user table
+    const updated = plainToClass(User, user);
+    const { email, given_name, family_name, domain, username } = session;
+    updated.email = email;
+    updated.firstname = given_name;
+    updated.lastname = family_name;
+    updated.username = username;
+    // note: idir/bceid can change.
+    if (domain === 'bceid') {
+      updated.bceid = username;
+      delete updated.idir;
+    } else if (domain === 'idir') {
+      updated.idir = username;
+      delete updated.bceid;
+    }
+    console.log(`keycloak session object has new info, upserting new user ${JSON.stringify(updated)}`);
+    await mutateAsync(updated);
   }
 
   return (

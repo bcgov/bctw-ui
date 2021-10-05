@@ -1,13 +1,9 @@
 import { getCritterEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
-import { createUrl } from 'api/api_helpers';
+import { createUrl, postJSON } from 'api/api_helpers';
 import { ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { plainToClass } from 'class-transformer';
 import { Animal, AttachedAnimal, eCritterFetchType, IAnimal, IAttachedAnimal } from 'types/animal';
 import { useQueryClient } from 'react-query';
-
-// fixme: type apis
-// type APICall<T> = (...args: unknown[]) => T | T[];
-// type API = Record<string, APICall<unknown>>;
 
 export const critterApi = (props: ApiProps) => {
   const { api } = props;
@@ -38,10 +34,7 @@ export const critterApi = (props: ApiProps) => {
   };
 
   const upsertCritter = async (payload: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
-    const { body } = payload;
-    const url = createUrl({ api: upsertCritterEndpoint });
-    // const critters = body.map(a => serialize(a))
-    const { data } = await api.post(url, body);
+    const { data } = await postJSON(api, createUrl({ api: upsertCritterEndpoint }), payload.body);
     invalidate();
     return data;
   };

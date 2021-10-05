@@ -14,19 +14,8 @@ const pg = require('pg');
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
 const isProd = process.env.NODE_ENV === 'production' ? true : false;
-const isTest = process.env.TEST === 'true';
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
-
-// set up the database pool
-const pgPool = new pg.Pool({
-  user: process.env.POSTGRES_USER,
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  host: process.env.POSTGRES_SERVER_HOST,
-  port: process.env.POSTGRES_SERVER_PORT,
-  max: 10,
-});
 
 // use Express memory store for session and Keycloak object
 var memoryStore = new expressSession.MemoryStore();
@@ -223,82 +212,10 @@ const notFound = function (req, res) {
   @param next {function} Node/Express function for flow control
  */
 const pageHandler = function (req, res, next) {
-  console.log('pageHandler() -- CALLED');
   return next();
 };
 
-/**
- * # onboardingRedirect
- * If you get here you have a valid IDIR.
- * Check if the user is registerd in the database.
- * If yes.... Pass through.
- * Else... Direct to the onboarding page.
- * @param req {object} Express request object
- * @param res {object} Express response object
- * @param next {function} Express function to continue on
- */
-const onboardingRedirect = async (req, res, next) => {
-
-  // Collect all user data from the keycloak object
-  const data = req.kauth.grant.access_token.content;
-  const { username, domain } = splitCredentials(data);
-  console.log('onboardingRedirect() -- user:', username)
-
-//  // Get a list of all allowed users
-//  const sql = 'select idir from bctw.user'
-//  const client = await pgPool.connect();
-//  const result = await client.query(sql);
-//  const idirs = result.rows.map((row) => row.idir);
-
-//  // Is the current user registered: Boolean
-//  const registered = (idirs.includes(username)) ? true : false;
-
-  let registered = false;
-
-  // check for user access given an IDIR
-  if (domain == "idir") {
-  const sql = `
-    SELECT idir, bceid, access
-    FROM bctw.user
-    WHERE idir = '${username}' AND access = 'granted'
-  `;
-  const client = await pgPool.connect();
-  const result = await client.query(sql);
-  result.rowCount == 1 ? registered = true : registered = false;
-  client.release(); // release database connection
-
-  console.log('onboardingRedirect() -- access granted for IDIR ' + username + '? ' + registered)
-
-  // check for user access given a BCeID
-  } else if (domain == "bceid") {
-    const sql = `
-      SELECT idir, bceid, access
-      FROM bctw.user
-      WHERE bceid = '${username}' AND access = 'granted'
-    `;
-    const client = await pgPool.connect();
-    const result = await client.query(sql);
-    result.rowCount == 1 ? registered = true : registered = false;
-    client.release(); // release database connection
-
-    console.log('onboardingRedirect() -- access granted for BCeID ' + username + '? ' + registered)
-
-  }
-
-  if (registered) {
-    next(); // pass through
-  } else {  
-    if (req.url.match(/\/onboarding/) || req.url.match(/\/static/) || req.url.match(/\/Reflect/)) {
-      next(); // allow static assets to pass through too
-    } else {
-        res.redirect('/onboarding'); // otherwise, redirect to the onboarding page
-    }
-  }
-
-};
-
 const handleUserAccessRequest = async (req, res) => {
-
   // This data will be inserted into the email
   const {
     accessType,
@@ -422,8 +339,6 @@ const handleUserAccessRequest = async (req, res) => {
 /* ## denied
   The route to the denied service page
   TODO: Deprecate as all remaining traffic goes to React.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
 */
 const denied = function (req, res) {
   res.render('denied', req);
@@ -431,8 +346,6 @@ const denied = function (req, res) {
 
 /* ## devServerRedirect
   Redirect traffic to the React dev server 
-  @param _ {object} Node/Express request object
-  @param res {object} Node/Express response object
 */
 const devServerRedirect = function (_, res) {
   res.redirect('locahost:1111');
@@ -453,26 +366,20 @@ var app = express()
   .use(gardenGate) // Keycloak Gate
   .get('/denied', denied);
 
+// Use keycloak authentication only in Production
 if (isProd) {
-  console.log('Environment -- isProd?', isProd);
   app
     .get('/api/session-info', retrieveSessionInfo)
     .post('/onboarding', keycloak.protect(), handleUserAccessRequest)
-    // .all('*', keycloak.protect(), onboardingRedirect);
     .all('*', keycloak.protect(), pageHandler);
 } else {
-  console.log('Environment -- isTest?', isTest);
   app
-    .post('/onboarding', handleUserAccessRequest);
-}
-
-if (isTest) {
-  app
+    .post('/onboarding', handleUserAccessRequest)
     .post('/api/import-csv', upload.single('csv'), pageHandler)
     .post('/api/import-xml', upload.array('xml'), pageHandler)
     .post('/api/:endpoint', proxyApi);
-  // Use keycloak authentication only in Production
-} else if (isProd) {
+}
+if (isProd) {
   app
     .get('/', keycloak.protect(), pageHandler)
     // .get('/api/session-info', retrieveSessionInfo)
@@ -484,11 +391,6 @@ if (isTest) {
     .post('/api/:endpoint', keycloak.protect(), proxyApi)
     // delete handlers
     .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi);
-} else {
-  console.log('express() -- neither isTest or IsProd')
-  app
-    .get('/api/:endpoint', proxyApi)
-    .get('/', pageHandler);
 }
 
 // handle static assets 

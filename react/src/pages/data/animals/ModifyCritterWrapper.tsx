@@ -68,7 +68,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const saveCritter = async (a: IUpsertPayload<Animal | AttachedAnimal>): Promise<void> => {
     const { body } = a;
     const formatted = body.toJSON();
-    console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
+    // console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
     await saveMutation({ body: formatted});
   } 
 

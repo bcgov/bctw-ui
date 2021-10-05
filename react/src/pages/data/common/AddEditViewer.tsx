@@ -32,7 +32,7 @@ export type IAddEditProps<T> = {
   editing: T;
   empty: T;
   onDelete?: (id: string) => void;
-  onSave?: (a: IUpsertPayload<T>) => void;
+  onSave?: (a: IUpsertPayload<T>) => Promise<void>;
   editText?: string;
   addText?: string
   deleteText?: string;
@@ -40,10 +40,11 @@ export type IAddEditProps<T> = {
   addTooltip?: string;
   deleteTooltip?: string;
   queryStatus: QueryStatus;
+  closeAfterSave?: boolean;
 };
 
 export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProps<T>): JSX.Element {
-  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText, editTooltip, addTooltip, deleteTooltip, queryStatus } = props;
+  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText, editTooltip, addTooltip, deleteTooltip, queryStatus, closeAfterSave = false } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -72,9 +73,12 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
     }
   };
 
-  const handleClickSave = (p): void => {
+  const handleClickSave = async (payload: IUpsertPayload<T>): Promise<void> => {
     if (typeof onSave === 'function') {
-      onSave(p)
+      await onSave(payload)
+      if (closeAfterSave) {
+        setShowModal(o => !o);
+      }
     }
   }
 

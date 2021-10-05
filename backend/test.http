@@ -4,22 +4,15 @@ content-type: application/json
 [
   {
   "animal_id": "test123",
-  "animal_status": "Alive",
-  "calf_at_heel": true,
   "sex": "M",
-  "wlh_id": "abc123",
-  "nickname": "shimmer",
-  "id": 2
-},
-{
-  "animal_id": "test123",
-  "animal_status": "Alive",
-  "calf_at_heel": true,
-  "species": "unicorn",
-  "sex": "M",
-  "wlh_id": "abc123",
-  "nickname": "shimmer"
-}
+  "wlh_id": "abc123"
+  },
+  {
+    "animal_id": "test1234",
+    "animal_status": "Alive",
+    "sex": "F",
+    "wlh_id": "jasdfk3"
+  }
 ]
 ###
 http://localhost:8080/api/get-user?bceid=asdfd

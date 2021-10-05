@@ -23,11 +23,11 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
 
   return (
     <EditModal
+      disableTabs={true} /** users dont have history */
       disableHistory={true}
       title={editing?.id ? `Editing ${editing.uid}` : 'Create New User'}
       showInFullScreen={false}
-      onReset={close}
-      onSave={(): void => { /* do nothing */}}
+      onSave={(): void => { /* do nothing, handled in UserAdmin.tsx */}}
       {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {

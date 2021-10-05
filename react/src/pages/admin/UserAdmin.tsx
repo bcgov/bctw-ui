@@ -57,7 +57,8 @@ export default function UserAdminPage(): JSX.Element {
         />
         <div className={'button-row'}>
           <AddEditViewer<User>
-            queryStatus='success'
+            closeAfterSave={true}
+            queryStatus={'success'}
             editText={'User'}
             addText={'User'}
             editing={userModified}

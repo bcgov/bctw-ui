@@ -5,9 +5,6 @@ const formatTime = 'YYYY-MM-DD HH:mm';
 const format24Hour = 'HH:mm:ss';
 const formatLocal = 'dddd, MMMM D, YYYY h:mm A';
 
-// used when creating new objects that have a date property. Use this as an arbitrary 'invalid date'
-const getInvalidDate = (): Date => new Date('1900-01-01');
-
 // if a valid dayjs is object is provided, format it normally. or return null
 const formatT = (d: Dayjs | null): string | null => d?.format(formatTime) ?? null;
 
@@ -72,6 +69,5 @@ export {
   getToday,
   formatDateStr,
   formatWithUTCOffset,
-  getInvalidDate,
   isInvalidDate,
 }

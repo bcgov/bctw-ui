@@ -36,11 +36,13 @@ export const userApi = (props: ApiProps) => {
 
   /**
    * @param user a new or existing @type {User}
-   * fixme: defaulting role to 'observer'
+   * defaults role_type to the user's property or 'observer' if that isn't defined
+   * note: user object returned will not have role_type
    */
   const addUser = async (user: User): Promise<User> => {
     // console.log('posting user', user)
-    const { data } = await postJSON(api, createUrl({ api: 'add-user' }), {user, role: eUserRole.observer});
+    const role = user.role_type ?? eUserRole.observer;
+    const { data } = await postJSON(api, createUrl({ api: 'add-user' }), {user, role});
     const ret = plainToClass(User, data);
     console.log('user upsert result:', ret);
     invalidate();
@@ -76,7 +78,7 @@ export const userApi = (props: ApiProps) => {
   const getUserAlerts = async (): Promise<MortalityAlert[]> => {
     const url = createUrl({ api: 'get-user-alerts' });
     const { data } = await api.get(url);
-    // console.log('user alerts fetched', data);
+    console.log('user alerts fetched', data);
     if (data && Array.isArray(data)) {
       const converted = data?.map((json) => plainToClass(MortalityAlert, json));
       return converted;

@@ -157,52 +157,26 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   get name(): string {
     return this.wlh_id ?? this.animal_id;
   }
-  // get mortalityCoords(): string {
-  //   return this.mortality_latitude && this.mortality_longitude
-  //     ? formatLatLong(this.mortality_latitude, this.mortality_longitude)
-  //     : '';
-  // }
-  // get mortalityUTM(): string {
-  //   if (this.mortality_utm_zone && this.mortality_utm_easting && this.mortality_utm_northing) {
-  //     return `${this.mortality_utm_zone}/${this.mortality_utm_easting}/${this.mortality_utm_northing}`;
-  //   }
-  //   return '';
-  // }
-  // get captureCoords(): string {
-  //   return this.capture_latitude && this.capture_longitude
-  //     ? formatLatLong(this.capture_latitude, this.capture_longitude)
-  //     : '';
-  // }
-  // get captureUTM(): string {
-  //   return this.capture_utm_zone && this.capture_utm_easting && this.capture_utm_northing
-  //     ? `${this.capture_utm_zone}/${this.capture_utm_easting}/${this.capture_utm_northing}`
-  //     : '';
-  // }
 
-  // todo: all date fields to str
   toJSON(): Animal {
-    delete this.map_colour;
-    return this;
+    const n = Object.assign(new Animal(), this);
+    delete n.permission_type;
+    delete n.map_colour;
+    delete n.valid_from;
+    delete n.valid_to;
+    return n;
   }
 
   formatPropAsHeader(str: keyof Animal): string {
     switch (str) {
       case 'associated_animal_relationship':
         return 'Associated Relationship';
-      // case 'captureCoords':
-      //   return 'Coordinates (Lat/Long)';
-      // case 'captureUTM':
-      //   return 'UTM';
       case 'collective_unit':
         return 'Collective Unit Name';
       case 'critter_id':
         return 'BCTW ID';
       case 'juvenile_at_heel':
         return 'Juvenile at Heel?';
-      // case 'mortalityCoords':
-      //   return 'Coordinates (Lat/Long)';
-      // case 'mortalityUTM':
-      //   return 'UTM';
       case 'population_unit':
         return 'Population Unit Name';
       case 'wlh_id':

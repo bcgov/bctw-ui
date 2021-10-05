@@ -1,4 +1,4 @@
-import { createUrl } from 'api/api_helpers';
+import { createUrl, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollar, Collar, AttachedCollar, IAttachedCollar, eCollarAssignedStatus } from 'types/collar';
 import { upsertDeviceEndpoint } from 'api/api_endpoint_urls';
@@ -44,9 +44,7 @@ export const collarApi = (props: ApiProps) => {
   };
 
   const upsertCollar = async (payload: IUpsertPayload<Collar>): Promise<IBulkUploadResults<Collar>> => {
-    const { body } = payload;
-    const url = createUrl({ api: upsertDeviceEndpoint });
-    const { data } = await api.post(url, body);
+    const { data } = await postJSON(api, createUrl({ api: upsertDeviceEndpoint }), payload.body);
     invalidate();
     return data;
   };
