@@ -8,6 +8,7 @@ import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { AttachedCollar, Collar } from 'types/collar';
 import { permissionCanModify } from 'types/permission';
+import { plainToClass } from 'class-transformer';
 
 type IModifyWrapperProps = {
   editing: AttachedCollar | Collar;
@@ -25,12 +26,17 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
 
   const [device, setDevice] = useState<typeof editing>(editing);
 
-  // fetch the device
-  const { data, status } = api.useType<Collar>('device', editing.collar_id, {enabled: !!(editing.collar_id)})
+  // fetch the device if the currently selected row has a device id. assume it's an attached collar
+  const { data, status } = api.useType<AttachedCollar>('device', editing.collar_id, {enabled: !!(editing.collar_id)})
 
   useEffect(() => {
     if (data || status === 'success') {
-      setDevice(data);
+      // verify the attachment status
+      if (data.assignment_id) {
+        setDevice(plainToClass(AttachedCollar, data));
+      } else {
+        setDevice(plainToClass(Collar, data));
+      }
     }
     setCanEdit(permissionCanModify(editing?.permission_type));
   }, [editing, status]);

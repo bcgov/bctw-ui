@@ -13,26 +13,16 @@ export const collarApi = (props: ApiProps) => {
     queryClient.invalidateQueries('collartype');
   }
 
-  const _handleGetResults = (
-    data: IAttachedCollar[] | Collar[],
-    type: eCollarAssignedStatus
-  ): AttachedCollar[] | Collar[] => {
-    const ret = data.map((json: ICollar | IAttachedCollar) => 
-      plainToClass(type === eCollarAssignedStatus.Assigned ? AttachedCollar : Collar, json)
-    );
-    return type === eCollarAssignedStatus.Assigned ? ret as AttachedCollar[] : ret as Collar[];
-  }
-
   const getAvailableCollars = async (page = 1): Promise<Collar[]> => {
-    // console.log('get available collars')
     const { data } = await api.get(createUrl({ api: 'get-available-collars', page }));
-    return _handleGetResults(data, eCollarAssignedStatus.Available);
+    const ret = data.map((json: ICollar) => plainToClass(Collar, json));
+    return ret;
   };
 
   const getAssignedCollars = async (page = 1): Promise<AttachedCollar[]> => {
-    // console.log('get assigned collars')
     const { data } = await api.get(createUrl({ api: 'get-assigned-collars', page }));
-    return _handleGetResults(data, eCollarAssignedStatus.Assigned) as AttachedCollar[];
+    const ret = data.map((json: ICollar) => plainToClass(AttachedCollar, json));
+    return ret;
   };
 
   // a list of changes made to a collar, vs collar/critter attachment history above

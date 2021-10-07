@@ -8,6 +8,7 @@ import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { IAddEditProps } from '../common/AddEditViewer';
+import { plainToClass } from 'class-transformer';
 
 type IModifyWrapperProps = {
   editing: Animal | AttachedAnimal;
@@ -29,8 +30,8 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [animal, setAnimal] = useState<typeof editing>(editing);
 
-  // fetch the critter
-  const { data, status } = api.useType<Animal>('animal', editing.critter_id, {enabled: !!(editing.critter_id)})
+  // fetch the critter, assume it's attached for now
+  const { data, status } = api.useType<AttachedAnimal>('animal', editing.critter_id, {enabled: !!(editing.critter_id)})
 
   /**
    * note: if data has been previously fetched, 'status' will not be updated.
@@ -38,7 +39,11 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
    */
   useEffect(() => {
     if (data || status === 'success') {
-      setAnimal(data);
+      if (data.assignment_id) {
+        setAnimal(plainToClass(AttachedAnimal, data));
+      } else {
+        setAnimal(plainToClass(Animal, data));
+      }
     }
     setHasCollar(editing instanceof AttachedAnimal)
     setCanEdit(permissionCanModify(editing.permission_type));

@@ -180,6 +180,7 @@ export interface IAttachedCollar extends ICollar, Pick<Animal, 'wlh_id' | 'anima
 }
 
 export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<AttachedCollar>, DataLife {
+  assignment_id: uuid;
   attachment_start: Dayjs;
   data_life_start: Dayjs;
   data_life_end: Dayjs;

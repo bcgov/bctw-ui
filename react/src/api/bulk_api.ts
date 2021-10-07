@@ -1,8 +1,5 @@
 import { createUrl } from 'api/api_helpers';
 import { AxiosInstance } from 'axios';
-import { plainToClass } from 'class-transformer';
-import { AttachedAnimal } from 'types/animal';
-import { Collar } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { exportEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
@@ -41,14 +38,15 @@ export const bulkApi = (api: AxiosInstance) => {
     return data;
   }
 
+  /**
+   * @param type 'animal' or 'device'
+   * @param id BCTW internal uuid
+   * @returns the raw data returned from the api, does not call the transformer
+   */
   const getType = async <T>(type: BCTWType, id: string): Promise<T> => {
     const url = createUrl({ api: `${type}/${id}`});
     const { data } = await api.get(url);
-    if (type === 'animal') {
-      return plainToClass(AttachedAnimal, data) as any;
-    } else {
-      return plainToClass(Collar, data) as any;
-    }
+    return data;
   }
 
   // handles deletes for animals/collars

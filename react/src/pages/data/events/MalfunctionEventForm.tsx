@@ -61,11 +61,11 @@ export default function MalfunctionEventForm({
         <Radio
           propName={wfFields.get('device_status').prop}
           changeHandler={onChange}
-          defaultSelectedValue={'Potential Mortality'}
-          values={['Potential Mortality', 'Active', 'Malfunction', 'Offline'].map((p) => ({
+          defaultSelectedValue={'Potential Malfunction'}
+          values={['Potential Malfunction', 'Active', 'Malfunction', 'Offline'].map((p) => ({
             label: p,
             value: p,
-            disabled: p === 'Potential Mortality'
+            disabled: p === 'Potential Malfunction'
           }))}
         />
       }

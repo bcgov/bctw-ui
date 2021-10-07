@@ -17,6 +17,7 @@ import MalfunctionEvent from 'types/events/malfunction_event';
 
 /**
  * todo: reimplement auto defaulting of fields based on collar type select
+ * when creating a new device
  */
 export default function EditCollar(props: EditorProps<Collar | AttachedCollar>): JSX.Element {
   const { isCreatingNew, editing } = props;

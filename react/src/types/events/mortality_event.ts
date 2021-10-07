@@ -108,7 +108,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly capture_date: Dayjs;
   location_event: LocationEvent;
 
-  constructor() {
+  constructor(mort_date = dayjs()) {
     this.event_type = 'mortality';
     this.shouldSaveAnimal = true;
     this.shouldSaveDevice = true;
@@ -125,7 +125,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.animal_status = 'Mortality';
     this.wasInvestigated = false;
     this.predator_known = false;
-    this.location_event = new LocationEvent('mortality', dayjs());
+    this.location_event = new LocationEvent('mortality', mort_date);
   }
 
   get displayProps(): (keyof MortalityEvent)[] {

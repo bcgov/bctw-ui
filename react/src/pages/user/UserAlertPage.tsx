@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { CircularProgress, IconButton, TableHead } from '@material-ui/core';
-import { eAlertType, MissingDataAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
+import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@material-ui/core';
 import { formatT } from 'utils/time';
@@ -15,6 +15,7 @@ import { columnToHeader } from 'utils/common_helpers';
 import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import MalfunctionEvent from 'types/events/malfunction_event';
+import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
 
 /**
  * modal component that shows current alerts
@@ -26,13 +27,14 @@ export default function AlertPage(): JSX.Element {
   const useAlerts = useContext(AlertContext);
 
   const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
-  const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MissingDataAlert | null>(null);
+  const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(null);
   // display status of the modal that the user can perform the alert update from
   const [showEventModal, setShowEventModal] = useState(false);
   // display status of the modal that requires the user to confirm snoozing
   const [showSnoozeModal, setShowSnoozeModal] = useState(false);
   const [snoozeMessage, setSnoozeMessage] = useState('');
-  const [workflow, createWorkflow] = useState<MortalityEvent | MalfunctionEvent | null>(null);
+  // when an alert row is selected, clicking the 'update' button will trigger a workflow modal based on the alert type
+  const [workflow, createWorkflow] = useState<IBCTWWorkflow | null>(null);
 
   useEffect(() => {
     const update = (): void => {
@@ -53,12 +55,23 @@ export default function AlertPage(): JSX.Element {
   // setup the mutation to update the alert status
   const { mutateAsync, isLoading } = bctwApi.useSaveUserAlert({ onSuccess, onError });
 
-  // alert is selected in table
+  /**
+   * when an alert row is selected from the table:
+   * a) set the selected row state
+   * b) based on the alert type, update the workflow state
+   */
   const handleSelectRow = (aid: number): void => {
     const selected = alerts.find((a) => a.alert_id === aid);
-    const type = selected.alert_type;
-    createWorkflow(type === eAlertType.missing_data ? new MalfunctionEvent() : new MortalityEvent())
     setSelectedAlert(selected);
+    const type = selected.alert_type;
+    createWorkflow(() => {
+      const n = selected.toWorkflow(
+        type === eAlertType.malfunction
+          ? new MalfunctionEvent(selected.valid_from)
+          : new MortalityEvent(selected.valid_from)
+      );
+      return n;
+    });
   };
 
   // post the updated alert
@@ -123,7 +136,9 @@ export default function AlertPage(): JSX.Element {
               <TableHead>
                 <TableRow>
                   {propsToShow.map((str, idx) => (
-                    <TableCell key={idx}>{alerts.length ? alerts[0].formatPropAsHeader(str) : columnToHeader(str)}</TableCell>
+                    <TableCell key={idx}>
+                      {alerts.length ? alerts[0].formatPropAsHeader(str) : columnToHeader(str)}
+                    </TableCell>
                   ))}
                 </TableRow>
               </TableHead>
@@ -150,7 +165,7 @@ export default function AlertPage(): JSX.Element {
                       </TableCell>
                       <TableCell>{formatT(a.valid_from)}</TableCell>
                       <TableCell>
-                        <IconButton style={{backgroundColor: 'orangered'}} onClick={(): void => editAlert(a)}>
+                        <IconButton style={{ backgroundColor: 'orangered' }} onClick={(): void => editAlert(a)}>
                           <Icon icon='edit' htmlColor='#fff' />
                         </IconButton>
                       </TableCell>
@@ -188,7 +203,7 @@ export default function AlertPage(): JSX.Element {
       />
       {selectedAlert ? (
         <WorkflowWrapper
-          event={workflow as any}
+          event={workflow as BCTWWorkflow<typeof workflow>}
           open={showEventModal}
           handleClose={(): void => setShowEventModal(false)}
           onEventSaved={handleEventSaved}

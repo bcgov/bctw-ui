@@ -8,7 +8,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ReactNode, useEffect, useState } from 'react';
-import { BCTWWorkflow } from 'types/events/event';
+import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
@@ -23,7 +23,7 @@ import ReleaseEvent from 'types/events/release_event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import MalfunctionEventForm from './MalfunctionEventForm';
 
-type WorkflowWrapperProps<T extends BCTWWorkflow<T>> = ModalBaseProps & {
+type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
   event: T;
   onEventSaved?: (e: BCTWWorkflow<T>) => void; // to notify alert that event was saved
 };
@@ -33,7 +33,6 @@ type WorkflowWrapperProps<T extends BCTWWorkflow<T>> = ModalBaseProps & {
  * handles:
     * modal state
     * saving
- * todo: Reset event on closing/saving modal
  */
 export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   event,
@@ -46,7 +45,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr] = useFormHasError();
-  //
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState<ReactNode>(null);
 
@@ -87,11 +86,9 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   const handleChildFormUpdated = (v: InboundObj): void => {
     checkHasErr(v);
     const k = Object.keys(v)[0];
-    // console.log(event[k])
     if (k && k !== 'displayProps') {
       event[k] = Object.values(v)[0];
     }
-    // console.log(event[k])
   };
 
   /**
@@ -108,7 +105,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
    * workflows that use this behavior 
    */
   const handleExitWorkflow = (): void => {
-    console.log('exiting workflow early!');
+    // console.log('exiting workflow early!');
     saveEvent(event);
     setShowConfirmModal(false);
   };
