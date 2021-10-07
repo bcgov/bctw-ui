@@ -1,16 +1,18 @@
 import { OutlinedTextFieldProps, StandardTextFieldProps } from '@material-ui/core';
 import { Box, Button, Grid, TextField } from '@material-ui/core';
-import { useContext, useEffect, useState } from 'react';
+import { ReactNode, useContext, useEffect, useState } from 'react';
 import { createUrl } from 'api/api_helpers';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { eUserRole, IKeyCloakSessionInfo, KeyCloakDomainType } from 'types/user';
 import { IOnboardUser, OnboardUser } from 'types/onboarding';
 
+type UserAccessRequestProps = { children?: ReactNode }
 /**
  * where unauthorized users are directed to submit a request for access to BCTW
  */
-const UserAccessRequest = (): JSX.Element => {
+
+const UserAccessRequest = ({children}: UserAccessRequestProps): JSX.Element => {
   const accessType = eUserRole.observer;
   const [populationUnit, setPopulationUnit] = useState('');
   const [projectManager, setProjectManager] = useState('');
@@ -113,6 +115,7 @@ const UserAccessRequest = (): JSX.Element => {
     <Box px={4} py={1}>
       <Box className='fieldset-form'>
         <h1>Request Access</h1>
+        {children}
         <div>
           <p>
             You will need to provide some additional details before accessing this application. Complete the request

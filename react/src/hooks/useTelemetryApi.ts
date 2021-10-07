@@ -31,7 +31,7 @@ import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow } from 'types/events/event';
-import { IOnboardUser, HandleOnboardInput } from 'types/onboarding';
+import { IOnboardUser, HandleOnboardInput, OnboardUser } from 'types/onboarding';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 
 /**
@@ -275,8 +275,8 @@ export const useTelemetryApi = () => {
   }
 
   /** get onboarding status for a non-existing BCTW user */
-  const useOnboardStatus = (): UseQueryResult<Pick<IOnboardUser, 'access'>, AxiosError> => {
-    return useQuery<Pick<IOnboardUser, 'access'>, AxiosError>(['getOnboardStatus'], () => onboardApi.getOnboardStatus(), defaultQueryOptions);
+  const useOnboardStatus = (): UseQueryResult<OnboardUser, AxiosError> => {
+    return useQuery<OnboardUser, AxiosError>(['getOnboardStatus'], () => onboardApi.getOnboardStatus(), defaultQueryOptions);
   }
 
   /** get onboard requests  */

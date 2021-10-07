@@ -56,10 +56,12 @@ export const onboardingApi = (props: ApiProps) => {
   /**
    * unauthorized endpoint that retrieves the current status of a non-existing user's onboard status
    * returns null if api could not locate a status for this user
+   * data will only have access, valid_from and valid_to properties, but
+   * transform the object anyway in order to access class methods
    */
-  const getOnboardStatus = async (): Promise<Pick<IOnboardUser, 'access'> | null> => {
+  const getOnboardStatus = async (): Promise<OnboardUser | null> => {
     const { data } = await api.get(createUrl({ api: getCurrentOnboardStatus }));
-    return data;
+    return plainToClass(OnboardUser, data);
   };
 
   return {

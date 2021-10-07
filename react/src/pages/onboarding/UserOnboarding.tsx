@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { OnboardingStatus } from 'types/onboarding';
+import { formatTime } from 'utils/time';
+import { Box } from '@material-ui/core';
 
 /**
  * # UserOnboarding
@@ -28,7 +30,7 @@ const UserOnboarding = (): JSX.Element => {
       // setUserEmail(data.email);
       setUserAccess(data.access);
     }
-  }, [data])
+  }, [data]);
 
   const containerStyle = {
     display: 'flex',
@@ -44,17 +46,18 @@ const UserOnboarding = (): JSX.Element => {
         <p>User's access is: {userAccess}</p>
       </div> */}
       {
-        userAccess ? // User is in the system
+        userAccess ? ( // User is in the system
           <div>
-            {/* {userAccess == "granted" ? <UserAccessApproved /> : ""} */}
             {userAccess === 'granted' ? <UserAccessRequest /> : ''}
             {userAccess === 'pending' ? <UserAccessPending /> : ''}
-            {userAccess === 'denied' ? <UserAccessDenied /> : ''}
+            {userAccess === 'denied' && data.canRequestBeResubmitted ? <UserAccessRequest children={<Box>Your last access request was denied on {data.valid_to.format(formatTime)}</Box> } /> : <UserAccessDenied onboard={data} />}
           </div>
-          : <UserAccessRequest /> // If here you're not in the system
+        ) : (
+          <UserAccessRequest />
+        ) // If here you're not in the system
       }
     </div>
-  )
-}
+  );
+};
 
 export default UserOnboarding;

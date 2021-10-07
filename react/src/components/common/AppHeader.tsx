@@ -11,19 +11,20 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import Icon from '@mdi/react';
 import Modal from 'components/modal/Modal';
 import UserAlert from 'pages/user/UserAlertPage';
+import { urls } from 'constants/external_urls';
 
 type AppheaderProps = {
   children?: JSX.Element;
 };
 
-const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
+const AppHeader = ({children}: AppheaderProps): JSX.Element => {
   // load the contexts
   const useUser = useContext(UserContext);
   const useAlert = useContext(AlertContext);
 
   const [user, setUser] = useState<User>();
-  const [alertCount, setAlertCount] = useState<number>(0);
-  const [showAlerts, setShowAlerts] = useState<boolean>(false);
+  const [alertCount, setAlertCount] = useState(0);
+  const [showAlerts, setShowAlerts] = useState(false);
 
   // when the UserContext is loaded, set the session info state 
   useDidMountEffect(() => {
@@ -44,10 +45,14 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   }
 
   // when the AlertContext is loaded, set the alert state
+  // don't consider an alert "active" if it is currently snoozed
   useDidMountEffect(() => {
     const { alerts } = useAlert;
-    setAlertCount(alerts.length);
-    if (!alerts.length) {
+    if (alerts.length) {
+      const notSnoozedCount = alerts.filter(a => !a.isSnoozed);
+      setAlertCount(notSnoozedCount.length);
+    }
+    else {
       setShowAlerts(false);
     }
   }, [useAlert]);
@@ -111,8 +116,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
               <a href='/profile'><span color={'inherit'}>{user?.firstname ?? 'Guest'}</span>&nbsp;<span>{user?.lastname ?? 'User'}</span></a>
             </li>
             <li className={'help'}>
-              {/* fixme: more hardcoded urls */}
-              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation' target='_blank'>
+              <a href={urls.bctw_support_url} target='_blank'>
                 <IconButton>
                   <Icon
                     path={mdiHelpCircle}
@@ -122,7 +126,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
                   />
                 </IconButton>
               </a>
-              <a href='https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation' target='_blank'><span color={'inherit'}>Help</span></a>
+              <a href={urls.bctw_support_url} target='_blank'><span color={'inherit'}>Help</span></a>
             </li>
             <li className={'logout'}>
               <span><a href='/logout'><span color={'inherit'}>Logout</span></a></span>
