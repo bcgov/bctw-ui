@@ -1,6 +1,6 @@
 import { createUrl, isDev, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { ITelemetryAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
+import { eAlertType, ITelemetryAlert, MissingDataAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
@@ -75,10 +75,20 @@ export const userApi = (props: ApiProps) => {
   /**
    * @returns {TelemetryAlert[]} that the user has access to (through their critters)
    */
-  const getUserAlerts = async (): Promise<MortalityAlert[]> => {
+  const getUserAlerts = async <T extends TelemetryAlert>(): Promise<T[]> => {
     const url = createUrl({ api: 'get-user-alerts' });
     const { data } = await api.get(url);
-    const alerts = data?.map((json) => plainToClass(MortalityAlert, json));
+    const alerts = data?.map((json: ITelemetryAlert) => {
+      switch (json.alert_type) {
+        case eAlertType.mortality:
+          return plainToClass(MortalityAlert, json);
+        case eAlertType.missing_data:
+          return plainToClass(MissingDataAlert, json);
+        default: 
+          return plainToClass(TelemetryAlert, json);
+      }
+    })
+    // console.log('alerts received', alerts);
     return alerts;
   };
 

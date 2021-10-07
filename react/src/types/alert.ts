@@ -4,20 +4,20 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWBase, BCTWValidDates, nullToDayjs, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { formatDay, formatT } from 'utils/time';
+import { formatDay } from 'utils/time';
 
 import { Code } from 'types/code';
 import { DataLife } from 'types/data_life';
-import MortalityEvent from 'types/events/mortality_event';
 import { editObjectToEvent } from './events/event';
 
-// possible types of telemetry alerts
-enum eAlertType {
+// telemetry alerts types
+export enum eAlertType {
   battery = 'battery',
-  mortality = 'mortality'
+  mortality = 'mortality',
+  missing_data = 'missing_data',
 }
 
-interface ITelemetryAlert extends BCTWValidDates {
+export interface ITelemetryAlert extends BCTWValidDates {
   alert_id: number;
   alert_type: eAlertType;
   snoozed_to: Dayjs;
@@ -26,6 +26,9 @@ interface ITelemetryAlert extends BCTWValidDates {
 
 type AlertProp = keyof ITelemetryAlert;
 
+/** 
+ * base class for user telemetry alerts.
+ */
 export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITelemetryAlert> {
   alert_id: number;
   alert_type: eAlertType;
@@ -68,12 +71,14 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
         return 'Potential Mortality';
       case eAlertType.battery:
         return 'Low Battery';
+      case eAlertType.missing_data:
+        return 'Missing Telemetry';
       default:
         return 'unknown';
     }
   }
 
-  formatPropAsHeader(str: keyof TelemetryAlert): string {
+  formatPropAsHeader(str: string): string {
     switch (str) {
       case 'valid_from':
         return 'Notification Time';
@@ -144,14 +149,18 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
     return ['wlh_id', 'animal_id', 'device_id', 'device_make', ...TelemetryAlert.displayableAlertProps, 'valid_from'];
   }
 
-  formatPropAsHeader(s: AlertProp | string): string {
-    return super.formatPropAsHeader(s as AlertProp);
+  formatPropAsHeader(s: string): string {
+    return super.formatPropAsHeader(s);
   }
 
-  toMortalityEvent(): MortalityEvent {
+  toWorkflow<T>(workflow: T): T{
     // don't preserve animal status from the alert.
-    return editObjectToEvent(Object.assign({}, this),  new MortalityEvent(), ['animal_status']);
+    return editObjectToEvent(Object.assign({}, this),  workflow, ['animal_status']);
   }
 }
 
-export type { eAlertType, ITelemetryAlert };
+export class MissingDataAlert extends MortalityAlert {
+  toWorkflow<T>(workflow: T): T{
+    return editObjectToEvent(Object.assign({}, this), workflow, []);
+  }
+}

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { CircularProgress, IconButton, TableHead } from '@material-ui/core';
-import { MortalityAlert, TelemetryAlert } from 'types/alert';
+import { eAlertType, MissingDataAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@material-ui/core';
 import { formatT } from 'utils/time';
@@ -13,10 +13,12 @@ import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
 import { columnToHeader } from 'utils/common_helpers';
 import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
+import MortalityEvent from 'types/events/mortality_event';
+import MalfunctionEvent from 'types/events/malfunction_event';
 
 /**
  * modal component that shows current alerts
- * todo: add support for other alert types
+ * todo: use an existing table component
  */
 export default function AlertPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -24,12 +26,13 @@ export default function AlertPage(): JSX.Element {
   const useAlerts = useContext(AlertContext);
 
   const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
-  const [selectedAlert, setSelectedAlert] = useState<TelemetryAlert | MortalityAlert>(null);
+  const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MissingDataAlert | null>(null);
   // display status of the modal that the user can perform the alert update from
   const [showEventModal, setShowEventModal] = useState(false);
   // display status of the modal that requires the user to confirm snoozing
   const [showSnoozeModal, setShowSnoozeModal] = useState(false);
   const [snoozeMessage, setSnoozeMessage] = useState('');
+  const [workflow, createWorkflow] = useState<MortalityEvent | MalfunctionEvent | null>(null);
 
   useEffect(() => {
     const update = (): void => {
@@ -53,6 +56,8 @@ export default function AlertPage(): JSX.Element {
   // alert is selected in table
   const handleSelectRow = (aid: number): void => {
     const selected = alerts.find((a) => a.alert_id === aid);
+    const type = selected.alert_type;
+    createWorkflow(type === eAlertType.missing_data ? new MalfunctionEvent() : new MortalityEvent())
     setSelectedAlert(selected);
   };
 
@@ -65,13 +70,13 @@ export default function AlertPage(): JSX.Element {
   };
 
   // user selected to take action on the alert, show the update modal
-  const editAlert = (row: TelemetryAlert): void => {
+  const editAlert = (row): void => {
     setSelectedAlert(row);
     setShowEventModal(true);
   };
 
   // make user confirm the snooze action
-  const handleClickSnooze = (alert: TelemetryAlert): void => {
+  const handleClickSnooze = (alert): void => {
     setSnoozeMessage(UserAlertStrings.snoozeConfirmation(alert.snoozesMax - alert.snooze_count));
     setSelectedAlert(alert);
     setShowSnoozeModal(true);
@@ -100,13 +105,12 @@ export default function AlertPage(): JSX.Element {
     setShowEventModal(false);
   };
 
-  const propsToShow = [...MortalityAlert.displayableMortalityAlertProps, 'update', 'Snooze Status', 'Snooze Action'];
+  const propsToShow = [...MortalityAlert.displayableMortalityAlertProps, 'update', 'status', 'snooze'];
 
   if (!alerts?.length) {
     return <div>no alerts</div>;
   }
 
-  // todo: use existing table
   return (
     <div className={'container'}>
       <Box p={1}>
@@ -119,7 +123,7 @@ export default function AlertPage(): JSX.Element {
               <TableHead>
                 <TableRow>
                   {propsToShow.map((str, idx) => (
-                    <TableCell key={idx}>{columnToHeader(str)}</TableCell>
+                    <TableCell key={idx}>{alerts.length ? alerts[0].formatPropAsHeader(str) : columnToHeader(str)}</TableCell>
                   ))}
                 </TableRow>
               </TableHead>
@@ -141,13 +145,13 @@ export default function AlertPage(): JSX.Element {
                       <TableCell>{a.animal_id}</TableCell>
                       <TableCell>{a.device_id}</TableCell>
                       <TableCell>{a.device_make}</TableCell>
-                      <TableCell style={{ color: 'red' }}>
+                      <TableCell style={{ color: 'orangered' }}>
                         <strong>{a.formatAlert}</strong>
                       </TableCell>
                       <TableCell>{formatT(a.valid_from)}</TableCell>
                       <TableCell>
-                        <IconButton onClick={(): void => editAlert(a)}>
-                          <Icon icon='edit' />
+                        <IconButton style={{backgroundColor: 'orangered'}} onClick={(): void => editAlert(a)}>
+                          <Icon icon='edit' htmlColor='#fff' />
                         </IconButton>
                       </TableCell>
                       <TableCell>
@@ -184,7 +188,7 @@ export default function AlertPage(): JSX.Element {
       />
       {selectedAlert ? (
         <WorkflowWrapper
-          event={(selectedAlert as MortalityAlert).toMortalityEvent()}
+          event={workflow as any}
           open={showEventModal}
           handleClose={(): void => setShowEventModal(false)}
           onEventSaved={handleEventSaved}

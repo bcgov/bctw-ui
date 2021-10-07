@@ -1,23 +1,24 @@
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
 import { useQueryClient } from 'react-query';
-import { MortalityAlert } from 'types/alert';
+import { TelemetryAlert } from 'types/alert';
 import { UserContext } from 'contexts/UserContext';
 
 /**
  * Context that children components can listen to.
  * Provides:
- *  a) an array of @type {TelemetryAlert} applicable to the user
+ *  a) an array of @type {T extends TelemetryAlert} applicable to the user
  *  b) a method to invalidate the query (force refetch alerts) when an alert is updated
- * todo: support other alert types
+ * 
+ * fixme: hooks with generic type??
  */
 
-export interface IAlertContext {
-  alerts: MortalityAlert[];
+export interface IAlertContext<T extends TelemetryAlert> {
+  alerts: T[];
   invalidate: () => void;
   error: string;
 }
-export const AlertContext = createContext<IAlertContext>({ alerts: [], invalidate: null, error: null});
+export const AlertContext = createContext<IAlertContext<any>>({ alerts: [], invalidate: null, error: null});
 export const AlertContextDispatch = createContext(null);
 
 export const AlertStateContextProvider: React.FC = (props) => {
@@ -25,7 +26,7 @@ export const AlertStateContextProvider: React.FC = (props) => {
   const queryClient = useQueryClient();
   const useUser = useContext(UserContext);
 
-  const [alertContext, setAlertContext] = useState<IAlertContext | null>(null);
+  const [alertContext, setAlertContext] = useState<IAlertContext<any> | null>(null);
   const [shouldFetchAlerts, setShouldFetchAlerts] = useState(false);
 
   const { data, status, error, dataUpdatedAt } = api.useAlert({enabled: shouldFetchAlerts});
@@ -65,7 +66,7 @@ export const AlertStateContextProvider: React.FC = (props) => {
   );
 };
 
-const useAlertContextDispatch = (): React.Context<IAlertContext> => {
+const useAlertContextDispatch = (): React.Context<IAlertContext<any>> => {
   const context = useContext(AlertContextDispatch);
   return context;
 };

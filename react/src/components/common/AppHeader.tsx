@@ -45,17 +45,25 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
   }
 
   // when the AlertContext is loaded, set the alert state
-  // don't consider an alert "active" if it is currently snoozed
   useDidMountEffect(() => {
     const { alerts } = useAlert;
     if (alerts.length) {
-      const notSnoozedCount = alerts.filter(a => !a.isSnoozed);
-      setAlertCount(notSnoozedCount.length);
+      setAlertCount(alerts.length);
     }
     else {
       setShowAlerts(false);
     }
   }, [useAlert]);
+
+  const getAlertTitle = (): string => {
+    const alerts = useAlert?.alerts;
+    if (!alerts?.length) {
+      return 'Alerts(0)';
+    }
+    const numSnoozed = alerts.filter(a => a.isSnoozed).length;
+    const snoozedStr = numSnoozed ? `Snoozed (${numSnoozed})` : '';
+    return `Alerts that require action (${alerts.length - numSnoozed}) ${snoozedStr}`;
+  }
 
   return (
     <header className={'app-header'}>
@@ -135,7 +143,7 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
           </ul>
         </nav>
       </div>
-      <Modal title={`Alerts (${alertCount})`} open={showAlerts} handleClose={(): void => setShowAlerts(false)}>
+      <Modal title={getAlertTitle()} open={showAlerts} handleClose={(): void => setShowAlerts(false)}>
         <UserAlert />
       </Modal>
     </header>
