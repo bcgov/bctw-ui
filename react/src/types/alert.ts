@@ -84,24 +84,28 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 
   performSnooze(): TelemetryAlert {
     this.snooze_count++;
-    const curSnooze = this.snoozed_to ?? dayjs();
+    const curSnooze = this.snoozed_to.isValid() ? this.snoozed_to : dayjs();
     this.snoozed_to = curSnooze.add(1, 'day');
     return this;
   }
 
   expireAlert(): TelemetryAlert {
-    this.valid_to = dayjs();
+    /**
+     * fixme:
+     * if the alert is being expired, set the valid_to to 
+     * before now for the invalidation to work properly 
+     */
+    this.valid_to = dayjs().subtract(1, 'minute');
     return this;
   }
 
-  toJSON(): TelemetryAlert {
-    return {
-      alert_id: this.alert_id,
-      // note: so that it's removed from list?
-      valid_to: this.valid_to === null ? null : formatT(dayjs().subtract(1, 'hour')),
-      snooze_count: this.snooze_count,
-      snoozed_to: this.snoozed_to === null ? null : formatT(this.snoozed_to),
-    } as unknown as TelemetryAlert;
+  toJSON(): Pick<TelemetryAlert, 'alert_id' | 'valid_to' | 'snooze_count' | 'snoozed_to'> {
+    const ret = {} as TelemetryAlert;
+    ret.alert_id = this.alert_id;
+    ret.valid_to = this.valid_to;
+    ret.snooze_count = this.snooze_count;
+    ret.snoozed_to = this.snoozed_to;
+    return ret;
   }
 
   static get displayableAlertProps(): AlertProp[] {

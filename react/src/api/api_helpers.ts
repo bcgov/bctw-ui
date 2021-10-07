@@ -90,7 +90,7 @@ const asJSON = <T>(o: T): T => {
 };
 
 const postJSON =  async<T>(api: AxiosInstance, url: string, body: T): Promise<AxiosResponse> => {
-  const json = asJSON(body);
+  const json = Array.isArray(body) ? body.map(b => asJSON(b)) : asJSON(body);
   // eslint-disable-next-line no-console
   console.log('json posted', json);
   return api.post(url, json);

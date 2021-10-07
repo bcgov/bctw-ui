@@ -36,8 +36,11 @@ export const AlertStateContextProvider: React.FC = (props) => {
     setShouldFetchAlerts(!!useUser?.user);
   }, [useUser]);
 
+  /**
+   * also watching @var dataUpdatedAt for query invalidations
+   * otherwise the context is not reset when alerts are updated
+   */
   useEffect(() => {
-    // also watch dataUpdatedAt for query invalidations, otherwise the context is not reset
     const update = (): void => {
       // console.log('user alert status', status, data);
       if (status === 'success') {

@@ -60,7 +60,7 @@ export default function AlertPage(): JSX.Element {
   const updateAlert = async (alert: TelemetryAlert): Promise<void> => {
     console.log('saving this alert', alert.toJSON());
     await mutateAsync([alert]);
-    // trigger the alert context to refetch
+    // force the alert context to refetch
     useAlerts.invalidate();
   };
 
@@ -97,6 +97,7 @@ export default function AlertPage(): JSX.Element {
     }
     selectedAlert.expireAlert();
     await updateAlert(selectedAlert);
+    setShowEventModal(false);
   };
 
   const propsToShow = [...MortalityAlert.displayableMortalityAlertProps, 'update', 'Snooze Status', 'Snooze Action'];

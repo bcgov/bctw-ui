@@ -78,12 +78,8 @@ export const userApi = (props: ApiProps) => {
   const getUserAlerts = async (): Promise<MortalityAlert[]> => {
     const url = createUrl({ api: 'get-user-alerts' });
     const { data } = await api.get(url);
-    console.log('user alerts fetched', data);
-    if (data && Array.isArray(data)) {
-      const converted = data?.map((json) => plainToClass(MortalityAlert, json));
-      return converted;
-    }
-    return [];
+    const alerts = data?.map((json) => plainToClass(MortalityAlert, json));
+    return alerts;
   };
 
   /**
@@ -91,8 +87,7 @@ export const userApi = (props: ApiProps) => {
    * @returns
    */
   const updateAlert = async (body: TelemetryAlert[]): Promise<TelemetryAlert[]> => {
-    const url = createUrl({ api: upsertAlertEndpoint });
-    const { data } = await api.post(url, body);
+    const { data } = await postJSON(api, createUrl({ api: upsertAlertEndpoint }), body) ;
     if (data && data.length) {
       const converted = data?.map((json: ITelemetryAlert) => plainToClass(TelemetryAlert, json));
       return converted;
