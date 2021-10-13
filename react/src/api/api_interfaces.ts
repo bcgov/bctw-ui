@@ -32,7 +32,7 @@ interface IBulkUploadResults<T> {
 // types that can be deleted
 interface IDeleteType {
   objType: 'animal' | 'collar' | 'user';
-  id: string; // the uuid
+  id: string | number; // the uuid
 }
 
 export type {

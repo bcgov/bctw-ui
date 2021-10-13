@@ -1,6 +1,6 @@
 import { Box, ButtonProps, Grid } from '@material-ui/core';
 import { formatTableCell } from 'components/table/table_helpers';
-import { ReactNode, ReactElement } from 'react';
+import { ReactNode } from 'react';
 
 interface TabPanelProps {
   children?: ReactNode;

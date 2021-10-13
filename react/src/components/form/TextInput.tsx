@@ -7,7 +7,7 @@ import { mustBeEmail } from 'components/form/form_validators';
 import { FormStrings } from 'constants/strings';
 import { FormBaseProps } from 'types/form_types';
 
-type TextInputProps = FormBaseProps & StandardTextFieldProps & {
+export type TextInputProps = FormBaseProps & StandardTextFieldProps & {
   defaultValue: string;
 }
 

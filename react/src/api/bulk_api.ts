@@ -20,7 +20,6 @@ export const bulkApi = (api: AxiosInstance) => {
     queryClient.invalidateQueries('getType');
   }
 
-  // todo:
   const invalidateUsers = (): void => {
     queryClient.invalidateQueries('all_users');
   }
@@ -49,11 +48,20 @@ export const bulkApi = (api: AxiosInstance) => {
     return data;
   }
 
-  // handles deletes for animals/collars
+  // handles critter/collar/user deletions
   const deleteType = async ({ objType, id }: IDeleteType): Promise<boolean> => {
     const url = createUrl({ api: `${objType}/${id}` });
     const { status, data } = await api.delete(url);
-    objType === 'animal' ? invalidateCritters() : invalidateDevices();
+    switch(objType) {
+      case 'animal':
+        invalidateCritters();
+        break;
+      case 'collar':
+        invalidateDevices();
+        break;
+      case 'user':
+        invalidateUsers();
+    }
     if (status === 200) {
       return true;
     }

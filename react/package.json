@@ -29,6 +29,7 @@
     "leaflet-labeled-circle": "^1.0.3",
     "leaflet.label": "^0.2.4",
     "match-sorter": "^6.3.0",
+    "material-ui-phone-number": "^3.0.0",
     "node-sass": "^4.14.1",
     "react": "17.0.2",
     "react-dom": "^17.0.1",

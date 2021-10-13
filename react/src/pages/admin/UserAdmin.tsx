@@ -9,38 +9,39 @@ import { User } from 'types/user';
 import EditUser from 'pages/user/EditUser';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
+import ConfirmModal from 'components/modal/ConfirmModal';
+import { UserStrings } from 'constants/strings';
 
 /**
- * page for user admin. requires admin user role.
+ * user management page - requires admin user role.
  */
 export default function UserAdminPage(): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const responseDispatch = useResponseDispatch();
-  const [userModified, setUserModified] = useState<User>({} as User);
+  const api = useTelemetryApi();
+  const showAlert = useResponseDispatch();
+  const [selectedUser, setSelectedUser] = useState<User>({} as User);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
-  const handleTableRowSelect = (u: User): void => setUserModified(u);
+  // when a user is selected in the data table
+  const handleTableRowSelect = (u: User): void => setSelectedUser(u);
 
-  const onSaveSuccess = (u: User): void => {
-    responseDispatch({ severity: 'success', message: `${u.username} saved!` });
-  };
+  // show notification alerts based on the post status result
+  const onSaveSuccess = (u: User): void => showAlert({ severity: 'success', message: `${u.username} saved!` });
 
-  const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void =>
+    showAlert({ severity: 'error', message: formatAxiosError(error) });
 
-  const onDeleteSuccess = (): void => {
-    // todo:
-  };
+  const onDeleteSuccess = (): void => showAlert({ severity: 'success', message: `user deleted succcesfully` });
 
-  // setup the mutations
-  const { mutateAsync: saveMutation } = bctwApi.useSaveUser({ onSuccess: onSaveSuccess, onError });
-  const { mutateAsync: deleteMutation } = bctwApi.useDelete({ onSuccess: onDeleteSuccess, onError });
+  // setup the mutations to add/remove users
+  const { mutateAsync: saveMutation } = api.useSaveUser({ onSuccess: onSaveSuccess, onError });
+  const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: onDeleteSuccess, onError });
 
   const saveUser = async (u: IUpsertPayload<User>): Promise<void> => {
-    console.log('AdminPage: im saving a user', u);
     await saveMutation(u.body);
   };
 
-  const deleteUser = async (id: string): Promise<void> => {
-    const payload: IDeleteType = { id, objType: 'user' };
+  const deleteUser = async (): Promise<void> => {
+    const payload: IDeleteType = { id: selectedUser.id, objType: 'user' };
     console.log('deleting user', payload);
     await deleteMutation(payload);
   };
@@ -52,7 +53,7 @@ export default function UserAdminPage(): JSX.Element {
         <DataTable
           headers={['id', 'role_type', 'username', 'domain', 'firstname', 'lastname', 'email']}
           title='Users'
-          queryProps={{ query: bctwApi.useUsers }}
+          queryProps={{ query: api.useUsers }}
           onSelect={handleTableRowSelect}
         />
         <div className={'button-row'}>
@@ -61,13 +62,19 @@ export default function UserAdminPage(): JSX.Element {
             queryStatus={'success'}
             editText={'User'}
             addText={'User'}
-            editing={userModified}
+            editing={selectedUser}
             empty={new User()}
             onSave={saveUser}
-            onDelete={deleteUser}>
+            onDelete={(): void => setShowConfirmDelete((o) => !o)}>
             <EditUser editing={new User()} open={false} onSave={null} handleClose={null} />
           </AddEditViewer>
         </div>
+        <ConfirmModal
+          handleClickYes={deleteUser}
+          open={showConfirmDelete}
+          handleClose={(): void => setShowConfirmDelete(false)}
+          message={UserStrings.deleteWarning(selectedUser?.username ?? '')}
+        />
       </div>
     </AuthLayout>
   );

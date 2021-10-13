@@ -185,17 +185,22 @@ const OnboardStrings = {
   denyGrant: (username: string): string =>  `Are you sure you want to deny ${username} access to BCTW?`
 }
 
+const UserStrings = {
+  deleteWarning: (username: string): string => `Are you sure you want to delete user ${username}?`,
+}
+
 export {
   CodeStrings,
   CollarStrings,
   CritterStrings,
+  DataLifeStrings,
   FileStrings,
   FormStrings,
+  ImportSteps,
   MapStrings,
   MapTileLayers,
-  UserAlertStrings,
-  WorkflowStrings,
-  ImportSteps,
-  DataLifeStrings,
   OnboardStrings,
+  WorkflowStrings,
+  UserAlertStrings,
+  UserStrings,
 }

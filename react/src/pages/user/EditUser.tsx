@@ -8,6 +8,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import BasicSelect from 'components/form/BasicSelect';
 import { Box } from '@material-ui/core';
 import { eInputType } from 'types/form_types';
+import PhoneInput from 'components/form/PhoneInput';
 
 /**
  * the edit user form, implemented in pags/admin/UserAdmin
@@ -27,7 +28,9 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
       disableHistory={true}
       title={editing?.id ? `Editing ${editing.uid}` : 'Create New User'}
       showInFullScreen={false}
-      onSave={(): void => { /* do nothing, handled in UserAdmin.tsx */}}
+      onSave={(): void => {
+        /* do nothing, handled in UserAdmin.tsx */
+      }}
       {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
@@ -43,16 +46,23 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
                       label={'Domain Type'}
                     />
                     <Box mr={2}></Box>
-                    {CreateFormField(editing, { prop: 'username', type: eInputType.text }, handlerFromContext, {required: true})}
+                    {CreateFormField(editing, { prop: 'username', type: eInputType.text }, handlerFromContext, {
+                      required: true
+                    })}
                   </Box>
                 }
                 <Box mt={2} mb={2}>
-                  {CreateFormField(editing, { prop: 'firstname', type: eInputType.text }, handlerFromContext )}
+                  {CreateFormField(editing, { prop: 'firstname', type: eInputType.text }, handlerFromContext)}
                   {CreateFormField(editing, { prop: 'lastname', type: eInputType.text }, handlerFromContext)}
                 </Box>
                 <Box mt={2} mb={2}>
                   {CreateFormField(editing, { prop: 'email', type: eInputType.text }, handlerFromContext)}
-                  {CreateFormField(editing, { prop: 'phone', type: eInputType.text }, handlerFromContext)}
+                  <PhoneInput
+                    defaultValue={editing.phone}
+                    propName='phone'
+                    label='Phone'
+                    changeHandler={handlerFromContext}
+                  />
                 </Box>
               </form>
             </div>

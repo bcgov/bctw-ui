@@ -6,13 +6,15 @@ import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { eUserRole, IKeyCloakSessionInfo, KeyCloakDomainType } from 'types/user';
 import { IOnboardUser, OnboardUser } from 'types/onboarding';
+import PhoneInput from 'components/form/PhoneInput';
+import { InboundObj } from 'types/form_types';
 
-type UserAccessRequestProps = { children?: ReactNode }
+type UserAccessRequestProps = { children?: ReactNode };
 /**
  * where unauthorized users are directed to submit a request for access to BCTW
  */
 
-const UserAccessRequest = ({children}: UserAccessRequestProps): JSX.Element => {
+const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element => {
   const accessType = eUserRole.observer;
   const [populationUnit, setPopulationUnit] = useState('');
   const [projectManager, setProjectManager] = useState('');
@@ -174,10 +176,11 @@ const UserAccessRequest = ({children}: UserAccessRequestProps): JSX.Element => {
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              label='Phone (for alerts only)'
-              onChange={(e): void => setTextMessageNumber(e.target.value)}
-              variant={'outlined'}
+            <PhoneInput
+              defaultValue={textMessageNumber}
+              propName={'phone'}
+              label={'Phone (for alerts only)'}
+              changeHandler={(v: InboundObj): void => setTextMessageNumber(v['phone'] as string)}
             />
           </Grid>
           <Grid item xs={12}>
