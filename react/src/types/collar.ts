@@ -112,7 +112,6 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   // fixme: 
   constructor(collar_type?: eNewCollarType) {
     this.activation_status = false;
-    this.device_id = 0;
     if (collar_type) {
       switch (collar_type) {
         case eNewCollarType.VHF:
@@ -124,22 +123,6 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
           return;
       }
     }
-    this.frequency = 0;
-    this.device_id = 0;
-  }
-
-  // todo: dayjs to formatted string
-  toJSON(): Collar {
-    if (!this.retrieval_date.isValid()) {
-      delete this.retrieval_date;
-    }
-    if (!this.malfunction_date.isValid()) {
-      delete this.malfunction_date
-    }
-    if (!this.offline_date.isValid()) {
-      delete this.offline_date
-    }
-    return this;
   }
 
   formatPropAsHeader(str: keyof Collar): string {
@@ -196,7 +179,6 @@ export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<
   }
 }
 
-
 export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   communicationFields: [
     { prop: 'device_type', type: eInputType.code },
@@ -204,7 +186,7 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'frequency', type: eInputType.number },
     { prop: 'frequency_unit', type: eInputType.code },
     { prop: 'fix_interval', type: eInputType.number },
-    { prop: 'fix_interval_unit', type: eInputType.code }, //fixme: what code header name is this?
+    { prop: 'fix_interval_unit', type: eInputType.code, codeName: 'fix_unit' },
   ],
   deviceOptionFields: [
     { prop: 'camera_device_id', type: eInputType.number },
@@ -213,8 +195,8 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'dropoff_frequency_unit', type: eInputType.code, codeName: 'frequency_unit' },
   ],
   identifierFields: [
-    { prop: 'device_id', type: eInputType.number },
-    { prop: 'device_make', type: eInputType.code },
+    { prop: 'device_id', type: eInputType.number, required: true },
+    { prop: 'device_make', type: eInputType.code, required: true },
     { prop: 'device_model', type: eInputType.text }
   ],
   activationFields: [

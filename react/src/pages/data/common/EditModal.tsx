@@ -24,6 +24,7 @@ import Tab from '@material-ui/core/Tab';
 import { BCTWBase } from 'types/common_types';
 import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
+import { buttonProps } from 'components/component_constants';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: React.ReactNode;
@@ -191,13 +192,12 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
 
                 <Box p={3}>
                   <Box display='flex' justifyContent='flex-end' className='form-buttons'>
-                    {/* save button */}
                     {hideSave ? null : (
-                      <Button size='large' color='primary' onClick={handleSave} disabled={!canSave}>
+                      <Button {...buttonProps} onClick={handleSave} disabled={!canSave}>
                         Save
                       </Button>
                     )}
-                    <Button size='large' variant='outlined' color='primary' onClick={(): void => handleClose(false)}>
+                    <Button {...buttonProps} variant='outlined' onClick={(): void => handleClose(false)}>
                       Cancel and Exit
                     </Button>
                   </Box>

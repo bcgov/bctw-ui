@@ -1,6 +1,6 @@
 import { createUrl, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { ICollar, Collar, AttachedCollar, IAttachedCollar, eCollarAssignedStatus } from 'types/collar';
+import { ICollar, Collar, AttachedCollar } from 'types/collar';
 import { upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { ApiProps, IBulkUploadResults, IUpsertPayload } from './api_interfaces';
 import { useQueryClient } from 'react-query';

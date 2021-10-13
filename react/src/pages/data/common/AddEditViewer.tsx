@@ -5,9 +5,10 @@ import { EditorProps } from 'components/component_interfaces';
 import { IEditModalProps } from 'pages/data/common/EditModal';
 import { cloneElement, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
-import { Box, Button, ButtonProps, CircularProgress }  from '@material-ui/core';
+import { Box, Button, ButtonProps } from '@material-ui/core';
 import { Tooltip } from 'components/common';
 import { QueryStatus } from 'react-query';
+import { buttonProps } from 'components/component_constants';
 
 /**
  * handles the show/hide functionality of the childEditComponent
@@ -34,7 +35,7 @@ export type IAddEditProps<T> = {
   onDelete?: (id: string) => void;
   onSave?: (a: IUpsertPayload<T>) => Promise<void>;
   editText?: string;
-  addText?: string
+  addText?: string;
   deleteText?: string;
   editTooltip?: string;
   addTooltip?: string;
@@ -44,7 +45,25 @@ export type IAddEditProps<T> = {
 };
 
 export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProps<T>): JSX.Element {
-  const { cannotEdit, children, disableAdd, disableEdit, editBtn, editing, empty, onDelete, onSave, addText, editText, deleteText, editTooltip, addTooltip, deleteTooltip, queryStatus, closeAfterSave = false } = props;
+  const {
+    cannotEdit,
+    children,
+    disableAdd,
+    disableEdit,
+    editBtn,
+    editing,
+    empty,
+    onDelete,
+    onSave,
+    addText,
+    editText,
+    deleteText,
+    editTooltip,
+    addTooltip,
+    deleteTooltip,
+    queryStatus,
+    closeAfterSave = false
+  } = props;
 
   const [editObj, setEditObj] = useState<T>(editing);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -75,20 +94,20 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
 
   const handleClickSave = async (payload: IUpsertPayload<T>): Promise<void> => {
     if (typeof onSave === 'function') {
-      await onSave(payload)
+      await onSave(payload);
       if (closeAfterSave) {
-        setShowModal(o => !o);
+        setShowModal((o) => !o);
       }
     }
-  }
+  };
 
   const handleClose = (): void => {
     setShowModal(false);
   };
 
   // override the open/close handlers and props of the child EditModal component
-  const editorProps: Pick<IEditModalProps<T>, 'editing' | 'open' | 'onSave' | 'handleClose' | 'disableHistory'>
-  & Pick<EditorProps<T>, 'isCreatingNew'> = {
+  const editorProps: Pick<IEditModalProps<T>, 'editing' | 'open' | 'onSave' | 'handleClose' | 'disableHistory'> &
+  Pick<EditorProps<T>, 'isCreatingNew'> = {
     // if this is a new instance - pass an empty object
     editing: isCreatingNew ? empty : editObj,
     // required in EditX components (ex. EditCritter)
@@ -96,7 +115,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
     open: showModal,
     disableHistory: isCreatingNew,
     handleClose,
-    onSave: handleClickSave,
+    onSave: handleClickSave
   };
 
   // do the same for the edit btn props
@@ -114,34 +133,43 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
       </>
     );
   }
-  const btnProps: Pick<ButtonProps, 'size' | 'variant' | 'color'> = {size:'large', variant:'outlined', color:'primary'}
+  const btnProps: Pick<ButtonProps, 'size' | 'variant' | 'color'> = {
+    variant: 'outlined',
+    ...buttonProps
+  };
 
   if (queryStatus === 'error') {
-    return <p>error: unable to load</p>
-  } else if (queryStatus === 'loading') {
-    return <CircularProgress />
+    return <p>error: unable to load</p>;
   }
   return (
     <>
       {/* clone child EditModal component to pass additional props */}
       {cloneElement(children, editorProps)}
-      <Box className="button-bar">
+      <Box className='button-bar'>
         {/* render add button */}
-        {disableAdd ? null :
+        {disableAdd ? null : (
           <Tooltip title={addTooltip ?? ''} inline={true}>
-            <Button {...btnProps} variant='contained' startIcon={<AddOutlinedIcon />} onClick={handleClickAdd}>{`Add ${addText ?? ''}`}</Button>
+            <Button {...btnProps} variant='contained' startIcon={<AddOutlinedIcon />} onClick={handleClickAdd}>{`Add ${
+              addText ?? ''
+            }`}</Button>
           </Tooltip>
-        }
+        )}
 
         {/* render edit button */}
         <Tooltip title={editTooltip ?? ''} inline={true}>
-          <Button {...btnProps} {...editBtnProps}>{` ${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}</Button>
+          <Button {...btnProps} disabled={queryStatus === 'loading' || editBtnProps.disabled} onClick={handleClickEdit}>
+            {`${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}
+          </Button>
         </Tooltip>
 
         {/* render delete button */}
         {enableDelete() ? (
           <Tooltip title={deleteTooltip ?? ''} inline={true}>
-            <Button {...btnProps} startIcon={<DeleteOutlineOutlinedIcon />} disabled={cannotEdit || !editing[editing.identifier]} onClick={handleClickDelete}>
+            <Button
+              {...btnProps}
+              startIcon={<DeleteOutlineOutlinedIcon />}
+              disabled={cannotEdit || !editing[editing.identifier]}
+              onClick={handleClickDelete}>
               {`Delete ${deleteText ?? ''}`}
             </Button>
           </Tooltip>

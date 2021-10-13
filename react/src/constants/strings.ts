@@ -1,6 +1,7 @@
 import { eUserRole } from 'types/user';
 
 const CritterStrings = {
+  wlh_id: 'Assigned by Provincial Wildlife Health Group',
   assignCollarBtnText: 'Assign Selected Device',
   assignedTableTitle: 'Animals Attached to a Device',
   collarAssignmentTitle: 'Assign a Device',
@@ -162,7 +163,7 @@ const FormStrings = {
   emptySelectValue: 'Blank',
   validateNegativeLongitude: 'Longitude must be negative',
   validateNumber: 'Must be a number',
-  isRequired: 'Field is required',
+  isRequired: ' ', // can't be an empty string
   filterColumnsLabel: 'Search Columns',
 }
 

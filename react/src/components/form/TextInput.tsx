@@ -1,5 +1,5 @@
 import { StandardTextFieldProps, TextField as MuiTextField } from '@material-ui/core';
-import { baseInputStyle } from 'components/component_constants';
+import { baseInputProps, baseInputStyle } from 'components/component_constants';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import {useState} from 'react';
@@ -15,8 +15,8 @@ export const inputPropsToRemove = ['propName', 'changeHandler', 'validate', 'err
 
 export default function TextField(props: TextInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, required } = props;
-  const [val, setVal] = useState<string>(defaultValue ?? '');
-  const [err, setErr] = useState<string>('');
+  const [val, setVal] = useState(defaultValue ?? '');
+  const [err, setErr] = useState('');
 
   // update when defaultValue is changed
   useEffect(() => {
@@ -56,19 +56,21 @@ export default function TextField(props: TextInputProps): JSX.Element {
 
   const callParentHandler = (): void => changeHandler({ [propName]: val, error: !!err.length });
 
-  const propsToPass = removeProps(props, inputPropsToRemove);
+  const propsToPass = {
+    ...baseInputProps,
+    ...removeProps(props, inputPropsToRemove)
+  };
 
   return (
     <MuiTextField
-      variant={'outlined'}
-      size={'small'}
       style={style ?? baseInputStyle}
       value={val}
       onBlur={handleBlur}
       onChange={handleChange}
       {...propsToPass}
       error={!!err}
-      helperText={err}
+      // fixme: email validation error missing.
+      // helperText={err}
     />
   );
 }

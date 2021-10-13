@@ -1,4 +1,5 @@
 import { Transform } from 'class-transformer';
+import { CritterStrings } from 'constants/strings';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { BaseTimestamps, BCTWBase, nullToDayjs, uuid } from 'types/common_types';
@@ -177,8 +178,6 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
         return 'BCTW ID';
       case 'juvenile_at_heel':
         return 'Juvenile at Heel?';
-      case 'population_unit':
-        return 'Population Unit Name';
       case 'wlh_id':
         return 'WLH ID';
       default:
@@ -242,7 +241,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'juvenile_at_heel_count', type: eInputType.number }
   ],
   identifierFields: [
-    { prop: 'wlh_id', type: eInputType.text },
+    { prop: 'wlh_id', type: eInputType.text, tooltip: CritterStrings.wlh_id },
     { prop: 'animal_id', type: eInputType.text, ...isRequired },
     { prop: 'region', type: eInputType.code, ...isRequired },
     { prop: 'population_unit', type: eInputType.code, ...isRequired },

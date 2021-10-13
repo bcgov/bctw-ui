@@ -194,14 +194,13 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
         <div>Please wait...</div>
       ) : codes && codes.length ? (
         <FormControl error={hasError} style={style} size='small' variant={'outlined'} className={`select-control ${hasError ? 'input-error' : ''}`}>
-          <InputLabel>{label}</InputLabel>
+          <InputLabel>{required ? `${label} *` : label}</InputLabel>
           <Select
             MenuProps={{
               anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
               transformOrigin: { vertical: 'top', horizontal: 'left' },
               getContentAnchorEl: null
             }}
-            label={label}
             value={multiple ? values : value}
             onChange={multiple ? handleChangeMultiple : handleChange}
 

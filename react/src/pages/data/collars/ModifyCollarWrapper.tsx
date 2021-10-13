@@ -61,11 +61,8 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   const { mutateAsync: saveMutation } = api.useSaveDevice({ onSuccess: onSaveSuccess, onError });
   const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: onDeleteSuccess, onError });
 
-  const saveCollar = async (c: IUpsertPayload<Collar>): Promise<void> => {
-    const {body } = c;
-    const formatted = body.toJSON();
-    console.log('ModifyCollarWrapper: saving device ', JSON.stringify(formatted, null, 2));
-    await saveMutation(c);
+  const saveCollar = async (payload: IUpsertPayload<Collar>): Promise<void> => {
+    await saveMutation(payload);
   }
 
   const deleteCollar = async (): Promise<void> => {
