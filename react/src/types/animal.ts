@@ -220,7 +220,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'associated_animal_relationship', type: eInputType.code }
   ],
   captureFields: [
-    { prop: 'capture_date', type: eInputType.datetime, ...isRequired },
+    { prop: 'capture_date', type: eInputType.datetime },
     { prop: 'capture_latitude', type: eInputType.number },
     { prop: 'capture_longitude', type: eInputType.number },
     { prop: 'capture_utm_zone', type: eInputType.number },

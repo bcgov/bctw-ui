@@ -55,16 +55,6 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
     }
   }, [useAlert]);
 
-  const getAlertTitle = (): string => {
-    const alerts = useAlert?.alerts;
-    if (!alerts?.length) {
-      return 'Alerts(0)';
-    }
-    const numSnoozed = alerts.filter(a => a.isSnoozed).length;
-    const snoozedStr = numSnoozed ? `Snoozed (${numSnoozed})` : '';
-    return `Alerts that require action (${alerts.length - numSnoozed}) ${snoozedStr}`;
-  }
-
   return (
     <header className={'app-header'}>
       <div className={'container'}>
@@ -143,7 +133,7 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
           </ul>
         </nav>
       </div>
-      <Modal title={getAlertTitle()} open={showAlerts} handleClose={(): void => setShowAlerts(false)}>
+      <Modal title={useAlert?.getAlertTitle()} open={showAlerts} handleClose={(): void => setShowAlerts(false)}>
         <UserAlert />
       </Modal>
     </header>

@@ -22,8 +22,8 @@ import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
  * todo: use an existing table component
  */
 export default function AlertPage(): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const responseDispatch = useResponseDispatch();
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
   const useAlerts = useContext(AlertContext);
 
   const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
@@ -46,19 +46,21 @@ export default function AlertPage(): JSX.Element {
   }, [useAlerts]);
 
   const onSuccess = async (): Promise<void> => {
-    responseDispatch({ severity: 'success', message: `telemetry alert saved` });
+    showNotif({ severity: 'success', message: `telemetry alert saved` });
   };
 
   const onError = (error: AxiosError): void =>
-    responseDispatch({ severity: 'error', message: formatAxiosError(error) });
+    showNotif({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutation to update the alert status
-  const { mutateAsync, isLoading } = bctwApi.useSaveUserAlert({ onSuccess, onError });
+  const { mutateAsync, isLoading } = api.useSaveUserAlert({ onSuccess, onError });
 
   /**
    * when an alert row is selected from the table:
    * a) set the selected row state
    * b) based on the alert type, update the workflow state
+   * 
+   * for malfunction events: default the date to last_transmission
    */
   const handleSelectRow = (aid: number): void => {
     const selected = alerts.find((a) => a.alert_id === aid);
@@ -67,7 +69,7 @@ export default function AlertPage(): JSX.Element {
     createWorkflow(() => {
       const n = selected.toWorkflow(
         type === eAlertType.malfunction
-          ? new MalfunctionEvent(selected.valid_from)
+          ? new MalfunctionEvent(selected.last_transmission_date)
           : new MortalityEvent(selected.valid_from)
       );
       return n;
@@ -78,8 +80,6 @@ export default function AlertPage(): JSX.Element {
   const updateAlert = async (alert: TelemetryAlert): Promise<void> => {
     console.log('saving this alert', alert.toJSON());
     await mutateAsync([alert]);
-    // force the alert context to refetch
-    useAlerts.invalidate();
   };
 
   // user selected to take action on the alert, show the update modal
@@ -126,6 +126,7 @@ export default function AlertPage(): JSX.Element {
 
   return (
     <div className={'container'}>
+      <Box>{UserAlertStrings.alertText}</Box>
       <Box p={1}>
         {/* is the alert being updated? */}
         {isLoading ? (
@@ -164,8 +165,9 @@ export default function AlertPage(): JSX.Element {
                         <strong>{a.formatAlert}</strong>
                       </TableCell>
                       <TableCell>{formatT(a.valid_from)}</TableCell>
+                      <TableCell>{formatT(a.last_transmission_date)}</TableCell>
                       <TableCell>
-                        <IconButton style={{ backgroundColor: 'orangered' }} onClick={(): void => editAlert(a)}>
+                        <IconButton style={{ padding: '9px', backgroundColor: 'orangered' }} onClick={(): void => editAlert(a)}>
                           <Icon icon='edit' htmlColor='#fff' />
                         </IconButton>
                       </TableCell>

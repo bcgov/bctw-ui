@@ -35,7 +35,7 @@ interface IMalfunctionEvent
   Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
   IDataLifeEndProps {}
 
-type MalfunctionDeviceStatus = 'Potential Malfunction';
+export type MalfunctionDeviceStatus = 'Potential Malfunction' | 'Active' | 'Offline' | 'Malfunction';
 
 /**
  * todo:
@@ -70,7 +70,8 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
   constructor(last_transmission = dayjs()) {
     this.onlySaveDeviceStatus = false;
     this.event_type = 'malfunction';
-    this.location_event = new LocationEvent('malfunction', last_transmission ?? dayjs());
+    // pass true as the disableDate param. 
+    this.location_event = new LocationEvent('malfunction', last_transmission ?? dayjs(), true);
     this.device_status = 'Potential Malfunction';
   }
 
@@ -94,6 +95,7 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
   }
 
   getDevice(): OptionalDevice {
+    // when set to device status of Active, only preserve the status
     if (this.onlySaveDeviceStatus) {
       const { collar_id, device_status } = this;
       return { collar_id, device_status };
@@ -103,15 +105,17 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
       'device_status',
       'retrieved'
     ];
+    // get the coordinate type properties from the location event
+    // note that date is not included 
     const locs = this.location_event.toJSON();
     let ret;
-    // props will come from the location event as expected
     if (this.device_status === 'Malfunction') {
-      props.push('device_malfunction_type');
+      props.push('device_malfunction_type', 'malfunction_date');
       ret = eventToJSON(props, this);
-    } // need to transform the location event props to offline
+    }
+    // transform the location event props to offline
     else if (this.device_status === 'Offline') {
-      props.push('offline_type');
+      props.push('offline_type', 'offline_date');
       ret = eventToJSON(props, this);
       locs.offline_comment = locs.malfunction_comment;
       locs.offline_date = locs.malfunction_date;

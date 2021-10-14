@@ -7,6 +7,7 @@ import {
 } from 'api/api_interfaces';
 import { eCritterPermission, filterOutNonePermissions, IExecutePermissionRequest, IPermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
+import { useQueryClient } from 'react-query';
 
 // what the API returns after saving user/animal permissions
 export interface IGrantCritterAccessResults {
@@ -18,6 +19,11 @@ export interface IGrantCritterAccessResults {
 
 export const permissionApi = (props: ApiProps) => {
   const { api } = props;
+  const queryClient = useQueryClient();
+
+  const invalidate = (): void => {
+    queryClient.invalidateQueries('getRequestHistory');
+  }
 
   /**
    * used in the admin page @file {permissions/GrantCritterAccessPage.tsx}
@@ -88,6 +94,7 @@ export const permissionApi = (props: ApiProps) => {
   const submitPermissionRequest = async (body: IPermissionRequestInput): Promise<IPermissionRequest> => {
     const url = createUrl({api: `submit-permission-request`});
     const { data } = await api.post(url, body);
+    invalidate();
     return data;
   }
 

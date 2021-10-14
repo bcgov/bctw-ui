@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
-import { Collar } from 'types/collar';
+import { Collar, IAttachedCollar } from 'types/collar';
 import { BCTWBase, BCTWValidDates, nullToDayjs, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { formatDay } from 'utils/time';
@@ -17,7 +17,7 @@ export enum eAlertType {
   mortality = 'mortality'
 }
 
-export interface ITelemetryAlert extends BCTWValidDates {
+export interface ITelemetryAlert extends BCTWValidDates, Required<Pick<IAttachedCollar, 'last_transmission_date'>> {
   alert_id: number;
   alert_type: eAlertType;
   snoozed_to: Dayjs;
@@ -35,6 +35,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
   @Transform(nullToDayjs) valid_from: Dayjs;
   @Transform(nullToDayjs) valid_to: Dayjs;
   @Transform(nullToDayjs) snoozed_to: Dayjs;
+  @Transform(nullToDayjs) last_transmission_date: Dayjs;
   snooze_count: number;
 
   @Transform(nullToDayjs) attachment_start: Dayjs;
@@ -84,6 +85,8 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
     switch (str) {
       case 'valid_from':
         return 'Notification Time';
+      case 'last_transmission_date':
+        return 'Last Transmission';
       default:
         return columnToHeader(str);
     }
@@ -122,7 +125,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 
 // props that any mortality event or alert should have.
 export interface IMortalityAlert
-  extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make'>,
+  extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'device_status'>,
   Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id' | 'captivity_status'>,
   DataLife {}
 
@@ -135,6 +138,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   collar_id: uuid;
   device_id: number;
   device_make: Code;
+  device_status: Code;
 
   critter_id: uuid;
   animal_id: string;
@@ -148,7 +152,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   attachment_end: Dayjs;
 
   static get displayableMortalityAlertProps(): (AlertProp | MortalityAlertProp)[] {
-    return ['wlh_id', 'animal_id', 'device_id', 'device_make', ...TelemetryAlert.displayableAlertProps, 'valid_from'];
+    return ['wlh_id', 'animal_id', 'device_id', 'device_make', ...TelemetryAlert.displayableAlertProps, 'valid_from', 'last_transmission_date'];
   }
 
   formatPropAsHeader(s: string): string {
@@ -157,7 +161,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
 
   toWorkflow<T>(workflow: T): T {
     // don't preserve animal status from the alert.
-    return editObjectToEvent(Object.assign({}, this), workflow, ['animal_status']);
+    return editObjectToEvent(this, workflow, ['animal_status']);
   }
 }
 
@@ -168,6 +172,6 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
  */
 export class MalfunctionAlert extends MortalityAlert {
   toWorkflow<T>(workflow: T): T {
-    return editObjectToEvent(Object.assign({}, this), workflow, []);
+    return editObjectToEvent(this, workflow, ['device_status']);
   }
 }

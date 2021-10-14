@@ -38,16 +38,19 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   };
 
   const createEvent = (type: WorkflowType): MalfunctionEvent | RetrievalEvent => {
-    let e, o;
     if (type === 'retrieval') {
-      e = new RetrievalEvent();
-      o = editObjectToEvent(Object.assign({}, editing), e, ['retrieved', 'retrieval_date', 'device_deployment_status']);
-      return o;
+      return editObjectToEvent(editing, new RetrievalEvent(), [
+        'retrieved',
+        'retrieval_date',
+        'device_deployment_status'
+      ]);
     } else if (type === 'malfunction') {
-      e = new MalfunctionEvent(editing instanceof AttachedCollar ? editing.last_transmission_date : null);
-      o = editObjectToEvent(Object.assign({}, editing), e, ['device_status', 'device_condition', 'device_deployment_status']);
+      return editObjectToEvent(
+        editing,
+        new MalfunctionEvent(editing instanceof AttachedCollar ? editing.last_transmission_date : null),
+        ['device_status', 'device_condition', 'device_deployment_status']
+      );
     }
-    return o;
   };
 
   const handleOpenWorkflow = (e: WorkflowType): void => {
@@ -57,15 +60,15 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   };
 
   // if a malfunction event is saved and the device is retrieved, open the retrieval workflow
-  const handleWorkflowSaved = async(e: IBCTWWorkflow): Promise<void> => {
+  const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
     await setShowWorkflowForm(false);
     if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved) {
       // console.log('im supposed to show the retrieval form', e);
       const retrievalWF = editObjectToEvent(e, new RetrievalEvent(), ['event_type']);
-      await updateEvent(retrievalWF as any); // fixme: 
-      await setShowWorkflowForm(o => !o);
+      await updateEvent(retrievalWF as any); // fixme:
+      await setShowWorkflowForm((o) => !o);
     }
-  }
+  };
 
   const {
     communicationFields,
@@ -135,49 +138,54 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
               {FormSection(
                 'device-ids',
                 'Identifiers',
-                identifierFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
+                identifierFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
               )}
               {FormSection(
                 'device-sat',
                 'Satellite Network and Beacon Frequency',
-                communicationFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
+                communicationFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
               )}
               {FormSection(
                 'device-add',
                 'Additional Device Sensors and Beacons',
-                activationFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
+                activationFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
               )}
               {FormSection(
                 'device-activ',
                 'Warranty & Activation Details',
-                deviceOptionFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
+                deviceOptionFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
               )}
               {FormSection(
                 'device-status',
                 'Device Status',
-                statusFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
+                statusFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
               )}
               {/**
                * hide the workflow related fields entirely when creating a new collar
                * note: disable the workflow event buttons for unattached devices as
                * last transmission date is not received for unattached
-              */
-              }
+               */}
               {!isCreatingNew ? (
                 <>
                   {FormSection(
                     'device-ret',
                     'Record Retrieval Details',
-                    retrievalFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
-                    <Button disabled={!isAttached} {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('retrieval')}>
+                    retrievalFields.map((f) => CreateFormField(editing, f, onChange, { ...isDisabled })),
+                    <Button
+                      disabled={!isAttached}
+                      {...editEventBtnProps}
+                      onClick={(): void => handleOpenWorkflow('retrieval')}>
                       Record Retrieval Details
                     </Button>
                   )}
                   {FormSection(
                     'device-malf',
                     'Record Malfunction & Offline Details',
-                    malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
-                    <Button disabled={!isAttached} {...editEventBtnProps} onClick={(): void => handleOpenWorkflow('malfunction')}>
+                    malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange, { ...isDisabled })),
+                    <Button
+                      disabled={!isAttached}
+                      {...editEventBtnProps}
+                      onClick={(): void => handleOpenWorkflow('malfunction')}>
                       Record Malfunction & Offline Details
                     </Button>
                   )}
@@ -192,9 +200,10 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                     handleClose={(): void => setShowWorkflowForm(false)}
                     onEventSaved={handleWorkflowSaved}
                   />
-                </> ) : null }
+                </>
+              ) : null}
             </>
-          )
+          );
         }}
       </ChangeContext.Consumer>
     </EditModal>

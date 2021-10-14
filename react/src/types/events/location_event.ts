@@ -30,24 +30,32 @@ export class LocationEvent implements ILocationEvent {
   constructor(
     private location_type: WorkflowType,
     public date: Dayjs = dayjs(),
-    public coordinate_type = eLocationPositionType.utm
+    public disable_date = false,
+    public coordinate_type = eLocationPositionType.utm,
   ) {}
 
   private utm_keys: (keyof this)[] = ['utm_easting', 'utm_northing', 'utm_zone'];
   private coord_keys: (keyof this)[] = ['latitude', 'longitude'];
   private json_keys: (keyof this)[] = [...this.utm_keys, ...this.coord_keys, 'comment', 'date'];
 
+  /**
+   * returns the location event as a new object.
+   * depending on the coordinate type used, removes the keys not in use 
+   */
   toJSON(): Record<string, unknown> {
     const o = {};
     for (let i = 0; i < this.json_keys.length; i++) {
-      const value = this.json_keys[i];
-      if (this.coordinate_type === 'utm' && this.coord_keys.includes(value)) {
-        continue;
-      } else if (this.coordinate_type === 'coord' && this.utm_keys.includes(value)) {
+      const k = this.json_keys[i];
+      if (k === 'date' && this.disable_date) {
         continue;
       }
-      const key = `${this.location_type}_${value}`;
-      o[key] = this[value];
+      if (this.coordinate_type === 'utm' && this.coord_keys.includes(k)) {
+        continue;
+      } else if (this.coordinate_type === 'coord' && this.utm_keys.includes(k)) {
+        continue;
+      }
+      const key = `${this.location_type}_${k}`;
+      o[key] = this[k];
     }
     return o;
   }

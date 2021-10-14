@@ -74,6 +74,8 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
     switch (s) {
       case 'shouldUnattachDevice':
         return WorkflowStrings.device.should_unattach;
+      case 'device_deployment_status':
+        return 'Deployment Status';
       default:
         return columnToHeader(s);
     }

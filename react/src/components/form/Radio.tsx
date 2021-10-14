@@ -1,10 +1,11 @@
-import { useState, ReactElement, ChangeEvent } from 'react';
+import { useState, ReactElement, ChangeEvent, ReactNode } from 'react';
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@material-ui/core';
 import { FormBaseProps } from 'types/form_types';
+import { Tooltip } from 'components/common';
 
 type RadioProps = FormBaseProps & {
   defaultSelectedValue: string;
-  values: { value: string; label: string, disabled?: boolean }[];
+  values: { value: string; label: string; disabled?: boolean, tooltip?: ReactNode}[];
 };
 
 export default function RadioField({
@@ -23,20 +24,21 @@ export default function RadioField({
 
   return (
     <FormControl component='fieldset'>
-      {label ? ( <FormLabel>{label}</FormLabel>) : null}
+      {label ? <FormLabel>{label}</FormLabel> : null}
       <RadioGroup row aria-label='position' name='position' value={selectedValue} onChange={handleSelect}>
         {values.map((v) => {
-          const { label, value, disabled = false } = v;
-          return (
+          const { label, value, tooltip, disabled = false } = v;
+          const comp = (
             <FormControlLabel
               key={`radio-${label}`}
               value={value}
               control={<Radio color='primary' />}
               label={label}
-              labelPlacement='start'
+              labelPlacement={'end'}
               disabled={disabled}
             />
           );
+          return tooltip ? <Tooltip title={tooltip}>{comp}</Tooltip> : comp;
         })}
       </RadioGroup>
     </FormControl>

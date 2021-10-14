@@ -8,6 +8,7 @@ import { formatAxiosError } from 'utils/errors';
 import UserOnboarding from 'pages/onboarding/UserOnboarding';
 import { ModalBaseProps } from 'components/component_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { isDev } from 'api/api_helpers';
 
 type IDefaultLayoutProps = {
   children: React.ReactNode;
@@ -37,9 +38,9 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
 
   useEffect(() => {
     if (useAlert?.alerts?.length) {
-      const dealWithIt = useAlert.alerts.some((a) => !a.isSnoozed && a.snoozesAvailable === 0);
-      // todo: making dealWithIt the commented out line below forces users to deal with snoozes.
-      // const dealWithIt= useAlert.alerts.some((a) => !a.isSnoozed);
+      // const dealWithIt = useAlert.alerts.some((a) => !a.isSnoozed && a.snoozesAvailable === 0);
+      // forces users to deal with alerts if they are not currently snoozed (unless in development)
+      const dealWithIt = useAlert.alerts.some((a) => !a.isSnoozed) && !isDev();
       setMustUpdateAlert(dealWithIt);
     }
   }, [useAlert]);
@@ -71,7 +72,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
 
   return (
     <>
-      <Modal title={`Alerts (${useAlert?.alerts?.length})`} open={showAlerts} {...disableCloseModalProps}>
+      <Modal title={useAlert?.getAlertTitle()} open={showAlerts} {...disableCloseModalProps}>
         <UserAlert />
       </Modal>
       {children}

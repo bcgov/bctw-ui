@@ -33,18 +33,13 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
    * binding all properties of the @var editing to the event
    */
   const createEvent = (wfType: WorkflowType): CaptureEvent | ReleaseEvent | MortalityEvent => {
-    let e, o;
     if (wfType === 'capture') {
-      e = new CaptureEvent();
-      o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['species', 'translocation', 'recapture', 'region', 'population_unit']);
+      return editObjectToEvent(editing, new CaptureEvent(), ['species', 'translocation', 'recapture', 'region', 'population_unit']);
     } else if (wfType === 'release') {
-      e = new ReleaseEvent();
-      o = editObjectToEvent(Object.assign({}, editing) as Animal, e, ['region', 'population_unit']);
+      return editObjectToEvent(editing, new ReleaseEvent(), ['region', 'population_unit']);
     } else if (wfType === 'mortality') {
-      e = new MortalityEvent();
-      o = editObjectToEvent(Object.assign({}, editing) as AttachedAnimal, e, ['animal_status']);
+      return editObjectToEvent(editing, new MortalityEvent(), ['animal_status']);
     }
-    return o;
   }
 
   /**

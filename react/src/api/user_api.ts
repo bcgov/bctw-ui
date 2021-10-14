@@ -12,8 +12,13 @@ export const userApi = (props: ApiProps) => {
   const { api } = props;
   const queryClient = useQueryClient();
 
-  const invalidate = (): void => {
+  const invalidateUsers = (): void => {
     queryClient.invalidateQueries('all_users');
+  }
+
+  const invalidateAlerts = (): void => {
+    // console.log('refetching user alerts');
+    queryClient.invalidateQueries('userAlert');
   }
 
   /**
@@ -45,7 +50,7 @@ export const userApi = (props: ApiProps) => {
     const { data } = await postJSON(api, createUrl({ api: 'add-user' }), {user, role});
     const ret = plainToClass(User, data);
     console.log('user upsert result:', ret);
-    invalidate();
+    invalidateUsers();
     return ret;
   };
 
@@ -88,7 +93,6 @@ export const userApi = (props: ApiProps) => {
           return plainToClass(TelemetryAlert, json);
       }
     })
-    // console.log('alerts received', alerts);
     return alerts;
   };
 
@@ -98,6 +102,7 @@ export const userApi = (props: ApiProps) => {
    */
   const updateAlert = async (body: TelemetryAlert[]): Promise<TelemetryAlert[]> => {
     const { data } = await postJSON(api, createUrl({ api: upsertAlertEndpoint }), body) ;
+    invalidateAlerts();
     if (data && data.length) {
       const converted = data?.map((json: ITelemetryAlert) => plainToClass(TelemetryAlert, json));
       return converted;

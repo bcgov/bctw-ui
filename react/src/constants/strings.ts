@@ -75,11 +75,13 @@ const WorkflowStrings = {
   malfunction: {
     workflowTitle: 'Malfunction Event Workflow',
     isMalfunction: 'Is this device malfunctioned or offline?',
-    lastTransmission: 'Defaults to the last transmission date for this device',
+    lastTransmission: 'If known, defaults to the last transmission date for this device',
     isActive: 'You have set the device status to Active. Do you wish to exit the workflow now?',
     isRetrieved: 'Did you retrieve the device?',
     wasRetrieved: 'If the device was retrieved, the retrieval workflow form will be opened after',
-
+    statusActive: 'todo: This device is still active',
+    statusOffline: 'todo: this device is offline',
+    statusMalfunction: 'todo: this device has had a malfunction',
   },
   device: {
     should_unattach: 'Unassign device from animal?',
@@ -168,6 +170,7 @@ const FormStrings = {
 }
 
 const UserAlertStrings = {
+  alertText: 'Alerts can either be snoozed by clicking the snooze action in the last column, or actioned upon by clicking the edit icon.',
   snoozeConfirmation: (remainingCount: number): string => {
     if (remainingCount === 1) {
       return `There is only one snooze remaining! Tomorrow you will be forced to update. Are you sure you want to snooze?`

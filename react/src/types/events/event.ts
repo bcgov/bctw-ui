@@ -67,8 +67,9 @@ export const eventToJSON = <T>(keys: string[], event: T): Record<string, unknown
  * @param toRemove - keys of the @param editing type that shouldn't end up in the workflow instance
 */
 export const editObjectToEvent = <WF, E>(editing: E, workflow: WF, toRemove: (keyof E)[]): WF => {
+  const editingCopy = Object.assign({}, editing);
   for (let index = 0; index < toRemove.length; index++) {
-    delete editing[toRemove[index]]
+    delete editingCopy[toRemove[index]]
   }
-  return Object.assign(workflow, editing);
+  return Object.assign(workflow, editingCopy);
 }
