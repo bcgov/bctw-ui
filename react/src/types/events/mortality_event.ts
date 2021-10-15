@@ -64,7 +64,7 @@ export type DeploymentStatusNotDeployed = 'Not Deployed';
 export type MortalityAnimalStatus = 'Mortality' | 'Alive';
 
 /**
- * fixme: todo: when a device removal is performed...what happens in the ui?
+ * todo: when a device removal is performed...what happens in the ui?
  */
 export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMortalityEvent {
   // event specific props - not saved. used to enable/disable fields

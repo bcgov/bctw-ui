@@ -101,8 +101,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 
   expireAlert(): TelemetryAlert {
     /**
-     * fixme:
-     * if the alert is being expired, set the valid_to to
+     * fixme: if the alert is being expired, set the valid_to to
      * before now for the invalidation to work properly
      */
     this.valid_to = dayjs().subtract(1, 'minute');
@@ -110,7 +109,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
   }
 
   toJSON(): Pick<TelemetryAlert, 'alert_id' | 'valid_to' | 'snooze_count' | 'snoozed_to'> {
-    const ret = {} as TelemetryAlert;
+    const ret = new TelemetryAlert();
     ret.alert_id = this.alert_id;
     ret.valid_to = this.valid_to;
     ret.snooze_count = this.snooze_count;

@@ -1,5 +1,5 @@
 import { eUserRole, IUser, KeyCloakDomainType, UserBase } from 'types/user';
-import { BCTWBase, BCTWValidDates, nullToDayjs } from 'types/common_types';
+import { BaseTimestamps, BCTWBase, BCTWValidDates, nullToDayjs } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { isDev } from 'api/api_helpers';
 import dayjs, { Dayjs } from 'dayjs';
@@ -10,7 +10,7 @@ import { Transform } from 'class-transformer';
  */
 export type OnboardingStatus = 'pending' | 'granted' | 'denied';
 //
-export interface IOnboardUser extends BCTWValidDates {
+export interface IOnboardUser extends BCTWValidDates, Required<Pick<BaseTimestamps, 'created_at'>> {
   onboarding_id: number;
   reason: string;
   access: OnboardingStatus;
@@ -26,6 +26,7 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
   role_type: eUserRole;
 
   /** include these timestamps for @method canRequestBeResubmitted */
+  @Transform(nullToDayjs) readonly created_at: Dayjs;
   @Transform(nullToDayjs) valid_from: Dayjs;
   @Transform(nullToDayjs) valid_to: Dayjs;
 
@@ -62,7 +63,8 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
       'phone',
       'access',
       'role_type',
-      'reason'
+      'reason',
+      'created_at'
     ];
     if (isDev()) {
       props.unshift('onboarding_id');

@@ -8,7 +8,7 @@ export interface BCTWValidDates {
 
 // most database tables contain these columns for transactional history
 export interface BaseTimestamps extends PartialPick<BCTWValidDates, 'valid_from' | 'valid_to'> {
-  created_at?: Date;
+  created_at?: Dayjs;
   created_by_user_id?: number;
   updated_at?: Date;
   updated_by_user_id?: number;

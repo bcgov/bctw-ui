@@ -19,14 +19,16 @@ import {
 } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
+import { formatDay } from 'utils/time';
+import { isDev } from 'api/api_helpers';
 
 /**
  * page that an admin uses to grant or deny permission requests from owners
  */
 export default function AdminHandleRequestPermissionPage(): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const responseDispatch = useResponseDispatch();
-  const { data, status, error } = bctwApi.usePermissionRequests();
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
+  const { data, status, error } = api.usePermissionRequests();
   const [requests, setRequests] = useState<IGroupedRequest[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
@@ -43,26 +45,24 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   // set permission request state on fetch
   useDidMountEffect(() => {
     if (status === 'success' && data) {
-      // console.log('permission requests retrieved', data);
       setRequests(groupPermissionRequests(data));
     } else {
-      // console.log(data, error);
-      responseDispatch({ severity: 'error', message: 'error retrieving permission requests' });
+      showNotif({ severity: 'error', message: 'error retrieving permission requests' });
     }
   }, [status]);
 
   const onSuccess = (): void => {
     setRequests((o) => o.filter((req) => req.id !== selectedRequestID));
-    responseDispatch({ severity: 'success', message: 'permission request handled succssfully' });
+    showNotif({ severity: 'success', message: 'permission request handled successfully' });
   };
 
   const onError = (err: AxiosError): void => {
-    responseDispatch({ severity: 'error', message: formatAxiosError(err) });
+    showNotif({ severity: 'error', message: formatAxiosError(err) });
   };
 
-  const { mutateAsync, isLoading } = bctwApi.useTakeActionOnPermissionRequest({ onSuccess, onError });
+  const { mutateAsync, isLoading } = api.useTakeActionOnPermissionRequest({ onSuccess, onError });
 
-  // submit the POST request when the grant/deny is confirmed in modal
+  // submit when grant/deny is confirmed in the modal
   const handleGrantOrDenyPermission = async (): Promise<void> => {
     if (!selectedRequestID) {
       return;
@@ -77,7 +77,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     await mutateAsync(body);
   };
 
-  // when the grant/deny icons are checked, show a confirmation modal
+  // if a grant/deny icon is clicked, show a confirmation modal
   const handleShowConfirm = (request: IGroupedRequest, isGrant: boolean): void => {
     setIsGrant(isGrant);
     setSelectedRequestID(request.id);
@@ -97,6 +97,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const Perm = (u: IGroupedRequest): JSX.Element => <List values={getUniqueValuesOfT(u.requests, 'permission_type')} />;
   const RequestID = (u: IGroupedRequest): JSX.Element => <>{u.id}</>;
   const RequestedBy = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].requested_by_email}</>;
+  const RequestedAt = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].requested_date.format(formatDay)}</>;
   const Comment = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].request_comment}</>;
   const GrantPermission = (u: IGroupedRequest): JSX.Element => {
     return (
@@ -106,19 +107,22 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     );
   };
 
-  const DenyMessage = (
+  /**
+   * when the user selects 'deny', they are presented with a window
+   * asking them to enter a reason for the denial
+   */
+  const DenyConfirmMessage = (
     <>
       <Typography>{confirmDenyMesg}</Typography>
       <Typography>Please select a reason you are denying the request:</Typography>
-      <Select 
+      <Select
         variant={'outlined'}
         value={denyReason}
-        style={{width: '80%', marginBottom: '10px'}}
-        onChange={(e):void => setDenyReason(e.target.value as PermissionWasDeniedReason)}
-      >
+        style={{ width: '80%', marginBottom: '10px' }}
+        onChange={(e): void => setDenyReason(e.target.value as PermissionWasDeniedReason)}>
         {permissionDeniedReasons.map((reason, idx) => {
           return (
-            <MenuItem key={idx} value={reason} >
+            <MenuItem key={idx} value={reason}>
               {reason}
             </MenuItem>
           );
@@ -126,7 +130,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
       </Select>
       <Typography>Or input an option below:</Typography>
       <TextField
-        style={{marginTop: '5px'}}
+        style={{ marginTop: '5px' }}
         propName={'deny'}
         changeHandler={(v: Record<string, unknown>): void => setDenyReason(v['deny'] as PermissionWasDeniedReason)}
         defaultValue={''}
@@ -136,8 +140,8 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   );
 
   const headers: string[] = [
-    'ID',
     'Requested By',
+    'Date',
     'Email',
     'Animal ID',
     'WLH ID',
@@ -146,6 +150,14 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     'Grant',
     'Deny'
   ];
+  const columns = [RequestedBy, RequestedAt, Emails, AnimalID, WLHID, Perm, Comment, GrantPermission];
+
+  // also show request id in development
+  if (isDev()) {
+    headers.unshift('ID');
+    columns.unshift(RequestID)
+  }
+
   return (
     <AuthLayout>
       {status === 'error' && error ? (
@@ -157,11 +169,11 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
             <Typography>no pending requests</Typography>
           ) : (
             <EditTable
-              columns={[RequestID, RequestedBy, Emails, AnimalID, WLHID, Perm, Comment, GrantPermission]}
+              headers={headers}
+              columns={columns}
               canSave={false}
               hideSave={true}
               data={requests}
-              headers={headers}
               onSave={(): void => { /* do nothing */ }}
               onRowModified={(u): void => handleShowConfirm(u as IGroupedRequest, false)}
               hideAdd={true}
@@ -175,7 +187,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
             <ConfirmModal
               handleClickYes={handleGrantOrDenyPermission}
               title={isGrant ? 'Confirm Grant Permission' : 'Confirm Deny Permission'}
-              message={isGrant ? confirmGrantMesg : DenyMessage}
+              message={isGrant ? confirmGrantMesg : DenyConfirmMessage}
               open={showConfirmModal}
               handleClose={(): void => setShowConfirmModal(false)}
             />

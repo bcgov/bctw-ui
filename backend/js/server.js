@@ -125,7 +125,6 @@ const proxyApi = function (req, res, next) {
 
   const errHandler = (err) => {
     const { response } = err;
-    console.error(response);
     res.status(response.status).json({ error: response.data });
   }
 
@@ -399,7 +398,7 @@ app
 
 // pass all remaning requests (i.e. not defined in Express) to React
 if (isProd) {
-  console.log('express() -- passing page request to React')
+  // console.log('express() -- passing page request to React')
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname + '../../../react/build/index.html'));
   });

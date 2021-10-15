@@ -78,8 +78,7 @@ export default function AlertPage(): JSX.Element {
 
   // post the updated alert
   const updateAlert = async (alert: TelemetryAlert): Promise<void> => {
-    console.log('saving this alert', alert.toJSON());
-    await mutateAsync([alert]);
+    await mutateAsync([alert.toJSON()]);
   };
 
   // user selected to take action on the alert, show the update modal

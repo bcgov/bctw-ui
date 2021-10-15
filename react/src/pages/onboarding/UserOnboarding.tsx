@@ -23,7 +23,6 @@ const UserOnboarding = (): JSX.Element => {
   const { data, status } = api.useOnboardStatus();
 
   const [userAccess, setUserAccess] = useState<OnboardingStatus | null>(null);
-  // const [userEmail, setUserEmail] = useState('');
 
   useDidMountEffect(() => {
     if (status === 'success') {
@@ -39,18 +38,28 @@ const UserOnboarding = (): JSX.Element => {
     minWidth: '100vw'
   };
 
+  const Denied = (): JSX.Element => {
+    if (userAccess !== 'denied') {
+      return null;
+    }
+    if (data.canRequestBeResubmitted) {
+      return (
+        <UserAccessRequest
+          children={<Box>Your last access request was denied on {data.valid_to.format(formatTime)}</Box>}
+        />
+      );
+    }
+    return <UserAccessDenied onboard={data} />;
+  };
+
   return (
     <div style={containerStyle}>
-      {/* <div>
-        <p>User's email is: {userEmail}</p>
-        <p>User's access is: {userAccess}</p>
-      </div> */}
       {
         userAccess ? ( // User is in the system
           <div>
             {userAccess === 'granted' ? <UserAccessRequest /> : ''}
             {userAccess === 'pending' ? <UserAccessPending /> : ''}
-            {userAccess === 'denied' && data.canRequestBeResubmitted ? <UserAccessRequest children={<Box>Your last access request was denied on {data.valid_to.format(formatTime)}</Box> } /> : <UserAccessDenied onboard={data} />}
+            <Denied />
           </div>
         ) : (
           <UserAccessRequest />

@@ -20,7 +20,7 @@ export enum eCritterPermission {
   admin = 'admin' // technically not an option
 }
 
-export type PermissionRequestStatus = 'approved' | 'denied' | 'pending' | 'unknown';
+export type PermissionRequestStatus = 'approved' | 'denied' | 'pending';
 
 export type PermissionWasDeniedReason = 'Not given' | 'Add other reasons here...';
 export const permissionDeniedReasons: PermissionWasDeniedReason[] = ['Not given', 'Add other reasons here...'];
@@ -71,7 +71,6 @@ export interface IPermissionRequest extends
   requested_for_email: string;
   requested_for_name: string;
   permission_type: eCritterPermission;
-  was_granted: boolean;
   was_denied_reason: string;
   status: PermissionRequestStatus;
 }
@@ -90,7 +89,6 @@ export class PermissionRequest implements IPermissionRequest, BCTWBase<Permissio
   requested_for_email: string;
   requested_for_name: string;
   permission_type: eCritterPermission;
-  was_granted: boolean;
   was_denied_reason: string;
   @Transform(nullToDayjs) valid_to: Dayjs;
   status: PermissionRequestStatus;
@@ -99,19 +97,6 @@ export class PermissionRequest implements IPermissionRequest, BCTWBase<Permissio
     return [];
   }
 
-  get permissionStatus(): PermissionRequestStatus {
-    if (this.valid_to === null) {
-      return 'pending';
-    } 
-    switch (this.was_granted) {
-      case true: 
-        return 'approved';
-      case false:
-        return 'denied';
-      default:
-        return 'unknown';
-    }
-  }
   get identifier(): string { return 'request_id' }
 
   formatPropAsHeader(str: keyof PermissionRequest): string {
@@ -120,6 +105,9 @@ export class PermissionRequest implements IPermissionRequest, BCTWBase<Permissio
 
   toJSON(): PermissionRequest { return this }
 
+  /**
+   * headers displayed in the delegation history table
+   */
   static get ownerHistoryPropsToDisplay(): (keyof PermissionRequest)[] {
     return [ 'wlh_id', 'animal_id', 'species', 'requested_date',
       'requested_for_name', 'requested_for_email',
