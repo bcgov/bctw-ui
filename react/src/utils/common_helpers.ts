@@ -94,6 +94,13 @@ function getProperty<T, K extends keyof T>(obj: T, key: K): unknown {
   return obj[key]; // Inferred type is T[K]
 }
 
+/**
+ * some components require a method prop that is overloaded in a parent component
+ * ex. EditModal requires an onSave method.
+ */
+const doNothingAsync = async(): Promise<void> => { /* do nothing */};
+const doNothing = (): void => { /* do nothing */};
+
 export {
   countDecimals,
   formatLatLong,
@@ -103,5 +110,7 @@ export {
   columnToHeader,
   omitNull,
   removeProps,
-  getProperty
+  getProperty,
+  doNothingAsync,
+  doNothing,
 };

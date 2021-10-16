@@ -7,6 +7,7 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
+import { doNothingAsync } from 'utils/common_helpers';
 
 type CritterOverViewProps = ModalBaseProps & {
   type: BCTWType;
@@ -15,7 +16,7 @@ type CritterOverViewProps = ModalBaseProps & {
 
 export default function MapOverview({ type, detail, open, handleClose }: CritterOverViewProps): JSX.Element {
   const editObj: Animal | Collar = Object.assign(type === 'animal' ? new Animal() : new Collar(), detail);
-  const editProps = { handleClose, open, onSave: (): void => { /* do nothing */}};
+  const editProps = { handleClose, open, onSave: doNothingAsync};
   if (type === 'animal') {
     return (
       <ModifyCritterWrapper editing={editObj as Animal}>

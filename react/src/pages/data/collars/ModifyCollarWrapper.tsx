@@ -89,7 +89,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
     cannotEdit: !canEdit,
     onDelete: (): void => setShowConfirmDelete(o => !o),
     onSave: saveCollar,
-    editing: device ?? editing,
+    editing: device,
     queryStatus: status
   }
 

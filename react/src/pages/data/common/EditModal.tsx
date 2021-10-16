@@ -118,11 +118,13 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     setCanSave(!hasErr);
   }, [newObj])
 
-  const handleSave = (): void => {
+  const handleSave = async (): Promise<void> => {
     // use Object.assign to preserve class methods
     const body = omitNull(Object.assign(editing, newObj));
     const toSave: IUpsertPayload<T> = { body };
-    onSave(toSave);
+    await onSave(toSave);
+    // todo: when to close the modal?
+    onClose();
   };
 
   // triggered on a form input change, newProp will be an object with a single key and value

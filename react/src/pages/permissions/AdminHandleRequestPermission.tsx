@@ -155,7 +155,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   // also show request id in development
   if (isDev()) {
     headers.unshift('ID');
-    columns.unshift(RequestID)
+    columns.unshift(RequestID);
   }
 
   return (

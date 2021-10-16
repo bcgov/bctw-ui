@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
+import { doNothing, doNothingAsync } from 'utils/common_helpers';
 // import download from 'downloadjs';
 
 export default function CritterPage(): JSX.Element {
@@ -41,8 +42,8 @@ export default function CritterPage(): JSX.Element {
   const editProps = {
     editing: null,
     open: false,
-    onSave: (): void => { /* do nothing */ },
-    handleClose: (): void => { /* do nothing */ },
+    onSave: doNothingAsync,
+    handleClose: doNothing,
   };
 
   const addEditProps = {

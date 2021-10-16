@@ -36,6 +36,18 @@ type ReleaseAnimalProps = Pick<Animal,
 | 'life_stage'
 >;
 
+type CaptureReleaseProps = {
+  // workflow should proceed to release workflow
+  wasReleased: boolean;
+  // workflow should proceed to mortality workflow
+  didDieDuringCapture: boolean; 
+  didDieDuringTransloc: boolean;
+  // indicates the animal was released after successful translocation
+  // workflow should proceed to release
+  isTranslocationComplete: boolean; 
+}
+
+
 export type CaptureFormField = {
   [Property in keyof CaptureEvent]+?: FormFieldObject<CaptureEvent>;
 };
@@ -46,13 +58,17 @@ export type CaptureFormField = {
 export default class CaptureEvent implements 
 CaptureAnimalEventProps, ReleaseAnimalProps,
 Readonly<Pick<CollarHistory, 'assignment_id'>>,
-IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
+IDataLifeStartProps, BCTWWorkflow<CaptureEvent>,
+CaptureReleaseProps {
   // workflow props
   readonly event_type: WorkflowType;
   shouldSaveDevice: boolean;
   readonly shouldSaveAnimal = true;
-  isAssociated: boolean;
+  isAssociated: boolean; // has an animal association
   location_event: LocationEvent;
+  wasReleased: boolean;
+  didDieDuringCapture: boolean;
+  didDieDuringTransloc: boolean;
   isTranslocationComplete: boolean;
   // data life props
   readonly assignment_id: uuid;
@@ -67,8 +83,9 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
   translocation: boolean;
   associated_animal_id: string;
   associated_animal_relationship: Code; // required if associated_animal_id populated
-  region: Code; // enabled when animal is translocated
-  population_unit: Code; // enabled when animal is translocated
+  // region & popunit are enabled when animal is translocated
+  region: Code;
+  population_unit: Code;
   captivity_status: boolean;
   // characteristic fields
   ear_tag_left_id: string;
@@ -96,6 +113,8 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
         return 'Associated Relationship';
       case 'isTranslocationComplete':
         return WorkflowStrings.capture.isTranslocCompleted;
+      // case 'wasReleased':
+        // return WorkflowStrings.capture.beenReleased;
       default:
         return columnToHeader(s);
     }
@@ -150,5 +169,7 @@ IDataLifeStartProps, BCTWWorkflow<CaptureEvent> {
 
   fields: CaptureFormField = {
     isTranslocationComplete: { prop: 'isTranslocationComplete', type: eInputType.check },
+    didDieDuringTransloc: { prop: 'didDieDuringTransloc', type: eInputType.check },
+    // wasReleased: { prop: 'wasReleased', type: eInputType.check },
   }
 }

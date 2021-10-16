@@ -21,6 +21,10 @@ export const userApi = (props: ApiProps) => {
     queryClient.invalidateQueries('userAlert');
   }
 
+  const invalidateUDF = ():void => {
+    queryClient.invalidateQueries('getUDF');
+  }
+
   /**
    * retrieves keycloak session data
    * note: in dev this will likely 404
@@ -126,6 +130,7 @@ export const userApi = (props: ApiProps) => {
   const upsertUDF = async (udfs: IUDFInput[]): Promise<IUDF[]> => {
     const url = createUrl({ api: 'add-udf' });
     const { data } = await api.post(url, udfs);
+    invalidateUDF();
     return data;
   };
 

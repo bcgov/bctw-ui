@@ -100,7 +100,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     cannotEdit: !canEdit,
     onDelete: (): void => setShowConfirmDelete(o => !o),
     onSave: saveCritter,
-    editing: animal ?? editing,
+    editing: animal,
     queryStatus: status
   }
 

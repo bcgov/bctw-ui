@@ -24,7 +24,7 @@ export default function Checkbox(props: ICheckboxProps): JSX.Element {
 
   // rerender if the default was changed
   useEffect(() => {
-    if (initialValue !== undefined) {
+    if (typeof initialValue === 'boolean') {
       setChecked(initialValue);
     }
   }, [initialValue]);

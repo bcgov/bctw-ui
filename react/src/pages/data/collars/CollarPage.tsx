@@ -11,6 +11,7 @@ import { AttachedCollar, Collar } from 'types/collar';
 import AddEditViewer from '../common/AddEditViewer';
 import CollarImport from 'pages/data/collars/CollarImport';
 import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
+import { doNothing, doNothingAsync } from 'utils/common_helpers';
 
 export default function CollarPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
@@ -36,8 +37,8 @@ export default function CollarPage(): JSX.Element {
   const editProps = {
     editing: new Collar(),
     open: false,
-    onSave: (): void => { /* do nothing */ },
-    handleClose: (): void => { /* do nothing */ }
+    onSave: doNothingAsync,
+    handleClose: doNothing,
   };
 
   return (
