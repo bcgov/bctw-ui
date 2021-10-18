@@ -11,6 +11,7 @@ import DateTimeInput from 'components/form/DateTimeInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { ReactNode } from 'react';
 import { boxSpreadRowProps } from './EventComponents';
+import { isDev } from 'api/api_helpers';
 
 type LocationEventProps = {
   event: LocationEvent;
@@ -58,7 +59,7 @@ export default function LocationEventForm({
     notifyChange({ reset: true });
   }, [showUtm]);
 
-  const baseInputProps = { changeHandler, required: true, disabled };
+  const baseInputProps = { changeHandler, required: !isDev(), disabled };
   return (
     <>
       {event.disable_date ? null : (
@@ -123,7 +124,7 @@ export default function LocationEventForm({
           </>
         )}
       </Box>
-      <Box marginTop={2}>
+      <Box marginTop={1}>
         <TextField
           style={{ width: '100%' }}
           multiline={true}

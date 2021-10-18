@@ -53,7 +53,6 @@ const WorkflowStrings = {
   release: {
     workflowTitle: 'Release Event Workflow',
     isNewDevice: 'Are you replacing the original device with a new device?',
-    removeDeviceAction: (device: number, aid: string, wlhid: string): string => `Warning: This action will remove device ${device} from animal ID ${aid} / WLH ID ${wlhid}. To attach a new device, visit the My Devices page.`,
     deviceRemovedNotif: 'The previous device has been unassigned from this animal, you must assign a new device to the animal',
   },
   capture: {
@@ -70,7 +69,7 @@ const WorkflowStrings = {
     associatedRel: 'What is the relationship of the individual to the captured individual?',
     beenReleased: 'Has the animal been released?',
     diedDuring: (wf: 'capture' | 'translocation'): string => `Did the animal die during ${wf}?`,
-    btnContinueTo: (wf: 'Mortality' | 'Release'): string => `Save & Continue to ${wf} Workflow`,
+    btnContinueTo: (wf: 'Mortality' | 'Release'): string => `Continue to ${wf} Workflow`,
   },
   retrieval: {
     workflowTitle: 'Retrieval Event Workflow',

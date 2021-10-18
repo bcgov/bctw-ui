@@ -19,7 +19,7 @@ import Button from 'components/form/Button';
  * todo: deal with data life
  * devices not assigned here?
  */
-export default function CaptureEventForm({ event, handleFormChange }: WorkflowFormProps<CaptureEvent>): JSX.Element {
+export default function CaptureEventForm({ canSave, event, handlePostponeSave, handleFormChange }: WorkflowFormProps<CaptureEvent>): JSX.Element {
   const [capture, setCaptureEvent] = useState(event);
   const [isTransloc, setIsTransloc] = useState(false);
   // controls the status of the notification when the translocation field is unchecked
@@ -67,6 +67,13 @@ export default function CaptureEventForm({ event, handleFormChange }: WorkflowFo
     return <p>unable to load capture workflow</p>;
   }
 
+  // strings used
+  const {
+    areUpdates, associated, associatedID,
+    beenReleased, btnContinueTo, diedDuring, isTransloc: strIsTransloc,
+    isRecapture, isTranslocCompleted, shouldReviewNotif, translocNotif
+  } = WorkflowStrings.capture;
+
   return (
     <>
       {FormSection('a', 'Capture Details', [
@@ -77,23 +84,23 @@ export default function CaptureEventForm({ event, handleFormChange }: WorkflowFo
         />,
         // recapture field
         <Box {...boxSpreadRowProps} mt={1}>
-          {<span>{WorkflowStrings.capture.isRecapture}</span>}
+          {<span>{isRecapture}</span>}
           {CreateFormField(capture, wfFields.get('recapture'), onChange)}
         </Box>,
         // captivity status section
         <CaptivityStatusForm event={capture} handleFormChange={handleFormChange} hideMortStatus={true} />,
         // associated animal section
         <Box {...boxSpreadRowProps} mt={1}>
-          {<span style={{ marginRight: '0.5rem' }}>{WorkflowStrings.capture.associated}</span>}
+          {<span style={{ marginRight: '0.5rem' }}>{associated}</span>}
           {CreateFormField(capture, wfFields.get('associated_animal_id'), onChange)}
         </Box>,
         <Box {...boxSpreadRowProps} mt={1}>
-          {<span>{WorkflowStrings.capture.associatedID}</span>}
+          {<span>{associatedID}</span>}
           {CreateFormField(capture, { ...wfFields.get('associated_animal_relationship'), required: hasAssociation }, onChange, { disabled: !hasAssociation })}
         </Box>,
         // animal characteristics section, with subheader tooltip indicating user should review other metadata
-        <Tooltip title={WorkflowStrings.capture.shouldReviewNotif}>
-          <Box mt={2}><span>{WorkflowStrings.capture.areUpdates}</span></Box>
+        <Tooltip title={shouldReviewNotif}>
+          <Box mt={2}><span>{areUpdates}</span></Box>
         </Tooltip>,
         <Box {...boxSpreadRowProps} mt={1}>
           {CreateFormField(capture, wfFields.get('ear_tag_left_id'), onChange)}
@@ -113,29 +120,28 @@ export default function CaptureEventForm({ event, handleFormChange }: WorkflowFo
         </Box>
       ])}
       {FormSection('b', 'Release Details', [
-        // todo: btn disabled 
         <Box {...boxSpreadRowProps}>
-          {<span>{WorkflowStrings.capture.beenReleased}</span>}
-          <Button>{WorkflowStrings.capture.btnContinueTo('Release')}</Button>
+          {<span>{beenReleased}</span>}
+          <Button disabled={!canSave} onClick={(): void => handlePostponeSave('release')}>{btnContinueTo('Release')}</Button>
         </Box >,
         <Box {...boxSpreadRowProps} mt={1}>
-          {<span>{WorkflowStrings.capture.diedDuring('capture')}</span>}
-          <Button >{WorkflowStrings.capture.btnContinueTo('Mortality')}</Button>
+          {<span>{diedDuring('capture')}</span>}
+          <Button disabled={!canSave} onClick={(): void => handlePostponeSave('mortality')}>{btnContinueTo('Mortality')}</Button>
         </Box>
       ])}
       {FormSection('c', 'Translocation Details', [
         <Box {...boxSpreadRowProps}>
-          {<span>{WorkflowStrings.capture.isTransloc}</span>}
+          {<span>{strIsTransloc}</span>}
           {/* translocation checkbox, controls disabled status of other fields in section */}
           {CreateFormField(capture, wfFields.get('translocation'), onChange)}
         </Box >,
         <Box {...boxSpreadRowProps}>
-          {<span>{WorkflowStrings.capture.diedDuring('translocation')}</span>}
-          <Button disabled={!isTransloc}>{WorkflowStrings.capture.btnContinueTo('Mortality')}</Button>
+          {<span>{diedDuring('translocation')}</span>}
+          <Button onClick={(): void => handlePostponeSave('mortality')} disabled={!isTransloc || !canSave}>{WorkflowStrings.capture.btnContinueTo('Mortality')}</Button>
         </Box>,
         <Box {...boxSpreadRowProps} mt={1}>
-          {<span>{WorkflowStrings.capture.isTranslocCompleted}</span>}
-          <Button disabled={!isTransloc} style={{paddingInline: '15px'}}>{WorkflowStrings.capture.btnContinueTo('Release')}</Button>
+          {<span>{isTranslocCompleted}</span>}
+          <Button onClick={(): void => handlePostponeSave('release')} disabled={!isTransloc || !canSave} style={{paddingInline: '15px'}}>{WorkflowStrings.capture.btnContinueTo('Release')}</Button>
         </Box>,
         <Box {...boxSpreadRowProps} mt={1}>
           {CreateFormField(capture, { ...wfFields.get('region'), required: mustPopulate }, onChange, { disabled: !isTransloc || !isTranslocComplete })}
@@ -143,7 +149,7 @@ export default function CaptureEventForm({ event, handleFormChange }: WorkflowFo
         </Box>
       ])}
       <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>
-        {WorkflowStrings.capture.translocNotif}
+        {translocNotif}
       </OkayModal>
     </>
   );

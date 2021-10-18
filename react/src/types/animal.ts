@@ -241,7 +241,8 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'juvenile_at_heel_count', type: eInputType.number }
   ],
   identifierFields: [
-    { prop: 'wlh_id', type: eInputType.text, tooltip: CritterStrings.wlh_id },
+    // todo: tooltip: CritterStrings.wlh_id 
+    { prop: 'wlh_id', type: eInputType.text },
     { prop: 'animal_id', type: eInputType.text, ...isRequired },
     { prop: 'region', type: eInputType.code, ...isRequired },
     { prop: 'population_unit', type: eInputType.code, ...isRequired },

@@ -8,7 +8,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ReactNode, useEffect, useState } from 'react';
-import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
+import { BCTWWorkflow, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
@@ -26,16 +26,17 @@ import MalfunctionEventForm from './MalfunctionEventForm';
 type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
   event: T;
   onEventSaved?: (e: BCTWWorkflow<T>) => void; // to notify alert that event was saved
+  onEventChain?: (e: BCTWWorkflow<T>, wft: WorkflowType) => void;
 };
 
 /**
- * wraps all of the workflow components.
- * handles:
-    * modal state
+ * wraps all of the workflow components that handles:
+    * modal open state
     * saving
  */
 export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   event,
+  onEventChain,
   onEventSaved,
   open,
   handleClose
@@ -59,12 +60,11 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     } else {
       // console.log('sucess!!', e);
       showNotif({ severity: 'success', message: `${event.event_type} workflow form saved!` });
-      // if the parent implements this, call it on successful save.
-      // Ex. UserAlertPage component will expire the telemetry alert
+      // if the parent implements this, call it on a successful save.
       if (typeof onEventSaved === 'function') {
         onEventSaved(event);
       } else {
-        handleClose(false)
+        handleClose(false);
       }
     }
   };
@@ -92,8 +92,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   };
 
   /**
-   * some forms have actions that when triggered, should show a confirmation modal to
-   * exist the workflow 'early'. this modal exists here
+   * some forms have actions that when triggered,
+   * show a confirmation modal to exit the workflow 'early'.
    */
   const handleShowExitWorkflow = (message: ReactNode): void => {
     setConfirmMessage(message);
@@ -101,8 +101,18 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   };
 
   /**
-   * when 'yes' is selected to confirm the early exit of the workflow, perform the save
-   * workflows that use this behavior 
+   * if the postpone flag is set, skip the confirmation modal and 
+   * close this workflow and immediately call the @param onEventSaved handler
+   * which 'continues' to the next workflow
+   */
+  const handlePostponeSave = (wft: WorkflowType): void => {
+    handleClose(false);
+    onEventChain(event, wft);
+  }
+
+  /**
+   * when 'yes' is selected to confirm the workflow early exit,
+   * still trigger the save. 
    */
   const handleExitWorkflow = (): void => {
     // console.log('exiting workflow early!');
@@ -110,12 +120,11 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     setShowConfirmModal(false);
   };
 
-  /** 
+  /**
    * based on the event class, render the workflow form
-   * fixme: not very typescripty
    */
   const determineWorkflow = (): JSX.Element => {
-    const props = { handleFormChange: handleChildFormUpdated, handleExitEarly: handleShowExitWorkflow};
+    const props = { canSave, handleFormChange: handleChildFormUpdated, handleExitEarly: handleShowExitWorkflow, handlePostponeSave };
 
     if (event instanceof ReleaseEvent) {
       return <ReleaseEventForm {...props} event={event} />;
@@ -128,8 +137,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     } else if (event instanceof MalfunctionEvent) {
       return <MalfunctionEventForm {...props} event={event} />;
     }
-    return <div>error: unable to determine workflow form type</div>
-  }
+    return <div>error: unable to determine workflow form type</div>;
+  };
 
   return (
     <Modal open={open} handleClose={handleClose}>
@@ -137,7 +146,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
         <EditHeader<T>
           title={event?.getWorkflowTitle()}
           headers={event.displayProps}
-          obj={event as any}
+          obj={event}
           format={event.formatPropAsHeader}
         />
 

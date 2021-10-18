@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
 import OkayModal from 'components/modal/OkayModal';
-import { WorkflowStrings } from 'constants/strings';
+import { releaseUnattachWarning } from 'constants/formatted_string_components';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useState } from 'react';
 import { wfFields, WorkflowFormProps } from 'types/events/event';
@@ -48,10 +48,8 @@ export default function ReleaseEventForm({ event, handleFormChange }: WorkflowFo
   return FormSection('release-wf', 'Release Details', [
     <LocationEventForm event={release.location_event} notifyChange={onChangeLocationProp} />,
     <Box {...boxSpreadRowProps} mt={2}>
-      {CreateFormField(release, { ...fields.shouldUnattachDevice, tooltip: <p>todo:</p> }, onChange)}
-      {CreateFormField(release, { ...fields.data_life_start, required: isBeingUnattached }, onChange, {
-        disabled: !isBeingUnattached
-      })}
+      {CreateFormField(release, {...fields.shouldUnattachDevice}, onChange)}
+      {/* {CreateFormField(release, { ...fields.data_life_start, required: isBeingUnattached }, onChange, { disabled: !isBeingUnattached })} */}
     </Box>,
     <>
       {release.translocation && release.animal_status === 'In Translocation' ? (
@@ -63,7 +61,7 @@ export default function ReleaseEventForm({ event, handleFormChange }: WorkflowFo
       ) : null}
     </>,
     <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>
-      {WorkflowStrings.release.removeDeviceAction(event.device_id, event.animal_id, event.wlh_id)}
+      {releaseUnattachWarning(event.device_id, event.animal_id, event.wlh_id)}
     </OkayModal>
   ]);
 }

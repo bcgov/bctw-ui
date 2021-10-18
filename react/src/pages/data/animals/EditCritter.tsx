@@ -53,6 +53,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
 
   /**
    * when a capture workflow is saved, always show the release workflow unless a translocation is underway
+   * todo: is this still needed?
    */
   const handleWorkflowSaved = async(e: IBCTWWorkflow): Promise<void> => {
     await setShowWorkflowForm(false);
@@ -61,14 +62,38 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
         // do nothing
       }
       else { // show the release form, populating the location and date fields
-        // note: bug: wipe 'fields' prop or the release form will have the capture fields
-        const rwf = editObjectToEvent(e, new ReleaseEvent(e.location_event), ['event_type', 'region', 'population_unit', 'fields']);
+        const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'population_unit']);
         // set the new event directly, triggering the display of the release form
-        console.log(rwf)
+        // console.log(rwf)
         await updateEvent(rwf as any);
         await setShowWorkflowForm(o => !o);
       }
     } 
+  }
+
+  /**
+   * the capture workflow has multiple exit points that chain to other workflows
+   * this is a separate handler because we do not want to save the form until the 
+   * @param nextWorkflow is completed
+   */
+  const handleWorkflowChain = async(e: CaptureEvent, nextWorkflow: WorkflowType): Promise<void> => {
+    if (e.event_type !== 'capture') {
+      return;
+    }
+    let newwf;
+    if (nextWorkflow === 'mortality') {
+      newwf = new MortalityEvent(undefined, e);
+    } else if (nextWorkflow === 'release') {
+      newwf = new ReleaseEvent(e);
+    }
+    if (!newwf) {
+      return;
+    }
+    // there are only animal-related fields in capture workflows
+    const next = editObjectToEvent(e.getAnimal(), newwf, []);
+    console.log(`capture workflow chained to ${nextWorkflow} type`, next);
+    await updateEvent(next);
+    await setShowWorkflowForm(o => !o);
   }
 
   const {
@@ -191,6 +216,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     event={event as any}
                     handleClose={(): void => setShowWorkflowForm(false)}
                     onEventSaved={handleWorkflowSaved}
+                    onEventChain={handleWorkflowChain}
                   />
                 </>
               ) : null}

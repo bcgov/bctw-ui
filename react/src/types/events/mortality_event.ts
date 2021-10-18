@@ -1,5 +1,5 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
@@ -12,6 +12,7 @@ import { Code } from 'types/code';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { DataLife } from 'types/data_life';
 import { WorkflowStrings } from 'constants/strings';
+import CaptureEvent from './capture_event';
 
 export type MortalityDeviceEventProps = Pick<
 Collar,
@@ -108,7 +109,23 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly capture_date: Dayjs;
   location_event: LocationEvent;
 
-  constructor(mort_date = dayjs()) {
+  private critterPropsToSave: (keyof Animal)[] = [
+    'critter_id',
+    'animal_status',
+    'predator_known',
+    'predator_species_pcod',
+    'predator_species_ucod',
+    'proximate_cause_of_death',
+    'ultimate_cause_of_death',
+    'pcod_confidence',
+    'ucod_confidence',
+    'captivity_status',
+    'mortality_investigation',
+    'mortality_report',
+    'mortality_captivity_status'
+  ];
+
+  constructor(mort_date = dayjs(), capture?: CaptureEvent) {
     this.event_type = 'mortality';
     this.shouldSaveAnimal = true;
     this.shouldSaveDevice = true;
@@ -126,6 +143,17 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.wasInvestigated = false;
     this.predator_known = false;
     this.location_event = new LocationEvent('mortality', mort_date);
+    if (capture) {
+      this.mortCritterPropsToSave = [...this.critterPropsToSave, ...capture.captureCritterPropsToSave];
+    }
+  }
+
+  set mortCritterPropsToSave(props: (keyof Animal)[]) {
+    this.critterPropsToSave = props;
+  }
+
+  get mortCritterPropsToSave(): (keyof Animal)[] {
+    return this.onlySaveAnimalStatus ? ['critter_id', 'animal_status'] : this.critterPropsToSave;
   }
 
   get displayProps(): (keyof MortalityEvent)[] {
@@ -180,23 +208,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
 
   // retrieve the animal metadata fields from the mortality event
   getAnimal(): OptionalAnimal {
-    const props: (keyof AttachedAnimal)[] = this.onlySaveAnimalStatus
-      ? ['critter_id', 'animal_status']
-      : [
-        'critter_id',
-        'animal_status',
-        'predator_known',
-        'predator_species_pcod',
-        'predator_species_ucod',
-        'proximate_cause_of_death',
-        'ultimate_cause_of_death',
-        'pcod_confidence',
-        'ucod_confidence',
-        'captivity_status',
-        'mortality_investigation',
-        'mortality_report',
-        'mortality_captivity_status'
-      ];
+    const props =  [...this.mortCritterPropsToSave];
     const ret = eventToJSON(props, this);
     if (this.onlySaveAnimalStatus) {
       return ret;

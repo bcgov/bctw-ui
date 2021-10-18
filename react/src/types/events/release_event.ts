@@ -10,20 +10,17 @@ import { WorkflowStrings } from 'constants/strings';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 import { Collar } from 'types/collar';
+import { formatTime } from 'utils/time';
+import CaptureEvent from './capture_event';
 
-type ReleaseProps = Pick<Animal,
-| 'species'
-| 'translocation'
-| 'region'
-| 'population_unit'
-| 'animal_status'
->;
+type ReleaseProps = Pick<Animal, 'species' | 'translocation' | 'region' | 'population_unit' | 'animal_status'>;
 
 export type ReleaseFormField = {
   [Property in keyof ReleaseEvent]+?: FormFieldObject<ReleaseEvent>;
 };
 
-interface IReleaseEvent extends ReleaseProps,
+interface IReleaseEvent
+  extends ReleaseProps,
   Readonly<Pick<CollarHistory, 'assignment_id'>>,
   Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
   Pick<Collar, 'device_id' | 'collar_id'>,
@@ -51,20 +48,27 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   translocation: boolean;
   region: Code;
   population_unit: Code;
-  //
+
   readonly collar_id: uuid;
   readonly device_id: number;
 
-  constructor(loc = new LocationEvent('release', dayjs())) {
+  private critterPropsToSave: (keyof Animal)[];
+
+  constructor(capture?: CaptureEvent) {
     this.event_type = 'release';
-    // if a location event instance is provided, it will be of type 'capture'. update it
-    this.location_event = Object.assign(loc, {location_type: 'release'});
+    if (capture) {
+      this.location_event = Object.assign(capture.location_event, {location_type: 'release'});
+      this.critterPropsToSave = capture.captureCritterPropsToSave;
+    } else {
+      this.location_event = new LocationEvent(this.event_type, dayjs());
+      this.critterPropsToSave = ['critter_id'];
+    }
     this.shouldUnattachDevice = false;
   }
 
   formatPropAsHeader(s: keyof ReleaseEvent): string {
     switch (s) {
-      case 'shouldUnattachDevice': 
+      case 'shouldUnattachDevice':
         return WorkflowStrings.release.isNewDevice;
       default:
         return columnToHeader(s);
@@ -77,8 +81,16 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     return WorkflowStrings.release.workflowTitle;
   }
 
+  set releaseCritterPropsToSave(props: (keyof Animal)[]) {
+    this.critterPropsToSave = props;
+  }
+
+  get releaseCritterPropsToSave(): (keyof Animal)[] {
+    return this.critterPropsToSave;
+  }
+
   getAnimal(): OptionalAnimal {
-    const props: (keyof Animal)[] = [ 'critter_id' ];
+    const props = [...this.critterPropsToSave];
     // if the critter was being translocated, preserve the region/population unit
     if (this.translocation) {
       props.push('region', 'population_unit');
@@ -88,18 +100,20 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     if (this.translocation && this.animal_status === 'In Translocation') {
       ret['animal_status'] = 'Alive';
     }
-    return omitNull({ ...ret, ...this.location_event.toJSON()});
+    return omitNull({ ...ret, ...this.location_event.toJSON() });
   }
 
-  // todo:
   getAttachment(): RemoveDeviceInput {
-    return null;
+    const now = dayjs().format(formatTime);
+    const ret: RemoveDeviceInput = {
+      assignment_id: this.assignment_id,
+      attachment_end: now,
+      data_life_end: now
+    };
+    return ret;
   }
 
   fields: ReleaseFormField = {
-    // todo: move these to common fields
-    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
-    data_life_start: { prop: 'data_life_start', type: eInputType.datetime },
-  }
-
+    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check }
+  };
 }

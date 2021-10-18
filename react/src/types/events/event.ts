@@ -11,7 +11,11 @@ export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' |
 export type WorkflowFormProps<T extends IBCTWWorkflow> = {
   event: T
   handleFormChange: FormChangeEvent;
+  // workflows can exit early by calling the following functions
   handleExitEarly?: (message: ReactNode) => void;
+  handlePostponeSave?: (wft: WorkflowType) => void;
+  // this state is managed in WorkflowWrapper, but some forms may want to know about it
+  canSave?: boolean;
 }
 
 // make all properties optional
@@ -67,9 +71,16 @@ export const eventToJSON = <T>(keys: string[], event: T): Record<string, unknown
  * @param toRemove - keys of the @param editing type that shouldn't end up in the workflow instance
 */
 export const editObjectToEvent = <WF, E>(editing: E, workflow: WF, toRemove: (keyof E)[]): WF => {
-  const editingCopy = Object.assign({}, editing);
+  const cp = Object.assign({}, editing);
+  // always remove these fields
+  delete cp['fields']; 
+  delete cp['event_type'];
+  delete cp['shouldUnattachDevice'];
+  delete cp['shouldSaveAnimal'];
+  delete cp['shouldSaveDevice'];
+  // remove all fields included in toRemove
   for (let index = 0; index < toRemove.length; index++) {
-    delete editingCopy[toRemove[index]]
+    delete cp[toRemove[index]]
   }
-  return Object.assign(workflow, editingCopy);
+  return Object.assign(workflow, cp);
 }

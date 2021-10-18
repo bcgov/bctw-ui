@@ -113,8 +113,6 @@ CaptureReleaseProps {
         return 'Associated Relationship';
       case 'isTranslocationComplete':
         return WorkflowStrings.capture.isTranslocCompleted;
-      // case 'wasReleased':
-        // return WorkflowStrings.capture.beenReleased;
       default:
         return columnToHeader(s);
     }
@@ -126,12 +124,15 @@ CaptureReleaseProps {
     return WorkflowStrings.capture.workflowTitle;
   }
 
+  get captureCritterPropsToSave(): (keyof Animal)[] {
+    return ['critter_id', 'recapture', 'translocation', 'species',
+      'associated_animal_id', 'associated_animal_relationship', 'captivity_status', 
+      'ear_tag_left_colour', 'ear_tag_left_id', 'ear_tag_right_colour', 'ear_tag_right_id',
+      'juvenile_at_heel', 'juvenile_at_heel_count', 'animal_colouration', 'life_stage' ]
+  }
+
   getAnimal(): OptionalAnimal {
-    const props: (keyof Animal)[] =
-      ['critter_id', 'recapture', 'translocation', 'species',
-        'associated_animal_id', 'associated_animal_relationship', 'captivity_status', 
-        'ear_tag_left_colour', 'ear_tag_left_id', 'ear_tag_right_colour', 'ear_tag_right_id',
-        'juvenile_at_heel', 'juvenile_at_heel_count', 'animal_colouration', 'life_stage' ];
+    const props = this.captureCritterPropsToSave;
     if (this.translocation ) {
       // if the translocation is completed, save the new region/population unit.
       // otherwise, need to update animal_status to 'in translocation';
@@ -155,21 +156,20 @@ CaptureReleaseProps {
   }
 
   // todo: should data life be updated??
-  getDataLife(): ChangeDataLifeInput{
-    if (!this.assignment_id|| !this.location_event.date) {
-      console.error('cannot update data life in capture event, missing props', this);
-      return null;
-    }
-    const ret: ChangeDataLifeInput = {
-      assignment_id: this.assignment_id,
-      data_life_start: this.location_event.date.format(formatTime)
-    }
-    return ret;
-  }
+  // getDataLife(): ChangeDataLifeInput{
+  //   if (!this.assignment_id|| !this.location_event.date) {
+  //     console.error('cannot update data life in capture event, missing props', this);
+  //     return null;
+  //   }
+  //   const ret: ChangeDataLifeInput = {
+  //     assignment_id: this.assignment_id,
+  //     data_life_start: this.location_event.date.format(formatTime)
+  //   }
+  //   return ret;
+  // }
 
   fields: CaptureFormField = {
     isTranslocationComplete: { prop: 'isTranslocationComplete', type: eInputType.check },
     didDieDuringTransloc: { prop: 'didDieDuringTransloc', type: eInputType.check },
-    // wasReleased: { prop: 'wasReleased', type: eInputType.check },
   }
 }

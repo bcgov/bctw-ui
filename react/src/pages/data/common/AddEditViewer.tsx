@@ -147,7 +147,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
         {/* render add button */}
         {disableAdd ? null : (
           <Tooltip title={addTooltip ?? ''} inline={true}>
-            <Button {...btnProps} variant='contained' startIcon={<Icon icon='delete' />} onClick={handleClickAdd}>{`Add ${
+            <Button {...btnProps} variant='contained' startIcon={<Icon icon='plus' />} onClick={handleClickAdd}>{`Add ${
               addText ?? ''
             }`}</Button>
           </Tooltip>
@@ -165,7 +165,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
           <Tooltip title={deleteTooltip ?? ''} inline={true}>
             <Button
               {...btnProps}
-              startIcon={<Icon icon='plus' />}
+              startIcon={<Icon icon='delete' />}
               disabled={cannotEdit || !editing[editing.identifier]}
               onClick={handleClickDelete}>
               {`Delete ${deleteText ?? ''}`}
