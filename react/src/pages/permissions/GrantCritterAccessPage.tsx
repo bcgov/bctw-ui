@@ -4,7 +4,7 @@ import Button from 'components/form/Button';
 import { User } from 'types/user';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';

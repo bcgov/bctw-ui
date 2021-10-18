@@ -1,6 +1,6 @@
 import { createUrl, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { ApiProps } from 'api/api_interfaces';
+import { API, ApiProps } from 'api/api_interfaces';
 import {
   getCurrentOnboardStatus,
   handleOnboardingRequest as handleURL,
@@ -10,7 +10,7 @@ import {
 import { IOnboardUser, HandleOnboardInput, OnboardUser } from 'types/onboarding';
 import { useQueryClient } from 'react-query';
 
-export const onboardingApi = (props: ApiProps) => {
+export const onboardingApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
 

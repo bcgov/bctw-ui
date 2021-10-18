@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableRow } from '@mui/material';
 import TableContainer from './TableContainer';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
 import { IPlainTableProps, Order } from 'components/table/table_interfaces';

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import RetrievalEvent from 'types/events/retrieval_event';
 import { parseFormChangeResult } from 'types/form_types';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
 import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';

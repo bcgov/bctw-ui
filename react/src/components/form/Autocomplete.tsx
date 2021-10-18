@@ -1,5 +1,5 @@
-import { Chip, TextField } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import { Chip, TextField } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import { useEffect, useState } from 'react';
 import { ISelectMultipleData } from './MultiSelect';
 
@@ -18,7 +18,7 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: IAutoc
     setSelected([]);
   }, [triggerReset]);
 
-  const handleChange = (event: React.ChangeEvent<{ unknown }>, value: ISelectMultipleData[]): void => {
+  const handleChange = (value: ISelectMultipleData[]): void => {
     setSelected(value);
     changeHandler(value as T[]);
   };
@@ -41,7 +41,7 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: IAutoc
       }}
       getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel}
       renderInput={(params): JSX.Element => <TextField {...params} label={label} variant='outlined' />}
-      onChange={handleChange}
+      onChange={(e, v): void => handleChange(v as ISelectMultipleData[])}
     />
   );
 }

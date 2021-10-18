@@ -1,18 +1,17 @@
 import React from 'react';
-import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Dialog from '@material-ui/core/Dialog';
-import Fade from '@material-ui/core/Fade';
-import Toolbar from '@material-ui/core/Toolbar';
-import { TransitionProps } from '@material-ui/core/transitions';
+import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Dialog from '@mui/material/Dialog';
+import Fade from '@mui/material/Fade';
+import Toolbar from '@mui/material/Toolbar';
+import { TransitionProps } from '@mui/material/transitions';
 import { ModalProps } from 'components/component_interfaces';
 import './modal.scss';
 
-import ArrowBack from '@material-ui/icons/ArrowBack';
-import HelpIcon from '@material-ui/icons/Help';
-
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import { Icon } from 'components/common';
+import { urls } from 'constants/external_urls';
 
 const useStyles = makeStyles(() => ({
   fsDialogHeader: {
@@ -33,7 +32,7 @@ const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement },
   ref: React.Ref<unknown>
 ) {
-  return <Fade ref={ref} {...props} />;
+  return <Fade ref={ref} {...props}>{props.children}</Fade>;
 });
 
 export default function FullScreenDialog({ open, handleClose, children }: ModalProps): JSX.Element {
@@ -54,7 +53,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
               variant="text"
               color="primary"
               disableElevation
-              startIcon={<ArrowBack />}
+              startIcon={<Icon icon={'back'}/>}
               onClick={(): void => handleClose(false)}>
                 Cancel and Exit
             </Button>
@@ -64,9 +63,8 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
               variant="text"
               color="primary"
               disableElevation
-              startIcon={<HelpIcon />}
-              // fixme: hardcoded url bad, move to .env file
-              onClick={(): void => {window.open('https://apps.nrs.gov.bc.ca/int/confluence/display/BCTW/Project+Support+and+Documentation')}}>
+              startIcon={<Icon icon={'help'}/>}
+              onClick={(): void => {window.open(urls.bctw_support_url)}}>
                 Help
             </Button>
           </Toolbar>

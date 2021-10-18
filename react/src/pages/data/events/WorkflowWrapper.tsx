@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Container, Divider, Paper } from '@material-ui/core';
+import { Box, CircularProgress, Container, Divider, Paper } from '@mui/material';
 import { AxiosError } from 'axios';
 import { Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
@@ -40,8 +40,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   open,
   handleClose
 }: WorkflowWrapperProps<T>): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const responseDispatch = useResponseDispatch();
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
 
   const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr] = useFormHasError();
@@ -55,10 +55,10 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   const onSuccess = async (e: AxiosError | boolean): Promise<void> => {
     if ((e as AxiosError)?.isAxiosError) {
-      responseDispatch({ severity: 'error', message: formatAxiosError(e as AxiosError) });
+      showNotif({ severity: 'error', message: formatAxiosError(e as AxiosError) });
     } else {
       // console.log('sucess!!', e);
-      responseDispatch({ severity: 'success', message: `${event.event_type} workflow form saved!` });
+      showNotif({ severity: 'success', message: `${event.event_type} workflow form saved!` });
       // if the parent implements this, call it on successful save.
       // Ex. UserAlertPage component will expire the telemetry alert
       if (typeof onEventSaved === 'function') {
@@ -71,11 +71,11 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   const onError = (e: AxiosError): void => {
     console.log('error saving event', formatAxiosError(e));
-    responseDispatch({ severity: 'success', message: `error saving ${event.event_type} workflow: ${formatAxiosError(e)}` });
+    showNotif({ severity: 'success', message: `error saving ${event.event_type} workflow: ${formatAxiosError(e)}` });
   };
 
   // setup save mutation
-  const { mutateAsync: saveEvent, isLoading } = bctwApi.useSaveWorkflowEvent<T>({ onSuccess, onError });
+  const { mutateAsync: saveEvent, isLoading } = api.useSaveWorkflowEvent<T>({ onSuccess, onError });
 
   // performs metadata updates of collar/critter
   const handleSave = async (): Promise<void> => {

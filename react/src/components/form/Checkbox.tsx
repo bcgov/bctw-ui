@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Checkbox as MuiCheckbox, CheckboxProps } from '@material-ui/core/';
-import { FormControlLabel } from '@material-ui/core';
+import { Checkbox as MuiCheckbox, CheckboxProps } from '@mui/material/';
+import { FormControlLabel } from '@mui/material';
 import { removeProps } from 'utils/common_helpers';
 import { inputPropsToRemove } from 'components/form/TextInput';
 import { FormBaseProps } from 'types/form_types';

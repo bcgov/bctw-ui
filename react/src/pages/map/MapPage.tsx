@@ -4,7 +4,7 @@ import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet/dist/leaflet.css';
 
-import { CircularProgress, Paper } from '@material-ui/core';
+import { CircularProgress, Paper } from '@mui/material';
 import { mdiDragHorizontalVariant } from '@mdi/js';
 import pointsWithinPolygon from '@turf/points-within-polygon';
 import dayjs from 'dayjs';
@@ -49,8 +49,6 @@ import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 
 // note: terrain page deprecated for now
-// import MapIcon from '@material-ui/icons/Map';
-// import LanguageIcon from '@material-ui/icons/Language';
 // import Terrain from '../terrain/TerrainPage';
 
 /**

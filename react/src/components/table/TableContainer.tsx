@@ -1,4 +1,4 @@
-import { TableContainer as MUITableContainer, Paper } from '@material-ui/core';
+import { TableContainer as MUITableContainer, Paper } from '@mui/material';
 
 type TableContainerProps = {
   children: JSX.Element; // the table

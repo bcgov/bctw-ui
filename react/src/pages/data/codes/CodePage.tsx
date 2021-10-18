@@ -1,4 +1,4 @@
-import { ButtonGroup, Typography } from '@material-ui/core';
+import { ButtonGroup, Typography } from '@mui/material';
 import { NotificationMessage } from 'components/common';
 import Button from 'components/form/Button';
 import DataTable from 'components/table/DataTable';

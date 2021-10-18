@@ -1,5 +1,5 @@
-import { createTheme } from '@material-ui/core';
-const appTheme = createTheme({
+import { createTheme, adaptV4Theme } from '@mui/material';
+const appTheme = createTheme(adaptV4Theme({
   palette: {
     // https://material-ui.com/customization/palette/
     primary: {
@@ -106,5 +106,5 @@ const appTheme = createTheme({
       }
     }
   }
-});
+}));
 export default appTheme;

@@ -1,4 +1,4 @@
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import MortalityEvent from 'types/events/mortality_event';

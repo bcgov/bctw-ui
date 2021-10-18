@@ -1,28 +1,28 @@
 import { useEffect, useState } from 'react';
-import DayjsUtils from '@date-io/dayjs';
 import dayjs, { Dayjs } from 'dayjs';
-import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers';
-import { formatTime } from 'utils/time';
+import { DesktopDateTimePicker } from '@mui/lab';
 import { DateInputProps } from 'components/form/Date';
-import { FormControl } from '@material-ui/core';
+import { FormControl, TextField } from '@mui/material';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
 /**
  * date time picker component
- * todo: merge with date only component
  */
 export default function DateTimeInput(props: DateInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName, minDate, maxDate, required, margin } = props;
+  const { defaultValue, label, changeHandler, propName, minDate, maxDate, required } = props;
   const [selectedTime, setSelectedTime] = useState<Dayjs | null>(defaultValue?.isValid() ? defaultValue : null);
 
   const checkForErr = (d: Dayjs | null): boolean => required && (!d || !d?.isValid());
 
   const [hasError, setHasError] = useState(checkForErr(selectedTime));
 
-  const handleChangeTime = (d: Dayjs): void => {
-    setSelectedTime(d);
-    const isErr = checkForErr(d);
+  const handleChangeTime = (d: Dayjs | null): void => {
+    const djs = dayjs(d);
+    setSelectedTime(djs);
+    const isErr = checkForErr(djs);
     setHasError(isErr);
-    const t = { [propName]: d, error: isErr};
+    const t = { [propName]: djs, error: isErr };
     changeHandler(t);
   };
 
@@ -33,31 +33,25 @@ export default function DateTimeInput(props: DateInputProps): JSX.Element {
     }
     const isErr = checkForErr(selectedTime);
     setHasError(isErr);
-    changeHandler({[propName]: selectedTime, error: isErr});
-  }, [required])
+    changeHandler({ [propName]: selectedTime, error: isErr });
+  }, [required]);
 
   return (
-    <MuiPickersUtilsProvider utils={DayjsUtils}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
       {/* shows the asterisk at the end of the label if error is present */}
-      <FormControl error={hasError}> 
-        <DateTimePicker
-          autoOk={true}
+      <FormControl error={hasError}>
+        <DesktopDateTimePicker
           ampm={false} // 24 hours
-          inputVariant={'outlined'}
+          InputProps={{ size: 'small', required, error: hasError }}
           disabled={props.disabled}
-          size={'small'}
-          clearable={true}
-          format={dayjs.isDayjs(selectedTime) ? selectedTime.format(formatTime) : ' '}
-          margin={margin ?? 'none'}
+          renderInput={(props): JSX.Element => <TextField {...props} />}
           label={label}
           value={selectedTime}
           onChange={handleChangeTime}
           minDate={minDate}
           maxDate={maxDate}
-          required={required}
-          error={hasError} /* shows the label in error state (red) if error */
         />
       </FormControl>
-    </MuiPickersUtilsProvider>
+    </LocalizationProvider>
   );
 }

@@ -13,8 +13,14 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ResponseProvider } from 'contexts/ApiResponseContext';
 import { SnackbarWrapper } from 'components/common';
 import { UserContext, UserStateContextProvider } from 'contexts/UserContext';
-import { makeStyles, ThemeProvider } from '@material-ui/core';
+import { ThemeProvider, Theme, StyledEngineProvider } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 // import { ReactQueryDevtools } from 'react-query/devtools'
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -29,45 +35,46 @@ const queryClient = new QueryClient();
 
 export default function App(): JSX.Element {
   const classes = useStyles();
-
   return (
     <QueryClientProvider client={queryClient}>
       {/* uncomment to debug query/caching issues */}
       {/* <ReactQueryDevtools initialIsOpen={false} />  */}
       <ResponseProvider>
-        <ThemeProvider theme={appTheme}>
-          <UserStateContextProvider>
-            <UserContext.Consumer>
-              {(): React.ReactNode => {
-                return (
-                  <AlertStateContextProvider>
-                    <AlertContext.Consumer>
-                      {(): React.ReactNode => {
-                        return (
-                          <BrowserRouter>
-                            <div className={classes.root}>
-                              <AppHeader />
-                              <div className={'app-body'}>
-                                <div className='app-body__inner'>
-                                  <SnackbarWrapper>
-                                    <DefaultLayout>
-                                      <AppRouter />
-                                    </DefaultLayout>
-                                  </SnackbarWrapper>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={appTheme}>
+            <UserStateContextProvider>
+              <UserContext.Consumer>
+                {(): React.ReactNode => {
+                  return (
+                    <AlertStateContextProvider>
+                      <AlertContext.Consumer>
+                        {(): React.ReactNode => {
+                          return (
+                            <BrowserRouter>
+                              <div className={classes.root}>
+                                <AppHeader />
+                                <div className={'app-body'}>
+                                  <div className='app-body__inner'>
+                                    <SnackbarWrapper>
+                                      <DefaultLayout>
+                                        <AppRouter />
+                                      </DefaultLayout>
+                                    </SnackbarWrapper>
+                                  </div>
                                 </div>
+                                <AppFooter />
                               </div>
-                              <AppFooter />
-                            </div>
-                          </BrowserRouter>
-                        );
-                      }}
-                    </AlertContext.Consumer>
-                  </AlertStateContextProvider>
-                );
-              }}
-            </UserContext.Consumer>
-          </UserStateContextProvider>
-        </ThemeProvider>
+                            </BrowserRouter>
+                          );
+                        }}
+                      </AlertContext.Consumer>
+                    </AlertStateContextProvider>
+                  );
+                }}
+              </UserContext.Consumer>
+            </UserStateContextProvider>
+          </ThemeProvider>
+        </StyledEngineProvider>
       </ResponseProvider>
     </QueryClientProvider>
   );

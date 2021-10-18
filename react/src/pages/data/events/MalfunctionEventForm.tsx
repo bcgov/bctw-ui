@@ -6,7 +6,7 @@ import { wfFields, WorkflowFormProps } from 'types/events/event';
 import LocationEventForm from './LocationEventForm';
 import { FormSection } from '../common/EditModalComponents';
 import { CreateFormField } from 'components/form/create_form_components';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { LocationEvent } from 'types/events/location_event';
 import Radio from 'components/form/Radio';
 import { Code } from 'types/code';

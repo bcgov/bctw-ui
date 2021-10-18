@@ -1,5 +1,5 @@
 import Button from 'components/form/Button';
-import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Icon } from 'components/common';
 import { IPlainTableProps } from 'components/table/table_interfaces';
 import './table.scss';
@@ -53,87 +53,85 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
     saveButtonText
   } = props;
 
-  return (
-    <>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {headers.map((h, idx) => (
-                <TableCell align='center' key={`head-${idx}`}>
-                  <strong>{h}</strong>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((u, idx) => {
-              const rowkey = `body-${idx}`;
-              const ComponentsFromProps = columns.map((cb, idx) => (
-                <TableCell key={`custom-${idx}`}>{cb(u)}</TableCell>
-              ));
+  return <>
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            {headers.map((h, idx) => (
+              <TableCell align='center' key={`head-${idx}`}>
+                <strong>{h}</strong>
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.map((u, idx) => {
+            const rowkey = `body-${idx}`;
+            const ComponentsFromProps = columns.map((cb, idx) => (
+              <TableCell key={`custom-${idx}`}>{cb(u)}</TableCell>
+            ));
 
-              return hideAll ? (
-                <TableRow key={rowkey}>{ComponentsFromProps}</TableRow>
-              ) : (
-                <TableRow key={rowkey}>
-                  {ComponentsFromProps}
+            return hideAll ? (
+              <TableRow key={rowkey}>{ComponentsFromProps}</TableRow>
+            ) : (
+              <TableRow key={rowkey}>
+                {ComponentsFromProps}
 
-                  {/* edit button */}
-                  {hideEdit ? null : (
-                    <TableCell>
-                      <IconButton onClick={(): void => onRowModified(u, 'edit')}>
-                        <Icon icon='edit' />
-                      </IconButton>
-                    </TableCell>
-                  )}
-                  {/* delete button */}
-                  {hideDelete ? null : (
-                    <TableCell>
-                      <IconButton onClick={(): void => onRowModified(u, 'delete')}>
-                        <Icon icon='close' htmlColor='#8B0000' />
-                      </IconButton>
-                    </TableCell>
-                  )}
-                  {/* duplicate button */}
-                  {hideDuplicate ? null : (
-                    <TableCell>
-                      <IconButton onClick={(): void => onRowModified(u, 'duplicate')}>
-                        <Icon icon='copy' />
-                      </IconButton>
-                    </TableCell>
-                  )}
-                  {/* reset button (not visible by default) */}
-                  {showReset ? (
-                    <TableCell>
-                      <IconButton onClick={(): void => onRowModified(u, 'reset')}>
-                        <Icon icon='reset' />
-                      </IconButton>
-                    </TableCell>
-                  ) : null}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {hideAll ? null : (
-        <div className={'side-btns'}>
-          {hideAdd ? null : (
-            <span>
-            <Button onClick={(): void => onRowModified({} as T, 'add')} color='primary' variant='outlined'>
-              Add Row
-            </Button>
-            &nbsp; &nbsp;
-            </span>
-          )}
-          {hideSave ? null : (
-            <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>
-              {saveButtonText ?? 'Save'}
-            </Button>
-          )}
-        </div>
-      )}
-    </>
-  );
+                {/* edit button */}
+                {hideEdit ? null : (
+                  <TableCell>
+                    <IconButton onClick={(): void => onRowModified(u, 'edit')} size="large">
+                      <Icon icon='edit' />
+                    </IconButton>
+                  </TableCell>
+                )}
+                {/* delete button */}
+                {hideDelete ? null : (
+                  <TableCell>
+                    <IconButton onClick={(): void => onRowModified(u, 'delete')} size="large">
+                      <Icon icon='close' htmlColor='#8B0000' />
+                    </IconButton>
+                  </TableCell>
+                )}
+                {/* duplicate button */}
+                {hideDuplicate ? null : (
+                  <TableCell>
+                    <IconButton onClick={(): void => onRowModified(u, 'duplicate')} size="large">
+                      <Icon icon='copy' />
+                    </IconButton>
+                  </TableCell>
+                )}
+                {/* reset button (not visible by default) */}
+                {showReset ? (
+                  <TableCell>
+                    <IconButton onClick={(): void => onRowModified(u, 'reset')} size="large">
+                      <Icon icon='reset' />
+                    </IconButton>
+                  </TableCell>
+                ) : null}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    {hideAll ? null : (
+      <div className={'side-btns'}>
+        {hideAdd ? null : (
+          <span>
+          <Button onClick={(): void => onRowModified({} as T, 'add')} color='primary' variant='outlined'>
+            Add Row
+          </Button>
+          &nbsp; &nbsp;
+          </span>
+        )}
+        {hideSave ? null : (
+          <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>
+            {saveButtonText ?? 'Save'}
+          </Button>
+        )}
+      </div>
+    )}
+  </>;
 }

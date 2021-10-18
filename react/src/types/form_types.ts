@@ -1,4 +1,4 @@
-import { BaseTextFieldProps } from "@material-ui/core";
+import { BaseTextFieldProps } from "@mui/material";
 import { ReactNode } from "react";
 
 export type KeyType = string | number | symbol;

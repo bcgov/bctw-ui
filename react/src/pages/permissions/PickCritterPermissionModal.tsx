@@ -8,7 +8,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useContext, useEffect, useState } from 'react';
 import { adminPermissionOptions, eCritterPermission, IUserCritterPermissionInput, ownerPermissionOptions } from 'types/permission';
 import { User } from 'types/user';
-import { Select, MenuItem } from '@material-ui/core';
+import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
 
@@ -165,7 +165,7 @@ export default function PickCritterPermissionModal({
         error={isError}
         style={{width: '90px'}} // fits the longest critter permission type
         value={defaultPermission}
-        onChange={(v: React.ChangeEvent<{ value: unknown }>): void => {
+        onChange={(v: SelectChangeEvent<eCritterPermission>): void => {
           // dont propagate the event to the row selected handler
           v.stopPropagation();
           const permission = v.target.value as eCritterPermission;

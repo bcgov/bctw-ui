@@ -6,7 +6,7 @@ import { CreateFormField } from 'components/form/create_form_components';
 import { useState } from 'react';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import BasicSelect from 'components/form/BasicSelect';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { eInputType } from 'types/form_types';
 import PhoneInput from 'components/form/PhoneInput';
 

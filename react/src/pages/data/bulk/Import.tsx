@@ -1,4 +1,4 @@
-import { Button, CircularProgress, FormControlLabel, Radio, RadioGroup, Typography } from '@material-ui/core';
+import { Button, CircularProgress, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import { createFormData } from 'api/api_helpers';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { NotificationMessage } from 'components/common';

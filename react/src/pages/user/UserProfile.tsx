@@ -2,7 +2,7 @@ import Button from 'components/form/Button';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'contexts/UserContext';
 import { User } from 'types/user';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography } from '@mui/material';
 import DataTable from 'components/table/DataTable';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -60,7 +60,7 @@ export default function UserProfile(): JSX.Element {
           </p>
           <p>
             Your phone number: <strong>{user.phone ?? 'No number on file'}</strong> &nbsp; &nbsp; 
-            <Button size="large" color="default" className='button' onClick={() => sendTestSms(user.phone)}>
+            <Button size="large" className='button' onClick={() => sendTestSms(user.phone)}>
               Send test SMS
             </Button>
           </p>

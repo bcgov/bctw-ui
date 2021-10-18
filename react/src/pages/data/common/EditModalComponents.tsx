@@ -1,4 +1,4 @@
-import { Box, ButtonProps, Grid } from '@material-ui/core';
+import { Box, ButtonProps, Grid } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
 import { ReactNode } from 'react';
 
@@ -89,6 +89,6 @@ const a11yProps = (index: number): Record<string, string> => {
   };
 };
 
-const editEventBtnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'default', className: 'button' };
+const editEventBtnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'inherit', className: 'button' };
 
 export { EditHeader, EditTabPanel, FormSection, a11yProps, editEventBtnProps };

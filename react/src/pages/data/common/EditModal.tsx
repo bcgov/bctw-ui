@@ -15,12 +15,12 @@ import FullScreenDialog from 'components/modal/DialogFullScreen';
 import Modal from 'components/modal/Modal';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
-import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
-import Divider from '@material-ui/core/Divider';
-import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
+import Paper from '@mui/material/Paper';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import { BCTWBase } from 'types/common_types';
 import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
@@ -78,7 +78,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   const [currentTabID, setCurrentTabID] = React.useState(0);
 
   // state handler for when the history / current properties tab is selected
-  const handleSwitchTab = (event: React.ChangeEvent<{ 1 }>, newValue: number): void => {
+  const handleSwitchTab = (newValue: number): void => {
     setCurrentTabID(newValue);
   };
 
@@ -175,7 +175,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
               <Box mb={4}>
                 <Tabs
                   value={currentTabID}
-                  onChange={handleSwitchTab}
+                  onChange={(e, v):void => handleSwitchTab(v)}
                   aria-label='simple tabs example'
                   indicatorColor='primary'
                   textColor='primary'>

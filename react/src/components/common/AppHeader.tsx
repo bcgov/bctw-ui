@@ -3,7 +3,7 @@ import 'styles/AppHeader.scss';
 import { mdiAccountCircle, mdiAccountRemove, mdiBell, mdiHelpCircle, mdiProgressClock } from '@mdi/js';
 import { useContext, useState } from 'react';
 import { AlertContext } from 'contexts/UserAlertContext';
-import { IconButton } from '@material-ui/core';
+import { IconButton } from '@mui/material';
 import { User } from 'types/user';
 import { UserContext } from 'contexts/UserContext';
 import headerImage from 'assets/images/gov3_bc_logo.png';
@@ -87,7 +87,10 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
             {alertCount > 0 ? (
               <li>
                 <div className={'alerts'}>
-                  <IconButton onClick={(): void => setShowAlerts((o) => !o)} disabled={!alertCount}>
+                  <IconButton
+                    onClick={(): void => setShowAlerts((o) => !o)}
+                    disabled={!alertCount}
+                    size="large">
                     <Icon
                       path={mdiBell}
                       color={alertCount ? 'red' : 'white'}
@@ -102,7 +105,7 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
             ) : null}
             <li className={'username'}>
               <a href='/profile'>
-                <IconButton>
+                <IconButton size="large">
                   <Icon
                     path={user ? mdiAccountCircle : useUser.error ? mdiAccountRemove : mdiProgressClock}
                     className={'icon'}
@@ -115,7 +118,7 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
             </li>
             <li className={'help'}>
               <a href={urls.bctw_support_url} target='_blank'>
-                <IconButton>
+                <IconButton size="large">
                   <Icon
                     path={mdiHelpCircle}
                     className={'icon'}

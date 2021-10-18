@@ -1,6 +1,6 @@
 import Icon from '@mdi/react';
 import { mdiCheckBold, mdiCloseBox } from '@mdi/js';
-import { IconButton } from '@material-ui/core';
+import { IconButton } from '@mui/material';
 import './style.css';
 
 const UserAccessPending = (): JSX.Element => {
@@ -19,7 +19,7 @@ const UserAccessPending = (): JSX.Element => {
       </div>
       <div className='description'>Your request has been submitted for review</div>
 
-      <IconButton color="secondary">
+      <IconButton color="secondary" size="large">
         <a href='/logout#/logout'>
           <Icon
             path={mdiCloseBox}
@@ -29,6 +29,6 @@ const UserAccessPending = (): JSX.Element => {
         </a>
       </IconButton>
     </div>
-  )
+  );
 }
 export default UserAccessPending;

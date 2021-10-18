@@ -1,5 +1,5 @@
 import { useState, ReactElement, ChangeEvent, ReactNode } from 'react';
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@material-ui/core';
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
 import { FormBaseProps } from 'types/form_types';
 import { Tooltip } from 'components/common';
 

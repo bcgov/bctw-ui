@@ -1,4 +1,4 @@
-import { ButtonProps, OutlinedTextFieldProps, StandardTextFieldProps } from '@material-ui/core';
+import { ButtonProps, OutlinedTextFieldProps, StandardTextFieldProps } from '@mui/material';
 
 const baseInputStyle = { marginRight: '10px', width: '200px' };
 const baseInputProps: Pick<OutlinedTextFieldProps, 'variant'> & Pick<StandardTextFieldProps, 'size'> = {

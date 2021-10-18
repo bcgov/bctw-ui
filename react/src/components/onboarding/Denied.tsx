@@ -1,6 +1,6 @@
 import Icon from '@mdi/react';
 import { mdiAlertCircleOutline, mdiCloseBox } from '@mdi/js';
-import { IconButton } from '@material-ui/core';
+import { IconButton } from '@mui/material';
 import { OnboardUser } from 'types/onboarding';
 import './style.css';
 import { formatDay } from 'utils/time';
@@ -23,7 +23,7 @@ const UserAccessDenied = ({ onboard }: UserAccessDeniedProps): JSX.Element => {
         </>
       ) : null}
 
-      <IconButton color='secondary'>
+      <IconButton color='secondary' size="large">
         <a href='/logout#/logout'>
           <Icon path={mdiCloseBox} size={1}></Icon>
           Log Out

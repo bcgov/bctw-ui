@@ -1,24 +1,25 @@
 import { useState } from 'react';
-import DayjsUtils from '@date-io/dayjs';
 import dayjs, { Dayjs } from 'dayjs';
-import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import { DesktopDatePicker } from '@mui/lab';
 import { formatDay } from 'utils/time';
-import { StandardTextFieldProps } from '@material-ui/core/TextField';
+import TextField, { StandardTextFieldProps } from '@mui/material/TextField';
 import { FormBaseProps } from 'types/form_types';
-import { PropTypes } from '@material-ui/core';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
 export type DateInputProps = FormBaseProps & StandardTextFieldProps & {
   defaultValue: Dayjs;
   minDate?: Dayjs;
   maxDate?: Dayjs;
-  margin?: PropTypes.Margin;
 };
 
 export default function DateInput(props: DateInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName, minDate, maxDate, margin } = props;
+  const { defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
   const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultValue.isValid() ? dayjs(defaultValue) : null);
 
-  const handleDateChange = (djs: Dayjs | null): void => {
+  // fixme: adapterdatefns not working, typed as dayjs but it's a string
+  const handleDateChange = (d: Dayjs): void => {
+    const djs = dayjs(d);
     setSelectedDate(djs);
     if (djs) {
       changeHandler({ [propName]: djs.format(formatDay) });
@@ -26,24 +27,17 @@ export default function DateInput(props: DateInputProps): JSX.Element {
   };
 
   return (
-    <MuiPickersUtilsProvider utils={DayjsUtils}>
-      <DatePicker
-        autoOk={true}
-        inputVariant={'outlined'}
-        disableToolbar
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <DesktopDatePicker
         disabled={props.disabled}
-        size={'small'}
-        variant='dialog'
-        // a plain empty string renders as today?
-        format={dayjs.isDayjs(selectedDate) ? selectedDate.format('YYYY/MM/DD') : ' '}
-        margin={margin ?? 'none'}
+        InputProps={{ size: 'small' }}
+        renderInput={(props): JSX.Element => <TextField {...props} />}
         label={label}
         value={selectedDate}
         onChange={handleDateChange}
-        // KeyboardButtonProps={{ 'aria-label': 'change date' }}
         minDate={minDate}
         maxDate={maxDate}
       />
-    </MuiPickersUtilsProvider>
+    </LocalizationProvider>
   );
 }

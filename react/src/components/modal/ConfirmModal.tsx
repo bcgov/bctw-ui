@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import Modal from 'components/modal/Modal';
 import Button from 'components/form/Button';
 import { ModalBaseProps } from 'components/component_interfaces';

@@ -1,5 +1,4 @@
-import { Box, Button, Divider, Grid, IconButton } from '@material-ui/core';
-import { Close, ArrowForward } from '@material-ui/icons';
+import { Box, Button, Divider, Grid, IconButton } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
@@ -188,8 +187,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         <Box display="flex" justifyContent="space-between" alignItems="center" px={3}>
           <h2>Filters</h2>
           <Box className="drawer-toggle-button">
-            <IconButton color="primary" onClick={handleDrawerOpen}>
-              {open ? <Close /> : <ArrowForward />}
+            <IconButton color="primary" onClick={handleDrawerOpen} size="large">
+              <Icon icon={open ? 'close' : 'forward'} />
             </IconButton>
           </Box>
         </Box>
@@ -315,7 +314,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                           label={MapStrings.customAnimalGroupLabel}
                           changeHandler={handleChangeUDF}
                         />
-                        <IconButton onClick={props.onClickEditUdf}>
+                        <IconButton onClick={props.onClickEditUdf} size="large">
                           <Icon icon='edit' />
                         </IconButton>
                       </div>

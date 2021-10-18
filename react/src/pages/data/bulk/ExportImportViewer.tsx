@@ -1,4 +1,4 @@
-import { ButtonGroup } from '@material-ui/core';
+import { ButtonGroup } from '@mui/material';
 import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import Export from 'pages/data/bulk/Export';

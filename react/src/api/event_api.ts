@@ -6,7 +6,7 @@ import { RemoveDeviceInput } from 'types/collar_history';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
-import { IBulkUploadResults, ApiProps } from './api_interfaces';
+import { API, IBulkUploadResults, ApiProps } from './api_interfaces';
 import { useQueryClient } from 'react-query';
 
 /**
@@ -15,7 +15,7 @@ import { useQueryClient } from 'react-query';
 
 export type WorkflowAPIResponse = true | AxiosError;
 
-export const eventApi = (props: ApiProps) => {
+export const eventApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
 

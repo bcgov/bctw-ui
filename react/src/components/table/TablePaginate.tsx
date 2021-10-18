@@ -1,8 +1,6 @@
 import React from 'react';
-import IconButton from '@material-ui/core/IconButton';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import IconButton from '@mui/material/IconButton';
+import { Icon } from 'components/common';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -32,21 +30,22 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         onClick={handleFirstPageButtonClick}
         disabled={page === 1}
         aria-label="first page"
-      ><FirstPageIcon /></IconButton>
+        size="large"><Icon icon='first' /></IconButton>
 
       <IconButton
         onClick={handleBackButtonClick}
-        disabled={page === 1} 
+        disabled={page === 1}
         aria-label="previous page"
-      ><KeyboardArrowLeft /></IconButton>
+        size="large"><Icon icon='back'/></IconButton>
 
       <span><strong>Page: {page}</strong></span>
 
       <IconButton
         onClick={handleNextButtonClick}
-        disabled={count < rowsPerPage} //{page >= Math.ceil(count / rowsPerPage) - 1}
+        //{page >= Math.ceil(count / rowsPerPage) - 1}
+        disabled={count < rowsPerPage}
         aria-label="next page"
-      ><KeyboardArrowRight /></IconButton>
+        size="large"><Icon icon='first'/></IconButton>
 
       {/* note: goto last page not shown */}
       {/* <IconButton

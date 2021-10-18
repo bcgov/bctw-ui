@@ -1,5 +1,4 @@
-import { DialogProps } from '@material-ui/core';
-import { AlertProps } from '@material-ui/lab/Alert';
+import { AlertProps } from '@mui/material/Alert';
 import { IUpsertPayload } from 'api/api_interfaces';
 
 /**
@@ -8,10 +7,11 @@ import { IUpsertPayload } from 'api/api_interfaces';
  * @param handleClose parent handler when modal is closed
  * @param title modal title string
 */
-type ModalBaseProps = Pick<DialogProps, 'disableBackdropClick' | 'disableEscapeKeyDown'> & {
+type ModalBaseProps = {
   open: boolean;
   handleClose: (v: boolean) => void;
   title?: string;
+  disableBackdropClick?: boolean;
 };
 
 /**

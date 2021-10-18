@@ -4,7 +4,7 @@ import {
   TableHead as MuiTableHead,
   TableRow,
   TableSortLabel,
-} from '@material-ui/core';
+} from '@mui/material';
 import { createHeadCell } from 'components/table/table_helpers';
 import { BCTWBase } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';

@@ -1,4 +1,4 @@
-import { SelectProps, FormControl, InputLabel, Select as MUISelect, MenuItem } from '@material-ui/core';
+import { SelectProps, FormControl, InputLabel, Select as MUISelect, MenuItem, SelectChangeEvent } from '@mui/material';
 import { useState } from 'react';
 
 type BasicSelectProps = SelectProps & {
@@ -13,7 +13,7 @@ type BasicSelectProps = SelectProps & {
 export default function Select({handleChange, defaultValue, label, values }: BasicSelectProps): JSX.Element {
   const [selected, setSelected] = useState(defaultValue ?? '');
 
-  const onChange = (event: React.ChangeEvent<{ value }>): void => {
+  const onChange = (event: SelectChangeEvent<string>): void => {
     const val = event.target.value;
     setSelected(val);
     handleChange(val);

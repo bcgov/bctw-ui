@@ -1,4 +1,4 @@
-import { StandardTextFieldProps, TextField as MuiTextField } from '@material-ui/core';
+import { StandardTextFieldProps, TextField as MuiTextField } from '@mui/material';
 import { baseInputProps, baseInputStyle } from 'components/component_constants';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common_helpers';

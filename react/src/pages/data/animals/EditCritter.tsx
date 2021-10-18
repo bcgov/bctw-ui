@@ -3,7 +3,7 @@ import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
-import { Box, Container } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
@@ -103,7 +103,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
             <Button
               size='large'
               variant='outlined'
-              color='default'
               className='button'
               onClick={(): void => setShowAssignmentHistory((o) => !o)}>
               Device Assignment

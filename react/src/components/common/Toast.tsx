@@ -1,7 +1,7 @@
 import React from 'react';
-import Snackbar from '@material-ui/core/Snackbar';
-import { Portal } from '@material-ui/core';
-import Alert, { AlertProps } from '@material-ui/lab/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import { Portal } from '@mui/material';
+import Alert, { AlertProps } from '@mui/material/Alert';
 
 type IToastProps = Pick<AlertProps, 'severity'> & {
   message: string;

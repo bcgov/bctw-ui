@@ -1,10 +1,6 @@
-import {
-  Theme,
-  Tooltip as MuiTooltip,
-  TooltipProps as MuiTooltipProps,
-  makeStyles,
-  createStyles
-} from '@material-ui/core';
+import { Theme, Tooltip as MuiTooltip, TooltipProps as MuiTooltipProps } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
 import { removeProps } from 'utils/common_helpers';
 
 const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {

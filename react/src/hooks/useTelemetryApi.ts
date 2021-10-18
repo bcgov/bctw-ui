@@ -368,7 +368,7 @@ export const useTelemetryApi = () => {
   
   /** POST a mortality event form */
   const useSaveWorkflowEvent = <T extends BCTWWorkflow<T>>(config: UseMutationOptions<WorkflowAPIResponse, AxiosError, T>): UseMutationResult<WorkflowAPIResponse, AxiosError, T> =>
-    useMutation<WorkflowAPIResponse, AxiosError, T>((body) => eventApi.saveEvent<T>(body), config);
+    useMutation<WorkflowAPIResponse, AxiosError, T>((body) => eventApi.saveEvent(body), config);
   
   /** add or update a user */
   const useSaveUser = (config: UseMutationOptions<User, AxiosError, User>): UseMutationResult<User, AxiosError> =>

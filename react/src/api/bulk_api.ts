@@ -4,10 +4,9 @@ import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { exportEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
 import { useQueryClient } from 'react-query';
+import { API, IBulkUploadResults, IDeleteType } from './api_interfaces';
 
-import { IBulkUploadResults, IDeleteType } from './api_interfaces';
-
-export const bulkApi = (api: AxiosInstance) => {
+export const bulkApi = (api: AxiosInstance): API => {
   const queryClient = useQueryClient();
 
   const invalidateCritters = (): void => {

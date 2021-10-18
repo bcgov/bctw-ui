@@ -1,5 +1,5 @@
-import { OutlinedTextFieldProps, StandardTextFieldProps } from '@material-ui/core';
-import { Box, Button, Grid, TextField } from '@material-ui/core';
+import { OutlinedTextFieldProps, StandardTextFieldProps } from '@mui/material';
+import { Box, Button, Grid, TextField } from '@mui/material';
 import { ReactNode, useContext, useEffect, useState } from 'react';
 import { createUrl } from 'api/api_helpers';
 import { UserContext } from 'contexts/UserContext';

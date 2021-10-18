@@ -1,6 +1,6 @@
 import Icon from '@mdi/react';
 import { mdiCheckAll, mdiLogin, mdiCloseBox } from '@mdi/js';
-import { IconButton } from '@material-ui/core';
+import { IconButton } from '@mui/material';
 import './style.css';
 
 const UserAccessApproved = (): JSX.Element => {
@@ -24,7 +24,7 @@ const UserAccessApproved = (): JSX.Element => {
       </div>
       <div className='description'>Your request for access has been approved</div>
 
-      <IconButton color="secondary" onClick={logOut}>
+      <IconButton color="secondary" onClick={logOut} size="large">
         <a href='/logout#/logout'>
           <Icon
             path={mdiCloseBox}
@@ -34,7 +34,7 @@ const UserAccessApproved = (): JSX.Element => {
         </a>
       </IconButton>
 
-      <IconButton color='primary'>
+      <IconButton color='primary' size="large">
         <a href='/#/map'>
           <Icon
             path={mdiLogin}
@@ -44,6 +44,6 @@ const UserAccessApproved = (): JSX.Element => {
         </a>
       </IconButton>
     </div>
-  )
+  );
 }
 export default UserAccessApproved;

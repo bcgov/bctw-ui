@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import DateTimeInput from 'components/form/DateTimeInput';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography } from '@mui/material';
 import { DataLifeStrings } from 'constants/strings';
 import { DataLifeInput } from 'types/data_life';
 import { Dayjs } from 'dayjs';

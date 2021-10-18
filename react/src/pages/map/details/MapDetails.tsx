@@ -1,11 +1,11 @@
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import { DetailsSortOption, ITelemetryPoint, ITelemetryGroup, OnPanelRowSelect, OnMapRowCellClick, OnlySelectedCritters, MapRange } from 'types/map';
 import Checkbox from 'components/form/Checkbox';
 import { getPointIDsFromTelemetryGroup, getUniqueCritterIDsFromSelectedPings, groupPings } from '../map_helpers';
 import MapExport from 'pages/map/MapExport';
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import { MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { Tooltip } from 'components/common';

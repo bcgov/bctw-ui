@@ -1,10 +1,7 @@
 import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { User } from 'types/user';
-import {
-  IBulkUploadResults,
-  ApiProps
-} from 'api/api_interfaces';
+import { API, IBulkUploadResults, ApiProps } from 'api/api_interfaces';
 import { eCritterPermission, filterOutNonePermissions, IExecutePermissionRequest, IPermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 import { useQueryClient } from 'react-query';
@@ -17,7 +14,7 @@ export interface IGrantCritterAccessResults {
   valid_from: Date;
 }
 
-export const permissionApi = (props: ApiProps) => {
+export const permissionApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
 

@@ -1,4 +1,4 @@
-import { CircularProgress, Typography } from '@material-ui/core';
+import { CircularProgress, Typography } from '@mui/material';
 import { CollarStrings as S, FileStrings } from 'constants/strings';
 import download from 'downloadjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';

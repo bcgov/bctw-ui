@@ -1,4 +1,4 @@
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { parseFormChangeResult } from 'types/form_types';

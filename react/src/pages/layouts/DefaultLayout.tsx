@@ -64,9 +64,9 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   }
 
   // pass these props to the modal to 'force' the user to perform the alert action
-  const disableCloseModalProps: Pick<ModalBaseProps, 'handleClose' | 'disableBackdropClick' | 'disableEscapeKeyDown'> = {
-    disableBackdropClick: true,
-    disableEscapeKeyDown: true,
+  const disableCloseModalProps: Pick<ModalBaseProps, 'handleClose'> = {
+    // disableBackdropClick: true,
+    // disableEscapeKeyDown: true,
     handleClose: mustUpdateAlert ? (): void => { /* dont close */ } : (): void => setShowAlerts(false)
   };
 

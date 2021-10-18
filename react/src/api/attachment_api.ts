@@ -2,7 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollarHistory, CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { attachDeviceEndpoint, getCollarAssignmentHistoryEndpoint, removeDeviceEndpoint, updateDatalifeEndpoint } from 'api/api_endpoint_urls';
-import { ApiProps } from 'api/api_interfaces';
+import { API, ApiProps } from 'api/api_interfaces';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { useQueryClient } from 'react-query';
 
@@ -10,7 +10,7 @@ import { useQueryClient } from 'react-query';
  * api for animal/device relationship endpoints
  */
 
-export const attachmentApi = (props: ApiProps) => {
+export const attachmentApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
 

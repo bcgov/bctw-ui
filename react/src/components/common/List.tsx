@@ -1,4 +1,4 @@
-import { List as MUIList, ListItem } from '@material-ui/core';
+import { List as MUIList, ListItem } from '@mui/material';
 
 type ListProps = {
   values: string[] | JSX.Element[];

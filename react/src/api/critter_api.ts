@@ -1,11 +1,11 @@
 import { getCritterEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
 import { createUrl, postJSON } from 'api/api_helpers';
-import { ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
+import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { plainToClass } from 'class-transformer';
 import { Animal, AttachedAnimal, eCritterFetchType, IAnimal, IAttachedAnimal } from 'types/animal';
 import { useQueryClient } from 'react-query';
 
-export const critterApi = (props: ApiProps) => {
+export const critterApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
 

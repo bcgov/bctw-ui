@@ -6,7 +6,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { OnboardingStatus } from 'types/onboarding';
 import { formatTime } from 'utils/time';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 
 /**
  * # UserOnboarding

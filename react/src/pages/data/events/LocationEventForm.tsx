@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { LocationEvent, eLocationPositionType } from 'types/events/location_event';
 import TextField from 'components/form/TextInput';
 import Radio from 'components/form/Radio';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';

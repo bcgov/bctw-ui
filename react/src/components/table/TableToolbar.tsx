@@ -1,4 +1,5 @@
-import { makeStyles, Box, Toolbar } from '@material-ui/core';
+import { Box, Toolbar } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import TableFilter from './TableFilters';
 import { ITableFilter } from './table_interfaces';
 
@@ -8,7 +9,7 @@ const useToolbarStyles = makeStyles((theme) => ({
     paddingRight: theme.spacing(1)
   },
   highlight:
-    theme.palette.type === 'light'
+    theme.palette.mode === 'light'
       ? { color: theme.palette.secondary.main }
       : { color: theme.palette.text.primary },
 

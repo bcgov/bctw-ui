@@ -1,5 +1,5 @@
 import { ITelemetryDetail, ITelemetryGroup, OnMapRowCellClick, TelemetryDetail } from 'types/map';
-import { Box, TableRow, TableCell, TableBody, Table, TableContainer, Paper, Checkbox } from '@material-ui/core';
+import { Box, TableRow, TableCell, TableBody, Table, TableContainer, Paper, Checkbox } from '@mui/material';
 import { getComparator } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';

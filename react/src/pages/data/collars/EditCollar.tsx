@@ -1,7 +1,7 @@
-import Box from '@material-ui/core/Box';
+import Box from '@mui/material/Box';
 import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
-import Container from '@material-ui/core/Container';
+import Container from '@mui/material/Container';
 import EditModal from 'pages/data/common/EditModal';
 import { AttachedCollar, Collar, collarFormFields, eNewCollarType } from 'types/collar';
 import { EditorProps } from 'components/component_interfaces';

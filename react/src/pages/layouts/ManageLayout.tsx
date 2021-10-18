@@ -1,6 +1,6 @@
 import { AppRoutes } from 'AppRouter';
-import { makeStyles } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
+import makeStyles from '@mui/styles/makeStyles';
+import Box from '@mui/material/Box';
 import SideBar from 'components/sidebar/SideBar';
 
 const useStyles = makeStyles(() => ({

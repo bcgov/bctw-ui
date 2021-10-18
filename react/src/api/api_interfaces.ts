@@ -35,7 +35,11 @@ interface IDeleteType {
   id: string | number; // the uuid
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type API = Record<string, (...args: any) => Promise<any>>;
+
 export type {
+  API,
   ApiProps,
   IBulkUploadError,
   IBulkUploadResults,

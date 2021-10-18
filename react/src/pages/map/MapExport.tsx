@@ -5,7 +5,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
 import download from 'downloadjs';
 import { eExportType, ExportQueryParams } from 'types/export';
-import { CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
+import { CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { omitNull } from 'utils/common_helpers';
 import { ITelemetryGroup, MapRange } from 'types/map';

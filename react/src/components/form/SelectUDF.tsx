@@ -1,9 +1,9 @@
 import 'styles/form.scss';
-import { FormControl, Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
+import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { removeProps } from 'utils/common_helpers';
-import { SelectProps } from '@material-ui/core';
+import { SelectProps } from '@mui/material';
 import { eUDFType, IUDF } from 'types/udf';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError } from 'utils/errors';
@@ -41,7 +41,7 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
   }, [triggerReset]);
 
   // when values are selected, set selected and call the parent handler
-  const handleChange = (event: React.ChangeEvent<{ value }>): void => {
+  const handleChange = (event: SelectChangeEvent<string[]>): void => {
     const selected = event.target.value as string[];
     setValues(selected);
     changeHandler(udfs.filter((u) => selected.includes(u.key)));

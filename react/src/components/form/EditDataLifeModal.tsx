@@ -6,7 +6,7 @@ import DataLifeInputForm from './DataLifeInputForm';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import Button from './Button';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { DataLifeInput, ChangeDataLifeInput } from 'types/data_life';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';

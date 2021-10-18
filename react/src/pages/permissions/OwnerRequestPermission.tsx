@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IconButton, Typography } from '@material-ui/core';
+import { IconButton, Typography } from '@mui/material';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import OwnerLayout from 'pages/layouts/OwnerLayout';
 import { eCritterPermission, IPermissionRequestInput, IUserCritterPermissionInput, ownerPermissionOptions, PermissionRequest, PermissionRequestInput } from 'types/permission';
@@ -11,7 +11,6 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import { Icon, NotificationMessage } from 'components/common';
-import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import DataTable from 'components/table/DataTable';
 import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
@@ -20,19 +19,19 @@ import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access'
  * Page that allows an owner to submit a request to grant other users animal permissions 
 */
 export default function OwnerRequestPermission(): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const responseDispatch = useResponseDispatch();
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
 
-  const [showPickCritterModal, setShowPickCritterModal] = useState<boolean>(false);
+  const [showPickCritterModal, setShowPickCritterModal] = useState(false);
 
   const [permission, setPermission] = useState<IUserCritterPermissionInput>();
 
   const [emailList, setEmailList] = useState<string[]>([]);
-  const [email, setEmail] = useState<string>('');
-  const [emailErr, setEmailErr] = useState<boolean>(false);
-  const [comment, setComment] = useState<string>('');
+  const [email, setEmail] = useState('');
+  const [emailErr, setEmailErr] = useState(false);
+  const [comment, setComment] = useState('');
 
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
 
   // reset error on changing emails
   useDidMountEffect(() => {
@@ -41,7 +40,7 @@ export default function OwnerRequestPermission(): JSX.Element {
 
   const onSuccess = (data): void => {
     console.log('successful request submission', data);
-    responseDispatch({severity: 'success', message: 'permission request submitted succssfully'});
+    showNotif({severity: 'success', message: 'permission request submitted succssfully'});
     setError('');
     reset();
   }
@@ -49,11 +48,11 @@ export default function OwnerRequestPermission(): JSX.Element {
   const onError = (err: AxiosError): void => {
     console.log(err)
     setError(err?.response?.data);
-    responseDispatch({severity: 'error', message: formatAxiosError(err)});
+    showNotif({severity: 'error', message: formatAxiosError(err)});
   }
 
   // setup the API call to POST the permission request
-  const { mutateAsync } = bctwApi.useSubmitPermissionRequest({ onSuccess, onError });
+  const { mutateAsync } = api.useSubmitPermissionRequest({ onSuccess, onError });
 
   // set the selected permission state when saved from the picker modal
   const handleCrittersSelected = (ca: IUserCritterPermissionInput): void => {
@@ -67,7 +66,7 @@ export default function OwnerRequestPermission(): JSX.Element {
     if (!emailList.includes(email)) {
       setEmailList([...emailList, email]);
       setEmail('');
-      responseDispatch({ severity: 'info', message: `${email} added` });
+      showNotif({ severity: 'info', message: `${email} added` });
     }
   };
 
@@ -133,7 +132,7 @@ export default function OwnerRequestPermission(): JSX.Element {
     )
   }
 
-  const listStyle: CSSProperties = { listStyle: 'none', minWidth: '200px', maxWidth: '300px'};
+  const listStyle = { listStyle: 'none', minWidth: '200px', maxWidth: '300px'};
   const renderEmailList = (): JSX.Element => {
     return (
       <ul style={listStyle}>
@@ -246,7 +245,7 @@ export default function OwnerRequestPermission(): JSX.Element {
         <DataTable
           title={'Successful Permission History (approved by an administrator)'}
           headers={PermissionRequest.ownerHistoryPropsToDisplay}
-          queryProps={{ query: bctwApi.usePermissionHistory}}
+          queryProps={{ query: api.usePermissionHistory}}
         />
       </>
     </OwnerLayout>

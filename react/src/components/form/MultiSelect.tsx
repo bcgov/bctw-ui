@@ -1,4 +1,4 @@
-import { Checkbox, FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectProps } from '@material-ui/core';
+import { Checkbox, FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectProps } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 export interface ISelectMultipleData {
@@ -61,11 +61,11 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: ISelec
         MenuProps={{
           anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
           transformOrigin: { vertical: 'top', horizontal: 'left' },
-          getContentAnchorEl: null
+          // getContentAnchorE: null
         }}
         // fixme: why is the input prop is required to have the 'notch' wide enough
         // to not cover the label. works fine in SelectCode without this??
-        input={<OutlinedInput labelWidth={label.length * 7} />}
+        input={<OutlinedInput /*labelWidth={label.length * 7}*/ />}
         style={props.style}
         multiple={true}
         variant={'outlined'}

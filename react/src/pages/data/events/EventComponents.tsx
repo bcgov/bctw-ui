@@ -1,4 +1,4 @@
-import { BoxProps } from '@material-ui/core';
+import { BoxProps } from '@mui/material';
 
 const boxSpreadRowProps: Pick<BoxProps, 'display' | 'justifyContent' | 'alignItems'> = {
   display: 'flex',

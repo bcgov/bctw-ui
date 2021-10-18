@@ -6,7 +6,7 @@ import {
   TableRow,
   Checkbox,
   CircularProgress
-} from '@material-ui/core';
+} from '@mui/material';
 import TableContainer from './TableContainer';
 import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';

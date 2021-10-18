@@ -1,4 +1,4 @@
-import { CircularProgress, IconButton, MenuItem, Select, Typography } from '@material-ui/core';
+import { CircularProgress, IconButton, MenuItem, Select, Typography } from '@mui/material';
 import { List } from 'components/common';
 import { Icon, NotificationMessage } from 'components/common';
 import TextField from 'components/form/TextInput';
@@ -101,7 +101,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const Comment = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].request_comment}</>;
   const GrantPermission = (u: IGroupedRequest): JSX.Element => {
     return (
-      <IconButton onClick={(): void => handleShowConfirm(u, true)}>
+      <IconButton onClick={(): void => handleShowConfirm(u, true)} size="large">
         <Icon icon='done' htmlColor='green' />
       </IconButton>
     );

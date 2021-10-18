@@ -4,11 +4,11 @@ import { eAlertType, ITelemetryAlert, MalfunctionAlert, MortalityAlert, Telemetr
 import { eUDFType, IUDF, IUDFInput } from 'types/udf';
 import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
-import { ApiProps } from 'api/api_interfaces';
+import { API, ApiProps } from 'api/api_interfaces';
 import { useQueryClient } from 'react-query';
 
 
-export const userApi = (props: ApiProps) => {
+export const userApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
 

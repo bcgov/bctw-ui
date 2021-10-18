@@ -1,4 +1,4 @@
-import Box from '@material-ui/core/Box';
+import Box from '@mui/material/Box';
 import Button from 'components/form/Button';
 import DataTable from 'components/table/DataTable';
 import { CollarStrings as S } from 'constants/strings';

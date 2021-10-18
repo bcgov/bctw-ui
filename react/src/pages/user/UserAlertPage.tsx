@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
-import { CircularProgress, IconButton, TableHead } from '@material-ui/core';
+import { CircularProgress, IconButton, TableHead } from '@mui/material';
 import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { AlertContext } from 'contexts/UserAlertContext';
-import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@material-ui/core';
+import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@mui/material';
 import { formatT } from 'utils/time';
 import { Icon } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
@@ -166,7 +166,10 @@ export default function AlertPage(): JSX.Element {
                       <TableCell>{formatT(a.valid_from)}</TableCell>
                       <TableCell>{formatT(a.last_transmission_date)}</TableCell>
                       <TableCell>
-                        <IconButton style={{ padding: '9px', backgroundColor: 'orangered' }} onClick={(): void => editAlert(a)}>
+                        <IconButton
+                          style={{ padding: '9px', backgroundColor: 'orangered' }}
+                          onClick={(): void => editAlert(a)}
+                          size="large">
                           <Icon icon='edit' htmlColor='#fff' />
                         </IconButton>
                       </TableCell>
@@ -175,15 +178,15 @@ export default function AlertPage(): JSX.Element {
                       </TableCell>
                       <TableCell>
                         {!a.isSnoozed && a.snoozesAvailable === 0 ? (
-                          <IconButton disabled={true}>
-                            <Icon icon='warning'></Icon>
+                          <IconButton disabled={true} size="large">
+                            <Icon icon='warning' htmlColor='orange'></Icon>
                           </IconButton>
                         ) : a.isSnoozed ? null : a.snoozesAvailable > 0 ? (
-                          <IconButton onClick={(): void => handleClickSnooze(a)}>
+                          <IconButton onClick={(): void => handleClickSnooze(a)} size="large">
                             <Icon icon='snooze' />
                           </IconButton>
                         ) : (
-                          <IconButton disabled={true}>
+                          <IconButton disabled={true} size="large">
                             <Icon icon='cannotSnooze' />
                           </IconButton>
                         )}

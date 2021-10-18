@@ -6,7 +6,7 @@ import {
   InputLabel,
   MenuItem,
   Select
-} from '@material-ui/core';
+} from '@mui/material';
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { UserContext } from 'contexts/UserContext';
 import Modal from 'components/modal/Modal';

@@ -1,4 +1,4 @@
-import { Chip, Typography } from '@material-ui/core';
+import { Chip, Typography } from '@mui/material';
 import { ExportImportProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import Modal from 'components/modal/Modal';

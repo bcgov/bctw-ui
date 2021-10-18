@@ -1,61 +1,102 @@
-import AccessibilityIcon from '@material-ui/icons/Accessibility';
-import Add from '@material-ui/icons/Add';
-import AlarmOffIcon from '@material-ui/icons/AlarmOff';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import ArrowUpward from '@material-ui/icons/ArrowUpward';
-import CloseIcon from '@material-ui/icons/Close';
-import CodeIcon from '@material-ui/icons/Code';
-import Dashboard from '@material-ui/icons/Dashboard';
-import DoneIcon from '@material-ui/icons/Done';
-import EditIcon from '@material-ui/icons/Edit';
-import ErrorIcon from '@material-ui/icons/Error';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
-import HomeIcon from '@material-ui/icons/Home';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import PersonIcon from '@material-ui/icons/Person';
-import Pets from '@material-ui/icons/Pets'
-import Remove from '@material-ui/icons/Remove';
-import RouterIcon from '@material-ui/icons/Router';
-import ReplayIcon from '@material-ui/icons/Replay';
-import ShareIcon from '@material-ui/icons/Share';
-import SnoozeIcon from '@material-ui/icons/Snooze';
-import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
-import VpnKeyIcon from '@material-ui/icons/VpnKey';
-import WarningIcon from '@material-ui/icons/Warning';
-import { cloneElement } from 'react';
-
-const mappings: Record<string, JSX.Element> = {
-  'arrow-down': <ArrowDownward />,
-  'arrow-up': <ArrowUpward />,
-  admin: <SupervisorAccountIcon />,
-  animals: <Pets />,
-  cannotSnooze: <AlarmOffIcon />,
-  close: <CloseIcon />,
-  code: <CodeIcon />,
-  devices: <RouterIcon />,
-  copy: <FileCopyIcon />,
-  data: <Dashboard />,
-  done: <DoneIcon />,
-  edit: <EditIcon />,
-  error: <ErrorIcon htmlColor='orange' />,
-  home: <HomeIcon />,
-  person: <AccessibilityIcon />,
-  personAdd: <PersonAddIcon />,
-  plus: <Add />,
-  profile: <PersonIcon />,
-  remove: <Remove />,
-  reset: <ReplayIcon />,
-  share: <ShareIcon />,
-  snooze: <SnoozeIcon />,
-  vpnKey: <VpnKeyIcon />,
-  warning: <WarningIcon htmlColor='orange' />,
-};
+import {
+  mdiFileMultiple,
+  mdiClose,
+  mdiAlarmOff,
+  mdiAccountSupervisor,
+  mdiPaw,
+  mdiRouterWireless,
+  mdiArrowUpBold,
+  mdiViewDashboard,
+  mdiCheck,
+  mdiPencil,
+  mdiAlertCircle,
+  mdiMinus,
+  mdiAccount,
+  mdiAccountPlus,
+  mdiAlarmSnooze,
+  mdiAlert,
+  mdiHome,
+  mdiKey,
+  mdiPlus,
+  mdiReplay,
+  mdiShare,
+  mdiHelpCircle,
+  mdiArrowLeft,
+  mdiArrowRight,
+  mdiPageFirst,
+  mdiTrashCanOutline,
+  mdiChartTimelineVariant,
+  mdiMapMarker
+} from '@mdi/js';
+import Icon from '@mdi/react';
 
 type IconProps = {
   icon: string;
   htmlColor?: string;
 };
 
-export default function Icon({ icon, htmlColor }: IconProps): JSX.Element {
-  return cloneElement(mappings[icon], { htmlColor })
+const getIconPath = (path: string): string => {
+  switch (path) {
+    case 'admin':
+      return mdiAccountSupervisor;
+    case 'animals':
+      return mdiPaw;
+    case 'arrow-up':
+      return mdiArrowUpBold;
+    case 'cannotSnooze':
+      return mdiAlarmOff;
+    case 'back':
+      return mdiArrowLeft;
+    case 'close':
+      return mdiClose;
+    case 'copy':
+      return mdiFileMultiple;
+    case 'data':
+      return mdiViewDashboard;
+    case 'delete':
+      return mdiTrashCanOutline;
+    case 'devices':
+      return mdiRouterWireless;
+    case 'done':
+      return mdiCheck;
+    case 'edit':
+      return mdiPencil;
+    case 'error':
+      return mdiAlertCircle;
+    case 'first':
+      return mdiPageFirst;
+    case 'forward':
+      return mdiArrowRight;
+    case 'help':
+      return mdiHelpCircle;
+    case 'home':
+      return mdiHome;
+    case 'key':
+      return mdiKey;
+    case 'location':
+      return mdiMapMarker;
+    case 'person':
+    case 'profile':
+      return mdiAccount;
+    case 'personAdd':
+      return mdiAccountPlus;
+    case 'plus':
+      return mdiPlus;
+    case 'remove':
+      return mdiMinus;
+    case 'reset':
+      return mdiReplay;
+    case 'share':
+      return mdiShare;
+    case 'snooze':
+      return mdiAlarmSnooze;
+    case 'timeline':
+      return mdiChartTimelineVariant;
+    case 'warning':
+      return mdiAlert;
+  }
+};
+
+export default function BCTWIcon({ icon, htmlColor }: IconProps): JSX.Element {
+  return <Icon path={getIconPath(icon)} color={htmlColor} className={'icon'} size={1} />;
 }

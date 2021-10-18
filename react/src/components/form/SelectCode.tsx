@@ -1,11 +1,11 @@
 import 'styles/form.scss';
-import { FormControl, Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
+import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
 import { useState, useEffect, ReactNode } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
 import { removeProps } from 'utils/common_helpers';
-import { SelectProps } from '@material-ui/core';
+import { SelectProps } from '@mui/material';
 import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
@@ -124,14 +124,14 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
   }, [value, hasError])
 
   // default handler when @param multiple is false
-  const handleChange = (event: React.ChangeEvent<{ value }>): void => {
+  const handleChange = (event: SelectChangeEvent<string>): void => {
     setHasError(false);
     const v = event.target.value;
     setValue(v);
   };
 
   // default handler when @param multiple is true
-  const handleChangeMultiple = (event: React.ChangeEvent<{ value }>): void => {
+  const handleChangeMultiple = (event: SelectChangeEvent<string[]>): void => {
     const selected = event.target.value as string[];
     setValues(selected);
     pushChangeMultiple(selected);
@@ -199,7 +199,7 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
             MenuProps={{
               anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
               transformOrigin: { vertical: 'top', horizontal: 'left' },
-              getContentAnchorEl: null
+              // getContentAnchorEl: null
             }}
             value={multiple ? values : value}
             onChange={multiple ? handleChangeMultiple : handleChange}

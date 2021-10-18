@@ -1,12 +1,10 @@
-import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
-import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import { IUpsertPayload } from 'api/api_interfaces';
 import { EditorProps } from 'components/component_interfaces';
 import { IEditModalProps } from 'pages/data/common/EditModal';
 import { cloneElement, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
-import { Box, Button, ButtonProps } from '@material-ui/core';
-import { Tooltip } from 'components/common';
+import { Box, Button, ButtonProps } from '@mui/material';
+import { Icon, Tooltip } from 'components/common';
 import { QueryStatus } from 'react-query';
 import { buttonProps } from 'components/component_constants';
 
@@ -149,7 +147,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
         {/* render add button */}
         {disableAdd ? null : (
           <Tooltip title={addTooltip ?? ''} inline={true}>
-            <Button {...btnProps} variant='contained' startIcon={<AddOutlinedIcon />} onClick={handleClickAdd}>{`Add ${
+            <Button {...btnProps} variant='contained' startIcon={<Icon icon='delete' />} onClick={handleClickAdd}>{`Add ${
               addText ?? ''
             }`}</Button>
           </Tooltip>
@@ -167,7 +165,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
           <Tooltip title={deleteTooltip ?? ''} inline={true}>
             <Button
               {...btnProps}
-              startIcon={<DeleteOutlineOutlinedIcon />}
+              startIcon={<Icon icon='plus' />}
               disabled={cannotEdit || !editing[editing.identifier]}
               onClick={handleClickDelete}>
               {`Delete ${deleteText ?? ''}`}

@@ -1,4 +1,4 @@
-import { Box, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { RouteKey } from 'AppRouter';
 import { Icon, Tooltip } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
