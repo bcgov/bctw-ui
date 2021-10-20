@@ -26,7 +26,7 @@ import {
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
-import { eUDFType, IUDF, IUDFInput } from 'types/udf';
+import { eUDFType, IUDF, UDF } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { ChangeDataLifeInput } from 'types/data_life';
@@ -258,8 +258,8 @@ export const useTelemetryApi = () => {
   /**
    * 
   */
-  const useUDF = (type: eUDFType): UseQueryResult<IUDF[], AxiosError> => {
-    return useQuery<IUDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), {
+  const useUDF = (type: eUDFType): UseQueryResult<UDF[], AxiosError> => {
+    return useQuery<UDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), {
       ...defaultQueryOptions /*, ...{refetchOnMount: true} */
     });
   }
@@ -359,8 +359,8 @@ export const useTelemetryApi = () => {
     useMutation<boolean, AxiosError, IDeleteType>((body) => bulkApi.deleteType(body), config);
 
   /** save user defined animal groups */
-  const useSaveUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDFInput[]>): UseMutationResult<IUDF[]> =>
-    useMutation<IUDF[], AxiosError, IUDFInput[]>((body) => userApi.upsertUDF(body), config);
+  const useSaveUDF = (config: UseMutationOptions<IUDF[], AxiosError, IUDF[]>): UseMutationResult<IUDF[]> =>
+    useMutation<IUDF[], AxiosError, IUDF[]>((body) => userApi.upsertUDF(body), config);
 
   /** expire or snooze a user telemetry alert */
   const useSaveUserAlert = (config: UseMutationOptions<TelemetryAlert[], AxiosError, TelemetryAlert[]>): UseMutationResult<TelemetryAlert[]> =>

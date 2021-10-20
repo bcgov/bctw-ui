@@ -1,43 +1,39 @@
 import { useContext, useEffect, useState } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import {
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select
-} from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { UserContext } from 'contexts/UserContext';
 import Modal from 'components/modal/Modal';
-import TextField from 'components/form/TextInput';
 import { UserCritterAccess } from 'types/animal_access';
 import { ModalBaseProps } from 'components/component_interfaces';
-import { useQueryClient } from 'react-query';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { filterOutNonePermissions } from 'types/permission';
 import PickCritterPermissionModal from 'pages/permissions/PickCritterPermissionModal';
 import EditTable, { EditTableRowAction } from 'components/table/EditTable';
-import { plainToClass } from 'class-transformer';
 import { InboundObj } from 'types/form_types';
+import { CritterDropdown, NumSelected, UDFNameField } from 'pages/udf/UDFComponents';
 
-export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const queryClient = useQueryClient();
-  const responseDispatch = useResponseDispatch();
+type ManageUDFProps = ModalBaseProps & {
+  udf_type: eUDFType;
+};
+
+export default function AddUDF({ open, handleClose, udf_type }: ManageUDFProps): JSX.Element {
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
   const [critters, setCritters] = useState<UserCritterAccess[]>([]);
   const useUser = useContext(UserContext);
-  const [udfs, setUdfs] = useState<IUDF[]>([]);
-  const [showCritterSelection, setShowCritterSelection] = useState<boolean>(false);
-  const [currentUdf, setCurrentUdf] = useState<IUDF>(null);
-  const [canSave, setCanSave] = useState<boolean>(false);
+  const [udfs, setUdfs] = useState<UDF[]>([]);
+  const [showCritterSelection, setShowCritterSelection] = useState(false);
+  const [currentUdf, setCurrentUdf] = useState<IUDF | null>(null);
+  const [canSave, setCanSave] = useState(false);
+  // collective unit udfs can't be deleted or modified.
 
   // fetch UDFs for this user
-  const { data: udfResults, status: udfStatus } = bctwApi.useUDF(eUDFType.critter_group);
+  const { data: udfResults, status: udfStatus } = api.useUDF(udf_type);
   // fetch critters only to display something useful (wlh_id) instead of the uuid
-  const { data: critterResults, status: critterStatus } = bctwApi.useCritterAccess(
+  const { data: critterResults, status: critterStatus } = api.useCritterAccess(
     0, // load all values
-    { user: useUser.user },
+    { user: useUser.user }
   );
 
   // when the udfs are fetched
@@ -57,36 +53,34 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     }
   }, [critterStatus]);
 
-  const onSuccess = (): void => {
-    responseDispatch({ severity: 'success', message: 'user defined groups saved!' });
-    queryClient.invalidateQueries('getUDF');
-  };
+  const onSuccess = (): void => showNotif({ severity: 'success', message: 'user defined groups saved!' });
 
-  const onError = (e): void => {
-    responseDispatch({ severity: 'error', message: `failed to save user defined group: ${e}` });
-  };
+  const onError = (e): void => showNotif({ severity: 'error', message: `failed to save user defined group: ${e}` });
 
   // setup the save mutation to save the UDF
-  const { mutateAsync, isLoading } = bctwApi.useSaveUDF({ onSuccess, onError });
+  const { mutateAsync, isLoading } = api.useSaveUDF({ onSuccess, onError });
 
   const addRow = (): void => {
     const curUdfs = [...udfs];
-    curUdfs.push({ udf_id: 0, user_id: 0, type: eUDFType.critter_group, key: '', value: [], changed: false });
+    curUdfs.push({ type: udf_type, key: '', value: [], changed: false } as UDF);
     setUdfs(curUdfs);
   };
 
-  const deleteRow = (u: IUDF): void => {
+  const deleteRow = (u: UDF): void => {
     setUdfs(udfs.filter((udf) => udf.key !== u.key));
     setCanSave(true);
   };
 
-  const duplicateRow = (u: IUDF): void => {
+  const duplicateRow = (u: UDF): void => {
     const dup = Object.assign({}, u);
     dup.key = '';
     setUdfs([...udfs, dup]);
   };
 
-  // when the group name textfield is modified, update the udf and allow the form to be saved
+  /**
+   * when the group name textfield is modified:
+   * update the udf and allow the form to be saved
+   */
   const handleChangeName = (v: InboundObj, udf: IUDF): void => {
     const newKey = v['group'] as string;
     if (!newKey) {
@@ -101,7 +95,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   };
 
   // when the user clicks the edit button for a udf in the table
-  const handleEditCritters = (udf: IUDF): void => {
+  const handleEditCritterGroup = (udf: IUDF): void => {
     setCurrentUdf(udf);
     setShowCritterSelection(true);
   };
@@ -109,7 +103,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
   /**
    * when user clicks save button in critter selection modal
    * update the current udfs value
-  */
+   */
   const handleCrittersSelected = (critterIDs: string[]): void => {
     setShowCritterSelection(false);
     const thisUDF = Object.assign({}, currentUdf);
@@ -117,14 +111,14 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     thisUDF.value = critterIDs;
     const idx = udfs.findIndex((udf) => udf.key === thisUDF.key);
     const cp = [...udfs];
-    cp[idx] = thisUDF;
+    cp[idx] = thisUDF as any;
     setUdfs(cp);
     setCanSave(true);
   };
 
   /**
    * save the UDFs
-  */
+   */
   const handleSave = (): void => {
     const udfInput = udfs.map((u) => {
       return { key: u.key, value: u.value, type: u.type };
@@ -136,42 +130,6 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
     // setCanSave(false);
     handleClose(false);
   };
-
-  // components to render in the EditTable
-
-  /**
-   * displays critter names (wlh_id/animal_id) from a UDFs value,
-   * this UDFs value is an array of critter_id
-  */
-  const renderCrittersAsDropdown = (u: UDF): JSX.Element => {
-    if (!u) {
-      return <></>
-    }
-    return (
-      <FormControl style={{ width: '100px' }} size='small' variant='outlined' className={'select-small'}>
-        <InputLabel>Show</InputLabel>
-        <Select disabled={u?.value?.length === 0}>
-          {critters
-            .filter((c) => u?.value?.includes(c.critter_id))
-            .map((c: UserCritterAccess) => (
-              <MenuItem key={c.critter_id}>{c.name}</MenuItem>
-            ))}
-        </Select>
-      </FormControl>
-    );
-  };
-
-  // renders a textfield containing the name of the UDF
-  const renderUDFNameField = (u: UDF): JSX.Element => (
-    <TextField
-      changeHandler={(v): void => handleChangeName(v, u)}
-      propName={'group'}
-      defaultValue={u.key}
-      required={true} />
-  )
-
-  // renders a plain table cell 
-  const renderNumCrittersSelected = (u: UDF): JSX.Element => <>{u?.value?.length}</>
 
   const handleRowModified = (u: UDF, action: EditTableRowAction): void => {
     switch (action) {
@@ -185,22 +143,31 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
         deleteRow(u);
         break;
       case 'edit':
-        handleEditCritters(u);
+        handleEditCritterGroup(u);
     }
+  };
+
+  const columns = [];
+  const headers: string[] = [];
+  if (udf_type === eUDFType.critter_group) {
+    headers.push('Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate');
+    columns.push(
+      (u: UDF) => UDFNameField((v) => handleChangeName(v, u), u),
+      (u: UDF) => CritterDropdown(critters, u),
+      (u: UDF) => NumSelected(u)
+    );
+  } else if (udf_type === eUDFType.collective_unit) {
+    headers.push('to', 'do');
+    columns.push();
   }
 
-  const headers = ['Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate'];
   return (
     <Modal open={open} title='Custom Animal Group' handleClose={onClose}>
       {isLoading ? <CircularProgress /> : null}
       <EditTable
         canSave={canSave}
-        columns={[
-          renderUDFNameField,
-          renderCrittersAsDropdown,
-          renderNumCrittersSelected
-        ]}
-        data={udfs.map(d => plainToClass(UDF, d))}
+        columns={columns}
+        data={udfs}
         headers={headers}
         onRowModified={handleRowModified}
         onSave={handleSave}
@@ -210,7 +177,7 @@ export default function AddUDF({ open, handleClose }: ModalBaseProps): JSX.Eleme
           open={showCritterSelection}
           handleClose={(): void => setShowCritterSelection(false)}
           onSave={handleCrittersSelected}
-          alreadySelected={currentUdf.value}
+          alreadySelected={currentUdf.value as string[]}
           filter={filterOutNonePermissions}
           title={`Select Animals For Group ${currentUdf.key}`}
           showSelectPermission={false}

@@ -47,6 +47,7 @@ import {
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
+import { eUDFType } from 'types/udf';
 
 // note: terrain page deprecated for now
 // import Terrain from '../terrain/TerrainPage';
@@ -726,7 +727,7 @@ export default function MapPage(): JSX.Element {
             detail={selectedDetail}
           />
         ) : null}
-        <AddUDF open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)} />
+        <AddUDF udf_type={eUDFType.critter_group} open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)} />
       </div>
     </div>
   );

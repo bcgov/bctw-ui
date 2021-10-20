@@ -1,7 +1,7 @@
 import { createUrl, isDev, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { eAlertType, ITelemetryAlert, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
-import { eUDFType, IUDF, IUDFInput } from 'types/udf';
+import { eUDFType, IUDF, UDF } from 'types/udf';
 import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
 import { API, ApiProps } from 'api/api_interfaces';
@@ -118,16 +118,18 @@ export const userApi = (props: ApiProps): API => {
    * @param udf_type (currently only one udf type defined, critter_group
    * @returns {IUDF[]} that are stored per user
    */
-  const getUDF = async (udf_type: eUDFType): Promise<IUDF[]> => {
+  const getUDF = async (udf_type: eUDFType): Promise<UDF[]> => {
     const url = createUrl({ api: 'get-udf', query: `type=${udf_type}` });
     const { data } = await api.get(url);
-    return data;
+    const converted = data?.map((json) => plainToClass(UDF, json));
+    return converted;
   };
 
   /**
    * replaces the user's existing UDFs with @param {IUDF[]}
+   * todo: use new post handler
    */
-  const upsertUDF = async (udfs: IUDFInput[]): Promise<IUDF[]> => {
+  const upsertUDF = async (udfs: IUDF[]): Promise<IUDF[]> => {
     const url = createUrl({ api: 'add-udf' });
     const { data } = await api.post(url, udfs);
     invalidateUDF();

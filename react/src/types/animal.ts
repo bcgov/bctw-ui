@@ -1,5 +1,4 @@
 import { Transform } from 'class-transformer';
-import { CritterStrings } from 'constants/strings';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { BaseTimestamps, BCTWBase, nullToDayjs, uuid } from 'types/common_types';
