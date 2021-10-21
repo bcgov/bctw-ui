@@ -119,6 +119,25 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
           {CreateFormField(capture, wfFields.get('life_stage'), onChange)}
         </Box>
       ])}
+      {FormSection('c', 'Translocation Details', [
+        <Box {...boxSpreadRowProps}>
+          {<span>{strIsTransloc}</span>}
+          {/* translocation checkbox, controls disabled status of other fields in section */}
+          {CreateFormField(capture, wfFields.get('translocation'), onChange)}
+        </Box >,
+        <Box {...boxSpreadRowProps} mt={1}>
+          {<span>{isTranslocCompleted}</span>}
+          <Button onClick={(): void => handlePostponeSave('release')} disabled={!isTransloc || !canSave} style={{paddingInline: '15px'}}>{WorkflowStrings.capture.btnContinueTo('Release')}</Button>
+        </Box>,
+        <Box {...boxSpreadRowProps}>
+          {<span>{diedDuring('translocation')}</span>}
+          <Button onClick={(): void => handlePostponeSave('mortality')} disabled={!isTransloc || !canSave}>{WorkflowStrings.capture.btnContinueTo('Mortality')}</Button>
+        </Box>,
+        <Box {...boxSpreadRowProps} mt={1}>
+          {CreateFormField(capture, { ...wfFields.get('region'), required: mustPopulate }, onChange, { disabled: !isTransloc || !isTranslocComplete })}
+          {CreateFormField(capture, { ...wfFields.get('population_unit'), required: mustPopulate }, onChange, { disabled: !isTransloc || !isTranslocComplete })}
+        </Box>
+      ])}
       {FormSection('b', 'Release Details', [
         <Box {...boxSpreadRowProps}>
           {<span>{beenReleased}</span>}
@@ -127,25 +146,6 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
         <Box {...boxSpreadRowProps} mt={1}>
           {<span>{diedDuring('capture')}</span>}
           <Button disabled={!canSave} onClick={(): void => handlePostponeSave('mortality')}>{btnContinueTo('Mortality')}</Button>
-        </Box>
-      ])}
-      {FormSection('c', 'Translocation Details', [
-        <Box {...boxSpreadRowProps}>
-          {<span>{strIsTransloc}</span>}
-          {/* translocation checkbox, controls disabled status of other fields in section */}
-          {CreateFormField(capture, wfFields.get('translocation'), onChange)}
-        </Box >,
-        <Box {...boxSpreadRowProps}>
-          {<span>{diedDuring('translocation')}</span>}
-          <Button onClick={(): void => handlePostponeSave('mortality')} disabled={!isTransloc || !canSave}>{WorkflowStrings.capture.btnContinueTo('Mortality')}</Button>
-        </Box>,
-        <Box {...boxSpreadRowProps} mt={1}>
-          {<span>{isTranslocCompleted}</span>}
-          <Button onClick={(): void => handlePostponeSave('release')} disabled={!isTransloc || !canSave} style={{paddingInline: '15px'}}>{WorkflowStrings.capture.btnContinueTo('Release')}</Button>
-        </Box>,
-        <Box {...boxSpreadRowProps} mt={1}>
-          {CreateFormField(capture, { ...wfFields.get('region'), required: mustPopulate }, onChange, { disabled: !isTransloc || !isTranslocComplete })}
-          {CreateFormField(capture, { ...wfFields.get('population_unit'), required: mustPopulate }, onChange, { disabled: !isTransloc || !isTranslocComplete })}
         </Box>
       ])}
       <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>

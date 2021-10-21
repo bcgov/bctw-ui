@@ -1,6 +1,6 @@
 import 'styles/form.scss';
 import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { removeProps } from 'utils/common_helpers';
 import { SelectProps } from '@mui/material';
@@ -16,7 +16,7 @@ type ISelectProps = SelectProps & {
 };
 
 export default function SelectUDF(props: ISelectProps): JSX.Element {
-  const { label, udfType, changeHandler, triggerReset } = props;
+  const { label, udfType, changeHandler, triggerReset, multiple = true } = props;
   const bctwApi = useTelemetryApi();
   const [values, setValues] = useState<string[]>([]);
   const [udfs, setUdfs] = useState<IUDF[]>([]);
@@ -57,7 +57,7 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
         <FormControl size='small' variant={'outlined'} className={'udf-select-control'}>
           <InputLabel>{label}</InputLabel>
           <Select
-            multiple={true}
+            multiple={multiple}
             label={label}
             variant={'outlined'}
             value={values}

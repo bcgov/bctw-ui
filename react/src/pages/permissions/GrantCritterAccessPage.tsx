@@ -2,13 +2,11 @@ import { useState } from 'react';
 import DataTable from 'components/table/DataTable';
 import Button from 'components/form/Button';
 import { User } from 'types/user';
-import { ITableQueryProps } from 'components/table/table_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { Typography } from '@mui/material';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import { useQueryClient } from 'react-query';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { adminPermissionOptions, IUserCritterPermissionInput } from 'types/permission';
@@ -19,34 +17,30 @@ import { IGrantCritterAccessResults } from 'api/permission_api';
  * admin-access only page that allows an admin to grant user-critter permissions
  */
 export default function GrantCritterAccessPage(): JSX.Element {
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
   const [user, setUser] = useState<User>(new User());
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const responseDispatch = useResponseDispatch();
-  const queryClient = useQueryClient();
-
-  const tableProps: ITableQueryProps<User> = { query: bctwApi.useUsers };
+  const [showModal, setShowModal] = useState(false);
 
   // show notification on successful user/critter grant api call
   const onSuccess = (ret: IBulkUploadResults<IGrantCritterAccessResults>): void => {
     const { errors } = ret;
     if (errors.length) {
-      responseDispatch({ severity: 'error', message: `${errors.join()}` });
+      showNotif({ severity: 'error', message: `${errors.join()}` });
     } else {
-      responseDispatch({
+      showNotif({
         severity: 'success',
         message: `animal access granted for users: ${user.uid}`
       });
-      queryClient.invalidateQueries('critterAccess');
     }
   };
 
   const onError = (error: AxiosError): void => {
     console.error(error);
-    responseDispatch({ severity: 'error', message: formatAxiosError(error) });
+    showNotif({ severity: 'error', message: formatAxiosError(error) });
   }
 
-  const { mutateAsync } = bctwApi.useGrantCritterAccess({ onSuccess, onError });
+  const { mutateAsync } = api.useGrantCritterAccess({ onSuccess, onError });
 
   const handleSave = async (body: IUserCritterPermissionInput): Promise<void> => {
     console.log(JSON.stringify(body, null, 2));
@@ -58,12 +52,11 @@ export default function GrantCritterAccessPage(): JSX.Element {
     <AuthLayout>
       <div className='container'>
         <h1>Set Animal Manager</h1>
-        {/* <Typography variant='h5' component='div'>Your role: {userModified.role_type ?? 'unknown'}</Typography> */}
         <Typography variant='body2' component='p'>A user has access to devices through the user-animal association.</Typography>
         <DataTable
           headers={user.displayProps}
           title='Users'
-          queryProps={tableProps}
+          queryProps={{ query: api.useUsers }}
           // when a row is selected from the data table, set the current user
           onSelect={(u: User): void => setUser(u)}
         />

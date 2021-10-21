@@ -22,8 +22,12 @@ export const permissionApi = (props: ApiProps): API => {
     queryClient.invalidateQueries('getRequestHistory');
   }
 
+  const invalidateCritterAccess = (): void => {
+    queryClient.invalidateQueries('critterAccess');
+  }
+
   /**
-   * used in the admin page @file {permissions/GrantCritterAccessPage.tsx}
+   * used in the admin @function GrantCritterAccessPage
    * to grant user's access to animal's and the devices that they are attached to.
   */
   const grantCritterAccessToUser = async (
@@ -32,6 +36,7 @@ export const permissionApi = (props: ApiProps): API => {
     const url = createUrl({ api: 'assign-critter-to-user' });
     const { data } = await api.post(url, [body]);
     const { results, errors } = data;
+    invalidateCritterAccess();
     return { results, errors };
   };
 

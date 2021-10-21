@@ -23,7 +23,6 @@ type MortEventProps = WorkflowFormProps<MortalityEvent> & {
 export default function MortalityEventForm({ event, handleFormChange, handleExitEarly }: MortEventProps): JSX.Element {
   const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
   // business logic workflow state
-  const [wasInvestigated, setWasInvestigated] = useState(false);
   const [isRetrieved, setIsRetrieved] = useState(false);
   const [isPredation, setIsPredation] = useState(false);
   const [isPredatorKnown, setIsPredatorKnown] = useState(false);
@@ -69,8 +68,6 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     } else if (key === 'shouldUnattachDevice') {
       // make attachment end state required if user is removing device
       setIsBeingUnattached(!!value);
-    } else if (key === 'wasInvestigated') {
-      setWasInvestigated(!!value);
     } else if (key === 'isUCODSpeciesKnown') {
       setIsUCODKnown(!!value);
     } else if (key === 'animal_status') {
@@ -135,8 +132,8 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
       {/* critter status fields */}
       {FormSection('mort-critter', 'Animal Details', [
         <Box {...boxSpreadRowProps}>
-          {CreateFormField(mortality, {...fields.wasInvestigated} , onChange, isDisabled)}
-          {CreateFormField(mortality, wfFields.get('mortality_investigation'), onChange, {disabled:!wasInvestigated || critterIsAlive})}
+          {<span>{WorkflowStrings.mortality.mort_investigation}</span>}
+          {CreateFormField(mortality, {required: true, ...wfFields.get('mortality_investigation')}, onChange, {disabled: critterIsAlive})}
         </Box>,
         CreateFormField(mortality, wfFields.get('mortality_report'), onChange, isDisabled, true),
         <Box mt={1}>

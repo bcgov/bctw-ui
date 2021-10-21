@@ -15,7 +15,7 @@ import {
   applyFilter,
   fillPoint,
   getLast10Fixes,
-  getUniqueDevicesFromPings,
+  getUniquePropFromPings,
   groupFilters,
   splitPings,
   getUniqueCritterIDsFromSelectedPings} from 'pages/map/map_helpers';
@@ -48,9 +48,6 @@ import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import { eUDFType } from 'types/udf';
-
-// note: terrain page deprecated for now
-// import Terrain from '../terrain/TerrainPage';
 
 /**
   there are several forms of state in this page:
@@ -470,7 +467,7 @@ export default function MapPage(): JSX.Element {
     if (!fetchedUnassignedTracks) {
       return;
     }
-    const uniqueDeviceIDs = getUniqueDevicesFromPings(up);
+    const uniqueDeviceIDs = getUniquePropFromPings(up) as number[];
     // note: as IUnassignedTelemetryLine
     const filteredTracks = (fetchedUnassignedTracks as any).filter((t) =>
       uniqueDeviceIDs.includes(t.properties.collar_id)
@@ -650,24 +647,13 @@ export default function MapPage(): JSX.Element {
     }
   };
 
-  // return map3D ? (
-  //   <>
-  //     <Terrain />
-  //     <div
-  //       className={'map-icon map-dimension-btn icon-on'}
-  //       onClick={(): void => setMap3D((o) => !o)}
-  //       title={map3D ? 'Switch to 2D view' : 'Switch to 3D view'}>
-  //       <MapIcon />
-  //     </div>
-  //   </>
-  // ) :
   return (
     <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
       <MapFilters
         start={range.start}
         end={range.end}
-        uniqueDevices={getUniqueDevicesFromPings(fetchedPings ?? [])}
-        unassignedDevices={showUnassignedLayers ? getUniqueDevicesFromPings(fetchedUnassignedPings ?? []) : []}
+        uniqueDevices={getUniquePropFromPings(fetchedPings ?? []) as number[]}
+        unassignedDevices={showUnassignedLayers ? getUniquePropFromPings(fetchedUnassignedPings ?? []) as number[] : []}
         onApplyFilters={handleApplyChangesFromFilterPanel}
         onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
         // todo: trigger when filter panel transition is completed without timeout
@@ -675,6 +661,7 @@ export default function MapPage(): JSX.Element {
         onShowLatestPings={handleShowLastKnownLocation}
         onShowLastFixes={handleShowLast10Fixes}
         onShowUnassignedDevices={handleShowUnassignedDevices}
+        collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
@@ -684,15 +671,6 @@ export default function MapPage(): JSX.Element {
         <div id='map'>
           <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
         </div>
-
-        {/* The layer switching button */}
-        {/*
-          <div className={'map-icon map-dimension-btn icon-off'}>
-            { onClick={(): void => setMap3D((o) => !o)} }
-            { title={map3D ? 'Switch to 2D map' : 'Switch to 3D view'}> }
-            <LanguageIcon />
-          </div>
-        */}
 
         <Paper square 
           style={{ height: bottomPanelHeight }}
@@ -727,7 +705,7 @@ export default function MapPage(): JSX.Element {
             detail={selectedDetail}
           />
         ) : null}
-        <AddUDF udf_type={eUDFType.critter_group} open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)} />
+        <AddUDF title={'Custom Animal Groups'} udf_type={eUDFType.critter_group} open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)} />
       </div>
     </div>
   );

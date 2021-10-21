@@ -34,13 +34,15 @@ const NumSelected = (u: UDF): JSX.Element => <>{u?.value?.length}</>;
 
 /**
  * renders a textfield containing the UDF key as the input
+ * used for critter_group udfs
  */
-const UDFNameField = (handleChange: FormChangeEvent, u: UDF): JSX.Element => (
+const UDFNameField = (handleChange: FormChangeEvent, u: UDF, disabled = false): JSX.Element => (
   <TextField
     changeHandler={handleChange}
     propName={'group'}
     defaultValue={u.key}
     required={true}
+    disabled={disabled}
   />
 );
 

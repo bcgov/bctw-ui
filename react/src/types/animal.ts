@@ -21,7 +21,7 @@ export interface IAnimalTelemetryBase {
   animal_id: string;
   animal_status: Code;
   capture_date: Dayjs | Date;
-  collective_unit: string; // fixme: what is this
+  collective_unit: string;
   map_colour: Code;
   species: Code;
   population_unit: Code;

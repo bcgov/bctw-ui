@@ -24,6 +24,7 @@ type MapFiltersProps = {
   end: string;
   uniqueDevices: number[];
   unassignedDevices: number[];
+  collectiveUnits: string[];
   onCollapsePanel: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onClickEditUdf: () => void;
@@ -36,19 +37,19 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const { uniqueDevices, unassignedDevices } = props;
   const classes = drawerStyles();
   // controls filter panel visibility
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState(true);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
-  const [numFiltersSelected, setNumFiltersSelected] = useState<number>(0);
+  const [numFiltersSelected, setNumFiltersSelected] = useState(0);
   // state for start and end ranges (date pickers)
-  const [start, setStart] = useState<string>(props.start);
-  const [end, setEnd] = useState<string>(props.end);
-  const [wasDatesChanged, setWasDatesChanged] = useState<boolean>(false);
+  const [start, setStart] = useState(props.start);
+  const [end, setEnd] = useState(props.end);
+  const [wasDatesChanged, setWasDatesChanged] = useState(false);
   // reset filter button status
-  const [reset, setReset] = useState<boolean>(false);
+  const [reset, setReset] = useState(false);
   // controls apply button disabled status
-  const [applyButtonStatus, setApplyButtonStatus] = useState<boolean>(true);
-  const [isLatestPing, setIsLatestPing] = useState<boolean>(false);
-  const [isLastFixes, setIsLastFixes] = useState<boolean>(false);
+  const [applyButtonStatus, setApplyButtonStatus] = useState(true);
+  const [isLatestPing, setIsLatestPing] = useState(false);
+  const [isLastFixes, setIsLastFixes] = useState(false);
 
   const orLabelStyle = {
     color: '#6d6d6d',
@@ -153,11 +154,16 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     changeFilter(asNormalFilters, 'critter_id');
   };
 
-  const handleChangeDeviceList = (values: ISelectMultipleData[]): void => {
+  // only code_header and description are actually used when applying the filter
+  const handleChangeAutocomplete = (values: ISelectMultipleData[]): void => {
+    if (!values.length) {
+      return;
+    }
+    const header_id = values[0].prop;
     const asFilters: ICodeFilter[] = values.map((v) => {
-      return { code_header: 'device_id', description: v.value as number, code: '', code_header_title: '', id: 0 };
+      return { code_header: v.prop, description: v.value, code: '', code_header_title: '', id: 0 };
     });
-    changeFilter(asFilters, 'device_id');
+    changeFilter(asFilters, header_id);
   };
 
   const handleDrawerOpen = (): void => {
@@ -173,9 +179,15 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     const merged = [...uniqueDevices, ...unassignedDevices].sort((a, b) => a - b);
     return merged.map((d) => {
       const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
-      return { id: d, value: d, displayLabel };
+      return { id: d, value: d, displayLabel, prop: 'device_id' };
     });
   };
+
+  const createCollectiveList = (): ISelectMultipleData[] => {
+    return props.collectiveUnits.map((c, idx) => {
+      return { id: idx, value: c, displayLabel: c, prop: 'collective_unit'}
+    })
+  }
 
   return (
     <Box
@@ -280,7 +292,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                       <AutoComplete
                         label={MapStrings.deviceListLabel}
                         data={createDeviceList()}
-                        changeHandler={handleChangeDeviceList}
+                        changeHandler={handleChangeAutocomplete}
                         triggerReset={reset}
                       />
                     </Tooltip>
@@ -292,6 +304,22 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Box mb={2}>
                 <Grid container spacing={2}>
                   {createMultiSelects()}
+                </Grid>
+              </Box>
+
+              {/* render the collective unit list selector */}
+              <Box mb={2}>
+                <Grid container spacing={2}>
+                  <Grid item sm={12}>
+                    <Tooltip title={<p>{MapStrings.collectiveUnitTooltip}</p>}>
+                      <AutoComplete
+                        label={MapStrings.collectiveUnitLabel}
+                        data={createCollectiveList()}
+                        changeHandler={handleChangeAutocomplete}
+                        triggerReset={reset}
+                      />
+                    </Tooltip>
+                  </Grid>
                 </Grid>
               </Box>
 
@@ -314,7 +342,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                           label={MapStrings.customAnimalGroupLabel}
                           changeHandler={handleChangeUDF}
                         />
-                        <IconButton onClick={props.onClickEditUdf} size="large">
+                        <IconButton onClick={props.onClickEditUdf}>
                           <Icon icon='edit' />
                         </IconButton>
                       </div>

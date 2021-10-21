@@ -9,15 +9,18 @@ import { ModalBaseProps } from 'components/component_interfaces';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { filterOutNonePermissions } from 'types/permission';
 import PickCritterPermissionModal from 'pages/permissions/PickCritterPermissionModal';
-import EditTable, { EditTableRowAction } from 'components/table/EditTable';
+import EditTable, { EditTableRowAction, EditTableVisibilityProps } from 'components/table/EditTable';
 import { InboundObj } from 'types/form_types';
 import { CritterDropdown, NumSelected, UDFNameField } from 'pages/udf/UDFComponents';
 
-type ManageUDFProps = ModalBaseProps & {
+type ManageUDFProps = ModalBaseProps & EditTableVisibilityProps & {
   udf_type: eUDFType;
 };
 
-export default function AddUDF({ open, handleClose, udf_type }: ManageUDFProps): JSX.Element {
+export default function AddUDF(props: ManageUDFProps): JSX.Element {
+  const { open, handleClose, udf_type, hideDelete, hideEdit, hideDuplicate, hideAdd, title } = props;
+  const editTableProps = { hideDelete, hideDuplicate, hideAdd, hideEdit };
+
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
   const [critters, setCritters] = useState<UserCritterAccess[]>([]);
@@ -26,7 +29,6 @@ export default function AddUDF({ open, handleClose, udf_type }: ManageUDFProps):
   const [showCritterSelection, setShowCritterSelection] = useState(false);
   const [currentUdf, setCurrentUdf] = useState<IUDF | null>(null);
   const [canSave, setCanSave] = useState(false);
-  // collective unit udfs can't be deleted or modified.
 
   // fetch UDFs for this user
   const { data: udfResults, status: udfStatus } = api.useUDF(udf_type);
@@ -62,7 +64,7 @@ export default function AddUDF({ open, handleClose, udf_type }: ManageUDFProps):
 
   const addRow = (): void => {
     const curUdfs = [...udfs];
-    curUdfs.push({ type: udf_type, key: '', value: [], changed: false } as UDF);
+    curUdfs.push(new UDF(udf_type));
     setUdfs(curUdfs);
   };
 
@@ -77,18 +79,39 @@ export default function AddUDF({ open, handleClose, udf_type }: ManageUDFProps):
     setUdfs([...udfs, dup]);
   };
 
+  const findUDFIndex = (k: string): number => udfs.findIndex((u) => u.key === k);
+
   /**
    * when the group name textfield is modified:
    * update the udf and allow the form to be saved
    */
-  const handleChangeName = (v: InboundObj, udf: IUDF): void => {
+  const handleChangeCritterGroupName = (v: InboundObj, udf: IUDF): void => {
     const newKey = v['group'] as string;
     if (!newKey) {
       return;
     }
-    const idx = udfs.findIndex((u) => u.key === udf.key);
+    const idx = findUDFIndex(udf.key);
     const cp = [...udfs];
     cp[idx].key = newKey;
+    cp[idx].changed = true;
+    setUdfs(cp);
+    setCanSave(true);
+  };
+
+
+  /**
+   * collective unit key/value are the same
+   * todo: dont enable duplicate keys
+   */
+  const handleChangeCollectiveName = (v: InboundObj, udf: IUDF): void => {
+    const newKey = v['group'] as string;
+    if (!newKey) {
+      return;
+    }
+    const idx = findUDFIndex(udf.key);
+    const cp = [...udfs];
+    cp[idx].key = newKey;
+    cp[idx].value = newKey;
     cp[idx].changed = true;
     setUdfs(cp);
     setCanSave(true);
@@ -120,10 +143,8 @@ export default function AddUDF({ open, handleClose, udf_type }: ManageUDFProps):
    * save the UDFs
    */
   const handleSave = (): void => {
-    const udfInput = udfs.map((u) => {
-      return { key: u.key, value: u.value, type: u.type };
-    });
-    mutateAsync(udfInput);
+    const body = udfs.map((u) => u.toJSON());
+    mutateAsync(body);
   };
 
   const onClose = (): void => {
@@ -149,20 +170,23 @@ export default function AddUDF({ open, handleClose, udf_type }: ManageUDFProps):
 
   const columns = [];
   const headers: string[] = [];
+
   if (udf_type === eUDFType.critter_group) {
     headers.push('Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate');
     columns.push(
-      (u: UDF) => UDFNameField((v) => handleChangeName(v, u), u),
+      (u: UDF) => UDFNameField((v) => handleChangeCritterGroupName(v, u), u),
       (u: UDF) => CritterDropdown(critters, u),
       (u: UDF) => NumSelected(u)
     );
   } else if (udf_type === eUDFType.collective_unit) {
-    headers.push('to', 'do');
-    columns.push();
+    headers.push('Collective Unit Name (cannot be edited or deleted once saved)');
+    columns.push((u: UDF) =>
+      UDFNameField((v) => handleChangeCollectiveName(v, u), u, udfResults.findIndex((v) => v.key === u.key) !== -1)
+    );
   }
 
   return (
-    <Modal open={open} title='Custom Animal Group' handleClose={onClose}>
+    <Modal open={open} title={title} handleClose={onClose}>
       {isLoading ? <CircularProgress /> : null}
       <EditTable
         canSave={canSave}
@@ -171,6 +195,7 @@ export default function AddUDF({ open, handleClose, udf_type }: ManageUDFProps):
         headers={headers}
         onRowModified={handleRowModified}
         onSave={handleSave}
+        {...editTableProps}
       />
       {currentUdf ? (
         <PickCritterPermissionModal

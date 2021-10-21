@@ -13,8 +13,6 @@ const CODE_FILTERS: { header: string; label?: string, filter?: string[] }[] = [
   { header: 'device_status' },
   { header: 'sex' },
   { header: 'population_unit', filter: [] },
-  // fixme: no longer a code?
-  // { header: 'collective_unit', filter: [] }
 ];
 
 export { CODE_FILTERS, DEVICE_STATUS_OPTIONS };

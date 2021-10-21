@@ -7,7 +7,7 @@ import TableContainer from './TableContainer';
 
 export type EditTableRowAction = 'add' | 'delete' | 'duplicate' | 'edit' | 'reset';
 
-type EditTableVisibilityProps = {
+export type EditTableVisibilityProps = {
   hideAll?: boolean;
   hideAdd?: boolean;
   hideDuplicate?: boolean;

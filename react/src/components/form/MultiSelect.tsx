@@ -2,10 +2,11 @@ import { Checkbox, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Sel
 import React, { useEffect, useState } from 'react';
 
 export interface ISelectMultipleData {
-  id: number;
+  id: number | string;
   value: string | number;
   default?: boolean;
   displayLabel?: string;
+  prop?: string;
 }
 
 type ISelectMultipleProps<T extends ISelectMultipleData> = SelectProps & {

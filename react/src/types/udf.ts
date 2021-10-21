@@ -29,6 +29,17 @@ export class UDF implements IUDF, BCTWBase<IUDF> {
   get displayProps(): (keyof IUDF)[] {
     return [];
   }
+  toJSON(): IUDF {
+    const { key, type, value } = this;
+    return { key, type, value }; 
+  }
+
+  constructor(udf_type: eUDFType) {
+    this.key ='';
+    this.value = [];
+    this.changed = false;
+    this.type = udf_type;
+  }
 }
 
 /**
@@ -54,7 +65,6 @@ const transformUdfToCodeFilter = (udfs: IUDF[], udfType: eUDFType): ICodeFilter[
       allValues.push(value);
     }
   })
-  console.log(allValues);
   // assuming each udf is of the same type
   return allValues.map(p => {
     return {code_header: prop, description: p, code: '', code_header_title: '', id: 0 };

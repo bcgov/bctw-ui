@@ -18,9 +18,9 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: IAutoc
     setSelected([]);
   }, [triggerReset]);
 
-  const handleChange = (value: ISelectMultipleData[]): void => {
+  const handleChange = (value: T[]): void => {
     setSelected(value);
-    changeHandler(value as T[]);
+    changeHandler(value);
   };
 
   return (
@@ -34,14 +34,19 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: IAutoc
       options={data}
       renderTags={(value: T[], getTagProps): JSX.Element[] => {
         return value
-          .sort((a, b) => a.id - b.id)
+          .sort((a, b) => {
+            if (typeof a.id === 'number' && typeof b.id === 'number') {
+              return a.id - b.id;
+            }
+            return -1;
+          })
           .map((option: T, index: number) => (
             <Chip variant='outlined' key={option.id} label={option.displayLabel} {...getTagProps({ index })} />
           ));
       }}
       getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel}
       renderInput={(params): JSX.Element => <TextField {...params} label={label} variant='outlined' />}
-      onChange={(e, v): void => handleChange(v as ISelectMultipleData[])}
+      onChange={(e, v): void => handleChange(v)}
     />
   );
 }

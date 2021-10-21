@@ -3,8 +3,7 @@ import { BCTWBase } from 'types/common_types';
 
 export enum eUserRole {
   administrator = 'administrator',
-  // editor = 'editor',
-  owner = 'owner',
+  manager = 'manager',
   observer = 'observer'
 }
 

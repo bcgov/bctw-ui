@@ -3,7 +3,7 @@ import { Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
-import { BCTWBase, nullToDayjs } from 'types/common_types';
+import { BCTWBase, nullToDayjs, PartialPick } from 'types/common_types';
 import { eCritterPermission } from 'types/permission';
 
 export interface IUserCritterAccess
@@ -11,9 +11,8 @@ export interface IUserCritterAccess
   Pick<Animal, 'critter_id' | 'animal_id' | 'species' | 'wlh_id' | 'valid_from' | 'valid_to'>,
   Pick<Collar, 'device_id' | 'device_make' | 'device_type' | 'frequency'> {}
 
-export interface IUserCritterAccessInput
-  extends Partial<Omit<IUserCritterAccess, 'critter_id' | 'permission_type'>>,
-  Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> {}
+export type IUserCritterAccessInput = Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> &
+PartialPick<IUserCritterAccess, 'animal_id' | 'wlh_id'>;
 
 export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritterAccess> {
   permission_type: eCritterPermission;

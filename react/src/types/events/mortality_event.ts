@@ -168,8 +168,6 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     switch (s) {
       case 'attachment_start':
         return 'Capture Date';
-      case 'wasInvestigated':
-        return WorkflowStrings.mortality.mort_investigation;
       case 'mortality_report':
         return WorkflowStrings.mortality.mort_wildlife;
       case 'retrieved':
@@ -201,7 +199,6 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   // mortality event specific fields
   fields: { [Property in keyof MortalitySpecificProps]+?: FormFieldObject<MortalitySpecificProps>; } = {
     data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
-    wasInvestigated: { prop: 'wasInvestigated', type: eInputType.check },
     isUCODSpeciesKnown: { prop: 'isUCODSpeciesKnown', type: eInputType.check },
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check }
   };
@@ -212,9 +209,6 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     const ret = eventToJSON(props, this);
     if (this.onlySaveAnimalStatus) {
       return ret;
-    }
-    if (!this.wasInvestigated) {
-      delete ret.mortality_investigation;
     }
     if (!this.predator_known) {
       delete ret.predator_species_pcod;

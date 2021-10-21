@@ -8,7 +8,8 @@ import {
   ITelemetryGroup,
   ITelemetryLine,
   doesPointArrayContainPoint,
-  PingGroupType
+  PingGroupType,
+  TelemetryDetail
 } from 'types/map';
 
 const MAP_COLOURS = {
@@ -215,15 +216,15 @@ const getUniqueCritterIDsFromSelectedPings = (features: ITelemetryPoint[], selec
   return grped.map((g) => g.critter_id);
 };
 
-const getUniqueDevicesFromPings = (features: ITelemetryPoint[]): number[] => {
+const getUniquePropFromPings = (features: ITelemetryPoint[], prop: keyof TelemetryDetail = 'device_id'): number[] | string[] => {
   const ids = [];
-  features.forEach((f) => {
-    const did = f.properties.device_id;
-    if (!ids.includes(did)) {
-      ids.push(did);
+  features?.forEach((f) => {
+    const val = f.properties[prop];
+    if (val !== null && !ids.includes(val)) {
+      ids.push(val);
     }
   });
-  return ids.sort((a, b) => a -b);
+  return ids.sort((a, b) => a - b);
 };
 
 /**
@@ -343,7 +344,7 @@ export {
   getLast10Tracks,
   getLatestPing,
   getUniqueCritterIDsFromSelectedPings,
-  getUniqueDevicesFromPings,
+  getUniquePropFromPings,
   groupPings,
   groupFilters,
   MAP_COLOURS,

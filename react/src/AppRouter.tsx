@@ -12,6 +12,7 @@ import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import OnboardingAdmin from 'pages/admin/OnboardingAdmin';
+import ManageCollectiveUnits from 'pages/manager/ManageCollectiveUnits';
 
 export type RouteKey = {
   path: string;
@@ -28,6 +29,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'map', path: '/map', title: 'Map', component: MapPage, sort: 1 },
   { name: 'animals', path: '/animals', title: 'My Animals', component: CritterPage, sort: 10, icon: 'animals' },
   { name: 'devices', path: '/devices', title: 'My Devices', component: CollarPage, sort: 11, icon: 'devices' },
+  { name: 'collectiveunits', path: '/collectiveunits', title: 'Collective Units', component: ManageCollectiveUnits, sort: 12, icon: 'data' },
   { name: 'profile', path: '/profile', title: 'My Profile', component: UserProfile, sort: 12, icon: 'profile' },
   { name: 'delegation', path: '/delegation', title: 'Delegation', component: OwnerRequestPermission, sort: 13, icon: 'share' },
   { name: 'import', path: '/import', title: 'Data Import', component: Import, sort: 14, icon: 'arrow-up' },
