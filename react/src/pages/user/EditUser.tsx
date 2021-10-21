@@ -9,6 +9,7 @@ import BasicSelect from 'components/form/BasicSelect';
 import { Box } from '@mui/material';
 import { eInputType } from 'types/form_types';
 import PhoneInput from 'components/form/PhoneInput';
+import { doNothing } from 'utils/common_helpers';
 
 /**
  * the edit user form, implemented in pags/admin/UserAdmin
@@ -24,13 +25,11 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
 
   return (
     <EditModal
-      disableTabs={true} /** users dont have history */
+      disableTabs={true}
       disableHistory={true}
       title={editing?.id ? `Editing ${editing.uid}` : 'Create New User'}
       showInFullScreen={false}
-      onSave={(): void => {
-        /* do nothing, handled in UserAdmin.tsx */
-      }}
+      onSave={doNothing}
       {...props}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
@@ -46,9 +45,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
                       label={'Domain Type'}
                     />
                     <Box mr={2}></Box>
-                    {CreateFormField(editing, { prop: 'username', type: eInputType.text }, handlerFromContext, {
-                      required: true
-                    })}
+                    {CreateFormField(editing, { prop: 'username', type: eInputType.text }, handlerFromContext, {required: true})}
                   </Box>
                 }
                 <Box mt={2} mb={2}>

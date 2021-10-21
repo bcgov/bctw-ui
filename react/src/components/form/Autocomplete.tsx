@@ -1,5 +1,5 @@
 import { Chip, TextField } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete';
+import { Autocomplete as MUIAutocomplete } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { ISelectMultipleData } from './MultiSelect';
 
@@ -10,7 +10,11 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
   data: T[];
 };
 
-export default function MultiSelect<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
+/**
+ * component similar to MultiSelect, but fills the text input with 
+ * tag components when an option is selected
+ */
+export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
   const { label, data, triggerReset, changeHandler } = props;
   const [selected, setSelected] = useState([]);
 
@@ -24,14 +28,15 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: IAutoc
   };
 
   return (
-    <Autocomplete
+    <MUIAutocomplete
       value={selected}
       disableCloseOnSelect={true}
       autoComplete
       size='small'
       multiple
       limitTags={3}
-      options={data}
+      // exclude selected values from the option list
+      options={data.filter(d => selected.findIndex(s => s.id === d.id) === -1)}
       renderTags={(value: T[], getTagProps): JSX.Element[] => {
         return value
           .sort((a, b) => {
@@ -41,11 +46,11 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: IAutoc
             return -1;
           })
           .map((option: T, index: number) => (
-            <Chip variant='outlined' key={option.id} label={option.displayLabel} {...getTagProps({ index })} />
+            <Chip key={option.id} label={option.displayLabel} {...getTagProps({ index })} />
           ));
       }}
       getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel}
-      renderInput={(params): JSX.Element => <TextField {...params} label={label} variant='outlined' />}
+      renderInput={(params): JSX.Element => <TextField {...params} label={label} />}
       onChange={(e, v): void => handleChange(v)}
     />
   );

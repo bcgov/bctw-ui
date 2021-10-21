@@ -9,7 +9,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { useState, useEffect } from 'react';
-import { getUniqueValuesOfT } from 'utils/common_helpers';
+import { doNothing, getUniqueValuesOfT } from 'utils/common_helpers';
 import {
   groupPermissionRequests,
   IExecutePermissionRequest,
@@ -174,7 +174,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
               canSave={false}
               hideSave={true}
               data={requests}
-              onSave={(): void => { /* do nothing */ }}
+              onSave={doNothing}
               onRowModified={(u): void => handleShowConfirm(u as IGroupedRequest, false)}
               hideAdd={true}
               hideEdit={true}

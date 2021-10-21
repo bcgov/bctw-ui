@@ -50,6 +50,12 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param onSave the parent handler called when the save button is clicked
  * @param headerComponent
  */
+/**
+  * fixme: dont need to pass the object being edited to Editmodal, it just needs
+  * an instance of T with the identifier (ex. critter_id) 
+  * to preserve the class methods when save is called
+  * see EditCritter
+  */
 export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<T>): JSX.Element {
   const api = useTelemetryApi();
   const {
@@ -67,12 +73,17 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     showInFullScreen = true
   } = props;
 
-  const [canSave, setCanSave] = useState<boolean>(false);
+  const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr] = useFormHasError();
-  // a copy of the object being edited.
-  const [newObj, setNewObj] = useState<T>(Object.assign({}, editing));
+  /**
+   * a copy of the object being edited.
+   * note: is this necessary, why not just use an empty objects since 
+   * all upserts should only update the changed fields
+   */
+  // const [newObj, setNewObj] = useState<T>(Object.assign({}, editing));
+  const [newObj, setNewObj] = useState<T>({} as T);
   // history-related state
-  const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
 
   const [currentTabID, setCurrentTabID] = React.useState(0);

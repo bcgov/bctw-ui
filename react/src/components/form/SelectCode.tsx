@@ -31,8 +31,6 @@ type CodeSelectProps = FormBaseProps & SelectProps & {
  * @param propname use this field as the key if the code header isn't the same. ex - ear_tag_colour_id
 */
 
-// fixme: in react strictmode the material ui component is warning about deprecated findDOMNode usage
-// todo: add filter option
 export default function SelectCode(props: CodeSelectProps): JSX.Element {
   const {
     addEmptyOption,
@@ -51,7 +49,7 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
   const [value, setValue] = useState<string>(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
-  const [hasError, setHasError] = useState<boolean>(required && !defaultValue ? true : false);
+  const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
 
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
@@ -82,17 +80,20 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
       // if a default was set (a code description, update the value to its actual value)
       // pass false as second param to not update the modals 'is saveable property'
       const found = data.find((d) => d?.description === defaultValue);
+      // update the error status if found
+      if (found?.description && hasError) {
+        setHasError(false);
+      }
       setValue(found?.description ?? '');
     };
     updateOptions();
   }, [isSuccess]);
 
   useEffect(() => {
-    // console.log(`${codeHeader} is required. ${value}`);
-    if (required && !value) {
-      setHasError(true);
+    if ((required && value) || !required) {
+      setHasError(false);
     } else {
-      setHasError(false)
+      setHasError(true);
     }
   }, [required])
 
@@ -151,10 +152,7 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
   /**
    * calls the parent changeHandler function
    * passing an object in the form of 
-   * {
-   *   [propName]: code,
-   *   error: bool
-   * }
+   * { *   [propName]: code, *   error: bool * }
    */
   const pushChange = (v: string): void => {
     const codeObj = codes.find((c) => c?.description === v);
@@ -193,13 +191,12 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
       ) : isLoading || isFetching ? (
         <div>Please wait...</div>
       ) : codes && codes.length ? (
-        <FormControl error={hasError} style={style} size='small' variant={'outlined'} className={`select-control ${hasError ? 'input-error' : ''}`}>
+        <FormControl error={hasError} style={style} size='small' className={`select-control ${hasError ? 'input-error' : ''}`}>
           <InputLabel>{required ? `${label} *` : label}</InputLabel>
           <Select
             MenuProps={{
               anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
               transformOrigin: { vertical: 'top', horizontal: 'left' },
-              // getContentAnchorEl: null
             }}
             value={multiple ? values : value}
             onChange={multiple ? handleChangeMultiple : handleChange}

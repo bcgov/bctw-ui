@@ -12,13 +12,15 @@ import PickCritterPermissionModal from 'pages/permissions/PickCritterPermissionM
 import EditTable, { EditTableRowAction, EditTableVisibilityProps } from 'components/table/EditTable';
 import { InboundObj } from 'types/form_types';
 import { CritterDropdown, NumSelected, UDFNameField } from 'pages/udf/UDFComponents';
+import { columnToHeader } from 'utils/common_helpers';
 
 type ManageUDFProps = ModalBaseProps & EditTableVisibilityProps & {
   udf_type: eUDFType;
+  afterSave?: () => void;
 };
 
 export default function AddUDF(props: ManageUDFProps): JSX.Element {
-  const { open, handleClose, udf_type, hideDelete, hideEdit, hideDuplicate, hideAdd, title } = props;
+  const { open, handleClose, udf_type, hideDelete, hideEdit, hideDuplicate, hideAdd, title, afterSave } = props;
   const editTableProps = { hideDelete, hideDuplicate, hideAdd, hideEdit };
 
   const api = useTelemetryApi();
@@ -55,7 +57,12 @@ export default function AddUDF(props: ManageUDFProps): JSX.Element {
     }
   }, [critterStatus]);
 
-  const onSuccess = (): void => showNotif({ severity: 'success', message: 'user defined groups saved!' });
+  const onSuccess = (): void => {
+    showNotif({ severity: 'success', message: `user defined type ${columnToHeader(udf_type)} saved!` });
+    if (typeof afterSave === 'function') {
+      afterSave();
+    }
+  }
 
   const onError = (e): void => showNotif({ severity: 'error', message: `failed to save user defined group: ${e}` });
 
@@ -74,7 +81,7 @@ export default function AddUDF(props: ManageUDFProps): JSX.Element {
   };
 
   const duplicateRow = (u: UDF): void => {
-    const dup = Object.assign({}, u);
+    const dup = Object.assign(new UDF(u.type), u);
     dup.key = '';
     setUdfs([...udfs, dup]);
   };
@@ -101,7 +108,7 @@ export default function AddUDF(props: ManageUDFProps): JSX.Element {
 
   /**
    * collective unit key/value are the same
-   * todo: dont enable duplicate keys
+   * todo: prevent duplicate keys
    */
   const handleChangeCollectiveName = (v: InboundObj, udf: IUDF): void => {
     const newKey = v['group'] as string;
@@ -129,12 +136,12 @@ export default function AddUDF(props: ManageUDFProps): JSX.Element {
    */
   const handleCrittersSelected = (critterIDs: string[]): void => {
     setShowCritterSelection(false);
-    const thisUDF = Object.assign({}, currentUdf);
+    const thisUDF = Object.assign(new UDF(currentUdf.type), currentUdf);
     thisUDF.changed = true;
     thisUDF.value = critterIDs;
     const idx = udfs.findIndex((udf) => udf.key === thisUDF.key);
     const cp = [...udfs];
-    cp[idx] = thisUDF as any;
+    cp[idx] = thisUDF;
     setUdfs(cp);
     setCanSave(true);
   };
@@ -143,7 +150,7 @@ export default function AddUDF(props: ManageUDFProps): JSX.Element {
    * save the UDFs
    */
   const handleSave = (): void => {
-    const body = udfs.map((u) => u.toJSON());
+    const body = udfs.filter(u => u.changed).map((u) => u.toJSON());
     mutateAsync(body);
   };
 
@@ -174,14 +181,14 @@ export default function AddUDF(props: ManageUDFProps): JSX.Element {
   if (udf_type === eUDFType.critter_group) {
     headers.push('Group Name', 'Animals', '#', 'Edit', 'Delete', 'Duplicate');
     columns.push(
-      (u: UDF) => UDFNameField((v) => handleChangeCritterGroupName(v, u), u),
+      (u: UDF) => UDFNameField((v) => handleChangeCritterGroupName(v, u), u.key),
       (u: UDF) => CritterDropdown(critters, u),
       (u: UDF) => NumSelected(u)
     );
   } else if (udf_type === eUDFType.collective_unit) {
     headers.push('Collective Unit Name (cannot be edited or deleted once saved)');
     columns.push((u: UDF) =>
-      UDFNameField((v) => handleChangeCollectiveName(v, u), u, udfResults.findIndex((v) => v.key === u.key) !== -1)
+      UDFNameField((v) => handleChangeCollectiveName(v, u), u.value as string, udfResults.findIndex((v) => v.key === u.key) !== -1)
     );
   }
 

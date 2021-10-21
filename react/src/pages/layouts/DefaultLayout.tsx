@@ -6,9 +6,9 @@ import { Modal } from 'components/common';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import UserOnboarding from 'pages/onboarding/UserOnboarding';
-import { ModalBaseProps } from 'components/component_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { isDev } from 'api/api_helpers';
+import { doNothing } from 'utils/common_helpers';
 
 type IDefaultLayoutProps = {
   children: React.ReactNode;
@@ -64,10 +64,9 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   }
 
   // pass these props to the modal to 'force' the user to perform the alert action
-  const disableCloseModalProps: Pick<ModalBaseProps, 'handleClose'> = {
-    // disableBackdropClick: true,
-    // disableEscapeKeyDown: true,
-    handleClose: mustUpdateAlert ? (): void => { /* dont close */ } : (): void => setShowAlerts(false)
+  const disableCloseModalProps = {
+    disableBackdropClick: true,
+    handleClose: mustUpdateAlert ? doNothing : (): void => setShowAlerts(false)
   };
 
   return (

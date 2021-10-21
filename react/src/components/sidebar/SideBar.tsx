@@ -38,7 +38,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       curRoutes.push(routes.find((r) => r.name === 'users'));
     }
     if (isOwner) {
-      curRoutes.push(...routes.filter((r) => ['delegation', 'collectiveunits'].includes(r.name)));
+      curRoutes.push(...routes.filter((r) => ['delegation'].includes(r.name)));
     }
     setVisibleRoutes(curRoutes);
   };
@@ -78,7 +78,6 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
             );
           })}
       </List>
-      {/* <div>{sidebarContent}</div> */}
     </Box>
   );
 }

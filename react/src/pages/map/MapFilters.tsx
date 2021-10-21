@@ -337,6 +337,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                       title={<p>{MapStrings.customAnimalGroupTooltip}</p>}>
                       <div className={'side-panel-udf'}>
                         <SelectUDF
+                          className={'udf-select-control'}
                           triggerReset={reset}
                           udfType={eUDFType.critter_group}
                           label={MapStrings.customAnimalGroupLabel}

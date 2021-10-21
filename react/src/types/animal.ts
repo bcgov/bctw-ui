@@ -143,6 +143,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   animal_comment: string;
   @Transform(nullToDayjs) valid_from: Dayjs;
   @Transform(nullToDayjs) valid_to: Dayjs;
+  owned_by_user_id: number; //todo: do this in device
 
   mortality_report: boolean;
   mortality_investigation: Code;
@@ -164,6 +165,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
     delete n.map_colour;
     delete n.valid_from;
     delete n.valid_to;
+    delete n.owned_by_user_id;
     return n;
   }
 
@@ -185,6 +187,10 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   }
   get displayProps(): (keyof Animal)[] {
     return ['species', 'population_unit', 'wlh_id', 'animal_id', 'animal_status'];
+  }
+
+  constructor(critter_id = '') {
+    this.critter_id = critter_id ;
   }
 }
 
@@ -239,13 +245,13 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'juvenile_at_heel', type: eInputType.code },
     { prop: 'juvenile_at_heel_count', type: eInputType.number }
   ],
-  identifierFields: [
-    // todo: tooltip: CritterStrings.wlh_id 
+  identifierFields1: [
     { prop: 'wlh_id', type: eInputType.text },
     { prop: 'animal_id', type: eInputType.text, ...isRequired },
     { prop: 'region', type: eInputType.code, ...isRequired },
     { prop: 'population_unit', type: eInputType.code, ...isRequired },
-    // { prop: 'collective_unit', type: eInputType.text }, // todo:
+  ],
+  identifierFields2: [
     { prop: 'ear_tag_left_colour', type: eInputType.text },
     { prop: 'ear_tag_right_colour', type: eInputType.text },
     { prop: 'ear_tag_left_id', type: eInputType.text },

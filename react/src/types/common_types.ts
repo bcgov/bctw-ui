@@ -25,7 +25,7 @@ export type BCTWFormat<T> = {
  */
 export interface BCTWBase<T> extends BaseTimestamps, BCTWFormat<T> {
   // Animal/Collar types may include this
-  owned_by_user_id?: boolean;
+  owned_by_user_id?: number;
   // used in tables to identify unique rows
   get identifier(): string;
 }

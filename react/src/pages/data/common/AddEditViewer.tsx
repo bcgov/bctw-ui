@@ -108,7 +108,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
   Pick<EditorProps<T>, 'isCreatingNew'> = {
     // if this is a new instance - pass an empty object
     editing: isCreatingNew ? empty : editObj,
-    // required in EditX components (ex. EditCritter)
+    // required in Edit components (ex. EditCritter)
     isCreatingNew,
     open: showModal,
     disableHistory: isCreatingNew,

@@ -33,14 +33,15 @@ const CritterDropdown = (critters: UserCritterAccess[], u: UDF): JSX.Element => 
 const NumSelected = (u: UDF): JSX.Element => <>{u?.value?.length}</>;
 
 /**
- * renders a textfield containing the UDF key as the input
- * used for critter_group udfs
+ * renders a textfield containing
+ * for critter_group udfs, this will be the 'key', since the value is a list of critter_ids
+ * for the simpler udfs like collective_unit, this will be the value
  */
-const UDFNameField = (handleChange: FormChangeEvent, u: UDF, disabled = false): JSX.Element => (
+const UDFNameField = (handleChange: FormChangeEvent, val: string, disabled = false): JSX.Element => (
   <TextField
     changeHandler={handleChange}
     propName={'group'}
-    defaultValue={u.key}
+    defaultValue={val}
     required={true}
     disabled={disabled}
   />

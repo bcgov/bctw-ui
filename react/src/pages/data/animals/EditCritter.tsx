@@ -3,7 +3,7 @@ import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
-import { Box, Container } from '@mui/material';
+import { Box, Container, IconButton } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
@@ -15,6 +15,11 @@ import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
 import { InboundObj, isDisabled } from 'types/form_types';
 import ReleaseEvent from 'types/events/release_event';
+import { Icon } from 'components/common';
+import { eUDFType, IUDF } from 'types/udf';
+import AddUDF from 'pages/udf/AddUDF';
+import SelectUDF from 'components/form/SelectUDF';
+import { MapStrings } from 'constants/strings';
 
 /**
  * the main animal form
@@ -22,11 +27,13 @@ import ReleaseEvent from 'types/events/release_event';
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
+  const canAssignCollectiveUnit = !!(canEdit && !editing.collective_unit);
 
   const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
   const [event, updateEvent] = useState<CaptureEvent | ReleaseEvent | MortalityEvent>(new MortalityEvent());
+  const [showUDFModal, setShowUDFModal] = useState(false);
 
   /**
    * when a workflow button is clicked, update the event type
@@ -100,7 +107,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     associatedAnimalFields,
     captureFields,
     characteristicsFields,
-    identifierFields,
+    identifierFields1, identifierFields2,
     mortalityFields,
     releaseFields,
     animalCommentField
@@ -139,19 +146,47 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   );
 
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit} {...props}>
+    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={new Animal(editing.critter_id)}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
-          const onChange = (v: InboundObj, modifyCanSave = true): void => {
-            handlerFromContext(v, modifyCanSave);
-          };
+          const onChange = (v: InboundObj): void => handlerFromContext(v);
           return (
             <>
+              <AddUDF
+                title='Manage Collective Units'
+                hideDelete={true}
+                hideEdit={true}
+                hideDuplicate={true}
+                udf_type={eUDFType.collective_unit}
+                open={showUDFModal}
+                handleClose={(): void => setShowUDFModal(false)}
+                afterSave={(): void => setShowUDFModal(false)}
+              />
               {FormSection(
                 'cr-ids',
                 'Identifiers',
-                identifierFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
+                [
+                  identifierFields1.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit})),
+                  // render the collective unit select. If the user has modify permission for the animal
+                  // they can add collective units here too
+                  <>
+                    <SelectUDF
+                      style={{ width: '200px'}}
+                      multiple={false}
+                      udfType={eUDFType.collective_unit}
+                      label={MapStrings.collectiveUnitLabel}
+                      changeHandler={(v: IUDF): void => onChange({[eUDFType.collective_unit]: v.value})}
+                    />
+                    {canAssignCollectiveUnit ? (
+                      <IconButton onClick={(): void => setShowUDFModal((o) => !o)}>
+                        <Icon icon='edit' />
+                      </IconButton>
+                    ) : null}
+                    <Box></Box>
+                  </>,
+                  identifierFields2.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
+                ],
               )}
               {FormSection(
                 'cr-chars',
