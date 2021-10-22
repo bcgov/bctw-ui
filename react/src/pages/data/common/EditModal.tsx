@@ -2,7 +2,7 @@ import { IUpsertPayload } from 'api/api_interfaces';
 import { EditModalBaseProps, ModalBaseProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
-import React, { useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
@@ -27,7 +27,7 @@ import { InboundObj } from 'types/form_types';
 import { buttonProps } from 'components/component_constants';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
-  children: React.ReactNode;
+  children: ReactNode;
   hideSave?: boolean;
   disableTabs?: boolean;
   disableHistory?: boolean;
@@ -75,18 +75,12 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
 
   const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr] = useFormHasError();
-  /**
-   * a copy of the object being edited.
-   * note: is this necessary, why not just use an empty objects since 
-   * all upserts should only update the changed fields
-   */
-  // const [newObj, setNewObj] = useState<T>(Object.assign({}, editing));
+  // an empty object to assign changed properties of T to
   const [newObj, setNewObj] = useState<T>({} as T);
-  // history-related state
+  // history-related & tab state
   const [showHistory, setShowHistory] = useState(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
-
-  const [currentTabID, setCurrentTabID] = React.useState(0);
+  const [currentTabID, setCurrentTabID] = useState(0);
 
   // state handler for when the history / current properties tab is selected
   const handleSwitchTab = (newValue: number): void => {
@@ -94,23 +88,16 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   };
 
   // set the history query status
-  useEffect(() => {
-    const updateParams = (): void => {
-      if (editing instanceof Animal) {
-        setHistoryParams({
-          query: api.useCritterHistory,
-          param: editing.critter_id,
-          propsToDisplay: (editing.displayProps) // show all Animal properties
-        });
-      } else if (editing instanceof Collar) {
-        setHistoryParams({
-          query: api.useCollarHistory,
-          param: editing.collar_id,
-          propsToDisplay: (editing.displayProps) // show all Device properties
-        });
-      }
-    };
-    updateParams();
+  useDidMountEffect(() => {
+    const params: Pick<IHistoryPageProps<T>, 'param' | 'propsToDisplay'> = {
+      param: editing[editing.identifier],
+      propsToDisplay: editing.displayProps
+    }
+    if (editing instanceof Animal) {
+      setHistoryParams({ query: api.useCritterHistory, ...params });
+    } else if (editing instanceof Collar) {
+      setHistoryParams({ query: api.useCollarHistory, ...params });
+    }
   }, [editing]);
 
   // when the modal opens, disable save
@@ -162,9 +149,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     handleClose(false);
   };
 
-  const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
-
-  const childrenComponents = (
+  const Children = (
     /**
      * wrap children in the change context provider so they have
      * access to this components handleChange form handler
@@ -227,9 +212,10 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     </ChangeContext.Provider>
   );
 
+  const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
   return showInFullScreen ? (
-    <FullScreenDialog {...modalProps}>{childrenComponents}</FullScreenDialog>
+    <FullScreenDialog {...modalProps}>{Children}</FullScreenDialog>
   ) : (
-    <Modal {...modalProps}>{childrenComponents}</Modal>
+    <Modal {...modalProps}>{Children}</Modal>
   );
 }

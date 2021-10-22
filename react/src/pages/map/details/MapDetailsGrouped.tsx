@@ -39,7 +39,7 @@ const rows_to_render = [
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
   const { pings, crittersSelected, handleShowOverview, handleRowSelected } = props;
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<string>('Critter Name');
+  const [orderBy, setOrderBy] = useState('Critter Name');
   const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
 
   const handleSort = (event: React.MouseEvent<unknown>, property: string): void => {

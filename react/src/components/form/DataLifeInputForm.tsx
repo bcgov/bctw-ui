@@ -52,7 +52,7 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
   const [minDate, setMinDate] = useState<Dayjs>(dli.attachment_start);
   const [maxDate, setMaxDate] = useState<Dayjs>(dli.attachment_end);
 
-  const [isModified, setIsModified] = useState<boolean>(false);
+  const [isModified, setIsModified] = useState(false);
 
   const handleDateOrTimeChange = (d): void => {
     const k = getFirstKey(d);

@@ -26,7 +26,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
   const [currentAttachment, setCurrentAttached] = useState<CollarHistory>(new CollarHistory());
   const [selectedAttachment, setSelectedAttachment] = useState<CollarHistory>(new CollarHistory());
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
-  const [showEditDL, setShowEditDL] = useState<boolean>(false);
+  const [showEditDL, setShowEditDL] = useState(false);
 
   const onNewData = (d: CollarHistory[]): void => {
     setCollarHistory(d);

@@ -20,7 +20,7 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, validate, required } = props;
 
   const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : '');
-  const [err, setErr] = useState<string>('');
+  const [err, setErr] = useState('');
 
   useEffect(() => {
     setVal(typeof defaultValue === 'number' ? defaultValue : '');
@@ -77,9 +77,8 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
 
   return (
     <TextField
-      variant={'outlined'}
-      size={props.size ?? 'small'}
       value={val}
+      size={'small'}
       style={style ?? baseInputStyle}
       onChange={handleChange}
       onBlur={handleBlur}

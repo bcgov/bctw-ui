@@ -7,7 +7,7 @@ type SnackbarWrapperProps = {
 }
 export default function SnackbarWrapper({children}: SnackbarWrapperProps): JSX.Element {
   const responseState = useResponseState();
-  const [showToast, setShowToast] = useState<boolean>(false);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     ((): void => {

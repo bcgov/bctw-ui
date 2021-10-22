@@ -30,7 +30,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const showNotif = useResponseDispatch();
   const { data, status, error } = api.usePermissionRequests();
   const [requests, setRequests] = useState<IGroupedRequest[]>([]);
-  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const [isGrant, setIsGrant] = useState(false);
   const [denyReason, setDenyReason] = useState<PermissionWasDeniedReason>('Not given');

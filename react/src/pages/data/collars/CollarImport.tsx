@@ -20,7 +20,7 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   const bctwApi = useTelemetryApi();
   const styles = bulkStyles();
   const [importType, setImportType] = useState<'keyx' | 'csv' | 'template' | ''>('');
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState('');
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<IBulkUploadError[]>([]);
 

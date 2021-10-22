@@ -3,7 +3,7 @@ import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import Container from '@mui/material/Container';
 import EditModal from 'pages/data/common/EditModal';
-import { AttachedCollar, Collar, collarFormFields, eNewCollarType } from 'types/collar';
+import { AttachedCollar, Collar, collarFormFields } from 'types/collar';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
@@ -12,30 +12,21 @@ import { editEventBtnProps, FormSection } from '../common/EditModalComponents';
 import RetrievalEvent from 'types/events/retrieval_event';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
-import { isDisabled } from 'types/form_types';
+import { isDisabled, parseFormChangeResult } from 'types/form_types';
 import MalfunctionEvent from 'types/events/malfunction_event';
+import { wfFields } from 'types/events/event';
 
-/**
- * todo: reimplement auto defaulting of fields based on collar type select
- * when creating a new device
- */
 export default function EditCollar(props: EditorProps<Collar | AttachedCollar>): JSX.Element {
   const { isCreatingNew, editing } = props;
 
   const isAttached = editing instanceof AttachedCollar;
-
-  // set the collar type when add collar is selected
-  const [collarType, setCollarType] = useState<eNewCollarType>(eNewCollarType.Other);
-  const [newCollar, setNewCollar] = useState<Collar>(editing);
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
 
-  // const [workflowType, setWorkflowType] = useState<WorkflowType>('unknown');
+  const [isVHF, setIsVHF] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+  const [hasDropoff, setHasDropoff] = useState(false);
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
   const [event, updateEvent] = useState(new MalfunctionEvent());
-
-  const close = (): void => {
-    setCollarType(eNewCollarType.Other);
-  };
 
   const createEvent = (type: WorkflowType): MalfunctionEvent | RetrievalEvent => {
     if (type === 'retrieval') {
@@ -71,31 +62,14 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   };
 
   const {
-    communicationFields,
+    frequencyFields,
     deviceOptionFields,
     identifierFields,
     activationFields,
     statusFields,
     retrievalFields,
     malfunctionOfflineFields,
-    deviceCommentField
   } = collarFormFields;
-
-  // const handleChooseCollarType = (type: eNewCollarType): void => {
-  //   setCollarType(type);
-  //   setNewCollar(new Collar(type));
-  // };
-
-  // render the choose collar type form if the add button was clicked
-  // const ChooseCollarType = (
-  //   <>
-  //     <Typography>{CS.addCollarTypeText}</Typography>
-  //     <div color='primary' className={modalClasses.btns}>
-  //       <Button onClick={(): void => handleChooseCollarType(eNewCollarType.VHF)}>{eNewCollarType.VHF}</Button>
-  //       <Button onClick={(): void => handleChooseCollarType(eNewCollarType.Vect)}>{eNewCollarType.Vect}</Button>
-  //     </div>
-  //   </>
-  // );
 
   const Header = (
     <Container maxWidth='xl'>
@@ -126,39 +100,61 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   );
 
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit} onReset={close} {...props}>
+    <EditModal headerComponent={Header} hideSave={!canEdit} onReset={close} {...props} editing={new Collar(editing.collar_id)}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
           // do form validation before passing change handler to EditModal
           const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
             handlerFromContext(v, modifyCanSave);
+            const [key, value] = parseFormChangeResult<Collar>(v);
+            if (key === 'device_type') {
+              setIsVHF(value === 'VHF');
+            } else if (key === 'activation_status') {
+              setIsActive(!!value);
+            } else if (key === 'dropoff_device_id') {
+              setHasDropoff(!!value);
+            }
           };
           return (
             <>
               {FormSection(
-                'device-ids',
+                'd-ids',
                 'Identifiers',
                 identifierFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
               )}
               {FormSection(
-                'device-sat',
-                'Satellite Network and Beacon Frequency',
-                communicationFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
+                'd-sat',
+                'Satellite Network and Beacon Frequency', [
+                  CreateFormField(editing, wfFields.get('device_type'), onChange),
+                  CreateFormField(editing, {...wfFields.get('satellite_network'), required: !isVHF}, onChange, {disabled: isVHF }),
+                  frequencyFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
+                ]
               )}
               {FormSection(
-                'device-add',
-                'Additional Device Sensors and Beacons',
-                activationFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
-              )}
-              {FormSection(
-                'device-activ',
-                'Warranty & Activation Details',
-                deviceOptionFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
-              )}
-              {FormSection(
-                'device-status',
+                'd-status',
                 'Device Status',
                 statusFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
+              )}
+              {FormSection(
+                'd-add',
+                'Additional Device Sensors and Beacons', [
+                  CreateFormField(editing, wfFields.get('activation_status'), onChange),
+                  activationFields.map((f) => CreateFormField(editing, {...f, required: isActive}, onChange, { disabled: !canEdit || !isActive })),
+                  CreateFormField(editing, wfFields.get('activation_comment'), onChange, { disabled: !isActive}),
+                ]
+              )}
+              {FormSection(
+                'd-activ',
+                'Warranty & Activation Details', [
+                  CreateFormField(editing, wfFields.get('camera_device_id'), onChange),
+                  CreateFormField(editing, wfFields.get('dropoff_device_id'), onChange),
+                  deviceOptionFields.map((f) => CreateFormField(editing, {...f, required: hasDropoff}, onChange, { disabled: !canEdit || !hasDropoff }))
+                ]
+              )}
+              {FormSection(
+                'd-comment',
+                'Comments About this Device',
+                [CreateFormField(editing, wfFields.get('device_comment'), onChange, { disabled: !isActive})]
               )}
               {/**
                * hide the workflow related fields entirely when creating a new collar
@@ -168,7 +164,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
               {!isCreatingNew ? (
                 <>
                   {FormSection(
-                    'device-ret',
+                    'd-ret',
                     'Record Retrieval Details',
                     retrievalFields.map((f) => CreateFormField(editing, f, onChange, { ...isDisabled })),
                     <Button
@@ -179,7 +175,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                     </Button>
                   )}
                   {FormSection(
-                    'device-malf',
+                    'd-malf',
                     'Record Malfunction & Offline Details',
                     malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange, { ...isDisabled })),
                     <Button
@@ -188,11 +184,6 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                       onClick={(): void => handleOpenWorkflow('malfunction')}>
                       Record Malfunction & Offline Details
                     </Button>
-                  )}
-                  {FormSection(
-                    'device-comment',
-                    'Comments About this Device',
-                    deviceCommentField.map((f) => CreateFormField(editing, f, onChange))
                   )}
                   <WorkflowWrapper
                     open={showWorkflowForm}

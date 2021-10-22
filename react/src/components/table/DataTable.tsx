@@ -48,7 +48,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState<number>(1);
-  const [rowIdentifier, setRowIdentifier] = useState<string>('id');
+  const [rowIdentifier, setRowIdentifier] = useState('id');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const isPaginate = paginate && !DISABLE_PAGINATION;
   /**

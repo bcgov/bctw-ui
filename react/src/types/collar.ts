@@ -3,7 +3,7 @@ import { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Code } from 'types/code';
 import { BCTWBase, nullToDayjs, uuid } from 'types/common_types';
-import { eInputType, FormFieldObject } from 'types/form_types';
+import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
 import { DataLife } from './data_life';
@@ -109,20 +109,8 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   }
   get identifier(): string { return 'collar_id' }
 
-  // fixme: 
-  constructor(collar_type?: eNewCollarType) {
-    this.activation_status = false;
-    if (collar_type) {
-      switch (collar_type) {
-        case eNewCollarType.VHF:
-          this.device_make = 'ATS';
-          this.device_type = 'VHF';
-          return;
-        case eNewCollarType.Vect:
-          this.device_type = 'VHF + GPS';
-          return;
-      }
-    }
+  constructor(collar_id = '') {
+    this.collar_id = collar_id;
   }
 
   formatPropAsHeader(str: keyof Collar): string {
@@ -180,35 +168,33 @@ export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<
 }
 
 export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
-  communicationFields: [
-    { prop: 'device_type', type: eInputType.code },
-    { prop: 'satellite_network', type: eInputType.code },
-    { prop: 'frequency', type: eInputType.number },
-    { prop: 'frequency_unit', type: eInputType.code },
-    { prop: 'fix_interval', type: eInputType.number },
-    { prop: 'fix_interval_unit', type: eInputType.code, codeName: 'fix_unit' },
+  frequencyFields: [
+    { prop: 'frequency', type: eInputType.number, ...isRequired },
+    { prop: 'frequency_unit', type: eInputType.code, ...isRequired },
+    { prop: 'fix_interval', type: eInputType.number, ...isRequired },
+    { prop: 'fix_interval_unit', type: eInputType.code, ...isRequired, codeName: 'fix_unit' },
   ],
   deviceOptionFields: [
-    { prop: 'camera_device_id', type: eInputType.number },
-    { prop: 'dropoff_device_id', type: eInputType.number },
     { prop: 'dropoff_frequency', type: eInputType.number },
     { prop: 'dropoff_frequency_unit', type: eInputType.code, codeName: 'frequency_unit' },
   ],
   identifierFields: [
-    { prop: 'device_id', type: eInputType.number, required: true },
-    { prop: 'device_make', type: eInputType.code, required: true },
-    { prop: 'device_model', type: eInputType.text }
+    { prop: 'device_id', type: eInputType.number, ...isRequired },
+    { prop: 'device_make', type: eInputType.code, ...isRequired },
+    { prop: 'device_model', type: eInputType.text, ...isRequired }
+  ],
+  isActiveField: [
+    { prop: 'activation_status', type: eInputType.check },
+    { prop: 'activation_comment', type: eInputType.multiline}
   ],
   activationFields: [
-    { prop: 'activation_status', type: eInputType.check },
     { prop: 'first_activation_year', type: eInputType.number },
     { prop: 'first_activation_month', type: eInputType.number },
-    { prop: 'activation_comment', type: eInputType.number }
   ],
   statusFields: [
-    { prop: 'device_status', type: eInputType.code },
-    { prop: 'device_deployment_status', type: eInputType.code, required: true },
-    { prop: 'device_condition', type: eInputType.code, required: true },
+    { prop: 'device_status', type: eInputType.code, ...isRequired },
+    { prop: 'device_deployment_status', type: eInputType.code, ...isRequired },
+    { prop: 'device_condition', type: eInputType.code, ...isRequired },
   ],
   retrievalFields: [
     { prop: 'retrieved', type: eInputType.check },
@@ -223,8 +209,13 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'offline_comment', type: eInputType.multiline},
     { prop: 'malfunction_comment', type: eInputType.multiline},
   ],
-  deviceCommentField: [
-    { prop: 'device_comment', type: eInputType.text }
+  // fields that are rendered individually due to form state
+  otherFields: [
+    { prop: 'device_comment', type: eInputType.multiline},
+    { prop: 'device_type', type: eInputType.code, ...isRequired },
+    { prop: 'satellite_network', type: eInputType.code },
+    { prop: 'camera_device_id', type: eInputType.number },
+    { prop: 'dropoff_device_id', type: eInputType.number },
   ]
 }
 

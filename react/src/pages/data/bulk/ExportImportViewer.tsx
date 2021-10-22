@@ -21,8 +21,8 @@ export type IImportExportProps<T> = {
  * and control their modal show/hide status with a button group
  */
 export default function ImportExportViewer<T>({ data, iTitle, iMsg, eTitle, eMsg, downloadTemplate, iDisabled = false, eDisabled = false }: IImportExportProps<T>): JSX.Element {
-  const [showExportModal, setShowExportModal] = useState<boolean>(false);
-  const [showImportModal, setShowImportModal] = useState<boolean>(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const handleClickExport = (): void => setShowExportModal(o => !o);
 

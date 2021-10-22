@@ -53,7 +53,7 @@ export default function PickCritterPermissionModal({
   const [user, setUser] = useState<User>(userToLoad ?? useUser.user);
   // table row selected state
   const [critterIDs, setCritterIDs] = useState<string[]>([]);
-  const [canSave, setCanSave] = useState<boolean>(false);
+  const [canSave, setCanSave] = useState(false);
   /**
    * state for each of the column select components rendered in the table
    * only used when @param showSelectPermission is true

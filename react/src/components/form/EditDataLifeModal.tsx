@@ -27,7 +27,7 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   const bctwApi = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
-  const [canSave, setCanSave] = useState<boolean>(false);
+  const [canSave, setCanSave] = useState(false);
   const [dli, setDli] = useState<DataLifeInput>(attachment.createDataLife());
 
   useDidMountEffect(() => {

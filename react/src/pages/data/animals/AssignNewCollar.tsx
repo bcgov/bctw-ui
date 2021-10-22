@@ -26,7 +26,7 @@ type IAssignNewCollarModal = Pick<Animal, 'critter_id'> & {
 export default function AssignNewCollarModal({ critter_id, dli, onClose, show, onSave }: IAssignNewCollarModal): JSX.Element {
   const bctwApi = useTelemetryApi();
 
-  const [collarId, setCollarId] = useState<string>('');
+  const [collarId, setCollarId] = useState('');
   const [ DLInput ] = useState<DataLifeInput>(dli);
 
   const handleSelectDevice = (row: Collar): void => setCollarId(row.collar_id);

@@ -56,7 +56,7 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: ISelec
   }, [triggerReset]);
 
   return (
-    <FormControl size='small' variant={'outlined'} className={'select-control'}>
+    <FormControl size='small' className={'select-control'}>
       <InputLabel>{label}</InputLabel>
       <Select
         MenuProps={{

@@ -17,7 +17,7 @@ export default function CollarPage(): JSX.Element {
   const bctwApi = useTelemetryApi();
 
   const [editObj, setEditObj] = useState<Collar | AttachedCollar>({} as Collar);
-  const [showImport, setShowImport] = useState<boolean>(false);
+  const [showImport, setShowImport] = useState(false);
 
   // set editing object when table row is selected
   const handleSelect = <T extends Collar,>(row: T): void => {

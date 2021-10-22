@@ -20,9 +20,9 @@ export default function Select({handleChange, defaultValue, label, values }: Bas
   };
 
   return (
-    <FormControl className={'select-control-small'} variant={'outlined'}>
+    <FormControl className={'select-control-small'} size='small'>
       <InputLabel>{label}</InputLabel>
-      <MUISelect onChange={onChange} value={selected} variant={'outlined'} required={true}>
+      <MUISelect onChange={onChange} value={selected} required={true}>
         {values.map((v, idx) => (
           <MenuItem key={`${idx}-${v}`} value={v}>
             {v}

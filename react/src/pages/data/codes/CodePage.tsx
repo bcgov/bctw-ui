@@ -6,18 +6,18 @@ import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import React, { useState } from 'react';
-import { CodeFormFields, CodeHeader, CodeHeaderInput, ICodeHeader } from 'types/code';
+import { CodeFormFields, CodeHeader, CodeHeaderInput } from 'types/code';
 import { formatAxiosError } from 'utils/errors';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import EditCodeHeader from 'pages/data/codes/EditCodeHeader';
-import { IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
+import { IUpsertPayload } from 'api/api_interfaces';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import ManageLayout from 'pages/layouts/ManageLayout';
 
 const CodePage: React.FC = () => {
   const [header, setHeader] = useState('animal_status');
-  const [title, setTitle] = useState<string>('');
-  const bctwApi = useTelemetryApi();
+  const [title, setTitle] = useState('');
+  const api = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
   const onSuccess = (data): void => {
@@ -36,13 +36,13 @@ const CodePage: React.FC = () => {
     setTitle(c.title);
   };
 
-  const { mutateAsync } = bctwApi.useSaveCodeHeader({ onSuccess });
+  const { mutateAsync } = api.useSaveCodeHeader({ onSuccess });
 
   const handleSave = async (p: IUpsertPayload<CodeHeaderInput>): Promise<void> => {
     await mutateAsync(p.body);
   }
 
-  const { isFetching, isLoading, isError, error, data, status } = bctwApi.useCodeHeaders();
+  const { isFetching, isLoading, isError, error, data, status } = api.useCodeHeaders();
 
   const importProps = {
     iMsg: S.importText,
@@ -84,7 +84,7 @@ const CodePage: React.FC = () => {
               headers={CodeHeader.getProps() as any}
               title={`${title} Codes`}
               queryProps={{
-                query: bctwApi.useCodes,
+                query: api.useCodes,
                 param: header,
                 // onNewData: (v): void => console.log(JSON.stringify(v[0]), null)
               }}

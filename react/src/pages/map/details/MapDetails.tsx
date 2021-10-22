@@ -51,7 +51,7 @@ export default function MapDetails({
   // state for the 'checked' rows in the table
   const [pingGroupChecked, setPingGroupChecked] = useState<ITelemetryGroup[]>([]);
 
-  const [showOnlySelected, setShowOnlySelected] = useState<boolean>(false);
+  const [showOnlySelected, setShowOnlySelected] = useState(false);
   const [sort] = useState<DetailsSortOption>('wlh_id');
 
   // upon initial load, display all critters in bottom panel

@@ -95,23 +95,23 @@ export default function MapPage(): JSX.Element {
   const [selectedPingIDs, setSelectedPingIDs] = useState<number[]>([]);
 
   // modal states - overview, export, udf editing
-  const [showOverviewModal, setShowModal] = useState<boolean>(false);
+  const [showOverviewModal, setShowModal] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
   const [overviewType, setOverviewType] = useState<BCTWType>();
-  const [showExportModal, setShowExportModal] = useState<boolean>(false);
-  const [showUdfEdit, setShowUdfEdit] = useState<boolean>(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showUdfEdit, setShowUdfEdit] = useState(false);
 
   // state tracking whether or not unassigned device layers are shown
-  const [showUnassignedLayers, setShowUnassignedLayers] = useState<boolean>(false);
+  const [showUnassignedLayers, setShowUnassignedLayers] = useState(false);
 
   // filter state
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
 
   // state for tracking filters that limit map layers
-  const [isMapOnlyFilterApplied, setIsMapOnlyFilterApplied] = useState<boolean>(false);
+  const [isMapOnlyFilterApplied, setIsMapOnlyFilterApplied] = useState(false);
   const [onlySelected, setOnlySelected] = useState<OnlySelectedCritters>({ show: false, critter_ids: [] });
-  const [onlyLastKnown, setOnlyLastKnown] = useState<boolean>(false);
-  const [onlyLast10, setOnlyLast10] = useState<boolean>(false);
+  const [onlyLastKnown, setOnlyLastKnown] = useState(false);
+  const [onlyLast10, setOnlyLast10] = useState(false);
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();

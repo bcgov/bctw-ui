@@ -36,11 +36,11 @@ export default function PerformAssignmentAction({
   const queryClient = useQueryClient();
   const responseDispatch = useResponseDispatch();
   // modal state
-  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
-  const [showAvailableModal, setShowAvailableModal] = useState<boolean>(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showAvailableModal, setShowAvailableModal] = useState(false);
   // is a device being attached or removed?
-  const [isLink, setIsLink] = useState<boolean>(!!current_attachment?.collar_id);
-  const [canEdit, setCanEdit] = useState<boolean>(false);
+  const [isLink, setIsLink] = useState(!!current_attachment?.collar_id);
+  const [canEdit, setCanEdit] = useState(false);
   /**
    * data life state. passed to both modals for attaching/removing devices
    * if there is no attachment, pass true as second param of DataLifeInput constructor to 
