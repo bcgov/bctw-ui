@@ -11,23 +11,16 @@ import Button from 'components/form/Button';
 import { IBulkUploadError, IBulkUploadResults } from 'api/api_interfaces';
 import { Collar } from 'types/collar';
 import { AxiosError } from 'axios';
-import { useQueryClient } from 'react-query';
 import bulkStyles from 'pages/data/bulk/bulk_styles';
 
 type CollarImportProps = ModalBaseProps & {
 };
 export default function CollarImport({ open, handleClose }: CollarImportProps): JSX.Element {
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
   const styles = bulkStyles();
   const [importType, setImportType] = useState<'keyx' | 'csv' | 'template' | ''>('');
   const [message, setMessage] = useState('');
-  const queryClient = useQueryClient();
   const [errors, setErrors] = useState<IBulkUploadError[]>([]);
-
-  // when successful posts are made to add new collars, refetch the collar page
-  const invalidate = (): void => {
-    queryClient.invalidateQueries('collartype');
-  };
 
   const onSuccessKeyx = (response: IBulkUploadResults<Collar>): void => {
     if (response.errors.length) {
@@ -35,7 +28,6 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
     } else {
       const newkeyx = response.results.map((r) => r.device_id).join(', ');
       setMessage(`devices ${newkeyx} were successfully registered!`);
-      invalidate();
     }
   };
 
@@ -46,7 +38,6 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
     } else {
       const newkeyx = response.results.map((r) => r.device_id).join(', ');
       setMessage(`devices ${newkeyx} were successfully updated!`);
-      invalidate();
     }
   };
 
@@ -71,13 +62,13 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   };
 
   // the bulk file handler mutation for importing .keyx files
-  const { mutateAsync: mutateKeyx, reset: resetKeyx, isLoading: isPostingKeyx } = bctwApi.useUploadXML({
+  const { mutateAsync: mutateKeyx, reset: resetKeyx, isLoading: isPostingKeyx } = api.useUploadXML({
     onSuccess: onSuccessKeyx,
     onError
   });
 
   // the single file mutation for importing a single .csv file with metadata
-  const { mutateAsync: mutateCsv, reset: resetCsv, isLoading: isPostingCsv } = bctwApi.useUploadCSV({
+  const { mutateAsync: mutateCsv, reset: resetCsv, isLoading: isPostingCsv } = api.useUploadCSV({
     onSuccess: onSuccessCsv,
     onError
   });
@@ -93,7 +84,8 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   };
 
   const onDownloadTemplate = (): void => {
-    download(Object.keys(new Collar()).join(), FileStrings.collarTemplateName, '');
+    const headers = Collar.toCSVHeaderTemplate;
+    download(headers.join(), FileStrings.collarTemplateName, '');
   };
 
   return (

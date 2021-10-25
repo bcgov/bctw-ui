@@ -121,7 +121,6 @@ export const UserStateContextProvider: React.FC = (props) => {
     updated.firstname = given_name;
     updated.lastname = family_name;
     updated.username = username;
-    // note: idir/bceid can change.
     if (domain === 'bceid') {
       updated.bceid = username;
       delete updated.idir;

@@ -11,7 +11,7 @@ import { BCTWBase } from 'types/common_types';
  */
 export type BasicTableProps<T> = IPlainTableProps<T> & {
   data: T[];
-  rowIdentifier: keyof T;
+  rowIdentifier: string;
 };
 
 export default function BasicTable<T extends BCTWBase<T>>({

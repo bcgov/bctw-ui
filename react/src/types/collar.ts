@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Code } from 'types/code';
@@ -68,7 +68,7 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   activation_status: boolean;
   readonly collar_id: uuid;
   camera_device_id: number;
-  readonly collar_transaction_id: uuid;
+  @Exclude() collar_transaction_id: uuid;
   device_id: number;
   device_deployment_status: Code;
   device_make: Code;
@@ -143,6 +143,12 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
 
   get displayProps(): (keyof Collar)[] {
     return Collar.propsToDisplay;
+  }
+
+  static get toCSVHeaderTemplate(): string[] {
+    const excluded: (keyof Collar)[] = ['collar_transaction_id'];
+    const keys = Object.keys(new Collar()).filter(k => !(excluded as string[]).includes(k));
+    return keys;
   }
 }
 

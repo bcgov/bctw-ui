@@ -4,7 +4,7 @@ import { CritterStrings as CS } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
-// import ExportImportViewer, { IImportExportProps } from 'pages/data/bulk/ExportImportViewer';
+import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
@@ -12,7 +12,6 @@ import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
-// import download from 'downloadjs';
 
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
@@ -20,25 +19,14 @@ export default function CritterPage(): JSX.Element {
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
 
   // for exporting state
-  // const [critterA, setCrittersA] = useState<Animal[]>([]);
-  // const [critterU, setCrittersU] = useState<Animal[]>([]);
+  const [critterA, setCrittersA] = useState<AttachedAnimal[]>([]);
+  const [critterU, setCrittersU] = useState<Animal[]>([]);
 
   const handleSelect = <T extends Animal>(row: T): void => {
     setEditObj(row);
   };
 
-  // set the export state when table loads
-  // const onNewData = (d: Animal[]): void => (d.length && d[0].device_id ? setCrittersA(d) : setCrittersU(d));
-
-  // pass this function to the import modal to allow user to download animal csv bulk import
-  /*
-  const handleDownloadTemplate = (): void => {
-    download(Object.keys(new Animal()).join(), FileStrings.animalTemplateName, '');
-  }
-  */
-
-  // props to be passed to the edit modal component
-  // most props are overwritten in {ModifyCritterWrappper}
+  // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
     editing: null,
     open: false,
@@ -58,12 +46,12 @@ export default function CritterPage(): JSX.Element {
       <Box className='manage-layout-titlebar'>
         <h1>My Animals</h1>
         <Box display='flex' alignItems='center'>
-          {/* <ExportImportViewer {...exportProps} /> */}
           <ModifyCritterWrapper editing={editObj}>
             <AddEditViewer<AttachedAnimal> {...addEditProps} >
               <EditCritter {...editProps} />
             </AddEditViewer>
           </ModifyCritterWrapper>
+          <ExportImportViewer data={[...critterA, ...critterU]} />
         </Box>
       </Box>
 
@@ -74,7 +62,7 @@ export default function CritterPage(): JSX.Element {
             <DataTable
               headers={AttachedAnimal.attachedCritterDisplayProps}
               title={CS.assignedTableTitle}
-              queryProps={{ query: api.useAssignedCritters }}
+              queryProps={{ query: api.useAssignedCritters, onNewData: (d: AttachedAnimal[]): void => setCrittersA(d)}}
               onSelect={handleSelect}
             />
           </Box>
@@ -82,7 +70,7 @@ export default function CritterPage(): JSX.Element {
             <DataTable
               headers={new Animal().displayProps}
               title={CS.unassignedTableTitle}
-              queryProps={{ query: api.useUnassignedCritters }}
+              queryProps={{ query: api.useUnassignedCritters, onNewData: (d: Animal[]): void => setCrittersU(d)}}
               onSelect={handleSelect}
             />
           </Box>

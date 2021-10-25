@@ -335,7 +335,7 @@ export const useTelemetryApi = () => {
   ): UseMutationResult =>
     useMutation<CollarHistory, AxiosError, ChangeDataLifeInput>((dl) => attachmentApi.updateAttachmentDataLife(dl), config);
 
-  /** upload a single .csv file to add or update codes/code headers, critters, or collars */
+  /** upload a single .csv file to add or update critters/devices */
   const useUploadCSV = <T>(
     config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, FormData>
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>

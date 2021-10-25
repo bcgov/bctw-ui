@@ -14,6 +14,9 @@ import { IUpsertPayload } from 'api/api_interfaces';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import ManageLayout from 'pages/layouts/ManageLayout';
 
+/**
+ * note: deprecated / not accessible
+ */
 const CodePage: React.FC = () => {
   const [header, setHeader] = useState('animal_status');
   const [title, setTitle] = useState('');

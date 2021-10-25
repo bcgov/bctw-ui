@@ -47,7 +47,7 @@ export default function CollarPage(): JSX.Element {
         <h1>My Devices</h1>
         <Box display='flex' alignItems='center'>
           <Box mr={1}>
-            <Button size='large' variant='contained' color='primary' onClick={(): void => setShowImport((o) => !o)}>
+            <Button size='large' color='primary' onClick={(): void => setShowImport((o) => !o)}>
               Import
             </Button>
           </Box>

@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { Transform, Exclude } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { BaseTimestamps, BCTWBase, nullToDayjs, uuid } from 'types/common_types';
@@ -89,7 +89,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 
 export class Animal implements BCTWBase<Animal>, IAnimal {
   readonly critter_id: uuid;
-  readonly critter_transaction_id: uuid;
+  @Exclude() critter_transaction_id: uuid;
   animal_id: string;
   animal_status: Code;
   associated_animal_id: string;
@@ -157,6 +157,12 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   }
   get name(): string {
     return this.wlh_id ?? this.animal_id;
+  }
+
+  static get toCSVHeaderTemplate(): string[] {
+    const excluded: (keyof Animal)[] = ['critter_transaction_id'];
+    const keys = Object.keys(new Animal()).filter(k => !(excluded as string[]).includes(k));
+    return keys;
   }
 
   toJSON(): Animal {

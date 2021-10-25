@@ -46,7 +46,7 @@ export const userApi = (props: ApiProps): API => {
   /**
    * @param user a new or existing @type {User}
    * defaults role_type to the user's property or 'observer' if that isn't defined
-   * note: user object returned will not have role_type
+   * note: returned user object will not have role_type
    */
   const addUser = async (user: User): Promise<User> => {
     // console.log('posting user', user)

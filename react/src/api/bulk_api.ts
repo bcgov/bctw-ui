@@ -26,6 +26,8 @@ export const bulkApi = (api: AxiosInstance): API => {
   const uploadCsv = async <T,>(form: FormData): Promise<IBulkUploadResults<T>> => {
     const url = createUrl({ api: importCSVEndpoint});
     const { data } = await api.post(url, form);
+    invalidateDevices();
+    invalidateCritters();
     return data;
   };
 
