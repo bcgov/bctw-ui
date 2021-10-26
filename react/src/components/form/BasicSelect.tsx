@@ -1,17 +1,21 @@
 import { SelectProps, FormControl, InputLabel, Select as MUISelect, MenuItem, SelectChangeEvent } from '@mui/material';
 import { useState } from 'react';
 
-type BasicSelectProps = SelectProps & {
-  values: string[];
+export type SharedSelectProps = SelectProps & {
   defaultValue: string;
+  triggerReset?: boolean;
+}
+
+type BasicSelectProps = SharedSelectProps & {
+  values: string[];
   handleChange: (v: string) => void;
 };
 
 /**
  * a simple single select component that takes a list of values as a string array
  */
-export default function Select({handleChange, defaultValue, label, values }: BasicSelectProps): JSX.Element {
-  const [selected, setSelected] = useState(defaultValue ?? '');
+export default function Select({handleChange, label, values, defaultValue = ''}: BasicSelectProps): JSX.Element {
+  const [selected, setSelected] = useState(defaultValue);
 
   const onChange = (event: SelectChangeEvent<string>): void => {
     const val = event.target.value;

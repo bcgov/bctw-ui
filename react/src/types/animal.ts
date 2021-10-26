@@ -1,7 +1,7 @@
-import { Transform, Exclude } from 'class-transformer';
+import { Transform, Exclude, classToPlain } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { BaseTimestamps, BCTWBase, nullToDayjs, uuid } from 'types/common_types';
+import { BaseTimestamps, BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
@@ -89,13 +89,13 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 
 export class Animal implements BCTWBase<Animal>, IAnimal {
   readonly critter_id: uuid;
-  @Exclude() critter_transaction_id: uuid;
+  @Exclude(toPlainOnly) critter_transaction_id: uuid;
   animal_id: string;
   animal_status: Code;
   associated_animal_id: string;
   associated_animal_relationship: Code;
   capture_comment: string;
-  @Transform(nullToDayjs) capture_date: Dayjs;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) capture_date: Dayjs;
   capture_latitude: number;
   capture_longitude: number;
   capture_utm_easting: number;
@@ -111,9 +111,9 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   juvenile_at_heel: Code;
   juvenile_at_heel_count: number;
   life_stage: Code;
-  map_colour: Code;
+  @Exclude(toPlainOnly) map_colour: Code;
   mortality_comment: string;
-  @Transform(nullToDayjs) mortality_date: Dayjs;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_date: Dayjs;
   mortality_latitude: number;
   mortality_longitude: number;
   mortality_utm_easting: number;
@@ -130,7 +130,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   recapture: boolean;
   region: Code;
   release_comment: string;
-  @Transform(nullToDayjs) release_date: Dayjs;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) release_date: Dayjs;
   release_latitude: number;
   release_longitude: number;
   release_utm_easting: number;
@@ -141,16 +141,16 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   translocation: boolean;
   wlh_id: string;
   animal_comment: string;
-  @Transform(nullToDayjs) valid_from: Dayjs;
-  @Transform(nullToDayjs) valid_to: Dayjs;
-  owned_by_user_id: number; //todo: do this in device
+  @Exclude(toPlainOnly) @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) valid_from: Dayjs;
+  @Exclude(toPlainOnly) @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) valid_to: Dayjs;
+  @Exclude(toPlainOnly) owned_by_user_id: number;
 
   mortality_report: boolean;
   mortality_investigation: Code;
   captivity_status: boolean;
   mortality_captivity_status: Code;
 
-  permission_type: eCritterPermission;
+  @Exclude(toPlainOnly) permission_type: eCritterPermission;
 
   get identifier(): keyof Animal {
     return 'critter_id';
@@ -204,16 +204,16 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
 export interface IAttachedAnimal extends IAnimal, ICollarHistory, DataLife {}
 
 export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<AttachedAnimal> {
-  assignment_id: uuid;
+  @Exclude(toPlainOnly) assignment_id: uuid;
   collar_id: uuid;
   device_id: number;
   device_make: Code;
   frequency: number;
 
-  attachment_start: Dayjs;
-  data_life_start: Dayjs;
-  data_life_end: Dayjs;
-  attachment_end: Dayjs;
+  @Exclude(toPlainOnly) attachment_start: Dayjs;
+  @Exclude(toPlainOnly) data_life_start: Dayjs;
+  @Exclude(toPlainOnly) data_life_end: Dayjs;
+  @Exclude(toPlainOnly) attachment_end: Dayjs;
 
   // con't overide since this class is inherited
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {

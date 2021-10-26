@@ -1,11 +1,13 @@
 import { Chip, TextField } from '@mui/material';
 import { Autocomplete as MUIAutocomplete } from '@mui/material';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useEffect, useState } from 'react';
 import { ISelectMultipleData } from './MultiSelect';
 
 type IAutocompleteProps<T extends ISelectMultipleData> = {
   label: string;
   changeHandler: (o: T[]) => void;
+  defaultValue?: T;
   triggerReset?: boolean; // unselect of all values
   data: T[];
 };
@@ -15,12 +17,18 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
  * tag components when an option is selected
  */
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
-  const { label, data, triggerReset, changeHandler } = props;
-  const [selected, setSelected] = useState([]);
+  const { label, data, triggerReset, changeHandler, defaultValue } = props;
+  const [selected, setSelected] = useState<T[]>([]);
 
   useEffect(() => {
     setSelected([]);
   }, [triggerReset]);
+
+  useDidMountEffect(() => {
+    if (defaultValue) {
+      setSelected(o => [...o, defaultValue]);
+    }
+  }, [defaultValue])
 
   const handleChange = (value: T[]): void => {
     setSelected(value);
@@ -46,12 +54,12 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
             return -1;
           })
           .map((option: T, index: number) => (
-            <Chip key={option.id} label={option.displayLabel} {...getTagProps({ index })} />
+            <Chip key={`${option.prop}-${option.id}`} label={option.displayLabel} {...getTagProps({ index })} />
           ));
       }}
       getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel}
       renderInput={(params): JSX.Element => <TextField {...params} label={label} />}
-      onChange={(e, v): void => handleChange(v)}
+      onChange={(e, v): void => handleChange(v as T[])}
     />
   );
 }

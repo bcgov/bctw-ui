@@ -20,7 +20,6 @@ type EditDataLifeModalProps = ModalBaseProps & {
 
 /**
  * modal form that wraps @function DataLifeInputForm for modifying a device attachment data life
- * note: integrate this with @function EditModal ?
  */
 export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.Element {
   const { attachment, open, handleClose, permission_type } = props;
@@ -89,7 +88,7 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
           <Button size='large' onClick={(): void => handleClose(false)}>
             Cancel
           </Button>
-          <Button disabled={!canSave} size='large' color='primary' onClick={handleSave}>
+          <Button disabled={!canSave} size='large' onClick={handleSave}>
             Save
           </Button>
         </Box>

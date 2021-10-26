@@ -16,12 +16,7 @@ type TextFilterProps = {
 /**
  * the text input search/filter component
  */
-function TextFilter({
-  disabled,
-  rowCount,
-  defaultFilter,
-  setGlobalFilter,
-}: TextFilterProps): JSX.Element {
+function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter }: TextFilterProps): JSX.Element {
   const [value, setValue] = useState(defaultFilter);
 
   const handleChange = (v): void => {
@@ -38,20 +33,18 @@ function TextFilter({
       placeholder={`${rowCount} records...`}
       disabled={disabled}
       size={'small'}
-      variant={'outlined'}
     />
   );
 }
 
 type TableFilterProps<T> = {
   rowCount: number;
-  // filterableProperties: string[];
   filterableProperties: (keyof T)[];
   onChangeFilter: (filter: ITableFilter) => void;
 };
 
 /**
- * the main search component visible in table toolbars
+ * the search component visible in table toolbars
  */
 function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   const { filterableProperties, onChangeFilter, rowCount } = props;
@@ -59,12 +52,12 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   const [searchStr, setSearchStr] = useState('');
 
   useDidMountEffect(() => {
-    const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr};
+    const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
-  }, [searchStr, selectedOption])
+  }, [searchStr, selectedOption]);
 
   const handleSelect = (v: ISelectMultipleData[]): void => {
-    const values = v.map(item => item.value as keyof T);
+    const values = v.map((item) => item.value as keyof T);
     setSelectedOption(values as string[]);
   };
 
@@ -86,22 +79,17 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
     []
   );
 
-
   return (
-    <Box display="flex" alignItems="center" width="100%">
-      <TextFilter
-        rowCount={rowCount}
-        setGlobalFilter={handleTextChange}
+    <Box display='flex' alignItems='center' width='100%'>
+      <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} />
+      <MultiSelect
+        renderValue={(v: string[]): string => `${v.length} selected`}
+        label={FormStrings.filterColumnsLabel}
+        data={selectOptions}
+        changeHandler={handleSelect}
       />
-      <MultiSelect renderValue={(v: string[]): string => `${v.length} selected`} label={FormStrings.filterColumnsLabel} data={selectOptions} changeHandler={handleSelect} />
     </Box>
   );
-
-  {/* <Tooltip title={ `${showFilter ? 'Hide' : 'Show'} Filter Controls`} >
-    <IconButton onClick={(): void => setShowFilter((o) => !o)} aria-label='filter list'>
-      <FilterListIcon htmlColor='#90caf9' />
-    </IconButton>
-  </Tooltip> */}
 }
 
 export default TableFilter;

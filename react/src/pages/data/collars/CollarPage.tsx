@@ -12,27 +12,20 @@ import AddEditViewer from '../common/AddEditViewer';
 import CollarImport from 'pages/data/collars/CollarImport';
 import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
+import ExportImportViewer from '../bulk/ExportImportViewer';
+import { classToPlain } from 'class-transformer';
 
 export default function CollarPage(): JSX.Element {
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
 
   const [editObj, setEditObj] = useState<Collar | AttachedCollar>({} as Collar);
   const [showImport, setShowImport] = useState(false);
 
-  // set editing object when table row is selected
-  const handleSelect = <T extends Collar,>(row: T): void => {
-    // console.log(`device_id: ${row.device_id} p: ${row.permission_type}`);
-    setEditObj(row);
-  };
+  const [devicesA, setDevicesA] = useState([]);
+  const [devicesU, setDevicesU] = useState([]);
 
-  // pass as callback to table component to set export data when api returns collar data
-  // const onNewData = (d: Collar[]): void => {
-  //   if (d.length && d[0].animal_id) {
-  //     setCollarsA(d);
-  //   } else {
-  //     setCollarsU(d);
-  //   }
-  // };
+  // set editing object when table row is selected
+  const handleSelect = <T extends Collar,>(row: T): void => setEditObj(row);
 
   const editProps = {
     editing: new Collar(),
@@ -41,21 +34,31 @@ export default function CollarPage(): JSX.Element {
     handleClose: doNothing,
   };
 
+  const onNewData = (collars: AttachedCollar[] | Collar[]): void => {
+    const asPlain = collars.map(device => classToPlain(device));
+    if (collars[0] instanceof AttachedCollar) {
+      setDevicesA(asPlain);
+    } else {
+      setDevicesU(asPlain);
+    }
+  }
+
   return (
     <ManageLayout>
       <Box className='manage-layout-titlebar'>
         <h1>My Devices</h1>
         <Box display='flex' alignItems='center'>
-          <Box mr={1}>
-            <Button size='large' color='primary' onClick={(): void => setShowImport((o) => !o)}>
-              Import
-            </Button>
-          </Box>
           <ModifyCollarWrapper editing={editObj}>
             <AddEditViewer<AttachedCollar> queryStatus='success' editing={editObj as AttachedCollar} empty={new AttachedCollar()}>
               <EditCollar {...editProps} />
             </AddEditViewer>
           </ModifyCollarWrapper>
+          <ExportImportViewer data={[...devicesA, ...devicesU]} />
+          <Box ml={1}>
+            <Button size='large' onClick={(): void => setShowImport((o) => !o)}>
+              Import
+            </Button>
+          </Box>
         </Box>
       </Box>
 
@@ -65,7 +68,7 @@ export default function CollarPage(): JSX.Element {
             <DataTable
               headers={AttachedCollar.attachedDevicePropsToDisplay}
               title={S.assignedCollarsTableTitle}
-              queryProps={{query: bctwApi.useAttachedDevices}}
+              queryProps={{query: api.useAttachedDevices, onNewData: (v: AttachedCollar[]): void => onNewData(v)}}
               onSelect={handleSelect}
             />
           </Box>
@@ -73,7 +76,7 @@ export default function CollarPage(): JSX.Element {
             <DataTable
               headers={Collar.propsToDisplay}
               title={S.availableCollarsTableTitle}
-              queryProps={{query: bctwApi.useUnattachedDevices}}
+              queryProps={{query: api.useUnattachedDevices, onNewData}}
               onSelect={handleSelect}
             />
           </Box>

@@ -1,4 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
+import { formatTime } from 'utils/time';
 
 export interface BCTWValidDates {
   valid_from: Date | Dayjs;
@@ -51,7 +52,10 @@ export type PartialPick<T, K extends keyof T> = {
  * generally only care about object received from API -> instance of UI class
  * ex. nulls can be transformed to a boolean or number
  */
-const transformOpt = { toClassOnly: true };
-const nullToDayjs = (v: Date | null): Dayjs => dayjs(v);
+const toClassOnly = { toClassOnly: true };
+const toPlainOnly = { toPlainOnly: true };
 
-export { nullToDayjs, transformOpt };
+const nullToDayjs = (v: Date | null): Dayjs => dayjs(v);
+const DayjsToPlain = (v: Dayjs): string => v?.format(formatTime);
+
+export { DayjsToPlain, nullToDayjs, toPlainOnly, toClassOnly };

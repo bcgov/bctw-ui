@@ -25,6 +25,7 @@ import { BCTWBase } from 'types/common_types';
 import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { buttonProps } from 'components/component_constants';
+import { Typography } from '@mui/material';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: ReactNode;
@@ -51,11 +52,11 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param headerComponent
  */
 /**
-  * fixme: dont need to pass the object being edited to Editmodal, it just needs
-  * an instance of T with the identifier (ex. critter_id) 
-  * to preserve the class methods when save is called
-  * see EditCritter
-  */
+ * fixme: dont need to pass the object being edited to Editmodal, it just needs
+ * an instance of T with the identifier (ex. critter_id)
+ * to preserve the class methods when save is called
+ * see EditCritter
+ */
 export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<T>): JSX.Element {
   const api = useTelemetryApi();
   const {
@@ -92,7 +93,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     const params: Pick<IHistoryPageProps<T>, 'param' | 'propsToDisplay'> = {
       param: editing[editing.identifier],
       propsToDisplay: editing.displayProps
-    }
+    };
     if (editing instanceof Animal) {
       setHistoryParams({ query: api.useCritterHistory, ...params });
     } else if (editing instanceof Collar) {
@@ -114,7 +115,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
 
   useDidMountEffect(() => {
     setCanSave(!hasErr);
-  }, [newObj])
+  }, [newObj]);
 
   const handleSave = async (): Promise<void> => {
     // use Object.assign to preserve class methods
@@ -171,7 +172,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
               <Box mb={4}>
                 <Tabs
                   value={currentTabID}
-                  onChange={(e, v):void => handleSwitchTab(v)}
+                  onChange={(e, v): void => handleSwitchTab(v)}
                   aria-label='simple tabs example'
                   indicatorColor='primary'
                   textColor='primary'>
@@ -189,11 +190,14 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
                 </Box>
 
                 <Box p={3}>
-                  <Box display='flex' justifyContent='flex-end' className='form-buttons'>
+                  <Box display='flex' alignItems={'center'} justifyContent='flex-end' className='form-buttons'>
                     {hideSave ? null : (
-                      <Button {...buttonProps} onClick={handleSave} disabled={!canSave}>
-                        Save
-                      </Button>
+                      <>
+                        {hasErr ? <Typography mr={1}>fields marked with * are required</Typography> : null}
+                        <Button {...buttonProps} onClick={handleSave} disabled={!canSave}>
+                          Save
+                        </Button>
+                      </>
                     )}
                     <Button {...buttonProps} variant='outlined' onClick={(): void => handleClose(false)}>
                       Cancel and Exit

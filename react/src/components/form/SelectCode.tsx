@@ -10,12 +10,14 @@ import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
 import { FormBaseProps } from 'types/form_types';
+import { SharedSelectProps } from './BasicSelect';
+import { PartialPick } from 'types/common_types';
+import { selectMenuProps } from 'components/component_constants';
 
-type CodeSelectProps = FormBaseProps & SelectProps & {
+type SelectCodeProps = FormBaseProps & SelectProps &
+PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
   codeHeader: string;
-  defaultValue?: string;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
-  triggerReset?: boolean;
   addEmptyOption?: boolean;
 };
 
@@ -29,9 +31,9 @@ type CodeSelectProps = FormBaseProps & SelectProps & {
  *   @param triggerReset unchecks all selected values
  *   @param addEmptyOption optionally add a 'blank' entry to end of select options
  * @param propname use this field as the key if the code header isn't the same. ex - ear_tag_colour_id
-*/
+ */
 
-export default function SelectCode(props: CodeSelectProps): JSX.Element {
+export default function SelectCode(props: SelectCodeProps): JSX.Element {
   const {
     addEmptyOption,
     codeHeader,
@@ -45,8 +47,8 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
     required,
     propName
   } = props;
-  const bctwApi = useTelemetryApi();
-  const [value, setValue] = useState<string>(defaultValue);
+  const api = useTelemetryApi();
+  const [value, setValue] = useState(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
@@ -64,7 +66,7 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
   ]);
 
   // load this codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = bctwApi.useCodes(0, codeHeader);
+  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader);
 
   // when data is successfully fetched
   useEffect(() => {
@@ -77,8 +79,7 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
         data.push({ id: 0, code: '', description: FormStrings.emptySelectValue });
       }
       setCodes(data);
-      // if a default was set (a code description, update the value to its actual value)
-      // pass false as second param to not update the modals 'is saveable property'
+      // if a default value was provided, update it to the actual value
       const found = data.find((d) => d?.description === defaultValue);
       // update the error status if found
       if (found?.description && hasError) {
@@ -95,7 +96,7 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
     } else {
       setHasError(true);
     }
-  }, [required])
+  }, [required]);
 
   // when the parent component forces a reset
   useEffect(() => {
@@ -122,16 +123,16 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
   // use useEffect to ensure parent is notified when the code is required and empty
   useEffect(() => {
     pushChange(value);
-  }, [value, hasError])
+  }, [value, hasError]);
 
-  // default handler when @param multiple is false
+  // handler when multiple is false
   const handleChange = (event: SelectChangeEvent<string>): void => {
     setHasError(false);
     const v = event.target.value;
     setValue(v);
   };
 
-  // default handler when @param multiple is true
+  // handler when multiple is true
   const handleChangeMultiple = (event: SelectChangeEvent<string[]>): void => {
     const selected = event.target.value as string[];
     setValues(selected);
@@ -151,7 +152,7 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
 
   /**
    * calls the parent changeHandler function
-   * passing an object in the form of 
+   * passing an object in the form of
    * { *   [propName]: code, *   error: bool * }
    */
   const pushChange = (v: string): void => {
@@ -191,16 +192,16 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
       ) : isLoading || isFetching ? (
         <div>Please wait...</div>
       ) : codes && codes.length ? (
-        <FormControl error={hasError} style={style} size='small' className={`select-control ${hasError ? 'input-error' : ''}`}>
+        <FormControl
+          error={hasError}
+          style={style}
+          size='small'
+          className={`select-control ${hasError ? 'input-error' : ''}`}>
           <InputLabel>{required ? `${label} *` : label}</InputLabel>
           <Select
-            MenuProps={{
-              anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-              transformOrigin: { vertical: 'top', horizontal: 'left' },
-            }}
+            MenuProps={selectMenuProps}
             value={multiple ? values : value}
             onChange={multiple ? handleChangeMultiple : handleChange}
-
             renderValue={(selected: string | string[]): ReactNode => {
               if (multiple) {
                 // remove empty string values
@@ -210,21 +211,12 @@ export default function SelectCode(props: CodeSelectProps): JSX.Element {
               return <span>{selected}</span>;
             }}
             {...propsToPass}>
-            {codes.map((c: ICode) => {
-              if (!multiple) {
-                return (
-                  <MenuItem key={c?.id} value={c?.description}>
-                    {c?.description}
-                  </MenuItem>
-                );
-              }
-              return (
-                <MenuItem key={c?.id} value={c?.description}>
-                  <Checkbox size='small' color='primary' checked={values.indexOf(c?.description) !== -1} />
-                  {c?.description}
-                </MenuItem>
-              );
-            })}
+            {codes.map((c: ICode) => (
+              <MenuItem key={c?.id} value={c?.description}>
+                {multiple ? <Checkbox size='small' checked={values.indexOf(c?.description) !== -1} /> : null}
+                {c?.description}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       ) : (

@@ -2,7 +2,7 @@ import { Exclude, Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Code } from 'types/code';
-import { BCTWBase, nullToDayjs, uuid } from 'types/common_types';
+import { BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { columnToHeader } from 'utils/common_helpers';
@@ -68,7 +68,7 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   activation_status: boolean;
   readonly collar_id: uuid;
   camera_device_id: number;
-  @Exclude() collar_transaction_id: uuid;
+  @Exclude(toPlainOnly) collar_transaction_id: uuid;
   device_id: number;
   device_deployment_status: Code;
   device_make: Code;
@@ -87,19 +87,20 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   frequency: number;
   frequency_unit: Code;
   malfunction_comment: string;
-  @Transform(nullToDayjs) malfunction_date: Dayjs;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) malfunction_date: Dayjs;
   device_malfunction_type: Code;
-  @Transform(nullToDayjs) offline_date: Dayjs;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) offline_date: Dayjs;
   offline_type: string;
   offline_comment: string;
-  permission_type: eCritterPermission;
-  @Transform(nullToDayjs) retrieval_date: Dayjs;
+  @Exclude(toPlainOnly) permission_type: eCritterPermission;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) retrieval_date: Dayjs;
   retrieved: boolean;
   retrieval_comment: string;
   satellite_network: Code;
   device_comment: string;
-  @Transform(nullToDayjs) valid_from: Dayjs;
-  @Transform(nullToDayjs) valid_to: Dayjs;
+  @Exclude(toPlainOnly) @Transform(nullToDayjs) valid_from: Dayjs;
+  @Exclude(toPlainOnly) @Transform(nullToDayjs) valid_to: Dayjs;
+  @Exclude(toPlainOnly) owned_by_user_id: number;
 
   get frequencyPadded(): string {
     const freq = this.frequency.toString();
@@ -130,8 +131,6 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
         return 'Drop-off Module Frequency Unit'
       case 'frequency':
         return 'Beacon Frequency'
-      // case 'implant_device_id':
-        // return 'Implant Module ID'
       default:
         return columnToHeader(str);
     }
@@ -157,11 +156,11 @@ export interface IAttachedCollar extends ICollar, Pick<Animal, 'wlh_id' | 'anima
 }
 
 export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<AttachedCollar>, DataLife {
-  assignment_id: uuid;
-  attachment_start: Dayjs;
-  data_life_start: Dayjs;
-  data_life_end: Dayjs;
-  attachment_end: Dayjs;
+  @Exclude(toPlainOnly) assignment_id: uuid;
+  @Exclude(toPlainOnly) attachment_start: Dayjs;
+  @Exclude(toPlainOnly) data_life_start: Dayjs;
+  @Exclude(toPlainOnly) data_life_end: Dayjs;
+  @Exclude(toPlainOnly) attachment_end: Dayjs;
   readonly wlh_id: string;
   readonly animal_id: string;
   readonly critter_id: string;
@@ -169,7 +168,7 @@ export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<
 
   // for attached collars, also display...
   static get attachedDevicePropsToDisplay(): (keyof AttachedCollar)[] {
-    return [...super.propsToDisplay, 'wlh_id', 'animal_id' /* , 'last_transmission_date' */];
+    return [...super.propsToDisplay, 'wlh_id', 'animal_id'];
   }
 }
 

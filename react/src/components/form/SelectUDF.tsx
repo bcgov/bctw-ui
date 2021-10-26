@@ -1,27 +1,26 @@
 import 'styles/form.scss';
-import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
+import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent, SelectProps } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { removeProps } from 'utils/common_helpers';
-import { SelectProps } from '@mui/material';
 import { eUDFType, IUDF } from 'types/udf';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError } from 'utils/errors';
+import { PartialPick } from 'types/common_types';
+import { SharedSelectProps } from './BasicSelect';
 
-type ISelectProps = SelectProps & {
+type ISelectProps = SelectProps & PartialPick<SharedSelectProps, 'triggerReset' | 'defaultValue'> & {
   udfType: eUDFType;
   changeHandler: (o: IUDF[] | IUDF) => void;
-  // force components that are 'multiple' to unselect all values
-  triggerReset?: boolean;
 };
 
 /**
  * todo: merge base select component with select codes / basic select components!
  */
 export default function SelectUDF(props: ISelectProps): JSX.Element {
-  const { label, udfType, changeHandler, triggerReset, multiple = true, className} = props;
+  const { label, udfType, defaultValue, changeHandler, triggerReset, multiple = true, className} = props;
   const api = useTelemetryApi();
-  const [values, setValues] = useState<string[] | string>([]);
+  const [values, setValues] = useState<string[] | string>(defaultValue ?? []);
   const [udfs, setUdfs] = useState<IUDF[]>([]);
 
   // to handle React warning about not recognizing the prop on a DOM element

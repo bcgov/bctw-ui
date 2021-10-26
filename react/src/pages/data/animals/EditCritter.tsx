@@ -174,6 +174,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     <SelectUDF
                       style={{ width: '200px'}}
                       multiple={false}
+                      defaultValue={editing.collective_unit}
                       udfType={eUDFType.collective_unit}
                       label={MapStrings.collectiveUnitLabel}
                       changeHandler={(v: IUDF): void => onChange({[eUDFType.collective_unit]: v.value})}

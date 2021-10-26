@@ -1,5 +1,8 @@
-import { Checkbox, FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectProps } from '@mui/material';
+import { Checkbox, FormControl, InputLabel, MenuItem, OutlinedInput, Select } from '@mui/material';
+import { selectMenuProps } from 'components/component_constants';
 import React, { useEffect, useState } from 'react';
+import { PartialPick } from 'types/common_types';
+import { SharedSelectProps } from './BasicSelect';
 
 export interface ISelectMultipleData {
   id: number | string;
@@ -9,20 +12,20 @@ export interface ISelectMultipleData {
   prop?: string;
 }
 
-type ISelectMultipleProps<T extends ISelectMultipleData> = SelectProps & {
+type ISelectMultipleProps<T extends ISelectMultipleData> = PartialPick<SharedSelectProps, 'triggerReset'> & {
   label: string;
   renderValue?: (value: unknown) => React.ReactNode;
   renderTypeLabel?: string; // what to show when multiple are selected
   changeHandler: (o: T[]) => void;
-  triggerReset?: boolean; // force unselect of all values
   data: T[];
 };
 
+// always render 'select all' as the first option
 const selectAll = { id: -1, value: 'Select All', default: false };
 
 /**
- * a multi-select dropdown component. unlike the @function SelectCode component,
- * @param data must be provided  
+ * a multi-select dropdown component
+ * @param data must be provided in advance to render options
  */
 export default function MultiSelect<T extends ISelectMultipleData>(props: ISelectMultipleProps<T>): JSX.Element {
   const { label, data, triggerReset, changeHandler, renderTypeLabel } = props;
@@ -59,27 +62,18 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: ISelec
     <FormControl size='small' className={'select-control'}>
       <InputLabel>{label}</InputLabel>
       <Select
-        MenuProps={{
-          anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-          transformOrigin: { vertical: 'top', horizontal: 'left' },
-          // getContentAnchorE: null
-        }}
-        // fixme: why is the input prop is required to have the 'notch' wide enough
-        // to not cover the label. works fine in SelectCode without this??
-        input={<OutlinedInput /*labelWidth={label.length * 7}*/ />}
-        style={props.style}
+        MenuProps={selectMenuProps}
+        input={<OutlinedInput />}
         multiple={true}
-        variant={'outlined'}
         value={selected}
         renderValue={props.renderValue ?? ((): string =>
           selected.length > 3 ? `${selected.length} ${renderTypeLabel ?? ''} selected` : selected.join(', ')
         )}>
-        {[...[selectAll], ...data].map((d: T, idx: number) => {
+        {[selectAll, ...data].map((d: T, idx: number) => {
           return (
             <MenuItem key={`${idx}-${d.id}`} value={d.value}>
               <Checkbox
                 size='small'
-                color='primary'
                 checked={
                   d.value === selectAll.value
                     ? selected.length === data.length || selected.includes(d.value)

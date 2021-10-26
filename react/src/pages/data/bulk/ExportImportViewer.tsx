@@ -39,7 +39,7 @@ export default function ImportExportViewer<T>({ data, iTitle, iMsg, eTitle, eMsg
   return (
     <Box ml={1}>
       {/* <Button size='large' color='primary' onClick={handleClickImport} disabled={iDisabled}>Import</Button> */}
-      <Button size='large' color='primary' onClick={handleClickExport} disabled={eDisabled}>Export</Button>
+      <Button size='large' onClick={handleClickExport} disabled={eDisabled || !data.length}>Export</Button>
       {/* {iDisabled ? null : <Import  />} */}
       {eDisabled ? null : <Export {...exportProps} />}
     </Box>
