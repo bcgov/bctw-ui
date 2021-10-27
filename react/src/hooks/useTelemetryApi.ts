@@ -14,7 +14,7 @@ import { useMemo } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
 import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
-import { AttachedCollar, Collar } from 'types/collar';
+import { AttachedCollar, Collar, IVectronicUpsert } from 'types/collar';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, User } from 'types/user';
 
@@ -343,9 +343,9 @@ export const useTelemetryApi = () => {
 
   /** upload one or more .keyx files to create new Vectronic devices */
   const useUploadXML = (
-    config: UseMutationOptions<IBulkUploadResults<any>, AxiosError, FormData>
-  ): UseMutationResult<IBulkUploadResults<any>, AxiosError> =>
-    useMutation<IBulkUploadResults<any>, AxiosError, FormData>((formData) => bulkApi.uploadFiles(formData), config);
+    config: UseMutationOptions<IBulkUploadResults<IVectronicUpsert>, AxiosError, FormData>
+  ): UseMutationResult<IBulkUploadResults<IVectronicUpsert>, AxiosError> =>
+    useMutation<IBulkUploadResults<IVectronicUpsert>, AxiosError, FormData>((formData) => bulkApi.uploadFiles(formData), config);
 
   /** grant or remove permissions to a user to animals */
   const useGrantCritterAccess = (

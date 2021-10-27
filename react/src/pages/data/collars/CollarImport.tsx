@@ -9,25 +9,25 @@ import Modal from 'components/modal/Modal';
 import { ModalBaseProps } from 'components/component_interfaces';
 import Button from 'components/form/Button';
 import { IBulkUploadError, IBulkUploadResults } from 'api/api_interfaces';
-import { Collar } from 'types/collar';
+import { Collar, IVectronicUpsert } from 'types/collar';
 import { AxiosError } from 'axios';
 import bulkStyles from 'pages/data/bulk/bulk_styles';
 
-type CollarImportProps = ModalBaseProps & {
-};
-export default function CollarImport({ open, handleClose }: CollarImportProps): JSX.Element {
+export default function CollarImport({ open, handleClose }: ModalBaseProps): JSX.Element {
   const api = useTelemetryApi();
   const styles = bulkStyles();
   const [importType, setImportType] = useState<'keyx' | 'csv' | 'template' | ''>('');
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<IBulkUploadError[]>([]);
 
-  const onSuccessKeyx = (response: IBulkUploadResults<Collar>): void => {
-    if (response.errors.length) {
+  const onSuccessKeyx = (response: IBulkUploadResults<IVectronicUpsert>): void => {
+    const { errors, results } = response;
+    if (errors.length) {
       setErrors(response.errors);
-    } else {
-      const newkeyx = response.results.map((r) => r.device_id).join(', ');
-      setMessage(`devices ${newkeyx} were successfully registered!`);
+    }
+    if (results.length) {
+      const newkeyx = results.map((r) => r.idcollar).join(', ');
+      setMessage(`Vectronic devices ${newkeyx} were successfully registered!`);
     }
   };
 
@@ -36,8 +36,8 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
       setMessage(`a bulk upload completed but there were ${response.errors.length} error(s)`);
       setErrors(response.errors);
     } else {
-      const newkeyx = response.results.map((r) => r.device_id).join(', ');
-      setMessage(`devices ${newkeyx} were successfully updated!`);
+      const devices = response.results.map((r) => r.device_id).join(', ');
+      setMessage(`devices ${devices} ${devices?.length > 1 ? 'were' : 'was'} successfully updated!`);
     }
   };
 
@@ -74,11 +74,13 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   });
 
   const onCsvFile = async (fieldName: string, files: FileList): Promise<void> => {
+    reset();
     const form = createFormData(fieldName, files);
     await mutateCsv(form);
   };
 
   const onKeyXFiles = async (name: string, files: FileList): Promise<void> => {
+    reset();
     const form = createFormData('xml', files);
     mutateKeyx(form);
   };
@@ -89,9 +91,8 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
   };
 
   return (
-    <Modal open={open} handleClose={onClose} title={'Device Import'}>
+    <Modal open={open} handleClose={onClose} title={S.collarImportStartMsg}>
       <div>
-        <Typography variant='h4'>{S.collarImportStartMsg}</Typography>
         <Typography variant={'h6'} onClick={(): void => setImportType('keyx')} className={'link link-hover'}>
           {S.collarImportKeyX}
         </Typography>
@@ -130,7 +131,7 @@ export default function CollarImport({ open, handleClose }: CollarImportProps): 
         {errors.map((e) => {
           return (
             <div key={e.rownum}>
-              <span className={styles.errRow}>Row {e.rownum}</span>
+              {importType === 'csv' ? (<span className={styles.errRow}>Row {e.rownum}</span>) : null}
               <span className={styles.err}>{e.error}</span>
             </div>
           );

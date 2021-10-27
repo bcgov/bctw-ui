@@ -23,13 +23,13 @@ import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
 // note: const override for disabling pagination
-const DISABLE_PAGINATION = true;
+const DISABLE_PAGINATION = false;
 /**
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
  */
 export default function DataTable<T extends BCTWBase<T>>({
-  customColumns,
+  customColumns = [],
   headers,
   queryProps,
   title,
@@ -47,9 +47,9 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [selected, setSelected] = useState<string[]>(alreadySelected);
-  const [page, setPage] = useState<number>(1);
+  const [page, setPage] = useState(1);
   const [rowIdentifier, setRowIdentifier] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(30);
   const isPaginate = paginate && !DISABLE_PAGINATION;
   /**
    * since data is updated when the page is changed, use the 'values'
@@ -93,7 +93,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       }
       const newV = [];
       // update the values state
-      // bug: code page, when new values are found they shouldn't be pushed to existing ones!
+      // bug: code page, when new values are found they shouldn't be pushed to existing ones
       data.forEach((d) => {
         const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
@@ -209,6 +209,10 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   // todo: why using memo for this?
   const headerProps = useMemo(() => headers, []);
+  // fixme: fix excesssive rerenders
+  // const customCols = customColumns.map((cc,idx) => {
+  //   return (obj: T) => useMemo(() => cc.column(obj, idx), [obj]);
+  // })
    
   // called in the render function
   // determines which values to render, based on page and filters applied
@@ -250,9 +254,7 @@ export default function DataTable<T extends BCTWBase<T>>({
                   return (
                     <TableRow
                       hover
-                      onClick={(event): void => {
-                        handleClickRow(event, obj[rowIdentifier]);
-                      }}
+                      onClick={(event): void => handleClickRow(event, obj[rowIdentifier])}
                       role='checkbox'
                       aria-checked={isRowSelected}
                       tabIndex={-1}
@@ -261,10 +263,7 @@ export default function DataTable<T extends BCTWBase<T>>({
                       {/* render checkbox column if multiselect is enabled */}
                       {isMultiSelect ? (
                         <TableCell padding='checkbox'>
-                          <Checkbox
-                            color='primary'
-                            checked={isRowSelected}
-                          />
+                          <Checkbox checked={isRowSelected} />
                         </TableCell>
                       ) : null}
                       {/* render main columns from data fetched from api */}
@@ -280,26 +279,30 @@ export default function DataTable<T extends BCTWBase<T>>({
                         );
                       })}
                       {/* render additional columns from props */}
-                      {customColumns
-                        ? customColumns.map((c: ICustomTableColumn<T>) => {
-                          const colComponent = c.column(obj, prop);
-                          return <TableCell key={`add-col-${prop}`}>{colComponent}</TableCell>;
-                        })
-                        : null}
+                      {customColumns.map((c: ICustomTableColumn<T>) => {
+                        const Col = c.column(obj, prop);
+                        return <TableCell key={`add-col-${prop}`}>{Col}</TableCell>;
+                      })
+                      }
                     </TableRow>
                   );
                 }
               )}
           </TableBody>
         </Table>
-        {/* 
-         * hide pagination when total results are under page limit (10)
+        {/**
+         * hide pagination when total results are under @var rowsPerPage
          * possible that only 10 results are actually available, in which
          * case the next page will load no new results
         */}
         {!isPaginate || isLoading || isFetching || isError || 
         (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
-            <PaginationActions count={data.length} page={page} rowsPerPage={rowsPerPage} onChangePage={handlePageChange} />
+            <PaginationActions
+              count={data.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onChangePage={handlePageChange}
+            />
           )}
       </>
     </TableContainer>

@@ -89,7 +89,6 @@ const CodePage: React.FC = () => {
               queryProps={{
                 query: api.useCodes,
                 param: header,
-                // onNewData: (v): void => console.log(JSON.stringify(v[0]), null)
               }}
             />
             <div className='button-row'>

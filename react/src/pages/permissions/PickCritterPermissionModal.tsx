@@ -22,12 +22,10 @@ type PickCritterProps = ModalBaseProps & {
 };
 
 /**
- * this type is only used in this component to differentiate between the user's own 
+ * used in this component to differentiate between the user's own 
  * permission_type and the one they selected if @param showSelectPermission is true
  */
-type SelectedUserCritterAccessInput = IUserCritterAccessInput & {
-  wasSelected: boolean;
-}
+type SelectedUserCritterAccessInput = IUserCritterAccessInput & { wasSelected: boolean }; 
 
 /**
  * the critter selection modal that appears when the user
@@ -49,7 +47,7 @@ export default function PickCritterPermissionModal({
   userToLoad,
 }: PickCritterProps): JSX.Element {
   const useUser = useContext(UserContext);
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
   const [user, setUser] = useState<User>(userToLoad ?? useUser.user);
   // table row selected state
   const [critterIDs, setCritterIDs] = useState<string[]>([]);
@@ -58,7 +56,7 @@ export default function PickCritterPermissionModal({
    * state for each of the column select components rendered in the table
    * only used when @param showSelectPermission is true
    */ 
-  const [accessTypes, setAccessTypes] = useState<SelectedUserCritterAccessInput[]>([]);
+  const [access, setAccess] = useState<Record<string, SelectedUserCritterAccessInput>>({});
   /**
    * the options to show in the select dropdown when @param showSelectPermission is true.
    * depends on the user role - admin vs owner
@@ -76,7 +74,7 @@ export default function PickCritterPermissionModal({
   useDidMountEffect(() => {
     if (showSelectPermission) {
       // if the select dropdown is shown, user must have an option selected for the corresponding row to be able to save
-      const selectedRows = accessTypes.filter(a => critterIDs.includes(a.critter_id) && a.wasSelected);
+      const selectedRows = Object.values(access).filter(a => critterIDs.includes(a.critter_id) && a.wasSelected);
       if (critterIDs.length !== selectedRows.length) {
         setCanSave(false);
         return;
@@ -86,28 +84,28 @@ export default function PickCritterPermissionModal({
     setCanSave(!!critterIDs.length);
   }, [critterIDs])
 
-  // when the table query finishes - update the accesTypes state
-  const handleDataLoaded = (rows: UserCritterAccess[]): void => {
-    setAccessTypes((o) => {
+  // when the table query finishes - update the access state
+  const onNewData = (rows: UserCritterAccess[]): void => {
+    setAccess((o) => {
       // preserve permission selections across pages.
-      const copy = [...o];
+      const copy = { ...o };
       rows.forEach((item) => {
-        const idx = copy.findIndex((c) => c.critter_id === item.critter_id);
-        if (idx === -1) {
-          // add the wasSelected prop
-          copy.push(Object.assign({wasSelected: false}, item));
-          return;
+        const match: SelectedUserCritterAccessInput = copy[item.critter_id];
+        if (match) {
+          match.wasSelected = false;
+        } else {
+          const { wlh_id, animal_id, critter_id, permission_type } = item;
+          copy[item.critter_id] = {animal_id, critter_id, permission_type, wasSelected: false, wlh_id};
         }
-        copy[idx].permission_type = item.permission_type;
       });
       return copy;
     });
   };
 
   const tableProps: ITableQueryProps<UserCritterAccess> = {
-    query: bctwApi.useCritterAccess,
+    query: api.useCritterAccess,
     param: { user, filter },
-    onNewData: handleDataLoaded
+    onNewData
   };
 
   /**
@@ -126,19 +124,16 @@ export default function PickCritterPermissionModal({
       return;
     }
     // get the permission type state for each selected
-    const access: IUserCritterAccessInput[] = critterIDs.map((c) => {
-      const critter = accessTypes.find((a) => a.critter_id === c);
+    const hasaccess: IUserCritterAccessInput[] = critterIDs.map((c) => {
+      const critter = access[c];
       if (!critter) {
-        //todo: show error?
-        console.error('cannot find critter from the loaded user/animal permission!')
         return;
       }
-      const { critter_id, permission_type, wlh_id, animal_id } = critter;
-      return { critter_id, permission_type, wlh_id, animal_id };
+      return critter;
     });
     const toSave: IUserCritterPermissionInput = {
       userId: user.id,
-      access
+      access: hasaccess
     };
     onSave(toSave);
   };
@@ -151,40 +146,37 @@ export default function PickCritterPermissionModal({
   /** 
    * adds a select dropdown component as the last table row that
    * allows the user to select a permission type for the animal row
-   * fixme: todo: way too many re-renders on selection of row OR dropdown!
+   * fixme: using a hook in this component triggers hook error in datatable
   */
-  const newColumn = (row: UserCritterAccess): JSX.Element => {
-    const access = accessTypes.find((cp) => cp.critter_id === row.critter_id);
+  const NewColumn = (row: UserCritterAccess): JSX.Element => {
+    const hasAccess = access[row.critter_id];
     // set default in this order
-    const defaultPermission = access?.permission_type ?? row?.permission_type ?? eCritterPermission.observer;
+    const defaultPermission = hasAccess?.permission_type ?? row?.permission_type ?? eCritterPermission.observer;
     // show an error if the select isn't filled out but the row is selected
-    const isError = !access ? false : (critterIDs.includes(access.critter_id) && !access.wasSelected);
+    const isError = !hasAccess ? false : (critterIDs.includes(hasAccess.critter_id) && !hasAccess.wasSelected);
     return (
       <Select
         required={true}
         error={isError}
-        style={{width: '90px'}} // fits the longest critter permission type
+        size='small'
         value={defaultPermission}
+        // dont propagate the event to the row selected handler
+        onClick={(event): void => event.stopPropagation()}
         onChange={(v: SelectChangeEvent<eCritterPermission>): void => {
-          // dont propagate the event to the row selected handler
-          v.stopPropagation();
           const permission = v.target.value as eCritterPermission;
-          setAccessTypes((prevState) => {
-            const idx = prevState.findIndex((c) => c.critter_id === row.critter_id);
-            const cp = Object.assign([], prevState);
-            cp[idx].permission_type = permission;
-            cp[idx].wasSelected = true;
+          setAccess((prevState) => {
+            const cp = {...prevState};
+            const found = cp[row.critter_id];
+            found.permission_type = permission;
+            found.wasSelected = true;
             return cp;
           });
         }}>
         {/* show select dropdown options based on user role */}
         {permissionsAccessible
           .sort()
-          .map((d) => (
-            <MenuItem key={`menuItem-${d}`} value={d}>
-              {d}
-            </MenuItem>
-          ))}
+          .map((d) => (<MenuItem key={`menuItem-${d}`} value={d}>{d}</MenuItem>))
+        }
       </Select>
     );
   };
@@ -198,7 +190,7 @@ export default function PickCritterPermissionModal({
         onSelectMultiple={handleSelect}
         isMultiSelect={true}
         alreadySelected={alreadySelected}
-        customColumns={showSelectPermission ? [{ column: newColumn, header: (): JSX.Element => <b>Select Permission</b> }] : null}
+        customColumns={showSelectPermission ? [{ column:NewColumn, header: (): JSX.Element => <b>Select Permission</b> }] : null}
       />
       <div className={'admin-btn-row'}>
         <Button disabled={!canSave} onClick={handleSave}>Save</Button>

@@ -47,8 +47,7 @@ export interface ICollar extends ICollarTelemetryBase {
   first_activation_month: number;
   first_activation_year: number;
   fix_interval: number;
-  fix_interval_unit: Code; // fixme: is now fix_interval_rate?
-  fix_success_rate: number; // fixme: removed?
+  fix_interval_rate: Code;
   frequency_unit: Code;
   malfunction_comment: string;
   malfunction_date: Dayjs;
@@ -82,8 +81,7 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   first_activation_month: number;
   first_activation_year: number;
   fix_interval: number;
-  fix_interval_unit: Code;
-  fix_success_rate: number;
+  fix_interval_rate: Code;
   frequency: number;
   frequency_unit: Code;
   malfunction_comment: string;
@@ -177,7 +175,7 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'frequency', type: eInputType.number, ...isRequired },
     { prop: 'frequency_unit', type: eInputType.code, ...isRequired },
     { prop: 'fix_interval', type: eInputType.number, ...isRequired },
-    { prop: 'fix_interval_unit', type: eInputType.code, ...isRequired, codeName: 'fix_unit' },
+    { prop: 'fix_interval_rate', type: eInputType.code, ...isRequired, codeName: 'fix_unit' },
   ],
   deviceOptionFields: [
     { prop: 'dropoff_frequency', type: eInputType.number },
@@ -230,3 +228,12 @@ export const getDeviceFormFields = (): FormFieldObject<Collar>[] => {
     .values(collarFormFields)
     .reduce((previous, current) => ([ ...previous, ...current ]) , []);
 };
+
+// vectronic keys upload result
+export interface IVectronicUpsert {
+  collarkey: string;
+  collartype: string;
+  comptype: string;
+  idcollar: number;
+  idcom: string;
+}

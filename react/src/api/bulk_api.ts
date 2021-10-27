@@ -5,6 +5,7 @@ import { ExportQueryParams } from 'types/export';
 import { exportEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
 import { useQueryClient } from 'react-query';
 import { API, IBulkUploadResults, IDeleteType } from './api_interfaces';
+import { IVectronicUpsert } from 'types/collar';
 
 export const bulkApi = (api: AxiosInstance): API => {
   const queryClient = useQueryClient();
@@ -32,7 +33,7 @@ export const bulkApi = (api: AxiosInstance): API => {
   };
 
   /** uploads one or more xml files to be parsed as Vectronic .keyx */
-  const uploadFiles = async(form: FormData): Promise<IBulkUploadResults<unknown>> => {
+  const uploadFiles = async(form: FormData): Promise<IBulkUploadResults<IVectronicUpsert>> => {
     const url = createUrl({api: importXMLEndpoint});
     const { data } = await api.post(url, form);
     return data;

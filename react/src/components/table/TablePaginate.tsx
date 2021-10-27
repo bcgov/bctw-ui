@@ -45,7 +45,7 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         //{page >= Math.ceil(count / rowsPerPage) - 1}
         disabled={count < rowsPerPage}
         aria-label="next page"
-        size="large"><Icon icon='first'/></IconButton>
+        size="large"><Icon icon='next'/></IconButton>
 
       {/* note: goto last page not shown */}
       {/* <IconButton

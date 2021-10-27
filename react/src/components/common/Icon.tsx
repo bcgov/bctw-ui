@@ -47,6 +47,8 @@ const getIconPath = (path: string): string => {
       return mdiAlarmOff;
     case 'back':
       return mdiArrowLeft;
+    case 'next':
+      return mdiArrowRight;
     case 'close':
       return mdiClose;
     case 'copy':

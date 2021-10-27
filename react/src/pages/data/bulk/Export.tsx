@@ -10,9 +10,7 @@ import { formatT } from 'utils/time';
 
 import bulkStyles from './bulk_styles';
 
-type ImportProps<T> = ExportImportProps & {
-  data: T[];
-};
+type ImportProps<T> = ExportImportProps & { data: T[] };
 
 export default function Export<T>({ data, message, title, open, handleClose }: ImportProps<T>): JSX.Element {
   const styles = bulkStyles();
@@ -42,12 +40,15 @@ export default function Export<T>({ data, message, title, open, handleClose }: I
       let r = '';
       for (let i = 0; i < included.length; i++) {
         const key = included[i];
-        r += d[key];
+        const value = d[key];
+        if (value) {
+          r += value;
+        }
         r += i !== included.length -1 ? ',' : '\n'; 
       }
       return r;
     }).join('');
-    download( `${included}\n${body}`, `export_${formatT(dayjs())}.csv`, 'csv');
+    download(`${included}\n${body}`, `export_${formatT(dayjs())}.csv`, 'csv');
   };
 
   const uncheckAll = (): void => setExcluded([...excluded, ...included.splice(0)]);
@@ -78,10 +79,10 @@ export default function Export<T>({ data, message, title, open, handleClose }: I
           </div>
           <div className={styles.footer}>
             <div>
-              <Button disabled={included.length === 0} onClick={uncheckAll}>remove all</Button>
-              <Button disabled={excluded.length === 0} onClick={reset}>reset</Button>
+              <Button disabled={included.length === 0} onClick={uncheckAll}>Remove all</Button>
+              <Button disabled={excluded.length === 0} onClick={reset}>Reset</Button>
             </div>
-            <Button disabled={included.length <= 0} onClick={exportData}>download</Button>
+            <Button disabled={included.length <= 0} onClick={exportData}>Download</Button>
           </div>
         </>
       ) : null}
