@@ -1,7 +1,6 @@
 import DataTable from 'components/table/DataTable';
-import { Modal } from 'components/common';
+import { Button, Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';

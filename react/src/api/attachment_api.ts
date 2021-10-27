@@ -14,9 +14,10 @@ export const attachmentApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
 
-  // todo: test
-  const invalidateQueries = (): void => {
+  const invalidateDeviceAssignmentHistory = (): void => {
     queryClient.invalidateQueries('collarAssignmentHistory');
+    queryClient.invalidateQueries('critters_unassigned');
+    queryClient.invalidateQueries('critters_assigned');
   }
 
   /** given a critter_id, retrieve it's device attachment history */
@@ -33,6 +34,7 @@ export const attachmentApi = (props: ApiProps): API => {
     const url = createUrl({ api: attachDeviceEndpoint});
     // console.log(`posting ${url}: ${JSON.stringify(body)}`);
     const { data } = await api.post(url, body);
+    invalidateDeviceAssignmentHistory()
     return plainToClass(CollarHistory, data);
   }
 
@@ -40,6 +42,7 @@ export const attachmentApi = (props: ApiProps): API => {
     const url = createUrl({ api: removeDeviceEndpoint});
     // console.log(`posting ${url}: ${JSON.stringify(body)}`);
     const { data } = await api.post(url, body);
+    invalidateDeviceAssignmentHistory()
     return plainToClass(CollarHistory, data);
   }
 
@@ -47,7 +50,7 @@ export const attachmentApi = (props: ApiProps): API => {
     const url = createUrl({ api: updateDatalifeEndpoint});
     // console.log(`posting ${url}: ${JSON.stringify(body)}`);
     const { data } = await api.post(url, body);
-    invalidateQueries();
+    invalidateDeviceAssignmentHistory();
     return plainToClass(CollarHistory, data);
   }
 

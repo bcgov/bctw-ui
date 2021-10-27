@@ -1,6 +1,5 @@
 import React from 'react';
 import AppBar from '@mui/material/AppBar';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Dialog from '@mui/material/Dialog';
 import Fade from '@mui/material/Fade';
@@ -10,7 +9,7 @@ import { ModalProps } from 'components/component_interfaces';
 import './modal.scss';
 
 import makeStyles from '@mui/styles/makeStyles';
-import { Icon } from 'components/common';
+import { Button, Icon } from 'components/common';
 import { urls } from 'constants/external_urls';
 
 const useStyles = makeStyles(() => ({
@@ -49,9 +48,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
           <Toolbar disableGutters className={classes.fsDialogHeader}>
             <Button
               className={classes.fsDialogBackBtn}
-              size="large"
-              variant="text"
-              color="primary"
+              variant='text'
               disableElevation
               startIcon={<Icon icon={'back'}/>}
               onClick={(): void => handleClose(false)}>
@@ -59,9 +56,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
             </Button>
             <Button
               className={classes.fsDialogHelpBtn}
-              size="large"
-              variant="text"
-              color="primary"
+              variant='text'
               disableElevation
               startIcon={<Icon icon={'help'}/>}
               onClick={(): void => {window.open(urls.bctw_support_url)}}>

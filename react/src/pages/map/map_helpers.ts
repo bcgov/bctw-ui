@@ -197,6 +197,7 @@ function sortGroupedTelemetry(array: ITelemetryGroup[], comparator: (a, b) => nu
     const foundIndex = array.findIndex((a) => a.device_id /*a.critter_id ?? a.collar_id*/ === identifiers[i]);
     ret.push(array[foundIndex]);
   }
+  console.log(ret);
   return ret;
 }
 

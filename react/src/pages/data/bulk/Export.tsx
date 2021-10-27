@@ -1,7 +1,6 @@
 import { Chip, Typography } from '@mui/material';
+import { Button, Modal } from 'components/common';
 import { ExportImportProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
-import Modal from 'components/modal/Modal';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import { useEffect, useState } from 'react';

@@ -54,13 +54,6 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
     pushRowCheck(newChecked);
   };
 
-  // note: disabled pre-workshop "clearing shape should not clear checkboxes in AT"
-  // useDidMountEffect(() => {
-  //   if (!crittersSelected.length) {
-  //     setCheckedGroups([]);
-  //   }
-  // }, [crittersSelected]);
-
   const handleRowCheck = (v: GroupedCheckedStatus): void => {
     let newChecked = null;
     const idxFound = checkedGroups.indexOf(v.critter_id);
@@ -90,7 +83,6 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
       <Table stickyHeader size='small'>
         {pings && pings.length ? (
           <TableHead
-            // fixme: convert to basic table
             headersToDisplay={[...rows_to_render, `Point Count (${totalPointCount()})`] as any}
             headerData={plainToClass(TelemetryDetail, pings[0].features[0].properties) as TelemetryDetail}
             numSelected={checkedGroups.length}
@@ -111,7 +103,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 pingCount={u.features.length}
                 isChecked={checkedGroups.includes(u.critter_id)}
                 isSelectedInMap={crittersSelected.indexOf(u.critter_id) !== -1}
-                // todo: fixme: should it be the latest props that are displayed?
+                // fixme: should it be the latest props that are displayed?
                 row={plainToClass(TelemetryDetail, getLatestPing(u.features)?.properties)}
                 handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
@@ -151,7 +143,7 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       <TableCell>
         <Box className='colour-swatch'
           style={{ width: '32px', height: '32px', border: '1px solid #999999',
-          backgroundColor: parseAnimalColour(row.map_colour).fillColor}}>
+            backgroundColor: parseAnimalColour(row.map_colour).fillColor}}>
         </Box>
       </TableCell>
       <TableCell>{row.species}</TableCell>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DataTable from 'components/table/DataTable';
-import Button from 'components/form/Button';
+import { Button } from 'components/common';
 import { User } from 'types/user';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { Typography } from '@mui/material';

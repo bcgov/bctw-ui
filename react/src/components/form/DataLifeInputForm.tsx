@@ -66,8 +66,7 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
     // update state to show warning if data life was modified
     // todo: check prop doesn't match attachment timestamp
     if (k.indexOf('data_') !== -1 && v) {
-      // fixme:
-      // setIsModified(true);
+      setIsModified(true);
     }
     // call parent change handler if it exists
     if (typeof onChange === 'function') {
@@ -82,7 +81,7 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
 
   const Body = (
     <Box paddingBottom={2} id='hi'>
-      {/* if data life has been modified and display is not row format - show a warning */}
+      {/* show a warning if data life has been modified and display is not row format */}
       {displayInRows ? null : (
         <Box height={35} display='flex' flexDirection={'column'} alignItems={'center'}>
           {isModified ? <Typography color={'error'}>{DataLifeStrings.editWarning}</Typography> : null}

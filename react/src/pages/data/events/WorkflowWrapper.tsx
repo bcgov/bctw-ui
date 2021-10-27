@@ -1,8 +1,7 @@
 import { Box, CircularProgress, Container, Divider, Paper } from '@mui/material';
 import { AxiosError } from 'axios';
-import { Modal } from 'components/common';
+import { Button, Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
@@ -70,7 +69,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   };
 
   const onError = (e: AxiosError): void => {
-    console.log('error saving event', formatAxiosError(e));
+    // console.log('error saving event', formatAxiosError(e));
     showNotif({ severity: 'success', message: `error saving ${event.event_type} workflow: ${formatAxiosError(e)}` });
   };
 
@@ -163,11 +162,11 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
                   {isLoading ? (
                     <CircularProgress />
                   ) : (
-                    <Button size='large' color='primary' onClick={handleSave} disabled={!canSave}>
+                    <Button onClick={handleSave} disabled={!canSave}>
                       Save
                     </Button>
                   )}
-                  <Button size='large' variant='outlined' color='primary' onClick={(): void => handleClose(false)}>
+                  <Button variant='outlined' onClick={(): void => handleClose(false)}>
                     Cancel and Exit
                   </Button>
                 </Box>

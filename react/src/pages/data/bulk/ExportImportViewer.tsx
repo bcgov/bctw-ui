@@ -1,13 +1,13 @@
 import { Box } from '@mui/material';
-import { ExportImportProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
+import { Button } from 'components/common';
+// import { ExportImportProps } from 'components/component_interfaces';
 import Export from 'pages/data/bulk/Export';
-import Import from 'pages/data/bulk/Import';
-import React, { useState } from 'react';
+// import Import from 'pages/data/bulk/Import';
+import { ReactNode, useState } from 'react';
 
 export type IImportExportProps<T> = {
   iTitle?: string;
-  iMsg?: string | React.ReactNode;
+  iMsg?: string | ReactNode;
   eTitle?: string;
   eMsg?: string;
   data: T[];
@@ -20,7 +20,7 @@ export type IImportExportProps<T> = {
  * used in data management views to wrap the import/export components
  * and control their modal show/hide status with a button group
  */
-export default function ImportExportViewer<T>({ data, iTitle, iMsg, eTitle, eMsg, downloadTemplate, iDisabled = false, eDisabled = false }: IImportExportProps<T>): JSX.Element {
+export default function ImportExportViewer<T>({ data, eTitle, eMsg, eDisabled = false }: IImportExportProps<T>): JSX.Element {
   const [showExportModal, setShowExportModal] = useState(false);
   // const [showImportModal, setShowImportModal] = useState(false);
 
@@ -39,7 +39,7 @@ export default function ImportExportViewer<T>({ data, iTitle, iMsg, eTitle, eMsg
   return (
     <Box ml={1}>
       {/* <Button size='large' color='primary' onClick={handleClickImport} disabled={iDisabled}>Import</Button> */}
-      <Button size='large' onClick={handleClickExport} disabled={eDisabled || !data.length}>Export</Button>
+      <Button onClick={handleClickExport} disabled={eDisabled || !data.length}>Export</Button>
       {/* {iDisabled ? null : <Import  />} */}
       {eDisabled ? null : <Export {...exportProps} />}
     </Box>

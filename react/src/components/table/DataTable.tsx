@@ -14,7 +14,7 @@ import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from './TablePaginate';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError } from 'utils/errors';
-import { ICustomTableColumn, ITableFilter, ITableProps, Order } from './table_interfaces';
+import { ICustomTableColumn, ITableFilter, DataTableProps, Order } from './table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
@@ -38,7 +38,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   paginate = true,
   isMultiSelect = false,
   alreadySelected = []
-}: ITableProps<T>): JSX.Element {
+}: DataTableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;

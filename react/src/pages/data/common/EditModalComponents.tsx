@@ -89,6 +89,6 @@ const a11yProps = (index: number): Record<string, string> => {
   };
 };
 
-const editEventBtnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'inherit', className: 'button' };
+const editEventBtnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'inherit', className: 'button', size: 'small' };
 
 export { EditHeader, EditTabPanel, FormSection, a11yProps, editEventBtnProps };

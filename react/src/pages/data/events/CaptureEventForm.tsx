@@ -13,7 +13,7 @@ import LocationEventForm from './LocationEventForm';
 import CaptivityStatusForm from './CaptivityStatusForm';
 import { Tooltip } from 'components/common';
 import OkayModal from 'components/modal/OkayModal';
-import Button from 'components/form/Button';
+import { Button } from 'components/common';
 
 /**
  * todo: deal with data life

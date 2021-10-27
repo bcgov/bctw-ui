@@ -1,5 +1,4 @@
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
-import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
@@ -15,7 +14,7 @@ import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
 import { InboundObj, isDisabled } from 'types/form_types';
 import ReleaseEvent from 'types/events/release_event';
-import { Icon } from 'components/common';
+import { Button, Icon } from 'components/common';
 import { eUDFType, IUDF } from 'types/udf';
 import AddUDF from 'pages/udf/AddUDF';
 import SelectUDF from 'components/form/SelectUDF';
@@ -133,7 +132,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
           obj={editing as AttachedAnimal}
           btn={
             <Button
-              size='large'
               variant='outlined'
               className='button'
               onClick={(): void => setShowAssignmentHistory((o) => !o)}>

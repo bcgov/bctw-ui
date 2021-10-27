@@ -1,6 +1,5 @@
 import { AxiosError } from 'axios';
-import { INotificationMessage } from 'components/component_interfaces';
-import Button from 'components/form/Button';
+import { Button } from 'components/common';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { CritterStrings as CS } from 'constants/strings';
@@ -10,7 +9,6 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AssignNewCollarModal from 'pages/data/animals/AssignNewCollar';
 import { useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { DataLifeInput } from 'types/data_life';
 import { canRemoveDeviceFromAnimal } from 'types/permission';
@@ -32,10 +30,8 @@ export default function PerformAssignmentAction({
   current_attachment,
   permission_type
 }: IPerformAssignmentActionPageProps): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const queryClient = useQueryClient();
-  const responseDispatch = useResponseDispatch();
-  // modal state
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showAvailableModal, setShowAvailableModal] = useState(false);
   // is a device being attached or removed?
@@ -77,45 +73,22 @@ export default function PerformAssignmentAction({
   })
 
   // post response handlers
-  const onAttachSuccess = (_data: CollarHistory): void => {
-    updateStatus({
-      severity: 'success',
-      message: 'device successfully attached to animal'
-    });
+  const onAttachSuccess = (): void => {
+    showNotif({ severity: 'success', message: 'device successfully attached to animal'});
     // todo: if device is attached ...update state to indicate that the device can only be removed
     setIsLink((o) => !o);
     closeModals();
   }
   
-  const onRemoveSuccess = (_data: CollarHistory): void => updateStatus({
-    severity: 'success',
-    message: 'device successfully removed from animal'
-  });
+  const onRemoveSuccess = (): void => 
+    showNotif({ severity: 'success', message: 'device successfully removed from animal' });
 
-  const onError = (error: AxiosError): void => {
-    updateStatus({
-      severity: 'error',
-      message: `error ${isLink ? 'attaching' : 'removing'} device: ${formatAxiosError(error)}`
-    });
-  }
-
-  // 
-  const updateStatus = (notif: INotificationMessage): void => {
-    responseDispatch(notif);
-    updateCollarHistory();
-  };
-
-  // force the collar history, current assigned/unassigned critter pages to refetch
-  const updateCollarHistory = async (): Promise<void> => {
-    console.log('invalidating collar assignment history queries');
-    queryClient.invalidateQueries('collarAssignmentHistory');
-    queryClient.invalidateQueries('critters_unassigned');
-    queryClient.invalidateQueries('critters_assigned');
-  };
+  const onError = (error: AxiosError): void => 
+    showNotif({ severity: 'error', message: `error ${isLink ? 'attaching' : 'removing'} device: ${formatAxiosError(error)}` });
 
   // setup mutations to save the device attachment status
-  const { mutateAsync: saveAttachDevice } = bctwApi.useAttachDevice({ onSuccess: onAttachSuccess, onError });
-  const { mutateAsync: saveRemoveDevice } = bctwApi.useRemoveDevice({ onSuccess: onRemoveSuccess, onError });
+  const { mutateAsync: saveAttachDevice } = api.useAttachDevice({ onSuccess: onAttachSuccess, onError });
+  const { mutateAsync: saveRemoveDevice } = api.useRemoveDevice({ onSuccess: onRemoveSuccess, onError });
 
   /* if there is a collar attached and user clicks the remove button, show the confirmation window
     otherwise, show the list of devices the user has access to
@@ -159,7 +132,6 @@ export default function PerformAssignmentAction({
         onClose={closeModals}
         dli={dli}
       />
-      {/* <p>permission: {permission_type}</p> */}
       <Button disabled={!canEdit} onClick={handleClickShowModal}>
         {isLink ? 'Remove Device' : 'Assign Device'}
       </Button>

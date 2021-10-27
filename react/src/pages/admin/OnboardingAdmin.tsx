@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import DataTable from 'components/table/DataTable';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import Button from 'components/form/Button';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { HandleOnboardInput, OnboardUser } from 'types/onboarding';
@@ -9,6 +8,8 @@ import ConfirmModal from 'components/modal/ConfirmModal';
 import { OnboardStrings } from 'constants/strings';
 import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
+import { Button } from 'components/common';
+import { Box } from '@mui/material';
 
 /**
  *
@@ -65,14 +66,14 @@ export default function OnboardingAdminPage(): JSX.Element {
           queryProps={{ query: api.useOnboardRequests }}
           onSelect={handleSelectRequest}
         />
-        <div className={'button-row'}>
-          <Button color='primary' disabled={!request || request?.access !== 'pending'} onClick={(): void => handleClickGrantOrDeny(true)}>
+        <Box display='flex' justifyContent={'flex-start'} columnGap={1}>
+          <Button disabled={!request || request?.access !== 'pending'} onClick={(): void => handleClickGrantOrDeny(true)}>
             Grant
           </Button>
           <Button color='secondary' disabled={!request || request?.access !== 'pending'} onClick={(): void => handleClickGrantOrDeny(false)}>
             Deny
           </Button>
-        </div>
+        </Box>
       </div>
       <ConfirmModal
         open={showConfirm}

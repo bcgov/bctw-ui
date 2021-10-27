@@ -72,9 +72,15 @@ export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
 
   // must get assignment id elsewhere
   toPartialEditDatalifeJSON(): Omit<ChangeDataLifeInput, 'assignment_id'> {
-    return {
-      data_life_start: this.data_life_start.format(formatTime),
-      data_life_end: this.data_life_end.format(formatTime)
+    const ret = {} as Omit<ChangeDataLifeInput, 'assignment_id'>;
+    const { data_life_start: dls, data_life_end: dle } = this;
+
+    if (dls.isValid()) {
+      ret.data_life_start = dls.format(formatTime);
     }
+    if (dle.isValid()) {
+      ret.data_life_end = dle.format(formatTime);
+    }
+    return ret;
   }
 }

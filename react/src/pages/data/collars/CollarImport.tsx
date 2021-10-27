@@ -5,13 +5,12 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, useEffect } from 'react';
 import FileInput from 'components/form/FileInput';
 import { createFormData } from 'api/api_helpers';
-import Modal from 'components/modal/Modal';
 import { ModalBaseProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
 import { IBulkUploadError, IBulkUploadResults } from 'api/api_interfaces';
 import { Collar, IVectronicUpsert } from 'types/collar';
 import { AxiosError } from 'axios';
 import bulkStyles from 'pages/data/bulk/bulk_styles';
+import { Button, Modal } from 'components/common';
 
 export default function CollarImport({ open, handleClose }: ModalBaseProps): JSX.Element {
   const api = useTelemetryApi();

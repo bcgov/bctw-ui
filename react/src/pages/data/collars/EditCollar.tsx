@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import Container from '@mui/material/Container';
 import EditModal from 'pages/data/common/EditModal';
@@ -15,6 +14,7 @@ import WorkflowWrapper from '../events/WorkflowWrapper';
 import { isDisabled, parseFormChangeResult } from 'types/form_types';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import { wfFields } from 'types/events/event';
+import { Button } from 'components/common';
 
 export default function EditCollar(props: EditorProps<Collar | AttachedCollar>): JSX.Element {
   const { isCreatingNew, editing } = props;
@@ -104,8 +104,8 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
           // do form validation before passing change handler to EditModal
-          const onChange = (v: Record<string, unknown>, modifyCanSave = true): void => {
-            handlerFromContext(v, modifyCanSave);
+          const onChange = (v: Record<string, unknown>): void => {
+            handlerFromContext(v);
             const [key, value] = parseFormChangeResult<Collar>(v);
             if (key === 'device_type') {
               setIsVHF(value === 'VHF');

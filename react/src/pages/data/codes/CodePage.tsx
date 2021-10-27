@@ -1,6 +1,5 @@
 import { ButtonGroup, Typography } from '@mui/material';
-import { NotificationMessage } from 'components/common';
-import Button from 'components/form/Button';
+import { Button, NotificationMessage } from 'components/common';
 import DataTable from 'components/table/DataTable';
 import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';

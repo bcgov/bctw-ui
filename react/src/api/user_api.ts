@@ -53,7 +53,7 @@ export const userApi = (props: ApiProps): API => {
     const role = user.role_type ?? eUserRole.observer;
     const { data } = await postJSON(api, createUrl({ api: 'add-user' }), {user, role});
     const ret = plainToClass(User, data);
-    console.log('user upsert result:', ret);
+    // console.log('user upsert result:', ret);
     invalidateUsers();
     return ret;
   };
@@ -75,7 +75,7 @@ export const userApi = (props: ApiProps): API => {
    * this param is provided by default
    * @returns {User[]} including their user role
    */
-  const getUsers = async (page: number): Promise<User[]> => {
+  const getUsers = async (): Promise<User[]> => {
     const url = createUrl({ api: 'get-users' });
     const { data } = await api.get(url);
     return data.map((json: IUser[]) => plainToClass(User, json));

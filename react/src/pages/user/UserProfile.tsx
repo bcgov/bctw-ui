@@ -1,4 +1,4 @@
-import Button from 'components/form/Button';
+import { Button } from 'components/common';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'contexts/UserContext';
 import { User } from 'types/user';
@@ -28,9 +28,9 @@ export default function UserProfile(): JSX.Element {
     return <div>Loading user information...</div>;
   }
 
-  function sendTestSms(phoneNumber) {
+  function sendTestSms(phoneNumber): void {
     alert('Test SMS will be sent to: ' + phoneNumber);
-    console.log('Sending test SMS to ' + phoneNumber);
+    // console.log('Sending test SMS to ' + phoneNumber);
     sendSmsMortality(phoneNumber);
   }
 
@@ -42,7 +42,7 @@ export default function UserProfile(): JSX.Element {
   return (
     <ManageLayout>
       <Box className='manage-layout-titlebar'>
-      <h1>My Profile</h1>
+        <h1>My Profile</h1>
       </Box>
       <div style={{margin: '20px'}}>
         <Typography>
@@ -60,25 +60,11 @@ export default function UserProfile(): JSX.Element {
           </p>
           <p>
             Your phone number: <strong>{user.phone ?? 'No number on file'}</strong> &nbsp; &nbsp; 
-            <Button size="large" className='button' onClick={() => sendTestSms(user.phone)}>
+            <Button className='button' onClick={(): void => sendTestSms(user.phone)}>
               Send test SMS
             </Button>
           </p>
         </Typography>
-        {/* <div style={{margin: '25px 0'}}>
-          {user.formFields.map((p) => {
-            const { prop } = p;
-            return (
-              <TextField
-                propName={p.prop}
-                defaultValue={user[prop as string]}
-                disabled={true}
-                label={prop.toUpperCase()}
-                changeHandler={(): void => {}}
-              />
-            );
-          })}
-        </div> */}
         <DataTable
           headers={UserCritterAccess.propsToDisplay}
           title='Animals you have access to:'

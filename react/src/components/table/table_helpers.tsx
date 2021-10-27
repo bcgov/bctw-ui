@@ -45,7 +45,7 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
 function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key
-): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
+): (a: { [key in Key] }, b: { [key in Key] }) => number {
   return order === 'desc'
     ? (a, b): number => descendingComparator(a, b, orderBy)
     : (a, b): number => -descendingComparator(a, b, orderBy);

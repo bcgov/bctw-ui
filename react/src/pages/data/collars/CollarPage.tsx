@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import Button from 'components/form/Button';
 import DataTable from 'components/table/DataTable';
 import { CollarStrings as S } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
@@ -14,6 +13,7 @@ import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import ExportImportViewer from '../bulk/ExportImportViewer';
 import { classToPlain } from 'class-transformer';
+import { Button } from 'components/common';
 
 export default function CollarPage(): JSX.Element {
   const api = useTelemetryApi();
@@ -55,7 +55,7 @@ export default function CollarPage(): JSX.Element {
           </ModifyCollarWrapper>
           <ExportImportViewer data={[...devicesA, ...devicesU]} />
           <Box ml={1}>
-            <Button size='large' onClick={(): void => setShowImport((o) => !o)}>
+            <Button onClick={(): void => setShowImport((o) => !o)}>
               Import
             </Button>
           </Box>

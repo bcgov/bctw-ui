@@ -1,9 +1,8 @@
 import { Typography } from '@mui/material';
-import Modal from 'components/modal/Modal';
-import Button from 'components/form/Button';
 import { ModalBaseProps } from 'components/component_interfaces';
 import modalStyles from 'components/modal/modal_styles';
 import { ReactNode } from 'react';
+import { Button, Modal } from 'components/common';
 
 /**
  * props for the simple yes/no style confirmation modal
@@ -31,7 +30,7 @@ export default function ConfirmModal({
   return (
     <Modal open={open} handleClose={handleClose} title={title}>
       <Typography>{message}</Typography>
-      <div className={classes.btns} color='primary'>
+      <div className={classes.btns}>
         <Button onClick={handleClickYes}>{btnYesText}</Button>
         <Button onClick={(): void => handleClose(false)}>{btnNoText}</Button>
       </div>

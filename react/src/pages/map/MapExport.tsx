@@ -1,5 +1,5 @@
 import { ModalBaseProps } from 'components/component_interfaces';
-import Modal from 'components/modal/Modal';
+import { Modal, Button } from 'components/common';
 import tokml from 'tokml';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
@@ -11,7 +11,6 @@ import { omitNull } from 'utils/common_helpers';
 import { ITelemetryGroup, MapRange } from 'types/map';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
-import Button from 'components/form/Button';
 
 type ImportProps = ModalBaseProps & {
   groupedAssignedPings: ITelemetryGroup[];

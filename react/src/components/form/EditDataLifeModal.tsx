@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { CollarHistory } from 'types/collar_history';
 import { ModalBaseProps } from 'components/component_interfaces';
-import { Modal } from 'components/common';
+import { Button, Modal } from 'components/common';
 import DataLifeInputForm from './DataLifeInputForm';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import Button from './Button';
 import { Box } from '@mui/material';
 import { DataLifeInput, ChangeDataLifeInput } from 'types/data_life';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -38,6 +37,7 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
 
   // must be defined before mutation declarations
   const onSuccess = async (data): Promise<void> => {
+    // eslint-disable-next-line no-console
     console.log('data life updated response:', data);
     responseDispatch({ severity: 'success', message: `data life updated` });
   };
@@ -84,13 +84,9 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
           disableDLEnd={isAdmin ? false : !dli.canChangeDLEnd}
           dli={dli}
         />
-        <Box display='flex' justifyContent='flex-end'>
-          <Button size='large' onClick={(): void => handleClose(false)}>
-            Cancel
-          </Button>
-          <Button disabled={!canSave} size='large' onClick={handleSave}>
-            Save
-          </Button>
+        <Box display='flex' columnGap={1} justifyContent='flex-end'>
+          <Button disabled={!canSave} onClick={handleSave}>Save</Button>
+          <Button variant='outlined' onClick={(): void => handleClose(false)}>Cancel</Button>
         </Box>
       </div>
     </Modal>

@@ -6,11 +6,10 @@ import { eCritterPermission, IPermissionRequestInput, IUserCritterPermissionInpu
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import TextField from 'components/form/TextInput';
 import EditTable, { EditTableRowAction } from 'components/table/EditTable';
-import Button from 'components/form/Button';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
-import { Icon, NotificationMessage } from 'components/common';
+import { Button, Icon, NotificationMessage } from 'components/common';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import DataTable from 'components/table/DataTable';
 import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
@@ -39,6 +38,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   }, [emailList])
 
   const onSuccess = (data): void => {
+    // eslint-disable-next-line no-console
     console.log('successful request submission', data);
     showNotif({severity: 'success', message: 'permission request submitted succssfully'});
     setError('');
@@ -46,7 +46,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   }
 
   const onError = (err: AxiosError): void => {
-    console.log(err)
+    // console.log(err)
     setError(err?.response?.data);
     showNotif({severity: 'error', message: formatAxiosError(err)});
   }
@@ -56,7 +56,7 @@ export default function OwnerRequestPermission(): JSX.Element {
 
   // set the selected permission state when saved from the picker modal
   const handleCrittersSelected = (ca: IUserCritterPermissionInput): void => {
-    console.log(ca);
+    // console.log(ca);
     setPermission(ca);
     setShowPickCritterModal(false);
   };
@@ -97,7 +97,7 @@ export default function OwnerRequestPermission(): JSX.Element {
       user_email_list: emailList,
       critter_permissions_list: permission.access,
     }
-    console.log(JSON.stringify(body, null, 2))
+    // console.log(JSON.stringify(body, null, 2))
     mutateAsync(body);
   }
 

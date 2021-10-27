@@ -41,27 +41,26 @@ interface ICustomTableColumn<T> {
 
 
 /**
- * @param customColumns array of functions that return components to add as additional columns
  * @param headers displays all props of T unless this is included
- * @param isMultiSelect renders a row of checkboxes and a special toolbar if true
- * @param paginate should the pagination actions be displayed
- * @param queryProps which query to use - see @type {ITableQuery}
  * @param title displayed as table title
  * @param onSelect parent handler triggered when a row is clicked
- * @param onSelectMultiple parent handler triggered when a row is checked if @param isMultiSelect
 */
-
-type IPlainTableProps<T> = {
+type PlainTableProps<T> = {
   headers: (keyof T)[];
   title?: string;
   onSelect?: (row: T) => void;
 }
 
-type ITableProps<T> = IPlainTableProps<T> & {
+/**
+ * @param customColumns array of functions that return components to add as additional columns
+ * @param isMultiSelect renders a row of checkboxes and a special toolbar if true
+ * @param paginate should the pagination actions be displayed
+ * @param queryProps which query to use - see @type {ITableQuery}
+ * @param onSelectMultiple parent handler triggered when a row is checked if @param isMultiSelect
+ */
+type DataTableProps<T> = PlainTableProps<T> & {
   customColumns?: ICustomTableColumn<T>[];
   isMultiSelect?: boolean;
-  // fixme:
-  // alreadySelected?: T[];
   alreadySelected?: string[];
   paginate?: boolean;
   queryProps: ITableQueryProps<T>;
@@ -74,7 +73,6 @@ type ITableProps<T> = IPlainTableProps<T> & {
 interface HeadCell<T> {
   disablePadding: boolean;
   id: keyof T;
-  // label: keyof T;
   numeric: boolean;
 }
 
@@ -89,13 +87,13 @@ interface HeadCell<T> {
  * @param orderBy should be a key of T
  * @param onSelectAllClick handler for when table header 'select all' is checked
 */
-interface ITableHeadProps<T> {
+type TableHeadProps<T> = {
   customHeaders: ((row: T, idx: number) => JSX.Element)[];
   headerData: T;
   headersToDisplay: (keyof T)[];
   isMultiSelect: boolean;
   numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof T) => void;
+  onRequestSort?: (event: React.MouseEvent<unknown>, property: keyof T) => void;
   order: Order;
   orderBy: string;
   rowCount: number;
@@ -115,9 +113,9 @@ export type {
   Order,
   ICustomTableColumn,
   ITableQuery,
-  ITableHeadProps,
-  IPlainTableProps,
-  ITableProps,
+  TableHeadProps,
+  PlainTableProps,
+  DataTableProps,
   ITableQueryProps,
   ITableSortProp,
   ITableFilter,

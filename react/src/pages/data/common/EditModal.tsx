@@ -1,6 +1,5 @@
 import { IUpsertPayload } from 'api/api_interfaces';
 import { EditModalBaseProps, ModalBaseProps } from 'components/component_interfaces';
-import Button from 'components/form/Button';
 import ChangeContext from 'contexts/InputChangeContext';
 import { ReactNode, useState } from 'react';
 import { Animal } from 'types/animal';
@@ -12,15 +11,10 @@ import { EditTabPanel, a11yProps } from 'pages/data/common/EditModalComponents';
 import HistoryPage from './HistoryPage';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
-import Modal from 'components/modal/Modal';
+import { Button, Modal } from 'components/common';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Divider from '@mui/material/Divider';
-import Paper from '@mui/material/Paper';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import { Box, Container, Divider, Paper, Tabs, Tab } from '@mui/material';
 import { BCTWBase } from 'types/common_types';
 import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
@@ -52,7 +46,7 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
  * @param headerComponent
  */
 /**
- * fixme: dont need to pass the object being edited to Editmodal, it just needs
+ * note: don't need to pass the object being edited to Editmodal, it only needs
  * an instance of T with the identifier (ex. critter_id)
  * to preserve the class methods when save is called
  * see EditCritter

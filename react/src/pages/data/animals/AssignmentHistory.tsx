@@ -5,9 +5,8 @@ import PerformAssignmentAction from 'pages/data/animals/PerformAssignmentAction'
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { CollarStrings } from 'constants/strings';
 import { ModalBaseProps } from 'components/component_interfaces';
-import { Modal } from 'components/common';
+import { Button, Modal } from 'components/common';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
-import Button from 'components/form/Button';
 import EditDataLifeModal from 'components/form/EditDataLifeModal';
 
 export type IAssignmentHistoryPageProps = Pick<ModalBaseProps, 'open' | 'handleClose'> & {
@@ -22,7 +21,7 @@ export type IAssignmentHistoryPageProps = Pick<ModalBaseProps, 'open' | 'handleC
  */
 export default function AssignmentHistory(props: IAssignmentHistoryPageProps): JSX.Element {
   const { critter_id, open, handleClose, permission_type } = props;
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
   const [currentAttachment, setCurrentAttached] = useState<CollarHistory>(new CollarHistory());
   const [selectedAttachment, setSelectedAttachment] = useState<CollarHistory>(new CollarHistory());
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
@@ -50,7 +49,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
       await setSelectedAttachment(row);
       setShowEditDL(() => !showEditDL);
     }
-    return <Button disabled={!permissionCanModify(permission_type)} onClick={handleClick}>Edit Data Life</Button>;
+    return <Button disabled={!permissionCanModify(permission_type)} onClick={handleClick}>Edit</Button>;
   };
 
   return (
@@ -58,7 +57,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
       <DataTable
         title={CollarStrings.assignmentHistoryByAnimalTitle}
         headers={CollarHistory.propsToDisplay}
-        queryProps={{ query: bctwApi.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
+        queryProps={{ query: api.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
         paginate={history?.length >= 10}
         customColumns={[{ column: EditDatalifeColumn, header: (): JSX.Element => <b>Modify Data Life</b> }]}
       />

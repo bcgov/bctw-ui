@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import Button from 'components/form/Button';
-import Modal from 'components/modal/Modal';
 import DataTable from 'components/table/DataTable';
 import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CritterStrings as CS } from 'constants/strings';
@@ -9,6 +7,7 @@ import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import { AttachDeviceInput } from 'types/collar_history';
 import { Animal } from 'types/animal';
 import { DataLifeInput } from 'types/data_life';
+import { Button, Modal } from 'components/common';
 
 type IAssignNewCollarModal = Pick<Animal, 'critter_id'> & {
   show: boolean;
@@ -42,20 +41,18 @@ export default function AssignNewCollarModal({ critter_id, dli, onClose, show, o
   }
 
   return (
-    <>
-      <Modal open={show} handleClose={onClose}>
-        <DataTable
-          headers={Collar.propsToDisplay}
-          title={CS.collarAssignmentTitle}
-          queryProps={{ query: bctwApi.useUnattachedDevices, param: eCollarAssignedStatus.Available }}
-          onSelect={handleSelectDevice}
-        />
-        {/* disable editing of end of the attachment when attaching the device */}
-        <DataLifeInputForm dli={DLInput} enableEditStart={true} enableEditEnd={false} />
-        <Button disabled={collarId === ''} onClick={handleSave}>
-          {CS.assignCollarBtnText}
-        </Button>
-      </Modal>
-    </>
+    <Modal open={show} handleClose={onClose}>
+      <DataTable
+        headers={Collar.propsToDisplay}
+        title={CS.collarAssignmentTitle}
+        queryProps={{ query: bctwApi.useUnattachedDevices, param: eCollarAssignedStatus.Available }}
+        onSelect={handleSelectDevice}
+      />
+      {/* disable editing of end of the attachment when attaching the device */}
+      <DataLifeInputForm dli={DLInput} enableEditStart={true} enableEditEnd={false} />
+      <Button disabled={collarId === ''} onClick={handleSave}>
+        {CS.assignCollarBtnText}
+      </Button>
+    </Modal>
   );
 }

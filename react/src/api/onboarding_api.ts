@@ -24,7 +24,7 @@ export const onboardingApi = (props: ApiProps): API => {
    * to be granted access to BCTW
    */
   const submitOnboardingRequest = async (body: IOnboardUser): Promise<IOnboardUser> => {
-    console.log('posting new user to be onboarded', body);
+    // console.log('posting new user to be onboarded', body);
     const { data } = await postJSON(api, createUrl({ api: submitURL }), body);
     invalidate()
     return data;
@@ -37,7 +37,7 @@ export const onboardingApi = (props: ApiProps): API => {
    */
   const handleOnboardingRequest = async (body: HandleOnboardInput): Promise<boolean> => {
     const url = createUrl({ api: handleURL });
-    console.log('posting grant/deny onboard new user to be onboarded', body);
+    // console.log('posting grant/deny onboard new user to be onboarded', body);
     const { data } = await api.post(url, body);
     invalidate();
     return data;

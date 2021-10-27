@@ -5,9 +5,11 @@ import Toast from 'components/common/Toast';
 import Tooltip from 'components/common/Tooltip';
 import Modal from 'components/modal/Modal';
 import List from 'components/common/List';
+import Button from 'components/common/Button';
 
-// simply re-exports common components
+// re-exports common components
 export {
+  Button,
   NotificationMessage,
   SnackbarWrapper,
   Icon,

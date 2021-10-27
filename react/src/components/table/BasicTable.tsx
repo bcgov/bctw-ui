@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
-import TableContainer from './TableContainer';
+import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
-import { IPlainTableProps, Order } from 'components/table/table_interfaces';
+import { PlainTableProps, Order } from 'components/table/table_interfaces';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { BCTWBase } from 'types/common_types';
@@ -9,7 +9,7 @@ import { BCTWBase } from 'types/common_types';
 /**
  * A table that expects the data to be provided.
  */
-export type BasicTableProps<T> = IPlainTableProps<T> & {
+export type BasicTableProps<T> = PlainTableProps<T> & {
   data: T[];
   rowIdentifier: string;
 };

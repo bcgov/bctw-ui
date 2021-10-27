@@ -1,9 +1,8 @@
-import Button from 'components/form/Button';
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Icon } from 'components/common';
-import { IPlainTableProps } from 'components/table/table_interfaces';
-import './table.scss';
+import { Button, Icon } from 'components/common';
+import { PlainTableProps } from 'components/table/table_interfaces';
 import TableContainer from './TableContainer';
+import './table.scss';
 
 export type EditTableRowAction = 'add' | 'delete' | 'duplicate' | 'edit' | 'reset';
 
@@ -17,7 +16,7 @@ export type EditTableVisibilityProps = {
   showReset?: boolean;
 };
 
-type EditTableProps<T> = Omit<IPlainTableProps<T>, 'headers'> & EditTableVisibilityProps & {
+type EditTableProps<T> = Omit<PlainTableProps<T>, 'headers'> & EditTableVisibilityProps & {
   canSave: boolean;
   columns: ((d: T) => JSX.Element)[];
   data: T[];
@@ -120,14 +119,14 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
       <div className={'side-btns'}>
         {hideAdd ? null : (
           <span>
-            <Button onClick={(): void => onRowModified({} as T, 'add')} color='primary' variant='outlined'>
+            <Button onClick={(): void => onRowModified({} as T, 'add')} variant='outlined'>
               Add Row
             </Button>
           &nbsp; &nbsp;
           </span>
         )}
         {hideSave ? null : (
-          <Button disabled={!canSave} onClick={onSave} color='primary' variant='contained'>
+          <Button disabled={!canSave} onClick={onSave}>
             {saveButtonText ?? 'Save'}
           </Button>
         )}
