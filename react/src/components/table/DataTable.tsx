@@ -7,14 +7,14 @@ import {
   Checkbox,
   CircularProgress
 } from '@mui/material';
-import TableContainer from './TableContainer';
+import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
-import PaginationActions from './TablePaginate';
+import PaginationActions from 'components/table/TablePaginate';
 import { NotificationMessage } from 'components/common';
 import { formatAxiosError } from 'utils/errors';
-import { ICustomTableColumn, ITableFilter, DataTableProps, Order } from './table_interfaces';
+import { ICustomTableColumn, ITableFilter, DataTableProps, Order } from 'components/table/table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
@@ -130,8 +130,11 @@ export default function DataTable<T extends BCTWBase<T>>({
     if (typeof onSelect === 'function' && data?.length) {
       setSelected([id]);
       // a row can only be selected from the current pages data set
-      const row = data.find((d) => d[rowIdentifier] === id);
-      onSelect(row);
+      // fixme: why ^?
+      const row = values.find((d) => d[rowIdentifier] === id);
+      if (row) {
+        onSelect(row);
+      }
     }
     // will be null unless parent component wraps RowSelectedProvider
     if (typeof dispatchRowSelected === 'function') {
@@ -198,14 +201,34 @@ export default function DataTable<T extends BCTWBase<T>>({
     </TableRow>
   );
 
-  const Toolbar = (): JSX.Element =>
+  const Toolbar = (): JSX.Element => (
     <TableToolbar
       rowCount={values.length}
       numSelected={selected.length}
       title={title}
       onChangeFilter={handleFilter}
       filterableProperties={headers}
+      sibling={
+      /**
+       * hide pagination when total results are under @var rowsPerPage
+       * possible that only 10 results are actually available, in which
+       * case the next page will load no new results
+      */
+        !isPaginate ||
+        isLoading ||
+        isFetching ||
+        isError ||
+        (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
+            <PaginationActions
+              count={data.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onChangePage={handlePageChange}
+            />
+          )
+      }
     />
+  );
 
   // todo: why using memo for this?
   const headerProps = useMemo(() => headers, []);
@@ -229,82 +252,66 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   return (
     <TableContainer toolbar={Toolbar()}>
-      <>
-        <Table stickyHeader>
-          {data === undefined ? null : (
-            <TableHead
-              headersToDisplay={headerProps}
-              headerData={data && data[0]}
-              isMultiSelect={isMultiSelect}
-              numSelected={selected.length}
-              order={order}
-              orderBy={(orderBy as string) ?? ''}
-              onRequestSort={handleSort}
-              onSelectAllClick={handleSelectAll}
-              rowCount={values?.length ?? 0}
-              customHeaders={customColumns?.map((c) => c.header) ?? []}
-            />
-          )}
-          <TableBody>
-            {(values && values.length === 0) || isFetching || isLoading || isError
-              ? NoData()
-              : stableSort(perPage(), getComparator(order, orderBy)).map(
-                (obj, prop: number) => {
-                  const isRowSelected = isSelected(obj[rowIdentifier]);
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event): void => handleClickRow(event, obj[rowIdentifier])}
-                      role='checkbox'
-                      aria-checked={isRowSelected}
-                      tabIndex={-1}
-                      key={`row${prop}`}
-                      selected={isRowSelected}>
-                      {/* render checkbox column if multiselect is enabled */}
-                      {isMultiSelect ? (
-                        <TableCell padding='checkbox'>
-                          <Checkbox checked={isRowSelected} />
-                        </TableCell>
-                      ) : null}
-                      {/* render main columns from data fetched from api */}
-                      {headerProps.map((k, i) => {
-                        if (!k) {
-                          return null;
-                        }
-                        const { value } = formatTableCell(obj, k);
-                        return (
-                          <TableCell key={`${k}${i}`} align={'left'}>
-                            {value}
-                          </TableCell>
-                        );
-                      })}
-                      {/* render additional columns from props */}
-                      {customColumns.map((c: ICustomTableColumn<T>) => {
-                        const Col = c.column(obj, prop);
-                        return <TableCell key={`add-col-${prop}`}>{Col}</TableCell>;
-                      })
+      <Table stickyHeader>
+        {data === undefined ? null : (
+          <TableHead
+            headersToDisplay={headerProps}
+            headerData={data && data[0]}
+            isMultiSelect={isMultiSelect}
+            numSelected={selected.length}
+            order={order}
+            orderBy={(orderBy as string) ?? ''}
+            onRequestSort={handleSort}
+            onSelectAllClick={handleSelectAll}
+            rowCount={values?.length ?? 0}
+            customHeaders={customColumns?.map((c) => c.header) ?? []}
+          />
+        )}
+        <TableBody>
+          {(values && values.length === 0) || isFetching || isLoading || isError
+            ? NoData()
+            : stableSort(perPage(), getComparator(order, orderBy)).map(
+              (obj, prop: number) => {
+                const isRowSelected = isSelected(obj[rowIdentifier]);
+                return (
+                  <TableRow
+                    hover
+                    onClick={(event): void => handleClickRow(event, obj[rowIdentifier])}
+                    role='checkbox'
+                    aria-checked={isRowSelected}
+                    tabIndex={-1}
+                    key={`row${prop}`}
+                    selected={isRowSelected}>
+                    {/* render checkbox column if multiselect is enabled */}
+                    {isMultiSelect ? (
+                      <TableCell padding='checkbox'>
+                        <Checkbox checked={isRowSelected} />
+                      </TableCell>
+                    ) : null}
+                    {/* render main columns from data fetched from api */}
+                    {headerProps.map((k, i) => {
+                      if (!k) {
+                        return null;
                       }
-                    </TableRow>
-                  );
-                }
-              )}
-          </TableBody>
-        </Table>
-        {/**
-         * hide pagination when total results are under @var rowsPerPage
-         * possible that only 10 results are actually available, in which
-         * case the next page will load no new results
-        */}
-        {!isPaginate || isLoading || isFetching || isError || 
-        (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
-            <PaginationActions
-              count={data.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onChangePage={handlePageChange}
-            />
-          )}
-      </>
+                      const { value } = formatTableCell(obj, k);
+                      return (
+                        <TableCell key={`${k}${i}`} align={'left'}>
+                          {value}
+                        </TableCell>
+                      );
+                    })}
+                    {/* render additional columns from props */}
+                    {customColumns.map((c: ICustomTableColumn<T>) => {
+                      const Col = c.column(obj, prop);
+                      return <TableCell key={`add-col-${prop}`}>{Col}</TableCell>;
+                    })
+                    }
+                  </TableRow>
+                );
+              }
+            )}
+        </TableBody>
+      </Table>
     </TableContainer>
   );
 }

@@ -25,7 +25,7 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
   };
 
   return (
-    <div className={'paginate'}>
+    </* div className={'paginate'} */>
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 1}
@@ -53,6 +53,6 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
         aria-label="last page"
       ><LastPageIcon /></IconButton> */}
-    </div>
+    </ /* div */>
   );
 }

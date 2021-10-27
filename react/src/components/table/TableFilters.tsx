@@ -1,9 +1,9 @@
 import { Box, TextField } from '@mui/material';
-import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
+import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { useMemo, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
-import { FormStrings } from 'constants/strings';
+// import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
 type TextFilterProps = {
@@ -80,14 +80,15 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   );
 
   return (
-    <Box display='flex' alignItems='center' width='100%'>
+    <Box display='flex' alignItems='center'>
       <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} />
-      <MultiSelect
+      {/* note: disabling - not neeeded? */}
+      {/* <MultiSelect
         renderValue={(v: string[]): string => `${v.length} selected`}
         label={FormStrings.filterColumnsLabel}
         data={selectOptions}
         changeHandler={handleSelect}
-      />
+      /> */}
     </Box>
   );
 }

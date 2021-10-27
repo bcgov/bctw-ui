@@ -29,11 +29,12 @@ type TableToolbarProps<T> = {
   title: string;
   filterableProperties: (keyof T)[];
   onChangeFilter: (filter: ITableFilter) => void;
+  sibling?: JSX.Element;
 };
 
 export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Element {
   const classes = useToolbarStyles();
-  const { numSelected, title } = props;
+  const { numSelected, sibling, title } = props;
 
   return (
     <Toolbar disableGutters>
@@ -47,8 +48,9 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
           {title ?? ''} &nbsp;
           {numSelected > 0 ? <span>({numSelected} selected)</span> : <span>{''}</span>}
         </Box>
-        <Box>
+        <Box display={'flex'} alignItems={'center'}>
           <TableFilter {...props} />
+          {sibling}
         </Box>
       </Box>
     </Toolbar>
