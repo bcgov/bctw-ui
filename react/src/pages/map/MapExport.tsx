@@ -5,18 +5,25 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
 import download from 'downloadjs';
 import { eExportType, ExportQueryParams } from 'types/export';
-import { CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { omitNull } from 'utils/common_helpers';
 import { ITelemetryGroup, MapRange } from 'types/map';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
+import DateInput from 'components/form/Date';
+import dayjs, { Dayjs } from 'dayjs';
+import { MapStrings } from 'constants/strings';
+import { formatDay } from 'utils/time';
+import { InboundObj, parseFormChangeResult } from 'types/form_types';
 
 type ImportProps = ModalBaseProps & {
   groupedAssignedPings: ITelemetryGroup[];
   groupedUnassignedPings: ITelemetryGroup[];
   range: MapRange;
 };
+
+type ExportRange = 'all' | 'selected';
 
 /**
  * exports telemetry and metadata
@@ -27,12 +34,14 @@ type ImportProps = ModalBaseProps & {
   selected window.
 */
 export default function Export({ open, handleClose, groupedAssignedPings, range}: ImportProps): JSX.Element {
-  const bctwApi = useTelemetryApi();
-  const [exportParams, setExportParams] = useState<{type: eExportType, timespan: 'all' | 'selected'}>(null);
-  const responseDispatch = useResponseDispatch();
-
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
+  const [exportParams, setExportParams] = useState<{type: eExportType, timespan: ExportRange}>(null);
   const [critter_ids, setCritterIDs] = useState<string[]>([]);
-  const [collar_ids, setCollarIDs] = useState<string[]>([])
+  const [collar_ids, setCollarIDs] = useState<string[]>([]);
+  const [start, setStart] = useState<Dayjs>(dayjs(range.start));
+  const [end, setEnd] = useState<Dayjs>(dayjs(range.end));
+  const [rangeType, setRangeType] = useState<ExportRange>('selected');
 
   useDidMountEffect(() => {
     const critters = groupedAssignedPings.map(d => d.critter_id).filter(a => a);
@@ -41,6 +50,7 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
     setCollarIDs(collars);
   }, [groupedAssignedPings])
 
+  // when the export state changes, fetch the data to be exported
   useDidMountEffect(() => {
     const fetchExportData = async (): Promise<void> => {
       if (exportParams) {
@@ -52,7 +62,10 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
           type,
         };
         if (timespan === 'selected') {
-          body.range = range;
+          body.range = {
+            start: start.format(formatDay),
+            end: end.format(formatDay)
+          };
         }
         mutateAsync(body);
       }
@@ -111,77 +124,63 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
   }
 
   // show notification when an error occurs
-  const onError = (err): void => responseDispatch({severity: 'error', message: formatAxiosError(err)});
+  const onError = (err): void => showNotif({severity: 'error', message: formatAxiosError(err)});
 
   // setup the API call 
-  const { mutateAsync, reset, isLoading } = bctwApi.useExport({ onSuccess, onError });
+  const { mutateAsync, reset, isLoading } = api.useExport({ onSuccess, onError });
 
   // when an export button is clicked, set the download state
-  const clickExport = (type: eExportType, range: 'all' | 'selected'): void => {
-    const n = {type, timespan: range};
-    setExportParams(n)
-  }
+  const clickExport = (type: eExportType): void => setExportParams({type, timespan: rangeType});
 
-  const cellClass = 'cell-border-right';
+  const handleChangeRange = (v: InboundObj): void => {
+    setRangeType('selected');
+    const [key, value] = parseFormChangeResult(v);
+    const val = String(value);
+    if (key === 'tstart') {
+      setStart(dayjs(val));
+    } else {
+      setEnd(dayjs(val))
+    }
+  }
 
   return (
     <Modal open={open} handleClose={handleClose} title={'Export'}>
-      <>
+      <Box px={5} py={2} style={{backgroundColor: '#fff'}}>
         {isLoading ? <CircularProgress /> : null}
         <p>
           <b>{critter_ids.length}</b> unique {critter_ids.length == 1 ? 'animal' : 'animals'} selected.<br />
           <b>{collar_ids.length}</b> unique {collar_ids.length == 1 ? 'device' : 'devices'}  selected.<br />
         </p>
-        <h4>Export history for:</h4>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell className={cellClass}><Typography style={{ fontWeight: 'bold' }}>{range.start} to {range.end}</Typography></TableCell>
-                <TableCell><Typography style={{ fontWeight: 'bold' }}>All Time</Typography></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell className={cellClass}>
-                  <Button onClick={(): void => clickExport(eExportType.animal, 'selected')}>
-                    Animal Metadata
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button onClick={(): void => clickExport(eExportType.animal, 'all')}>
-                    Animal Metadata
-                  </Button>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className={cellClass}>
-                  <Button onClick={(): void => clickExport(eExportType.collar, 'selected')}>
-                    Device Metadata
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button onClick={(): void => clickExport(eExportType.collar, 'all')}>
-                    Device Metadata
-                  </Button>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className={cellClass}>
-                  <Button onClick={(): void => clickExport(eExportType.movement, 'selected')}>
-                    Location Data
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button onClick={(): void => clickExport(eExportType.movement, 'all')}>
-                    Location Data
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </>
+        <h3>Export history {rangeType === 'selected' ? `from ${start.format(formatDay)} to ${end.format(formatDay)}` : 'for all time'}</h3>
+
+        <Box display='flex' columnGap={3} mb={5} alignItems={'center'}>
+          <Box width={'50%'} display={'flex'} flexDirection={'column'} rowGap={2}>
+            <DateInput
+              propName='tstart'
+              label={MapStrings.startDateLabel}
+              defaultValue={start}
+              changeHandler={handleChangeRange}
+              maxDate={end}
+            />
+            <DateInput
+              propName='tend'
+              label={MapStrings.endDateLabel}
+              defaultValue={end}
+              changeHandler={handleChangeRange}
+              minDate={start}
+            />
+          </Box>
+          <Box><b>OR</b></Box>
+          <Button variant='outlined' onClick={(): void => setRangeType('all')}>All Time</Button>
+        </Box>
+        <hr/>
+        <h3>Download</h3>
+        <Box display={'flex'} columnGap={2}>
+          <Button onClick={(): void => clickExport(eExportType.animal)}>Animal Metadata</Button>
+          <Button onClick={(): void => clickExport(eExportType.collar)}>Device Metadata</Button>
+          <Button onClick={(): void => clickExport(eExportType.movement)}>Location Data</Button>
+        </Box>
+      </Box>
     </Modal>
   );
 }

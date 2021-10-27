@@ -65,11 +65,8 @@ import { eUDFType } from 'types/udf';
       allOtherPings.forEach(p => pings.addData(p));
  */
 export default function MapPage(): JSX.Element {
-  const bctwApi = useTelemetryApi();
+  const api = useTelemetryApi();
   const mapRef = useRef<L.Map>(null);
-
-  // The flag for which map is showing
-  // const [map3D, setMap3D] = useState(false);
 
   // pings layer state
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
@@ -119,10 +116,10 @@ export default function MapPage(): JSX.Element {
 
   // fetch the map data
   const { start, end } = range;
-  const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = bctwApi.usePings(start, end);
-  const { isError: isErrorUPings, data: fetchedUnassignedPings } = bctwApi.useUnassignedPings(start, end);
-  const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = bctwApi.useTracks(start, end);
-  const { isError: isErrorUTracks, data: fetchedUnassignedTracks } = bctwApi.useUnassignedTracks(start, end);
+  const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = api.usePings(start, end);
+  const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
+  const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
+  const { isError: isErrorUTracks, data: fetchedUnassignedTracks } = api.useUnassignedTracks(start, end);
 
   // refetch pings when start/end times are changed
   useEffect(() => {
