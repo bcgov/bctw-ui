@@ -34,8 +34,8 @@ export class LocationEvent implements ILocationEvent {
     public coordinate_type = eLocationPositionType.utm,
   ) {}
 
-  private utm_keys: (keyof this)[] = ['utm_easting', 'utm_northing', 'utm_zone'];
-  private coord_keys: (keyof this)[] = ['latitude', 'longitude'];
+  utm_keys: (keyof this)[] = ['utm_easting', 'utm_northing', 'utm_zone'];
+  coord_keys: (keyof this)[] = ['latitude', 'longitude'];
   private json_keys: (keyof this)[] = [...this.utm_keys, ...this.coord_keys, 'comment', 'date'];
 
   /**

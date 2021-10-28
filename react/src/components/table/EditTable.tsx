@@ -1,4 +1,4 @@
-import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Button, Icon } from 'components/common';
 import { PlainTableProps } from 'components/table/table_interfaces';
 import TableContainer from './TableContainer';
@@ -116,7 +116,7 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
       </Table>
     </TableContainer>
     {hideAll ? null : (
-      <div className={'side-btns'}>
+      <div>
         {hideAdd ? null : (
           <span>
             <Button onClick={(): void => onRowModified({} as T, 'add')} variant='outlined'>
@@ -126,9 +126,11 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
           </span>
         )}
         {hideSave ? null : (
-          <Button disabled={!canSave} onClick={onSave}>
-            {saveButtonText ?? 'Save'}
-          </Button>
+          <Box mt={1} mb={2}>
+            <Button disabled={!canSave} onClick={onSave}>
+              {saveButtonText ?? 'Save'}
+            </Button>
+          </Box>
         )}
       </div>
     )}

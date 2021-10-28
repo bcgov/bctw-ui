@@ -7,6 +7,8 @@ import { Box, Button, ButtonProps } from '@mui/material';
 import { Icon, Tooltip } from 'components/common';
 import { QueryStatus } from 'react-query';
 import { buttonProps } from 'components/component_constants';
+import LoadingButton from '@mui/lab/LoadingButton';
+
 
 /**
  * handles the show/hide functionality of the childEditComponent
@@ -155,9 +157,15 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
 
         {/* render edit button */}
         <Tooltip title={editTooltip ?? ''} inline={true}>
-          <Button {...btnProps} disabled={queryStatus === 'loading' || editBtnProps.disabled} onClick={handleClickEdit}>
-            {`${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}
-          </Button>
+          {
+            queryStatus === 'loading' ? (
+              <LoadingButton loading loadingIndicator='Loading...'>Fetch data</LoadingButton>
+            ) : (
+              <Button {...btnProps} disabled={editBtnProps.disabled} onClick={handleClickEdit}>
+                {`${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}
+              </Button>
+            )
+          }
         </Tooltip>
 
         {/* render delete button */}

@@ -27,7 +27,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
     <EditModal
       disableTabs={true}
       disableHistory={true}
-      title={editing?.id ? `Editing ${editing.uid}` : 'Create New User'}
+      title={editing?.id ? `Editing ${editing.username}` : 'Create New User'}
       showInFullScreen={false}
       onSave={doNothing}
       {...props}>

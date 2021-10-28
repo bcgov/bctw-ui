@@ -11,6 +11,7 @@ import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { UserStrings } from 'constants/strings';
+import { Typography } from '@mui/material';
 
 /**
  * user management page - requires admin user role.
@@ -50,7 +51,8 @@ export default function UserAdminPage(): JSX.Element {
   return (
     <AuthLayout>
       <div className='container'>
-        <h1>BCTW Users</h1>
+        <h1>User Management</h1>
+        <Typography mb={3} variant='body1' component='p'>Create or Edit BCTW users</Typography>
         <DataTable
           headers={['id', 'role_type', 'username', 'domain', 'firstname', 'lastname', 'email']}
           title='Users'

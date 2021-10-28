@@ -42,7 +42,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     }
   }, [data]);
 
-  // set permission request state on fetch
+  // set the permission request state on a successful fetch
   useDidMountEffect(() => {
     if (status === 'success' && data) {
       setRequests(groupPermissionRequests(data));
@@ -60,6 +60,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     showNotif({ severity: 'error', message: formatAxiosError(err) });
   };
 
+  // setup mutation for granting/denying a permission request
   const { mutateAsync, isLoading } = api.useTakeActionOnPermissionRequest({ onSuccess, onError });
 
   // submit when grant/deny is confirmed in the modal
@@ -88,7 +89,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const confirmDenyMesg = `${ays} deny this permission request?`;
   const confirmGrantMesg = `${ays} accept this permission request?`;
 
-  /** columns to render in edit table */
+  /** components to render in the edit table */
   const Emails = (u: IGroupedRequest): JSX.Element => (
     <List values={getUniqueValuesOfT(u.requests, 'requested_for_email')} />
   );
@@ -108,8 +109,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   };
 
   /**
-   * when the user selects 'deny', they are presented with a window
-   * asking them to enter a reason for the denial
+   * when the admin chooses to deny, show a modal asking a reason for the denial
    */
   const DenyConfirmMessage = (
     <>
@@ -164,7 +164,8 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
         <NotificationMessage severity={'error'} message={formatAxiosError(error)} />
       ) : (
         <>
-          <h1>Delegation Requests</h1>
+          <h1>Animal Acess Delegation Requests</h1>
+          <Typography mb={3} variant='body1' component='p'>Grant or deny animal access requests from managers.</Typography>
           {requests.length === 0 ? (
             <Typography>no pending requests</Typography>
           ) : (

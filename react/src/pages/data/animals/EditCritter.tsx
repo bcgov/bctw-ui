@@ -26,7 +26,7 @@ import { MapStrings } from 'constants/strings';
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
-  const canAssignCollectiveUnit = !!(canEdit && !editing.collective_unit);
+  const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
 
   const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
@@ -166,8 +166,11 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 'Identifiers',
                 [
                   identifierFields1.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit})),
-                  // render the collective unit select. If the user has modify permission for the animal
-                  // they can add collective units here too
+                  /**
+                   * render the collective unit (CU) select.
+                   * disabled if a CU has already been assigned
+                   * CU editor is available if user has permission
+                   */
                   <>
                     <SelectUDF
                       style={{ width: '200px'}}
@@ -176,8 +179,9 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                       udfType={eUDFType.collective_unit}
                       label={MapStrings.collectiveUnitLabel}
                       changeHandler={(v: IUDF): void => onChange({[eUDFType.collective_unit]: v.value})}
+                      disabled={!canEditCollectiveUnit}
                     />
-                    {canAssignCollectiveUnit ? (
+                    {canEditCollectiveUnit ? (
                       <IconButton onClick={(): void => setShowUDFModal((o) => !o)}>
                         <Icon icon='edit' />
                       </IconButton>

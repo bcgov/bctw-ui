@@ -56,7 +56,7 @@ export default function LocationEventForm({
 
   // notify parent error handler that required errors need to update when utm/lat long is changed
   useDidMountEffect(() => {
-    notifyChange({ reset: true });
+    notifyChange({ reset: true, toReset: showUtm ? event.utm_keys : event.coord_keys });
   }, [showUtm]);
 
   const baseInputProps = { changeHandler, required: !isDev(), disabled };

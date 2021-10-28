@@ -13,6 +13,7 @@ import { Button, Icon, NotificationMessage } from 'components/common';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import DataTable from 'components/table/DataTable';
 import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
+import { AnimalDelegationSteps } from 'constants/strings';
 
 /**
  * Page that allows an owner to submit a request to grant other users animal permissions 
@@ -102,8 +103,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   }
 
   /** components passed to be rendered in the edit table */
-
-  const renderEmailField = (): JSX.Element => {
+  const EmailField = (): JSX.Element => {
     const prop = 'email';
     const onChange = (v): void => {
       setEmailErr(v.error);
@@ -120,7 +120,7 @@ export default function OwnerRequestPermission(): JSX.Element {
     );
   };
 
-  const renderCommentField = (): JSX.Element => {
+  const CommentField = (): JSX.Element => {
     return (
       <TextField
         propName={'comment'}
@@ -133,7 +133,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   }
 
   const listStyle = { listStyle: 'none', minWidth: '200px', maxWidth: '300px'};
-  const renderEmailList = (): JSX.Element => {
+  const EmailList = (): JSX.Element => {
     return (
       <ul style={listStyle}>
         {emailList.length ? (
@@ -151,8 +151,7 @@ export default function OwnerRequestPermission(): JSX.Element {
     );
   };
 
-
-  const renderPermissionList = (): JSX.Element => {
+  const PermissionList = (): JSX.Element => {
     const p = permission?.access;
     return (
       p?.length ? (
@@ -165,7 +164,7 @@ export default function OwnerRequestPermission(): JSX.Element {
     );
   };
 
-  const renderCritterList = (): JSX.Element => {
+  const CritterList = (): JSX.Element => {
     const p = permission?.access;
     return (
       p?.length ? (
@@ -178,6 +177,12 @@ export default function OwnerRequestPermission(): JSX.Element {
     );
   };
 
+  const AddEmailBtn = (): JSX.Element => (
+    <Button size='small' disabled={!email.length || emailErr} onClick={handleAddEmail}>
+      Add
+    </Button>
+  );
+
   // the submit button state
   const canSubmitRequest = (): boolean => {
     const access = permission?.access ?? [];
@@ -189,31 +194,21 @@ export default function OwnerRequestPermission(): JSX.Element {
     return !!(emailList.length && access.length)
   }
 
-  const renderAddEmailBtn = (): JSX.Element => (
-    <Button disabled={!email.length || emailErr} onClick={handleAddEmail}>
-      Add Email
-    </Button>
-  );
-
   return (
     <OwnerLayout>
-      <>
+      <div className='container'>
         <h1>Delegation</h1>
-        <Typography>Submit a new permission request. Start by:</Typography>
+        <Typography variant='body1' component='p'>Submit a new animal permission request for another user</Typography>
         <ol>
-          <li>Enter a valid email address of the user you wish to give access to</li>
-          <li>Click <b>Add Email</b></li>
-          <li>Click the <b>Edit</b> icon</li>
-          <li>Choose from a list of animals and permissions from the popup</li>
-          <li>Click <b>Save</b></li>
-          <li>Once complete, click the <b>Submit Permission Request</b> button</li>
-          <li>An administrator will be notified of the pending request</li>
+          {
+            AnimalDelegationSteps.map((step: string, idx: number) => <li key={idx}>{step}</li>)
+          }
         </ol>
         <EditTable
           canSave={canSubmitRequest()}
-          columns={[renderEmailField, renderAddEmailBtn, renderEmailList, renderCritterList, renderPermissionList, renderCommentField]}
+          columns={[EmailField, AddEmailBtn, EmailList, CritterList, PermissionList, CommentField]}
           data={[new PermissionRequestInput()]}
-          headers={['', '', 'Emails', 'Animal Identifier', 'Permission Type', 'Comment', 'Edit', 'Reset']}
+          headers={['', '', 'Emails', 'Animal Identifier', 'Permission', 'Comment', 'Edit', 'Reset']}
           onRowModified={handleRowModified}
           onSave={handleSavePermission}
           hideAdd={true}
@@ -243,11 +238,11 @@ export default function OwnerRequestPermission(): JSX.Element {
           ) : null
         }
         <DataTable
-          title={'Successful Permission History (approved by an administrator)'}
+          title={'Submitted Permission History'}
           headers={PermissionRequest.ownerHistoryPropsToDisplay}
           queryProps={{ query: api.usePermissionHistory}}
         />
-      </>
+      </div>
     </OwnerLayout>
   );
 }

@@ -1,5 +1,5 @@
 import { ModalBaseProps } from 'components/component_interfaces';
-import { Modal, Button } from 'components/common';
+import { Modal, Button, Tooltip } from 'components/common';
 import tokml from 'tokml';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
@@ -170,8 +170,10 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
               minDate={start}
             />
           </Box>
-          <Box><b>OR</b></Box>
-          <Button variant='outlined' onClick={(): void => setRangeType('all')}>All Time</Button>
+          <Box><b>— or —</b></Box>
+          <Tooltip title={MapStrings.export.allTime}>
+            <Button variant='outlined' onClick={(): void => setRangeType('all')}>All Time</Button>
+          </Tooltip>
         </Box>
         <hr/>
         <h3>Download</h3>

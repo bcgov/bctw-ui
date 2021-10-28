@@ -1,6 +1,7 @@
 import { isDev } from 'api/api_helpers';
 import { useEffect, useState } from 'react';
 import { InboundObj } from 'types/form_types';
+import { removeProps } from 'utils/common_helpers';
 
 /**
  * hook that can be used in forms to determine if any of the child input components have errors
@@ -21,16 +22,22 @@ export default function useFormHasError(): [boolean, (r: Record<string, unknown>
     setErrorsExist(numErrs > 0);
   }, [errors]);
 
-  const reset = (): void => {
-    // fixme: only reset those errors!
-    setErrors({});
+  // if v contains the toReset string[], only remove those errors
+  const reset = (v: InboundObj & {toReset?: string[]}): void => {
+    if (Object.prototype.hasOwnProperty.call(v, 'toReset')) {
+      const { toReset } = v;
+      if (Array.isArray(toReset)) {
+        setErrors(errs => removeProps(errs, toReset));
+      }
+    } else {
+      setErrors({});
+    }
   }
 
   const checkErrors = (v: InboundObj): void => {
     // if v contains a reset key, wipe errors
     if (Object.prototype.hasOwnProperty.call(v, 'reset')) {
-      // console.log('error state reset triggered with ', v)
-      reset();
+      reset(v);
       return;
     }
     // verify the error key exists

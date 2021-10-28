@@ -9,7 +9,7 @@ import { OnboardStrings } from 'constants/strings';
 import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
 import { Button } from 'components/common';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 /**
  *
@@ -20,7 +20,7 @@ export default function OnboardingAdminPage(): JSX.Element {
   const [isGranting, setIsGranting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [msg, setMsg] = useState('');
-  const responseDispatch = useResponseDispatch();
+  const showNotif = useResponseDispatch();
 
   const handleSelectRequest = (o: OnboardUser): void => {
     setRequest(o);
@@ -28,11 +28,11 @@ export default function OnboardingAdminPage(): JSX.Element {
 
   const onSuccess = (result: boolean): void => {
     const message = result ? `user ${request.username} created successfully` : `onboarding request denied`;
-    responseDispatch({ severity: 'success', message });
+    showNotif({ severity: 'success', message });
   };
 
   const onError = (e: AxiosError): void => {
-    responseDispatch({ severity: 'error', message: formatAxiosError(e)});
+    showNotif({ severity: 'error', message: formatAxiosError(e)});
   };
 
   // setup the mutations
@@ -45,7 +45,6 @@ export default function OnboardingAdminPage(): JSX.Element {
       role_type,
       access: isGranting ? 'granted' : 'denied'
     };
-    // console.log(body)
     saveMutation(body);
     setShowConfirm(o => !o);
   };
@@ -60,9 +59,11 @@ export default function OnboardingAdminPage(): JSX.Element {
   return (
     <AuthLayout>
       <div className='container'>
+        <h1>Onboarding Requests</h1>
+        <Typography mb={3} variant='body1' component='p'>Grant or deny new user requests. Only requests with Access type pending can be modified.</Typography>
         <DataTable
           headers={new OnboardUser().displayProps}
-          title='Pending BCTW onboarding requests'
+          title='New user requests'
           queryProps={{ query: api.useOnboardRequests }}
           onSelect={handleSelectRequest}
         />

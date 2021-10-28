@@ -6,7 +6,6 @@ import { useState } from 'react';
 import BasicTable from 'components/table/BasicTable';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import ManageLayout from 'pages/layouts/ManageLayout';
 import React from 'react';
 import { formatAxiosError } from 'utils/errors';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -21,6 +20,7 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { plainToClass } from 'class-transformer';
 import { IBulkUploadResults } from 'api/api_interfaces';
+import AuthLayout from 'pages/layouts/AuthLayout';
 
 enum eImportType {
   animal = 'animal',
@@ -134,9 +134,10 @@ export default function Import(): JSX.Element {
   };
 
   return (
-    <ManageLayout>
-      <h1>Data Import</h1>
-      <div>
+    <AuthLayout>
+      <div className='container'>
+        <h1>Data Import</h1>
+        <Typography mb={3} variant='body1' component='p'>Import metadata via CSV file.</Typography>
         {/* save progress indicator */}
         {isLoading ? <div>saving...<CircularProgress /></div> : null}
         {/* import type options and instructions */}
@@ -158,7 +159,7 @@ export default function Import(): JSX.Element {
             <Typography variant='h5'>{'Import Instructions'}</Typography>
             <ol>
               {ImportSteps.map((step, index) => {
-                if (index === 0 && importType) {
+                if (index === 1 && importType) {
                   return <li onClick={downloadTemplate} className={'cell-clickable'}>{step}</li>;
                 }
                 return <li>{step}</li>;
@@ -180,6 +181,6 @@ export default function Import(): JSX.Element {
         </div>
         {isError ? <NotificationMessage severity='error' message={formatAxiosError(error)} /> : null}
       </div>
-    </ManageLayout>
+    </AuthLayout>
   );
 }

@@ -14,13 +14,25 @@ const CritterStrings = {
 }
 
 const ImportSteps = [ 
+  'Select the import type',
   'Download the template.',
   'Paste the column headers into an Excel spreadsheet',
   'Fill out the rows',
-  'Save the file as the CSV format',
+  'Save the file in CSV format',
   'Click the upload button and select your CSV file',
   'If there were errors during the upload, view them in the error table.',
   'Fix the errors, re-download the file as a CSV and try the upload again',
+];
+
+
+const AnimalDelegationSteps = [
+  'Enter a valid email address of the user you wish to give access to',
+  'Click Add Email',
+  'Click the Edit icon',
+  'Choose from a list of animals and permissions from the popup',
+  'Click Save',
+  'Once complete, click the Submit Permission Request button',
+  'An administrator will be notified of the pending request',
 ];
 
 const FileStrings = {
@@ -81,9 +93,9 @@ const WorkflowStrings = {
     isActive: 'You have set the device status to Active. Do you wish to exit the workflow now?',
     isRetrieved: 'Did you retrieve the device?',
     wasRetrieved: 'If the device was retrieved, the retrieval workflow form will be opened after',
-    statusActive: 'todo: This device is still active',
-    statusOffline: 'todo: this device is offline',
-    statusMalfunction: 'todo: this device has had a malfunction',
+    statusActive: 'This device is still active',
+    statusOffline: 'This device is offline',
+    statusMalfunction: 'This device has had a malfunction',
   },
   device: {
     should_unattach: 'Unassign device from animal?',
@@ -98,11 +110,6 @@ const CollarStrings = {
   availableCollarsTableTitle: 'Unattached Devices',
   editableProps: ['device_id', 'frequency', 'device_make', 'device_model', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
   exportTitle: 'Bulk Export Device Data',
-  // exportText: '',
-  // addCollarTypeTitle: 'Select Device Type',
-  // addCollarTypeText: 'What type of device would you like to add?',
-  // addCollarVect: 'Vectronics Device',
-  // addCollarVHF: 'VHF Device',
   assignmentHistoryByAnimalTitle: 'History of Devices Assigned',
   assignmentHistoryByDeviceTitle: 'History of Animals Assigned',
   collarImportStartMsg: 'Device import - What do you want to do?',
@@ -155,6 +162,9 @@ const MapStrings = {
   drawLineLabel: 'Measure distance',
   drawPolygonLabel: 'Select fixes by drawing a polygon',
   drawRectangleLabel: 'Select fixes by drawing a rectangle',
+  export: {
+    allTime: 'Export the entire history for this selection',
+  }
 }
 
 const MapTileLayers = {
@@ -196,6 +206,7 @@ const UserStrings = {
 }
 
 export {
+  AnimalDelegationSteps,
   CodeStrings,
   CollarStrings,
   CritterStrings,

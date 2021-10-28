@@ -9,6 +9,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { sendSmsMortality } from 'utils/gcNotify';
 import { UserCritterAccess } from 'types/animal_access';
+import { isDev } from 'api/api_helpers';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
@@ -30,7 +31,6 @@ export default function UserProfile(): JSX.Element {
 
   function sendTestSms(phoneNumber): void {
     alert('Test SMS will be sent to: ' + phoneNumber);
-    // console.log('Sending test SMS to ' + phoneNumber);
     sendSmsMortality(phoneNumber);
   }
 
@@ -38,33 +38,30 @@ export default function UserProfile(): JSX.Element {
     query: bctwApi.useCritterAccess,
     param: { user }
   };
-
+  const Span = (props): JSX.Element => (
+    <Typography>
+      <label style={{textAlign: 'right', marginRight: '20px'}}>{props.label}</label>
+      <span style={{fontWeight: 'bolder', marginRight: '20px'}}>{props.msg}</span>
+      {props.child}
+    </Typography>
+  );
   return (
     <ManageLayout>
-      <Box className='manage-layout-titlebar'>
+      <div className='container'>
         <h1>My Profile</h1>
-      </Box>
-      <div style={{margin: '20px'}}>
-        <Typography>
-          <p>
-            Your Name: <strong>{user.firstname ?? 'Local'}</strong>&nbsp;<strong>{user.lastname ?? 'User'}</strong>
-          </p>
-          <p>
-            Your username: <strong>{user.identifier}\{user.uid?? 'Local Username'}</strong>
-          </p>
-          <p>
-            Your Role: <strong>{user.role_type}</strong>
-          </p>
-          <p>
-            Your email address: <strong>{user.email}</strong>
-          </p>
-          <p>
-            Your phone number: <strong>{user.phone ?? 'No number on file'}</strong> &nbsp; &nbsp; 
-            <Button className='button' onClick={(): void => sendTestSms(user.phone)}>
-              Send test SMS
-            </Button>
-          </p>
-        </Typography>
+        <Box display={'grid'} my={2} >
+          <Span label={'Name:'} msg={user.name}/>
+          <Span label={'Username:'} msg={user.username}/>
+          <Span label={'Role:'} msg={user.role_type}/>
+          <Span label={'Email:'} msg={user.email}/>
+          <Span label={'Phone:'} msg={user.phone ?? 'No number on file'} child={
+            isDev() ? (
+              <Button disabled={!user.phone} size='small' onClick={(): void => sendTestSms(user.phone)}>
+                Send test SMS
+              </Button>
+            ) : null
+          }/>
+        </Box>
         <DataTable
           headers={UserCritterAccess.propsToDisplay}
           title='Animals you have access to:'

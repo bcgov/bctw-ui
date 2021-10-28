@@ -32,10 +32,8 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
-      curRoutes.push(routes.find((r) => r.name === 'animal-manager'));
-      curRoutes.push(routes.find((r) => r.name === 'delegation-requests'));
-      curRoutes.push(routes.find((r) => r.name === 'onboarding-admin'));
-      curRoutes.push(routes.find((r) => r.name === 'users'));
+      const adminRoutes = ['import', 'animal-manager', 'delegation-requests', 'onboarding-admin', 'users'];
+      curRoutes.push(...routes.filter((r) => adminRoutes.includes(r.name)));
     }
     if (isOwner) {
       curRoutes.push(...routes.filter((r) => ['delegation'].includes(r.name)));
@@ -51,18 +49,16 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       case '/devices':
       case '/delegation':
       case '/delegation-requests':
-      case '/import':
       case '/onboarding-requests':
       case '/profile':
     }
-    handleSetVisible(['animals', 'devices', 'import', 'profile']);
+    handleSetVisible(['animals', 'devices', 'profile']);
   }, [location, isAdmin, isOwner]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
     <Box className={'sidebar'} id="manage_sidebar" py={2} px={2}>
-
-      <List component='nav' color="primary">
+      <List component='nav'>
         {routesToShow
           .filter((r) => r.name !== 'notFound' && r.icon)
           .map((route: RouteKey, idx: number) => {

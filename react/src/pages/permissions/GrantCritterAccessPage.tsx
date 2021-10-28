@@ -30,7 +30,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
     } else {
       showNotif({
         severity: 'success',
-        message: `animal access granted for users: ${user.uid}`
+        message: `animal access granted for users: ${user.username}`
       });
     }
   };
@@ -52,12 +52,11 @@ export default function GrantCritterAccessPage(): JSX.Element {
     <AuthLayout>
       <div className='container'>
         <h1>Set Animal Manager</h1>
-        <Typography variant='body2' component='p'>A user has access to devices through the user-animal association.</Typography>
+        <Typography mb={3} variant='body1' component='p'>A user has access to devices through the user-animal association.</Typography>
         <DataTable
-          headers={user.displayProps}
+          headers={user.displayProps.filter(prop => !['idir', 'bceid'].includes(prop))}
           title='Users'
           queryProps={{ query: api.useUsers }}
-          // when a row is selected from the data table, set the current user
           onSelect={(u: User): void => setUser(u)}
         />
         <div className={'button-row'}>
@@ -66,7 +65,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
         <PickCritterPermissionModal
           open={showModal}
           handleClose={(): void => setShowModal(false)}
-          title={`Modifying ${user.uid}'s Animal Access`}
+          title={`Modifying ${user.username}'s Animal Access`}
           onSave={handleSave}
           filter={adminPermissionOptions}
           alreadySelected={[]}

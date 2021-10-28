@@ -55,7 +55,6 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
 
   get displayProps(): (keyof OnboardUser)[] {
     const props: (keyof OnboardUser)[] = [
-      'domain',
       'username',
       'firstname',
       'lastname',
@@ -67,7 +66,7 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
       'created_at'
     ];
     if (isDev()) {
-      props.unshift('onboarding_id');
+      props.unshift('onboarding_id', 'domain');
     }
     return props;
   }

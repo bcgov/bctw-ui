@@ -1,5 +1,6 @@
 import { columnToHeader } from 'utils/common_helpers';
 import { BCTWBase } from 'types/common_types';
+import { isDev } from 'api/api_helpers';
 
 export enum eUserRole {
   administrator = 'administrator',
@@ -11,7 +12,7 @@ export type KeyCloakDomainType = 'idir' | 'bceid';
 
 /**
  * interface representing the keycloak object retrieved
- * in the UserContext.tsx
+ * in the @file UserContext.tsx
  */
 export interface IKeyCloakSessionInfo {
   domain: KeyCloakDomainType;
@@ -21,7 +22,7 @@ export interface IKeyCloakSessionInfo {
   given_name: string;
 }
 
-// properties that all user classes implement
+// all user classes implement
 type UserBaseType = {
   firstname: string;
   lastname: string;
@@ -32,7 +33,10 @@ type UserBaseType = {
   username: string;
 };
 
-// the "base" user class, extended by onboarding and bctw user classes
+/**
+ * the base user class
+ * extended by @class OnboardUser and @class User 
+ */
 export class UserBase implements UserBaseType {
   firstname: string;
   lastname: string;
@@ -53,7 +57,6 @@ export interface IUser extends UserBaseType {
 
 /** 
  * the main user class representing a row in the bctw.user table 
- * todo: deprecate idir, bceid
  */
 export class User extends UserBase implements BCTWBase<User>, IUser {
   is_owner: boolean;
@@ -66,16 +69,17 @@ export class User extends UserBase implements BCTWBase<User>, IUser {
   }
 
   get displayProps(): (keyof User)[] {
-    return ['id', 'username', 'idir', 'bceid', 'role_type', 'is_owner'];
+    const props: (keyof User)[] = ['username', 'email', 'idir', 'bceid', 'role_type', 'is_owner'];
+    if (isDev()) {
+      props.unshift('id');
+    }
+    return props;
   }
-  /**
-   * gets either the IDIR or BCEID, whichever is present
-   * todo: need a better name? cannot use "identifier" as
-   * it conflicts with the table row identifier property
-   */
-  get uid(): string {
-    return this.idir ?? this.bceid ?? 'user';
+
+  get name(): string {
+    return this.firstname && this.lastname ? `${this.firstname} ${this.lastname}` : 'unknown';
   }
+
   get identifier(): string {
     return 'id';
   }
