@@ -38,7 +38,7 @@ export default function RadioField({
               disabled={disabled}
             />
           );
-          return tooltip ? <Tooltip title={tooltip}>{comp}</Tooltip> : comp;
+          return tooltip ? <Tooltip key={`tt-${label}`} title={tooltip}>{comp}</Tooltip> : comp;
         })}
       </RadioGroup>
     </FormControl>

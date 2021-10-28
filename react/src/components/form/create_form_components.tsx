@@ -119,6 +119,7 @@ function CreateEditSelectField({
   return (
     <SelectCode
       style={{ width: '200px', marginRight: '10px' }}
+      key={`${label}-select`}
       label={label}
       disabled={disabled}
       codeHeader={codeName ?? String(prop)}

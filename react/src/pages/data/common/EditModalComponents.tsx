@@ -1,6 +1,6 @@
 import { Box, ButtonProps, Grid } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
-import { ReactNode } from 'react';
+import { cloneElement, Children, Key, ReactElement, ReactNode } from 'react';
 
 interface TabPanelProps {
   children?: ReactNode;
@@ -58,29 +58,36 @@ const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>
   );
 };
 
-/**
- * creates a section of a form 
- * todo: pass disabled status to all children through this component?
+type FormSectionProps = {
+  id: Key,
+  header: string,
+  btn?: ReactNode,
+  disabled?: boolean;
+  children: ReactNode;
+}
+/** creates a section of a form with a grid layout
+ * @param children must not contain non valid elements (ex. fragments or nulls)
+ * top level children must have key props
  */
-const FormSection = (key: string, header: string, children: ReactNode[], btn?: ReactNode, disabled = false): JSX.Element => (
-  <Box component='fieldset' p={2}  style={{opacity: disabled ? 0.3 : 1}}>
-    {header ? (
-      <Box component='legend' className={'legend'} mb={1} mt={1}>
-        {header}
-        {btn}
-      </Box>
-    ) : null}
-    <Box className='fieldset-form'>
-      <Grid container spacing={1}>
-        <Grid item xs={12}>
-          {children.map((c, idx) => (
-            <span key={`${key}-${idx}`}>{c}</span>
-          ))}
+const FormSection = ({ id, header, btn, disabled, children }: FormSectionProps): JSX.Element => { 
+  return (
+    <Box component='fieldset' p={2}>
+      {header ? (
+        <Box component='legend' className={'legend'} mb={1} mt={1}>{header}{btn}</Box>
+      ) : null}
+      <Box className='fieldset-form'>
+        <Grid container spacing={1}>
+          <Grid item xs={12}>
+            {Children.map(children, (child: ReactElement, idx: number) => {
+              const isDisabled = child?.props?.disabled ?? disabled;
+              return cloneElement(child, {key:`${id}-${idx}`, disabled: isDisabled});
+            })}
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     </Box>
-  </Box>
-);
+  )
+};
 
 const a11yProps = (index: number): Record<string, string> => {
   return {
@@ -91,4 +98,4 @@ const a11yProps = (index: number): Record<string, string> => {
 
 const editEventBtnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'inherit', className: 'button', size: 'small' };
 
-export { EditHeader, EditTabPanel, FormSection, a11yProps, editEventBtnProps };
+export { EditHeader, EditTabPanel, a11yProps, editEventBtnProps, FormSection };

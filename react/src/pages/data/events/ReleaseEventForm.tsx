@@ -45,23 +45,27 @@ export default function ReleaseEventForm({ event, handleFormChange }: WorkflowFo
     return <p>unable to load release workflow</p>;
   }
 
-  return FormSection('release-wf', 'Release Details', [
-    <LocationEventForm event={release.location_event} notifyChange={onChangeLocationProp} />,
-    <Box {...boxSpreadRowProps} mt={2}>
-      {CreateFormField(release, {...fields.shouldUnattachDevice}, onChange)}
-      {/* {CreateFormField(release, { ...fields.data_life_start, required: isBeingUnattached }, onChange, { disabled: !isBeingUnattached })} */}
-    </Box>,
+  return (
     <>
-      {release.translocation && release.animal_status === 'In Translocation' ? (
-        <Box {...boxSpreadRowProps} mt={2}>
-          <h4>Update translocation details:</h4>
-          {CreateFormField(release, {...wfFields.get('region'), required: true}, onChange)}
-          {CreateFormField(release, {...wfFields.get('population_unit'), required: true}, onChange)}
-        </Box>
-      ) : null}
-    </>,
-    <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>
-      {releaseUnattachWarning(event.device_id, event.animal_id, event.wlh_id)}
-    </OkayModal>
-  ]);
+      <FormSection id='release-wf' header='Release Details'>
+        {[
+          <LocationEventForm key='rl-loc' event={release.location_event} notifyChange={onChangeLocationProp} />,
+          <Box key='bx-dev' {...boxSpreadRowProps} mt={2}>
+            {CreateFormField(release, { ...fields.shouldUnattachDevice }, onChange)}
+            {/* {CreateFormField(release, { ...fields.data_life_start, required: isBeingUnattached }, onChange, { disabled: !isBeingUnattached })} */}
+          </Box>,
+          release.translocation && release.animal_status === 'In Translocation' ? (
+            <Box key='bx-trsloc' {...boxSpreadRowProps} mt={2}>
+              <h4>Update translocation details:</h4>
+              {CreateFormField(release, { ...wfFields.get('region'), required: true }, onChange)}
+              {CreateFormField(release, { ...wfFields.get('population_unit'), required: true }, onChange)}
+            </Box>
+          ) : <span key='empty'></span>
+        ]}
+      </FormSection>
+      <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>
+        {releaseUnattachWarning(event.device_id, event.animal_id, event.wlh_id)}
+      </OkayModal>
+    </>
+  );
 }

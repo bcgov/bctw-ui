@@ -11,8 +11,11 @@ import { wfFields, WorkflowFormProps } from 'types/events/event';
 
 /**
  *
-*/
-export default function RetrievalEventForm({event, handleFormChange}: WorkflowFormProps<RetrievalEvent>): JSX.Element {
+ */
+export default function RetrievalEventForm({
+  event,
+  handleFormChange
+}: WorkflowFormProps<RetrievalEvent>): JSX.Element {
   const [retrieval, setRetrieval] = useState<RetrievalEvent>(event);
 
   useEffect(() => {
@@ -23,7 +26,6 @@ export default function RetrievalEventForm({event, handleFormChange}: WorkflowFo
   const [isRetrieved, setIsRetrieved] = useState(true);
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
   const [minRetrievalDate, setMinRetrievalDate] = useState<Dayjs>(retrieval.retrieval_date);
-
 
   // form component changes can trigger mortality specific business logic
   const onChange = (v: Record<keyof RetrievalEvent, unknown>): void => {
@@ -44,25 +46,43 @@ export default function RetrievalEventForm({event, handleFormChange}: WorkflowFo
   }
 
   return (
-    <>
-      {FormSection('retrieval-device', 'Device Details', [
-        <Box {...boxSpreadRowProps} mb={1}>
+    <FormSection id='retrieval-device' header='Device Details'>
+      {[
+        <Box key='bx-ret' {...boxSpreadRowProps} mb={1}>
           {CreateFormField(retrieval, wfFields.get('retrieved'), onChange)}
-          {CreateFormField(retrieval, wfFields.get('retrieval_date'), onChange, {disabled: !isRetrieved, minDate: minRetrievalDate}, false)}
+          {CreateFormField(
+            retrieval,
+            wfFields.get('retrieval_date'),
+            onChange,
+            { disabled: !isRetrieved, minDate: minRetrievalDate },
+            false
+          )}
         </Box>,
-        <Box {...boxSpreadRowProps} mb={2}>
+        <Box key='bx-dev' {...boxSpreadRowProps} mb={2}>
           {CreateFormField(retrieval, fields.shouldUnattachDevice, onChange, {}, true)}
-          {CreateFormField(retrieval, {...fields.data_life_end, required: isBeingUnattached }, onChange, {disabled: !isBeingUnattached})}
+          {CreateFormField(retrieval, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
+            disabled: !isBeingUnattached
+          })}
         </Box>,
-        <Box {...boxSpreadRowProps} mb={1}>
+        <Box key='bx-cdn' {...boxSpreadRowProps} mb={1}>
           {CreateFormField(retrieval, wfFields.get('device_condition'), onChange)}
           {CreateFormField(retrieval, wfFields.get('device_deployment_status'), onChange)}
         </Box>,
-        <Box {...boxSpreadRowProps} mb={1}>
-          {CreateFormField(retrieval, {...wfFields.get('activation_status'), tooltip: <p><span style={{color: 'orangered'}}>Reminder: </span>{`${WorkflowStrings.device.activation_warning}`}</p>}, onChange, {}, true)}
+        <Box key='bx-status' {...boxSpreadRowProps} mb={1}>
+          {CreateFormField(
+            retrieval,
+            {...wfFields.get('activation_status'),
+              tooltip: (
+                <p>
+                  <span style={{ color: 'orangered' }}>Reminder: </span>
+                  {`${WorkflowStrings.device.activation_warning}`}
+                </p>
+              )
+            }, onChange, {}, true
+          )}
         </Box>,
-        CreateFormField(retrieval, wfFields.get('retrieval_comment'), onChange),
-      ])}
-    </>
+        CreateFormField(retrieval, wfFields.get('retrieval_comment'), onChange)
+      ]}
+    </FormSection>
   );
 }

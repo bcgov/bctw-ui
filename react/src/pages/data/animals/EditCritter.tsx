@@ -12,7 +12,7 @@ import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/eve
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
-import { InboundObj, isDisabled } from 'types/form_types';
+import { InboundObj } from 'types/form_types';
 import ReleaseEvent from 'types/events/release_event';
 import { Button, Icon } from 'components/common';
 import { eUDFType, IUDF } from 'types/udf';
@@ -40,16 +40,22 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
    */
   const createEvent = (wfType: WorkflowType): CaptureEvent | ReleaseEvent | MortalityEvent => {
     if (wfType === 'capture') {
-      return editObjectToEvent(editing, new CaptureEvent(), ['species', 'translocation', 'recapture', 'region', 'population_unit']);
+      return editObjectToEvent(editing, new CaptureEvent(), [
+        'species',
+        'translocation',
+        'recapture',
+        'region',
+        'population_unit'
+      ]);
     } else if (wfType === 'release') {
       return editObjectToEvent(editing, new ReleaseEvent(), ['region', 'population_unit']);
     } else if (wfType === 'mortality') {
       return editObjectToEvent(editing, new MortalityEvent(), ['animal_status']);
     }
-  }
+  };
 
   /**
-   * if a workflow button is clicked and the event type is the same, open or close the workflow modal. 
+   * if a workflow button is clicked and the event type is the same, open or close the workflow modal.
    * otherwise, update the workflow type which will trigger the modal state
    */
   const handleOpenWorkflow = (e: WorkflowType): void => {
@@ -61,28 +67,28 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
    * when a capture workflow is saved, always show the release workflow unless a translocation is underway
    * todo: is this still needed?
    */
-  const handleWorkflowSaved = async(e: IBCTWWorkflow): Promise<void> => {
+  const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
     await setShowWorkflowForm(false);
     if (e.event_type === 'capture' && e instanceof CaptureEvent) {
       if (e.translocation && !e.isTranslocationComplete) {
         // do nothing
-      }
-      else { // show the release form, populating the location and date fields
+      } else {
+        // show the release form, populating the location and date fields
         const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'population_unit']);
         // set the new event directly, triggering the display of the release form
         // console.log(rwf)
         await updateEvent(rwf as any);
-        await setShowWorkflowForm(o => !o);
+        await setShowWorkflowForm((o) => !o);
       }
-    } 
-  }
+    }
+  };
 
   /**
    * the capture workflow has multiple exit points that chain to other workflows
-   * this is a separate handler because we do not want to save the form until the 
+   * this is a separate handler because we do not want to save the form until the
    * @param nextWorkflow is completed
    */
-  const handleWorkflowChain = async(e: CaptureEvent, nextWorkflow: WorkflowType): Promise<void> => {
+  const handleWorkflowChain = async (e: CaptureEvent, nextWorkflow: WorkflowType): Promise<void> => {
     if (e.event_type !== 'capture') {
       return;
     }
@@ -99,14 +105,15 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     const next = editObjectToEvent(e.getAnimal(), newwf, []);
     console.log(`capture workflow chained to ${nextWorkflow} type`, next);
     await updateEvent(next);
-    await setShowWorkflowForm(o => !o);
-  }
+    await setShowWorkflowForm((o) => !o);
+  };
 
   const {
     associatedAnimalFields,
     captureFields,
     characteristicsFields,
-    identifierFields1, identifierFields2,
+    identifierFields1,
+    identifierFields2,
     mortalityFields,
     releaseFields,
     animalCommentField
@@ -124,17 +131,15 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
         <EditHeader<AttachedAnimal>
           title={
             <>
-              WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '} {editing?.animal_id ?? '-'}
+              WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '}
+              {editing?.animal_id ?? '-'}
             </>
           }
           headers={['species', 'device_id', 'permission_type']}
           format={(editing as AttachedAnimal).formatPropAsHeader}
           obj={editing as AttachedAnimal}
           btn={
-            <Button
-              variant='outlined'
-              className='button'
-              onClick={(): void => setShowAssignmentHistory((o) => !o)}>
+            <Button variant='outlined' className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
               Device Assignment
             </Button>
           }
@@ -161,87 +166,89 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 handleClose={(): void => setShowUDFModal(false)}
                 afterSave={(): void => setShowUDFModal(false)}
               />
-              {FormSection(
-                'cr-ids',
-                'Identifiers',
-                [
-                  identifierFields1.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit})),
-                  /**
-                   * render the collective unit (CU) select.
-                   * disabled if a CU has already been assigned
-                   * CU editor is available if user has permission
-                   */
-                  <>
+              {/* 
+                render the collective unit (CU) select.
+                disabled if a CU has already been assigned
+                CU editor is available if user has permission
+              */}
+              <FormSection id='cr-ids' header='Identifiers' disabled={!canEdit}>
+                {[
+                  ...identifierFields1.map((f) => CreateFormField(editing, f, onChange)),
+                  <Box display='inline' key='udf-cu'>
                     <SelectUDF
-                      style={{ width: '200px'}}
+                      style={{ width: '200px' }}
                       multiple={false}
                       defaultValue={editing.collective_unit}
                       udfType={eUDFType.collective_unit}
                       label={MapStrings.collectiveUnitLabel}
-                      changeHandler={(v: IUDF): void => onChange({[eUDFType.collective_unit]: v.value})}
+                      changeHandler={(v: IUDF): void => onChange({ [eUDFType.collective_unit]: v.value })}
                       disabled={!canEditCollectiveUnit}
                     />
                     {canEditCollectiveUnit ? (
-                      <IconButton onClick={(): void => setShowUDFModal((o) => !o)}>
+                      <IconButton key='udf-icon' onClick={(): void => setShowUDFModal((o) => !o)}>
                         <Icon icon='edit' />
                       </IconButton>
                     ) : null}
-                    <Box></Box>
-                  </>,
-                  identifierFields2.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
-                ],
-              )}
-              {FormSection(
-                'cr-chars',
-                'Characteristics',
-                characteristicsFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
-              )}
-              {FormSection(
-                'cr-asoc',
-                'Association With Another Individual',
-                associatedAnimalFields.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
-              )}
-              {FormSection(
-                'cr-comm',
-                'Comments About This Animal',
-                animalCommentField.map((f) => CreateFormField(editing, f, onChange, {disabled: !canEdit}))
-              )}
+                  </Box>,
+                  ...identifierFields2.map((f) => CreateFormField(editing, f, onChange))
+                ]}
+              </FormSection>
+              <FormSection id='cr-chars' header='Characteristics' disabled={!canEdit}>
+                {characteristicsFields.map((f) => CreateFormField(editing, f, onChange))}
+              </FormSection>
+              <FormSection id='cr-asoc' header='Association With Another Individual' disabled={!canEdit}>
+                {associatedAnimalFields.map((f) => CreateFormField(editing, f, onChange))}
+              </FormSection>
+              <FormSection id='cr-comm' header='Comments About This Animal' disabled={!canEdit}>
+                {animalCommentField.map((f) => CreateFormField(editing, f, onChange))}
+              </FormSection>
               {/* hide all workflow related fields when creating a new animal */}
               {!isCreatingNew ? (
                 <>
-                  {FormSection(
-                    'cr-cap',
-                    'Latest Capture Details',
-                    captureFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled} )),
-                    <Button 
-                      disabled={!isAttached}
-                      {...editEventBtnProps}
-                      onClick={(): void => handleOpenWorkflow('capture')}>
-                      Add Capture Event
-                    </Button>
-                  )}
-                  {FormSection(
-                    'cr-rel',
-                    'Latest Release Details',
-                    releaseFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
-                    <Button 
-                      disabled={!isAttached}
-                      {...editEventBtnProps} 
-                      onClick={(): void => handleOpenWorkflow('release')}>
-                      Add Release Event
-                    </Button>
-                  )}
-                  {FormSection(
-                    'cr-mort',
-                    'Mortality Details',
-                    mortalityFields.map((f) => CreateFormField(editing, f, onChange, {...isDisabled})),
-                    <Button
-                      disabled={!isAttached}
-                      {...editEventBtnProps}
-                      onClick={(): void => handleOpenWorkflow('mortality')}>
-                      Record Mortality Details
-                    </Button>
-                  )}
+                  <FormSection
+                    id='cr-cap'
+                    header='Latest Capture Details'
+                    disabled={true}
+                    btn={
+                      <Button
+                        disabled={!isAttached}
+                        {...editEventBtnProps}
+                        onClick={(): void => handleOpenWorkflow('capture')}>
+                        Add Capture Event
+                      </Button>
+                    }>
+                    {captureFields.map((f) => CreateFormField(editing, f, onChange))}
+                  </FormSection>
+                  <FormSection
+                    id='cr-rel'
+                    header='Latest Release Details'
+                    disabled={true}
+                    btn={
+                      <Button
+                        disabled={!isAttached}
+                        {...editEventBtnProps}
+                        onClick={(): void => handleOpenWorkflow('release')}>
+                        Add Release Event
+                      </Button>
+                    }>
+                    {releaseFields.map((f) => CreateFormField(editing, f, onChange))}
+                  </FormSection>
+
+                  <FormSection
+                    id='cr-mort'
+                    header='Mortality Details'
+                    disabled={true}
+                    btn={
+                      <Button
+                        disabled={!isAttached}
+                        {...editEventBtnProps}
+                        onClick={(): void => handleOpenWorkflow('mortality')}>
+                        Record Mortality Details
+                      </Button>
+                    }>
+                    {mortalityFields.map((f) => CreateFormField(editing, f, onChange))}
+                  </FormSection>
+
                   {/* hide device assignment history for new critters */}
                   <AssignmentHistory
                     open={showAssignmentHistory}

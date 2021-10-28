@@ -11,7 +11,7 @@ import { editEventBtnProps, FormSection } from '../common/EditModalComponents';
 import RetrievalEvent from 'types/events/retrieval_event';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
-import { isDisabled, parseFormChangeResult } from 'types/form_types';
+import { parseFormChangeResult } from 'types/form_types';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import { wfFields } from 'types/events/event';
 import { Button } from 'components/common';
@@ -117,45 +117,37 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
           };
           return (
             <>
-              {FormSection(
-                'd-ids',
-                'Identifiers',
-                identifierFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
-              )}
-              {FormSection(
-                'd-sat',
-                'Satellite Network and Beacon Frequency', [
+              <FormSection id='d-ids' header='Identifiers' disabled={!canEdit}>
+                {identifierFields.map((f) => CreateFormField(editing, f, onChange))}
+              </FormSection>
+              <FormSection id='d-sat' header='Satellite Network and Beacon Frequency' disabled={!canEdit}>
+                {[
                   CreateFormField(editing, wfFields.get('device_type'), onChange),
                   CreateFormField(editing, {...wfFields.get('satellite_network'), required: !isVHF}, onChange, {disabled: isVHF }),
-                  frequencyFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
-                ]
-              )}
-              {FormSection(
-                'd-status',
-                'Device Status',
-                statusFields.map((f) => CreateFormField(editing, f, onChange, { disabled: !canEdit }))
-              )}
-              {FormSection(
-                'd-add',
-                'Additional Device Sensors and Beacons', [
+                  frequencyFields.map((f) => CreateFormField(editing, f, onChange))
+                ]}
+              </FormSection> 
+              <FormSection id='d-status' header='Device Status' disabled={!canEdit}>
+                {statusFields.map((f) => CreateFormField(editing, f, onChange))}
+              </FormSection>
+              
+              <FormSection id='d-add' header='Additional Device Sensors and Beacons' disabled={!canEdit}>
+                {[
                   CreateFormField(editing, wfFields.get('activation_status'), onChange),
-                  activationFields.map((f) => CreateFormField(editing, {...f, required: isActive}, onChange, { disabled: !canEdit || !isActive })),
-                  CreateFormField(editing, wfFields.get('activation_comment'), onChange, { disabled: !isActive}),
-                ]
-              )}
-              {FormSection(
-                'd-activ',
-                'Warranty & Activation Details', [
+                  activationFields.map((f) => CreateFormField(editing, {...f, required: isActive}, onChange)),
+                  CreateFormField(editing, wfFields.get('activation_comment'), onChange, { disabled: !isActive})
+                ]}
+              </FormSection> 
+              <FormSection id='d-activ' header='Warranty & Activation Details' disabled={!canEdit}>
+                {[
                   CreateFormField(editing, wfFields.get('camera_device_id'), onChange),
                   CreateFormField(editing, wfFields.get('dropoff_device_id'), onChange),
-                  deviceOptionFields.map((f) => CreateFormField(editing, {...f, required: hasDropoff}, onChange, { disabled: !canEdit || !hasDropoff }))
-                ]
-              )}
-              {FormSection(
-                'd-comment',
-                'Comments About this Device',
-                [CreateFormField(editing, wfFields.get('device_comment'), onChange, { disabled: !isActive})]
-              )}
+                  deviceOptionFields.map((f) => CreateFormField(editing, {...f, required: hasDropoff}, onChange, { disabled: !hasDropoff }))
+                ]}
+              </FormSection> 
+              <FormSection id='d-comment' header='Comments About this Device' disabled={!isActive}>
+                {CreateFormField(editing, wfFields.get('device_comment'), onChange, { disabled: !isActive})}
+              </FormSection>
               {/**
                * hide the workflow related fields entirely when creating a new collar
                * note: disable the workflow event buttons for unattached devices as
@@ -163,28 +155,35 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                */}
               {!isCreatingNew ? (
                 <>
-                  {FormSection(
-                    'd-ret',
-                    'Record Retrieval Details',
-                    retrievalFields.map((f) => CreateFormField(editing, f, onChange, { ...isDisabled })),
-                    <Button
-                      disabled={!isAttached}
-                      {...editEventBtnProps}
-                      onClick={(): void => handleOpenWorkflow('retrieval')}>
-                      Record Retrieval Details
-                    </Button>
-                  )}
-                  {FormSection(
-                    'd-malf',
-                    'Record Malfunction & Offline Details',
-                    malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange, { ...isDisabled })),
-                    <Button
-                      disabled={!isAttached}
-                      {...editEventBtnProps}
-                      onClick={(): void => handleOpenWorkflow('malfunction')}>
-                      Record Malfunction & Offline Details
-                    </Button>
-                  )}
+                  <FormSection 
+                    id='d-ret'
+                    header='Record Retrieval Details'
+                    disabled={true}
+                    btn={
+                      <Button
+                        disabled={!isAttached}
+                        {...editEventBtnProps}
+                        onClick={(): void => handleOpenWorkflow('retrieval')}>
+                        Record Retrieval Details
+                      </Button>
+                    }>
+                    {retrievalFields.map((f) => CreateFormField(editing, f, onChange))}
+                  </FormSection>
+                  
+                  <FormSection
+                    id='d-malf'
+                    header='Record Malfunction & Offline Details'
+                    disabled={true}
+                    btn={
+                      <Button
+                        disabled={!isAttached}
+                        {...editEventBtnProps}
+                        onClick={(): void => handleOpenWorkflow('malfunction')}>
+                        Record Malfunction & Offline Details
+                      </Button>
+                    }>
+                    {malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange, ))}
+                  </FormSection>
                   <WorkflowWrapper
                     open={showWorkflowForm}
                     event={event}

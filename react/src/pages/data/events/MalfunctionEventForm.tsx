@@ -74,68 +74,79 @@ export default function MalfunctionEventForm({
     }
   };
 
-  return FormSection('m', 'Select a device status:', [
-    <Box mb={2}>
-      {
-        <Radio
-          propName={wfFields.get('device_status').prop}
-          changeHandler={onChange}
-          defaultSelectedValue={'Potential Malfunction'}
-          values={statuses.map((p) => ({
-            label: p,
-            value: p,
-            disabled: p === 'Potential Malfunction',
-            tooltip: getTooltip(p)
-          }))}
-        />
-      }
-    </Box>,
-    <LocationEventForm
-      disabled={deviceIsActive || event.device_status === statuses[0]}
-      event={malfunction.location_event}
-      notifyChange={(v: Record<keyof LocationEvent, unknown>): void => handleFormChange(v)}
-    />,
-    deviceStatus == 'Offline' ? (
-      <Box mt={2} {...boxSpreadRowProps}>
-        {CreateFormField(
-          malfunction,
-          { ...wfFields.get('offline_type'), required: deviceStatus === 'Offline' },
-          onChange,
-          { disabled: deviceIsActive }
-        )}
-        <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
-          <DateTimeInput
-            propName={'offline_date'}
-            label={'Offline Date'}
-            defaultValue={event.location_event.date}
-            changeHandler={onChange}
-            disabled={deviceIsActive}
-            required={true}
-          />
-        </Tooltip>
-      </Box>
-    ) : deviceStatus === 'Malfunction' ? (
-      <Box mt={2} {...boxSpreadRowProps}>
-        {CreateFormField(
-          malfunction,
-          { ...wfFields.get('device_malfunction_type'), required: deviceStatus === 'Malfunction' },
-          onChange,
-          { disabled: deviceIsActive }
-        )}
-        <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
-          <DateTimeInput
-            propName={'malfunction_date'}
-            label={'Malfunction Date'}
-            defaultValue={event.location_event.date}
-            changeHandler={onChange}
-            disabled={deviceIsActive}
-          />
-        </Tooltip>
-      </Box>
-    ) : null,
-    <Box mt={2}>{CreateFormField(malfunction, wfFields.get('retrieved'), onChange, { disabled: deviceIsActive })}</Box>,
-    <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>
-      {WorkflowStrings.malfunction.wasRetrieved}
-    </OkayModal>
-  ]);
+  return (
+    <>
+      <FormSection id='mf-wf' header='Select a device status:'>
+        {[
+          <Box key='rad-status' mb={2}>
+            {
+              <Radio
+                propName={wfFields.get('device_status').prop}
+                changeHandler={onChange}
+                defaultSelectedValue={'Potential Malfunction'}
+                values={statuses.map((p) => ({
+                  label: p,
+                  value: p,
+                  disabled: p === 'Potential Malfunction',
+                  tooltip: getTooltip(p)
+                }))}
+              />
+            }
+          </Box>,
+          <LocationEventForm
+            key='mf-loc'
+            disabled={deviceIsActive || event.device_status === statuses[0]}
+            event={malfunction.location_event}
+            notifyChange={(v: Record<keyof LocationEvent, unknown>): void => handleFormChange(v)}
+          />,
+          deviceStatus == 'Offline' ? (
+            <Box key='mf-off' mt={2} {...boxSpreadRowProps}>
+              {CreateFormField(
+                malfunction,
+                { ...wfFields.get('offline_type'), required: deviceStatus === 'Offline' },
+                onChange,
+                { disabled: deviceIsActive }
+              )}
+              <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
+                <DateTimeInput
+                  propName={'offline_date'}
+                  label={'Offline Date'}
+                  defaultValue={event.location_event.date}
+                  changeHandler={onChange}
+                  disabled={deviceIsActive}
+                  required={true}
+                />
+              </Tooltip>
+            </Box>
+          ) : deviceStatus === 'Malfunction' ? (
+            <Box key='mf-mf' mt={2} {...boxSpreadRowProps}>
+              {CreateFormField(
+                malfunction,
+                { ...wfFields.get('device_malfunction_type'), required: deviceStatus === 'Malfunction' },
+                onChange,
+                { disabled: deviceIsActive }
+              )}
+              <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
+                <DateTimeInput
+                  propName={'malfunction_date'}
+                  label={'Malfunction Date'}
+                  defaultValue={event.location_event.date}
+                  changeHandler={onChange}
+                  disabled={deviceIsActive}
+                />
+              </Tooltip>
+            </Box>
+          ) : (
+            <span key='empty'></span>
+          ),
+          <Box key='mf-act' mt={2}>
+            {CreateFormField(malfunction, wfFields.get('retrieved'), onChange, { disabled: deviceIsActive })}
+          </Box>
+        ]}
+      </FormSection>
+      <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>
+        {WorkflowStrings.malfunction.wasRetrieved}
+      </OkayModal>
+    </>
+  );
 }
