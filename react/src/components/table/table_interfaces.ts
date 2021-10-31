@@ -13,7 +13,8 @@ interface ITableSortProp<T> {
 }
 
 /**
- * a hook from @file 'hooks/useTelemetryApi.ts passed to a data table 
+ * a property name from the useTelemetry hook (@file 'hooks/useTelemetryApi.ts)
+ * is passed to a data table
 */
 type ITableQuery<T> = (
   page: number,
@@ -29,8 +30,8 @@ type ITableQuery<T> = (
 interface ITableQueryProps<T> {
   defaultSort?: ITableSortProp<T>;
   param?: unknown;
-  // query: ITableQuery<T>
-  query: any; //fixme:
+  query: any;
+  // query: APIHandler;
   onNewData?: (data: T[]) => void;
 }
 

@@ -17,7 +17,7 @@ export default function HistoryPage<T extends BCTWBase<T>>(props: IHistoryPagePr
     defaultSort
   }
 
-  if (props.query === '') {
+  if (!props.query) {
     return <div>no history to display.</div>;
   }
 

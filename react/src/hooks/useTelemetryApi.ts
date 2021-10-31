@@ -33,6 +33,7 @@ import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow } from 'types/events/event';
 import { IOnboardUser, HandleOnboardInput, OnboardUser } from 'types/onboarding';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
+import { parseArgs } from 'utils/common_helpers';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -56,16 +57,16 @@ type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
 export const useTelemetryApi = () => {
   const api = useApi();
 
-  const collarApi = collar_api({ api });
-  const critterApi = critter_api({ api });
-  const codeApi = code_api({ api });
-  const bulkApi = bulk_api(api);
-  const mapApi = map_api({ api });
-  const userApi = user_api({ api });
-  const eventApi = event_api({ api });
+  const collarApi     = collar_api({ api });
+  const critterApi    = critter_api({ api });
+  const codeApi       = code_api({ api });
+  const bulkApi       = bulk_api(api);
+  const mapApi        = map_api({ api });
+  const userApi       = user_api({ api });
+  const eventApi      = event_api({ api });
   const permissionApi = permission_api({ api});
   const attachmentApi = attachment_api({ api});
-  const onboardApi = onboarding_api({ api});
+  const onboardApi    = onboarding_api({ api});
 
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
 
@@ -84,7 +85,7 @@ export const useTelemetryApi = () => {
     return useQuery<ITelemetryLine[], AxiosError>(
       ['unassigned_tracks', start, end],
       () => mapApi.getTracks(start, end, true),
-      {...defaultQueryOptions, refetchOnMount: false, }
+      {...defaultQueryOptions, refetchOnMount: false }
     );
   };
 
@@ -131,23 +132,29 @@ export const useTelemetryApi = () => {
   /**
    *  retrieves critters that have a collar assigned
   */
-  const useAssignedCritters = (page: number): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+  const useAssignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+    const queryProps = ['critters_assigned', page];
+    const search = parseArgs(args);
+    if (search) {
+      queryProps.push(search.term);
+    }
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
-      ['critters_assigned', page],
-      () => critterApi.getCritters(page, eCritterFetchType.assigned),
-      critterOptions
+      queryProps, () => critterApi.getCritters(page, eCritterFetchType.assigned, search), critterOptions
     );
   };
 
   /**
    * retrieves critters not assigned to a collar
   */
-  const useUnassignedCritters = (page: number): UseQueryResult<Animal[] | AttachedAnimal[]> =>
-    useQuery<Animal[] | AttachedAnimal[], AxiosError>(
-      ['critters_unassigned', page],
-      () => critterApi.getCritters(page, eCritterFetchType.unassigned),
-      critterOptions
-    );
+  const useUnassignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+    const queryProps = ['critters_unassigned', page];
+    const search = parseArgs(args);
+    if (search) {
+      queryProps.push(search.term);
+    }
+    return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
+      queryProps, () => critterApi.getCritters(page, eCritterFetchType.unassigned, search), critterOptions);
+  }
 
   /**
    * @returns a list of critters representing the audit history of @param critterId
@@ -160,6 +167,7 @@ export const useTelemetryApi = () => {
     );
   };
 
+  // minimize code refetching
   const codeOptions = {...defaultQueryOptions, refetchOnMount: false};
 
   /**
@@ -189,7 +197,7 @@ export const useTelemetryApi = () => {
     return useQuery<CollarHistory[], AxiosError>(
       ['collarAssignmentHistory', critterId],
       () => attachmentApi.getCollarAssignmentHistory(critterId),
-      { ...config }
+      config
     );
   };
 
@@ -197,9 +205,7 @@ export const useTelemetryApi = () => {
    * @returns a list of collars representing the audit history of @param collarId
   */
   const useCollarHistory = (page: number, collarId: string, config?: Record<string, unknown>): UseQueryResult => {
-    return useQuery<Collar[], AxiosError>(['collarHistory', collarId], () => collarApi.getCollarHistory(collarId), {
-      ...config
-    });
+    return useQuery<Collar[], AxiosError>(['collarHistory', collarId], () => collarApi.getCollarHistory(collarId), config);
   };
 
   /**
@@ -229,12 +235,18 @@ export const useTelemetryApi = () => {
    * note: query keys are important! make sure to include params in the key
    * note: enabled prop can be set to false to delay the query
    */
-  const useCritterAccess = (page: number, param: {user: User; filter?: eCritterPermission[]} /*, enabled = true*/): UseQueryResult<UserCritterAccess[], AxiosError> => {
+  const useCritterAccess = (page: number, param: {user: User; filter?: eCritterPermission[]}, ...args: unknown[]): UseQueryResult<UserCritterAccess[], AxiosError> => {
     const { user, filter } = param;
+    const queryKeys = ['critterAccess', page, user];
+    // const search = parseArgs(args);
+    // if (search) {
+    //   queryProps.push(search.term);
+    // }
+
+    // note: what to consider changed? 
+    // term if its the search string, keys if its the filter type
     return useQuery<UserCritterAccess[], AxiosError>(
-      ['critterAccess', page, user],
-      () => permissionApi.getUserCritterAccess(page, user, filter), defaultQueryOptions
-    );
+      queryKeys, () => permissionApi.getUserCritterAccess(page, user, filter, /*search*/), defaultQueryOptions);
   };
 
   /**
@@ -246,22 +258,16 @@ export const useTelemetryApi = () => {
     );
   };
 
-  /** default type getter for animals or collars
-   * @returns
-   */
+  // default getter for individual animals or collars
   const useType = <T>(type: BCTWType, id: string, options?: QueryEnabled): UseQueryResult<T> => {
     return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), 
       { ...defaultQueryOptions, ...options }
     );
   };
 
-  /**
-   * 
-  */
+  /** retrieve UDFS of @param type (@type {eUDFType})  */
   const useUDF = (type: eUDFType): UseQueryResult<UDF[], AxiosError> => {
-    return useQuery<UDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), {
-      ...defaultQueryOptions /*, ...{refetchOnMount: true} */
-    });
+    return useQuery<UDF[], AxiosError>(['getUDF', type], () => userApi.getUDF(type), defaultQueryOptions);
   }
 
   /** see permission_api documentation */
@@ -284,18 +290,16 @@ export const useTelemetryApi = () => {
     return useQuery<IOnboardUser[], AxiosError>(['getOnboardRequests', page], () => onboardApi.getOnboardingRequests(), defaultQueryOptions)
   }
 
+  /** fetch json to be exported */
+  const useExport = (config: UseMutationOptions<string[], AxiosError, ExportQueryParams>): UseMutationResult<string[]> => {
+    return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
+  };
+
   /**
    *
    * mutations - post/delete requests
    * 
    */
-
-  /**
-   * todo:
-  */
-  const useExport = (config: UseMutationOptions<string[], AxiosError, ExportQueryParams>): UseMutationResult<string[]> => {
-    return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
-  };
 
   /** save a code header */
   const useSaveCodeHeader = (

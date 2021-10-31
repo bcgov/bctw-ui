@@ -1,10 +1,11 @@
 import { Box, TextField } from '@mui/material';
-import { ISelectMultipleData } from 'components/form/MultiSelect';
+import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
 import { useMemo, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
-// import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { FormStrings } from 'constants/strings';
+import useDebounce from 'hooks/useDebounce';
 
 type TextFilterProps = {
   rowCount: number;
@@ -17,18 +18,20 @@ type TextFilterProps = {
  * the text input search/filter component
  */
 function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter }: TextFilterProps): JSX.Element {
-  const [value, setValue] = useState(defaultFilter);
+  const [term, setTerm] = useState(defaultFilter);
+  const debouncedTerm = useDebounce(term, 800);
 
-  const handleChange = (v): void => {
-    const value = v.target.value;
-    setValue(value);
-    setGlobalFilter(value);
-  };
+  useDidMountEffect(() => {
+    if (debouncedTerm) {
+      setGlobalFilter(debouncedTerm);
+    }
+  }, [debouncedTerm])
+
   return (
     <TextField
       className='table-filter-input'
-      defaultValue={value}
-      onChange={handleChange}
+      defaultValue={term}
+      onChange={(v): void => setTerm(v.target.value)}
       label={'Search'}
       placeholder={`${rowCount} records...`}
       disabled={disabled}
@@ -82,13 +85,12 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   return (
     <Box display='flex' alignItems='center'>
       <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} />
-      {/* note: disabling - not neeeded? */}
-      {/* <MultiSelect
+      <MultiSelect
         renderValue={(v: string[]): string => `${v.length} selected`}
         label={FormStrings.filterColumnsLabel}
         data={selectOptions}
         changeHandler={handleSelect}
-      /> */}
+      />
     </Box>
   );
 }

@@ -4,17 +4,18 @@ import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_inter
 import { plainToClass } from 'class-transformer';
 import { Animal, AttachedAnimal, eCritterFetchType, IAnimal, IAttachedAnimal } from 'types/animal';
 import { useQueryClient } from 'react-query';
+import { ITableFilter } from 'components/table/table_interfaces';
 
 export const critterApi = (props: ApiProps): API => {
   const { api } = props;
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
   const invalidate = (): void => {
-    queryClient.invalidateQueries('critters_assigned');
-    queryClient.invalidateQueries('critters_unassigned');
-    queryClient.invalidateQueries('getType');
-    queryClient.invalidateQueries('pings');
-  }
+    qc.invalidateQueries('critters_assigned');
+    qc.invalidateQueries('critters_unassigned');
+    qc.invalidateQueries('getType');
+    qc.invalidateQueries('pings');
+  };
 
   const _handleGetResults = (
     data: IAnimal[] | IAttachedAnimal[],
@@ -23,10 +24,14 @@ export const critterApi = (props: ApiProps): API => {
     const results = data.map((json: IAnimal) =>
       type === eCritterFetchType.assigned ? plainToClass(AttachedAnimal, json) : plainToClass(Animal, json)
     );
-    return type === eCritterFetchType.assigned ? results as AttachedAnimal[] : results as Animal[];
+    return type === eCritterFetchType.assigned ? (results as AttachedAnimal[]) : (results as Animal[]);
   };
 
-  const getCritters = async (page = 1, critterType: eCritterFetchType): Promise<Animal[] | AttachedAnimal[]> => {
+  const getCritters = async (
+    page = 1,
+    critterType: eCritterFetchType,
+    search?: ITableFilter
+  ): Promise<Animal[] | AttachedAnimal[]> => {
     const url = createUrl({ api: getCritterEndpoint, query: `critterType=${critterType}`, page });
     // console.log(`requesting assigned critters page: ${page}`);
     const { data } = await api.get(url);
@@ -48,6 +53,6 @@ export const critterApi = (props: ApiProps): API => {
   return {
     getCritters,
     getCritterHistory,
-    upsertCritter,
+    upsertCritter
   };
 };

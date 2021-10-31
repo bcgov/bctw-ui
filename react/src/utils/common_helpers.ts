@@ -1,3 +1,5 @@
+import { ITableFilter } from 'components/table/table_interfaces';
+
 // returns the number of digits after the decimal in a float
 const countDecimals = (value: number): number => {
   if (Math.floor(value) === value) return 0;
@@ -26,26 +28,6 @@ const getUniqueValuesOfT = <T,>(arr: T[], prop: keyof T): string[] => {
   });
   return ret;
 };
-
-/**
- * shallow compare of objects for use in forms
- * values can only be primitive types
- * @param o1 the new object  
- * @param o2 the original object
- * todo: deprecated?
- */
-const objectCompare = (o1: Record<string, unknown>, o2: Record<string, unknown>): boolean => {
-  for (const key of Object.keys(o1)) {
-    // consider emptystring and null 'the same'
-    if ((o1[key] === '' && o2[key] === null) || (o1[key] === null && o2[key] === '')) {
-      continue;
-    }
-    if (o1[key] !== o2[key]) {
-      return false;
-    }
-  }
-  return true;
-}
 
 /**
  * formats a property name as a table header ex. population_unit -> Population Unit 
@@ -101,16 +83,40 @@ function getProperty<T, K extends keyof T>(obj: T, key: K): unknown {
 const doNothingAsync = async(): Promise<void> => { /* do nothing */};
 const doNothing = (): void => { /* do nothing */};
 
+// is the unknown object a table filter?
+const isSearchTerm = (obj: unknown): obj is ITableFilter=> {
+  const props = Object.keys(obj); // safe for types that aren't objects, will be []
+  return props.includes('keys') && props.includes('term');
+}
+
+/**
+ * iterates unknown function parameters (ex. ...args) 
+ * returns @type { ITableFilter } if located
+ */
+const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'> | undefined => {
+  for (let i = 0; i < args.length; i++) {
+    const element = args[i];
+    if (typeof element === 'object') {
+      if (isSearchTerm(element)) {
+        const { term, keys } = element;
+        if (term && keys) {
+          return { keys, term };
+        }
+      }
+    }
+  }
+}
+
 export {
-  countDecimals,
-  formatLatLong,
-  formatUTM,
-  getUniqueValuesOfT,
-  objectCompare,
   columnToHeader,
-  omitNull,
-  removeProps,
-  getProperty,
+  countDecimals,
   doNothingAsync,
   doNothing,
+  formatLatLong,
+  formatUTM,
+  getProperty,
+  getUniqueValuesOfT,
+  omitNull,
+  parseArgs,
+  removeProps,
 };

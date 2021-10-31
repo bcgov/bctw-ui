@@ -3,7 +3,6 @@ import { AxiosInstance } from 'axios';
 // props required for all API hooks
 type ApiProps = {
   api: AxiosInstance;
-  testUser?: string;
 };
 
 /**
@@ -12,7 +11,6 @@ type ApiProps = {
  * @param body object of T being added
  */
 interface IUpsertPayload<T> {
-  // note: don't believe this is needed any longer as all endpoints are upsert-like
   body: T;
 }
 
@@ -38,9 +36,17 @@ interface IDeleteType {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type API = Record<string, (...args: any) => Promise<any>>;
 
+interface CreateUrlParams {
+  api: string;
+  query?: string;
+  page?: number;
+  noApiPrefix?: boolean;
+}
+
 export type {
   API,
   ApiProps,
+  CreateUrlParams,
   IBulkUploadError,
   IBulkUploadResults,
   IUpsertPayload,

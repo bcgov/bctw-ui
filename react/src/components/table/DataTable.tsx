@@ -77,7 +77,7 @@ export default function DataTable<T extends BCTWBase<T>>({
     data,
     isPreviousData,
     isSuccess
-  }: UseQueryResult<T[], AxiosError> = query(page, param);
+  }: UseQueryResult<T[], AxiosError> = query(page, param, filter);
 
   useDidMountEffect(() => {
     // console.log('data changed, successfully fetched: ', isSuccess);
