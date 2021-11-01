@@ -81,7 +81,7 @@ export default function PickCritterPermissionModal({
     } 
     // at least one row has to be selected
     setCanSave(!!critterIDs.length);
-  }, [critterIDs])
+  }, [critterIDs, access])
 
   // when the table query finishes - update the access state
   const onNewData = (rows: UserCritterAccess[]): void => {
@@ -138,6 +138,7 @@ export default function PickCritterPermissionModal({
   };
 
   const beforeClose = (): void => {
+    setCritterIDs([]);
     setCanSave(false);
     handleClose(false);
   };
@@ -189,7 +190,7 @@ export default function PickCritterPermissionModal({
         onSelectMultiple={handleSelect}
         isMultiSelect={true}
         alreadySelected={alreadySelected}
-        customColumns={showSelectPermission ? [{ column:NewColumn, header: (): JSX.Element => <b>Select Permission</b> }] : null}
+        customColumns={showSelectPermission ? [{ column:NewColumn, header: (): JSX.Element => <b>Select Permission</b> }] : []}
       />
       <div className={'admin-btn-row'}>
         <Button disabled={!canSave} onClick={handleSave}>Save</Button>

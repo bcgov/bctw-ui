@@ -1,6 +1,7 @@
 import { FormStrings } from 'constants/strings';
 
 const mustBeNegativeNumber = (v: number): string => (v > 0 ? FormStrings.validateNegativeLongitude : '');
+const mustbePositiveNumber = <T>(t: T): string => typeof t === 'number' ? t >= 0 ? '' : 'must be positive' : '';
 
 const mustBeXDigits = (v: number, numDigits: number): string =>
   v?.toString().length === numDigits ? '' : `Field must be ${numDigits} digits`;
@@ -10,4 +11,4 @@ const mustBeEmail = (email: string): string => {
   return re.test(String(email).toLowerCase()) ? '' : 'Must be a valid email';
 }
 
-export { mustBeNegativeNumber, mustBeXDigits, mustBeEmail };
+export { mustbePositiveNumber, mustBeNegativeNumber, mustBeXDigits, mustBeEmail };

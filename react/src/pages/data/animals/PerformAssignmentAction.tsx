@@ -32,8 +32,8 @@ export default function PerformAssignmentAction({
 }: IPerformAssignmentActionPageProps): JSX.Element {
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showAvailableModal, setShowAvailableModal] = useState(false);
+  const [showConfirmUnattachModal, setShowConfirmModal] = useState(false);
+  const [showDevicesAvailableModal, setShowAvailableModal] = useState(false);
   // is a device being attached or removed?
   const [isLink, setIsLink] = useState(!!current_attachment?.collar_id);
   const [canEdit, setCanEdit] = useState(false);
@@ -42,7 +42,7 @@ export default function PerformAssignmentAction({
    * if there is no attachment, pass true as second param of DataLifeInput constructor to 
    * default the start datetimes to now
    */
-  const [dli, setDli] = useState<DataLifeInput>(new DataLifeInput(dayjs(), dayjs(), null, null));
+  const [dli, setDli] = useState<DataLifeInput>(new DataLifeInput(dayjs(), dayjs(), null, dayjs()));
 
   /**
    * users with admin/owner permission can attach/unattach devices
@@ -58,11 +58,16 @@ export default function PerformAssignmentAction({
     return false;
   };
 
+  // update data life class when the current attachment is loaded
   useDidMountEffect(() => {
     // console.log(`perm: ${permission_type}, islink : ${isLink}`);
     if (current_attachment) {
       setIsLink(!!current_attachment?.collar_id);
-      setDli(current_attachment.createDataLife());
+      setDli( o => {
+        // preserve the empty end dates
+        const n = new DataLifeInput(current_attachment.attachment_start, current_attachment.data_life_start, o.data_life_end, o.attachment_end);
+        return n;
+      });
     }
   }, [current_attachment]);
 
@@ -80,8 +85,10 @@ export default function PerformAssignmentAction({
     closeModals();
   }
   
-  const onRemoveSuccess = (): void => 
+  const onRemoveSuccess = (): void => {
     showNotif({ severity: 'success', message: 'device successfully removed from animal' });
+    closeModals();
+  }
 
   const onError = (error: AxiosError): void => 
     showNotif({ severity: 'error', message: `error ${isLink ? 'attaching' : 'removing'} device: ${formatAxiosError(error)}` });
@@ -121,14 +128,14 @@ export default function PerformAssignmentAction({
       <ConfirmModal
         handleClickYes={handleConfirmRemoveDevice}
         handleClose={closeModals}
-        open={showConfirmModal}
+        open={showConfirmUnattachModal}
         message={ConfirmRemoval}
         title={CS.collarRemovalTitle}
       />
       <AssignNewCollarModal
         onSave={saveAttachDevice}
         critter_id={critter_id}
-        show={showAvailableModal}
+        show={showDevicesAvailableModal}
         onClose={closeModals}
         dli={dli}
       />

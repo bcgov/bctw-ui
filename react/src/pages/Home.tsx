@@ -7,7 +7,7 @@ const Home = (): JSX.Element => {
         British Columbia Telemetry Warehouse
       </Typography>
       <Typography paragraph>
-        Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the Province of British Columbia’s wildlife telemetry observations to support informed management decisions and improving conservation efforts.
+        Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the Province of British Columbia’s wildlife telemetry observations to support informed management decisions and improve conservation efforts.
       </Typography>
       <Typography paragraph>
       Search for <a href='https://www.gov.bc.ca/wildlife-species-information' target='_blank'>wildlife data and information</a>

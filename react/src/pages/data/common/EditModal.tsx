@@ -187,7 +187,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
                   <Box display='flex' alignItems={'center'} justifyContent='flex-end' className='form-buttons'>
                     {hideSave ? null : (
                       <>
-                        {hasErr ? <Typography mr={1}>fields marked with * are required</Typography> : null}
+                        {hasErr ? <Typography mr={1}>Fields marked with * are required</Typography> : null}
                         <Button {...buttonProps} onClick={handleSave} disabled={!canSave}>
                           Save
                         </Button>

@@ -1,4 +1,5 @@
 import { Transform, Exclude } from 'class-transformer';
+import { mustbePositiveNumber } from 'components/form/form_validators';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { BaseTimestamps, BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
@@ -181,8 +182,8 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
         return 'Associated Relationship';
       case 'collective_unit':
         return 'Collective Unit Name';
-      case 'critter_id':
-        return 'BCTW ID';
+      // case 'critter_id':
+      //   return 'BCTW ID';
       case 'juvenile_at_heel':
         return 'Juvenile at Heel?';
       case 'wlh_id':
@@ -246,10 +247,10 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'species', type: eInputType.code, ...isRequired },
     { prop: 'sex', type: eInputType.code, ...isRequired },
     { prop: 'animal_colouration', type: eInputType.text },
-    { prop: 'estimated_age', type: eInputType.number },
+    { prop: 'estimated_age', type: eInputType.number, validate: mustbePositiveNumber },
     { prop: 'life_stage', type: eInputType.code },
     { prop: 'juvenile_at_heel', type: eInputType.code },
-    { prop: 'juvenile_at_heel_count', type: eInputType.number }
+    { prop: 'juvenile_at_heel_count', type: eInputType.number, validate: mustbePositiveNumber}
   ],
   identifierFields1: [
     { prop: 'wlh_id', type: eInputType.text },

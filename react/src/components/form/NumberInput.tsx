@@ -48,7 +48,8 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
   const callParentHandler = (): void => changeHandler({ [propName]: val, error: !!err });
 
   // will receive warnings if these are not deleted
-  const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue']);
+  // note: removing 'type' prop to disable input number +-
+  const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue', 'type']);
 
   const handleChange = (event): void => {
     setErr('')

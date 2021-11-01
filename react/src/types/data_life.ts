@@ -56,25 +56,34 @@ export class DataLifeInput implements IDataLifeStartProps, IDataLifeEndProps {
 
   // must get assignment_id elsewhere
   toRemoveDeviceJSON(): Omit<RemoveDeviceInput, 'assignment_id'> {
-    return {
-      attachment_end: this.attachment_end.format(formatTime),
-      data_life_end: this.data_life_end.format(formatTime),
+    const ret = {} as Omit<RemoveDeviceInput, 'assignment_id'>;
+    const { attachment_end: ae, data_life_end: dle } = this;
+    if (ae?.isValid()) {
+      ret.attachment_end = ae.format(formatTime);
     }
+    if (dle?.isValid()) {
+      ret.data_life_end = dle.format(formatTime);
+    }
+    return ret;
   }
 
   // must provide critter/collar ids separarately
   toPartialAttachDeviceJSON(): Omit<AttachDeviceInput, 'collar_id' | 'critter_id'> {
-    return {
-      attachment_start: this.attachment_start.format(formatTime),
-      data_life_start: this.data_life_start.format(formatTime),
+    const ret = {} as Omit<AttachDeviceInput, 'collar_id' | 'critter_id'>;
+    const { attachment_start: as, data_life_start: dls } = this;
+    if (as?.isValid()) {
+      ret.attachment_start = as.format(formatTime);
     }
+    if (dls?.isValid()) {
+      ret.data_life_start = dls.format(formatTime);
+    }
+    return ret;
   }
 
   // must get assignment id elsewhere
   toPartialEditDatalifeJSON(): Omit<ChangeDataLifeInput, 'assignment_id'> {
     const ret = {} as Omit<ChangeDataLifeInput, 'assignment_id'>;
     const { data_life_start: dls, data_life_end: dle } = this;
-
     if (dls.isValid()) {
       ret.data_life_start = dls.format(formatTime);
     }

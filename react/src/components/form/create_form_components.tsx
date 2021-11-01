@@ -26,18 +26,20 @@ type CreateInputProps = CreateInputBaseProps
   codeName?: string;
   errorMessage?: string;
   span?: boolean;
+  validate?: <T>(input: T) => string;
 };
 
 // text and number field handler
 function CreateEditTextField(props: CreateInputProps): ReactElement {
-  const { prop, type, value, errorMessage, handleChange } = props;
+  const { prop, type, value, errorMessage, handleChange, validate } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
-  return typeof value === 'number' ? (
+  return type === eInputType.number ? (
     <NumberField
       propName={prop}
       key={`input-num-${String(prop)}`}
       defaultValue={value as number}
+      validate={validate}
       changeHandler={handleChange}
       {...propsToPass}
     />
@@ -173,8 +175,6 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
     value: obj[prop as keyof T],
     handleChange,
     label: obj.formatPropAsHeader(prop as keyof T),
-    // todo: is this needed
-    // key: `${type}-${prop}`,
     ...formField,
     ...inputProps
   };

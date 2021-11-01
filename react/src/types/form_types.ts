@@ -35,6 +35,7 @@ export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled'| 'required'
   codeName?: string;
   span?: boolean;
   tooltip?: ReactNode;
+  validate?: <T>(input: T) => string;
 };
 
 // spread in form field constructors to make a field required

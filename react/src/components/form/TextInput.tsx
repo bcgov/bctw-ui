@@ -6,6 +6,7 @@ import {useState} from 'react';
 import { mustBeEmail } from 'components/form/form_validators';
 import { FormStrings } from 'constants/strings';
 import { FormBaseProps } from 'types/form_types';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 export type TextInputProps = FormBaseProps & StandardTextFieldProps & {
   defaultValue: string;
@@ -24,6 +25,10 @@ export default function TextField(props: TextInputProps): JSX.Element {
     setVal(n);
     handleIsRequired(n);
   }, [defaultValue]);
+
+  useDidMountEffect(() => {
+    callParentHandler();
+  }, [err]);
 
   // pass changes to parent handler when focus is lost
   const handleBlur = ():void => {

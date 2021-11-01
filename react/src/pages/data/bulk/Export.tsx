@@ -40,9 +40,7 @@ export default function Export<T>({ data, message, title, open, handleClose }: I
       for (let i = 0; i < included.length; i++) {
         const key = included[i];
         const value = d[key];
-        if (value) {
-          r += value;
-        }
+        r += value ?? '';
         r += i !== included.length -1 ? ',' : '\n'; 
       }
       return r;

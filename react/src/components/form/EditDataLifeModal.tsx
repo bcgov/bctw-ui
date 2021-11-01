@@ -22,8 +22,8 @@ type EditDataLifeModalProps = ModalBaseProps & {
  */
 export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.Element {
   const { attachment, open, handleClose, permission_type } = props;
-  const bctwApi = useTelemetryApi();
-  const responseDispatch = useResponseDispatch();
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
 
   const [canSave, setCanSave] = useState(false);
   const [dli, setDli] = useState<DataLifeInput>(attachment.createDataLife());
@@ -39,11 +39,11 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   const onSuccess = async (data): Promise<void> => {
     // eslint-disable-next-line no-console
     console.log('data life updated response:', data);
-    responseDispatch({ severity: 'success', message: `data life updated` });
+    showNotif({ severity: 'success', message: `data life updated` });
   };
 
   const onError = async (err): Promise<void> => {
-    responseDispatch({ severity: 'error', message: `data life failed to update: ${formatAxiosError(err)}` });
+    showNotif({ severity: 'error', message: `data life failed to update: ${formatAxiosError(err)}` });
   };
 
   const handleSave = async (): Promise<void> => {
@@ -63,7 +63,7 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   };
 
   // setup mutation to save the modified data life
-  const { mutateAsync } = bctwApi.useEditDataLife({ onSuccess, onError });
+  const { mutateAsync } = api.useEditDataLife({ onSuccess, onError });
   const isAdmin = permission_type === eCritterPermission.admin;
 
   return (

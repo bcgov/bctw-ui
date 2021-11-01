@@ -80,7 +80,7 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
   };
 
   const Body = (
-    <Box paddingBottom={2} id='hi'>
+    <Box paddingBottom={2} id='dli_form'>
       {/* show a warning if data life has been modified and display is not row format */}
       {displayInRows ? null : (
         <Box height={35} display='flex' flexDirection={'column'} alignItems={'center'}>

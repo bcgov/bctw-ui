@@ -1,4 +1,4 @@
-import { createUrl } from 'api/api_helpers';
+import { createUrl, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollarHistory, CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { attachDeviceEndpoint, getCollarAssignmentHistoryEndpoint, removeDeviceEndpoint, updateDatalifeEndpoint } from 'api/api_endpoint_urls';
@@ -31,25 +31,19 @@ export const attachmentApi = (props: ApiProps): API => {
   };
 
   const attachDevice = async (body: AttachDeviceInput): Promise<CollarHistory> => {
-    const url = createUrl({ api: attachDeviceEndpoint});
-    // console.log(`posting ${url}: ${JSON.stringify(body)}`);
-    const { data } = await api.post(url, body);
+    const { data } = await postJSON(api, createUrl({ api: attachDeviceEndpoint}), body);
     invalidateDeviceAssignmentHistory()
     return plainToClass(CollarHistory, data);
   }
 
   const removeDevice = async (body: RemoveDeviceInput): Promise<CollarHistory> => {
-    const url = createUrl({ api: removeDeviceEndpoint});
-    // console.log(`posting ${url}: ${JSON.stringify(body)}`);
-    const { data } = await api.post(url, body);
+    const { data } = await postJSON(api, createUrl({ api: removeDeviceEndpoint}), body);
     invalidateDeviceAssignmentHistory()
     return plainToClass(CollarHistory, data);
   }
 
   const updateAttachmentDataLife = async (body: ChangeDataLifeInput): Promise<CollarHistory> => {
-    const url = createUrl({ api: updateDatalifeEndpoint});
-    // console.log(`posting ${url}: ${JSON.stringify(body)}`);
-    const { data } = await api.post(url, body);
+    const { data } = await postJSON(api, createUrl({ api: updateDatalifeEndpoint}), body);
     invalidateDeviceAssignmentHistory();
     return plainToClass(CollarHistory, data);
   }

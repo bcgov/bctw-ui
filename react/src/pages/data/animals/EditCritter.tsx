@@ -135,7 +135,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               {editing?.animal_id ?? '-'}
             </>
           }
-          headers={['species', 'device_id', 'permission_type']}
+          headers={['species', 'device_id', 'critter_id', 'permission_type']}
           format={(editing as AttachedAnimal).formatPropAsHeader}
           obj={editing as AttachedAnimal}
           btn={
