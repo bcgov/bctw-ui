@@ -275,7 +275,11 @@ const handleUserAccessRequest = async (req, res) => {
   const emailMessage = `
     <div>
       Access to the BC Telemetry Warehouse has been requested by
-      <b>${domain}</b> user <b>${firstName} ${lastName}</b>. Username is <b>${username}</b>.
+      <b>${domain}</b> user <b>${firstName} ${lastName}</b>.
+    </div>
+    <div>
+      Username: <b>${username}</b><br />
+      Email: <b><a href="mailto:${email}">${email}</a></b>
     </div>
     <br />
     <div>
@@ -293,18 +297,14 @@ const handleUserAccessRequest = async (req, res) => {
     </p>
     <br />
     <div>
-      <u>Provided reason is as follows</u>:
+      <u>Provided reason</u>:
     </div>
     <div style="padding=10px; color: #626262;">
       ${reason}
-    </div>
-    <br />
-    <div style="border-width: 1px; border-color: #626262; border-style: solid none none none;">
-      <a href="mailto:${email}">${email}</a>.
     </div>`
 
   const emailPayload = {
-    subject: 'Access request for the BC Telemetry Warehouse',
+    subject: 'Access request for the BC Telemetry Warehouse: ' + username,
     priority: 'normal',
     encoding: 'utf-8',
     bodyType: 'html',
