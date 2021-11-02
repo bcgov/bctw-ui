@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import DataTable from 'components/table/DataTable';
-import { CritterStrings as CS } from 'constants/strings';
+import { CritterStrings, CritterStrings as CS } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
@@ -25,20 +25,20 @@ export default function CritterPage(): JSX.Element {
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
   const onNewData = (animals: AttachedAnimal[] | Animal[]): void => {
-    const asPlain = animals.map(a => classToPlain(a));
+    const asPlain = animals.map((a) => classToPlain(a));
     if (animals[0] instanceof AttachedAnimal) {
       setCrittersA(asPlain);
     } else {
       setCrittersU(asPlain);
     }
-  }
+  };
 
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
     editing: null,
     open: false,
     onSave: doNothingAsync,
-    handleClose: doNothing,
+    handleClose: doNothing
   };
 
   const addEditProps = {
@@ -46,7 +46,7 @@ export default function CritterPage(): JSX.Element {
     empty: new AttachedAnimal(),
     addTooltip: CS.addTooltip,
     queryStatus: 'idle' as QueryStatus
-  }
+  };
 
   return (
     <ManageLayout>
@@ -54,11 +54,25 @@ export default function CritterPage(): JSX.Element {
         <h1>My Animals</h1>
         <Box display='flex' alignItems='center'>
           <ModifyCritterWrapper editing={editObj}>
-            <AddEditViewer<AttachedAnimal> {...addEditProps} >
+            <AddEditViewer<AttachedAnimal> {...addEditProps}>
               <EditCritter {...editProps} />
             </AddEditViewer>
           </ModifyCritterWrapper>
-          <ExportImportViewer data={[...critterA, ...critterU]} />
+          <ExportImportViewer
+            template={[
+              'critter_id',
+              'species',
+              'population_unit',
+              'wlh_id',
+              'animal_id',
+              'collar_id',
+              'device_id',
+              'frequency',
+              'animal_id'
+            ]}
+            data={[...critterA, ...critterU]}
+            eTitle={CritterStrings.exportTitle}
+          />
         </Box>
       </Box>
 
@@ -69,7 +83,7 @@ export default function CritterPage(): JSX.Element {
             <DataTable
               headers={AttachedAnimal.attachedCritterDisplayProps}
               title={CS.assignedTableTitle}
-              queryProps={{ query: api.useAssignedCritters, onNewData: (a: AttachedAnimal[]): void => onNewData(a)}}
+              queryProps={{ query: api.useAssignedCritters, onNewData: (a: AttachedAnimal[]): void => onNewData(a) }}
               onSelect={handleSelect}
             />
           </Box>
@@ -77,7 +91,7 @@ export default function CritterPage(): JSX.Element {
             <DataTable
               headers={new Animal().displayProps}
               title={CS.unassignedTableTitle}
-              queryProps={{ query: api.useUnassignedCritters, onNewData}}
+              queryProps={{ query: api.useUnassignedCritters, onNewData }}
               onSelect={handleSelect}
             />
           </Box>

@@ -4,12 +4,11 @@ import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { Animal } from 'types/animal';
-import { ChangeDataLifeInput, IDataLifeStartProps } from 'types/data_life';
+import { IDataLifeStartProps } from 'types/data_life';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
-import { formatTime } from 'utils/time';
 
 type CaptureAnimalEventProps = Pick<Animal, 
 | 'critter_id'

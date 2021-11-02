@@ -76,11 +76,13 @@ const FormSection = ({ id, header, btn, disabled, children }: FormSectionProps):
         <Box component='legend' className={'legend'} mb={1} mt={1}>{header}{btn}</Box>
       ) : null}
       <Box className='fieldset-form'>
+        {/* fixme: why doesn't colGap/columnspacing work? */}
         <Grid container spacing={1}>
           <Grid item xs={12}>
             {Children.map(children, (child: ReactElement, idx: number) => {
               const isDisabled = child?.props?.disabled ?? disabled;
-              return cloneElement(child, {key:`${id}-${idx}`, disabled: isDisabled});
+              // fixme: adding colgap via child component margin-botom instead
+              return cloneElement(child, {key:`${id}-${idx}`, disabled: isDisabled, style: {...child.props.style, marginBottom: '5px'}});
             })}
           </Grid>
         </Grid>

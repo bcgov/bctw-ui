@@ -7,8 +7,7 @@ const CritterStrings = {
   collarAssignmentTitle: 'Assign a Device',
   collarRemovalText: (deviceid: number, make: string): string => `Are you sure you wish to remove ${make} device ${deviceid}?`,
   collarRemovalTitle: 'Confirm Device Unassignment',
-  exportText: '',
-  exportTitle: 'Bulk Export Animal Data',
+  exportTitle: 'animal_export',
   unassignedTableTitle: 'Animals Without a Device',
   addTooltip: 'TODO: addTooltip'
 }
@@ -72,7 +71,6 @@ const WorkflowStrings = {
     areUpdates: 'Are there updates to the animal identifiers or characteristics?',
     shouldReviewNotif: 'Please review the entire metadata for this animal for updates not captured in this form',
     isRecapture: 'Is this a recapture?',
-    whatSpecies: 'What species did you capture?',
     isTransloc: 'Is this animal being translocated?',
     isTranslocCompleted: 'Has the translocated animal been released?',
     translocNotif: 'If the animal translocation is not complete, please fill out the Release Event separately when it has',
@@ -109,7 +107,7 @@ const CollarStrings = {
   assignedCollarsTableTitle: 'Attached Devices',
   availableCollarsTableTitle: 'Unattached Devices',
   editableProps: ['device_id', 'frequency', 'device_make', 'device_model', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
-  exportTitle: 'Bulk Export Device Data',
+  exportTitle: 'device_export',
   assignmentHistoryByAnimalTitle: 'History of Devices Assigned',
   assignmentHistoryByDeviceTitle: 'History of Animals Assigned',
   collarImportStartMsg: 'Device import - What do you want to do?',
@@ -164,7 +162,8 @@ const MapStrings = {
   drawRectangleLabel: 'Select fixes by drawing a rectangle',
   export: {
     allTime: 'Export the entire history for this selection',
-  }
+  },
+  noCrittersFound: 'No telemetry found within this date range. Try adjusting the date range in the filter panel.'
 }
 
 const MapTileLayers = {

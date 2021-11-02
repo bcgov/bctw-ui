@@ -126,7 +126,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
               </>
             }
           />,
-          <Box key='bx-devcond' mt={2}>
+          <Box key='bx-devcond' mt={2} display='flex' columnGap={1}>
             {/* device status */}
             {CreateFormField(mortality, wfFields.get('device_condition'), onChange, isDisabled)}
             {CreateFormField(mortality, wfFields.get('device_deployment_status'), onChange, isDisabled)}
@@ -146,7 +146,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
           <Box key='bx-mort-rep'>
             {CreateFormField(mortality, wfFields.get('mortality_report'), onChange, isDisabled, true)}
           </Box>,
-          <Box key='bx-cod' mt={1}>
+          <Box key='bx-cod' mt={1} display='flex' columnGap={1}>
             {CreateFormField(mortality, wfFields.get('proximate_cause_of_death'), onChange, isDisabled)}
             {CreateFormField(mortality, wfFields.get('ultimate_cause_of_death'), onChange, {disabled: ucodDisabled || critterIsAlive})}
           </Box>,

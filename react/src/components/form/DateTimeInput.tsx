@@ -5,6 +5,7 @@ import { DateInputProps } from 'components/form/Date';
 import { FormControl, TextField } from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { baseInputStyle } from 'components/component_constants';
 
 /**
  * date time picker component
@@ -39,7 +40,7 @@ export default function DateTimeInput(props: DateInputProps): JSX.Element {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       {/* shows the asterisk at the end of the label if error is present */}
-      <FormControl error={hasError}>
+      <FormControl error={hasError} style={baseInputStyle}>
         <DesktopDateTimePicker
           ampm={false} // 24 hours
           InputProps={{ size: 'small', required, error: hasError }}

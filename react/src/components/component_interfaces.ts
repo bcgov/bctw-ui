@@ -41,16 +41,6 @@ type EditorProps<T> = EditModalBaseProps<T> & {
   validateFailed?: (errors: Record<string, unknown>) => void;
 };
 
-
-/**
- * props specific to the data management Export modals
- */
-type ExportImportProps = ModalBaseProps & {
-  message?: string | React.ReactNode;
-  downloadTemplate?: () => void;
-};
-
-
 /**
  * interface for the Notifaction component
  * ex. many components on successful/failed API responses will 
@@ -64,7 +54,6 @@ export type {
   EditorProps,
   ModalProps,
   ModalBaseProps,
-  ExportImportProps,
   EditModalBaseProps,
   INotificationMessage,
 };

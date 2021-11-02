@@ -83,7 +83,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   );
 
   return (
-    <Box display='flex' alignItems='center'>
+    <Box display='flex' alignItems='center' columnGap={1}>
       <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} />
       <MultiSelect
         renderValue={(v: string[]): string => `${v.length} selected`}

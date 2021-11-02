@@ -49,7 +49,7 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
 
   // will receive warnings if these are not deleted
   // note: removing 'type' prop to disable input number +-
-  const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue', 'type']);
+  const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue', 'type', 'style']);
 
   const handleChange = (event): void => {
     setErr('')
@@ -80,7 +80,7 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
     <TextField
       value={val}
       size={'small'}
-      style={style ?? baseInputStyle}
+      style={{...style, ...baseInputStyle}}
       onChange={handleChange}
       onBlur={handleBlur}
       helperText={err}

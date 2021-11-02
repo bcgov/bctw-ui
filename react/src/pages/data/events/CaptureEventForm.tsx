@@ -80,7 +80,6 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
         {[
           <LocationEventForm
             key='ce-loc'
-            childNextToDate={CreateFormField(capture, { ...wfFields.get('species'), tooltip: <p>{WorkflowStrings.capture.whatSpecies}</p> }, onChange)}
             event={capture.location_event}
             notifyChange={onChangeLocationProp}
           />,

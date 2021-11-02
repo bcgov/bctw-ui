@@ -25,23 +25,23 @@ export default function CollarPage(): JSX.Element {
   const [devicesU, setDevicesU] = useState([]);
 
   // set editing object when table row is selected
-  const handleSelect = <T extends Collar,>(row: T): void => setEditObj(row);
+  const handleSelect = <T extends Collar>(row: T): void => setEditObj(row);
 
   const editProps = {
     editing: new Collar(),
     open: false,
     onSave: doNothingAsync,
-    handleClose: doNothing,
+    handleClose: doNothing
   };
 
   const onNewData = (collars: AttachedCollar[] | Collar[]): void => {
-    const asPlain = collars.map(device => classToPlain(device));
+    const asPlain = collars.map((device) => classToPlain(device));
     if (collars[0] instanceof AttachedCollar) {
       setDevicesA(asPlain);
     } else {
       setDevicesU(asPlain);
     }
-  }
+  };
 
   return (
     <ManageLayout>
@@ -49,15 +49,31 @@ export default function CollarPage(): JSX.Element {
         <h1>My Devices</h1>
         <Box display='flex' alignItems='center'>
           <ModifyCollarWrapper editing={editObj}>
-            <AddEditViewer<AttachedCollar> queryStatus='success' editing={editObj as AttachedCollar} empty={new AttachedCollar()}>
+            <AddEditViewer<AttachedCollar>
+              queryStatus='success'
+              editing={editObj as AttachedCollar}
+              empty={new AttachedCollar()}>
               <EditCollar {...editProps} />
             </AddEditViewer>
           </ModifyCollarWrapper>
-          <ExportImportViewer data={[...devicesA, ...devicesU]} />
+          <ExportImportViewer
+            template={[
+              'collar_id',
+              'device_id',
+              'frequency',
+              'device_type',
+              'device_make',
+              'activation_status',
+              'device_model',
+              'wlh_id',
+              'animal_id',
+              'critter_id'
+            ]}
+            data={[...devicesA, ...devicesU]}
+            eTitle={S.exportTitle}
+          />
           <Box ml={1}>
-            <Button onClick={(): void => setShowImport((o) => !o)}>
-              Import
-            </Button>
+            <Button onClick={(): void => setShowImport((o) => !o)}>Import</Button>
           </Box>
         </Box>
       </Box>
@@ -68,7 +84,7 @@ export default function CollarPage(): JSX.Element {
             <DataTable
               headers={AttachedCollar.attachedDevicePropsToDisplay}
               title={S.assignedCollarsTableTitle}
-              queryProps={{query: api.useAttachedDevices, onNewData: (v: AttachedCollar[]): void => onNewData(v)}}
+              queryProps={{ query: api.useAttachedDevices, onNewData: (v: AttachedCollar[]): void => onNewData(v) }}
               onSelect={handleSelect}
             />
           </Box>
@@ -76,7 +92,7 @@ export default function CollarPage(): JSX.Element {
             <DataTable
               headers={Collar.propsToDisplay}
               title={S.availableCollarsTableTitle}
-              queryProps={{query: api.useUnattachedDevices, onNewData}}
+              queryProps={{ query: api.useUnattachedDevices, onNewData }}
               onSelect={handleSelect}
             />
           </Box>

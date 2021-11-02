@@ -30,7 +30,9 @@ const rows_to_render = [
   'Collective Unit',
   'WLH ID',
   'Animal ID',
+  'Animal Status',
   'Device ID',
+  'Device Status',
   'Frequency (MHz)',
   'Capture Date',
   'Last Transmit Date'
@@ -159,7 +161,9 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       ) : (
         <TableCell></TableCell>
       )}
+      <TableCell>{row.animal_status}</TableCell>
       <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('device', row)} />
+      <TableCell>{row.device_status}</TableCell>
       <TableCell>{row.paddedFrequency}</TableCell>
       <TableCell>{row.formattedCaptureDate}</TableCell>
       <TableCell>{row.formattedDate}</TableCell>

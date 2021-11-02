@@ -63,12 +63,12 @@ export default function TextField(props: TextInputProps): JSX.Element {
 
   const propsToPass = {
     ...baseInputProps,
-    ...removeProps(props, inputPropsToRemove)
+    ...removeProps(props, [...inputPropsToRemove, 'style'])
   };
 
   return (
     <MuiTextField
-      style={style ?? baseInputStyle}
+      style={{...baseInputStyle, ...style}}
       value={val}
       onBlur={handleBlur}
       onChange={handleChange}

@@ -120,7 +120,7 @@ function CreateEditSelectField({
 }: CreateInputProps): ReactElement {
   return (
     <SelectCode
-      style={{ width: '200px', marginRight: '10px' }}
+      // style={{ minWidth: '200px', maxWidth: '250px' }}
       key={`${label}-select`}
       label={label}
       disabled={disabled}

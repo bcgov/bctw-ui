@@ -239,8 +239,8 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'capture_utm_easting', type: eInputType.number },
     { prop: 'capture_utm_northing', type: eInputType.number },
     { prop: 'recapture', type: eInputType.check },
-    { prop: 'capture_comment', type: eInputType.text },
     { prop: 'captivity_status', type: eInputType.check },
+    { prop: 'capture_comment', type: eInputType.multiline },
   ],
   characteristicsFields: [
     { prop: 'animal_status', type: eInputType.code, ...isRequired },
@@ -271,7 +271,6 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'mortality_utm_zone', type: eInputType.number },
     { prop: 'mortality_utm_easting', type: eInputType.number },
     { prop: 'mortality_utm_northing', type: eInputType.number },
-    { prop: 'mortality_comment', type: eInputType.text },
     { prop: 'proximate_cause_of_death', type: eInputType.code },
     { prop: 'ultimate_cause_of_death', type: eInputType.code },
     { prop: 'pcod_confidence', type: eInputType.code, codeName: 'cod_confidence' },
@@ -280,7 +279,8 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'predator_species_ucod', type: eInputType.code, codeName: 'predator_species' },
     { prop: 'mortality_investigation', type: eInputType.code },
     { prop: 'mortality_report', type: eInputType.check },
-    { prop: 'predator_known', type: eInputType.check }
+    { prop: 'predator_known', type: eInputType.check },
+    { prop: 'mortality_comment', type: eInputType.multiline},
   ],
   releaseFields: [
     { prop: 'release_date', type: eInputType.datetime },
@@ -290,7 +290,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'release_utm_easting', type: eInputType.number },
     { prop: 'release_utm_northing', type: eInputType.number },
     { prop: 'translocation', type: eInputType.check },
-    { prop: 'release_comment', type: eInputType.text }
+    { prop: 'release_comment', type: eInputType.multiline }
   ],
   animalCommentField: [
     { prop: 'animal_comment', type: eInputType.multiline }

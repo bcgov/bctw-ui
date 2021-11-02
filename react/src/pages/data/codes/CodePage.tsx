@@ -3,7 +3,6 @@ import { Button, NotificationMessage } from 'components/common';
 import DataTable from 'components/table/DataTable';
 import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
 import React, { useState } from 'react';
 import { CodeFormFields, CodeHeader, CodeHeaderInput } from 'types/code';
 import { formatAxiosError } from 'utils/errors';
@@ -91,7 +90,7 @@ const CodePage: React.FC = () => {
               }}
             />
             <div className='button-row'>
-              <ExportImportViewer {...importProps} data={[]} eDisabled={true} />
+              {/* <ExportImportViewer {...importProps} data={[]} eDisabled={true} /> */}
               <AddEditViewer<CodeHeaderInput>
                 queryStatus={status}
                 onSave={handleSave}

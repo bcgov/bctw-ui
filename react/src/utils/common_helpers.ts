@@ -37,7 +37,8 @@ const columnToHeader = (prop: string): string => {
   const asArr = prop
     .replaceAll('_', ' ')
     .replaceAll(' id', ' ID')
-    .replaceAll('wlh', 'WLH') // used frequently
+    .replaceAll('wlh', 'WLH')
+    .replaceAll('utm', 'UTM') 
     .split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };

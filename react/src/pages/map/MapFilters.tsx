@@ -133,7 +133,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         <Tooltip title={<p>{MapStrings.codeFiltersTooltips[cf.header]}</p>}>
           <SelectCode
             propName={cf.header}
-            fullWidth
+            style={{width: '100%'}}
             multiple
             label={cf.label ?? columnToHeader(cf.header)}
             codeHeader={cf.header}

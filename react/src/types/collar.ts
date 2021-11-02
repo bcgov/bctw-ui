@@ -1,4 +1,5 @@
 import { Exclude, Transform } from 'class-transformer';
+import { mustbePositiveNumber } from 'components/form/form_validators';
 import { Dayjs } from 'dayjs';
 import { Animal } from 'types/animal';
 import { Code } from 'types/code';
@@ -170,19 +171,21 @@ export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<
   }
 }
 
+const positive = { validate: mustbePositiveNumber };
+
 export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   frequencyFields: [
-    { prop: 'frequency', type: eInputType.number, ...isRequired },
+    { prop: 'frequency', type: eInputType.number, ...isRequired, ...positive },
     { prop: 'frequency_unit', type: eInputType.code, ...isRequired },
-    { prop: 'fix_interval', type: eInputType.number, ...isRequired },
+    { prop: 'fix_interval', type: eInputType.number, ...isRequired, ...positive },
     { prop: 'fix_interval_rate', type: eInputType.code, ...isRequired, codeName: 'fix_unit' },
   ],
   deviceOptionFields: [
-    { prop: 'dropoff_frequency', type: eInputType.number },
+    { prop: 'dropoff_frequency', type: eInputType.number, ...positive},
     { prop: 'dropoff_frequency_unit', type: eInputType.code, codeName: 'frequency_unit' },
   ],
   identifierFields: [
-    { prop: 'device_id', type: eInputType.number, ...isRequired },
+    { prop: 'device_id', type: eInputType.number, ...isRequired, ...positive },
     { prop: 'device_make', type: eInputType.code, ...isRequired },
     { prop: 'device_model', type: eInputType.text, ...isRequired }
   ],
@@ -217,8 +220,8 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'device_comment', type: eInputType.multiline},
     { prop: 'device_type', type: eInputType.code, ...isRequired },
     { prop: 'satellite_network', type: eInputType.code },
-    { prop: 'camera_device_id', type: eInputType.number },
-    { prop: 'dropoff_device_id', type: eInputType.number },
+    { prop: 'camera_device_id', type: eInputType.number, ...positive },
+    { prop: 'dropoff_device_id', type: eInputType.number, ...positive },
   ]
 }
 

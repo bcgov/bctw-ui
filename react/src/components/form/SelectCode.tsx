@@ -12,7 +12,7 @@ import { formatAxiosError } from 'utils/errors';
 import { FormBaseProps } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
-import { selectMenuProps } from 'components/component_constants';
+import { baseInputStyle, selectMenuProps } from 'components/component_constants';
 
 type SelectCodeProps = FormBaseProps & SelectProps &
 PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
@@ -184,7 +184,6 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       changeHandlerMultiple(ret as ICodeFilter[]);
     }
   };
-
   return (
     <>
       {isError ? (
@@ -194,8 +193,8 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       ) : codes && codes.length ? (
         <FormControl
           error={hasError}
-          style={style}
           size='small'
+          style={{...baseInputStyle, ...style}}
           className={`select-control ${hasError ? 'input-error' : ''}`}>
           <InputLabel>{required ? `${label} *` : label}</InputLabel>
           <Select
