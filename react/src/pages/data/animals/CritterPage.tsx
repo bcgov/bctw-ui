@@ -17,6 +17,7 @@ import { classToPlain } from 'class-transformer';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
+  const [deleted, setDeleted] = useState('');
 
   // for exporting state
   const [critterA, setCrittersA] = useState([]);
@@ -53,7 +54,7 @@ export default function CritterPage(): JSX.Element {
       <Box className='manage-layout-titlebar'>
         <h1>My Animals</h1>
         <Box display='flex' alignItems='center'>
-          <ModifyCritterWrapper editing={editObj}>
+          <ModifyCritterWrapper editing={editObj} onDelete={(critter_id: string): void => setDeleted(critter_id)}>
             <AddEditViewer<AttachedAnimal> {...addEditProps}>
               <EditCritter {...editProps} />
             </AddEditViewer>
@@ -85,6 +86,7 @@ export default function CritterPage(): JSX.Element {
               title={CS.assignedTableTitle}
               queryProps={{ query: api.useAssignedCritters, onNewData: (a: AttachedAnimal[]): void => onNewData(a) }}
               onSelect={handleSelect}
+              deleted={deleted}
             />
           </Box>
           <Box mb={4}>
@@ -93,6 +95,7 @@ export default function CritterPage(): JSX.Element {
               title={CS.unassignedTableTitle}
               queryProps={{ query: api.useUnassignedCritters, onNewData }}
               onSelect={handleSelect}
+              deleted={deleted}
             />
           </Box>
         </>

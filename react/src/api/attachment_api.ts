@@ -12,12 +12,13 @@ import { useQueryClient } from 'react-query';
 
 export const attachmentApi = (props: ApiProps): API => {
   const { api } = props;
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
   const invalidateDeviceAssignmentHistory = (): void => {
-    queryClient.invalidateQueries('collarAssignmentHistory');
-    queryClient.invalidateQueries('critters_unassigned');
-    queryClient.invalidateQueries('critters_assigned');
+    qc.invalidateQueries('collarAssignmentHistory');
+    qc.invalidateQueries('critters_unassigned');
+    qc.invalidateQueries('critters_assigned');
+    qc.invalidateQueries('getType');
   }
 
   /** given a critter_id, retrieve it's device attachment history */

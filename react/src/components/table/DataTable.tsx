@@ -35,6 +35,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   title,
   onSelect,
   onSelectMultiple,
+  deleted,
   paginate = true,
   isMultiSelect = false,
   alreadySelected = []
@@ -68,6 +69,12 @@ export default function DataTable<T extends BCTWBase<T>>({
     }
   }, [useRowState]);
 
+  useDidMountEffect(() => {
+    if (deleted) {
+      handleRowDeleted(deleted);
+    }
+  }, [deleted])
+
   // fetch the data from the props query
   const {
     isFetching,
@@ -80,7 +87,6 @@ export default function DataTable<T extends BCTWBase<T>>({
   }: UseQueryResult<T[], AxiosError> = query(page, param, filter);
 
   useDidMountEffect(() => {
-    // console.log('data changed, successfully fetched: ', isSuccess);
     if (isSuccess) {
       // update the row identifier
       const first = data && data.length && data[0];
@@ -108,6 +114,10 @@ export default function DataTable<T extends BCTWBase<T>>({
       setRowsPerPage(o => isPaginate ? o : data.length);
     }
   }, [data]);
+
+  const handleRowDeleted = (id: string): void => {
+    setValues(o => o.filter(f => String(f[rowIdentifier]) !== id))
+  }
 
   const handleSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';

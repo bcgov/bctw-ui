@@ -58,6 +58,7 @@ type PlainTableProps<T> = {
  * @param paginate should the pagination actions be displayed
  * @param queryProps which query to use - see @type {ITableQuery}
  * @param onSelectMultiple parent handler triggered when a row is checked if @param isMultiSelect
+ * @param deleted notify the datatable that a row with this identifier has been removed
  */
 type DataTableProps<T> = PlainTableProps<T> & {
   customColumns?: ICustomTableColumn<T>[];
@@ -66,6 +67,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   paginate?: boolean;
   queryProps: ITableQueryProps<T>;
   onSelectMultiple?: (rows: T[]) => void;
+  deleted?: string;
 };
 
 /**

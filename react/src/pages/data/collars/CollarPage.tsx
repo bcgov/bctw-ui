@@ -20,6 +20,7 @@ export default function CollarPage(): JSX.Element {
 
   const [editObj, setEditObj] = useState<Collar | AttachedCollar>({} as Collar);
   const [showImport, setShowImport] = useState(false);
+  const [deleted, setDeleted] = useState('');
 
   const [devicesA, setDevicesA] = useState([]);
   const [devicesU, setDevicesU] = useState([]);
@@ -48,7 +49,7 @@ export default function CollarPage(): JSX.Element {
       <Box className='manage-layout-titlebar'>
         <h1>My Devices</h1>
         <Box display='flex' alignItems='center'>
-          <ModifyCollarWrapper editing={editObj}>
+          <ModifyCollarWrapper editing={editObj} onDelete={(collar_id: string): void => setDeleted(collar_id)}>
             <AddEditViewer<AttachedCollar>
               queryStatus='success'
               editing={editObj as AttachedCollar}
@@ -86,6 +87,7 @@ export default function CollarPage(): JSX.Element {
               title={S.assignedCollarsTableTitle}
               queryProps={{ query: api.useAttachedDevices, onNewData: (v: AttachedCollar[]): void => onNewData(v) }}
               onSelect={handleSelect}
+              deleted={deleted}
             />
           </Box>
           <Box mb='3'>
@@ -94,6 +96,7 @@ export default function CollarPage(): JSX.Element {
               title={S.availableCollarsTableTitle}
               queryProps={{ query: api.useUnattachedDevices, onNewData }}
               onSelect={handleSelect}
+              deleted={deleted}
             />
           </Box>
         </>

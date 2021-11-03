@@ -19,6 +19,7 @@ import { Typography } from '@mui/material';
 export default function UserAdminPage(): JSX.Element {
   const api = useTelemetryApi();
   const showAlert = useResponseDispatch();
+  const [deleted, setDeleted] = useState(0);
   const [selectedUser, setSelectedUser] = useState<User>({} as User);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
@@ -31,7 +32,10 @@ export default function UserAdminPage(): JSX.Element {
   const onError = (error: AxiosError): void =>
     showAlert({ severity: 'error', message: formatAxiosError(error) });
 
-  const onDeleteSuccess = (): void => showAlert({ severity: 'success', message: `user deleted succcesfully` });
+  const onDeleteSuccess = (): void => {
+    showAlert({ severity: 'success', message: `user deleted succcesfully` });
+    setDeleted(selectedUser.id);
+  } 
 
   // setup the mutations to add/remove users
   const { mutateAsync: saveMutation } = api.useSaveUser({ onSuccess: onSaveSuccess, onError });
@@ -43,7 +47,7 @@ export default function UserAdminPage(): JSX.Element {
 
   const deleteUser = async (): Promise<void> => {
     const payload: IDeleteType = { id: selectedUser.id, objType: 'user' };
-    console.log('deleting user', payload);
+    // console.log('deleting user', payload);
     await deleteMutation(payload);
     setShowConfirmDelete(false);
   };
@@ -58,6 +62,7 @@ export default function UserAdminPage(): JSX.Element {
           title='Users'
           queryProps={{ query: api.useUsers }}
           onSelect={handleTableRowSelect}
+          deleted={String(deleted)}
         />
         <div className={'button-row'}>
           <AddEditViewer<User>

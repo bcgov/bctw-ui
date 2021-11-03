@@ -13,6 +13,7 @@ import { plainToClass } from 'class-transformer';
 type IModifyWrapperProps = {
   editing: Animal | AttachedAnimal;
   children: JSX.Element;
+  onDelete?: (v: string) => void;
 };
 
 /**
@@ -20,9 +21,9 @@ type IModifyWrapperProps = {
  */
 export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.Element {
   const api = useTelemetryApi();
-  const responseDispatch = useResponseDispatch();
+  const showNotif = useResponseDispatch();
 
-  const { editing, children } = props;
+  const { children, editing, onDelete } = props;
   // used in child AddEditViewer component to determine the add/edit button state (view/edit)
   const [canEdit, setCanEdit] = useState(false);
   // used to determine the state of the delete modal
@@ -53,18 +54,21 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const handleSaveResult = async (data: IBulkUploadResults<Animal>): Promise<void> => {
     const { errors, results } = data;
     if (errors.length) {
-      responseDispatch({ severity: 'error', message: `${errors.map(e => e.error)}` });
+      showNotif({ severity: 'error', message: `${errors.map(e => e.error)}` });
     } else {
       const critter = results[0];
-      responseDispatch({ severity: 'success', message: `${critter.animal_id} saved!` });
+      showNotif({ severity: 'success', message: `${critter.animal_id} saved!` });
     }
   };
 
   const handleDeleteResult = async (): Promise<void> => {
-    responseDispatch({ severity: 'success', message: `critter deleted successfully` });
+    showNotif({ severity: 'success', message: `critter deleted successfully` });
+    if (typeof onDelete === 'function') {
+      onDelete(editing.critter_id);
+    }
   };
 
-  const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void => showNotif({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutations
   const { mutateAsync: saveMutation } = api.useSaveAnimal({ onSuccess: handleSaveResult, onError });

@@ -22,10 +22,6 @@ export const bulkApi = (api: AxiosInstance): API => {
     qc.invalidateQueries('getType');
   }
 
-  const invalidateUsers = (): void => {
-    qc.invalidateQueries('all_users');
-  }
-
   const uploadCsv = async <T,>(form: FormData): Promise<IBulkUploadResults<T>> => {
     const url = createUrl({ api: importCSVEndpoint});
     const { data } = await api.post(url, form);
@@ -56,16 +52,6 @@ export const bulkApi = (api: AxiosInstance): API => {
   const deleteType = async ({ objType, id }: IDeleteType): Promise<boolean> => {
     const url = createUrl({ api: `${objType}/${id}` });
     const { status, data } = await api.delete(url);
-    switch(objType) {
-      case 'animal':
-        invalidateCritters();
-        break;
-      case 'collar':
-        invalidateDevices();
-        break;
-      case 'user':
-        invalidateUsers();
-    }
     if (status === 200) {
       return true;
     }

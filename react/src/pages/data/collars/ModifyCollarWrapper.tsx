@@ -13,6 +13,7 @@ import { plainToClass } from 'class-transformer';
 type IModifyWrapperProps = {
   editing: AttachedCollar | Collar;
   children: JSX.Element;
+  onDelete?: (v: string) => void;
 };
 
 // wraps the AddEditViewer to provide additional critter/user-specific functionality
@@ -20,7 +21,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   const api = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
-  const { editing, children } = props;
+  const { children, editing, onDelete } = props;
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
 
@@ -54,7 +55,10 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
   const onDeleteSuccess = async (): Promise<void> => {
-    responseDispatch({ severity: 'success', message: `collar deleted successfully` });
+    responseDispatch({ severity: 'success', message: `collar deleted successfully`});
+    if (typeof onDelete === 'function') {
+      onDelete(editing.collar_id);
+    }
   };
 
   // setup the mutation collar mutations
