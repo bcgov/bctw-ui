@@ -20,8 +20,7 @@ type IPerformAssignmentActionPageProps = Pick<IAssignmentHistoryPageProps, 'perm
   current_attachment: CollarHistory;
 };
 /**
- * component that performs post requests to assign/unassign a collar
- * consists of:
+ * handles attaching/removing devices from animals. Contains:
  *  1. a confirmation dialog if user chooses to unassign the collar
  *  2. a modal that displays a list of available collars with a save button
  */
@@ -35,14 +34,17 @@ export default function PerformAssignmentAction({
   const [showConfirmUnattachModal, setShowConfirmModal] = useState(false);
   const [showDevicesAvailableModal, setShowAvailableModal] = useState(false);
   // is a device being attached or removed?
-  const [isLink, setIsLink] = useState(!!current_attachment?.collar_id);
+  const [isRemovingDevice, setIsRemovingDevice] = useState(!!current_attachment?.collar_id);
   const [canEdit, setCanEdit] = useState(false);
+  const now = dayjs();
   /**
    * data life state. passed to both modals for attaching/removing devices
-   * if there is no attachment, pass true as second param of DataLifeInput constructor to 
+   * if there is no attachment, pass true as second param of DataLifeInput constructor to
    * default the start datetimes to now
    */
-  const [dli, setDli] = useState<DataLifeInput>(new DataLifeInput(dayjs(), dayjs(), null, dayjs()));
+  const [dli, setDli] = useState<DataLifeInput>(
+    new DataLifeInput(now, now, isRemovingDevice ? now : null, isRemovingDevice ? now : null)
+  );
 
   /**
    * users with admin/owner permission can attach/unattach devices
@@ -53,20 +55,23 @@ export default function PerformAssignmentAction({
       return true;
     }
     if (permission_type === 'editor') {
-      return isLink ? false : true;
+      return isRemovingDevice ? false : true;
     }
     return false;
   };
 
-  // update data life class when the current attachment is loaded
+  // update data life class when the existing attachment is loaded
   useDidMountEffect(() => {
-    // console.log(`perm: ${permission_type}, islink : ${isLink}`);
     if (current_attachment) {
-      setIsLink(!!current_attachment?.collar_id);
-      setDli( o => {
-        // preserve the empty end dates
-        const n = new DataLifeInput(current_attachment.attachment_start, current_attachment.data_life_start, o.data_life_end, o.attachment_end);
-        return n;
+      const isRemoving = !!current_attachment?.collar_id;
+      setIsRemovingDevice(isRemoving);
+      setDli((o) => {
+        const { attachment_start, data_life_start } = current_attachment;
+        if (isRemoving) {
+          return new DataLifeInput(attachment_start, data_life_start, now, now);
+        } else {
+          return new DataLifeInput(attachment_start, data_life_start, null, null);
+        }
       });
     }
   }, [current_attachment]);
@@ -75,23 +80,26 @@ export default function PerformAssignmentAction({
   // so update the assignment button status regardless
   useEffect(() => {
     setCanEdit(determineButtonState());
-  })
+  });
 
   // post response handlers
   const onAttachSuccess = (): void => {
-    showNotif({ severity: 'success', message: 'device successfully attached to animal'});
+    showNotif({ severity: 'success', message: 'device successfully attached to animal' });
     // todo: if device is attached ...update state to indicate that the device can only be removed
-    setIsLink((o) => !o);
+    setIsRemovingDevice((o) => !o);
     closeModals();
-  }
-  
+  };
+
   const onRemoveSuccess = (): void => {
     showNotif({ severity: 'success', message: 'device successfully removed from animal' });
     closeModals();
-  }
+  };
 
-  const onError = (error: AxiosError): void => 
-    showNotif({ severity: 'error', message: `error ${isLink ? 'attaching' : 'removing'} device: ${formatAxiosError(error)}` });
+  const onError = (error: AxiosError): void =>
+    showNotif({
+      severity: 'error',
+      message: `error ${isRemovingDevice ? 'attaching' : 'removing'} device: ${formatAxiosError(error)}`
+    });
 
   // setup mutations to save the device attachment status
   const { mutateAsync: saveAttachDevice } = api.useAttachDevice({ onSuccess: onAttachSuccess, onError });
@@ -100,7 +108,7 @@ export default function PerformAssignmentAction({
   /* if there is a collar attached and user clicks the remove button, show the confirmation window
     otherwise, show the list of devices the user has access to
   */
-  const handleClickShowModal = (): void => (isLink ? setShowConfirmModal(true) : setShowAvailableModal(true));
+  const handleClickShowModal = (): void => (isRemovingDevice ? setShowConfirmModal(true) : setShowAvailableModal(true));
 
   const closeModals = (): void => {
     setShowConfirmModal(false);
@@ -111,9 +119,9 @@ export default function PerformAssignmentAction({
     const body: RemoveDeviceInput = {
       assignment_id: current_attachment.assignment_id,
       ...dli.toRemoveDeviceJSON()
-    }
+    };
     saveRemoveDevice(body);
-  }
+  };
 
   // componenet passed to the confirm device removal as the modal body.
   const ConfirmRemoval = (
@@ -121,7 +129,7 @@ export default function PerformAssignmentAction({
       <p>{CS.collarRemovalText(current_attachment?.device_id, current_attachment?.device_make)}</p>
       <DataLifeInputForm dli={dli} enableEditEnd={true} enableEditStart={false} />
     </>
-  )
+  );
 
   return (
     <>
@@ -140,7 +148,7 @@ export default function PerformAssignmentAction({
         dli={dli}
       />
       <Button disabled={!canEdit} onClick={handleClickShowModal}>
-        {isLink ? 'Remove Device' : 'Assign Device'}
+        {isRemovingDevice ? 'Remove Device' : 'Assign Device'}
       </Button>
     </>
   );

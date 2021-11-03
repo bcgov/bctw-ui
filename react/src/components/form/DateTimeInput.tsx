@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { DesktopDateTimePicker } from '@mui/lab';
 import { DateInputProps } from 'components/form/Date';
 import { FormControl, TextField } from '@mui/material';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import AdapterDateFns from '@mui/lab/AdapterDayjs';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { baseInputStyle } from 'components/component_constants';
 
@@ -19,11 +19,10 @@ export default function DateTimeInput(props: DateInputProps): JSX.Element {
   const [hasError, setHasError] = useState(checkForErr(selectedTime));
 
   const handleChangeTime = (d: Dayjs | null): void => {
-    const djs = dayjs(d);
-    setSelectedTime(djs);
-    const isErr = checkForErr(djs);
+    setSelectedTime(d);
+    const isErr = checkForErr(d);
     setHasError(isErr);
-    const t = { [propName]: djs, error: isErr };
+    const t = { [propName]: d, error: isErr };
     changeHandler(t);
   };
 
