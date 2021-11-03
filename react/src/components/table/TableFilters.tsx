@@ -22,9 +22,7 @@ function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter }: Text
   const debouncedTerm = useDebounce(term, 800);
 
   useDidMountEffect(() => {
-    if (debouncedTerm) {
-      setGlobalFilter(debouncedTerm);
-    }
+    setGlobalFilter(debouncedTerm);
   }, [debouncedTerm])
 
   return (

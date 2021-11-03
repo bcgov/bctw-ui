@@ -141,7 +141,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
         {[
           <Box key='bx-invest' {...boxSpreadRowProps}>
             {<span>{WorkflowStrings.mortality.mort_investigation}</span>}
-            {CreateFormField(mortality, {required: true, ...wfFields.get('mortality_investigation')}, onChange, {disabled: critterIsAlive})}
+            {CreateFormField(mortality, {required: true, ...wfFields.get('mortality_investigation')}, onChange, {disabled: critterIsAlive, style: {width: '250px'}})}
           </Box>,
           <Box key='bx-mort-rep'>
             {CreateFormField(mortality, wfFields.get('mortality_report'), onChange, isDisabled, true)}

@@ -38,7 +38,7 @@ export default function CaptivityStatusForm<
       {CreateFormField(event, captivity_status, handleFormChange, { disabled: isDisabled || disabled })}
       {hideMortStatus
         ? null
-        : CreateFormField(event, mortality_captivity_status, handleFormChange, { disabled: disabled })}
+        : CreateFormField(event, mortality_captivity_status, handleFormChange, { disabled: disabled, style: {width: '250px'} })}
     </Box>
   );
 }

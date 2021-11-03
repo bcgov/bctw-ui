@@ -92,8 +92,12 @@ export default function DataTable<T extends BCTWBase<T>>({
         onNewData(data);
       }
       const newV = [];
-      // update the values state
-      // bug: code page, when new values are found they shouldn't be pushed to existing ones
+      /**
+       * update the values state
+       * note: important that the order by backend query specifies a specific order.
+       * otherwise, query doesn't guarantee order, which can result in duplicates
+       * across different pages / limitoffset
+       */
       data.forEach((d) => {
         const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {

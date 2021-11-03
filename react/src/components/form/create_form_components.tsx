@@ -20,7 +20,7 @@ type CreateInputBaseProps = {
 };
 
 type CreateInputProps = CreateInputBaseProps 
-& Pick<InputProps, 'rows' | 'multiline' | 'disabled' | 'required'> 
+& Pick<InputProps, 'rows' | 'multiline' | 'disabled' | 'required' | 'style'> 
 & Pick<DateInputProps, 'minDate' |'maxDate'> 
 & Pick<BaseTextFieldProps, 'label'> & {
   codeName?: string;
@@ -116,11 +116,12 @@ function CreateEditSelectField({
   required,
   errorMessage,
   label,
-  codeName
+  codeName,
+  style
 }: CreateInputProps): ReactElement {
   return (
     <SelectCode
-      // style={{ minWidth: '200px', maxWidth: '250px' }}
+      style={style}
       key={`${label}-select`}
       label={label}
       disabled={disabled}

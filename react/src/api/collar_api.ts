@@ -7,10 +7,13 @@ import { useQueryClient } from 'react-query';
 
 export const collarApi = (props: ApiProps): API => {
   const { api } = props;
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
   const invalidate = (): void => {
-    queryClient.invalidateQueries('collartype');
+    qc.invalidateQueries('collars_attached');
+    qc.invalidateQueries('collars_unattached');
+    qc.invalidateQueries('collarHistory');
+    qc.invalidateQueries('getType');
   }
 
   const getAvailableCollars = async (page = 1): Promise<Collar[]> => {

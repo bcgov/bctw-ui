@@ -8,20 +8,22 @@ import { API, IBulkUploadResults, IDeleteType } from './api_interfaces';
 import { IVectronicUpsert } from 'types/collar';
 
 export const bulkApi = (api: AxiosInstance): API => {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
   const invalidateCritters = (): void => {
-    queryClient.invalidateQueries('critters_assigned');
-    queryClient.invalidateQueries('critters_unassigned');
+    qc.invalidateQueries('critters_assigned');
+    qc.invalidateQueries('critters_unassigned');
+    qc.invalidateQueries('getType');
   }
 
   const invalidateDevices = (): void => {
-    queryClient.invalidateQueries('collartype');
-    queryClient.invalidateQueries('getType');
+    qc.invalidateQueries('collars_attached');
+    qc.invalidateQueries('collars_unattached');
+    qc.invalidateQueries('getType');
   }
 
   const invalidateUsers = (): void => {
-    queryClient.invalidateQueries('all_users');
+    qc.invalidateQueries('all_users');
   }
 
   const uploadCsv = async <T,>(form: FormData): Promise<IBulkUploadResults<T>> => {
