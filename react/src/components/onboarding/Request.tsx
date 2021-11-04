@@ -1,11 +1,10 @@
 import { OutlinedTextFieldProps, StandardTextFieldProps } from '@mui/material';
 import { Box, Button, Grid, TextField } from '@mui/material';
 import { ReactNode, useContext, useEffect, useState } from 'react';
-import { createUrl } from 'api/api_helpers';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { eUserRole, IKeyCloakSessionInfo, KeyCloakDomainType } from 'types/user';
-import { IOnboardUser, OnboardUser } from 'types/onboarding';
+import { IOnboardUser, OnboardUserRequest } from 'types/onboarding';
 import PhoneInput from 'components/form/PhoneInput';
 import { InboundObj } from 'types/form_types';
 
@@ -53,57 +52,28 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
     }
   }, [useKeycloakUser]);
 
-  // visual feedback to user while page is loading
-  // if (!keycloakUser) {
-  //   return <div>Loading...</div>;
-  // }
-
   /**
    * ## submitForm
    * Form payload and submit.
    */
   const submitRequest = async (): Promise<void> => {
-    const payload = {
-      accessType,
-      domain,
-      email,
-      firstName,
-      lastName,
-      populationUnit,
-      projectManager,
-      projectName,
-      projectRole,
-      reason,
-      region,
-      species,
-      textMessageNumber,
-      username
-    };
-
-    const url = createUrl({ api: 'onboarding', noApiPrefix: true });
-    console.log('submitRequest() -- Payload to CHES:', JSON.stringify(payload));
-
-    const request = new Request(url, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    // send the email
-    const emailResponse = await fetch(request);
-    console.log(`email response status ${emailResponse.status}:`, emailResponse);
-
-    // create a new User object
-    const newUser = new OnboardUser();
-    newUser.role_type = accessType;
-    newUser.domain = domain;
-    newUser.username = username;
-    newUser.email = email;
-    newUser.firstname = firstName;
-    newUser.lastname = lastName;
-    newUser.phone = textMessageNumber;
-    newUser.reason = reason;
-    newUser.access = 'pending';
+    const newUser = new OnboardUserRequest();
+    const { user, emailInfo } = newUser;
+    user.role_type = accessType;
+    user.domain = domain;
+    user.username = username;
+    user.email = email;
+    user.firstname = firstName;
+    user.lastname = lastName;
+    user.phone = textMessageNumber;
+    user.reason = reason;
+    user.access = 'pending';
+    emailInfo.populationUnit = populationUnit;
+    emailInfo.projectManager = projectManager;
+    emailInfo.projectName = projectName;
+    emailInfo.projectRole = projectRole;
+    emailInfo.region = region;
+    emailInfo.species = species;
     console.log(`UserOnboarding: Request: submitRequest: submitting onboarding request`, newUser);
     await saveMutation(newUser);
   };

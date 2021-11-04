@@ -9,7 +9,6 @@ const keycloakConnect = require('keycloak-connect');
 const morgan = require('morgan');
 const multer = require('multer');
 const path = require('path')
-const pg = require('pg');
 
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
@@ -214,127 +213,6 @@ const pageHandler = function (req, res, next) {
   return next();
 };
 
-const handleUserAccessRequest = async (req, res) => {
-  // This data will be inserted into the email
-  const {
-    accessType,
-    domain,
-    email,
-    firstName,
-    lastName,
-    populationUnit,
-    projectManager,
-    projectName,
-    projectRole,
-    reason,
-    region,
-    species,
-    textMessageNumber,
-    username,
-  } = req.body;
-
-  const data = req.kauth.grant.access_token.content;
-
-  // TODO: This has to be tested in dev unfortunately
-  // console.log('handleUserAccessRequest() -- Keycloak data', data);
-  // console.log('handleUserAccessRequest() -- message contents', req.body);
-
-  // Get all the environment variable dependencies
-  const chesTokenUrl = `${process.env.BCTW_CHES_AUTH_URL}/protocol/openid-connect/token`;
-  const chesApiUrl = `${process.env.BCTW_CHES_API_URL}/api/v1/email`;
-  const chesUsername = process.env.BCTW_CHES_USERNAME;
-  const chesPassword = process.env.BCTW_CHES_PASSWORD;
-  const chesFromEmail = process.env.BCTW_CHES_FROM_EMAIL;
-  const chesToEmail = process.env.BCTW_CHES_TO_EMAIL.split(',');
-
-  console.log('handleUserAccessRequest() -- CHES token URL:', chesTokenUrl);
-  console.log('handleUserAccessRequest() -- CHES API URL:', chesApiUrl);
-  console.log('handleUserAccessRequest() -- CHES username:', chesUsername);
-  console.log('handleUserAccessRequest() -- CHES fromEmail:', chesFromEmail);
-  console.log('handleUserAccessRequest() -- CHES toEmail:', chesToEmail);
-
-  // Create the authorization hash
-  const prehash = Buffer.from(`${chesUsername}:${chesPassword}`, 'utf8').toString('base64');
-  const hash = `Basic ${prehash}`;
-
-  const tokenParcel = await axios.post(
-    chesTokenUrl,
-    'grant_type=client_credentials',
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: hash
-      }
-    });
-
-  const pretoken = tokenParcel.data.access_token;
-  if (!pretoken) return res.status(500).send('Authentication failed');
-  const token = `Bearer ${pretoken}`;
-  console.log('handleUserAccessRequest() -- bearer token obtained');
-
-  const emailMessage = `
-    <div>
-      Access to the BC Telemetry Warehouse has been requested by
-      <b>${domain}</b> user <b>${firstName} ${lastName}</b>.
-    </div>
-    <div>
-      Username: <b>${username}</b><br />
-      Email: <b><a href="mailto:${email}">${email}</a></b>
-    </div>
-    <br />
-    <div>
-      <u>Details</u>:
-    </div>
-    <p>
-      Access type: <b>${accessType}</b><br />
-      Population Unit: <b>${populationUnit}</b><br />
-      Project Manager: <b>${projectManager}</b><br />
-      Project Name: <b>${projectName}</b><br />
-      Project Role: <b>${projectRole}</b><br />
-      Region: <b>${region}</b><br />
-      Species: <b>${species}</b><br />
-      Text Message Number: <b>${textMessageNumber}</b><br />
-    </p>
-    <br />
-    <div>
-      <u>Provided reason</u>:
-    </div>
-    <div style="padding=10px; color: #626262;">
-      ${reason}
-    </div>`
-
-  const emailPayload = {
-    subject: 'Access request for the BC Telemetry Warehouse: ' + username,
-    priority: 'normal',
-    encoding: 'utf-8',
-    bodyType: 'html',
-    body: emailMessage,
-    from: chesFromEmail,
-    to: chesToEmail,
-    cc: [],
-    bcc: [],
-    delayTS: 0
-  }
-
-  console.log('handleUserAccessRequest() -- POSTing to CHES', emailPayload);
-  axios.post(
-    chesApiUrl,
-    emailPayload,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  ).then((response) => {
-    console.log('handleUserAccessReques() -- OK')
-    res.status(200).send('Email was sent');
-  }).catch((error) => {
-    console.log('handleUserAccessReques() -- ERROR', error)
-    res.status(500).send('Email failed');
-  })
-};
-
 /* ## denied
   The route to the denied service page
   TODO: Deprecate as all remaining traffic goes to React.
@@ -369,11 +247,9 @@ var app = express()
 if (isProd) {
   app
     .get('/api/session-info', retrieveSessionInfo)
-    .post('/onboarding', keycloak.protect(), handleUserAccessRequest)
     .all('*', keycloak.protect(), pageHandler);
 } else {
   app
-    .post('/onboarding', handleUserAccessRequest)
     .post('/api/import-csv', upload.single('csv'), pageHandler)
     .post('/api/import-xml', upload.array('xml'), pageHandler)
     .post('/api/:endpoint', proxyApi);

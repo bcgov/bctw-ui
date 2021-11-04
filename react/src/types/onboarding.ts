@@ -72,5 +72,26 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
   }
 }
 
+// sent as part of the onboarding request
+// currently only used as details in the email sent to admin
+export interface IOnboardEmailDetails {
+  populationUnit?: string;
+  projectManager?: string;
+  projectName?: string;
+  projectRole?: string;
+  region?: string;
+  species?: string;
+}
+
+export class OnboardUserRequest {
+  user: OnboardUser;
+  emailInfo: IOnboardEmailDetails;
+  constructor() {
+    this.user = new OnboardUser();
+    this.emailInfo = {};
+  }
+}
+
+
 // what an admin passes to the API to grant/deny an onboard request
 export type HandleOnboardInput = Pick<IOnboardUser, 'onboarding_id' | 'access'> & Pick<IUser, 'role_type'>;

@@ -7,7 +7,7 @@ import {
   submitOnboardingRequest as submitURL,
   getOnboardingRequests as getURL
 } from 'api/api_endpoint_urls';
-import { IOnboardUser, HandleOnboardInput, OnboardUser } from 'types/onboarding';
+import { IOnboardUser, HandleOnboardInput, OnboardUser, OnboardUserRequest } from 'types/onboarding';
 import { useQueryClient } from 'react-query';
 
 export const onboardingApi = (props: ApiProps): API => {
@@ -23,7 +23,7 @@ export const onboardingApi = (props: ApiProps): API => {
    * from the requests page, when an unauthorized user submits a request
    * to be granted access to BCTW
    */
-  const submitOnboardingRequest = async (body: IOnboardUser): Promise<IOnboardUser> => {
+  const submitOnboardingRequest = async (body: OnboardUserRequest): Promise<IOnboardUser> => {
     // console.log('posting new user to be onboarded', body);
     const { data } = await postJSON(api, createUrl({ api: submitURL }), body);
     invalidate()
@@ -36,9 +36,8 @@ export const onboardingApi = (props: ApiProps): API => {
    * @returns a boolea depending on if the request was granted or denied.
    */
   const handleOnboardingRequest = async (body: HandleOnboardInput): Promise<boolean> => {
-    const url = createUrl({ api: handleURL });
     // console.log('posting grant/deny onboard new user to be onboarded', body);
-    const { data } = await api.post(url, body);
+    const { data } = await postJSON(api, createUrl({ api: handleURL }), body);
     invalidate();
     return data;
   };

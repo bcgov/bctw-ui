@@ -31,7 +31,7 @@ import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import { eCritterPermission, IExecutePermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow } from 'types/events/event';
-import { IOnboardUser, HandleOnboardInput, OnboardUser } from 'types/onboarding';
+import { IOnboardUser, HandleOnboardInput, OnboardUser, OnboardUserRequest } from 'types/onboarding';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 import { parseArgs } from 'utils/common_helpers';
 
@@ -379,8 +379,8 @@ export const useTelemetryApi = () => {
     useMutation<User, AxiosError, User>((body,) => userApi.addUser(body), config);
 
   /** add a new user that hasn't been onboarded */
-  const useSubmitOnboardingRequest = (config: UseMutationOptions<IOnboardUser, AxiosError, IOnboardUser>): UseMutationResult<IOnboardUser, AxiosError> =>
-    useMutation<IOnboardUser, AxiosError, IOnboardUser>((body) => onboardApi.submitOnboardingRequest(body), config);
+  const useSubmitOnboardingRequest = (config: UseMutationOptions<IOnboardUser, AxiosError, OnboardUserRequest>): UseMutationResult<IOnboardUser, AxiosError> =>
+    useMutation<IOnboardUser, AxiosError, OnboardUserRequest>((body) => onboardApi.submitOnboardingRequest(body), config);
   
   /** grants or denies an onboarding request */
   const useHandleOnboardingRequest = (config: UseMutationOptions<boolean, AxiosError, HandleOnboardInput>): UseMutationResult<boolean, AxiosError> =>
