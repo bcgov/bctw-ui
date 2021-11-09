@@ -114,6 +114,19 @@ export const userApi = (props: ApiProps): API => {
     return [];
   };
 
+
+  /**
+   * endpoint will attempt to send test SMS and email notifications (with fake data)
+   * simulating a mortality alert
+   * @param email users email address
+   * @param phone users phone number
+   * @returns nothing, errors are only logged to the api console
+   */
+  const testUserAlertNotifications = async(body: {email: string, phone: string}): Promise<void> => {
+    const { email, phone } = body;
+    await api.get(createUrl({api: 'test-alert-notif', query: `email=${email}&phone=${phone}`}));
+  }
+
   /**
    * @param udf_type (currently only one udf type defined, critter_group
    * @returns {IUDF[]} that are stored per user
@@ -142,6 +155,7 @@ export const userApi = (props: ApiProps): API => {
     getUser,
     getUsers,
     getUserAlerts,
+    testUserAlertNotifications,
     upsertUDF,
     updateAlert,
     getSessionInfo,
