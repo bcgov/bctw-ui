@@ -8,7 +8,7 @@ import { removeProps } from 'utils/common_helpers';
 
 export default function Modal(props: ModalProps): JSX.Element {
   const { disableBackdropClick, open, title, handleClose, children } = props;
-  const propsToPass = removeProps(props, ['handleClose']);
+  const propsToPass = removeProps(props, ['handleClose', 'disableBackdropClick']);
   const classes = modalStyles();
   return (
     <Dialog

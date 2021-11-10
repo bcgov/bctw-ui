@@ -28,6 +28,10 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
   }, [defaultValue]);
 
   useDidMountEffect(() => {
+    handleIsRequired(val);
+  }, [required])
+
+  useDidMountEffect(() => {
     callParentHandler();
   }, [val, err]);
 
@@ -70,9 +74,11 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
     handleIsRequired(target);
   };
 
-  const handleIsRequired = (v: number): void => {
+  const handleIsRequired = (v: number | ''): void => {
     if (!v && required) {
       setErr(FormStrings.isRequired);
+    } else {
+      setErr('')
     }
   }
 

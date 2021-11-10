@@ -123,7 +123,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
               <FormSection id='d-sat' header='Satellite Network and Beacon Frequency' disabled={!canEdit}>
                 {[
                   CreateFormField(editing, wfFields.get('device_type'), onChange),
-                  CreateFormField(editing, {...wfFields.get('satellite_network'), required: !isVHF}, onChange, {disabled: isVHF }),
+                  CreateFormField(editing, wfFields.get('satellite_network'), onChange, {required: !isVHF, disabled: isVHF }),
                   frequencyFields.map((f) => CreateFormField(editing, f, onChange))
                 ]}
               </FormSection> 
@@ -131,18 +131,18 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                 {statusFields.map((f) => CreateFormField(editing, f, onChange))}
               </FormSection>
               
-              <FormSection id='d-add' header='Additional Device Sensors and Beacons' disabled={!canEdit}>
+              <FormSection id='d-add' header='Warranty & Activation Details' disabled={!canEdit}>
                 {[
-                  CreateFormField(editing, wfFields.get('activation_status'), onChange),
+                  CreateFormField(editing, wfFields.get('activation_status'), onChange, {labelPlacement: 'start'}),
                   activationFields.map((f) => CreateFormField(editing, {...f, required: isActive}, onChange)),
                   CreateFormField(editing, wfFields.get('activation_comment'), onChange, { disabled: !isActive})
                 ]}
               </FormSection> 
-              <FormSection id='d-activ' header='Warranty & Activation Details' disabled={!canEdit}>
+              <FormSection id='d-activ' header='Additional Device Sensors and Beacons' disabled={!canEdit}>
                 {[
                   CreateFormField(editing, wfFields.get('camera_device_id'), onChange),
                   CreateFormField(editing, wfFields.get('dropoff_device_id'), onChange),
-                  deviceOptionFields.map((f) => CreateFormField(editing, {...f, required: hasDropoff}, onChange, { disabled: !hasDropoff }))
+                  deviceOptionFields.map((f) => CreateFormField(editing, f, onChange, {required: hasDropoff, disabled: !hasDropoff }))
                 ]}
               </FormSection> 
               <FormSection id='d-comment' header='Comments About this Device' disabled={!isActive}>

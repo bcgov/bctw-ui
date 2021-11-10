@@ -182,10 +182,8 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
         return 'Associated Relationship';
       case 'collective_unit':
         return 'Collective Unit Name';
-      // case 'critter_id':
-      //   return 'BCTW ID';
-      case 'juvenile_at_heel':
-        return 'Juvenile at Heel?';
+      case 'juvenile_at_heel_count':
+        return 'Juvenile Count';
       case 'wlh_id':
         return 'WLH ID';
       default:
@@ -249,6 +247,8 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'animal_colouration', type: eInputType.text },
     { prop: 'estimated_age', type: eInputType.number, validate: mustbePositiveNumber },
     { prop: 'life_stage', type: eInputType.code },
+  ],
+  characteristicFields2: [
     { prop: 'juvenile_at_heel', type: eInputType.code },
     { prop: 'juvenile_at_heel_count', type: eInputType.number, validate: mustbePositiveNumber}
   ],

@@ -58,13 +58,13 @@ export default function RetrievalEventForm({
             false
           )}
         </Box>,
-        <Box key='bx-dev' {...boxSpreadRowProps} mb={2}>
+        <Box key='bx-dev' {...boxSpreadRowProps}>
           {CreateFormField(retrieval, fields.shouldUnattachDevice, onChange, {}, true)}
-          {CreateFormField(retrieval, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
-            disabled: !isBeingUnattached
+          {CreateFormField(retrieval, fields.data_life_end, onChange, {
+            disabled: !isBeingUnattached, required: isBeingUnattached 
           })}
         </Box>,
-        <Box key='bx-cdn' {...boxSpreadRowProps} mb={1}>
+        <Box key='bx-cdn' {...boxSpreadRowProps} mt={2} mb={1}>
           {CreateFormField(retrieval, wfFields.get('device_condition'), onChange)}
           {CreateFormField(retrieval, wfFields.get('device_deployment_status'), onChange)}
         </Box>,

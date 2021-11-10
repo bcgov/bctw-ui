@@ -1,7 +1,9 @@
 import { FormStrings } from 'constants/strings';
 
 const mustBeNegativeNumber = (v: number): string => (v > 0 ? FormStrings.validateNegativeLongitude : '');
-const mustbePositiveNumber = <T>(t: T): string => typeof t === 'number' ? t >= 0 ? '' : 'must be positive' : '';
+const mustbePositiveNumber = <T>(t: T): string => {
+  return typeof t === 'number' && t > 0 ? '' : 'must be positive';
+} 
 
 const mustBeXDigits = (v: number, numDigits: number): string =>
   v?.toString().length === numDigits ? '' : `Field must be ${numDigits} digits`;

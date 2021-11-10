@@ -611,17 +611,6 @@ export default function MapPage(): JSX.Element {
     unassignedPingsLayer.addTo(mapRef.current);
   }, [unassignedPingsLayer]);
 
-  // upon 3D -> 2D map, need to re-init
-  /*
-  useDidMountEffect(() => {
-    if (!map3D) {
-      initMap(mapRef, drawnItems, selectedPingsLayer, handleDrawShape, handleDrawLine, handleDeleteLine);
-      togglePings(true);
-      toggleTracks(true);
-    }
-  }, [map3D]);
-  */
-
   // todo: move this to separate component / wrapper
   // resizable state & handlers
   const [bottomPanelHeight, setBottomPanelHeight] = useState<number>(400);

@@ -8,23 +8,24 @@ import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
-import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/event';
+import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
-import { InboundObj } from 'types/form_types';
+import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import ReleaseEvent from 'types/events/release_event';
 import { Button, Icon } from 'components/common';
 import { eUDFType, IUDF } from 'types/udf';
 import AddUDF from 'pages/udf/AddUDF';
 import SelectUDF from 'components/form/SelectUDF';
 import { MapStrings } from 'constants/strings';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 /**
  * the main animal form
  */
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
-  const { isCreatingNew, editing } = props;
+  const { isCreatingNew, editing, open } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
 
@@ -33,6 +34,18 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
   const [event, updateEvent] = useState<CaptureEvent | ReleaseEvent | MortalityEvent>(new MortalityEvent());
   const [showUDFModal, setShowUDFModal] = useState(false);
+
+  const [hasBabies, setHasBabies] = useState(false);
+
+  useDidMountEffect(() => {
+    if(open) {
+      reset();
+    }
+  }, [open]);
+
+  const reset = (): void => {
+    setHasBabies(false);
+  }
 
   /**
    * when a workflow button is clicked, update the event type
@@ -153,7 +166,13 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
-          const onChange = (v: InboundObj): void => handlerFromContext(v);
+          const onChange = (v: InboundObj): void => {
+            const [key, value] = parseFormChangeResult<Animal>(v);
+            if (key === 'juvenile_at_heel' && value) {
+              setHasBabies(String(value).toLowerCase() === 'y');
+            }
+            handlerFromContext(v);
+          }
           return (
             <>
               <AddUDF
@@ -195,6 +214,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               </FormSection>
               <FormSection id='cr-chars' header='Characteristics' disabled={!canEdit}>
                 {characteristicsFields.map((f) => CreateFormField(editing, f, onChange))}
+                {CreateFormField(editing, wfFields.get('juvenile_at_heel'), onChange)}
+                {CreateFormField(editing, wfFields.get('juvenile_at_heel_count'), onChange, {required: hasBabies, disabled: !hasBabies || !canEdit })}
               </FormSection>
               <FormSection id='cr-asoc' header='Association With Another Individual' disabled={!canEdit}>
                 {associatedAnimalFields.map((f) => CreateFormField(editing, f, onChange))}

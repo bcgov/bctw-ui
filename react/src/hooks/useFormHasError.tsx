@@ -7,9 +7,9 @@ import { removeProps } from 'utils/common_helpers';
  * hook that can be used in forms to determine if any of the child input components have errors
  * @returns a boolean set to true if there are errors,
  * @returns a function handler that checks for errors that should be called when an input changes
- * ex. see @function EditModal
+ * @retursn a function that can reset the error state
  */
-export default function useFormHasError(): [boolean, (r: Record<string, unknown>) => void] {
+export default function useFormHasError(): [boolean, (r: InboundObj) => void, () => void] {
   const [errorsExist, setErrorsExist] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -21,6 +21,10 @@ export default function useFormHasError(): [boolean, (r: Record<string, unknown>
     }
     setErrorsExist(numErrs > 0);
   }, [errors]);
+
+  const forceReset = (): void => {
+    setErrors({});
+  }
 
   // if v contains the toReset string[], only remove those errors
   const reset = (v: InboundObj & {toReset?: string[]}): void => {
@@ -59,5 +63,5 @@ export default function useFormHasError(): [boolean, (r: Record<string, unknown>
       setErrors({...newErrs});
     }
   }
-  return [errorsExist, checkErrors];
+  return [errorsExist, checkErrors, forceReset];
 }

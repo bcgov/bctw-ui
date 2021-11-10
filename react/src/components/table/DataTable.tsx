@@ -61,7 +61,7 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   // if a row is selected in a different table, unselect all rows in this table
   useDidMountEffect(() => {
-    if (useRowState && data.length) {
+    if (useRowState && data?.length) {
       const found = data.findIndex((p) => p[rowIdentifier] === useRowState);
       if (found === -1) {
         setSelected([]);

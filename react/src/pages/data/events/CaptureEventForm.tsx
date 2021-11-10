@@ -49,7 +49,7 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
     } else if (key === 'associated_animal_id') {
       setHasAssociation(!!(value as string).length);
     } else if (key === 'juvenile_at_heel') {
-      setHasBabies(value === 'Y');
+      setHasBabies(String(value).toLowerCase() === 'y');
     }
   };
 
@@ -97,7 +97,7 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
           </Box>,
           <Box key='bx-rel' {...boxSpreadRowProps} mt={1}>
             {<span>{associatedID}</span>}
-            {CreateFormField(capture, { ...wfFields.get('associated_animal_relationship'), required: hasAssociation }, onChange, { disabled: !hasAssociation })}
+            {CreateFormField(capture, wfFields.get('associated_animal_relationship'), onChange, {required: hasAssociation, disabled: !hasAssociation })}
           </Box>,
           // animal characteristics section, with subheader tooltip indicating user should review other metadata
           <Tooltip key='tt-rev' title={shouldReviewNotif}>
@@ -113,7 +113,7 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
           </Box>,
           <Box key='bx-juv' {...boxSpreadRowProps} mt={1}>
             {CreateFormField(capture, wfFields.get('juvenile_at_heel'), onChange)}
-            {CreateFormField(capture, wfFields.get('juvenile_at_heel_count'), onChange, { disabled: !hasBabies })}
+            {CreateFormField(capture, wfFields.get('juvenile_at_heel_count'), onChange, { required: hasBabies, disabled: !hasBabies })}
           </Box>,
           <Box key='bx-life' {...boxSpreadRowProps} mt={1}>
             {CreateFormField(capture, wfFields.get('animal_colouration'), onChange)}
@@ -137,8 +137,8 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
             <Button onClick={(): void => handlePostponeSave('mortality')} disabled={!isTransloc || !canSave}>{WorkflowStrings.capture.btnContinueTo('Mortality')}</Button>
           </Box>,
           <Box key='bx-f' {...boxSpreadRowProps} mt={1}>
-            {CreateFormField(capture, { ...wfFields.get('region'), required: mustPopulate }, onChange, { disabled: !isTransloc || !isTranslocComplete })}
-            {CreateFormField(capture, { ...wfFields.get('population_unit'), required: mustPopulate }, onChange, { disabled: !isTransloc || !isTranslocComplete })}
+            {CreateFormField(capture, wfFields.get('region'), onChange, {required: mustPopulate, disabled: !isTransloc || !isTranslocComplete })}
+            {CreateFormField(capture, wfFields.get('population_unit'), onChange, {required: mustPopulate, disabled: !isTransloc || !isTranslocComplete })}
           </Box>
         ]}
       </FormSection>

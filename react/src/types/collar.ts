@@ -116,18 +116,18 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   formatPropAsHeader(str: keyof Collar): string {
     switch (str) {
       case 'activation_status':
-        return 'Is device active with vendor?'
+        return 'Device is active with vendor?'
       case 'camera_device_id':
-        return 'Camera Module ID';
+        return 'Camera ID';
       case 'device_deployment_status':
       case 'device_malfunction_type':
         return columnToHeader(str.replace('device_', ''))
       case 'dropoff_device_id':
-        return 'Drop-off Module ID'
+        return 'Drop-off ID'
       case 'dropoff_frequency':
-        return 'Drop-off Module Frequency'
+        return 'Drop-off Frequency'
       case 'dropoff_frequency_unit':
-        return 'Drop-off Module Frequency Unit'
+        return 'Frequency Unit'
       case 'frequency':
         return 'Beacon Frequency'
       default:

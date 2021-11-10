@@ -10,7 +10,7 @@ import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap } from '
 import dayjs, { Dayjs } from 'dayjs';
 import { BCTWFormat } from 'types/common_types';
 import { Tooltip } from 'components/common'
-import { BaseTextFieldProps, InputProps } from '@mui/material';
+import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -22,7 +22,8 @@ type CreateInputBaseProps = {
 type CreateInputProps = CreateInputBaseProps 
 & Pick<InputProps, 'rows' | 'multiline' | 'disabled' | 'required' | 'style'> 
 & Pick<DateInputProps, 'minDate' |'maxDate'> 
-& Pick<BaseTextFieldProps, 'label'> & {
+& Pick<BaseTextFieldProps, 'label'>
+& Pick<FormControlLabelProps, 'labelPlacement'> & {
   codeName?: string;
   errorMessage?: string;
   span?: boolean;
@@ -94,12 +95,13 @@ function CreateEditDateTimeField({ prop, value, handleChange, label, disabled, r
 }
 
 // checkbox field handler
-function CreateEditCheckboxField({ prop, value, handleChange, label, disabled }: CreateInputProps): ReactElement {
+function CreateEditCheckboxField({ prop, value, handleChange, label, disabled, labelPlacement }: CreateInputProps): ReactElement {
   return (
     <CheckBox
       changeHandler={handleChange}
       initialValue={value as boolean}
       label={label}
+      labelPlacement={labelPlacement}
       propName={prop}
       disabled={disabled}
       key={`input-check-${String(prop)}`}

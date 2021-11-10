@@ -45,7 +45,8 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     triggerReset,
     style,
     required,
-    propName
+    propName,
+    disabled
   } = props;
   const api = useTelemetryApi();
   const [value, setValue] = useState(defaultValue);
@@ -196,7 +197,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
           size='small'
           style={{...baseInputStyle, ...style}}
           className={`select-control ${hasError ? 'input-error' : ''}`}>
-          <InputLabel>{required ? `${label} *` : label}</InputLabel>
+          <InputLabel disabled={disabled}>{required ? `${label} *` : label}</InputLabel>
           <Select
             MenuProps={selectMenuProps}
             value={multiple ? values : value}

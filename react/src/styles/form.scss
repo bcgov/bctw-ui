@@ -1,6 +1,9 @@
   // default 
   .MuiFormControl-root.select-control {
     width: 100%;
+    // .Mui-disabled {
+    //   color: 'orange'
+    // }
   }
 
   .MuiFormControl-root.udf-select-control {
@@ -18,13 +21,3 @@
       // opacity: 0.3;
     }
   }
-
-// for use in overview pages to display disabled text fields
-.text-disabled {
-  .MuiInput-underline.Mui-disabled:before {
-    border-bottom-style: none;
-  }
-  .MuiInputBase-input {
-    color: #000;
-  }
-}

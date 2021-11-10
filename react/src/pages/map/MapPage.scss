@@ -72,14 +72,14 @@ $appearAboveMap: 1001;
 }
 
 // Map Bottom Panel
-// fixme: last row obscured
 .map-bottom-panel {
   bottom: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  // overflow: hidden;
   position: absolute;
   width: 100%;
+  margin-bottom: 23px;
 
   .MuiTableContainer-root {
     box-shadow: none;
@@ -110,7 +110,7 @@ $appearAboveMap: 1001;
 .map-detail-table-container {
   flex: 1 1 auto;
   // fixme: why?
-  overflow-x: hidden;
+  // overflow-x: hidden;
 }
 
 // must be at least this index to appear for full-screen dialog

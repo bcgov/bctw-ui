@@ -69,7 +69,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   } = props;
 
   const [canSave, setCanSave] = useState(false);
-  const [hasErr, checkHasErr] = useFormHasError();
+  const [hasErr, checkHasErr, resetErrs] = useFormHasError();
   // an empty object to assign changed properties of T to
   const [newObj, setNewObj] = useState<T>({} as T);
   // history-related & tab state
@@ -132,6 +132,8 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   };
 
   const reset = (): void => {
+    setNewObj({} as T);
+    resetErrs();
     setShowHistory(false);
     setCanSave(false);
     if (typeof onReset === 'function') {

@@ -164,7 +164,7 @@ export default function AlertPage(): JSX.Element {
                         <strong>{a.formatAlert}</strong>
                       </TableCell>
                       <TableCell>{formatT(a.valid_from)}</TableCell>
-                      <TableCell>{formatT(a.last_transmission_date)}</TableCell>
+                      <TableCell>{a.last_transmission_date.isValid() ? formatT(a.last_transmission_date) : ''}</TableCell>
                       <TableCell>
                         <IconButton
                           style={{ padding: '9px', backgroundColor: 'orangered' }}

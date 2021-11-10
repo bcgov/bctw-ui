@@ -53,6 +53,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     setCanSave(!hasErr);
   }, [hasErr]);
 
+  // save response handler
   const onSuccess = async (e: AxiosError | boolean): Promise<void> => {
     if ((e as AxiosError)?.isAxiosError) {
       showNotif({ severity: 'error', message: formatAxiosError(e as AxiosError) });
@@ -68,8 +69,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     }
   };
 
+  // error response handler
   const onError = (e: AxiosError): void => {
-    // console.log('error saving event', formatAxiosError(e));
     showNotif({ severity: 'success', message: `error saving ${event.event_type} workflow: ${formatAxiosError(e)}` });
   };
 
