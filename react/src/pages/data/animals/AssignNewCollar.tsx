@@ -8,12 +8,15 @@ import { AttachDeviceInput } from 'types/collar_history';
 import { Animal } from 'types/animal';
 import { DataLifeInput } from 'types/data_life';
 import { Button, Modal } from 'components/common';
+import { MutationStatus } from 'react-query';
+import { Box, CircularProgress } from '@mui/material';
 
 type IAssignNewCollarModal = Pick<Animal, 'critter_id'> & {
   show: boolean;
   onClose: (close: boolean) => void;
-  onSave: (obj: AttachDeviceInput ) => void;
+  onSave: (obj: AttachDeviceInput) => void;
   dli: DataLifeInput;
+  saveStatus: MutationStatus;
 };
 
 /**
@@ -22,23 +25,33 @@ type IAssignNewCollarModal = Pick<Animal, 'critter_id'> & {
  * @param {onSave} - parent component {PerformAssignment} handles this.
  * collar row must be selected in order to enable the save button
  */
-export default function AssignNewCollarModal({ critter_id, dli, onClose, show, onSave }: IAssignNewCollarModal): JSX.Element {
+export default function AssignNewCollarModal({
+  critter_id,
+  dli,
+  onClose,
+  show,
+  onSave,
+  saveStatus
+}: IAssignNewCollarModal): JSX.Element {
   const bctwApi = useTelemetryApi();
 
-  const [collarId, setCollarId] = useState('');
-  const [ DLInput ] = useState<DataLifeInput>(dli);
+  const [selectedDevice, setSelectedDevice] = useState<Collar>({} as Collar);
+  const [DLInput] = useState<DataLifeInput>(dli);
 
-  const handleSelectDevice = (row: Collar): void => setCollarId(row.collar_id);
+  const handleSelectDevice = (row: Collar): void => setSelectedDevice(row);
 
   const handleSave = (): void => {
+    // todo: use device id to display more useful notification after save
+    const { collar_id, device_id } = selectedDevice;
     const body: AttachDeviceInput = {
       critter_id,
-      collar_id: collarId,
+      collar_id: collar_id,
+      device_id: device_id,
       // formats the datetime properties
       ...DLInput.toPartialAttachDeviceJSON()
-    }
+    };
     onSave(body);
-  }
+  };
 
   return (
     <Modal open={show} handleClose={onClose}>
@@ -50,9 +63,17 @@ export default function AssignNewCollarModal({ critter_id, dli, onClose, show, o
       />
       {/* disable editing of end of the attachment when attaching the device */}
       <DataLifeInputForm dli={DLInput} enableEditStart={true} enableEditEnd={false} />
-      <Button disabled={collarId === ''} onClick={handleSave}>
-        {CS.assignCollarBtnText}
-      </Button>
+      <Box>
+        {saveStatus === 'loading' ? (
+          <div>
+            <CircularProgress />
+          </div>
+        ) : (
+          <Button disabled={Object.keys(selectedDevice).length === 0} onClick={handleSave}>
+            {CS.assignCollarBtnText}
+          </Button>
+        )}
+      </Box>
     </Modal>
   );
 }

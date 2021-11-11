@@ -1,5 +1,5 @@
 import { Collar } from 'types/collar';
-import { BCTWBase, nullToDayjs, uuid } from 'types/common_types';
+import { BCTWBase, nullToDayjs, PartialPick, uuid } from 'types/common_types';
 import { Expose, Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
@@ -17,7 +17,7 @@ export interface ICollarHistory extends
 // passed to the API when attaching a device to an animal
 export type AttachDeviceInput = Pick<Animal, 'critter_id'> & Pick<Collar, 'collar_id'> &
 { [Property in keyof IDataLifeStartProps]: string } &
-{ [Property in keyof IDataLifeEndProps]: string };
+{ [Property in keyof IDataLifeEndProps]: string } & PartialPick<Collar, 'device_id'>;
 
 // passed to the API when removing a device from an animal
 // note: data_life_end must be provided for the attachment to be considered over

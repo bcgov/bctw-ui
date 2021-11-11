@@ -8,7 +8,9 @@ import { Icon, Tooltip } from 'components/common';
 import { QueryStatus } from 'react-query';
 import { buttonProps } from 'components/component_constants';
 import LoadingButton from '@mui/lab/LoadingButton';
-
+import { useAttachmentChanged } from 'contexts/DeviceAttachmentChangedContext';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { Animal, AttachedAnimal } from 'types/animal';
 
 /**
  * handles the show/hide functionality of the childEditComponent
@@ -68,17 +70,32 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
   const [editObj, setEditObj] = useState<T>(editing);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const deviceAttachmentChange = useAttachmentChanged();
+
+  const inverseModalState = (): void => {
+    setShowModal(o => !o);
+  }
+
+  /**
+   * close the edit modal when editing an animal and 
+   * a device is attached or removed 
+   */
+  useDidMountEffect(() => {
+    if (editing instanceof AttachedAnimal || editing instanceof Animal) {
+      inverseModalState();
+    }
+  }, [deviceAttachmentChange])
 
   const handleClickAdd = (): void => {
     setIsCreatingNew(true);
     setEditObj(empty);
-    setShowModal((o) => !o);
+    inverseModalState();
   };
 
   const handleClickEdit = (): void => {
     setIsCreatingNew(false);
     setEditObj(editing);
-    setShowModal((o) => !o);
+    inverseModalState();
   };
 
   const enableDelete = (): boolean => {
@@ -96,7 +113,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
     if (typeof onSave === 'function') {
       await onSave(payload);
       if (closeAfterSave) {
-        setShowModal((o) => !o);
+        inverseModalState();
       }
     }
   };

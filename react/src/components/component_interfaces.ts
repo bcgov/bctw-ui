@@ -38,7 +38,6 @@ type EditModalBaseProps<T> = ModalBaseProps & {
 */
 type EditorProps<T> = EditModalBaseProps<T> & {
   isCreatingNew?: boolean;
-  validateFailed?: (errors: Record<string, unknown>) => void;
 };
 
 /**

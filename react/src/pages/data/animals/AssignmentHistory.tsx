@@ -8,6 +8,7 @@ import { ModalBaseProps } from 'components/component_interfaces';
 import { Button, Modal } from 'components/common';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import EditDataLifeModal from 'components/form/EditDataLifeModal';
+import { useAttachmentChanged } from 'contexts/DeviceAttachmentChangedContext';
 
 export type IAssignmentHistoryPageProps = Pick<ModalBaseProps, 'open' | 'handleClose'> & {
   critter_id: string;
@@ -22,6 +23,7 @@ export type IAssignmentHistoryPageProps = Pick<ModalBaseProps, 'open' | 'handleC
 export default function AssignmentHistory(props: IAssignmentHistoryPageProps): JSX.Element {
   const { critter_id, open, handleClose, permission_type } = props;
   const api = useTelemetryApi();
+  const attachmentChanged = useAttachmentChanged();
   const [currentAttachment, setCurrentAttached] = useState<CollarHistory>(new CollarHistory());
   const [selectedAttachment, setSelectedAttachment] = useState<CollarHistory>(new CollarHistory());
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
@@ -39,6 +41,11 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
     }
   }, [history]);
 
+  useEffect(() => {
+    // console.log('assignment history page: device was assigned or removed', attachmentChanged);
+    handleClose(false);
+  }, [attachmentChanged])
+
   /**
    * Custom column button component passed to device assignment history data table.
    * When the 'selected' attachment is selected clicking the button,
@@ -48,8 +55,12 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
     const handleClick = async (): Promise<void> => {
       await setSelectedAttachment(row);
       setShowEditDL(() => !showEditDL);
-    }
-    return <Button disabled={!permissionCanModify(permission_type)} onClick={handleClick}>Edit</Button>;
+    };
+    return (
+      <Button disabled={!permissionCanModify(permission_type)} onClick={handleClick}>
+        Edit
+      </Button>
+    );
   };
 
   return (
@@ -61,7 +72,10 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
         paginate={history?.length >= 10}
         customColumns={[{ column: EditDatalifeColumn, header: (): JSX.Element => <b>Modify Data Life</b> }]}
       />
-      <PerformAssignmentAction current_attachment={currentAttachment} {...props} />
+      <PerformAssignmentAction
+        current_attachment={currentAttachment}
+        {...props}
+      />
       <EditDataLifeModal
         attachment={selectedAttachment}
         handleClose={(): void => setShowEditDL(false)}

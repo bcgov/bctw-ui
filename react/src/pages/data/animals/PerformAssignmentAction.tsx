@@ -1,9 +1,11 @@
+import { CircularProgress } from '@mui/material';
 import { AxiosError } from 'axios';
 import { Button } from 'components/common';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { useAttachmentDispatch } from 'contexts/DeviceAttachmentChangedContext';
 import dayjs from 'dayjs';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -16,7 +18,7 @@ import { formatAxiosError } from 'utils/errors';
 
 import { IAssignmentHistoryPageProps } from './AssignmentHistory';
 
-type IPerformAssignmentActionPageProps = Pick<IAssignmentHistoryPageProps, 'permission_type' | 'critter_id'> & {
+type PerformAssignmentPageProps = Pick<IAssignmentHistoryPageProps, 'permission_type' | 'critter_id'> & {
   current_attachment: CollarHistory;
 };
 /**
@@ -28,8 +30,9 @@ export default function PerformAssignmentAction({
   critter_id,
   current_attachment,
   permission_type
-}: IPerformAssignmentActionPageProps): JSX.Element {
+}: PerformAssignmentPageProps): JSX.Element {
   const api = useTelemetryApi();
+  const notifyAttachment = useAttachmentDispatch();
   const showNotif = useResponseDispatch();
   const [showConfirmUnattachModal, setShowConfirmModal] = useState(false);
   const [showDevicesAvailableModal, setShowAvailableModal] = useState(false);
@@ -83,16 +86,22 @@ export default function PerformAssignmentAction({
   });
 
   // post response handlers
-  const onAttachSuccess = (): void => {
+  const onAttachSuccess = (record: CollarHistory): void => {
     showNotif({ severity: 'success', message: 'device successfully attached to animal' });
-    // todo: if device is attached ...update state to indicate that the device can only be removed
+    // update state to indicate that the device can only be removed
     setIsRemovingDevice((o) => !o);
-    closeModals();
+    onMutationComplete(record);
   };
 
-  const onRemoveSuccess = (): void => {
-    showNotif({ severity: 'success', message: 'device successfully removed from animal' });
+  const onRemoveSuccess = (record: CollarHistory): void => {
+    showNotif({ severity: 'success', message: `device ${current_attachment?.device_id} successfully removed` });
+    onMutationComplete(record);
+  };
+
+  const onMutationComplete = (record: CollarHistory): void => {
     closeModals();
+    // update the context
+    notifyAttachment(record);
   };
 
   const onError = (error: AxiosError): void =>
@@ -102,8 +111,14 @@ export default function PerformAssignmentAction({
     });
 
   // setup mutations to save the device attachment status
-  const { mutateAsync: saveAttachDevice } = api.useAttachDevice({ onSuccess: onAttachSuccess, onError });
-  const { mutateAsync: saveRemoveDevice } = api.useRemoveDevice({ onSuccess: onRemoveSuccess, onError });
+  const { mutateAsync: saveAttachDevice, status: attachmentStatus } = api.useAttachDevice({
+    onSuccess: onAttachSuccess,
+    onError
+  });
+  const { mutateAsync: saveRemoveDevice, isLoading: isRemoving } = api.useRemoveDevice({
+    onSuccess: onRemoveSuccess,
+    onError
+  });
 
   /* if there is a collar attached and user clicks the remove button, show the confirmation window
     otherwise, show the list of devices the user has access to
@@ -111,7 +126,6 @@ export default function PerformAssignmentAction({
   const handleClickShowModal = (): void => (isRemovingDevice ? setShowConfirmModal(true) : setShowAvailableModal(true));
 
   const closeModals = (): void => {
-    setShowConfirmModal(false);
     setShowAvailableModal(false);
   };
 
@@ -121,12 +135,13 @@ export default function PerformAssignmentAction({
       ...dli.toRemoveDeviceJSON()
     };
     saveRemoveDevice(body);
+    setShowConfirmModal(false);
   };
 
   // componenet passed to the confirm device removal as the modal body.
   const ConfirmRemoval = (
     <>
-      <p>{CS.collarRemovalText(current_attachment?.device_id, current_attachment?.device_make)}</p>
+      {CS.collarRemovalText(current_attachment?.device_id, current_attachment?.device_make)}
       <DataLifeInputForm dli={dli} enableEditEnd={true} enableEditStart={false} />
     </>
   );
@@ -146,10 +161,15 @@ export default function PerformAssignmentAction({
         show={showDevicesAvailableModal}
         onClose={closeModals}
         dli={dli}
+        saveStatus={attachmentStatus}
       />
-      <Button disabled={!canEdit} onClick={handleClickShowModal}>
-        {isRemovingDevice ? 'Remove Device' : 'Assign Device'}
-      </Button>
+      {isRemoving ? (
+        <CircularProgress />
+      ) : (
+        <Button disabled={!canEdit} onClick={handleClickShowModal}>
+          {isRemovingDevice ? 'Remove Device' : 'Assign Device'}
+        </Button>
+      )}
     </>
   );
 }
