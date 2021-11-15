@@ -94,8 +94,8 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 
   performSnooze(): TelemetryAlert {
     this.snooze_count++;
-    const curSnooze = this.snoozed_to.isValid() ? this.snoozed_to : dayjs();
-    this.snoozed_to = curSnooze.add(1, 'day');
+    // const curSnooze = this.snoozed_to.isValid() ? this.snoozed_to : dayjs();
+    this.snoozed_to = dayjs().add(1, 'day');
     return this;
   }
 
