@@ -12,6 +12,7 @@ import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import OnboardingAdmin from 'pages/admin/OnboardingAdmin';
+import VendorAPIPage from 'pages/vendor/TriggerFetchTelemetry';
 
 export type RouteKey = {
   path: string;
@@ -35,8 +36,8 @@ const AppRoutes: RouteKey[] = [
   { name: 'users', path: '/users', title: 'BCTW Users', component: UserAdminPage, sort: 101, icon: 'admin' },
   { name: 'onboarding-admin', path: '/admin-onboarding', title: 'Onboarding Requests', component: OnboardingAdmin, sort: 102, icon: 'personAdd' },
   { name: 'animal-manager', path: '/animal-manager', title: 'Set Animal Manager', component: GrantCritterAccessPage, sort: 103, icon: 'key' },
-  // { name: 'codes', path: '/codes', title: 'Code Tables', component: CodePage, sort: 104, icon: 'code' },
   { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: UserOnboarding, sort: 201 },
+  { name: 'vendor', path: '/vendor', title: 'Telemetry Retrieval', component: VendorAPIPage, sort: 202, icon: 'devices' },
   { name: 'notFound', path: '/*', title: 'React: Not Found', component: (): JSX.Element => <div>React AppRouter.tsx says: Page not found!</div>, sort: 404 },
 ];
 

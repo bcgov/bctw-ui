@@ -34,6 +34,7 @@ import { BCTWWorkflow } from 'types/events/event';
 import { IOnboardUser, HandleOnboardInput, OnboardUser, OnboardUserRequest } from 'types/onboarding';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 import { parseArgs } from 'utils/common_helpers';
+import { FetchTelemetryInput } from 'types/events/vendor';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -112,18 +113,18 @@ export const useTelemetryApi = () => {
   /**
    * @param type the collar types to be fetched (assigned, unassigned)
    */
-  const useAttachedDevices = (page: number): UseQueryResult<AttachedCollar[], AxiosError> => {
+  const useAttachedDevices = (page: number, ...args: unknown[]): UseQueryResult<AttachedCollar[], AxiosError> => {
     return useQuery<AttachedCollar[], AxiosError>(
       ['collars_attached', page],
-      () => collarApi.getAssignedCollars(page),
+      () => collarApi.getAssignedCollars(page, parseArgs(args)),
       critterOptions
     );
   };
 
-  const useUnattachedDevices = (page: number): UseQueryResult<Collar[], AxiosError> => {
+  const useUnattachedDevices = (page: number, ...args: unknown[]): UseQueryResult<Collar[], AxiosError> => {
     return useQuery<Collar[], AxiosError>(
       ['collars_unattached', page],
-      () => collarApi.getAvailableCollars(page),
+      () => collarApi.getAvailableCollars(page, parseArgs(args)),
       critterOptions
     );
   };
@@ -402,6 +403,10 @@ export const useTelemetryApi = () => {
     return useMutation<void, AxiosError>((body) => userApi.testUserAlertNotifications(body));
   }
 
+  /** */
+  const useTriggerVendorTelemetry = (config: UseMutationOptions<void, AxiosError, FetchTelemetryInput>): UseMutationResult<void, AxiosError> =>
+    useMutation<void, AxiosError>((body) => collarApi.triggerVendorTelemetryUpdate(body, config));
+
   return {
     // queries
     useAlert,
@@ -449,5 +454,6 @@ export const useTelemetryApi = () => {
     useTakeActionOnPermissionRequest,
     useSubmitOnboardingRequest,
     useHandleOnboardingRequest,
+    useTriggerVendorTelemetry,
   };
 };

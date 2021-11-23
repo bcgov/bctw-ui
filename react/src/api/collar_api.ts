@@ -1,9 +1,11 @@
 import { createUrl, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollar, Collar, AttachedCollar } from 'types/collar';
-import { upsertDeviceEndpoint } from 'api/api_endpoint_urls';
+import { triggerTelemetryFetch, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from './api_interfaces';
 import { useQueryClient } from 'react-query';
+import { DeviceMake, FetchTelemetryInput } from 'types/events/vendor';
+import { Search } from 'components/table/table_interfaces';
 
 export const collarApi = (props: ApiProps): API => {
   const { api } = props;
@@ -14,10 +16,15 @@ export const collarApi = (props: ApiProps): API => {
     qc.invalidateQueries('collars_unattached');
     qc.invalidateQueries('collarHistory');
     qc.invalidateQueries('getType');
-  }
+  };
 
-  const getAvailableCollars = async (page = 1): Promise<Collar[]> => {
-    const { data } = await api.get(createUrl({ api: 'get-available-collars', page }));
+  const getAvailableCollars = async (page = 1, search?: Search): Promise<Collar[]> => {
+    const url = createUrl({
+      api: `get-available-collars`,
+      query: search ? `keys=${search.keys}&term=${search.term}` : '',
+      page
+    });
+    const { data } = await api.get(url);
     const ret = data.map((json: ICollar) => plainToClass(Collar, json));
     return ret;
   };
@@ -42,10 +49,20 @@ export const collarApi = (props: ApiProps): API => {
     return data;
   };
 
+  /**
+   * triggers a manual fetch of telemetry for the provided @param body.device_ids.
+   * todo: provide type
+   */
+  const triggerVendorTelemetryUpdate = async (body: FetchTelemetryInput, type: DeviceMake): Promise<void> => {
+    const { data } = await postJSON(api, createUrl({ api: triggerTelemetryFetch }), body);
+    return data;
+  };
+
   return {
     getAvailableCollars,
     getAssignedCollars,
     getCollarHistory,
+    triggerVendorTelemetryUpdate,
     upsertCollar
   };
 };

@@ -17,6 +17,7 @@ const submitOnboardingRequest            = 'submit-onboarding-request';
 const getOnboardingRequests              = 'onboarding-requests';
 const handleOnboardingRequest            = 'handle-onboarding-request';
 const getCurrentOnboardStatus            = 'get-onboard-status';
+const triggerTelemetryFetch              = 'fetch-telemetry';
 
 export {
   importCSVEndpoint,
@@ -34,4 +35,5 @@ export {
   getOnboardingRequests,
   getCurrentOnboardStatus,
   handleOnboardingRequest,
+  triggerTelemetryFetch,
 }

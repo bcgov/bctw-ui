@@ -1,4 +1,4 @@
-import { ITableFilter } from 'components/table/table_interfaces';
+import { ITableFilter, Search } from 'components/table/table_interfaces';
 
 // returns the number of digits after the decimal in a float
 const countDecimals = (value: number): number => {
@@ -94,7 +94,7 @@ const isSearchTerm = (obj: unknown): obj is ITableFilter=> {
  * iterates unknown function parameters (ex. ...args) 
  * returns @type { ITableFilter } if located
  */
-const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'> | undefined => {
+const parseArgs = (args: unknown[]): Search | undefined => {
   for (let i = 0; i < args.length; i++) {
     const element = args[i];
     if (typeof element === 'object') {
