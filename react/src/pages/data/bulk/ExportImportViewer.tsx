@@ -3,19 +3,17 @@ import { Button } from 'components/common';
 import Export from 'pages/data/bulk/Export';
 import { useState } from 'react';
 
-export type IImportExportProps<T> = {
+export type ExportPageProps<T> = {
   eTitle: string;
   eMsg?: string;
-  data: T[];
   eDisabled?: boolean;
   template: (keyof T)[];
 };
 
 /**
- * used in data management views to wrap the import/export components
- * and control their modal show/hide status with a button group
+ * used in data management views to wrap the export component and control the modal visibility 
  */
-export default function ImportExportViewer<T>({ data, eTitle, eMsg, template, eDisabled = false }: IImportExportProps<T>): JSX.Element {
+export default function ExportViewer<T>({ eTitle, eMsg, template, eDisabled = false }: ExportPageProps<T>): JSX.Element {
   const [showExportModal, setShowExportModal] = useState(false);
 
   const handleClickExport = (): void => setShowExportModal(o => !o);
@@ -24,11 +22,11 @@ export default function ImportExportViewer<T>({ data, eTitle, eMsg, template, eD
     setShowExportModal(false);
   }
 
-  const exportProps = { title: eTitle, message: eMsg, data, handleClose, open: showExportModal, template }
+  const exportProps = { title: eTitle, message: eMsg, handleClose, open: showExportModal, template }
 
   return (
     <Box ml={1}>
-      <Button onClick={handleClickExport} disabled={eDisabled || !data.length}>Export</Button>
+      <Button onClick={handleClickExport} disabled={eDisabled}>Export</Button>
       {eDisabled ? null : <Export {...exportProps} />}
     </Box>
   );

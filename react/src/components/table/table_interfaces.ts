@@ -111,8 +111,6 @@ interface ITableFilter {
   term: string;
 }
 
-type Search = Omit<ITableFilter, 'operator'>;
-
 export type {
   HeadCell,
   Order,
@@ -125,5 +123,4 @@ export type {
   ITableSortProp,
   ITableFilter,
   FilterOperator,
-  Search
 };

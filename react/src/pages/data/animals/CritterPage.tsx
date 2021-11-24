@@ -4,7 +4,7 @@ import { CritterStrings, CritterStrings as CS } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
-import ExportImportViewer from 'pages/data/bulk/ExportImportViewer';
+import ExportViewer from 'pages/data/bulk/ExportImportViewer';
 import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
@@ -12,27 +12,13 @@ import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
-import { classToPlain } from 'class-transformer';
 
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
   const [deleted, setDeleted] = useState('');
 
-  // for exporting state
-  const [critterA, setCrittersA] = useState([]);
-  const [critterU, setCrittersU] = useState([]);
-
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
-
-  const onNewData = (animals: AttachedAnimal[] | Animal[]): void => {
-    const asPlain = animals.map((a) => classToPlain(a));
-    if (animals[0] instanceof AttachedAnimal) {
-      setCrittersA(asPlain);
-    } else {
-      setCrittersU(asPlain);
-    }
-  };
 
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
@@ -59,7 +45,7 @@ export default function CritterPage(): JSX.Element {
               <EditCritter {...editProps} />
             </AddEditViewer>
           </ModifyCritterWrapper>
-          <ExportImportViewer
+          <ExportViewer<AttachedAnimal>
             template={[
               'critter_id',
               'species',
@@ -71,7 +57,6 @@ export default function CritterPage(): JSX.Element {
               'frequency',
               'animal_id'
             ]}
-            data={[...critterA, ...critterU]}
             eTitle={CritterStrings.exportTitle}
           />
         </Box>
@@ -84,7 +69,7 @@ export default function CritterPage(): JSX.Element {
             <DataTable
               headers={AttachedAnimal.attachedCritterDisplayProps}
               title={CS.assignedTableTitle}
-              queryProps={{ query: api.useAssignedCritters, onNewData: (a: AttachedAnimal[]): void => onNewData(a) }}
+              queryProps={{ query: api.useAssignedCritters }}
               onSelect={handleSelect}
               deleted={deleted}
             />
@@ -93,7 +78,7 @@ export default function CritterPage(): JSX.Element {
             <DataTable
               headers={new Animal().displayProps}
               title={CS.unassignedTableTitle}
-              queryProps={{ query: api.useUnassignedCritters, onNewData }}
+              queryProps={{ query: api.useUnassignedCritters }}
               onSelect={handleSelect}
               deleted={deleted}
             />

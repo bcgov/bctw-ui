@@ -483,8 +483,8 @@ export default function MapPage(): JSX.Element {
    * triggered when user clicks checkbox in filter panel
    * since latest pings are a separate layer, this toggles the pings/tracks layers
    * @param show should only the latest pings be shown?
+   * fixme: points within drawn polygons are still displayed
    */
-  // fixme: points within drawn polygons are still displayed
   const handleShowLastKnownLocation = (show: boolean): void => {
     setOnlyLastKnown(show);
     if (show) {
@@ -524,7 +524,6 @@ export default function MapPage(): JSX.Element {
 
   /**
    * @param b boolean on whether the map should be filtered to each critter's last 10 pings
-   * fixme: line segment to the latest point not appearing
    */
   const handleShowLast10Fixes = (b: boolean): void => {
     setOnlyLast10(b);

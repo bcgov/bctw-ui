@@ -32,9 +32,9 @@ const _appendQueryToUrl = (url: string, query: string): string => {
  * @param search the table filter object
  * @returns a query string with the destructured serach object
  */
-const searchQuery = (search: ITableFilter): string | undefined => {
+const searchToQueryString = (search: ITableFilter): string => {
   if (!search) {
-    return;
+    return '';
   }
   const { term, keys } = search;
   return `&term=${term}&keys=${keys}`;
@@ -121,4 +121,4 @@ const postJSON = async <T>(api: AxiosInstance, url: string, body: T): Promise<Ax
   return api.post(url, json);
 };
 
-export { asJSON, escapeRegex, getBaseUrl, createUrl, createFormData, isDev, sleep, postJSON, searchQuery };
+export { asJSON, escapeRegex, getBaseUrl, createUrl, createFormData, isDev, sleep, postJSON, searchToQueryString };

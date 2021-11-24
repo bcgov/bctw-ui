@@ -1,5 +1,5 @@
 import { getCritterEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
-import { createUrl, postJSON } from 'api/api_helpers';
+import { createUrl, postJSON, searchToQueryString } from 'api/api_helpers';
 import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { plainToClass } from 'class-transformer';
 import { Animal, AttachedAnimal, eCritterFetchType, IAnimal, IAttachedAnimal } from 'types/animal';
@@ -17,6 +17,9 @@ export const critterApi = (props: ApiProps): API => {
     qc.invalidateQueries('pings');
   };
 
+  /**
+   * converts json to the class instance of the animals 
+   */
   const _handleGetResults = (
     data: IAnimal[] | IAttachedAnimal[],
     type: eCritterFetchType
@@ -27,23 +30,32 @@ export const critterApi = (props: ApiProps): API => {
     return type === eCritterFetchType.assigned ? (results as AttachedAnimal[]) : (results as Animal[]);
   };
 
+  /**
+   * fetches animals, based on @param critterType 
+   */
   const getCritters = async (
     page = 1,
     critterType: eCritterFetchType,
     search?: ITableFilter
   ): Promise<Animal[] | AttachedAnimal[]> => {
-    const url = createUrl({ api: getCritterEndpoint, query: `critterType=${critterType}`, page });
-    // console.log(`requesting assigned critters page: ${page}`);
+    const query = `critterType=${critterType}${searchToQueryString(search)}`;
+    const url = createUrl({ api: getCritterEndpoint, query, page });
     const { data } = await api.get(url);
     return _handleGetResults(data, critterType);
   };
 
+  /**
+   * create or edit an animal
+   */
   const upsertCritter = async (payload: IUpsertPayload<Animal>): Promise<IBulkUploadResults<Animal>> => {
     const { data } = await postJSON(api, createUrl({ api: upsertCritterEndpoint }), payload.body);
     invalidate();
     return data;
   };
 
+  /**
+   * retrieve the metadata history of an animal, given a @param id (critter_id) 
+   */
   const getCritterHistory = async (page: number, id: string): Promise<Animal[]> => {
     const url = createUrl({ api: `get-animal-history/${id}`, page });
     const { data } = await api.get(url);

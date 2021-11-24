@@ -11,8 +11,7 @@ import AddEditViewer from '../common/AddEditViewer';
 import CollarImport from 'pages/data/collars/CollarImport';
 import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
-import ExportImportViewer from '../bulk/ExportImportViewer';
-import { classToPlain } from 'class-transformer';
+import ExportViewer from 'pages/data/bulk/ExportImportViewer';
 import { Button } from 'components/common';
 
 export default function CollarPage(): JSX.Element {
@@ -22,9 +21,6 @@ export default function CollarPage(): JSX.Element {
   const [showImport, setShowImport] = useState(false);
   const [deleted, setDeleted] = useState('');
 
-  const [devicesA, setDevicesA] = useState([]);
-  const [devicesU, setDevicesU] = useState([]);
-
   // set editing object when table row is selected
   const handleSelect = <T extends Collar>(row: T): void => setEditObj(row);
 
@@ -33,15 +29,6 @@ export default function CollarPage(): JSX.Element {
     open: false,
     onSave: doNothingAsync,
     handleClose: doNothing
-  };
-
-  const onNewData = (collars: AttachedCollar[] | Collar[]): void => {
-    const asPlain = collars.map((device) => classToPlain(device));
-    if (collars[0] instanceof AttachedCollar) {
-      setDevicesA(asPlain);
-    } else {
-      setDevicesU(asPlain);
-    }
   };
 
   return (
@@ -57,7 +44,7 @@ export default function CollarPage(): JSX.Element {
               <EditCollar {...editProps} />
             </AddEditViewer>
           </ModifyCollarWrapper>
-          <ExportImportViewer
+          <ExportViewer<AttachedCollar>
             template={[
               'collar_id',
               'device_id',
@@ -70,7 +57,6 @@ export default function CollarPage(): JSX.Element {
               'animal_id',
               'critter_id'
             ]}
-            data={[...devicesA, ...devicesU]}
             eTitle={S.exportTitle}
           />
           <Box ml={1}>
@@ -85,7 +71,7 @@ export default function CollarPage(): JSX.Element {
             <DataTable
               headers={AttachedCollar.attachedDevicePropsToDisplay}
               title={S.assignedCollarsTableTitle}
-              queryProps={{ query: api.useAttachedDevices, onNewData: (v: AttachedCollar[]): void => onNewData(v) }}
+              queryProps={{ query: api.useAttachedDevices }}
               onSelect={handleSelect}
               deleted={deleted}
             />
@@ -94,7 +80,7 @@ export default function CollarPage(): JSX.Element {
             <DataTable
               headers={Collar.propsToDisplay}
               title={S.availableCollarsTableTitle}
-              queryProps={{ query: api.useUnattachedDevices, onNewData }}
+              queryProps={{ query: api.useUnattachedDevices }}
               onSelect={handleSelect}
               deleted={deleted}
             />

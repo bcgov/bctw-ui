@@ -3,16 +3,45 @@ import { Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
-import { useEffect, useState } from 'react';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useState } from 'react';
 import { formatT } from 'utils/time';
 
-type ImportProps<T> = ModalBaseProps & { data: T[], template: (keyof T)[] };
+type ImportProps<T> = ModalBaseProps & { template: (keyof T)[] };
 
-export default function Export<T>({ data, handleClose, open, template, title }: ImportProps<T>): JSX.Element {
-  const [downloading, setIsDownloading] = useState(true);
+export default function Export<T>({ handleClose, open, template, title }: ImportProps<T>): JSX.Element {
+  const api = useTelemetryApi();
+  const [downloading, setIsDownloading] = useState(false);
   const fields = template.join(',');
 
-  useEffect(() => {
+  const [aResults, setAResults] = useState([]);
+  const [uResults, setUResults] = useState([]);
+
+  // fixme: better way to determine which page
+  const isCritter = template[0] === 'critter_id';
+
+  const {
+    isError: isAError,
+    data: aData,
+    status: aStatus
+  } = isCritter ? api.useAssignedCritters(0) : api.useAttachedDevices(0);
+  const {
+    isError: isUError,
+    data: uData,
+    status: uStatus
+  } = isCritter ? api.useUnassignedCritters(0) : api.useUnattachedDevices(0);
+
+  useDidMountEffect(() => {
+    if (aStatus === 'success' && !isAError) {
+      setAResults(aData);
+    }
+    if (uStatus === 'success' && !isUError) {
+      setUResults(uData);
+    }
+  }, [aStatus, uStatus]);
+
+  useDidMountEffect(() => {
     if (open) {
       setIsDownloading(true);
       exportData();
@@ -20,6 +49,7 @@ export default function Export<T>({ data, handleClose, open, template, title }: 
   }, [open]);
 
   const exportData = (): void => {
+    const data = [...aResults, ...uResults];
     const body = data
       .map((d) => {
         let r = '';
@@ -39,9 +69,11 @@ export default function Export<T>({ data, handleClose, open, template, title }: 
 
   return (
     <Modal open={open} handleClose={handleClose} title={title}>
-      {downloading ? (
+      {isAError || isUError ? (
+        <div>error retrieving data...</div>
+      ) : downloading ? (
         <div>
-          downloading
+          downloading...
           <CircularProgress />
         </div>
       ) : (

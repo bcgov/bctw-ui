@@ -281,19 +281,26 @@ const getLast10Fixes = (
   };
 };
 
-// returns the most recent 9 telemetry points per critter group
-// 9 instead of 10 as the latest ping is stored in a separate layer
-const getLast10Points = (pings: ITelemetryGroup[]): ITelemetryPoint[] => {
-  const p = [];
-  for (let i = 0; i < pings.length; i++) {
-    const features = pings[i].features;
+/**
+ * returns the most recent 9 telemetry points per critter group
+ * since the latest ping is stored in a separate layer
+ */
+const getLast10Points = (group: ITelemetryGroup[]): ITelemetryPoint[] => {
+  const ret = [];
+  for (let i = 0; i < group.length; i++) {
+    const features = group[i].features;
+    // skip if there are under 10 pings available
+    if (features.length <= 9) {
+      ret.push(...features);
+      continue;
+    }
     const sorted = features.sort((a, b) => {
       return new Date(b.properties.date_recorded).getTime() - new Date(a.properties.date_recorded).getTime();
     });
-    const last10 = sorted.filter((s, idx) => idx > 0 && idx <= 10);
-    p.push(...last10);
+    const last10 = sorted.slice(0, 10);
+    ret.push(...last10);
   }
-  return p;
+  return ret;
 };
 
 /**
