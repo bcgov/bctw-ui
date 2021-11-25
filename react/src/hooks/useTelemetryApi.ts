@@ -34,7 +34,7 @@ import { BCTWWorkflow } from 'types/events/event';
 import { IOnboardUser, HandleOnboardInput, OnboardUser, OnboardUserRequest } from 'types/onboarding';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 import { parseArgs } from 'utils/common_helpers';
-import { FetchTelemetryInput } from 'types/events/vendor';
+import { FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -404,8 +404,8 @@ export const useTelemetryApi = () => {
   }
 
   /** */
-  const useTriggerVendorTelemetry = (config: UseMutationOptions<void, AxiosError, FetchTelemetryInput>): UseMutationResult<void, AxiosError> =>
-    useMutation<void, AxiosError>((body) => collarApi.triggerVendorTelemetryUpdate(body, config));
+  const useTriggerVendorTelemetry = (config: UseMutationOptions<ResponseTelemetry[], AxiosError, FetchTelemetryInput>): UseMutationResult<ResponseTelemetry[], AxiosError> =>
+    useMutation<ResponseTelemetry[], AxiosError, FetchTelemetryInput>((body) => collarApi.triggerVendorTelemetryUpdate(body), config);
 
   return {
     // queries

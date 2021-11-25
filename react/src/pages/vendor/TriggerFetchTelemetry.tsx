@@ -8,21 +8,25 @@ import { useState } from 'react';
 import { Box } from '@mui/material';
 import DateInput from 'components/form/Date';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
-import { Button } from 'components/common';
+import { Button, List } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { formatDay } from 'utils/time';
-import { FetchTelemetryInput } from 'types/events/vendor';
+import { FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { isDev } from 'api/api_helpers';
 
 /**
+ * allows an admin to manually trigger a Vectronic API fetch for raw telemetry
+ * note: the materialized view is NOT rrefreshed
+ * the datatable only fetches unattached devices
  */
 export default function VendorAPIPage(): JSX.Element {
   const api = useTelemetryApi();
   const showAlert = useResponseDispatch();
   const startDate = isDev() ? dayjs().subtract(1, 'month') : dayjs().subtract(1, 'year');
+  const [results, setResults] = useState<ResponseTelemetry[]>([]);
 
   const [showConfirmFetch, setShowConfirmFetch] = useState(false);
   const [start, setStart] = useState<Dayjs>(startDate);
@@ -40,19 +44,22 @@ export default function VendorAPIPage(): JSX.Element {
   };
 
   const onError = (e: AxiosError): void => {
-    showAlert({severity: 'error', message: formatAxiosError(e)});
+    showAlert({ severity: 'error', message: formatAxiosError(e) });
   };
 
-  const { mutateAsync, status } = api.useTriggerVendorTelemetry({ onError });
+  const onSuccess = (rows: ResponseTelemetry[]): void => {
+    setResults(rows);
+  };
+
+  const { mutateAsync, status } = api.useTriggerVendorTelemetry({ onSuccess, onError });
 
   useDidMountEffect(() => {
-    // console.log('fetching status: ', status)
     if (status === 'loading') {
-      showAlert({severity: 'info', message: 'Vendor telemetry fetch has begun. This could take a while'})
+      showAlert({ severity: 'info', message: 'Vendor telemetry fetch has begun. This could take a while' });
     } else if (status === 'success') {
-      showAlert({severity: 'success', message: 'records were successfully fetched'});
+      showAlert({ severity: 'success', message: 'records were successfully fetched' });
     }
-  }, [status])
+  }, [status]);
 
   const performFetchVendorTelemetry = (): void => {
     const body: FetchTelemetryInput = {
@@ -88,11 +95,19 @@ export default function VendorAPIPage(): JSX.Element {
           </Button>
         </Box>
 
+        <Box>
+          {results.length ? (
+            <List
+              values={results.map((l) => `${l.records_found} records found for device ${l.device_id}`)}
+            />
+          ) : null}
+        </Box>
+
         <ConfirmModal
           handleClickYes={performFetchVendorTelemetry}
           open={showConfirmFetch}
           handleClose={(): void => setShowConfirmFetch(false)}
-          message={'are you sure you wish to manually trigger fetching of telemetry for these devices?'}
+          message={'Are you sure you wish to manually fetch of telemetry for these devices?'}
         />
       </div>
     </AuthLayout>
