@@ -33,6 +33,9 @@ export default function VendorAPIPage(): JSX.Element {
   const [end, setEnd] = useState<Dayjs>(dayjs());
   const [devices, setDevices] = useState<number[]>([]);
 
+  const [startTime, setStartTime] = useState<Dayjs | null>();
+  const [endTime, setEndTime] = useState<Dayjs | null>();
+
   const handleSelectRow = (rows: Collar[]): void => {
     const ids = rows.map((r) => r.device_id);
     setDevices(ids);
@@ -48,6 +51,7 @@ export default function VendorAPIPage(): JSX.Element {
   };
 
   const onSuccess = (rows: ResponseTelemetry[]): void => {
+    setEndTime(dayjs());
     setResults(rows);
   };
 
@@ -55,7 +59,7 @@ export default function VendorAPIPage(): JSX.Element {
 
   useDidMountEffect(() => {
     if (status === 'loading') {
-      showAlert({ severity: 'info', message: 'Vendor telemetry fetch has begun. This could take a while' });
+      showAlert({ severity: 'info', message: 'Vendor telemetry fetch has begun. This could take a while...' });
     } else if (status === 'success') {
       showAlert({ severity: 'success', message: 'records were successfully fetched' });
     }
@@ -67,8 +71,17 @@ export default function VendorAPIPage(): JSX.Element {
       end: end.format(formatDay),
       ids: devices
     };
+    setStartTime(dayjs());
     mutateAsync(body);
     setShowConfirmFetch(false);
+  };
+
+  const getTimeElapsed = (): string => {
+    if (startTime?.isValid() && endTime?.isValid()) {
+      const diff = endTime.diff(startTime, 's');
+      return `fetched in ${diff} seconds`;
+    }
+    return `fetch time unavailable`;
   };
 
   return (
@@ -79,6 +92,12 @@ export default function VendorAPIPage(): JSX.Element {
           <DateInput propName='tstart' label={'Start'} defaultValue={start} changeHandler={handleChangeDate} />
           <DateInput propName='tend' label={'End'} defaultValue={end} changeHandler={handleChangeDate} />
         </Box>
+        <Box mb={2} display='flex' flexDirection='row' alignItems='center' columnGap={2}>
+          <Button disabled={!devices.length} onClick={(): void => setShowConfirmFetch((o) => !o)}>
+            Fetch Telemetry
+          </Button>
+          <span>Devices selected: {devices.length ? devices.join(', ') : 'none'}</span>
+        </Box>
         <DataTable<Collar>
           headers={['device_id', 'device_make', 'frequency', 'device_model', 'device_status']}
           title='Vectronic Devices'
@@ -86,20 +105,13 @@ export default function VendorAPIPage(): JSX.Element {
           onSelectMultiple={handleSelectRow}
           isMultiSelect={true}
         />
-        <Box>
-          <p>Devices selected: {devices.length ? devices.join(', ') : 'none'}</p>
-        </Box>
-        <Box>
-          <Button disabled={!devices.length} onClick={(): void => setShowConfirmFetch((o) => !o)}>
-            Fetch Telemetry
-          </Button>
-        </Box>
 
         <Box>
+          <h4>
+            Results {status === 'loading' ? '(In progress...)' : status === 'success' ? `(${getTimeElapsed()})` : null}
+          </h4>
           {results.length ? (
-            <List
-              values={results.map((l) => `${l.records_found} records found for device ${l.device_id}`)}
-            />
+            <List values={results.map((l) => `${l.records_found} records found for device ${l.device_id}`)} />
           ) : null}
         </Box>
 

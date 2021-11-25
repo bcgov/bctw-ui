@@ -1,11 +1,12 @@
 import { Box, TextField } from '@mui/material';
-import MultiSelect, { ISelectMultipleData } from 'components/form/MultiSelect';
+import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { useMemo, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
 import useDebounce from 'hooks/useDebounce';
+import AutoComplete from 'components/form/Autocomplete';
 
 type TextFilterProps = {
   rowCount: number;
@@ -82,13 +83,14 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
 
   return (
     <Box display='flex' alignItems='center' columnGap={1}>
-      <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} />
-      <MultiSelect
-        renderValue={(v: string[]): string => `${v.length} selected`}
+      <AutoComplete
         label={FormStrings.filterColumnsLabel}
         data={selectOptions}
         changeHandler={handleSelect}
+        tagLimit={1}
+        width={300}
       />
+      <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} />
     </Box>
   );
 }

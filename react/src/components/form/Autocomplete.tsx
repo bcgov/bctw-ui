@@ -10,6 +10,8 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
   defaultValue?: T;
   triggerReset?: boolean; // unselect of all values
   data: T[];
+  width?: number;
+  tagLimit?: number;
 };
 
 /**
@@ -17,7 +19,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
  * tag components when an option is selected
  */
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
-  const { label, data, triggerReset, changeHandler, defaultValue } = props;
+  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit } = props;
   const [selected, setSelected] = useState<T[]>([]);
 
   useEffect(() => {
@@ -42,7 +44,8 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       autoComplete
       size='small'
       multiple
-      limitTags={3}
+      style={{width}}
+      limitTags={tagLimit ?? 3}
       // exclude selected values from the option list
       options={data.filter(d => selected.findIndex(s => s.id === d.id) === -1)}
       renderTags={(value: T[], getTagProps): JSX.Element[] => {
