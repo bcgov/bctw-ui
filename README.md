@@ -8,10 +8,6 @@ Front-end (scientist-facing) interface for the BC Telemetry Warehouse.
 
 See `DEV_SETUP.md`.
 
-## Deploy to Dev
+## OpenShift ##
 
-```bash
-cd bctw-ui/.pipeline
-npm i (one time)
-npm run build -- --env=dev
-```
+OpenShift details including build, deployment and pipelines are in the [openshift](openshift/README.md) folder.
