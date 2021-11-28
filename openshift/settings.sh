@@ -1,4 +1,4 @@
-export PROJECT_NAMESPACE="dgsbmb"
+export PROJECT_NAMESPACE="0dff19"
 export GIT_URI="https://github.com/bcgov/bctw-ui.git"
 export GIT_REF="main"
 
