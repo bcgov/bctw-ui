@@ -4,8 +4,8 @@ import { ICollar, Collar, AttachedCollar } from 'types/collar';
 import { triggerTelemetryFetch, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from './api_interfaces';
 import { useQueryClient } from 'react-query';
-import { DeviceMake, FetchTelemetryInput } from 'types/events/vendor';
-import { ITableFilter } from 'components/table/table_interfaces';
+import { DeviceMake, FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
+import { ITableFilter} from 'components/table/table_interfaces';
 
 export const collarApi = (props: ApiProps): API => {
   const { api } = props;
@@ -53,9 +53,8 @@ export const collarApi = (props: ApiProps): API => {
 
   /**
    * triggers a manual fetch of telemetry for the provided @param body.device_ids.
-   * todo: provide type
    */
-  const triggerVendorTelemetryUpdate = async (body: FetchTelemetryInput, type: DeviceMake): Promise<void> => {
+  const triggerVendorTelemetryUpdate = async (body: FetchTelemetryInput, type: DeviceMake): Promise<ResponseTelemetry> => {
     const { data } = await postJSON(api, createUrl({ api: triggerTelemetryFetch }), body);
     return data;
   };

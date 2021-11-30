@@ -126,15 +126,19 @@ export default function DataTable<T extends BCTWBase<T>>({
   };
 
   const handleSelectAll = (event): void => {
+    const handlerExists = typeof onSelectMultiple === 'function';
     if (event.target.checked) {
       const newIds = [...selected, ...data.map((r) => r[rowIdentifier])];
       setSelected(newIds);
-      if (typeof onSelectMultiple === 'function') {
+      if (handlerExists) {
         onSelectMultiple(values.filter((d) => newIds.includes(d[rowIdentifier])));
       }
-      return;
+    } else {
+      if (handlerExists) {
+        onSelectMultiple([]);
+      }
+      setSelected([]);
     }
-    setSelected([]);
   };
 
   const handleClickRow = (event: React.MouseEvent<unknown>, id: string): void => {
