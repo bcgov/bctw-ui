@@ -125,10 +125,10 @@ export default function DataTable<T extends BCTWBase<T>>({
     setOrderBy(property);
   };
 
-  const handleSelectAll = (event): void => {
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const handlerExists = typeof onSelectMultiple === 'function';
     if (event.target.checked) {
-      const newIds = [...selected, ...data.map((r) => r[rowIdentifier])];
+      const newIds = data.map((r) => r[rowIdentifier]);
       setSelected(newIds);
       if (handlerExists) {
         onSelectMultiple(values.filter((d) => newIds.includes(d[rowIdentifier])));
