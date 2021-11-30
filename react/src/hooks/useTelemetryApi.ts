@@ -111,24 +111,24 @@ export const useTelemetryApi = () => {
   }
 
   /**
-   * @param type the collar types to be fetched (assigned, unassigned)
-   * note: search is parsed and added to query params in order to refetch query if search term changed
+   * retrieves devices that are attached to an animal
    */
   const useAttachedDevices = (page: number, ...args: unknown[]): UseQueryResult<AttachedCollar[], AxiosError> => {
     const search = parseArgs(args);
-    const queryProps = ['collars_attached', page, search];
     return useQuery<AttachedCollar[], AxiosError>(
-      queryProps,
+      ['collars_attached', page, search?.term],
       () => collarApi.getAssignedCollars(page, search),
       critterOptions
     );
   };
 
+  /**
+   * retrieves devices that are not currently attached to an animal
+   */
   const useUnattachedDevices = (page: number, ...args: unknown[]): UseQueryResult<Collar[], AxiosError> => {
     const search = parseArgs(args);
-    const queryProps = ['collars_unattached', page, search];
     return useQuery<Collar[], AxiosError>(
-      queryProps,
+      ['collars_unattached', page, search?.term],
       () => collarApi.getAvailableCollars(page, search),
       critterOptions
     );
@@ -139,13 +139,11 @@ export const useTelemetryApi = () => {
    * retrieves critters that have a collar assigned
   */
   const useAssignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
-    const queryProps = ['critters_assigned', page];
     const search = parseArgs(args);
-    if (search) {
-      queryProps.push(search.term);
-    }
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
-      queryProps, () => critterApi.getCritters(page, eCritterFetchType.assigned, search), critterOptions
+      ['critters_assigned', page, search?.term],
+      () => critterApi.getCritters(page, eCritterFetchType.assigned, search),
+      critterOptions
     );
   };
 
@@ -153,13 +151,12 @@ export const useTelemetryApi = () => {
    * retrieves critters not assigned to a collar
   */
   const useUnassignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
-    const queryProps = ['critters_unassigned', page];
     const search = parseArgs(args);
-    if (search) {
-      queryProps.push(search.term);
-    }
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
-      queryProps, () => critterApi.getCritters(page, eCritterFetchType.unassigned, search), critterOptions);
+      ['critters_unassigned', page, search?.term],
+      () => critterApi.getCritters(page, eCritterFetchType.unassigned, search),
+      critterOptions
+    );
   }
 
   /**
@@ -409,8 +406,8 @@ export const useTelemetryApi = () => {
   }
 
   /** */
-  const useTriggerVendorTelemetry = (config: UseMutationOptions<ResponseTelemetry[], AxiosError, FetchTelemetryInput>): UseMutationResult<ResponseTelemetry[], AxiosError> =>
-    useMutation<ResponseTelemetry[], AxiosError, FetchTelemetryInput>((body) => collarApi.triggerVendorTelemetryUpdate(body), config);
+  const useTriggerVendorTelemetry = (config: UseMutationOptions<ResponseTelemetry[], AxiosError, FetchTelemetryInput[]>): UseMutationResult<ResponseTelemetry[], AxiosError> =>
+    useMutation<ResponseTelemetry[], AxiosError, FetchTelemetryInput[]>((body) => collarApi.triggerVendorTelemetryUpdate(body), config);
 
   return {
     // queries

@@ -11,7 +11,7 @@ import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { Button, List } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { formatDay } from 'utils/time';
-import { FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
+import { DeviceMake, FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -31,14 +31,19 @@ export default function VendorAPIPage(): JSX.Element {
   const [showConfirmFetch, setShowConfirmFetch] = useState(false);
   const [start, setStart] = useState<Dayjs>(startDate);
   const [end, setEnd] = useState<Dayjs>(dayjs());
-  const [devices, setDevices] = useState<number[]>([]);
+  const [devices, setDevices] = useState<{ ids: number[]; make: DeviceMake }[]>([]);
 
   const [startTime, setStartTime] = useState<Dayjs | null>();
   const [endTime, setEndTime] = useState<Dayjs | null>();
 
-  const handleSelectRow = (rows: Collar[]): void => {
-    const ids = rows.map((r) => r.device_id);
-    setDevices(ids);
+  const handleSelectRow = (rows: Collar[], make: DeviceMake): void => {
+    const filteredOut = devices.filter((f) => f.make !== make);
+    if (!rows.length) {
+      setDevices(filteredOut);
+    } else {
+      const n = { ids: rows.map((r) => r.device_id), make };
+      setDevices(() => [...filteredOut, n]);
+    }
   };
 
   const handleChangeDate = (v: InboundObj): void => {
@@ -66,11 +71,12 @@ export default function VendorAPIPage(): JSX.Element {
   }, [status]);
 
   const performFetchVendorTelemetry = (): void => {
-    const body: FetchTelemetryInput = {
+    const body: FetchTelemetryInput[] = devices.map((d) => ({
       start: start.format(formatDay),
       end: end.format(formatDay),
-      ids: devices
-    };
+      ids: d.ids,
+      vendor: d.make
+    }));
     setStartTime(dayjs());
     mutateAsync(body);
     setShowConfirmFetch(false);
@@ -84,6 +90,17 @@ export default function VendorAPIPage(): JSX.Element {
     return `fetch time unavailable`;
   };
 
+  // render span component to display the currently selected devices / vendor type
+  const DevicesSelected = (make: DeviceMake): JSX.Element => {
+    const selected = 'devices selected: ';
+    const filtered = devices.filter(d => d.make === make);
+    if (!filtered.length) {
+      return <span>{make} {selected}none</span>;
+    }
+    return <span>{make} {selected}{filtered.map(d => d.ids.join(', ')).join()}</span>;
+  }
+
+  const headers: (keyof Collar)[] = ['device_id', 'device_make', 'frequency', 'device_model', 'device_status'];
   return (
     <AuthLayout>
       <div className='container'>
@@ -96,16 +113,23 @@ export default function VendorAPIPage(): JSX.Element {
           <Button disabled={!devices.length} onClick={(): void => setShowConfirmFetch((o) => !o)}>
             Fetch Telemetry
           </Button>
-          <span>Devices selected: {devices.length ? devices.join(', ') : 'none'}</span>
+          {DevicesSelected('Lotek')}
+          {DevicesSelected('Vectronic')}
         </Box>
         <DataTable<Collar>
-          headers={['device_id', 'device_make', 'frequency', 'device_model', 'device_status']}
-          title='Vectronic Devices'
-          queryProps={{ query: api.useUnattachedDevices, param: { keys: 'device_make', term: 'vectronic' } }}
-          onSelectMultiple={handleSelectRow}
+          headers={headers}
+          title='Lotek Devices'
+          queryProps={{ query: api.useUnattachedDevices, param: { keys: 'device_make', term: 'lotek' } }}
+          onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
           isMultiSelect={true}
         />
-
+        <DataTable<Collar>
+          headers={headers}
+          title='Vectronic Devices'
+          queryProps={{ query: api.useUnattachedDevices, param: { keys: 'device_make', term: 'vectronic' } }}
+          onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
+          isMultiSelect={true}
+        />
         <Box>
           <h4>
             Results {status === 'loading' ? '(In progress...)' : status === 'success' ? `(${getTimeElapsed()})` : null}
