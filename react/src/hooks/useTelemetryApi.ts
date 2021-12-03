@@ -137,7 +137,7 @@ export const useTelemetryApi = () => {
   /**
    * retrieves a combined list of attached/unattached devices 
    */
-  const useAllDevices = (page: number, ...args: unknown[]): UseQueryResult<(AttachedCollar | Collar)[], AxiosError> => {
+  const useAllDevices = (page: number, ...args: unknown[]): UseQueryResult<(Collar)[], AxiosError> => {
     const search = parseArgs(args);
     return useQuery<Collar[], AxiosError>(
       ['all_devices', page, search.map(s => s?.term).join()],

@@ -32,11 +32,11 @@ export const collarApi = (props: ApiProps): API => {
     return ret;
   };
 
-  // combines the queries
-  const getAllDevices = async (page = 1, search?: ITableFilter[]): Promise<(AttachedCollar | Collar)[]> => {
-    const attached: AttachedCollar[] = await getAssignedCollars(page, search);
-    const unattached: Collar[] = await getAvailableCollars(page, search);
-    return [...attached, ...unattached];
+  const getAllDevices = async (page = 1, search?: ITableFilter[]): Promise<(Collar)[]> => {
+    const url = createUrl({ api: 'get-all-collars', page, search });
+    const { data } = await api.get(url);
+    const ret = data.map((json: ICollar) => plainToClass(Collar, json));
+    return ret;
   };
 
   // a list of changes made to a collar, vs collar/critter attachment history above
