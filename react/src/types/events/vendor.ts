@@ -14,5 +14,7 @@ export type FetchTelemetryInput = {
 export type ResponseTelemetry = {
   device_id: number;
   records_found: number;
+  vendor: DeviceMake;
+  error: string;
 }
 

@@ -135,7 +135,12 @@ export default function VendorAPIPage(): JSX.Element {
             Results {status === 'loading' ? '(In progress...)' : status === 'success' ? `(${getTimeElapsed()})` : null}
           </h4>
           {results.length ? (
-            <List values={results.map((l) => `${l.records_found} records found for device ${l.device_id}`)} />
+            <List values={results.map((l) => {
+              if (l.error) {
+                return `${l.vendor} device ${l.device_id} error: ${l.error}`;
+              }
+              return `${l.records_found} records found for ${l.vendor} device ${l.device_id}`;
+            })} />
           ) : null}
         </Box>
 
