@@ -1,4 +1,5 @@
 import { AxiosInstance } from 'axios';
+import { ITableFilter } from 'components/table/table_interfaces';
 
 // props required for all API hooks
 type ApiProps = {
@@ -41,6 +42,7 @@ interface CreateUrlParams {
   query?: string;
   page?: number;
   noApiPrefix?: boolean;
+  search?: ITableFilter[];
 }
 
 export type {

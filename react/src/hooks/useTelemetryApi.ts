@@ -116,7 +116,7 @@ export const useTelemetryApi = () => {
   const useAttachedDevices = (page: number, ...args: unknown[]): UseQueryResult<AttachedCollar[], AxiosError> => {
     const search = parseArgs(args);
     return useQuery<AttachedCollar[], AxiosError>(
-      ['collars_attached', page, search?.term],
+      ['collars_attached', page, search.map(s => s?.term).join()],
       () => collarApi.getAssignedCollars(page, search),
       critterOptions
     );
@@ -128,8 +128,20 @@ export const useTelemetryApi = () => {
   const useUnattachedDevices = (page: number, ...args: unknown[]): UseQueryResult<Collar[], AxiosError> => {
     const search = parseArgs(args);
     return useQuery<Collar[], AxiosError>(
-      ['collars_unattached', page, search?.term],
+      ['collars_unattached', page, search.map(s => s?.term).join()],
       () => collarApi.getAvailableCollars(page, search),
+      critterOptions
+    );
+  };
+
+  /**
+   * retrieves a combined list of attached/unattached devices 
+   */
+  const useAllDevices = (page: number, ...args: unknown[]): UseQueryResult<(AttachedCollar | Collar)[], AxiosError> => {
+    const search = parseArgs(args);
+    return useQuery<Collar[], AxiosError>(
+      ['all_devices', page, search.map(s => s?.term).join()],
+      () => collarApi.getAllDevices(page, search),
       critterOptions
     );
   };
@@ -141,7 +153,7 @@ export const useTelemetryApi = () => {
   const useAssignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
     const search = parseArgs(args);
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
-      ['critters_assigned', page, search?.term],
+      ['critters_assigned', page, search.map(s => s?.term).join()],
       () => critterApi.getCritters(page, eCritterFetchType.assigned, search),
       critterOptions
     );
@@ -153,7 +165,7 @@ export const useTelemetryApi = () => {
   const useUnassignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
     const search = parseArgs(args);
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
-      ['critters_unassigned', page, search?.term],
+      ['critters_unassigned', page, search.map(s => s?.term).join()],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned, search),
       critterOptions
     );
@@ -418,8 +430,9 @@ export const useTelemetryApi = () => {
     useUnassignedTracks,
     usePings,
     useUnassignedPings,
-    useUnattachedDevices,
+    useAllDevices,
     useAttachedDevices,
+    useUnattachedDevices,
     useAssignedCritters,
     useUnassignedCritters,
     useCritterHistory,

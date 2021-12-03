@@ -119,14 +119,14 @@ export default function VendorAPIPage(): JSX.Element {
         <DataTable<Collar>
           headers={headers}
           title='Lotek Devices'
-          queryProps={{ query: api.useUnattachedDevices, param: { keys: 'device_make', term: 'lotek' } }}
+          queryProps={{ query: api.useAllDevices, param: { keys: 'device_make', term: 'lotek' } }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
           isMultiSelect={true}
         />
         <DataTable<Collar>
           headers={headers}
           title='Vectronic Devices'
-          queryProps={{ query: api.useUnattachedDevices, param: { keys: 'device_make', term: 'vectronic' } }}
+          queryProps={{ query: api.useAllDevices, param: { keys: 'device_make', term: 'vectronic' } }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
           isMultiSelect={true}
         />

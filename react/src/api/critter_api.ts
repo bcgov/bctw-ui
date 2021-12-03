@@ -1,5 +1,5 @@
 import { getCritterEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
-import { createUrl, postJSON, searchToQueryString } from 'api/api_helpers';
+import { createUrl, postJSON } from 'api/api_helpers';
 import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { plainToClass } from 'class-transformer';
 import { Animal, AttachedAnimal, eCritterFetchType, IAnimal, IAttachedAnimal } from 'types/animal';
@@ -18,7 +18,7 @@ export const critterApi = (props: ApiProps): API => {
   };
 
   /**
-   * converts json to the class instance of the animals 
+   * converts json to the class instance of the animals
    */
   const _handleGetResults = (
     data: IAnimal[] | IAttachedAnimal[],
@@ -31,15 +31,14 @@ export const critterApi = (props: ApiProps): API => {
   };
 
   /**
-   * fetches animals, based on @param critterType 
+   * fetches animals, based on @param critterType
    */
   const getCritters = async (
     page = 1,
     critterType: eCritterFetchType,
-    search?: ITableFilter
+    search?: ITableFilter[]
   ): Promise<Animal[] | AttachedAnimal[]> => {
-    const query = `critterType=${critterType}${searchToQueryString(search)}`;
-    const url = createUrl({ api: getCritterEndpoint, query, page });
+    const url = createUrl({ api: getCritterEndpoint, query: `critterType=${critterType}`, page, search });
     const { data } = await api.get(url);
     return _handleGetResults(data, critterType);
   };
@@ -54,7 +53,7 @@ export const critterApi = (props: ApiProps): API => {
   };
 
   /**
-   * retrieve the metadata history of an animal, given a @param id (critter_id) 
+   * retrieve the metadata history of an animal, given a @param id (critter_id)
    */
   const getCritterHistory = async (page: number, id: string): Promise<Animal[]> => {
     const url = createUrl({ api: `get-animal-history/${id}`, page });

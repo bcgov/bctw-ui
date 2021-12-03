@@ -30,14 +30,20 @@ const _appendQueryToUrl = (url: string, query: string): string => {
 
 /**
  * @param search the table filter object
- * @returns a query string with the destructured serach object
+ * @returns a query string with the destructured search object
  */
-const searchToQueryString = (search: ITableFilter): string => {
+const searchToQueryString = (search: ITableFilter[]): string => {
   if (!search) {
     return '';
   }
-  const { term, keys } = search;
-  return `&term=${term}&keys=${keys}`;
+  return search.map(s => {
+    const { term, keys } = s;
+    const termStr = `&term=${term}`;
+    if (Array.isArray(keys)) {
+      return `${keys.map(k => `&keys=${k}`).join('')}${termStr}`;
+    }
+    return `&keys=${keys}${termStr}`;
+  }).join('')
 };
 
 /**
@@ -45,7 +51,7 @@ const searchToQueryString = (search: ITableFilter): string => {
  * if in development mode, uses environment variables from .env.local
  * @returns a query string constructed from params
  */
-const createUrl = ({ api, query, page, noApiPrefix }: CreateUrlParams): string => {
+const createUrl = ({ api, query, page, noApiPrefix, search }: CreateUrlParams): string => {
   const baseUrl = getBaseUrl(noApiPrefix);
   // console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;
@@ -59,7 +65,10 @@ const createUrl = ({ api, query, page, noApiPrefix }: CreateUrlParams): string =
   if (page) {
     url = _appendQueryToUrl(url, `page=${page}`);
   }
-  // console.log('createURL() -- final created URL:', url)
+  if (search) {
+    url += searchToQueryString(search);
+  }
+  // console.log('created URL:', url)
   return url;
 };
 

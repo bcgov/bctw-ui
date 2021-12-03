@@ -1,11 +1,11 @@
-import { createUrl, postJSON, searchToQueryString } from 'api/api_helpers';
+import { createUrl, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { ICollar, Collar, AttachedCollar } from 'types/collar';
 import { triggerTelemetryFetch, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
 import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from './api_interfaces';
 import { useQueryClient } from 'react-query';
 import { FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
-import { ITableFilter} from 'components/table/table_interfaces';
+import { ITableFilter } from 'components/table/table_interfaces';
 
 export const collarApi = (props: ApiProps): API => {
   const { api } = props;
@@ -18,23 +18,25 @@ export const collarApi = (props: ApiProps): API => {
     qc.invalidateQueries('getType');
   };
 
-  const getAvailableCollars = async (page = 1, search?: ITableFilter): Promise<Collar[]> => {
-    const url = createUrl({
-      api: `get-available-collars`,
-      query: search ? searchToQueryString(search) : '',
-      page
-    });
+  const getAvailableCollars = async (page = 1, search?: ITableFilter[]): Promise<Collar[]> => {
+    const url = createUrl({ api: `get-available-collars`, page, search });
     const { data } = await api.get(url);
     const ret = data.map((json: ICollar) => plainToClass(Collar, json));
     return ret;
   };
 
-  const getAssignedCollars = async (page = 1, search?: ITableFilter): Promise<AttachedCollar[]> => {
-    const { data } = await api.get(
-      createUrl({ api: 'get-assigned-collars', page, query: search ? searchToQueryString(search) : '' })
-    );
+  const getAssignedCollars = async (page = 1, search?: ITableFilter[]): Promise<AttachedCollar[]> => {
+    const url = createUrl({ api: 'get-assigned-collars', page, search });
+    const { data } = await api.get(url);
     const ret = data.map((json: ICollar) => plainToClass(AttachedCollar, json));
     return ret;
+  };
+
+  // combines the queries
+  const getAllDevices = async (page = 1, search?: ITableFilter[]): Promise<(AttachedCollar | Collar)[]> => {
+    const attached: AttachedCollar[] = await getAssignedCollars(page, search);
+    const unattached: Collar[] = await getAvailableCollars(page, search);
+    return [...attached, ...unattached];
   };
 
   // a list of changes made to a collar, vs collar/critter attachment history above
@@ -66,6 +68,7 @@ export const collarApi = (props: ApiProps): API => {
     getAssignedCollars,
     getCollarHistory,
     triggerVendorTelemetryUpdate,
-    upsertCollar
+    upsertCollar,
+    getAllDevices
   };
 };

@@ -94,18 +94,20 @@ const isSearchTerm = (obj: unknown): obj is ITableFilter=> {
  * iterates unknown function parameters (ex. ...args) 
  * returns @type { ITableFilter } if located
  */
-const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'> | undefined => {
+const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'>[] => {
+  const ret = [];
   for (let i = 0; i < args.length; i++) {
     const element = args[i];
     if (typeof element === 'object') {
       if (isSearchTerm(element)) {
         const { term, keys } = element;
         if (term && keys) {
-          return { keys, term };
+          ret.push({keys, term })
         }
       }
     }
   }
+  return ret;
 }
 
 export {
