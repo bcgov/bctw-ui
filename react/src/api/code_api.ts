@@ -11,6 +11,9 @@ export interface IGetCodeProps {
 export const codeApi = (props: ApiProps): API => {
   const { api } = props;
 
+  /**
+   * fetches codes for a code header 
+   */
   const getCodes = async (props: IGetCodeProps): Promise<ICode[]> => {
     const { page, codeHeader } = props;
     const url = createUrl({ api: 'get-code', query: `codeHeader=${codeHeader}`, page });
@@ -19,6 +22,10 @@ export const codeApi = (props: ApiProps): API => {
     return data;
   };
 
+  /**
+   * fetches a list of code headers
+   * note: not currently in use
+   */
   const getCodeHeaders = async (): Promise<ICodeHeader[]> => {
     const url = createUrl({ api: 'get-code-headers' });
     // console.log('requesting code headers')
@@ -26,6 +33,10 @@ export const codeApi = (props: ApiProps): API => {
     return data;
   };
 
+  /**
+   * adds a new code header
+   * note: not in use
+   */
   const addCodeHeader = async (headers: ICodeHeader[]): Promise<IBulkUploadResults<ICodeHeader>> => {
     const url = createUrl({ api: 'add-code-header' });
     const { data } = await api.post(url, headers);

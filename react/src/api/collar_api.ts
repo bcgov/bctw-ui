@@ -18,6 +18,7 @@ export const collarApi = (props: ApiProps): API => {
     qc.invalidateQueries('getType');
   };
 
+  /** fetches devices not attached to an animal  */
   const getAvailableCollars = async (page = 1, search?: ITableFilter[]): Promise<Collar[]> => {
     const url = createUrl({ api: `get-available-collars`, page, search });
     const { data } = await api.get(url);
@@ -25,6 +26,7 @@ export const collarApi = (props: ApiProps): API => {
     return ret;
   };
 
+  /** fetches devices that are currently attached to an animal */
   const getAssignedCollars = async (page = 1, search?: ITableFilter[]): Promise<AttachedCollar[]> => {
     const url = createUrl({ api: 'get-assigned-collars', page, search });
     const { data } = await api.get(url);
@@ -32,6 +34,7 @@ export const collarApi = (props: ApiProps): API => {
     return ret;
   };
 
+  /** fetches all devices, regardless of attachment status (from bctw.collar_v) */
   const getAllDevices = async (page = 1, search?: ITableFilter[]): Promise<(Collar)[]> => {
     const url = createUrl({ api: 'get-all-collars', page, search });
     const { data } = await api.get(url);
@@ -39,14 +42,14 @@ export const collarApi = (props: ApiProps): API => {
     return ret;
   };
 
-  // a list of changes made to a collar, vs collar/critter attachment history above
+  // rerieve metadata changes made to a collar
   const getCollarHistory = async (collarId: string, page = 1): Promise<Collar[]> => {
     const url = createUrl({ api: `get-collar-history/${collarId}`, page });
-    // console.log(`requesting collar history`);
     const { data } = await api.get(url);
     return data.map((json: ICollar[]) => plainToClass(Collar, json));
   };
 
+  /** adds or updates a device */
   const upsertCollar = async (payload: IUpsertPayload<Collar>): Promise<IBulkUploadResults<Collar>> => {
     const { data } = await postJSON(api, createUrl({ api: upsertDeviceEndpoint }), payload.body);
     invalidate();

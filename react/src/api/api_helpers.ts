@@ -98,6 +98,7 @@ const escapeRegex = (str: string): string => {
 /**
  * class of @type {T} to JSON converter
  * removes nulls
+ * remove "error" properties
  * converts valid dayjs objects to time formatted strings
  */
 const asJSON = <T>(o: T): T => {

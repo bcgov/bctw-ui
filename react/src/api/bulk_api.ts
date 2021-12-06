@@ -22,6 +22,7 @@ export const bulkApi = (api: AxiosInstance): API => {
     qc.invalidateQueries('getType');
   }
 
+  /** uploads a single .csv file in to upsert animals/collars */
   const uploadCsv = async <T,>(form: FormData): Promise<IBulkUploadResults<T>> => {
     const url = createUrl({ api: importCSVEndpoint});
     const { data } = await api.post(url, form);
@@ -38,8 +39,9 @@ export const bulkApi = (api: AxiosInstance): API => {
   }
 
   /**
+   * fetch a single device/animal
    * @param type 'animal' or 'device'
-   * @param id BCTW internal uuid
+   * @param id the collar_id / critter_id
    * @returns the raw data returned from the api, does not call the transformer
    */
   const getType = async <T>(type: BCTWType, id: string): Promise<T> => {
@@ -48,7 +50,9 @@ export const bulkApi = (api: AxiosInstance): API => {
     return data;
   }
 
-  // handles critter/collar/user deletions
+  /**
+   * removes / soft deletes a critter/collar/user
+   */
   const deleteType = async ({ objType, id }: IDeleteType): Promise<boolean> => {
     const url = createUrl({ api: `${objType}/${id}` });
     const { status, data } = await api.delete(url);
@@ -58,6 +62,9 @@ export const bulkApi = (api: AxiosInstance): API => {
     return data;
   };
 
+  /**
+   * 
+   */
   const getExportData = async (body: ExportQueryParams): Promise<string[]> => {
     const url = createUrl({ api: exportEndpoint})
     const { data } = await api.post(url, body);

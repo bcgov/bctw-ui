@@ -8,6 +8,12 @@ import { API, ApiProps } from 'api/api_interfaces';
 import { useQueryClient } from 'react-query';
 
 
+/** api for handling:
+ * user object updates
+ * session info
+ * retrieving/ updating telemetry alerts
+ * retrieving/ updating udfs (custom animal groups and animal collective units)
+ */
 export const userApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
@@ -102,7 +108,6 @@ export const userApi = (props: ApiProps): API => {
 
   /**
    * @param body @type {TelemetryAlert}
-   * @returns
    */
   const updateAlert = async (body: TelemetryAlert[]): Promise<TelemetryAlert[]> => {
     const { data } = await postJSON(api, createUrl({ api: upsertAlertEndpoint }), body) ;
@@ -116,8 +121,9 @@ export const userApi = (props: ApiProps): API => {
 
 
   /**
-   * endpoint will attempt to send test SMS and email notifications (with fake data)
-   * simulating a mortality alert
+   *  sends a test SMS and email notification
+   * user must have email address associated
+   * simulating a mortality alert (with fake data)
    * @param email users email address
    * @param phone users phone number
    * @returns nothing, errors are only logged to the api console

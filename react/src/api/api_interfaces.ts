@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { ITableFilter } from 'components/table/table_interfaces';
+import { uuid } from 'types/common_types';
 
 // props required for all API hooks
 type ApiProps = {
@@ -28,14 +29,17 @@ interface IBulkUploadResults<T> {
   results: T[];
 }
 
-// types that can be deleted
+// models that can be deleted
 interface IDeleteType {
   objType: 'animal' | 'collar' | 'user';
-  id: string | number; // the uuid
+  id: uuid | number; // users have number ids
 }
 
+// an API object 
+// todo: improve typing
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type API = Record<string, (...args: any) => Promise<any>>;
+
 
 interface CreateUrlParams {
   api: string;
