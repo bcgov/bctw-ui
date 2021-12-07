@@ -36,11 +36,9 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
             <TableCell padding='checkbox'>
               <Checkbox
                 /* 
-                  renders a dash when 'some' values are checked. disabling it 
-                  as it's not clear when there are multiple checked
-                  across different pages 
+                  renders a dash when 'some' values are checked. 
                 */
-                // indeterminate={numSelected > 0 && numSelected < rowCount}
+                indeterminate={numSelected > 0 && numSelected < rowCount}
                 checked={rowCount > 0 && numSelected === rowCount}
                 onChange={onSelectAllClick}
                 inputProps={{ 'aria-label': 'select all' }}

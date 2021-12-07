@@ -127,7 +127,7 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const handlerExists = typeof onSelectMultiple === 'function';
-    if (event.target.checked) {
+    if (event.target.checked && selected.length === 0) {
       const newIds = data.map((r) => r[rowIdentifier]);
       setSelected(newIds);
       if (handlerExists) {
