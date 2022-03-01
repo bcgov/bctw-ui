@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderLeft: '10px solid #38598a',
     margin: '16px 0',
     backgroundColor: '#f2f2f2'
-  }
+  },
 }));
 
 const Home = (): JSX.Element => {
@@ -53,12 +53,12 @@ const Home = (): JSX.Element => {
         Province of British Columbia’s wildlife telemetry observations to support informed management decisions and
         improve conservation efforts.
       </Typography>
-      <Grid container spacing={2} flexDirection='column'>
-        <Grid item xl={2} lg={2} xs={12} md={12}>
-          <GovLinkBox title={support.title} data={support.data} />
+      <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'>
+        <Grid item xl={2} lg={12} xs={12} md={12}>
+          <GovLinkBox title={resources.title} data={resources.data}/>
         </Grid>
-        <Grid item xl={2} lg={2} xs={12} md={12}>
-          <GovLinkBox title={resources.title} data={resources.data} />
+          <Grid item xl={2} lg={12} xs={12} md={12}>
+          <GovLinkBox title={support.title} data={support.data} />
         </Grid>
       </Grid>
     </div>
