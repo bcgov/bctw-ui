@@ -5,7 +5,7 @@ import GovLinkBox from 'components/common/GovLinkBox';
 const useStyles = makeStyles((theme: Theme) => ({
   callout: {
     padding: '25px',
-    borderLeft: '10px solid #38598a',
+    borderLeft: `10px solid ${theme.palette.primary.main}`,
     margin: '16px 0',
     backgroundColor: '#f2f2f2'
   },
@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const Home = (): JSX.Element => {
   const styles = useStyles();
   const cards = {
-    about: `Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
+    welcome: `Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
             Province of British Columbia’s wildlife telemetry observations to support informed management decisions and
             improve conservation efforts.`,
     support: {
@@ -45,18 +45,18 @@ const Home = (): JSX.Element => {
       ]
     }
   };
-  const { about, support, resources } = cards;
+  const { welcome, support, resources } = cards;
   return (
     <div className='container'>
-      <Typography variant='h3' style={{ fontWeight: 'bold' }}>
+      <Typography variant='h2' style={{ fontWeight: 'bold' }}>
         BC Telemetry Warehouse
       </Typography>
-      <Typography paragraph className={styles.callout}>{about}</Typography>
+      <Typography paragraph className={styles.callout} children={welcome}/>
       <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'>
-        <Grid item xl={2} lg={12} xs={12} md={12}>
+        <Grid item xl={2} lg={3} xs={12} md={4}>
           <GovLinkBox title={resources.title} data={resources.data}/>
         </Grid>
-          <Grid item xl={2} lg={12} xs={12} md={12}>
+          <Grid item xl={2} lg={3} xs={12} md={4}>
           <GovLinkBox title={support.title} data={support.data} />
         </Grid>
       </Grid>

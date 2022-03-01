@@ -1,12 +1,12 @@
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Link, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   box: {
     backgroundColor: '#f2f2f2',
   },
   blueHeadingBar: {
-    backgroundColor: '#38598a',
+    backgroundColor: theme.palette.primary.main,
     padding: '8px 15px 10px 10px'
   },
   boxText: {
