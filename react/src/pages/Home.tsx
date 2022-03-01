@@ -14,6 +14,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 const Home = (): JSX.Element => {
   const styles = useStyles();
   const cards = {
+    about: `Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
+            Province of British Columbia’s wildlife telemetry observations to support informed management decisions and
+            improve conservation efforts.`,
     support: {
       title: 'Need Support?',
       data: [
@@ -42,17 +45,13 @@ const Home = (): JSX.Element => {
       ]
     }
   };
-  const { support, resources } = cards;
+  const { about, support, resources } = cards;
   return (
     <div className='container'>
       <Typography variant='h3' style={{ fontWeight: 'bold' }}>
         BC Telemetry Warehouse
       </Typography>
-      <Typography paragraph className={styles.callout}>
-        Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
-        Province of British Columbia’s wildlife telemetry observations to support informed management decisions and
-        improve conservation efforts.
-      </Typography>
+      <Typography paragraph className={styles.callout}>{about}</Typography>
       <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'>
         <Grid item xl={2} lg={12} xs={12} md={12}>
           <GovLinkBox title={resources.title} data={resources.data}/>
