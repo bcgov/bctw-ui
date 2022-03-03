@@ -25,14 +25,14 @@ interface LinkBoxProps {
 }
 const GovLinkBox = ({ title, data }: LinkBoxProps): JSX.Element => {
   const styles = useStyles();
-  console.log(data);
   return (
     <Box className={styles.box}>
       <Typography variant={'h5'} className={styles.blueHeadingBar} color='white' paragraph>
         {title}
       </Typography>
       <Box className={styles.boxText}>
-        {data.map((item) => (
+        {data.map((item, index) => (
+          <div key={index}>
           <Typography paragraph>
             {item.textPrefix}
             <Link href={item.href} target='_blank'>
@@ -40,6 +40,7 @@ const GovLinkBox = ({ title, data }: LinkBoxProps): JSX.Element => {
             </Link>
             {item.textSuffix && item.textSuffix}
           </Typography>
+          </div>
         ))}
       </Box>
     </Box>

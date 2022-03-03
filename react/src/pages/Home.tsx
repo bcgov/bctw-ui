@@ -1,6 +1,8 @@
-import { Box, Grid, Link, Theme, Typography } from '@mui/material';
+import { Box, Grid, Link, Theme, Typography, CircularProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import GovLinkBox from 'components/common/GovLinkBox';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useEffect } from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
   callout: {
@@ -13,8 +15,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const Home = (): JSX.Element => {
   const styles = useStyles();
+  const api = useTelemetryApi();
+  const { data, status, isLoading } = api.useCodeDesc('HOME_HDR');
+  console.log(data)
   const cards = {
-    welcome: `Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
+    welcome: `Wwwwwelcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
             Province of British Columbia’s wildlife telemetry observations to support informed management decisions and
             improve conservation efforts.`,
     support: {
@@ -48,10 +53,10 @@ const Home = (): JSX.Element => {
   const { welcome, support, resources } = cards;
   return (
     <div className='container'>
-      <Typography variant='h2' style={{ fontWeight: 'bold' }}>
+        <Typography variant='h2' style={{ fontWeight: 'bold' }}>
         BC Telemetry Warehouse
       </Typography>
-      <Typography paragraph className={styles.callout} children={welcome}/>
+      {data && <Typography paragraph className={styles.callout} children={data}/>}
       <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'>
         <Grid item xl={2} lg={3} xs={12} md={4}>
           <GovLinkBox title={resources.title} data={resources.data}/>
