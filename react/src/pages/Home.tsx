@@ -56,7 +56,8 @@ const Home = (): JSX.Element => {
         <Typography variant='h2' style={{ fontWeight: 'bold' }}>
         BC Telemetry Warehouse
       </Typography>
-      {data && <Typography paragraph className={styles.callout} children={data}/>}
+      {/* TODO: Add 'HOME_HDR' to code table */}
+      <Typography paragraph className={styles.callout} children={data ?? welcome}/>
       <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'>
         <Grid item xl={2} lg={3} xs={12} md={4}>
           <GovLinkBox title={resources.title} data={resources.data}/>
