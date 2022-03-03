@@ -17,7 +17,6 @@ const Home = (): JSX.Element => {
   const styles = useStyles();
   const api = useTelemetryApi();
   const { data, status, isLoading } = api.useCodeDesc('HOME_HDR');
-  console.log(data)
   const cards = {
     welcome: `Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
             Province of British Columbia’s wildlife telemetry observations to support informed management decisions and
