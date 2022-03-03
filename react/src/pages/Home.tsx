@@ -19,7 +19,7 @@ const Home = (): JSX.Element => {
   const { data, status, isLoading } = api.useCodeDesc('HOME_HDR');
   console.log(data)
   const cards = {
-    welcome: `Wwwwwelcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
+    welcome: `Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
             Province of British Columbia’s wildlife telemetry observations to support informed management decisions and
             improve conservation efforts.`,
     support: {
