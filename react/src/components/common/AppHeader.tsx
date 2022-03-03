@@ -59,7 +59,7 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
     <header className={'app-header'}>
       <div className={'container'}>
         <a href='/home' className={'brand'} color={'inherit'}>
-          <img src={headerImage} width={155} height={52} alt={'Government of British Columbia'} />
+          <img src={urls.bc_logo_url || headerImage} width={155} height={52} alt={'Government of British Columbia'} />
           BCTW
         </a>
         <nav id={'top-nav'} className={'app-nav'} style={topNavStyle}>

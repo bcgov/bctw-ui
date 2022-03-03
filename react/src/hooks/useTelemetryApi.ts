@@ -193,7 +193,14 @@ export const useTelemetryApi = () => {
     const props = { page, codeHeader };
     return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), codeOptions);
   };
-
+    /**
+   * @param codeName the code name used to determine which desc to fetch
+  */
+  const useCodeDesc = (codeName: string): UseQueryResult<string, AxiosError> => {
+    return useQuery<string, AxiosError>(
+      ['codeName', codeName],
+      () => codeApi.getCodeLongDesc(codeName), codeOptions);
+  };
   /**
    * retrieves list of code headers, no parameters
   */
@@ -425,6 +432,7 @@ export const useTelemetryApi = () => {
     // queries
     useAlert,
     useCodes,
+    useCodeDesc,
     useCodeHeaders,
     useTracks,
     useUnassignedTracks,
