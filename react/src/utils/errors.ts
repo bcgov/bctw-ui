@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
  */
 const formatAxiosError = (err: AxiosError): string => {
   let msg = err.message || '';
-  if(err.response.data !== undefined) msg = err.response.data;
+  if(err?.response?.data !== undefined) msg = err.response.data;
   return `${msg}`;
 };
 
