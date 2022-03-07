@@ -5,7 +5,12 @@ import { AxiosError } from 'axios';
  */
 const formatAxiosError = (err: AxiosError): string => {
   let msg = err.message || '';
-  if(err?.response?.data !== undefined) msg = err.response.data;
+  const {response} = err;
+  const {data} = response;
+  if(typeof data == 'string'){
+    msg = data;
+  } 
+  console.log(msg)
   return `${msg}`;
 };
 
