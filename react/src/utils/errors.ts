@@ -4,13 +4,12 @@ import { AxiosError } from 'axios';
  * formats an Axios error to a string
  */
 const formatAxiosError = (err: AxiosError): string => {
+  console.log('AxiosError:' + err.response.data)
   let msg = err.message || 'An error occured';
-  const {response} = err;
-  const {data} = response;
-  if(typeof data == 'string'){
-    msg = data;
-  } 
-  console.log(err)
+  if(err.response === undefined) return msg;
+  if(err.response.data === undefined) return msg;
+  if(typeof err.response.data !== 'string') return msg;
+  msg = err.response.data;
   return `${msg}`;
 };
 
