@@ -56,7 +56,6 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
                   propName='phone'
                   label='Phone'
                   changeHandler={handlerFromContext}
-                  required
                 />
               </Box>
             </div>
