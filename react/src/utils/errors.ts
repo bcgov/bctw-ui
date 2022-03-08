@@ -1,3 +1,4 @@
+import { isDev } from 'api/api_helpers';
 import { AxiosError } from 'axios';
 
 /**
@@ -5,10 +6,15 @@ import { AxiosError } from 'axios';
  */
 const formatAxiosError = (err: AxiosError): string => {
   let msg = err.message || 'An error occured';
+  console.log(msg)
   if(err.response === undefined) return msg;
   if(err.response.data === undefined) return msg;
-  if(typeof err.response.data !== 'string') return msg;
-  msg = err.response.data;
+  if(err.response.data.error === undefined){
+    msg = err.response.data;
+  } else {
+    msg = err.response.data.error;
+  }
+  console.log(msg)
   return `${msg}`;
 };
 
