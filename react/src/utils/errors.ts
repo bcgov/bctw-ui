@@ -6,7 +6,6 @@ import { AxiosError } from 'axios';
  */
 const formatAxiosError = (err: AxiosError): string => {
   let msg = err.message || 'An error occured';
-  console.log(msg)
   if(err.response === undefined) return msg;
   if(err.response.data === undefined) return msg;
   if(err.response.data.error === undefined){
@@ -14,7 +13,6 @@ const formatAxiosError = (err: AxiosError): string => {
   } else {
     msg = err.response.data.error;
   }
-  console.log(msg)
   return `${msg}`;
 };
 
