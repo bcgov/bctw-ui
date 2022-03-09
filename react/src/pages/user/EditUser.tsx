@@ -20,7 +20,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
   const [domain, setDomain] = useState<KeyCloakDomainType>("idir");
   useDidMountEffect(() => {
     editing.domain = domain;
-  }, [editing]);
+  }, [editing, domain]);
 
   return (
     <EditModal
