@@ -75,8 +75,8 @@ export default function MapPage(): JSX.Element {
   const [latestUPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON());
 
   // tracks layer state
-  const [unassignedPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Unassigned Pings
-  const [unassignedTracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Unassigned Tracks
+  // const [unassignedPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Unassigned Pings
+  // const [unassignedTracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Unassigned Tracks
 
   const selectedPingsLayer = new L.GeoJSON();
   selectedPingsLayer.options = setupSelectedPings();
@@ -88,7 +88,7 @@ export default function MapPage(): JSX.Element {
 
   // pings/tracks state is changed when filters are applied, so use these variables for the 'global' state - used in bottom panel
   const [pings, setPings] = useState<ITelemetryPoint[]>([]);
-  const [unassignedPings, setUnassignedPings] = useState<ITelemetryPoint[]>([]);
+  // const [unassignedPings, setUnassignedPings] = useState<ITelemetryPoint[]>([]);
   const [selectedPingIDs, setSelectedPingIDs] = useState<number[]>([]);
 
   // modal states - overview, export, udf editing
@@ -99,7 +99,7 @@ export default function MapPage(): JSX.Element {
   const [showUdfEdit, setShowUdfEdit] = useState(false);
 
   // state tracking whether or not unassigned device layers are shown
-  const [showUnassignedLayers, setShowUnassignedLayers] = useState(false);
+  // const [showUnassignedLayers, setShowUnassignedLayers] = useState(false);
 
   // filter state
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
@@ -117,9 +117,9 @@ export default function MapPage(): JSX.Element {
   // fetch the map data
   const { start, end } = range;
   const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = api.usePings(start, end);
-  const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
+  // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
-  const { isError: isErrorUTracks, data: fetchedUnassignedTracks } = api.useUnassignedTracks(start, end);
+  // const { isError: isErrorUTracks, data: fetchedUnassignedTracks } = api.useUnassignedTracks(start, end);
 
   // refetch pings when start/end times are changed
   useEffect(() => {
@@ -168,24 +168,24 @@ export default function MapPage(): JSX.Element {
   }, [fetchedPings]);
 
   // unassigned pings
-  useEffect(() => {
-    if (fetchedUnassignedPings && !isErrorUPings) {
-      setUnassignedPings(fetchedUnassignedPings);
+  // useEffect(() => {
+  //   if (fetchedUnassignedPings && !isErrorUPings) {
+  //     setUnassignedPings(fetchedUnassignedPings);
 
-      setupPingOptions(unassignedPingsLayer, handlePointClick, handlePointClose, true);
-      setupLatestPingOptions(latestUPingsLayer, handlePointClick, handlePointClose, true);
+  //     setupPingOptions(unassignedPingsLayer, handlePointClick, handlePointClose, true);
+  //     setupLatestPingOptions(latestUPingsLayer, handlePointClick, handlePointClose, true);
 
-      unassignedPingsLayer.addData(fetchedUnassignedPings as any);
-      latestUPingsLayer.addData(splitPings(fetchedUnassignedPings, 'collar_id').latest as any);
-      // initially hide unassigned points
-      if (!showUnassignedLayers) {
-        mapRef?.current?.removeLayer(unassignedPingsLayer);
-        mapRef?.current?.removeLayer(latestUPingsLayer);
-      } else if (filters.length) {
-        applyFiltersToUnassignedPings(filters, fetchedUnassignedPings);
-      }
-    }
-  }, [fetchedUnassignedPings]);
+  //     unassignedPingsLayer.addData(fetchedUnassignedPings as any);
+  //     latestUPingsLayer.addData(splitPings(fetchedUnassignedPings, 'collar_id').latest as any);
+  //     // initially hide unassigned points
+  //     if (!showUnassignedLayers) {
+  //       mapRef?.current?.removeLayer(unassignedPingsLayer);
+  //       mapRef?.current?.removeLayer(latestUPingsLayer);
+  //     } else if (filters.length) {
+  //       applyFiltersToUnassignedPings(filters, fetchedUnassignedPings);
+  //     }
+  //   }
+  // }, [fetchedUnassignedPings]);
 
   // assigned tracks
   useEffect(() => {
@@ -204,17 +204,17 @@ export default function MapPage(): JSX.Element {
   }, [fetchedTracks]);
 
   // unassigned tracks
-  useEffect(() => {
-    if (fetchedUnassignedTracks && !isErrorUTracks) {
-      setupTracksOptions(unassignedTracksLayer, true);
-      unassignedTracksLayer.addData(fetchedUnassignedTracks as any);
-      // initially hide unassigned points
-      if (!showUnassignedLayers) {
-        mapRef.current?.removeLayer(unassignedTracksLayer);
-        return;
-      }
-    }
-  }, [fetchedUnassignedTracks]);
+  // useEffect(() => {
+  //   if (fetchedUnassignedTracks && !isErrorUTracks) {
+  //     setupTracksOptions(unassignedTracksLayer, true);
+  //     unassignedTracksLayer.addData(fetchedUnassignedTracks as any);
+  //     // initially hide unassigned points
+  //     if (!showUnassignedLayers) {
+  //       mapRef.current?.removeLayer(unassignedTracksLayer);
+  //       return;
+  //     }
+  //   }
+  // }, [fetchedUnassignedTracks]);
 
   // when one of the map only filters are applied, set the state
   useEffect(() => {
@@ -241,24 +241,24 @@ export default function MapPage(): JSX.Element {
   }, [showExportModal, showOverviewModal, showUdfEdit]);
 
   // hide or show unattached device layers
-  useEffect(() => {
-    const ref = mapRef.current;
-    if (!ref) {
-      return;
-    }
-    if (showUnassignedLayers) {
-      ref.addLayer(unassignedPingsLayer);
-      ref.addLayer(unassignedTracksLayer);
-      ref.addLayer(latestUPingsLayer);
-    } else {
-      // fixme: why does this need a delay?
-      setTimeout(() => {
-        ref.removeLayer(unassignedPingsLayer);
-        ref.removeLayer(unassignedTracksLayer);
-        ref.removeLayer(latestUPingsLayer);
-      }, 100);
-    }
-  }, [showUnassignedLayers]);
+  // useEffect(() => {
+  //   const ref = mapRef.current;
+  //   if (!ref) {
+  //     return;
+  //   }
+  //   if (showUnassignedLayers) {
+  //     ref.addLayer(unassignedPingsLayer);
+  //     ref.addLayer(unassignedTracksLayer);
+  //     ref.addLayer(latestUPingsLayer);
+  //   } else {
+  //     // fixme: why does this need a delay?
+  //     setTimeout(() => {
+  //       ref.removeLayer(unassignedPingsLayer);
+  //       ref.removeLayer(unassignedTracksLayer);
+  //       ref.removeLayer(latestUPingsLayer);
+  //     }, 100);
+  //   }
+  // }, [showUnassignedLayers]);
 
   /**
    * when a map point is clicked,
@@ -326,7 +326,7 @@ export default function MapPage(): JSX.Element {
   // clears existing pings/tracks layers
   const clearLayers = (): void => {
     const layerPicker = L.control.layers();
-    const allLayers = [...getAssignedLayers(), ...getUnassignedLayers()];
+    const allLayers = [...getAssignedLayers()];
     allLayers.forEach((l) => {
       layerPicker.removeLayer(l);
       if (typeof (l as L.GeoJSON).clearLayers === 'function') {
@@ -345,12 +345,12 @@ export default function MapPage(): JSX.Element {
     latestPingsLayer.addData(latest as any);
     pingsLayer.addData(other as any);
     tracksLayer.addData(newTracks as any);
-    if (showUnassignedLayers && fetchedUnassignedPings && fetchedUnassignedTracks) {
-      const { latest, other } = splitPings(fetchedUnassignedPings, 'collar_id');
-      unassignedTracksLayer.addData(fetchedUnassignedTracks as any);
-      unassignedPingsLayer.addData(other as any);
-      latestUPingsLayer.addData(latest as any);
-    }
+    // if (showUnassignedLayers && fetchedUnassignedPings && fetchedUnassignedTracks) {
+    //   const { latest, other } = splitPings(fetchedUnassignedPings, 'collar_id');
+    //   unassignedTracksLayer.addData(fetchedUnassignedTracks as any);
+    //   unassignedPingsLayer.addData(other as any);
+    //   latestUPingsLayer.addData(latest as any);
+    // }
   };
 
   // redraw only pings, if no params supplied it will default the fetched ones
@@ -366,19 +366,19 @@ export default function MapPage(): JSX.Element {
     selectedPingIDs.forEach((f) => fillPoint(f, true));
   };
 
-  const redrawUnassignedPings = (upings = fetchedUnassignedPings): void => {
-    const { latest, other } = splitPings(upings, 'critter_id');
-    const layerPicker = L.control.layers();
+  // const redrawUnassignedPings = (upings = fetchedUnassignedPings): void => {
+  //   const { latest, other } = splitPings(upings, 'critter_id');
+  //   const layerPicker = L.control.layers();
 
-    layerPicker.removeLayer(unassignedPingsLayer);
-    layerPicker.removeLayer(latestUPingsLayer);
+  //   layerPicker.removeLayer(unassignedPingsLayer);
+  //   layerPicker.removeLayer(latestUPingsLayer);
 
-    unassignedPingsLayer.clearLayers();
-    latestUPingsLayer.clearLayers();
+  //   unassignedPingsLayer.clearLayers();
+  //   latestUPingsLayer.clearLayers();
 
-    unassignedPingsLayer.addData(other as any);
-    latestUPingsLayer.addData(latest as any);
-  };
+  //   unassignedPingsLayer.addData(other as any);
+  //   latestUPingsLayer.addData(latest as any);
+  // };
 
   // redraw only tracks
   const redrawTracks = (newTracks: ITelemetryLine[]): void => {
@@ -388,12 +388,12 @@ export default function MapPage(): JSX.Element {
     tracksLayer.addData(newTracks as any);
   };
 
-  const redrawUnassignedTracks = (ut: IUnassignedTelemetryLine[]): void => {
-    const layerPicker = L.control.layers();
-    layerPicker.removeLayer(unassignedTracksLayer);
-    unassignedTracksLayer.clearLayers();
-    unassignedTracksLayer.addData(ut as any);
-  };
+  // const redrawUnassignedTracks = (ut: IUnassignedTelemetryLine[]): void => {
+  //   const layerPicker = L.control.layers();
+  //   layerPicker.removeLayer(unassignedTracksLayer);
+  //   unassignedTracksLayer.clearLayers();
+  //   unassignedTracksLayer.addData(ut as any);
+  // };
 
   // triggered when side-panel filters are applied
   const handleApplyChangesFromFilterPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
@@ -404,9 +404,9 @@ export default function MapPage(): JSX.Element {
     // otherwise, update the filter state and apply the filters
     setFilters(filters);
     applyFiltersToPings(filters);
-    if (showUnassignedLayers) {
-      applyFiltersToUnassignedPings(filters);
-    }
+    // if (showUnassignedLayers) {
+    //   applyFiltersToUnassignedPings(filters);
+    // }
   };
 
   // the handler that actually updates the ping state when the filter state is changed
@@ -427,21 +427,21 @@ export default function MapPage(): JSX.Element {
     applyFiltersToTracks(filteredPings);
   };
 
-  const applyFiltersToUnassignedPings = (filters: ICodeFilter[], upings = fetchedUnassignedPings): void => {
-    if (!filters.length) {
-      setUnassignedPings(upings);
-      redrawLayers();
-      return;
-    }
-    const deviceIDFilter = groupFilters(filters).filter((gf) => gf.code_header === 'device_id');
+  // const applyFiltersToUnassignedPings = (filters: ICodeFilter[], upings = fetchedUnassignedPings): void => {
+  //   if (!filters.length) {
+  //     setUnassignedPings(upings);
+  //     redrawLayers();
+  //     return;
+  //   }
+  //   const deviceIDFilter = groupFilters(filters).filter((gf) => gf.code_header === 'device_id');
 
-    if (deviceIDFilter.length) {
-      const filteredUPings = applyFilter(deviceIDFilter, fetchedUnassignedPings);
-      setUnassignedPings(filteredUPings);
-      redrawUnassignedPings(filteredUPings);
-      applyFiltersToUnassignedTracks(filteredUPings);
-    }
-  };
+  //   if (deviceIDFilter.length) {
+  //     const filteredUPings = applyFilter(deviceIDFilter, fetchedUnassignedPings);
+  //     setUnassignedPings(filteredUPings);
+  //     redrawUnassignedPings(filteredUPings);
+  //     applyFiltersToUnassignedTracks(filteredUPings);
+  //   }
+  // };
 
   /**
    * in order to know what tracks need to be updated, the filters need to be applied to pings first,
@@ -460,17 +460,17 @@ export default function MapPage(): JSX.Element {
     redrawTracks(filteredTracks);
   };
 
-  const applyFiltersToUnassignedTracks = (up = unassignedPings): void => {
-    if (!fetchedUnassignedTracks) {
-      return;
-    }
-    const uniqueDeviceIDs = getUniquePropFromPings(up) as number[];
+  // const applyFiltersToUnassignedTracks = (up = unassignedPings): void => {
+  //   if (!fetchedUnassignedTracks) {
+  //     return;
+  //   }
+    // const uniqueDeviceIDs = getUniquePropFromPings(up) as number[];
     // note: as IUnassignedTelemetryLine
-    const filteredTracks = (fetchedUnassignedTracks as any).filter((t) =>
-      uniqueDeviceIDs.includes(t.properties.collar_id)
-    );
-    redrawUnassignedTracks(filteredTracks);
-  };
+  //   const filteredTracks = (fetchedUnassignedTracks as any).filter((t) =>
+  //     uniqueDeviceIDs.includes(t.properties.collar_id)
+  //   );
+  //   redrawUnassignedTracks(filteredTracks);
+  // };
 
   // show the critter overview modal when a row is clicked in bottom panel
   const handleShowOverview = (type: BCTWType, row: ITelemetryDetail): void => {
@@ -490,35 +490,39 @@ export default function MapPage(): JSX.Element {
     if (show) {
       mapRef.current.removeLayer(pingsLayer);
       mapRef.current.removeLayer(tracksLayer);
-      if (showUnassignedLayers) {
-        mapRef.current.removeLayer(unassignedPingsLayer);
-        mapRef.current.removeLayer(unassignedTracksLayer);
-      }
+      // if (showUnassignedLayers) {
+      //   mapRef.current.removeLayer(unassignedPingsLayer);
+      //   mapRef.current.removeLayer(unassignedTracksLayer);
+      // }
     } else {
       mapRef.current.addLayer(pingsLayer);
       mapRef.current.addLayer(tracksLayer);
-      if (showUnassignedLayers) {
-        mapRef.current.addLayer(unassignedPingsLayer);
-        mapRef.current.addLayer(unassignedTracksLayer);
-      }
+      // if (showUnassignedLayers) {
+      //   mapRef.current.addLayer(unassignedPingsLayer);
+      //   mapRef.current.addLayer(unassignedTracksLayer);
+      // }
     }
   };
 
   const toggleTracks = (show: boolean): void => {
     const ref = mapRef.current;
-    if (showUnassignedLayers) {
-      getTracksLayers().forEach((l) => (show ? ref.addLayer(l) : ref.removeLayer(l)));
-      unassignedTracksLayer.bringToBack();
-    } else {
-      const l = getTracksLayers()[0];
-      show ? ref.addLayer(l) : ref.removeLayer(l);
-    }
+    // if (showUnassignedLayers) {
+    //   getTracksLayers().forEach((l) => (show ? ref.addLayer(l) : ref.removeLayer(l)));
+    //   unassignedTracksLayer.bringToBack();
+    // } else {
+    //   const l = getTracksLayers()[0];
+    //   show ? ref.addLayer(l) : ref.removeLayer(l);
+    // }
+    // copied this line below to remove these statements from inside the else
+    const l = getTracksLayers()[0];
+    show ? ref.addLayer(l) : ref.removeLayer(l);
     tracksLayer.bringToBack();
   };
 
   const togglePings = (show: boolean): void => {
     const ref = mapRef.current;
-    const layers = showUnassignedLayers ? getPingLayers() : getPingLayers().slice(0, 2);
+    // const layers = showUnassignedLayers ? getPingLayers() : getPingLayers().slice(0, 2);
+    const layers = getPingLayers().slice(0, 2);
     layers.forEach((l) => (show ? ref.addLayer(l) : ref.removeLayer(l)));
   };
 
@@ -550,9 +554,9 @@ export default function MapPage(): JSX.Element {
   };
 
   const getAssignedLayers = (): L.Layer[] => [latestPingsLayer, pingsLayer, tracksLayer];
-  const getUnassignedLayers = (): L.Layer[] => [unassignedPingsLayer, latestUPingsLayer, unassignedTracksLayer];
-  const getTracksLayers = (): L.Layer[] => [tracksLayer, unassignedTracksLayer];
-  const getPingLayers = (): L.Layer[] => [pingsLayer, latestPingsLayer, unassignedPingsLayer, latestUPingsLayer];
+  // const getUnassignedLayers = (): L.Layer[] => [latestUPingsLayer];
+  const getTracksLayers = (): L.Layer[] => [tracksLayer];
+  const getPingLayers = (): L.Layer[] => [pingsLayer, latestPingsLayer, latestUPingsLayer];
 
   /**
    * when device assignment status select dropdown is changed
@@ -561,11 +565,11 @@ export default function MapPage(): JSX.Element {
   const handleShowUnassignedDevices = (o: ISelectMultipleData[]): void => {
     const values = o.map((s) => s.value);
     // setting this state will trigger visibility of unassigned layers
-    setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
+    // setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
 
     const ref = mapRef.current;
     const layers = [0, 2].includes(values.length)
-      ? [...getAssignedLayers(), ...getUnassignedLayers()]
+      ? [...getAssignedLayers()]
       : getAssignedLayers();
 
     // when all or no options are selected
@@ -592,10 +596,10 @@ export default function MapPage(): JSX.Element {
     tracksLayer.addTo(mapRef.current);
   }, [tracksLayer]);
 
-  useEffect(() => {
-    unassignedTracksLayer.addTo(mapRef.current);
-    unassignedTracksLayer.on('add', (l) => l.target.bringToBack());
-  }, [unassignedTracksLayer]);
+  // useEffect(() => {
+  //   unassignedTracksLayer.addTo(mapRef.current);
+  //   unassignedTracksLayer.on('add', (l) => l.target.bringToBack());
+  // }, [unassignedTracksLayer]);
 
   // Add the ping layers
   useEffect(() => {
@@ -606,9 +610,9 @@ export default function MapPage(): JSX.Element {
     latestPingsLayer.addTo(mapRef.current);
   }, [latestPingsLayer]);
 
-  useEffect(() => {
-    unassignedPingsLayer.addTo(mapRef.current);
-  }, [unassignedPingsLayer]);
+  // useEffect(() => {
+  //   unassignedPingsLayer.addTo(mapRef.current);
+  // }, [unassignedPingsLayer]);
 
   // todo: move this to separate component / wrapper
   // resizable state & handlers
@@ -638,14 +642,14 @@ export default function MapPage(): JSX.Element {
         start={range.start}
         end={range.end}
         uniqueDevices={getUniquePropFromPings(fetchedPings ?? []) as number[]}
-        unassignedDevices={showUnassignedLayers ? getUniquePropFromPings(fetchedUnassignedPings ?? []) as number[] : []}
+        // unassignedDevices={showUnassignedLayers ? getUniquePropFromPings(fetchedUnassignedPings ?? []) as number[] : []}
         onApplyFilters={handleApplyChangesFromFilterPanel}
         onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
         // todo: trigger when filter panel transition is completed without timeout
         onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
         onShowLatestPings={handleShowLastKnownLocation}
         onShowLastFixes={handleShowLast10Fixes}
-        onShowUnassignedDevices={handleShowUnassignedDevices}
+        // onShowUnassignedDevices={handleShowUnassignedDevices}
         collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
       />
       <div className={'map-container'}>
@@ -672,7 +676,7 @@ export default function MapPage(): JSX.Element {
           </div>
           <MapDetails
             pings={[...pings]}
-            unassignedPings={showUnassignedLayers ? [...unassignedPings] : []}
+            unassignedPings={[]}
             selectedAssignedIDs={selectedPingIDs}
             handleShowOnlySelected={handleShowOnlySelected}
             handleShowOverview={handleShowOverview}
