@@ -23,18 +23,17 @@ type MapFiltersProps = {
   start: string;
   end: string;
   uniqueDevices: number[];
-  unassignedDevices: number[];
   collectiveUnits: string[];
   onCollapsePanel: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;
-  onShowUnassignedDevices: (o: ISelectMultipleData[]) => void;
+  // onShowUnassignedDevices: (o: ISelectMultipleData[]) => void;
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
-  const { uniqueDevices, unassignedDevices } = props;
+  const { uniqueDevices } = props;
   const classes = drawerStyles();
   // controls filter panel visibility
   const [open, setOpen] = useState(true);
@@ -176,9 +175,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const createDeviceList = (): ISelectMultipleData[] => {
-    const merged = [...uniqueDevices, ...unassignedDevices].sort((a, b) => a - b);
+    const merged = [...uniqueDevices].sort((a, b) => a - b);
     return merged.map((d) => {
-      const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
+      // const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
+      const displayLabel = d.toString();
       return { id: d, value: d, displayLabel, prop: 'device_id' };
     });
   };
@@ -239,7 +239,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               </Box>
 
               {/* render the unassigned/assigned data points selector */}
-              <Box mb={2}>
+              {/* <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={12}>
                     <Tooltip
@@ -260,7 +260,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     </Tooltip>
                   </Grid>
                 </Grid>
-              </Box>
+              </Box> */}
 
               {/* render the last pings/ last 10 fixes checkboxes */}
               <Box mb={2}>
