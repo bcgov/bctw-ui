@@ -119,7 +119,6 @@ export default function MapPage(): JSX.Element {
   const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = api.usePings(start, end);
   // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
-  // const { isError: isErrorUTracks, data: fetchedUnassignedTracks } = api.useUnassignedTracks(start, end);
 
   // refetch pings when start/end times are changed
   useEffect(() => {
