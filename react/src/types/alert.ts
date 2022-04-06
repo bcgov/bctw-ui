@@ -9,6 +9,7 @@ import { formatDay } from 'utils/time';
 import { Code } from 'types/code';
 import { DataLife } from 'types/data_life';
 import { editObjectToEvent } from './events/event';
+import { eCritterPermission } from './permission';
 
 // telemetry alerts types
 export enum eAlertType {
@@ -37,7 +38,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
   @Transform(nullToDayjs) snoozed_to: Dayjs;
   @Transform(nullToDayjs) last_transmission_date: Dayjs;
   snooze_count: number;
-
+  permission_type: eCritterPermission;
   @Transform(nullToDayjs) attachment_start: Dayjs;
   @Transform(nullToDayjs) attachment_end: Dayjs;
   @Transform(nullToDayjs) data_life_start: Dayjs;
@@ -48,6 +49,9 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
   }
   get isSnoozed(): boolean {
     return dayjs().isBefore(dayjs(this.snoozed_to));
+  }
+  get isEditor(): boolean {
+    return this.permission_type == 'editor';
   }
   get identifier(): keyof TelemetryAlert {
     return 'alert_id';
@@ -125,7 +129,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 // props that any mortality event or alert should have.
 export interface IMortalityAlert
   extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'device_status'>,
-  Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id' | 'captivity_status'>,
+  Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id' | 'captivity_status' | 'species'>,
   DataLife {}
 
 type MortalityAlertProp = keyof IMortalityAlert;
@@ -144,14 +148,16 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   animal_status: Code;
   captivity_status: boolean;
   wlh_id: string;
+  species: string;
 
   attachment_start: Dayjs;
   data_life_start: Dayjs;
   data_life_end: Dayjs;
   attachment_end: Dayjs;
+  
 
   static get displayableMortalityAlertProps(): (AlertProp | MortalityAlertProp)[] {
-    return ['wlh_id', 'animal_id', 'device_id', 'device_make', ...TelemetryAlert.displayableAlertProps, 'valid_from', 'last_transmission_date'];
+    return ['wlh_id', 'animal_id','species', 'device_id', 'device_make', ...TelemetryAlert.displayableAlertProps, 'valid_from', 'last_transmission_date'];
   }
 
   formatPropAsHeader(s: string): string {

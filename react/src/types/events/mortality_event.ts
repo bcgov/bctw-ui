@@ -94,6 +94,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly critter_id: uuid;
   readonly animal_id: string;
   readonly wlh_id: string;
+  species: string;
   animal_status: MortalityAnimalStatus;
   predator_species_pcod: Code;
   predator_species_ucod: Code;
