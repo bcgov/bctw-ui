@@ -1,4 +1,5 @@
 import * as L from 'leaflet'; // must be imported first
+import 'leaflet.markercluster';
 import './MapPage.scss';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -67,7 +68,10 @@ import { eUDFType } from 'types/udf';
 export default function MapPage(): JSX.Element {
   const api = useTelemetryApi();
   const mapRef = useRef<L.Map>(null);
-
+  // const [cluster] = useState(L.markerClusterGroup({
+  //   spiderfyOnMaxZoom: true,
+  
+  // }))
   // pings layer state
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
   const [pingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Pings
@@ -602,10 +606,14 @@ export default function MapPage(): JSX.Element {
 
   // Add the ping layers
   useEffect(() => {
+    // cluster.addLayer(pingsLayer);
+    // cluster.addTo(mapRef.current);
     pingsLayer.addTo(mapRef.current);
   }, [pingsLayer]);
 
   useEffect(() => {
+    // cluster.addLayer(latestPingsLayer);
+    // cluster.addTo(mapRef.current);
     latestPingsLayer.addTo(mapRef.current);
   }, [latestPingsLayer]);
 

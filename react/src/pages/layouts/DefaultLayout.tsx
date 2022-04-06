@@ -46,7 +46,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   useDidMountEffect(() => {
     // forces users to deal with alerts if they are not currently snoozed (unless in development)
     // const dealWithIt = alerts.some((a) => !a.isSnoozed);
-    const dealWithIt = alerts.some((a) => !a.isSnoozed) && !isDev();
+    const dealWithIt = alerts.some((a) => !a.isEditor || !a.isSnoozed) && !isDev();
     setMustUpdateAlert(dealWithIt);
   }, [alerts]);
 

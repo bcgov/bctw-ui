@@ -16,6 +16,10 @@ import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
+import { UserContext } from 'contexts/UserContext';
+import { UserCritterAccess } from 'types/animal_access';
+import { eCritterPermission } from 'types/permission';
+import { uuid } from 'types/common_types';
 
 /**
  * modal component that shows current alerts
@@ -23,10 +27,15 @@ import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
  */
 export default function AlertPage(): JSX.Element {
   const api = useTelemetryApi();
+  
+
   const showNotif = useResponseDispatch();
   const useAlerts = useContext(AlertContext);
-
+  const useUser = useContext(UserContext);
+  const eCritters = api.useCritterAccess(1, {user: useUser.user, filter: [eCritterPermission.editor]});
   const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
+
+  // console.log(alerts, useUser)
   const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(null);
   // display status of the modal that the user can perform the alert update from
   const [showEventModal, setShowEventModal] = useState(false);
@@ -39,7 +48,6 @@ export default function AlertPage(): JSX.Element {
   useEffect(() => {
     const update = (): void => {
       const alerts = useAlerts.alerts;
-      // console.log('alerts loaded', alerts);
       setAlerts(alerts);
     };
     update();
@@ -54,6 +62,8 @@ export default function AlertPage(): JSX.Element {
 
   // setup the mutation to update the alert status
   const { mutateAsync, isLoading } = api.useSaveUserAlert({ onSuccess, onError });
+
+  const isEditor = (alert: MortalityAlert) => alert.permission_type === 'editor';
 
   /**
    * when an alert row is selected from the table:
@@ -158,6 +168,7 @@ export default function AlertPage(): JSX.Element {
                       key={a.alert_id}>
                       <TableCell>{a.wlh_id}</TableCell>
                       <TableCell>{a.animal_id}</TableCell>
+                      <TableCell>{a.species}</TableCell>
                       <TableCell>{a.device_id}</TableCell>
                       <TableCell>{a.device_make}</TableCell>
                       <TableCell style={{ color: 'orangered' }}>
@@ -166,18 +177,24 @@ export default function AlertPage(): JSX.Element {
                       <TableCell>{formatT(a.valid_from)}</TableCell>
                       <TableCell>{a.last_transmission_date.isValid() ? formatT(a.last_transmission_date) : ''}</TableCell>
                       <TableCell>
-                        <IconButton
+
+                        { !isEditor(a)
+                        ? <IconButton
                           style={{ padding: '9px', backgroundColor: 'orangered' }}
                           onClick={(): void => editAlert(a)}
                           size="large">
                           <Icon icon='edit' htmlColor='#fff' />
                         </IconButton>
+                        : <p>N/A</p>}
+                        
                       </TableCell>
                       <TableCell>
                         {a.snooze_count === a.snoozesMax ? <b>{a.snoozeStatus}</b> : a.snoozeStatus}
                       </TableCell>
+                      
                       <TableCell>
-                        {!a.isSnoozed && a.snoozesAvailable === 0 ? (
+                      {!isEditor(a) ? 
+                        (!a.isSnoozed && a.snoozesAvailable === 0 ? (
                           <IconButton disabled={true} size="large">
                             <Icon icon='warning' htmlColor='orange'></Icon>
                           </IconButton>
@@ -189,8 +206,10 @@ export default function AlertPage(): JSX.Element {
                           <IconButton disabled={true} size="large">
                             <Icon icon='cannotSnooze' />
                           </IconButton>
-                        )}
+                        ))
+                        :<p>N/A</p>}
                       </TableCell>
+                      
                     </TableRow>
                   );
                 })}
