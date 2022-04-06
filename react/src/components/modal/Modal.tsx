@@ -1,4 +1,4 @@
-import { Dialog, IconButton } from '@mui/material';
+import { Button, Dialog, IconButton } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
 import modalStyles from 'components/modal/modal_styles';
@@ -24,14 +24,19 @@ export default function Modal(props: ModalProps): JSX.Element {
           <div className={classes.title}>
             <h3>{title}</h3>
             {/* if this prop was passed, dont show the close button */}
-            {disableBackdropClick ? null : (
-              <IconButton
-                style={{float: 'right'}}
-                onClick={(): void => handleClose(false)}
-                size="large">
-                <Icon icon='close' />
-              </IconButton>
-            )}
+            {disableBackdropClick 
+            ? null 
+            : 
+            <Button variant='outlined' size='large' onClick={(): void => handleClose(false)}>
+            Close
+            </Button>
+              // <IconButton
+              //   style={{float: 'right'}}
+              //   onClick={(): void => handleClose(false)}
+              //   size="large">
+              //   <Icon icon='close' />
+              // </IconButton>
+            }
           </div>
           <div>{children}</div>
         </div>

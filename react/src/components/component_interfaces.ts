@@ -12,6 +12,7 @@ type ModalBaseProps = {
   handleClose: (v: boolean) => void;
   title?: string;
   disableBackdropClick?: boolean;
+  useButtonClose?: boolean;
 };
 
 /**

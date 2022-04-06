@@ -28,6 +28,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   const [showAlerts, setShowAlerts] = useState(false);
   const [mustUpdateAlert, setMustUpdateAlert] = useState(false);
 
+  const [mustHandleAlerts, setMustHandleAlerts] = useState<TelemetryAlert[]>([])
   // set user state when user context changes
   useEffect(() => {
     const { error } = useUser;
@@ -46,8 +47,12 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   useDidMountEffect(() => {
     // forces users to deal with alerts if they are not currently snoozed (unless in development)
     // const dealWithIt = alerts.some((a) => !a.isSnoozed);
-    const dealWithIt = alerts.some((a) => !a.isEditor || !a.isSnoozed) && !isDev();
-    setMustUpdateAlert(dealWithIt);
+    //const dealWithIt = alerts.some((a) => !a.isSnoozed) && !isDev();
+    const filteredAlerts = alerts.filter((a) => !a.isEditor || a.isSnoozed)
+    console.log(filteredAlerts)
+    const dealWithIt = (filteredAlerts.length > 0) && !isDev();
+    setMustUpdateAlert(dealWithIt)
+    //setMustUpdateAlert(dealWithIt);
   }, [alerts]);
 
   useDidMountEffect(() => {
@@ -74,7 +79,9 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
         title={useAlert?.getAlertTitle()}
         open={showAlerts}
         disableBackdropClick={mustUpdateAlert}
-        handleClose={mustUpdateAlert ? doNothing : (): void => setShowAlerts(false)}>
+        handleClose={mustUpdateAlert ? doNothing : (): void => setShowAlerts(false)}
+        useButtonClose={true}
+        >
         <UserAlert />
       </Modal>
       {children}

@@ -51,7 +51,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
     return dayjs().isBefore(dayjs(this.snoozed_to));
   }
   get isEditor(): boolean {
-    return this.permission_type == 'editor';
+    return this.permission_type == eCritterPermission.editor;
   }
   get identifier(): keyof TelemetryAlert {
     return 'alert_id';
