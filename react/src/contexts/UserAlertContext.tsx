@@ -61,8 +61,9 @@ export const AlertStateContextProvider: React.FC = (props) => {
       return 'Alerts(0)';
     }
     const numSnoozed = data.filter((a) => a.isSnoozed).length;
+    const numEditors = data.filter((a) => a.isEditor).length;
     const snoozedStr = numSnoozed ? `Snoozed (${numSnoozed})` : '';
-    return `Alerts that require action (${data.length - numSnoozed}) ${snoozedStr}`;
+    return `Alerts that require action (${data.length - numSnoozed - numEditors}) ${snoozedStr}`;
   };
 
   return (

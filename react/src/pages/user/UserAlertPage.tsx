@@ -11,7 +11,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
-import { columnToHeader } from 'utils/common_helpers';
+import { capitalize, columnToHeader } from 'utils/common_helpers';
 import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import MalfunctionEvent from 'types/events/malfunction_event';
@@ -126,7 +126,7 @@ export default function AlertPage(): JSX.Element {
     setShowEventModal(false);
   };
 
-  const propsToShow = [...MortalityAlert.displayableMortalityAlertProps, 'update', 'status', 'snooze'];
+  const propsToShow = [...MortalityAlert.displayableMortalityAlertProps, 'permission_type', 'update', 'status', 'snooze'];
 
   if (!alerts?.length) {
     return <div>no alerts</div>;
@@ -175,6 +175,7 @@ export default function AlertPage(): JSX.Element {
                       </TableCell>
                       <TableCell>{formatT(a.valid_from)}</TableCell>
                       <TableCell>{a.last_transmission_date.isValid() ? formatT(a.last_transmission_date) : ''}</TableCell>
+                      <TableCell>{capitalize(a.permission_type)}</TableCell>
                       <TableCell>
 
                         { !isEditor(a)
