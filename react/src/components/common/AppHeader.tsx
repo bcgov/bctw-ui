@@ -136,7 +136,7 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
           </ul>
         </nav>
       </div>
-      <Modal title={useAlert?.getAlertTitle()} open={showAlerts} handleClose={(): void => setShowAlerts(false)}>
+      <Modal title={useAlert?.getAlertTitle()} open={showAlerts} handleClose={(): void => setShowAlerts(false)}  useButton>
         <UserAlert />
       </Modal>
     </header>

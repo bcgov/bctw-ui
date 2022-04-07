@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { UserContext } from 'contexts/UserContext';
 import { AlertContext } from 'contexts/UserAlertContext';
 import UserAlert from 'pages/user/UserAlertPage';
-import { Modal } from 'components/common';
+// import Modal from "components/modal/Modal";
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import UserOnboarding from 'pages/onboarding/UserOnboarding';
@@ -10,6 +10,8 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { isDev } from 'api/api_helpers';
 import { doNothing } from 'utils/common_helpers';
 import { TelemetryAlert } from 'types/alert';
+import AlertModal from 'components/modal/AlertModal';
+import Modal from 'components/modal/Modal';
 
 type IDefaultLayoutProps = {
   children: React.ReactNode;
@@ -27,8 +29,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   const [userErr, setUserErr] = useState<AxiosError | null>(null);
   const [showAlerts, setShowAlerts] = useState(false);
   const [mustUpdateAlert, setMustUpdateAlert] = useState(false);
-
-  const [mustHandleAlerts, setMustHandleAlerts] = useState<TelemetryAlert[]>([])
+ 
   // set user state when user context changes
   useEffect(() => {
     const { error } = useUser;
@@ -45,14 +46,12 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   }, [useAlert]);
 
   useDidMountEffect(() => {
-    // forces users to deal with alerts if they are not currently snoozed (unless in development)
-    // const dealWithIt = alerts.some((a) => !a.isSnoozed);
-    //const dealWithIt = alerts.some((a) => !a.isSnoozed) && !isDev();
-    const filteredAlerts = alerts.filter((a) => !a.isEditor || a.isSnoozed)
-    console.log(filteredAlerts)
-    const dealWithIt = (filteredAlerts.length > 0) && !isDev();
+    // forces users to deal with alerts if they are not currently snoozed (unless in development or editor)
+    const nonEditorAlerts = alerts.filter((a) => !a.isEditor)
+    const notSnoozed = nonEditorAlerts.filter((a) => !a.isSnoozed)
+    const dealWithIt = (notSnoozed.length > 0) && !isDev();
+    console.log(`${dealWithIt} ${notSnoozed.length} alerts`)
     setMustUpdateAlert(dealWithIt)
-    //setMustUpdateAlert(dealWithIt);
   }, [alerts]);
 
   useDidMountEffect(() => {
@@ -72,7 +71,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
       return <div>ERROR {formatAxiosError(userErr)}</div>;
     }
   }
-
+  console.log(mustUpdateAlert)
   return (
     <>
       <Modal
@@ -80,7 +79,6 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
         open={showAlerts}
         disableBackdropClick={mustUpdateAlert}
         handleClose={mustUpdateAlert ? doNothing : (): void => setShowAlerts(false)}
-        useButtonClose={true}
         >
         <UserAlert />
       </Modal>

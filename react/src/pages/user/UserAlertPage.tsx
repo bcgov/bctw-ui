@@ -35,7 +35,6 @@ export default function AlertPage(): JSX.Element {
   const eCritters = api.useCritterAccess(1, {user: useUser.user, filter: [eCritterPermission.editor]});
   const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
 
-  // console.log(alerts, useUser)
   const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(null);
   // display status of the modal that the user can perform the alert update from
   const [showEventModal, setShowEventModal] = useState(false);

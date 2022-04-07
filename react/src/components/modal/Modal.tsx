@@ -7,8 +7,8 @@ import { Icon } from 'components/common';
 import { removeProps } from 'utils/common_helpers';
 
 export default function Modal(props: ModalProps): JSX.Element {
-  const { disableBackdropClick, open, title, handleClose, children } = props;
-  const propsToPass = removeProps(props, ['handleClose', 'disableBackdropClick']);
+  const { disableBackdropClick, open, title, handleClose, children, useButton } = props;
+  const propsToPass = removeProps(props, ['handleClose', 'disableBackdropClick', 'useButton']);
   const classes = modalStyles();
   return (
     <Dialog
@@ -27,15 +27,18 @@ export default function Modal(props: ModalProps): JSX.Element {
             {disableBackdropClick 
             ? null 
             : 
-            <Button variant='outlined' size='large' onClick={(): void => handleClose(false)}>
-            Close
-            </Button>
-              // <IconButton
-              //   style={{float: 'right'}}
-              //   onClick={(): void => handleClose(false)}
-              //   size="large">
-              //   <Icon icon='close' />
-              // </IconButton>
+            useButton ? <Button 
+            variant='outlined' 
+            onClick={(): void => handleClose(false)} 
+            size='small'>Close</Button> 
+            
+            : <IconButton
+            style={{float: 'right'}}
+            onClick={(): void => handleClose(false)}
+            size="large">
+            <Icon icon='close' />
+          </IconButton>
+
             }
           </div>
           <div>{children}</div>
