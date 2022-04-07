@@ -10,7 +10,6 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { isDev } from 'api/api_helpers';
 import { doNothing } from 'utils/common_helpers';
 import { TelemetryAlert } from 'types/alert';
-import AlertModal from 'components/modal/AlertModal';
 import Modal from 'components/modal/Modal';
 
 type IDefaultLayoutProps = {
