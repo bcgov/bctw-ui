@@ -47,7 +47,6 @@ margin-left: -6px;"
       id="star_filled" 
       data-name="star 
       filled" xmlns="http://www.w3.org/2000/svg"
-      
       >
 
     <path 
