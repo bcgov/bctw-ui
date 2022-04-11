@@ -26,10 +26,43 @@ const animalColoredPointStyle = (ping: ITelemetryPoint, isUnassigned: boolean): 
     color
   }
 }
-
+// <div
+// style="display: flex;
+// align-items: center;
+// border: 1px solid blue;
+// height: 100%;"
+// >
 const createLatestPingIcon = (fillColour: string, color = '#000'): L.DivIcon => {
   return L.divIcon({
-    html: `<svg width="24px" height="24px" viewBox="0 0 24 24" id="star_filled" data-name="star filled" xmlns="http://www.w3.org/2000/svg"><path id="Star" d="M10,15,4.122,18.09l1.123-6.545L.489,6.91l6.572-.955L10,0l2.939,5.955,6.572.955-4.755,4.635,1.123,6.545Z" transform="translate(2 3)" stroke="${color}" fill="${fillColour}" stroke-miterlimit="10" stroke-width="1.5"/></svg>`,
+    html: `
+    <div
+style="
+height: 24px;
+width: 24px;
+margin-top: -6px;
+margin-left: -6px;"
+>
+    <svg      
+      viewBox="0 0 24 24" 
+      id="star_filled" 
+      data-name="star 
+      filled" xmlns="http://www.w3.org/2000/svg"
+      
+      >
+
+    <path 
+      id="Star" 
+      d="M10,15,4.122,18.09l1.123-6.545L.489,6.91l6.572-.955L10,0l2.939,5.955,6.572.955-4.755,4.635,1.123,6.545Z" 
+      transform="translate(2 3)" 
+      
+      stroke="${color}" 
+      fill="${fillColour}" 
+      stroke-miterlimit="10" 
+      stroke-width="1.5"/>
+
+    </svg>
+    </div>
+    `,
     className: 'latest-ping'
   });
 };
