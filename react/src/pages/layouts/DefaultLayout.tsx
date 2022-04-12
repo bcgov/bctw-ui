@@ -49,7 +49,6 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
     const nonEditorAlerts = alerts.filter((a) => !a.isEditor)
     const notSnoozed = nonEditorAlerts.filter((a) => !a.isSnoozed)
     const dealWithIt = (notSnoozed.length > 0) && !isDev();
-    console.log(`${dealWithIt} ${notSnoozed.length} alerts`)
     setMustUpdateAlert(dealWithIt)
   }, [alerts]);
 

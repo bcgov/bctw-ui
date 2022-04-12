@@ -26,22 +26,17 @@ const animalColoredPointStyle = (ping: ITelemetryPoint, isUnassigned: boolean): 
     color
   }
 }
-// <div
-// style="display: flex;
-// align-items: center;
-// border: 1px solid blue;
-// height: 100%;"
-// >
+
 const createLatestPingIcon = (fillColour: string, color = '#000'): L.DivIcon => {
   return L.divIcon({
     html: `
     <div
-style="
-height: 24px;
-width: 24px;
-margin-top: -6px;
-margin-left: -6px;"
->
+      style="
+      height: 24px;
+      width: 24px;
+      margin-top: -6px;
+      margin-left: -6px;"
+      >
     <svg      
       viewBox="0 0 24 24" 
       id="star_filled" 
