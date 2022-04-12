@@ -69,7 +69,6 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
       return <div>ERROR {formatAxiosError(userErr)}</div>;
     }
   }
-  console.log(mustUpdateAlert)
   return (
     <>
       <Modal
