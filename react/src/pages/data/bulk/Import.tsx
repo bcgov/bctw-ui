@@ -21,6 +21,7 @@ import { Collar } from 'types/collar';
 import { plainToClass } from 'class-transformer';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
+import { eUserRole } from 'types/user';
 
 enum eImportType {
   animal = 'animal',
@@ -134,7 +135,7 @@ export default function Import(): JSX.Element {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Data Import</h1>
         <Typography mb={3} variant='body1' component='p'>Import metadata via CSV file.</Typography>

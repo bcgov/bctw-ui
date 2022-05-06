@@ -4,6 +4,7 @@ import { Icon, Tooltip } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { eUserRole } from 'types/user';
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
@@ -14,6 +15,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [isDataAdmin, setIsDataAdmin] = useState(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
   const useUser = useContext(UserContext);
 
@@ -22,8 +24,9 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
     const updateComponent = (): void => {
       const { user } = useUser;
       if (user) {
-        setIsAdmin(user.role_type === 'administrator');
+        setIsAdmin(user.role_type === eUserRole.administrator);
         setIsOwner(user.is_owner);
+        setIsDataAdmin(user.role_type === eUserRole.data_administrator)
       }
     };
     updateComponent();
@@ -37,6 +40,10 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
     }
     if (isOwner) {
       curRoutes.push(...routes.filter((r) => ['delegation'].includes(r.name)));
+    }
+    if (isDataAdmin) {
+      const dataAdminRoutes = ['import', 'animal-manager', 'delegation-requests', 'animal-manager', 'vendor'];
+      curRoutes.push(...routes.filter((r) => dataAdminRoutes.includes(r.name)));
     }
     setVisibleRoutes(curRoutes);
   };
@@ -53,7 +60,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       case '/profile':
     }
     handleSetVisible(['animals', 'devices', 'profile']);
-  }, [location, isAdmin, isOwner]); // only fire when these states change
+  }, [location, isAdmin, isOwner, isDataAdmin]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (

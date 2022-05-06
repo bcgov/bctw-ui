@@ -51,12 +51,12 @@ export const userApi = (props: ApiProps): API => {
 
   /**
    * @param user a new or existing @type {User}
-   * defaults role_type to the user's property or 'observer' if that isn't defined
+   * defaults role_type to the user's property or 'user' if that isn't defined
    * note: returned user object will not have role_type
    */
   const addUser = async (user: User): Promise<User> => {
     // console.log('posting user', user)
-    const role = user.role_type ?? eUserRole.observer;
+    const role = user.role_type ?? eUserRole.user;
     const { data } = await postJSON(api, createUrl({ api: 'add-user' }), {user, role});
     const ret = plainToClass(User, data);
     // console.log('user upsert result:', ret);

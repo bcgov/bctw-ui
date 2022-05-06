@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import DataTable from 'components/table/DataTable';
 import { Button } from 'components/common';
-import { User } from 'types/user';
+import { eUserRole, User } from 'types/user';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { Typography } from '@mui/material';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -49,7 +49,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Set Animal Manager</h1>
         <Typography mb={3} variant='body1' component='p'>A user has access to devices through the user-animal association.</Typography>

@@ -16,6 +16,7 @@ import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { isDev } from 'api/api_helpers';
+import { eUserRole } from 'types/user';
 
 /**
  * allows an admin to manually trigger a Vectronic API fetch for raw telemetry
@@ -102,7 +103,7 @@ export default function VendorAPIPage(): JSX.Element {
 
   const headers: (keyof Collar)[] = ['device_id', 'device_make', 'frequency', 'device_model', 'device_status'];
   return (
-    <AuthLayout>
+    <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <Box mb={2}>
           <h4>Select the date range you wish to retrieve telemetry for</h4>

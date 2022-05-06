@@ -4,8 +4,9 @@ import { isDev } from 'api/api_helpers';
 
 export enum eUserRole {
   administrator = 'administrator',
-  manager = 'manager',
-  observer = 'observer'
+  //manager = 'manager', //Removed from DB and enum. Not used...
+  user = 'user',
+  data_administrator = 'data_administrator',
 }
 
 export type KeyCloakDomainType = 'idir' | 'bceid';

@@ -14,7 +14,7 @@ type UserAccessRequestProps = { children?: ReactNode };
  */
 
 const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element => {
-  const accessType = eUserRole.observer;
+  const accessType = eUserRole.user;
   const [populationUnit, setPopulationUnit] = useState('');
   const [projectManager, setProjectManager] = useState('');
   const [projectName, setProjectName] = useState('');

@@ -16,8 +16,8 @@ type IDefaultLayoutProps = {
 export default function AuthLayout({ children, required_user_role = eUserRole.administrator }: IDefaultLayoutProps): JSX.Element {
   const history = useHistory();
   const userChanges = useContext(UserContext);
-  const admin = eUserRole.administrator;
-
+  const {data_administrator, administrator} = eUserRole;
+  
   useEffect(() => {
     const updateComponent = (): void => {
       const { user } = userChanges;
@@ -25,14 +25,20 @@ export default function AuthLayout({ children, required_user_role = eUserRole.ad
         return;
       }
       const { role_type } = user;
-      if (required_user_role === admin && role_type !== admin) {
+      const isAdmins = (role_type === administrator || role_type === data_administrator)
+      if (required_user_role === administrator && role_type !== administrator) {
         history.push('/home');
       } 
       // admins can always access content,
       // even if the required_user_role is not specifically admin
-      else if (![required_user_role, admin].includes(role_type)) {
+      else if (![required_user_role, administrator].includes(role_type)) {
         history.push('/home');
       }
+      //Data admins have access to all admin pages except user management related pages
+      else if (required_user_role === data_administrator && !isAdmins) {
+        history.push('/home');
+      } 
+
     };
     updateComponent();
   }, [userChanges]);

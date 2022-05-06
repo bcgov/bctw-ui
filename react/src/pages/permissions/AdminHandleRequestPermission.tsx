@@ -21,6 +21,7 @@ import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
 import { formatDay } from 'utils/time';
 import { isDev } from 'api/api_helpers';
+import { eUserRole } from 'types/user';
 
 /**
  * page that an admin uses to grant or deny permission requests from owners
@@ -159,7 +160,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout required_user_role={eUserRole.data_administrator}>
       {status === 'error' && error ? (
         <NotificationMessage severity={'error'} message={formatAxiosError(error)} />
       ) : (
