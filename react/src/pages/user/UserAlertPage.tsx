@@ -27,12 +27,11 @@ import { uuid } from 'types/common_types';
  */
 export default function AlertPage(): JSX.Element {
   const api = useTelemetryApi();
-  
 
   const showNotif = useResponseDispatch();
   const useAlerts = useContext(AlertContext);
   const useUser = useContext(UserContext);
-  const eCritters = api.useCritterAccess(1, {user: useUser.user, filter: [eCritterPermission.editor]});
+  const eCritters = api.useCritterAccess(1, { user: useUser.user, filter: [eCritterPermission.editor] });
   const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
 
   const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(null);
@@ -56,8 +55,7 @@ export default function AlertPage(): JSX.Element {
     showNotif({ severity: 'success', message: `telemetry alert saved` });
   };
 
-  const onError = (error: AxiosError): void =>
-    showNotif({ severity: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void => showNotif({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutation to update the alert status
   const { mutateAsync, isLoading } = api.useSaveUserAlert({ onSuccess, onError });
@@ -68,7 +66,7 @@ export default function AlertPage(): JSX.Element {
    * when an alert row is selected from the table:
    * a) set the selected row state
    * b) based on the alert type, update the workflow state
-   * 
+   *
    * for malfunction events: default the date to last_transmission
    */
   const handleSelectRow = (aid: number): void => {
@@ -126,7 +124,13 @@ export default function AlertPage(): JSX.Element {
     setShowEventModal(false);
   };
 
-  const propsToShow = [...MortalityAlert.displayableMortalityAlertProps, 'permission_type', 'update', 'status', 'snooze'];
+  const propsToShow = [
+    ...MortalityAlert.displayableMortalityAlertProps,
+    'permission_type',
+    'update',
+    'status',
+    'snooze'
+  ];
 
   if (!alerts?.length) {
     return <div>no alerts</div>;
@@ -174,42 +178,45 @@ export default function AlertPage(): JSX.Element {
                         <strong>{a.formatAlert}</strong>
                       </TableCell>
                       <TableCell>{formatT(a.valid_from)}</TableCell>
-                      <TableCell>{a.last_transmission_date.isValid() ? formatT(a.last_transmission_date) : ''}</TableCell>
+                      <TableCell>
+                        {a.last_transmission_date.isValid() ? formatT(a.last_transmission_date) : ''}
+                      </TableCell>
                       <TableCell>{capitalize(a.permission_type)}</TableCell>
                       <TableCell>
-
-                        { !isEditor(a)
-                        ? <IconButton
-                          style={{ padding: '9px', backgroundColor: 'orangered' }}
-                          onClick={(): void => editAlert(a)}
-                          size="large">
-                          <Icon icon='edit' htmlColor='#fff' />
-                        </IconButton>
-                        : <p>N/A</p>}
-                        
+                        {!isEditor(a) ? (
+                          <IconButton
+                            style={{ padding: '9px', backgroundColor: 'orangered' }}
+                            onClick={(): void => editAlert(a)}
+                            size='large'>
+                            <Icon icon='edit' htmlColor='#fff' />
+                          </IconButton>
+                        ) : (
+                          <p>N/A</p>
+                        )}
                       </TableCell>
                       <TableCell>
                         {a.snooze_count === a.snoozesMax ? <b>{a.snoozeStatus}</b> : a.snoozeStatus}
                       </TableCell>
-                      
+
                       <TableCell>
-                      {!isEditor(a) ? 
-                        (!a.isSnoozed && a.snoozesAvailable === 0 ? (
-                          <IconButton disabled={true} size="large">
-                            <Icon icon='warning' htmlColor='orange'></Icon>
-                          </IconButton>
-                        ) : a.isSnoozed ? null : a.snoozesAvailable > 0 ? (
-                          <IconButton onClick={(): void => handleClickSnooze(a)} size="large">
-                            <Icon icon='snooze' />
-                          </IconButton>
+                        {!isEditor(a) ? (
+                          !a.isSnoozed && a.snoozesAvailable === 0 ? (
+                            <IconButton disabled={true} size='large'>
+                              <Icon icon='warning' htmlColor='orange'></Icon>
+                            </IconButton>
+                          ) : a.isSnoozed ? null : a.snoozesAvailable > 0 ? (
+                            <IconButton onClick={(): void => handleClickSnooze(a)} size='large'>
+                              <Icon icon='snooze' />
+                            </IconButton>
+                          ) : (
+                            <IconButton disabled={true} size='large'>
+                              <Icon icon='cannotSnooze' />
+                            </IconButton>
+                          )
                         ) : (
-                          <IconButton disabled={true} size="large">
-                            <Icon icon='cannotSnooze' />
-                          </IconButton>
-                        ))
-                        :<p>N/A</p>}
+                          <p>N/A</p>
+                        )}
                       </TableCell>
-                      
                     </TableRow>
                   );
                 })}

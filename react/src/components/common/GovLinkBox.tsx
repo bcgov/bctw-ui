@@ -3,7 +3,7 @@ import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme: Theme) => ({
   box: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#f2f2f2'
   },
   blueHeadingBar: {
     backgroundColor: theme.palette.primary.main,
@@ -14,10 +14,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 interface LinkData {
-    link?: string;
-    href?: string;
-    textPrefix: string;
-    textSuffix?: string;
+  link?: string;
+  href?: string;
+  textPrefix: string;
+  textSuffix?: string;
 }
 interface LinkBoxProps {
   title: string;
@@ -33,13 +33,13 @@ const GovLinkBox = ({ title, data }: LinkBoxProps): JSX.Element => {
       <Box className={styles.boxText}>
         {data.map((item, index) => (
           <div key={index}>
-          <Typography paragraph>
-            {item.textPrefix}
-            <Link href={item.href} target='_blank'>
-              {item.link}
-            </Link>
-            {item.textSuffix && item.textSuffix}
-          </Typography>
+            <Typography paragraph>
+              {item.textPrefix}
+              <Link href={item.href} target='_blank'>
+                {item.link}
+              </Link>
+              {item.textSuffix && item.textSuffix}
+            </Typography>
           </div>
         ))}
       </Box>

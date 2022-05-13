@@ -24,22 +24,15 @@ export default function Modal(props: ModalProps): JSX.Element {
           <div className={classes.title}>
             <h3>{title}</h3>
             {/* if this prop was passed, dont show the close button */}
-            {disableBackdropClick 
-            ? null 
-            : 
-            useButton ? <Button 
-            variant='outlined' 
-            onClick={(): void => handleClose(false)} 
-            size='small'>Close</Button> 
-            
-            : <IconButton
-            style={{float: 'right'}}
-            onClick={(): void => handleClose(false)}
-            size="large">
-            <Icon icon='close' />
-          </IconButton>
-
-            }
+            {disableBackdropClick ? null : useButton ? (
+              <Button variant='outlined' onClick={(): void => handleClose(false)} size='small'>
+                Close
+              </Button>
+            ) : (
+              <IconButton style={{ float: 'right' }} onClick={(): void => handleClose(false)} size='large'>
+                <Icon icon='close' />
+              </IconButton>
+            )}
           </div>
           <div>{children}</div>
         </div>

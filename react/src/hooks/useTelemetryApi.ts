@@ -146,6 +146,18 @@ export const useTelemetryApi = () => {
     );
   };
 
+  /**
+   * retrieves a combined list of attached/unattached devices with devices that have no collar_id.
+   */
+   const useAllDevicesWithUnassignedCollarIds = (page: number, ...args: unknown[]): UseQueryResult<(Collar)[], AxiosError> => {
+    const search = parseArgs(args);
+    return useQuery<Collar[], AxiosError>(
+      ['all_devices_with_unassigned', page, search.map(s => s?.term).join()],
+      () => collarApi.getAllDevicesWithUnassignedCollarIds(page, search),
+      critterOptions
+    );
+  };
+
   const critterOptions = { ...defaultQueryOptions, keepPreviousData: true };
   /**
    * retrieves critters that have a collar assigned
@@ -458,6 +470,7 @@ export const useTelemetryApi = () => {
     useOnboardRequests,
     useOnboardStatus,
     useTestNotifications,
+    useAllDevicesWithUnassignedCollarIds,
     // mutations
     useSaveCodeHeader,
     useUploadCSV,

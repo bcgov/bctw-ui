@@ -95,12 +95,13 @@ export default function VendorAPIPage(): JSX.Element {
   const DevicesSelected = (make: DeviceMake): JSX.Element => {
     const selected = 'devices selected: ';
     const filtered = devices.filter(d => d.make === make);
+    console.log(devices)
     if (!filtered.length) {
       return <span>{make} {selected}none</span>;
     }
     return <span>{make} {selected}{filtered.map(d => d.ids.join(', ')).join()}</span>;
   }
-
+  
   const headers: (keyof Collar)[] = ['device_id', 'device_make', 'frequency', 'device_model', 'device_status'];
   return (
     <AuthLayout required_user_role={eUserRole.data_administrator}>
@@ -120,14 +121,14 @@ export default function VendorAPIPage(): JSX.Element {
         <DataTable<Collar>
           headers={headers}
           title='Lotek Devices'
-          queryProps={{ query: api.useAllDevices, param: { keys: 'device_make', term: 'lotek' } }}
+          queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'lotek' } }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
           isMultiSelect={true}
         />
         <DataTable<Collar>
           headers={headers}
           title='Vectronic Devices'
-          queryProps={{ query: api.useAllDevices, param: { keys: 'device_make', term: 'vectronic' } }}
+          queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'vectronic' } }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
           isMultiSelect={true}
         />

@@ -42,6 +42,17 @@ export const collarApi = (props: ApiProps): API => {
     return ret;
   };
 
+  /** fetches all devices with devices that have no associated collar_id
+   *  combines collar_v with unassigned_telemetry_v
+   *  used in Telemetry Retrieval
+  */
+  const getAllDevicesWithUnassignedCollarIds = async (page = 1, search?: ITableFilter[]): Promise<(Collar)[]> => {
+    const url = createUrl({ api: 'get-collars-and-deviceids', page, search });
+    const { data } = await api.get(url);
+    const ret = data.map((json: ICollar) => plainToClass(Collar, json));
+    return ret;
+  };
+
   // rerieve metadata changes made to a collar
   const getCollarHistory = async (collarId: string, page = 1): Promise<Collar[]> => {
     const url = createUrl({ api: `get-collar-history/${collarId}`, page });
@@ -69,6 +80,7 @@ export const collarApi = (props: ApiProps): API => {
   return {
     getAvailableCollars,
     getAssignedCollars,
+    getAllDevicesWithUnassignedCollarIds,
     getCollarHistory,
     triggerVendorTelemetryUpdate,
     upsertCollar,
