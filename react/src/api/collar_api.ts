@@ -73,8 +73,13 @@ export const collarApi = (props: ApiProps): API => {
   const triggerVendorTelemetryUpdate = async (body: FetchTelemetryInput[]): Promise<ResponseTelemetry> => {
     const { data } = await postJSON(api, createUrl({ api: triggerTelemetryFetch }), body);
     // eslint-disable-next-line no-console
-    console.log(`json received from manual vendor trigger`, data);
+    if (!data){
+      console.log(`No JSON received from manual vendor trigger...`)
+      return;
+    }
+    console.log(`Success! JSON received from manual vendor trigger`, data);
     return data;
+    
   };
 
   return {
