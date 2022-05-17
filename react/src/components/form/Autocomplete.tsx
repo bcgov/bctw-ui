@@ -21,7 +21,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
   const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit } = props;
   const [selected, setSelected] = useState<T[]>([]);
-
+  const [filteredData, setFilteredData] = useState<T[]>(data);
   useEffect(() => {
     setSelected([]);
   }, [triggerReset]);
@@ -46,8 +46,11 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       multiple
       style={{width}}
       limitTags={tagLimit ?? 3}
+      isOptionEqualToValue={(option, value) => (option.id === value.id)}
       // exclude selected values from the option list
-      options={data.filter(d => selected.findIndex(s => s.id === d.id) === -1)}
+      filterSelectedOptions={true}
+      //options={filteredData.filter(d => selected.findIndex(s => s.id === d.id) === -1)}
+      options={data}
       renderTags={(value: T[], getTagProps): JSX.Element[] => {
         return value
           .sort((a, b) => {
