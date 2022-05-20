@@ -1,4 +1,4 @@
-import {Grid, Theme, Typography} from '@mui/material';
+import {Grid, Stack, Theme, Typography} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import GovLinkBox from 'components/common/GovLinkBox';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -23,16 +23,26 @@ const Home = (): JSX.Element => {
       <Typography variant='h2' style={{ fontWeight: 'bold' }}>
         BC Telemetry Warehouse
       </Typography>
-      {/* TODO: Add 'HOME_HDR' to code table */}
       <Typography paragraph className={styles.callout} children={data ?? welcome} />
-      <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'>
-        <Grid item xl={2} lg={3} xs={12} md={4}>
-          <GovLinkBox title={resources.title} data={resources.data} />
+
+      {/* <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'> */}
+
+        {/* <Grid item xl={2} lg={3} xs={12} md={4}>
+          
         </Grid>
         <Grid item xl={2} lg={3} xs={12} md={4}>
-          <GovLinkBox title={support.title} data={support.data} />
+          
+        </Grid> */}
+        <Stack 
+          direction="column"
+          justifyContent="flex-start"
+          alignItems="flex-end"
+          spacing={2}>
+        <Grid item xl={2} lg={3} xs={12} md={4}>
+        <GovLinkBox title={resources.title} data={resources.data} />
+        <GovLinkBox title={support.title} data={support.data} />
         </Grid>
-      </Grid>
+        </Stack>
     </div>
   );
 };

@@ -29,8 +29,8 @@ export const codeApi = (props: ApiProps): API => {
   const getCodeLongDesc = async (codeName: string): Promise<string> => {
     const url = createUrl({api: 'get-code-long-desc', query: `codeName=${codeName}`});
     const {data} = await api.get(url);
-    const desc = data.rows[0].code_description_long
-    return desc;
+    
+    return data;
   }
   /**
    * fetches a list of code headers

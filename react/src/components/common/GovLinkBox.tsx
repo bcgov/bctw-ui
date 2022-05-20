@@ -3,7 +3,8 @@ import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme: Theme) => ({
   box: {
-    backgroundColor: '#f2f2f2'
+    backgroundColor: '#f2f2f2',
+    marginBottom: theme.spacing(2),
   },
   blueHeadingBar: {
     backgroundColor: theme.palette.primary.main,
