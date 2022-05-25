@@ -623,19 +623,29 @@ export default function MapPage(): JSX.Element {
 
   // todo: move this to separate component / wrapper
   // resizable state & handlers
-  const [bottomPanelHeight, setBottomPanelHeight] = useState<number>(400);
+  const [bottomPanelHeight, setBottomPanelHeight] = useState<number>(300);
+  const [bottomPanelPos, setBottomPanelPos] = useState<number>(null);
   const [dragging, setDragging] = useState(false);
+  
   // update the height of the bottom panel
   const onMove = (e: React.MouseEvent): void => {
+    
     if (dragging) {
-      const mpv = document.getElementById('map-view');
-      const offset = mpv.offsetHeight - e.clientY;
-      // 70 added to base to smooth out the initial 'jump' when drag started
-      setBottomPanelHeight(offset + 70);
+      const mbp = document.getElementById('map-bottom-panel');
+      const mv = document.getElementById('map-view');
+      const height = bottomPanelHeight + (bottomPanelPos - e.clientY);
+      if(height <= mv.offsetHeight && height >= 80){
+        mbp.style.height = `${height}px`;
+      }
     }
   };
   // when mouse is clicked on the 'drag' div id
-  const onDown = (): void => setDragging(true);
+  const onDown = (e: React.MouseEvent): void => {
+    const mbp = document.getElementById('map-bottom-panel');
+    setBottomPanelPos(e.clientY);
+    setBottomPanelHeight(mbp.offsetHeight);
+    setDragging(true);
+  }
   // consider the 'dragging' event finished when the mouse is released anywhere on the screen
   const onUp = (): void => {
     if (dragging) {
@@ -644,7 +654,7 @@ export default function MapPage(): JSX.Element {
   };
 
   return (
-    <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
+    <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove} >
       <MapFilters
         start={range.start}
         end={range.end}
@@ -670,7 +680,8 @@ export default function MapPage(): JSX.Element {
 
         <Paper square 
           style={{ height: bottomPanelHeight }}
-          className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}>
+          className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}
+          id={`map-bottom-panel`}>
           <div onMouseDown={onDown} id='drag'>
             <div id='drag-icon'>
               <Icon
