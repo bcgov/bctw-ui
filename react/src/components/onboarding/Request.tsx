@@ -7,6 +7,8 @@ import { eUserRole, IKeyCloakSessionInfo, KeyCloakDomainType } from 'types/user'
 import { IOnboardUser, OnboardUserRequest } from 'types/onboarding';
 import PhoneInput from 'components/form/PhoneInput';
 import { InboundObj } from 'types/form_types';
+import { formatAxiosError } from 'utils/errors';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
 
 type UserAccessRequestProps = { children?: ReactNode };
 /**
@@ -14,6 +16,9 @@ type UserAccessRequestProps = { children?: ReactNode };
  */
 
 const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element => {
+  const showNotif = useResponseDispatch();
+  const api = useTelemetryApi();
+
   const accessType = eUserRole.user;
   const [populationUnit, setPopulationUnit] = useState('');
   const [projectManager, setProjectManager] = useState('');
@@ -30,12 +35,13 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
 
   // create access request stub
   const onSuccess = (u: IOnboardUser): void => {
+    showNotif({ severity: 'success', message: `User onboarding request submitted`});
     console.log('UserOnboarding: Request: new user onboarding submission response', u);
   };
   const onError = (e): void => {
-    console.log('UserOnboarding: Request: error submitting new user onboarding', e);
+    showNotif({ severity: 'error', message: `${formatAxiosError(e)}` });
   };
-  const api = useTelemetryApi();
+  
   const { mutateAsync: saveMutation } = api.useSubmitOnboardingRequest({ onSuccess, onError });
 
   const email = keycloakUser?.email ?? 'email@address.com';
@@ -75,7 +81,8 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
     emailInfo.region = region;
     emailInfo.species = species;
     console.log(`UserOnboarding: Request: submitRequest: submitting onboarding request`, newUser);
-    await saveMutation(newUser);
+    await saveMutation(newUser)
+    
   };
 
   const textProps: Pick<StandardTextFieldProps, 'size'> & Pick<OutlinedTextFieldProps, 'variant'> = {
