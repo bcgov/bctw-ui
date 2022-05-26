@@ -1,4 +1,4 @@
-import {Grid, Stack, Theme, Typography} from '@mui/material';
+import { Grid, Stack, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import GovLinkBox from 'components/common/GovLinkBox';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -27,22 +27,18 @@ const Home = (): JSX.Element => {
 
       {/* <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'> */}
 
-        {/* <Grid item xl={2} lg={3} xs={12} md={4}>
+      {/* <Grid item xl={2} lg={3} xs={12} md={4}>
           
         </Grid>
         <Grid item xl={2} lg={3} xs={12} md={4}>
           
         </Grid> */}
-        <Stack 
-          direction="column"
-          justifyContent="flex-start"
-          alignItems="flex-end"
-          spacing={2}>
+      <Stack direction='column' justifyContent='flex-start' alignItems='flex-end' spacing={2}>
         <Grid item xl={2} lg={3} xs={12} md={4}>
-        <GovLinkBox title={resources.title} data={resources.data} />
-        <GovLinkBox title={support.title} data={support.data} />
+          <GovLinkBox title={resources.title} data={resources.data} />
+          <GovLinkBox title={support.title} data={support.data} />
         </Grid>
-        </Stack>
+      </Stack>
     </div>
   );
 };
