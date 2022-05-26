@@ -39,7 +39,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
     console.log('UserOnboarding: Request: new user onboarding submission response', u);
   };
   const onError = (e): void => {
-    showNotif({ severity: 'error', message: `Error submitting new user: ${formatAxiosError(e)}` });
+    showNotif({ severity: 'error', message: `${formatAxiosError(e)}` });
   };
   
   const { mutateAsync: saveMutation } = api.useSubmitOnboardingRequest({ onSuccess, onError });
