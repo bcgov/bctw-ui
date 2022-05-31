@@ -12,6 +12,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
   data: T[];
   width?: number;
   tagLimit?: number;
+  isMultiSearch?: boolean;
 };
 
 /**
@@ -19,9 +20,8 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
  * tag components when an option is selected
  */
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
-  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit } = props;
+  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch } = props;
   const [selected, setSelected] = useState<T[]>([]);
-  const [filteredData, setFilteredData] = useState<T[]>(data);
   useEffect(() => {
     setSelected([]);
   }, [triggerReset]);
@@ -33,14 +33,17 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
   }, [defaultValue])
 
   const handleChange = (value: T[]): void => {
-    setSelected(value);
-    changeHandler(value);
+    const len = value.length;
+    const lastElem = len > 0 ? [value[len-1]] : value;
+    const mutatedValue = isMultiSearch ? value : lastElem;
+    setSelected(mutatedValue);
+    changeHandler(mutatedValue);
   };
 
   return (
     <MUIAutocomplete
       value={selected}
-      disableCloseOnSelect={true}
+      disableCloseOnSelect={isMultiSearch}
       autoComplete
       size='small'
       multiple

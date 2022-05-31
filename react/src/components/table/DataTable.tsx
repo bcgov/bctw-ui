@@ -38,6 +38,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   deleted,
   paginate = true,
   isMultiSelect = false,
+  isMultiSearch = true,
   alreadySelected = []
 }: DataTableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
@@ -226,6 +227,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       title={title}
       onChangeFilter={handleFilter}
       filterableProperties={headers}
+      isMultiSearch={isMultiSearch}
       sibling={
       /**
        * hide pagination when total results are under @var rowsPerPage
@@ -233,12 +235,12 @@ export default function DataTable<T extends BCTWBase<T>>({
        * case the next page will load no new results
       */
         !isPaginate ||
-        isLoading ||
-        isFetching ||
+        // isLoading ||
+        // isFetching ||
         isError ||
         (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
             <PaginationActions
-              count={data.length}
+              count={!isFetching && data.length}
               page={page}
               rowsPerPage={rowsPerPage}
               onChangePage={handlePageChange}
@@ -260,7 +262,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   const perPage = (): T[] => {
     const results =
       filter && filter.term
-        ? fuzzySearchMutipleWords(values, filter.keys && filter.keys.length ? filter.keys : (headerProps as string[]), filter.term)
+        ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headerProps as string[]), filter.term)
         : values;
     const start = (rowsPerPage + page - rowsPerPage - 1) * rowsPerPage;
     const end = rowsPerPage * page - 1;

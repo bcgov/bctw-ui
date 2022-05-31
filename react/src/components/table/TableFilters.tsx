@@ -1,6 +1,6 @@
 import { Box, TextField } from '@mui/material';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -13,24 +13,25 @@ type TextFilterProps = {
   defaultFilter?: string;
   setGlobalFilter: (filter: string) => void;
   disabled?: boolean;
+  clearInput?: boolean;
 };
 
 /**
  * the text input search/filter component
  */
-function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter }: TextFilterProps): JSX.Element {
+function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter, clearInput }: TextFilterProps): JSX.Element {
   const [term, setTerm] = useState(defaultFilter);
   const debouncedTerm = useDebounce(term, 800);
-
   useDidMountEffect(() => {
     setGlobalFilter(debouncedTerm);
-  }, [debouncedTerm])
-
+  }, [debouncedTerm]);
+  useEffect(()=>{clearInput && setTerm('')},[clearInput]);
   return (
     <TextField
       className='table-filter-input'
       defaultValue={term}
       onChange={(v): void => setTerm(v.target.value)}
+      value={term}
       label={'Search'}
       placeholder={`${rowCount} records...`}
       disabled={disabled}
@@ -43,22 +44,24 @@ type TableFilterProps<T> = {
   rowCount: number;
   filterableProperties: (keyof T)[];
   onChangeFilter: (filter: ITableFilter) => void;
+  isMultiSearch?: boolean;
 };
 
 /**
  * the search component visible in table toolbars
  */
 function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
-  const { filterableProperties, onChangeFilter, rowCount } = props;
+  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch } = props;
   const [selectedOption, setSelectedOption] = useState<string[]>();
   const [searchStr, setSearchStr] = useState('');
-
+  const [clearText, setClearText] = useState(false);
   useDidMountEffect(() => {
     const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
   }, [searchStr, selectedOption]);
-
+  
   const handleSelect = (v: ISelectMultipleData[]): void => {
+    !isMultiSearch && setClearText(selectedOption?.length !== 0);
     const values = v.map((item) => item.value as keyof T);
     setSelectedOption(values as string[]);
   };
@@ -89,8 +92,9 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         changeHandler={handleSelect}
         tagLimit={1}
         width={300}
+        isMultiSearch={isMultiSearch}
       />
-      <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} />
+      <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} clearInput={clearText}/>
     </Box>
   );
 }

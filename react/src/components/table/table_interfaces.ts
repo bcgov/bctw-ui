@@ -63,6 +63,7 @@ type PlainTableProps<T> = {
 type DataTableProps<T> = PlainTableProps<T> & {
   customColumns?: ICustomTableColumn<T>[];
   isMultiSelect?: boolean;
+  isMultiSearch?: boolean;
   alreadySelected?: string[];
   paginate?: boolean;
   queryProps: ITableQueryProps<T>;

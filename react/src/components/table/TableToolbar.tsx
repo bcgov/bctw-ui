@@ -30,6 +30,7 @@ type TableToolbarProps<T> = {
   filterableProperties: (keyof T)[];
   onChangeFilter: (filter: ITableFilter) => void;
   sibling?: JSX.Element;
+  isMultiSearch?: boolean;
 };
 
 export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Element {

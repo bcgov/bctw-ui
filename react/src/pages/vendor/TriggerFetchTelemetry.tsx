@@ -124,6 +124,7 @@ export default function VendorAPIPage(): JSX.Element {
           queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'lotek' } }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
           isMultiSelect={true}
+          isMultiSearch={false}
         />
         <DataTable<Collar>
           headers={headers}
@@ -131,6 +132,7 @@ export default function VendorAPIPage(): JSX.Element {
           queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'vectronic' } }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
           isMultiSelect={true}
+          isMultiSearch={false}
         />
         <Box>
           <h4>
