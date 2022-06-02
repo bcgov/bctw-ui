@@ -69,7 +69,7 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
           {customHeaders
             ? customHeaders.map((header, idx): JSX.Element => {
               const Header = header(headerData, 0);
-              return <TableCell key={`add-h-${idx}`}>{Header}</TableCell>;
+              return <TableCell key={`add-h-${idx}`} >{Header}</TableCell>;
             })
             : null}
         </TableRow>

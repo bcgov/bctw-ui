@@ -1,19 +1,10 @@
-import { useMemo, useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Checkbox,
-  CircularProgress
-} from '@mui/material';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Table, TableBody, TableCell, TableRow, Checkbox, CircularProgress } from '@mui/material';
 import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import PaginationActions from 'components/table/TablePaginate';
-import { NotificationMessage } from 'components/common';
-import { formatAxiosError } from 'utils/errors';
 import { ICustomTableColumn, ITableFilter, DataTableProps, Order } from 'components/table/table_interfaces';
 import { AxiosError } from 'axios';
 import { UseQueryResult } from 'react-query';
@@ -21,6 +12,7 @@ import { BCTWBase } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { minHeight } from '@mui/system';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;
@@ -38,7 +30,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   deleted,
   paginate = true,
   isMultiSelect = false,
-  isMultiSearch = true,
+  isMultiSearch = false,
   alreadySelected = []
 }: DataTableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
@@ -51,7 +43,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState(1);
   const [rowIdentifier, setRowIdentifier] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const tableMounted = useRef(false);
   const isPaginate = paginate && !DISABLE_PAGINATION;
   /**
    * since data is updated when the page is changed, use the 'values'
@@ -74,18 +67,11 @@ export default function DataTable<T extends BCTWBase<T>>({
     if (deleted) {
       handleRowDeleted(deleted);
     }
-  }, [deleted])
+  }, [deleted]);
 
   // fetch the data from the props query
-  const {
-    isFetching,
-    isLoading,
-    isError,
-    error,
-    data,
-    isPreviousData,
-    isSuccess
-  }: UseQueryResult<T[], AxiosError> = query(page, param, filter);
+  const { isFetching, isLoading, isError, error, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> =
+    query(page, param, filter);
 
   useDidMountEffect(() => {
     if (isSuccess) {
@@ -112,13 +98,13 @@ export default function DataTable<T extends BCTWBase<T>>({
         }
       });
       setValues((o) => [...o, ...newV]);
-      setRowsPerPage(o => isPaginate ? o : data.length);
+      setRowsPerPage((o) => (isPaginate ? o : data.length));
     }
   }, [data]);
 
   const handleRowDeleted = (id: string): void => {
-    setValues(o => o.filter(f => String(f[rowIdentifier]) !== id))
-  }
+    setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
+  };
 
   const handleSort = (event: React.MouseEvent<unknown>, property: keyof T): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -132,7 +118,8 @@ export default function DataTable<T extends BCTWBase<T>>({
       const newIds = data.map((r) => r[rowIdentifier]);
       setSelected(newIds);
       if (handlerExists) {
-        onSelectMultiple(values.filter((d) => newIds.includes(d[rowIdentifier])));
+        const multi = values.filter((d) => newIds.includes(d[rowIdentifier]));
+        onSelectMultiple(multi);
       }
     } else {
       if (handlerExists) {
@@ -186,7 +173,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   };
 
   const isSelected = (id: string): boolean => {
-    return selected.indexOf(id) !== -1;
+    const checkIsSelected = selected.indexOf(id) !== -1;
+    return checkIsSelected;
   };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, page: number): void => {
@@ -204,21 +192,24 @@ export default function DataTable<T extends BCTWBase<T>>({
     setFilter(filter);
   };
 
-  const NoData = (): JSX.Element => (
-    <TableRow>
-      <TableCell>
-        {isFetching || isLoading ? (
-          <CircularProgress />
-        ) : isError ? (
-          <NotificationMessage severity='error' message={formatAxiosError(error)} />
-        ) : isSuccess && data.length === 0 ? (
-          <strong>No data available</strong>
-        ) : (
-          <strong>Loading...</strong>
-        )}
-      </TableCell>
-    </TableRow>
-  );
+  const NoData = (): JSX.Element => {
+    if (isLoading || isFetching)
+      return (
+        <TableRow>
+          <TableCell>
+            <CircularProgress />
+          </TableCell>
+        </TableRow>
+      );
+    const res: string = isSuccess && data.length === 0 ? 'No data available' : 'Loading...';
+    return (
+      <TableRow>
+        <TableCell>
+          <strong>{res}</strong>
+        </TableCell>
+      </TableRow>
+    );
+  };
 
   const Toolbar = (): JSX.Element => (
     <TableToolbar
@@ -229,23 +220,23 @@ export default function DataTable<T extends BCTWBase<T>>({
       filterableProperties={headers}
       isMultiSearch={isMultiSearch}
       sibling={
-      /**
-       * hide pagination when total results are under @var rowsPerPage
-       * possible that only 10 results are actually available, in which
-       * case the next page will load no new results
-      */
+        /**
+         * hide pagination when total results are under @var rowsPerPage
+         * possible that only 10 results are actually available, in which
+         * case the next page will load no new results
+         */
         !isPaginate ||
         // isLoading ||
         // isFetching ||
         isError ||
         (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
-            <PaginationActions
-              count={!isFetching && data.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onChangePage={handlePageChange}
-            />
-          )
+          <PaginationActions
+            count={!isFetching && data.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={handlePageChange}
+          />
+        )
       }
     />
   );
@@ -256,7 +247,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   // const customCols = customColumns.map((cc,idx) => {
   //   return (obj: T) => useMemo(() => cc.column(obj, idx), [obj]);
   // })
-   
+
   // called in the render function
   // determines which values to render, based on page and filters applied
   const perPage = (): T[] => {
@@ -267,7 +258,7 @@ export default function DataTable<T extends BCTWBase<T>>({
     const start = (rowsPerPage + page - rowsPerPage - 1) * rowsPerPage;
     const end = rowsPerPage * page - 1;
     // console.log(`slice start ${start}, slice end ${end}`);
-    return results.length > rowsPerPage ?  results.slice(start, end) : results;
+    return results.length > rowsPerPage ? results.slice(start, end) : results;
   };
 
   return (
@@ -288,10 +279,9 @@ export default function DataTable<T extends BCTWBase<T>>({
           />
         )}
         <TableBody>
-          {(values && values.length === 0) || isFetching || isLoading || isError
+          {(values && values.length === 0) || isLoading || isError
             ? NoData()
-            : stableSort(perPage(), getComparator(order, orderBy)).map(
-              (obj, prop: number) => {
+            : stableSort(perPage(), getComparator(order, orderBy)).map((obj, prop: number) => {
                 const isRowSelected = isSelected(obj[rowIdentifier]);
                 return (
                   <TableRow
@@ -324,12 +314,10 @@ export default function DataTable<T extends BCTWBase<T>>({
                     {customColumns.map((c: ICustomTableColumn<T>) => {
                       const Col = c.column(obj, prop);
                       return <TableCell key={`add-col-${prop}`}>{Col}</TableCell>;
-                    })
-                    }
+                    })}
                   </TableRow>
                 );
-              }
-            )}
+              })}
         </TableBody>
       </Table>
     </TableContainer>

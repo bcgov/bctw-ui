@@ -1,3 +1,5 @@
+import { BCTWBase } from "types/common_types";
+
 /**
  * types related to the TriggerFetchTelemetry page
  */
@@ -14,7 +16,14 @@ export type FetchTelemetryInput = {
 export type ResponseTelemetry = {
   device_id: number;
   records_found: number;
+  records_inserted: number;
   vendor: DeviceMake;
   error: string;
+}
+
+export type TelemetryResultCounts = {
+  found: number;
+  inserted: number;
+  errors: number;
 }
 

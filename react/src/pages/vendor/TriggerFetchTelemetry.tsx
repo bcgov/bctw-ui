@@ -11,7 +11,7 @@ import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { Button, List } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { formatDay } from 'utils/time';
-import { DeviceMake, FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
+import { DeviceMake, FetchTelemetryInput, ResponseTelemetry, TelemetryResultCounts } from 'types/events/vendor';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -28,7 +28,12 @@ export default function VendorAPIPage(): JSX.Element {
   const showAlert = useResponseDispatch();
   const startDate = isDev() ? dayjs().subtract(1, 'month') : dayjs().subtract(1, 'year');
   const [results, setResults] = useState<ResponseTelemetry[]>([]);
-
+  const DEFAULT_RESULTS: TelemetryResultCounts = {
+    found: 0,
+    inserted: 0,
+    errors: 0
+  }
+  const [resultCounts, setResultCounts] = useState<TelemetryResultCounts>(DEFAULT_RESULTS);
   const [showConfirmFetch, setShowConfirmFetch] = useState(false);
   const [start, setStart] = useState<Dayjs>(startDate);
   const [end, setEnd] = useState<Dayjs>(dayjs());
@@ -36,7 +41,7 @@ export default function VendorAPIPage(): JSX.Element {
 
   const [startTime, setStartTime] = useState<Dayjs | null>();
   const [endTime, setEndTime] = useState<Dayjs | null>();
-
+  
   const handleSelectRow = (rows: Collar[], make: DeviceMake): void => {
     const filteredOut = devices.filter((f) => f.make !== make);
     if (!rows.length) {
@@ -53,12 +58,19 @@ export default function VendorAPIPage(): JSX.Element {
   };
 
   const onError = (e: AxiosError): void => {
-    showAlert({ severity: 'error', message: formatAxiosError(e) });
+    showAlert({ severity: 'error', message: 'error' });
   };
 
   const onSuccess = (rows: ResponseTelemetry[]): void => {
+    const counts: TelemetryResultCounts = DEFAULT_RESULTS;
     setEndTime(dayjs());
     setResults(rows);
+    rows.forEach((row) =>{
+      counts.found += row.records_found;
+      counts.inserted += row.records_inserted;
+      counts.errors += (row.error === null ? 0 : 1)
+    });
+    setResultCounts(counts);
   };
 
   const { mutateAsync, status } = api.useTriggerVendorTelemetry({ onSuccess, onError });
@@ -124,7 +136,6 @@ export default function VendorAPIPage(): JSX.Element {
           queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'lotek' } }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
           isMultiSelect={true}
-          isMultiSearch={false}
         />
         <DataTable<Collar>
           headers={headers}
@@ -132,19 +143,21 @@ export default function VendorAPIPage(): JSX.Element {
           queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'vectronic' } }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
           isMultiSelect={true}
-          isMultiSearch={false}
         />
         <Box>
           <h4>
             Results {status === 'loading' ? '(In progress...)' : status === 'success' ? `(${getTimeElapsed()})` : null}
           </h4>
           {results.length ? (
-            <List values={results.map((l) => {
-              if (l.error) {
-                return `${l.vendor} device ${l.device_id} error: ${l.error}`;
-              }
-              return `${l.records_found} records found for ${l.vendor} device ${l.device_id}`;
-            })} />
+            <div>
+              <List values={results.map((l) => {
+                if (l.error) {
+                  return `${l.vendor} device ${l.device_id} error: ${l.error}`;
+                }
+                return `${l.vendor} Device: ${l.device_id} | ${l.records_found} records found | ${l.records_inserted ?? 0} inserted`;
+              })} />
+              <List values={[`Totals: Found: ${resultCounts.found} | Inserted: ${resultCounts.inserted} | Errors: ${resultCounts.errors}`]}/>
+            </div>
           ) : null}
         </Box>
 
