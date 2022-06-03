@@ -1,6 +1,6 @@
 import { Box, TextField } from '@mui/material';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -20,16 +20,17 @@ type TextFilterProps = {
  * the text input search/filter component
  */
 function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter, clearInput }: TextFilterProps): JSX.Element {
-  const [term, setTerm] = useState(defaultFilter);
+  const [term, setTerm] = useState(defaultFilter ?? '');
   const debouncedTerm = useDebounce(term, 800);
   useDidMountEffect(() => {
     setGlobalFilter(debouncedTerm);
   }, [debouncedTerm]);
   useEffect(()=>{clearInput && setTerm('')},[clearInput]);
+  const inputRef = useRef();
   return (
     <TextField
       className='table-filter-input'
-      defaultValue={term}
+      //defaultValue={term}
       onChange={(v): void => setTerm(v.target.value)}
       value={term}
       label={'Search'}
@@ -45,13 +46,14 @@ type TableFilterProps<T> = {
   filterableProperties: (keyof T)[];
   onChangeFilter: (filter: ITableFilter) => void;
   isMultiSearch?: boolean;
+  setPage: (page: number) => void;
 };
 
 /**
  * the search component visible in table toolbars
  */
 function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
-  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch } = props;
+  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch, setPage } = props;
   const [selectedOption, setSelectedOption] = useState<string[]>();
   const [searchStr, setSearchStr] = useState('');
   const [clearText, setClearText] = useState(false);
@@ -68,6 +70,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
 
   const handleTextChange = (value: string): void => {
     setSearchStr(value);
+    setPage(1);
   };
 
   // useMemo to minimize re-rendering

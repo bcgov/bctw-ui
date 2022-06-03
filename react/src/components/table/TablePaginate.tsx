@@ -7,10 +7,12 @@ interface TablePaginationActionsProps {
   page: number;
   rowsPerPage: number;
   onChangePage: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void;
+  totalPages: number;
 }
 
 export default function PaginationActions(props: TablePaginationActionsProps): JSX.Element {
-  const { count, page, rowsPerPage, onChangePage } = props;
+  const { count, rowsPerPage, onChangePage, totalPages } = props;
+  const { page } = props;
 
   const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     onChangePage(event, +1);
@@ -24,8 +26,11 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
     onChangePage(event, page + 1);
   };
 
+  const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+    onChangePage(event, totalPages);
+  }
   return (
-    </* div className={'paginate'} */>
+    <>
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 1}
@@ -38,7 +43,7 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         aria-label="previous page"
         size="large"><Icon icon='back'/></IconButton>
 
-      <span><strong>Page: {page}</strong></span>
+      <span><strong>{`Page: ${page} / ${totalPages}`}</strong></span>
 
       <IconButton
         onClick={handleNextButtonClick}
@@ -46,13 +51,7 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         disabled={count < rowsPerPage}
         aria-label="next page"
         size="large"><Icon icon='next'/></IconButton>
+    </>
 
-      {/* note: goto last page not shown */}
-      {/* <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      ><LastPageIcon /></IconButton> */}
-    </ /* div */>
   );
 }

@@ -26,7 +26,8 @@ import {
   mdiPageFirst,
   mdiTrashCanOutline,
   mdiChartTimelineVariant,
-  mdiMapMarker
+  mdiMapMarker,
+  mdiPageLast
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -49,6 +50,8 @@ const getIconPath = (path: string): string => {
       return mdiArrowLeft;
     case 'next':
       return mdiArrowRight;
+    case 'last':
+      return mdiPageLast;
     case 'close':
       return mdiClose;
     case 'copy':

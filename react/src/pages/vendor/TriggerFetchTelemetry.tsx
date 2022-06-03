@@ -24,7 +24,7 @@ import { eUserRole } from 'types/user';
  * the datatable only fetches unattached devices
  */
 export default function VendorAPIPage(): JSX.Element {
-  const api = useTelemetryApi();
+  const api = useTelemetryApi(); 
   const showAlert = useResponseDispatch();
   const startDate = isDev() ? dayjs().subtract(1, 'month') : dayjs().subtract(1, 'year');
   const [results, setResults] = useState<ResponseTelemetry[]>([]);
@@ -133,14 +133,14 @@ export default function VendorAPIPage(): JSX.Element {
         <DataTable<Collar>
           headers={headers}
           title='Lotek Devices'
-          queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'lotek' } }}
+          queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'lotek'} }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
           isMultiSelect={true}
         />
         <DataTable<Collar>
           headers={headers}
           title='Vectronic Devices'
-          queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'vectronic' } }}
+          queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'vectronic'} }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
           isMultiSelect={true}
         />

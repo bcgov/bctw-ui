@@ -36,15 +36,15 @@ export default function DataTable<T extends BCTWBase<T>>({
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
-
   const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRows, setTotalRows] = useState(0);
   const [rowIdentifier, setRowIdentifier] = useState('id');
   const [rowsPerPage, setRowsPerPage] = useState(100);
-  const tableMounted = useRef(false);
   const isPaginate = paginate && !DISABLE_PAGINATION;
   /**
    * since data is updated when the page is changed, use the 'values'
@@ -75,6 +75,20 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   useDidMountEffect(() => {
     if (isSuccess) {
+      //Only set total pages on inital load
+      const rowCount = data[0]?.row_count;
+      if(rowCount){
+
+        const getPageCount = rowCount ? Math.ceil(rowCount / rowsPerPage) : -1;
+        if(getPageCount !== totalPages && getPageCount !== -1) {
+          setTotalPages(getPageCount);
+        }
+        if(!totalRows){
+          setTotalRows(rowCount)
+        }
+      }
+      
+
       // update the row identifier
       const first = data && data.length && data[0];
       if (first && typeof first.identifier === 'string') {
@@ -213,12 +227,13 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   const Toolbar = (): JSX.Element => (
     <TableToolbar
-      rowCount={values.length}
+      rowCount={totalRows}
       numSelected={selected.length}
       title={title}
       onChangeFilter={handleFilter}
       filterableProperties={headers}
       isMultiSearch={isMultiSearch}
+      setPage={setPage}
       sibling={
         /**
          * hide pagination when total results are under @var rowsPerPage
@@ -235,6 +250,7 @@ export default function DataTable<T extends BCTWBase<T>>({
             page={page}
             rowsPerPage={rowsPerPage}
             onChangePage={handlePageChange}
+            totalPages={totalPages}
           />
         )
       }
@@ -259,6 +275,8 @@ export default function DataTable<T extends BCTWBase<T>>({
     const end = rowsPerPage * page - 1;
     // console.log(`slice start ${start}, slice end ${end}`);
     return results.length > rowsPerPage ? results.slice(start, end) : results;
+
+    
   };
 
   return (
@@ -279,9 +297,10 @@ export default function DataTable<T extends BCTWBase<T>>({
           />
         )}
         <TableBody>
-          {(values && values.length === 0) || isLoading || isError
-            ? NoData()
-            : stableSort(perPage(), getComparator(order, orderBy)).map((obj, prop: number) => {
+          {
+          // (values && values.length === 0) || isLoading || isError || isFetching && 
+              isSuccess &&
+              stableSort(perPage(), getComparator(order, orderBy)).map((obj, prop: number) => {
                 const isRowSelected = isSelected(obj[rowIdentifier]);
                 return (
                   <TableRow
