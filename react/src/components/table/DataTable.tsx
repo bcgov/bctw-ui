@@ -12,7 +12,7 @@ import { BCTWBase } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { minHeight } from '@mui/system';
+
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;
@@ -78,7 +78,6 @@ export default function DataTable<T extends BCTWBase<T>>({
       //Only set total pages on inital load
       const rowCount = data[0]?.row_count;
       if(rowCount){
-
         const getPageCount = rowCount ? Math.ceil(rowCount / rowsPerPage) : -1;
         if(getPageCount !== totalPages && getPageCount !== -1) {
           setTotalPages(getPageCount);
@@ -129,7 +128,9 @@ export default function DataTable<T extends BCTWBase<T>>({
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const handlerExists = typeof onSelectMultiple === 'function';
     if (event.target.checked && selected.length === 0) {
-      const newIds = data.map((r) => r[rowIdentifier]);
+      //const newIds = data.map((r) => r[rowIdentifier]);
+      //Select by the page not by initial data.
+      const newIds = perPage().map((r) =>r[rowIdentifier]);
       setSelected(newIds);
       if (handlerExists) {
         const multi = values.filter((d) => newIds.includes(d[rowIdentifier]));
