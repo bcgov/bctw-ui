@@ -27,9 +27,6 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     typeof headerData.formatPropAsHeader === 'function'
       ? headerData.formatPropAsHeader(cell)
       : columnToHeader(cell as string);
-  useEffect(()=>{
-    console.log(headerData);
-  }, [headerData])
   return (
     <MuiTableHead>
       {!headerData ? null : (
