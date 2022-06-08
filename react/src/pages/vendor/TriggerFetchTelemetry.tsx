@@ -42,6 +42,11 @@ export default function VendorAPIPage(): JSX.Element {
   const [startTime, setStartTime] = useState<Dayjs | null>();
   const [endTime, setEndTime] = useState<Dayjs | null>();
   
+  const handleFetchButton = () => {
+    setShowConfirmFetch((o) => !o);
+    setResults([]);
+  }
+
   const handleSelectRow = (rows: Collar[], make: DeviceMake): void => {
     const filteredOut = devices.filter((f) => f.make !== make);
     if (!rows.length) {
@@ -78,10 +83,10 @@ export default function VendorAPIPage(): JSX.Element {
   useDidMountEffect(() => {
     if (status === 'loading') {
       showAlert({ severity: 'info', message: 'Vendor telemetry fetch has begun. This could take a while...' });
-    } else if (status === 'success') {
+    } else if (status === 'success' && results) {
       showAlert({ severity: 'success', message: 'records were successfully fetched' });
     }
-  }, [status]);
+  }, [status, results]);
 
   const performFetchVendorTelemetry = (): void => {
     const body: FetchTelemetryInput[] = devices.map((d) => ({
@@ -124,7 +129,7 @@ export default function VendorAPIPage(): JSX.Element {
           <DateInput propName='tend' label={'End'} defaultValue={end} changeHandler={handleChangeDate} />
         </Box>
         <Box mb={2} display='flex' flexDirection='row' alignItems='center' columnGap={2}>
-          <Button disabled={!devices.length} onClick={(): void => setShowConfirmFetch((o) => !o)}>
+          <Button disabled={!devices.length} onClick={handleFetchButton}>
             Fetch Telemetry
           </Button>
           {DevicesSelected('Lotek')}

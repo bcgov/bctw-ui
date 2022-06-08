@@ -267,6 +267,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       return <CircularProgress />;
     }
     if (isSuccess && !data?.length) {
+      setTotalPages(1);
       return (
         <TableBody>
           <TableRow>
