@@ -44,6 +44,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [totalRows, setTotalRows] = useState(0);
   const [rowIdentifier, setRowIdentifier] = useState('id');
   const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [displayPagination, setDisplayPagination] = useState<boolean>(false);
   const isPaginate = paginate && !DISABLE_PAGINATION;
   /**
    * since data is updated when the page is changed, use the 'values'
@@ -80,6 +81,9 @@ export default function DataTable<T extends BCTWBase<T>>({
         const getPageCount = rowCount ? Math.ceil(rowCount / rowsPerPage) : -1;
         if (getPageCount !== totalPages && getPageCount !== -1) {
           setTotalPages(getPageCount);
+        }
+        if(!displayPagination){
+          setDisplayPagination(true);
         }
         if (!totalRows) {
           setTotalRows(rowCount);
@@ -219,8 +223,12 @@ export default function DataTable<T extends BCTWBase<T>>({
          * hide pagination when total results are under @var rowsPerPage
          * possible that only 10 results are actually available, in which
          * case the next page will load no new results
+         * 
+         * DEPRECIATED -> workflow was jarring / dissorientating as pagination was conditionally rendered
+         * 
          */
-        !isPaginate || isError || (isSuccess && data?.length < rowsPerPage && paginate && page === 1) ? null : (
+        // !isPaginate || isError || (isSuccess && data?.length < rowsPerPage && paginate && page === 1)
+        !isPaginate || isError || !displayPagination ? null : (
           <PaginationActions
             count={!isFetching && data.length}
             page={page}
