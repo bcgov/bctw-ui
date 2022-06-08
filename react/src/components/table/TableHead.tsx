@@ -3,6 +3,7 @@ import { createHeadCell } from 'components/table/table_helpers';
 import { BCTWBase } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { HeadCell, TableHeadProps } from 'components/table/table_interfaces';
+import { useEffect } from 'react';
 
 export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T>): JSX.Element {
   const {
@@ -26,7 +27,6 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     typeof headerData.formatPropAsHeader === 'function'
       ? headerData.formatPropAsHeader(cell)
       : columnToHeader(cell as string);
-
   return (
     <MuiTableHead>
       {!headerData ? null : (

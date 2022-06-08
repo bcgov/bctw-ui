@@ -23,10 +23,9 @@ function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter, clearI
   const [term, setTerm] = useState(defaultFilter ?? '');
   const debouncedTerm = useDebounce(term, 800);
   useDidMountEffect(() => {
-    setGlobalFilter(debouncedTerm);
+    setGlobalFilter(debouncedTerm.toLowerCase());
   }, [debouncedTerm]);
   useEffect(()=>{clearInput && setTerm('')},[clearInput]);
-  const inputRef = useRef();
   return (
     <TextField
       className='table-filter-input'
