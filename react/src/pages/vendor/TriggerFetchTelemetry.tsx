@@ -66,8 +66,8 @@ export default function VendorAPIPage(): JSX.Element {
     setEndTime(dayjs());
     setResults(rows);
     rows.forEach((row) =>{
-      counts.found += row.records_found;
-      counts.inserted += row.records_inserted;
+      counts.found += row.records_found ?? 0;
+      counts.inserted += row.records_inserted ?? 0;
       counts.errors += (!row.error ? 0 : 1);
     });
     setResultCounts(counts);
