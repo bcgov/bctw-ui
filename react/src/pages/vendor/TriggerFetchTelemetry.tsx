@@ -5,12 +5,12 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { Collar } from 'types/collar';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import DateInput from 'components/form/Date';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { Button, List } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
-import { formatDay } from 'utils/time';
+import { dateObjectToDateStr, formatDay } from 'utils/time';
 import { DeviceMake, FetchTelemetryInput, ResponseTelemetry, TelemetryResultCounts } from 'types/events/vendor';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
@@ -79,7 +79,6 @@ export default function VendorAPIPage(): JSX.Element {
   };
 
   const { mutateAsync, status } = api.useTriggerVendorTelemetry({ onSuccess, onError });
-  console.log(results);
   useDidMountEffect(() => {
     if (status === 'loading') {
       showAlert({ severity: 'info', message: 'Vendor telemetry fetch has begun. This could take a while...' });
@@ -151,19 +150,19 @@ export default function VendorAPIPage(): JSX.Element {
         />
         <Box>
           <h4>
-            Results {status === 'loading' ? '(In progress...)' : status === 'success' ? `(${getTimeElapsed()})` : null}
+            Results {status === 'loading' ? 'fetching...' : status === 'success' ? `(${getTimeElapsed()})` : null}
           </h4>
           {results.length ? (
             <div>
               <List values={results.map((l) => {
-                if (l.error) {
-                  return `${l.vendor} device ${l.device_id} error: ${l.error}`;
-                }
-                return `${l.vendor} Device: ${l.device_id} | ${l.records_found} records found | ${l.records_inserted ?? 0} inserted`;
+                  if (l.error) {
+                    return `${l.vendor} device ${l.device_id} error: ${l.error}`;
+                  }
+                  return `${l.vendor} Device: ${l.device_id} | ${l.records_found} records found | ${l.records_inserted ?? 0} inserted`;
               })} />
               <List values={[`Totals: Found: ${resultCounts.found} | Inserted: ${resultCounts.inserted} | Errors: ${resultCounts.errors}`]}/>
             </div>
-          ) : null}
+          ) : <List values={[`No telemetry found between ${start.format('D, MMM YYYY')} - ${end.format('D, MMM YYYY')}`]}/>}
         </Box>
 
         <ConfirmModal
