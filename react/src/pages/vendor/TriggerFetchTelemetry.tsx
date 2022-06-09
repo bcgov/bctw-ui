@@ -79,11 +79,11 @@ export default function VendorAPIPage(): JSX.Element {
   };
 
   const { mutateAsync, status } = api.useTriggerVendorTelemetry({ onSuccess, onError });
-
+  console.log(results);
   useDidMountEffect(() => {
     if (status === 'loading') {
       showAlert({ severity: 'info', message: 'Vendor telemetry fetch has begun. This could take a while...' });
-    } else if (status === 'success' && results) {
+    } else if (status === 'success' && results?.length > 0) {
       showAlert({ severity: 'success', message: 'records were successfully fetched' });
     }
   }, [status, results]);
