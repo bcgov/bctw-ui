@@ -39,9 +39,11 @@ export default function OnboardingAdminPage(): JSX.Element {
   const { mutateAsync: saveMutation } = api.useHandleOnboardingRequest({ onSuccess: onSuccess, onError });
 
   const grantOrDenyRequest = async (): Promise<void> => {
-    const { onboarding_id, role_type } = request;
+    const { onboarding_id, role_type, email, firstname } = request;
     const body: HandleOnboardInput = {
+      firstname,
       onboarding_id,
+      email,
       role_type,
       access: isGranting ? 'granted' : 'denied'
     };
