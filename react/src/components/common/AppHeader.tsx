@@ -73,6 +73,10 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
             <li>
               <a href='/manage' color={'inherit'}>Manage</a>
             </li>
+            <li style={{marginRight: 5}}>
+              <a href='/summary' color={'inherit'}>Summary</a>
+            </li>
+            <div className={'Beta-PhaseBanner'}>New</div>
           </ul>
         </nav>
         <nav id={'request-access-top-nav'} className={'app-nav'} style={requestAccessTopNavStyle}>

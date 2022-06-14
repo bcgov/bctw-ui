@@ -8,6 +8,7 @@ import MapPage from 'pages/map/MapPage';
 import OwnerRequestPermission from 'pages/permissions/OwnerRequestPermission';
 import UserAdminPage from 'pages/admin/UserAdmin';
 import UserOnboarding from 'pages/onboarding/UserOnboarding'
+import SummaryPage from 'pages/summary/SummaryPage';
 import UserProfile from 'pages/user/UserProfile';
 import { FunctionComponent } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
@@ -27,6 +28,7 @@ export type RouteKey = {
 const AppRoutes: RouteKey[] = [
   { name: 'home', path: '/home', title: 'Home', component: Home, sort: 0, icon: 'home' },
   { name: 'map', path: '/map', title: 'Map', component: MapPage, sort: 1 },
+  { name: 'summary', path: '/summary', title: 'Map', component: SummaryPage, sort: 1 },
   { name: 'animals', path: '/animals', title: 'My Animals', component: CritterPage, sort: 10, icon: 'animals' },
   { name: 'devices', path: '/devices', title: 'My Devices', component: CollarPage, sort: 11, icon: 'devices' },
   { name: 'profile', path: '/profile', title: 'My Profile', component: UserProfile, sort: 12, icon: 'profile' },
