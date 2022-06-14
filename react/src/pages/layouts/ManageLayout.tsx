@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import SideBar from 'components/sidebar/SideBar';
 import { AttachmentChangedProvider } from 'contexts/DeviceAttachmentChangedContext';
 
-const useStyles = makeStyles(() => ({
+export const manageLayoutStyles = makeStyles((height?: number) => ({
   manageLayoutSidebar: {
     flexBasis: '10rem'
   },
@@ -28,7 +28,7 @@ type IDefaultLayoutProps = {
   so child components can listen to device attachment events
 **/
 export default function ManageLayout({ children }: IDefaultLayoutProps): JSX.Element {
-  const classes = useStyles();
+  const classes = manageLayoutStyles();
 
   return (
     <AttachmentChangedProvider>
