@@ -10,8 +10,6 @@ const IS_PROD = +window.location.port === 1111 ? false : true;
 if(!IS_PROD) {
   dotenv.config();
 }
-
-console.log(process.env.REACT_APP_IDENTIFIER)
 /**
  * @param noApiPrefix if true, exclude '/api' beginning of the base url
  */

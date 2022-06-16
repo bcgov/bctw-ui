@@ -71,7 +71,6 @@ export const userApi = (props: ApiProps): API => {
     const url = createUrl({ api: 'get-user' });
     const { data } = await api.get(url);
     const user = plainToClass(User, data);
-    console.log(user);
     // console.log('fetched user info', user);
     return user;
   };
