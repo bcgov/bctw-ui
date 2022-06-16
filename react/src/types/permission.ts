@@ -33,13 +33,13 @@ const filterOutNonePermissions: eCritterPermission[] = [
   eCritterPermission.observer,
 ];
 
-// an owner can delegate these animal permissions to other users
-const ownerPermissionOptions: eCritterPermission[] = [eCritterPermission.editor, eCritterPermission.observer];
+// an manager can delegate these animal permissions to other users
+const managerPermissionOptions: eCritterPermission[] = [eCritterPermission.editor, eCritterPermission.observer];
 // standard for what an admin should see - includes 'none'
 const adminPermissionOptions: eCritterPermission[] = [...filterOutNonePermissions, eCritterPermission.none];
 
 /**
- * the type that an 'owner' will submit a request for other
+ * the type that an 'manager' will submit a request for other
  * users to receive animal permissions
 */
 export interface IPermissionRequestInput {
@@ -58,7 +58,7 @@ export class PermissionRequestInput implements IPermissionRequestInput {
 /**
  * interface that represents:
  * a) what an admin sees in the requests page - from the API schema view permission_request_v
- * b) what an owner sees in the request history table (some fields)
+ * b) what an manager sees in the request history table (some fields)
 */
 export interface IPermissionRequest extends 
   Pick<Animal, 'animal_id' | 'wlh_id' | 'species'>, Pick<BCTWValidDates, 'valid_to'> {
@@ -108,7 +108,7 @@ export class PermissionRequest implements IPermissionRequest, BCTWBase<Permissio
   /**
    * headers displayed in the delegation history table
    */
-  static get ownerHistoryPropsToDisplay(): (keyof PermissionRequest)[] {
+  static get managerHistoryPropsToDisplay(): (keyof PermissionRequest)[] {
     return [ 'wlh_id', 'animal_id', 'species', 'requested_date',
       'requested_for_name', 'requested_for_email',
       'permission_type', 'status', 'was_denied_reason' ];
@@ -161,7 +161,7 @@ const canRemoveDeviceFromAnimal = (p: eCritterPermission): boolean => {
 
 export {
   adminPermissionOptions,
-  ownerPermissionOptions,
+  managerPermissionOptions,
   permissionCanModify,
   canRemoveDeviceFromAnimal,
   filterOutNonePermissions,

@@ -52,15 +52,15 @@ export interface IUser extends UserBaseType {
   id: number;
   idir: string;
   bceid: string;
-  // indicates if the user is considered the owner of at least one animal
-  is_owner?: boolean;
+  // indicates if the user is considered the manager of at least one animal
+  is_manager?: boolean;
 }
 
 /** 
  * the main user class representing a row in the bctw.user table 
  */
 export class User extends UserBase implements BCTWBase<User>, IUser {
-  is_owner: boolean;
+  is_manager: boolean;
   id: number;
   idir: string;
   bceid: string;
@@ -70,7 +70,7 @@ export class User extends UserBase implements BCTWBase<User>, IUser {
   }
 
   get displayProps(): (keyof User)[] {
-    const props: (keyof User)[] = ['username', 'email', 'idir', 'bceid', 'role_type', 'is_owner'];
+    const props: (keyof User)[] = ['username', 'email', 'idir', 'bceid', 'role_type', 'is_manager'];
     if (isDev()) {
       props.unshift('id');
     }

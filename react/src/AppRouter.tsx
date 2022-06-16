@@ -5,7 +5,7 @@ import GrantCritterAccessPage from 'pages/permissions/GrantCritterAccessPage';
 import Home from 'pages/Home';
 import Import from 'pages/data/bulk/Import';
 import MapPage from 'pages/map/MapPage';
-import OwnerRequestPermission from 'pages/permissions/OwnerRequestPermission';
+import ManagerRequestPermission from 'pages/permissions/ManagerRequestPermission';
 import UserAdminPage from 'pages/admin/UserAdmin';
 import UserOnboarding from 'pages/onboarding/UserOnboarding'
 import SummaryPage from 'pages/summary/SummaryPage';
@@ -32,7 +32,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'animals', path: '/animals', title: 'My Animals', component: CritterPage, sort: 10, icon: 'animals' },
   { name: 'devices', path: '/devices', title: 'My Devices', component: CollarPage, sort: 11, icon: 'devices' },
   { name: 'profile', path: '/profile', title: 'My Profile', component: UserProfile, sort: 12, icon: 'profile' },
-  { name: 'delegation', path: '/delegation', title: 'Delegation', component: OwnerRequestPermission, sort: 13, icon: 'share' },
+  { name: 'delegation', path: '/delegation', title: 'Delegation', component: ManagerRequestPermission, sort: 13, icon: 'share' },
   { name: 'import', path: '/import', title: 'Data Import', component: Import, sort: 14, icon: 'arrow-up' },
   { name: 'delegation-requests', path: '/delegation-requests', title: 'Delegation Requests', component: AdminHandleRequestPermissionPage, sort: 100, icon: 'edit' },
   { name: 'users', path: '/users', title: 'BCTW Users', component: UserAdminPage, sort: 101, icon: 'admin' },

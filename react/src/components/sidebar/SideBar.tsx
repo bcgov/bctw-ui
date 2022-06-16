@@ -14,7 +14,7 @@ type SideBarProps = {
 export default function SideBar({ routes }: SideBarProps): JSX.Element {
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
+  const [isCritterManager, setIsCritterManager] = useState(false);
   const [isDataAdmin, setIsDataAdmin] = useState(false);
   const [visibleRoutes, setVisibleRoutes] = useState<RouteKey[]>(routes);
   const useUser = useContext(UserContext);
@@ -25,7 +25,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       const { user } = useUser;
       if (user) {
         setIsAdmin(user.role_type === eUserRole.administrator);
-        setIsOwner(user.is_owner);
+        setIsCritterManager(user.is_manager);
         setIsDataAdmin(user.role_type === eUserRole.data_administrator)
       }
     };
@@ -38,7 +38,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       const adminRoutes = ['import', 'animal-manager', 'delegation-requests', 'onboarding-admin', 'users', 'vendor'];
       curRoutes.push(...routes.filter((r) => adminRoutes.includes(r.name)));
     }
-    if (isOwner) {
+    if (isCritterManager) {
       curRoutes.push(...routes.filter((r) => ['delegation'].includes(r.name)));
     }
     if (isDataAdmin) {
@@ -60,7 +60,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       case '/profile':
     }
     handleSetVisible(['animals', 'devices', 'profile']);
-  }, [location, isAdmin, isOwner, isDataAdmin]); // only fire when these states change
+  }, [location, isAdmin, isCritterManager, isDataAdmin]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (

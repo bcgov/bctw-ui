@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { IconButton, Typography } from '@mui/material';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import OwnerLayout from 'pages/layouts/OwnerLayout';
-import { eCritterPermission, IPermissionRequestInput, IUserCritterPermissionInput, ownerPermissionOptions, PermissionRequest, PermissionRequestInput } from 'types/permission';
+import ManagerLayout from 'pages/layouts/ManagerLayout';
+import { eCritterPermission, IPermissionRequestInput, IUserCritterPermissionInput, managerPermissionOptions, PermissionRequest, PermissionRequestInput } from 'types/permission';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import TextField from 'components/form/TextInput';
 import EditTable, { EditTableRowAction } from 'components/table/EditTable';
@@ -16,9 +16,9 @@ import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access'
 import { AnimalDelegationSteps } from 'constants/strings';
 
 /**
- * Page that allows an owner to submit a request to grant other users animal permissions 
+ * Page that allows an manager to submit a request to grant other users animal permissions 
 */
-export default function OwnerRequestPermission(): JSX.Element {
+export default function ManagerRequestPermission(): JSX.Element {
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
 
@@ -187,7 +187,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   const canSubmitRequest = (): boolean => {
     const access = permission?.access ?? [];
     access.forEach((a: IUserCritterAccessInput) => {
-      if (!ownerPermissionOptions.includes(a.permission_type)) {
+      if (!managerPermissionOptions.includes(a.permission_type)) {
         return false;
       }
     })
@@ -195,7 +195,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   }
 
   return (
-    <OwnerLayout>
+    <ManagerLayout>
       <div className='container'>
         <h1>Delegation</h1>
         <Typography variant='body1' component='p'>Submit a new animal permission request for another user</Typography>
@@ -239,10 +239,10 @@ export default function OwnerRequestPermission(): JSX.Element {
         }
         <DataTable
           title={'Submitted Permission History'}
-          headers={PermissionRequest.ownerHistoryPropsToDisplay}
+          headers={PermissionRequest.managerHistoryPropsToDisplay}
           queryProps={{ query: api.usePermissionHistory}}
         />
       </div>
-    </OwnerLayout>
+    </ManagerLayout>
   );
 }

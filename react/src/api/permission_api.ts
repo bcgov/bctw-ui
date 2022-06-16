@@ -81,7 +81,7 @@ export const permissionApi = (props: ApiProps): API => {
   }
 
   /**
-   * an owner endpoint for viewing successful permission requests that were granted.
+   * an manager endpoint for viewing successful permission requests that were granted.
    * @returns {PermissionRequest[]}, which queries the API schemas user_animal_assignment_v view. 
    * Note: some fields will not be present ex. request_id 
   */
@@ -92,7 +92,7 @@ export const permissionApi = (props: ApiProps): API => {
   }
 
   /**
-   * an endpoint for an owner to submit a permission request to grant one or more email addresses access
+   * an endpoint for an manager to submit a permission request to grant one or more email addresses access
    * to a list of animals
   */
   const submitPermissionRequest = async (body: IPermissionRequestInput): Promise<IPermissionRequest> => {
@@ -103,7 +103,7 @@ export const permissionApi = (props: ApiProps): API => {
   }
 
   /** 
-   * an endpoint that an admin uses to grant or deny an owner's permission request
+   * an endpoint that an admin uses to grant or deny an manager's permission request
    * currently now edit functionality exists
   */
   const takeActionOnPermissionRequest = async (body: IExecutePermissionRequest): Promise<IUserCritterAccess> => {

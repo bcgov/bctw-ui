@@ -24,7 +24,7 @@ import { isDev } from 'api/api_helpers';
 import { eUserRole } from 'types/user';
 
 /**
- * page that an admin uses to grant or deny permission requests from owners
+ * page that an admin uses to grant or deny permission requests from managers
  */
 export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const api = useTelemetryApi();

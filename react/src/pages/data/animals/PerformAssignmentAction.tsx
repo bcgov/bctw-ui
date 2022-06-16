@@ -50,7 +50,7 @@ export default function PerformAssignmentAction({
   );
 
   /**
-   * users with admin/owner permission can attach/unattach devices
+   * users with admin/critter 'manager' permission can attach/unattach devices
    * users with editor permission can only unattach devices
    */
   const determineButtonState = (): boolean => {
