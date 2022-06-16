@@ -5,7 +5,7 @@ import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useContext, useEffect, useState } from 'react';
-import { adminPermissionOptions, eCritterPermission, IUserCritterPermissionInput, ownerPermissionOptions } from 'types/permission';
+import { adminPermissionOptions, eCritterPermission, IUserCritterPermissionInput, managerPermissionOptions } from 'types/permission';
 import { User } from 'types/user';
 import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -58,7 +58,7 @@ export default function PickCritterPermissionModal({
   const [access, setAccess] = useState<Record<string, SelectedUserCritterAccessInput>>({});
   /**
    * the options to show in the select dropdown when @param showSelectPermission is true.
-   * depends on the user role - admin vs owner
+   * depends on the user role - admin vs critter manager
    */
   const [permissionsAccessible, setPermissionsAccessible] = useState<eCritterPermission[]>([]);
 
@@ -66,7 +66,7 @@ export default function PickCritterPermissionModal({
   useEffect(() => {
     const u = !userToLoad && useUser.user ? useUser.user : userToLoad;
     setUser(u);
-    setPermissionsAccessible(useUser?.user?.is_admin ? adminPermissionOptions : ownerPermissionOptions);
+    setPermissionsAccessible(useUser?.user?.is_admin ? adminPermissionOptions : managerPermissionOptions);
   }, [userToLoad, useUser]);
 
   // when the selected state changes, update the save button's disabled state

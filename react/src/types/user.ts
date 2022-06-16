@@ -52,7 +52,7 @@ export interface IUser extends UserBaseType {
   id: number;
   idir: string;
   bceid: string;
-  // indicates if the user is considered the owner of at least one animal
+  // indicates if the user is considered the manager of at least one animal
   is_manager?: boolean;
 }
 

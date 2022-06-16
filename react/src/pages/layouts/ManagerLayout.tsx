@@ -8,7 +8,7 @@ type IDefaultLayoutProps = {
 };
 
 /**
- * wrap this component around child components that requires the user to be considered an owner
+ * wrap this component around child components that requires the user to be considered an critter manager
  * of an animal or collar
  * ex. @file GrantCritterAccessPage.tsx
  */
@@ -20,7 +20,6 @@ export default function ManagerLayout({ children }: IDefaultLayoutProps): JSX.El
     const updateComponent = (): void => {
       const { user } = userChanges;
       if (user && !user?.is_manager) {
-        // console.log('no owner access, rerouting to home')
         history.push('/home');
       }
     };
