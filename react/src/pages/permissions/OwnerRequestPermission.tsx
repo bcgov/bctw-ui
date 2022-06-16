@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { IconButton, Typography } from '@mui/material';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import OwnerLayout from 'pages/layouts/OwnerLayout';
+import ManagerLayout from 'pages/layouts/ManagerLayout';
 import { eCritterPermission, IPermissionRequestInput, IUserCritterPermissionInput, ownerPermissionOptions, PermissionRequest, PermissionRequestInput } from 'types/permission';
 import PickCritterPermissionModal from './PickCritterPermissionModal';
 import TextField from 'components/form/TextInput';
@@ -195,7 +195,7 @@ export default function OwnerRequestPermission(): JSX.Element {
   }
 
   return (
-    <OwnerLayout>
+    <ManagerLayout>
       <div className='container'>
         <h1>Delegation</h1>
         <Typography variant='body1' component='p'>Submit a new animal permission request for another user</Typography>
@@ -243,6 +243,6 @@ export default function OwnerRequestPermission(): JSX.Element {
           queryProps={{ query: api.usePermissionHistory}}
         />
       </div>
-    </OwnerLayout>
+    </ManagerLayout>
   );
 }

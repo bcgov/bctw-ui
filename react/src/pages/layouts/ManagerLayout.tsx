@@ -12,14 +12,14 @@ type IDefaultLayoutProps = {
  * of an animal or collar
  * ex. @file GrantCritterAccessPage.tsx
  */
-export default function OwnerLayout({ children }: IDefaultLayoutProps): JSX.Element {
+export default function ManagerLayout({ children }: IDefaultLayoutProps): JSX.Element {
   const history = useHistory();
   const userChanges = useContext(UserContext);
 
   useEffect(() => {
     const updateComponent = (): void => {
       const { user } = userChanges;
-      if (user && !user?.is_owner) {
+      if (user && !user?.is_manager) {
         // console.log('no owner access, rerouting to home')
         history.push('/home');
       }
