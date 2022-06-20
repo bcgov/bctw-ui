@@ -27,7 +27,8 @@ import {
   mdiTrashCanOutline,
   mdiChartTimelineVariant,
   mdiMapMarker,
-  mdiPageLast
+  mdiPageLast,
+  mdiDatabase
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -99,6 +100,8 @@ const getIconPath = (path: string): string => {
       return mdiChartTimelineVariant;
     case 'warning':
       return mdiAlert;
+    case 'database':
+      return mdiDatabase;
   }
 };
 

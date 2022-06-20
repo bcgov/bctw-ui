@@ -12,7 +12,7 @@ const formatLatLong = (lat: number, long: number): string => {
 };
 
 //Capitalizes the first letter of a word
-const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)
+const capitalize = (s: string):string => s && s[0].toUpperCase() + s.slice(1)
 
 // formats UTM nicely
 const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;

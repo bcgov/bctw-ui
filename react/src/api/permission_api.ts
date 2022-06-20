@@ -51,7 +51,6 @@ export const permissionApi = (props: ApiProps): API => {
     page: number,
     user: User,
     filter: eCritterPermission[] = filterOutNonePermissions,
-    search?: ITableFilter
   ): Promise<UserCritterAccess[]> => {
     if (!user?.username) {
       // eslint-disable-next-line no-console

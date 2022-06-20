@@ -1,4 +1,3 @@
-import { isDev } from 'api/api_helpers';
 import { AxiosError } from 'axios';
 
 /**
