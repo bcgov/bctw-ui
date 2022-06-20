@@ -8,7 +8,7 @@ export default function SummaryPage(): JSX.Element {
     { name: 'Wolves',       id: 9,    icon: 'animals' },
     { name: 'Moose',        id: 8,    icon: 'animals' },
     { name: 'Bears',        id: null, icon: 'animals' },
-    { name: 'Data Quality', id: null, icon: 'database'}
+    { name: 'Data Quality', id: 10,   icon: 'database'}
   ]
   return <MetabaseDashboard dashboardItems={dashboards} lineBreaks={[4]}/>
 }
