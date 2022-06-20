@@ -43,8 +43,9 @@ export default function VendorAPIPage(): JSX.Element {
   const [endTime, setEndTime] = useState<Dayjs | null>();
   
   const handleFetchButton = () => {
-    setShowConfirmFetch((o) => !o);
     setResults([]);
+    setShowConfirmFetch((o) => !o);
+    
   }
 
   const handleSelectRow = (rows: Collar[], make: DeviceMake): void => {
@@ -63,7 +64,7 @@ export default function VendorAPIPage(): JSX.Element {
   };
 
   const onError = (e: AxiosError): void => {
-    showAlert({ severity: 'error', message: 'error' });
+    showAlert({ severity: 'error', message: formatAxiosError(e) });
   };
 
   const onSuccess = (rows: ResponseTelemetry[]): void => {
@@ -152,17 +153,14 @@ export default function VendorAPIPage(): JSX.Element {
           <h4>
             Results {status === 'loading' ? 'fetching...' : status === 'success' ? `(${getTimeElapsed()})` : null}
           </h4>
-          {results.length ? (
-            <div>
               <List values={results.map((l) => {
-                  if (l.error) {
-                    return `${l.vendor} device ${l.device_id} error: ${l.error}`;
-                  }
-                  return `${l.vendor} Device: ${l.device_id} | ${l.records_found} records found | ${l.records_inserted ?? 0} inserted`;
-              })} />
-              <List values={[`Totals: Found: ${resultCounts.found} | Inserted: ${resultCounts.inserted} | Errors: ${resultCounts.errors}`]}/>
-            </div>
-          ) : <List values={[`No telemetry found between ${start.format('D, MMM YYYY')} - ${end.format('D, MMM YYYY')}`]}/>}
+                  if (l.error) return `${l.vendor} device ${l.device_id} error: ${l.error}`
+                  return `${l.vendor} Device: ${l.device_id} | ${l.records_found} records found | ${l.records_inserted ?? 0} inserted`})} />
+                  {status === 'success' && (
+                    results?.length 
+                    ? <List values={[`Totals: Found: ${resultCounts.found} | Inserted: ${resultCounts.inserted} | Errors: ${resultCounts.errors}`]}/>
+                    : <List values={[`No telemetry found between ${start.format('D, MMM YYYY')} - ${end.format('D, MMM YYYY')}`]}/>
+                  )}
         </Box>
 
         <ConfirmModal

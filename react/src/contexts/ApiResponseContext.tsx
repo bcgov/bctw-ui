@@ -15,19 +15,19 @@ const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => 
 
   const clearNotif = (): void => dispatch(null);
   const notifDisplayTime = 8000;
-
   // automatically clear the notification after timer elapsed
   // or if the message is blank
   useEffect(() => {
     const timeout = (): void => {
-      if(state?.message == ' ' || state?.message == ''){
-        clearNotif();
+      if(!state){
         return;
       }
       if (state?.message) {
         setTimeout(clearNotif, notifDisplayTime);
-      }else{
+        return;
+      } else {
         clearNotif();
+        return;
       }
 
     };
