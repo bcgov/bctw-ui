@@ -1,6 +1,6 @@
 import { Box, TextField } from '@mui/material';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';

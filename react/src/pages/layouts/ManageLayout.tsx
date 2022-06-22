@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import SideBar from 'components/sidebar/SideBar';
 import { AttachmentChangedProvider } from 'contexts/DeviceAttachmentChangedContext';
 
-export const manageLayoutStyles = makeStyles((height?: number) => ({
+export const manageLayoutStyles = makeStyles(() => ({
   manageLayoutSidebar: {
     flexBasis: '10rem'
   },

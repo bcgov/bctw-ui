@@ -49,7 +49,7 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       multiple
       style={{width}}
       limitTags={tagLimit ?? 3}
-      isOptionEqualToValue={(option, value) => (option.id === value.id)}
+      isOptionEqualToValue={(option, value):boolean => (option.id === value.id)}
       // exclude selected values from the option list
       filterSelectedOptions={true}
       //options={filteredData.filter(d => selected.findIndex(s => s.id === d.id) === -1)}

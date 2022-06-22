@@ -76,7 +76,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
         open={showAlerts}
         disableBackdropClick={mustUpdateAlert}
         handleClose={mustUpdateAlert ? doNothing : (): void => setShowAlerts(false)}
-        >
+      >
         <UserAlert />
       </Modal>
       {children}

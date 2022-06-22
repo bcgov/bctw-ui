@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import jwt from 'jsonwebtoken';
 
 interface IDashboardUrl {

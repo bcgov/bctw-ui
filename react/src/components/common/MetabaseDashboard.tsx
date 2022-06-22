@@ -31,7 +31,7 @@ export default function MetabaseDashboard({ dashboardItems, lineBreaks }: Dashbo
                 className='side-bar-item'
                 button
                 disabled={item.id === null}
-                onClick={() => setDashboardKey(item.id)}
+                onClick={():void => setDashboardKey(item.id)}
                 id={item.name}>
                 <ListItemIcon>
                   <Icon icon={item.icon} />
@@ -45,7 +45,7 @@ export default function MetabaseDashboard({ dashboardItems, lineBreaks }: Dashbo
       </Box>
       <Box py={3} px={4} className={classes.manageLayoutContent}>
         {/* <iframe src={url} scrolling='no' id='iframe' allow='fullscreen' frameBorder={0} style={{minWidth: '100%', minHeight:'100%'}}></iframe> */}
-        <IframeResizer  src={url} frameBorder={0} style={{ minWidth: '100%'}} onInit={()=>setIsLoading(false)}/>
+        <IframeResizer  src={url} frameBorder={0} style={{ minWidth: '100%'}} onInit={():void => setIsLoading(false)}/>
         {isLoading && <CircularProgress/>}
       </Box>
     </>

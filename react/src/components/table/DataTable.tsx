@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableRow, Checkbox, CircularProgress } from '@mui/material';
 import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
@@ -70,7 +70,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   }, [deleted]);
 
   // fetch the data from the props query
-  const { isFetching, isLoading, isError, error, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> =
+  const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> =
     query(page, param, filter);
 
   useDidMountEffect(() => {

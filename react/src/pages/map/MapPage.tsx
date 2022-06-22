@@ -30,8 +30,7 @@ import {
   ITelemetryPoint,
   ITelemetryLine,
   MapRange,
-  OnlySelectedCritters,
-  IUnassignedTelemetryLine
+  OnlySelectedCritters
 } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { BCTWType } from 'types/common_types';
