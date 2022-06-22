@@ -5,7 +5,6 @@ import { API, IBulkUploadResults, ApiProps } from 'api/api_interfaces';
 import { eCritterPermission, filterOutNonePermissions, IExecutePermissionRequest, IPermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 import { useQueryClient } from 'react-query';
-import { ITableFilter } from 'components/table/table_interfaces';
 
 // what the API returns after saving user/animal permissions
 export interface IGrantCritterAccessResults {

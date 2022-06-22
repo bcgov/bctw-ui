@@ -5,12 +5,12 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { Collar } from 'types/collar';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
 import DateInput from 'components/form/Date';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { Button, List } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
-import { dateObjectToDateStr, formatDay } from 'utils/time';
+import { formatDay } from 'utils/time';
 import { DeviceMake, FetchTelemetryInput, ResponseTelemetry, TelemetryResultCounts } from 'types/events/vendor';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
@@ -24,7 +24,7 @@ import { eUserRole } from 'types/user';
  * the datatable only fetches unattached devices
  */
 export default function VendorAPIPage(): JSX.Element {
-  const api = useTelemetryApi(); 
+  const api = useTelemetryApi();
   const showAlert = useResponseDispatch();
   const startDate = isDev() ? dayjs().subtract(1, 'month') : dayjs().subtract(1, 'year');
   const [results, setResults] = useState<ResponseTelemetry[]>([]);
@@ -32,7 +32,7 @@ export default function VendorAPIPage(): JSX.Element {
     found: 0,
     inserted: 0,
     errors: 0
-  }
+  };
   const [resultCounts, setResultCounts] = useState<TelemetryResultCounts>(DEFAULT_RESULTS);
   const [showConfirmFetch, setShowConfirmFetch] = useState(false);
   const [start, setStart] = useState<Dayjs>(startDate);
@@ -41,12 +41,11 @@ export default function VendorAPIPage(): JSX.Element {
 
   const [startTime, setStartTime] = useState<Dayjs | null>();
   const [endTime, setEndTime] = useState<Dayjs | null>();
-  
-  const handleFetchButton = () => {
+
+  const handleFetchButton = ():void => {
     setResults([]);
     setShowConfirmFetch((o) => !o);
-    
-  }
+  };
 
   const handleSelectRow = (rows: Collar[], make: DeviceMake): void => {
     const filteredOut = devices.filter((f) => f.make !== make);
@@ -71,10 +70,10 @@ export default function VendorAPIPage(): JSX.Element {
     const counts: TelemetryResultCounts = DEFAULT_RESULTS;
     setEndTime(dayjs());
     setResults(rows);
-    rows.forEach((row) =>{
+    rows.forEach((row) => {
       counts.found += row.records_found ?? 0;
       counts.inserted += row.records_inserted ?? 0;
-      counts.errors += (!row.error ? 0 : 1);
+      counts.errors += !row.error ? 0 : 1;
     });
     setResultCounts(counts);
   };
@@ -111,14 +110,23 @@ export default function VendorAPIPage(): JSX.Element {
   // render span component to display the currently selected devices / vendor type
   const DevicesSelected = (make: DeviceMake): JSX.Element => {
     const selected = 'devices selected: ';
-    const filtered = devices.filter(d => d.make === make);
+    const filtered = devices.filter((d) => d.make === make);
     //console.log(devices)
     if (!filtered.length) {
-      return <span>{make} {selected}none</span>;
+      return (
+        <span>
+          {make} {selected}none
+        </span>
+      );
     }
-    return <span>{make} {selected}{filtered.map(d => d.ids.join(', ')).join()}</span>;
-  }
-  
+    return (
+      <span>
+        {make} {selected}
+        {filtered.map((d) => d.ids.join(', ')).join()}
+      </span>
+    );
+  };
+
   const headers: (keyof Collar)[] = ['device_id', 'device_make', 'frequency', 'device_model', 'device_status'];
   return (
     <AuthLayout required_user_role={eUserRole.data_administrator}>
@@ -138,14 +146,20 @@ export default function VendorAPIPage(): JSX.Element {
         <DataTable<Collar>
           headers={headers}
           title='Lotek Devices'
-          queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'lotek'} }}
+          queryProps={{
+            query: api.useAllDevicesWithUnassignedCollarIds,
+            param: { keys: 'device_make', term: 'lotek' }
+          }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
           isMultiSelect={true}
         />
         <DataTable<Collar>
           headers={headers}
           title='Vectronic Devices'
-          queryProps={{ query: api.useAllDevicesWithUnassignedCollarIds, param: { keys: 'device_make', term: 'vectronic'} }}
+          queryProps={{
+            query: api.useAllDevicesWithUnassignedCollarIds,
+            param: { keys: 'device_make', term: 'vectronic' }
+          }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
           isMultiSelect={true}
         />
@@ -153,14 +167,26 @@ export default function VendorAPIPage(): JSX.Element {
           <h4>
             Results {status === 'loading' ? 'fetching...' : status === 'success' ? `(${getTimeElapsed()})` : null}
           </h4>
-              <List values={results.map((l) => {
-                  if (l.error) return `${l.vendor} device ${l.device_id} error: ${l.error}`
-                  return `${l.vendor} Device: ${l.device_id} | ${l.records_found} records found | ${l.records_inserted ?? 0} inserted`})} />
-                  {status === 'success' && (
-                    results?.length 
-                    ? <List values={[`Totals: Found: ${resultCounts.found} | Inserted: ${resultCounts.inserted} | Errors: ${resultCounts.errors}`]}/>
-                    : <List values={[`No telemetry found between ${start.format('D, MMM YYYY')} - ${end.format('D, MMM YYYY')}`]}/>
-                  )}
+          <List
+            values={results.map((l) => {
+              if (l.error) return `${l.vendor} device ${l.device_id} error: ${l.error}`;
+              return `${l.vendor} Device: ${l.device_id} | ${l.records_found} records found | ${
+                l.records_inserted ?? 0
+              } inserted`;
+            })}
+          />
+          {status === 'success' &&
+            (results?.length ? (
+              <List
+                values={[
+                  `Totals: Found: ${resultCounts.found} | Inserted: ${resultCounts.inserted} | Errors: ${resultCounts.errors}`
+                ]}
+              />
+            ) : (
+              <List
+                values={[`No telemetry found between ${start.format('D, MMM YYYY')} - ${end.format('D, MMM YYYY')}`]}
+              />
+            ))}
         </Box>
 
         <ConfirmModal

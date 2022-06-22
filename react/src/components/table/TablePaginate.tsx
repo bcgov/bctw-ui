@@ -26,9 +26,9 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
     onChangePage(event, page + 1);
   };
 
-  const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
-    onChangePage(event, totalPages);
-  }
+  // const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+  //   onChangePage(event, totalPages);
+  // }
   return (
     <>
       <IconButton

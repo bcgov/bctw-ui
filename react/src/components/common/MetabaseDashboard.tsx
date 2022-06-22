@@ -1,10 +1,9 @@
 import { Box, CircularProgress, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import IframeResizer from 'iframe-resizer-react';
 import useMetabaseDashboard from 'hooks/useMetabaseDashboard';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Icon } from 'components/common';
 import { manageLayoutStyles } from 'pages/layouts/ManageLayout';
-import useDidMountEffect from 'hooks/useDidMountEffect';
 export type DashboardItem = {
   name: string;
   id: number | null;
