@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "start": "node js/server.js",
-    "dev": "node node_modules/nodemon/bin/nodemon.js node js/server.js"
+    "dev": "node node_modules/nodemon/bin/nodemon.js node js/server.js",
+    "reload": "nodemon -r dotenv/config js/server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "form-data": "^3.0.0",

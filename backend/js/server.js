@@ -31,7 +31,7 @@ var keyCloakConfig = {
   realm: process.env.KEYCLOAK_REALM,
   sslRequired: 'external',
   //clientId: process.env.KEYCLOAK_CLIENT_ID,
-  public: true,
+  publicClient: true,
   resource: process.env.KEYCLOAK_RESOURCE
   
 };
