@@ -121,10 +121,10 @@ const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'>[] => {
 const classToArray = <T>(
   keys: string[],
   startsWith: (keyof T)[],
-  excluded: (keyof T)[], 
+  excluded?: (keyof T)[], 
   ):(keyof T)[] => {
-  const mutate = [...excluded];
-  const ke = keys.filter(k => !(mutate as string[]).includes(k)) as unknown as (keyof T)[];
+  const filterOut = excluded ? [...startsWith,...excluded] : startsWith
+  const ke = keys.filter(k => !(filterOut as string[]).includes(k)) as unknown as (keyof T)[];
   return [...startsWith, ...ke];
 }
 

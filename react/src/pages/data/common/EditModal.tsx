@@ -92,6 +92,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       params.propsToDisplay = editing.historyDisplayProps();
       setHistoryParams({ query: api.useCritterHistory, ...params });
     } else if (editing instanceof Collar) {
+      params.propsToDisplay = editing.historyDisplayProps();
       setHistoryParams({ query: api.useCollarHistory, ...params });
     }
   }, [editing]);

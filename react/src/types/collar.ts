@@ -6,7 +6,7 @@ import { Code } from 'types/code';
 import { BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
-import { columnToHeader } from 'utils/common_helpers';
+import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { DataLife } from './data_life';
 
 // fetchable api collar types
@@ -144,8 +144,10 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   }
   
   historyDisplayProps(): (keyof Collar)[] {
-
-    return this.displayProps;
+    const keys = Object.keys(new Collar()) as unknown as (keyof Collar)[];
+    const startsWith = this.displayProps;
+    const excludes = ['collar_id', 'collar_transaction_id'] as (keyof Collar)[];
+    return classToArray(keys, startsWith, excludes);
   }
 
   static get toCSVHeaderTemplate(): string[] {
