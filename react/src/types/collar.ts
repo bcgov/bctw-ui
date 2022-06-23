@@ -142,6 +142,11 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   get displayProps(): (keyof Collar)[] {
     return Collar.propsToDisplay;
   }
+  
+  historyDisplayProps(): (keyof Collar)[] {
+
+    return this.displayProps;
+  }
 
   static get toCSVHeaderTemplate(): string[] {
     const excluded: (keyof Collar)[] = ['collar_transaction_id'];
