@@ -26,14 +26,10 @@ const upload = multer({ storage });
 // create a Keycloak config object (deprecates use of keycloak.json)
 // see: https://wjw465150.gitbooks.io/keycloak-documentation/content/securing_apps/topics/oidc/nodejs-adapter.html
 var keyCloakConfig = {
-  confidentialPort: 0,
   authServerUrl: process.env.KEYCLOAK_SERVER_URL,
-  realm: process.env.KEYCLOAK_REALM,
-  sslRequired: 'external',
-  //clientId: process.env.KEYCLOAK_CLIENT_ID,
-  publicClient: true,
-  resource: process.env.KEYCLOAK_RESOURCE
-  
+  clientId: process.env.KEYCLOAK_CLIENT_ID,
+  public: true,
+  realm: process.env.KEYCLOAK_REALM
 };
 
 // instantiate Keycloak Node.js adapter, passing in configuration
