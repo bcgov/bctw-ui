@@ -88,7 +88,6 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       param: editing[editing.identifier],
       propsToDisplay: editing.displayProps,
     };
-    console.log(editing);
     if (editing instanceof Animal) {
       params.propsToDisplay = editing.historyDisplayProps();
       setHistoryParams({ query: api.useCritterHistory, ...params });
