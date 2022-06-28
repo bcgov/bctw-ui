@@ -5,7 +5,7 @@ import { Code } from 'types/code';
 import { BaseTimestamps, BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
-import { columnToHeader } from 'utils/common_helpers';
+import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 
@@ -190,8 +190,17 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
         return columnToHeader(str);
     }
   }
+  
   get displayProps(): (keyof Animal)[] {
     return ['species', 'population_unit', 'wlh_id', 'animal_id', 'animal_status'];
+    //return Animal.toCSVHeaderTemplate;
+  }
+
+  historyDisplayProps(): (keyof Animal)[] {
+    const keys = Object.keys(new Animal()) as unknown as (keyof Animal)[];
+    const startsWith = this.displayProps;
+    const excludes = ['critter_id', 'critter_transaction_id'] as (keyof Animal)[];
+    return classToArray(keys, startsWith, excludes);
   }
 
   constructor(critter_id = '') {
@@ -216,7 +225,8 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
 
   // con't overide since this class is inherited
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
-    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency', 'animal_status'];
+    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+    
   }
 
   formatPropAsHeader(str: keyof Animal): string {

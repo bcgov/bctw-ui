@@ -112,6 +112,22 @@ const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'>[] => {
   }
   return ret;
 }
+/** 
+* Converts a class to an array of keys
+* @param keys class converted to its object keys. ie Object.keys(new Animal())
+* @param startsWith items which append the array
+* @param excluded array of items to exclude from final array.
+* 
+**/
+const classToArray = <T>(
+  keys: string[],
+  startsWith: (keyof T)[],
+  excluded?: (keyof T)[], 
+  ):(keyof T)[] => {
+  const filterOut = excluded ? [...startsWith,...excluded] : startsWith
+  const ke = keys.filter(k => !(filterOut as string[]).includes(k)) as unknown as (keyof T)[];
+  return [...startsWith, ...ke];
+}
 
 export {
   columnToHeader,
@@ -126,4 +142,5 @@ export {
   parseArgs,
   removeProps,
   capitalize,
+  classToArray,
 };

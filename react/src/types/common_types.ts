@@ -19,6 +19,7 @@ export interface BaseTimestamps extends PartialPick<BCTWValidDates, 'valid_from'
 export type BCTWFormat<T> = {
   formatPropAsHeader(k: keyof T): string;
   get displayProps(): (keyof T)[];
+  historyDisplayProps?(): (keyof T)[];
 }
 
 /**
