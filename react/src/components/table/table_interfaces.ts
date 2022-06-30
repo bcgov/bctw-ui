@@ -69,6 +69,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   queryProps: ITableQueryProps<T>;
   onSelectMultiple?: (rows: T[]) => void;
   deleted?: string;
+  updated?: string;
 };
 
 /**

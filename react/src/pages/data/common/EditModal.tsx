@@ -1,7 +1,7 @@
 import { IUpsertPayload } from 'api/api_interfaces';
 import { EditModalBaseProps, ModalBaseProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
@@ -112,6 +112,8 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   useDidMountEffect(() => {
     setCanSave(!hasErr);
   }, [newObj]);
+
+  //useEffect(()=>{},[onSave]);
 
   const handleSave = async (): Promise<void> => {
     // use Object.assign to preserve class methods

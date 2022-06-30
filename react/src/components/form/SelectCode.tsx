@@ -13,6 +13,7 @@ import { FormBaseProps } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
+import { swapQuotes } from './create_form_components';
 
 type SelectCodeProps = FormBaseProps & SelectProps &
 PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {

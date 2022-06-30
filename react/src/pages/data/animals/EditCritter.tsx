@@ -6,7 +6,7 @@ import { Box, Container, IconButton } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
@@ -25,7 +25,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
  * the main animal form
  */
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
-  const { isCreatingNew, editing, open } = props;
+  const { isCreatingNew, editing, open, refresh } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
 
@@ -36,7 +36,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const [showUDFModal, setShowUDFModal] = useState(false);
 
   const [hasBabies, setHasBabies] = useState(false);
-
   useDidMountEffect(() => {
     if(open) {
       reset();
@@ -46,7 +45,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const reset = (): void => {
     setHasBabies(false);
   }
-
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
@@ -116,7 +114,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     }
     // there are only animal-related fields in capture workflows
     const next = editObjectToEvent(e.getAnimal(), newwf, []);
-    console.log(`capture workflow chained to ${nextWorkflow} type`, next);
+    //console.log(`capture workflow chained to ${nextWorkflow} type`, next);
     await updateEvent(next);
     await setShowWorkflowForm((o) => !o);
   };

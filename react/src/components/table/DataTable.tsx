@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableRow, Checkbox, CircularProgress } from '@mui/material';
 import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
@@ -27,6 +27,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   onSelect,
   onSelectMultiple,
   deleted,
+  updated,
   paginate = true,
   isMultiSelect = false,
   isMultiSearch = false,
@@ -52,7 +53,7 @@ export default function DataTable<T extends BCTWBase<T>>({
    * this state is passed to the parent select handlers
    */
   const [values, setValues] = useState<T[]>([]);
-
+  
   // if a row is selected in a different table, unselect all rows in this table
   useDidMountEffect(() => {
     if (useRowState && data?.length) {
@@ -62,7 +63,6 @@ export default function DataTable<T extends BCTWBase<T>>({
       }
     }
   }, [useRowState]);
-
   useDidMountEffect(() => {
     if (deleted) {
       handleRowDeleted(deleted);
@@ -72,8 +72,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> =
     query(page, param, filter);
-
   useDidMountEffect(() => {
+    
     if (isSuccess) {
       //Only set total pages on inital load
       const rowCount = data[0]?.row_count;
@@ -89,7 +89,6 @@ export default function DataTable<T extends BCTWBase<T>>({
           setTotalRows(rowCount);
         }
       }
-
       // update the row identifier
       const first = data && data.length && data[0];
       if (first && typeof first.identifier === 'string') {
@@ -106,16 +105,22 @@ export default function DataTable<T extends BCTWBase<T>>({
        * otherwise, query doesn't guarantee order, which can result in duplicates
        * across different pages / limitoffset
        */
-      data.forEach((d) => {
+      data.forEach((d, i) => {
+        
         const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
           newV.push(d);
+        }
+        if(updated && d[rowIdentifier] === updated){
+          //If updated identifier is set, insert new data into array
+          values[i] = d;
+          setValues(values);
         }
       });
       setValues((o) => [...o, ...newV]);
       setRowsPerPage((o) => (isPaginate ? o : data.length));
     }
-  }, [data]);
+  }, [data, updated]);
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -264,7 +269,15 @@ export default function DataTable<T extends BCTWBase<T>>({
   const TableContents = (): JSX.Element => {
 
     if (isLoading || isError) {
-      return <CircularProgress />;
+      return (
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              <CircularProgress />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      )
     }
     if (isSuccess && !data?.length) {
       setTotalPages(1);

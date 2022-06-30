@@ -7,6 +7,7 @@ import { mustBeEmail } from 'components/form/form_validators';
 import { FormStrings } from 'constants/strings';
 import { FormBaseProps } from 'types/form_types';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { swapQuotes } from './create_form_components';
 
 export type TextInputProps = FormBaseProps & StandardTextFieldProps & {
   defaultValue: string;

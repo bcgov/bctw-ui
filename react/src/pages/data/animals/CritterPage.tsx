@@ -12,14 +12,12 @@ import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
-
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
   const [deleted, setDeleted] = useState('');
-
+  const [updated, setUpdated] = useState('');
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
-
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
     editing: null,
@@ -40,7 +38,12 @@ export default function CritterPage(): JSX.Element {
       <Box className='manage-layout-titlebar'>
         <h1>My Animals</h1>
         <Box display='flex' alignItems='center'>
-          <ModifyCritterWrapper editing={editObj} onDelete={(critter_id: string): void => setDeleted(critter_id)}>
+          <ModifyCritterWrapper 
+            editing={editObj} 
+            onDelete={(critter_id: string): void => setDeleted(critter_id)}
+            onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+            setCritter={setEditObj}
+          >
             <AddEditViewer<AttachedAnimal> {...addEditProps}>
               <EditCritter {...editProps} />
             </AddEditViewer>
@@ -72,6 +75,7 @@ export default function CritterPage(): JSX.Element {
               queryProps={{ query: api.useAssignedCritters }}
               onSelect={handleSelect}
               deleted={deleted}
+              updated={updated}
             />
           </Box>
           <Box mb={4}>

@@ -14,6 +14,8 @@ type IModifyWrapperProps = {
   editing: Animal | AttachedAnimal;
   children: JSX.Element;
   onDelete?: (v: string) => void;
+  onUpdate?: (v: string) => void;
+  setCritter?:(a: Animal | AttachedAnimal) => void
 };
 
 /**
@@ -23,16 +25,17 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
 
-  const { children, editing, onDelete } = props;
+  const { children, editing, onDelete, setCritter, onUpdate} = props;
   // used in child AddEditViewer component to determine the add/edit button state (view/edit)
   const [canEdit, setCanEdit] = useState(false);
   // used to determine the state of the delete modal
   const [hasCollar, setHasCollar] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [animal, setAnimal] = useState<typeof editing>(editing);
+  // const [refreshPage, setRefreshPage] = useState(false);
 
   // fetch the critter, assume it's attached for now
-  const { data, status } = api.useType<AttachedAnimal>('animal', editing.critter_id, {enabled: !!(editing.critter_id)})
+  const { data, status } = api.useType<AttachedAnimal>('animal', editing.critter_id, {enabled: !!(editing.critter_id)});
 
   /**
    * note: if data has been previously fetched, 'status' will not be updated.
@@ -48,6 +51,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     }
     setHasCollar(editing instanceof AttachedAnimal)
     setCanEdit(permissionCanModify(editing.permission_type));
+
   }, [editing, status]);
 
   // must be defined before mutation declarations
@@ -58,6 +62,8 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     } else {
       const critter = results[0];
       showNotif({ severity: 'success', message: `${critter.animal_id} saved!` });
+      setCritter(results[0]);
+      onUpdate(results[0].critter_id)
     }
   };
 
@@ -78,7 +84,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     const { body } = a;
     const formatted = body.toJSON();
     // console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
-    await saveMutation({ body: formatted});
+    await saveMutation({ body: formatted})
   } 
 
   const deleteCritter = async (critterId: string): Promise<void> => {

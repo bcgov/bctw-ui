@@ -29,6 +29,13 @@ type CreateInputProps = CreateInputBaseProps
   span?: boolean;
   validate?: <T>(input: T) => string;
 };
+export const swapQuotes = (s: string) => {
+  if(!s || s.charCodeAt(0) === 96 && s.length === 0){
+    return ''
+  }else{
+    return s;
+  }
+}
 
 // text and number field handler
 function CreateEditTextField(props: CreateInputProps): ReactElement {
@@ -109,6 +116,7 @@ function CreateEditCheckboxField({ prop, value, handleChange, label, disabled, l
   );
 }
 
+
 // select component handler
 function CreateEditSelectField({
   value,
@@ -128,7 +136,7 @@ function CreateEditSelectField({
       label={label}
       disabled={disabled}
       codeHeader={codeName ?? String(prop)}
-      defaultValue={typeof value === 'string' ? value : ''}
+      defaultValue={typeof value === 'string' ? value : ""}
       changeHandler={handleChange}
       required={required}
       error={!!errorMessage?.length}
@@ -171,8 +179,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   if (formField === undefined) {
     return null;
   }
-  const { prop, type, tooltip } = formField;
 
+  const { prop, type, tooltip } = formField;
   const toPass = {
     // fixme: why wont this type if U overlaps T?
     value: obj[prop as keyof T],
