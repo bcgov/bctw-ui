@@ -115,7 +115,6 @@ export default function DataTable<T extends BCTWBase<T>>({
           //If updated identifier is set, insert new data into array
           values[i] = d;
           setValues(values);
-          console.log('inserted');
         }
       });
       setValues((o) => [...o, ...newV]);
