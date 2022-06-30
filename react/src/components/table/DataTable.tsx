@@ -111,16 +111,17 @@ export default function DataTable<T extends BCTWBase<T>>({
         if (!found) {
           newV.push(d);
         }
-        if(updated && d[rowIdentifier] === updated){
+        if(updated && d[rowIdentifier] === updated && d !== values[i]){
           //If updated identifier is set, insert new data into array
           values[i] = d;
           setValues(values);
+          console.log('inserted');
         }
       });
       setValues((o) => [...o, ...newV]);
       setRowsPerPage((o) => (isPaginate ? o : data.length));
     }
-  }, [data, updated]);
+  }, [data]);
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
