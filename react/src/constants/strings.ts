@@ -137,7 +137,7 @@ const MapStrings = {
   assignmentStatusTooltip2: ': show device telemetry that does not have an animal attached.',
   assignmentStatusTooltip3: 'To attach a device, click Manage from the top navigation bar and edit an animal.',  
   lastKnownLocationLabel: 'Last Known Location',
-  lastKnownLocationTooltip: 'TODO: lastKnownLocationTooltip',
+  lastKnownLocationTooltip: 'Shows last know point',
   lastFixesLabel: 'Last 10 Fixes',
   lastFixesTooltip: 'TODO: lastFixesTooltip',
   deviceListLabel: 'Device List',
