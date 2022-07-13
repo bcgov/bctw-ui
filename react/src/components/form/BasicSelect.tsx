@@ -14,7 +14,7 @@ type BasicSelectProps = SharedSelectProps & {
 /**
  * a simple single select component that takes a list of values as a string array
  */
-export default function Select({handleChange, label, values, defaultValue = ''}: BasicSelectProps): JSX.Element {
+export default function Select({handleChange, label, values, sx, defaultValue = ''}: BasicSelectProps): JSX.Element {
   const [selected, setSelected] = useState(defaultValue);
 
   const onChange = (event: SelectChangeEvent<string>): void => {
@@ -22,9 +22,8 @@ export default function Select({handleChange, label, values, defaultValue = ''}:
     setSelected(val);
     handleChange(val);
   };
-
   return (
-    <FormControl className={'select-control-small'} size='small'>
+    <FormControl className={'select-control-small'} size='small' sx={sx}>
       <InputLabel>{label}</InputLabel>
       <MUISelect onChange={onChange} value={selected} required={true}>
         {values.map((v, idx) => (<MenuItem key={`${idx}-${v}`} value={v}>{v}</MenuItem>))}

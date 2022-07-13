@@ -20,6 +20,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { buttonProps } from 'components/component_constants';
 import { Typography } from '@mui/material';
+import { User } from 'types/user';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: ReactNode;
@@ -96,11 +97,11 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       setHistoryParams({ query: api.useCollarHistory, ...params });
     }
   }, [editing]);
-
+  
   // when the modal opens, disable save
   useDidMountEffect(() => {
     if (open) {
-      setCanSave(false);
+      setCanSave(!hasErr);
     }
   }, [open]);
 
@@ -113,7 +114,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     setCanSave(!hasErr);
   }, [newObj]);
 
-  //useEffect(()=>{},[onSave]);
+  //useEffect(()=>{console.log('editing')},[editing]);
 
   const handleSave = async (): Promise<void> => {
     // use Object.assign to preserve class methods

@@ -28,6 +28,7 @@ type CreateInputProps = CreateInputBaseProps
   errorMessage?: string;
   span?: boolean;
   validate?: <T>(input: T) => string;
+  maxwidth?: boolean;
 };
 export const swapQuotes = (s: string) => {
   if(!s || s.charCodeAt(0) === 96 && s.length === 0){
@@ -39,7 +40,7 @@ export const swapQuotes = (s: string) => {
 
 // text and number field handler
 function CreateEditTextField(props: CreateInputProps): ReactElement {
-  const { prop, type, value, errorMessage, handleChange, validate } = props;
+  const { prop, type, value, errorMessage, style, handleChange, validate } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
   return type === eInputType.number ? (
@@ -175,6 +176,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   handleChange: FormChangeEvent,
   inputProps?: Partial<CreateInputProps>,
   displayBlock = false,
+  style = {},
 ): ReactNode {
   if (formField === undefined) {
     return null;
@@ -186,6 +188,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
     value: obj[prop as keyof T],
     handleChange,
     label: obj.formatPropAsHeader(prop as keyof T),
+    style,
     ...formField,
     ...inputProps
   };
