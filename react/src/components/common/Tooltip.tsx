@@ -11,7 +11,7 @@ const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     tooltip: {
-      backgroundColor: theme.palette.common.white,
+      backgroundColor: 'transparent',
       color: 'rgba(0, 0, 0, 0.87)',
       fontSize: 16
     }
