@@ -12,6 +12,8 @@ import { BCTWBase } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { Animal } from 'types/animal';
+import { formatDateStr, formatT } from 'utils/time';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;
@@ -31,7 +33,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   paginate = true,
   isMultiSelect = false,
   isMultiSearch = false,
-  alreadySelected = []
+  alreadySelected = [],
+  showValidRecord = false,
 }: DataTableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
@@ -292,10 +295,12 @@ export default function DataTable<T extends BCTWBase<T>>({
       );
     }
     if (isSuccess) {
+      const sortedResults = stableSort(perPage(), getComparator(order, orderBy));
       return (
         <TableBody>
-          {stableSort(perPage(), getComparator(order, orderBy)).map((obj, prop: number) => {
+          {sortedResults.map((obj, prop: number) => {
             const isRowSelected = isSelected(obj[rowIdentifier]);
+            const highlightValidRow = showValidRecord && !formatTableCell(obj, 'valid_to').value;
             return (
               <TableRow
                 hover
@@ -304,7 +309,9 @@ export default function DataTable<T extends BCTWBase<T>>({
                 aria-checked={isRowSelected}
                 tabIndex={-1}
                 key={`row${prop}`}
-                selected={isRowSelected}>
+                selected={isRowSelected || highlightValidRow}
+                >
+                  
                 {/* render checkbox column if multiselect is enabled */}
                 {isMultiSelect ? (
                   <TableCell padding='checkbox'>
@@ -317,6 +324,7 @@ export default function DataTable<T extends BCTWBase<T>>({
                     return null;
                   }
                   const { value } = formatTableCell(obj, k);
+                  
                   return (
                     <TableCell key={`${k}${i}`} align={'left'}>
                       {value}
