@@ -22,6 +22,6 @@ export default function HistoryPage<T extends BCTWBase<T>>(props: IHistoryPagePr
   }
 
   return (
-    <DataTable headers={propsToDisplay} queryProps={tblProps}/>
+    <DataTable headers={propsToDisplay} queryProps={tblProps} showValidRecord={true}/>
   );
 }
