@@ -1,5 +1,6 @@
 import { BaseTextFieldProps } from "@mui/material";
 import { ReactNode } from "react";
+import { species } from "./animal";
 
 export type KeyType = string | number | symbol;
 
@@ -32,6 +33,7 @@ export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled'| 'required'
   prop: keyof T;
   // prop: KeyType;
   type: eInputType;
+  species?: species[];
   codeName?: string;
   span?: boolean;
   tooltip?: ReactNode;

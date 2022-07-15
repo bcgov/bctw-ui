@@ -9,6 +9,11 @@ import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 
+export enum species {
+  caribou = 'caribou',
+  grizzly_bear = 'grizzly bear',
+  moose = 'moose',
+}
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
   assigned = 'assigned',
@@ -233,40 +238,41 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
     return super.formatPropAsHeader(str);
   }
 }
-
+const {caribou, grizzly_bear, moose} = species;
+const ALL_SPECIES = Object.values(species);
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
   associatedAnimalFields: [
-    { prop: 'associated_animal_id', type: eInputType.text },
+    { prop: 'associated_animal_id', type: eInputType.text},
     { prop: 'associated_animal_relationship', type: eInputType.code }
   ],
   captureFields: [
-    { prop: 'capture_date', type: eInputType.datetime },
-    { prop: 'capture_latitude', type: eInputType.number },
-    { prop: 'capture_longitude', type: eInputType.number },
-    { prop: 'capture_utm_zone', type: eInputType.number },
-    { prop: 'capture_utm_easting', type: eInputType.number },
-    { prop: 'capture_utm_northing', type: eInputType.number },
-    { prop: 'recapture', type: eInputType.check },
-    { prop: 'captivity_status', type: eInputType.check },
-    { prop: 'capture_comment', type: eInputType.multiline },
+    { prop: 'capture_date', type: eInputType.datetime, species: [caribou] },
+    { prop: 'capture_latitude', type: eInputType.number, species: [caribou] },
+    { prop: 'capture_longitude', type: eInputType.number, species: [caribou] },
+    { prop: 'capture_utm_zone', type: eInputType.number, species: [caribou] },
+    { prop: 'capture_utm_easting', type: eInputType.number, species: [caribou] },
+    { prop: 'capture_utm_northing', type: eInputType.number, species: [caribou] },
+    { prop: 'recapture', type: eInputType.check, species: [caribou] },
+    { prop: 'captivity_status', type: eInputType.check, species: [caribou] },
+    { prop: 'capture_comment', type: eInputType.multiline, species: [caribou] },
   ],
   characteristicsFields: [
-    { prop: 'animal_status', type: eInputType.code, ...isRequired },
-    { prop: 'species', type: eInputType.code, ...isRequired },
-    { prop: 'sex', type: eInputType.code, ...isRequired },
-    { prop: 'animal_colouration', type: eInputType.text },
-    { prop: 'estimated_age', type: eInputType.number, validate: mustbePositiveNumber },
-    { prop: 'life_stage', type: eInputType.code },
+    { prop: 'animal_status', type: eInputType.code, species: [...ALL_SPECIES], ...isRequired},
+    { prop: 'species', type: eInputType.code, species: [...ALL_SPECIES], ...isRequired },
+    { prop: 'sex', type: eInputType.code, species: [...ALL_SPECIES], ...isRequired },
+    { prop: 'animal_colouration', type: eInputType.text, species: [...ALL_SPECIES], },
+    { prop: 'estimated_age', type: eInputType.number, species: [...ALL_SPECIES], validate: mustbePositiveNumber },
+    { prop: 'life_stage', type: eInputType.code, species: [...ALL_SPECIES], },
   ],
   characteristicFields2: [
-    { prop: 'juvenile_at_heel', type: eInputType.code },
-    { prop: 'juvenile_at_heel_count', type: eInputType.number, validate: mustbePositiveNumber}
+    { prop: 'juvenile_at_heel', type: eInputType.code, species: [...ALL_SPECIES]},
+    { prop: 'juvenile_at_heel_count', type: eInputType.number, species: [...ALL_SPECIES], validate: mustbePositiveNumber}
   ],
   identifierFields1: [
-    { prop: 'wlh_id', type: eInputType.text },
-    { prop: 'animal_id', type: eInputType.text, ...isRequired },
-    { prop: 'region', type: eInputType.code, ...isRequired },
-    { prop: 'population_unit', type: eInputType.code, ...isRequired },
+    { prop: 'wlh_id', type: eInputType.text, species: [...ALL_SPECIES] },
+    { prop: 'animal_id', type: eInputType.text, species: [...ALL_SPECIES], ...isRequired },
+    { prop: 'region', type: eInputType.code, species: [...ALL_SPECIES], ...isRequired },
+    { prop: 'population_unit', type: eInputType.code, species: [...ALL_SPECIES], ...isRequired },
   ],
   identifierFields2: [
     { prop: 'ear_tag_left_colour', type: eInputType.text },
