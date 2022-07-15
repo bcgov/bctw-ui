@@ -1,4 +1,4 @@
-import { Box, Toolbar } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableRow, Toolbar } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import TableFilter from './TableFilters';
 import { ITableFilter } from './table_interfaces';
@@ -17,7 +17,6 @@ const useToolbarStyles = makeStyles((theme) => ({
     paddingRight: theme.spacing(2),
     paddingLeft: theme.spacing(2)
   },
-
   toolbarTitle: {
     fontWeight: 700
   }
@@ -31,13 +30,13 @@ type TableToolbarProps<T> = {
   onChangeFilter: (filter: ITableFilter) => void;
   sibling?: JSX.Element;
   isMultiSearch?: boolean;
+  showTooltip?: boolean;
   setPage: (page: number) => void;
 };
 
 export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Element {
   const classes = useToolbarStyles();
-  const { numSelected, sibling, title } = props;
-
+  const { numSelected, sibling, title, showTooltip } = props;
   return (
     <Toolbar disableGutters>
       <Box
@@ -46,6 +45,7 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
         alignItems='center'
         justifyContent='space-between'
         width='100%'>
+      {showTooltip && <TableRow selected={true}><TableCell style={{color: 'black'}}>Current Record</TableCell></TableRow>}
         <Box className={classes.toolbarTitle}>
           {title ?? ''} &nbsp;
           {numSelected > 0 ? <span>({numSelected} selected)</span> : <span>{''}</span>}

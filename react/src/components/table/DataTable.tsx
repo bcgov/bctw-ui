@@ -12,8 +12,6 @@ import { BCTWBase } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Animal } from 'types/animal';
-import { formatDateStr, formatT } from 'utils/time';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;
@@ -226,6 +224,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       filterableProperties={headers}
       isMultiSearch={isMultiSearch}
       setPage={setPage}
+      showTooltip={showValidRecord}
       sibling={
         /**
          * hide pagination when total results are under @var rowsPerPage
