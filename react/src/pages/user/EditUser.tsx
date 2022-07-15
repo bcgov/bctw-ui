@@ -49,7 +49,7 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
               <Box mt={2} mb={2} display={'flex'}>
                 <BasicSelect
                   handleChange={(e) => editing.role_type = headerToColumn(e) as eUserRole}
-                  defaultValue={columnToHeader(editing.role_type)}
+                  defaultValue={editing?.id ? columnToHeader(editing.role_type) : columnToHeader(eUserRole.user)}
                   values={Object.keys(eUserRole).map(p => columnToHeader(p))}
                   label={'Permission Type'}
                   sx={{flex:1}}
