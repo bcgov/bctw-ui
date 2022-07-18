@@ -5,12 +5,13 @@ import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
 import { ReactElement, ReactNode } from 'react';
-import { removeProps } from 'utils/common_helpers';
+import { removeProps, showField } from 'utils/common_helpers';
 import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap } from 'types/form_types';
 import dayjs, { Dayjs } from 'dayjs';
 import { BCTWFormat } from 'types/common_types';
 import { Tooltip } from 'components/common'
 import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
+import { Animal, AttachedAnimal, eSpecies } from 'types/animal';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -177,12 +178,15 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   inputProps?: Partial<CreateInputProps>,
   displayBlock = false,
   style = {},
+  species?: string,
 ): ReactNode {
   if (formField === undefined) {
     return null;
   }
-
-  const { prop, type, tooltip } = formField;
+  if(obj instanceof Animal && species){
+    if(!showField(formField, species)) return null;
+  }
+  const { prop, type, tooltip} = formField;
   const toPass = {
     // fixme: why wont this type if U overlaps T?
     value: obj[prop as keyof T],

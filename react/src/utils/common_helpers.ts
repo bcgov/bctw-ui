@@ -1,4 +1,6 @@
 import { ITableFilter } from 'components/table/table_interfaces';
+import { Animal, critterFormFields, eSpecies } from 'types/animal';
+import { FormFieldObject } from 'types/form_types';
 
 // returns the number of digits after the decimal in a float
 const countDecimals = (value: number): number => {
@@ -143,6 +145,20 @@ const classToArray = <T>(
   return [...startsWith, ...ke];
 }
 
+const showField = <T>(
+  field: FormFieldObject<T>, 
+  species: string):boolean => {
+  //If field has length of 0, field applies to all species
+  if(!field.species.length) return true;
+  return field.species.includes(species);
+}
+
+const hideSection = <T>(
+  fields: FormFieldObject<T>[],
+  species: string): boolean => {
+  return !fields.map((f)=> showField(f, species)).includes(true);
+}
+
 export {
   columnToHeader,
   countDecimals,
@@ -158,4 +174,6 @@ export {
   capitalize,
   classToArray,
   headerToColumn,
+  showField,
+  hideSection
 };
