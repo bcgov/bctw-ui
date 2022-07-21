@@ -4,22 +4,24 @@ import { useState, useEffect, ReactNode } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
-import { removeProps } from 'utils/common_helpers';
+import { columnToHeader, headerToColumn, removeProps } from 'utils/common_helpers';
 import { SelectProps } from '@mui/material';
 import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { formatAxiosError } from 'utils/errors';
-import { FormBaseProps } from 'types/form_types';
+import { FormBaseProps, SpeciesCast } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
-import { swapQuotes } from './create_form_components';
+import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import { transformCodeHeader } from 'types/animal';
 
 type SelectCodeProps = FormBaseProps & SelectProps &
 PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
   codeHeader: string;
   changeHandlerMultiple?: (o: ICodeFilter[]) => void;
   addEmptyOption?: boolean;
+  cast?: SpeciesCast;
 };
 
 /**
@@ -47,14 +49,18 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     style,
     required,
     propName,
-    disabled
+    disabled,
+    cast
   } = props;
   const api = useTelemetryApi();
+  const species = useSpecies();
+  const updateSpecies = useUpdateSpecies();
   const [value, setValue] = useState(defaultValue);
+  const [code, setCode] = useState<ICode>();
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
-
+  const SPECIES_STR = 'species';
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
     'propName',
@@ -66,9 +72,20 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     'triggerReset',
     'defaultValue'
   ]);
-
-  // load this codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader);
+  const convertCodeHeader = (codeHeader: string, cast?: SpeciesCast, species?: string) => {
+    if(!cast) return codeHeader;
+    if(!species) return codeHeader;
+    if(!cast[species]) return codeHeader;
+    return cast[species];
+  }
+  useEffect(() => {
+    if(codeHeader === SPECIES_STR && updateSpecies){
+      updateSpecies(headerToColumn(value));
+    }
+  },[value]);
+  // load the codeHeaders codes from db
+  const { data, error, isFetching, isError, isLoading, isSuccess, refetch } 
+  = api.useCodes(0, convertCodeHeader(codeHeader, cast, species), { cacheTime: species ? 0 : 5000});
 
   // when data is successfully fetched
   useEffect(() => {
@@ -88,6 +105,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
         setHasError(false);
       }
       setValue(found?.description ?? '');
+      setCode(found);
     };
     updateOptions();
   }, [isSuccess]);
@@ -186,6 +204,10 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       changeHandlerMultiple(ret as ICodeFilter[]);
     }
   };
+  const getLabel = (codeHeader: string, required: boolean, species?: string): string => {
+    const t = columnToHeader(convertCodeHeader(`${codeHeader}`, cast, species));
+    return required ? `${t} *` : t;
+  }
   return (
     <>
       {isError ? (
@@ -198,7 +220,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
           size='small'
           style={{...baseInputStyle, ...style}}
           className={`select-control ${hasError ? 'input-error' : ''}`}>
-          <InputLabel disabled={disabled}>{required ? `${label} *` : label}</InputLabel>
+          <InputLabel disabled={disabled}>{getLabel(codeHeader, required, species)}</InputLabel>
           <Select
             MenuProps={selectMenuProps}
             value={multiple ? values : value}

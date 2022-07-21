@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { eSpecies } from "./animal";
 
 export type KeyType = string | number | symbol;
-
+export type SpeciesCast = {[key in keyof typeof eSpecies]?: string};
 export enum eInputType {
   text = 'text',
   number = 'number',
@@ -34,6 +34,7 @@ export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled'| 'required'
   // prop: KeyType;
   type: eInputType;
   species?: string[];
+  cast?: SpeciesCast // ex: {moose: 'wildlife_unit', grey_wolf: 'wildlife_unit'}
   codeName?: string;
   span?: boolean;
   tooltip?: ReactNode;

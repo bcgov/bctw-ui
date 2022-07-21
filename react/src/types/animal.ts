@@ -9,12 +9,17 @@ import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
-
-export enum eSpecies {
-  caribou = 'M-RATA',
-  grizzly_bear = 'M-URAR',
-  moose = 'M-ALAM',
+export enum ePopulationUnit {
+  population_unit = 'population_unit',
+  wildlife_unit = 'wildlife_unit',
 }
+export enum eSpecies {
+  caribou = 'caribou',
+  grizzly_bear = 'grizzly_bear',
+  moose = 'moose',
+  grey_wolf = 'grey_wolf'
+}
+const {caribou, grizzly_bear, moose} = eSpecies;
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
   assigned = 'assigned',
@@ -239,27 +244,57 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
     return super.formatPropAsHeader(str);
   }
 }
-const {caribou, grizzly_bear, moose} = eSpecies;
-
+/**
+ * Formats codeHeaders to correct names for backend queries, used in UI to populate select dropdowns.
+ * See SelectCode.tsx
+ * @param codeHeader
+ * @param species
+ * @returns transformed codeHeader as a string.
+ */
+export const transformCodeHeader = (codeHeader: string, species?: string) => {
+  if(!species) return codeHeader;
+  const { population_unit, wildlife_unit } = ePopulationUnit;
+  if(codeHeader === population_unit as keyof Animal){
+    if(species === caribou) return population_unit;
+    return wildlife_unit;
+  }
+  if(codeHeader === 'life_stage' as keyof Animal){
+    if(species === moose) return 'moose_life_stage'
+  }
+  return codeHeader;
+}
+const WLU = 'wildlife_unit';
+const MLS = 'moose_life_stage';
 // species: [] represents all species, used for optimization on searching
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
+  testFields: [
+    { prop: 'capture_date', type: eInputType.datetime, species: [moose] },
+    { prop: 'capture_latitude', type: eInputType.number, species: [moose] },
+    { prop: 'capture_longitude', type: eInputType.number, species: [moose] },
+    { prop: 'capture_utm_zone', type: eInputType.number, species: [moose] },
+    { prop: 'capture_utm_easting', type: eInputType.number, species: [moose] },
+    { prop: 'capture_utm_northing', type: eInputType.number, species: [moose] },
+    { prop: 'recapture', type: eInputType.check, species: [moose] },
+    { prop: 'captivity_status', type: eInputType.check, species: [moose] },
+    { prop: 'capture_comment', type: eInputType.multiline, species: [moose] },
+  ],
   speciesField: [
     { prop: 'species', type: eInputType.code, species: [], ...isRequired },
   ],
   associatedAnimalFields: [
-    { prop: 'associated_animal_id', type: eInputType.text, species: [caribou]},
-    { prop: 'associated_animal_relationship', type: eInputType.code, species: [caribou] }
+    { prop: 'associated_animal_id', type: eInputType.text, species: []},
+    { prop: 'associated_animal_relationship', type: eInputType.code, species: [] }
   ],
   captureFields: [
-    { prop: 'capture_date', type: eInputType.datetime, species: [caribou] },
-    { prop: 'capture_latitude', type: eInputType.number, species: [caribou] },
-    { prop: 'capture_longitude', type: eInputType.number, species: [caribou] },
-    { prop: 'capture_utm_zone', type: eInputType.number, species: [caribou] },
-    { prop: 'capture_utm_easting', type: eInputType.number, species: [caribou] },
-    { prop: 'capture_utm_northing', type: eInputType.number, species: [caribou] },
-    { prop: 'recapture', type: eInputType.check, species: [caribou] },
+    { prop: 'capture_date', type: eInputType.datetime, species: [] },
+    { prop: 'capture_latitude', type: eInputType.number, species: [] },
+    { prop: 'capture_longitude', type: eInputType.number, species: [] },
+    { prop: 'capture_utm_zone', type: eInputType.number, species: [] },
+    { prop: 'capture_utm_easting', type: eInputType.number, species: [] },
+    { prop: 'capture_utm_northing', type: eInputType.number, species: [] },
+    { prop: 'recapture', type: eInputType.check, species: [] },
     { prop: 'captivity_status', type: eInputType.check, species: [caribou] },
-    { prop: 'capture_comment', type: eInputType.multiline, species: [caribou] },
+    { prop: 'capture_comment', type: eInputType.multiline, species: [] },
   ],
   characteristicsFields: [
     { prop: 'animal_status', type: eInputType.code, species: [], ...isRequired},
@@ -267,7 +302,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'sex', type: eInputType.code, species: [], ...isRequired },
     { prop: 'animal_colouration', type: eInputType.text, species: [], },
     { prop: 'estimated_age', type: eInputType.number, species: [], validate: mustbePositiveNumber },
-    { prop: 'life_stage', type: eInputType.code, species: [], },
+    { prop: 'life_stage', type: eInputType.code, species: [], cast: {moose: MLS} }, //Species dependant, with code table
   ],
   characteristicFields2: [
     { prop: 'juvenile_at_heel', type: eInputType.code, species: []},
@@ -276,22 +311,23 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
   identifierFields1: [
     { prop: 'wlh_id', type: eInputType.text, species: [] },
     { prop: 'animal_id', type: eInputType.text, species: [], ...isRequired },
+    //Add nickname field for bears
     { prop: 'region', type: eInputType.code, species: [], ...isRequired },
-    { prop: 'population_unit', type: eInputType.code, species: [], ...isRequired },
+    { prop: 'population_unit', type: eInputType.code, species: [], cast: { moose: WLU, grizzly_bear: WLU, grey_wolf: WLU}, ...isRequired }, //Population unit needs to be species dependant, surface with code table   
   ],
   identifierFields2: [
-    { prop: 'ear_tag_left_colour', type: eInputType.text, species: [caribou] },
-    { prop: 'ear_tag_right_colour', type: eInputType.text, species: [caribou] },
-    { prop: 'ear_tag_left_id', type: eInputType.text, species: [caribou] },
-    { prop: 'ear_tag_right_id', type: eInputType.text, species: [caribou] }
+    { prop: 'ear_tag_left_colour', type: eInputType.text, species: [] },
+    { prop: 'ear_tag_right_colour', type: eInputType.text, species: [] },
+    { prop: 'ear_tag_left_id', type: eInputType.text, species: [] },
+    { prop: 'ear_tag_right_id', type: eInputType.text, species: [] }
   ],
   mortalityFields: [
-    { prop: 'mortality_date', type: eInputType.datetime, species: [caribou] },
-    { prop: 'mortality_latitude', type: eInputType.number, species: [caribou] },
-    { prop: 'mortality_longitude', type: eInputType.number, species: [caribou] },
-    { prop: 'mortality_utm_zone', type: eInputType.number, species: [caribou] },
-    { prop: 'mortality_utm_easting', type: eInputType.number, species: [caribou] },
-    { prop: 'mortality_utm_northing', type: eInputType.number, species: [caribou] },
+    { prop: 'mortality_date', type: eInputType.datetime, species: [] },
+    { prop: 'mortality_latitude', type: eInputType.number, species: [] },
+    { prop: 'mortality_longitude', type: eInputType.number, species: [] },
+    { prop: 'mortality_utm_zone', type: eInputType.number, species: [] },
+    { prop: 'mortality_utm_easting', type: eInputType.number, species: [] },
+    { prop: 'mortality_utm_northing', type: eInputType.number, species: [] },
     { prop: 'proximate_cause_of_death', type: eInputType.code, species: [caribou] },
     { prop: 'ultimate_cause_of_death', type: eInputType.code, species: [caribou] },
     { prop: 'pcod_confidence', type: eInputType.code, species: [caribou], codeName: 'cod_confidence' },
@@ -301,17 +337,17 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'mortality_investigation', type: eInputType.code, species: [caribou] },
     { prop: 'mortality_report', type: eInputType.check, species: [caribou] },
     { prop: 'predator_known', type: eInputType.check, species: [caribou] },
-    { prop: 'mortality_comment', type: eInputType.multiline, species: [caribou]},
+    { prop: 'mortality_comment', type: eInputType.multiline, species: []},
   ],
   releaseFields: [
-    { prop: 'release_date', type: eInputType.datetime, species: [caribou] },
-    { prop: 'release_latitude', type: eInputType.number, species: [caribou] },
-    { prop: 'release_longitude', type: eInputType.number, species: [caribou] },
-    { prop: 'release_utm_zone', type: eInputType.number, species: [caribou] },
-    { prop: 'release_utm_easting', type: eInputType.number, species: [caribou] },
-    { prop: 'release_utm_northing', type: eInputType.number, species: [caribou] },
-    { prop: 'translocation', type: eInputType.check, species: [caribou] },
-    { prop: 'release_comment', type: eInputType.multiline, species: [caribou] }
+    { prop: 'release_date', type: eInputType.datetime, species: [] },
+    { prop: 'release_latitude', type: eInputType.number, species: [] },
+    { prop: 'release_longitude', type: eInputType.number, species: [] },
+    { prop: 'release_utm_zone', type: eInputType.number, species: [] },
+    { prop: 'release_utm_easting', type: eInputType.number, species: [] },
+    { prop: 'release_utm_northing', type: eInputType.number, species: [] },
+    { prop: 'translocation', type: eInputType.check, species: [] },
+    { prop: 'release_comment', type: eInputType.multiline, species: [] }
   ],
   animalCommentField: [
     { prop: 'animal_comment', type: eInputType.multiline, species: [] }

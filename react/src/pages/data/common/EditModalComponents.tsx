@@ -1,6 +1,8 @@
 import { Box, ButtonProps, Grid } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
-import { cloneElement, Children, Key, ReactElement, ReactNode } from 'react';
+import { useSpecies } from 'contexts/SpeciesContext';
+import { cloneElement, Children, Key, ReactElement, ReactNode, useState } from 'react';
+import { containsOrEmpty } from 'utils/common_helpers';
 
 interface TabPanelProps {
   children?: ReactNode;
@@ -63,17 +65,15 @@ type FormSectionProps = {
   header: string,
   btn?: ReactNode,
   disabled?: boolean;
-  hideComponent?: boolean;
+  hide?: boolean;
   children: ReactNode;
 }
 /** creates a section of a form with a grid layout
  * @param children must not contain non valid elements (ex. fragments or nulls)
  * top level children must have key props
  */
-const FormSection = ({ id, header, btn, disabled, hideComponent = false, children }: FormSectionProps): JSX.Element => { 
-  if(hideComponent){
-    return null;
-  }
+const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionProps): JSX.Element => { 
+  if (hide) return null;
   return (
     <Box component='fieldset' p={2}>
       {header ? (
@@ -86,7 +86,7 @@ const FormSection = ({ id, header, btn, disabled, hideComponent = false, childre
             {Children.map(children, (child: ReactElement, idx: number) => {
               const isDisabled = child?.props?.disabled ?? disabled;
               // fixme: adding colgap via child component margin-botom instead
-              return cloneElement(child, {key:`${id}-${idx}`, disabled: isDisabled, style: {...child.props.style, marginBottom: '5px'}});
+              return cloneElement(child, {key:`${id}-${idx}`, disabled: isDisabled, style: {...child.props.style, marginBottom: '10px'}});
             })}
           </Grid>
         </Grid>
