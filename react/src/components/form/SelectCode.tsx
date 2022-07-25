@@ -59,6 +59,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   const [value, setValue] = useState(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
+  const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
   const SPECIES_STR = 'species';
   // to handle React warning about not recognizing the prop on a DOM element
@@ -72,23 +73,27 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     'triggerReset',
     'defaultValue'
   ]);
-
   useEffect(() => {
     const updateSpeciesContext = () => {
       if(codeHeader === SPECIES_STR && updateSpecies && value && codes.length){
         if(species?.name === value) return;
         const s = codes.find(c => c?.description === value);
         updateSpecies(formatCodeToSpecies(s));
+        setCanFetch(false);
+      }
+      if(!species){
+        setCanFetch(true);
       }
     }
     updateSpeciesContext();
   },[value]);
 
   // load the codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess, refetch } 
+  const { data, error, isFetching, isError, isLoading, isSuccess } 
   = api.useCodes(0, codeHeader, species?.id, {
+    // cacheTime set to zero to prevent weird caching behaviour with species selection
     cacheTime: 0, 
-    enabled: species?.name !== value || !species?.id,
+    enabled: canFetch,
   });
 
   // when data is successfully fetched
@@ -227,7 +232,11 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
           size='small'
           style={{...baseInputStyle, ...style}}
           className={`select-control ${hasError ? 'input-error' : ''}`}>
-          <InputLabel disabled={disabled}>{getLabel(codeHeader, required, species)}</InputLabel>
+          <InputLabel disabled={disabled}>{
+          required 
+            ? `${codes[0].code_header_title} *` 
+            : codes[0].code_header_title}
+          </InputLabel>
           <Select
             MenuProps={selectMenuProps}
             value={multiple ? values : value}
