@@ -1,8 +1,6 @@
 import { Box, ButtonProps, Grid } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
-import { useSpecies } from 'contexts/SpeciesContext';
-import { cloneElement, Children, Key, ReactElement, ReactNode, useState } from 'react';
-import { containsOrEmpty } from 'utils/common_helpers';
+import { cloneElement, Children, Key, ReactElement, ReactNode } from 'react';
 
 interface TabPanelProps {
   children?: ReactNode;

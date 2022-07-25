@@ -4,7 +4,7 @@ import { useState, useEffect, ReactNode } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
-import { columnToHeader, headerToColumn, removeProps } from 'utils/common_helpers';
+import { columnToHeader, removeProps } from 'utils/common_helpers';
 import { SelectProps } from '@mui/material';
 import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -14,7 +14,8 @@ import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
 import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
-import { transformCodeHeader } from 'types/animal';
+import { ISpecies } from 'types/animal';
+import { castCodeHeader, formatCodeToSpecies } from 'utils/species';
 
 type SelectCodeProps = FormBaseProps & SelectProps &
 PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
@@ -56,7 +57,6 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   const species = useSpecies();
   const updateSpecies = useUpdateSpecies();
   const [value, setValue] = useState(defaultValue);
-  const [code, setCode] = useState<ICode>();
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
@@ -72,20 +72,24 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     'triggerReset',
     'defaultValue'
   ]);
-  const convertCodeHeader = (codeHeader: string, cast?: SpeciesCast, species?: string) => {
-    if(!cast) return codeHeader;
-    if(!species) return codeHeader;
-    if(!cast[species]) return codeHeader;
-    return cast[species];
-  }
+
   useEffect(() => {
-    if(codeHeader === SPECIES_STR && updateSpecies){
-      updateSpecies(headerToColumn(value));
+    const updateSpeciesContext = () => {
+      if(codeHeader === SPECIES_STR && updateSpecies && value && codes.length){
+        if(species?.name === value) return;
+        const s = codes.find(c => c?.description === value);
+        updateSpecies(formatCodeToSpecies(s));
+      }
     }
+    updateSpeciesContext();
   },[value]);
+
   // load the codeHeaders codes from db
   const { data, error, isFetching, isError, isLoading, isSuccess, refetch } 
-  = api.useCodes(0, convertCodeHeader(codeHeader, cast, species), { cacheTime: species ? 0 : 5000});
+  = api.useCodes(0, codeHeader, species?.id, {
+    cacheTime: 0, 
+    enabled: species?.name !== value || !species?.id,
+  });
 
   // when data is successfully fetched
   useEffect(() => {
@@ -100,12 +104,15 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       setCodes(data);
       // if a default value was provided, update it to the actual value
       const found = data.find((d) => d?.description === defaultValue);
+      //Set the species context
+      if(found && found?.code_header_title.toLowerCase() === SPECIES_STR){
+        updateSpecies(formatCodeToSpecies(found));
+      }
       // update the error status if found
       if (found?.description && hasError) {
         setHasError(false);
       }
-      setValue(found?.description ?? '');
-      setCode(found);
+      setValue(found?.description ?? "");
     };
     updateOptions();
   }, [isSuccess]);
@@ -204,8 +211,8 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       changeHandlerMultiple(ret as ICodeFilter[]);
     }
   };
-  const getLabel = (codeHeader: string, required: boolean, species?: string): string => {
-    const t = columnToHeader(convertCodeHeader(`${codeHeader}`, cast, species));
+  const getLabel = (codeHeader: string, required: boolean, species?: ISpecies): string => {
+    const t = columnToHeader(castCodeHeader(`${codeHeader}`, cast, species));
     return required ? `${t} *` : t;
   }
   return (

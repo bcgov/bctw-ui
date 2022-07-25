@@ -1,8 +1,9 @@
 import React, { SetStateAction } from 'react';
 import { useContext, createContext, useState, useEffect } from 'react';
+import { ISpecies } from 'types/animal';
 
-const SpeciesContext = createContext<string | null>(null);
-const SpeciesUpdateContext = createContext<React.Dispatch<React.SetStateAction<string>> | null>(null);
+const SpeciesContext = createContext<ISpecies | null>(null);
+const SpeciesUpdateContext = createContext<React.Dispatch<React.SetStateAction<ISpecies>> | null>(null);
 
 export const useSpecies = () => {
   return useContext(SpeciesContext);
@@ -12,7 +13,7 @@ export const useUpdateSpecies = () => {
 };
 
 export const SpeciesProvider = (props: { children: React.ReactNode }): JSX.Element => {
-  const [species, setSpecies] = useState<string | null>(null);
+  const [species, setSpecies] = useState<ISpecies | null>(null);
 
   return (
     <SpeciesContext.Provider value={species}>

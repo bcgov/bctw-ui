@@ -4,16 +4,17 @@ import SelectCode from './SelectCode';
 import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
-import { ReactElement, ReactNode, useEffect, useState } from 'react';
-import { columnToHeader, headerToColumn, removeProps, showField } from 'utils/common_helpers';
+import { ReactElement, ReactNode } from 'react';
+import { removeProps } from 'utils/common_helpers';
 import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap, SpeciesCast } from 'types/form_types';
 import dayjs, { Dayjs } from 'dayjs';
 import { BCTWFormat } from 'types/common_types';
 import { Tooltip } from 'components/common'
 import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
-import { Animal, AttachedAnimal, eSpecies, transformCodeHeader } from 'types/animal';
+import { Animal, AttachedAnimal } from 'types/animal';
 import { useSpecies } from 'contexts/SpeciesContext';
 import { WorkflowFormField } from 'types/events/event';
+import { showField } from 'utils/species';
 
 type CreateInputBaseProps = {
   value: unknown;

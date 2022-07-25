@@ -12,7 +12,7 @@ import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, UseMutationOptions, UseMutationResult, useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
-import { Animal, AttachedAnimal, eCritterFetchType, transformCodeHeader } from 'types/animal';
+import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar, IVectronicUpsert } from 'types/collar';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
@@ -204,8 +204,8 @@ export const useTelemetryApi = () => {
    * @param codeHeader the code header name used to determine which codes to fetch
    * @param page not currently used
   */
-  const useCodes = <T>(page: number, codeHeader: string, options?: T): UseQueryResult<ICode[], AxiosError> => {
-    const props = {page, codeHeader};
+  const useCodes = <T>(page: number, codeHeader: string, species?: string | null, options?: T): UseQueryResult<ICode[], AxiosError> => {
+    const props = {page, codeHeader, species};
     return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), {...codeOptions, ...options});
   };
     /**

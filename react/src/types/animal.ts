@@ -9,23 +9,18 @@ import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
-export enum ePopulationUnit {
-  population_unit = 'population_unit',
-  wildlife_unit = 'wildlife_unit',
-}
-export enum eSpecies {
-  caribou = 'caribou',
-  grizzly_bear = 'grizzly_bear',
-  moose = 'moose',
-  grey_wolf = 'grey_wolf'
-}
-const {caribou, grizzly_bear, moose} = eSpecies;
+
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
   assigned = 'assigned',
   unassigned = 'unassigned'
 }
 
+export interface ISpecies {
+  id: string,
+  key: string,
+  name: string
+}
 /**
  * Animal properties that are re-used in Telemetry classes (map.ts)
  */
@@ -244,28 +239,23 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
     return super.formatPropAsHeader(str);
   }
 }
-/**
- * Formats codeHeaders to correct names for backend queries, used in UI to populate select dropdowns.
- * See SelectCode.tsx
- * @param codeHeader
- * @param species
- * @returns transformed codeHeader as a string.
- */
-export const transformCodeHeader = (codeHeader: string, species?: string) => {
-  if(!species) return codeHeader;
-  const { population_unit, wildlife_unit } = ePopulationUnit;
-  if(codeHeader === population_unit as keyof Animal){
-    if(species === caribou) return population_unit;
-    return wildlife_unit;
-  }
-  if(codeHeader === 'life_stage' as keyof Animal){
-    if(species === moose) return 'moose_life_stage'
-  }
-  return codeHeader;
+
+export enum eCasts {
+  PU = 'population_unit',
+  WMU = 'wildlife_unit',
+  MLS = 'moose_life_stage',
 }
-const WLU = 'wildlife_unit';
-const MLS = 'moose_life_stage';
-// species: [] represents all species, used for optimization on searching
+//Fixme: move this into a context that fetches from the DB to stay in sync.
+export enum eSpecies {
+  caribou = 'M-RATA',
+  grizzly_bear = 'M-URAR',
+  moose = 'M-ALAM',
+  grey_wolf = 'M-CALU',
+}
+
+const {caribou, grizzly_bear, moose} = eSpecies;
+const {PU, WMU, MLS} = eCasts;
+// species: [] represents field applies to all species, used for optimization on searching
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
   testFields: [
     { prop: 'capture_date', type: eInputType.datetime, species: [moose] },
@@ -302,7 +292,10 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'sex', type: eInputType.code, species: [], ...isRequired },
     { prop: 'animal_colouration', type: eInputType.text, species: [], },
     { prop: 'estimated_age', type: eInputType.number, species: [], validate: mustbePositiveNumber },
-    { prop: 'life_stage', type: eInputType.code, species: [], cast: {moose: MLS} }, //Species dependant, with code table
+    { prop: 'life_stage', type: eInputType.code, species: [], 
+      cast: {
+        moose: MLS
+      }}, //Species dependant, with code table
   ],
   characteristicFields2: [
     { prop: 'juvenile_at_heel', type: eInputType.code, species: []},
@@ -313,7 +306,12 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'animal_id', type: eInputType.text, species: [], ...isRequired },
     //Add nickname field for bears
     { prop: 'region', type: eInputType.code, species: [], ...isRequired },
-    { prop: 'population_unit', type: eInputType.code, species: [], cast: { moose: WLU, grizzly_bear: WLU, grey_wolf: WLU}, ...isRequired }, //Population unit needs to be species dependant, surface with code table   
+    { prop: 'population_unit', type: eInputType.code, species: [], 
+      cast: { 
+        moose: WMU, 
+        grizzly_bear: WMU, 
+        grey_wolf: WMU
+      }, ...isRequired }, //Population unit needs to be species dependant, surface with code table   
   ],
   identifierFields2: [
     { prop: 'ear_tag_left_colour', type: eInputType.text, species: [] },

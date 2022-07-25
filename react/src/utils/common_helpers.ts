@@ -1,6 +1,4 @@
 import { ITableFilter } from 'components/table/table_interfaces';
-import { Animal, critterFormFields, eSpecies } from 'types/animal';
-import { FormFieldObject } from 'types/form_types';
 
 // returns the number of digits after the decimal in a float
 const countDecimals = (value: number): number => {
@@ -145,45 +143,6 @@ const classToArray = <T>(
   return [...startsWith, ...ke];
 }
 
-/**
- * Used to hide individual form elements from the UI - used with species related form fields
- * @param field FormFieldObject
- * @param species Name of species to search object
- * @returns Boolean
- */
-const showField = <T>(
-  field: FormFieldObject<T>, 
-  species: string):boolean => {
-  //If field has length of 0, field applies to all species
-  if(!field.species.length) return true;
-  return field.species.includes(species);
-}
-
-/**
- * Used to hide FormSection from UI
- * @param fields Array of FormFieldObjects
- * @param species Name of species to search object
- * @returns Boolean
- */
-const hideSection = <T>(
-  fields: FormFieldObject<T>[],
-  species: string): boolean => {
-  return !fields.map((f)=> showField(f, species)).includes(true);
-}
-/**
- * Checks if search item exists in array or array is empty.
- * @param arr array to search
- * @param search search item
- * @returns boolean
- */
-const containsOrEmpty = <T>(arr: T[], search: T) => {
-  if(!arr.length) return true;
-  if(arr.find(el => el === search)) return true
-  return false;
-}
-
-
-
 export {
   columnToHeader,
   countDecimals,
@@ -199,7 +158,4 @@ export {
   capitalize,
   classToArray,
   headerToColumn,
-  showField,
-  hideSection,
-  containsOrEmpty,
 };

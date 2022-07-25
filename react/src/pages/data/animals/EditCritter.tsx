@@ -4,9 +4,9 @@ import EditModal from 'pages/data/common/EditModal';
 import { Animal, AttachedAnimal, critterFormFields, eSpecies } from 'types/animal';
 import { Box, Container, IconButton } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
-import { CreateFormField, CreateSpeciesFormField } from 'components/form/create_form_components';
+import { CreateSpeciesFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
-import { ReactNode, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
@@ -21,13 +21,13 @@ import SelectUDF from 'components/form/SelectUDF';
 import { MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useSpecies } from 'contexts/SpeciesContext';
-import { hideSection } from 'utils/common_helpers';
+import { hideSection } from 'utils/species';
 
 /**
  * the main animal form
  */
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
-  const { isCreatingNew, editing, open, refresh } = props;
+  const { isCreatingNew, editing, open } = props;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
   const species = useSpecies();

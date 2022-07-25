@@ -48,6 +48,7 @@ import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import { eUDFType } from 'types/udf';
+import { SpeciesProvider } from 'contexts/SpeciesContext';
 
 /**
   there are several forms of state in this page:
@@ -653,6 +654,7 @@ export default function MapPage(): JSX.Element {
   };
 
   return (
+    <SpeciesProvider>
     <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove} >
       <MapFilters
         start={range.start}
@@ -714,5 +716,6 @@ export default function MapPage(): JSX.Element {
         <AddUDF title={'Custom Animal Groups'} udf_type={eUDFType.critter_group} open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)} />
       </div>
     </div>
+    </SpeciesProvider>
   );
 }
