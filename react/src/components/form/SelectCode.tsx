@@ -4,7 +4,7 @@ import { useState, useEffect, ReactNode } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
-import { columnToHeader, removeProps } from 'utils/common_helpers';
+import { removeProps } from 'utils/common_helpers';
 import { SelectProps } from '@mui/material';
 import { FormStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -14,8 +14,9 @@ import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
 import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
-import { ISpecies } from 'types/animal';
-import { castCodeHeader, formatCodeToSpecies } from 'utils/species';
+import { formatCodeToSpecies } from 'utils/species';
+import ConfirmModal from 'components/modal/ConfirmModal';
+import { speciesModalMessage } from 'constants/formatted_string_components';
 
 type SelectCodeProps = FormBaseProps & SelectProps &
 PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
@@ -60,6 +61,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
   const [canFetch, setCanFetch] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
   const SPECIES_STR = 'species';
   // to handle React warning about not recognizing the prop on a DOM element
@@ -73,19 +75,34 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     'triggerReset',
     'defaultValue'
   ]);
+  const handleConfirmSpeciesUpdate = (): void => {
+    // && updateSpecies && value && codes.length
+    const s = formatCodeToSpecies(codes.find(c => c?.description === value));
+    updateSpecies(s);
+    setShowModal(false);
+  }
+
+  const handleDeclineSpeciesModal = (): void => {
+    setValue(species?.name);
+    setShowModal(false);
+  } 
+
   useEffect(() => {
-    const updateSpeciesContext = () => {
-      if(codeHeader === SPECIES_STR && updateSpecies && value && codes.length){
-        if(species?.name === value) return;
-        const s = codes.find(c => c?.description === value);
-        updateSpecies(formatCodeToSpecies(s));
-        setCanFetch(false);
+    if(codeHeader !== SPECIES_STR) return;
+    //if(!species) setCanFetch(true);
+    //When the species  first dropdown value is '' we know we are adding a new critter.
+    if(!value) return;
+    if(!codes.length) return;
+      if(species) {
+        //Show the modal on all changes to the species from within the edit critter page
+        if(value !== species?.name) {
+          setShowModal(true);
+        }
+      }else {
+        //Only show the modal after the second species selection
+        handleConfirmSpeciesUpdate();
       }
-      if(!species){
-        setCanFetch(true);
-      }
-    }
-    updateSpeciesContext();
+    setCanFetch(false);
   },[value]);
 
   // load the codeHeaders codes from db
@@ -216,12 +233,13 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       changeHandlerMultiple(ret as ICodeFilter[]);
     }
   };
-  const getLabel = (codeHeader: string, required: boolean, species?: ISpecies): string => {
-    const t = columnToHeader(castCodeHeader(`${codeHeader}`, cast, species));
-    return required ? `${t} *` : t;
-  }
   return (
     <>
+    <ConfirmModal 
+      open={showModal} 
+      handleClose={handleDeclineSpeciesModal} 
+      message={speciesModalMessage} 
+      handleClickYes={handleConfirmSpeciesUpdate}/>
       {isError ? (
         <NotificationMessage severity='error' message={formatAxiosError(error)} />
       ) : isLoading || isFetching ? (

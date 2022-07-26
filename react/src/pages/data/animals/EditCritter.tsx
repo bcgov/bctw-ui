@@ -20,7 +20,7 @@ import AddUDF from 'pages/udf/AddUDF';
 import SelectUDF from 'components/form/SelectUDF';
 import { MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { useSpecies } from 'contexts/SpeciesContext';
+import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import { hideSection } from 'utils/species';
 
 /**
@@ -31,6 +31,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
   const species = useSpecies();
+  const updateSpecies = useUpdateSpecies();
   const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
@@ -45,6 +46,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
 
   const reset = (): void => {
     setHasBabies(false);
+    updateSpecies(null);
   }
   /**
    * when a workflow button is clicked, update the event type

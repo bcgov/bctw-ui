@@ -36,4 +36,7 @@ const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX
   </>
 )
 
-export { critterImportMessage, deviceImportMessage, bothImportMessage, pointImportMessage, releaseUnattachWarning };
+const speciesModalMessage = (
+  <h3>Switching species will remove some previously saved attributes. <br/><div style={{textAlign: 'center'}}>Are you sure you want to do this?</div></h3>
+)
+export { critterImportMessage, deviceImportMessage, bothImportMessage, pointImportMessage, releaseUnattachWarning, speciesModalMessage };
