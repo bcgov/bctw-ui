@@ -38,7 +38,9 @@ var keyCloakConfig = {
   sslRequired: 'external'
 };
 
-console.log("*** Keycloak configuration: " + keyCloakConfig);
+var keyCloakConfigString = JSON.stringify(keyCloakConfig, null, 4);
+console.log("*** Keycloak configuration:");
+console.log(keyCloakConfigString);
 
 // instantiate Keycloak Node.js adapter, passing in configuration
 var keycloak = new keycloakConnect({
