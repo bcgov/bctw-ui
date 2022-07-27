@@ -15,7 +15,6 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.17.1",
-    "express-openid-connect": "^2.8.0",
     "express-session": "^1.17.0",
     "form-data": "^3.0.0",
     "helmet": "^3.21.2",
