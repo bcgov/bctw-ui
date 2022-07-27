@@ -38,7 +38,7 @@ var keyCloakConfig = {
   'public-client': isPublic,
   pkceMethod: 'S256',
   'pkce-method': 'S256',
-  realm: process.env.KEYCLOAK_REALM 
+  realm: process.env.KEYCLOAK_REALM
 };
 
 var keyCloakConfigString = JSON.stringify(keyCloakConfig, null, 4);
@@ -65,11 +65,9 @@ console.log("*** OpenIdConnect configuration:");
 console.log(openIdConfigString);
 
 // instantiate Keycloak Node.js adapter, passing in configuration
-/*
 var keycloak = new keycloakConnect({
   store: memoryStore
 }, keyCloakConfig);
-*/
 
 // set up the session
 var session = {
@@ -273,8 +271,8 @@ var app = express()
   .use(express.json({ limit: '50mb' }))
   .use(express.urlencoded({ limit: '50mb', extended: true }))
   .use(expressSession(session))
-  //.use(keycloak.middleware())
-  .use(auth(openIdConfig))
+  .use(keycloak.middleware())
+  //.use(auth(openIdConfig))
   .use(gardenGate) // Keycloak Gate
   .get('/denied', denied);
 
@@ -282,8 +280,8 @@ var app = express()
 if (isProd) {
   app
     .get('/api/session-info', retrieveSessionInfo)
-    //.all('*', keycloak.protect(), pageHandler);
-    .all('*', requiresAuth(), pageHandler);
+    .all('*', keycloak.protect(), pageHandler);
+    //.all('*', requiresAuth(), pageHandler);
 } else {
   app
     .post('/api/import-csv', upload.single('csv'), pageHandler)
@@ -292,23 +290,23 @@ if (isProd) {
 }
 if (isProd) {
   app
-    //.get('/', keycloak.protect(), pageHandler)
-    .get('/', requiresAuth(), pageHandler)
+    .get('/', keycloak.protect(), pageHandler)
+    //.get('/', requiresAuth(), pageHandler)
     // .get('/api/session-info', retrieveSessionInfo)
-    //.get('/api/:endpoint', keycloak.protect(), proxyApi)
-    .get('/api/:endpoint', requiresAuth(), proxyApi)
-    //.get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
-    .get('/api/:endpoint/:endpointId', requiresAuth(), proxyApi)
+    .get('/api/:endpoint', keycloak.protect(), proxyApi)
+    //.get('/api/:endpoint', requiresAuth(), proxyApi)
+    .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
+    //.get('/api/:endpoint/:endpointId', requiresAuth(), proxyApi)
     // bulk file import handlers
-    //.post('/api/import-csv', upload.single('csv'), keycloak.protect(), pageHandler)
-    .post('/api/import-csv', upload.single('csv'), requiresAuth(), pageHandler)
-    //.post('/api/import-xml', upload.array('xml'), keycloak.protect(), pageHandler)
-    .post('/api/import-xml', upload.array('xml'), requiresAuth(), pageHandler)
-    //.post('/api/:endpoint', keycloak.protect(), proxyApi)
-    .post('/api/:endpoint', requiresAuth(), proxyApi)
+    .post('/api/import-csv', upload.single('csv'), keycloak.protect(), pageHandler)
+    //.post('/api/import-csv', upload.single('csv'), requiresAuth(), pageHandler)
+    .post('/api/import-xml', upload.array('xml'), keycloak.protect(), pageHandler)
+    //.post('/api/import-xml', upload.array('xml'), requiresAuth(), pageHandler)
+    .post('/api/:endpoint', keycloak.protect(), proxyApi)
+    //.post('/api/:endpoint', requiresAuth(), proxyApi)
     // delete handlers
-    //.delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi);
-    .delete('/api/:endpoint/:endpointId', requiresAuth(), proxyApi);
+    .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi);
+    //.delete('/api/:endpoint/:endpointId', requiresAuth(), proxyApi);
 }
 
 // handle static assets 
