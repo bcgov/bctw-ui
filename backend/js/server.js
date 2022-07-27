@@ -32,13 +32,16 @@ var keyCloakConfig = {
   'auth-server-url': process.env.KEYCLOAK_SERVER_URL,
   clientId: process.env.KEYCLOAK_CLIENT_ID,
   'client-id': process.env.KEYCLOAK_CLIENT_ID,
+  credentials: {
+    secret: process.env.KEYCLOAK_CLIENT_SECRET
+  },
   resource: process.env.KEYCLOAK_CLIENT_ID,
   public: isPublic,
   publicClient: isPublic,
   'public-client': isPublic,
   pkceMethod: 'S256',
   'pkce-method': 'S256',
-  realm: process.env.KEYCLOAK_REALM
+  realm: process.env.KEYCLOAK_REALM,
 };
 
 var keyCloakConfigString = JSON.stringify(keyCloakConfig, null, 4);
