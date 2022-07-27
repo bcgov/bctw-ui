@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cors = require('cors');
 const express = require('express');
+const { auth, requiresAuth } = require('express-openid-connect');
 const expressSession = require('express-session');
 const helmet = require('helmet');
 const formData = require('form-data');
@@ -28,24 +29,47 @@ const upload = multer({ storage });
 // see: https://www.keycloak.org/docs/latest/securing_apps/index.html#_nodejs_adapter
 var keyCloakConfig = {
   authServerUrl: process.env.KEYCLOAK_SERVER_URL,
+  'auth-server-url': process.env.KEYCLOAK_SERVER_URL,
   clientId: process.env.KEYCLOAK_CLIENT_ID,
-  confidentialPort: '0',
+  'client-id': process.env.KEYCLOAK_CLIENT_ID,
   resource: process.env.KEYCLOAK_CLIENT_ID,
   public: isPublic,
   publicClient: isPublic,
+  'public-client': isPublic,
   pkceMethod: 'S256',
-  realm: process.env.KEYCLOAK_REALM,
-  sslRequired: 'external'
+  'pkce-method': 'S256',
+  realm: process.env.KEYCLOAK_REALM 
 };
 
 var keyCloakConfigString = JSON.stringify(keyCloakConfig, null, 4);
 console.log("*** Keycloak configuration:");
 console.log(keyCloakConfigString);
 
+var openIdConfig = {
+  issuerBaseURL: process.env.KEYCLOAK_SERVER_URL,
+  baseURL: process.env.BASE_URL,
+  clientID: process.env.KEYCLOAK_CLIENT_ID,
+  secret: sessionSalt,
+  idpLogout: true,
+  realm: process.env.KEYCLOAK_REALM,
+  'auth-server-url': process.env.KEYCLOAK_SERVER_URL,
+  'ssl-required': "external",
+  resource: process.env.KEYCLOAK_CLIENT_ID,
+  credentials: {
+    secret: sessionSalt
+  }
+}
+
+var openIdConfigString = JSON.stringify(openIdConfig, null, 4);
+console.log("*** OpenIdConnect configuration:");
+console.log(openIdConfigString);
+
 // instantiate Keycloak Node.js adapter, passing in configuration
+/*
 var keycloak = new keycloakConnect({
   store: memoryStore
 }, keyCloakConfig);
+*/
 
 // set up the session
 var session = {
@@ -249,7 +273,8 @@ var app = express()
   .use(express.json({ limit: '50mb' }))
   .use(express.urlencoded({ limit: '50mb', extended: true }))
   .use(expressSession(session))
-  .use(keycloak.middleware())
+  //.use(keycloak.middleware())
+  .use(auth(openIdConfig))
   .use(gardenGate) // Keycloak Gate
   .get('/denied', denied);
 
@@ -257,7 +282,8 @@ var app = express()
 if (isProd) {
   app
     .get('/api/session-info', retrieveSessionInfo)
-    .all('*', keycloak.protect(), pageHandler);
+    //.all('*', keycloak.protect(), pageHandler);
+    .all('*', requiresAuth(), pageHandler);
 } else {
   app
     .post('/api/import-csv', upload.single('csv'), pageHandler)
@@ -266,16 +292,23 @@ if (isProd) {
 }
 if (isProd) {
   app
-    .get('/', keycloak.protect(), pageHandler)
+    //.get('/', keycloak.protect(), pageHandler)
+    .get('/', requiresAuth(), pageHandler)
     // .get('/api/session-info', retrieveSessionInfo)
-    .get('/api/:endpoint', keycloak.protect(), proxyApi)
-    .get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
+    //.get('/api/:endpoint', keycloak.protect(), proxyApi)
+    .get('/api/:endpoint', requiresAuth(), proxyApi)
+    //.get('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi)
+    .get('/api/:endpoint/:endpointId', requiresAuth(), proxyApi)
     // bulk file import handlers
-    .post('/api/import-csv', upload.single('csv'), keycloak.protect(), pageHandler)
-    .post('/api/import-xml', upload.array('xml'), keycloak.protect(), pageHandler)
-    .post('/api/:endpoint', keycloak.protect(), proxyApi)
+    //.post('/api/import-csv', upload.single('csv'), keycloak.protect(), pageHandler)
+    .post('/api/import-csv', upload.single('csv'), requiresAuth(), pageHandler)
+    //.post('/api/import-xml', upload.array('xml'), keycloak.protect(), pageHandler)
+    .post('/api/import-xml', upload.array('xml'), requiresAuth(), pageHandler)
+    //.post('/api/:endpoint', keycloak.protect(), proxyApi)
+    .post('/api/:endpoint', requiresAuth(), proxyApi)
     // delete handlers
-    .delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi);
+    //.delete('/api/:endpoint/:endpointId', keycloak.protect(), proxyApi);
+    .delete('/api/:endpoint/:endpointId', requiresAuth(), proxyApi);
 }
 
 // handle static assets 
