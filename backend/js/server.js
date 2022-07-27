@@ -13,6 +13,7 @@ const path = require('path')
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
 const isProd = process.env.NODE_ENV === 'production' ? true : false;
+const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === 'public' ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
 
@@ -28,8 +29,13 @@ const upload = multer({ storage });
 var keyCloakConfig = {
   authServerUrl: process.env.KEYCLOAK_SERVER_URL,
   clientId: process.env.KEYCLOAK_CLIENT_ID,
-  public: true,
-  realm: process.env.KEYCLOAK_REALM
+  confidentialPort: '0',
+  resource: process.env.KEYCLOAK_CLIENT_ID,
+  public: isPublic,
+  publicClient: isPublic,
+  pkceMethod: 'S256',
+  realm: process.env.KEYCLOAK_REALM,
+  sslRequired: 'external'
 };
 
 // instantiate Keycloak Node.js adapter, passing in configuration
