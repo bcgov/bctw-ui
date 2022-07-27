@@ -9,7 +9,9 @@ const CritterStrings = {
   collarRemovalTitle: 'Confirm Device Unassignment',
   exportTitle: 'animal_export',
   unassignedTableTitle: 'Animals Without a Device',
-  addTooltip: 'TODO: addTooltip'
+  addTooltip: 'TODO: addTooltip',
+  lockedSpeciesTooltip: 'Unlock to change species. Warning potential data loss.',
+  unlockedSpeciesTooltip: 'Lock species selection'
 }
 
 const ImportSteps = [ 

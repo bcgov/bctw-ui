@@ -6,7 +6,7 @@ import { Box, Container, IconButton } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateSpeciesFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
@@ -14,13 +14,13 @@ import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import ReleaseEvent from 'types/events/release_event';
-import { Button, Icon } from 'components/common';
+import { Button, Icon, Tooltip } from 'components/common';
 import { eUDFType, IUDF } from 'types/udf';
 import AddUDF from 'pages/udf/AddUDF';
 import SelectUDF from 'components/form/SelectUDF';
-import { MapStrings } from 'constants/strings';
+import { CritterStrings, MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import { useLockSpecies, useSpecies, useUpdateLockSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import { hideSection } from 'utils/species';
 
 /**
@@ -28,9 +28,13 @@ import { hideSection } from 'utils/species';
  */
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing, open } = props;
+
+  const species = useSpecies();
+  const lockSpecies = useLockSpecies();
+  const setLockSpecies = useUpdateLockSpecies();
+  
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
-  const species = useSpecies();
   const updateSpecies = useUpdateSpecies();
   const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
@@ -38,6 +42,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const [event, updateEvent] = useState<CaptureEvent | ReleaseEvent | MortalityEvent>(new MortalityEvent());
   const [showUDFModal, setShowUDFModal] = useState(false);
   const [hasBabies, setHasBabies] = useState(false);
+
   useDidMountEffect(() => {
     if(open) {
       reset();
@@ -48,6 +53,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     setHasBabies(false);
     updateSpecies(null);
   }
+  useEffect(() => setLockSpecies(!isCreatingNew),[isCreatingNew])
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
@@ -172,9 +178,10 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
             if (key === 'juvenile_at_heel' && value) {
               setHasBabies(String(value).toLowerCase() === 'y');
             }
-            // if (key === 'species' && value) {
-            //   setSpecies(String(value));
-            // }
+            if (key === 'species' && value){
+              //updateSpecies(value);
+              console.log(value);
+            }
             handlerFromContext(v);
           }
           return (
@@ -195,7 +202,15 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 CU editor is available if user has permission
               */}
               <FormSection id='cr-species' header='Species' disabled={!canEdit}>
-                <CreateSpeciesFormField obj={editing} formField={wfFields.get('species')} handleChange={onChange}/>
+                <CreateSpeciesFormField obj={editing} formField={wfFields.get('species')} handleChange={onChange} inputProps={{disabled: lockSpecies}}/>
+                <IconButton key='udf-icon' onClick={()=>setLockSpecies(l=>!l)}>
+                  {!isCreatingNew &&
+                    (lockSpecies 
+                      ? <Tooltip children={<Icon icon='lock'/>} title={CritterStrings.lockedSpeciesTooltip}/>
+                      : <Tooltip children={<Icon icon='unlocked'/>} title={CritterStrings.unlockedSpeciesTooltip}/>
+                    )
+                  }
+                </IconButton>
               </FormSection>
               <FormSection id='cr-test' header='Test' disabled={!canEdit} hide={hideSection(testFields, species)}>
                 {testFields.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)}

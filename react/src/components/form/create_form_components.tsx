@@ -188,9 +188,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   if (formField === undefined) {
     return null;
   }
-  // if(obj instanceof Animal && species){
-  //   if(!showField(formField, species)) return null;
-  // }
+
   const { prop, type, tooltip} = formField;
   const toPass = {
     // fixme: why wont this type if U overlaps T?

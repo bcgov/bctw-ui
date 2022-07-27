@@ -13,7 +13,7 @@ import { FormBaseProps, SpeciesCast } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
-import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import { useSpecies, useUpdateLockSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import { formatCodeToSpecies } from 'utils/species';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { speciesModalMessage } from 'constants/formatted_string_components';
@@ -52,11 +52,12 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     required,
     propName,
     disabled,
-    cast
   } = props;
   const api = useTelemetryApi();
   const species = useSpecies();
   const updateSpecies = useUpdateSpecies();
+  const updateSpeciesLock = useUpdateLockSpecies();
+  
   const [value, setValue] = useState(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
@@ -85,9 +86,16 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   const handleDeclineSpeciesModal = (): void => {
     setValue(species?.name);
     setShowModal(false);
+    updateSpeciesLock(true);
   } 
 
   useEffect(() => {
+    if(!value){
+      //console.log(`ch: ${codeHeader} val: ${value}`);
+      // const ret = { [getIdentifier()]: value, error: hasError };
+      // console.log(ret);
+      // changeHandler(ret);
+    }
     if(codeHeader !== SPECIES_STR) return;
     //if(!species) setCanFetch(true);
     //When the species  first dropdown value is '' we know we are adding a new critter.
@@ -249,7 +257,9 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
           error={hasError}
           size='small'
           style={{...baseInputStyle, ...style}}
-          className={`select-control ${hasError ? 'input-error' : ''}`}>
+          className={`select-control ${hasError ? 'input-error' : ''}`}
+          disabled={disabled}
+          >
           <InputLabel disabled={disabled}>{
           required 
             ? `${codes[0].code_header_title} *` 

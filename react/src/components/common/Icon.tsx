@@ -28,7 +28,9 @@ import {
   mdiChartTimelineVariant,
   mdiMapMarker,
   mdiPageLast,
-  mdiDatabase
+  mdiDatabase,
+  mdiLock,
+  mdiLockOpenCheck
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -102,6 +104,10 @@ const getIconPath = (path: string): string => {
       return mdiAlert;
     case 'database':
       return mdiDatabase;
+    case 'lock':
+      return mdiLock;
+    case 'unlocked':
+      return mdiLockOpenCheck;
   }
 };
 
