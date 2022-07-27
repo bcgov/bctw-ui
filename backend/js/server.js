@@ -25,7 +25,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // create a Keycloak config object (deprecates use of keycloak.json)
-// see: https://wjw465150.gitbooks.io/keycloak-documentation/content/securing_apps/topics/oidc/nodejs-adapter.html
+// see: https://www.keycloak.org/docs/latest/securing_apps/index.html#_nodejs_adapter
 var keyCloakConfig = {
   authServerUrl: process.env.KEYCLOAK_SERVER_URL,
   clientId: process.env.KEYCLOAK_CLIENT_ID,
@@ -37,6 +37,8 @@ var keyCloakConfig = {
   realm: process.env.KEYCLOAK_REALM,
   sslRequired: 'external'
 };
+
+console.log("*** Keycloak configuration: " + keyCloakConfig);
 
 // instantiate Keycloak Node.js adapter, passing in configuration
 var keycloak = new keycloakConnect({
