@@ -52,8 +52,11 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const reset = (): void => {
     setHasBabies(false);
     updateSpecies(null);
+    setLockSpecies(!isCreatingNew);
   }
-  useEffect(() => setLockSpecies(!isCreatingNew),[isCreatingNew])
+  useEffect(() => {
+    setLockSpecies(!isCreatingNew)
+  },[isCreatingNew, species])
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
@@ -178,10 +181,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
             if (key === 'juvenile_at_heel' && value) {
               setHasBabies(String(value).toLowerCase() === 'y');
             }
-            if (key === 'species' && value){
-              //updateSpecies(value);
-              console.log(value);
-            }
             handlerFromContext(v);
           }
           return (
@@ -195,7 +194,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 open={showUDFModal}
                 handleClose={(): void => setShowUDFModal(false)}
                 afterSave={(): void => setShowUDFModal(false)}
-              />
+                />
               {/* 
                 render the collective unit (CU) select.
                 disabled if a CU has already been assigned
@@ -208,12 +207,9 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     (lockSpecies 
                       ? <Tooltip children={<Icon icon='lock'/>} title={CritterStrings.lockedSpeciesTooltip}/>
                       : <Tooltip children={<Icon icon='unlocked'/>} title={CritterStrings.unlockedSpeciesTooltip}/>
-                    )
-                  }
+                      )
+                    }
                 </IconButton>
-              </FormSection>
-              <FormSection id='cr-test' header='Test' disabled={!canEdit} hide={hideSection(testFields, species)}>
-                {testFields.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)}
               </FormSection>
               <FormSection id='cr-ids' header='Identifiers' disabled={!canEdit} hide={hideSection([...identifierFields2, ...identifierFields2], species)}>
                 {[
@@ -227,7 +223,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                       label={MapStrings.collectiveUnitLabel}
                       changeHandler={(v: IUDF): void => onChange({ [eUDFType.collective_unit]: v.value })}
                       disabled={!canEditCollectiveUnit}
-                    />
+                      />
                     {canEditCollectiveUnit ? (
                       <IconButton key='udf-icon' onClick={(): void => setShowUDFModal((o) => !o)}>
                         <Icon icon='edit' />
@@ -274,9 +270,9 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     disabled={true}
                     btn={
                       <Button
-                        disabled={!isAttached}
-                        {...editEventBtnProps}
-                        onClick={(): void => handleOpenWorkflow('release')}>
+                      disabled={!isAttached}
+                      {...editEventBtnProps}
+                      onClick={(): void => handleOpenWorkflow('release')}>
                         Add Release Event
                       </Button>
                     }>
@@ -289,7 +285,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     disabled={true}
                     btn={
                       <Button
-                        disabled={!isAttached}
+                      disabled={!isAttached}
                         {...editEventBtnProps}
                         onClick={(): void => handleOpenWorkflow('mortality')}>
                         Record Mortality Details
@@ -304,14 +300,14 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     handleClose={(): void => setShowAssignmentHistory(false)}
                     critter_id={editing.critter_id}
                     permission_type={editing.permission_type}
-                  />
+                    />
                   <WorkflowWrapper
                     open={showWorkflowForm}
                     event={event as any}
                     handleClose={(): void => setShowWorkflowForm(false)}
                     onEventSaved={handleWorkflowSaved}
                     onEventChain={handleWorkflowChain}
-                  />
+                    />
                 </>
               ) : null}
             </>

@@ -6,7 +6,7 @@ import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
 import { ReactElement, ReactNode } from 'react';
 import { removeProps } from 'utils/common_helpers';
-import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap, SpeciesCast } from 'types/form_types';
+import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap } from 'types/form_types';
 import dayjs, { Dayjs } from 'dayjs';
 import { BCTWFormat } from 'types/common_types';
 import { Tooltip } from 'components/common'
@@ -21,7 +21,6 @@ type CreateInputBaseProps = {
   prop: KeyType;
   type: eInputType;
   handleChange: FormChangeEvent;
-  cast?: SpeciesCast;
 };
 
 type CreateInputProps = CreateInputBaseProps 
@@ -134,7 +133,6 @@ function CreateEditSelectField({
   label,
   codeName,
   style,
-  cast
 }: CreateInputProps): ReactElement {
   return (
     <SelectCode
@@ -148,7 +146,6 @@ function CreateEditSelectField({
       required={required}
       error={!!errorMessage?.length}
       propName={String(prop)}
-      cast={cast}
     />
   );
 }

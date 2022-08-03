@@ -240,11 +240,6 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   }
 }
 
-export enum eCasts {
-  PU = 'population_unit',
-  WMU = 'wildlife_unit',
-  MLS = 'moose_life_stage',
-}
 //Fixme: move this into a context that fetches from the DB to stay in sync.
 export enum eSpecies {
   caribou = 'M-RATA',
@@ -254,20 +249,8 @@ export enum eSpecies {
 }
 
 const {caribou, grizzly_bear, moose} = eSpecies;
-const {PU, WMU, MLS} = eCasts;
 // species: [] represents field applies to all species, used for optimization on searching
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
-  testFields: [
-    { prop: 'capture_date', type: eInputType.datetime, species: [moose] },
-    { prop: 'capture_latitude', type: eInputType.number, species: [moose] },
-    { prop: 'capture_longitude', type: eInputType.number, species: [moose] },
-    { prop: 'capture_utm_zone', type: eInputType.number, species: [moose] },
-    { prop: 'capture_utm_easting', type: eInputType.number, species: [moose] },
-    { prop: 'capture_utm_northing', type: eInputType.number, species: [moose] },
-    { prop: 'recapture', type: eInputType.check, species: [moose] },
-    { prop: 'captivity_status', type: eInputType.check, species: [moose] },
-    { prop: 'capture_comment', type: eInputType.multiline, species: [moose] },
-  ],
   speciesField: [
     { prop: 'species', type: eInputType.code, species: [], ...isRequired },
   ],
@@ -290,12 +273,9 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'animal_status', type: eInputType.code, species: [], ...isRequired},
     //{ prop: 'species', type: eInputType.code, species: [...ALL_SPECIES], ...isRequired },
     { prop: 'sex', type: eInputType.code, species: [], ...isRequired },
-    { prop: 'animal_colouration', type: eInputType.text, species: [], },
+    { prop: 'animal_colouration', type: eInputType.text, species: [] },
     { prop: 'estimated_age', type: eInputType.number, species: [], validate: mustbePositiveNumber },
-    { prop: 'life_stage', type: eInputType.code, species: [], 
-      cast: {
-        moose: MLS
-      }}, //Species dependant, with code table
+    { prop: 'life_stage', type: eInputType.code, species: [] }, //Species dependant, with code table
   ],
   characteristicFields2: [
     { prop: 'juvenile_at_heel', type: eInputType.code, species: []},
@@ -306,12 +286,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'animal_id', type: eInputType.text, species: [], ...isRequired },
     //Add nickname field for bears
     { prop: 'region', type: eInputType.code, species: [], ...isRequired },
-    { prop: 'population_unit', type: eInputType.code, species: [], 
-      cast: { 
-        moose: WMU, 
-        grizzly_bear: WMU, 
-        grey_wolf: WMU
-      }, ...isRequired }, //Population unit needs to be species dependant, surface with code table   
+    { prop: 'population_unit', type: eInputType.code, species: [] }, //Population unit needs to be species dependant, surface with code table   
   ],
   identifierFields2: [
     { prop: 'ear_tag_left_colour', type: eInputType.text, species: [] },

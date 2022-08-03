@@ -9,9 +9,7 @@ const useToolbarStyles = makeStyles((theme) => ({
     paddingRight: theme.spacing(1)
   },
   highlight:
-    theme.palette.mode === 'light'
-      ? { color: theme.palette.secondary.main }
-      : { color: theme.palette.text.primary },
+    theme.palette.mode === 'light' ? { color: theme.palette.secondary.main } : { color: theme.palette.text.primary },
 
   toolbarInner: {
     paddingRight: theme.spacing(2),
@@ -45,7 +43,11 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
         alignItems='center'
         justifyContent='space-between'
         width='100%'>
-      {showTooltip && <TableRow selected={true}><TableCell style={{color: 'black'}}>Current Record</TableCell></TableRow>}
+        {showTooltip && (
+          <TableRow selected={true}>
+            <TableCell style={{ color: 'black' }}>Current Record</TableCell>
+          </TableRow>
+        )}
         <Box className={classes.toolbarTitle}>
           {title ?? ''} &nbsp;
           {numSelected > 0 ? <span>({numSelected} selected)</span> : <span>{''}</span>}

@@ -1,6 +1,6 @@
 import { ISpecies } from "types/animal";
 import { ICode } from "types/code";
-import { FormFieldObject, SpeciesCast } from "types/form_types";
+import { FormFieldObject } from "types/form_types";
 import { headerToColumn } from "./common_helpers";
 
 /**
@@ -39,12 +39,12 @@ const hideSection = <T>(
  * @param species species object
  * @returns casted codeHeader as string
  */
-const castCodeHeader = (codeHeader: string, cast?: SpeciesCast, species?: ISpecies):string => {
-  if(!cast) return codeHeader;
-  if(!species) return codeHeader;
-  if(!cast[species.key]) return codeHeader;
-  return cast[species.key];
-}
+// const castCodeHeader = (codeHeader: string, cast?: SpeciesCast, species?: ISpecies):string => {
+//   if(!cast) return codeHeader;
+//   if(!species) return codeHeader;
+//   if(!cast[species.key]) return codeHeader;
+//   return cast[species.key];
+// }
 
 /**
  * 
@@ -62,6 +62,5 @@ const formatCodeToSpecies = (code: ICode): ISpecies => {
 export {
   showField,
   hideSection,
-  castCodeHeader,
   formatCodeToSpecies,
 }

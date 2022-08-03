@@ -1,3 +1,6 @@
+import { Typography } from "@mui/material";
+import { capitalize, columnToHeader } from "utils/common_helpers";
+
 const critterImportMessage = (
   <>
     <h4>Add or update animals.</h4>
@@ -36,7 +39,16 @@ const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX
   </>
 )
 
-const speciesModalMessage = (
-  <h3>Switching species will remove some previously saved attributes. <br/><div style={{textAlign: 'center'}}>Are you sure you want to do this?</div></h3>
+const speciesModalMessage = (species: string) => (
+  <Typography variant='subtitle1' style={{textAlign: 'center', margin: 20}}>
+    Switching to species <b>{`'${species}'`}</b> could remove previously saved attributes
+  <Typography style={{textAlign: 'center'}}>
+    <b>'Population Unit'</b>, <b>'Wildlife Management Unit'</b>, <br/>
+    <b> 'Life Stage'</b> and <b>'Moose Life Stage'</b> might be removed
+  </Typography><br/>
+  <Typography variant="h5" style={{textAlign: 'center', fontWeight: 'bold'}}>
+    Are you sure you want to do this?
+  </Typography>
+  </Typography>
 )
 export { critterImportMessage, deviceImportMessage, bothImportMessage, pointImportMessage, releaseUnattachWarning, speciesModalMessage };

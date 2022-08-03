@@ -29,6 +29,7 @@ interface ICode {
   description: string;
   long_description?: string;
   code_header_title?: string;
+  code_header_name?: string;
 }
 
 interface ICodeHeader {
