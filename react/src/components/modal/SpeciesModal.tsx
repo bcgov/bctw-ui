@@ -26,7 +26,6 @@ export const SpeciesModal = ({
 
   const handleSpeciesModalConfirm = (): void => {
     const s = formatCodeToSpecies(codes.find((c) => c?.description === value));
-    // setAttributes([]);
     updateSpecies(s);
     setShowModal(false);
     

@@ -46,7 +46,7 @@ const speciesModalMessage = (species: string) => (
     <b>'Population Unit'</b>, <b>'Wildlife Management Unit'</b>, <br/>
     <b> 'Life Stage'</b> and <b>'Moose Life Stage'</b> might be removed
   </Typography><br/>
-  <Typography variant="h5" style={{textAlign: 'center', fontWeight: 'bold'}}>
+  <Typography style={{textAlign: 'center', fontWeight: 'bold'}}>
     Are you sure you want to do this?
   </Typography>
   </Typography>
