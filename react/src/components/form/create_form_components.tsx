@@ -11,6 +11,10 @@ import dayjs, { Dayjs } from 'dayjs';
 import { BCTWFormat } from 'types/common_types';
 import { Tooltip } from 'components/common'
 import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
+import { Animal, AttachedAnimal } from 'types/animal';
+import { useSpecies } from 'contexts/SpeciesContext';
+import { WorkflowFormField } from 'types/events/event';
+import { showField } from 'utils/species';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -128,7 +132,7 @@ function CreateEditSelectField({
   errorMessage,
   label,
   codeName,
-  style
+  style,
 }: CreateInputProps): ReactElement {
   return (
     <SelectCode
@@ -182,7 +186,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
     return null;
   }
 
-  const { prop, type, tooltip } = formField;
+  const { prop, type, tooltip} = formField;
   const toPass = {
     // fixme: why wont this type if U overlaps T?
     value: obj[prop as keyof T],
@@ -203,5 +207,20 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
-
-export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, CreateFormField };
+interface ISpeciesFormField {
+  obj: Animal | AttachedAnimal,
+  formField: WorkflowFormField,
+  handleChange: FormChangeEvent,
+  inputProps?: Partial<CreateInputProps>,
+  displayBlock?: boolean,
+  style?: any,
+}
+function CreateSpeciesFormField({obj, formField, handleChange, inputProps, displayBlock = false, style = {}}: ISpeciesFormField):JSX.Element {
+  const species = useSpecies();
+  if(!showField(formField, species)){
+    return null
+  }else{
+    return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element
+  }
+}
+export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, CreateFormField, CreateSpeciesFormField };

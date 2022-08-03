@@ -13,14 +13,17 @@ import { FormBaseProps } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
-import { swapQuotes } from './create_form_components';
+import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import { formatCodeToSpecies } from 'utils/species';
+import { SpeciesModal } from 'components/modal/SpeciesModal';
 
-type SelectCodeProps = FormBaseProps & SelectProps &
-PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
-  codeHeader: string;
-  changeHandlerMultiple?: (o: ICodeFilter[]) => void;
-  addEmptyOption?: boolean;
-};
+type SelectCodeProps = FormBaseProps &
+  SelectProps &
+  PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
+    codeHeader: string;
+    changeHandlerMultiple?: (o: ICodeFilter[]) => void;
+    addEmptyOption?: boolean;
+  };
 
 /**
  * a dropdown select component that loads code tables for options
@@ -50,11 +53,15 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     disabled
   } = props;
   const api = useTelemetryApi();
+  const species = useSpecies();
+  const updateSpecies = useUpdateSpecies();
+
   const [value, setValue] = useState(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
+  const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
-
+  const SPECIES_STR = 'species';
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
     'propName',
@@ -67,8 +74,12 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     'defaultValue'
   ]);
 
-  // load this codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader);
+  // load the codeHeaders codes from db
+  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader, species?.id, {
+    // cacheTime set to zero to prevent weird caching behaviour with species selection
+    cacheTime: 0,
+    enabled: canFetch
+  });
 
   // when data is successfully fetched
   useEffect(() => {
@@ -83,6 +94,10 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       setCodes(data);
       // if a default value was provided, update it to the actual value
       const found = data.find((d) => d?.description === defaultValue);
+      //Set the species context
+      if (found && found?.code_header_title.toLowerCase() === SPECIES_STR) {
+        updateSpecies(formatCodeToSpecies(found));
+      }
       // update the error status if found
       if (found?.description && hasError) {
         setHasError(false);
@@ -98,7 +113,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     } else {
       setHasError(true);
     }
-  }, [required]);
+  }, [required, value]);
 
   // when the parent component forces a reset
   useEffect(() => {
@@ -188,38 +203,44 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   };
   return (
     <>
+      <SpeciesModal codeHeader={codeHeader} value={value} codes={codes} setValue={setValue} setCanFetch={setCanFetch} />
       {isError ? (
         <NotificationMessage severity='error' message={formatAxiosError(error)} />
       ) : isLoading || isFetching ? (
         <div>Please wait...</div>
       ) : codes && codes.length ? (
-        <FormControl
-          error={hasError}
-          size='small'
-          style={{...baseInputStyle, ...style}}
-          className={`select-control ${hasError ? 'input-error' : ''}`}>
-          <InputLabel disabled={disabled}>{required ? `${label} *` : label}</InputLabel>
-          <Select
-            MenuProps={selectMenuProps}
-            value={multiple ? values : value}
-            onChange={multiple ? handleChangeMultiple : handleChange}
-            renderValue={(selected: string | string[]): ReactNode => {
-              if (multiple) {
-                // remove empty string values
-                const l = (selected as string[]).filter((a) => a);
-                return l.length > 4 ? `${l.length} selected` : l.join(', ');
-              }
-              return <span>{selected}</span>;
-            }}
-            {...propsToPass}>
-            {codes.map((c: ICode) => (
-              <MenuItem key={c?.id} value={c?.description}>
-                {multiple ? <Checkbox size='small' checked={values.indexOf(c?.description) !== -1} /> : null}
-                {c?.description}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <>
+          <FormControl
+            error={hasError}
+            size='small'
+            style={{ ...baseInputStyle, ...style }}
+            className={`select-control ${hasError ? 'input-error' : ''}`}
+            disabled={disabled}>
+            <InputLabel disabled={disabled}>
+              {required ? `${codes[0].code_header_title} *` : codes[0].code_header_title}
+            </InputLabel>
+            <Select
+              MenuProps={selectMenuProps}
+              value={multiple ? values : value}
+              onChange={multiple ? handleChangeMultiple : handleChange}
+              renderValue={(selected: string | string[]): ReactNode => {
+                if (multiple) {
+                  // remove empty string values
+                  const l = (selected as string[]).filter((a) => a);
+                  return l.length > 4 ? `${l.length} selected` : l.join(', ');
+                }
+                return <span>{selected}</span>;
+              }}
+              {...propsToPass}>
+              {codes.map((c: ICode) => (
+                <MenuItem key={c?.id} value={c?.description}>
+                  {multiple ? <Checkbox size='small' checked={values.indexOf(c?.description) !== -1} /> : null}
+                  {c?.description}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </>
       ) : (
         <div>unable to load {codeHeader} codes</div>
       )}

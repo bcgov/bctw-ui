@@ -12,6 +12,7 @@ import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
+import { SpeciesProvider } from 'contexts/SpeciesContext';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
@@ -35,6 +36,7 @@ export default function CritterPage(): JSX.Element {
 
   return (
     <ManageLayout>
+      <SpeciesProvider>
       <Box className='manage-layout-titlebar'>
         <h1>My Animals</h1>
         <Box display='flex' alignItems='center'>
@@ -89,6 +91,7 @@ export default function CritterPage(): JSX.Element {
           </Box>
         </>
       </RowSelectedProvider>
+      </SpeciesProvider>
     </ManageLayout>
   );
 }

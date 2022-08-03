@@ -30,7 +30,6 @@ type ModalProps = ModalBaseProps & {
 type EditModalBaseProps<T> = ModalBaseProps & {
   editing: T;
   onSave: (c: IUpsertPayload<T>) => Promise<void>;
-  refresh?: boolean;
 };
 
 /**
