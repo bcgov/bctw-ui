@@ -82,7 +82,9 @@ const retrieveSessionInfo = function (req, res, next) {
   }
   // get contents of the current Keycloak access token
   const data = req.kauth.grant.access_token.content;
+  //Logging for the keycloak sessions vars
   console.log('UI server backend: retrieveSessionInfo()',data);
+
   if (!data) {
     return res.status(500).send('Error: Unable to retrieve Keycloak session information');
   }
