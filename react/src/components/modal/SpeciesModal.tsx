@@ -58,7 +58,7 @@ export const SpeciesModal = ({
       <ConfirmModal
       open={showModal}
       handleClose={handleSpeciesModalDecline}
-      message={speciesModalMessage(value)}
+      message={speciesModalMessage(species?.name, value)}
       handleClickYes={handleSpeciesModalConfirm}
     />
   );

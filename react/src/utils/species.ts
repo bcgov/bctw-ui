@@ -53,9 +53,9 @@ const hideSection = <T>(
  */
 const formatCodeToSpecies = (code: ICode): ISpecies => {
   return {
-    id: String(code.id),
-    key: headerToColumn(code.description),
-    name: code.description,
+    id: String(code?.id),
+    //key: headerToColumn(code?.description),
+    name: code?.description,
   }
 }
 

@@ -1,4 +1,5 @@
 import { Typography } from "@mui/material";
+import { ISpecies } from "types/animal";
 import { capitalize, columnToHeader } from "utils/common_helpers";
 
 const critterImportMessage = (
@@ -39,16 +40,33 @@ const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX
   </>
 )
 
-const speciesModalMessage = (species: string) => (
-  <Typography variant='subtitle1' style={{textAlign: 'center', margin: 20}}>
-    Switching to species <b>{`'${species}'`}</b> could remove previously saved attributes
-  <Typography style={{textAlign: 'center'}}>
-    <b>'Population Unit'</b>, <b>'Wildlife Management Unit'</b>, <br/>
-    <b> 'Life Stage'</b> and <b>'Moose Life Stage'</b> might be removed
-  </Typography><br/>
-  <Typography style={{textAlign: 'center', fontWeight: 'bold'}}>
-    Are you sure you want to do this?
-  </Typography>
-  </Typography>
-)
+const speciesModalMessage = (currentSpecies: string, nextSpecies: string) => {
+  const WMU = 'Wildlife Management Unit';
+  const values = {
+    'Moose': [WMU, 'Moose Life Stage'],
+    'Caribou': ['Population Unit'],
+    'Grey Wolf': [WMU],
+    'Grizzly Bear': [WMU],
+  }
+  const sArr = values[currentSpecies];
+  return (
+    <Typography variant='subtitle1' style={{textAlign: 'center', margin: 20}}>
+    Switching to species <b>{`'${nextSpecies}'`}</b> could remove previously saved attributes
+    {sArr && 
+      <Typography style={{textAlign: 'center'}}>
+        {sArr.map((s: string ) => `'${s}' `).join(', ')}
+         might be removed.
+      {/* <b>'Population Unit'</b>, <b>'Wildlife Management Unit'</b>, <br/>
+      <b> 'Life Stage'</b> and <b>'Moose Life Stage'</b> might be removed */}
+    </Typography>
+    }
+    <br/>
+    <Typography style={{textAlign: 'center', fontWeight: 'bold'}}>
+      Are you sure you want to do this?
+    </Typography>
+    </Typography>
+  )
+}
+
+
 export { critterImportMessage, deviceImportMessage, bothImportMessage, pointImportMessage, releaseUnattachWarning, speciesModalMessage };

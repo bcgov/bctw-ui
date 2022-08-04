@@ -18,7 +18,7 @@ export enum eCritterFetchType {
 
 export interface ISpecies {
   id: string,
-  key: string,
+  //key: string,
   name: string
 }
 /**
