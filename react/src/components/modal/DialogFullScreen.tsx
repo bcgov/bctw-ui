@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Container from '@mui/material/Container';
 import Dialog from '@mui/material/Dialog';
@@ -36,7 +36,6 @@ const Transition = React.forwardRef(function Transition(
 
 export default function FullScreenDialog({ open, handleClose, children }: ModalProps): JSX.Element {
   const classes = useStyles();
-  
   return (
     <Dialog
       fullScreen
