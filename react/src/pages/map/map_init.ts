@@ -29,6 +29,7 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
     Device ID: ${p.formattedDevice}<br>
     Latitude: ${coordinates[1] + '<br>'}
     Longitude: ${coordinates[0] + '<br>'}
+    Elevation: ${p.elevation + ' meters' + '<br>'}
     Frequency (MHz): ${p.paddedFrequency}<br>
     ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
     ${p.animal_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
