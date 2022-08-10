@@ -179,7 +179,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
               <LoadingButton loading loadingIndicator='Loading...'>Fetch data</LoadingButton>
             ) : (
               <Button {...btnProps} disabled={editBtnProps.disabled} onClick={handleClickEdit}>
-                {`${cannotEdit ? 'View' : 'Edit'} ${editText ?? ''}`}
+                {`${cannotEdit ? 'View' : 'View / Edit'} ${editText ?? ''}`}
               </Button>
             )
           }
