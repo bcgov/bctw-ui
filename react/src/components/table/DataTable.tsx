@@ -42,12 +42,13 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState<number | null>(1);
   const [totalRows, setTotalRows] = useState(0);
   const [rowIdentifier, setRowIdentifier] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  
   const [displayPagination, setDisplayPagination] = useState<boolean>(false);
   const isPaginate = paginate && !DISABLE_PAGINATION;
+  const rowsPerPage = 100;
   /**
    * since data is updated when the page is changed, use the 'values'
    * state to keep track of the entire set of data across pages.
@@ -73,23 +74,33 @@ export default function DataTable<T extends BCTWBase<T>>({
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> =
     query(page, param, filter);
+
+  const handlePages = (): void => {
+    //Only set total pages on inital load
+    const rowCount = data[0]?.row_count;
+    const pageCount = rowCount ? Math.ceil(rowCount / rowsPerPage) : null;
+    if(pageCount && pageCount !== totalPages){
+      setTotalPages(pageCount);
+    }
+  }
   useDidMountEffect(() => {
     
     if (isSuccess) {
-      //Only set total pages on inital load
-      const rowCount = data[0]?.row_count;
-      if (rowCount) {
-        const getPageCount = rowCount ? Math.ceil(rowCount / rowsPerPage) : -1;
-        if (getPageCount !== totalPages && getPageCount !== -1) {
-          setTotalPages(getPageCount);
-        }
-        if(!displayPagination){
-          setDisplayPagination(true);
-        }
-        if (!totalRows) {
-          setTotalRows(rowCount);
-        }
-      }
+      
+      handlePages();
+      // if (rowCount) {
+      //   const getPageCount = rowCount ? Math.ceil(rowCount / rowsPerPage) : -1;
+      //   if (getPageCount !== totalPages && getPageCount !== -1) {
+      //     setTotalPages(getPageCount);
+      //   }
+      //   if(!displayPagination){
+      //     setDisplayPagination(true);
+      //   }
+      //   // if (!totalRows) {
+      //   //   setTotalRows(rowCount);
+      //   // }
+      //   setTotalRows(rowCount);
+      // }
       // update the row identifier
       const first = data && data.length && data[0];
       if (first && typeof first.identifier === 'string') {
@@ -110,7 +121,7 @@ export default function DataTable<T extends BCTWBase<T>>({
         
         const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
-          newV.push(d);
+            newV.push(d);
         }
         if(updated && d[rowIdentifier] === updated && d !== values[i]){
           //If updated identifier is set, insert new data into array
@@ -118,10 +129,12 @@ export default function DataTable<T extends BCTWBase<T>>({
           setValues(values);
         }
       });
+
       setValues((o) => [...o, ...newV]);
-      setRowsPerPage((o) => (isPaginate ? o : data.length));
+      //setRowsPerPage((o) => (isPaginate ? o : data.length));
     }
   }, [data]);
+
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -235,7 +248,7 @@ export default function DataTable<T extends BCTWBase<T>>({
          * 
          */
         // !isPaginate || isError || (isSuccess && data?.length < rowsPerPage && paginate && page === 1)
-        !isPaginate || isError || !displayPagination ? null : (
+        !isPaginate || isError ? null : (
           <PaginationActions
             count={!isFetching && data.length}
             page={page}

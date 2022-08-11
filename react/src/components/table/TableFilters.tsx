@@ -11,21 +11,33 @@ import AutoComplete from 'components/form/Autocomplete';
 type TextFilterProps = {
   rowCount: number;
   defaultFilter?: string;
-  setGlobalFilter: (filter: string) => void;
+  handleTextChange: (filter: string) => void;
   disabled?: boolean;
-  clearInput?: boolean;
 };
+
+type TableFilterProps<T> = {
+  rowCount: number;
+  filterableProperties: (keyof T)[];
+  onChangeFilter: (filter: ITableFilter) => void;
+  isMultiSearch?: boolean;
+  setPage: (page: number) => void;
+};
+
 
 /**
  * the text input search/filter component
  */
-function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter, clearInput }: TextFilterProps): JSX.Element {
+function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange }: TextFilterProps): JSX.Element {
   const [term, setTerm] = useState(defaultFilter ?? '');
   const debouncedTerm = useDebounce(term, 800);
+
   useDidMountEffect(() => {
-    setGlobalFilter(debouncedTerm.toLowerCase());
+    setTerm(defaultFilter);
+  },[defaultFilter])
+
+  useDidMountEffect(() => {
+    handleTextChange(debouncedTerm.toLowerCase());
   }, [debouncedTerm]);
-  useEffect(()=>{clearInput && setTerm('')},[clearInput]);
   return (
     <TextField
       className='table-filter-input'
@@ -40,35 +52,34 @@ function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter, clearI
   );
 }
 
-type TableFilterProps<T> = {
-  rowCount: number;
-  filterableProperties: (keyof T)[];
-  onChangeFilter: (filter: ITableFilter) => void;
-  isMultiSearch?: boolean;
-  setPage: (page: number) => void;
-};
 
 /**
  * the search component visible in table toolbars
  */
 function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   const { filterableProperties, onChangeFilter, rowCount, isMultiSearch, setPage } = props;
-  const [selectedOption, setSelectedOption] = useState<string[]>();
+  const [selectedOption, setSelectedOption] = useState<string[] | null>(null);
   const [searchStr, setSearchStr] = useState('');
-  const [clearText, setClearText] = useState(false);
+
   useDidMountEffect(() => {
     const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
   }, [searchStr, selectedOption]);
   
   const handleSelect = (v: ISelectMultipleData[]): void => {
-    !isMultiSearch && setClearText(selectedOption?.length !== 0);
     const values = v.map((item) => item.value as keyof T);
+    console.log({values}, {selectedOption});
+    if(selectedOption && !values.length){
+      setSearchStr('');
+    }
     setSelectedOption(values as string[]);
   };
 
   const handleTextChange = (value: string): void => {
     setSearchStr(value);
+    if(!value){
+      setSelectedOption(null);
+    }
     setPage(1);
   };
 
@@ -96,7 +107,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         width={300}
         isMultiSearch={isMultiSearch}
       />
-      <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} clearInput={clearText}/>
+      <TextFilter rowCount={rowCount} handleTextChange={handleTextChange} defaultFilter={searchStr}/>
     </Box>
   );
 }
