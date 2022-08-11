@@ -15,6 +15,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;
+export const ROWS_PER_PAGE = 100;
 /**
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
@@ -41,14 +42,14 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [selected, setSelected] = useState<string[]>(alreadySelected);
+  const [rowIdentifier, setRowIdentifier] = useState('id');
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number | null>(1);
   const [totalRows, setTotalRows] = useState(0);
-  const [rowIdentifier, setRowIdentifier] = useState('id');
-  
-  const [displayPagination, setDisplayPagination] = useState<boolean>(false);
+
   const isPaginate = paginate && !DISABLE_PAGINATION;
-  const rowsPerPage = 100;
+
   /**
    * since data is updated when the page is changed, use the 'values'
    * state to keep track of the entire set of data across pages.
@@ -65,6 +66,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       }
     }
   }, [useRowState]);
+
   useDidMountEffect(() => {
     if (deleted) {
       handleRowDeleted(deleted);
@@ -76,9 +78,11 @@ export default function DataTable<T extends BCTWBase<T>>({
     query(page, param, filter);
 
   const handlePages = (): void => {
-    //Only set total pages on inital load
     const rowCount = data[0]?.row_count;
-    const pageCount = rowCount ? Math.ceil(rowCount / rowsPerPage) : null;
+    const pageCount = rowCount ? Math.ceil(rowCount / ROWS_PER_PAGE) : null;
+    if(rowCount){
+      setTotalRows(rowCount);
+    }
     if(pageCount && pageCount !== totalPages){
       setTotalPages(pageCount);
     }
@@ -238,9 +242,10 @@ export default function DataTable<T extends BCTWBase<T>>({
       isMultiSearch={isMultiSearch}
       setPage={setPage}
       showTooltip={showValidRecord}
+      disabled={totalPages !== 1}
       sibling={
         /**
-         * hide pagination when total results are under @var rowsPerPage
+         * hide pagination when total results are under @var ROWS_PER_PAGE
          * possible that only 10 results are actually available, in which
          * case the next page will load no new results
          * 
@@ -252,7 +257,7 @@ export default function DataTable<T extends BCTWBase<T>>({
           <PaginationActions
             count={!isFetching && data.length}
             page={page}
-            rowsPerPage={rowsPerPage}
+            rowsPerPage={ROWS_PER_PAGE}
             onChangePage={handlePageChange}
             totalPages={totalPages}
           />
@@ -275,14 +280,19 @@ export default function DataTable<T extends BCTWBase<T>>({
       filter && filter.term
         ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headerProps as string[]), filter.term)
         : values;
-    const start = (rowsPerPage + page - rowsPerPage - 1) * rowsPerPage;
-    const end = rowsPerPage * page - 1;
+    const start = (ROWS_PER_PAGE + page - ROWS_PER_PAGE - 1) * ROWS_PER_PAGE;
+    const end = ROWS_PER_PAGE * page - 1;
     // console.log(`slice start ${start}, slice end ${end}`);
-    return results.length > rowsPerPage ? results.slice(start, end) : results;
+    return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
   };
 
   const TableContents = (): JSX.Element => {
-
+    const noData = isSuccess && !data?.length;
+    useEffect(() => {
+      if(noData && totalPages !== 1){
+        setTotalPages(1);
+      }
+    }, [])
     if (isLoading || isError) {
       return (
         <TableBody>
@@ -294,8 +304,7 @@ export default function DataTable<T extends BCTWBase<T>>({
         </TableBody>
       )
     }
-    if (isSuccess && !data?.length) {
-      setTotalPages(1);
+    if (noData) {
       return (
         <TableBody>
           <TableRow>
@@ -338,7 +347,7 @@ export default function DataTable<T extends BCTWBase<T>>({
                   const { value } = formatTableCell(obj, k);
                   
                   return (
-                    <TableCell key={`${k}${i}`} align={'left'}>
+                    <TableCell key={`${String(k)}${i}`} align={'left'}>
                       {value}
                     </TableCell>
                   );
