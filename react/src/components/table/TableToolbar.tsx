@@ -32,6 +32,7 @@ type TableToolbarProps<T> = {
   isMultiSearch?: boolean;
   showTooltip?: boolean;
   setPage: (page: number) => void;
+  disabled: boolean;
 };
 
 export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Element {
