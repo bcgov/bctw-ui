@@ -1,44 +1,21 @@
 import { Box, TextField } from '@mui/material';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
-import { useEffect, useMemo, useState } from 'react';
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
 import useDebounce from 'hooks/useDebounce';
 import AutoComplete from 'components/form/Autocomplete';
+import { ROWS_PER_PAGE } from './DataTable';
 
 type TextFilterProps = {
   rowCount: number;
   defaultFilter?: string;
-  setGlobalFilter: (filter: string) => void;
+  handleTextChange: (filter: string) => void;
   disabled?: boolean;
-  clearInput?: boolean;
+  inputRef?: MutableRefObject<any>;
 };
-
-/**
- * the text input search/filter component
- */
-function TextFilter({ disabled, rowCount, defaultFilter, setGlobalFilter, clearInput }: TextFilterProps): JSX.Element {
-  const [term, setTerm] = useState(defaultFilter ?? '');
-  const debouncedTerm = useDebounce(term, 800);
-  useDidMountEffect(() => {
-    setGlobalFilter(debouncedTerm.toLowerCase());
-  }, [debouncedTerm]);
-  useEffect(()=>{clearInput && setTerm('')},[clearInput]);
-  return (
-    <TextField
-      className='table-filter-input'
-      //defaultValue={term}
-      onChange={(v): void => setTerm(v.target.value)}
-      value={term}
-      label={'Search'}
-      placeholder={`${rowCount} records...`}
-      disabled={disabled}
-      size={'small'}
-    />
-  );
-}
 
 type TableFilterProps<T> = {
   rowCount: number;
@@ -46,25 +23,69 @@ type TableFilterProps<T> = {
   onChangeFilter: (filter: ITableFilter) => void;
   isMultiSearch?: boolean;
   setPage: (page: number) => void;
+  disabled: boolean;
 };
+
+
+/**
+ * the text input search/filter component
+ */
+function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, inputRef }: TextFilterProps): JSX.Element {
+  const [term, setTerm] = useState(defaultFilter ?? '');
+  const debouncedTerm = useDebounce(term, 800);
+
+  useDidMountEffect(() => {
+    if(!defaultFilter){
+      setTerm(defaultFilter);
+    }
+  },[defaultFilter])
+
+  useDidMountEffect(() => {
+    handleTextChange(debouncedTerm.toLowerCase());
+  }, [debouncedTerm]);
+
+  return (
+    <TextField
+      className='table-filter-input'
+      //defaultValue={term}
+      onChange={(v): void => setTerm(v.target.value)}
+      value={term}
+      label={disabled ? 'Search - Select Column*' : 'Search'}
+      placeholder={`${rowCount} records...`}
+      disabled={disabled}
+      size={'small'}
+      inputRef={inputRef}
+    />
+  );
+}
+
 
 /**
  * the search component visible in table toolbars
  */
 function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
-  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch, setPage } = props;
-  const [selectedOption, setSelectedOption] = useState<string[]>();
+  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch, setPage, disabled } = props;
+  const [selectedOption, setSelectedOption] = useState<string[] | null>(null);
   const [searchStr, setSearchStr] = useState('');
-  const [clearText, setClearText] = useState(false);
+  const textInput = useRef(null);
+  const isDisabled = disabled && !selectedOption?.length;
+
   useDidMountEffect(() => {
     const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
   }, [searchStr, selectedOption]);
   
   const handleSelect = (v: ISelectMultipleData[]): void => {
-    !isMultiSearch && setClearText(selectedOption?.length !== 0);
     const values = v.map((item) => item.value as keyof T);
+    if(selectedOption && !values.length){
+      setSearchStr('');
+    }
     setSelectedOption(values as string[]);
+
+    setTimeout(() => {
+      textInput.current.focus();
+    },100);
+
   };
 
   const handleTextChange = (value: string): void => {
@@ -85,7 +106,6 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
       }),
     []
   );
-
   return (
     <Box display='flex' alignItems='center' columnGap={1}>
       <AutoComplete
@@ -96,7 +116,13 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         width={300}
         isMultiSearch={isMultiSearch}
       />
-      <TextFilter rowCount={rowCount} setGlobalFilter={handleTextChange} clearInput={clearText}/>
+      <TextFilter 
+        rowCount={rowCount} 
+        handleTextChange={handleTextChange} 
+        defaultFilter={searchStr} 
+        disabled={isDisabled}
+        inputRef={textInput}
+      />
     </Box>
   );
 }

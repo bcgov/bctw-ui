@@ -70,8 +70,12 @@ const splitCredentials = (sessionObject) => {
   if (!credentials.length) {
     return {};
   }
+<<<<<<< HEAD
   //FIXME: removed trailing business from string. Use object as it comes in future.
   return { username: credentials[0], domain: credentials[1].replace('-business','') };
+=======
+  return { username: credentials[0], domain: credentials[1].replace('-business', '') };
+>>>>>>> main
 }
 
 // TODO: move into separate package?
@@ -82,9 +86,13 @@ const retrieveSessionInfo = function (req, res, next) {
   }
   // get contents of the current Keycloak access token
   const data = req.kauth.grant.access_token.content;
+<<<<<<< HEAD
   //Logging for the keycloak sessions vars
   console.log('UI server backend: retrieveSessionInfo()',data);
 
+=======
+  console.log(`Keycloak session data: `, data);
+>>>>>>> main
   if (!data) {
     return res.status(500).send('Error: Unable to retrieve Keycloak session information');
   }

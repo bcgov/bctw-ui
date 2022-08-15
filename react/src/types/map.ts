@@ -71,6 +71,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   collar_id: string;
   device_id: number;
   device_vendor: string;
+  elevation: number;
   frequency: number;
   frequency_unit: string;
   device_status: string;

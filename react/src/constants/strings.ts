@@ -131,7 +131,7 @@ const MapStrings = {
   startDateLabel: 'Start Date',
   startDateTooltip: 'Start date for telemetry fetch',
   endDateLabel: 'End Date',
-  endDateTooltip: 'Start date for telemetry fetch',
+  endDateTooltip: 'End date for telemetry fetch',
   assignmentStatusLabel: 'Device Assignment Status',
   assignmentStatusOptionA: 'Assigned Devices',
   assignmentStatusOptionU: 'Unassigned Devices',

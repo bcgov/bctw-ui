@@ -77,7 +77,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   const [showHistory, setShowHistory] = useState(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
   const [currentTabID, setCurrentTabID] = useState(0);
-
+  const [openFullScreen, setOpenFullScreen] = useState(false);
   // state handler for when the history / current properties tab is selected
   const handleSwitchTab = (newValue: number): void => {
     setCurrentTabID(newValue);
@@ -100,8 +100,10 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   
   // when the modal opens, disable save
   useDidMountEffect(() => {
+    console.log(open);
     if (open) {
       setCanSave(!hasErr);
+      setOpenFullScreen(true);
     }
   }, [open]);
 
@@ -146,10 +148,13 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     }
   };
 
-  const onClose = (): void => {
+  const onClose = () => {
     reset();
     handleClose(false);
-  };
+    if(showInFullScreen){
+      setOpenFullScreen(false);
+    }
+  }
 
   const Children = (
     /**
@@ -200,7 +205,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
                         </Button>
                       </>
                     )}
-                    <Button {...buttonProps} variant='outlined' onClick={(): void => handleClose(false)}>
+                    <Button {...buttonProps} variant='outlined' onClick={(): void => onClose()}>
                       Cancel and Exit
                     </Button>
                   </Box>
@@ -219,8 +224,8 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
 
   const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
   return showInFullScreen ? (
-    <FullScreenDialog {...modalProps}>{Children}</FullScreenDialog>
+    <FullScreenDialog open={openFullScreen} handleClose={onClose} title={title}>{Children}</FullScreenDialog>
   ) : (
-    <Modal {...modalProps}>{Children}</Modal>
+    <Modal open={open} handleClose={onClose} title={title}>{Children}</Modal>
   );
 }

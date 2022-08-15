@@ -10,7 +10,7 @@ import { MapStrings } from 'constants/strings';
 import { MapTileLayers } from 'constants/strings';
 import { formatLocal } from 'utils/time';
 import { plainToClass } from 'class-transformer';
-
+import { Point} from 'geojson';
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
   doc.innerHTML = '';
@@ -20,12 +20,16 @@ const hidePopup = (): void => {
 const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const doc = document.getElementById('popup');
   const p = plainToClass(TelemetryDetail, feature.properties);
+  const {coordinates} = feature.geometry;
   const t = dayjs(p.date_recorded).format(formatLocal);
   const text = `
     ${p.species ? 'Species: ' + p.species + '<br>' : ''}
     ${p.wlh_id ? 'WLH ID: ' + p.wlh_id + '<br>' : ''}
     ${p.animal_id ? 'Animal ID: ' + p.animal_id + '<br>' : ''}
     Device ID: ${p.formattedDevice}<br>
+    Latitude: ${coordinates[1] + '<br>'}
+    Longitude: ${coordinates[0] + '<br>'}
+    Elevation: ${p.elevation + ' meters' + '<br>'}
     Frequency (MHz): ${p.paddedFrequency}<br>
     ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
     ${p.animal_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
