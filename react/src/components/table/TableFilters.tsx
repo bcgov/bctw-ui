@@ -50,7 +50,7 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
       //defaultValue={term}
       onChange={(v): void => setTerm(v.target.value)}
       value={term}
-      label={'Search'}
+      label={disabled ? 'Search - Select Column*' : 'Search'}
       placeholder={`${rowCount} records...`}
       disabled={disabled}
       size={'small'}
@@ -68,7 +68,8 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   const [selectedOption, setSelectedOption] = useState<string[] | null>(null);
   const [searchStr, setSearchStr] = useState('');
   const textInput = useRef(null);
-  
+  const isDisabled = disabled && !selectedOption?.length;
+
   useDidMountEffect(() => {
     const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
@@ -119,7 +120,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         rowCount={rowCount} 
         handleTextChange={handleTextChange} 
         defaultFilter={searchStr} 
-        disabled={disabled && !selectedOption?.length}
+        disabled={isDisabled}
         inputRef={textInput}
       />
     </Box>
