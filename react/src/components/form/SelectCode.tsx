@@ -14,7 +14,7 @@ import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
 import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
-import { formatCodeToSpecies } from 'utils/species';
+import { formatCodeToSpecies, SPECIES_STR } from 'utils/species';
 import { SpeciesModal } from 'components/modal/SpeciesModal';
 
 type SelectCodeProps = FormBaseProps &
@@ -56,14 +56,12 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   } = props;
   const api = useTelemetryApi();
   const species = useSpecies();
-  const updateSpecies = useUpdateSpecies();
 
   const [value, setValue] = useState(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
-  const [canFetch, setCanFetch] = useState(true);
+  //const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
-  const SPECIES_STR = 'species';
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
     'propName',
@@ -75,12 +73,12 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     'triggerReset',
     'defaultValue'
   ]);
-
   // load the codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader, species?.id, {
+  const { data, error, isFetching, isError, isLoading, isSuccess } = 
+  api.useCodes(0, codeHeader, species?.id, {
     // cacheTime set to zero to prevent weird caching behaviour with species selection
     cacheTime: 0,
-    enabled: canFetch
+    enabled: codeHeader !== SPECIES_STR
   });
 
   // when data is successfully fetched

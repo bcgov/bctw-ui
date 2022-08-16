@@ -2,7 +2,7 @@ import { speciesModalMessage } from 'constants/formatted_string_components';
 import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import { useEffect, useState } from 'react';
 import { ICode } from 'types/code';
-import { formatCodeToSpecies } from 'utils/species';
+import { formatCodeToSpecies, SPECIES_STR } from 'utils/species';
 import ConfirmModal from './ConfirmModal';
 
 interface SpeciesModalProps {
@@ -22,7 +22,6 @@ export const SpeciesModal = ({
   const updateSpecies = useUpdateSpecies();
 
   const [showModal, setShowModal] = useState(false);
-  const SPECIES_STR = 'species';
 
   const handleSpeciesModalConfirm = (): void => {
     const s = formatCodeToSpecies(codes.find((c) => c?.description === value));

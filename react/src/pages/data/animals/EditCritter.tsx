@@ -20,7 +20,7 @@ import AddUDF from 'pages/udf/AddUDF';
 import SelectUDF from 'components/form/SelectUDF';
 import { CritterStrings, MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { useLockSpecies, useSpecies, useUISpecies, useUpdateLockSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import { useSpecies, useUISpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import { hideSection } from 'utils/species';
 import { SpeciesSelect } from 'components/form/SpeciesSelect';
 
@@ -31,7 +31,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const { isCreatingNew, editing, open } = props;
   const updateSpecies = useUpdateSpecies();
   const species = useSpecies();
-  
+
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
   const isAttached = editing instanceof AttachedAnimal;
@@ -199,7 +199,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               */}
               <FormSection id='cr-species' header='Species' disabled={!canEdit}>
                 {/* <CreateSpeciesFormField obj={editing} formField={wfFields.get('species')} handleChange={onChange} inputProps={{disabled: lockSpecies}}/> */}
-                <SpeciesSelect handleChange={onChange} value={editing.species} useLock={!isCreatingNew}/>
+                <SpeciesSelect handleChange={onChange} value={editing.species} useLock={!isCreatingNew} useModal/>
               </FormSection>
               <FormSection id='cr-ids' header='Identifiers' disabled={!canEdit} hide={hideSection([...identifierFields2, ...identifierFields2], species)}>
                 {[

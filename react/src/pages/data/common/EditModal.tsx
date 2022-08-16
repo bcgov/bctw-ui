@@ -100,7 +100,6 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   
   // when the modal opens, disable save
   useDidMountEffect(() => {
-    console.log(open);
     if (open) {
       setCanSave(!hasErr);
       setOpenFullScreen(true);

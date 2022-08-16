@@ -2,7 +2,7 @@ import { ISpecies } from "types/animal";
 import { ICode } from "types/code";
 import { FormFieldObject } from "types/form_types";
 import { headerToColumn } from "./common_helpers";
-
+const SPECIES_STR = 'species';
 /**
  * Used to hide individual form elements from the UI - used with species related form fields
  * @param field FormFieldObject
@@ -63,4 +63,5 @@ export {
   showField,
   hideSection,
   formatCodeToSpecies,
+  SPECIES_STR,
 }

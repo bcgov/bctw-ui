@@ -41,18 +41,22 @@ const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX
 )
 
 const speciesModalMessage = (currentSpecies: string, nextSpecies: string) => {
+  const diff = (a?: string[], b?: string[]) => !a || !b ? null : a.filter((v) => !b.includes(v));
   const WMU = 'Wildlife Management Unit';
+  const MLS = 'Moose Life Stage';
+  const PU = 'Population Unit';
+
   const values = {
-    'Moose': [WMU, 'Moose Life Stage'],
-    'Caribou': ['Population Unit'],
+    'Moose': [WMU, MLS],
+    'Caribou': [PU],
     'Grey Wolf': [WMU],
     'Grizzly Bear': [WMU],
   }
-  const sArr = values[currentSpecies];
+  const sArr = diff(values[currentSpecies], values[nextSpecies]);
   return (
     <Typography variant='subtitle1' style={{textAlign: 'center', margin: 20}}>
     Switching to species <b>{`'${nextSpecies}'`}</b> could remove previously saved attributes
-    {sArr && 
+    {sArr && !!sArr?.length && 
       <Typography style={{textAlign: 'center'}}>
         {sArr.map((s: string ) => `'${s}' `).join(', ')}
          might be removed.
