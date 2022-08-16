@@ -1,6 +1,6 @@
 import 'styles/form.scss';
 import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, MutableRefObject } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
@@ -23,6 +23,7 @@ type SelectCodeProps = FormBaseProps &
     codeHeader: string;
     changeHandlerMultiple?: (o: ICodeFilter[]) => void;
     addEmptyOption?: boolean;
+    inputRef?: MutableRefObject<any>;
   };
 
 /**
@@ -50,7 +51,8 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     style,
     required,
     propName,
-    disabled
+    disabled,
+    inputRef,
   } = props;
   const api = useTelemetryApi();
   const species = useSpecies();
@@ -95,9 +97,9 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       // if a default value was provided, update it to the actual value
       const found = data.find((d) => d?.description === defaultValue);
       //Set the species context
-      if (found && found?.code_header_title.toLowerCase() === SPECIES_STR) {
-        updateSpecies(formatCodeToSpecies(found));
-      }
+      // if (found && found?.code_header_title.toLowerCase() === SPECIES_STR) {
+      //   updateSpecies(formatCodeToSpecies(found));
+      // }
       // update the error status if found
       if (found?.description && hasError) {
         setHasError(false);
@@ -203,7 +205,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   };
   return (
     <>
-      <SpeciesModal codeHeader={codeHeader} value={value} codes={codes} setValue={setValue} setCanFetch={setCanFetch} />
+      {/* <SpeciesModal codeHeader={codeHeader} value={value} codes={codes} setValue={setValue} setCanFetch={setCanFetch} /> */}
       {isError ? (
         <NotificationMessage severity='error' message={formatAxiosError(error)} />
       ) : isLoading || isFetching ? (
@@ -223,6 +225,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
               MenuProps={selectMenuProps}
               value={multiple ? values : value}
               onChange={multiple ? handleChangeMultiple : handleChange}
+              inputRef={inputRef}
               renderValue={(selected: string | string[]): ReactNode => {
                 if (multiple) {
                   // remove empty string values

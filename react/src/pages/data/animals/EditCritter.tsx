@@ -20,22 +20,20 @@ import AddUDF from 'pages/udf/AddUDF';
 import SelectUDF from 'components/form/SelectUDF';
 import { CritterStrings, MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { useLockSpecies, useSpecies, useUpdateLockSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import { useLockSpecies, useSpecies, useUISpecies, useUpdateLockSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import { hideSection } from 'utils/species';
+import { SpeciesSelect } from 'components/form/SpeciesSelect';
 
 /**
  * the main animal form
  */
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing, open } = props;
-
+  const updateSpecies = useUpdateSpecies();
   const species = useSpecies();
-  const lockSpecies = useLockSpecies();
-  const setLockSpecies = useUpdateLockSpecies();
   
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
-  const updateSpecies = useUpdateSpecies();
   const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
@@ -52,11 +50,10 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const reset = (): void => {
     setHasBabies(false);
     updateSpecies(null);
-    setLockSpecies(!isCreatingNew);
   }
-  useEffect(() => {
-    setLockSpecies(!isCreatingNew)
-  },[isCreatingNew, species])
+  // useEffect(() => {
+  //   setLockSpecies(!isCreatingNew)
+  // },[isCreatingNew, species])
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
@@ -182,7 +179,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               setHasBabies(String(value).toLowerCase() === 'y');
             }
             handlerFromContext(v);
-          }
+          };
           return (
             <>
               <AddUDF
@@ -201,15 +198,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 CU editor is available if user has permission
               */}
               <FormSection id='cr-species' header='Species' disabled={!canEdit}>
-                <CreateSpeciesFormField obj={editing} formField={wfFields.get('species')} handleChange={onChange} inputProps={{disabled: lockSpecies}}/>
-                <IconButton key='udf-icon' onClick={()=>setLockSpecies(l=>!l)}>
-                  {!isCreatingNew &&
-                    (lockSpecies 
-                      ? <Tooltip children={<Icon icon='lock'/>} title={CritterStrings.lockedSpeciesTooltip}/>
-                      : <Tooltip children={<Icon icon='unlocked'/>} title={CritterStrings.unlockedSpeciesTooltip}/>
-                      )
-                    }
-                </IconButton>
+                {/* <CreateSpeciesFormField obj={editing} formField={wfFields.get('species')} handleChange={onChange} inputProps={{disabled: lockSpecies}}/> */}
+                <SpeciesSelect handleChange={onChange} value={editing.species} useLock={!isCreatingNew}/>
               </FormSection>
               <FormSection id='cr-ids' header='Identifiers' disabled={!canEdit} hide={hideSection([...identifierFields2, ...identifierFields2], species)}>
                 {[
