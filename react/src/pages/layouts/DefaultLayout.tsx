@@ -7,7 +7,7 @@ import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import UserOnboarding from 'pages/onboarding/UserOnboarding';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { isDev } from 'api/api_helpers';
+import { ENABLE_ALERTS, isDev } from 'api/api_helpers';
 import { doNothing } from 'utils/common_helpers';
 import { TelemetryAlert } from 'types/alert';
 import Modal from 'components/modal/Modal';
@@ -49,7 +49,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
     const nonEditorAlerts = alerts.filter((a) => !a.isEditor)
     const notSnoozed = nonEditorAlerts.filter((a) => !a.isSnoozed)
     const dealWithIt = (notSnoozed.length > 0) && !isDev();
-    setMustUpdateAlert(dealWithIt)
+    setMustUpdateAlert(ENABLE_ALERTS && dealWithIt)
   }, [alerts]);
 
   useDidMountEffect(() => {
