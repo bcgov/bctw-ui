@@ -10,7 +10,9 @@ const IS_PROD = +window.location.port === 1111 ? false : true;
 if(!IS_PROD) {
   dotenv.config();
 }
-export const ENABLE_ALERTS = process.env.REACT_APP_ENABLE_ALERTS == 'true';
+
+//Disabled while fixing alerts bugs...
+export const ENABLE_ALERTS = false;
 
 /**
  * @param noApiPrefix if true, exclude '/api' beginning of the base url
