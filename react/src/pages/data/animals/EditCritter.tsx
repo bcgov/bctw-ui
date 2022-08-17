@@ -199,7 +199,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
               */}
               <FormSection id='cr-species' header='Species' disabled={!canEdit}>
                 {/* <CreateSpeciesFormField obj={editing} formField={wfFields.get('species')} handleChange={onChange} inputProps={{disabled: lockSpecies}}/> */}
-                <SpeciesSelect handleChange={onChange} value={editing.species} useLock={!isCreatingNew} useModal/>
+                <SpeciesSelect handleChange={onChange} value={editing.species} useLock={!isCreatingNew} useModal />
               </FormSection>
               <FormSection id='cr-ids' header='Identifiers' disabled={!canEdit} hide={hideSection([...identifierFields2, ...identifierFields2], species)}>
                 {[

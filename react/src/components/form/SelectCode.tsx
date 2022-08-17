@@ -62,6 +62,8 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   const [codes, setCodes] = useState<ICode[]>([]);
   //const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
+  const isSpeciesSelect = codeHeader === SPECIES_STR;
+  
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
     'propName',
@@ -78,7 +80,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   api.useCodes(0, codeHeader, species?.id, {
     // cacheTime set to zero to prevent weird caching behaviour with species selection
     cacheTime: 0,
-    enabled: codeHeader !== SPECIES_STR
+    enabled: !isSpeciesSelect
   });
 
   // when data is successfully fetched

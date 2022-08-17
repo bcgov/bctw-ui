@@ -8,7 +8,7 @@ import { useUISpecies, useUpdateSpecies, useSpecies } from 'contexts/SpeciesCont
 import { SPECIES_STR } from 'utils/species';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { speciesModalMessage } from 'constants/formatted_string_components';
-import useDidMountEffect from 'hooks/useDidMountEffect';
+
 interface SpeciesSelectProps {
   handleChange: (v: InboundObj) => void;
   value: string;
@@ -16,7 +16,12 @@ interface SpeciesSelectProps {
   useModal?: boolean;
 }
 
-export const SpeciesSelect = ({ handleChange, value, useLock, useModal }: SpeciesSelectProps): JSX.Element => {
+export const SpeciesSelect = ({ 
+  handleChange, 
+  value, 
+  useLock, 
+  useModal }: SpeciesSelectProps): JSX.Element => {
+
   const inputRef = useRef(null);
   const updateSpecies = useUpdateSpecies();
   const species = useSpecies();
@@ -24,31 +29,37 @@ export const SpeciesSelect = ({ handleChange, value, useLock, useModal }: Specie
   
   const [lockSpecies, setLockSpecies] = useState(useLock);
   const [showModal, setShowModal] = useState(false);
-
+  
   const selection = inputRef.current?.value;
-
+  
   const handleClose = (): void => {
-    console.log('closeCalled')
     setShowModal(false);
     setLockSpecies(useLock);
   }
 
   const handleConfirm = (): void => {
-    setShowModal(false);
     handleChangeSpecies();
+    setShowModal(false);
+    setLockSpecies(useLock);
   }
 
   const handleChangeSpecies = (): void => {
-    const found = allSpecies.find(
-      s => s.name === (inputRef.current?.value ?? value));
+    const found = allSpecies.find(s => s.name === (selection ?? value));
     if(found) {
-      setLockSpecies(useLock);
       updateSpecies(found)
+      setLockSpecies(useLock);
     }
+  }
+  
+  const handleStates = (): void => {
+    const canShowModal = useModal && species && selection && species?.name !== selection;
+    canShowModal
+      ? setShowModal(true)
+      : handleChangeSpecies();
   }
 
   useEffect(()=> {
-    useModal && selection ? setShowModal(true) : handleChangeSpecies();
+    handleStates();
   },[selection]);
 
   return (
