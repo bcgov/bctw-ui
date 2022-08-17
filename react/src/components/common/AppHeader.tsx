@@ -12,6 +12,7 @@ import Icon from '@mdi/react';
 import Modal from 'components/modal/Modal';
 import UserAlert from 'pages/user/UserAlertPage';
 import { urls } from 'constants/external_urls';
+import { ENABLE_ALERTS } from 'api/api_helpers';
 
 type AppheaderProps = {
   children?: JSX.Element;
@@ -88,7 +89,7 @@ const AppHeader = ({children}: AppheaderProps): JSX.Element => {
         </nav>
         <nav className='profile-nav'>
           <ul className={'header-ul'}>
-            {alertCount > 0 ? (
+            {(alertCount > 0 && ENABLE_ALERTS) ? (
               <li>
                 <div className={'alerts'}>
                   <IconButton
