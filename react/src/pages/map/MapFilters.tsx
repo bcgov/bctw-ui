@@ -1,10 +1,10 @@
-import { Box, Button, Divider, Grid, IconButton } from '@mui/material';
+import { Box, Button, Divider, Grid, IconButton, Slide, Tab, Tabs } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import SelectCode from 'components/form/SelectCode';
 import { ICodeFilter } from 'types/code';
-import { MapRange } from 'types/map';
+import { MapRange, TelemetryDetail } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
 import Checkbox from 'components/form/Checkbox';
 import SelectUDF from 'components/form/SelectUDF';
@@ -18,12 +18,20 @@ import { CODE_FILTERS } from 'pages/map/map_constants';
 import { Tooltip } from 'components/common';
 import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
-
+import { ITelemetryPoint } from 'types/map';
+import { getUniquePropFromPings } from './map_helpers';
+enum TabNames {
+  search = "Search",
+  filter = "Filter",
+  symbolize = "Symbolize",
+}
 type MapFiltersProps = {
   start: string;
   end: string;
-  uniqueDevices: number[];
-  collectiveUnits: string[];
+  // uniqueDevices: number[];
+  // collectiveUnits: string[];
+  // pingsToDisplay: boolean;
+  pings: ITelemetryPoint[];
   onCollapsePanel: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onClickEditUdf: () => void;
@@ -33,8 +41,10 @@ type MapFiltersProps = {
 };
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
-  const { uniqueDevices } = props;
+  const { pings } = props;
+  const {search, filter, symbolize} = TabNames;
   const classes = drawerStyles();
+  const containerRef = useRef(null);
   // controls filter panel visibility
   const [open, setOpen] = useState(true);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
@@ -50,6 +60,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const [isLatestPing, setIsLatestPing] = useState(false);
   const [isLastFixes, setIsLastFixes] = useState(false);
 
+  // controls the Tabs
+  const [tab, setTab] = useState<TabNames>(TabNames.search);
+  useEffect(()=> {console.log({filters})}, [filters])
   const orLabelStyle = {
     color: '#6d6d6d',
     display: 'flex',
@@ -91,6 +104,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     setApplyButtonStatus(false);
     setFilters((o) => {
       const notThisFilter = o.filter((prev) => prev.code_header !== code_header);
+      console.log(notThisFilter);
       const ret = [...notThisFilter, ...filters];
       return ret;
     });
@@ -130,7 +144,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     return CODE_FILTERS.map((cf, idx) => (
       <Grid item sm={12} key={`${cf.header}-${idx}`}>
         <Tooltip title={<p>{MapStrings.codeFiltersTooltips[cf.header]}</p>}>
-          <SelectCode
+          {/* <SelectCode
             propName={cf.header}
             style={{width: '100%'}}
             multiple
@@ -140,7 +154,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             changeHandlerMultiple={(codes): void => changeFilter(codes, cf.header)}
             triggerReset={reset}
             addEmptyOption={true}
-          />
+          /> */}
+          <AutoComplete
+            label={cf.label ?? columnToHeader(cf.header)}
+            data={createUniqueList(cf.header)}
+            changeHandler={handleChangeAutocomplete}
+            triggerReset={reset}
+            isMultiSearch
+            />
         </Tooltip>
       </Grid>
     ));
@@ -154,10 +175,13 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   // only code_header and description are actually used when applying the filter
-  const handleChangeAutocomplete = (values: ISelectMultipleData[]): void => {
+  const handleChangeAutocomplete = (values: ISelectMultipleData[], header: string): void => {
+    //console.log({values}, {header})
+
     if (!values.length) {
       return;
     }
+
     const header_id = values[0].prop;
     const asFilters: ICodeFilter[] = values.map((v) => {
       return { code_header: v.prop, description: v.value, code: '', code_header_title: '', id: 0 };
@@ -174,42 +198,63 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
   };
 
-  const createDeviceList = (): ISelectMultipleData[] => {
-    const merged = [...uniqueDevices].sort((a, b) => a - b);
+  const createUniqueList = (propName: keyof TelemetryDetail): ISelectMultipleData[] => {
+    const devices = getUniquePropFromPings(pings ?? [], propName) as number[];
+    const merged = [...devices].sort((a, b) => a - b);
     return merged.map((d) => {
       // const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
       const displayLabel = d.toString();
-      return { id: d, value: d, displayLabel, prop: 'device_id' };
+      return { id: d, value: d, displayLabel, prop: propName };
     });
   };
 
   const createCollectiveList = (): ISelectMultipleData[] => {
-    return props.collectiveUnits.map((c, idx) => {
+    const collectiveUnits = getUniquePropFromPings(pings, 'collective_unit') as string[];
+    return collectiveUnits.map((c, idx) => {
       return { id: idx, value: c, displayLabel: c, prop: 'collective_unit'}
     })
   }
 
+  const handleTabChange = (event: SyntheticEvent<Element>, newValue: TabNames): void => {
+    setTab(newValue);
+  }
+
+  const isTab = (tabName: TabNames): boolean => tabName === tab;
   return (
     <Box
       className={clsx(classes.drawer, {
         [classes.drawerOpen]: open,
         [classes.drawerClose]: !open
-      })}>
+      })}
+      ref={containerRef}>
+      
       <Box className="side-panel-content">
+
         <Box display="flex" justifyContent="space-between" alignItems="center" px={3}>
-          <h2>Filters</h2>
+        <Tabs value={tab} onChange={handleTabChange}>
+        <Tab icon={<Icon icon={search as string}/>} value={search} label={search} />
+        <Tab icon={<Icon icon={filter as string}/>} value={filter} label={filter} disabled={!pings?.length}/>
+        <Tab icon={<Icon icon={symbolize as string}/>} value={symbolize} label={symbolize} disabled={!pings?.length}/>
+        </Tabs>
+          {/* <h2>Filters</h2> */}
           <Box className="drawer-toggle-button">
             <IconButton color="primary" onClick={handleDrawerOpen} size="large">
               <Icon icon={open ? 'close' : 'forward'} />
             </IconButton>
           </Box>
         </Box>
+        <Divider/>
         {open ? (
           <>
+            {/* <Slide direction="right" in={tab == TabNames.search || tab == TabNames.filter} container={containerRef.current}> */}
             <Box p={3} pt={0}>
 
               {/* render the date pickers */}
-              <Box mb={2}>
+              <h2>{tab}</h2>
+
+              {/* SEARCH */}
+              {isTab(search) && 
+              <Box mb={2} mt={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={6}>
                     <Tooltip title={<p>{MapStrings.startDateTooltip}</p>}>
@@ -236,32 +281,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     </Tooltip>
                   </Grid>
                 </Grid>
-              </Box>
+              </Box>}
 
-              {/* render the unassigned/assigned data points selector */}
-              {/* <Box mb={2}>
-                <Grid container spacing={2}>
-                  <Grid item sm={12}>
-                    <Tooltip
-                      title={
-                        <>
-                          <p><b><em>{MapStrings.assignmentStatusOptionA}</em></b>{MapStrings.assignmentStatusTooltip1}</p>
-                          <p><b><em>{MapStrings.assignmentStatusOptionU}</em></b>{MapStrings.assignmentStatusTooltip2}</p>
-                          <p>{MapStrings.assignmentStatusTooltip3}</p>
-                        </>
-                      } >
-                      <div>
-                        <MultiSelect
-                          label={MapStrings.assignmentStatusLabel}
-                          data={DEVICE_STATUS_OPTIONS}
-                          changeHandler={props.onShowUnassignedDevices}
-                        />
-                      </div>
-                    </Tooltip>
-                  </Grid>
-                </Grid>
-              </Box> */}
-
+              {/* FILTER */}
+              {isTab(filter) && 
+              <>
               {/* render the last pings/ last 10 fixes checkboxes */}
               <Box mb={2}>
                 <Tooltip inline={true} title={<p>{MapStrings.lastKnownLocationTooltip}</p>}>
@@ -280,25 +304,26 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     initialValue={isLastFixes}
                     changeHandler={(): void => setIsLastFixes((o) => !o)}
                     disabled={isLatestPing}
-                  />
+                    />
                 </Tooltip>
               </Box>
 
+
               {/* render the device list selector */}
-              <Box mb={2}>
+              {/* <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={12}>
                     <Tooltip title={<p>{MapStrings.deviceListTooltip}</p>}>
                       <AutoComplete
                         label={MapStrings.deviceListLabel}
-                        data={createDeviceList()}
+                        data={createUniqueList('device_id')}
                         changeHandler={handleChangeAutocomplete}
                         triggerReset={reset}
-                      />
+                        />
                     </Tooltip>
                   </Grid>
                 </Grid>
-              </Box>
+              </Box> */}
 
               {/* render the other select filter components */}
               <Box mb={2}>
@@ -306,9 +331,22 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   {createMultiSelects()}
                 </Grid>
               </Box>
+              {/* <Box mb={2}>
+                <Grid container spacing={2}>
+                <Grid item sm={12}>
+                <AutoComplete
+                  label={'species'}
+                  data={createUniqueList('species')}
+                  changeHandler={handleChangeAutocomplete}
+                  triggerReset={reset}
+                  isMultiSearch
+                  />
+                </Grid>
+                </Grid>
+              </Box> */}
 
               {/* render the collective unit list selector */}
-              <Box mb={2}>
+              {/* <Box mb={2}>
                 <Grid container spacing={2}>
                   <Grid item sm={12}>
                     <Tooltip title={<p>{MapStrings.collectiveUnitTooltip}</p>}>
@@ -317,11 +355,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                         data={createCollectiveList()}
                         changeHandler={handleChangeAutocomplete}
                         triggerReset={reset}
-                      />
+                        />
                     </Tooltip>
                   </Grid>
                 </Grid>
-              </Box>
+              </Box> */}
 
               <Box mb={2}>
                 <div style={orLabelStyle}>
@@ -342,7 +380,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                           udfType={eUDFType.critter_group}
                           label={MapStrings.customAnimalGroupLabel}
                           changeHandler={handleChangeUDF}
-                        />
+                          />
                         <IconButton onClick={props.onClickEditUdf}>
                           <Icon icon='edit' />
                         </IconButton>
@@ -351,24 +389,44 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   </Grid>
                 </Grid>
               </Box>
+              </>
+            }
+
+            {/* SYMBOLIZE */}
+            {isTab(symbolize) && 
+              <Box mb={2} mt={2}>
+                <Grid container spacing={2}>
+                  <Grid item sm={6}>
+                    {/* <Tooltip title={<p>{MapStrings.startDateTooltip}</p>}>
+                    </Tooltip> */}
+                  </Grid>
+                  <Grid item sm={6}>
+                    {/* <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
+                    </Tooltip> */}
+                  </Grid>
+                </Grid>
+              </Box>}
 
               <Divider />
 
-              <Box className={'form-buttons'} display="flex" justifyContent="flex-end" py={3}>
+              <Box className={'form-buttons'} display="flex" justifyContent="flex-start" py={3}>
                 <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>
-                  Apply Filters
+                  {tab}
                 </Button>
-                <Button color="primary" variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
+                {isTab(filter) && <Button color="primary" variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
                   Reset
-                </Button>
+                </Button>}
               </Box>
+              
+              
 
             </Box>
+            {/* </Slide> */}
           </>
         ) : (
           <></>
         )}
       </Box>
     </Box>
-  );
+    );
 }

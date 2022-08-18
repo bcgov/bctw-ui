@@ -64,7 +64,8 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<any
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
   const isSpeciesSelect = codeHeader === SPECIES_STR;
   useImperativeHandle(ref, () => ({
-    setValue, value
+    setValue, 
+    value
   }));
   //useImperativeHandle(ref, () => value)
   
@@ -83,7 +84,7 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<any
   const { data, error, isFetching, isError, isLoading, isSuccess } = 
   api.useCodes(0, codeHeader, species?.id, {
     // cacheTime set to zero to prevent weird caching behaviour with species selection
-    cacheTime: 0,
+    cacheTime: ref ? 0 : 5000, 
     enabled: !isSpeciesSelect
   });
   

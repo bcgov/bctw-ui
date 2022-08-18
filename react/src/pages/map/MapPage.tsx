@@ -170,26 +170,6 @@ export default function MapPage(): JSX.Element {
     update();
   }, [fetchedPings]);
 
-  // unassigned pings
-  // useEffect(() => {
-  //   if (fetchedUnassignedPings && !isErrorUPings) {
-  //     setUnassignedPings(fetchedUnassignedPings);
-
-  //     setupPingOptions(unassignedPingsLayer, handlePointClick, handlePointClose, true);
-  //     setupLatestPingOptions(latestUPingsLayer, handlePointClick, handlePointClose, true);
-
-  //     unassignedPingsLayer.addData(fetchedUnassignedPings as any);
-  //     latestUPingsLayer.addData(splitPings(fetchedUnassignedPings, 'collar_id').latest as any);
-  //     // initially hide unassigned points
-  //     if (!showUnassignedLayers) {
-  //       mapRef?.current?.removeLayer(unassignedPingsLayer);
-  //       mapRef?.current?.removeLayer(latestUPingsLayer);
-  //     } else if (filters.length) {
-  //       applyFiltersToUnassignedPings(filters, fetchedUnassignedPings);
-  //     }
-  //   }
-  // }, [fetchedUnassignedPings]);
-
   // assigned tracks
   useEffect(() => {
     if (fetchedTracks && !isErrorTracks) {
@@ -205,19 +185,6 @@ export default function MapPage(): JSX.Element {
       }
     }
   }, [fetchedTracks]);
-
-  // unassigned tracks
-  // useEffect(() => {
-  //   if (fetchedUnassignedTracks && !isErrorUTracks) {
-  //     setupTracksOptions(unassignedTracksLayer, true);
-  //     unassignedTracksLayer.addData(fetchedUnassignedTracks as any);
-  //     // initially hide unassigned points
-  //     if (!showUnassignedLayers) {
-  //       mapRef.current?.removeLayer(unassignedTracksLayer);
-  //       return;
-  //     }
-  //   }
-  // }, [fetchedUnassignedTracks]);
 
   // when one of the map only filters are applied, set the state
   useEffect(() => {
@@ -242,26 +209,6 @@ export default function MapPage(): JSX.Element {
       hidePopup();
     }
   }, [showExportModal, showOverviewModal, showUdfEdit]);
-
-  // hide or show unattached device layers
-  // useEffect(() => {
-  //   const ref = mapRef.current;
-  //   if (!ref) {
-  //     return;
-  //   }
-  //   if (showUnassignedLayers) {
-  //     ref.addLayer(unassignedPingsLayer);
-  //     ref.addLayer(unassignedTracksLayer);
-  //     ref.addLayer(latestUPingsLayer);
-  //   } else {
-  //     // fixme: why does this need a delay?
-  //     setTimeout(() => {
-  //       ref.removeLayer(unassignedPingsLayer);
-  //       ref.removeLayer(unassignedTracksLayer);
-  //       ref.removeLayer(latestUPingsLayer);
-  //     }, 100);
-  //   }
-  // }, [showUnassignedLayers]);
 
   /**
    * when a map point is clicked,
@@ -348,12 +295,6 @@ export default function MapPage(): JSX.Element {
     latestPingsLayer.addData(latest as any);
     pingsLayer.addData(other as any);
     tracksLayer.addData(newTracks as any);
-    // if (showUnassignedLayers && fetchedUnassignedPings && fetchedUnassignedTracks) {
-    //   const { latest, other } = splitPings(fetchedUnassignedPings, 'collar_id');
-    //   unassignedTracksLayer.addData(fetchedUnassignedTracks as any);
-    //   unassignedPingsLayer.addData(other as any);
-    //   latestUPingsLayer.addData(latest as any);
-    // }
   };
 
   // redraw only pings, if no params supplied it will default the fetched ones
@@ -369,20 +310,6 @@ export default function MapPage(): JSX.Element {
     selectedPingIDs.forEach((f) => fillPoint(f, true));
   };
 
-  // const redrawUnassignedPings = (upings = fetchedUnassignedPings): void => {
-  //   const { latest, other } = splitPings(upings, 'critter_id');
-  //   const layerPicker = L.control.layers();
-
-  //   layerPicker.removeLayer(unassignedPingsLayer);
-  //   layerPicker.removeLayer(latestUPingsLayer);
-
-  //   unassignedPingsLayer.clearLayers();
-  //   latestUPingsLayer.clearLayers();
-
-  //   unassignedPingsLayer.addData(other as any);
-  //   latestUPingsLayer.addData(latest as any);
-  // };
-
   // redraw only tracks
   const redrawTracks = (newTracks: ITelemetryLine[]): void => {
     const layerPicker = L.control.layers();
@@ -390,13 +317,6 @@ export default function MapPage(): JSX.Element {
     tracksLayer.clearLayers();
     tracksLayer.addData(newTracks as any);
   };
-
-  // const redrawUnassignedTracks = (ut: IUnassignedTelemetryLine[]): void => {
-  //   const layerPicker = L.control.layers();
-  //   layerPicker.removeLayer(unassignedTracksLayer);
-  //   unassignedTracksLayer.clearLayers();
-  //   unassignedTracksLayer.addData(ut as any);
-  // };
 
   // triggered when side-panel filters are applied
   const handleApplyChangesFromFilterPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
@@ -407,9 +327,6 @@ export default function MapPage(): JSX.Element {
     // otherwise, update the filter state and apply the filters
     setFilters(filters);
     applyFiltersToPings(filters);
-    // if (showUnassignedLayers) {
-    //   applyFiltersToUnassignedPings(filters);
-    // }
   };
 
   // the handler that actually updates the ping state when the filter state is changed
@@ -430,22 +347,6 @@ export default function MapPage(): JSX.Element {
     applyFiltersToTracks(filteredPings);
   };
 
-  // const applyFiltersToUnassignedPings = (filters: ICodeFilter[], upings = fetchedUnassignedPings): void => {
-  //   if (!filters.length) {
-  //     setUnassignedPings(upings);
-  //     redrawLayers();
-  //     return;
-  //   }
-  //   const deviceIDFilter = groupFilters(filters).filter((gf) => gf.code_header === 'device_id');
-
-  //   if (deviceIDFilter.length) {
-  //     const filteredUPings = applyFilter(deviceIDFilter, fetchedUnassignedPings);
-  //     setUnassignedPings(filteredUPings);
-  //     redrawUnassignedPings(filteredUPings);
-  //     applyFiltersToUnassignedTracks(filteredUPings);
-  //   }
-  // };
-
   /**
    * in order to know what tracks need to be updated, the filters need to be applied to pings first,
    * because that will determine which critters are displayed
@@ -462,18 +363,6 @@ export default function MapPage(): JSX.Element {
     const filteredTracks = fetchedTracks.filter((t) => uniqueCritterIDs.includes(t.properties.critter_id));
     redrawTracks(filteredTracks);
   };
-
-  // const applyFiltersToUnassignedTracks = (up = unassignedPings): void => {
-  //   if (!fetchedUnassignedTracks) {
-  //     return;
-  //   }
-    // const uniqueDeviceIDs = getUniquePropFromPings(up) as number[];
-    // note: as IUnassignedTelemetryLine
-  //   const filteredTracks = (fetchedUnassignedTracks as any).filter((t) =>
-  //     uniqueDeviceIDs.includes(t.properties.collar_id)
-  //   );
-  //   redrawUnassignedTracks(filteredTracks);
-  // };
 
   // show the critter overview modal when a row is clicked in bottom panel
   const handleShowOverview = (type: BCTWType, row: ITelemetryDetail): void => {
@@ -493,29 +382,14 @@ export default function MapPage(): JSX.Element {
     if (show) {
       mapRef.current.removeLayer(pingsLayer);
       mapRef.current.removeLayer(tracksLayer);
-      // if (showUnassignedLayers) {
-      //   mapRef.current.removeLayer(unassignedPingsLayer);
-      //   mapRef.current.removeLayer(unassignedTracksLayer);
-      // }
     } else {
       mapRef.current.addLayer(pingsLayer);
       mapRef.current.addLayer(tracksLayer);
-      // if (showUnassignedLayers) {
-      //   mapRef.current.addLayer(unassignedPingsLayer);
-      //   mapRef.current.addLayer(unassignedTracksLayer);
-      // }
     }
   };
 
   const toggleTracks = (show: boolean): void => {
     const ref = mapRef.current;
-    // if (showUnassignedLayers) {
-    //   getTracksLayers().forEach((l) => (show ? ref.addLayer(l) : ref.removeLayer(l)));
-    //   unassignedTracksLayer.bringToBack();
-    // } else {
-    //   const l = getTracksLayers()[0];
-    //   show ? ref.addLayer(l) : ref.removeLayer(l);
-    // }
     // copied this line below to remove these statements from inside the else
     const l = getTracksLayers()[0];
     show ? ref.addLayer(l) : ref.removeLayer(l);
@@ -652,23 +526,22 @@ export default function MapPage(): JSX.Element {
       setDragging(false);
     }
   };
-
   return (
     <SpeciesProvider>
     <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove} >
       <MapFilters
         start={range.start}
         end={range.end}
-        uniqueDevices={getUniquePropFromPings(fetchedPings ?? []) as number[]}
-        // unassignedDevices={showUnassignedLayers ? getUniquePropFromPings(fetchedUnassignedPings ?? []) as number[] : []}
+        pings={fetchedPings ?? []}
+        // uniqueDevices={getUniquePropFromPings(fetchedPings ?? []) as number[]}
         onApplyFilters={handleApplyChangesFromFilterPanel}
         onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
         // todo: trigger when filter panel transition is completed without timeout
         onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
         onShowLatestPings={handleShowLastKnownLocation}
         onShowLastFixes={handleShowLast10Fixes}
-        // onShowUnassignedDevices={handleShowUnassignedDevices}
-        collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
+        // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
+        // pingsToDisplay={!!pings?.length}
       />
       <div className={'map-container'}>
         {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}

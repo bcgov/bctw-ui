@@ -6,7 +6,7 @@ import { ISelectMultipleData } from './MultiSelect';
 
 type IAutocompleteProps<T extends ISelectMultipleData> = {
   label: string;
-  changeHandler: (o: T[]) => void;
+  changeHandler: (o: T[], p?: string) => void;
   defaultValue?: T;
   triggerReset?: boolean; // unselect of all values
   data: T[];
@@ -37,7 +37,7 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
     const lastElem = len > 0 ? [value[len-1]] : value;
     const mutatedValue = isMultiSearch ? value : lastElem;
     setSelected(mutatedValue);
-    changeHandler(mutatedValue);
+    changeHandler(mutatedValue, data[0]?.prop);
   };
 
   return (

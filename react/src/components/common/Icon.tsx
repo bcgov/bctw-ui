@@ -30,7 +30,10 @@ import {
   mdiPageLast,
   mdiDatabase,
   mdiLock,
-  mdiLockOpenCheck
+  mdiLockOpenCheck,
+  mdiMagnify,
+  mdiFilterOutline,
+  mdiBrush,
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -40,6 +43,7 @@ type IconProps = {
 };
 
 const getIconPath = (path: string): string => {
+  path = path.toLowerCase();
   switch (path) {
     case 'admin':
       return mdiAccountSupervisor;
@@ -108,6 +112,12 @@ const getIconPath = (path: string): string => {
       return mdiLock;
     case 'unlocked':
       return mdiLockOpenCheck;
+    case 'search':
+      return mdiMagnify;
+    case 'filter':
+      return mdiFilterOutline;
+    case 'symbolize':
+      return mdiBrush;
   }
 };
 

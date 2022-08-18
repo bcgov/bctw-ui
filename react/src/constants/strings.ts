@@ -145,11 +145,13 @@ const MapStrings = {
   deviceListLabel: 'Device List',
   deviceListTooltip: 'Filter for specific device within date range',
   codeFiltersTooltips: {
+    device_id: 'Filter for specific device within date range',
     species: 'Select species to filter',
     animal_status: 'Animal status filter',
     device_status: 'Device status filter',
     sex: 'Filter critter sex',
     population_unit: 'Filter by population unit',
+    collective_unit: 'Filter by collection unit',
   },
   collectiveUnitLabel: 'Collective Unit',
   collectiveUnitTooltip: 'Filter by collection unit ',
