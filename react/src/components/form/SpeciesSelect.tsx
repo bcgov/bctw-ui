@@ -1,13 +1,14 @@
 import { IconButton } from '@mui/material';
 import { CritterStrings } from 'constants/strings';
-import { useEffect, useRef, useState } from 'react';
+import { SetStateAction, useEffect, useRef, useState } from 'react';
 import { InboundObj } from 'types/form_types';
-import SelectCode from './SelectCode';
+
 import { Icon, Tooltip } from 'components/common';
 import { useUISpecies, useUpdateSpecies, useSpecies } from 'contexts/SpeciesContext';
 import { SPECIES_STR } from 'utils/species';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { speciesModalMessage } from 'constants/formatted_string_components';
+import SelectCode from './SelectCode';
 
 interface SpeciesSelectProps {
   handleChange: (v: InboundObj) => void;
@@ -23,6 +24,8 @@ export const SpeciesSelect = ({
   useModal }: SpeciesSelectProps): JSX.Element => {
 
   const inputRef = useRef(null);
+  const myRef = useRef(null);
+
   const updateSpecies = useUpdateSpecies();
   const species = useSpecies();
   const allSpecies = useUISpecies();
@@ -31,10 +34,11 @@ export const SpeciesSelect = ({
   const [showModal, setShowModal] = useState(false);
   
   const selection = inputRef.current?.value;
-  
+
   const handleClose = (): void => {
     setShowModal(false);
     setLockSpecies(useLock);
+    myRef?.current?.setValue(species?.name);
   }
 
   const handleConfirm = (): void => {
@@ -74,6 +78,7 @@ export const SpeciesSelect = ({
         changeHandler={handleChange}
         required={false}
         //error={'Test error'}
+        ref={myRef}
         inputRef={inputRef}
         propName={SPECIES_STR}
       />

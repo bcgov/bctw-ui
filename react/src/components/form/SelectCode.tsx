@@ -1,6 +1,6 @@
 import 'styles/form.scss';
 import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
-import { useState, useEffect, ReactNode, MutableRefObject } from 'react';
+import { useState, useEffect, ReactNode, MutableRefObject, SetStateAction, forwardRef, useImperativeHandle } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
@@ -38,7 +38,7 @@ type SelectCodeProps = FormBaseProps &
  * @param propname use this field as the key if the code header isn't the same. ex - ear_tag_colour_id
  */
 
-export default function SelectCode(props: SelectCodeProps): JSX.Element {
+const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<any>): JSX.Element => {
   const {
     addEmptyOption,
     codeHeader,
@@ -63,6 +63,10 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   //const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
   const isSpeciesSelect = codeHeader === SPECIES_STR;
+  useImperativeHandle(ref, () => ({
+    setValue, value
+  }));
+  //useImperativeHandle(ref, () => value)
   
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
@@ -82,7 +86,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     cacheTime: 0,
     enabled: !isSpeciesSelect
   });
-
+  
   // when data is successfully fetched
   useEffect(() => {
     const updateOptions = (): void => {
@@ -249,4 +253,6 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       )}
     </>
   );
-}
+});
+
+export default SelectCode;
