@@ -276,6 +276,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   }
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
+
   return (
     <Box
       className={clsx(classes.drawer, {
