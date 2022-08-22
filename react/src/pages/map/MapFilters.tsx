@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Grid, IconButton, Slide, Tab, Tabs, Typography } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
-import { Children, SyntheticEvent, useEffect, useRef, useState } from 'react';
+import { Children, ReactNode, SyntheticEvent, useEffect, useRef, useState } from 'react';
 import SelectCode from 'components/form/SelectCode';
 import { ICodeFilter } from 'types/code';
 import { MapRange, TelemetryDetail } from 'types/map';
@@ -21,9 +21,9 @@ import dayjs from 'dayjs';
 import { ITelemetryPoint } from 'types/map';
 import { getUniquePropFromPings } from './map_helpers';
 enum TabNames {
-  search = "Search",
-  filter = "Filter",
-  symbolize = "Symbolize",
+  search = 'Search',
+  filter = 'Filter',
+  symbolize = 'Symbolize'
 }
 type MapFiltersProps = {
   start: string;
@@ -42,7 +42,7 @@ type MapFiltersProps = {
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const { pings } = props;
-  const {search, filter, symbolize} = TabNames;
+  const { search, filter, symbolize } = TabNames;
   const classes = drawerStyles();
   const containerRef = useRef(null);
   // controls filter panel visibility
@@ -62,13 +62,15 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   // controls the Tabs
   const [tab, setTab] = useState<TabNames>(TabNames.search);
-  useEffect(()=> {console.log({filters})}, [filters])
+  useEffect(() => {
+    console.log({ filters });
+  }, [filters]);
   const orLabelStyle = {
     color: '#6d6d6d',
     display: 'flex',
     fontSize: '13px',
     justifyContent: 'center'
-  }
+  };
 
   // keep track of how many filters are currently set
   useEffect(() => {
@@ -137,97 +139,123 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     // since setFilters is async, call handleApplyFilters manually with an empty array
     handleApplyFilters(null, true);
   };
-  interface ConditionalWrapperProps {
-    condition: boolean;
-    wrapper: (c: JSX.Element) => JSX.Element;
-    children: JSX.Element;
-  }
-  const ConditionalWrapper = ({condition, wrapper, children}: ConditionalWrapperProps): JSX.Element => {
-    // return <>{Children.map(children, child => wrapper(child))}</>
-    return condition ? wrapper(children) : children;
-  }
+
   // creates select elements
   const createFilters = (): React.ReactNode => {
+    const itemSpacing = isTab(filter) ? 12 : false;
+    const boxContainerSpacing = isTab(filter) ? 2 : 0;
     return (
       <>
-      {isTab(filter) && 
-      <Box mb={2}>
-        <Tooltip inline={true} title={<p>{MapStrings.lastKnownLocationTooltip}</p>}>
-          <Checkbox
-            label={MapStrings.lastKnownLocationLabel}
-            propName={MapStrings.lastKnownLocationLabel}
-            initialValue={isLatestPing}
-            changeHandler={(): void => setIsLatestPing((o) => !o)}
-            disabled={isLastFixes}
-          />
-        </Tooltip>
-        <Tooltip inline={true} title={<p>{MapStrings.lastFixesTooltip}</p>}>
-          <Checkbox
-            propName={MapStrings.lastFixesLabel}
-            label={MapStrings.lastFixesLabel}
-            initialValue={isLastFixes}
-            changeHandler={(): void => setIsLastFixes((o) => !o)}
-            disabled={isLatestPing}
-            />
-        </Tooltip>
-      </Box>}
-      
-      <Box mb={2}>
-      <Grid container spacing={2}>
-      {CODE_FILTERS.map((cf, idx) => (
-        // <ConditionalWrapper condition={isTab(filter)}
-        //   wrapper={child => <Grid item sm={12} key={`${cf.header}-${idx}`}>
-        //     {child}
-        //   </Grid>}>
-      <Grid item sm={12} key={`${cf.header}-${idx}`}>
-        <Tooltip title={<p>{MapStrings.codeFiltersTooltips[cf.header]}</p>}>
-          <AutoComplete
-            label={cf.label ?? columnToHeader(cf.header)}
-            data={createUniqueList(cf.header)}
-            changeHandler={handleChangeAutocomplete}
-            triggerReset={reset}
-            isMultiSearch
-            hidden={!isTab(filter)}
-            />
-        </Tooltip>
-      </Grid>
-      // </ConditionalWrapper>
-      ))}
-      </Grid>
-      </Box>
-      {/* //Fix me this will need to be changed to how autocomplete section works. */}
-      {isTab(filter) && <>
-      <Box mb={2}>
-      <div style={orLabelStyle}>
-        &mdash; or &mdash;
-      </div>
-    </Box>
-    <Box mb={2}>
-      <Grid container spacing={2}>
-        <Grid item sm={12}>
-          <Tooltip
-            title={<p>{MapStrings.customAnimalGroupTooltip}</p>}>
-            <div className={'side-panel-udf'}>
-              <SelectUDF
-                className={'udf-select-control'}
-                triggerReset={reset}
-                udfType={eUDFType.critter_group}
-                label={MapStrings.customAnimalGroupLabel}
-                changeHandler={handleChangeUDF}
-                />
-              <IconButton onClick={props.onClickEditUdf}>
-                <Icon icon='edit' />
-              </IconButton>
-            </div>
-          </Tooltip>
-        </Grid>
-      </Grid>
-    </Box>
-    </>}
-    </>
-    )
+        {isTab(filter) && (
+          <Box mb={boxContainerSpacing}>
+            <Tooltip inline={true} title={<p>{MapStrings.lastKnownLocationTooltip}</p>}>
+              <Checkbox
+                label={MapStrings.lastKnownLocationLabel}
+                propName={MapStrings.lastKnownLocationLabel}
+                initialValue={isLatestPing}
+                changeHandler={(): void => setIsLatestPing((o) => !o)}
+                disabled={isLastFixes}
+              />
+            </Tooltip>
+            <Tooltip inline={true} title={<p>{MapStrings.lastFixesTooltip}</p>}>
+              <Checkbox
+                propName={MapStrings.lastFixesLabel}
+                label={MapStrings.lastFixesLabel}
+                initialValue={isLastFixes}
+                changeHandler={(): void => setIsLastFixes((o) => !o)}
+                disabled={isLatestPing}
+              />
+            </Tooltip>
+          </Box>
+        )}
+
+        <Box mb={boxContainerSpacing}>
+          <Grid container spacing={boxContainerSpacing}>
+            {CODE_FILTERS.map((cf, idx) => (
+              <Grid item sm={itemSpacing} key={`${cf.header}-${idx}`}>
+                <Tooltip title={<p>{MapStrings.codeFiltersTooltips[cf.header]}</p>}>
+                  <AutoComplete
+                    label={cf.label ?? columnToHeader(cf.header)}
+                    data={createUniqueList(cf.header)}
+                    changeHandler={handleChangeAutocomplete}
+                    triggerReset={reset}
+                    isMultiSearch
+                    hide={!isTab(filter)}
+                  />
+                </Tooltip>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+        {/* //Fix me this will need to be changed to how autocomplete section works. */}
+        {isTab(filter) && (
+          <Box mb={boxContainerSpacing}>
+            <div style={orLabelStyle}>&mdash; or &mdash;</div>
+          </Box>
+        )}
+        <Box mb={boxContainerSpacing}>
+          <Grid container spacing={boxContainerSpacing}>
+            <Grid item sm={itemSpacing}>
+              <Tooltip title={<p>{MapStrings.customAnimalGroupTooltip}</p>}>
+                <div className={'side-panel-udf'}>
+                  <SelectUDF
+                    className={'udf-select-control'}
+                    triggerReset={reset}
+                    udfType={eUDFType.critter_group}
+                    label={MapStrings.customAnimalGroupLabel}
+                    changeHandler={handleChangeUDF}
+                    hide={!isTab(filter)}
+                  />
+                  {isTab(filter) && (
+                    <IconButton onClick={props.onClickEditUdf}>
+                      <Icon icon='edit' />
+                    </IconButton>
+                  )}
+                </div>
+              </Tooltip>
+            </Grid>
+          </Grid>
+        </Box>
+      </>
+    );
   };
 
+  const createSearch = (): ReactNode => {
+    return (
+      <>
+        {isTab(search) && (
+          <Box mb={2} mt={2}>
+            <Grid container spacing={2}>
+              <Grid item sm={6}>
+                <Tooltip title={<p>{MapStrings.startDateTooltip}</p>}>
+                  <DateInput
+                    fullWidth
+                    propName='tstart'
+                    label={MapStrings.startDateLabel}
+                    defaultValue={dayjs(start)}
+                    changeHandler={(e): void => setStart(e['tstart'] as string)}
+                    maxDate={dayjs(end)}
+                  />
+                </Tooltip>
+              </Grid>
+              <Grid item sm={6}>
+                <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
+                  <DateInput
+                    fullWidth
+                    propName='tend'
+                    label={MapStrings.endDateLabel}
+                    defaultValue={dayjs(end)}
+                    changeHandler={(e): void => setEnd(e['tend'] as string)}
+                    minDate={dayjs(start)}
+                  />
+                </Tooltip>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+      </>
+    );
+  };
   // udfs are treated as any other filter, use this function to convert them
   // and then 'push' them to the normal filter change handler
   const handleChangeUDF = (v: IUDF[]): void => {
@@ -237,9 +265,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   // only code_header and description are actually used when applying the filter
   const handleChangeAutocomplete = (values: ISelectMultipleData[], header: string): void => {
-
     if (!values.length) {
-      changeFilter([], header)
+      changeFilter([], header);
       return;
     }
 
@@ -247,7 +274,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     const asFilters: ICodeFilter[] = values.map((v) => {
       return { code_header: v.prop, description: v.value, code: '', code_header_title: '', id: 0 };
     });
-    console.log({asFilters})
+    console.log({ asFilters });
     changeFilter(asFilters, header_id);
   };
 
@@ -270,10 +297,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     });
   };
 
-
   const handleTabChange = (event: SyntheticEvent<Element>, newValue: TabNames): void => {
     setTab(newValue);
-  }
+  };
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
 
@@ -284,84 +310,51 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         [classes.drawerClose]: !open
       })}
       ref={containerRef}>
-      
-      <Box className="side-panel-content">
-
-        <Box display="flex" justifyContent="space-between" alignItems="center" px={3}>
-        <Tabs value={tab} onChange={handleTabChange}>
-        <Tab icon={<Icon icon={search as string}/>} value={search} label={search} />
-        <Tab icon={<Icon icon={filter as string}/>} value={filter} label={filter} disabled={!pings?.length}/>
-        <Tab icon={<Icon icon={symbolize as string}/>} value={symbolize} label={symbolize} disabled={!pings?.length}/>
-        </Tabs>
+      <Box className='side-panel-content'>
+        <Box display='flex' justifyContent='space-between' alignItems='center' px={3}>
+          <Tabs value={tab} onChange={handleTabChange}>
+            <Tab icon={<Icon icon={search as string} />} value={search} label={search} />
+            <Tab icon={<Icon icon={filter as string} />} value={filter} label={filter} disabled={!pings?.length} />
+            <Tab
+              icon={<Icon icon={symbolize as string} />}
+              value={symbolize}
+              label={symbolize}
+              disabled={!pings?.length}
+            />
+          </Tabs>
           {/* <h2>Filters</h2> */}
-          <Box className="drawer-toggle-button">
-            <IconButton color="primary" onClick={handleDrawerOpen} size="large">
+          <Box className='drawer-toggle-button'>
+            <IconButton color='primary' onClick={handleDrawerOpen} size='large'>
               <Icon icon={open ? 'close' : 'forward'} />
             </IconButton>
           </Box>
         </Box>
-        <Divider/>
+        <Divider />
         {open ? (
           <>
             {/* <Slide direction="right" in={tab == TabNames.search || tab == TabNames.filter} container={containerRef.current}> */}
             <Box p={3} pt={0}>
-
               {/* render the date pickers */}
               <h2>{tab}</h2>
               <Typography variant='subtitle2'>Lorem ipsum dolor sit amet</Typography>
-              {/* SEARCH */}
-              {isTab(search) && 
-              <Box mb={2} mt={2}>
-                <Grid container spacing={2}>
-                  <Grid item sm={6}>
-                    <Tooltip title={<p>{MapStrings.startDateTooltip}</p>}>
-                      <DateInput
-                        fullWidth
-                        propName='tstart'
-                        label={MapStrings.startDateLabel}
-                        defaultValue={dayjs(start)}
-                        changeHandler={(e): void => setStart(e['tstart'] as string)}
-                        maxDate={dayjs(end)}
-                      />
-                    </Tooltip>
-                  </Grid>
-                  <Grid item sm={6}>
-                    <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
-                      <DateInput
-                        fullWidth
-                        propName='tend'
-                        label={MapStrings.endDateLabel}
-                        defaultValue={dayjs(end)}
-                        changeHandler={(e): void => setEnd(e['tend'] as string)}
-                        minDate={dayjs(start)}
-                      />
-                    </Tooltip>
-                  </Grid>
-                </Grid>
-              </Box>}
-
-              {/* FILTER */}
-              {/* render the other select filter components */}
+              {createSearch()}
               {createFilters()}
 
-            {/* SYMBOLIZE */}
-            {isTab(symbolize) && 
-              <Box mb={2} mt={2}>
-              </Box>}
+              {/* SYMBOLIZE */}
+              {isTab(symbolize) && <Box mb={2} mt={2}></Box>}
 
               <Divider />
 
-              <Box className={'form-buttons'} display="flex" justifyContent="flex-start" py={3}>
+              <Box className={'form-buttons'} display='flex' justifyContent='flex-start' py={3}>
                 <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>
                   {tab}
                 </Button>
-                {isTab(filter) && <Button color="primary" variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
-                  Reset
-                </Button>}
+                {isTab(filter) && (
+                  <Button color='primary' variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
+                    Reset
+                  </Button>
+                )}
               </Box>
-              
-              
-
             </Box>
             {/* </Slide> */}
           </>
@@ -370,5 +363,5 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         )}
       </Box>
     </Box>
-    );
+  );
 }

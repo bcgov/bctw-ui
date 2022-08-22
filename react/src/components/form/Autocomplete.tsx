@@ -13,15 +13,15 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
   width?: number;
   tagLimit?: number;
   isMultiSearch?: boolean;
-  hidden?: boolean;
+  hide?: boolean;
 };
 
 /**
- * component similar to MultiSelect, but fills the text input with 
+ * component similar to MultiSelect, but fills the text input with
  * tag components when an option is selected
  */
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
-  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch, hidden } = props;
+  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch, hide } = props;
   const [selected, setSelected] = useState<T[]>([]);
   useEffect(() => {
     setSelected([]);
@@ -29,49 +29,49 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
 
   useDidMountEffect(() => {
     if (defaultValue) {
-      setSelected(o => [...o, defaultValue]);
+      setSelected((o) => [...o, defaultValue]);
     }
-  }, [defaultValue])
+  }, [defaultValue]);
 
   const handleChange = (value: T[]): void => {
     const len = value.length;
-    const lastElem = len > 0 ? [value[len-1]] : value;
+    const lastElem = len > 0 ? [value[len - 1]] : value;
     const mutatedValue = isMultiSearch ? value : lastElem;
     setSelected(mutatedValue);
     changeHandler(mutatedValue, data[0]?.prop);
   };
-
+  if (hide) {
+    return null;
+  }
   return (
-      !hidden ?
-        <MUIAutocomplete
-        value={selected}
-        disableCloseOnSelect={isMultiSearch}
-        autoComplete
-        size='small'
-        multiple
-        style={{width}}
-        limitTags={tagLimit ?? 3}
-        isOptionEqualToValue={(option, value):boolean => (option.id === value.id)}
-        // exclude selected values from the option list
-        filterSelectedOptions={true}
-        //options={filteredData.filter(d => selected.findIndex(s => s.id === d.id) === -1)}
-        options={data}
-        renderTags={(value: T[], getTagProps): JSX.Element[] => {
-          return value
-            .sort((a, b) => {
-              if (typeof a.id === 'number' && typeof b.id === 'number') {
-                return a.id - b.id;
-              }
-              return -1;
-            })
-            .map((option: T, index: number) => (
-              <Chip key={`${option.prop}-${option.id}`} label={option.displayLabel} {...getTagProps({ index })} />
-            ));
-        }}
-        getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel}
-        renderInput={(params): JSX.Element => <TextField {...params} label={label} />}
-        onChange={(e, v): void => handleChange(v as T[])}
-      />
-      : null
+    <MUIAutocomplete
+      value={selected}
+      disableCloseOnSelect={isMultiSearch}
+      autoComplete
+      size='small'
+      multiple
+      style={{ width }}
+      limitTags={tagLimit ?? 3}
+      isOptionEqualToValue={(option, value): boolean => option.id === value.id}
+      // exclude selected values from the option list
+      filterSelectedOptions={true}
+      //options={filteredData.filter(d => selected.findIndex(s => s.id === d.id) === -1)}
+      options={data}
+      renderTags={(value: T[], getTagProps): JSX.Element[] => {
+        return value
+          .sort((a, b) => {
+            if (typeof a.id === 'number' && typeof b.id === 'number') {
+              return a.id - b.id;
+            }
+            return -1;
+          })
+          .map((option: T, index: number) => (
+            <Chip key={`${option.prop}-${option.id}`} label={option.displayLabel} {...getTagProps({ index })} />
+          ));
+      }}
+      getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel}
+      renderInput={(params): JSX.Element => <TextField {...params} label={label} />}
+      onChange={(e, v): void => handleChange(v as T[])}
+    />
   );
 }
