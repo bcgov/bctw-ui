@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
-import React, { ReactNode, SyntheticEvent, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ICodeFilter } from 'types/code';
 import { MapRange, TelemetryDetail } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
@@ -118,12 +118,21 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   useEffect(() => {
     console.log({ filters });
   }, [filters]);
+
   const orLabelStyle = {
     color: '#6d6d6d',
     display: 'flex',
     fontSize: '13px',
     justifyContent: 'center'
   };
+
+  // Update the formfield values when pings are loaded.
+  // Use memo to minimize computing result.
+  useMemo(() => {
+    if (pings?.length) {
+      setFormValues(getFormValues());
+    }
+  }, [pings]);
 
   // keep track of how many filters are currently set
   useEffect(() => {
@@ -136,7 +145,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       if (end !== props.end || start !== props.start) {
         setApplyButtonStatus(false);
         setWasDatesChanged(true);
-        setFormValues(getFormValues());
       }
     };
     onChangeDate();

@@ -33,8 +33,8 @@ const MAP_COLOURS_OUTLINE = {
 };
 
 /**
- * @param numColours: Total number steps to get color, means total colors
- * @param index: The step number, means the order of the color
+ * @param numColours: Total colors
+ * @param index: The order of the colour
  */
 //https://stackoverflow.com/questions/1484506/random-color-generator
 export const getEvenlySpacedColour = (numColours: number, index: number): string => {
