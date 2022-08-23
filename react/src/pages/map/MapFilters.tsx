@@ -1,8 +1,29 @@
-import { Box, Button, Divider, Grid, IconButton, Slide, Tab, Tabs, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+  IconButton,
+  Radio,
+  RadioGroup,
+  Slide,
+  Tab,
+  TableHead,
+  TableCell,
+  TableRow,
+  Tabs,
+  Typography,
+  TableContainer,
+  TableBody,
+  Table,
+  Paper
+} from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
-import { Children, ReactNode, SyntheticEvent, useEffect, useRef, useState } from 'react';
-import SelectCode from 'components/form/SelectCode';
+import React, { ReactNode, SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { ICodeFilter } from 'types/code';
 import { MapRange, TelemetryDetail } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
@@ -19,7 +40,8 @@ import { Tooltip } from 'components/common';
 import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { ITelemetryPoint } from 'types/map';
-import { getUniquePropFromPings } from './map_helpers';
+import { getEvenlySpacedColour, getUniquePropFromPings } from './map_helpers';
+import BasicTable from 'components/table/BasicTable';
 enum TabNames {
   search = 'Search',
   filter = 'Filter',
@@ -42,6 +64,7 @@ type MapFiltersProps = {
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const { pings } = props;
+  const DEFAULT_SYMBOLIZE = 'device_id';
   const { search, filter, symbolize } = TabNames;
   const classes = drawerStyles();
   const containerRef = useRef(null);
@@ -62,6 +85,36 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   // controls the Tabs
   const [tab, setTab] = useState<TabNames>(TabNames.search);
+  // controls symbolize value
+  const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_SYMBOLIZE);
+
+  const createUniqueList = (propName: keyof TelemetryDetail): ISelectMultipleData[] => {
+    const devices = getUniquePropFromPings(pings ?? [], propName) as number[];
+    const merged = [...devices].sort((a, b) => a - b);
+    return merged.map((d) => {
+      // const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
+      const displayLabel = d.toString();
+      return { id: d, value: d, displayLabel, prop: propName };
+    });
+  };
+
+  const getFormValues = () =>
+    CODE_FILTERS.map((cf, idx) => {
+      const list = createUniqueList(cf.header);
+      return {
+        id: idx,
+        header: cf.header,
+        label: columnToHeader(cf?.label ?? cf.header),
+        values: list.map((val, i) => ({
+          item: val,
+          colour: getEvenlySpacedColour(list.length, i)
+        }))
+      };
+    });
+
+  // controls the formValues, used in filters / symbolize pages
+  const [formValues, setFormValues] = useState(getFormValues());
+
   useEffect(() => {
     console.log({ filters });
   }, [filters]);
@@ -83,6 +136,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       if (end !== props.end || start !== props.start) {
         setApplyButtonStatus(false);
         setWasDatesChanged(true);
+        setFormValues(getFormValues());
       }
     };
     onChangeDate();
@@ -124,6 +178,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
   };
 
+  const handleApplySymbolize = (): void => {};
   /**
     1) uses a timeout to temporarily set reset status to true,
       the select components are listening for these changes, which 
@@ -140,6 +195,45 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     handleApplyFilters(null, true);
   };
 
+  const resetSymbolize = (): void => {
+    setSymbolizeBy(DEFAULT_SYMBOLIZE);
+  };
+  // udfs are treated as any other filter, use this function to convert them
+  // and then 'push' them to the normal filter change handler
+  const handleChangeUDF = (v: IUDF[]): void => {
+    const asNormalFilters = transformUdfToCodeFilter(v, eUDFType.critter_group);
+    changeFilter(asNormalFilters, 'critter_id');
+  };
+
+  // only code_header and description are actually used when applying the filter
+  const handleChangeAutocomplete = (values: ISelectMultipleData[], header: string): void => {
+    if (!values.length) {
+      changeFilter([], header);
+      return;
+    }
+
+    const header_id = values[0].prop;
+    const asFilters: ICodeFilter[] = values.map((v) => {
+      return { code_header: v.prop, description: v.value, code: '', code_header_title: '', id: 0 };
+    });
+    console.log({ asFilters });
+    changeFilter(asFilters, header_id);
+  };
+
+  const handleDrawerOpen = (): void => {
+    const newVal = !open;
+    setOpen(newVal);
+    if (open) {
+      // notify map parent that it needs to resize
+      props.onCollapsePanel();
+    }
+  };
+
+  const handleTabChange = (event: SyntheticEvent<Element>, newValue: TabNames): void => {
+    setTab(newValue);
+  };
+
+  const isTab = (tabName: TabNames): boolean => tabName === tab;
   // creates select elements
   const createFilters = (): React.ReactNode => {
     const itemSpacing = isTab(filter) ? 12 : false;
@@ -171,16 +265,16 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
         <Box mb={boxContainerSpacing}>
           <Grid container spacing={boxContainerSpacing}>
-            {CODE_FILTERS.map((cf, idx) => (
-              <Grid item sm={itemSpacing} key={`${cf.header}-${idx}`}>
-                <Tooltip title={<p>{MapStrings.codeFiltersTooltips[cf.header]}</p>}>
+            {formValues.map((fv, idx) => (
+              <Grid item sm={itemSpacing} key={`${fv.header}-${fv.id}`}>
+                <Tooltip title={<p>{MapStrings.codeFiltersTooltips[fv.header]}</p>}>
                   <AutoComplete
-                    label={cf.label ?? columnToHeader(cf.header)}
-                    data={createUniqueList(cf.header)}
+                    label={fv.label}
+                    data={fv.values.map((v) => v.item)}
                     changeHandler={handleChangeAutocomplete}
                     triggerReset={reset}
                     isMultiSearch
-                    hide={!isTab(filter)}
+                    hidden={!isTab(filter)}
                   />
                 </Tooltip>
               </Grid>
@@ -204,7 +298,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     udfType={eUDFType.critter_group}
                     label={MapStrings.customAnimalGroupLabel}
                     changeHandler={handleChangeUDF}
-                    hide={!isTab(filter)}
+                    hidden={!isTab(filter)}
                   />
                   {isTab(filter) && (
                     <IconButton onClick={props.onClickEditUdf}>
@@ -256,52 +350,85 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       </>
     );
   };
-  // udfs are treated as any other filter, use this function to convert them
-  // and then 'push' them to the normal filter change handler
-  const handleChangeUDF = (v: IUDF[]): void => {
-    const asNormalFilters = transformUdfToCodeFilter(v, eUDFType.critter_group);
-    changeFilter(asNormalFilters, 'critter_id');
+
+  const createSymbolize = (): ReactNode => {
+    const handleSymbolizeBy = (e: React.ChangeEvent<HTMLInputElement>): void => {
+      setSymbolizeBy((e.target as HTMLInputElement).value);
+    };
+    return (
+      <>
+        {isTab(symbolize) && (
+          <Box mb={2} mt={2}>
+            <Grid container spacing={2}>
+              <Grid item sm={6}>
+                <FormControl>
+                  <FormLabel>Categorize points by colour</FormLabel>
+                  <RadioGroup value={symbolizeBy} onChange={handleSymbolizeBy} row>
+                    {formValues.map((fv, idx) => (
+                      <FormControlLabel
+                        value={fv.header}
+                        control={<Radio />}
+                        label={fv.label}
+                        key={`symbolize-${idx}`}
+                        disabled={!fv.values?.length}
+                      />
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+      </>
+    );
   };
 
-  // only code_header and description are actually used when applying the filter
-  const handleChangeAutocomplete = (values: ISelectMultipleData[], header: string): void => {
-    if (!values.length) {
-      changeFilter([], header);
-      return;
-    }
-
-    const header_id = values[0].prop;
-    const asFilters: ICodeFilter[] = values.map((v) => {
-      return { code_header: v.prop, description: v.value, code: '', code_header_title: '', id: 0 };
-    });
-    console.log({ asFilters });
-    changeFilter(asFilters, header_id);
+  const createSymbolizeLegend = (): ReactNode => {
+    const tableData = createUniqueList(symbolizeBy as keyof TelemetryDetail);
+    const symbolizeData = formValues.find((el) => el.header == symbolizeBy).values;
+    return (
+      <>
+        {isTab(symbolize) && (
+          <>
+            <h2>Legend</h2>
+            <TableContainer component={Paper}>
+              <Table aria-label='simple table'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>id</TableCell>
+                    <TableCell>{columnToHeader(symbolizeBy)}</TableCell>
+                    <TableCell>Colour</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {symbolizeData.map((row, idx) => (
+                    <TableRow key={idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell component='th' scope='row'>
+                        {idx}
+                      </TableCell>
+                      <TableCell component='th' scope='row'>
+                        {row.item.value}
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          className='colour-swatch'
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            border: '1px solid #999999',
+                            backgroundColor: getEvenlySpacedColour(symbolizeData.length, idx)
+                          }}></Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
+        )}
+      </>
+    );
   };
-
-  const handleDrawerOpen = (): void => {
-    const newVal = !open;
-    setOpen(newVal);
-    if (open) {
-      // notify map parent that it needs to resize
-      props.onCollapsePanel();
-    }
-  };
-
-  const createUniqueList = (propName: keyof TelemetryDetail): ISelectMultipleData[] => {
-    const devices = getUniquePropFromPings(pings ?? [], propName) as number[];
-    const merged = [...devices].sort((a, b) => a - b);
-    return merged.map((d) => {
-      // const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
-      const displayLabel = d.toString();
-      return { id: d, value: d, displayLabel, prop: propName };
-    });
-  };
-
-  const handleTabChange = (event: SyntheticEvent<Element>, newValue: TabNames): void => {
-    setTab(newValue);
-  };
-
-  const isTab = (tabName: TabNames): boolean => tabName === tab;
 
   return (
     <Box
@@ -311,7 +438,13 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       })}
       ref={containerRef}>
       <Box className='side-panel-content'>
-        <Box display='flex' justifyContent='space-between' alignItems='center' px={3}>
+        <Box
+          display='flex'
+          justifyContent={open ? 'start' : 'space-between'}
+          alignItems='center'
+          px={3}
+          pl={1}
+          flexDirection={open ? 'row-reverse' : 'row'}>
           <Tabs value={tab} onChange={handleTabChange}>
             <Tab icon={<Icon icon={search as string} />} value={search} label={search} />
             <Tab icon={<Icon icon={filter as string} />} value={filter} label={filter} disabled={!pings?.length} />
@@ -325,42 +458,45 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           {/* <h2>Filters</h2> */}
           <Box className='drawer-toggle-button'>
             <IconButton color='primary' onClick={handleDrawerOpen} size='large'>
-              <Icon icon={open ? 'close' : 'forward'} />
+              <Icon icon={open ? 'back' : 'forward'} />
             </IconButton>
           </Box>
         </Box>
         <Divider />
-        {open ? (
-          <>
-            {/* <Slide direction="right" in={tab == TabNames.search || tab == TabNames.filter} container={containerRef.current}> */}
-            <Box p={3} pt={0}>
-              {/* render the date pickers */}
-              <h2>{tab}</h2>
-              <Typography variant='subtitle2'>Lorem ipsum dolor sit amet</Typography>
-              {createSearch()}
-              {createFilters()}
+        {/* {open ? (
+          <> */}
+        {/* <Slide direction="right" in={tab == TabNames.search || tab == TabNames.filter} container={containerRef.current}> */}
+        <Box p={3} pt={0}>
+          <h2>{tab}</h2>
+          <Typography variant='subtitle2'>Lorem ipsum dolor sit amet</Typography>
+          {createSearch()}
+          {createFilters()}
+          {createSymbolize()}
+          {/* <Divider /> */}
 
-              {/* SYMBOLIZE */}
-              {isTab(symbolize) && <Box mb={2} mt={2}></Box>}
+          <Box className={'form-buttons'} display='flex' justifyContent='flex-start' py={2}>
+            <Button
+              color='primary'
+              variant='contained'
+              disabled={!isTab(symbolize) && applyButtonStatus}
+              onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
+              {tab}
+            </Button>
 
-              <Divider />
-
-              <Box className={'form-buttons'} display='flex' justifyContent='flex-start' py={3}>
-                <Button color='primary' variant='contained' disabled={applyButtonStatus} onClick={handleApplyFilters}>
-                  {tab}
-                </Button>
-                {isTab(filter) && (
-                  <Button color='primary' variant='outlined' disabled={numFiltersSelected === 0} onClick={resetFilters}>
-                    Reset
-                  </Button>
-                )}
-              </Box>
-            </Box>
-            {/* </Slide> */}
-          </>
+            {isTab(filter) && (
+              <Button color='primary' variant='outlined' disabled={!numFiltersSelected} onClick={resetFilters}>
+                Reset
+              </Button>
+            )}
+          </Box>
+          <Divider />
+          {createSymbolizeLegend()}
+        </Box>
+        {/* </Slide> */}
+        {/* </>
         ) : (
           <></>
-        )}
+        )} */}
       </Box>
     </Box>
   );

@@ -13,7 +13,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
   width?: number;
   tagLimit?: number;
   isMultiSearch?: boolean;
-  hide?: boolean;
+  hidden?: boolean;
 };
 
 /**
@@ -21,7 +21,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
  * tag components when an option is selected
  */
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
-  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch, hide } = props;
+  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch, hidden } = props;
   const [selected, setSelected] = useState<T[]>([]);
   useEffect(() => {
     setSelected([]);
@@ -40,7 +40,7 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
     setSelected(mutatedValue);
     changeHandler(mutatedValue, data[0]?.prop);
   };
-  if (hide) {
+  if (hidden) {
     return null;
   }
   return (

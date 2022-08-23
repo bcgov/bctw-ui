@@ -33,7 +33,7 @@ import {
   mdiLockOpenCheck,
   mdiMagnify,
   mdiFilterOutline,
-  mdiBrush,
+  mdiBrush
 } from '@mdi/js';
 import Icon from '@mdi/react';
 

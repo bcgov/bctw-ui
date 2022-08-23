@@ -33,6 +33,56 @@ const MAP_COLOURS_OUTLINE = {
 };
 
 /**
+ * @param numColours: Total number steps to get color, means total colors
+ * @param index: The step number, means the order of the color
+ */
+//https://stackoverflow.com/questions/1484506/random-color-generator
+export const getEvenlySpacedColour = (numColours: number, index: number): string => {
+  let r: number, g: number, b: number;
+  const h = index / numColours;
+  const i = ~~(h * 6);
+  const f = h * 6 - i;
+  const q = 1 - f;
+  switch (i % 6) {
+    case 0:
+      r = 1;
+      g = f;
+      b = 0;
+      break;
+    case 1:
+      r = q;
+      g = 1;
+      b = 0;
+      break;
+    case 2:
+      r = 0;
+      g = 1;
+      b = f;
+      break;
+    case 3:
+      r = 0;
+      g = q;
+      b = 1;
+      break;
+    case 4:
+      r = f;
+      g = 0;
+      b = 1;
+      break;
+    case 5:
+      r = 1;
+      g = 0;
+      b = q;
+      break;
+  }
+  const c =
+    '#' +
+    ('00' + (~~(r * 255)).toString(16)).slice(-2) +
+    ('00' + (~~(g * 255)).toString(16)).slice(-2) +
+    ('00' + (~~(b * 255)).toString(16)).slice(-2);
+  return c;
+};
+/**
  * @param colourString the @type {Animal} animal_colour string
  * which in the @file {map_api.ts} -> @function {getPings} is returned
  * in a concatted format of `${fill_collour},${border_colour}`
@@ -58,7 +108,7 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
   }
   const { properties } = point;
   if (properties?.animal_status === 'Mortality') {
-    const { date_recorded, mortality_date} = properties;
+    const { date_recorded, mortality_date } = properties;
     // if the mortality date is not set, fill all points red
     // otherwise only fill points red after the mortality date
     if (!mortality_date || dayjs(date_recorded) > dayjs(mortality_date)) {
@@ -103,7 +153,7 @@ const fillPoint = (layer: any, selected = false): void => {
 const groupPings = (
   pings: ITelemetryPoint[],
   sortOption?: DetailsSortOption,
-  groupBy: PingGroupType = 'critter_id',
+  groupBy: PingGroupType = 'critter_id'
 ): ITelemetryGroup[] => {
   const uniques: ITelemetryGroup[] = [];
   if (!pings.length) {
@@ -216,7 +266,10 @@ const getUniqueCritterIDsFromSelectedPings = (features: ITelemetryPoint[], selec
   return grped.map((g) => g.critter_id);
 };
 
-const getUniquePropFromPings = (features: ITelemetryPoint[], prop: keyof TelemetryDetail = 'device_id'): number[] | string[] => {
+const getUniquePropFromPings = (
+  features: ITelemetryPoint[],
+  prop: keyof TelemetryDetail = 'device_id'
+): number[] | string[] => {
   const ids = [];
   features?.forEach((f) => {
     const val = f.properties[prop];
@@ -248,7 +301,10 @@ const getEarliestPing = (features: ITelemetryPoint[]): ITelemetryPoint => {
 // groups the param features by critter, returning an object containing:
 // an array of the most recent pings
 // an arrya of all other pings
-const splitPings = (pings: ITelemetryPoint[], splitBy: PingGroupType = 'critter_id'): { latest: ITelemetryPoint[]; other: ITelemetryPoint[] } => {
+const splitPings = (
+  pings: ITelemetryPoint[],
+  splitBy: PingGroupType = 'critter_id'
+): { latest: ITelemetryPoint[]; other: ITelemetryPoint[] } => {
   const gp = groupPings(pings, null, splitBy);
   const latest = getLatestPingsFromTelemetryGroup(gp);
   const latestIds = latest.map((l) => l.id);
@@ -314,10 +370,7 @@ const getLast10Points = (group: ITelemetryGroup[]): ITelemetryPoint[] => {
  * is the same as @property {ITelemetryPoint.geometry.coordinates},
  * the only difference is how Leaflet displays them!
  */
-const getLast10Tracks = (
-  groupedPings: ITelemetryGroup[],
-  originalTracks: ITelemetryLine[]
-): ITelemetryLine[] => {
+const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelemetryLine[]): ITelemetryLine[] => {
   const newTracks: ITelemetryLine[] = [];
   groupedPings.forEach((e) => {
     const critterPingCoordinates = e.features.map((p) => p.geometry.coordinates);
@@ -358,5 +411,5 @@ export {
   MAP_COLOURS_OUTLINE,
   parseAnimalColour,
   sortGroupedTelemetry,
-  splitPings,
+  splitPings
 };

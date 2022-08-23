@@ -13,14 +13,14 @@ type ISelectProps = SelectProps &
   PartialPick<SharedSelectProps, 'triggerReset' | 'defaultValue'> & {
     udfType: eUDFType;
     changeHandler: (o: IUDF[] | IUDF) => void;
-    hide?: boolean;
+    hidden?: boolean;
   };
 
 /**
  * todo: merge base select component with select codes / basic select components!
  */
 export default function SelectUDF(props: ISelectProps): JSX.Element {
-  const { label, udfType, defaultValue, changeHandler, triggerReset, multiple = true, className, hide } = props;
+  const { label, udfType, defaultValue, changeHandler, triggerReset, multiple = true, className, hidden } = props;
   const api = useTelemetryApi();
   const [values, setValues] = useState<string[] | string>(defaultValue ?? []);
   const [udfs, setUdfs] = useState<IUDF[]>([]);
@@ -54,7 +54,7 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
       changeHandler(udfs.find((u) => u.value === (selected as string)));
     }
   };
-  if (hide) {
+  if (hidden) {
     return null;
   }
   return (
