@@ -1,6 +1,6 @@
 import * as L from 'leaflet';
 import { getFillColorByStatus, getOutlineColor, MAP_COLOURS, MAP_COLOURS_OUTLINE } from 'pages/map/map_helpers';
-import { ITelemetryPoint } from 'types/map';
+import { ITelemetryPoint, MapFormValue, Symbolize } from 'types/map';
 
 const defaultPointStyle: L.CircleMarkerOptions = {
   radius: 8,
@@ -10,22 +10,22 @@ const defaultPointStyle: L.CircleMarkerOptions = {
 };
 
 const selectedPointStyle = (): L.CircleMarkerOptions => {
-  return { 
+  return {
     fillColor: MAP_COLOURS.selected,
     color: MAP_COLOURS_OUTLINE.selected,
-    ...defaultPointStyle 
-  }
-}
+    ...defaultPointStyle
+  };
+};
 
-const animalColoredPointStyle = (ping: ITelemetryPoint, isUnassigned: boolean): L.CircleMarkerOptions => {
-  const fillColor = isUnassigned ? MAP_COLOURS['unassigned point'] : getFillColorByStatus(ping);
-  const color = isUnassigned ?  MAP_COLOURS_OUTLINE['unassigned point'] : getOutlineColor(ping);
+const animalColoredPointStyle = (ping: ITelemetryPoint): L.CircleMarkerOptions => {
+  const fillColor = getFillColorByStatus(ping);
+  const color = getOutlineColor(ping);
   return {
     ...defaultPointStyle,
     fillColor,
     color
-  }
-}
+  };
+};
 
 const createLatestPingIcon = (fillColour: string, color = '#000'): L.DivIcon => {
   return L.divIcon({
@@ -64,15 +64,19 @@ const createLatestPingIcon = (fillColour: string, color = '#000'): L.DivIcon => 
 const latestSelectedPingIcon = createLatestPingIcon(MAP_COLOURS.selected);
 // setup for the latest pings for assigned devices
 // the icon is replaced when the marker is clicked
-const setupLatestPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn, closeHandler: L.LeafletEventHandlerFn, isUnassigned: boolean): void => {
+const setupLatestPingOptions = (
+  pings: L.GeoJSON,
+  clickHandler: L.LeafletEventHandlerFn,
+  closeHandler: L.LeafletEventHandlerFn
+): void => {
   pings.options = {
     pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
-      const unselectedIcon = createLatestPingIcon(isUnassigned ?  MAP_COLOURS['unassigned point'] : getFillColorByStatus(feature), isUnassigned ? MAP_COLOURS_OUTLINE['unassigned point'] : getOutlineColor(feature));
-      const marker = new L.Marker(latlng, {icon: unselectedIcon});
+      const unselectedIcon = createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature));
+      const marker = new L.Marker(latlng, { icon: unselectedIcon });
       // make a hidden popup that will help deal with click events
-      marker.bindPopup('', {className:'marker-popup' }).openPopup();
+      marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
-        e.target.setIcon(unselectedIcon)
+        e.target.setIcon(unselectedIcon);
         closeHandler(e);
       });
       marker.on('click', (e) => {
@@ -97,32 +101,51 @@ const highlightLatestPings = (layer: L.GeoJSON, selectedIDs: number[]): void => 
   });
 };
 
-const highlightPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
+const highlightPings = (layer: L.GeoJSON, selectedIDs: number[], colour?: string): void => {
   layer.eachLayer((p: any) => {
     const feature = p.feature;
     if (typeof p.setStyle === 'function') {
       p.setStyle({
         weight: 1.0,
         color: getOutlineColor(feature),
-        fillColor: getFillColorByStatus(feature, selectedIDs.includes(feature.id))
+        fillColor: colour ? colour : getFillColorByStatus(feature, selectedIDs.includes(feature.id))
       });
     }
   });
-}
+};
 
+const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue): void => {
+  const { header, values } = mfv;
+  layer.eachLayer((p: any) => {
+    const feature = p.feature;
+    const attr = feature.properties[header as string];
+    const colour = values.find((val) => val.item.id === attr)?.colour;
+    if (typeof p.setStyle === 'function' && colour) {
+      p.setStyle({
+        weight: 1.0,
+        color: getOutlineColor(feature),
+        fillColor: colour
+      });
+    }
+  });
+};
 
 // setup for normal pings for assigned devices
 // when a ping is clicked/unselected, only the point style is changed
-const setupPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerFn, closeHandler: L.LeafletEventHandlerFn , isUnassigned: boolean): void => {
+const setupPingOptions = (
+  pings: L.GeoJSON,
+  clickHandler: L.LeafletEventHandlerFn,
+  closeHandler: L.LeafletEventHandlerFn
+): void => {
   pings.options = {
     pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
-      const critterStyle = animalColoredPointStyle(feature, isUnassigned);
+      const critterStyle = animalColoredPointStyle(feature);
       const marker = L.circleMarker(latlng, critterStyle);
-      marker.bindPopup('', {className:'marker-popup' }).openPopup();
+      marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
         e.target.setStyle(critterStyle);
         closeHandler(e);
-      }) 
+      });
       marker.on('click', (e) => {
         e.target.setStyle(selectedPointStyle());
         clickHandler(e);
@@ -134,8 +157,8 @@ const setupPingOptions = (pings: L.GeoJSON, clickHandler: L.LeafletEventHandlerF
 };
 
 // tracks setup
-const setupTracksOptions = (tracks: L.GeoJSON, isUnassigned: boolean): void => {
-  const color = isUnassigned ? MAP_COLOURS['unassigned line segment'] : MAP_COLOURS.track;
+const setupTracksOptions = (tracks: L.GeoJSON): void => {
+  const color = MAP_COLOURS.track;
   tracks.options = {
     style: (): Record<string, string> => {
       return {
@@ -161,4 +184,14 @@ const setupSelectedPings = (): L.GeoJSONOptions => {
   };
 };
 
-export { highlightPings, highlightLatestPings, createLatestPingIcon, defaultPointStyle, setupSelectedPings, setupLatestPingOptions, setupTracksOptions, setupPingOptions };
+export {
+  highlightPings,
+  highlightLatestPings,
+  createLatestPingIcon,
+  defaultPointStyle,
+  setupSelectedPings,
+  setupLatestPingOptions,
+  setupTracksOptions,
+  setupPingOptions,
+  symbolizePings
+};

@@ -45,7 +45,8 @@ import {
   setupLatestPingOptions,
   setupPingOptions,
   setupSelectedPings,
-  setupTracksOptions
+  setupTracksOptions,
+  symbolizePings
 } from 'pages/map/point_setup';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { MapStrings } from 'constants/strings';
@@ -119,7 +120,6 @@ export default function MapPage(): JSX.Element {
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
   const drawnLines = [];
-  console.log(pings.length);
   // fetch the map data
   const { start, end } = range;
   const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = api.usePings(start, end);
@@ -139,8 +139,8 @@ export default function MapPage(): JSX.Element {
     const update = (): void => {
       if (fetchedPings && !isErrorPings) {
         // must be called before adding data to pings layer
-        setupPingOptions(pingsLayer, handlePointClick, handlePointClose, false);
-        setupLatestPingOptions(latestPingsLayer, handlePointClick, handlePointClose, false);
+        setupPingOptions(pingsLayer, handlePointClick, handlePointClose);
+        setupLatestPingOptions(latestPingsLayer, handlePointClick, handlePointClose);
         // re-apply filters
         if (filters.length) {
           applyFiltersToPings(filters);
@@ -175,7 +175,7 @@ export default function MapPage(): JSX.Element {
   // assigned tracks
   useEffect(() => {
     if (fetchedTracks && !isErrorTracks) {
-      setupTracksOptions(tracksLayer, false);
+      setupTracksOptions(tracksLayer);
       /* 
         todo: only last 10 fixes is and needs to be handled when pings are updated?
         since pings are what filter the tracks?
@@ -300,7 +300,7 @@ export default function MapPage(): JSX.Element {
   };
 
   // redraw only pings, if no params supplied it will default the fetched ones
-  const redrawPings = (newPings: ITelemetryPoint[]): void => {
+  const redrawPings = (newPings: ITelemetryPoint[], colour?: string): void => {
     const { latest, other } = splitPings(newPings);
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(pingsLayer);
@@ -321,16 +321,7 @@ export default function MapPage(): JSX.Element {
   };
 
   const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue): void => {
-    const { header, values } = mfv;
-    console.log(values);
-    // const found = pings.find((ping) => ping.properties[header as string]);
-    // console.log(found);
-    pings.forEach((ping) => {
-      //console.log(ping);
-      if (ping.properties[header as string]) {
-        console.log(ping.id);
-      }
-    });
+    symbolizePings(pingsLayer, mfv);
   };
 
   // triggered when side-panel filters are applied
