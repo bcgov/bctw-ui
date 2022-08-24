@@ -19,7 +19,8 @@ import {
   getUniquePropFromPings,
   groupFilters,
   splitPings,
-  getUniqueCritterIDsFromSelectedPings} from 'pages/map/map_helpers';
+  getUniqueCritterIDsFromSelectedPings
+} from 'pages/map/map_helpers';
 import Icon from '@mdi/react';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
@@ -30,7 +31,9 @@ import {
   ITelemetryPoint,
   ITelemetryLine,
   MapRange,
-  OnlySelectedCritters
+  OnlySelectedCritters,
+  Symbolize,
+  MapFormValue
 } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { BCTWType } from 'types/common_types';
@@ -70,7 +73,7 @@ export default function MapPage(): JSX.Element {
   const mapRef = useRef<L.Map>(null);
   // const [cluster] = useState(L.markerClusterGroup({
   //   spiderfyOnMaxZoom: true,
-  
+
   // }))
   // pings layer state
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
@@ -89,7 +92,6 @@ export default function MapPage(): JSX.Element {
     start: dayjs().subtract(7, 'day').format(formatDay),
     end: getToday()
   });
-
   // pings/tracks state is changed when filters are applied, so use these variables for the 'global' state - used in bottom panel
   const [pings, setPings] = useState<ITelemetryPoint[]>([]);
   // const [unassignedPings, setUnassignedPings] = useState<ITelemetryPoint[]>([]);
@@ -117,7 +119,7 @@ export default function MapPage(): JSX.Element {
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
   const drawnLines = [];
-
+  console.log(pings.length);
   // fetch the map data
   const { start, end } = range;
   const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = api.usePings(start, end);
@@ -318,6 +320,19 @@ export default function MapPage(): JSX.Element {
     tracksLayer.addData(newTracks as any);
   };
 
+  const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue): void => {
+    const { header, values } = mfv;
+    console.log(values);
+    // const found = pings.find((ping) => ping.properties[header as string]);
+    // console.log(found);
+    pings.forEach((ping) => {
+      //console.log(ping);
+      if (ping.properties[header as string]) {
+        console.log(ping.id);
+      }
+    });
+  };
+
   // triggered when side-panel filters are applied
   const handleApplyChangesFromFilterPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
     // if the timerange was changed, update that first. will trigger refetch
@@ -445,9 +460,7 @@ export default function MapPage(): JSX.Element {
     // setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
 
     const ref = mapRef.current;
-    const layers = [0, 2].includes(values.length)
-      ? [...getAssignedLayers()]
-      : getAssignedLayers();
+    const layers = [0, 2].includes(values.length) ? [...getAssignedLayers()] : getAssignedLayers();
 
     // when all or no options are selected
     if (layers.length > 3) {
@@ -500,15 +513,14 @@ export default function MapPage(): JSX.Element {
   const [bottomPanelHeight, setBottomPanelHeight] = useState<number>(300);
   const [bottomPanelPos, setBottomPanelPos] = useState<number>(null);
   const [dragging, setDragging] = useState(false);
-  
+
   // update the height of the bottom panel
   const onMove = (e: React.MouseEvent): void => {
-    
     if (dragging) {
       const mbp = document.getElementById('map-bottom-panel');
       const mv = document.getElementById('map-view');
       const height = bottomPanelHeight + (bottomPanelPos - e.clientY);
-      if(height <= mv.offsetHeight && height >= 80){
+      if (height <= mv.offsetHeight && height >= 80) {
         mbp.style.height = `${height}px`;
       }
     }
@@ -519,7 +531,7 @@ export default function MapPage(): JSX.Element {
     setBottomPanelPos(e.clientY);
     setBottomPanelHeight(mbp.offsetHeight);
     setDragging(true);
-  }
+  };
   // consider the 'dragging' event finished when the mouse is released anywhere on the screen
   const onUp = (): void => {
     if (dragging) {
@@ -528,67 +540,69 @@ export default function MapPage(): JSX.Element {
   };
   return (
     <SpeciesProvider>
-    <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove} >
-      <MapFilters
-        start={range.start}
-        end={range.end}
-        pings={fetchedPings ?? []}
-        // uniqueDevices={getUniquePropFromPings(fetchedPings ?? []) as number[]}
-        onApplyFilters={handleApplyChangesFromFilterPanel}
-        onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
-        // todo: trigger when filter panel transition is completed without timeout
-        onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
-        onShowLatestPings={handleShowLastKnownLocation}
-        onShowLastFixes={handleShowLast10Fixes}
-        // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
-        // pingsToDisplay={!!pings?.length}
-      />
-      <div className={'map-container'}>
-        {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
+      <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
+        <MapFilters
+          start={range.start}
+          end={range.end}
+          pings={pings ?? []}
+          // uniqueDevices={getUniquePropFromPings(fetchedPings ?? []) as number[]}
+          onApplyFilters={handleApplyChangesFromFilterPanel}
+          onApplySymbolize={handleApplyChangesFromSymbolizePanel}
+          onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
+          // todo: trigger when filter panel transition is completed without timeout
+          onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
+          onShowLatestPings={handleShowLastKnownLocation}
+          onShowLastFixes={handleShowLast10Fixes}
+          // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
+          // pingsToDisplay={!!pings?.length}
+        />
+        <div className={'map-container'}>
+          {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
 
-        <div id='popup' style={{ bottom: bottomPanelHeight }} />
+          <div id='popup' style={{ bottom: bottomPanelHeight }} />
 
-        <div id='map'>
-          <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
-        </div>
-
-        <Paper square 
-          style={{ height: bottomPanelHeight }}
-          className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}
-          id={`map-bottom-panel`}>
-          <div onMouseDown={onDown} id='drag'>
-            <div id='drag-icon'>
-              <Icon
-                path={mdiDragHorizontalVariant}
-                className={'icon'}
-                title='Drag to resize'
-                size={1}
-              />
-            </div>
+          <div id='map'>
+            <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
           </div>
-          <MapDetails
-            pings={[...pings]}
-            unassignedPings={[]}
-            selectedAssignedIDs={selectedPingIDs}
-            handleShowOnlySelected={handleShowOnlySelected}
-            handleShowOverview={handleShowOverview}
-            handleRowSelected={handleDetailPaneRowSelect}
-            showExportModal={showExportModal}
-            setShowExportModal={setShowExportModal}
-            timeRange={range}
+
+          <Paper
+            square
+            style={{ height: bottomPanelHeight }}
+            className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}
+            id={`map-bottom-panel`}>
+            <div onMouseDown={onDown} id='drag'>
+              <div id='drag-icon'>
+                <Icon path={mdiDragHorizontalVariant} className={'icon'} title='Drag to resize' size={1} />
+              </div>
+            </div>
+            <MapDetails
+              pings={[...pings]}
+              unassignedPings={[]}
+              selectedAssignedIDs={selectedPingIDs}
+              handleShowOnlySelected={handleShowOnlySelected}
+              handleShowOverview={handleShowOverview}
+              handleRowSelected={handleDetailPaneRowSelect}
+              showExportModal={showExportModal}
+              setShowExportModal={setShowExportModal}
+              timeRange={range}
+            />
+          </Paper>
+          {selectedDetail ? (
+            <MapOverView
+              open={showOverviewModal}
+              handleClose={setShowModal}
+              type={overviewType}
+              detail={selectedDetail}
+            />
+          ) : null}
+          <AddUDF
+            title={'Custom Animal Groups'}
+            udf_type={eUDFType.critter_group}
+            open={showUdfEdit}
+            handleClose={(): void => setShowUdfEdit(false)}
           />
-        </Paper>
-        {selectedDetail ? (
-          <MapOverView
-            open={showOverviewModal}
-            handleClose={setShowModal}
-            type={overviewType}
-            detail={selectedDetail}
-          />
-        ) : null}
-        <AddUDF title={'Custom Animal Groups'} udf_type={eUDFType.critter_group} open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)} />
+        </div>
       </div>
-    </div>
     </SpeciesProvider>
   );
 }

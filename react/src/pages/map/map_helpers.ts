@@ -1,3 +1,4 @@
+import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { FormStrings } from 'constants/strings';
 import dayjs from 'dayjs';
 import { ICodeFilter, IGroupedCodeFilter } from 'types/code';
@@ -9,8 +10,11 @@ import {
   ITelemetryLine,
   doesPointArrayContainPoint,
   PingGroupType,
-  TelemetryDetail
+  TelemetryDetail,
+  MapFormValue
 } from 'types/map';
+import { columnToHeader } from 'utils/common_helpers';
+import { CODE_FILTERS } from './map_constants';
 
 const MAP_COLOURS = {
   point: '#00ff44',
@@ -132,7 +136,7 @@ const getOutlineColor = (feature: ITelemetryPoint): string => {
 /**
  * sets the @param layer {setStyle} function
  */
-const fillPoint = (layer: any, selected = false): void => {
+const fillPoint = (layer: any, selected = false, colour?: string): void => {
   // dont style tracks or invalid points
   if (!layer.feature || layer.feature?.geometry?.type === 'LineString' || typeof layer.setStyle !== 'function') {
     return;
@@ -141,7 +145,7 @@ const fillPoint = (layer: any, selected = false): void => {
     class: selected ? 'selected-ping' : '',
     weight: 1.0,
     color: getOutlineColor(layer.feature),
-    fillColor: getFillColorByStatus(layer.feature, selected)
+    fillColor: colour ? colour : getFillColorByStatus(layer.feature, selected)
   });
 };
 
@@ -391,6 +395,30 @@ const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelem
   return newTracks;
 };
 
+//Creates a unique list of items from an unique prop.
+const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoint[]): ISelectMultipleData[] => {
+  const devices = getUniquePropFromPings(pings ?? [], propName) as number[];
+  const merged = [...devices].sort((a, b) => a - b);
+  return merged.map((d) => {
+    const displayLabel = d.toString();
+    return { id: d, value: d, displayLabel, prop: propName };
+  });
+};
+
+//Formats a MapFormValues array.
+const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] =>
+  CODE_FILTERS.map((cf, idx) => {
+    const list = createUniqueList(cf.header, pings);
+    return {
+      header: cf.header,
+      label: columnToHeader(cf?.label ?? cf.header),
+      values: list.map((val, i) => ({
+        item: val,
+        colour: getEvenlySpacedColour(list.length, i)
+      }))
+    };
+  });
+
 export {
   applyFilter,
   fillPoint,
@@ -411,5 +439,7 @@ export {
   MAP_COLOURS_OUTLINE,
   parseAnimalColour,
   sortGroupedTelemetry,
-  splitPings
+  splitPings,
+  createUniqueList,
+  getFormValues
 };

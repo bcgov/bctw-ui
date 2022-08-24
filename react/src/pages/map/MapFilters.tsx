@@ -25,7 +25,7 @@ import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
 import React, { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ICodeFilter } from 'types/code';
-import { MapRange, TelemetryDetail } from 'types/map';
+import { MapFormValue, MapRange, Symbolize, TelemetryDetail } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
 import Checkbox from 'components/form/Checkbox';
 import SelectUDF from 'components/form/SelectUDF';
@@ -40,13 +40,14 @@ import { Tooltip } from 'components/common';
 import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { ITelemetryPoint } from 'types/map';
-import { getEvenlySpacedColour, getUniquePropFromPings } from './map_helpers';
+import { getEvenlySpacedColour, getFormValues, getUniquePropFromPings } from './map_helpers';
 import BasicTable from 'components/table/BasicTable';
 enum TabNames {
   search = 'Search',
   filter = 'Filter',
   symbolize = 'Symbolize'
 }
+
 type MapFiltersProps = {
   start: string;
   end: string;
@@ -56,6 +57,7 @@ type MapFiltersProps = {
   pings: ITelemetryPoint[];
   onCollapsePanel: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
+  onApplySymbolize: (s: MapFormValue) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;
@@ -85,39 +87,17 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   // controls the Tabs
   const [tab, setTab] = useState<TabNames>(TabNames.search);
+
+  // controls the formValues, used in filters / symbolize pages
+  // Nothing actually calls on inital page load. Pings load after this fires.
+  const [formValues, setFormValues] = useState(getFormValues(pings));
+
   // controls symbolize value
   const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_SYMBOLIZE);
 
-  const createUniqueList = (propName: keyof TelemetryDetail): ISelectMultipleData[] => {
-    const devices = getUniquePropFromPings(pings ?? [], propName) as number[];
-    const merged = [...devices].sort((a, b) => a - b);
-    return merged.map((d) => {
-      // const displayLabel = unassignedDevices.includes(d) ? `${d} (unassigned)` : d.toString();
-      const displayLabel = d.toString();
-      return { id: d, value: d, displayLabel, prop: propName };
-    });
-  };
-
-  const getFormValues = () =>
-    CODE_FILTERS.map((cf, idx) => {
-      const list = createUniqueList(cf.header);
-      return {
-        id: idx,
-        header: cf.header,
-        label: columnToHeader(cf?.label ?? cf.header),
-        values: list.map((val, i) => ({
-          item: val,
-          colour: getEvenlySpacedColour(list.length, i)
-        }))
-      };
-    });
-
-  // controls the formValues, used in filters / symbolize pages
-  const [formValues, setFormValues] = useState(getFormValues());
-
-  useEffect(() => {
-    console.log({ filters });
-  }, [filters]);
+  // useEffect(() => {
+  //   console.log({ filters });
+  // }, [filters]);
 
   const orLabelStyle = {
     color: '#6d6d6d',
@@ -130,7 +110,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // Use memo to minimize computing result.
   useMemo(() => {
     if (pings?.length) {
-      setFormValues(getFormValues());
+      setFormValues(getFormValues(pings));
     }
   }, [pings]);
 
@@ -186,7 +166,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
   };
 
-  const handleApplySymbolize = (): void => {};
+  const handleApplySymbolize = (): void => {
+    // console.log(symbolizeBy);
+    const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
+    props.onApplySymbolize(symbolize);
+  };
   /**
     1) uses a timeout to temporarily set reset status to true,
       the select components are listening for these changes, which 
@@ -224,7 +208,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     const asFilters: ICodeFilter[] = values.map((v) => {
       return { code_header: v.prop, description: v.value, code: '', code_header_title: '', id: 0 };
     });
-    console.log({ asFilters });
     changeFilter(asFilters, header_id);
   };
 
@@ -274,7 +257,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         <Box mb={boxContainerSpacing}>
           <Grid container spacing={boxContainerSpacing}>
             {formValues.map((fv, idx) => (
-              <Grid item sm={itemSpacing} key={`${fv.header}-${fv.id}`}>
+              <Grid item sm={itemSpacing} key={`${fv.header}-${idx}`}>
                 <Tooltip title={<p>{MapStrings.codeFiltersTooltips[fv.header]}</p>}>
                   <AutoComplete
                     label={fv.label}
@@ -392,7 +375,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const createSymbolizeLegend = (): ReactNode => {
-    const tableData = createUniqueList(symbolizeBy as keyof TelemetryDetail);
     const symbolizeData = formValues.find((el) => el.header == symbolizeBy).values;
     return (
       <>
@@ -424,7 +406,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                             width: '32px',
                             height: '32px',
                             border: '1px solid #999999',
-                            backgroundColor: getEvenlySpacedColour(symbolizeData.length, idx)
+                            backgroundColor: row.colour
                           }}></Box>
                       </TableCell>
                     </TableRow>
