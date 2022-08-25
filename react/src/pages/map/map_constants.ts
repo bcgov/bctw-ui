@@ -8,14 +8,14 @@ const DEVICE_STATUS_OPTIONS = [
 ];
 
 // dropdown filters displayed in map filters panel
-const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string, filter?: string[] }[] = [
-  { header: 'device_id', label: 'Device List'},
+const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: string[] }[] = [
+  { header: 'device_id', label: 'Device ID (Default)' },
   { header: 'species' },
   { header: 'animal_status' },
   { header: 'device_status' },
   { header: 'sex' },
   { header: 'population_unit', filter: [] },
-  { header: 'collective_unit' },
+  { header: 'collective_unit' }
 ];
 
 export { CODE_FILTERS, DEVICE_STATUS_OPTIONS };

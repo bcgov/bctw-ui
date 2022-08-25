@@ -23,6 +23,8 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
+const queryClient = new QueryClient();
+
 // const useStyles = makeStyles(() => ({
 //   root: {
 //     display: 'flex',
@@ -31,9 +33,6 @@ declare module '@mui/styles/defaultTheme' {
 //     overflowY: 'scroll'
 //   }
 // }));
-
-const queryClient = new QueryClient();
-
 export default function App(): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
@@ -51,7 +50,7 @@ export default function App(): JSX.Element {
                         {(): React.ReactNode => {
                           return (
                             <BrowserRouter>
-                              <div className={'app-main'}>
+                              <div className='app-main'>
                                 <AppHeader />
                                 <div className={'app-body'}>
                                   <div className='app-body__inner'>

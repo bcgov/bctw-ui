@@ -37,55 +37,10 @@ const MAP_COLOURS_OUTLINE = {
 };
 
 /**
- * @param numColours: Total colors
- * @param index: The order of the colour
+ * @param index: The order of the colour]
+ * @returns formatted string of a unique pastel colour
  */
-//https://stackoverflow.com/questions/1484506/random-color-generator
-export const getEvenlySpacedColour = (numColours: number, index: number): string => {
-  let r: number, g: number, b: number;
-  const h = index / numColours;
-  const i = ~~(h * 6);
-  const f = h * 6 - i;
-  const q = 1 - f;
-  switch (i % 6) {
-    case 0:
-      r = 1;
-      g = f;
-      b = 0;
-      break;
-    case 1:
-      r = q;
-      g = 1;
-      b = 0;
-      break;
-    case 2:
-      r = 0;
-      g = 1;
-      b = f;
-      break;
-    case 3:
-      r = 0;
-      g = q;
-      b = 1;
-      break;
-    case 4:
-      r = f;
-      g = 0;
-      b = 1;
-      break;
-    case 5:
-      r = 1;
-      g = 0;
-      b = q;
-      break;
-  }
-  const c =
-    '#' +
-    ('00' + (~~(r * 255)).toString(16)).slice(-2) +
-    ('00' + (~~(g * 255)).toString(16)).slice(-2) +
-    ('00' + (~~(b * 255)).toString(16)).slice(-2);
-  return c;
-};
+export const getEvenlySpacedColour = (index: number): string => `hsl(${(index + 1) * 137.508},50%,70%)`;
 /**
  * @param colourString the @type {Animal} animal_colour string
  * which in the @file {map_api.ts} -> @function {getPings} is returned
@@ -272,13 +227,18 @@ const getUniqueCritterIDsFromSelectedPings = (features: ITelemetryPoint[], selec
 
 const getUniquePropFromPings = (
   features: ITelemetryPoint[],
-  prop: keyof TelemetryDetail = 'device_id'
+  prop: keyof TelemetryDetail = 'device_id',
+  includeNulls?: boolean
 ): number[] | string[] => {
   const ids = [];
   features?.forEach((f) => {
     const val = f.properties[prop];
-    if (val !== null && !ids.includes(val)) {
-      ids.push(val);
+    if (!ids.includes(val)) {
+      if (includeNulls) {
+        ids.push(val);
+      } else if (val !== null) {
+        ids.push(val);
+      }
     }
   });
   return ids.sort((a, b) => a - b);
@@ -395,29 +355,42 @@ const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelem
   return newTracks;
 };
 
-//Creates a unique list of items from an unique prop.
+//Creates a sorted unique list of items from an unique prop.
 const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoint[]): ISelectMultipleData[] => {
-  const devices = getUniquePropFromPings(pings ?? [], propName) as number[];
-  const merged = [...devices].sort((a, b) => a - b);
-  return merged.map((d) => {
-    const displayLabel = d.toString();
-    return { id: d, value: d, displayLabel, prop: propName };
+  const IS_DEFAULT = propName === 'device_id';
+  const devices = getUniquePropFromPings(pings ?? [], propName, true) as number[];
+  const merged = [...devices].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
+  return merged.map((d, i) => {
+    const displayLabel = d ? d.toString() : 'Undefined';
+    let colour: string;
+    const pointCount = pings.filter((p) => {
+      if (IS_DEFAULT && p.properties[propName] === d) {
+        if (p.properties.map_colour) {
+          colour = parseAnimalColour(p.properties.map_colour).fillColor;
+        }
+      }
+      return p.properties[propName] === d;
+    }).length;
+    return {
+      id: d,
+      value: d ?? displayLabel,
+      displayLabel,
+      prop: propName,
+      colour: colour ? colour : getEvenlySpacedColour(i),
+      pointCount
+    };
   });
 };
 
 //Formats a MapFormValues array.
-const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] =>
-  CODE_FILTERS.map((cf, idx) => {
-    const list = createUniqueList(cf.header, pings);
-    return {
-      header: cf.header,
-      label: columnToHeader(cf?.label ?? cf.header),
-      values: list.map((val, i) => ({
-        item: val,
-        colour: getEvenlySpacedColour(list.length, i)
-      }))
-    };
-  });
+const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] => {
+  console.log('getFormValues called');
+  return CODE_FILTERS.map((cf) => ({
+    header: cf.header,
+    label: columnToHeader(cf?.label ?? cf.header),
+    values: createUniqueList(cf.header, pings)
+  }));
+};
 
 export {
   applyFilter,

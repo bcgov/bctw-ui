@@ -25,7 +25,7 @@ import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
 import React, { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ICodeFilter } from 'types/code';
-import { MapFormValue, MapRange, Symbolize, TelemetryDetail } from 'types/map';
+import { DEFAULT_MFV, MapFormValue, MapRange, TelemetryDetail } from 'types/map';
 import drawerStyles from 'components/sidebar/drawer_classes';
 import Checkbox from 'components/form/Checkbox';
 import SelectUDF from 'components/form/SelectUDF';
@@ -90,10 +90,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   // controls the formValues, used in filters / symbolize pages
   // Nothing actually calls on inital page load. Pings load after this fires.
-  const [formValues, setFormValues] = useState(getFormValues(pings));
+  const [formValues, setFormValues] = useState<MapFormValue[]>([DEFAULT_MFV]);
 
   // controls symbolize value
-  const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_SYMBOLIZE);
+  const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_MFV.header);
 
   // useEffect(() => {
   //   console.log({ filters });
@@ -188,7 +188,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const resetSymbolize = (): void => {
-    setSymbolizeBy(DEFAULT_SYMBOLIZE);
+    setSymbolizeBy(DEFAULT_MFV.header);
   };
   // udfs are treated as any other filter, use this function to convert them
   // and then 'push' them to the normal filter change handler
@@ -261,7 +261,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 <Tooltip title={<p>{MapStrings.codeFiltersTooltips[fv.header]}</p>}>
                   <AutoComplete
                     label={fv.label}
-                    data={fv.values.map((v) => v.item)}
+                    data={fv.values}
                     changeHandler={handleChangeAutocomplete}
                     triggerReset={reset}
                     isMultiSearch
@@ -344,7 +344,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   const createSymbolize = (): ReactNode => {
     const handleSymbolizeBy = (e: React.ChangeEvent<HTMLInputElement>): void => {
-      setSymbolizeBy((e.target as HTMLInputElement).value);
+      setSymbolizeBy((e.target as HTMLInputElement).value as keyof TelemetryDetail);
     };
     return (
       <>
@@ -373,32 +373,25 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       </>
     );
   };
-
   const createSymbolizeLegend = (): ReactNode => {
     const symbolizeData = formValues.find((el) => el.header == symbolizeBy).values;
     return (
       <>
         {isTab(symbolize) && (
           <>
-            <h2>Legend</h2>
+            <h2>Legends</h2>
             <TableContainer component={Paper}>
               <Table aria-label='simple table'>
                 <TableHead>
                   <TableRow>
-                    <TableCell>id</TableCell>
-                    <TableCell>{columnToHeader(symbolizeBy)}</TableCell>
                     <TableCell>Colour</TableCell>
+                    <TableCell>{columnToHeader(symbolizeBy)}</TableCell>
+                    <TableCell>Point Count</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {symbolizeData.map((row, idx) => (
                     <TableRow key={idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                      <TableCell component='th' scope='row'>
-                        {idx}
-                      </TableCell>
-                      <TableCell component='th' scope='row'>
-                        {row.item.value}
-                      </TableCell>
                       <TableCell>
                         <Box
                           className='colour-swatch'
@@ -408,6 +401,12 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                             border: '1px solid #999999',
                             backgroundColor: row.colour
                           }}></Box>
+                      </TableCell>
+                      <TableCell component='th' scope='row'>
+                        {row.displayLabel}
+                      </TableCell>
+                      <TableCell component='th' scope='row'>
+                        {row.pointCount}
                       </TableCell>
                     </TableRow>
                   ))}

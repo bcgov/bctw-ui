@@ -139,14 +139,21 @@ const padFrequency = (num: number): string => {
   return freq.padEnd(numToAdd, '0');
 };
 
-type Symbolize = {
-  item: ISelectMultipleData;
-  colour: string;
-};
+// type Symbolize = {
+//   item: ISelectMultipleData;
+//   colour: string;
+//   pointCount: number;
+// };
 type MapFormValue = {
   header: keyof TelemetryDetail;
   label: string;
-  values: Symbolize[];
+  values: ISelectMultipleData[];
+};
+
+export const DEFAULT_MFV: MapFormValue = {
+  header: 'device_id',
+  label: 'Device ID (Default)',
+  values: []
 };
 
 export type {
@@ -161,8 +168,7 @@ export type {
   ITelemetryPoint,
   ITelemetryGroup,
   PingGroupType,
-  MapFormValue,
-  Symbolize
+  MapFormValue
 };
 
 export { doesPointArrayContainPoint };

@@ -32,7 +32,6 @@ import {
   ITelemetryLine,
   MapRange,
   OnlySelectedCritters,
-  Symbolize,
   MapFormValue
 } from 'types/map';
 import { formatDay, getToday } from 'utils/time';

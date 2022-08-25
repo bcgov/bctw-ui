@@ -1,6 +1,6 @@
 import * as L from 'leaflet';
 import { getFillColorByStatus, getOutlineColor, MAP_COLOURS, MAP_COLOURS_OUTLINE } from 'pages/map/map_helpers';
-import { ITelemetryPoint, MapFormValue, Symbolize } from 'types/map';
+import { ITelemetryPoint, MapFormValue } from 'types/map';
 
 const defaultPointStyle: L.CircleMarkerOptions = {
   radius: 8,
@@ -119,7 +119,7 @@ const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue): void => {
   layer.eachLayer((p: any) => {
     const feature = p.feature;
     const attr = feature.properties[header as string];
-    const colour = values.find((val) => val.item.id === attr)?.colour;
+    const colour = values.find((val) => val.id === attr)?.colour;
     if (typeof p.setStyle === 'function' && colour) {
       p.setStyle({
         weight: 1.0,
