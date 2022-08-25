@@ -4,6 +4,12 @@
   display: flex;
   flex-direction: row;
 }
+.app-main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: scroll;
+}
 
 .app-body {
   position: relative;

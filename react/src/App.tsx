@@ -13,7 +13,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ResponseProvider } from 'contexts/ApiResponseContext';
 import { SnackbarWrapper } from 'components/common';
 import { UserContext, UserStateContextProvider } from 'contexts/UserContext';
-import { ThemeProvider, Theme, StyledEngineProvider } from '@mui/material';
+import { Theme, StyledEngineProvider } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 // import { ReactQueryDevtools } from 'react-query/devtools'
 
@@ -22,19 +23,18 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-const useStyles = makeStyles(() => ({
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    overflowY: 'scroll'
-  }
-}));
+// const useStyles = makeStyles(() => ({
+//   root: {
+//     display: 'flex',
+//     flexDirection: 'column',
+//     height: '100vh',
+//     overflowY: 'scroll'
+//   }
+// }));
 
 const queryClient = new QueryClient();
 
 export default function App(): JSX.Element {
-  const classes = useStyles();
   return (
     <QueryClientProvider client={queryClient}>
       {/* uncomment to debug query/caching issues */}
@@ -51,7 +51,7 @@ export default function App(): JSX.Element {
                         {(): React.ReactNode => {
                           return (
                             <BrowserRouter>
-                              <div className={classes.root}>
+                              <div className={'app-main'}>
                                 <AppHeader />
                                 <div className={'app-body'}>
                                   <div className='app-body__inner'>
