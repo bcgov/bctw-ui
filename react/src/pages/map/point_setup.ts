@@ -67,18 +67,11 @@ const latestSelectedPingIcon = createLatestPingIcon(MAP_COLOURS.selected);
 const setupLatestPingOptions = (
   pings: L.GeoJSON,
   clickHandler: L.LeafletEventHandlerFn,
-  closeHandler: L.LeafletEventHandlerFn,
-  mfv?: MapFormValue
+  closeHandler: L.LeafletEventHandlerFn
 ): void => {
   pings.options = {
     pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
-      let unselectedIcon = createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature));
-      console.log(mfv);
-      if (mfv) {
-        const { fillColor, color } = getSymbolizeColours(mfv, feature);
-        unselectedIcon = createLatestPingIcon(fillColor, color);
-        console.log('called');
-      }
+      const unselectedIcon = createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature));
       const marker = new L.Marker(latlng, { icon: unselectedIcon });
       // make a hidden popup that will help deal with click events
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
@@ -126,7 +119,7 @@ const getSymbolizeColours = (mfv: MapFormValue, feature: ITelemetryPoint): { fil
   const isDeviceID = header === DEFAULT_MFV.header;
   const attr = feature.properties[header as string];
   const fillColor = values.find((val) => val.id === attr)?.colour;
-  const color = getOutlineColor(feature, !isDeviceID && MAP_COLOURS.outline);
+  const color = isDeviceID ? getOutlineColor(feature) : MAP_COLOURS.outline;
   return { fillColor, color };
 };
 

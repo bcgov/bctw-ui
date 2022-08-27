@@ -58,10 +58,7 @@ const parseAnimalColour = (colourString: string): { fillColor: string; color: st
 /**
  * @returns the hex colour value to show as the fill colour
  */
-const getFillColorByStatus = (point: ITelemetryPoint, selected = false, colour?: string): string => {
-  if (colour) {
-    return colour;
-  }
+const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string => {
   if (selected) {
     return MAP_COLOURS.selected;
   }
@@ -83,10 +80,7 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false, colour?:
 };
 
 // same as getFillColorByStatus - but for the point border/outline color
-const getOutlineColor = (feature: ITelemetryPoint, colour?: string): string => {
-  if (colour) {
-    return colour;
-  }
+const getOutlineColor = (feature: ITelemetryPoint): string => {
   if (feature.id < 0) {
     return MAP_COLOURS_OUTLINE['unassigned point'];
   }
