@@ -57,7 +57,7 @@ type MapFiltersProps = {
   pings: ITelemetryPoint[];
   onCollapsePanel: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
-  onApplySymbolize: (s: MapFormValue) => void;
+  onApplySymbolize: (s: MapFormValue, includeLatest: boolean) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;
@@ -94,7 +94,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   // controls symbolize value
   const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_MFV.header);
-
+  const [symbolizeLast, setSymbolizeLast] = useState(false);
   // useEffect(() => {
   //   console.log({ filters });
   // }, [filters]);
@@ -167,9 +167,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const handleApplySymbolize = (): void => {
-    // console.log(symbolizeBy);
     const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
-    props.onApplySymbolize(symbolize);
+    props.onApplySymbolize(symbolize, symbolizeLast);
   };
   /**
     1) uses a timeout to temporarily set reset status to true,
@@ -225,6 +224,44 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
+
+  const createSearch = (): ReactNode => {
+    return (
+      <>
+        {isTab(search) && (
+          <Box mb={2} mt={2}>
+            <Grid container spacing={2}>
+              <Grid item sm={6}>
+                <Tooltip title={<p>{MapStrings.startDateTooltip}</p>}>
+                  <DateInput
+                    fullWidth
+                    propName='tstart'
+                    label={MapStrings.startDateLabel}
+                    defaultValue={dayjs(start)}
+                    changeHandler={(e): void => setStart(e['tstart'] as string)}
+                    maxDate={dayjs(end)}
+                  />
+                </Tooltip>
+              </Grid>
+              <Grid item sm={6}>
+                <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
+                  <DateInput
+                    fullWidth
+                    propName='tend'
+                    label={MapStrings.endDateLabel}
+                    defaultValue={dayjs(end)}
+                    changeHandler={(e): void => setEnd(e['tend'] as string)}
+                    minDate={dayjs(start)}
+                  />
+                </Tooltip>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+      </>
+    );
+  };
+
   // creates select elements
   const createFilters = (): React.ReactNode => {
     const itemSpacing = isTab(filter) ? 12 : false;
@@ -305,70 +342,47 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     );
   };
 
-  const createSearch = (): ReactNode => {
-    return (
-      <>
-        {isTab(search) && (
-          <Box mb={2} mt={2}>
-            <Grid container spacing={2}>
-              <Grid item sm={6}>
-                <Tooltip title={<p>{MapStrings.startDateTooltip}</p>}>
-                  <DateInput
-                    fullWidth
-                    propName='tstart'
-                    label={MapStrings.startDateLabel}
-                    defaultValue={dayjs(start)}
-                    changeHandler={(e): void => setStart(e['tstart'] as string)}
-                    maxDate={dayjs(end)}
-                  />
-                </Tooltip>
-              </Grid>
-              <Grid item sm={6}>
-                <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
-                  <DateInput
-                    fullWidth
-                    propName='tend'
-                    label={MapStrings.endDateLabel}
-                    defaultValue={dayjs(end)}
-                    changeHandler={(e): void => setEnd(e['tend'] as string)}
-                    minDate={dayjs(start)}
-                  />
-                </Tooltip>
-              </Grid>
-            </Grid>
-          </Box>
-        )}
-      </>
-    );
-  };
-
   const createSymbolize = (): ReactNode => {
     const handleSymbolizeBy = (e: React.ChangeEvent<HTMLInputElement>): void => {
       setSymbolizeBy((e.target as HTMLInputElement).value as keyof TelemetryDetail);
     };
+    const boxContainerSpacing = isTab(symbolize) ? 2 : 0;
     return (
       <>
         {isTab(symbolize) && (
-          <Box mb={2} mt={2}>
-            <Grid container spacing={2}>
-              <Grid item sm={6}>
-                <FormControl>
-                  <FormLabel>Categorize points by colour</FormLabel>
-                  <RadioGroup value={symbolizeBy} onChange={handleSymbolizeBy} row>
-                    {formValues.map((fv, idx) => (
-                      <FormControlLabel
-                        value={fv.header}
-                        control={<Radio />}
-                        label={fv.label}
-                        key={`symbolize-${idx}`}
-                        disabled={!fv.values?.length}
-                      />
-                    ))}
-                  </RadioGroup>
-                </FormControl>
+          <>
+            <Box mb={boxContainerSpacing}>
+              <Tooltip inline={true} title={<p>{MapStrings.lastKnownLocationTooltip}</p>}>
+                <Checkbox
+                  label='Symbolize last known location'
+                  propName={MapStrings.lastKnownLocationLabel}
+                  initialValue={symbolizeLast}
+                  changeHandler={(): void => setSymbolizeLast((o) => !o)}
+                  disabled={isLastFixes}
+                />
+              </Tooltip>
+            </Box>
+            <Box mb={2} mt={2}>
+              <Grid container spacing={2}>
+                <Grid item sm={6}>
+                  <FormControl>
+                    <FormLabel>Categorize points by colour</FormLabel>
+                    <RadioGroup value={symbolizeBy} onChange={handleSymbolizeBy} row>
+                      {formValues.map((fv, idx) => (
+                        <FormControlLabel
+                          value={fv.header}
+                          control={<Radio />}
+                          label={fv.label}
+                          key={`symbolize-${idx}`}
+                          disabled={!fv.values?.length}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
               </Grid>
-            </Grid>
-          </Box>
+            </Box>
+          </>
         )}
       </>
     );
@@ -379,7 +393,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       <>
         {isTab(symbolize) && (
           <>
-            <h2>Legends</h2>
+            <h2>Legend</h2>
             <TableContainer component={Paper}>
               <Table aria-label='simple table'>
                 <TableHead>

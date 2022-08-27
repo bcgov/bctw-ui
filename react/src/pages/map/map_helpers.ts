@@ -58,7 +58,10 @@ const parseAnimalColour = (colourString: string): { fillColor: string; color: st
 /**
  * @returns the hex colour value to show as the fill colour
  */
-const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string => {
+const getFillColorByStatus = (point: ITelemetryPoint, selected = false, colour?: string): string => {
+  if (colour) {
+    return colour;
+  }
   if (selected) {
     return MAP_COLOURS.selected;
   }
@@ -80,18 +83,21 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
 };
 
 // same as getFillColorByStatus - but for the point border/outline color
-const getOutlineColor = (feature: ITelemetryPoint): string => {
+const getOutlineColor = (feature: ITelemetryPoint, colour?: string): string => {
+  if (colour) {
+    return colour;
+  }
   if (feature.id < 0) {
     return MAP_COLOURS_OUTLINE['unassigned point'];
   }
-  const colour = feature?.properties?.map_colour;
-  return colour ? parseAnimalColour(colour)?.color : MAP_COLOURS.outline;
+  const c = feature?.properties?.map_colour;
+  return c ? parseAnimalColour(c)?.color : MAP_COLOURS.outline;
 };
 
 /**
  * sets the @param layer {setStyle} function
  */
-const fillPoint = (layer: any, selected = false, colour?: string): void => {
+const fillPoint = (layer: any, selected = false): void => {
   // dont style tracks or invalid points
   if (!layer.feature || layer.feature?.geometry?.type === 'LineString' || typeof layer.setStyle !== 'function') {
     return;
@@ -100,7 +106,7 @@ const fillPoint = (layer: any, selected = false, colour?: string): void => {
     class: selected ? 'selected-ping' : '',
     weight: 1.0,
     color: getOutlineColor(layer.feature),
-    fillColor: colour ? colour : getFillColorByStatus(layer.feature, selected)
+    fillColor: getFillColorByStatus(layer.feature, selected)
   });
 };
 
@@ -365,9 +371,9 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
     let colour: string;
     const pointCount = pings.filter((p) => {
       if (IS_DEFAULT && p.properties[propName] === d) {
-        if (p.properties.map_colour) {
-          colour = parseAnimalColour(p.properties.map_colour).fillColor;
-        }
+        p.properties.map_colour
+          ? (colour = parseAnimalColour(p.properties.map_colour).fillColor)
+          : (colour = MAP_COLOURS['unassigned point']);
       }
       return p.properties[propName] === d;
     }).length;
@@ -384,7 +390,6 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
 
 //Formats a MapFormValues array.
 const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] => {
-  console.log('getFormValues called');
   return CODE_FILTERS.map((cf) => ({
     header: cf.header,
     label: columnToHeader(cf?.label ?? cf.header),

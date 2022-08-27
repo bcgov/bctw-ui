@@ -71,10 +71,7 @@ import { SpeciesProvider } from 'contexts/SpeciesContext';
 export default function MapPage(): JSX.Element {
   const api = useTelemetryApi();
   const mapRef = useRef<L.Map>(null);
-  // const [cluster] = useState(L.markerClusterGroup({
-  //   spiderfyOnMaxZoom: true,
 
-  // }))
   // pings layer state
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
   const [pingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Pings
@@ -82,9 +79,6 @@ export default function MapPage(): JSX.Element {
   const [latestUPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON());
 
   // tracks layer state
-  // const [unassignedPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Unassigned Pings
-  // const [unassignedTracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Unassigned Tracks
-
   const selectedPingsLayer = new L.GeoJSON();
   selectedPingsLayer.options = setupSelectedPings();
 
@@ -94,7 +88,6 @@ export default function MapPage(): JSX.Element {
   });
   // pings/tracks state is changed when filters are applied, so use these variables for the 'global' state - used in bottom panel
   const [pings, setPings] = useState<ITelemetryPoint[]>([]);
-  // const [unassignedPings, setUnassignedPings] = useState<ITelemetryPoint[]>([]);
   const [selectedPingIDs, setSelectedPingIDs] = useState<number[]>([]);
 
   // modal states - overview, export, udf editing
@@ -103,9 +96,6 @@ export default function MapPage(): JSX.Element {
   const [overviewType, setOverviewType] = useState<BCTWType>();
   const [showExportModal, setShowExportModal] = useState(false);
   const [showUdfEdit, setShowUdfEdit] = useState(false);
-
-  // state tracking whether or not unassigned device layers are shown
-  // const [showUnassignedLayers, setShowUnassignedLayers] = useState(false);
 
   // filter state
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
@@ -119,6 +109,7 @@ export default function MapPage(): JSX.Element {
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
   const drawnLines = [];
+
   // fetch the map data
   const { start, end } = range;
   const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = api.usePings(start, end);
@@ -299,7 +290,7 @@ export default function MapPage(): JSX.Element {
   };
 
   // redraw only pings, if no params supplied it will default the fetched ones
-  const redrawPings = (newPings: ITelemetryPoint[], colour?: string): void => {
+  const redrawPings = (newPings: ITelemetryPoint[]): void => {
     const { latest, other } = splitPings(newPings);
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(pingsLayer);
@@ -319,8 +310,9 @@ export default function MapPage(): JSX.Element {
     tracksLayer.addData(newTracks as any);
   };
 
-  const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue): void => {
-    symbolizePings(pingsLayer, mfv);
+  const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue, includeLatest: boolean): void => {
+    symbolizePings(pingsLayer, mfv, includeLatest);
+    symbolizePings(latestPingsLayer, mfv, includeLatest);
   };
 
   // triggered when side-panel filters are applied
@@ -543,6 +535,7 @@ export default function MapPage(): JSX.Element {
           onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
           onShowLatestPings={handleShowLastKnownLocation}
           onShowLastFixes={handleShowLast10Fixes}
+
           // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
           // pingsToDisplay={!!pings?.length}
         />
