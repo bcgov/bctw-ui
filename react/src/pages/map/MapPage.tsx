@@ -19,19 +19,14 @@ import {
   getUniquePropFromPings,
   groupFilters,
   splitPings,
-  getUniqueCritterIDsFromSelectedPings} from 'pages/map/map_helpers';
+  getUniqueCritterIDsFromSelectedPings
+} from 'pages/map/map_helpers';
 import Icon from '@mdi/react';
 import MapFilters from 'pages/map/MapFilters';
 import MapOverView from 'pages/map/MapOverview';
 import React, { useEffect, useRef, useState } from 'react';
 import { ICodeFilter } from 'types/code';
-import {
-  ITelemetryDetail,
-  ITelemetryPoint,
-  ITelemetryLine,
-  MapRange,
-  OnlySelectedCritters
-} from 'types/map';
+import { ITelemetryDetail, ITelemetryPoint, ITelemetryLine, MapRange, OnlySelectedCritters } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { BCTWType } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
@@ -50,6 +45,7 @@ import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import { eUDFType } from 'types/udf';
 
 /**
+ * 
   there are several forms of state in this page:
     a) the fetched pings/tracks state from the API 
     b) the 'displayed' data state, which is further divided into:
@@ -69,7 +65,7 @@ export default function MapPage(): JSX.Element {
   const mapRef = useRef<L.Map>(null);
   // const [cluster] = useState(L.markerClusterGroup({
   //   spiderfyOnMaxZoom: true,
-  
+
   // }))
   // pings layer state
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
@@ -466,8 +462,8 @@ export default function MapPage(): JSX.Element {
   //   if (!fetchedUnassignedTracks) {
   //     return;
   //   }
-    // const uniqueDeviceIDs = getUniquePropFromPings(up) as number[];
-    // note: as IUnassignedTelemetryLine
+  // const uniqueDeviceIDs = getUniquePropFromPings(up) as number[];
+  // note: as IUnassignedTelemetryLine
   //   const filteredTracks = (fetchedUnassignedTracks as any).filter((t) =>
   //     uniqueDeviceIDs.includes(t.properties.collar_id)
   //   );
@@ -570,9 +566,7 @@ export default function MapPage(): JSX.Element {
     // setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
 
     const ref = mapRef.current;
-    const layers = [0, 2].includes(values.length)
-      ? [...getAssignedLayers()]
-      : getAssignedLayers();
+    const layers = [0, 2].includes(values.length) ? [...getAssignedLayers()] : getAssignedLayers();
 
     // when all or no options are selected
     if (layers.length > 3) {
@@ -625,15 +619,14 @@ export default function MapPage(): JSX.Element {
   const [bottomPanelHeight, setBottomPanelHeight] = useState<number>(300);
   const [bottomPanelPos, setBottomPanelPos] = useState<number>(null);
   const [dragging, setDragging] = useState(false);
-  
+
   // update the height of the bottom panel
   const onMove = (e: React.MouseEvent): void => {
-    
     if (dragging) {
       const mbp = document.getElementById('map-bottom-panel');
       const mv = document.getElementById('map-view');
       const height = bottomPanelHeight + (bottomPanelPos - e.clientY);
-      if(height <= mv.offsetHeight && height >= 80){
+      if (height <= mv.offsetHeight && height >= 80) {
         mbp.style.height = `${height}px`;
       }
     }
@@ -644,7 +637,7 @@ export default function MapPage(): JSX.Element {
     setBottomPanelPos(e.clientY);
     setBottomPanelHeight(mbp.offsetHeight);
     setDragging(true);
-  }
+  };
   // consider the 'dragging' event finished when the mouse is released anywhere on the screen
   const onUp = (): void => {
     if (dragging) {
@@ -653,7 +646,7 @@ export default function MapPage(): JSX.Element {
   };
 
   return (
-    <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove} >
+    <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
       <MapFilters
         start={range.start}
         end={range.end}
@@ -677,18 +670,14 @@ export default function MapPage(): JSX.Element {
           <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
         </div>
 
-        <Paper square 
+        <Paper
+          square
           style={{ height: bottomPanelHeight }}
           className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}
           id={`map-bottom-panel`}>
           <div onMouseDown={onDown} id='drag'>
             <div id='drag-icon'>
-              <Icon
-                path={mdiDragHorizontalVariant}
-                className={'icon'}
-                title='Drag to resize'
-                size={1}
-              />
+              <Icon path={mdiDragHorizontalVariant} className={'icon'} title='Drag to resize' size={1} />
             </div>
           </div>
           <MapDetails
@@ -711,7 +700,12 @@ export default function MapPage(): JSX.Element {
             detail={selectedDetail}
           />
         ) : null}
-        <AddUDF title={'Custom Animal Groups'} udf_type={eUDFType.critter_group} open={showUdfEdit} handleClose={(): void => setShowUdfEdit(false)} />
+        <AddUDF
+          title={'Custom Animal Groups'}
+          udf_type={eUDFType.critter_group}
+          open={showUdfEdit}
+          handleClose={(): void => setShowUdfEdit(false)}
+        />
       </div>
     </div>
   );
