@@ -45,7 +45,6 @@ import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import { eUDFType } from 'types/udf';
 
 /**
- * 
   there are several forms of state in this page:
     a) the fetched pings/tracks state from the API 
     b) the 'displayed' data state, which is further divided into:
