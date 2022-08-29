@@ -1,6 +1,6 @@
 import makeStyles from '@mui/styles/makeStyles';
 
-const drawerWidth = '25rem'; // 448px
+const drawerWidth = '24rem'; // 448px
 const useStyles = makeStyles((theme) => ({
   drawer: {
     position: 'relative',

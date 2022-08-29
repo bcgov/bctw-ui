@@ -9,7 +9,6 @@ import {
   IconButton,
   Radio,
   RadioGroup,
-  Slide,
   Tab,
   TableHead,
   TableCell,
@@ -35,13 +34,11 @@ import { MapStrings } from 'constants/strings';
 import { columnToHeader } from 'utils/common_helpers';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { CODE_FILTERS } from 'pages/map/map_constants';
 import { Tooltip } from 'components/common';
 import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { ITelemetryPoint } from 'types/map';
-import { getEvenlySpacedColour, getFormValues, getUniquePropFromPings } from './map_helpers';
-import BasicTable from 'components/table/BasicTable';
+import { getFormValues } from './map_helpers';
 enum TabNames {
   search = 'Search',
   filter = 'Filter',
@@ -94,7 +91,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   // controls symbolize value
   const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_MFV.header);
-  const [symbolizeLast, setSymbolizeLast] = useState(false);
+  const [symbolizeLast, setSymbolizeLast] = useState(true);
   // useEffect(() => {
   //   console.log({ filters });
   // }, [filters]);
@@ -164,6 +161,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     if (wasDatesChanged) {
       setIsLatestPing(false);
     }
+    setSymbolizeBy(DEFAULT_MFV.header);
+    setSymbolizeLast(true);
   };
 
   const handleApplySymbolize = (): void => {
@@ -394,7 +393,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         {isTab(symbolize) && (
           <>
             <h2>Legend</h2>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{ border: 1 }}>
               <Table aria-label='simple table'>
                 <TableHead>
                   <TableRow>
@@ -458,7 +457,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               disabled={!pings?.length}
             />
           </Tabs>
-          {/* <h2>Filters</h2> */}
           <Box className='drawer-toggle-button'>
             <IconButton color='primary' onClick={handleDrawerOpen} size='large'>
               <Icon icon={open ? 'back' : 'forward'} />
@@ -466,17 +464,12 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           </Box>
         </Box>
         <Divider />
-        {/* {open ? (
-          <> */}
-        {/* <Slide direction="right" in={tab == TabNames.search || tab == TabNames.filter} container={containerRef.current}> */}
-        <Box p={3} pt={0}>
+        <Box p={3} pt={0} style={open ? {} : { marginRight: '2rem' }}>
           <h2>{tab}</h2>
-          <Typography variant='subtitle2'>Lorem ipsum dolor sit amet</Typography>
+          <Typography variant='subtitle2'>{MapStrings.mapPanels.subTitle[tab]}</Typography>
           {createSearch()}
           {createFilters()}
           {createSymbolize()}
-          {/* <Divider /> */}
-
           <Box className={'form-buttons'} display='flex' justifyContent='flex-start' py={2}>
             <Button
               color='primary'
@@ -485,7 +478,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
               {tab}
             </Button>
-
             {isTab(filter) && (
               <Button color='primary' variant='outlined' disabled={!numFiltersSelected} onClick={resetFilters}>
                 Reset
@@ -495,11 +487,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           <Divider />
           {createSymbolizeLegend()}
         </Box>
-        {/* </Slide> */}
-        {/* </>
-        ) : (
-          <></>
-        )} */}
       </Box>
     </Box>
   );

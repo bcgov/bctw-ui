@@ -1,4 +1,4 @@
-@import "styles/colours.scss";
+@import 'styles/colours.scss';
 $appearAboveMap: 1001;
 
 .map-container {
@@ -51,7 +51,7 @@ $appearAboveMap: 1001;
   top: 0;
   bottom: 0;
   right: 0;
-  width: 25rem;
+  width: 24rem;
   overflow-y: auto;
 }
 

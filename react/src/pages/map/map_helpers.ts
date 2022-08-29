@@ -360,8 +360,14 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
   const IS_DEFAULT = propName === 'device_id';
   const devices = getUniquePropFromPings(pings ?? [], propName, true) as number[];
   const merged = [...devices].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
-  return merged.map((d, i) => {
-    const displayLabel = d ? d.toString() : 'Undefined';
+  let undefinedCount = 0;
+  const formated = merged.map((d, i) => {
+    let displayLabel = 'Undefined';
+    if (d) {
+      displayLabel = d.toString();
+    } else {
+      undefinedCount++;
+    }
     let colour: string;
     const pointCount = pings.filter((p) => {
       if (IS_DEFAULT && p.properties[propName] === d) {
@@ -380,6 +386,9 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
       pointCount
     };
   });
+  //Return empty array if all elements are null/undefined.
+  const results = undefinedCount === merged.length ? [] : formated;
+  return results;
 };
 
 //Formats a MapFormValues array.
