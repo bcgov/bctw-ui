@@ -1,20 +1,19 @@
 import { Box, TextField } from '@mui/material';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
-import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
+import { MutableRefObject, useMemo, useRef, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import { ITableFilter } from './table_interfaces';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormStrings } from 'constants/strings';
 import useDebounce from 'hooks/useDebounce';
 import AutoComplete from 'components/form/Autocomplete';
-import { ROWS_PER_PAGE } from './DataTable';
 
 type TextFilterProps = {
   rowCount: number;
   defaultFilter?: string;
   handleTextChange: (filter: string) => void;
   disabled?: boolean;
-  inputRef?: MutableRefObject<any>;
+  inputRef?: MutableRefObject<JSX.Element>;
 };
 
 type TableFilterProps<T> = {
@@ -26,7 +25,6 @@ type TableFilterProps<T> = {
   disabled: boolean;
 };
 
-
 /**
  * the text input search/filter component
  */
@@ -35,10 +33,10 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
   const debouncedTerm = useDebounce(term, 800);
 
   useDidMountEffect(() => {
-    if(!defaultFilter){
+    if (!defaultFilter) {
       setTerm(defaultFilter);
     }
-  },[defaultFilter])
+  }, [defaultFilter]);
 
   useDidMountEffect(() => {
     handleTextChange(debouncedTerm.toLowerCase());
@@ -59,7 +57,6 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
   );
 }
 
-
 /**
  * the search component visible in table toolbars
  */
@@ -74,18 +71,17 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
     const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
   }, [searchStr, selectedOption]);
-  
+
   const handleSelect = (v: ISelectMultipleData[]): void => {
     const values = v.map((item) => item.value as keyof T);
-    if(selectedOption && !values.length){
+    if (selectedOption && !values.length) {
       setSearchStr('');
     }
     setSelectedOption(values as string[]);
 
     setTimeout(() => {
       textInput.current.focus();
-    },100);
-
+    }, 100);
   };
 
   const handleTextChange = (value: string): void => {
@@ -116,10 +112,10 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         width={300}
         isMultiSearch={isMultiSearch}
       />
-      <TextFilter 
-        rowCount={rowCount} 
-        handleTextChange={handleTextChange} 
-        defaultFilter={searchStr} 
+      <TextFilter
+        rowCount={rowCount}
+        handleTextChange={handleTextChange}
+        defaultFilter={searchStr}
         disabled={isDisabled}
         inputRef={textInput}
       />

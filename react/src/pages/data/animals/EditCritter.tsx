@@ -1,12 +1,12 @@
 import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
-import { Animal, AttachedAnimal, critterFormFields, eSpecies } from 'types/animal';
+import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
 import { Box, Container, IconButton } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateSpeciesFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
@@ -14,13 +14,13 @@ import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent from 'types/events/capture_event';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import ReleaseEvent from 'types/events/release_event';
-import { Button, Icon, Tooltip } from 'components/common';
+import { Button, Icon } from 'components/common';
 import { eUDFType, IUDF } from 'types/udf';
 import AddUDF from 'pages/udf/AddUDF';
 import SelectUDF from 'components/form/SelectUDF';
-import { CritterStrings, MapStrings } from 'constants/strings';
+import { MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { useSpecies, useUISpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import { hideSection } from 'utils/species';
 import { SpeciesSelect } from 'components/form/SpeciesSelect';
 
@@ -88,7 +88,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
    * todo: is this still needed?
    */
   const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
-    await setShowWorkflowForm(false);
+    setShowWorkflowForm(false);
     if (e.event_type === 'capture' && e instanceof CaptureEvent) {
       if (e.translocation && !e.isTranslocationComplete) {
         // do nothing
@@ -97,8 +97,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
         const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'population_unit']);
         // set the new event directly, triggering the display of the release form
         // console.log(rwf)
-        await updateEvent(rwf as any);
-        await setShowWorkflowForm((o) => !o);
+        updateEvent(rwf);
+        setShowWorkflowForm((o) => !o);
       }
     }
   };

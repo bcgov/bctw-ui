@@ -4,7 +4,7 @@ import SelectCode from './SelectCode';
 import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
-import { ReactElement, ReactNode } from 'react';
+import { CSSProperties, ReactElement, ReactNode } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap } from 'types/form_types';
 import dayjs, { Dayjs } from 'dayjs';
@@ -37,7 +37,7 @@ type CreateInputProps = CreateInputBaseProps &
 
 // text and number field handler
 function CreateEditTextField(props: CreateInputProps): ReactElement {
-  const { prop, type, value, errorMessage, style, handleChange, validate } = props;
+  const { prop, type, value, errorMessage, handleChange, validate } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
   return type === eInputType.number ? (
@@ -221,7 +221,7 @@ interface ISpeciesFormField {
   handleChange: FormChangeEvent;
   inputProps?: Partial<CreateInputProps>;
   displayBlock?: boolean;
-  style?: any;
+  style?: CSSProperties;
 }
 function CreateSpeciesFormField({
   obj,

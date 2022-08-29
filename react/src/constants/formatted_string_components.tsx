@@ -1,6 +1,4 @@
 import { Typography } from '@mui/material';
-import { ISpecies } from 'types/animal';
-import { capitalize, columnToHeader } from 'utils/common_helpers';
 
 const critterImportMessage = (
   <>

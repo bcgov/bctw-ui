@@ -1,6 +1,15 @@
 import 'styles/form.scss';
 import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
-import { useState, useEffect, ReactNode, MutableRefObject, forwardRef, useImperativeHandle } from 'react';
+import {
+  useState,
+  useEffect,
+  ReactNode,
+  MutableRefObject,
+  forwardRef,
+  useImperativeHandle,
+  SetStateAction,
+  Dispatch
+} from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
@@ -17,13 +26,17 @@ import { useSpecies } from 'contexts/SpeciesContext';
 import { SPECIES_STR } from 'utils/species';
 
 /* eslint-disable indent */
+type ChildRefs = {
+  setValue: Dispatch<SetStateAction<string>>;
+  value: string;
+};
 type SelectCodeProps = FormBaseProps &
   SelectProps &
   PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
     codeHeader: string;
     changeHandlerMultiple?: (o: ICodeFilter[]) => void;
     addEmptyOption?: boolean;
-    inputRef?: MutableRefObject<any>;
+    inputRef?: MutableRefObject<ChildRefs>;
   };
 
 /**
@@ -38,7 +51,7 @@ type SelectCodeProps = FormBaseProps &
  * @param propname use this field as the key if the code header isn't the same. ex - ear_tag_colour_id
  */
 
-const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<any>): JSX.Element => {
+const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<ChildRefs>): JSX.Element => {
   const {
     addEmptyOption,
     codeHeader,

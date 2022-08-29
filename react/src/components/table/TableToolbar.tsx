@@ -1,4 +1,4 @@
-import { Box, Table, TableBody, TableCell, TableRow, Toolbar } from '@mui/material';
+import { Box, TableCell, TableRow, Toolbar } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import TableFilter from './TableFilters';
 import { ITableFilter } from './table_interfaces';
