@@ -37,60 +37,59 @@ export default function CritterPage(): JSX.Element {
   return (
     <ManageLayout>
       <SpeciesProvider>
-      <Box className='manage-layout-titlebar'>
-        <h1>My Animals</h1>
-        <Box display='flex' alignItems='center'>
-          <ModifyCritterWrapper 
-            editing={editObj} 
-            onDelete={(critter_id: string): void => setDeleted(critter_id)}
-            onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-            setCritter={setEditObj}
-          >
-            <AddEditViewer<AttachedAnimal> {...addEditProps}>
-              <EditCritter {...editProps} />
-            </AddEditViewer>
-          </ModifyCritterWrapper>
-          <ExportViewer<AttachedAnimal>
-            template={[
-              'critter_id',
-              'species',
-              'population_unit',
-              'wlh_id',
-              'animal_id',
-              'collar_id',
-              'device_id',
-              'frequency',
-              'animal_id'
-            ]}
-            eTitle={CritterStrings.exportTitle}
-          />
+        <Box className='manage-layout-titlebar'>
+          <h1>My Animals</h1>
+          <Box display='flex' alignItems='center'>
+            <ModifyCritterWrapper
+              editing={editObj}
+              onDelete={(critter_id: string): void => setDeleted(critter_id)}
+              onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+              setCritter={setEditObj}>
+              <AddEditViewer<AttachedAnimal> {...addEditProps}>
+                <EditCritter {...editProps} />
+              </AddEditViewer>
+            </ModifyCritterWrapper>
+            <ExportViewer<AttachedAnimal>
+              template={[
+                'critter_id',
+                'species',
+                'population_unit',
+                'wlh_id',
+                'animal_id',
+                'collar_id',
+                'device_id',
+                'frequency',
+                'animal_id'
+              ]}
+              eTitle={CritterStrings.exportTitle}
+            />
+          </Box>
         </Box>
-      </Box>
 
-      {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
-      <RowSelectedProvider>
-        <>
-          <Box mb={4}>
-            <DataTable
-              headers={AttachedAnimal.attachedCritterDisplayProps}
-              title={CS.assignedTableTitle}
-              queryProps={{ query: api.useAssignedCritters }}
-              onSelect={handleSelect}
-              deleted={deleted}
-              updated={updated}
-            />
-          </Box>
-          <Box mb={4}>
-            <DataTable
-              headers={new Animal().displayProps}
-              title={CS.unassignedTableTitle}
-              queryProps={{ query: api.useUnassignedCritters }}
-              onSelect={handleSelect}
-              deleted={deleted}
-            />
-          </Box>
-        </>
-      </RowSelectedProvider>
+        {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
+        <RowSelectedProvider>
+          <>
+            <Box mb={4}>
+              <DataTable
+                headers={AttachedAnimal.attachedCritterDisplayProps}
+                title={CS.assignedTableTitle}
+                queryProps={{ query: api.useAssignedCritters }}
+                onSelect={handleSelect}
+                deleted={deleted}
+                updated={updated}
+              />
+            </Box>
+            <Box mb={4}>
+              <DataTable
+                headers={new Animal().displayProps}
+                title={CS.unassignedTableTitle}
+                queryProps={{ query: api.useUnassignedCritters }}
+                onSelect={handleSelect}
+                deleted={deleted}
+              />
+            </Box>
+          </>
+        </RowSelectedProvider>
       </SpeciesProvider>
     </ManageLayout>
   );

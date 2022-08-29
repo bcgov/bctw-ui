@@ -10,7 +10,7 @@ import { MapStrings } from 'constants/strings';
 import { MapTileLayers } from 'constants/strings';
 import { formatLocal } from 'utils/time';
 import { plainToClass } from 'class-transformer';
-import { Point} from 'geojson';
+import { Point } from 'geojson';
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
   doc.innerHTML = '';
@@ -20,7 +20,7 @@ const hidePopup = (): void => {
 const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const doc = document.getElementById('popup');
   const p = plainToClass(TelemetryDetail, feature.properties);
-  const {coordinates} = feature.geometry;
+  const { coordinates } = feature.geometry;
   const t = dayjs(p.date_recorded).format(formatLocal);
   const text = `
     ${p.species ? 'Species: ' + p.species + '<br>' : ''}
@@ -114,7 +114,6 @@ const getUWR = () => {
 };
 
 const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Control.Layers): void => {
-
   const bingOrtho = L.tileLayer(MapTileLayers.bing, {
     attribution: '&copy; <a href="https://esri.com">ESRI Basemap</a> ',
     maxZoom: 24,
@@ -147,7 +146,7 @@ const initMap = (
   selectedPings: L.GeoJSON,
   drawSelectedLayer: () => void,
   handleDrawLine: (l) => void,
-  handleDeleteLine: () => void,
+  handleDeleteLine: () => void
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
   const layerPicker = L.control.layers(null, null, { position: 'topleft' });
@@ -168,7 +167,7 @@ const initMap = (
     },
     edit: {
       featureGroup: drawnItems
-    },
+    }
   });
 
   mapRef.current.addControl(drawControl);
@@ -223,7 +222,7 @@ const initMap = (
     .on('draw:deletestop', (e) => {
       drawSelectedLayer();
       handleDeleteLine();
-    })
+    });
 };
 
 export { initMap, hidePopup, setPopupInnerHTML, addTileLayers };

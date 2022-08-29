@@ -42,7 +42,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const [hasBabies, setHasBabies] = useState(false);
 
   useDidMountEffect(() => {
-    if(open) {
+    if (open) {
       reset();
     }
   }, [open]);
@@ -50,7 +50,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const reset = (): void => {
     setHasBabies(false);
     updateSpecies(null);
-  }
+  };
   // useEffect(() => {
   //   setLockSpecies(!isCreatingNew)
   // },[isCreatingNew, species])
@@ -128,8 +128,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     await setShowWorkflowForm((o) => !o);
   };
   const {
-    testFields,
-    speciesField,
     associatedAnimalFields,
     captureFields,
     characteristicsFields,
@@ -167,7 +165,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
       )}
     </Container>
   );
-
   return (
     <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={new Animal(editing.critter_id)}>
       <ChangeContext.Consumer>
@@ -191,7 +188,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 open={showUDFModal}
                 handleClose={(): void => setShowUDFModal(false)}
                 afterSave={(): void => setShowUDFModal(false)}
-                />
+              />
               {/* 
                 render the collective unit (CU) select.
                 disabled if a CU has already been assigned
@@ -201,9 +198,15 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 {/* <CreateSpeciesFormField obj={editing} formField={wfFields.get('species')} handleChange={onChange} inputProps={{disabled: lockSpecies}}/> */}
                 <SpeciesSelect handleChange={onChange} value={editing.species} useLock={!isCreatingNew} useModal />
               </FormSection>
-              <FormSection id='cr-ids' header='Identifiers' disabled={!canEdit} hide={hideSection([...identifierFields2, ...identifierFields2], species)}>
+              <FormSection
+                id='cr-ids'
+                header='Identifiers'
+                disabled={!canEdit}
+                hide={hideSection([...identifierFields2, ...identifierFields2], species)}>
                 {[
-                  ...identifierFields1.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>),
+                  ...identifierFields1.map((f) => (
+                    <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                  )),
                   <Box display='inline' key='udf-cu'>
                     <SelectUDF
                       style={{ width: '200px' }}
@@ -213,7 +216,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                       label={MapStrings.collectiveUnitLabel}
                       changeHandler={(v: IUDF): void => onChange({ [eUDFType.collective_unit]: v.value })}
                       disabled={!canEditCollectiveUnit}
-                      />
+                    />
                     {canEditCollectiveUnit ? (
                       <IconButton key='udf-icon' onClick={(): void => setShowUDFModal((o) => !o)}>
                         <Icon icon='edit' />
@@ -221,21 +224,49 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     ) : null}
                   </Box>,
                   //FIXME
-                  ...identifierFields2.map(f => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)
+                  ...identifierFields2.map((f) => (
+                    <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                  ))
                 ]}
               </FormSection>
-              <FormSection id='cr-chars' header='Characteristics' disabled={!canEdit} hide={hideSection(characteristicsFields, species)}>
-                {characteristicsFields.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)}
-                <CreateSpeciesFormField obj={editing} formField={wfFields.get('juvenile_at_heel')} handleChange={onChange}/>
-                <CreateSpeciesFormField obj={editing} formField={wfFields.get('juvenile_at_heel_count')} 
-                handleChange={onChange} inputProps={{required: hasBabies, disabled: !hasBabies || !canEdit }}/>
+              <FormSection
+                id='cr-chars'
+                header='Characteristics'
+                disabled={!canEdit}
+                hide={hideSection(characteristicsFields, species)}>
+                {characteristicsFields.map((f) => (
+                  <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                ))}
+                <CreateSpeciesFormField
+                  obj={editing}
+                  formField={wfFields.get('juvenile_at_heel')}
+                  handleChange={onChange}
+                />
+                <CreateSpeciesFormField
+                  obj={editing}
+                  formField={wfFields.get('juvenile_at_heel_count')}
+                  handleChange={onChange}
+                  inputProps={{ required: hasBabies, disabled: !hasBabies || !canEdit }}
+                />
               </FormSection>
-              <FormSection id='cr-asoc' header='Association With Another Individual' disabled={!canEdit} hide={hideSection(associatedAnimalFields, species)}>
-                {associatedAnimalFields.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)}
+              <FormSection
+                id='cr-asoc'
+                header='Association With Another Individual'
+                disabled={!canEdit}
+                hide={hideSection(associatedAnimalFields, species)}>
+                {associatedAnimalFields.map((f) => (
+                  <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                ))}
               </FormSection>
-                {/* {associatedAnimalFields.map((f) => displaySpeciesFormFields(f, 'caribou' as eSpecies) && CreateFormField(editing, f, onChange))} */}
-              <FormSection id='cr-comm' header='Comments About This Animal' disabled={!canEdit} hide={hideSection(animalCommentField, species)}>
-                {animalCommentField.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)}
+              {/* {associatedAnimalFields.map((f) => displaySpeciesFormFields(f, 'caribou' as eSpecies) && CreateFormField(editing, f, onChange))} */}
+              <FormSection
+                id='cr-comm'
+                header='Comments About This Animal'
+                disabled={!canEdit}
+                hide={hideSection(animalCommentField, species)}>
+                {animalCommentField.map((f) => (
+                  <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                ))}
               </FormSection>
               {/* hide all workflow related fields when creating a new animal */}
               {!isCreatingNew ? (
@@ -252,7 +283,9 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                         Add Capture Event
                       </Button>
                     }>
-                    {captureFields.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)}
+                    {captureFields.map((f) => (
+                      <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                    ))}
                   </FormSection>
                   <FormSection
                     id='cr-rel'
@@ -260,13 +293,15 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     disabled={true}
                     btn={
                       <Button
-                      disabled={!isAttached}
-                      {...editEventBtnProps}
-                      onClick={(): void => handleOpenWorkflow('release')}>
+                        disabled={!isAttached}
+                        {...editEventBtnProps}
+                        onClick={(): void => handleOpenWorkflow('release')}>
                         Add Release Event
                       </Button>
                     }>
-                    {releaseFields.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)}
+                    {releaseFields.map((f) => (
+                      <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                    ))}
                   </FormSection>
 
                   <FormSection
@@ -275,13 +310,15 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     disabled={true}
                     btn={
                       <Button
-                      disabled={!isAttached}
+                        disabled={!isAttached}
                         {...editEventBtnProps}
                         onClick={(): void => handleOpenWorkflow('mortality')}>
                         Record Mortality Details
                       </Button>
                     }>
-                    {mortalityFields.map((f) => <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange}/>)}
+                    {mortalityFields.map((f) => (
+                      <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                    ))}
                   </FormSection>
 
                   {/* hide device assignment history for new critters */}
@@ -290,14 +327,14 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     handleClose={(): void => setShowAssignmentHistory(false)}
                     critter_id={editing.critter_id}
                     permission_type={editing.permission_type}
-                    />
+                  />
                   <WorkflowWrapper
                     open={showWorkflowForm}
                     event={event as any}
                     handleClose={(): void => setShowWorkflowForm(false)}
                     onEventSaved={handleWorkflowSaved}
                     onEventChain={handleWorkflowChain}
-                    />
+                  />
                 </>
               ) : null}
             </>

@@ -77,7 +77,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   const [showHistory, setShowHistory] = useState(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
   const [currentTabID, setCurrentTabID] = useState(0);
-  const [openFullScreen, setOpenFullScreen] = useState(false);
+  const [openFullScreen, setOpenFullScreen] = useState(open);
   // state handler for when the history / current properties tab is selected
   const handleSwitchTab = (newValue: number): void => {
     setCurrentTabID(newValue);
@@ -87,7 +87,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   useDidMountEffect(() => {
     const params: Pick<IHistoryPageProps<T>, 'param' | 'propsToDisplay'> = {
       param: editing[editing.identifier],
-      propsToDisplay: editing.displayProps,
+      propsToDisplay: editing.displayProps
     };
     if (editing instanceof Animal) {
       params.propsToDisplay = editing.historyDisplayProps();
@@ -97,7 +97,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       setHistoryParams({ query: api.useCollarHistory, ...params });
     }
   }, [editing]);
-  
+
   // when the modal opens, disable save
   useDidMountEffect(() => {
     if (open) {
@@ -150,10 +150,10 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   const onClose = () => {
     reset();
     handleClose(false);
-    if(showInFullScreen){
+    if (showInFullScreen) {
       setOpenFullScreen(false);
     }
-  }
+  };
 
   const Children = (
     /**
@@ -221,10 +221,14 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     </ChangeContext.Provider>
   );
 
-  const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
+  // const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
   return showInFullScreen ? (
-    <FullScreenDialog open={openFullScreen} handleClose={onClose} title={title}>{Children}</FullScreenDialog>
+    <FullScreenDialog open={openFullScreen} handleClose={onClose} title={title}>
+      {Children}
+    </FullScreenDialog>
   ) : (
-    <Modal open={open} handleClose={onClose} title={title}>{Children}</Modal>
+    <Modal open={open} handleClose={onClose} title={title}>
+      {Children}
+    </Modal>
   );
 }

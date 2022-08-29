@@ -126,7 +126,7 @@ export default function PerformAssignmentAction({
   const handleClickShowModal = (): void => (isRemovingDevice ? setShowConfirmModal(true) : setShowAvailableModal(true));
 
   const closeModals = (): void => {
-    setShowAvailableModal(false);
+    isRemovingDevice ? setShowConfirmModal(false) : setShowAvailableModal(false);
   };
 
   const handleConfirmRemoveDevice = (): void => {
