@@ -63,7 +63,6 @@ type MapFiltersProps = {
 
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const { pings } = props;
-  const DEFAULT_SYMBOLIZE = 'device_id';
   const { search, filter, symbolize } = TabNames;
   const classes = drawerStyles();
   const containerRef = useRef(null);
@@ -136,6 +135,12 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     props.onShowLastFixes(isLastFixes);
   }, [isLastFixes]);
 
+  useDidMountEffect(() => {
+    if (symbolizeBy === DEFAULT_MFV.header) {
+      handleApplySymbolize();
+    }
+  }, [symbolizeBy]);
+
   /**
    * handler for when a select component is changed
    * @param filters array passed from multi-select component
@@ -185,9 +190,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     handleApplyFilters(null, true);
   };
 
-  const resetSymbolize = (): void => {
-    setSymbolizeBy(DEFAULT_MFV.header);
-  };
   // udfs are treated as any other filter, use this function to convert them
   // and then 'push' them to the normal filter change handler
   const handleChangeUDF = (v: IUDF[]): void => {
@@ -478,11 +480,16 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
               {tab}
             </Button>
-            {isTab(filter) && (
-              <Button color='primary' variant='outlined' disabled={!numFiltersSelected} onClick={resetFilters}>
-                Reset
-              </Button>
-            )}
+            {isTab(filter) ||
+              (isTab(symbolize) && (
+                <Button
+                  color='primary'
+                  variant='outlined'
+                  disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : !numFiltersSelected}
+                  onClick={isTab(symbolize) ? () => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
+                  Reset
+                </Button>
+              ))}
           </Box>
           <Divider />
           {createSymbolizeLegend()}

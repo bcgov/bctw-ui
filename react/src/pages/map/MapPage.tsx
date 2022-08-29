@@ -16,7 +16,6 @@ import {
   applyFilter,
   fillPoint,
   getLast10Fixes,
-  getUniquePropFromPings,
   groupFilters,
   splitPings,
   getUniqueCritterIDsFromSelectedPings
@@ -52,6 +51,7 @@ import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import { eUDFType } from 'types/udf';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
+import { GeoJsonObject } from 'geojson';
 
 /**
   there are several forms of state in this page:
@@ -284,6 +284,7 @@ export default function MapPage(): JSX.Element {
   const redrawLayers = (newPings = fetchedPings, newTracks = fetchedTracks): void => {
     clearLayers();
     const { latest, other } = splitPings(newPings);
+    console.log(other.length);
     latestPingsLayer.addData(latest as any);
     pingsLayer.addData(other as any);
     tracksLayer.addData(newTracks as any);
