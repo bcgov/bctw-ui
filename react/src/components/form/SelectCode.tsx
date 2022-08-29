@@ -1,6 +1,6 @@
 import 'styles/form.scss';
 import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
-import { useState, useEffect, ReactNode, MutableRefObject, SetStateAction, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, ReactNode, MutableRefObject, forwardRef, useImperativeHandle } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
@@ -14,9 +14,9 @@ import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
 import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
-import { formatCodeToSpecies, SPECIES_STR } from 'utils/species';
-import { SpeciesModal } from 'components/modal/SpeciesModal';
+import { SPECIES_STR } from 'utils/species';
 
+/* eslint-disable indent */
 type SelectCodeProps = FormBaseProps &
   SelectProps &
   PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
@@ -45,14 +45,13 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<any
     defaultValue,
     changeHandler,
     changeHandlerMultiple,
-    label,
     multiple,
     triggerReset,
     style,
     required,
     propName,
     disabled,
-    inputRef,
+    inputRef
   } = props;
   const api = useTelemetryApi();
   const species = useSpecies();
@@ -64,11 +63,11 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<any
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
   const isSpeciesSelect = codeHeader === SPECIES_STR;
   useImperativeHandle(ref, () => ({
-    setValue, 
+    setValue,
     value
   }));
   //useImperativeHandle(ref, () => value)
-  
+
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
     'propName',
@@ -81,13 +80,12 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<any
     'defaultValue'
   ]);
   // load the codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = 
-  api.useCodes(0, codeHeader, species?.id, {
+  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader, species?.id, {
     // cacheTime set to zero to prevent weird caching behaviour with species selection
-    cacheTime: ref ? 0 : 5000, 
+    cacheTime: ref ? 0 : 5000,
     enabled: !isSpeciesSelect
   });
-  
+
   // when data is successfully fetched
   useEffect(() => {
     const updateOptions = (): void => {

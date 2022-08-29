@@ -5,9 +5,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "env": {
     "es6": true,
     "browser": true,
@@ -20,13 +18,8 @@
   },
   "rules": {
     "no-console": "warn",
-    "@typescript-eslint/indent": [
-      "warn",
-      2
-    ],
-    "@typescript-eslint/ban-ts-comment": [
-      "warn"
-    ],
+    "@typescript-eslint/indent": ["warn", 2],
+    "@typescript-eslint/ban-ts-comment": ["warn"],
     "@typescript-eslint/explicit-function-return-type": [
       "warn",
       {
@@ -38,10 +31,7 @@
   "settings": {},
   "overrides": [
     {
-      "files": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
+      "files": ["**/*.ts", "**/*.tsx"],
       "rules": {
         "no-undef": "off"
       }

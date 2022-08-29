@@ -1,9 +1,16 @@
-import { codeApi } from 'api/code_api';
 import { Transform, Exclude } from 'class-transformer';
 import { mustbePositiveNumber } from 'components/form/form_validators';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { BaseTimestamps, BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
+import {
+  BaseTimestamps,
+  BCTWBase,
+  DayjsToPlain,
+  nullToDayjs,
+  toClassOnly,
+  toPlainOnly,
+  uuid
+} from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader } from 'utils/common_helpers';
@@ -17,9 +24,9 @@ export enum eCritterFetchType {
 }
 
 export interface ISpecies {
-  id: string,
+  id: string;
   //key: string,
-  name: string
+  name: string;
 }
 /**
  * Animal properties that are re-used in Telemetry classes (map.ts)
@@ -168,7 +175,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
 
   static get toCSVHeaderTemplate(): string[] {
     const excluded: (keyof Animal)[] = ['critter_transaction_id'];
-    const keys = Object.keys(new Animal()).filter(k => !(excluded as string[]).includes(k));
+    const keys = Object.keys(new Animal()).filter((k) => !(excluded as string[]).includes(k));
     return keys;
   }
 
@@ -196,7 +203,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
         return columnToHeader(str);
     }
   }
-  
+
   get displayProps(): (keyof Animal)[] {
     return ['species', 'population_unit', 'wlh_id', 'animal_id', 'animal_status'];
     //return Animal.toCSVHeaderTemplate;
@@ -210,7 +217,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   }
 
   constructor(critter_id = '') {
-    this.critter_id = critter_id ;
+    this.critter_id = critter_id;
   }
 }
 
@@ -232,7 +239,6 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   // con't overide since this class is inherited
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
     return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
-    
   }
 
   formatPropAsHeader(str: keyof Animal): string {
@@ -245,17 +251,15 @@ export enum eSpecies {
   caribou = 'M-RATA',
   grizzly_bear = 'M-URAR',
   moose = 'M-ALAM',
-  grey_wolf = 'M-CALU',
+  grey_wolf = 'M-CALU'
 }
 
-const {caribou, grizzly_bear, moose} = eSpecies;
+const { caribou } = eSpecies;
 // species: [] represents field applies to all species, used for optimization on searching
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
-  speciesField: [
-    { prop: 'species', type: eInputType.code, species: [], ...isRequired },
-  ],
+  speciesField: [{ prop: 'species', type: eInputType.code, species: [], ...isRequired }],
   associatedAnimalFields: [
-    { prop: 'associated_animal_id', type: eInputType.text, species: []},
+    { prop: 'associated_animal_id', type: eInputType.text, species: [] },
     { prop: 'associated_animal_relationship', type: eInputType.code, species: [] }
   ],
   captureFields: [
@@ -267,26 +271,26 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'capture_utm_northing', type: eInputType.number, species: [] },
     { prop: 'recapture', type: eInputType.check, species: [] },
     { prop: 'captivity_status', type: eInputType.check, species: [caribou] },
-    { prop: 'capture_comment', type: eInputType.multiline, species: [] },
+    { prop: 'capture_comment', type: eInputType.multiline, species: [] }
   ],
   characteristicsFields: [
-    { prop: 'animal_status', type: eInputType.code, species: [], ...isRequired},
+    { prop: 'animal_status', type: eInputType.code, species: [], ...isRequired },
     //{ prop: 'species', type: eInputType.code, species: [...ALL_SPECIES], ...isRequired },
     { prop: 'sex', type: eInputType.code, species: [], ...isRequired },
     { prop: 'animal_colouration', type: eInputType.text, species: [] },
     { prop: 'estimated_age', type: eInputType.number, species: [], validate: mustbePositiveNumber },
-    { prop: 'life_stage', type: eInputType.code, species: [] }, //Species dependant, with code table
+    { prop: 'life_stage', type: eInputType.code, species: [] } //Species dependant, with code table
   ],
   characteristicFields2: [
-    { prop: 'juvenile_at_heel', type: eInputType.code, species: []},
-    { prop: 'juvenile_at_heel_count', type: eInputType.number, species: [], validate: mustbePositiveNumber}
+    { prop: 'juvenile_at_heel', type: eInputType.code, species: [] },
+    { prop: 'juvenile_at_heel_count', type: eInputType.number, species: [], validate: mustbePositiveNumber }
   ],
   identifierFields1: [
     { prop: 'wlh_id', type: eInputType.text, species: [] },
     { prop: 'animal_id', type: eInputType.text, species: [], ...isRequired },
     //Add nickname field for bears
     { prop: 'region', type: eInputType.code, species: [], ...isRequired },
-    { prop: 'population_unit', type: eInputType.code, species: [] }, //Population unit needs to be species dependant, surface with code table   
+    { prop: 'population_unit', type: eInputType.code, species: [] } //Population unit needs to be species dependant, surface with code table
   ],
   identifierFields2: [
     { prop: 'ear_tag_left_colour', type: eInputType.text, species: [] },
@@ -310,7 +314,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'mortality_investigation', type: eInputType.code, species: [caribou] },
     { prop: 'mortality_report', type: eInputType.check, species: [caribou] },
     { prop: 'predator_known', type: eInputType.check, species: [caribou] },
-    { prop: 'mortality_comment', type: eInputType.multiline, species: []},
+    { prop: 'mortality_comment', type: eInputType.multiline, species: [] }
   ],
   releaseFields: [
     { prop: 'release_date', type: eInputType.datetime, species: [] },
@@ -322,14 +326,10 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'translocation', type: eInputType.check, species: [] },
     { prop: 'release_comment', type: eInputType.multiline, species: [] }
   ],
-  animalCommentField: [
-    { prop: 'animal_comment', type: eInputType.multiline, species: [] }
-  ],
+  animalCommentField: [{ prop: 'animal_comment', type: eInputType.multiline, species: [] }]
 };
 
 // a 'flatteneed' critterFormFields array
 export const getAnimalFormFields = (): FormFieldObject<Partial<Animal>>[] => {
-  return Object
-    .values(critterFormFields)
-    .reduce((previous, current) => ([ ...previous, ...current ]), []);
+  return Object.values(critterFormFields).reduce((previous, current) => [...previous, ...current], []);
 };

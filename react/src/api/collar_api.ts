@@ -35,7 +35,7 @@ export const collarApi = (props: ApiProps): API => {
   };
 
   /** fetches all devices, regardless of attachment status (from bctw.collar_v) */
-  const getAllDevices = async (page = 1, search?: ITableFilter[]): Promise<(Collar)[]> => {
+  const getAllDevices = async (page = 1, search?: ITableFilter[]): Promise<Collar[]> => {
     const url = createUrl({ api: 'get-all-collars', page, search });
     const { data } = await api.get(url);
     const ret = data.map((json: ICollar) => plainToClass(Collar, json));
@@ -45,8 +45,8 @@ export const collarApi = (props: ApiProps): API => {
   /** fetches all devices with devices that have no associated collar_id
    *  combines collar_v with unassigned_telemetry_v
    *  used in Telemetry Retrieval
-  */
-  const getAllDevicesWithUnassignedCollarIds = async (page = 1, search?: ITableFilter[]): Promise<(Collar)[]> => {
+   */
+  const getAllDevicesWithUnassignedCollarIds = async (page = 1, search?: ITableFilter[]): Promise<Collar[]> => {
     const url = createUrl({ api: 'get-collars-and-deviceids', page, search });
     const { data } = await api.get(url);
     const ret = data.map((json: ICollar) => plainToClass(Collar, json));
@@ -73,13 +73,12 @@ export const collarApi = (props: ApiProps): API => {
   const triggerVendorTelemetryUpdate = async (body: FetchTelemetryInput[]): Promise<ResponseTelemetry> => {
     const { data } = await postJSON(api, createUrl({ api: triggerTelemetryFetch }), body);
     // eslint-disable-next-line no-console
-    if (!data){
-      console.log(`No JSON received from manual vendor trigger...`)
+    if (!data) {
+      //console.log(`No JSON received from manual vendor trigger...`)
       return;
     }
-    console.log(`Success! JSON received from manual vendor trigger`, data);
+    //console.log(`Success! JSON received from manual vendor trigger`, data);
     return data;
-    
   };
 
   return {

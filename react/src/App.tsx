@@ -15,7 +15,6 @@ import { SnackbarWrapper } from 'components/common';
 import { UserContext, UserStateContextProvider } from 'contexts/UserContext';
 import { Theme, StyledEngineProvider } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
 // import { ReactQueryDevtools } from 'react-query/devtools'
 
 declare module '@mui/styles/defaultTheme' {

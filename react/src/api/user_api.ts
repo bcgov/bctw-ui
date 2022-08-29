@@ -7,7 +7,6 @@ import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
 import { API, ApiProps } from 'api/api_interfaces';
 import { useQueryClient } from 'react-query';
 
-
 /** api for handling:
  * user object updates
  * session info
@@ -20,16 +19,16 @@ export const userApi = (props: ApiProps): API => {
 
   const invalidateUsers = (): void => {
     queryClient.invalidateQueries('all_users');
-  }
+  };
 
   const invalidateAlerts = (): void => {
     // console.log('refetching user alerts');
     queryClient.invalidateQueries('userAlert');
-  }
+  };
 
-  const invalidateUDF = ():void => {
+  const invalidateUDF = (): void => {
     queryClient.invalidateQueries('getUDF');
-  }
+  };
 
   /**
    * retrieves keycloak session data
@@ -45,7 +44,7 @@ export const userApi = (props: ApiProps): API => {
     }
     const url = createUrl({ api: 'session-info' });
     const { data } = await api.get(url);
-    console.log('retrieve session info', data);
+    //console.log('retrieve session info', data);
     return data;
   };
 
@@ -57,7 +56,7 @@ export const userApi = (props: ApiProps): API => {
   const addUser = async (user: User): Promise<User> => {
     // console.log('posting user', user)
     const role = user.role_type ?? eUserRole.user;
-    const { data } = await postJSON(api, createUrl({ api: 'add-user' }), {user, role});
+    const { data } = await postJSON(api, createUrl({ api: 'add-user' }), { user, role });
     const ret = plainToClass(User, data);
     // console.log('user upsert result:', ret);
     invalidateUsers();
@@ -99,10 +98,10 @@ export const userApi = (props: ApiProps): API => {
           return plainToClass(MortalityAlert, json);
         case eAlertType.malfunction:
           return plainToClass(MalfunctionAlert, json);
-        default: 
+        default:
           return plainToClass(TelemetryAlert, json);
       }
-    })
+    });
     return alerts;
   };
 
@@ -110,7 +109,7 @@ export const userApi = (props: ApiProps): API => {
    * @param body @type {TelemetryAlert}
    */
   const updateAlert = async (body: TelemetryAlert[]): Promise<TelemetryAlert[]> => {
-    const { data } = await postJSON(api, createUrl({ api: upsertAlertEndpoint }), body) ;
+    const { data } = await postJSON(api, createUrl({ api: upsertAlertEndpoint }), body);
     invalidateAlerts();
     if (data && data.length) {
       const converted = data?.map((json: ITelemetryAlert) => plainToClass(TelemetryAlert, json));
@@ -118,7 +117,6 @@ export const userApi = (props: ApiProps): API => {
     }
     return [];
   };
-
 
   /**
    *  sends a test SMS and email notification
@@ -128,10 +126,10 @@ export const userApi = (props: ApiProps): API => {
    * @param phone users phone number
    * @returns nothing, errors are only logged to the api console
    */
-  const testUserAlertNotifications = async(body: {email: string, phone: string}): Promise<void> => {
+  const testUserAlertNotifications = async (body: { email: string; phone: string }): Promise<void> => {
     const { email, phone } = body;
-    await api.get(createUrl({api: 'test-alert-notif', query: `email=${email}&phone=${phone}`}));
-  }
+    await api.get(createUrl({ api: 'test-alert-notif', query: `email=${email}&phone=${phone}` }));
+  };
 
   /**
    * @param udf_type (currently only one udf type defined, critter_group
@@ -164,6 +162,6 @@ export const userApi = (props: ApiProps): API => {
     testUserAlertNotifications,
     upsertUDF,
     updateAlert,
-    getSessionInfo,
+    getSessionInfo
   };
 };
