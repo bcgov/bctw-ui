@@ -51,7 +51,6 @@ import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import { eUDFType } from 'types/udf';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
-import { GeoJsonObject } from 'geojson';
 
 /**
   there are several forms of state in this page:
