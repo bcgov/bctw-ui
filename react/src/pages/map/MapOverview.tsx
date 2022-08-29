@@ -3,14 +3,11 @@ import EditCritter from 'pages/data/animals/EditCritter';
 import ModifyCritterWrapper from 'pages/data/animals/ModifyCritterWrapper';
 import EditCollar from 'pages/data/collars/EditCollar';
 import ModifyCollarWrapper from 'pages/data/collars/ModifyCollarWrapper';
-import AddEditViewer from 'pages/data/common/AddEditViewer';
-import { QueryStatus } from 'react-query';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWType } from 'types/common_types';
 import { ITelemetryDetail } from 'types/map';
 import { doNothingAsync } from 'utils/common_helpers';
-import { CritterStrings as CS } from 'constants/strings';
 
 type CritterOverViewProps = ModalBaseProps & {
   type: BCTWType;

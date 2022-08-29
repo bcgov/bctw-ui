@@ -13,7 +13,7 @@ import { FormBaseProps } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
-import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import { useSpecies } from 'contexts/SpeciesContext';
 import { SPECIES_STR } from 'utils/species';
 
 /* eslint-disable indent */

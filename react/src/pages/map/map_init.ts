@@ -43,7 +43,7 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
 };
 
 // caribou herd boundaries
-const getCHB = () => {
+const getCHB = (): L.TileLayer => {
   const fl = new FeatureLayer({
     url: 'https://services6.arcgis.com/ubm4tcTYICKBpist/arcgis/rest/services/Caribou_BC/FeatureServer/0'
   });
@@ -54,7 +54,7 @@ const getCHB = () => {
 const bcgw_url = 'http://openmaps.gov.bc.ca/geo/pub/ows';
 
 // ENV regional boundaries
-const getERB = () => {
+const getERB = (): L.TileLayer.WMS => {
   return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_ADMIN_BOUNDARIES.EADM_WLAP_REGION_BND_AREA_SVW',
     format: 'image/png',
@@ -64,7 +64,7 @@ const getERB = () => {
 };
 
 // parks and protected areas
-const getPPA = () => {
+const getPPA = (): L.TileLayer.WMS => {
   return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW',
     format: 'image/png',
@@ -74,7 +74,7 @@ const getPPA = () => {
 };
 
 // wildlife habitat areas
-const getWHA = () => {
+const getWHA = (): L.TileLayer.WMS => {
   return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_WILDLIFE_MANAGEMENT.WCP_WILDLIFE_HABITAT_AREA_POLY',
     format: 'image/png',
@@ -84,7 +84,7 @@ const getWHA = () => {
 };
 
 // wildlife magement units
-const getWMU = () => {
+const getWMU = (): L.TileLayer.WMS => {
   return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_WILDLIFE_MANAGEMENT.WAA_WILDLIFE_MGMT_UNITS_SVW',
     format: 'image/png',
@@ -94,7 +94,7 @@ const getWMU = () => {
 };
 
 // TRIM contour lines
-const getTCL = () => {
+const getTCL = (): L.TileLayer.WMS => {
   return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_BASEMAPPING.TRIM_CONTOUR_LINES',
     format: 'image/png',
@@ -104,7 +104,7 @@ const getTCL = () => {
 };
 
 // ungulate winter ranges
-const getUWR = () => {
+const getUWR = (): L.TileLayer.WMS => {
   return L.tileLayer.wms(bcgw_url, {
     layers: 'WHSE_WILDLIFE_MANAGEMENT.WCP_UNGULATE_WINTER_RANGE_SP',
     format: 'image/png',
