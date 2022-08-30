@@ -204,8 +204,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 disabled={!canEdit}
                 hide={hideSection([...identifierFields2, ...identifierFields2], species)}>
                 {[
-                  ...identifierFields1.map((f) => (
-                    <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                  ...identifierFields1.map((f, i) => (
+                    <CreateSpeciesFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                   )),
                   <Box display='inline' key='udf-cu'>
                     <SelectUDF
@@ -224,8 +224,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     ) : null}
                   </Box>,
                   //FIXME
-                  ...identifierFields2.map((f) => (
-                    <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                  ...identifierFields2.map((f, i) => (
+                    <CreateSpeciesFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                   ))
                 ]}
               </FormSection>
@@ -234,8 +234,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 header='Characteristics'
                 disabled={!canEdit}
                 hide={hideSection(characteristicsFields, species)}>
-                {characteristicsFields.map((f) => (
-                  <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                {characteristicsFields.map((f, i) => (
+                  <CreateSpeciesFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
                 <CreateSpeciesFormField
                   obj={editing}
@@ -254,8 +254,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 header='Association With Another Individual'
                 disabled={!canEdit}
                 hide={hideSection(associatedAnimalFields, species)}>
-                {associatedAnimalFields.map((f) => (
-                  <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                {associatedAnimalFields.map((f, i) => (
+                  <CreateSpeciesFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
               {/* {associatedAnimalFields.map((f) => displaySpeciesFormFields(f, 'caribou' as eSpecies) && CreateFormField(editing, f, onChange))} */}
@@ -264,8 +264,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 header='Comments About This Animal'
                 disabled={!canEdit}
                 hide={hideSection(animalCommentField, species)}>
-                {animalCommentField.map((f) => (
-                  <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                {animalCommentField.map((f, i) => (
+                  <CreateSpeciesFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
               {/* hide all workflow related fields when creating a new animal */}
@@ -283,8 +283,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                         Add Capture Event
                       </Button>
                     }>
-                    {captureFields.map((f) => (
-                      <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                    {captureFields.map((f, i) => (
+                      <CreateSpeciesFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                     ))}
                   </FormSection>
                   <FormSection
@@ -299,8 +299,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                         Add Release Event
                       </Button>
                     }>
-                    {releaseFields.map((f) => (
-                      <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                    {releaseFields.map((f, i) => (
+                      <CreateSpeciesFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                     ))}
                   </FormSection>
 
@@ -316,8 +316,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                         Record Mortality Details
                       </Button>
                     }>
-                    {mortalityFields.map((f) => (
-                      <CreateSpeciesFormField obj={editing} formField={f} handleChange={onChange} />
+                    {mortalityFields.map((f, i) => (
+                      <CreateSpeciesFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                     ))}
                   </FormSection>
 

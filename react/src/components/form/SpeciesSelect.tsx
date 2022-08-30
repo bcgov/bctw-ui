@@ -84,13 +84,14 @@ export const SpeciesSelect = ({ handleChange, value, useLock, useModal }: Specie
           )}
         </IconButton>
       )}
-      {
+      {/* Used for debugging */}
+      {/* {
         <p>{`Species: ${species?.name} 
       Lock: ${lockSpecies} 
       ShowModal: ${showModal}
       Selection: ${selection}
       `}</p>
-      }
+      } */}
       {useModal && (
         <ConfirmModal
           open={showModal}

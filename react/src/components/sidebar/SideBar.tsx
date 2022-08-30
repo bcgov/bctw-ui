@@ -26,7 +26,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       if (user) {
         setIsAdmin(user.role_type === eUserRole.administrator);
         setIsCritterManager(user.is_manager);
-        setIsDataAdmin(user.role_type === eUserRole.data_administrator)
+        setIsDataAdmin(user.role_type === eUserRole.data_administrator);
       }
     };
     updateComponent();
@@ -64,14 +64,14 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
-    <Box className={'sidebar'} id="manage_sidebar" py={2} px={2}>
+    <Box className={'sidebar'} id='manage_sidebar' py={2} px={2}>
       <List component='nav'>
         {routesToShow
           .filter((r) => r.name !== 'notFound' && r.icon)
           .map((route: RouteKey, idx: number) => {
             return (
               <Tooltip key={idx} title={route.title}>
-                <ListItem className="side-bar-item" button {...{ component: Link, to: route.path }}>
+                <ListItem className='side-bar-item' button {...{ component: Link, to: route.path }}>
                   <ListItemIcon>
                     <Icon icon={route.icon} />
                   </ListItemIcon>
