@@ -91,9 +91,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // controls symbolize value
   const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_MFV.header);
   const [symbolizeLast, setSymbolizeLast] = useState(true);
-  // useEffect(() => {
-  //   console.log({ filters });
-  // }, [filters]);
+
+  const isTab = (tabName: TabNames): boolean => tabName === tab;
+
+  const symbolizeOrFilterPanel = isTab(filter) || isTab(symbolize);
 
   const orLabelStyle = {
     color: '#6d6d6d',
@@ -223,8 +224,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const handleTabChange = (event: SyntheticEvent<Element>, newValue: TabNames): void => {
     setTab(newValue);
   };
-
-  const isTab = (tabName: TabNames): boolean => tabName === tab;
 
   const createSearch = (): ReactNode => {
     return (
@@ -479,16 +478,15 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
               {tab}
             </Button>
-            {isTab(filter) ||
-              (isTab(symbolize) && (
-                <Button
-                  color='primary'
-                  variant='outlined'
-                  disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : !numFiltersSelected}
-                  onClick={isTab(symbolize) ? (): void => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
-                  Reset
-                </Button>
-              ))}
+            {symbolizeOrFilterPanel && (
+              <Button
+                color='primary'
+                variant='outlined'
+                disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : !numFiltersSelected}
+                onClick={isTab(symbolize) ? (): void => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
+                Reset
+              </Button>
+            )}
           </Box>
           <Divider />
           {createSymbolizeLegend()}
