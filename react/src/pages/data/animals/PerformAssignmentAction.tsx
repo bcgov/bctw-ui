@@ -68,7 +68,7 @@ export default function PerformAssignmentAction({
     if (current_attachment) {
       const isRemoving = !!current_attachment?.collar_id;
       setIsRemovingDevice(isRemoving);
-      setDli((o) => {
+      setDli(() => {
         const { attachment_start, data_life_start } = current_attachment;
         if (isRemoving) {
           return new DataLifeInput(attachment_start, data_life_start, now, now);

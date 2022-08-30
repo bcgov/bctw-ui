@@ -38,8 +38,12 @@ import { BCTWType } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import {
+  Colour,
+  defaultPointStyle,
+  getColors,
   highlightLatestPings,
   highlightPings,
+  selectedPointStyle,
   setupLatestPingOptions,
   setupPingOptions,
   setupSelectedPings,
@@ -105,6 +109,7 @@ export default function MapPage(): JSX.Element {
   const [onlyLastKnown, setOnlyLastKnown] = useState(false);
   const [onlyLast10, setOnlyLast10] = useState(false);
 
+  const [prevColour, setPrevColour] = useState<Colour>();
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
   const drawnLines = [];
@@ -200,7 +205,6 @@ export default function MapPage(): JSX.Element {
       hidePopup();
     }
   }, [showExportModal, showOverviewModal, showUdfEdit]);
-
   /**
    * when a map point is clicked,
    * populate the popup with metadata and show it
@@ -209,16 +213,18 @@ export default function MapPage(): JSX.Element {
     const layer = event.target;
     const feature: ITelemetryPoint = layer?.feature;
     setPopupInnerHTML(feature);
+    event.target.prevColours = getColors(event);
     // set the feature id state so bottom panel will highlight the row
     setSelectedPingIDs([feature.id]);
   };
-
+  //console.log(prevColour);
   /**
    * when the native leaflet popup (always hidden) is 'closed'
    */
   // todo: handle unselected pings
   const handlePointClose = (event: L.LeafletEvent): void => {
     hidePopup();
+
     // unhighlight them in bottom table
     setSelectedPingIDs([]);
   };
@@ -283,7 +289,6 @@ export default function MapPage(): JSX.Element {
   const redrawLayers = (newPings = fetchedPings, newTracks = fetchedTracks): void => {
     clearLayers();
     const { latest, other } = splitPings(newPings);
-    console.log(other.length);
     latestPingsLayer.addData(latest as any);
     pingsLayer.addData(other as any);
     tracksLayer.addData(newTracks as any);

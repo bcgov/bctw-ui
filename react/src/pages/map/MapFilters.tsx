@@ -439,8 +439,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       className={clsx(classes.drawer, {
         [classes.drawerOpen]: open,
         [classes.drawerClose]: !open
-      })}
-      ref={containerRef}>
+      })}>
       <Box className='side-panel-content'>
         <Box
           display='flex'
@@ -486,7 +485,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   color='primary'
                   variant='outlined'
                   disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : !numFiltersSelected}
-                  onClick={isTab(symbolize) ? () => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
+                  onClick={isTab(symbolize) ? (): void => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
                   Reset
                 </Button>
               ))}

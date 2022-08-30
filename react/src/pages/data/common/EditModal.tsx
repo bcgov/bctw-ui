@@ -1,7 +1,7 @@
 import { IUpsertPayload } from 'api/api_interfaces';
-import { EditModalBaseProps, ModalBaseProps } from 'components/component_interfaces';
+import { EditModalBaseProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
@@ -20,7 +20,6 @@ import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { buttonProps } from 'components/component_constants';
 import { Typography } from '@mui/material';
-import { User } from 'types/user';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: ReactNode;
@@ -147,7 +146,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     }
   };
 
-  const onClose = () => {
+  const onClose = (): void => {
     reset();
     handleClose(false);
     if (showInFullScreen) {

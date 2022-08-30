@@ -57,8 +57,8 @@ const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX
   </>
 );
 
-const speciesModalMessage = (currentSpecies: string, nextSpecies: string) => {
-  const diff = (a?: string[], b?: string[]) => (!a || !b ? null : a.filter((v) => !b.includes(v)));
+const speciesModalMessage = (currentSpecies: string, nextSpecies: string): JSX.Element => {
+  const diff = (a?: string[], b?: string[]): string[] => (!a || !b ? null : a.filter((v) => !b.includes(v)));
   const WMU = 'Wildlife Management Unit';
   const MLS = 'Moose Life Stage';
   const PU = 'Population Unit';

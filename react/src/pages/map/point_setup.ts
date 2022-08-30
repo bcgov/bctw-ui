@@ -1,6 +1,17 @@
 import * as L from 'leaflet';
-import { getFillColorByStatus, getOutlineColor, MAP_COLOURS, MAP_COLOURS_OUTLINE } from 'pages/map/map_helpers';
+import {
+  getFillColorByStatus,
+  getOutlineColor,
+  MAP_COLOURS,
+  MAP_COLOURS_OUTLINE,
+  parseAnimalColour
+} from 'pages/map/map_helpers';
 import { DEFAULT_MFV, ITelemetryPoint, MapFormValue } from 'types/map';
+
+export type Colour = {
+  fillColor: string;
+  color: string;
+};
 
 const defaultPointStyle: L.CircleMarkerOptions = {
   radius: 8,
@@ -27,7 +38,13 @@ const animalColoredPointStyle = (ping: ITelemetryPoint): L.CircleMarkerOptions =
   };
 };
 
-const createLatestPingIcon = (fillColour: string, color = '#000'): L.DivIcon => {
+const getColors = (event: L.LeafletEvent): Colour => {
+  const obj = event.sourceTarget.options;
+  const { color, fillColor } = obj?.color ? obj : parseAnimalColour(obj.icon.options.attribution);
+  return { color, fillColor };
+};
+
+const createLatestPingIcon = (fillColor: string, color = '#000'): L.DivIcon => {
   return L.divIcon({
     html: `
     <div
@@ -50,14 +67,15 @@ const createLatestPingIcon = (fillColour: string, color = '#000'): L.DivIcon => 
       transform="translate(2 3)" 
       
       stroke="${color}" 
-      fill="${fillColour}" 
+      fill="${fillColor}" 
       stroke-miterlimit="10" 
       stroke-width="1.5"/>
 
     </svg>
     </div>
     `,
-    className: 'latest-ping'
+    className: 'latest-ping',
+    attribution: `${fillColor},${color}`
   });
 };
 
@@ -76,18 +94,43 @@ const setupLatestPingOptions = (
       // make a hidden popup that will help deal with click events
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
-        e.target.setIcon(unselectedIcon);
         closeHandler(e);
+        const { color, fillColor } = e.target.prevColours;
+        e.target.setIcon(createLatestPingIcon(fillColor, color));
       });
       marker.on('click', (e) => {
-        e.target.setIcon(latestSelectedPingIcon);
         clickHandler(e);
+        e.target.setIcon(latestSelectedPingIcon);
       });
       return marker;
     }
   };
 };
 
+// setup for normal pings for assigned devices
+// when a ping is clicked/unselected, only the point style is changed
+const setupPingOptions = (
+  pings: L.GeoJSON,
+  clickHandler: L.LeafletEventHandlerFn,
+  closeHandler: L.LeafletEventHandlerFn
+): void => {
+  pings.options = {
+    pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
+      const critterStyle = animalColoredPointStyle(feature);
+      const marker = L.circleMarker(latlng, critterStyle);
+      marker.bindPopup('', { className: 'marker-popup' }).openPopup();
+      marker.on('popupclose', (e) => {
+        closeHandler(e);
+        e.target.setStyle(e.target.prevColours);
+      });
+      marker.on('click', (e) => {
+        clickHandler(e);
+        e.target.setStyle(selectedPointStyle());
+      });
+      return marker;
+    }
+  };
+};
 const highlightLatestPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
   layer.eachLayer((p: any) => {
     const feature = p.feature;
@@ -142,32 +185,6 @@ const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue, includeLatest: bool
   });
 };
 
-// setup for normal pings for assigned devices
-// when a ping is clicked/unselected, only the point style is changed
-const setupPingOptions = (
-  pings: L.GeoJSON,
-  clickHandler: L.LeafletEventHandlerFn,
-  closeHandler: L.LeafletEventHandlerFn
-): void => {
-  pings.options = {
-    pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
-      const critterStyle = animalColoredPointStyle(feature);
-      const marker = L.circleMarker(latlng, critterStyle);
-      marker.bindPopup('', { className: 'marker-popup' }).openPopup();
-      marker.on('popupclose', (e) => {
-        e.target.setStyle(critterStyle);
-        closeHandler(e);
-      });
-      marker.on('click', (e) => {
-        e.target.setStyle(selectedPointStyle());
-        clickHandler(e);
-      });
-      marker.on('click', clickHandler);
-      return marker;
-    }
-  };
-};
-
 // tracks setup
 const setupTracksOptions = (tracks: L.GeoJSON): void => {
   const color = MAP_COLOURS.track;
@@ -205,5 +222,7 @@ export {
   setupLatestPingOptions,
   setupTracksOptions,
   setupPingOptions,
-  symbolizePings
+  symbolizePings,
+  getColors,
+  selectedPointStyle
 };

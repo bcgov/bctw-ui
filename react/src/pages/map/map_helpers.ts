@@ -51,8 +51,11 @@ const parseAnimalColour = (colourString: string): { fillColor: string; color: st
   if (!colourString) {
     return { fillColor: MAP_COLOURS['unassigned point'], color: MAP_COLOURS['unassigned point'] };
   }
+  const n = colourString.lastIndexOf(',');
+  const s1 = colourString.substring(0, n);
+  const s2 = colourString.substring(n + 1);
   const s = colourString.split(',');
-  return { fillColor: s[0], color: s[1] };
+  return { fillColor: s1, color: s2 };
 };
 
 /**
