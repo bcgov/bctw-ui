@@ -195,7 +195,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 CU editor is available if user has permission
               */}
               <FormSection id='cr-species' header='Species' disabled={!canEdit}>
-                {/* <CreateSpeciesFormField obj={editing} formField={wfFields.get('species')} handleChange={onChange} inputProps={{disabled: lockSpecies}}/> */}
                 <SpeciesSelect handleChange={onChange} value={editing.species} useLock={!isCreatingNew} useModal />
               </FormSection>
               <FormSection
