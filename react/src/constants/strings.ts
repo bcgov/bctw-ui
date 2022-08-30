@@ -5,14 +5,17 @@ const CritterStrings = {
   assignCollarBtnText: 'Assign Selected Device',
   assignedTableTitle: 'Animals Attached to a Device',
   collarAssignmentTitle: 'Assign a Device',
-  collarRemovalText: (deviceid: number, make: string): string => `Are you sure you wish to remove ${make} device ${deviceid}?`,
+  collarRemovalText: (deviceid: number, make: string): string =>
+    `Are you sure you wish to remove ${make} device ${deviceid}?`,
   collarRemovalTitle: 'Confirm Device Unassignment',
   exportTitle: 'animal_export',
   unassignedTableTitle: 'Animals Without a Device',
-  addTooltip: 'TODO: addTooltip'
-}
+  addTooltip: 'TODO: addTooltip',
+  lockedSpeciesTooltip: 'Unlock to change species. Warning potential data loss.',
+  unlockedSpeciesTooltip: 'Lock species selection'
+};
 
-const ImportSteps = [ 
+const ImportSteps = [
   'Select the import type',
   'Download the template.',
   'Paste the column headers into an Excel spreadsheet',
@@ -20,9 +23,8 @@ const ImportSteps = [
   'Save the file in CSV format',
   'Click the upload button and select your CSV file',
   'If there were errors during the upload, view them in the error table.',
-  'Fix the errors, re-download the file as a CSV and try the upload again',
+  'Fix the errors, re-download the file as a CSV and try the upload again'
 ];
-
 
 const AnimalDelegationSteps = [
   'Enter a valid email address of the user you wish to give access to',
@@ -31,7 +33,7 @@ const AnimalDelegationSteps = [
   'Choose from a list of animals and permissions from the popup',
   'Click Save',
   'Once complete, click the Submit Permission Request button',
-  'An administrator will be notified of the pending request',
+  'An administrator will be notified of the pending request'
 ];
 
 const FileStrings = {
@@ -39,32 +41,35 @@ const FileStrings = {
   animalTemplateName: 'BCTW_bulk_import_animal_template.csv',
   bothTemplateName: 'BCTW_import_metadata_template.csv',
   pointTemplateName: 'BCTW_import_historical_telemetry_template.csv',
-  templateButtonText: 'Download Template',
-}
+  templateButtonText: 'Download Template'
+};
 
 const WorkflowStrings = {
   location: {
     coordTypeLatLong: 'Use Lat/Long',
-    coordTypeUTM: 'Use UTM',
+    coordTypeUTM: 'Use UTM'
   },
   captivity: {
     captivity: 'Animal is or has been part of a captivity program',
     isCaptive: 'Is the animal in a captivity program?',
-    mort_captivity_status: 'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?',
+    mort_captivity_status:
+      'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?'
   },
   mortality: {
     workflowTitle: 'Mortality Event Workflow',
-    unassignDeviceTooltip: 'If you unassign the device, no new telemetry from this device will be connected to this animal.',
+    unassignDeviceTooltip:
+      'If you unassign the device, no new telemetry from this device will be connected to this animal.',
     exitEarly: 'You have set the animal mortality status to Alive. Do you wish to exit the workflow now?',
     mort_investigation: 'Was a mortality investigation undertaken?',
     mort_wildlife: 'Was the Wildlife Health Group mortality form completed?',
     mort_predator_pcod: 'Is the PCOD predator species known?',
-    mort_predator_ucod: 'Is the UCOD predator species known?',
+    mort_predator_ucod: 'Is the UCOD predator species known?'
   },
   release: {
     workflowTitle: 'Release Event Workflow',
     isNewDevice: 'Are you replacing the original device with a new device?',
-    deviceRemovedNotif: 'The previous device has been unassigned from this animal, you must assign a new device to the animal',
+    deviceRemovedNotif:
+      'The previous device has been unassigned from this animal, you must assign a new device to the animal'
   },
   capture: {
     workflowTitle: 'Capture Event Workflow',
@@ -73,16 +78,17 @@ const WorkflowStrings = {
     isRecapture: 'Is this a recapture?',
     isTransloc: 'Is this animal being translocated?',
     isTranslocCompleted: 'Has the translocated animal been released?',
-    translocNotif: 'If the animal translocation is not complete, please fill out the Release Event separately when it has',
+    translocNotif:
+      'If the animal translocation is not complete, please fill out the Release Event separately when it has',
     associated: 'Is this animal is associated with another marked animal?',
     associatedID: 'What is the associated animal’s WLHID?',
     associatedRel: 'What is the relationship of the individual to the captured individual?',
     beenReleased: 'Has the animal been released?',
     diedDuring: (wf: 'capture' | 'translocation'): string => `Did the animal die during ${wf}?`,
-    btnContinueTo: (wf: 'Mortality' | 'Release'): string => `Continue to ${wf} Workflow`,
+    btnContinueTo: (wf: 'Mortality' | 'Release'): string => `Continue to ${wf} Workflow`
   },
   retrieval: {
-    workflowTitle: 'Retrieval Event Workflow',
+    workflowTitle: 'Retrieval Event Workflow'
   },
   malfunction: {
     workflowTitle: 'Malfunction Event Workflow',
@@ -93,20 +99,29 @@ const WorkflowStrings = {
     wasRetrieved: 'If the device was retrieved, the retrieval workflow form will be opened after',
     statusActive: 'This device is still active',
     statusOffline: 'This device is offline',
-    statusMalfunction: 'This device has had a malfunction',
+    statusMalfunction: 'This device has had a malfunction'
   },
   device: {
     should_unattach: 'Unassign device from animal?',
     vendor_activation: 'Is device still active with vendor?',
     was_retrieved: 'Was the device retrieved?',
-    activation_warning: 'contact the vendor to deactivate device to avoid fees',
+    activation_warning: 'contact the vendor to deactivate device to avoid fees'
   }
-}
+};
 
 const CollarStrings = {
   assignedCollarsTableTitle: 'Attached Devices',
   availableCollarsTableTitle: 'Unattached Devices',
-  editableProps: ['device_id', 'frequency', 'device_make', 'device_model', 'satellite_network', 'device_status', 'device_type', 'device_deployment_status'],
+  editableProps: [
+    'device_id',
+    'frequency',
+    'device_make',
+    'device_model',
+    'satellite_network',
+    'device_status',
+    'device_type',
+    'device_deployment_status'
+  ],
   exportTitle: 'device_export',
   assignmentHistoryByAnimalTitle: 'History of Devices Assigned',
   assignmentHistoryByDeviceTitle: 'History of Animals Assigned',
@@ -115,15 +130,15 @@ const CollarStrings = {
   collarImportDowloadTemplate: 'Download a CSV template for importing device metadata',
   collarImportMetadata: 'Import metadata for existing devices using a .CSV file',
   keyxButtonText: 'Upload .keyx files',
-  csvButtonText: 'Upload CSV file',
-
-}
+  csvButtonText: 'Upload CSV file'
+};
 
 const CodeStrings = {
   addHeaderTitle: 'Add A New Code Header',
   importTitle: 'Bulk Import Codes',
-  importText: 'Use this feature to add multiple codes. Codes cannot be edited here. The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional.',
-}
+  importText:
+    'Use this feature to add multiple codes. Codes cannot be edited here. The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional.'
+};
 
 const MapStrings = {
   startDateLabel: 'Start Date',
@@ -135,7 +150,7 @@ const MapStrings = {
   assignmentStatusOptionU: 'Unassigned Devices',
   assignmentStatusTooltip1: ': shows device telemetry that currently has an animal attached.',
   assignmentStatusTooltip2: ': show device telemetry that does not have an animal attached.',
-  assignmentStatusTooltip3: 'To attach a device, click Manage from the top navigation bar and edit an animal.',  
+  assignmentStatusTooltip3: 'To attach a device, click Manage from the top navigation bar and edit an animal.',
   lastKnownLocationLabel: 'Last Known Location',
   lastKnownLocationTooltip: 'Shows last know point',
   lastFixesLabel: 'Last 10 Fixes',
@@ -143,11 +158,13 @@ const MapStrings = {
   deviceListLabel: 'Device List',
   deviceListTooltip: 'Filter for specific device within date range',
   codeFiltersTooltips: {
+    device_id: 'Filter for specific device within date range',
     species: 'Select species to filter',
     animal_status: 'Animal status filter',
     device_status: 'Device status filter',
     sex: 'Filter critter sex',
     population_unit: 'Filter by population unit',
+    collective_unit: 'Filter by collection unit'
   },
   collectiveUnitLabel: 'Collective Unit',
   collectiveUnitTooltip: 'Filter by collection unit ',
@@ -161,48 +178,57 @@ const MapStrings = {
   drawPolygonLabel: 'Select fixes by drawing a polygon',
   drawRectangleLabel: 'Select fixes by drawing a rectangle',
   export: {
-    allTime: 'Export the entire history for this selection',
+    allTime: 'Export the entire history for this selection'
   },
-  noCrittersFound: 'No telemetry found within this date range. Try adjusting the date range in the filter panel.'
-}
+  noCrittersFound: 'No telemetry found within this date range. Try adjusting the date range in the filter panel.',
+  mapPanels: {
+    subTitle: {
+      Search: '',
+      Filter: '',
+      Symbolize: ''
+    }
+  }
+};
 
 const MapTileLayers = {
   bing: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   govBase: 'https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer/tile/{z}/{y}/{x}',
   esriWorldTopo: 'https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
-}
+};
 
 const FormStrings = {
   emptySelectValue: 'Blank',
   validateNegativeLongitude: 'Longitude must be negative',
   validateNumber: 'Must be a number',
   isRequired: ' ', // can't be an empty string
-  filterColumnsLabel: 'Search Columns',
-}
+  filterColumnsLabel: 'Search Columns'
+};
 
 const UserAlertStrings = {
-  alertText: 'Alerts can either be snoozed by clicking the snooze action in the last column, or actioned upon by clicking the edit icon.',
+  alertText:
+    'Alerts can either be snoozed by clicking the snooze action in the last column, or actioned upon by clicking the edit icon.',
   snoozeConfirmation: (remainingCount: number): string => {
     if (remainingCount === 1) {
-      return `There is only one snooze remaining! Tomorrow you will be forced to update. Are you sure you want to snooze?`
+      return `There is only one snooze remaining! Tomorrow you will be forced to update. Are you sure you want to snooze?`;
     }
     return `There are ${remainingCount} snoozes remaining. Are you sure you want to snooze the alert until tomorrow?`;
   },
-  noMoreSnoozes: 'Maximum number of snoozes performed, you must perform the alert update',
-}
+  noMoreSnoozes: 'Maximum number of snoozes performed, you must perform the alert update'
+};
 
 const DataLifeStrings = {
   editWarning: 'Warning: data life fields can only be modified once'
-}
+};
 
 const OnboardStrings = {
-  confirmGrant: (username: string, permission: eUserRole): string => `Are you sure you want to grant ${username} the ${permission} role?`,
-  denyGrant: (username: string): string =>  `Are you sure you want to deny ${username} access to BCTW?`
-}
+  confirmGrant: (username: string, permission: eUserRole): string =>
+    `Are you sure you want to grant ${username} the ${permission} role?`,
+  denyGrant: (username: string): string => `Are you sure you want to deny ${username} access to BCTW?`
+};
 
 const UserStrings = {
-  deleteWarning: (username: string): string => `Are you sure you want to delete user ${username}?`,
-}
+  deleteWarning: (username: string): string => `Are you sure you want to delete user ${username}?`
+};
 const HomePageStrings = {
   welcome: `Welcome to the BC Telemetry Warehouse (BCTW). The BCTW is an application and database to manage and store the
           Province of British Columbia’s wildlife telemetry observations to support informed management decisions and
@@ -250,5 +276,5 @@ export {
   WorkflowStrings,
   UserAlertStrings,
   UserStrings,
-  HomePageStrings,
-}
+  HomePageStrings
+};

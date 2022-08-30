@@ -9,16 +9,18 @@ import { formatAxiosError } from 'utils/errors';
 import { PartialPick } from 'types/common_types';
 import { SharedSelectProps } from './BasicSelect';
 
-type ISelectProps = SelectProps & PartialPick<SharedSelectProps, 'triggerReset' | 'defaultValue'> & {
-  udfType: eUDFType;
-  changeHandler: (o: IUDF[] | IUDF) => void;
-};
+type ISelectProps = SelectProps &
+  PartialPick<SharedSelectProps, 'triggerReset' | 'defaultValue'> & {
+    udfType: eUDFType;
+    changeHandler: (o: IUDF[] | IUDF) => void;
+    hidden?: boolean;
+  };
 
 /**
  * todo: merge base select component with select codes / basic select components!
  */
 export default function SelectUDF(props: ISelectProps): JSX.Element {
-  const { label, udfType, defaultValue, changeHandler, triggerReset, multiple = true, className} = props;
+  const { label, udfType, defaultValue, changeHandler, triggerReset, multiple = true, className, hidden } = props;
   const api = useTelemetryApi();
   const [values, setValues] = useState<string[] | string>(defaultValue ?? []);
   const [udfs, setUdfs] = useState<IUDF[]>([]);
@@ -52,7 +54,9 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
       changeHandler(udfs.find((u) => u.value === (selected as string)));
     }
   };
-
+  if (hidden) {
+    return null;
+  }
   return (
     <>
       {isError ? (
@@ -68,7 +72,9 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
             label={label}
             value={values}
             onChange={handleChange}
-            renderValue={(selected: string[] | string): string => Array.isArray(selected) ? selected.join(', ') : selected}
+            renderValue={(selected: string[] | string): string =>
+              Array.isArray(selected) ? selected.join(', ') : selected
+            }
             {...propsToPass}>
             {udfs.map((u: IUDF, idx: number) => {
               if (multiple) {
@@ -79,7 +85,11 @@ export default function SelectUDF(props: ISelectProps): JSX.Element {
                   </MenuItem>
                 );
               } else {
-                return <MenuItem key={idx} value={u.value}>{u.value}</MenuItem>
+                return (
+                  <MenuItem key={idx} value={u.value}>
+                    {u.value}
+                  </MenuItem>
+                );
               }
             })}
           </Select>

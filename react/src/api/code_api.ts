@@ -6,6 +6,7 @@ import { API, ApiProps, IBulkUploadResults } from './api_interfaces';
 export interface IGetCodeProps {
   page: number;
   codeHeader: string;
+  species?: string | null;
 }
 
 export const codeApi = (props: ApiProps): API => {
@@ -15,8 +16,10 @@ export const codeApi = (props: ApiProps): API => {
    * fetches codes for a code header 
    */
   const getCodes = async (props: IGetCodeProps): Promise<ICode[]> => {
-    const { page, codeHeader } = props;
-    const url = createUrl({ api: 'get-code', query: `codeHeader=${codeHeader}`, page });
+    const { page, codeHeader, species } = props;
+    const ch = `codeHeader=${codeHeader}`
+    const s = species ? ch + `&species=${species}` : ch;
+    const url = createUrl({ api: 'get-code', query: s, page });
     // console.log(`requesting ${codeHeader} codes`);
     const { data } = await api.get(url);
     return data;

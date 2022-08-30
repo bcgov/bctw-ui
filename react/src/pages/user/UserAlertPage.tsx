@@ -16,10 +16,8 @@ import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
-import { UserContext } from 'contexts/UserContext';
-import { UserCritterAccess } from 'types/animal_access';
-import { eCritterPermission } from 'types/permission';
-import { uuid } from 'types/common_types';
+// import { UserContext } from 'contexts/UserContext';
+// import { eCritterPermission } from 'types/permission';
 
 /**
  * modal component that shows current alerts
@@ -30,8 +28,8 @@ export default function AlertPage(): JSX.Element {
 
   const showNotif = useResponseDispatch();
   const useAlerts = useContext(AlertContext);
-  const useUser = useContext(UserContext);
-  const eCritters = api.useCritterAccess(1, { user: useUser.user, filter: [eCritterPermission.editor] });
+  // const useUser = useContext(UserContext);
+  // const eCritters = api.useCritterAccess(1, { user: useUser.user, filter: [eCritterPermission.editor] });
   const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
 
   const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(null);
@@ -60,7 +58,7 @@ export default function AlertPage(): JSX.Element {
   // setup the mutation to update the alert status
   const { mutateAsync, isLoading } = api.useSaveUserAlert({ onSuccess, onError });
 
-  const isEditor = (alert: MortalityAlert) => alert.permission_type === 'editor';
+  const isEditor = (alert: MortalityAlert): boolean => alert.permission_type === 'editor';
 
   /**
    * when an alert row is selected from the table:
@@ -115,7 +113,7 @@ export default function AlertPage(): JSX.Element {
    * update/expire the alert
    */
   const handleEventSaved = async (): Promise<void> => {
-    console.log('workflow saved, UserAlertPage handleEventSaved called with event', selectedAlert);
+    //console.log('workflow saved, UserAlertPage handleEventSaved called with event', selectedAlert);
     if (!selectedAlert) {
       return;
     }

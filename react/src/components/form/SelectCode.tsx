@@ -1,6 +1,15 @@
 import 'styles/form.scss';
 import { FormControl, Select, InputLabel, MenuItem, Checkbox, SelectChangeEvent } from '@mui/material';
-import { useState, useEffect, ReactNode } from 'react';
+import {
+  useState,
+  useEffect,
+  ReactNode,
+  MutableRefObject,
+  forwardRef,
+  useImperativeHandle,
+  SetStateAction,
+  Dispatch
+} from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICode, ICodeFilter } from 'types/code';
 import { NotificationMessage } from 'components/common';
@@ -13,14 +22,22 @@ import { FormBaseProps } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
-import { swapQuotes } from './create_form_components';
+import { useSpecies } from 'contexts/SpeciesContext';
+import { SPECIES_STR } from 'utils/species';
 
-type SelectCodeProps = FormBaseProps & SelectProps &
-PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
-  codeHeader: string;
-  changeHandlerMultiple?: (o: ICodeFilter[]) => void;
-  addEmptyOption?: boolean;
+/* eslint-disable indent */
+type ChildRefs = {
+  setValue: Dispatch<SetStateAction<string>>;
+  value: string;
 };
+type SelectCodeProps = FormBaseProps &
+  SelectProps &
+  PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
+    codeHeader: string;
+    changeHandlerMultiple?: (o: ICodeFilter[]) => void;
+    addEmptyOption?: boolean;
+    inputRef?: MutableRefObject<ChildRefs>;
+  };
 
 /**
  * a dropdown select component that loads code tables for options
@@ -34,26 +51,35 @@ PartialPick<SharedSelectProps, 'defaultValue' | 'triggerReset'> & {
  * @param propname use this field as the key if the code header isn't the same. ex - ear_tag_colour_id
  */
 
-export default function SelectCode(props: SelectCodeProps): JSX.Element {
+const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<ChildRefs>): JSX.Element => {
   const {
     addEmptyOption,
     codeHeader,
     defaultValue,
     changeHandler,
     changeHandlerMultiple,
-    label,
     multiple,
     triggerReset,
     style,
     required,
     propName,
-    disabled
+    disabled,
+    inputRef
   } = props;
   const api = useTelemetryApi();
+  const species = useSpecies();
+
   const [value, setValue] = useState(defaultValue);
   const [values, setValues] = useState<string[]>([]);
   const [codes, setCodes] = useState<ICode[]>([]);
+  //const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
+  const isSpeciesSelect = codeHeader === SPECIES_STR;
+  useImperativeHandle(ref, () => ({
+    setValue,
+    value
+  }));
+  //useImperativeHandle(ref, () => value)
 
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
@@ -66,9 +92,12 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     'triggerReset',
     'defaultValue'
   ]);
-
-  // load this codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader);
+  // load the codeHeaders codes from db
+  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader, species?.id, {
+    // cacheTime set to zero to prevent weird caching behaviour with species selection
+    cacheTime: ref ? 0 : 5000,
+    enabled: !isSpeciesSelect
+  });
 
   // when data is successfully fetched
   useEffect(() => {
@@ -83,6 +112,10 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
       setCodes(data);
       // if a default value was provided, update it to the actual value
       const found = data.find((d) => d?.description === defaultValue);
+      //Set the species context
+      // if (found && found?.code_header_title.toLowerCase() === SPECIES_STR) {
+      //   updateSpecies(formatCodeToSpecies(found));
+      // }
       // update the error status if found
       if (found?.description && hasError) {
         setHasError(false);
@@ -98,7 +131,7 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
     } else {
       setHasError(true);
     }
-  }, [required]);
+  }, [required, value]);
 
   // when the parent component forces a reset
   useEffect(() => {
@@ -188,41 +221,50 @@ export default function SelectCode(props: SelectCodeProps): JSX.Element {
   };
   return (
     <>
+      {/* <SpeciesModal codeHeader={codeHeader} value={value} codes={codes} setValue={setValue} setCanFetch={setCanFetch} /> */}
       {isError ? (
         <NotificationMessage severity='error' message={formatAxiosError(error)} />
       ) : isLoading || isFetching ? (
         <div>Please wait...</div>
       ) : codes && codes.length ? (
-        <FormControl
-          error={hasError}
-          size='small'
-          style={{...baseInputStyle, ...style}}
-          className={`select-control ${hasError ? 'input-error' : ''}`}>
-          <InputLabel disabled={disabled}>{required ? `${label} *` : label}</InputLabel>
-          <Select
-            MenuProps={selectMenuProps}
-            value={multiple ? values : value}
-            onChange={multiple ? handleChangeMultiple : handleChange}
-            renderValue={(selected: string | string[]): ReactNode => {
-              if (multiple) {
-                // remove empty string values
-                const l = (selected as string[]).filter((a) => a);
-                return l.length > 4 ? `${l.length} selected` : l.join(', ');
-              }
-              return <span>{selected}</span>;
-            }}
-            {...propsToPass}>
-            {codes.map((c: ICode) => (
-              <MenuItem key={c?.id} value={c?.description}>
-                {multiple ? <Checkbox size='small' checked={values.indexOf(c?.description) !== -1} /> : null}
-                {c?.description}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <>
+          <FormControl
+            error={hasError}
+            size='small'
+            style={{ ...baseInputStyle, ...style }}
+            className={`select-control ${hasError ? 'input-error' : ''}`}
+            disabled={disabled}>
+            <InputLabel disabled={disabled}>
+              {required ? `${codes[0].code_header_title} *` : codes[0].code_header_title}
+            </InputLabel>
+            <Select
+              MenuProps={selectMenuProps}
+              value={multiple ? values : value}
+              onChange={multiple ? handleChangeMultiple : handleChange}
+              inputRef={inputRef}
+              renderValue={(selected: string | string[]): ReactNode => {
+                if (multiple) {
+                  // remove empty string values
+                  const l = (selected as string[]).filter((a) => a);
+                  return l.length > 4 ? `${l.length} selected` : l.join(', ');
+                }
+                return <span>{selected}</span>;
+              }}
+              {...propsToPass}>
+              {codes.map((c: ICode) => (
+                <MenuItem key={c?.id} value={c?.description}>
+                  {multiple ? <Checkbox size='small' checked={values.indexOf(c?.description) !== -1} /> : null}
+                  {c?.description}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </>
       ) : (
         <div>unable to load {codeHeader} codes</div>
       )}
     </>
   );
-}
+});
+
+export default SelectCode;

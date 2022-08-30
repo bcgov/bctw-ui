@@ -64,7 +64,7 @@ const appendQueryToUrl = (url, parameter) => {
 };
 
 // TODO: move into separate package?
-// split out the username and  domain ('username@idir' or 'username@bceid') from Keycloak preferred_username
+// split out the username and  domain ('username@idir' or 'username@bceid-business') from Keycloak preferred_username
 const splitCredentials = (sessionObject) => {
   const credentials = sessionObject.preferred_username.split('@');
   if (!credentials.length) {

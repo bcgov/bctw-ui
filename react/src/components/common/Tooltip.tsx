@@ -1,4 +1,4 @@
-import { Theme, Tooltip as MuiTooltip, TooltipProps as MuiTooltipProps } from '@mui/material';
+import { Tooltip as MuiTooltip, TooltipProps as MuiTooltipProps } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import createStyles from '@mui/styles/createStyles';
 import { removeProps } from 'utils/common_helpers';
@@ -8,7 +8,7 @@ const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
   placement: 'right-start'
 };
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     tooltip: {
       backgroundColor: 'transparent',
@@ -33,8 +33,7 @@ export default function Tooltip(props: TooltipProps): JSX.Element {
   const classes = useStyles();
   return (
     <MuiTooltip className={classes.tooltip} {...ttProps} {...removeProps(props, ['inline'])}>
-      <div style={{ display: props.inline ? 'inline' : 'block' }}
-        className={props.nestedClass}>
+      <div style={{ display: props.inline ? 'inline' : 'block' }} className={props.nestedClass}>
         {props.children}
       </div>
     </MuiTooltip>

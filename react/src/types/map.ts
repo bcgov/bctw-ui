@@ -1,4 +1,5 @@
 import { Type, Expose } from 'class-transformer';
+import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
 import { IAnimalTelemetryBase } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
@@ -14,7 +15,7 @@ interface MapRange {
 type OnlySelectedCritters = {
   show: boolean;
   critter_ids: string[];
-}
+};
 
 type PingGroupType = 'critter_id' | 'collar_id';
 type DetailsSortOption = 'wlh_id' | 'device_id' | 'frequency' | 'date_recorded';
@@ -38,17 +39,17 @@ interface ITelemetryPoint extends GeoJsonObject {
 // represents a track
 interface ITelemetryLine extends GeoJsonObject {
   type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'species'>
-  geometry: LineString
+  properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'species'>;
+  geometry: LineString;
 }
 
 interface IUnassignedTelemetryLine extends GeoJsonObject {
   type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'collar_id' | 'device_id'>
-  geometry: LineString
+  properties: Pick<ITelemetryDetail, 'collar_id' | 'device_id'>;
+  geometry: LineString;
 }
 
-// a grouped by critter_id version of @type {ITelemetryPoint} 
+// a grouped by critter_id version of @type {ITelemetryPoint}
 interface ITelemetryGroup {
   collar_id: string;
   critter_id: string;
@@ -59,7 +60,7 @@ interface ITelemetryGroup {
 }
 
 // represents the jsonb object in the get_telemetry pg function
-export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDetail>  {
+export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDetail> {
   critter_id: string;
   species: string;
   wlh_id: string;
@@ -92,8 +93,12 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   }
   map_colour: string;
 
-  toJSON(): TelemetryDetail { return this; }
-  get identifier(): keyof TelemetryDetail{ return 'device_id'}
+  toJSON(): TelemetryDetail {
+    return this;
+  }
+  get identifier(): keyof TelemetryDetail {
+    return 'device_id';
+  }
 
   get displayProps(): (keyof TelemetryDetail)[] {
     return [];
@@ -118,21 +123,38 @@ export class TelemetryFeature implements ITelemetryPoint {
 
 // determines if a single coordinate array can be found in a group of coordinates
 const doesPointArrayContainPoint = (pings: Position[], coord: Position): boolean => {
-  for (let i =0; i< pings.length; i++) {
+  for (let i = 0; i < pings.length; i++) {
     const ping = pings[i];
     if (ping[0] === coord[0] && ping[1] === coord[1]) {
       return true;
     }
   }
   return false;
-}
+};
 
 const padFrequency = (num: number): string => {
   const freq = num.toString();
   const numDecimalPlaces = freq.slice(freq.lastIndexOf('.') + 1).length;
-  const numToAdd = (3 - numDecimalPlaces) + freq.length;
+  const numToAdd = 3 - numDecimalPlaces + freq.length;
   return freq.padEnd(numToAdd, '0');
-}
+};
+
+// type Symbolize = {
+//   item: ISelectMultipleData;
+//   colour: string;
+//   pointCount: number;
+// };
+type MapFormValue = {
+  header: keyof TelemetryDetail;
+  label: string;
+  values: ISelectMultipleData[];
+};
+
+export const DEFAULT_MFV: MapFormValue = {
+  header: 'device_id',
+  label: 'Device ID (Default)',
+  values: []
+};
 
 export type {
   ITelemetryDetail,
@@ -146,8 +168,7 @@ export type {
   ITelemetryPoint,
   ITelemetryGroup,
   PingGroupType,
+  MapFormValue
 };
 
-export {
-  doesPointArrayContainPoint,
-}
+export { doesPointArrayContainPoint };

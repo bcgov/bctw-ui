@@ -7,5 +7,6 @@ import { InboundObj } from 'types/form_types';
  */
 const ChangeContext = createContext((o: InboundObj) => {
   /* do nothing */
+  o;
 });
 export default ChangeContext;

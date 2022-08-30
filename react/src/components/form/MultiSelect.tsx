@@ -10,6 +10,8 @@ export interface ISelectMultipleData {
   default?: boolean;
   displayLabel?: string;
   prop?: string;
+  colour?: string;
+  pointCount?: number;
 }
 
 type ISelectMultipleProps<T extends ISelectMultipleData> = PartialPick<SharedSelectProps, 'triggerReset'> & {
@@ -66,9 +68,11 @@ export default function MultiSelect<T extends ISelectMultipleData>(props: ISelec
         input={<OutlinedInput />}
         multiple={true}
         value={selected}
-        renderValue={props.renderValue ?? ((): string =>
-          selected.length > 3 ? `${selected.length} ${renderTypeLabel ?? ''} selected` : selected.join(', ')
-        )}>
+        renderValue={
+          props.renderValue ??
+          ((): string =>
+            selected.length > 3 ? `${selected.length} ${renderTypeLabel ?? ''} selected` : selected.join(', '))
+        }>
         {[selectAll, ...data].map((d: T, idx: number) => {
           return (
             <MenuItem key={`${idx}-${d.id}`} value={d.value}>
