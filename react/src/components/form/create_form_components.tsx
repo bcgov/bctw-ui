@@ -4,13 +4,17 @@ import SelectCode from './SelectCode';
 import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import CheckBox from 'components/form/Checkbox';
-import { ReactElement, ReactNode } from 'react';
+import { CSSProperties, ReactElement, ReactNode } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap } from 'types/form_types';
 import dayjs, { Dayjs } from 'dayjs';
 import { BCTWFormat } from 'types/common_types';
-import { Tooltip } from 'components/common'
+import { Tooltip } from 'components/common';
 import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
+import { Animal, AttachedAnimal } from 'types/animal';
+import { useSpecies } from 'contexts/SpeciesContext';
+import { WorkflowFormField } from 'types/events/event';
+import { showField } from 'utils/species';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -19,28 +23,21 @@ type CreateInputBaseProps = {
   handleChange: FormChangeEvent;
 };
 
-type CreateInputProps = CreateInputBaseProps 
-& Pick<InputProps, 'rows' | 'multiline' | 'disabled' | 'required' | 'style'> 
-& Pick<DateInputProps, 'minDate' |'maxDate'> 
-& Pick<BaseTextFieldProps, 'label'>
-& Pick<FormControlLabelProps, 'labelPlacement'> & {
-  codeName?: string;
-  errorMessage?: string;
-  span?: boolean;
-  validate?: <T>(input: T) => string;
-  maxwidth?: boolean;
-};
-export const swapQuotes = (s: string) => {
-  if(!s || s.charCodeAt(0) === 96 && s.length === 0){
-    return ''
-  }else{
-    return s;
-  }
-}
+type CreateInputProps = CreateInputBaseProps &
+  Pick<InputProps, 'rows' | 'multiline' | 'disabled' | 'required' | 'style'> &
+  Pick<DateInputProps, 'minDate' | 'maxDate'> &
+  Pick<BaseTextFieldProps, 'label'> &
+  Pick<FormControlLabelProps, 'labelPlacement'> & {
+    codeName?: string;
+    errorMessage?: string;
+    span?: boolean;
+    validate?: <T>(input: T) => string;
+    maxwidth?: boolean;
+  };
 
 // text and number field handler
 function CreateEditTextField(props: CreateInputProps): ReactElement {
-  const { prop, type, value, errorMessage, style, handleChange, validate } = props;
+  const { prop, type, value, errorMessage, handleChange, validate } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
   return type === eInputType.number ? (
@@ -67,7 +64,7 @@ function CreateEditTextField(props: CreateInputProps): ReactElement {
 }
 
 function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
-  const newProps = Object.assign({multiline: true, rows: 1, style: { width: '100%'}}, props);
+  const newProps = Object.assign({ multiline: true, rows: 1, style: { width: '100%' } }, props);
   return CreateEditTextField(newProps);
 }
 
@@ -86,7 +83,16 @@ function CreateEditDateField({ prop, value, handleChange, label, disabled }: Cre
 }
 
 // datetime field handler
-function CreateEditDateTimeField({ prop, value, handleChange, label, disabled, required, minDate, maxDate}: CreateInputProps): ReactElement {
+function CreateEditDateTimeField({
+  prop,
+  value,
+  handleChange,
+  label,
+  disabled,
+  required,
+  minDate,
+  maxDate
+}: CreateInputProps): ReactElement {
   return (
     <DateTimeInput
       propName={prop}
@@ -103,7 +109,14 @@ function CreateEditDateTimeField({ prop, value, handleChange, label, disabled, r
 }
 
 // checkbox field handler
-function CreateEditCheckboxField({ prop, value, handleChange, label, disabled, labelPlacement }: CreateInputProps): ReactElement {
+function CreateEditCheckboxField({
+  prop,
+  value,
+  handleChange,
+  label,
+  disabled,
+  labelPlacement
+}: CreateInputProps): ReactElement {
   return (
     <CheckBox
       changeHandler={handleChange}
@@ -116,7 +129,6 @@ function CreateEditCheckboxField({ prop, value, handleChange, label, disabled, l
     />
   );
 }
-
 
 // select component handler
 function CreateEditSelectField({
@@ -137,7 +149,7 @@ function CreateEditSelectField({
       label={label}
       disabled={disabled}
       codeHeader={codeName ?? String(prop)}
-      defaultValue={typeof value === 'string' ? value : ""}
+      defaultValue={typeof value === 'string' ? value : ''}
       changeHandler={handleChange}
       required={required}
       error={!!errorMessage?.length}
@@ -147,7 +159,7 @@ function CreateEditSelectField({
 }
 
 // returns the funtion to create the form component based on input type
-const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement ) => {
+const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
   switch (inputType) {
     case eInputType.check:
       return CreateEditCheckboxField;
@@ -176,7 +188,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   handleChange: FormChangeEvent,
   inputProps?: Partial<CreateInputProps>,
   displayBlock = false,
-  style = {},
+  style = {}
 ): ReactNode {
   if (formField === undefined) {
     return null;
@@ -203,5 +215,34 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
-
-export { CreateEditTextField, CreateEditDateField, CreateEditCheckboxField, CreateEditSelectField, CreateFormField };
+interface ISpeciesFormField {
+  obj: Animal | AttachedAnimal;
+  formField: WorkflowFormField;
+  handleChange: FormChangeEvent;
+  inputProps?: Partial<CreateInputProps>;
+  displayBlock?: boolean;
+  style?: CSSProperties;
+}
+function CreateSpeciesFormField({
+  obj,
+  formField,
+  handleChange,
+  inputProps,
+  displayBlock = false,
+  style = {}
+}: ISpeciesFormField): JSX.Element {
+  const species = useSpecies();
+  if (!showField(formField, species)) {
+    return null;
+  } else {
+    return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
+  }
+}
+export {
+  CreateEditTextField,
+  CreateEditDateField,
+  CreateEditCheckboxField,
+  CreateEditSelectField,
+  CreateFormField,
+  CreateSpeciesFormField
+};

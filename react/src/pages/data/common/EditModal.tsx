@@ -1,7 +1,7 @@
 import { IUpsertPayload } from 'api/api_interfaces';
-import { EditModalBaseProps, ModalBaseProps } from 'components/component_interfaces';
+import { EditModalBaseProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
@@ -20,7 +20,6 @@ import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { buttonProps } from 'components/component_constants';
 import { Typography } from '@mui/material';
-import { User } from 'types/user';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: ReactNode;
@@ -77,7 +76,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   const [showHistory, setShowHistory] = useState(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
   const [currentTabID, setCurrentTabID] = useState(0);
-  const [openFullScreen, setOpenFullScreen] = useState(false);
+  const [openFullScreen, setOpenFullScreen] = useState(open);
   // state handler for when the history / current properties tab is selected
   const handleSwitchTab = (newValue: number): void => {
     setCurrentTabID(newValue);
@@ -87,7 +86,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   useDidMountEffect(() => {
     const params: Pick<IHistoryPageProps<T>, 'param' | 'propsToDisplay'> = {
       param: editing[editing.identifier],
-      propsToDisplay: editing.displayProps,
+      propsToDisplay: editing.displayProps
     };
     if (editing instanceof Animal) {
       params.propsToDisplay = editing.historyDisplayProps();
@@ -97,10 +96,9 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       setHistoryParams({ query: api.useCollarHistory, ...params });
     }
   }, [editing]);
-  
+
   // when the modal opens, disable save
   useDidMountEffect(() => {
-    console.log(open);
     if (open) {
       setCanSave(!hasErr);
       setOpenFullScreen(true);
@@ -148,13 +146,13 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     }
   };
 
-  const onClose = () => {
+  const onClose = (): void => {
     reset();
     handleClose(false);
-    if(showInFullScreen){
+    if (showInFullScreen) {
       setOpenFullScreen(false);
     }
-  }
+  };
 
   const Children = (
     /**
@@ -222,10 +220,14 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     </ChangeContext.Provider>
   );
 
-  const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
+  // const modalProps: ModalBaseProps = { open, handleClose: onClose, title };
   return showInFullScreen ? (
-    <FullScreenDialog open={openFullScreen} handleClose={onClose} title={title}>{Children}</FullScreenDialog>
+    <FullScreenDialog open={openFullScreen} handleClose={onClose} title={title}>
+      {Children}
+    </FullScreenDialog>
   ) : (
-    <Modal open={open} handleClose={onClose} title={title}>{Children}</Modal>
+    <Modal open={open} handleClose={onClose} title={title}>
+      {Children}
+    </Modal>
   );
 }

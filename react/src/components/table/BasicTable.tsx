@@ -78,7 +78,7 @@ export default function BasicTable<T extends BCTWBase<T>>({
                   }
                   const { value } = formatTableCell(obj, k);
                   return (
-                    <TableCell key={`${k}${i}`} align={'left'}>
+                    <TableCell key={`${String(k)}${i}`} align={'left'}>
                       {value}
                     </TableCell>
                   );

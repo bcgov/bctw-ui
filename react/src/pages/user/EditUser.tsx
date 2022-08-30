@@ -17,7 +17,7 @@ import { columnToHeader, doNothing, headerToColumn } from 'utils/common_helpers'
  */
 export default function EditUser(props: EditorProps<User>): JSX.Element {
   const { editing } = props;
-  const [domain, setDomain] = useState<KeyCloakDomainType>("idir");
+  const [domain, setDomain] = useState<KeyCloakDomainType>('idir');
   //const [roleType, setRoleType] = useState<eUserRole>(editing.role_type);
   useDidMountEffect(() => {
     editing.domain = domain;
@@ -36,31 +36,45 @@ export default function EditUser(props: EditorProps<User>): JSX.Element {
           return (
             <div className='container'>
               <Box mt={2} mb={2} display={'flex'} alignItems={'center'}>
-                {CreateFormField(editing, { prop: 'username', type: eInputType.text, ...isRequired }, handlerFromContext)}
+                {CreateFormField(
+                  editing,
+                  { prop: 'username', type: eInputType.text, ...isRequired },
+                  handlerFromContext
+                )}
                 <BasicSelect
                   handleChange={(v: string): void => setDomain(v as KeyCloakDomainType)}
                   defaultValue={domain}
                   values={['idir', 'bceid']}
                   label={'Domain Type'}
-                  sx={{flex:1}}
+                  sx={{ flex: 1 }}
                 />
-                
               </Box>
               <Box mt={2} mb={2} display={'flex'}>
                 <BasicSelect
-                  handleChange={(e) => editing.role_type = headerToColumn(e) as eUserRole}
+                  handleChange={(e) => (editing.role_type = headerToColumn(e) as eUserRole)}
                   defaultValue={editing?.id ? columnToHeader(editing.role_type) : columnToHeader(eUserRole.user)}
-                  values={Object.keys(eUserRole).map(p => columnToHeader(p))}
+                  values={Object.keys(eUserRole).map((p) => columnToHeader(p))}
                   label={'Permission Type'}
-                  sx={{flex:1}}
+                  sx={{ flex: 1 }}
                 />
               </Box>
               <Box mt={2} mb={2} display={'flex'}>
-                {CreateFormField(editing, { prop: 'firstname', type: eInputType.text, ...isRequired }, handlerFromContext)}
-                {CreateFormField(editing, { prop: 'lastname', type: eInputType.text, ...isRequired }, handlerFromContext, {}, false, {flex: 1, marginRight: 0})}
+                {CreateFormField(
+                  editing,
+                  { prop: 'firstname', type: eInputType.text, ...isRequired },
+                  handlerFromContext
+                )}
+                {CreateFormField(
+                  editing,
+                  { prop: 'lastname', type: eInputType.text, ...isRequired },
+                  handlerFromContext,
+                  {},
+                  false,
+                  { flex: 1, marginRight: 0 }
+                )}
               </Box>
               <Box mt={2} mb={2}>
-                {CreateFormField(editing, { prop: 'email', type: eInputType.text, ...isRequired }, handlerFromContext )}
+                {CreateFormField(editing, { prop: 'email', type: eInputType.text, ...isRequired }, handlerFromContext)}
                 <PhoneInput
                   defaultValue={editing.phone}
                   propName='phone'

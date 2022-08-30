@@ -63,13 +63,15 @@ type FormSectionProps = {
   header: string,
   btn?: ReactNode,
   disabled?: boolean;
+  hide?: boolean;
   children: ReactNode;
 }
 /** creates a section of a form with a grid layout
  * @param children must not contain non valid elements (ex. fragments or nulls)
  * top level children must have key props
  */
-const FormSection = ({ id, header, btn, disabled, children }: FormSectionProps): JSX.Element => { 
+const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionProps): JSX.Element => { 
+  if (hide) return null;
   return (
     <Box component='fieldset' p={2}>
       {header ? (
@@ -82,7 +84,7 @@ const FormSection = ({ id, header, btn, disabled, children }: FormSectionProps):
             {Children.map(children, (child: ReactElement, idx: number) => {
               const isDisabled = child?.props?.disabled ?? disabled;
               // fixme: adding colgap via child component margin-botom instead
-              return cloneElement(child, {key:`${id}-${idx}`, disabled: isDisabled, style: {...child.props.style, marginBottom: '5px'}});
+              return cloneElement(child, {key:`${id}-${idx}`, disabled: isDisabled, style: {...child.props.style, marginBottom: '10px'}});
             })}
           </Grid>
         </Grid>

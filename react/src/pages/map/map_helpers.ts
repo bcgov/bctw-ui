@@ -1,3 +1,4 @@
+import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { FormStrings } from 'constants/strings';
 import dayjs from 'dayjs';
 import { ICodeFilter, IGroupedCodeFilter } from 'types/code';
@@ -9,8 +10,11 @@ import {
   ITelemetryLine,
   doesPointArrayContainPoint,
   PingGroupType,
-  TelemetryDetail
+  TelemetryDetail,
+  MapFormValue
 } from 'types/map';
+import { columnToHeader } from 'utils/common_helpers';
+import { CODE_FILTERS } from './map_constants';
 
 const MAP_COLOURS = {
   point: '#00ff44',
@@ -33,6 +37,11 @@ const MAP_COLOURS_OUTLINE = {
 };
 
 /**
+ * @param index: The order of the colour]
+ * @returns formatted string of a unique pastel colour
+ */
+export const getEvenlySpacedColour = (index: number): string => `hsl(${(index + 1) * 137.508},50%,70%)`;
+/**
  * @param colourString the @type {Animal} animal_colour string
  * which in the @file {map_api.ts} -> @function {getPings} is returned
  * in a concatted format of `${fill_collour},${border_colour}`
@@ -42,8 +51,11 @@ const parseAnimalColour = (colourString: string): { fillColor: string; color: st
   if (!colourString) {
     return { fillColor: MAP_COLOURS['unassigned point'], color: MAP_COLOURS['unassigned point'] };
   }
+  const n = colourString.lastIndexOf(',');
+  const s1 = colourString.substring(0, n);
+  const s2 = colourString.substring(n + 1);
   const s = colourString.split(',');
-  return { fillColor: s[0], color: s[1] };
+  return { fillColor: s1, color: s2 };
 };
 
 /**
@@ -58,7 +70,7 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
   }
   const { properties } = point;
   if (properties?.animal_status === 'Mortality') {
-    const { date_recorded, mortality_date} = properties;
+    const { date_recorded, mortality_date } = properties;
     // if the mortality date is not set, fill all points red
     // otherwise only fill points red after the mortality date
     if (!mortality_date || dayjs(date_recorded) > dayjs(mortality_date)) {
@@ -75,8 +87,8 @@ const getOutlineColor = (feature: ITelemetryPoint): string => {
   if (feature.id < 0) {
     return MAP_COLOURS_OUTLINE['unassigned point'];
   }
-  const colour = feature?.properties?.map_colour;
-  return colour ? parseAnimalColour(colour)?.color : MAP_COLOURS.outline;
+  const c = feature?.properties?.map_colour;
+  return c ? parseAnimalColour(c)?.color : MAP_COLOURS.outline;
 };
 
 /**
@@ -103,7 +115,7 @@ const fillPoint = (layer: any, selected = false): void => {
 const groupPings = (
   pings: ITelemetryPoint[],
   sortOption?: DetailsSortOption,
-  groupBy: PingGroupType = 'critter_id',
+  groupBy: PingGroupType = 'critter_id'
 ): ITelemetryGroup[] => {
   const uniques: ITelemetryGroup[] = [];
   if (!pings.length) {
@@ -216,12 +228,20 @@ const getUniqueCritterIDsFromSelectedPings = (features: ITelemetryPoint[], selec
   return grped.map((g) => g.critter_id);
 };
 
-const getUniquePropFromPings = (features: ITelemetryPoint[], prop: keyof TelemetryDetail = 'device_id'): number[] | string[] => {
+const getUniquePropFromPings = (
+  features: ITelemetryPoint[],
+  prop: keyof TelemetryDetail = 'device_id',
+  includeNulls?: boolean
+): number[] | string[] => {
   const ids = [];
   features?.forEach((f) => {
     const val = f.properties[prop];
-    if (val !== null && !ids.includes(val)) {
-      ids.push(val);
+    if (!ids.includes(val)) {
+      if (includeNulls) {
+        ids.push(val);
+      } else if (val !== null) {
+        ids.push(val);
+      }
     }
   });
   return ids.sort((a, b) => a - b);
@@ -248,7 +268,10 @@ const getEarliestPing = (features: ITelemetryPoint[]): ITelemetryPoint => {
 // groups the param features by critter, returning an object containing:
 // an array of the most recent pings
 // an arrya of all other pings
-const splitPings = (pings: ITelemetryPoint[], splitBy: PingGroupType = 'critter_id'): { latest: ITelemetryPoint[]; other: ITelemetryPoint[] } => {
+const splitPings = (
+  pings: ITelemetryPoint[],
+  splitBy: PingGroupType = 'critter_id'
+): { latest: ITelemetryPoint[]; other: ITelemetryPoint[] } => {
   const gp = groupPings(pings, null, splitBy);
   const latest = getLatestPingsFromTelemetryGroup(gp);
   const latestIds = latest.map((l) => l.id);
@@ -314,10 +337,7 @@ const getLast10Points = (group: ITelemetryGroup[]): ITelemetryPoint[] => {
  * is the same as @property {ITelemetryPoint.geometry.coordinates},
  * the only difference is how Leaflet displays them!
  */
-const getLast10Tracks = (
-  groupedPings: ITelemetryGroup[],
-  originalTracks: ITelemetryLine[]
-): ITelemetryLine[] => {
+const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelemetryLine[]): ITelemetryLine[] => {
   const newTracks: ITelemetryLine[] = [];
   groupedPings.forEach((e) => {
     const critterPingCoordinates = e.features.map((p) => p.geometry.coordinates);
@@ -336,6 +356,51 @@ const getLast10Tracks = (
     newTracks.push(newTrack);
   });
   return newTracks;
+};
+
+//Creates a sorted unique list of items from an unique prop.
+const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoint[]): ISelectMultipleData[] => {
+  const IS_DEFAULT = propName === 'device_id';
+  const devices = getUniquePropFromPings(pings ?? [], propName, true) as number[];
+  const merged = [...devices].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
+  let undefinedCount = 0;
+  const formated = merged.map((d, i) => {
+    let displayLabel = 'Undefined';
+    if (d) {
+      displayLabel = d.toString();
+    } else {
+      undefinedCount++;
+    }
+    let colour: string;
+    const pointCount = pings.filter((p) => {
+      if (IS_DEFAULT && p.properties[propName] === d) {
+        p.properties.map_colour
+          ? (colour = parseAnimalColour(p.properties.map_colour).fillColor)
+          : (colour = MAP_COLOURS['unassigned point']);
+      }
+      return p.properties[propName] === d;
+    }).length;
+    return {
+      id: d,
+      value: d ?? displayLabel,
+      displayLabel,
+      prop: propName,
+      colour: colour ? colour : getEvenlySpacedColour(i),
+      pointCount
+    };
+  });
+  //Return empty array if all elements are null/undefined.
+  const results = undefinedCount === merged.length ? [] : formated;
+  return results;
+};
+
+//Formats a MapFormValues array.
+const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] => {
+  return CODE_FILTERS.map((cf) => ({
+    header: cf.header,
+    label: columnToHeader(cf?.label ?? cf.header),
+    values: createUniqueList(cf.header, pings)
+  }));
 };
 
 export {
@@ -359,4 +424,6 @@ export {
   parseAnimalColour,
   sortGroupedTelemetry,
   splitPings,
+  createUniqueList,
+  getFormValues
 };

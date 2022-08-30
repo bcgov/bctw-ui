@@ -36,7 +36,9 @@ export const AlertStateContextProvider: React.FC = (props) => {
   // until the user is loaded, don't bother fetching alerts
   useEffect(() => {
     // console.log('should fetch alerts', !!useUser?.user);
-    setShouldFetchAlerts(!!useUser?.user);
+    //Uncomment this line to enable user alerts again
+    //Issue in get_user_telemetry_alerts query returning more than one result...
+    //setShouldFetchAlerts(!!useUser?.user);
   }, [useUser]);
 
   /**
@@ -63,7 +65,7 @@ export const AlertStateContextProvider: React.FC = (props) => {
     const numSnoozed = data.filter((a) => a.isSnoozed).length;
     const numEditors = data.filter((a) => a.isEditor).length;
     const snoozedStr = numSnoozed ? `Snoozed (${numSnoozed})` : '';
-    const actionAlerts = (data.length - numSnoozed - numEditors);
+    const actionAlerts = data.length - numSnoozed - numEditors;
 
     return `Alerts that require action (${actionAlerts < 0 ? 0 : actionAlerts}) ${snoozedStr}`;
   };

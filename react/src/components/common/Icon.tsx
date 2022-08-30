@@ -28,7 +28,12 @@ import {
   mdiChartTimelineVariant,
   mdiMapMarker,
   mdiPageLast,
-  mdiDatabase
+  mdiDatabase,
+  mdiLock,
+  mdiLockOpenCheck,
+  mdiMagnify,
+  mdiFilterOutline,
+  mdiBrush
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -38,7 +43,9 @@ type IconProps = {
 };
 
 const getIconPath = (path: string): string => {
+  path = path.toLowerCase();
   switch (path) {
+    //Use lowercase for cases.
     case 'admin':
       return mdiAccountSupervisor;
     case 'animals':
@@ -81,10 +88,10 @@ const getIconPath = (path: string): string => {
       return mdiKey;
     case 'location':
       return mdiMapMarker;
-    case 'person':
+    //case 'person':
     case 'profile':
       return mdiAccount;
-    case 'personAdd':
+    case 'personadd':
       return mdiAccountPlus;
     case 'plus':
       return mdiPlus;
@@ -102,6 +109,16 @@ const getIconPath = (path: string): string => {
       return mdiAlert;
     case 'database':
       return mdiDatabase;
+    case 'lock':
+      return mdiLock;
+    case 'unlocked':
+      return mdiLockOpenCheck;
+    case 'search':
+      return mdiMagnify;
+    case 'filter':
+      return mdiFilterOutline;
+    case 'symbolize':
+      return mdiBrush;
   }
 };
 
