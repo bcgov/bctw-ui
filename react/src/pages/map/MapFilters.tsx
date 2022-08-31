@@ -65,17 +65,19 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const { pings } = props;
   const { search, filter, symbolize } = TabNames;
   const classes = drawerStyles();
-  const containerRef = useRef(null);
+
   // controls filter panel visibility
   const [open, setOpen] = useState(true);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
-  const [numFiltersSelected, setNumFiltersSelected] = useState(0);
+
   // state for start and end ranges (date pickers)
   const [start, setStart] = useState(props.start);
   const [end, setEnd] = useState(props.end);
   const [wasDatesChanged, setWasDatesChanged] = useState(false);
+
   // reset filter button status
   const [reset, setReset] = useState(false);
+
   // controls apply button disabled status
   const [applyButtonStatus, setApplyButtonStatus] = useState(true);
   const [isLatestPing, setIsLatestPing] = useState(false);
@@ -111,10 +113,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
   }, [pings]);
 
-  // keep track of how many filters are currently set
-  useEffect(() => {
-    setNumFiltersSelected(filters.length);
-  }, [filters]);
+  // // keep track of how many filters are currently set
+  // useEffect(() => {
+  //   setNumFiltersSelected(filters.length);
+  // }, [filters]);
 
   // handler for when a date is changed
   useEffect(() => {
@@ -169,6 +171,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
     setSymbolizeBy(DEFAULT_MFV.header);
     setSymbolizeLast(true);
+    // if (!reset) {
+    //   setReset(true);
+    // }
   };
 
   const handleApplySymbolize = (): void => {
@@ -482,7 +487,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Button
                 color='primary'
                 variant='outlined'
-                disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : !numFiltersSelected}
+                disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : !filters?.length}
                 onClick={isTab(symbolize) ? (): void => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
                 Reset
               </Button>
