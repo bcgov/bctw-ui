@@ -18,7 +18,13 @@ import {
   TableContainer,
   TableBody,
   Table,
-  Paper
+  Paper,
+  List,
+  ListItemText,
+  ListItemButton,
+  ListSubheader,
+  ListItem,
+  ButtonGroup
 } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -39,6 +45,8 @@ import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { ITelemetryPoint } from 'types/map';
 import { getFormValues } from './map_helpers';
+import { SEARCH_PRESETS } from './map_constants';
+import { getStartDate, StartDateKey } from 'utils/time';
 enum TabNames {
   search = 'Search',
   filter = 'Filter',
@@ -222,6 +230,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     setTab(newValue);
   };
 
+  const handlePresets = (key: StartDateKey): void => {
+    setStart(getStartDate(end, key));
+    // handleApplyFilters(null);
+  };
+
   const createSearch = (): ReactNode => {
     return (
       <>
@@ -239,6 +252,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     maxDate={dayjs(end)}
                   />
                 </Tooltip>
+                <ListSubheader sx={{ pl: 0 }}>Month Presets</ListSubheader>
+                <ButtonGroup orientation='vertical'>
+                  {SEARCH_PRESETS.months.map((sp) => (
+                    <Button size='medium' key={sp.key} onClick={() => handlePresets(sp.key)}>
+                      {sp.label}
+                    </Button>
+                  ))}
+                </ButtonGroup>
               </Grid>
               <Grid item sm={6}>
                 <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
@@ -251,6 +272,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     minDate={dayjs(start)}
                   />
                 </Tooltip>
+                <ListSubheader sx={{ pl: 0 }}>Week Presets</ListSubheader>
+                <ButtonGroup orientation='vertical'>
+                  {SEARCH_PRESETS.weeks.map((sp) => (
+                    <Button size='medium' key={sp.key} onClick={() => handlePresets(sp.key)}>
+                      {sp.label}
+                    </Button>
+                  ))}
+                </ButtonGroup>
               </Grid>
             </Grid>
           </Box>
@@ -294,7 +323,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Grid item sm={itemSpacing} key={`${fv.header}-${idx}`}>
                 <Tooltip title={<p>{MapStrings.codeFiltersTooltips[fv.header]}</p>}>
                   <AutoComplete
-                    label={fv.label}
+                    label={fv.header === DEFAULT_MFV.header ? 'Device ID' : fv.label}
                     data={fv.values}
                     changeHandler={handleChangeAutocomplete}
                     triggerReset={reset}
