@@ -113,11 +113,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
   }, [pings]);
 
-  // // keep track of how many filters are currently set
-  // useEffect(() => {
-  //   setNumFiltersSelected(filters.length);
-  // }, [filters]);
-
   // handler for when a date is changed
   useEffect(() => {
     const onChangeDate = (): void => {
@@ -171,9 +166,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
     setSymbolizeBy(DEFAULT_MFV.header);
     setSymbolizeLast(true);
-    // if (!reset) {
-    //   setReset(true);
-    // }
   };
 
   const handleApplySymbolize = (): void => {
@@ -184,7 +176,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     1) uses a timeout to temporarily set reset status to true,
       the select components are listening for these changes, which 
       trigger them to unselect all menu items
-    2) also resets the apply button enabled state
+    2) also resets the apply button enabled state  
   */
   const resetFilters = (): void => {
     setApplyButtonStatus(true);
@@ -487,7 +479,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Button
                 color='primary'
                 variant='outlined'
-                disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : !filters?.length}
+                disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : applyButtonStatus}
                 onClick={isTab(symbolize) ? (): void => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
                 Reset
               </Button>
