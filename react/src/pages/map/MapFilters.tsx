@@ -47,6 +47,8 @@ import { ITelemetryPoint } from 'types/map';
 import { getFormValues } from './map_helpers';
 import { MapWeekMonthPresets, SEARCH_PRESETS } from './map_constants';
 import { getStartDate, StartDateKey } from 'utils/time';
+import makeStyles from '@mui/styles/makeStyles';
+
 enum TabNames {
   search = 'Search',
   filter = 'Filter',
@@ -68,12 +70,21 @@ type MapFiltersProps = {
   onShowLastFixes: (b: boolean) => void;
   // onShowUnassignedDevices: (o: ISelectMultipleData[]) => void;
 };
-
+const useMapStyles = makeStyles((theme) => ({
+  presetBtn: {
+    backgroundColor: theme.palette.info.main,
+    minWidth: '8rem'
+  },
+  btn: {
+    minWidth: '8rem',
+    marginRight: '0.5rem'
+  }
+}));
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const { pings } = props;
   const { search, filter, symbolize } = TabNames;
   const classes = drawerStyles();
-
+  const mapStyles = useMapStyles();
   // controls filter panel visibility
   const [open, setOpen] = useState(true);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
@@ -260,7 +271,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   {SEARCH_PRESETS.months.map((sp) => (
                     <ListItem sx={{ pl: 0, pt: 0 }}>
                       <Button
-                        sx={{ minWidth: '8rem' }}
+                        className={mapStyles.presetBtn}
                         variant='contained'
                         size='medium'
                         key={sp.key}
@@ -287,8 +298,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   {SEARCH_PRESETS.weeks.map((sp) => (
                     <ListItem sx={{ pl: 0, pt: 0 }}>
                       <Button
-                        sx={{ minWidth: '8rem' }}
+                        className={mapStyles.presetBtn}
                         variant='contained'
+                        color='primary'
                         size='medium'
                         key={sp.key}
                         onClick={() => handlePresets(sp.key)}>
@@ -513,10 +525,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           {createSearch()}
           {createFilters()}
           {createSymbolize()}
-          <Box className={'form-buttons'} display='flex' justifyContent='flex-start' py={2}>
+          <Box display='flex' justifyContent='flex-start' py={2}>
             <Button
               color='primary'
               variant='contained'
+              className={mapStyles.btn}
               disabled={!isTab(symbolize) && applyButtonStatus}
               onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
               {tab}
@@ -525,6 +538,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Button
                 color='primary'
                 variant='outlined'
+                className={mapStyles.btn}
                 disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : applyButtonStatus}
                 onClick={isTab(symbolize) ? (): void => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
                 Reset

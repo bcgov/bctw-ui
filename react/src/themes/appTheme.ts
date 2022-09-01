@@ -14,6 +14,9 @@ const appTheme = createTheme(
         main: '#e3a82b', // BC ID: corporate gold
         dark: '#ad7900',
         contrastText: '#000000'
+      },
+      info: {
+        main: '#1A5A96'
       }
     },
 
