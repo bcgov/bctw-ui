@@ -2,7 +2,7 @@ import { MapStrings } from 'constants/strings';
 import { TelemetryDetail } from 'types/map';
 import { StartDateKey } from 'utils/time';
 
-type MapWeekMonthPresets = {
+export type MapWeekMonthPresets = {
   label: string;
   key: StartDateKey;
 };

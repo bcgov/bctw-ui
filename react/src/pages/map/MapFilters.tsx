@@ -45,7 +45,7 @@ import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { ITelemetryPoint } from 'types/map';
 import { getFormValues } from './map_helpers';
-import { SEARCH_PRESETS } from './map_constants';
+import { MapWeekMonthPresets, SEARCH_PRESETS } from './map_constants';
 import { getStartDate, StartDateKey } from 'utils/time';
 enum TabNames {
   search = 'Search',
@@ -236,6 +236,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const createSearch = (): ReactNode => {
+    const SearchPresetButtons = (presets: MapWeekMonthPresets[]): JSX.Element => {
+      return <></>;
+    };
     return (
       <>
         {isTab(search) && (
@@ -252,14 +255,21 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     maxDate={dayjs(end)}
                   />
                 </Tooltip>
-                <ListSubheader sx={{ pl: 0 }}>Month Presets</ListSubheader>
-                <ButtonGroup orientation='vertical'>
+                <ListSubheader sx={{ pl: 0, pt: 0, pb: 0 }}>Month Presets</ListSubheader>
+                <List sx={{ pt: 0 }}>
                   {SEARCH_PRESETS.months.map((sp) => (
-                    <Button size='medium' key={sp.key} onClick={() => handlePresets(sp.key)}>
-                      {sp.label}
-                    </Button>
+                    <ListItem sx={{ pl: 0, pt: 0 }}>
+                      <Button
+                        sx={{ minWidth: '8rem' }}
+                        variant='contained'
+                        size='medium'
+                        key={sp.key}
+                        onClick={() => handlePresets(sp.key)}>
+                        {sp.label}
+                      </Button>
+                    </ListItem>
                   ))}
-                </ButtonGroup>
+                </List>
               </Grid>
               <Grid item sm={6}>
                 <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
@@ -272,14 +282,21 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     minDate={dayjs(start)}
                   />
                 </Tooltip>
-                <ListSubheader sx={{ pl: 0 }}>Week Presets</ListSubheader>
-                <ButtonGroup orientation='vertical'>
+                <ListSubheader sx={{ pl: 0, pt: 0, pb: 0 }}>Week Presets</ListSubheader>
+                <List sx={{ pt: 0 }}>
                   {SEARCH_PRESETS.weeks.map((sp) => (
-                    <Button size='medium' key={sp.key} onClick={() => handlePresets(sp.key)}>
-                      {sp.label}
-                    </Button>
+                    <ListItem sx={{ pl: 0, pt: 0 }}>
+                      <Button
+                        sx={{ minWidth: '8rem' }}
+                        variant='contained'
+                        size='medium'
+                        key={sp.key}
+                        onClick={() => handlePresets(sp.key)}>
+                        {sp.label}
+                      </Button>
+                    </ListItem>
                   ))}
-                </ButtonGroup>
+                </List>
               </Grid>
             </Grid>
           </Box>
