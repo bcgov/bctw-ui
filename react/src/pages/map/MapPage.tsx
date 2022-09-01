@@ -116,7 +116,12 @@ export default function MapPage(): JSX.Element {
 
   // fetch the map data
   const { start, end } = range;
-  const { isFetching: fetchingPings, isError: isErrorPings, data: fetchedPings } = api.usePings(start, end);
+  const {
+    isFetching: fetchingPings,
+    isLoading: isLoadingPings,
+    isError: isErrorPings,
+    data: fetchedPings
+  } = api.usePings(start, end);
   // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
 
@@ -543,7 +548,7 @@ export default function MapPage(): JSX.Element {
           // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
         />
         <div className={'map-container'}>
-          {fetchingPings || fetchingTracks ? <CircularProgress className='progress' color='secondary' /> : null}
+          {isLoadingPings ? <CircularProgress className='progress' color='secondary' /> : null}
 
           <div id='popup' style={{ bottom: bottomPanelHeight }} />
 

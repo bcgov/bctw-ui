@@ -18,7 +18,13 @@ import {
   TableContainer,
   TableBody,
   Table,
-  Paper
+  Paper,
+  List,
+  ListItemText,
+  ListItemButton,
+  ListSubheader,
+  ListItem,
+  ButtonGroup
 } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -39,6 +45,8 @@ import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { ITelemetryPoint } from 'types/map';
 import { getFormValues } from './map_helpers';
+import { MapWeekMonthPresets, SEARCH_PRESETS } from './map_constants';
+import { getStartDate, StartDateKey } from 'utils/time';
 enum TabNames {
   search = 'Search',
   filter = 'Filter',
@@ -65,17 +73,19 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const { pings } = props;
   const { search, filter, symbolize } = TabNames;
   const classes = drawerStyles();
-  const containerRef = useRef(null);
+
   // controls filter panel visibility
   const [open, setOpen] = useState(true);
   const [filters, setFilters] = useState<ICodeFilter[]>([]);
-  const [numFiltersSelected, setNumFiltersSelected] = useState(0);
+
   // state for start and end ranges (date pickers)
   const [start, setStart] = useState(props.start);
   const [end, setEnd] = useState(props.end);
   const [wasDatesChanged, setWasDatesChanged] = useState(false);
+
   // reset filter button status
   const [reset, setReset] = useState(false);
+
   // controls apply button disabled status
   const [applyButtonStatus, setApplyButtonStatus] = useState(true);
   const [isLatestPing, setIsLatestPing] = useState(false);
@@ -110,11 +120,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       setFormValues(getFormValues(pings));
     }
   }, [pings]);
-
-  // keep track of how many filters are currently set
-  useEffect(() => {
-    setNumFiltersSelected(filters.length);
-  }, [filters]);
 
   // handler for when a date is changed
   useEffect(() => {
@@ -179,7 +184,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     1) uses a timeout to temporarily set reset status to true,
       the select components are listening for these changes, which 
       trigger them to unselect all menu items
-    2) also resets the apply button enabled state
+    2) also resets the apply button enabled state  
   */
   const resetFilters = (): void => {
     setApplyButtonStatus(true);
@@ -225,7 +230,15 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     setTab(newValue);
   };
 
+  const handlePresets = (key: StartDateKey): void => {
+    setStart(getStartDate(end, key));
+    // handleApplyFilters(null);
+  };
+
   const createSearch = (): ReactNode => {
+    const SearchPresetButtons = (presets: MapWeekMonthPresets[]): JSX.Element => {
+      return <></>;
+    };
     return (
       <>
         {isTab(search) && (
@@ -242,6 +255,21 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     maxDate={dayjs(end)}
                   />
                 </Tooltip>
+                <ListSubheader sx={{ pl: 0, pt: 0, pb: 0 }}>Month Presets</ListSubheader>
+                <List sx={{ pt: 0 }}>
+                  {SEARCH_PRESETS.months.map((sp) => (
+                    <ListItem sx={{ pl: 0, pt: 0 }}>
+                      <Button
+                        sx={{ minWidth: '8rem' }}
+                        variant='contained'
+                        size='medium'
+                        key={sp.key}
+                        onClick={() => handlePresets(sp.key)}>
+                        {sp.label}
+                      </Button>
+                    </ListItem>
+                  ))}
+                </List>
               </Grid>
               <Grid item sm={6}>
                 <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
@@ -254,6 +282,21 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                     minDate={dayjs(start)}
                   />
                 </Tooltip>
+                <ListSubheader sx={{ pl: 0, pt: 0, pb: 0 }}>Week Presets</ListSubheader>
+                <List sx={{ pt: 0 }}>
+                  {SEARCH_PRESETS.weeks.map((sp) => (
+                    <ListItem sx={{ pl: 0, pt: 0 }}>
+                      <Button
+                        sx={{ minWidth: '8rem' }}
+                        variant='contained'
+                        size='medium'
+                        key={sp.key}
+                        onClick={() => handlePresets(sp.key)}>
+                        {sp.label}
+                      </Button>
+                    </ListItem>
+                  ))}
+                </List>
               </Grid>
             </Grid>
           </Box>
@@ -297,7 +340,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Grid item sm={itemSpacing} key={`${fv.header}-${idx}`}>
                 <Tooltip title={<p>{MapStrings.codeFiltersTooltips[fv.header]}</p>}>
                   <AutoComplete
-                    label={fv.label}
+                    label={fv.header === DEFAULT_MFV.header ? 'Device ID' : fv.label}
                     data={fv.values}
                     changeHandler={handleChangeAutocomplete}
                     triggerReset={reset}
@@ -482,7 +525,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Button
                 color='primary'
                 variant='outlined'
-                disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : !numFiltersSelected}
+                disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : applyButtonStatus}
                 onClick={isTab(symbolize) ? (): void => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
                 Reset
               </Button>

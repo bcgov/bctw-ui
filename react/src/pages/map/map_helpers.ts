@@ -11,7 +11,8 @@ import {
   doesPointArrayContainPoint,
   PingGroupType,
   TelemetryDetail,
-  MapFormValue
+  MapFormValue,
+  DEFAULT_MFV
 } from 'types/map';
 import { columnToHeader } from 'utils/common_helpers';
 import { CODE_FILTERS } from './map_constants';
@@ -360,9 +361,10 @@ const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelem
 
 //Creates a sorted unique list of items from an unique prop.
 const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoint[]): ISelectMultipleData[] => {
-  const IS_DEFAULT = propName === 'device_id';
-  const devices = getUniquePropFromPings(pings ?? [], propName, true) as number[];
-  const merged = [...devices].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
+  const IS_DEFAULT = propName === DEFAULT_MFV.header;
+  const IS_POPUNIT = propName === 'population_unit';
+  const unique = getUniquePropFromPings(pings ?? [], propName, true) as number[];
+  const merged = [...unique].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
   let undefinedCount = 0;
   const formated = merged.map((d, i) => {
     let displayLabel = 'Undefined';
@@ -372,18 +374,22 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
       undefinedCount++;
     }
     let colour: string;
+    let species: string;
     const pointCount = pings.filter((p) => {
       if (IS_DEFAULT && p.properties[propName] === d) {
         p.properties.map_colour
           ? (colour = parseAnimalColour(p.properties.map_colour).fillColor)
           : (colour = MAP_COLOURS['unassigned point']);
       }
+      if (IS_POPUNIT && p.properties[propName] === displayLabel) {
+        species = p.properties.species;
+      }
       return p.properties[propName] === d;
     }).length;
     return {
       id: d,
       value: d ?? displayLabel,
-      displayLabel,
+      displayLabel: IS_POPUNIT ? `${species}: ${displayLabel}` : displayLabel,
       prop: propName,
       colour: colour ? colour : getEvenlySpacedColour(i),
       pointCount
