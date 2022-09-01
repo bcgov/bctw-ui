@@ -14,7 +14,7 @@ import {
   MapFormValue,
   DEFAULT_MFV
 } from 'types/map';
-import { columnToHeader } from 'utils/common_helpers';
+import { capitalize, columnToHeader } from 'utils/common_helpers';
 import { CODE_FILTERS } from './map_constants';
 
 const MAP_COLOURS = {
@@ -361,20 +361,21 @@ const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelem
 
 //Creates a sorted unique list of items from an unique prop.
 const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoint[]): ISelectMultipleData[] => {
+  const PLACEHOLDER = 'Undefined';
   const IS_DEFAULT = propName === DEFAULT_MFV.header;
   const IS_POPUNIT = propName === 'population_unit';
   const unique = getUniquePropFromPings(pings ?? [], propName, true) as number[];
   const merged = [...unique].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
   let undefinedCount = 0;
   const formated = merged.map((d, i) => {
-    let displayLabel = 'Undefined';
+    let displayLabel = PLACEHOLDER;
+    let species = PLACEHOLDER;
+    let colour: string;
     if (d) {
       displayLabel = d.toString();
     } else {
       undefinedCount++;
     }
-    let colour: string;
-    let species: string;
     const pointCount = pings.filter((p) => {
       if (IS_DEFAULT && p.properties[propName] === d) {
         p.properties.map_colour
@@ -389,7 +390,7 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
     return {
       id: d,
       value: d ?? displayLabel,
-      displayLabel: IS_POPUNIT ? `${species}: ${displayLabel}` : displayLabel,
+      displayLabel: IS_POPUNIT ? `${capitalize(species)}: ${displayLabel}` : displayLabel,
       prop: propName,
       colour: colour ? colour : getEvenlySpacedColour(i),
       pointCount

@@ -112,6 +112,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // controls symbolize value
   const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_MFV.header);
   const [symbolizeLast, setSymbolizeLast] = useState(true);
+  const [legend, setLegend] = useState(symbolizeBy);
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
 
@@ -189,6 +190,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   const handleApplySymbolize = (): void => {
     const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
+    setLegend(symbolizeBy);
     props.onApplySymbolize(symbolize, symbolizeLast);
   };
   /**
@@ -247,9 +249,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const createSearch = (): ReactNode => {
-    const SearchPresetButtons = (presets: MapWeekMonthPresets[]): JSX.Element => {
-      return <></>;
-    };
     return (
       <>
         {isTab(search) && (
@@ -421,7 +420,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               <Grid container spacing={2}>
                 <Grid item sm={6}>
                   <FormControl>
-                    <FormLabel>Categorize points by colour</FormLabel>
+                    <FormLabel disabled>Categorize points by colour</FormLabel>
                     <RadioGroup value={symbolizeBy} onChange={handleSymbolizeBy} row>
                       {formValues.map((fv, idx) => (
                         <FormControlLabel
@@ -443,7 +442,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     );
   };
   const createSymbolizeLegend = (): ReactNode => {
-    const symbolizeData = formValues.find((el) => el.header == symbolizeBy).values;
+    const symbolizeData = formValues.find((el) => el.header == legend).values;
     return (
       <>
         {isTab(symbolize) && (
@@ -454,7 +453,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 <TableHead>
                   <TableRow>
                     <TableCell>Colour</TableCell>
-                    <TableCell>{columnToHeader(symbolizeBy)}</TableCell>
+                    <TableCell>{columnToHeader(legend)}</TableCell>
                     <TableCell>Point Count</TableCell>
                   </TableRow>
                 </TableHead>
@@ -487,7 +486,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       </>
     );
   };
-
+  const disableQueryBtn = (reset?: boolean): boolean => {
+    if (isTab(search)) return applyButtonStatus;
+    if (isTab(filter)) return reset ? applyButtonStatus : !filters.length;
+    if (isTab(symbolize)) return symbolizeBy === DEFAULT_MFV.header;
+  };
   return (
     <Box
       className={clsx(classes.drawer, {
@@ -530,7 +533,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               color='primary'
               variant='contained'
               className={mapStyles.btn}
-              disabled={!isTab(symbolize) && applyButtonStatus}
+              disabled={disableQueryBtn()}
               onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
               {tab}
             </Button>
@@ -539,7 +542,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 color='primary'
                 variant='outlined'
                 className={mapStyles.btn}
-                disabled={isTab(symbolize) ? symbolizeBy === DEFAULT_MFV.header : applyButtonStatus}
+                disabled={disableQueryBtn(true)}
                 onClick={isTab(symbolize) ? (): void => setSymbolizeBy(DEFAULT_MFV.header) : resetFilters}>
                 Reset
               </Button>
