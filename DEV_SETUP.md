@@ -17,7 +17,7 @@
 1. Using a text editor (e.g. Notepad) create a new `.env.local` file in the **_bctw-ui/react_** directory with the following line:
 
 ```
-  REACT_APP_IDIR=<your_idir>
+  REACT_APP_IDENTIFIER=<your_idir>
   REACT_APP_DOMAIN=idir
 ```
 
