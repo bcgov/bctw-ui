@@ -24,7 +24,8 @@ import {
   ListItemButton,
   ListSubheader,
   ListItem,
-  ButtonGroup
+  ButtonGroup,
+  Slider
 } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -64,7 +65,7 @@ type MapFiltersProps = {
   pings: ITelemetryPoint[];
   onCollapsePanel: () => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
-  onApplySymbolize: (s: MapFormValue, includeLatest: boolean) => void;
+  onApplySymbolize: (s: MapFormValue, includeLatest: boolean, opacity: number) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;
@@ -113,6 +114,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_MFV.header);
   const [symbolizeLast, setSymbolizeLast] = useState(true);
   const [legend, setLegend] = useState(symbolizeBy);
+  const [opacity, setOpacity] = useState(0.8);
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
 
@@ -191,7 +193,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const handleApplySymbolize = (): void => {
     const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
     setLegend(symbolizeBy);
-    props.onApplySymbolize(symbolize, symbolizeLast);
+    props.onApplySymbolize(symbolize, symbolizeLast, opacity);
   };
   /**
     1) uses a timeout to temporarily set reset status to true,
@@ -400,6 +402,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     const handleSymbolizeBy = (e: React.ChangeEvent<HTMLInputElement>): void => {
       setSymbolizeBy((e.target as HTMLInputElement).value as keyof TelemetryDetail);
     };
+    const handleChange = (event: Event, op: number) => {
+      setOpacity(op);
+      const symbolize = formValues.find((fv) => fv.header === legend);
+      props.onApplySymbolize(symbolize, symbolizeLast, opacity);
+    };
     const boxContainerSpacing = isTab(symbolize) ? 2 : 0;
     return (
       <>
@@ -416,6 +423,20 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 />
               </Tooltip>
             </Box>
+            <Typography id='input-slider' gutterBottom>
+              Opacity
+            </Typography>
+            <Slider
+              size='small'
+              value={opacity}
+              aria-label='Small'
+              valueLabelDisplay='auto'
+              onChange={handleChange}
+              min={0}
+              max={1}
+              step={0.1}
+              marks
+            />
             <Box mb={2} mt={2}>
               <Grid container spacing={2}>
                 <Grid item sm={6}>
