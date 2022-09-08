@@ -19,8 +19,10 @@
 .container {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   // align-items: center;
   padding: 5px 20px;
+
 }
 
 .editMsgs {
