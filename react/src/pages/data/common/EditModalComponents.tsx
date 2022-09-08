@@ -36,7 +36,7 @@ type EditHeaderProps<T> = {
  */
 const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>): JSX.Element => {
   return (
-    <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
+    <Box display='flex' justifyContent='space-between' alignItems='top' pt={3} mx={3}>
       <Box>
         <Box component='h1' mt={0} mb={1}>
           {title}
