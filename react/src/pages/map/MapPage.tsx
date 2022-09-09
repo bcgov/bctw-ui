@@ -220,7 +220,7 @@ export default function MapPage(): JSX.Element {
     // set the feature id state so bottom panel will highlight the row
     setSelectedPingIDs([feature.id]);
   };
-  //console.log(prevColour);
+
   /**
    * when the native leaflet popup (always hidden) is 'closed'
    */
