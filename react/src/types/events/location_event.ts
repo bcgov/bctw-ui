@@ -31,7 +31,7 @@ export class LocationEvent implements ILocationEvent {
     private location_type: WorkflowType,
     public date: Dayjs = dayjs(),
     public disable_date = false,
-    public coordinate_type = eLocationPositionType.utm,
+    public coordinate_type = eLocationPositionType.utm
   ) {}
 
   utm_keys: (keyof this)[] = ['utm_easting', 'utm_northing', 'utm_zone'];
@@ -40,7 +40,7 @@ export class LocationEvent implements ILocationEvent {
 
   /**
    * returns the location event as a new object.
-   * depending on the coordinate type used, removes the keys not in use 
+   * depending on the coordinate type used, removes the keys not in use
    */
   toJSON(): Record<string, unknown> {
     const o = {};
@@ -54,7 +54,7 @@ export class LocationEvent implements ILocationEvent {
       } else if (this.coordinate_type === 'coord' && this.utm_keys.includes(k)) {
         continue;
       }
-      const key = `${this.location_type}_${k}`;
+      const key = `${this.location_type}_${String(k)}`;
       o[key] = this[k];
     }
     return o;
