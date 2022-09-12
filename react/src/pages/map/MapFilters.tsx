@@ -423,25 +423,13 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 />
               </Tooltip>
             </Box>
-            <Typography id='input-slider' gutterBottom>
-              Opacity
-            </Typography>
-            <Slider
-              size='small'
-              value={opacity}
-              aria-label='Small'
-              valueLabelDisplay='auto'
-              onChange={handleChange}
-              min={0}
-              max={1}
-              step={0.1}
-              marks
-            />
             <Box mb={2} mt={2}>
               <Grid container spacing={2}>
                 <Grid item sm={6}>
                   <FormControl>
-                    <FormLabel disabled>Categorize points by colour</FormLabel>
+                    <Typography id='input-slider' gutterBottom>
+                      Categorize points by colour
+                    </Typography>
                     <RadioGroup value={symbolizeBy} onChange={handleSymbolizeBy} row>
                       {formValues.map((fv, idx) => (
                         <FormControlLabel
@@ -456,6 +444,20 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   </FormControl>
                 </Grid>
               </Grid>
+              <Typography id='input-slider' sx={{ pt: 2 }}>
+                Opacity
+              </Typography>
+              <Slider
+                size='small'
+                value={opacity}
+                aria-label='Small'
+                valueLabelDisplay='off'
+                onChange={handleChange}
+                min={0}
+                max={1}
+                step={0.1}
+                marks
+              />
             </Box>
           </>
         )}

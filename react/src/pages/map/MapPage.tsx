@@ -54,6 +54,7 @@ import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import { eUDFType } from 'types/udf';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
+import { useShowMap } from 'contexts/MapDisplayContext';
 
 /**
   there are several forms of state in this page:
@@ -72,6 +73,7 @@ import { SpeciesProvider } from 'contexts/SpeciesContext';
  */
 export default function MapPage(): JSX.Element {
   const api = useTelemetryApi();
+  const showMap = useShowMap();
   const mapRef = useRef<L.Map>(null);
 
   // pings layer state
