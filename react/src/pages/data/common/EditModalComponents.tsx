@@ -36,14 +36,14 @@ type EditHeaderProps<T> = {
  */
 const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>): JSX.Element => {
   return (
-    <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
+    <Box display='flex' justifyContent='space-between' alignItems='top' pt={3} mx={3}>
       <Box>
         <Box component='h1' mt={0} mb={1}>
           {title}
         </Box>
         <dl className='headergroup-dl'>
           {headers.map((p, idx: number) => {
-            const { value } = formatTableCell<T>(obj, p)
+            const { value } = formatTableCell<T>(obj, p);
             return (
               <Box key={`header-${idx}`} display='inline' mr={2}>
                 <dd>{format(p)}:</dd>
@@ -59,23 +59,26 @@ const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>
 };
 
 type FormSectionProps = {
-  id: Key,
-  header: string,
-  btn?: ReactNode,
+  id: Key;
+  header: string;
+  btn?: ReactNode;
   disabled?: boolean;
   hide?: boolean;
   children: ReactNode;
-}
+};
 /** creates a section of a form with a grid layout
  * @param children must not contain non valid elements (ex. fragments or nulls)
  * top level children must have key props
  */
-const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionProps): JSX.Element => { 
+const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionProps): JSX.Element => {
   if (hide) return null;
   return (
     <Box component='fieldset' p={2}>
       {header ? (
-        <Box component='legend' className={'legend'} mb={1} mt={1}>{header}{btn}</Box>
+        <Box component='legend' className={'legend'} mb={1} mt={1}>
+          {header}
+          {btn}
+        </Box>
       ) : null}
       <Box className='fieldset-form'>
         {/* fixme: why doesn't colGap/columnspacing work? */}
@@ -84,13 +87,17 @@ const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionP
             {Children.map(children, (child: ReactElement, idx: number) => {
               const isDisabled = child?.props?.disabled ?? disabled;
               // fixme: adding colgap via child component margin-botom instead
-              return cloneElement(child, {key:`${id}-${idx}`, disabled: isDisabled, style: {...child.props.style, marginBottom: '10px'}});
+              return cloneElement(child, {
+                key: `${id}-${idx}`,
+                disabled: isDisabled,
+                style: { ...child.props.style, marginBottom: '10px' }
+              });
             })}
           </Grid>
         </Grid>
       </Box>
     </Box>
-  )
+  );
 };
 
 const a11yProps = (index: number): Record<string, string> => {
@@ -100,6 +107,11 @@ const a11yProps = (index: number): Record<string, string> => {
   };
 };
 
-const editEventBtnProps: ButtonProps = { style: { marginLeft: '20px' }, color: 'inherit', className: 'button', size: 'small' };
+const editEventBtnProps: ButtonProps = {
+  style: { marginLeft: '20px' },
+  color: 'inherit',
+  className: 'button',
+  size: 'small'
+};
 
 export { EditHeader, EditTabPanel, a11yProps, editEventBtnProps, FormSection };

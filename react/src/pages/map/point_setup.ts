@@ -8,9 +8,10 @@ import {
 } from 'pages/map/map_helpers';
 import { DEFAULT_MFV, ITelemetryPoint, MapFormValue } from 'types/map';
 
-export type Colour = {
+export type PointStyle = {
   fillColor: string;
   color: string;
+  opacity: number;
 };
 
 const defaultPointStyle: L.CircleMarkerOptions = {
@@ -38,13 +39,21 @@ const animalColoredPointStyle = (ping: ITelemetryPoint): L.CircleMarkerOptions =
   };
 };
 
-const getColors = (event: L.LeafletEvent): Colour => {
+const getStyle = (event: L.LeafletEvent): PointStyle => {
   const obj = event.sourceTarget.options;
-  const { color, fillColor } = obj?.color ? obj : parseAnimalColour(obj.icon.options.attribution);
-  return { color, fillColor };
+  if (obj?.color) {
+    const { color, fillColor, opacity } = obj;
+    return { color, fillColor, opacity };
+  } else {
+    const [color, fillColor, opacity] = obj.icon.options.attribution.split(' ');
+    return { color, fillColor, opacity };
+  }
+  // const { color, fillColor, opacity } = obj?.color ? obj : obj.icon.options.attribution.split(' ');
+  // console.log(color, fillColor, opacity);
+  // return { color, fillColor, opacity };
 };
 
-const createLatestPingIcon = (fillColor: string, color = '#000'): L.DivIcon => {
+const createLatestPingIcon = (fillColor: string, color = '#000', opacity = defaultPointStyle.opacity): L.DivIcon => {
   return L.divIcon({
     html: `
     <div
@@ -68,6 +77,8 @@ const createLatestPingIcon = (fillColor: string, color = '#000'): L.DivIcon => {
       
       stroke="${color}" 
       fill="${fillColor}" 
+      fill-opacity="${opacity}"
+      opacity="${opacity}"
       stroke-miterlimit="10" 
       stroke-width="1.5"/>
 
@@ -75,7 +86,7 @@ const createLatestPingIcon = (fillColor: string, color = '#000'): L.DivIcon => {
     </div>
     `,
     className: 'latest-ping',
-    attribution: `${fillColor},${color}`
+    attribution: `${color} ${fillColor} ${opacity}`
   });
 };
 
@@ -95,8 +106,8 @@ const setupLatestPingOptions = (
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
         closeHandler(e);
-        const { color, fillColor } = e.target.prevColours;
-        e.target.setIcon(createLatestPingIcon(fillColor, color));
+        const { color, fillColor, opacity } = e.target.prevStyle;
+        e.target.setIcon(createLatestPingIcon(fillColor, color, opacity));
       });
       marker.on('click', (e) => {
         clickHandler(e);
@@ -121,7 +132,7 @@ const setupPingOptions = (
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
         closeHandler(e);
-        e.target.setStyle(e.target.prevColours);
+        e.target.setStyle({ ...e.target.prevStyle, fillOpacity: e.target.prevStyle.opacity });
       });
       marker.on('click', (e) => {
         clickHandler(e);
@@ -131,6 +142,7 @@ const setupPingOptions = (
     }
   };
 };
+
 const highlightLatestPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
   layer.eachLayer((p: any) => {
     const feature = p.feature;
@@ -166,21 +178,23 @@ const getSymbolizeColours = (mfv: MapFormValue, feature: ITelemetryPoint): { fil
   return { fillColor, color };
 };
 
-const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue, includeLatest: boolean): void => {
+const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue, includeLatest: boolean, opacity: number): void => {
   layer.eachLayer((p: any) => {
     const { color, fillColor } = getSymbolizeColours(mfv, p.feature);
     if (typeof p.setStyle === 'function' && color && fillColor) {
       p.setStyle({
         weight: 1.0,
         color,
-        fillColor
+        fillColor,
+        opacity,
+        fillOpacity: opacity
       });
     }
     if (typeof p.setIcon === 'function') {
       const { fillColor, color } = getSymbolizeColours(mfv, p.feature);
       includeLatest
-        ? p.setIcon(createLatestPingIcon(fillColor, color))
-        : p.setIcon(createLatestPingIcon(getFillColorByStatus(p.feature), getOutlineColor(p.feature)));
+        ? p.setIcon(createLatestPingIcon(fillColor, color, opacity))
+        : p.setIcon(createLatestPingIcon(getFillColorByStatus(p.feature), getOutlineColor(p.feature), opacity));
     }
   });
 };
@@ -223,6 +237,6 @@ export {
   setupTracksOptions,
   setupPingOptions,
   symbolizePings,
-  getColors,
+  getStyle,
   selectedPointStyle
 };
