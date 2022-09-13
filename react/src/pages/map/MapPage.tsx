@@ -38,9 +38,8 @@ import { BCTWType } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import {
-  Colour,
   defaultPointStyle,
-  getColors,
+  getStyle,
   highlightLatestPings,
   highlightPings,
   selectedPointStyle,
@@ -55,7 +54,6 @@ import { MapStrings } from 'constants/strings';
 import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import { eUDFType } from 'types/udf';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
-
 /**
   there are several forms of state in this page:
     a) the fetched pings/tracks state from the API 
@@ -109,7 +107,6 @@ export default function MapPage(): JSX.Element {
   const [onlyLastKnown, setOnlyLastKnown] = useState(false);
   const [onlyLast10, setOnlyLast10] = useState(false);
 
-  const [prevColour, setPrevColour] = useState<Colour>();
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
   const drawnLines = [];
@@ -218,11 +215,11 @@ export default function MapPage(): JSX.Element {
     const layer = event.target;
     const feature: ITelemetryPoint = layer?.feature;
     setPopupInnerHTML(feature);
-    event.target.prevColours = getColors(event);
+    event.target.prevStyle = getStyle(event);
     // set the feature id state so bottom panel will highlight the row
     setSelectedPingIDs([feature.id]);
   };
-  //console.log(prevColour);
+
   /**
    * when the native leaflet popup (always hidden) is 'closed'
    */
@@ -320,9 +317,9 @@ export default function MapPage(): JSX.Element {
     tracksLayer.addData(newTracks as any);
   };
 
-  const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue, includeLatest: boolean): void => {
-    symbolizePings(pingsLayer, mfv, includeLatest);
-    symbolizePings(latestPingsLayer, mfv, includeLatest);
+  const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue, includeLatest: boolean, opacity: number): void => {
+    symbolizePings(pingsLayer, mfv, includeLatest, opacity);
+    symbolizePings(latestPingsLayer, mfv, includeLatest, opacity);
   };
 
   // triggered when side-panel filters are applied
