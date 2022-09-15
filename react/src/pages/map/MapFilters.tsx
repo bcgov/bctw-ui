@@ -545,7 +545,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           </Box>
         </Box>
         <Divider />
-        <Box p={3} pt={0} style={open ? {} : { marginRight: '2rem' }}>
+        <Box p={3} pt={0} sx={!open ? { display: 'none' } : {}}>
           <h2>{tab}</h2>
           <Typography variant='subtitle2'>{MapStrings.mapPanels.subTitle[tab]}</Typography>
           {createSearch()}
