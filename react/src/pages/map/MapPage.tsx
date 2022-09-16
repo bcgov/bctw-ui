@@ -121,7 +121,7 @@ export default function MapPage(): JSX.Element {
   } = api.usePings(start, end);
   // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
-
+  
   // refetch pings when start/end times are changed
   useEffect(() => {
     // wipe the attribute panel state on refresh

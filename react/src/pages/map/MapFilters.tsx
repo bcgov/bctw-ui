@@ -49,6 +49,7 @@ import { getFormValues } from './map_helpers';
 import { MapWeekMonthPresets, SEARCH_PRESETS } from './map_constants';
 import { getStartDate, StartDateKey } from 'utils/time';
 import makeStyles from '@mui/styles/makeStyles';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 enum TabNames {
   search = 'Search',
@@ -82,6 +83,7 @@ const useMapStyles = makeStyles((theme) => ({
   }
 }));
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
+  const api = useTelemetryApi();
   const { pings } = props;
   const { search, filter, symbolize } = TabNames;
   const classes = drawerStyles();
@@ -127,6 +129,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     justifyContent: 'center'
   };
 
+  const { isFetching: fetchingEstimate, isError: isErrorEstimate, data: fetchedEstimate, isSuccess: estimateSuccess } = api.useEstimate(start, end);
+
   // Update the formfield values when pings are loaded.
   // Use memo to minimize computing result.
   useMemo(() => {
@@ -138,13 +142,22 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // handler for when a date is changed
   useEffect(() => {
     const onChangeDate = (): void => {
+      console.log(fetchedEstimate);
+      console.log(fetchedEstimate === undefined);
       if (end !== props.end || start !== props.start) {
         setApplyButtonStatus(false);
         setWasDatesChanged(true);
       }
+
+      if(fetchedEstimate === undefined || fetchedEstimate.is_pings_cap) {
+        setApplyButtonStatus(true);
+      }
+      else {
+        setApplyButtonStatus(false);
+      }
     };
     onChangeDate();
-  }, [start, end]);
+  }, [start, end, estimateSuccess, isErrorEstimate]);
 
   // call parent handler when latest ping changes
   useDidMountEffect(() => {
@@ -167,7 +180,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
    * @param code_header the code header
    */
   const changeFilter = (filters: ICodeFilter[], code_header: string): void => {
-    setApplyButtonStatus(false);
+    setApplyButtonStatus(fetchedEstimate === undefined || fetchedEstimate.is_pings_cap);
     setFilters((o) => {
       const notThisFilter = o.filter((prev) => prev.code_header !== code_header);
       const ret = [...notThisFilter, ...filters];
@@ -202,7 +215,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     2) also resets the apply button enabled state  
   */
   const resetFilters = (): void => {
-    setApplyButtonStatus(true);
+    setApplyButtonStatus(fetchedEstimate === undefined || fetchedEstimate.is_pings_cap);
     setReset(true);
     setTimeout(() => setReset(false), 1000);
 
@@ -572,6 +585,13 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             )}
           </Box>
           <Divider />
+          { (fetchedEstimate?.is_pings_cap) && (
+          <Box display='flex' justifyContent='flex-start' py={2} whiteSpace="normal">
+            <Typography paragraph variant='caption' style={{color: "red"}}>
+              {"Searching over this date range will load an excessive amount of data.\n Please refine your search and try again."}
+            </Typography>
+          </Box>
+         )}
           {createSymbolizeLegend()}
         </Box>
       </Box>
