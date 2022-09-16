@@ -585,7 +585,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             )}
           </Box>
           <Divider />
-          { (fetchedEstimate?.is_pings_cap) && (
+          { (fetchedEstimate?.is_pings_cap && isTab(search)) && (
           <Box display='flex' justifyContent='flex-start' py={2} whiteSpace="normal">
             <Typography paragraph variant='caption' style={{color: "red"}}>
               {"Searching over this date range will load an excessive amount of data.\n Please refine your search and try again."}
