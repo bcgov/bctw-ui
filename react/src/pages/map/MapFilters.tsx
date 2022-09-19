@@ -26,7 +26,8 @@ import {
   ListItem,
   ButtonGroup,
   Slider,
-  CircularProgress
+  CircularProgress,
+  ThemeProvider
 } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -67,6 +68,7 @@ type MapFiltersProps = {
   // pingsToDisplay: boolean;
   pings: ITelemetryPoint[];
   onCollapsePanel: () => void;
+  onApplySearch: (r: MapRange, filters: ICodeFilter[]) => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
   onApplySymbolize: (s: MapFormValue, includeLatest: boolean, opacity: number) => void;
   onClickEditUdf: () => void;
@@ -83,6 +85,15 @@ const useMapStyles = makeStyles((theme) => ({
   btn: {
     minWidth: '8rem',
     marginRight: '0.5rem'
+  },
+  MuiCircularProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    height: '20px !important',
+    width: '20px !important',
+    marginLeft: '-17px',
+    marginTop: '-10px'
   }
 }));
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
@@ -196,7 +207,12 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
    * @param reset force calling the parent handler with empty array
    */
   const handleApplyFilters = (event: React.MouseEvent<HTMLInputElement>, reset = false): void => {
-    props.onApplyFilters({ start, end }, reset ? [] : filters);
+    if(isTab(filter)) {
+      props.onApplyFilters({ start, end }, reset ? [] : filters);
+    }
+    else {
+      props.onApplySearch({ start, end }, reset ? [] : filters);
+    }
     // if dates were changed, it will draw all the new points, so
     // set the status of the show latest pings checkbox to false
     if (wasDatesChanged) {
@@ -568,17 +584,20 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           {createFilters()}
           {createSymbolize()}
           <Box display='flex' justifyContent='flex-start' py={2}>
-            <LoadingButton
-              color='primary'
-              variant='contained'
-              loading={props.isFetching}
-              loadingPosition="center"
-              className={mapStyles.btn}
-              loadingIndicator = {"Searching..."}
-              disabled={disableQueryBtn()}
-              onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
-              {tab}
-            </LoadingButton>
+            
+              <LoadingButton
+                color='primary'
+                variant='contained'
+                loading={props.isFetching}
+                loadingPosition="end"
+                className={mapStyles.btn}
+                loadingIndicator = {<CircularProgress className={mapStyles.MuiCircularProgress}  color="inherit" size={16} />}
+                disabled={disableQueryBtn()}
+                endIcon={<Icon icon='search'/>}
+                onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
+                {isTab(search) && props.isFetching ? "Searching..." : tab}
+              </LoadingButton>
+            
             {symbolizeOrFilterPanel && (
               <Button
                 color='primary'
@@ -593,7 +612,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           <Divider />
           { (fetchedEstimate?.is_pings_cap && isTab(search)) && (
           <Box display='flex' justifyContent='flex-start' py={2} whiteSpace="normal">
-            <Typography paragraph variant='caption' style={{color: "red"}}>
+            <Typography color="orangered">
               {"Searching over this date range will load an excessive amount of data.\n Please refine your search and try again."}
             </Typography>
           </Box>
