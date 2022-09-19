@@ -542,6 +542,7 @@ export default function MapPage(): JSX.Element {
           onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
           onShowLatestPings={handleShowLastKnownLocation}
           onShowLastFixes={handleShowLast10Fixes}
+          isFetching={isLoadingPings}
           // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
         />
         <div className={'map-container'}>

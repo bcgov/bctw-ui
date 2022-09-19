@@ -25,7 +25,8 @@ import {
   ListSubheader,
   ListItem,
   ButtonGroup,
-  Slider
+  Slider,
+  CircularProgress
 } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -50,6 +51,7 @@ import { MapWeekMonthPresets, SEARCH_PRESETS } from './map_constants';
 import { getStartDate, StartDateKey } from 'utils/time';
 import makeStyles from '@mui/styles/makeStyles';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { LoadingButton } from '@mui/lab';
 
 enum TabNames {
   search = 'Search',
@@ -70,6 +72,7 @@ type MapFiltersProps = {
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;
+  isFetching: boolean;
   // onShowUnassignedDevices: (o: ISelectMultipleData[]) => void;
 };
 const useMapStyles = makeStyles((theme) => ({
@@ -565,14 +568,17 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           {createFilters()}
           {createSymbolize()}
           <Box display='flex' justifyContent='flex-start' py={2}>
-            <Button
+            <LoadingButton
               color='primary'
               variant='contained'
+              loading={props.isFetching}
+              loadingPosition="center"
               className={mapStyles.btn}
+              loadingIndicator = {"Searching..."}
               disabled={disableQueryBtn()}
               onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
               {tab}
-            </Button>
+            </LoadingButton>
             {symbolizeOrFilterPanel && (
               <Button
                 color='primary'
