@@ -104,7 +104,7 @@ export const permissionApi = (props: ApiProps): API => {
    * an endpoint that an admin uses to grant or deny an manager's permission request
    * currently now edit functionality exists
   */
-  const takeActionOnPermissionRequest = async (body: IExecutePermissionRequest): Promise<IUserCritterAccess> => {
+  const takeActionOnPermissionRequest = async (body: IExecutePermissionRequest[]): Promise<IUserCritterAccess> => {
     const url = createUrl({api: `execute-permission-request`});
     const { data } = await api.post(url, body);
     return data;

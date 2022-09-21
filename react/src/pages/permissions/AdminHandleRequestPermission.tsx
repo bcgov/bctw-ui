@@ -1,4 +1,4 @@
-import { CircularProgress, IconButton, MenuItem, Select, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, IconButton, MenuItem, Select, Typography } from '@mui/material';
 import { List } from 'components/common';
 import { Icon, NotificationMessage } from 'components/common';
 import TextField from 'components/form/TextInput';
@@ -15,6 +15,7 @@ import {
   IExecutePermissionRequest,
   IGroupedRequest,
   permissionDeniedReasons,
+  PermissionRequest,
   PermissionWasDeniedReason
 } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
@@ -22,6 +23,9 @@ import { AxiosError } from 'axios';
 import { formatDay } from 'utils/time';
 import { isDev } from 'api/api_helpers';
 import { eUserRole } from 'types/user';
+import DataTable from 'components/table/DataTable';
+import { ITableQueryProps } from 'components/table/table_interfaces';
+import makeStyles from '@mui/styles/makeStyles';
 
 /**
  * page that an admin uses to grant or deny permission requests from managers
@@ -36,6 +40,14 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const [isGrant, setIsGrant] = useState(false);
   const [denyReason, setDenyReason] = useState<PermissionWasDeniedReason>('Not given');
   const [selectedRequestID, setSelectedRequestID] = useState<number>();
+  const [selectedMultiRequestIDs, setSelectedMultiRequestIDs] = useState<number[]>([]);
+
+  const useStyles = makeStyles((theme) => ({
+    btn: {
+      backgroundColor: theme.palette.info.main,
+      minWidth: '8rem'
+    }}));
+  const style = useStyles();
 
   useEffect(() => {
     if (data) {
@@ -53,7 +65,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   }, [status]);
 
   const onSuccess = (): void => {
-    setRequests((o) => o.filter((req) => req.id !== selectedRequestID));
+    setRequests((o) => o.filter((req) => selectedMultiRequestIDs.indexOf(req.id) === -1));
     showNotif({ severity: 'success', message: 'permission request handled successfully' });
   };
 
@@ -66,14 +78,15 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   // submit when grant/deny is confirmed in the modal
   const handleGrantOrDenyPermission = async (): Promise<void> => {
-    if (!selectedRequestID) {
+    if (!selectedRequestID && selectedMultiRequestIDs.length < 1) {
       return;
     }
-    const body: IExecutePermissionRequest = {
+    const body: IExecutePermissionRequest[] = selectedMultiRequestIDs.map(id => ({request_id: id, is_grant: isGrant, was_denied_reason: denyReason}) );
+      /*{
       request_id: selectedRequestID,
       is_grant: isGrant,
       was_denied_reason: denyReason
-    };
+    };*/
     // console.log('handle grant or deny permission', JSON.stringify(body, null, 2));
     setShowConfirmModal(false);
     await mutateAsync(body);
@@ -86,9 +99,36 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     setShowConfirmModal((o) => !o);
   };
 
+  const handleShowConfirmMultiple = (isGrant: boolean): void => {
+    setIsGrant(isGrant);
+    setShowConfirmModal((o) => !o);
+  }
+
+  //useEffect(()=>console.log(selectedMultiRequestIDs), [selectedMultiRequestIDs]);
+  const handleSelectRow = (rows: IGroupedRequest[]): void => {
+    if(rows.length) {
+      setSelectedMultiRequestIDs(rows.map(u => u.id));
+    }
+    else {
+      setSelectedMultiRequestIDs([]);
+    }
+  }
+
   const ays = 'Are you sure you wish to';
   const confirmDenyMesg = `${ays} deny this permission request?`;
   const confirmGrantMesg = `${ays} accept this permission request?`;
+
+  const confirmDenyMesgMulti = `${ays} deny each of the ${selectedMultiRequestIDs.length} permission requests?`;
+  const confirmGrantMesgMulti = `${ays} accept each of the ${selectedMultiRequestIDs.length} permission requests?`;
+
+  const getConfirmMessage = (): string | JSX.Element => {
+    if(selectedMultiRequestIDs.length) {
+      return isGrant ? confirmGrantMesgMulti : DenyConfirmMessage;
+    }
+    else {
+      return isGrant ? confirmGrantMesg : DenyConfirmMessage;
+    }
+  }
 
   /** components to render in the edit table */
   const Emails = (u: IGroupedRequest): JSX.Element => (
@@ -151,6 +191,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     'Grant',
     'Deny'
   ];
+
   const columns = [RequestedBy, RequestedAt, Emails, AnimalID, WLHID, Perm, Comment, GrantPermission];
 
   // also show request id in development
@@ -165,7 +206,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
         <NotificationMessage severity={'error'} message={formatAxiosError(error)} />
       ) : (
         <>
-          <h1>Animal Acess Delegation Requests</h1>
+          <h1>Animal Access Delegation Requests</h1>
           <Typography mb={3} variant='body1' component='p'>Grant or deny animal access requests from managers.</Typography>
           {requests.length === 0 ? (
             <Typography>no pending requests</Typography>
@@ -177,19 +218,37 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
               hideSave={true}
               data={requests}
               onSave={doNothing}
+              onSelectMultiple={(rows: IGroupedRequest[]): void => handleSelectRow(rows)}
               onRowModified={(u): void => handleShowConfirm(u as IGroupedRequest, false)}
               hideAdd={true}
               hideEdit={true}
               hideDuplicate={true}
+              isMultiSelect={true}
             />
+            /*<DataTable 
+            headers={PermissionRequest.requestHistoryPropsToDisplay}
+            title={'Requests'}
+            queryProps={tableProps}
+            onSelectMultiple={ () => {} }
+            isMultiSelect={true}
+            customColumns={[{ column:confirmColumn, header: (): JSX.Element => <b>Grant-Deny</b> }]}
+            />*/
           )}
+          <Box mb={2} display='flex' justifyContent='flex-end' flexDirection='row' alignItems='center' columnGap={2}>
+            <Button color='primary' disabled={selectedMultiRequestIDs.length < 1} variant='contained' className={style.btn} onClick={() => {handleShowConfirmMultiple(true)}} >
+              Approve Selected
+            </Button>
+            <Button color='primary' disabled={selectedMultiRequestIDs.length < 1} variant='contained' className={style.btn} onClick={() => {handleShowConfirmMultiple(false)}} >
+              Deny Selected
+            </Button>
+          </Box>
           {isLoading ? (
             <CircularProgress />
           ) : (
             <ConfirmModal
               handleClickYes={handleGrantOrDenyPermission}
               title={isGrant ? 'Confirm Grant Permission' : 'Confirm Deny Permission'}
-              message={isGrant ? confirmGrantMesg : DenyConfirmMessage}
+              message={getConfirmMessage()}
               open={showConfirmModal}
               handleClose={(): void => setShowConfirmModal(false)}
             />
