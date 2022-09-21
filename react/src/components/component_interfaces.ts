@@ -48,6 +48,7 @@ type EditorProps<T> = EditModalBaseProps<T> & {
  */
 interface INotificationMessage extends Pick<AlertProps, 'severity'>  {
   message: string;
+  callback?: Function;
 }
 
 export type {

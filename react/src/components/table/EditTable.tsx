@@ -27,6 +27,7 @@ type EditTableProps<T> = Omit<PlainTableProps<T>, 'headers'> & EditTableVisibili
   onSelectMultiple?: (n: T[]) => void;
   saveButtonText?: string;
   isMultiSelect?: boolean;
+  //selected: number[];
   //numSelected?: number;
   //onCheckAllClick?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };

@@ -14,6 +14,7 @@ import {
   groupPermissionRequests,
   IExecutePermissionRequest,
   IGroupedRequest,
+  IPermissionRequest,
   permissionDeniedReasons,
   PermissionRequest,
   PermissionWasDeniedReason
@@ -39,7 +40,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   const [isGrant, setIsGrant] = useState(false);
   const [denyReason, setDenyReason] = useState<PermissionWasDeniedReason>('Not given');
-  const [selectedRequestID, setSelectedRequestID] = useState<number>();
+  //const [selectedRequestID, setSelectedRequestID] = useState<number>();
   const [selectedMultiRequestIDs, setSelectedMultiRequestIDs] = useState<number[]>([]);
 
   const useStyles = makeStyles((theme) => ({
@@ -64,10 +65,22 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     }
   }, [status]);
 
-  const onSuccess = (): void => {
-    setRequests((o) => o.filter((req) => selectedMultiRequestIDs.indexOf(req.id) === -1));
-    showNotif({ severity: 'success', message: 'permission request handled successfully' });
+  const onSuccess = (data: IExecutePermissionRequest[]): void => {
+    const successfulRequests : number[] = data.filter(o => 'errormsg' in o == false).map(e => e.request_id);
+    setRequests((o) => o.filter((req) => successfulRequests.indexOf(req.id) === -1));
+    notifRecurse(data);
   };
+
+  const notifRecurse = (data: IExecutePermissionRequest[]): void => { //Each notification will call this function on close, until theres nothing left to notify about
+    if(data.length == 0 || data === undefined) return;
+    const o : IExecutePermissionRequest = data.shift();
+    if('errormsg' in o) {
+      showNotif({ severity: 'error', message: `${o.requested_by_email} failed with: ${o.errormsg}`, callback: () => {notifRecurse(data)}  });
+    }
+    else {
+      showNotif({ severity: 'success', message: `Request for ${o.requested_by_email} successful`, callback: () => {notifRecurse(data)}});
+    }
+  }
 
   const onError = (err: AxiosError): void => {
     showNotif({ severity: 'error', message: formatAxiosError(err) });
@@ -78,16 +91,11 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   // submit when grant/deny is confirmed in the modal
   const handleGrantOrDenyPermission = async (): Promise<void> => {
-    if (!selectedRequestID && selectedMultiRequestIDs.length < 1) {
+    if (/*!selectedRequestID &&*/ selectedMultiRequestIDs.length < 1) {
       return;
     }
     const body: IExecutePermissionRequest[] = selectedMultiRequestIDs.map(id => ({request_id: id, is_grant: isGrant, was_denied_reason: denyReason}) );
-      /*{
-      request_id: selectedRequestID,
-      is_grant: isGrant,
-      was_denied_reason: denyReason
-    };*/
-    // console.log('handle grant or deny permission', JSON.stringify(body, null, 2));
+
     setShowConfirmModal(false);
     await mutateAsync(body);
   };
@@ -95,7 +103,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   // if a grant/deny icon is clicked, show a confirmation modal
   const handleShowConfirm = (request: IGroupedRequest, isGrant: boolean): void => {
     setIsGrant(isGrant);
-    setSelectedRequestID(request.id);
+    /*setSelectedRequestID(request.id);*/
     setShowConfirmModal((o) => !o);
   };
 
@@ -154,7 +162,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
    */
   const DenyConfirmMessage = (
     <>
-      <Typography>{confirmDenyMesg}</Typography>
+      <Typography>{selectedMultiRequestIDs.length > 1 ? confirmDenyMesgMulti : confirmDenyMesg}</Typography>
       <Typography>Please select a reason you are denying the request:</Typography>
       <Select
         variant={'outlined'}

@@ -511,12 +511,21 @@ export const useTelemetryApi = () => {
 
   /** see permission_api doc */
   const useTakeActionOnPermissionRequest = (
+    config: UseMutationOptions<IExecutePermissionRequest[], AxiosError, IExecutePermissionRequest[]>
+  ): UseMutationResult<IExecutePermissionRequest[]> =>
+    useMutation<IExecutePermissionRequest[], AxiosError, IExecutePermissionRequest[]>(
+      (body) => permissionApi.takeActionOnPermissionRequest(body),
+      config
+    );
+
+    /*
+      const useTakeActionOnPermissionRequest = (
     config: UseMutationOptions<IUserCritterAccess, AxiosError, IExecutePermissionRequest>
   ): UseMutationResult<IUserCritterAccess> =>
     useMutation<IUserCritterAccess, AxiosError, IExecutePermissionRequest>(
       (body) => permissionApi.takeActionOnPermissionRequest(body),
       config
-    );
+    );*/
 
   /**
    * although this not a post request, use it like a mutation so it can be triggered manually

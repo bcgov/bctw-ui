@@ -148,6 +148,8 @@ const groupPermissionRequests = (r: PermissionRequest[]): IGroupedRequest[] => {
 export interface IExecutePermissionRequest extends Pick<IPermissionRequest, 'request_id'> {
   is_grant: boolean; // whether or not to approve or deny
   was_denied_reason: string; // optional message if the request is being denied
+  requested_by_email?: string;
+  errormsg?: string;
 }
 
 /* permission-related helpers */
