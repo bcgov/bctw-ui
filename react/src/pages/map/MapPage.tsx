@@ -121,7 +121,7 @@ export default function MapPage(): JSX.Element {
   } = api.usePings(start, end);
   // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
-
+  
   // refetch pings when start/end times are changed
   useEffect(() => {
     // wipe the attribute panel state on refresh
@@ -324,6 +324,16 @@ export default function MapPage(): JSX.Element {
 
   // triggered when side-panel filters are applied
   const handleApplyChangesFromFilterPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
+    // if the timerange was changed, update that first. will trigger refetch
+    /*if (newRange.start !== range.start || newRange.end !== range.end) {
+      setRange(newRange);
+    }*/
+    // otherwise, update the filter state and apply the filters
+    setFilters(filters);
+    applyFiltersToPings(filters);
+  };
+
+  const handleApplyChangesFromSearchPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
     // if the timerange was changed, update that first. will trigger refetch
     if (newRange.start !== range.start || newRange.end !== range.end) {
       setRange(newRange);
@@ -535,6 +545,7 @@ export default function MapPage(): JSX.Element {
           start={range.start}
           end={range.end}
           pings={pings ?? []}
+          onApplySearch={handleApplyChangesFromSearchPanel}
           onApplyFilters={handleApplyChangesFromFilterPanel}
           onApplySymbolize={handleApplyChangesFromSymbolizePanel}
           onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
@@ -542,6 +553,7 @@ export default function MapPage(): JSX.Element {
           onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
           onShowLatestPings={handleShowLastKnownLocation}
           onShowLastFixes={handleShowLast10Fixes}
+          isFetching={isLoadingPings}
           // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
         />
         <div className={'map-container'}>

@@ -5,6 +5,12 @@ import { API, ApiProps } from './api_interfaces';
 export const mapApi = (props: ApiProps): API => {
   const { api } = props;
 
+  const getEstimate = async (start: string, end: string): Promise<any> => {
+    const url = createUrl({api: 'get-pings-estimate', query:  `start=${start}&end=${end}`});
+    const { data } = await api.get(url);
+    return data;
+  }
+
   const getTracks = async (start: string, end: string): Promise<ITelemetryLine[]> => {
     const url = createUrl({ api: 'get-critter-tracks', query: `start=${start}&end=${end}` });
     const { data } = await api.get(url);
@@ -19,6 +25,7 @@ export const mapApi = (props: ApiProps): API => {
 
   return {
     getPings,
-    getTracks
+    getTracks,
+    getEstimate
   };
 };
