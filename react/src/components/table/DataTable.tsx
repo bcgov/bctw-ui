@@ -29,11 +29,12 @@ export default function DataTable<T extends BCTWBase<T>>({
   onSelectMultiple,
   deleted,
   updated,
+  resetSelections,
   paginate = true,
   isMultiSelect = false,
   isMultiSearch = false,
   alreadySelected = [],
-  showValidRecord = false,
+  showValidRecord = false
 }: DataTableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
@@ -56,7 +57,11 @@ export default function DataTable<T extends BCTWBase<T>>({
    * this state is passed to the parent select handlers
    */
   const [values, setValues] = useState<T[]>([]);
-  
+
+  useEffect(() => {
+    setSelected([]);
+  }, [resetSelections]);
+
   // if a row is selected in a different table, unselect all rows in this table
   useDidMountEffect(() => {
     if (useRowState && data?.length) {
@@ -74,37 +79,25 @@ export default function DataTable<T extends BCTWBase<T>>({
   }, [deleted]);
 
   // fetch the data from the props query
-  const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> =
-    query(page, param, filter);
+  const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
+    page,
+    param,
+    filter
+  );
 
   const handlePages = (): void => {
     const rowCount = data[0]?.row_count;
     const pageCount = rowCount ? Math.ceil(rowCount / ROWS_PER_PAGE) : null;
-    if(rowCount){
+    if (rowCount) {
       setTotalRows(rowCount);
     }
-    if(pageCount && pageCount !== totalPages){
+    if (pageCount && pageCount !== totalPages) {
       setTotalPages(pageCount);
     }
-  }
+  };
   useDidMountEffect(() => {
-    
     if (isSuccess) {
-      
       handlePages();
-      // if (rowCount) {
-      //   const getPageCount = rowCount ? Math.ceil(rowCount / rowsPerPage) : -1;
-      //   if (getPageCount !== totalPages && getPageCount !== -1) {
-      //     setTotalPages(getPageCount);
-      //   }
-      //   if(!displayPagination){
-      //     setDisplayPagination(true);
-      //   }
-      //   // if (!totalRows) {
-      //   //   setTotalRows(rowCount);
-      //   // }
-      //   setTotalRows(rowCount);
-      // }
       // update the row identifier
       const first = data && data.length && data[0];
       if (first && typeof first.identifier === 'string') {
@@ -122,12 +115,11 @@ export default function DataTable<T extends BCTWBase<T>>({
        * across different pages / limitoffset
        */
       data.forEach((d, i) => {
-        
         const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
-            newV.push(d);
+          newV.push(d);
         }
-        if(updated && d[rowIdentifier] === updated && d !== values[i]){
+        if (updated && d[rowIdentifier] === updated && d !== values[i]) {
           //If updated identifier is set, insert new data into array
           values[i] = d;
           setValues(values);
@@ -138,7 +130,6 @@ export default function DataTable<T extends BCTWBase<T>>({
       //setRowsPerPage((o) => (isPaginate ? o : data.length));
     }
   }, [data]);
-
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -248,9 +239,9 @@ export default function DataTable<T extends BCTWBase<T>>({
          * hide pagination when total results are under @var ROWS_PER_PAGE
          * possible that only 10 results are actually available, in which
          * case the next page will load no new results
-         * 
+         *
          * DEPRECIATED -> workflow was jarring / dissorientating as pagination was conditionally rendered
-         * 
+         *
          */
         // !isPaginate || isError || (isSuccess && data?.length < rowsPerPage && paginate && page === 1)
         !isPaginate || isError ? null : (
@@ -289,10 +280,10 @@ export default function DataTable<T extends BCTWBase<T>>({
   const TableContents = (): JSX.Element => {
     const noData = isSuccess && !data?.length;
     useEffect(() => {
-      if(noData && totalPages !== 1){
+      if (noData && totalPages !== 1) {
         setTotalPages(1);
       }
-    }, [])
+    }, []);
     if (isLoading || isError) {
       return (
         <TableBody>
@@ -302,7 +293,7 @@ export default function DataTable<T extends BCTWBase<T>>({
             </TableCell>
           </TableRow>
         </TableBody>
-      )
+      );
     }
     if (noData) {
       return (
@@ -330,9 +321,7 @@ export default function DataTable<T extends BCTWBase<T>>({
                 aria-checked={isRowSelected}
                 tabIndex={-1}
                 key={`row${prop}`}
-                selected={isRowSelected || highlightValidRow}
-                >
-                  
+                selected={isRowSelected || highlightValidRow}>
                 {/* render checkbox column if multiselect is enabled */}
                 {isMultiSelect ? (
                   <TableCell padding='checkbox'>
@@ -345,7 +334,7 @@ export default function DataTable<T extends BCTWBase<T>>({
                     return null;
                   }
                   const { value } = formatTableCell(obj, k);
-                  
+
                   return (
                     <TableCell key={`${String(k)}${i}`} align={'left'}>
                       {value}

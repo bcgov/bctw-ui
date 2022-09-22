@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
 import { UseQueryResult } from 'react-query';
 
 type Order = 'asc' | 'desc';
@@ -15,7 +16,7 @@ interface ITableSortProp<T> {
 /**
  * a property name from the useTelemetry hook (@file 'hooks/useTelemetryApi.ts)
  * is passed to a data table
-*/
+ */
 type ITableQuery<T> = (
   page: number,
   param?: unknown,
@@ -23,8 +24,8 @@ type ITableQuery<T> = (
 ) => UseQueryResult<T[], AxiosError>;
 
 /**
- * @param defaultSort 
- * @param query - the bctwApi hook 
+ * @param defaultSort
+ * @param query - the bctwApi hook
  * @param onNewData handler to call when new data is loaded
  */
 interface ITableQueryProps<T> {
@@ -40,17 +41,16 @@ interface ICustomTableColumn<T> {
   column: (row: T, idx: number) => JSX.Element;
 }
 
-
 /**
  * @param headers displays all props of T unless this is included
  * @param title displayed as table title
  * @param onSelect parent handler triggered when a row is clicked
-*/
+ */
 type PlainTableProps<T> = {
   headers: (keyof T)[];
   title?: string;
   onSelect?: (row: T) => void;
-}
+};
 
 /**
  * @param customColumns array of functions that return components to add as additional columns
@@ -66,6 +66,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   isMultiSearch?: boolean;
   showValidRecord?: boolean;
   alreadySelected?: string[];
+  resetSelections?: number; //Placeholder to trigger reset
   paginate?: boolean;
   queryProps: ITableQueryProps<T>;
   onSelectMultiple?: (rows: T[]) => void;
@@ -75,7 +76,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
 
 /**
  * interface used to generate headers in TableHead
-*/
+ */
 interface HeadCell<T> {
   disablePadding: boolean;
   id: keyof T;
@@ -92,7 +93,7 @@ interface HeadCell<T> {
  * @param order see @type {Order}
  * @param orderBy should be a key of T
  * @param onSelectAllClick handler for when table header 'select all' is checked
-*/
+ */
 type TableHeadProps<T> = {
   customHeaders: ((row: T, idx: number) => JSX.Element)[];
   headerData: T;
@@ -104,7 +105,7 @@ type TableHeadProps<T> = {
   orderBy: string;
   rowCount: number;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
+};
 
 type FilterOperator = 'equals' | 'contains';
 
@@ -125,5 +126,5 @@ export type {
   ITableQueryProps,
   ITableSortProp,
   ITableFilter,
-  FilterOperator,
+  FilterOperator
 };
