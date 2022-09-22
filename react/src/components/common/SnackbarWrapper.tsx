@@ -25,7 +25,7 @@ export default function SnackbarWrapper({children}: SnackbarWrapperProps): JSX.E
   return (
     <>
       {children}
-      <Toast severity={responseState?.severity} show={showToast} message={responseState?.message} onClose={(): void => {setShowToast(false); responseState?.callback?.()}} />
+      {responseState && (<Toast severity={responseState?.severity} show={showToast} message={responseState?.message} onClose={(): void => {setShowToast(false); responseState?.callback?.()}} />)}
     </>
   )
 }

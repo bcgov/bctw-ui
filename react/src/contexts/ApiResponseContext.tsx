@@ -1,5 +1,6 @@
 import { INotificationMessage } from 'components/component_interfaces';
 import { useContext, createContext, useState, useEffect } from 'react';
+import { callbackify } from 'util';
 
 export const ApiResponseContext = createContext<INotificationMessage>(null);
 export const ApiResponseDispatch = createContext(null);
@@ -13,8 +14,11 @@ const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => 
   const { children } = props;
   const [state, dispatch] = useState<INotificationMessage>(null);
 
-  const clearNotif = (): void => dispatch(null);
-  const notifDisplayTime = 8000;
+  const clearNotif = (): void => {
+      dispatch(null);
+      state?.callback?.();
+  }
+  const notifDisplayTime = 3000;
   // automatically clear the notification after timer elapsed
   // or if the message is blank
   useEffect(() => {
