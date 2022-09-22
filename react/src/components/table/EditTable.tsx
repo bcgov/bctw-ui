@@ -3,7 +3,7 @@ import { Button, Icon } from 'components/common';
 import { PlainTableProps } from 'components/table/table_interfaces';
 import TableContainer from './TableContainer';
 import './table.scss';
-import React from 'react';
+import React, { useImperativeHandle } from 'react';
 
 export type EditTableRowAction = 'add' | 'delete' | 'duplicate' | 'edit' | 'reset';
 
@@ -40,7 +40,8 @@ type EditTableProps<T> = Omit<PlainTableProps<T>, 'headers'> & EditTableVisibili
  * @param onRowModified - call parent handler with the row clicked and @type {EditTableRowAction}
  * @param onSave - calls parent handler when save button clicked
  */
-export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
+//export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
+const EditTable = React.forwardRef( function<T> (props: EditTableProps<T>, ref): JSX.Element {
   const {
     canSave,
     headers,
@@ -63,6 +64,11 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
   } = props;
 
   const [selected, setSelected] = React.useState<number[]>([]);
+
+  useImperativeHandle(ref, () => ({
+    setSelected,
+    selected
+  }));
 
   const isSelected = (idx: number) => { return selected.indexOf(idx) !== -1 };
 
@@ -112,7 +118,7 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
       <Table>
         <TableHead>
           <TableRow>
-              <TableCell padding="checkbox">
+              <TableCell /*padding="checkbox"*/>
                   {isMultiSelect && (
                   <Checkbox 
                   indeterminate={selected.length > 0 && selected.length < data.length} 
@@ -121,7 +127,7 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
                   />)}
               </TableCell>
             {headers.map((h, idx) => (
-              <TableCell align='center' key={`head-${idx}`}>
+              <TableCell align='left' key={`head-${idx}`}>
                 <strong>{h}</strong>
               </TableCell>
             ))}
@@ -131,7 +137,7 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
           {data.map((u, idx) => {
             const rowkey = `body-${idx}`;
             const ComponentsFromProps = columns.map((cb, idx) => (
-              <TableCell key={`custom-${idx}`}>{cb(u)}</TableCell>
+              <TableCell align='left' key={`custom-${idx}`}>{cb(u)}</TableCell>
             ));
             const isItemSelected = isSelected(idx);
             
@@ -142,7 +148,7 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
               selected={isItemSelected} 
               onClick={isMultiSelect ? (event) => handleCheckClick(event, idx) : () => {}}
               >
-                <TableCell padding="checkbox">
+                <TableCell align='left' /*padding="checkbox"*/>
                   {isMultiSelect && (
                   <Checkbox
                   checked={isItemSelected}
@@ -208,4 +214,6 @@ export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
       </div>
     )}
   </>;
-}
+});
+
+export default EditTable;

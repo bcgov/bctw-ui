@@ -8,7 +8,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AuthLayout from 'pages/layouts/AuthLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { doNothing, getUniqueValuesOfT } from 'utils/common_helpers';
 import {
   groupPermissionRequests,
@@ -43,6 +43,8 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   //const [selectedRequestID, setSelectedRequestID] = useState<number>();
   const [selectedMultiRequestIDs, setSelectedMultiRequestIDs] = useState<number[]>([]);
 
+  const ref = useRef(null);
+
   const useStyles = makeStyles((theme) => ({
     btn: {
       backgroundColor: theme.palette.info.main,
@@ -68,6 +70,8 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const onSuccess = (data: IExecutePermissionRequest[]): void => {
     const successfulRequests : number[] = data.filter(o => 'errormsg' in o == false).map(e => e.request_id);
     setRequests((o) => o.filter((req) => successfulRequests.indexOf(req.id) === -1));
+    setSelectedMultiRequestIDs([]);
+    ref?.current?.setSelected([]);
     notifRecurse(data);
   };
 
@@ -101,11 +105,13 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   };
 
   // if a grant/deny icon is clicked, show a confirmation modal
-  const handleShowConfirm = (request: IGroupedRequest, isGrant: boolean): void => {
+  /*const handleShowConfirm = (request: IGroupedRequest, isGrant: boolean): void => {
     setIsGrant(isGrant);
-    /*setSelectedRequestID(request.id);*/
+    setSelectedMultiRequestIDs([request.id]);
+    ref?.current?.setSelected([requests.findIndex(o => o.id == request.id)]);
+    //setSelectedRequestID(request.id);
     setShowConfirmModal((o) => !o);
-  };
+  };*/
 
   const handleShowConfirmMultiple = (isGrant: boolean): void => {
     setIsGrant(isGrant);
@@ -140,22 +146,22 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   /** components to render in the edit table */
   const Emails = (u: IGroupedRequest): JSX.Element => (
-    <List values={getUniqueValuesOfT(u.requests, 'requested_for_email')} />
+    <List disableGutters={true} values={getUniqueValuesOfT(u.requests, 'requested_for_email')} />
   );
-  const AnimalID = (u: IGroupedRequest): JSX.Element => <List values={getUniqueValuesOfT(u.requests, 'animal_id')} />;
-  const WLHID = (u: IGroupedRequest): JSX.Element => <List values={getUniqueValuesOfT(u.requests, 'wlh_id')} />;
-  const Perm = (u: IGroupedRequest): JSX.Element => <List values={getUniqueValuesOfT(u.requests, 'permission_type')} />;
+  const AnimalID = (u: IGroupedRequest): JSX.Element => <List disableGutters={true} values={getUniqueValuesOfT(u.requests, 'animal_id')} />;
+  const WLHID = (u: IGroupedRequest): JSX.Element => <List disableGutters={true} values={getUniqueValuesOfT(u.requests, 'wlh_id')} />;
+  const Perm = (u: IGroupedRequest): JSX.Element => <List disableGutters={true} values={getUniqueValuesOfT(u.requests, 'permission_type')} />;
   const RequestID = (u: IGroupedRequest): JSX.Element => <>{u.id}</>;
   const RequestedBy = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].requested_by_email}</>;
   const RequestedAt = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].requested_date.format(formatDay)}</>;
   const Comment = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].request_comment}</>;
-  const GrantPermission = (u: IGroupedRequest): JSX.Element => {
+  /*const GrantPermission = (u: IGroupedRequest): JSX.Element => {
     return (
       <IconButton onClick={(): void => handleShowConfirm(u, true)} size="large">
         <Icon icon='done' htmlColor='green' />
       </IconButton>
     );
-  };
+  };*/
 
   /**
    * when the admin chooses to deny, show a modal asking a reason for the denial
@@ -196,11 +202,11 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     'WLH ID',
     'Permission',
     'Comment',
-    'Grant',
-    'Deny'
+    //'Grant',
+   // 'Deny'
   ];
 
-  const columns = [RequestedBy, RequestedAt, Emails, AnimalID, WLHID, Perm, Comment, GrantPermission];
+  const columns = [RequestedBy, RequestedAt, Emails, AnimalID, WLHID, Perm, Comment]//, GrantPermission];
 
   // also show request id in development
   if (isDev()) {
@@ -227,11 +233,15 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
               data={requests}
               onSave={doNothing}
               onSelectMultiple={(rows: IGroupedRequest[]): void => handleSelectRow(rows)}
-              onRowModified={(u): void => handleShowConfirm(u as IGroupedRequest, false)}
+              onRowModified={(u): void => {
+                //handleShowConfirm(u as IGroupedRequest, false); 
+              }}
               hideAdd={true}
               hideEdit={true}
+              hideDelete={true}
               hideDuplicate={true}
               isMultiSelect={true}
+              ref={ref}
             />
             /*<DataTable 
             headers={PermissionRequest.requestHistoryPropsToDisplay}
