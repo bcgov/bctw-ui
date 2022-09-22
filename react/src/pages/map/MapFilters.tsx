@@ -98,7 +98,7 @@ const useMapStyles = makeStyles((theme) => ({
 }));
 export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const api = useTelemetryApi();
-  const { pings } = props;
+  const { pings, isFetching } = props;
   const { search, filter, symbolize } = TabNames;
   const classes = drawerStyles();
   const mapStyles = useMapStyles();
@@ -143,7 +143,12 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     justifyContent: 'center'
   };
 
-  const { isFetching: fetchingEstimate, isError: isErrorEstimate, data: fetchedEstimate, isSuccess: estimateSuccess } = api.useEstimate(start, end);
+  const {
+    isFetching: fetchingEstimate,
+    isError: isErrorEstimate,
+    data: fetchedEstimate,
+    isSuccess: estimateSuccess
+  } = api.useEstimate(start, end);
 
   // Update the formfield values when pings are loaded.
   // Use memo to minimize computing result.
@@ -163,10 +168,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
         setWasDatesChanged(true);
       }
 
-      if(fetchedEstimate === undefined || fetchedEstimate.is_pings_cap) {
+      if (fetchedEstimate === undefined || fetchedEstimate.is_pings_cap) {
         setApplyButtonStatus(true);
-      }
-      else {
+      } else {
         setApplyButtonStatus(false);
       }
     };
@@ -207,10 +211,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
    * @param reset force calling the parent handler with empty array
    */
   const handleApplyFilters = (event: React.MouseEvent<HTMLInputElement>, reset = false): void => {
-    if(isTab(filter)) {
+    if (isTab(filter)) {
       props.onApplyFilters({ start, end }, reset ? [] : filters);
-    }
-    else {
+    } else {
       props.onApplySearch({ start, end }, reset ? [] : filters);
     }
     // if dates were changed, it will draw all the new points, so
@@ -562,13 +565,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           flexDirection={open ? 'row-reverse' : 'row'}>
           <Tabs value={tab} onChange={handleTabChange}>
             <Tab icon={<Icon icon={search as string} />} value={search} label={search} />
-            <Tab icon={<Icon icon={filter as string} />} value={filter} label={filter} disabled={!pings?.length} />
-            <Tab
-              icon={<Icon icon={symbolize as string} />}
-              value={symbolize}
-              label={symbolize}
-              disabled={!pings?.length}
-            />
+            <Tab icon={<Icon icon={filter as string} />} value={filter} label={filter} disabled={isFetching} />
+            <Tab icon={<Icon icon={symbolize as string} />} value={symbolize} label={symbolize} disabled={isFetching} />
           </Tabs>
           <Box className='drawer-toggle-button'>
             <IconButton color='primary' onClick={handleDrawerOpen} size='large'>
@@ -584,20 +582,21 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           {createFilters()}
           {createSymbolize()}
           <Box display='flex' justifyContent='flex-start' py={2}>
-            
-              <LoadingButton
-                color='primary'
-                variant='contained'
-                loading={props.isFetching}
-                loadingPosition="end"
-                className={mapStyles.btn}
-                loadingIndicator = {<CircularProgress className={mapStyles.MuiCircularProgress}  color="inherit" size={16} />}
-                disabled={disableQueryBtn()}
-                endIcon={<Icon icon='search'/>}
-                onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
-                {isTab(search) && props.isFetching ? "Searching..." : tab}
-              </LoadingButton>
-            
+            <LoadingButton
+              color='primary'
+              variant='contained'
+              loading={props.isFetching}
+              loadingPosition='end'
+              className={mapStyles.btn}
+              loadingIndicator={
+                <CircularProgress className={mapStyles.MuiCircularProgress} color='inherit' size={16} />
+              }
+              disabled={disableQueryBtn()}
+              endIcon={isTab(search) && <Icon icon='search' />}
+              onClick={isTab(symbolize) ? handleApplySymbolize : handleApplyFilters}>
+              {isTab(search) && props.isFetching ? 'Searching...' : tab}
+            </LoadingButton>
+
             {symbolizeOrFilterPanel && (
               <Button
                 color='primary'
@@ -610,13 +609,15 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             )}
           </Box>
           <Divider />
-          { (fetchedEstimate?.is_pings_cap && isTab(search)) && (
-          <Box display='flex' justifyContent='flex-start' py={2} whiteSpace="normal">
-            <Typography color="orangered">
-              {"Searching over this date range will load an excessive amount of data.\n Please refine your search and try again."}
-            </Typography>
-          </Box>
-         )}
+          {fetchedEstimate?.is_pings_cap && isTab(search) && (
+            <Box display='flex' justifyContent='flex-start' py={2} whiteSpace='normal'>
+              <Typography color='orangered'>
+                {
+                  'Searching over this date range will load an excessive amount of data.\n Please refine your search and try again.'
+                }
+              </Typography>
+            </Box>
+          )}
           {createSymbolizeLegend()}
         </Box>
       </Box>
