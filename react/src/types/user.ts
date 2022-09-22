@@ -1,4 +1,4 @@
-import { columnToHeader } from 'utils/common_helpers';
+import { capitalize, columnToHeader } from 'utils/common_helpers';
 import { BCTWBase } from 'types/common_types';
 import { isDev } from 'api/api_helpers';
 
@@ -6,7 +6,7 @@ export enum eUserRole {
   administrator = 'administrator',
   //manager = 'manager', //Removed from DB and enum. Not used...
   user = 'user',
-  data_administrator = 'data_administrator',
+  data_administrator = 'data_administrator'
 }
 
 export type KeyCloakDomainType = 'idir' | 'bceid';
@@ -36,7 +36,7 @@ type UserBaseType = {
 
 /**
  * the base user class
- * extended by @class OnboardUser and @class User 
+ * extended by @class OnboardUser and @class User
  */
 export class UserBase implements UserBaseType {
   firstname: string;
@@ -56,8 +56,8 @@ export interface IUser extends UserBaseType {
   is_manager?: boolean;
 }
 
-/** 
- * the main user class representing a row in the bctw.user table 
+/**
+ * the main user class representing a row in the bctw.user table
  */
 export class User extends UserBase implements BCTWBase<User>, IUser {
   is_manager: boolean;
@@ -70,7 +70,7 @@ export class User extends UserBase implements BCTWBase<User>, IUser {
   }
 
   get displayProps(): (keyof User)[] {
-    const props: (keyof User)[] = ['username', 'email', 'idir', 'bceid', 'role_type', 'is_manager'];
+    const props: (keyof User)[] = ['name', 'username', 'email', 'idir', 'bceid', 'role_type', 'is_manager'];
     if (isDev()) {
       props.unshift('id');
     }
@@ -78,7 +78,7 @@ export class User extends UserBase implements BCTWBase<User>, IUser {
   }
 
   get name(): string {
-    return this.firstname && this.lastname ? `${this.firstname} ${this.lastname}` : 'unknown';
+    return this.firstname && this.lastname ? capitalize(`${this.firstname} ${this.lastname}`) : 'unknown';
   }
 
   get identifier(): string {

@@ -2,7 +2,15 @@ import { createUrl } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
 import { User } from 'types/user';
 import { API, IBulkUploadResults, ApiProps } from 'api/api_interfaces';
-import { eCritterPermission, filterOutNonePermissions, IExecutePermissionRequest, IPermissionRequest, IPermissionRequestInput, IUserCritterPermissionInput, PermissionRequest } from 'types/permission';
+import {
+  eCritterPermission,
+  filterOutNonePermissions,
+  IExecutePermissionRequest,
+  IPermissionRequest,
+  IPermissionRequestInput,
+  IUserCritterPermissionInput,
+  PermissionRequest
+} from 'types/permission';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 import { useQueryClient } from 'react-query';
 
@@ -20,16 +28,16 @@ export const permissionApi = (props: ApiProps): API => {
 
   const invalidate = (): void => {
     queryClient.invalidateQueries('getRequestHistory');
-  }
+  };
 
   const invalidateCritterAccess = (): void => {
     queryClient.invalidateQueries('critterAccess');
-  }
+  };
 
   /**
    * used in the admin @function GrantCritterAccessPage
    * to grant user's access to animal's and the devices that they are attached to.
-  */
+   */
   const grantCritterAccessToUser = async (
     body: IUserCritterPermissionInput
   ): Promise<IBulkUploadResults<IGrantCritterAccessResults>> => {
@@ -41,15 +49,15 @@ export const permissionApi = (props: ApiProps): API => {
   };
 
   /**
-   * @param user the @type {User} to retrieve the permissions for. 
-   * @param filter an optional @type {eCritterPermission[]}, which is defaulted to 
-   * all permission types other than 'none' - aka backend will not return critters that 
+   * @param user the @type {User} to retrieve the permissions for.
+   * @param filter an optional @type {eCritterPermission[]}, which is defaulted to
+   * all permission types other than 'none' - aka backend will not return critters that
    * the user does not have any permission to.
-  */
+   */
   const getUserCritterAccess = async (
     page: number,
     user: User,
-    filter: eCritterPermission[] = filterOutNonePermissions,
+    filter: eCritterPermission[] = filterOutNonePermissions
   ): Promise<UserCritterAccess[]> => {
     if (!user?.username) {
       // eslint-disable-next-line no-console
@@ -68,39 +76,39 @@ export const permissionApi = (props: ApiProps): API => {
 
   /**
    * admin only endpoint to display a list of active permission requests.
-   * @returns {IPermissionRequest[]}, which queries from an view 
-   * that splits the email list and individual @type {IUserCritterAccessInput} 
+   * @returns {IPermissionRequest[]}, which queries from an view
+   * that splits the email list and individual @type {IUserCritterAccessInput}
    * into multiple rows.
-  */
+   */
   const getPermissionRequest = async (): Promise<PermissionRequest[]> => {
-    const { data } = await api.get(createUrl({ api: `permission-request`}));
+    const { data } = await api.get(createUrl({ api: `permission-request` }));
     const converted = data.map((d: IPermissionRequest) => plainToClass(PermissionRequest, d));
     return converted;
-  }
+  };
 
   /**
    * an manager endpoint for viewing successful permission requests that were granted.
-   * @returns {PermissionRequest[]}, which queries the API schemas user_animal_assignment_v view. 
-   * Note: some fields will not be present ex. request_id 
-  */
+   * @returns {PermissionRequest[]}, which queries the API schemas user_animal_assignment_v view.
+   * Note: some fields will not be present ex. request_id
+   */
   const getPermissionHistory = async (page = 1): Promise<PermissionRequest[]> => {
-    const { data } = await api.get(createUrl({ api: `permission-history`, page}));
+    const { data } = await api.get(createUrl({ api: `permission-history`, page }));
     const converted = data.map((d: IPermissionRequest) => plainToClass(PermissionRequest, d));
     return converted;
-  }
+  };
 
   /**
    * an endpoint for an manager to submit a permission request to grant one or more email addresses access
    * to a list of animals
-  */
+   */
   const submitPermissionRequest = async (body: IPermissionRequestInput): Promise<IPermissionRequest> => {
-    const url = createUrl({api: `submit-permission-request`});
+    const url = createUrl({ api: `submit-permission-request` });
     const { data } = await api.post(url, body);
     invalidate();
     return data;
-  }
+  };
 
-  /** 
+  /**
    * an endpoint that an admin uses to grant or deny an manager's permission request
    * currently now edit functionality exists
   */
@@ -108,7 +116,7 @@ export const permissionApi = (props: ApiProps): API => {
     const url = createUrl({api: `execute-permission-request`});
     const { data } = await api.post(url, body);
     return data;
-  }
+  };
 
   return {
     getUserCritterAccess,
