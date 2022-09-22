@@ -6,7 +6,7 @@ export const mapApi = (props: ApiProps): API => {
   const { api } = props;
 
   const getEstimate = async (start: string, end: string): Promise<any> => {
-    const url = createUrl({api: 'get-critters-estimate', query:  `start=${start}&end=${end}`});
+    const url = createUrl({api: 'get-pings-estimate', query:  `start=${start}&end=${end}`});
     const { data } = await api.get(url);
     return data;
   }
