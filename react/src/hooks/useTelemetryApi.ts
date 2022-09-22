@@ -84,6 +84,14 @@ export const useTelemetryApi = () => {
   /**
    *
    */
+  const useEstimate = (start: string, end: string): UseQueryResult<any, AxiosError> => {
+    return useQuery<any, AxiosError>(
+      ['estimate', start, end],
+      () => mapApi.getEstimate(start, end),
+      {...defaultQueryOptions, retry: false}
+    );
+  };
+
   const useTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
     return useQuery<ITelemetryLine[], AxiosError>(
       ['tracks', start, end],
@@ -511,12 +519,21 @@ export const useTelemetryApi = () => {
 
   /** see permission_api doc */
   const useTakeActionOnPermissionRequest = (
+    config: UseMutationOptions<IExecutePermissionRequest[], AxiosError, IExecutePermissionRequest[]>
+  ): UseMutationResult<IExecutePermissionRequest[]> =>
+    useMutation<IExecutePermissionRequest[], AxiosError, IExecutePermissionRequest[]>(
+      (body) => permissionApi.takeActionOnPermissionRequest(body),
+      config
+    );
+
+    /*
+      const useTakeActionOnPermissionRequest = (
     config: UseMutationOptions<IUserCritterAccess, AxiosError, IExecutePermissionRequest>
   ): UseMutationResult<IUserCritterAccess> =>
     useMutation<IUserCritterAccess, AxiosError, IExecutePermissionRequest>(
       (body) => permissionApi.takeActionOnPermissionRequest(body),
       config
-    );
+    );*/
 
   /**
    * although this not a post request, use it like a mutation so it can be triggered manually
@@ -541,6 +558,7 @@ export const useTelemetryApi = () => {
     useCodes,
     useCodeDesc,
     useCodeHeaders,
+    useEstimate,
     useTracks,
     useUnassignedTracks,
     usePings,

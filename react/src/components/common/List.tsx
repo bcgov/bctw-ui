@@ -2,6 +2,7 @@ import { List as MUIList, ListItem } from '@mui/material';
 
 type ListProps = {
   values: string[] | JSX.Element[];
+  disableGutters?: boolean;
 };
 
 /**
@@ -9,9 +10,9 @@ type ListProps = {
  * @param values that are rendered as the list items
  * can be either plain strings or components
 */
-const List = ({ values }: ListProps): JSX.Element => {
+const List = ({ values, disableGutters }: ListProps): JSX.Element => {
   const MakeListItem = (v: string | JSX.Element, i: number): JSX.Element => (
-    <ListItem dense key={`li-${i}`}>
+    <ListItem disableGutters={disableGutters} dense key={`li-${i}`}>
       {v}
     </ListItem>
   );
