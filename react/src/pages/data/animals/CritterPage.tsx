@@ -13,6 +13,7 @@ import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
+import Icon from 'components/common/Icon';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
@@ -34,11 +35,16 @@ export default function CritterPage(): JSX.Element {
     queryStatus: 'idle' as QueryStatus
   };
 
+  const CollarStatusIcon = (row: AttachedAnimal) => {
+    return <Icon icon={'error'}></Icon>;
+  };
+
   return (
     <ManageLayout>
       <SpeciesProvider>
-        <Box className='manage-layout-titlebar'>
-          <h1>My Animals</h1>
+        <h1>Animals</h1>
+        <Box className='manage-layout-titlebar' style={{ marginBottom: 0 }}>
+          <h2>Collared Animals</h2>
           <Box display='flex' alignItems='center'>
             <ModifyCritterWrapper
               editing={editObj}
@@ -72,7 +78,7 @@ export default function CritterPage(): JSX.Element {
             <Box mb={4}>
               <DataTable
                 headers={AttachedAnimal.attachedCritterDisplayProps}
-                title={CS.assignedTableTitle}
+                //title={CS.assignedTableTitle}
                 queryProps={{ query: api.useAssignedCritters }}
                 onSelect={handleSelect}
                 deleted={deleted}
@@ -80,9 +86,10 @@ export default function CritterPage(): JSX.Element {
               />
             </Box>
             <Box mb={4}>
+              <h2>Non-collared Animals</h2>
               <DataTable
                 headers={new Animal().displayProps}
-                title={CS.unassignedTableTitle}
+                //title={CS.unassignedTableTitle}
                 queryProps={{ query: api.useUnassignedCritters }}
                 onSelect={handleSelect}
                 deleted={deleted}

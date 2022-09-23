@@ -230,7 +230,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   device_id: number;
   device_make: Code;
   frequency: number;
-
+  device_status: string;
   @Exclude(toPlainOnly) attachment_start: Dayjs;
   @Exclude(toPlainOnly) data_life_start: Dayjs;
   @Exclude(toPlainOnly) data_life_end: Dayjs;
@@ -238,7 +238,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
 
   // con't overide since this class is inherited
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
-    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+    return ['animal_id', 'device_status', 'animal_status', 'wlh_id', 'device_id', 'species', 'frequency'];
   }
 
   formatPropAsHeader(str: keyof Animal): string {

@@ -21,6 +21,17 @@ export enum eNewCollarType {
   VHF = 'VHF',
   Vect = 'Vectronics'
 }
+//Used in table_helpers
+export enum eDeviceStatus {
+  mortality = 'Mortality',
+  active = 'Active',
+  malfunction = 'Malfunction',
+  offline = 'Offline',
+  potential_mortality = 'Potential Mortality',
+  unknown = 'Unknown',
+  potential_malfunction = 'Potential Malfunction'
+}
+
 export interface ICollarBase {
   readonly collar_id: uuid;
 }
@@ -63,7 +74,7 @@ export interface ICollar extends ICollarTelemetryBase {
   satellite_network: Code;
 }
 
-export class Collar implements BCTWBase<Collar>, ICollar  {
+export class Collar implements BCTWBase<Collar>, ICollar {
   activation_comment: string;
   activation_status: boolean;
   readonly collar_id: uuid;
@@ -107,7 +118,9 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
     const numToAdd = 3 - numDecimalPlaces + freq.length;
     return freq.padEnd(numToAdd, '0');
   }
-  get identifier(): string { return 'collar_id' }
+  get identifier(): string {
+    return 'collar_id';
+  }
 
   constructor(collar_id = '') {
     this.collar_id = collar_id;
@@ -116,33 +129,41 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
   formatPropAsHeader(str: keyof Collar): string {
     switch (str) {
       case 'activation_status':
-        return 'Device is active with vendor?'
+        return 'Device is active with vendor?';
       case 'camera_device_id':
         return 'Camera ID';
       case 'device_deployment_status':
       case 'device_malfunction_type':
-        return columnToHeader(str.replace('device_', ''))
+        return columnToHeader(str.replace('device_', ''));
       case 'dropoff_device_id':
-        return 'Drop-off ID'
+        return 'Drop-off ID';
       case 'dropoff_frequency':
-        return 'Drop-off Frequency'
+        return 'Drop-off Frequency';
       case 'dropoff_frequency_unit':
-        return 'Frequency Unit'
+        return 'Frequency Unit';
       case 'frequency':
-        return 'Beacon Frequency'
+        return 'Beacon Frequency';
       default:
         return columnToHeader(str);
     }
   }
 
   static get propsToDisplay(): (keyof Collar)[] {
-    return [ 'device_id', 'device_status', 'frequency', 'device_type', 'device_make', 'activation_status', 'device_model' ];
+    return [
+      'device_id',
+      'device_status',
+      'frequency',
+      'device_type',
+      'device_make',
+      'activation_status',
+      'device_model'
+    ];
   }
 
   get displayProps(): (keyof Collar)[] {
     return Collar.propsToDisplay;
   }
-  
+
   historyDisplayProps(): (keyof Collar)[] {
     const keys = Object.keys(new Collar()) as unknown as (keyof Collar)[];
     const startsWith = this.displayProps;
@@ -152,7 +173,7 @@ export class Collar implements BCTWBase<Collar>, ICollar  {
 
   static get toCSVHeaderTemplate(): string[] {
     const excluded: (keyof Collar)[] = ['collar_transaction_id'];
-    const keys = Object.keys(new Collar()).filter(k => !(excluded as string[]).includes(k));
+    const keys = Object.keys(new Collar()).filter((k) => !(excluded as string[]).includes(k));
     return keys;
   }
 }
@@ -185,11 +206,11 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'frequency', type: eInputType.number, ...isRequired, ...positive },
     { prop: 'frequency_unit', type: eInputType.code, ...isRequired },
     { prop: 'fix_interval', type: eInputType.number, ...isRequired, ...positive },
-    { prop: 'fix_interval_rate', type: eInputType.code, ...isRequired, codeName: 'fix_unit' },
+    { prop: 'fix_interval_rate', type: eInputType.code, ...isRequired, codeName: 'fix_unit' }
   ],
   deviceOptionFields: [
-    { prop: 'dropoff_frequency', type: eInputType.number, ...positive},
-    { prop: 'dropoff_frequency_unit', type: eInputType.code, codeName: 'frequency_unit' },
+    { prop: 'dropoff_frequency', type: eInputType.number, ...positive },
+    { prop: 'dropoff_frequency_unit', type: eInputType.code, codeName: 'frequency_unit' }
   ],
   identifierFields: [
     { prop: 'device_id', type: eInputType.number, ...isRequired, ...positive },
@@ -198,45 +219,43 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
   ],
   isActiveField: [
     { prop: 'activation_status', type: eInputType.check },
-    { prop: 'activation_comment', type: eInputType.multiline}
+    { prop: 'activation_comment', type: eInputType.multiline }
   ],
   activationFields: [
     { prop: 'first_activation_year', type: eInputType.number },
-    { prop: 'first_activation_month', type: eInputType.number },
+    { prop: 'first_activation_month', type: eInputType.number }
   ],
   statusFields: [
     { prop: 'device_status', type: eInputType.code, ...isRequired },
     { prop: 'device_deployment_status', type: eInputType.code, ...isRequired },
-    { prop: 'device_condition', type: eInputType.code, ...isRequired },
+    { prop: 'device_condition', type: eInputType.code, ...isRequired }
   ],
   retrievalFields: [
     { prop: 'retrieved', type: eInputType.check },
     { prop: 'retrieval_date', type: eInputType.datetime },
-    { prop: 'retrieval_comment', type: eInputType.multiline},
+    { prop: 'retrieval_comment', type: eInputType.multiline }
   ],
   malfunctionOfflineFields: [
     { prop: 'malfunction_date', type: eInputType.datetime },
     { prop: 'device_malfunction_type', type: eInputType.code },
     { prop: 'offline_date', type: eInputType.datetime },
     { prop: 'offline_type', type: eInputType.code },
-    { prop: 'offline_comment', type: eInputType.multiline},
-    { prop: 'malfunction_comment', type: eInputType.multiline},
+    { prop: 'offline_comment', type: eInputType.multiline },
+    { prop: 'malfunction_comment', type: eInputType.multiline }
   ],
   // fields that are rendered individually due to form state
   otherFields: [
-    { prop: 'device_comment', type: eInputType.multiline},
+    { prop: 'device_comment', type: eInputType.multiline },
     { prop: 'device_type', type: eInputType.code, ...isRequired },
     { prop: 'satellite_network', type: eInputType.code },
     { prop: 'camera_device_id', type: eInputType.number, ...positive },
-    { prop: 'dropoff_device_id', type: eInputType.number, ...positive },
+    { prop: 'dropoff_device_id', type: eInputType.number, ...positive }
   ]
-}
+};
 
 // flattened version of all available collarfields
 export const getDeviceFormFields = (): FormFieldObject<Collar>[] => {
-  return Object
-    .values(collarFormFields)
-    .reduce((previous, current) => ([ ...previous, ...current ]) , []);
+  return Object.values(collarFormFields).reduce((previous, current) => [...previous, ...current], []);
 };
 
 // vectronic keys upload result

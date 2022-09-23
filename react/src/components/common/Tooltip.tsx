@@ -32,7 +32,11 @@ type TooltipProps = MuiTooltipProps & {
 export default function Tooltip(props: TooltipProps): JSX.Element {
   const classes = useStyles();
   return (
-    <MuiTooltip className={classes.tooltip} {...ttProps} {...removeProps(props, ['inline'])}>
+    <MuiTooltip
+      className={classes.tooltip}
+      {...ttProps}
+      {...removeProps(props, ['inline'])}
+      placement={props.placement}>
       <div style={{ display: props.inline ? 'inline' : 'block' }} className={props.nestedClass}>
         {props.children}
       </div>

@@ -44,7 +44,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
   useEffect(() => {
     // console.log('assignment history page: device was assigned or removed', attachmentChanged);
     handleClose(false);
-  }, [attachmentChanged])
+  }, [attachmentChanged]);
 
   /**
    * Custom column button component passed to device assignment history data table.
@@ -72,10 +72,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
         paginate={history?.length >= 10}
         customColumns={[{ column: EditDatalifeColumn, header: (): JSX.Element => <b>Modify Data Life</b> }]}
       />
-      <PerformAssignmentAction
-        current_attachment={currentAttachment}
-        {...props}
-      />
+      <PerformAssignmentAction current_attachment={currentAttachment} {...props} />
       <EditDataLifeModal
         attachment={selectedAttachment}
         handleClose={(): void => setShowEditDL(false)}

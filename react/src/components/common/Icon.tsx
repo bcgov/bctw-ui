@@ -33,7 +33,10 @@ import {
   mdiLockOpenCheck,
   mdiMagnify,
   mdiFilterOutline,
-  mdiBrush
+  mdiBrush,
+  mdiCancel,
+  mdiCircle,
+  mdiAlertRhombus
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -119,6 +122,12 @@ const getIconPath = (path: string): string => {
       return mdiFilterOutline;
     case 'symbolize':
       return mdiBrush;
+    case 'cancel':
+      return mdiCancel;
+    case 'circle':
+      return mdiCircle;
+    case 'alert':
+      return mdiAlertRhombus;
   }
 };
 
