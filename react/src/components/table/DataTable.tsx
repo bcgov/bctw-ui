@@ -1,15 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Checkbox,
-  CircularProgress,
-  TableFooter,
-  TablePagination,
-  Skeleton
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableRow, Checkbox, CircularProgress } from '@mui/material';
 import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
@@ -22,7 +12,6 @@ import { BCTWBase } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import TablePaginationActions from '@mui/material/TablePagination/TablePaginationActions';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
 import { AttachedAnimal } from 'types/animal';
 import { CritterStrings } from 'constants/strings';
@@ -43,6 +32,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   onSelectMultiple,
   deleted,
   updated,
+  exportFields,
   resetSelections,
   paginate = true,
   isMultiSelect = false,
@@ -267,21 +257,22 @@ export default function DataTable<T extends BCTWBase<T>>({
               onChangePage={handlePageChange}
               totalPages={totalPages}
             />
-
-            <ExportViewer<AttachedAnimal>
-              template={[
-                'critter_id',
-                'species',
-                'population_unit',
-                'wlh_id',
-                'animal_id',
-                'collar_id',
-                'device_id',
-                'frequency',
-                'animal_id'
-              ]}
-              eTitle={CritterStrings.exportTitle}
-            />
+            {values[0] instanceof AttachedAnimal && (
+              <ExportViewer<AttachedAnimal>
+                template={[
+                  'critter_id',
+                  'species',
+                  'population_unit',
+                  'wlh_id',
+                  'animal_id',
+                  'collar_id',
+                  'device_id',
+                  'frequency',
+                  'animal_id'
+                ]}
+                eTitle={CritterStrings.exportTitle}
+              />
+            )}
           </>
         )
       }

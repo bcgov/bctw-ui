@@ -72,6 +72,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   onSelectMultiple?: (rows: T[]) => void;
   deleted?: string;
   updated?: string;
+  exportFields?: keyof T;
 };
 
 /**

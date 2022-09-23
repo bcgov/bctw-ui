@@ -20,6 +20,7 @@ export default function CritterPage(): JSX.Element {
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
+
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
     editing: null,
