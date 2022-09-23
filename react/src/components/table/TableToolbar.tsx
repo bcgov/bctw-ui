@@ -12,11 +12,14 @@ const useToolbarStyles = makeStyles((theme) => ({
     theme.palette.mode === 'light' ? { color: theme.palette.secondary.main } : { color: theme.palette.text.primary },
 
   toolbarInner: {
-    paddingRight: theme.spacing(2),
-    paddingLeft: theme.spacing(2)
+    //paddingRight: theme.spacing(2)
+    //paddingLeft: theme.spacing(2)
   },
   toolbarTitle: {
     fontWeight: 700
+  },
+  title: {
+    marginBottom: 0
   }
 }));
 
@@ -50,8 +53,8 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
           </TableRow>
         )}
         <Box className={classes.toolbarTitle}>
-          {title ?? ''} &nbsp;
-          {numSelected > 0 ? <span>({numSelected} selected)</span> : <span>{''}</span>}
+          <h2 className={classes.title}>{title ?? ''}</h2>&nbsp;
+          {numSelected > 0 && <span>({numSelected} Selected)</span>}
         </Box>
         <Box display={'flex'} alignItems={'center'}>
           <TableFilter {...props} />

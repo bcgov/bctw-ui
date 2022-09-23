@@ -1,5 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Table, TableBody, TableCell, TableRow, Checkbox, CircularProgress } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Checkbox,
+  CircularProgress,
+  TableFooter,
+  TablePagination,
+  Skeleton
+} from '@mui/material';
 import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
@@ -12,6 +22,10 @@ import { BCTWBase } from 'types/common_types';
 import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import TablePaginationActions from '@mui/material/TablePagination/TablePaginationActions';
+import ExportViewer from 'pages/data/bulk/ExportImportViewer';
+import { AttachedAnimal } from 'types/animal';
+import { CritterStrings } from 'constants/strings';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;
@@ -245,13 +259,30 @@ export default function DataTable<T extends BCTWBase<T>>({
          */
         // !isPaginate || isError || (isSuccess && data?.length < rowsPerPage && paginate && page === 1)
         !isPaginate || isError ? null : (
-          <PaginationActions
-            count={!isFetching && data.length}
-            page={page}
-            rowsPerPage={ROWS_PER_PAGE}
-            onChangePage={handlePageChange}
-            totalPages={totalPages}
-          />
+          <>
+            <PaginationActions
+              count={!isFetching && data.length}
+              page={page}
+              rowsPerPage={ROWS_PER_PAGE}
+              onChangePage={handlePageChange}
+              totalPages={totalPages}
+            />
+
+            <ExportViewer<AttachedAnimal>
+              template={[
+                'critter_id',
+                'species',
+                'population_unit',
+                'wlh_id',
+                'animal_id',
+                'collar_id',
+                'device_id',
+                'frequency',
+                'animal_id'
+              ]}
+              eTitle={CritterStrings.exportTitle}
+            />
+          </>
         )
       }
     />
@@ -306,58 +337,56 @@ export default function DataTable<T extends BCTWBase<T>>({
         </TableBody>
       );
     }
-    if (isSuccess) {
-      const sortedResults = stableSort(perPage(), getComparator(order, orderBy));
-      return (
-        <TableBody>
-          {sortedResults.map((obj, prop: number) => {
-            const isRowSelected = isSelected(obj[rowIdentifier]);
-            const highlightValidRow = showValidRecord && !formatTableCell(obj, 'valid_to').value;
-            return (
-              <TableRow
-                hover
-                onClick={(event): void => handleClickRow(event, obj[rowIdentifier])}
-                role='checkbox'
-                aria-checked={isRowSelected}
-                tabIndex={-1}
-                key={`row${prop}`}
-                selected={isRowSelected || highlightValidRow}>
-                {/* render checkbox column if multiselect is enabled */}
-                {isMultiSelect ? (
-                  <TableCell padding='checkbox'>
-                    <Checkbox checked={isRowSelected} />
-                  </TableCell>
-                ) : null}
-                {/* render main columns from data fetched from api */}
-                {headerProps.map((k, i) => {
-                  if (!k) {
-                    return null;
-                  }
-                  const { value } = formatTableCell(obj, k);
+    // if (isSuccess) {
+    const sortedResults = stableSort(perPage(), getComparator(order, orderBy));
+    return (
+      <TableBody>
+        {sortedResults.map((obj, prop: number) => {
+          const isRowSelected = isSelected(obj[rowIdentifier]);
+          const highlightValidRow = showValidRecord && !formatTableCell(obj, 'valid_to').value;
+          return (
+            <TableRow
+              hover
+              onClick={(event): void => handleClickRow(event, obj[rowIdentifier])}
+              role='checkbox'
+              aria-checked={isRowSelected}
+              tabIndex={-1}
+              key={`row${prop}`}
+              selected={isRowSelected || highlightValidRow}>
+              {/* render checkbox column if multiselect is enabled */}
+              {isMultiSelect ? (
+                <TableCell padding='checkbox'>
+                  <Checkbox checked={isRowSelected} />
+                </TableCell>
+              ) : null}
+              {/* render main columns from data fetched from api */}
+              {headerProps.map((k, i) => {
+                if (!k) {
+                  return null;
+                }
+                const { value } = formatTableCell(obj, k);
 
-                  return (
-                    <TableCell key={`${String(k)}${i}`} align={'left'}>
-                      {value}
-                    </TableCell>
-                  );
-                })}
-                {/* render additional columns from props */}
-                {customColumns.map((c: ICustomTableColumn<T>) => {
-                  const Col = c.column(obj, prop);
-                  return <TableCell key={`add-col-${prop}`}>{Col}</TableCell>;
-                })}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      );
-    }
-    return null;
+                return (
+                  <TableCell key={`${String(k)}${i}`} align={'left'}>
+                    {value}
+                  </TableCell>
+                );
+              })}
+              {/* render additional columns from props */}
+              {customColumns.map((c: ICustomTableColumn<T>) => {
+                const Col = c.column(obj, prop);
+                return <TableCell key={`add-col-${prop}`}>{Col}</TableCell>;
+              })}
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    );
   };
   return (
     <TableContainer toolbar={Toolbar()}>
-      <Table stickyHeader>
-        {data === undefined ? null : (
+      <>
+        <Table stickyHeader>
           <TableHead
             headersToDisplay={headerProps}
             headerData={data && data[0]}
@@ -370,9 +399,9 @@ export default function DataTable<T extends BCTWBase<T>>({
             rowCount={values?.length ?? 0}
             customHeaders={customColumns?.map((c) => c.header) ?? []}
           />
-        )}
-        <TableContents />
-      </Table>
+          <TableContents />
+        </Table>
+      </>
     </TableContainer>
   );
 }

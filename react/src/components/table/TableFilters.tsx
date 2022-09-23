@@ -53,6 +53,7 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
       disabled={disabled}
       size={'small'}
       inputRef={inputRef}
+      style={{ width: 250 }}
     />
   );
 }
@@ -66,7 +67,6 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   const [searchStr, setSearchStr] = useState('');
   const textInput = useRef(null);
   const isDisabled = disabled && !selectedOption?.length;
-
   useDidMountEffect(() => {
     const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
@@ -78,10 +78,11 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
       setSearchStr('');
     }
     setSelectedOption(values as string[]);
-
-    setTimeout(() => {
-      textInput.current.focus();
-    }, 100);
+    if (values?.length) {
+      setTimeout(() => {
+        textInput.current.focus();
+      }, 100);
+    }
   };
 
   const handleTextChange = (value: string): void => {
@@ -109,16 +110,18 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         data={selectOptions}
         changeHandler={handleSelect}
         tagLimit={1}
-        width={300}
+        width={250}
         isMultiSearch={isMultiSearch}
       />
-      <TextFilter
-        rowCount={rowCount}
-        handleTextChange={handleTextChange}
-        defaultFilter={searchStr}
-        disabled={isDisabled}
-        inputRef={textInput}
-      />
+      {!!selectedOption?.length && (
+        <TextFilter
+          rowCount={rowCount}
+          handleTextChange={handleTextChange}
+          defaultFilter={searchStr}
+          disabled={isDisabled}
+          inputRef={textInput}
+        />
+      )}
     </Box>
   );
 }

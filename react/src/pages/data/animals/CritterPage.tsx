@@ -42,9 +42,8 @@ export default function CritterPage(): JSX.Element {
   return (
     <ManageLayout>
       <SpeciesProvider>
-        <h1>Animals</h1>
-        <Box className='manage-layout-titlebar' style={{ marginBottom: 0 }}>
-          <h2>Collared Animals</h2>
+        <Box className='manage-layout-titlebar'>
+          <h1>Animals</h1>
           <Box display='flex' alignItems='center'>
             <ModifyCritterWrapper
               editing={editObj}
@@ -55,7 +54,7 @@ export default function CritterPage(): JSX.Element {
                 <EditCritter {...editProps} />
               </AddEditViewer>
             </ModifyCritterWrapper>
-            <ExportViewer<AttachedAnimal>
+            {/* <ExportViewer<AttachedAnimal>
               template={[
                 'critter_id',
                 'species',
@@ -68,7 +67,7 @@ export default function CritterPage(): JSX.Element {
                 'animal_id'
               ]}
               eTitle={CritterStrings.exportTitle}
-            />
+            /> */}
           </Box>
         </Box>
 
@@ -83,16 +82,17 @@ export default function CritterPage(): JSX.Element {
                 onSelect={handleSelect}
                 deleted={deleted}
                 updated={updated}
+                title={'Collared Animals'}
               />
             </Box>
             <Box mb={4}>
-              <h2>Non-collared Animals</h2>
               <DataTable
                 headers={new Animal().displayProps}
                 //title={CS.unassignedTableTitle}
                 queryProps={{ query: api.useUnassignedCritters }}
                 onSelect={handleSelect}
                 deleted={deleted}
+                title={'Non-collared Animals'}
               />
             </Box>
           </>
