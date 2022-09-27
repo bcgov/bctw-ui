@@ -369,7 +369,7 @@ export default function DataTable<T extends BCTWBase<T>>({
               showFirstButton
               rowsPerPageOptions={[]}
               component='div'
-              count={totalRows}
+              count={totalRows as number}
               rowsPerPage={ROWS_PER_PAGE}
               page={page - 1}
               onPageChange={handlePageChange}

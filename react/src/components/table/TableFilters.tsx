@@ -73,7 +73,8 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
   }, [searchStr, selectedOption]);
 
   const handleSelect = (v: ISelectMultipleData[]): void => {
-    const values = v.map((item) => item.value as keyof T);
+    const arrV = Array.isArray(v) ? v : [v];
+    const values = arrV.map((item) => item.value as keyof T);
     if (selectedOption && !values.length) {
       setSearchStr('');
     }
@@ -113,15 +114,13 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         width={250}
         isMultiSearch={isMultiSearch}
       />
-      {!!selectedOption?.length && (
-        <TextFilter
-          rowCount={rowCount}
-          handleTextChange={handleTextChange}
-          defaultFilter={searchStr}
-          //disabled={isDisabled}
-          inputRef={textInput}
-        />
-      )}
+      <TextFilter
+        rowCount={rowCount}
+        handleTextChange={handleTextChange}
+        defaultFilter={searchStr}
+        //disabled={isDisabled}
+        inputRef={textInput}
+      />
     </Box>
   );
 }

@@ -34,11 +34,11 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
   }, [defaultValue]);
 
   const handleChange = (value: T[]): void => {
-    const len = value.length;
-    const lastElem = len > 0 ? [value[len - 1]] : value;
-    const mutatedValue = isMultiSearch ? value : lastElem;
-    setSelected(mutatedValue);
-    changeHandler(mutatedValue, data[0]?.prop);
+    // const len = value?.length;
+    // const lastElem = len > 0 ? [value[len - 1]] : value;
+    //const mutatedValue = isMultiSearch ? value : lastElem;
+    setSelected(value ? value : []);
+    changeHandler(value ? value : [], data[0]?.prop);
   };
   if (hidden) {
     return null;
@@ -49,7 +49,7 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       disableCloseOnSelect={isMultiSearch}
       autoComplete
       size='small'
-      multiple
+      multiple={isMultiSearch}
       style={{ width }}
       limitTags={tagLimit ?? 3}
       isOptionEqualToValue={(option, value): boolean => option.id === value.id}
@@ -69,9 +69,11 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
             <Chip key={`${option.prop}-${option.id}`} label={option.displayLabel} {...getTagProps({ index })} />
           ));
       }}
-      getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel}
+      getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel ?? ''}
       renderInput={(params): JSX.Element => <TextField {...params} label={label} />}
-      onChange={(e, v): void => handleChange(v as T[])}
+      onChange={(e, v): void => {
+        handleChange(v as T[]);
+      }}
     />
   );
 }
