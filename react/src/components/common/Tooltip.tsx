@@ -4,7 +4,7 @@ import createStyles from '@mui/styles/createStyles';
 import { removeProps } from 'utils/common_helpers';
 
 const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
-  enterDelay: 750,
+  enterDelay: 500,
   placement: 'right-start'
 };
 

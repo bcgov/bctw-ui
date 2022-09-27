@@ -1,5 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Table, TableBody, TableCell, TableRow, Checkbox, CircularProgress } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Checkbox,
+  CircularProgress,
+  TableFooter,
+  TablePagination,
+  Divider,
+  Box
+} from '@mui/material';
 import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
@@ -32,7 +43,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   onSelectMultiple,
   deleted,
   updated,
-  exportFields,
+  exporter,
   resetSelections,
   paginate = true,
   isMultiSelect = false,
@@ -50,7 +61,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [rowIdentifier, setRowIdentifier] = useState('id');
 
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState<number | null>(1);
+  const [queryPage, setQueryPage] = useState(1);
+  //const [totalPages, setTotalPages] = useState<number | null>(1);
   const [totalRows, setTotalRows] = useState(0);
 
   const isPaginate = paginate && !DISABLE_PAGINATION;
@@ -89,19 +101,21 @@ export default function DataTable<T extends BCTWBase<T>>({
     filter
   );
 
-  const handlePages = (): void => {
+  const handleRows = (): void => {
+    if (!data?.length) {
+      setTotalRows(0);
+      return;
+    }
     const rowCount = data[0]?.row_count;
-    const pageCount = rowCount ? Math.ceil(rowCount / ROWS_PER_PAGE) : null;
     if (rowCount) {
       setTotalRows(rowCount);
     }
-    if (pageCount && pageCount !== totalPages) {
-      setTotalPages(pageCount);
-    }
   };
+  useEffect(() => {
+    handleRows();
+  }, [values]);
   useDidMountEffect(() => {
     if (isSuccess) {
-      handlePages();
       // update the row identifier
       const first = data && data.length && data[0];
       if (first && typeof first.identifier === 'string') {
@@ -129,9 +143,8 @@ export default function DataTable<T extends BCTWBase<T>>({
           setValues(values);
         }
       });
-
+      //queryPage === 1 && setQueryPage(0);
       setValues((o) => [...o, ...newV]);
-      //setRowsPerPage((o) => (isPaginate ? o : data.length));
     }
   }, [data]);
 
@@ -212,15 +225,9 @@ export default function DataTable<T extends BCTWBase<T>>({
     return checkIsSelected;
   };
 
-  const handlePageChange = (event: React.MouseEvent<unknown>, page: number): void => {
-    const currentPage = page;
-    if (page > currentPage) {
-      if (!isPreviousData) {
-        setPage(page);
-        return;
-      }
-    }
-    setPage(page);
+  const handlePageChange = (event: React.MouseEvent<unknown>, p: number): void => {
+    // TablePagination is zero index. Adding 1 fixes second page results from not refreshing.
+    setPage(p + 1);
   };
 
   const handleFilter = (filter: ITableFilter): void => {
@@ -237,45 +244,8 @@ export default function DataTable<T extends BCTWBase<T>>({
       isMultiSearch={isMultiSearch}
       setPage={setPage}
       showTooltip={showValidRecord}
-      disabled={totalPages !== 1}
-      sibling={
-        /**
-         * hide pagination when total results are under @var ROWS_PER_PAGE
-         * possible that only 10 results are actually available, in which
-         * case the next page will load no new results
-         *
-         * DEPRECIATED -> workflow was jarring / dissorientating as pagination was conditionally rendered
-         *
-         */
-        // !isPaginate || isError || (isSuccess && data?.length < rowsPerPage && paginate && page === 1)
-        !isPaginate || isError ? null : (
-          <>
-            <PaginationActions
-              count={!isFetching && data.length}
-              page={page}
-              rowsPerPage={ROWS_PER_PAGE}
-              onChangePage={handlePageChange}
-              totalPages={totalPages}
-            />
-            {values[0] instanceof AttachedAnimal && (
-              <ExportViewer<AttachedAnimal>
-                template={[
-                  'critter_id',
-                  'species',
-                  'population_unit',
-                  'wlh_id',
-                  'animal_id',
-                  'collar_id',
-                  'device_id',
-                  'frequency',
-                  'animal_id'
-                ]}
-                eTitle={CritterStrings.exportTitle}
-              />
-            )}
-          </>
-        )
-      }
+      //disabled={totalPages !== 1}
+      sibling={<>{exporter}</>}
     />
   );
 
@@ -301,11 +271,11 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   const TableContents = (): JSX.Element => {
     const noData = isSuccess && !data?.length;
-    useEffect(() => {
-      if (noData && totalPages !== 1) {
-        setTotalPages(1);
-      }
-    }, []);
+    // useEffect(() => {
+    //   if (noData && totalPages !== 1) {
+    //     setTotalPages(1);
+    //   }
+    // }, []);
     if (isLoading || isError) {
       return (
         <TableBody>
@@ -392,6 +362,20 @@ export default function DataTable<T extends BCTWBase<T>>({
           />
           <TableContents />
         </Table>
+        {!isPaginate || isError || values.length < ROWS_PER_PAGE ? null : (
+          <Box className={'table-footer'}>
+            <Divider />
+            <TablePagination
+              showFirstButton
+              rowsPerPageOptions={[]}
+              component='div'
+              count={totalRows}
+              rowsPerPage={ROWS_PER_PAGE}
+              page={page - 1}
+              onPageChange={handlePageChange}
+            />
+          </Box>
+        )}
       </>
     </TableContainer>
   );

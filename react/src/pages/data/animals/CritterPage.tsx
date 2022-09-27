@@ -55,20 +55,6 @@ export default function CritterPage(): JSX.Element {
                 <EditCritter {...editProps} />
               </AddEditViewer>
             </ModifyCritterWrapper>
-            {/* <ExportViewer<AttachedAnimal>
-              template={[
-                'critter_id',
-                'species',
-                'population_unit',
-                'wlh_id',
-                'animal_id',
-                'collar_id',
-                'device_id',
-                'frequency',
-                'animal_id'
-              ]}
-              eTitle={CritterStrings.exportTitle}
-            /> */}
           </Box>
         </Box>
 
@@ -84,6 +70,22 @@ export default function CritterPage(): JSX.Element {
                 deleted={deleted}
                 updated={updated}
                 title={'Collared Animals'}
+                exporter={
+                  <ExportViewer<AttachedAnimal>
+                    template={[
+                      'critter_id',
+                      'species',
+                      'population_unit',
+                      'wlh_id',
+                      'animal_id',
+                      'collar_id',
+                      'device_id',
+                      'frequency',
+                      'animal_id'
+                    ]}
+                    eTitle={CritterStrings.exportTitle}
+                  />
+                }
               />
             </Box>
             <Box mb={4}>

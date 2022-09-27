@@ -22,7 +22,7 @@ type TableFilterProps<T> = {
   onChangeFilter: (filter: ITableFilter) => void;
   isMultiSearch?: boolean;
   setPage: (page: number) => void;
-  disabled: boolean;
+  //disabled: boolean;
 };
 
 /**
@@ -50,7 +50,7 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
       value={term}
       label={disabled ? 'Search - Select Column*' : 'Search'}
       placeholder={`${rowCount} records...`}
-      disabled={disabled}
+      //disabled={disabled}
       size={'small'}
       inputRef={inputRef}
       style={{ width: 250 }}
@@ -62,11 +62,11 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
  * the search component visible in table toolbars
  */
 function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
-  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch, setPage, disabled } = props;
+  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch, setPage } = props;
   const [selectedOption, setSelectedOption] = useState<string[] | null>(null);
   const [searchStr, setSearchStr] = useState('');
   const textInput = useRef(null);
-  const isDisabled = disabled && !selectedOption?.length;
+  //const isDisabled = disabled && !selectedOption?.length;
   useDidMountEffect(() => {
     const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
@@ -118,7 +118,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
           rowCount={rowCount}
           handleTextChange={handleTextChange}
           defaultFilter={searchStr}
-          disabled={isDisabled}
+          //disabled={isDisabled}
           inputRef={textInput}
         />
       )}

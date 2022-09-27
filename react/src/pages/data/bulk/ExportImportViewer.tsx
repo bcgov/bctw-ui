@@ -11,22 +11,29 @@ export type ExportPageProps<T> = {
 };
 
 /**
- * used in data management views to wrap the export component and control the modal visibility 
+ * used in data management views to wrap the export component and control the modal visibility
  */
-export default function ExportViewer<T>({ eTitle, eMsg, template, eDisabled = false }: ExportPageProps<T>): JSX.Element {
+export default function ExportViewer<T>({
+  eTitle,
+  eMsg,
+  template,
+  eDisabled = false
+}: ExportPageProps<T>): JSX.Element {
   const [showExportModal, setShowExportModal] = useState(false);
 
-  const handleClickExport = (): void => setShowExportModal(o => !o);
+  const handleClickExport = (): void => setShowExportModal((o) => !o);
 
   const handleClose = (): void => {
     setShowExportModal(false);
-  }
+  };
 
-  const exportProps = { title: eTitle, message: eMsg, handleClose, open: showExportModal, template }
+  const exportProps = { title: eTitle, message: eMsg, handleClose, open: showExportModal, template };
 
   return (
     <Box ml={1}>
-      <Button onClick={handleClickExport} disabled={eDisabled}>Export</Button>
+      <Button onClick={handleClickExport} disabled={eDisabled} size='medium'>
+        Export
+      </Button>
       {eDisabled ? null : <Export {...exportProps} />}
     </Box>
   );

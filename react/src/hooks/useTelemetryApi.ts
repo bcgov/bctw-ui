@@ -85,11 +85,10 @@ export const useTelemetryApi = () => {
    *
    */
   const useEstimate = (start: string, end: string): UseQueryResult<any, AxiosError> => {
-    return useQuery<any, AxiosError>(
-      ['estimate', start, end],
-      () => mapApi.getEstimate(start, end),
-      {...defaultQueryOptions, retry: false}
-    );
+    return useQuery<any, AxiosError>(['estimate', start, end], () => mapApi.getEstimate(start, end), {
+      ...defaultQueryOptions,
+      retry: false
+    });
   };
 
   const useTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
@@ -526,7 +525,7 @@ export const useTelemetryApi = () => {
       config
     );
 
-    /*
+  /*
       const useTakeActionOnPermissionRequest = (
     config: UseMutationOptions<IUserCritterAccess, AxiosError, IExecutePermissionRequest>
   ): UseMutationResult<IUserCritterAccess> =>
