@@ -2,7 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { AxiosInstance } from 'axios';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
-import { exportEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
+import { exportEndpoint, exportAllEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
 import { useQueryClient } from 'react-query';
 import { API, IBulkUploadResults, IDeleteType } from './api_interfaces';
 import { IVectronicUpsert } from 'types/collar';
@@ -72,9 +72,17 @@ export const bulkApi = (api: AxiosInstance): API => {
     return results;
   }
 
+  const getAllExportData = async (body: any): Promise<string[]> => {
+    const url = createUrl({ api: exportAllEndpoint })
+    const { data } = await api.post(url, body);
+    const results = data.flat();
+    return results;
+  }
+
   return {
     deleteType,
     getExportData,
+    getAllExportData,
     getType,
     uploadCsv,
     uploadFiles,

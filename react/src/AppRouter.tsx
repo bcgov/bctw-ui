@@ -1,6 +1,7 @@
 import AdminHandleRequestPermissionPage from 'pages/permissions/AdminHandleRequestPermission';
 import CollarPage from 'pages/data/collars/CollarPage';
 import CritterPage from 'pages/data/animals/CritterPage';
+import ExportPageV2 from 'pages/data/bulk/ExportV2';
 import GrantCritterAccessPage from 'pages/permissions/GrantCritterAccessPage';
 import Home from 'pages/Home';
 import Import from 'pages/data/bulk/Import';
@@ -40,7 +41,8 @@ const AppRoutes: RouteKey[] = [
   { name: 'animal-manager', path: '/animal-manager', title: 'Set Animal Manager', component: GrantCritterAccessPage, sort: 103, icon: 'key' },
   { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: UserOnboarding, sort: 201 },
   { name: 'vendor', path: '/vendor', title: 'Telemetry Retrieval', component: VendorAPIPage, sort: 202, icon: 'devices' },
-  { name: 'notFound', path: '/*', title: 'React: Not Found', component: (): JSX.Element => <div>React AppRouter.tsx says: Page not found!</div>, sort: 404 },
+  { name: 'data', path: '/data', title: 'Data Export', component: ExportPageV2, sort: 300, icon: 'animals' },
+  { name: 'notFound', path: '/*', title: 'React: Not Found', component: (): JSX.Element => <div>React AppRouter.tsx says: Page not found!</div>, sort: 404 }
 ];
 
 const AppRouter = (): JSX.Element => {
