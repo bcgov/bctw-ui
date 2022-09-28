@@ -37,7 +37,10 @@ import {
   mdiCancel,
   mdiCircle,
   mdiAlertRhombus,
-  mdiSleep
+  mdiSleep,
+  mdiBell,
+  mdiChevronDown,
+  mdiChevronUp
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -62,6 +65,10 @@ const getIconPath = (path: string): string => {
       return mdiArrowLeft;
     case 'next':
       return mdiArrowRight;
+    case 'down':
+      return mdiChevronDown;
+    case 'up':
+      return mdiChevronUp;
     case 'last':
       return mdiPageLast;
     case 'close':
@@ -131,6 +138,8 @@ const getIconPath = (path: string): string => {
       return mdiAlertRhombus;
     case 'zzz':
       return mdiSleep;
+    case 'bell':
+      return mdiBell;
   }
 };
 

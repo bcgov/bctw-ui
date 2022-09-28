@@ -16,14 +16,20 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 interface BannerProps {
-  variant: 'info' | 'warning' | 'success';
+  variant: 'info' | 'warning' | 'success' | 'error';
   text: string | string[];
   icon?: JSX.Element;
-  closeBtn?: boolean;
+  action?: 'close' | 'collapse';
 }
-export const Banner = ({ variant, icon, text, closeBtn }: BannerProps) => {
+export const Banner = ({ variant, icon, text, action }: BannerProps) => {
   const style = useStyles();
   const [open, setOpen] = useState(true);
+  const [expand, setExpand] = useState(false);
+  const getAction = (a: string) => {
+    if (a === 'collapse' && !expand) return 'down';
+    if (a === 'collapse' && expand) return 'up';
+    return a;
+  };
   return (
     <Collapse in={open}>
       <Alert
@@ -31,14 +37,14 @@ export const Banner = ({ variant, icon, text, closeBtn }: BannerProps) => {
         icon={icon}
         className={style.root}
         action={
-          closeBtn ? (
+          action ? (
             <IconButton
               color='inherit'
               size='small'
               onClick={() => {
-                setOpen(false);
+                action === 'close' ? setOpen(false) : setExpand((e) => !e);
               }}>
-              <Icon icon={'close'} />
+              <Icon icon={getAction(action)} />
             </IconButton>
           ) : null
         }>
@@ -51,7 +57,10 @@ export const Banner = ({ variant, icon, text, closeBtn }: BannerProps) => {
         ) : (
           <div>{text}</div>
         )}
+        <Collapse in={expand}>blah blah blah</Collapse>
       </Alert>
     </Collapse>
   );
 };
+
+export const InfoBanner = (text: keyof BannerProps) => {};

@@ -57,8 +57,13 @@ export default function CritterPage(): JSX.Element {
           </Box>
         </Box>
         <Banner variant='info' text={BannerStrings.exportDetails} />
-        <Banner variant='info' text={BannerStrings.noNotifs} icon={<Icon icon={'zzz'} />} closeBtn />
-
+        <Banner variant='info' text={BannerStrings.noNotifications} icon={<Icon icon={'zzz'} />} action='close' />
+        <Banner
+          variant='error'
+          text={BannerStrings.getNotifications(1)}
+          icon={<Icon icon={'bell'} />}
+          action='collapse'
+        />
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
         <RowSelectedProvider>
           <>
