@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import DataTable from 'components/table/DataTable';
-import { CritterStrings, CritterStrings as CS } from 'constants/strings';
+import { BannerStrings, CritterStrings, CritterStrings as CS } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
@@ -14,6 +14,9 @@ import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
 import Icon from 'components/common/Icon';
+import { Alert } from '@mui/material';
+import { Banner } from 'components/common/Banner';
+
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
@@ -36,10 +39,6 @@ export default function CritterPage(): JSX.Element {
     queryStatus: 'idle' as QueryStatus
   };
 
-  const CollarStatusIcon = (row: AttachedAnimal) => {
-    return <Icon icon={'error'}></Icon>;
-  };
-
   return (
     <ManageLayout>
       <SpeciesProvider>
@@ -57,6 +56,8 @@ export default function CritterPage(): JSX.Element {
             </ModifyCritterWrapper>
           </Box>
         </Box>
+        <Banner variant='info' text={BannerStrings.exportDetails} />
+        <Banner variant='info' text={BannerStrings.noNotifs} icon={<Icon icon={'zzz'} />} closeBtn />
 
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
         <RowSelectedProvider>
@@ -96,6 +97,12 @@ export default function CritterPage(): JSX.Element {
                 onSelect={handleSelect}
                 deleted={deleted}
                 title={'Non-collared Animals'}
+                exporter={
+                  <ExportViewer<Animal>
+                    template={['critter_id', 'species', 'population_unit', 'wlh_id', 'animal_id', 'animal_id']}
+                    eTitle={CritterStrings.exportTitle}
+                  />
+                }
               />
             </Box>
           </>

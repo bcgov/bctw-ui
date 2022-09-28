@@ -44,6 +44,14 @@ const FileStrings = {
   templateButtonText: 'Download Template'
 };
 
+const BannerStrings = {
+  noNotifs: 'No Notifications',
+  exportDetails: [
+    'Use Quick Export to quickly get telemetry data for any of your animals.',
+    'Use Advanced Export to get data that matches custom query parameters.'
+  ]
+};
+
 const WorkflowStrings = {
   location: {
     coordTypeLatLong: 'Use Lat/Long',
@@ -276,5 +284,6 @@ export {
   WorkflowStrings,
   UserAlertStrings,
   UserStrings,
-  HomePageStrings
+  HomePageStrings,
+  BannerStrings
 };

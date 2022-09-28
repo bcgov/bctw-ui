@@ -53,7 +53,7 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
       //disabled={disabled}
       size={'small'}
       inputRef={inputRef}
-      style={{ width: 250 }}
+      style={{ width: 200 }}
     />
   );
 }
@@ -111,16 +111,18 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         data={selectOptions}
         changeHandler={handleSelect}
         tagLimit={1}
-        width={250}
+        width={200}
         isMultiSearch={isMultiSearch}
       />
-      <TextFilter
-        rowCount={rowCount}
-        handleTextChange={handleTextChange}
-        defaultFilter={searchStr}
-        //disabled={isDisabled}
-        inputRef={textInput}
-      />
+      {!!selectedOption?.length && (
+        <TextFilter
+          rowCount={rowCount}
+          handleTextChange={handleTextChange}
+          defaultFilter={searchStr}
+          //disabled={isDisabled}
+          inputRef={textInput}
+        />
+      )}
     </Box>
   );
 }

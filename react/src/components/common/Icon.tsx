@@ -36,7 +36,8 @@ import {
   mdiBrush,
   mdiCancel,
   mdiCircle,
-  mdiAlertRhombus
+  mdiAlertRhombus,
+  mdiSleep
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -128,6 +129,8 @@ const getIconPath = (path: string): string => {
       return mdiCircle;
     case 'alert':
       return mdiAlertRhombus;
+    case 'zzz':
+      return mdiSleep;
   }
 };
 
