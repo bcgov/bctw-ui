@@ -36,7 +36,8 @@ export default function CritterPage(): JSX.Element {
     editing: new AttachedAnimal(),
     empty: new AttachedAnimal(),
     addTooltip: CS.addTooltip,
-    queryStatus: 'idle' as QueryStatus
+    queryStatus: 'idle' as QueryStatus,
+    disableAdd: true
   };
 
   return (
@@ -44,17 +45,7 @@ export default function CritterPage(): JSX.Element {
       <SpeciesProvider>
         <Box className='manage-layout-titlebar'>
           <h1>Animals</h1>
-          <Box display='flex' alignItems='center'>
-            <ModifyCritterWrapper
-              editing={editObj}
-              onDelete={(critter_id: string): void => setDeleted(critter_id)}
-              onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-              setCritter={setEditObj}>
-              <AddEditViewer<AttachedAnimal> {...addEditProps}>
-                <EditCritter {...editProps} />
-              </AddEditViewer>
-            </ModifyCritterWrapper>
-          </Box>
+          <Box display='flex' alignItems='center'></Box>
         </Box>
         <Banner variant='info' text={BannerStrings.exportDetails} />
         <Banner variant='info' text={BannerStrings.noNotifications} icon={<Icon icon={'zzz'} />} action='close' />
@@ -77,20 +68,31 @@ export default function CritterPage(): JSX.Element {
                 updated={updated}
                 title={'Collared Animals'}
                 exporter={
-                  <ExportViewer<AttachedAnimal>
-                    template={[
-                      'critter_id',
-                      'species',
-                      'population_unit',
-                      'wlh_id',
-                      'animal_id',
-                      'collar_id',
-                      'device_id',
-                      'frequency',
-                      'animal_id'
-                    ]}
-                    eTitle={CritterStrings.exportTitle}
-                  />
+                  <>
+                    <ModifyCritterWrapper
+                      editing={editObj}
+                      onDelete={(critter_id: string): void => setDeleted(critter_id)}
+                      onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+                      setCritter={setEditObj}>
+                      <AddEditViewer<AttachedAnimal> {...addEditProps}>
+                        <EditCritter {...editProps} />
+                      </AddEditViewer>
+                    </ModifyCritterWrapper>
+                    <ExportViewer<AttachedAnimal>
+                      template={[
+                        'critter_id',
+                        'species',
+                        'population_unit',
+                        'wlh_id',
+                        'animal_id',
+                        'collar_id',
+                        'device_id',
+                        'frequency',
+                        'animal_id'
+                      ]}
+                      eTitle={CritterStrings.exportTitle}
+                    />
+                  </>
                 }
               />
             </Box>

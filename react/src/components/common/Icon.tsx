@@ -40,7 +40,9 @@ import {
   mdiSleep,
   mdiBell,
   mdiChevronDown,
-  mdiChevronUp
+  mdiChevronUp,
+  mdiEye,
+  mdiEyePlus
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -140,6 +142,10 @@ const getIconPath = (path: string): string => {
       return mdiSleep;
     case 'bell':
       return mdiBell;
+    case 'eye':
+      return mdiEye;
+    case 'eyeplus':
+      return mdiEyePlus;
   }
 };
 

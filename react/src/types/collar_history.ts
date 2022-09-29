@@ -7,10 +7,12 @@ import { DataLife, IDataLifeStartProps, IDataLifeEndProps, DataLifeInput } from 
 import { isDev } from 'api/api_helpers';
 import { Code } from 'types/code';
 import { Animal } from './animal';
+import { IHistoricalTelemetryInput } from './point_import';
 
 export interface ICollarHistory
   extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'frequency' | 'device_status'>,
     DataLife,
+    Pick<IHistoricalTelemetryInput, 'latitude' | 'longitude'>,
     Pick<Animal, 'critter_id'> {
   assignment_id: uuid;
 }
@@ -38,6 +40,8 @@ export class CollarHistory implements BCTWBase<CollarHistory>, ICollarHistory {
   device_make: Code;
   frequency: number;
   device_status: string;
+  latitude: number;
+  longitude: number;
   @Transform(nullToDayjs) data_life_start: Dayjs;
   @Transform(nullToDayjs) data_life_end: Dayjs;
   @Transform(nullToDayjs) attachment_start: Dayjs;

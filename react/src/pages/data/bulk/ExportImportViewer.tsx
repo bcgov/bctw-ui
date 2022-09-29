@@ -2,6 +2,7 @@ import { Box } from '@mui/material';
 import { Button } from 'components/common';
 import Export from 'pages/data/bulk/Export';
 import { useState } from 'react';
+import { buttonProps } from 'components/component_constants';
 
 export type ExportPageProps<T> = {
   eTitle: string;
@@ -31,7 +32,7 @@ export default function ExportViewer<T>({
 
   return (
     <Box ml={1}>
-      <Button onClick={handleClickExport} disabled={eDisabled} size='medium'>
+      <Button onClick={handleClickExport} disabled={eDisabled} {...buttonProps}>
         Export
       </Button>
       {eDisabled ? null : <Export {...exportProps} />}
