@@ -241,8 +241,17 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
     return ['animal_id', 'device_status', 'animal_status', 'wlh_id', 'device_id', 'species', 'frequency'];
   }
 
-  formatPropAsHeader(str: keyof Animal): string {
-    return super.formatPropAsHeader(str);
+  formatPropAsHeader(str: keyof Animal | keyof AttachedAnimal): string {
+    if (str in Animal) {
+      return super.formatPropAsHeader(str as keyof Animal);
+    } else {
+      switch (str) {
+        case 'device_status':
+          return 'Collar Status';
+        default:
+          return columnToHeader(str);
+      }
+    }
   }
 }
 

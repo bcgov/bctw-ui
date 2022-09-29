@@ -237,7 +237,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   const Toolbar = (): JSX.Element => (
     <TableToolbar
       rowCount={totalRows}
-      numSelected={selected.length}
+      numSelected={isMultiSelect ? selected.length : 0}
       title={title}
       onChangeFilter={handleFilter}
       filterableProperties={headers}
@@ -347,7 +347,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   return (
     <TableContainer toolbar={Toolbar()}>
       <>
-        <Table stickyHeader>
+        <Table stickyHeader size='small'>
           <TableHead
             headersToDisplay={headerProps}
             headerData={data && data[0]}
