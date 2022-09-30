@@ -347,7 +347,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   return (
     <TableContainer toolbar={Toolbar()}>
       <>
-        <Table stickyHeader size='small'>
+        <Table stickyHeader>
           <TableHead
             headersToDisplay={headerProps}
             headerData={data && data[0]}

@@ -42,7 +42,8 @@ import {
   mdiChevronDown,
   mdiChevronUp,
   mdiEye,
-  mdiEyePlus
+  mdiEyePlus,
+  mdiDotsHorizontal
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -146,6 +147,8 @@ const getIconPath = (path: string): string => {
       return mdiEye;
     case 'eyeplus':
       return mdiEyePlus;
+    case 'dots':
+      return mdiDotsHorizontal;
   }
 };
 

@@ -238,6 +238,13 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   @Exclude(toPlainOnly) data_life_end: Dayjs;
   @Exclude(toPlainOnly) attachment_end: Dayjs;
 
+  get lastKnownLocation(): string {
+    if (this.latitude && this.longitude) {
+      return `${this.latitude.toFixed(2)} ${this.longitude.toFixed(2)}`;
+    } else {
+      return null;
+    }
+  }
   // con't overide since this class is inherited
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
     return [
@@ -248,8 +255,9 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
       'device_id',
       'species',
       'frequency',
-      'latitude',
-      'longitude'
+      'lastKnownLocation'
+      // 'latitude',
+      // 'longitude'
     ];
   }
 
@@ -260,6 +268,8 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
       switch (str) {
         case 'device_status':
           return 'Collar Status';
+        case 'lastKnownLocation':
+          return 'Last Lat Long';
         default:
           return columnToHeader(str);
       }

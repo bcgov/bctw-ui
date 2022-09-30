@@ -16,10 +16,17 @@ const useToolbarStyles = makeStyles((theme) => ({
     //paddingLeft: theme.spacing(2)
   },
   toolbarTitle: {
-    fontWeight: 700
+    fontWeight: 700,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%'
   },
   title: {
     marginBottom: 0
+  },
+  actions: {
+    float: 'right'
   }
 }));
 
@@ -41,12 +48,7 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
   const { numSelected, sibling, title, showTooltip } = props;
   return (
     <Toolbar disableGutters>
-      <Box
-        className={classes.toolbarInner}
-        display='flex'
-        alignItems='center'
-        justifyContent='space-between'
-        width='100%'>
+      <Box className={classes.toolbarInner} width='100%'>
         {showTooltip && (
           <TableRow selected={true}>
             <TableCell style={{ color: 'black' }}>Current Record</TableCell>
@@ -55,10 +57,10 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
         <Box className={classes.toolbarTitle}>
           <h2 className={classes.title}>{title ?? ''}</h2>&nbsp;
           {numSelected > 0 && <span>({numSelected} Selected)</span>}
-        </Box>
-        <Box display={'flex'} alignItems={'center'}>
-          <TableFilter {...props} />
-          {sibling}
+          <Box display={'flex'} alignItems={'center'} className={classes.actions}>
+            <TableFilter {...props} />
+            {sibling}
+          </Box>
         </Box>
       </Box>
     </Toolbar>

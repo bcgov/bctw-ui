@@ -13,7 +13,7 @@ export const manageLayoutStyles = makeStyles(() => ({
     background: '#f7f8fa',
     '& h1': {
       marginTop: 0,
-      marginBottom: 0,
+      marginBottom: 0
     }
   }
 }));

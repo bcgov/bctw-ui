@@ -64,7 +64,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
-    <Box className={'sidebar'} id='manage_sidebar' py={2} px={2}>
+    <Box className={'sidebar'} id='manage_sidebar' py={2} px={1}>
       <List component='nav'>
         {routesToShow
           .filter((r) => r.name !== 'notFound' && r.icon)

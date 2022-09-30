@@ -14,8 +14,9 @@ import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
 import Icon from 'components/common/Icon';
-import { Alert } from '@mui/material';
-import { Banner } from 'components/common/Banner';
+import { Alert, Button, IconButton } from '@mui/material';
+import { Banner, InfoBanner, NotificationBanner } from 'components/common/Banner';
+import { buttonProps } from 'components/component_constants';
 
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
@@ -37,24 +38,45 @@ export default function CritterPage(): JSX.Element {
     empty: new AttachedAnimal(),
     addTooltip: CS.addTooltip,
     queryStatus: 'idle' as QueryStatus,
-    disableAdd: true
+    disableAdd: true,
+    disableDelete: true
   };
 
+  const Actions = () => {
+    return (
+      <IconButton>
+        <Icon icon='dots' />
+      </IconButton>
+    );
+  };
   return (
     <ManageLayout>
       <SpeciesProvider>
         <Box className='manage-layout-titlebar'>
           <h1>Animals</h1>
-          <Box display='flex' alignItems='center'></Box>
+          <Box display='flex' alignItems='center'>
+            <Button size='medium' variant='outlined'>
+              Manage My Animals
+            </Button>
+          </Box>
         </Box>
-        <Banner variant='info' text={BannerStrings.exportDetails} />
-        <Banner variant='info' text={BannerStrings.noNotifications} icon={<Icon icon={'zzz'} />} action='close' />
+        {/* <Banner variant='info' text={BannerStrings.exportDetails} />
+        <Banner variant='info' text={BannerStrings.getNotifications(0)} icon={<Icon icon={'zzz'} />} action='close' />
         <Banner
           variant='error'
           text={BannerStrings.getNotifications(1)}
           icon={<Icon icon={'bell'} />}
           action='collapse'
-        />
+          hiddenContent={
+            <div>
+              <p>Hello this is a notification</p>
+              <b>Critter 123</b>
+              <p>blah blah blah</p>
+            </div>
+          }
+        /> */}
+        <InfoBanner text={BannerStrings.exportDetails} />
+        <NotificationBanner notifications={[<div>Notification 1</div>, <div>Notification 2</div>]} />
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
         <RowSelectedProvider>
           <>
@@ -67,6 +89,7 @@ export default function CritterPage(): JSX.Element {
                 deleted={deleted}
                 updated={updated}
                 title={'Collared Animals'}
+                customColumns={[{ column: Actions, header: (): JSX.Element => <></> }]}
                 exporter={
                   <>
                     <ModifyCritterWrapper
@@ -88,7 +111,9 @@ export default function CritterPage(): JSX.Element {
                         'collar_id',
                         'device_id',
                         'frequency',
-                        'animal_id'
+                        'animal_id',
+                        'latitude',
+                        'longitude'
                       ]}
                       eTitle={CritterStrings.exportTitle}
                     />

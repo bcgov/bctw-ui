@@ -45,7 +45,6 @@ const FileStrings = {
 };
 
 const BannerStrings = {
-  noNotifications: 'No Notifications',
   getNotifications: (n: number): string => `${n} Notification${n > 1 ? 's' : ''}`,
   exportDetails: [
     'Use Quick Export to quickly get telemetry data for any of your animals.',
