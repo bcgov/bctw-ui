@@ -142,4 +142,12 @@ function fuzzySearchMutipleWords<T>(rows: T[], keys: string[], filterValue: stri
   return terms.reduceRight((results, term) => matchSorter(results, term, { keys }), rows);
 }
 
-export { fuzzySearchMutipleWords, descendingComparator, getComparator, stableSort, createHeadCell, formatTableCell };
+export {
+  fuzzySearchMutipleWords,
+  getDeviceStatusIcon,
+  descendingComparator,
+  getComparator,
+  stableSort,
+  createHeadCell,
+  formatTableCell
+};

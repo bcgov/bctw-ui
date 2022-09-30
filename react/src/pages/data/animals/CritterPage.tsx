@@ -17,6 +17,7 @@ import Icon from 'components/common/Icon';
 import { Alert, Button, IconButton } from '@mui/material';
 import { Banner, InfoBanner, NotificationBanner } from 'components/common/Banner';
 import { buttonProps } from 'components/component_constants';
+import { attachedAnimalNotification } from 'constants/formatted_string_components';
 
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
@@ -76,7 +77,38 @@ export default function CritterPage(): JSX.Element {
           }
         /> */}
         <InfoBanner text={BannerStrings.exportDetails} />
-        <NotificationBanner notifications={[<div>Notification 1</div>, <div>Notification 2</div>]} />
+        <NotificationBanner
+          notifications={[
+            attachedAnimalNotification({
+              device_status: 'Mortality',
+              device_id: 123,
+              frequency: 123,
+              animal_id: 'Cool Guy',
+              wlh_id: '123'
+            }),
+            attachedAnimalNotification({
+              device_status: 'Potential Mortality',
+              device_id: 1234,
+              frequency: 1234,
+              animal_id: 'Not Cool Guy',
+              wlh_id: '1234'
+            }),
+            attachedAnimalNotification({
+              device_status: 'Mortality',
+              device_id: 123,
+              frequency: 123,
+              animal_id: 'Cool Guy',
+              wlh_id: '123'
+            }),
+            attachedAnimalNotification({
+              device_status: 'Potential Mortality',
+              device_id: 1234,
+              frequency: 1234,
+              animal_id: 'Not Cool Guy',
+              wlh_id: '1234'
+            })
+          ]}
+        />
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
         <RowSelectedProvider>
           <>

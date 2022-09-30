@@ -67,7 +67,9 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
         ) : (
           <div>{text}</div>
         )}
-        <Collapse in={expand}>{hiddenContent}</Collapse>
+        <Collapse in={expand}>
+          <List dense>{hiddenContent}</List>
+        </Collapse>
       </Alert>
     </Collapse>
   );
@@ -90,7 +92,7 @@ export const NotificationBanner = ({ notifications }: INotification) => {
       hiddenContent={
         <div>
           {notifications.map((notif) => (
-            <div className={style.spacing}>{notif}</div>
+            <div>{notif}</div>
           ))}
         </div>
       }
