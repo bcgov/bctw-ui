@@ -79,12 +79,9 @@ const getGuid = (sessionObject) => {
   //   username: credentials[0],
   //   domain: credentials[1].replace("-business", ""),
   // };
-  const keycloak_guid =
-    sessionObject?.idir_user_guid ?? sessionObject?.bceid_business_guid;
-  //sessionObject?.bceid_user_guid;
-
   return {
-    keycloak_guid,
+    keycloak_guid:
+      sessionObject?.idir_user_guid ?? sessionObject?.bceid_business_guid,
     domain: sessionObject?.idir_user_guid ? "idir" : "bceid",
   };
 };
