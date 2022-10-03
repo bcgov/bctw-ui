@@ -80,9 +80,10 @@ const getGuid = (sessionObject) => {
   //   domain: credentials[1].replace("-business", ""),
   // };
   return {
-    keycloak_guid:
-      sessionObject?.idir_user_guid ?? sessionObject?.bceid_business_guid,
-    domain: sessionObject?.idir_user_guid ? "idir" : "bceid",
+    keycloak_guid: sessionObject.idir_user_guid
+      ? sessionObject.idir_user_guid
+      : sessionObject.bceid_business_guid,
+    domain: sessionObject.idir_user_guid ? "idir" : "bceid",
   };
 };
 
