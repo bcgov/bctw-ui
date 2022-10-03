@@ -156,6 +156,7 @@ function CreateEditSelectField({
       multiple={multiple}
       codeHeader={codeName ?? String(prop)}
       defaultValue={typeof value === 'string' ? value : ''}
+      defaultValues={multiple ? value as string[] : []}
       changeHandler={handleChange}
       changeHandlerMultiple={handleChangeMultiple}
       required={required}
@@ -211,6 +212,11 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
     ...formField,
     ...inputProps
   };
+  console.log("formField obj is " + JSON.stringify(formField));
+  console.log("Obj is " + JSON.stringify(obj));
+  console.log("Prop is " + prop);
+  console.log("Value is " + toPass.value);
+
   let Comp = getInputFnFromType(type)(toPass);
 
   if (tooltip) {

@@ -38,6 +38,7 @@ type SelectCodeProps = FormBaseProps &
     addEmptyOption?: boolean;
     inputRef?: MutableRefObject<ChildRefs>;
     isSpeciesSelect?: boolean;
+    defaultValues?: string[];
   };
 
 /**
@@ -57,6 +58,7 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
     addEmptyOption,
     codeHeader,
     defaultValue,
+    defaultValues,
     changeHandler,
     changeHandlerMultiple,
     multiple,
@@ -72,7 +74,7 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
   const species = useSpecies();
 
   const [value, setValue] = useState(defaultValue);
-  const [values, setValues] = useState<string[]>([]);
+  const [values, setValues] = useState<string[]>( defaultValues ? defaultValues : []);
   const [codes, setCodes] = useState<ICode[]>([]);
   //const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);

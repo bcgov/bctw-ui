@@ -35,15 +35,16 @@ export interface IFormRowEntry {
     column: ColumnOptions;
     operator: string;
     value: Array<string>;
+    formField: PossibleColumnValues;
 }
 
 class PossibleColumnValues implements BCTWFormat<PossibleColumnValues> {
-    species: string;
-    population_unit: string;
+    species: string[];
+    population_unit: string[];
     wlh_id: string;
     animal_id: string;
-    device_id: number;
-    frequency: number;
+    device_id: string;
+    frequency: string;
 
     get displayProps(): (keyof PossibleColumnValues)[] {
         return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];    
@@ -87,7 +88,7 @@ export default function ExportPageV2 (): JSX.Element {
     const operators: string[] = ['Equals','Not Equals'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
     const [end, setEnd] = useState(dayjs());
-    const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: '', value: []}]);
+    const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: '', value: [], formField: new PossibleColumnValues}]);
     const [tab, setTab] = useState<TabNames>(TabNames.quick);
     const [formsFilled, setFormsFilled] = useState(false);
     const [collarIDs, setCollarIDs] = useState([]);
@@ -159,7 +160,7 @@ export default function ExportPageV2 (): JSX.Element {
     };
 
     const handleAddNewRow = (): void => {
-        setRows([...rows, {column: 'species', operator: '', value: []}]);
+        setRows([...rows, {column: 'species', operator: '', value: [], formField: new PossibleColumnValues}]);
     }
 
     const handleRemoveRow = (): void => {
@@ -254,13 +255,23 @@ export default function ExportPageV2 (): JSX.Element {
         if(['population_unit', 'species'].includes(o.column) === false) {
             //console.log(strval.replace(/\s+/g, '').split(','));
             o.value = strval.replace(/\s+/g, '').split(',');
+            const ff = new PossibleColumnValues;
+            const key: keyof typeof PossibleColumnValues = o.column as keyof typeof PossibleColumnValues;
+            ff[key] = strval as string;
+            o.formField = ff;
+            //formFields[o.column] = strval;
+            console.log("Setting formFields " + JSON.stringify(formFields));
         }
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 
     const handleDropdownChange = (newval: ICodeFilter[], idx: number): void => {
         const o = rows[idx];
-        o.value = newval.map(n => n.description.toString().toLowerCase());
+        o.value = newval.map(n => n.description.toString());
+        const ff = new PossibleColumnValues;
+        const key: keyof typeof PossibleColumnValues = o.column as keyof typeof PossibleColumnValues;
+        ff[key]= o.value;
+        o.formField = ff;
         console.log(newval);
         console.log(o.value);
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
@@ -324,7 +335,16 @@ export default function ExportPageV2 (): JSX.Element {
             updated={updated}*/
             />
         </Box>
-        <Button onClick={() => {handleSimpleExportClick()}}>Export Selected Data</Button>
+        <LoadingButton
+            style={{padding: '8px 22px', lineHeight: '26.25px'}} 
+            className='form-buttons' 
+            variant='contained'
+            loading={loadingExport}
+            disabled={!collarIDs.length}
+            loadingIndicator={<CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />}
+            onClick={() => {handleSimpleExportClick()}}>
+                Export Selected Data
+        </LoadingButton>
         </>
         )
     }
@@ -338,7 +358,7 @@ export default function ExportPageV2 (): JSX.Element {
             <>
             <Select className='query-builder-column' label={'Column'} defaultValue={formFields.formatPropAsHeader(row.column)} values={formFields.displayProps.map(o => formFields.formatPropAsHeader(o))} handleChange={(str) => handleColumnChange(str, idx)}></Select>
             <Select className='query-builder' label={'Operator'} defaultValue={row.operator} values={operators} handleChange={(str) => handleOperatorChange(str, idx)}></Select>
-            {CreateFormField(formFields, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), multiple: true, style: {minWidth: '300px'}})}
+            {CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), multiple: true, style: {minWidth: '300px'}})}
             {idx < rows.length - 1 && (<Typography marginTop={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>)}
             </>
         ))}
