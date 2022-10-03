@@ -79,6 +79,8 @@ const getGuid = (sessionObject) => {
   //   username: credentials[0],
   //   domain: credentials[1].replace("-business", ""),
   // };
+  //Issue with optional chaining sessionObject?.idir_user_guid
+  //Maybe node version issue?
   return {
     keycloak_guid: sessionObject.idir_user_guid
       ? sessionObject.idir_user_guid
