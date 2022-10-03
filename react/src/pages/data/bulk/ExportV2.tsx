@@ -28,6 +28,7 @@ import download from 'downloadjs';
 import tokml from 'tokml';
 import { LoadingButton } from '@mui/lab';
 import makeStyles from '@mui/styles/makeStyles';
+import ExportDownloadModal from './ExportDownloadModal';
 
 type ColumnOptions = 'species' | 'population_unit' | 'wlh_id' | 'animal_id' | 'device_id' | 'frequency';
 
@@ -160,7 +161,8 @@ export default function ExportPageV2 (): JSX.Element {
     };
 
     const handleAddNewRow = (): void => {
-        setRows([...rows, {column: 'species', operator: '', value: [], formField: new PossibleColumnValues}]);
+        const firstRemaining = getValidColumnChoices()[0];
+        setRows([...rows, {column: firstRemaining as ColumnOptions, operator: '', value: [], formField: new PossibleColumnValues}]);
     }
 
     const handleRemoveRow = (): void => {
@@ -244,6 +246,13 @@ export default function ExportPageV2 (): JSX.Element {
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 
+    /*
+    * Below, a new PossibleColumnValues is made everytime we change a Value field.
+    * This probably isn't really ideal, since it sort of duplicates data, but CreateFormField needs an object of this type to properly
+    * handle the defaultValue for the form and have that information persist between re-renders. 
+    * A partial refactor to better reflect this is on 710-refactored-row-data.
+    */
+
     const handleValueChange = (newval: Record<string, unknown>, idx: number): void => {
         if(newval === undefined) {
             return;
@@ -253,14 +262,11 @@ export default function ExportPageV2 (): JSX.Element {
         //o.value = strval;
         console.log(`Handling ${o.column} change: ` + newval[o.column] as string);
         if(['population_unit', 'species'].includes(o.column) === false) {
-            //console.log(strval.replace(/\s+/g, '').split(','));
             o.value = strval.replace(/\s+/g, '').split(',');
             const ff = new PossibleColumnValues;
             const key: keyof typeof PossibleColumnValues = o.column as keyof typeof PossibleColumnValues;
             ff[key] = strval as string;
             o.formField = ff;
-            //formFields[o.column] = strval;
-            console.log("Setting formFields " + JSON.stringify(formFields));
         }
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
@@ -281,7 +287,16 @@ export default function ExportPageV2 (): JSX.Element {
         setTab(newVal);
     }
 
+    const getValidColumnChoices = (ownchoice?: ColumnOptions): string[] => {
+        const chosen = rows.map(o => o.column);
+        const remaining = formFields.displayProps.filter(o => !chosen.includes(o as ColumnOptions));
+        if(ownchoice !== undefined)
+            remaining.unshift(ownchoice);
+        return remaining;
+    }
+
     const getFormFieldObjForColumn = (col: ColumnOptions): FormFieldObject<any> => {
+        console.log("Got this column value: " + col);
         const ff = wfFields.get(col);
         if(col === 'device_id' || col == 'frequency') {
             ff.type = eInputType.text;
@@ -356,14 +371,14 @@ export default function ExportPageV2 (): JSX.Element {
         
         {rows.map((row, idx) => (
             <>
-            <Select className='query-builder-column' label={'Column'} defaultValue={formFields.formatPropAsHeader(row.column)} values={formFields.displayProps.map(o => formFields.formatPropAsHeader(o))} handleChange={(str) => handleColumnChange(str, idx)}></Select>
+            <Select className='query-builder-column' label={'Column'} defaultValue={formFields.formatPropAsHeader(row.column)} values={getValidColumnChoices(row.column).map(o => formFields.formatPropAsHeader(o as ColumnOptions))} handleChange={(str) => handleColumnChange(str, idx)}></Select>
             <Select className='query-builder' label={'Operator'} defaultValue={row.operator} values={operators} handleChange={(str) => handleOperatorChange(str, idx)}></Select>
             {CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), multiple: true, style: {minWidth: '300px'}})}
             {idx < rows.length - 1 && (<Typography marginTop={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>)}
             </>
         ))}
             <Box className='form-buttons'>
-                <Button className='form-buttons' onClick={() => handleAddNewRow()}>Add Additional Parameter</Button>
+                <Button className='form-buttons' disabled={rows.length == formFields.displayProps.length} onClick={() => handleAddNewRow()}>Add Additional Parameter</Button>
                 <Button className='form-buttons' onClick={() => handleRemoveRow()}>Remove a Parameter</Button>
                 <LoadingButton 
                     style={{padding: '8px 22px', lineHeight: '26.25px'}} 
@@ -379,6 +394,7 @@ export default function ExportPageV2 (): JSX.Element {
         </Box>
         </>
     )}
+    <ExportDownloadModal open={false} handleClose={() => {}}></ExportDownloadModal>
     
         
     </ManageLayout>
