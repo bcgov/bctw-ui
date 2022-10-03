@@ -10,6 +10,7 @@ import ManageLayout from 'pages/layouts/ManageLayout';
 import { UserCritterAccess } from 'types/animal_access';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { UserAnimalAccess } from 'pages/data/animals/UserAnimalAccess';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
@@ -36,13 +37,8 @@ export default function UserProfile(): JSX.Element {
   const handleClickTestNotifs = async (): Promise<void> => {
     const { email, phone } = user;
     await performNotificationTest({ email, phone });
-    setShowTestConfirm(o => !o);
-    showNotif({severity: 'info', message: 'notification triggered, please check your inbox & phone shortly'});
-  };
-
-  const tableProps: ITableQueryProps<UserCritterAccess> = {
-    query: api.useCritterAccess,
-    param: { user }
+    setShowTestConfirm((o) => !o);
+    showNotif({ severity: 'info', message: 'notification triggered, please check your inbox & phone shortly' });
   };
   const Span = (props): JSX.Element => (
     <Typography>
@@ -74,11 +70,7 @@ export default function UserProfile(): JSX.Element {
             }
           />
         </Box>
-        <DataTable
-          headers={UserCritterAccess.propsToDisplay}
-          title='Animals you have access to:'
-          queryProps={tableProps}
-        />
+        <UserAnimalAccess />
         <ConfirmModal
           handleClickYes={handleClickTestNotifs}
           handleClose={(): void => setShowTestConfirm(false)}

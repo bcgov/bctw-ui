@@ -37,8 +37,9 @@ interface ITableQueryProps<T> {
 }
 
 interface ICustomTableColumn<T> {
-  header: (row: T, idx: number) => JSX.Element;
+  header: JSX.Element;
   column: (row: T, idx: number) => JSX.Element;
+  column2?: JSX.Element;
 }
 
 /**
@@ -96,7 +97,7 @@ interface HeadCell<T> {
  * @param onSelectAllClick handler for when table header 'select all' is checked
  */
 type TableHeadProps<T> = {
-  customHeaders: ((row: T, idx: number) => JSX.Element)[];
+  customHeaders: JSX.Element[];
   headerData: T;
   headersToDisplay: (keyof T)[];
   isMultiSelect: boolean;

@@ -81,7 +81,6 @@ interface INotification {
   notifications: JSX.Element[];
 }
 export const NotificationBanner = ({ notifications }: INotification) => {
-  const style = useStyles();
   const numNotifs = notifications.length;
   return numNotifs ? (
     <Banner
