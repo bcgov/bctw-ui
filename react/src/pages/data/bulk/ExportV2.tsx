@@ -39,6 +39,11 @@ export interface IFormRowEntry {
     formField: PossibleColumnValues;
 }
 
+export interface DateRange {
+    start: dayjs.Dayjs,
+    end: dayjs.Dayjs
+}
+
 class PossibleColumnValues implements BCTWFormat<PossibleColumnValues> {
     species: string[];
     population_unit: string[];
@@ -63,25 +68,10 @@ class PossibleColumnValues implements BCTWFormat<PossibleColumnValues> {
     }
 }
 
-enum TabNames {
+export enum TabNames {
     quick = 'Quick Export',
     advanced = 'Advanced Export'
 }
-
-
-const useStyle = makeStyles((theme) => ({
-    MuiCircularProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      height: '20px !important',
-      width: '20px !important',
-      marginLeft: '-17px',
-      marginTop: '-10px'
-    }
-  }));
-
-
 
 export default function ExportPageV2 (): JSX.Element {
     const api = useTelemetryApi();
@@ -93,65 +83,12 @@ export default function ExportPageV2 (): JSX.Element {
     const [tab, setTab] = useState<TabNames>(TabNames.quick);
     const [formsFilled, setFormsFilled] = useState(false);
     const [collarIDs, setCollarIDs] = useState([]);
-    const styles = useStyle();
+    const [showModal, setShowModal] = useState(false);
     const formFields: PossibleColumnValues = new PossibleColumnValues();
-
-
-    //Duplicate from MapExport.tsx, so should probably be yanked out and imported from elsewhere-----------
-    const formatResultAsCSV = (data: unknown[]): string => {
-        const headers = Object.keys(data[0]).join();
-        const values = data.map(d => Object.values(d).join()).join('\n')
-        const ret = `${headers}\n${values}`;
-        return ret;
-    }
-    const formatResultAsKML = (data: Record<string, unknown>[][]): string => {
-        const flattened: Record<string,unknown>[] = data.flatMap(d => omitNull(d));
-        const asGeoJSON = flattened.map((d, i) => {
-          const withoutGeom = Object.assign({}, d);
-          // remove objects from the geojson feature.
-          delete withoutGeom.geom;
-          return { 
-            type: 'Feature',
-            id: i,
-            geometry: d.geom,
-            properties: withoutGeom 
-          }
-        })
-        const ret = tokml({type: 'FeatureCollection', features: asGeoJSON})
-        return ret;
-      }
-    //-----------------------------------------------------------------------------------------------------
-
-    const onSuccessExportAll = (data): void => {
-        if(data && data.length) {
-            const result = formatResultAsCSV(data);
-            const filename = 'telemetry_export_advanced.csv';
-            download(result, filename); 
-        }
-    }
-
-    const onErrorExportAll = (err): void => {
-        console.log(err);
-    }
-
-    const onSuccessExport = (data): void => {
-        if(data && data.length) {
-            const result = formatResultAsKML(data);
-            const filename = 'telemetry_export_simple.kml';
-            download(result, filename, 'application/xml'); 
-        }
-    }
-
-    const onErrorExport = (err): void => {
-        console.log(err);
-    }
 
     useEffect(() => {
         areFieldsFilled();
     }, [rows]);
-
-    const {mutateAsync: mutateExportAll, reset: resetExportAll, isLoading: loadingExportAll } = api.useExportAll({onSuccess: onSuccessExportAll, onError: onErrorExportAll});
-    const {mutateAsync: mutateExport, reset: resetExport, isLoading: loadingExport} = api.useExport({onSuccess: onSuccessExport, onError: onErrorExport});
 
     const isTab = (tabName: TabNames): boolean => tabName === tab;
 
@@ -188,46 +125,6 @@ export default function ExportPageV2 (): JSX.Element {
         return;
     }
 
-    const operatorTranslation = (operatorWord: string): string => {
-        switch(operatorWord) {
-            case "Equals":
-                return "=";
-            case "Not Equals":
-                return "<>";
-            default:
-                return "";
-        }
-    }
-
-    const handleAdvancedExportClick = (): void => {
-        const body = {queries: [], range: {}};
-        for(const row of rows) {
-            body.queries.push({
-                key: row.column,
-                operator: operatorTranslation(row.operator),
-                term: row.value.map(o => o.toString().toLowerCase())
-            });
-        }
-        body.range = {
-            start: start.format(formatDay),
-            end: end.format(formatDay)
-        }
-        console.log("Sending this body: " + body);
-        mutateExportAll(body);
-    }
-
-    const handleSimpleExportClick = (): void => {
-        const body = {
-            collar_ids: collarIDs,
-            type: 'movement',
-            range: {
-                start: start.format(formatDay),
-                end: end.format(formatDay)
-            }
-        }
-        console.log("Sending this body: " + body);
-        mutateExport(body);
-    }
 
     const handleDataTableSelect = (selected: AttachedAnimal[]): void => {
         const ids = selected.map(v => v.collar_id);
@@ -250,7 +147,8 @@ export default function ExportPageV2 (): JSX.Element {
     * Below, a new PossibleColumnValues is made everytime we change a Value field.
     * This probably isn't really ideal, since it sort of duplicates data, but CreateFormField needs an object of this type to properly
     * handle the defaultValue for the form and have that information persist between re-renders. 
-    * A partial refactor to better reflect this is on 710-refactored-row-data.
+    * A partial refactor to better reflect this is on 710-refactored-row-data, but I shelved it since the fact that PossibleColumnValues is readonly 
+    * makes it hard to avoid just spawning more of them.
     */
 
     const handleValueChange = (newval: Record<string, unknown>, idx: number): void => {
@@ -260,7 +158,7 @@ export default function ExportPageV2 (): JSX.Element {
         const o = rows[idx];
         const strval = newval[o.column] as string;
         //o.value = strval;
-        console.log(`Handling ${o.column} change: ` + newval[o.column] as string);
+        //console.log(`Handling ${o.column} change: ` + newval[o.column] as string);
         if(['population_unit', 'species'].includes(o.column) === false) {
             o.value = strval.replace(/\s+/g, '').split(',');
             const ff = new PossibleColumnValues;
@@ -278,8 +176,8 @@ export default function ExportPageV2 (): JSX.Element {
         const key: keyof typeof PossibleColumnValues = o.column as keyof typeof PossibleColumnValues;
         ff[key]= o.value;
         o.formField = ff;
-        console.log(newval);
-        console.log(o.value);
+        //console.log(newval);
+        //console.log(o.value);
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 
@@ -296,7 +194,6 @@ export default function ExportPageV2 (): JSX.Element {
     }
 
     const getFormFieldObjForColumn = (col: ColumnOptions): FormFieldObject<any> => {
-        console.log("Got this column value: " + col);
         const ff = wfFields.get(col);
         if(col === 'device_id' || col == 'frequency') {
             ff.type = eInputType.text;
@@ -350,16 +247,12 @@ export default function ExportPageV2 (): JSX.Element {
             updated={updated}*/
             />
         </Box>
-        <LoadingButton
-            style={{padding: '8px 22px', lineHeight: '26.25px'}} 
+        <Button     
             className='form-buttons' 
-            variant='contained'
-            loading={loadingExport}
             disabled={!collarIDs.length}
-            loadingIndicator={<CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />}
-            onClick={() => {handleSimpleExportClick()}}>
+            onClick={() => {setShowModal(true)}}>
                 Export Selected Data
-        </LoadingButton>
+        </Button>
         </>
         )
     }
@@ -373,29 +266,31 @@ export default function ExportPageV2 (): JSX.Element {
             <>
             <Select className='query-builder-column' label={'Column'} defaultValue={formFields.formatPropAsHeader(row.column)} values={getValidColumnChoices(row.column).map(o => formFields.formatPropAsHeader(o as ColumnOptions))} handleChange={(str) => handleColumnChange(str, idx)}></Select>
             <Select className='query-builder' label={'Operator'} defaultValue={row.operator} values={operators} handleChange={(str) => handleOperatorChange(str, idx)}></Select>
-            {CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), multiple: true, style: {minWidth: '300px'}})}
+            {CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), required: true, multiple: true, style: {minWidth: '300px'}})}
             {idx < rows.length - 1 && (<Typography marginTop={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>)}
             </>
         ))}
             <Box className='form-buttons'>
                 <Button className='form-buttons' disabled={rows.length == formFields.displayProps.length} onClick={() => handleAddNewRow()}>Add Additional Parameter</Button>
                 <Button className='form-buttons' onClick={() => handleRemoveRow()}>Remove a Parameter</Button>
-                <LoadingButton 
-                    style={{padding: '8px 22px', lineHeight: '26.25px'}} 
+                <Button 
                     className='form-buttons' 
-                    variant='contained' 
-                    loading={loadingExportAll} 
                     disabled={!formsFilled} 
-                    onClick={() => handleAdvancedExportClick() }
-                    loadingIndicator={<CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />}>
+                    onClick={() => {setShowModal(true)}}>
                     Export From Query
-                </LoadingButton>
+                </Button>
             </Box>
         </Box>
         </>
     )}
-    <ExportDownloadModal open={false} handleClose={() => {}}></ExportDownloadModal>
-    
+    <ExportDownloadModal 
+        exportType={tab} 
+        open={showModal} 
+        handleClose={() => {setShowModal(false)} } 
+        rowEntries={rows} 
+        collarIDs={collarIDs}
+        range={{start:start, end:end}}>
+    </ExportDownloadModal>
         
     </ManageLayout>
     )
