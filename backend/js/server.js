@@ -70,22 +70,15 @@ const appendQueryToUrl = (url, parameter) => {
 
 // TODO: move into separate package?
 // split out the username and  domain ('username@idir' or 'username@bceid-business') from Keycloak preferred_username
-const getGuid = (sessionObject) => {
-  // const credentials = sessionObject.preferred_username.split("@");
-  // if (!credentials.length) {
-  //   return {};
-  // }
-  // return {
-  //   username: credentials[0],
-  //   domain: credentials[1].replace("-business", ""),
-  // };
-  //Issue with optional chaining sessionObject?.idir_user_guid
-  //Maybe node version issue?
+const getProperties = (ob) => {
+  const domain = ob.idir_user_guid ? "idir" : "bceid";
+  const isIdir = domain === "idir";
+  const keycloak_guid = isIdir ? ob.idir_user_guid : ob.bceid_business_guid;
+  const username = isIdir ? ob.idir_username : ob.bceid_username;
   return {
-    keycloak_guid: sessionObject.idir_user_guid
-      ? sessionObject.idir_user_guid
-      : sessionObject.bceid_business_guid,
-    domain: sessionObject.idir_user_guid ? "idir" : "bceid",
+    keycloak_guid,
+    domain,
+    username,
   };
 };
 
@@ -110,7 +103,7 @@ const retrieveSessionInfo = function (req, res, next) {
     email,
     family_name,
     given_name,
-    ...getGuid(data),
+    ...getProperties(data),
   };
   res.status(200).send(sessionInfo);
 };
@@ -131,7 +124,7 @@ const proxyApi = function (req, res, next) {
   let url;
   if (isProd) {
     // split out the domain and username of logged-in user
-    const { domain, keycloak_guid } = getGuid(
+    const { domain, keycloak_guid } = getProperties(
       req.kauth.grant.access_token.content
     );
 
