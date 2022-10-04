@@ -48,6 +48,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
   const firstName = keycloakUser?.given_name ?? 'given_Name';
   const lastName = keycloakUser?.family_name ?? 'last_Name';
   const username = keycloakUser?.username ?? 'username';
+  const keycloak_guid = keycloakUser?.keycloak_guid;
 
   // as user is not onboarded, use Keycloak user details instead of from local database
   useEffect(() => {
@@ -65,6 +66,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
   const submitRequest = async (): Promise<void> => {
     const newUser = new OnboardUserRequest();
     const { user, emailInfo } = newUser;
+    user.keycloak_guid = keycloak_guid;
     user.role_type = accessType;
     user.domain = domain;
     user.username = username;

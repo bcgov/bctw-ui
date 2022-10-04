@@ -74,7 +74,9 @@ const getProperties = (ob) => {
   const domain = ob.idir_user_guid ? "idir" : "bceid";
   const isIdir = domain === "idir";
   const keycloak_guid = isIdir ? ob.idir_user_guid : ob.bceid_business_guid;
-  const username = isIdir ? ob.idir_username : ob.bceid_username;
+  const username = isIdir
+    ? ob.idir_username.toLowerCase()
+    : ob.bceid_username.toLowerCase();
   return {
     keycloak_guid,
     domain,
