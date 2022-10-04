@@ -33,6 +33,7 @@ type UserBaseType = {
   role_type: eUserRole;
   domain: KeyCloakDomainType;
   username: string;
+  keycloak_guid: string;
 };
 
 /**
@@ -47,6 +48,7 @@ export class UserBase implements UserBaseType {
   role_type: eUserRole;
   domain: KeyCloakDomainType;
   username: string;
+  keycloak_guid: string;
 }
 
 export interface IUser extends UserBaseType {
