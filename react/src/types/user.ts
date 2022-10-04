@@ -21,6 +21,7 @@ export interface IKeyCloakSessionInfo {
   email: string;
   family_name: string;
   given_name: string;
+  keycloak_guid: string;
 }
 
 // all user classes implement
@@ -64,7 +65,7 @@ export class User extends UserBase implements BCTWBase<User>, IUser {
   id: number;
   idir: string;
   bceid: string;
-
+  keycloak_guid: string;
   get is_admin(): boolean {
     return this.role_type === eUserRole.administrator;
   }

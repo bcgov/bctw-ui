@@ -35,13 +35,13 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
   console.log(useKeycloakUser);
   // create access request stub
   const onSuccess = (u: IOnboardUser): void => {
-    showNotif({ severity: 'success', message: `User onboarding request submitted`});
+    showNotif({ severity: 'success', message: `User onboarding request submitted` });
     console.log('UserOnboarding: Request: new user onboarding submission response', u);
   };
   const onError = (e): void => {
     showNotif({ severity: 'error', message: `${formatAxiosError(e)}` });
   };
-  
+
   const { mutateAsync: saveMutation } = api.useSubmitOnboardingRequest({ onSuccess, onError });
 
   const email = keycloakUser?.email ?? 'email@address.com';
@@ -81,8 +81,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
     emailInfo.region = region;
     emailInfo.species = species;
     console.log(`UserOnboarding: Request: submitRequest: submitting onboarding request`, newUser);
-    await saveMutation(newUser)
-    
+    await saveMutation(newUser);
   };
 
   const textProps: Pick<StandardTextFieldProps, 'size'> & Pick<OutlinedTextFieldProps, 'variant'> = {
