@@ -21,7 +21,7 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
   domain: KeyCloakDomainType;
   username: string;
   reason: string;
-
+  keycloak_guid: string;
   access: OnboardingStatus;
   role_type: eUserRole;
 
@@ -92,6 +92,6 @@ export class OnboardUserRequest {
   }
 }
 
-
 // what an admin passes to the API to grant/deny an onboard request
-export type HandleOnboardInput = Pick<IOnboardUser, 'onboarding_id' | 'access'> & Pick<IUser, 'role_type' | 'email' | 'firstname'>;
+export type HandleOnboardInput = Pick<IOnboardUser, 'onboarding_id' | 'access'> &
+  Pick<IUser, 'role_type' | 'email' | 'firstname' | 'keycloak_guid'>;

@@ -32,23 +32,24 @@ export default function OnboardingAdminPage(): JSX.Element {
   };
 
   const onError = (e: AxiosError): void => {
-    showNotif({ severity: 'error', message: formatAxiosError(e)});
+    showNotif({ severity: 'error', message: formatAxiosError(e) });
   };
 
   // setup the mutations
   const { mutateAsync: saveMutation } = api.useHandleOnboardingRequest({ onSuccess: onSuccess, onError });
 
   const grantOrDenyRequest = async (): Promise<void> => {
-    const { onboarding_id, role_type, email, firstname } = request;
+    const { onboarding_id, role_type, email, firstname, keycloak_guid } = request;
     const body: HandleOnboardInput = {
       firstname,
       onboarding_id,
       email,
       role_type,
-      access: isGranting ? 'granted' : 'denied'
+      access: isGranting ? 'granted' : 'denied',
+      keycloak_guid
     };
     saveMutation(body);
-    setShowConfirm(o => !o);
+    setShowConfirm((o) => !o);
   };
 
   const handleClickGrantOrDeny = (b: boolean): void => {
@@ -62,7 +63,9 @@ export default function OnboardingAdminPage(): JSX.Element {
     <AuthLayout>
       <div className='container'>
         <h1>Onboarding Requests</h1>
-        <Typography mb={3} variant='body1' component='p'>Grant or deny new user requests. Only requests with Access type pending can be modified.</Typography>
+        <Typography mb={3} variant='body1' component='p'>
+          Grant or deny new user requests. Only requests with Access type pending can be modified.
+        </Typography>
         <DataTable
           headers={new OnboardUser().displayProps}
           title='New user requests'
@@ -70,10 +73,15 @@ export default function OnboardingAdminPage(): JSX.Element {
           onSelect={handleSelectRequest}
         />
         <Box display='flex' justifyContent={'flex-start'} columnGap={1}>
-          <Button disabled={!request || request?.access !== 'pending'} onClick={(): void => handleClickGrantOrDeny(true)}>
+          <Button
+            disabled={!request || request?.access !== 'pending'}
+            onClick={(): void => handleClickGrantOrDeny(true)}>
             Grant
           </Button>
-          <Button color='secondary' disabled={!request || request?.access !== 'pending'} onClick={(): void => handleClickGrantOrDeny(false)}>
+          <Button
+            color='secondary'
+            disabled={!request || request?.access !== 'pending'}
+            onClick={(): void => handleClickGrantOrDeny(false)}>
             Deny
           </Button>
         </Box>
