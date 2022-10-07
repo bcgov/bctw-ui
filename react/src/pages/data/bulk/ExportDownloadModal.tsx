@@ -1,15 +1,13 @@
 import { ModalBaseProps } from "components/component_interfaces";
 import { Box, CircularProgress } from "@mui/material";
-import { Modal, Button } from 'components/common';
+import { Modal } from 'components/common';
 import { IFormRowEntry, DateRange, TabNames } from "./ExportV2";
 import download from "downloadjs";
 import { omitNull } from "utils/common_helpers";
 import { useTelemetryApi } from "hooks/useTelemetryApi";
 import tokml from 'tokml';
-import dayjs from "dayjs";
 import { formatDay } from "utils/time";
-import { useEffect, useRef, useState } from "react";
-import { AttachedAnimal } from "types/animal";
+import { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import makeStyles from '@mui/styles/makeStyles';
 import useDidMountEffect from "hooks/useDidMountEffect";
@@ -18,7 +16,8 @@ type ExportModalProps = ModalBaseProps & {
     rowEntries: IFormRowEntry[];
     range: DateRange;
     exportType: TabNames;
-    collarIDs: AttachedAnimal[];
+    collarIDs: string[];
+    critterIDs?: string[];
     children?: React.ReactNode;
 }
 
@@ -39,7 +38,7 @@ const useStyle = makeStyles((theme) => ({
     }
   }));
 
-export default function ExportDownloadModal({open, handleClose, rowEntries, range, exportType, collarIDs}: ExportModalProps): JSX.Element {
+export default function ExportDownloadModal({open, handleClose, rowEntries, range, exportType, collarIDs, critterIDs}: ExportModalProps): JSX.Element {
     const api = useTelemetryApi();
     const [downloadType, setDownloadType] = useState({downloadType: ''});
     const styles = useStyle();
@@ -109,13 +108,7 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
         }
     }
 
-    const didMount = useRef(false);
-
     useDidMountEffect(() => {
-        /*if ( !didMount.current ) {
-            didMount.current = true;
-            return;
-        }*/
         startRequest();
     }, [downloadType]);
 
@@ -140,16 +133,23 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
     }
 
     const handleSimpleExport = (): void => {
-        const body = {
+        const body = {queries: [], range: {}};
+        body.queries = [{key: "critter_id", operator: "=", term: critterIDs }];
+        body.range = {
+            start: range.start.format(formatDay),
+            end: range.end.format(formatDay)
+        };
+        /*const body = {
             collar_ids: collarIDs,
             type: 'movement',
             range: {
                 start: range.start.format(formatDay),
                 end: range.end.format(formatDay)
             }
-        }
+        }*/
         console.log("Sending this body: " + body);
-        mutateExport(body);
+        mutateExportAll(body);
+        //mutateExport(body);
     }
 
     const startRequest = (): void => {

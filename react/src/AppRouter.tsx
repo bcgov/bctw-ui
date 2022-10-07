@@ -35,13 +35,13 @@ const AppRoutes: RouteKey[] = [
   { name: 'profile', path: '/profile', title: 'My Profile', component: UserProfile, sort: 12, icon: 'profile' },
   { name: 'delegation', path: '/delegation', title: 'Delegation', component: ManagerRequestPermission, sort: 13, icon: 'share' },
   { name: 'import', path: '/import', title: 'Data Import', component: Import, sort: 14, icon: 'arrow-up' },
+  { name: 'export', path: '/export', title: 'Data Export', component: ExportPageV2, sort: 15, icon: 'arrow-down' },
   { name: 'delegation-requests', path: '/delegation-requests', title: 'Delegation Requests', component: AdminHandleRequestPermissionPage, sort: 100, icon: 'edit' },
   { name: 'users', path: '/users', title: 'BCTW Users', component: UserAdminPage, sort: 101, icon: 'admin' },
   { name: 'onboarding-admin', path: '/admin-onboarding', title: 'Onboarding Requests', component: OnboardingAdmin, sort: 102, icon: 'personAdd' },
   { name: 'animal-manager', path: '/animal-manager', title: 'Set Animal Manager', component: GrantCritterAccessPage, sort: 103, icon: 'key' },
   { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: UserOnboarding, sort: 201 },
   { name: 'vendor', path: '/vendor', title: 'Telemetry Retrieval', component: VendorAPIPage, sort: 202, icon: 'devices' },
-  { name: 'data', path: '/data', title: 'Data Export', component: ExportPageV2, sort: 300, icon: 'animals' },
   { name: 'notFound', path: '/*', title: 'React: Not Found', component: (): JSX.Element => <div>React AppRouter.tsx says: Page not found!</div>, sort: 404 }
 ];
 

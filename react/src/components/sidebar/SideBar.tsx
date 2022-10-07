@@ -59,7 +59,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       case '/onboarding-requests':
       case '/profile':
     }
-    handleSetVisible(['animals', 'devices', 'profile']);
+    handleSetVisible(['animals', 'devices', 'profile', 'export']);
   }, [location, isAdmin, isCritterManager, isDataAdmin]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));

@@ -1,33 +1,22 @@
 import Box from '@mui/material/Box';
 import DataTable from 'components/table/DataTable';
-import { CritterStrings, CritterStrings as CS, MapStrings } from 'constants/strings';
-import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
+import { CritterStrings as CS, MapStrings } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import EditCritter from 'pages/data/animals/EditCritter';
-import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { SyntheticEvent, useEffect, useState } from 'react';
-import { Animal, AttachedAnimal } from 'types/animal';
-import { QueryStatus } from 'react-query';
+import { AttachedAnimal } from 'types/animal';
 import { columnToHeader, doNothing, doNothingAsync, headerToColumn, omitNull } from 'utils/common_helpers';
-import { SpeciesProvider } from 'contexts/SpeciesContext';
 import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { eInputType, FormFieldObject, InboundObj, parseFormChangeResult } from 'types/form_types';
 import Select from 'components/form/BasicSelect';
 import { Button } from 'components/common';
-import { CircularProgress, Grid, Tab, Tabs, Typography } from '@mui/material';
+import Checkbox from 'components/form/Checkbox';
+import { Grid, Tab, Tabs, Typography } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
 import { wfFields } from 'types/events/event';
 import { BCTWFormat } from 'types/common_types';
-import SelectCode from 'components/form/SelectCode';
-import { formatDay } from 'utils/time';
 import { ICodeFilter } from 'types/code';
-import download from 'downloadjs';
-import tokml from 'tokml';
-import { LoadingButton } from '@mui/lab';
-import makeStyles from '@mui/styles/makeStyles';
 import ExportDownloadModal from './ExportDownloadModal';
 
 type ColumnOptions = 'species' | 'population_unit' | 'wlh_id' | 'animal_id' | 'device_id' | 'frequency';
@@ -83,7 +72,9 @@ export default function ExportPageV2 (): JSX.Element {
     const [tab, setTab] = useState<TabNames>(TabNames.quick);
     const [formsFilled, setFormsFilled] = useState(false);
     const [collarIDs, setCollarIDs] = useState([]);
+    const [critterIDs, setCritterIDs] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [selectedLifetime, setSelectedLifetime] = useState(false);
     const formFields: PossibleColumnValues = new PossibleColumnValues();
 
     useEffect(() => {
@@ -128,7 +119,9 @@ export default function ExportPageV2 (): JSX.Element {
 
     const handleDataTableSelect = (selected: AttachedAnimal[]): void => {
         const ids = selected.map(v => v.collar_id);
-        setCollarIDs(ids);
+        const critters = selected.map(v => v.critter_id);
+        setCollarIDs(ids); //<-- To remove, we probably do not want to do these queries by collar id anymore.
+        setCritterIDs(critters);
     }
 
     const handleColumnChange = (newval: string, idx: number): void => {
@@ -162,7 +155,7 @@ export default function ExportPageV2 (): JSX.Element {
         if(['population_unit', 'species'].includes(o.column) === false) {
             o.value = strval.replace(/\s+/g, '').split(',');
             const ff = new PossibleColumnValues;
-            const key: keyof typeof PossibleColumnValues = o.column as keyof typeof PossibleColumnValues;
+            const key = o.column as keyof typeof PossibleColumnValues;
             ff[key] = strval as string;
             o.formField = ff;
         }
@@ -173,7 +166,7 @@ export default function ExportPageV2 (): JSX.Element {
         const o = rows[idx];
         o.value = newval.map(n => n.description.toString());
         const ff = new PossibleColumnValues;
-        const key: keyof typeof PossibleColumnValues = o.column as keyof typeof PossibleColumnValues;
+        const key = o.column as keyof typeof PossibleColumnValues;
         ff[key]= o.value;
         o.formField = ff;
         //console.log(newval);
@@ -185,6 +178,7 @@ export default function ExportPageV2 (): JSX.Element {
         setTab(newVal);
     }
 
+    //Helper function to determine what column choices to display in the dropdown, avoids duplicate rows.
     const getValidColumnChoices = (ownchoice?: ColumnOptions): string[] => {
         const chosen = rows.map(o => o.column);
         const remaining = formFields.displayProps.filter(o => !chosen.includes(o as ColumnOptions));
@@ -193,6 +187,8 @@ export default function ExportPageV2 (): JSX.Element {
         return remaining;
     }
 
+    //Here we force the fields that would normally be number fields to be text fields instead.
+    //Need to do this since they won't be able to input commas for the list otherwise.
     const getFormFieldObjForColumn = (col: ColumnOptions): FormFieldObject<any> => {
         const ff = wfFields.get(col);
         if(col === 'device_id' || col == 'frequency') {
@@ -215,6 +211,7 @@ export default function ExportPageV2 (): JSX.Element {
                 <DateInput
                 fullWidth
                 propName='tstart'
+                disabled={selectedLifetime}
                 label={MapStrings.startDateLabel}
                 defaultValue={dayjs(start)}
                 changeHandler={handleChangeDate}
@@ -224,11 +221,20 @@ export default function ExportPageV2 (): JSX.Element {
             <Grid item sm={2}>
                 <DateInput
                 fullWidth
+                disabled={selectedLifetime}
                 propName='tend'
                 label={MapStrings.endDateLabel}
                 defaultValue={dayjs(end)}
                 changeHandler={handleChangeDate}
                 //maxDate={dayjs(end)}
+                />
+            </Grid>
+            <Grid item sm={2}>
+                <Checkbox
+                propName={"animalLifetime"}
+                label={"Animal Lifetime"}
+                initialValue={selectedLifetime}
+                changeHandler={() => setSelectedLifetime((o) => !o)}
                 />
             </Grid>
         </Grid>
@@ -266,7 +272,7 @@ export default function ExportPageV2 (): JSX.Element {
             <>
             <Select className='query-builder-column' label={'Column'} defaultValue={formFields.formatPropAsHeader(row.column)} values={getValidColumnChoices(row.column).map(o => formFields.formatPropAsHeader(o as ColumnOptions))} handleChange={(str) => handleColumnChange(str, idx)}></Select>
             <Select className='query-builder' label={'Operator'} defaultValue={row.operator} values={operators} handleChange={(str) => handleOperatorChange(str, idx)}></Select>
-            {CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), required: true, multiple: true, style: {minWidth: '300px'}})}
+            {CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), required: false, multiple: true, style: {minWidth: '300px'}})}
             {idx < rows.length - 1 && (<Typography marginTop={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>)}
             </>
         ))}
@@ -288,8 +294,12 @@ export default function ExportPageV2 (): JSX.Element {
         open={showModal} 
         handleClose={() => {setShowModal(false)} } 
         rowEntries={rows} 
+        critterIDs={critterIDs}
         collarIDs={collarIDs}
-        range={{start:start, end:end}}>
+        range={{
+            start: selectedLifetime ? dayjs('1970-01-01') : start,
+            end: selectedLifetime ? dayjs() : end
+        }}>
     </ExportDownloadModal>
         
     </ManageLayout>

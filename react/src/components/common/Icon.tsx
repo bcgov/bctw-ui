@@ -33,7 +33,8 @@ import {
   mdiLockOpenCheck,
   mdiMagnify,
   mdiFilterOutline,
-  mdiBrush
+  mdiBrush,
+  mdiArrowDownBold
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -52,6 +53,8 @@ const getIconPath = (path: string): string => {
       return mdiPaw;
     case 'arrow-up':
       return mdiArrowUpBold;
+    case 'arrow-down':
+      return mdiArrowDownBold;
     case 'cannotSnooze':
       return mdiAlarmOff;
     case 'back':
