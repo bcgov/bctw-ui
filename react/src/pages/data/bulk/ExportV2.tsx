@@ -18,6 +18,7 @@ import { wfFields } from 'types/events/event';
 import { BCTWFormat } from 'types/common_types';
 import { ICodeFilter } from 'types/code';
 import ExportDownloadModal from './ExportDownloadModal';
+import { SpeciesProvider, useSpecies, useUISpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 
 type ColumnOptions = 'species' | 'population_unit' | 'wlh_id' | 'animal_id' | 'device_id' | 'frequency';
 
@@ -64,6 +65,9 @@ export enum TabNames {
 
 export default function ExportPageV2 (): JSX.Element {
     const api = useTelemetryApi();
+    const species = useSpecies();
+    const updateSpecies = useUpdateSpecies();
+    const allSpecies = useUISpecies();
     
     const operators: string[] = ['Equals','Not Equals'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
@@ -169,6 +173,14 @@ export default function ExportPageV2 (): JSX.Element {
         const key = o.column as keyof typeof PossibleColumnValues;
         ff[key]= o.value;
         o.formField = ff;
+
+        if(o.column === 'species') {
+            const found = allSpecies.find((s) => s.name === o.value[0]);
+            if (found) {
+                updateSpecies(found);
+                console.log("Updated species to " + found);
+            }
+        }
         //console.log(newval);
         //console.log(o.value);
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
@@ -198,8 +210,8 @@ export default function ExportPageV2 (): JSX.Element {
     }
     //{CreateFormField(formFields, wfFields.get(rows[idx].column), () => {})}
     //<SelectCode codeHeader='species' defaultValue='' changeHandler={() => {}} required={false} propName={'species'}></SelectCode>
-    return( 
-    <ManageLayout> 
+    return(
+    <>
     <h1>Export Animal Telemetry</h1>
     <Tabs value={tab} sx={{borderBottom: 1, borderColor: 'divider'}} onChange={handleChangeTab}>
         <Tab label={"Quick Export"} value={TabNames.quick} />
@@ -301,7 +313,6 @@ export default function ExportPageV2 (): JSX.Element {
             end: selectedLifetime ? dayjs() : end
         }}>
     </ExportDownloadModal>
-        
-    </ManageLayout>
+    </>
     )
 }
