@@ -7,7 +7,7 @@ import { ISelectMultipleData } from './MultiSelect';
 type IAutocompleteProps<T extends ISelectMultipleData> = {
   label: string;
   changeHandler: (o: T[], p?: string) => void;
-  defaultValue?: T;
+  defaultValue?: T[];
   triggerReset?: boolean; // unselect of all values
   data: T[];
   width?: number;
@@ -27,9 +27,10 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
     setSelected([]);
   }, [triggerReset]);
 
-  useDidMountEffect(() => {
+  useEffect(() => {
     if (defaultValue) {
-      setSelected((o) => [...o, defaultValue]);
+      setSelected(defaultValue);
+      console.log("Set default to " + JSON.stringify(defaultValue));
     }
   }, [defaultValue]);
 
@@ -50,6 +51,7 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       autoComplete
       size='small'
       multiple
+      sx={{display: 'inline-flex'}}
       style={{ width }}
       limitTags={tagLimit ?? 3}
       isOptionEqualToValue={(option, value): boolean => option.id === value.id}

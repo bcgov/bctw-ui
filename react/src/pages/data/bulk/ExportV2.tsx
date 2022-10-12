@@ -19,6 +19,7 @@ import { BCTWFormat } from 'types/common_types';
 import { ICodeFilter } from 'types/code';
 import ExportDownloadModal from './ExportDownloadModal';
 import { SpeciesProvider, useSpecies, useUISpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
+import AutoComplete from 'components/form/Autocomplete';
 
 type ColumnOptions = 'species' | 'population_unit' | 'wlh_id' | 'animal_id' | 'device_id' | 'frequency';
 
@@ -81,6 +82,8 @@ export default function ExportPageV2 (): JSX.Element {
     const [selectedLifetime, setSelectedLifetime] = useState(false);
     const formFields: PossibleColumnValues = new PossibleColumnValues();
 
+    const {data: crittersData, isSuccess: critterSuccess} = api.useAssignedCritters(0);
+
     useEffect(() => {
         areFieldsFilled();
     }, [rows]);
@@ -130,6 +133,8 @@ export default function ExportPageV2 (): JSX.Element {
 
     const handleColumnChange = (newval: string, idx: number): void => {
         const o = rows[idx];
+        //console.log(crittersData.length);
+        //console.log(crittersData.map(o => o[formFields.formatHeaderAsProp(newval)]).filter((v, i, a) => a.indexOf(v) === i));
         o.column = formFields.formatHeaderAsProp(newval) as ColumnOptions;
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
@@ -186,6 +191,12 @@ export default function ExportPageV2 (): JSX.Element {
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 
+    const handleAutocompleteChange = (newVals, idx) => {
+        const o = rows[idx];
+        o.value = newVals.map(n => n.value);
+        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
+    }
+
     const handleChangeTab = (event: SyntheticEvent<Element>, newVal: TabNames): void => {
         setTab(newVal);
     }
@@ -208,8 +219,25 @@ export default function ExportPageV2 (): JSX.Element {
         }
         return ff;
     }
+
+    const getUniqueValueOptions = (col) => {
+        if(crittersData) {
+            const uniqueItemsForColumn = crittersData.map(o => o[col]).filter((v, i, a) => v && a.indexOf(v) === i);
+            return uniqueItemsForColumn.map((f, i) => {
+                return {
+                    id: i,
+                    value: f,
+                    displayLabel: f
+                }
+            })
+        }
+        else {
+            return [{id: 0, value: "Loading...", displayLabel: "Loading..."}];
+        }
+    }
     //{CreateFormField(formFields, wfFields.get(rows[idx].column), () => {})}
     //<SelectCode codeHeader='species' defaultValue='' changeHandler={() => {}} required={false} propName={'species'}></SelectCode>
+    //{CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), required: false, multiple: true, style: {minWidth: '300px'}})}
     return(
     <>
     <h1>Export Animal Telemetry</h1>
@@ -278,14 +306,34 @@ export default function ExportPageV2 (): JSX.Element {
     <>
     <h2>Advanced Export</h2>
     <h4>Export all critters where...</h4>
-        <Box width={800}>
+        <Box width={1000}>
         
         {rows.map((row, idx) => (
             <>
-            <Select className='query-builder-column' label={'Column'} defaultValue={formFields.formatPropAsHeader(row.column)} values={getValidColumnChoices(row.column).map(o => formFields.formatPropAsHeader(o as ColumnOptions))} handleChange={(str) => handleColumnChange(str, idx)}></Select>
-            <Select className='query-builder' label={'Operator'} defaultValue={row.operator} values={operators} handleChange={(str) => handleOperatorChange(str, idx)}></Select>
-            {CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), required: false, multiple: true, style: {minWidth: '300px'}})}
-            {idx < rows.length - 1 && (<Typography marginTop={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>)}
+            <Select 
+                className='query-builder-column' 
+                label={'Column'} 
+                defaultValue={formFields.formatPropAsHeader(row.column)} 
+                values={getValidColumnChoices(row.column).map(o => formFields.formatPropAsHeader(o as ColumnOptions))} 
+                handleChange={(str) => handleColumnChange(str, idx)}
+            />
+            <Select 
+                className='query-builder' 
+                label={'Operator'} 
+                defaultValue={row.operator} 
+                values={operators} 
+                handleChange={(str) => handleOperatorChange(str, idx)}
+            />
+            <AutoComplete 
+                label={"Value"}
+                data={getUniqueValueOptions(row.column)}
+                defaultValue={ row.value.map((o, i) => { return {id: i, value: o, displayLabel: o} }) }
+                changeHandler={(o) => {handleAutocompleteChange(o, idx)}}
+                isMultiSearch
+                width={400}
+            />
+            {idx < rows.length - 1 && (<Typography marginTop={'7px'} marginLeft={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>)}
+            <div></div>
             </>
         ))}
             <Box className='form-buttons'>
