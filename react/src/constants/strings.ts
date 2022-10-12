@@ -44,6 +44,14 @@ const FileStrings = {
   templateButtonText: 'Download Template'
 };
 
+const BannerStrings = {
+  getNotifications: (n: number): string => `${n} Notifications`,
+  exportDetails: [
+    'Use Quick Export to quickly get telemetry data for any of your animals.',
+    'Use Advanced Export to get data that matches custom query parameters.'
+  ]
+};
+
 const WorkflowStrings = {
   location: {
     coordTypeLatLong: 'Use Lat/Long',
@@ -261,16 +269,6 @@ const HomePageStrings = {
     ]
   }
 };
-
-const DelegationRequestStrings = {
-  confirmDenyMesg: `Are you sure you wish to deny this permission request?`,
-  confirmGrantMesg: `Are you sure you wish to accept this permission request?`,
-  confirmDenyMesgMulti: (len: number): string => 
-    `Are you sure you wish to deny each of the ${len} permission requests?`
-  ,
-  confirmGrantMesgMulti: (len: number): string => 
-  `Are you sure you wish to accept each of the ${len} permission requests?`
-}
 export {
   AnimalDelegationSteps,
   CodeStrings,
@@ -287,5 +285,5 @@ export {
   UserAlertStrings,
   UserStrings,
   HomePageStrings,
-  DelegationRequestStrings
+  BannerStrings
 };
