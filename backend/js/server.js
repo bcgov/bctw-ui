@@ -94,7 +94,7 @@ const retrieveSessionInfo = function (req, res, next) {
   }
   // get contents of the current Keycloak access token
   const data = req.kauth.grant.access_token.content;
-  console.log(`Keycloak session data: `, data);
+  //console.log(`Keycloak session data: `, data);
   if (!data) {
     return res
       .status(500)
@@ -107,6 +107,7 @@ const retrieveSessionInfo = function (req, res, next) {
     given_name,
     ...getProperties(data),
   };
+  console.log("Keycloak session info: ", sessionInfo);
   res.status(200).send(sessionInfo);
 };
 
