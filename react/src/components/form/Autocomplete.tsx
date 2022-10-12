@@ -1,5 +1,6 @@
 import { Chip, TextField } from '@mui/material';
 import { Autocomplete as MUIAutocomplete } from '@mui/material';
+import { SxProps } from '@mui/system';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useEffect, useState } from 'react';
 import { ISelectMultipleData } from './MultiSelect';
@@ -14,6 +15,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
   tagLimit?: number;
   isMultiSearch?: boolean;
   hidden?: boolean;
+  sx?: SxProps;
 };
 
 /**
@@ -21,7 +23,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
  * tag components when an option is selected
  */
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
-  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch, hidden } = props;
+  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch, hidden, sx } = props;
   const [selected, setSelected] = useState<T[]>([]);
   useEffect(() => {
     setSelected([]);
@@ -30,9 +32,8 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
   useEffect(() => {
     if (defaultValue) {
       setSelected(defaultValue);
-      console.log("Set default to " + JSON.stringify(defaultValue));
     }
-  }, [defaultValue]);
+  }, []);
 
   const handleChange = (value: T[]): void => {
     const len = value.length;
@@ -51,7 +52,7 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       autoComplete
       size='small'
       multiple
-      sx={{display: 'inline-flex'}}
+      sx={sx}
       style={{ width }}
       limitTags={tagLimit ?? 3}
       isOptionEqualToValue={(option, value): boolean => option.id === value.id}
@@ -68,7 +69,7 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
             return -1;
           })
           .map((option: T, index: number) => (
-            <Chip key={`${option.prop}-${option.id}`} label={option.displayLabel} {...getTagProps({ index })} />
+            <Chip key={`${option.prop}-${option.id}`} label={option.displayLabel} size='small' {...getTagProps({ index })} />
           ));
       }}
       getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel}

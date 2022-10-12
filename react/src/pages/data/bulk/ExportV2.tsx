@@ -223,6 +223,7 @@ export default function ExportPageV2 (): JSX.Element {
     const getUniqueValueOptions = (col) => {
         if(crittersData) {
             const uniqueItemsForColumn = crittersData.map(o => o[col]).filter((v, i, a) => v && a.indexOf(v) === i);
+            uniqueItemsForColumn.sort();
             return uniqueItemsForColumn.map((f, i) => {
                 return {
                     id: i,
@@ -240,7 +241,7 @@ export default function ExportPageV2 (): JSX.Element {
     //{CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), required: false, multiple: true, style: {minWidth: '300px'}})}
     return(
     <>
-    <h1>Export Animal Telemetry</h1>
+    <h1>Export My Animal Telemetry</h1>
     <Tabs value={tab} sx={{borderBottom: 1, borderColor: 'divider'}} onChange={handleChangeTab}>
         <Tab label={"Quick Export"} value={TabNames.quick} />
         <Tab label={"Advanced Export"} value={TabNames.advanced} />
@@ -330,6 +331,8 @@ export default function ExportPageV2 (): JSX.Element {
                 defaultValue={ row.value.map((o, i) => { return {id: i, value: o, displayLabel: o} }) }
                 changeHandler={(o) => {handleAutocompleteChange(o, idx)}}
                 isMultiSearch
+                tagLimit={2}
+                sx={{display: 'inline-flex', marginBottom: '1rem'}}
                 width={400}
             />
             {idx < rows.length - 1 && (<Typography marginTop={'7px'} marginLeft={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>)}
@@ -338,7 +341,7 @@ export default function ExportPageV2 (): JSX.Element {
         ))}
             <Box className='form-buttons'>
                 <Button className='form-buttons' disabled={rows.length == formFields.displayProps.length} onClick={() => handleAddNewRow()}>Add Additional Parameter</Button>
-                <Button className='form-buttons' onClick={() => handleRemoveRow()}>Remove a Parameter</Button>
+                <Button className='form-buttons' disabled={rows.length < 2} onClick={() => handleRemoveRow()}>Remove a Parameter</Button>
                 <Button 
                     className='form-buttons' 
                     disabled={!formsFilled} 
