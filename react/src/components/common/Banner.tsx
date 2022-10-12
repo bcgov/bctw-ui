@@ -26,7 +26,7 @@ interface BannerProps {
   text: string | string[];
   icon?: JSX.Element;
   action?: 'close' | 'collapse';
-  hiddenContent?: JSX.Element;
+  hiddenContent?: JSX.Element[];
 }
 
 export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerProps) => {
@@ -66,33 +66,38 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
           <div>{text}</div>
         )}
         <Collapse in={expand}>
-          <List dense>{hiddenContent}</List>
+          {hiddenContent?.length ? (
+            <List dense>
+              {hiddenContent.map((content) => (
+                <div>{content}</div>
+              ))}
+            </List>
+          ) : null}
         </Collapse>
       </Alert>
     </Collapse>
   );
 };
 
-export const InfoBanner = (text: Pick<BannerProps, 'text'>) => <Banner variant='info' {...text} />;
+type SuccessBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
+export const SuccessBanner = (props: SuccessBannerProps) => <Banner variant='success' action='collapse' {...props} />;
 
-interface INotification {
-  notifications: JSX.Element[];
-}
-export const NotificationBanner = ({ notifications }: INotification) => {
-  const numNotifs = notifications.length;
+type ErrorBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
+export const ErrorBanner = (props: SuccessBannerProps) => <Banner variant='error' action='collapse' {...props} />;
+
+type InfoBannerProps = Pick<BannerProps, 'text'>;
+export const InfoBanner = (props: InfoBannerProps) => <Banner variant='info' {...props} />;
+
+type NotificationBannerProps = Pick<BannerProps, 'hiddenContent'>;
+export const NotificationBanner = (props: NotificationBannerProps) => {
+  const numNotifs = props.hiddenContent.length;
   return numNotifs ? (
     <Banner
       variant='error'
       text={BannerStrings.getNotifications(numNotifs)}
       icon={<Icon icon={'bell'} />}
       action='collapse'
-      hiddenContent={
-        <div>
-          {notifications.map((notif) => (
-            <div>{notif}</div>
-          ))}
-        </div>
-      }
+      {...props}
     />
   ) : (
     <Banner
