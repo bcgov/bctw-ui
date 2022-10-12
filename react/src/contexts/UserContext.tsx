@@ -56,7 +56,6 @@ export const UserStateContextProvider: React.FC = (props) => {
 
   // when the user data is fetched...
   useEffect(() => {
-    // console.log('user fetching status', userStatus)
     if (userStatus === 'success') {
       setUserContext((o) => ({ ...o, user: userData }));
     }
@@ -84,7 +83,6 @@ export const UserStateContextProvider: React.FC = (props) => {
   // when there was an error fetching the user
   useEffect(() => {
     if (userError) {
-      console.log('UserContext: failed to fetch user', userError);
       const n = { user: null, error: userError };
       setUserContext((o) => ({ ...o, ...n }));
     }
@@ -93,7 +91,6 @@ export const UserStateContextProvider: React.FC = (props) => {
   // when there was an error fetching the keycloak session
   useEffect(() => {
     if (sessionError) {
-      console.log('UserContext: failed to retrieve session', sessionError);
       const n = { session: null, error: sessionError };
       setUserContext((o) => ({ ...o, ...n }));
     }

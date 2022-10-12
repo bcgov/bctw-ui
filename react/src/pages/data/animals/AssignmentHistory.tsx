@@ -36,13 +36,11 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
   useEffect(() => {
     if (history.length) {
       const attachment = hasCollarCurrentlyAssigned(history);
-      // console.log('found current device attachment', attachment);
       setCurrentAttached(attachment);
     }
   }, [history]);
 
   useEffect(() => {
-    // console.log('assignment history page: device was assigned or removed', attachmentChanged);
     handleClose(false);
   }, [attachmentChanged])
 

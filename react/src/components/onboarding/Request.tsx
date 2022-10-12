@@ -32,11 +32,10 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
   const useKeycloakUser = useContext(UserContext);
   const [keycloakUser, setKeycloakUser] = useState<IKeyCloakSessionInfo>(null);
   const [domain, setDomain] = useState<KeyCloakDomainType>('idir');
-  console.log(useKeycloakUser);
+
   // create access request stub
   const onSuccess = (u: IOnboardUser): void => {
     showNotif({ severity: 'success', message: `User onboarding request submitted` });
-    console.log('UserOnboarding: Request: new user onboarding submission response', u);
   };
   const onError = (e): void => {
     showNotif({ severity: 'error', message: `${formatAxiosError(e)}` });
@@ -82,7 +81,6 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
     emailInfo.projectRole = projectRole;
     emailInfo.region = region;
     emailInfo.species = species;
-    console.log(`UserOnboarding: Request: submitRequest: submitting onboarding request`, newUser);
     await saveMutation(newUser);
   };
 

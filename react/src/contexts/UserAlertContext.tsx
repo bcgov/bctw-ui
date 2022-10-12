@@ -35,7 +35,6 @@ export const AlertStateContextProvider: React.FC = (props) => {
 
   // until the user is loaded, don't bother fetching alerts
   useEffect(() => {
-    // console.log('should fetch alerts', !!useUser?.user);
     //Uncomment this line to enable user alerts again
     //Issue in get_user_telemetry_alerts query returning more than one result...
     //setShouldFetchAlerts(!!useUser?.user);
@@ -47,7 +46,6 @@ export const AlertStateContextProvider: React.FC = (props) => {
    */
   useEffect(() => {
     const update = (): void => {
-      // console.log('user alert status', status, data);
       if (status === 'success') {
         setAlertContext({ alerts: data, getAlertTitle, error: null });
       } else if (status === 'error') {

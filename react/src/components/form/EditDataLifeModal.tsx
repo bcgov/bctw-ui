@@ -30,7 +30,6 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
 
   useDidMountEffect(() => {
     if (attachment) {
-      // console.log('new attachment provided to DL modal', attachment.assignment_id)
       setDli(attachment.createDataLife());
     }
   }, [attachment]);
@@ -38,7 +37,6 @@ export default function EditDataLifeModal(props: EditDataLifeModalProps): JSX.El
   // must be defined before mutation declarations
   const onSuccess = async (data): Promise<void> => {
     // eslint-disable-next-line no-console
-    console.log('data life updated response:', data);
     showNotif({ severity: 'success', message: `data life updated` });
   };
 

@@ -273,7 +273,6 @@ export default function DataTable<T extends BCTWBase<T>>({
         : values;
     const start = (ROWS_PER_PAGE + page - ROWS_PER_PAGE - 1) * ROWS_PER_PAGE;
     const end = ROWS_PER_PAGE * page - 1;
-    // console.log(`slice start ${start}, slice end ${end}`);
     return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
   };
 
