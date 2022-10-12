@@ -9,7 +9,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
   label: string;
   changeHandler: (o: T[], p?: string) => void;
   defaultValue?: T[];
-  triggerReset?: boolean; // unselect of all values
+  triggerReset?: any; // unselect of all values
   data: T[];
   width?: number;
   tagLimit?: number;

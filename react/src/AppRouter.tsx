@@ -15,7 +15,7 @@ import { FunctionComponent } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import OnboardingAdmin from 'pages/admin/OnboardingAdmin';
 import VendorAPIPage from 'pages/vendor/TriggerFetchTelemetry';
-import ExportV2Wrapper from 'pages/data/bulk/ExportV2Wrapper';
+import ExportV2 from 'pages/data/bulk/ExportV2';
 
 export type RouteKey = {
   path: string;
@@ -36,7 +36,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'profile', path: '/profile', title: 'My Profile', component: UserProfile, sort: 12, icon: 'profile' },
   { name: 'delegation', path: '/delegation', title: 'Delegation', component: ManagerRequestPermission, sort: 13, icon: 'share' },
   { name: 'import', path: '/import', title: 'Data Import', component: Import, sort: 14, icon: 'arrow-up' },
-  { name: 'export', path: '/export', title: 'Data Export', component: ExportV2Wrapper, sort: 15, icon: 'arrow-down' },
+  { name: 'export', path: '/export', title: 'Data Export', component: ExportV2, sort: 15, icon: 'arrow-down' },
   { name: 'delegation-requests', path: '/delegation-requests', title: 'Delegation Requests', component: AdminHandleRequestPermissionPage, sort: 100, icon: 'edit' },
   { name: 'users', path: '/users', title: 'BCTW Users', component: UserAdminPage, sort: 101, icon: 'admin' },
   { name: 'onboarding-admin', path: '/admin-onboarding', title: 'Onboarding Requests', component: OnboardingAdmin, sort: 102, icon: 'personAdd' },

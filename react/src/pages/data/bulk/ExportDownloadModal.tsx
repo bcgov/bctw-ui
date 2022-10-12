@@ -121,7 +121,7 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
             body.queries.push({
                 key: row.column,
                 operator: operatorTranslation(row.operator),
-                term: row.value.map(o => o.toString().toLowerCase())
+                term: row.value.map(o => o.toString().toLowerCase().trim())
             });
         }
         body.range = {

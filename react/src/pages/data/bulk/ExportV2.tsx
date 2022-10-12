@@ -136,6 +136,7 @@ export default function ExportPageV2 (): JSX.Element {
         //console.log(crittersData.length);
         //console.log(crittersData.map(o => o[formFields.formatHeaderAsProp(newval)]).filter((v, i, a) => a.indexOf(v) === i));
         o.column = formFields.formatHeaderAsProp(newval) as ColumnOptions;
+        o.value = [];
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 
@@ -240,7 +241,7 @@ export default function ExportPageV2 (): JSX.Element {
     //<SelectCode codeHeader='species' defaultValue='' changeHandler={() => {}} required={false} propName={'species'}></SelectCode>
     //{CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), required: false, multiple: true, style: {minWidth: '300px'}})}
     return(
-    <>
+    <ManageLayout>
     <h1>Export My Animal Telemetry</h1>
     <Tabs value={tab} sx={{borderBottom: 1, borderColor: 'divider'}} onChange={handleChangeTab}>
         <Tab label={"Quick Export"} value={TabNames.quick} />
@@ -330,6 +331,7 @@ export default function ExportPageV2 (): JSX.Element {
                 data={getUniqueValueOptions(row.column)}
                 defaultValue={ row.value.map((o, i) => { return {id: i, value: o, displayLabel: o} }) }
                 changeHandler={(o) => {handleAutocompleteChange(o, idx)}}
+                triggerReset={row.column}
                 isMultiSearch
                 tagLimit={2}
                 sx={{display: 'inline-flex', marginBottom: '1rem'}}
@@ -364,6 +366,6 @@ export default function ExportPageV2 (): JSX.Element {
             end: selectedLifetime ? dayjs() : end
         }}>
     </ExportDownloadModal>
-    </>
+    </ManageLayout>
     )
 }
