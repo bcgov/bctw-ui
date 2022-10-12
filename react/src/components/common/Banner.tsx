@@ -6,8 +6,6 @@ import { useState } from 'react';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: 'flex',
-    // alignItems: 'center',
-    // flexWrap: 'wrap',
     width: '100%',
     marginBottom: theme.spacing(2)
   },
