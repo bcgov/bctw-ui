@@ -33,7 +33,17 @@ import {
   mdiLockOpenCheck,
   mdiMagnify,
   mdiFilterOutline,
-  mdiBrush
+  mdiBrush,
+  mdiCancel,
+  mdiCircle,
+  mdiAlertRhombus,
+  mdiSleep,
+  mdiBell,
+  mdiChevronDown,
+  mdiChevronUp,
+  mdiEye,
+  mdiEyePlus,
+  mdiDotsHorizontal
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -58,6 +68,10 @@ const getIconPath = (path: string): string => {
       return mdiArrowLeft;
     case 'next':
       return mdiArrowRight;
+    case 'down':
+      return mdiChevronDown;
+    case 'up':
+      return mdiChevronUp;
     case 'last':
       return mdiPageLast;
     case 'close':
@@ -119,6 +133,22 @@ const getIconPath = (path: string): string => {
       return mdiFilterOutline;
     case 'symbolize':
       return mdiBrush;
+    case 'cancel':
+      return mdiCancel;
+    case 'circle':
+      return mdiCircle;
+    case 'alert':
+      return mdiAlertRhombus;
+    case 'zzz':
+      return mdiSleep;
+    case 'bell':
+      return mdiBell;
+    case 'eye':
+      return mdiEye;
+    case 'eyeplus':
+      return mdiEyePlus;
+    case 'dots':
+      return mdiDotsHorizontal;
   }
 };
 
