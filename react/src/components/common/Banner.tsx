@@ -25,7 +25,7 @@ interface BannerProps {
   variant: 'info' | 'warning' | 'success' | 'error';
   text: string | string[];
   icon?: JSX.Element;
-  action?: 'close' | 'collapse';
+  action?: 'close' | 'collapse' | 'both';
   hiddenContent?: JSX.Element[];
 }
 
@@ -34,6 +34,8 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
   const [open, setOpen] = useState(true);
   const [expand, setExpand] = useState(false);
   const getAction = (a: string) => {
+    if (a === 'both' && expand) return 'close';
+    else a = 'collapse';
     if (a === 'collapse' && !expand) return 'down';
     if (a === 'collapse' && expand) return 'up';
     return a;
@@ -45,12 +47,12 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
         icon={icon}
         className={style[variant]}
         action={
-          action ? (
+          action && hiddenContent ? (
             <IconButton
               color='inherit'
               size='small'
               onClick={() => {
-                action === 'close' ? setOpen(false) : setExpand((e) => !e);
+                getAction(action) === 'close' ? setOpen(false) : setExpand((e) => !e);
               }}>
               <Icon icon={getAction(action)} />
             </IconButton>
@@ -68,9 +70,11 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
         <Collapse in={expand}>
           {hiddenContent?.length ? (
             <List dense>
-              {hiddenContent.map((content) => (
-                <div>{content}</div>
-              ))}
+              <div>
+                {hiddenContent.map((content) => (
+                  <div>{content}</div>
+                ))}
+              </div>
             </List>
           ) : null}
         </Collapse>
@@ -83,13 +87,13 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
  * Used for bulk request handling. Usually bottom page
  */
 type SuccessBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
-export const SuccessBanner = (props: SuccessBannerProps) => <Banner variant='success' action='collapse' {...props} />;
+export const SuccessBanner = (props: SuccessBannerProps) => <Banner variant='success' action='both' {...props} />;
 
 /**
  * Used for bulk error handling. Usually bottom page
  */
 type ErrorBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
-export const ErrorBanner = (props: ErrorBannerProps) => <Banner variant='error' action='collapse' {...props} />;
+export const ErrorBanner = (props: ErrorBannerProps) => <Banner variant='error' action='both' {...props} />;
 
 /**
  * Used at top of page for help / info
