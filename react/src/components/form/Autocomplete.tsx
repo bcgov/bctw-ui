@@ -10,6 +10,7 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
   changeHandler: (o: T[], p?: string) => void;
   defaultValue?: T[];
   triggerReset?: any; // unselect of all values
+  resetToDefaultValue?: boolean;
   data: T[];
   width?: number;
   tagLimit?: number;
@@ -23,10 +24,15 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
  * tag components when an option is selected
  */
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
-  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch, hidden, sx } = props;
+  const { label, data, triggerReset, changeHandler, resetToDefaultValue, defaultValue, width, tagLimit, isMultiSearch, hidden, sx } = props;
   const [selected, setSelected] = useState<T[]>([]);
   useEffect(() => {
-    setSelected([]);
+    if(resetToDefaultValue) {
+      setSelected(defaultValue ?? []);
+    }
+    else {
+      setSelected([]);
+    }
   }, [triggerReset]);
 
   useEffect(() => {

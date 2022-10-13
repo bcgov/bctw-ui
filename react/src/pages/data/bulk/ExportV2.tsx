@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import DataTable from 'components/table/DataTable';
-import { CritterStrings as CS, MapStrings } from 'constants/strings';
+import { CritterStrings as CS, ExportStrings, MapStrings } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { SyntheticEvent, useEffect, useState } from 'react';
@@ -10,9 +10,9 @@ import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { eInputType, FormFieldObject, InboundObj, parseFormChangeResult } from 'types/form_types';
 import Select from 'components/form/BasicSelect';
-import { Button } from 'components/common';
+import { Button, Icon } from 'components/common';
 import Checkbox from 'components/form/Checkbox';
-import { Grid, Tab, Tabs, Typography } from '@mui/material';
+import { Grid, IconButton, Tab, Tabs, Typography, Button as MUIButton } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
 import { wfFields } from 'types/events/event';
 import { BCTWFormat } from 'types/common_types';
@@ -20,6 +20,9 @@ import { ICodeFilter } from 'types/code';
 import ExportDownloadModal from './ExportDownloadModal';
 import { SpeciesProvider, useSpecies, useUISpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import AutoComplete from 'components/form/Autocomplete';
+import { InfoBanner } from 'components/common/Banner';
+import ContainerLayout from 'pages/layouts/ContainerLayout';
+import makeStyles from '@mui/styles/makeStyles';
 
 type ColumnOptions = 'species' | 'population_unit' | 'wlh_id' | 'animal_id' | 'device_id' | 'frequency';
 
@@ -34,6 +37,25 @@ export interface DateRange {
     start: dayjs.Dayjs,
     end: dayjs.Dayjs
 }
+
+export const exportStyles = makeStyles(() => ({
+    queryBuilderCol : {
+        display: 'inline-flex',
+        marginRight: '0.5rem',
+        marginBottom: '1rem',
+        width: '200px'
+    },
+    queryBuilderOp : {
+        display: 'inline-flex',
+        marginRight: '0.5rem',
+        marginBottom: '1rem',
+        width: '150px'
+    },
+    rightJustifyButton: {
+        marginLeft: 'auto', 
+        marginRight: '34px'
+    }
+}));
 
 class PossibleColumnValues implements BCTWFormat<PossibleColumnValues> {
     species: string[];
@@ -59,6 +81,7 @@ class PossibleColumnValues implements BCTWFormat<PossibleColumnValues> {
     }
 }
 
+
 export enum TabNames {
     quick = 'Quick Export',
     advanced = 'Advanced Export'
@@ -66,10 +89,7 @@ export enum TabNames {
 
 export default function ExportPageV2 (): JSX.Element {
     const api = useTelemetryApi();
-    const species = useSpecies();
-    const updateSpecies = useUpdateSpecies();
-    const allSpecies = useUISpecies();
-    
+    const styles = exportStyles();
     const operators: string[] = ['Equals','Not Equals'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
     const [end, setEnd] = useState(dayjs());
@@ -88,6 +108,10 @@ export default function ExportPageV2 (): JSX.Element {
         areFieldsFilled();
     }, [rows]);
 
+    useEffect(() => {
+        console.log(JSON.stringify(rows));
+    }, [rows]);
+
     const isTab = (tabName: TabNames): boolean => tabName === tab;
 
     const handleChangeDate = (v: InboundObj): void => {
@@ -100,11 +124,11 @@ export default function ExportPageV2 (): JSX.Element {
         setRows([...rows, {column: firstRemaining as ColumnOptions, operator: '', value: [], formField: new PossibleColumnValues}]);
     }
 
-    const handleRemoveRow = (): void => {
+    const handleRemoveRow = (idx: number): void => {
         if(rows.length < 2) {
             return;
         }
-        setRows(rows.slice(0, -1));
+        setRows([...rows.slice(0, idx), ...rows.slice(idx+1)]);
     }
 
     /*
@@ -152,8 +176,11 @@ export default function ExportPageV2 (): JSX.Element {
     * handle the defaultValue for the form and have that information persist between re-renders. 
     * A partial refactor to better reflect this is on 710-refactored-row-data, but I shelved it since the fact that PossibleColumnValues is readonly 
     * makes it hard to avoid just spawning more of them.
+    * 
+    * UPDATE 10/13/2022 - This part may not be needed, but it will depend on what is decided about the next bits of functionality for this page,
+    * so I'm leaving it in for now.
     */
-
+    /*
     const handleValueChange = (newval: Record<string, unknown>, idx: number): void => {
         if(newval === undefined) {
             return;
@@ -171,7 +198,7 @@ export default function ExportPageV2 (): JSX.Element {
         }
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
-
+    
     const handleDropdownChange = (newval: ICodeFilter[], idx: number): void => {
         const o = rows[idx];
         o.value = newval.map(n => n.description.toString());
@@ -179,19 +206,9 @@ export default function ExportPageV2 (): JSX.Element {
         const key = o.column as keyof typeof PossibleColumnValues;
         ff[key]= o.value;
         o.formField = ff;
-
-        if(o.column === 'species') {
-            const found = allSpecies.find((s) => s.name === o.value[0]);
-            if (found) {
-                updateSpecies(found);
-                console.log("Updated species to " + found);
-            }
-        }
-        //console.log(newval);
-        //console.log(o.value);
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
-
+    */
     const handleAutocompleteChange = (newVals, idx) => {
         const o = rows[idx];
         o.value = newVals.map(n => n.value);
@@ -213,13 +230,14 @@ export default function ExportPageV2 (): JSX.Element {
 
     //Here we force the fields that would normally be number fields to be text fields instead.
     //Need to do this since they won't be able to input commas for the list otherwise.
-    const getFormFieldObjForColumn = (col: ColumnOptions): FormFieldObject<any> => {
+    /*const getFormFieldObjForColumn = (col: ColumnOptions): FormFieldObject<any> => {
         const ff = wfFields.get(col);
         if(col === 'device_id' || col == 'frequency') {
             ff.type = eInputType.text;
         }
         return ff;
-    }
+    }*/
+    //<Typography marginTop={'7px'} marginLeft={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>
 
     const getUniqueValueOptions = (col) => {
         if(crittersData) {
@@ -235,7 +253,7 @@ export default function ExportPageV2 (): JSX.Element {
         }
         else {
             return [{id: 0, value: "Loading...", displayLabel: "Loading..."}];
-        }
+    }
     }
     //{CreateFormField(formFields, wfFields.get(rows[idx].column), () => {})}
     //<SelectCode codeHeader='species' defaultValue='' changeHandler={() => {}} required={false} propName={'species'}></SelectCode>
@@ -243,12 +261,16 @@ export default function ExportPageV2 (): JSX.Element {
     return(
     <ManageLayout>
     <h1>Export My Animal Telemetry</h1>
-    <Tabs value={tab} sx={{borderBottom: 1, borderColor: 'divider'}} onChange={handleChangeTab}>
-        <Tab label={"Quick Export"} value={TabNames.quick} />
+    <Box marginTop={'15px'}>
+        <InfoBanner text={ExportStrings.infoBannerMesgs} />
+    </Box>
+    <ContainerLayout>
+    <Tabs value={tab} className='tabs' onChange={handleChangeTab}>
+        <Tab label={"Quick Export"} value={TabNames.quick}/>
         <Tab label={"Advanced Export"} value={TabNames.advanced} />
     </Tabs>
     <h2>Specify Date Range</h2>
-        <Grid container spacing ={2}>
+        <Grid marginBottom={'2rem'} container spacing={2}>
             <Grid item sm={2}>
                 <DateInput
                 fullWidth
@@ -274,7 +296,7 @@ export default function ExportPageV2 (): JSX.Element {
             <Grid item sm={2}>
                 <Checkbox
                 propName={"animalLifetime"}
-                label={"Animal Lifetime"}
+                label={"All Telemetry"}
                 initialValue={selectedLifetime}
                 changeHandler={() => setSelectedLifetime((o) => !o)}
                 />
@@ -282,7 +304,7 @@ export default function ExportPageV2 (): JSX.Element {
         </Grid>
     {isTab(TabNames.quick) && (
         <>
-        <h2>Simple Export</h2>
+        <h2>Select Animals</h2>
         <Box mb={4}>
             <DataTable
             headers={AttachedAnimal.attachedCritterDisplayProps}
@@ -299,30 +321,31 @@ export default function ExportPageV2 (): JSX.Element {
             className='form-buttons' 
             disabled={!collarIDs.length}
             onClick={() => {setShowModal(true)}}>
-                Export Selected Data
+                Export
         </Button>
         </>
         )
     }
     {isTab(TabNames.advanced) && (
     <>
-    <h2>Advanced Export</h2>
-    <h4>Export all critters where...</h4>
-        <Box width={1000}>
+    <h2>Build Query</h2>
+        <Box width={800}>
         
         {rows.map((row, idx) => (
             <>
             <Select 
-                className='query-builder-column' 
+                className={styles.queryBuilderCol}
                 label={'Column'} 
-                defaultValue={formFields.formatPropAsHeader(row.column)} 
+                defaultValue={formFields.formatPropAsHeader(row.column)}
+                triggerReset={row.column}
                 values={getValidColumnChoices(row.column).map(o => formFields.formatPropAsHeader(o as ColumnOptions))} 
                 handleChange={(str) => handleColumnChange(str, idx)}
             />
             <Select 
-                className='query-builder' 
+                className={styles.queryBuilderOp} 
                 label={'Operator'} 
                 defaultValue={row.operator} 
+                triggerReset={row.operator}
                 values={operators} 
                 handleChange={(str) => handleOperatorChange(str, idx)}
             />
@@ -333,22 +356,41 @@ export default function ExportPageV2 (): JSX.Element {
                 changeHandler={(o) => {handleAutocompleteChange(o, idx)}}
                 triggerReset={row.column}
                 isMultiSearch
+                resetToDefaultValue
                 tagLimit={2}
                 sx={{display: 'inline-flex', marginBottom: '1rem'}}
                 width={400}
             />
-            {idx < rows.length - 1 && (<Typography marginTop={'7px'} marginLeft={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>)}
+            {rows.length > 1 && (
+                <>
+                <IconButton
+                    style={{marginBottom:'5px'}}
+                    color='default'
+                    size='small'
+                    onClick={() => {handleRemoveRow(idx)}}
+                >
+                    <Icon icon='delete' />
+                </IconButton>
+                </>
+            )}
             <div></div>
             </>
         ))}
-            <Box className='form-buttons'>
-                <Button className='form-buttons' disabled={rows.length == formFields.displayProps.length} onClick={() => handleAddNewRow()}>Add Additional Parameter</Button>
-                <Button className='form-buttons' disabled={rows.length < 2} onClick={() => handleRemoveRow()}>Remove a Parameter</Button>
-                <Button 
+            <Box display='flex'>
+                <MUIButton 
                     className='form-buttons' 
+                    disabled={rows.length == formFields.displayProps.length}
+                    size='large'
+                    startIcon={<Icon icon='plus'/>}
+                    variant='text'
+                    onClick={() => handleAddNewRow()}
+                >Add Parameter
+                </MUIButton>
+                <Button
+                    className={styles.rightJustifyButton}
                     disabled={!formsFilled} 
                     onClick={() => {setShowModal(true)}}>
-                    Export From Query
+                    Export
                 </Button>
             </Box>
         </Box>
@@ -366,6 +408,7 @@ export default function ExportPageV2 (): JSX.Element {
             end: selectedLifetime ? dayjs() : end
         }}>
     </ExportDownloadModal>
+    </ContainerLayout>
     </ManageLayout>
     )
 }
