@@ -25,8 +25,8 @@ interface BannerProps {
   variant: 'info' | 'warning' | 'success' | 'error';
   text: string | string[];
   icon?: JSX.Element;
-  action?: 'close' | 'collapse';
-  hiddenContent?: JSX.Element;
+  action?: 'close' | 'collapse' | 'both';
+  hiddenContent?: JSX.Element[];
 }
 
 export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerProps) => {
@@ -34,6 +34,8 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
   const [open, setOpen] = useState(true);
   const [expand, setExpand] = useState(false);
   const getAction = (a: string) => {
+    if (a === 'both' && expand) return 'close';
+    else a = 'collapse';
     if (a === 'collapse' && !expand) return 'down';
     if (a === 'collapse' && expand) return 'up';
     return a;
@@ -45,12 +47,12 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
         icon={icon}
         className={style[variant]}
         action={
-          action ? (
+          action && hiddenContent ? (
             <IconButton
               color='inherit'
               size='small'
               onClick={() => {
-                action === 'close' ? setOpen(false) : setExpand((e) => !e);
+                getAction(action) === 'close' ? setOpen(false) : setExpand((e) => !e);
               }}>
               <Icon icon={getAction(action)} />
             </IconButton>
@@ -66,33 +68,53 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
           <div>{text}</div>
         )}
         <Collapse in={expand}>
-          <List dense>{hiddenContent}</List>
+          {hiddenContent?.length ? (
+            <List dense>
+              <div>
+                {hiddenContent.map((content) => (
+                  <div>{content}</div>
+                ))}
+              </div>
+            </List>
+          ) : null}
         </Collapse>
       </Alert>
     </Collapse>
   );
 };
 
-export const InfoBanner = (text: Pick<BannerProps, 'text'>) => <Banner variant='info' {...text} />;
+/**
+ * Used for bulk request handling. Usually bottom page
+ */
+type SuccessBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
+export const SuccessBanner = (props: SuccessBannerProps) => <Banner variant='success' action='both' {...props} />;
 
-interface INotification {
-  notifications: JSX.Element[];
-}
-export const NotificationBanner = ({ notifications }: INotification) => {
-  const numNotifs = notifications.length;
+/**
+ * Used for bulk error handling. Usually bottom page
+ */
+type ErrorBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
+export const ErrorBanner = (props: ErrorBannerProps) => <Banner variant='error' action='both' {...props} />;
+
+/**
+ * Used at top of page for help / info
+ */
+type InfoBannerProps = Pick<BannerProps, 'text'>;
+export const InfoBanner = (props: InfoBannerProps) => <Banner variant='info' {...props} />;
+
+/**
+ * Used at top of page to display notifications or alerts.
+ * Displays blue when no notifications provided.
+ */
+type NotificationBannerProps = Pick<BannerProps, 'hiddenContent'>;
+export const NotificationBanner = (props: NotificationBannerProps) => {
+  const numNotifs = props.hiddenContent.length;
   return numNotifs ? (
     <Banner
       variant='error'
       text={BannerStrings.getNotifications(numNotifs)}
       icon={<Icon icon={'bell'} />}
       action='collapse'
-      hiddenContent={
-        <div>
-          {notifications.map((notif) => (
-            <div>{notif}</div>
-          ))}
-        </div>
-      }
+      {...props}
     />
   ) : (
     <Banner
