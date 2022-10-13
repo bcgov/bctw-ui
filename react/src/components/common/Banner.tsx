@@ -85,7 +85,6 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
 
 /**
  * Used for bulk request handling. Usually bottom page
- *
  */
 type SuccessBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
 export const SuccessBanner = (props: SuccessBannerProps) => <Banner variant='success' action='both' {...props} />;
