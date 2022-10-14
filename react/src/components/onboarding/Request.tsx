@@ -35,19 +35,20 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
   console.log(useKeycloakUser);
   // create access request stub
   const onSuccess = (u: IOnboardUser): void => {
-    showNotif({ severity: 'success', message: `User onboarding request submitted`});
+    showNotif({ severity: 'success', message: `User onboarding request submitted` });
     console.log('UserOnboarding: Request: new user onboarding submission response', u);
   };
   const onError = (e): void => {
     showNotif({ severity: 'error', message: `${formatAxiosError(e)}` });
   };
-  
+
   const { mutateAsync: saveMutation } = api.useSubmitOnboardingRequest({ onSuccess, onError });
 
   const email = keycloakUser?.email ?? 'email@address.com';
   const firstName = keycloakUser?.given_name ?? 'given_Name';
   const lastName = keycloakUser?.family_name ?? 'last_Name';
   const username = keycloakUser?.username ?? 'username';
+  const keycloak_guid = keycloakUser?.keycloak_guid;
 
   // as user is not onboarded, use Keycloak user details instead of from local database
   useEffect(() => {
@@ -65,6 +66,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
   const submitRequest = async (): Promise<void> => {
     const newUser = new OnboardUserRequest();
     const { user, emailInfo } = newUser;
+    user.keycloak_guid = keycloak_guid;
     user.role_type = accessType;
     user.domain = domain;
     user.username = username;
@@ -81,8 +83,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
     emailInfo.region = region;
     emailInfo.species = species;
     console.log(`UserOnboarding: Request: submitRequest: submitting onboarding request`, newUser);
-    await saveMutation(newUser)
-    
+    await saveMutation(newUser);
   };
 
   const textProps: Pick<StandardTextFieldProps, 'size'> & Pick<OutlinedTextFieldProps, 'variant'> = {

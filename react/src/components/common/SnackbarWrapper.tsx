@@ -9,6 +9,11 @@ export default function SnackbarWrapper({children}: SnackbarWrapperProps): JSX.E
   const responseState = useResponseState();
   const [showToast, setShowToast] = useState(false);
 
+  const handleClose = (): void => {
+    setShowToast(false); 
+    responseState?.callback?.();
+  }
+
   useEffect(() => {
     ((): void => {
       if (responseState) {
@@ -25,7 +30,7 @@ export default function SnackbarWrapper({children}: SnackbarWrapperProps): JSX.E
   return (
     <>
       {children}
-      {responseState && (<Toast severity={responseState?.severity} show={showToast} message={responseState?.message} onClose={(): void => {setShowToast(false); responseState?.callback?.()}} />)}
+      {responseState && (<Toast severity={responseState?.severity} show={showToast} message={responseState?.message} onClose={(): void => {handleClose();}} />)}
     </>
   )
 }

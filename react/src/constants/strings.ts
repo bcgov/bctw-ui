@@ -269,6 +269,15 @@ const HomePageStrings = {
     ]
   }
 };
+
+const DelegationRequestStrings = {
+  confirmDenyMesg: `Are you sure you wish to deny this permission request?`,
+  confirmGrantMesg: `Are you sure you wish to accept this permission request?`,
+  confirmDenyMesgMulti: (len: number): string =>
+    `Are you sure you wish to deny each of the ${len} permission requests?`,
+  confirmGrantMesgMulti: (len: number): string =>
+    `Are you sure you wish to accept each of the ${len} permission requests?`
+};
 export {
   AnimalDelegationSteps,
   CodeStrings,
@@ -285,5 +294,6 @@ export {
   UserAlertStrings,
   UserStrings,
   HomePageStrings,
+  DelegationRequestStrings,
   BannerStrings
 };

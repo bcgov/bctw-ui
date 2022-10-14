@@ -59,14 +59,15 @@ export const permissionApi = (props: ApiProps): API => {
     user: User,
     filter: eCritterPermission[] = filterOutNonePermissions
   ): Promise<UserCritterAccess[]> => {
+    console.log(user);
     if (!user?.username) {
       // eslint-disable-next-line no-console
       console.log(`unable to fetch user animal access, invalid user object ${JSON.stringify(user)}`);
       return [];
     }
     const filtersAsString = filter.join(',');
-    const { username } = user;
-    const url = createUrl({ api: `get-critter-access/${username}`, query: `filters=${filtersAsString}`, page });
+    const { keycloak_guid } = user;
+    const url = createUrl({ api: `get-critter-access/${keycloak_guid}`, query: `filters=${filtersAsString}`, page });
     const { data } = await api.get(url);
     // may not be in an array if the user only has accesss to one animal
     const d: IUserCritterAccess[] = !Array.isArray(data) ? [data] : data;
@@ -111,9 +112,9 @@ export const permissionApi = (props: ApiProps): API => {
   /**
    * an endpoint that an admin uses to grant or deny an manager's permission request
    * currently now edit functionality exists
-  */
+   */
   const takeActionOnPermissionRequest = async (body: IExecutePermissionRequest[]): Promise<IUserCritterAccess> => {
-    const url = createUrl({api: `execute-permission-request`});
+    const url = createUrl({ api: `execute-permission-request` });
     const { data } = await api.post(url, body);
     return data;
   };

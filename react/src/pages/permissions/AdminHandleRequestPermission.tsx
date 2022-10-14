@@ -24,9 +24,7 @@ import { AxiosError } from 'axios';
 import { formatDay } from 'utils/time';
 import { isDev } from 'api/api_helpers';
 import { eUserRole } from 'types/user';
-import DataTable from 'components/table/DataTable';
-import { ITableQueryProps } from 'components/table/table_interfaces';
-import makeStyles from '@mui/styles/makeStyles';
+import { DelegationRequestStrings as msgStrings } from 'constants/strings';
 
 /**
  * page that an admin uses to grant or deny permission requests from managers
@@ -61,7 +59,12 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   }, [status]);
 
   const onSuccess = (data: IExecutePermissionRequest[]): void => {
-    const successfulRequests: number[] = data.filter((o) => 'errormsg' in o == false).map((e) => e.request_id);
+    const successfulRequests: number[] = [];
+    for(const item of data) {
+      if('errormsg' in item === false) {
+        successfulRequests.push(item.request_id);
+      }
+    }
     setRequests((o) => o.filter((req) => successfulRequests.indexOf(req.id) === -1));
     setSelectedMultiRequestIDs([]);
     ref?.current?.setSelected([]);
@@ -113,15 +116,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     await mutateAsync(body);
   };
 
-  // if a grant/deny icon is clicked, show a confirmation modal
-  /*const handleShowConfirm = (request: IGroupedRequest, isGrant: boolean): void => {
-    setIsGrant(isGrant);
-    setSelectedMultiRequestIDs([request.id]);
-    ref?.current?.setSelected([requests.findIndex(o => o.id == request.id)]);
-    //setSelectedRequestID(request.id);
-    setShowConfirmModal((o) => !o);
-  };*/
-
   const handleShowConfirmMultiple = (isGrant: boolean): void => {
     setIsGrant(isGrant);
     setShowConfirmModal((o) => !o);
@@ -136,18 +130,11 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     }
   };
 
-  const ays = 'Are you sure you wish to';
-  const confirmDenyMesg = `${ays} deny this permission request?`;
-  const confirmGrantMesg = `${ays} accept this permission request?`;
-
-  const confirmDenyMesgMulti = `${ays} deny each of the ${selectedMultiRequestIDs.length} permission requests?`;
-  const confirmGrantMesgMulti = `${ays} accept each of the ${selectedMultiRequestIDs.length} permission requests?`;
-
   const getConfirmMessage = (): string | JSX.Element => {
     if (selectedMultiRequestIDs.length) {
-      return isGrant ? confirmGrantMesgMulti : DenyConfirmMessage;
+      return isGrant ? msgStrings.confirmDenyMesgMulti(selectedMultiRequestIDs.length) : DenyConfirmMessage;
     } else {
-      return isGrant ? confirmGrantMesg : DenyConfirmMessage;
+      return isGrant ? msgStrings.confirmGrantMesg : DenyConfirmMessage;
     }
   };
 
@@ -181,7 +168,11 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
    */
   const DenyConfirmMessage = (
     <>
-      <Typography>{selectedMultiRequestIDs.length > 1 ? confirmDenyMesgMulti : confirmDenyMesg}</Typography>
+      <Typography>{
+        selectedMultiRequestIDs.length > 1 ? 
+        msgStrings.confirmDenyMesgMulti(selectedMultiRequestIDs.length)
+         : msgStrings.confirmDenyMesg}
+        </Typography>
       <Typography>Please select a reason you are denying the request:</Typography>
       <Select
         variant={'outlined'}

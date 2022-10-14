@@ -15,7 +15,6 @@ import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
 import Icon from 'components/common/Icon';
 import { Alert, Button, Container, IconButton, Menu, MenuItem } from '@mui/material';
-import { Banner, InfoBanner, NotificationBanner } from 'components/common/Banner';
 import { buttonProps } from 'components/component_constants';
 import { attachedAnimalNotification } from 'constants/formatted_string_components';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
@@ -25,6 +24,7 @@ import UserProfile from 'pages/user/UserProfile';
 import { UserAnimalAccess } from './UserAnimalAccess';
 import { AttachedCollar } from 'types/collar';
 
+import { ErrorBanner, InfoBanner, NotificationBanner, SuccessBanner } from 'components/common/Banner';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
@@ -96,7 +96,7 @@ export default function CritterPage(): JSX.Element {
         </Box>
         <InfoBanner text={BannerStrings.exportDetails} />
         <NotificationBanner
-          notifications={[
+          hiddenContent={[
             attachedAnimalNotification({
               device_status: 'Mortality',
               device_id: 123,
@@ -127,6 +127,13 @@ export default function CritterPage(): JSX.Element {
             })
           ]}
         />
+        <SuccessBanner text={'hi'} hiddenContent={[<div>hello</div>]} />
+        <InfoBanner text='Info' />
+        <InfoBanner text={['hello', 'world']} />
+        <NotificationBanner hiddenContent={[<div>hello</div>]} />
+        <NotificationBanner hiddenContent={[]} />
+        <ErrorBanner text={'hi'} hiddenContent={[<div>hello</div>]} />
+
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
         <RowSelectedProvider>
           <>

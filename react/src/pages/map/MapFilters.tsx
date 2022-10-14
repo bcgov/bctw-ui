@@ -565,8 +565,18 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           flexDirection={open ? 'row-reverse' : 'row'}>
           <Tabs value={tab} onChange={handleTabChange}>
             <Tab icon={<Icon icon={search as string} />} value={search} label={search} />
-            <Tab icon={<Icon icon={filter as string} />} value={filter} label={filter} disabled={isFetching} />
-            <Tab icon={<Icon icon={symbolize as string} />} value={symbolize} label={symbolize} disabled={isFetching} />
+            <Tab
+              icon={<Icon icon={filter as string} />}
+              value={filter}
+              label={filter}
+              disabled={isFetching || !pings?.length}
+            />
+            <Tab
+              icon={<Icon icon={symbolize as string} />}
+              value={symbolize}
+              label={symbolize}
+              disabled={isFetching || !pings?.length}
+            />
           </Tabs>
           <Box className='drawer-toggle-button'>
             <IconButton color='primary' onClick={handleDrawerOpen} size='large'>
