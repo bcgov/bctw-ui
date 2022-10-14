@@ -5,6 +5,7 @@ import { Box, IconButton, Button as MUIButton } from '@mui/material';
 import { useState } from 'react';
 import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import makeStyles from '@mui/styles/makeStyles';
+import { ISelectMultipleData } from './MultiSelect';
 
 export interface IFormRowEntry {
     column: string;
@@ -12,17 +13,18 @@ export interface IFormRowEntry {
     value: Array<string>;
 }
 
-type IQueryBuilderProps = {
+type IQueryBuilderProps<T extends ISelectMultipleData> = {
     rows: IFormRowEntry[];
     operators: string[];
     columns: string[];
     data: any[];
     handleColumnChange: (str: string, idx: number) => void;
     handleOperatorChange: (str: string, idx: number) => void;
-    handleValueChange: (str: string[], idx: number) => void;
+    handleValueChange: (str: T[], idx: number) => void;
     handleRemoveRow: (idx: number) => void;
-    handleAddRow: () => void;
+    handleAddRow: (str) => void;
     handleExport: () => void;
+    disabled?: boolean;
 }
 
 export const exportStyles = makeStyles(() => ({
@@ -44,8 +46,8 @@ export const exportStyles = makeStyles(() => ({
     }
 }));
 
-export default function QueryBuilder (props: IQueryBuilderProps) : JSX.Element {
-    const { rows, operators, columns, handleColumnChange, handleOperatorChange, handleValueChange, handleAddRow, handleRemoveRow, handleExport, data} = props;
+export default function QueryBuilder<T extends ISelectMultipleData> (props: IQueryBuilderProps<T>) : JSX.Element {
+    const { rows, operators, columns, handleColumnChange, handleOperatorChange, handleValueChange, handleAddRow, handleRemoveRow, handleExport, data, disabled} = props;
     const [formsFilled, setFormsFilled] = useState(false);
     const styles = exportStyles();
 
@@ -59,7 +61,7 @@ export default function QueryBuilder (props: IQueryBuilderProps) : JSX.Element {
 
     const onAddNewRow = (): void => {
         const firstRemaining = getValidColumnChoices()[0];
-        handleAddRow();
+        handleAddRow(firstRemaining);
     }
 
     const getUniqueValueOptions = (col) => {
@@ -103,7 +105,7 @@ export default function QueryBuilder (props: IQueryBuilderProps) : JSX.Element {
                 label={"Value"}
                 data={getUniqueValueOptions(row.column)}
                 defaultValue={ row.value.map((o, i) => { return {id: i, value: o, displayLabel: o} }) }
-                changeHandler={(o) => {handleValueChange(o, idx)}}
+                changeHandler={(o) => {handleValueChange(o as T[], idx)}}
                 triggerReset={row.column}
                 isMultiSearch
                 resetToDefaultValue
@@ -129,17 +131,17 @@ export default function QueryBuilder (props: IQueryBuilderProps) : JSX.Element {
         <Box display='flex'>
                 <MUIButton 
                     className='form-buttons' 
-                    disabled={rows.length == columns}
+                    disabled={rows.length == columns.length}
                     size='large'
                     startIcon={<Icon icon='plus'/>}
                     variant='text'
-                    onClick={() => handleAddRow()}
+                    onClick={() => onAddNewRow()}
                 >Add Parameter
                 </MUIButton>
                 <Button
                     className={styles.rightJustifyButton}
-                    disabled={!formsFilled} 
-                    onClick={() => {handleExport()}}>
+                    disabled={disabled} 
+                    onClick={() => handleExport()}>
                     Export
                 </Button>
             </Box>

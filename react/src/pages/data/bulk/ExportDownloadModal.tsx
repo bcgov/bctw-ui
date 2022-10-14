@@ -1,7 +1,7 @@
 import { ModalBaseProps } from "components/component_interfaces";
 import { Box, CircularProgress } from "@mui/material";
 import { Modal } from 'components/common';
-import { IFormRowEntry, DateRange, TabNames } from "./ExportV2";
+import { DateRange, TabNames } from "./ExportV2";
 import download from "downloadjs";
 import { omitNull } from "utils/common_helpers";
 import { useTelemetryApi } from "hooks/useTelemetryApi";
@@ -11,6 +11,7 @@ import { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import makeStyles from '@mui/styles/makeStyles';
 import useDidMountEffect from "hooks/useDidMountEffect";
+import { IFormRowEntry } from "components/form/QueryBuilder";
 
 type ExportModalProps = ModalBaseProps & {
     rowEntries: IFormRowEntry[];

@@ -5,82 +5,22 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { AttachedAnimal } from 'types/animal';
-import { columnToHeader, doNothing, doNothingAsync, headerToColumn, omitNull } from 'utils/common_helpers';
+import { headerToColumn } from 'utils/common_helpers';
 import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
-import { eInputType, FormFieldObject, InboundObj, parseFormChangeResult } from 'types/form_types';
-import Select from 'components/form/BasicSelect';
-import { Button, Icon } from 'components/common';
+import { InboundObj, parseFormChangeResult } from 'types/form_types';
+import { Button  } from 'components/common';
 import Checkbox from 'components/form/Checkbox';
-import { Grid, IconButton, Tab, Tabs, Typography, Button as MUIButton } from '@mui/material';
-import { CreateFormField } from 'components/form/create_form_components';
-import { wfFields } from 'types/events/event';
-import { BCTWFormat } from 'types/common_types';
-import { ICodeFilter } from 'types/code';
+import { Grid, Tab, Tabs } from '@mui/material';
 import ExportDownloadModal from './ExportDownloadModal';
-import { SpeciesProvider, useSpecies, useUISpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
-import AutoComplete from 'components/form/Autocomplete';
 import { InfoBanner } from 'components/common/Banner';
 import ContainerLayout from 'pages/layouts/ContainerLayout';
-import makeStyles from '@mui/styles/makeStyles';
-
-type ColumnOptions = 'species' | 'population_unit' | 'wlh_id' | 'animal_id' | 'device_id' | 'frequency';
-
-export interface IFormRowEntry {
-    column: ColumnOptions;
-    operator: string;
-    value: Array<string>;
-    formField: PossibleColumnValues;
-}
+import QueryBuilder, { IFormRowEntry } from 'components/form/QueryBuilder';
 
 export interface DateRange {
     start: dayjs.Dayjs,
     end: dayjs.Dayjs
 }
-
-export const exportStyles = makeStyles(() => ({
-    queryBuilderCol : {
-        display: 'inline-flex',
-        marginRight: '0.5rem',
-        marginBottom: '1rem',
-        width: '200px'
-    },
-    queryBuilderOp : {
-        display: 'inline-flex',
-        marginRight: '0.5rem',
-        marginBottom: '1rem',
-        width: '150px'
-    },
-    rightJustifyButton: {
-        marginLeft: 'auto', 
-        marginRight: '34px'
-    }
-}));
-
-class PossibleColumnValues implements BCTWFormat<PossibleColumnValues> {
-    species: string[];
-    population_unit: string[];
-    wlh_id: string;
-    animal_id: string;
-    device_id: string;
-    frequency: string;
-
-    get displayProps(): (keyof PossibleColumnValues)[] {
-        return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];    
-    }
-
-    formatHeaderAsProp(k: string): string {
-        return headerToColumn(k);
-    }
-
-    formatPropAsHeader(k: keyof PossibleColumnValues): string {
-        switch (k) {
-            default:
-                return columnToHeader(k);
-        }
-    }
-}
-
 
 export enum TabNames {
     quick = 'Quick Export',
@@ -89,18 +29,18 @@ export enum TabNames {
 
 export default function ExportPageV2 (): JSX.Element {
     const api = useTelemetryApi();
-    const styles = exportStyles();
     const operators: string[] = ['Equals','Not Equals'];
+    const columns: string[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
     const [end, setEnd] = useState(dayjs());
-    const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: '', value: [], formField: new PossibleColumnValues}]);
+    const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: '', value: []}]);
     const [tab, setTab] = useState<TabNames>(TabNames.quick);
     const [formsFilled, setFormsFilled] = useState(false);
     const [collarIDs, setCollarIDs] = useState([]);
     const [critterIDs, setCritterIDs] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedLifetime, setSelectedLifetime] = useState(false);
-    const formFields: PossibleColumnValues = new PossibleColumnValues();
+
 
     const {data: crittersData, isSuccess: critterSuccess} = api.useAssignedCritters(0);
 
@@ -115,9 +55,8 @@ export default function ExportPageV2 (): JSX.Element {
         key === 'tstart' ? setStart(dayjs(String(value))) : setEnd(dayjs(String(value)));
     };
 
-    const handleAddNewRow = (): void => {
-        const firstRemaining = getValidColumnChoices()[0];
-        setRows([...rows, {column: firstRemaining as ColumnOptions, operator: '', value: [], formField: new PossibleColumnValues}]);
+    const handleAddNewRow = (str): void => {
+        setRows([...rows, {column: str, operator: '', value: []}]);
     }
 
     const handleRemoveRow = (idx: number): void => {
@@ -126,13 +65,6 @@ export default function ExportPageV2 (): JSX.Element {
         }
         setRows([...rows.slice(0, idx), ...rows.slice(idx+1)]);
     }
-
-    /*
-    const handleColumnChange = (newval: string, objkey: keyof IFormRowEntry, idx: number) : void => {
-        const o = rows[idx];
-        o[objkey] = objkey === 'column' ? newval as ColumnOptions : newval;
-        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
-    }*/
 
     const areFieldsFilled = (): void => {
         if(rows.some(o => o.operator == '' || o.value.length < 1)) {
@@ -155,7 +87,7 @@ export default function ExportPageV2 (): JSX.Element {
         const o = rows[idx];
         //console.log(crittersData.length);
         //console.log(crittersData.map(o => o[formFields.formatHeaderAsProp(newval)]).filter((v, i, a) => a.indexOf(v) === i));
-        o.column = formFields.formatHeaderAsProp(newval) as ColumnOptions;
+        o.column = headerToColumn(newval);
         o.value = [];
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
@@ -215,42 +147,6 @@ export default function ExportPageV2 (): JSX.Element {
         setTab(newVal);
     }
 
-    //Helper function to determine what column choices to display in the dropdown, avoids duplicate rows.
-    const getValidColumnChoices = (ownchoice?: ColumnOptions): string[] => {
-        const chosen = rows.map(o => o.column);
-        const remaining = formFields.displayProps.filter(o => !chosen.includes(o as ColumnOptions));
-        if(ownchoice !== undefined)
-            remaining.unshift(ownchoice);
-        return remaining;
-    }
-
-    //Here we force the fields that would normally be number fields to be text fields instead.
-    //Need to do this since they won't be able to input commas for the list otherwise.
-    /*const getFormFieldObjForColumn = (col: ColumnOptions): FormFieldObject<any> => {
-        const ff = wfFields.get(col);
-        if(col === 'device_id' || col == 'frequency') {
-            ff.type = eInputType.text;
-        }
-        return ff;
-    }*/
-    //<Typography marginTop={'7px'} marginLeft={'7px'} display={'inline-block'} maxWidth={'100px'} variant={'h6'}>AND</Typography>
-
-    const getUniqueValueOptions = (col) => {
-        if(crittersData) {
-            const uniqueItemsForColumn = crittersData.map(o => o[col]).filter((v, i, a) => v && a.indexOf(v) === i);
-            uniqueItemsForColumn.sort();
-            return uniqueItemsForColumn.map((f, i) => {
-                return {
-                    id: i,
-                    value: f,
-                    displayLabel: f
-                }
-            })
-        }
-        else {
-            return [{id: 0, value: "Loading...", displayLabel: "Loading..."}];
-        }
-    }
     //{CreateFormField(formFields, wfFields.get(rows[idx].column), () => {})}
     //<SelectCode codeHeader='species' defaultValue='' changeHandler={() => {}} required={false} propName={'species'}></SelectCode>
     //{CreateFormField(rows[idx].formField, getFormFieldObjForColumn(rows[idx].column), (v) => {handleValueChange(v, idx)}, {handleChangeMultiple: (v) => handleDropdownChange(v, idx), required: false, multiple: true, style: {minWidth: '300px'}})}
@@ -326,69 +222,19 @@ export default function ExportPageV2 (): JSX.Element {
     <>
     <h2>Build Query</h2>
         <Box width={800}>
-        
-        {rows.map((row, idx) => (
-            <>
-            <Select 
-                className={styles.queryBuilderCol}
-                label={'Column'} 
-                defaultValue={formFields.formatPropAsHeader(row.column)}
-                triggerReset={row.column}
-                values={getValidColumnChoices(row.column).map(o => formFields.formatPropAsHeader(o as ColumnOptions))} 
-                handleChange={(str) => handleColumnChange(str, idx)}
+            <QueryBuilder
+                rows={rows}
+                operators={operators}
+                columns={columns}
+                data={crittersData}
+                handleColumnChange={handleColumnChange}
+                handleOperatorChange={handleOperatorChange}
+                handleValueChange={handleAutocompleteChange}
+                handleRemoveRow={handleRemoveRow}
+                handleAddRow={handleAddNewRow}
+                handleExport={() => setShowModal(true)}
+                disabled={!formsFilled}
             />
-            <Select 
-                className={styles.queryBuilderOp} 
-                label={'Operator'} 
-                defaultValue={row.operator} 
-                triggerReset={row.operator}
-                values={operators} 
-                handleChange={(str) => handleOperatorChange(str, idx)}
-            />
-            <AutoComplete 
-                label={"Value"}
-                data={getUniqueValueOptions(row.column)}
-                defaultValue={ row.value.map((o, i) => { return {id: i, value: o, displayLabel: o} }) }
-                changeHandler={(o) => {handleAutocompleteChange(o, idx)}}
-                triggerReset={row.column}
-                isMultiSearch
-                resetToDefaultValue
-                tagLimit={2}
-                sx={{display: 'inline-flex', marginBottom: '1rem'}}
-                width={400}
-            />
-            {rows.length > 1 && (
-                <>
-                <IconButton
-                    style={{marginBottom:'5px'}}
-                    color='default'
-                    size='small'
-                    onClick={() => {handleRemoveRow(idx)}}
-                >
-                    <Icon icon='delete' />
-                </IconButton>
-                </>
-            )}
-            <div></div>
-            </>
-        ))}
-            <Box display='flex'>
-                <MUIButton 
-                    className='form-buttons' 
-                    disabled={rows.length == formFields.displayProps.length}
-                    size='large'
-                    startIcon={<Icon icon='plus'/>}
-                    variant='text'
-                    onClick={() => handleAddNewRow()}
-                >Add Parameter
-                </MUIButton>
-                <Button
-                    className={styles.rightJustifyButton}
-                    disabled={!formsFilled} 
-                    onClick={() => {setShowModal(true)}}>
-                    Export
-                </Button>
-            </Box>
         </Box>
         </>
     )}
