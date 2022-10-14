@@ -108,10 +108,6 @@ export default function ExportPageV2 (): JSX.Element {
         areFieldsFilled();
     }, [rows]);
 
-    useEffect(() => {
-        console.log(JSON.stringify(rows));
-    }, [rows]);
-
     const isTab = (tabName: TabNames): boolean => tabName === tab;
 
     const handleChangeDate = (v: InboundObj): void => {
@@ -253,7 +249,7 @@ export default function ExportPageV2 (): JSX.Element {
         }
         else {
             return [{id: 0, value: "Loading...", displayLabel: "Loading..."}];
-    }
+        }
     }
     //{CreateFormField(formFields, wfFields.get(rows[idx].column), () => {})}
     //<SelectCode codeHeader='species' defaultValue='' changeHandler={() => {}} required={false} propName={'species'}></SelectCode>
