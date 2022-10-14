@@ -1,8 +1,8 @@
-import { Box, TableCell, TableRow, Toolbar } from '@mui/material';
+import { Box, TableCell, TableRow, Toolbar, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { SubHeader } from 'components/common/partials/SubHeader';
 import TableFilter from './TableFilters';
 import { ITableFilter } from './table_interfaces';
-
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
     paddingLeft: theme.spacing(2),
@@ -20,10 +20,8 @@ const useToolbarStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-end',
     width: '100%'
-  },
-  title: {
-    marginBottom: 0
   },
   actions: {
     float: 'right'
@@ -55,7 +53,8 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
           </TableRow>
         )}
         <Box className={classes.toolbarTitle}>
-          <h2 className={classes.title}>{title ?? ''}</h2>&nbsp;
+          <SubHeader text={title} />
+          &nbsp;
           {numSelected > 0 && <span>({numSelected} Selected)</span>}
           <Box display={'flex'} alignItems={'center'} className={classes.actions}>
             <TableFilter {...props} />

@@ -11,7 +11,7 @@ export default function TableContainer({ children, toolbar }: TableContainerProp
   return (
     <>
       {toolbar}
-      <Paper className={'paper'}>
+      <Paper className={'paper'} sx={{ boxShadow: 3 }}>
         <MUITableContainer className={'table-container'} component={Paper}>
           {children}
         </MUITableContainer>

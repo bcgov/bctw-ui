@@ -25,6 +25,8 @@ import { UserAnimalAccess } from './UserAnimalAccess';
 import { AttachedCollar } from 'types/collar';
 
 import { ErrorBanner, InfoBanner, NotificationBanner, SuccessBanner } from 'components/common/Banner';
+import { InfoCard } from 'components/common/InfoCard';
+import { QuickSummary } from 'components/common/QuickSummary';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
@@ -93,6 +95,9 @@ export default function CritterPage(): JSX.Element {
               </Container>
             </FullScreenDialog>
           </Box>
+        </Box>
+        <Box mb={4}>
+          <QuickSummary />
         </Box>
         {/* <InfoBanner text={BannerStrings.exportDetails} />
         <NotificationBanner

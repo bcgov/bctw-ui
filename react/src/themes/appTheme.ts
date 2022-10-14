@@ -17,6 +17,10 @@ const appTheme = createTheme(
       },
       info: {
         main: '#1A5A96'
+      },
+      success: {
+        main: '#40AE40',
+        contrastText: '#ffffff'
       }
     },
 
@@ -31,7 +35,7 @@ const appTheme = createTheme(
         h2: { fontSize: '2.5rem' },
         h3: { fontSize: '2rem' },
         h4: { fontSize: '1.5rem' },
-        h5: { fontSize: '1.25rem' },
+        h5: { fontSize: '1.20rem' },
         h6: { fontSize: '1rem' }
       },
 
@@ -47,7 +51,11 @@ const appTheme = createTheme(
           marginTop: '-30px'
         }
       },
-
+      MuiPaper: {
+        root: {
+          borderRadius: 8
+        }
+      },
       MuiButton: {
         root: {
           textTransform: 'none',
