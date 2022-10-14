@@ -94,7 +94,7 @@ export default function CritterPage(): JSX.Element {
             </FullScreenDialog>
           </Box>
         </Box>
-        <InfoBanner text={BannerStrings.exportDetails} />
+        {/* <InfoBanner text={BannerStrings.exportDetails} />
         <NotificationBanner
           hiddenContent={[
             attachedAnimalNotification({
@@ -132,7 +132,7 @@ export default function CritterPage(): JSX.Element {
         <InfoBanner text={['hello', 'world']} />
         <NotificationBanner hiddenContent={[<div>hello</div>]} />
         <NotificationBanner hiddenContent={[]} />
-        <ErrorBanner text={'hi'} hiddenContent={[<div>hello</div>]} />
+        <ErrorBanner text={'hi'} hiddenContent={[<div>hello</div>]} /> */}
 
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
         <RowSelectedProvider>

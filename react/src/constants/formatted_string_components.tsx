@@ -1,5 +1,5 @@
 import { Button, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import { getDeviceStatusIcon } from 'components/table/table_helpers';
+import { getTag } from 'components/table/table_helpers';
 import { AttachedAnimal } from 'types/animal';
 import { eDeviceStatus } from 'types/collar';
 
@@ -64,7 +64,7 @@ const attachedAnimalNotification = (
   animalNotif: Pick<AttachedAnimal, 'device_status' | 'device_id' | 'frequency' | 'animal_id' | 'wlh_id'>
 ) => (
   <ListItem>
-    <ListItemIcon>{getDeviceStatusIcon(animalNotif.device_status as eDeviceStatus)}</ListItemIcon>
+    <ListItemIcon>{getTag(animalNotif.device_status as eDeviceStatus)}</ListItemIcon>
     <ListItemText
       primary={
         <Typography>

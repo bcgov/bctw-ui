@@ -17,6 +17,15 @@ import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 
+export enum eSpecies {
+  caribou = 'M-RATA',
+  grizzly_bear = 'M-URAR',
+  moose = 'M-ALAM',
+  grey_wolf = 'M-CALU'
+}
+
+const { caribou, grizzly_bear, moose, grey_wolf } = eSpecies;
+
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
   assigned = 'assigned',
@@ -216,6 +225,21 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
     return classToArray(keys, startsWith, excludes);
   }
 
+  tagColor(): string {
+    switch (this.species) {
+      case 'Caribou':
+        return '#9575cd';
+      case 'Moose':
+        return '#64b5f6';
+      case 'Grey Wolf':
+        return '#4db6ac';
+      case 'Grizzly Bear':
+        return '#81c784';
+      default:
+        return '#bdbdbd';
+    }
+  }
+
   constructor(critter_id = '') {
     this.critter_id = critter_id;
   }
@@ -261,6 +285,10 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
     ];
   }
 
+  tagColor(): string {
+    return super.tagColor();
+  }
+
   formatPropAsHeader(str: keyof Animal | keyof AttachedAnimal): string {
     if (str in Animal) {
       return super.formatPropAsHeader(str as keyof Animal);
@@ -277,15 +305,6 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   }
 }
 
-//Fixme: move this into a context that fetches from the DB to stay in sync.
-export enum eSpecies {
-  caribou = 'M-RATA',
-  grizzly_bear = 'M-URAR',
-  moose = 'M-ALAM',
-  grey_wolf = 'M-CALU'
-}
-
-const { caribou } = eSpecies;
 // species: [] represents field applies to all species, used for optimization on searching
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
   speciesField: [{ prop: 'species', type: eInputType.code, species: [], ...isRequired }],

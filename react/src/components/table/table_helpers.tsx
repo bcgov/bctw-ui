@@ -5,6 +5,8 @@ import { dateObjectToTimeStr, formatTime } from 'utils/time';
 import { Icon, Tooltip } from 'components/common';
 import { isDayjs } from 'dayjs';
 import { Collar, eDeviceStatus } from 'types/collar';
+import { Chip } from '@mui/material';
+import { Animal } from 'types/animal';
 
 /**
  * converts an object to a list of HeadCells
@@ -65,18 +67,19 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
   return stabilizedThis.map((el) => el[0]);
 }
 
-const getDeviceStatusIcon = (value: eDeviceStatus): JSX.Element => {
+const getTag = (value: string, color?: string): JSX.Element => {
+  const { active, offline, potential_mortality, mortality, potential_malfunction, malfunction } = eDeviceStatus;
+  const style = { width: '99px' };
+  if (color) return <Chip label={value} sx={{ backgroundColor: color, color: '#ffff', ...style }} />;
   switch (value) {
-    case eDeviceStatus.active:
-      return <Icon icon={'circle'} htmlColor={'green'} />;
-    case eDeviceStatus.offline:
-      return <Icon icon={'circle'} htmlColor={'red'} />;
-    case eDeviceStatus.potential_malfunction:
-      return <Icon icon={'circle'} htmlColor={'orange'} />;
-    case eDeviceStatus.mortality:
-      return <Icon icon={'alert'} htmlColor={'red'} />;
-    case eDeviceStatus.potential_mortality:
-      return <Icon icon={'alert'} htmlColor={'orange'} />;
+    case active:
+      return <Chip label={value} color={'success'} sx={style} />;
+    case offline:
+      return <Chip label={value} sx={{ backgroundColor: '#bdbdbd', color: '#ffff', ...style }} />;
+    case potential_malfunction || malfunction:
+      return <Chip label={malfunction} color={'warning'} sx={style} />;
+    case mortality || potential_mortality:
+      return <Chip label={mortality} color={'error'} sx={style} />;
     default:
       return null;
   }
@@ -96,17 +99,12 @@ const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
   const value: unknown = obj[key];
   if (key === 'device_status') {
-    const icon = getDeviceStatusIcon(value as eDeviceStatus);
-    return icon
-      ? {
-          ...align,
-          value: (
-            <Tooltip title={value} placement='left'>
-              {icon}
-            </Tooltip>
-          )
-        }
-      : { ...align, value };
+    const icon = getTag(value as string);
+    return icon ? { ...align, value: icon } : { ...align, value };
+  }
+  if (key === 'species' && obj instanceof Animal) {
+    const icon = getTag(value as string, obj.tagColor());
+    return icon ? { ...align, value: icon } : { ...align, value };
   }
   if (typeof value === 'boolean') {
     return { ...align, value: <Icon icon={value ? 'done' : 'close'} /> };
@@ -144,7 +142,7 @@ function fuzzySearchMutipleWords<T>(rows: T[], keys: string[], filterValue: stri
 
 export {
   fuzzySearchMutipleWords,
-  getDeviceStatusIcon,
+  getTag,
   descendingComparator,
   getComparator,
   stableSort,
