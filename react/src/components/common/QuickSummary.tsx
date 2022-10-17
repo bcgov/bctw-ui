@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Skeleton, Theme, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Link, Skeleton, Theme, Typography, useTheme } from '@mui/material';
 import { InfoCard } from './InfoCard';
 import { SubHeader } from './partials/SubHeader';
 import makeStyles from '@mui/styles/makeStyles';
@@ -9,6 +9,8 @@ import { UserContext } from 'contexts/UserContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { eCritterPermission } from 'types/permission';
 import { Icon } from 'components/common';
+import { LatestDataRetrieval } from 'constants/strings';
+import { getToday } from 'utils/time';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -25,11 +27,23 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   card3: {
     float: 'right'
+  },
+  details: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'end'
+  },
+  detailsLink: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'end'
   }
 }));
 export const QuickSummary = (): JSX.Element => {
   const api = useTelemetryApi();
   const classes = useStyles();
+  const theme = useTheme();
   const useUser = useContext(UserContext);
   const { data, isSuccess } = api.useCritterAccess(
     0, // load all values
@@ -46,24 +60,45 @@ export const QuickSummary = (): JSX.Element => {
       });
       setAnimalPermsCount({ manager, observer });
     }
-  });
+  }, [data]);
   return (
     <>
-      <SubHeader text={'Quick Summary'} />
       <Box className={classes.root}>
         <Box className={classes.cards2}>
           <Box className={classes.card}>
+            <SubHeader text={'Quick Summary'} />
             <InfoCard
               element={<Typography variant={'h1'}>{animalPermsCount.manager}</Typography>}
+              size='small'
               subTitle={'Managed Animals'}
             />
           </Box>
+          <Box>
+            <SubHeader text={null} />
+            <InfoCard
+              element={<Typography variant={'h1'}>{animalPermsCount.observer}</Typography>}
+              size='small'
+              subTitle={'Observed Animals'}
+            />
+          </Box>
+        </Box>
+        <Box>
+          <Box className={classes.details}>
+            <SubHeader text={'Latest Data Retrieval'} />
+            <Link pb={0} mb={0} href='#' onClick={() => console.log('clicked')} underline='none'>
+              <Box className={classes.detailsLink}>
+                <span>See Details</span>
+                <Icon icon={'next'} size={0.8} />
+              </Box>
+            </Link>
+          </Box>
           <InfoCard
-            element={<Typography variant={'h1'}>{animalPermsCount.observer}</Typography>}
-            subTitle={'Observed Animals'}
+            size='large'
+            element={<Icon icon={'check'} htmlColor={theme.palette.success.main} size={4} />}
+            body={LatestDataRetrieval.success}
+            // subTitle={`Fetched on: ${getToday()}`}
           />
         </Box>
-        <InfoCard size='large' element={<Icon icon={'check'} />} subTitle={'Observed Animals'} />
       </Box>
     </>
   );

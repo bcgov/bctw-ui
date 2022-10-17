@@ -1,9 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 interface InfoCardProps {
@@ -17,15 +14,21 @@ export const InfoCard = ({ element, body, subTitle, size }: InfoCardProps) => {
     <Box mt={2}>
       <Card
         sx={{
-          width: size == 'large' ? '24rem' : '12rem',
+          width: size === 'small' ? '16rem' : '26rem',
+          height: '8rem',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
           p: 3,
           boxShadow: 3
         }}>
-        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-          <Box pr={3}>{element}</Box>
-          {body}
+        <Box>
+          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            {element}
+            <Box pl={1.5}>{body}</Box>
+          </Box>
+          <Box>{subTitle ? <Typography color='text.secondary'>{subTitle}</Typography> : null}</Box>
         </Box>
-        {subTitle && <Typography color='text.secondary'>{subTitle}</Typography>}
       </Card>
     </Box>
   );

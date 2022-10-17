@@ -51,6 +51,7 @@ import Icon from '@mdi/react';
 type IconProps = {
   icon: string;
   htmlColor?: string;
+  size?: number;
 };
 
 const getIconPath = (path: string): string => {
@@ -155,6 +156,6 @@ const getIconPath = (path: string): string => {
   }
 };
 
-export default function BCTWIcon({ icon, htmlColor }: IconProps): JSX.Element {
-  return <Icon path={getIconPath(icon)} color={htmlColor} className={'icon'} size={1} />;
+export default function BCTWIcon({ icon, htmlColor, size = 1 }: IconProps): JSX.Element {
+  return <Icon path={getIconPath(icon)} color={htmlColor} className={'icon'} size={size} />;
 }

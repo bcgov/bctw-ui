@@ -15,6 +15,11 @@ const CritterStrings = {
   unlockedSpeciesTooltip: 'Lock species selection'
 };
 
+const LatestDataRetrieval = {
+  success: 'We successfully retrieved data from all your devices in our latest attempt.',
+  failure: 'We failed to retrieve data from one or more of your devices in our latest attempt.'
+};
+
 const ImportSteps = [
   'Select the import type',
   'Download the template.',
@@ -295,5 +300,6 @@ export {
   UserStrings,
   HomePageStrings,
   DelegationRequestStrings,
-  BannerStrings
+  BannerStrings,
+  LatestDataRetrieval
 };

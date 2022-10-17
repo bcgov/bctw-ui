@@ -11,6 +11,6 @@ export const SubHeader = ({ text }: SubHeaderProps) => (
     }}
     variant='h4'
     color='text.secondary'>
-    {text ?? ''}
+    {text ?? <span>&nbsp;</span>}
   </Typography>
 );
