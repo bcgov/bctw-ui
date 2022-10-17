@@ -39,7 +39,6 @@ interface ITableQueryProps<T> {
 interface ICustomTableColumn<T> {
   header: JSX.Element;
   column: (row: T, idx: number) => JSX.Element;
-  column2?: JSX.Element;
 }
 
 /**

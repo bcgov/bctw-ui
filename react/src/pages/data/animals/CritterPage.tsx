@@ -27,9 +27,11 @@ import { AttachedCollar } from 'types/collar';
 import { ErrorBanner, InfoBanner, NotificationBanner, SuccessBanner } from 'components/common/Banner';
 import { InfoCard } from 'components/common/InfoCard';
 import { QuickSummary } from 'components/common/QuickSummary';
+import { ActionsMenu } from 'components/common/partials/ActionsMenu';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
+  const [selectedIdx, setSelectedIdx] = useState(null);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
@@ -56,28 +58,19 @@ export default function CritterPage(): JSX.Element {
     disableDelete: true
   };
 
-  const ActionsMenu = (row: AttachedAnimal, idx: number): JSX.Element => {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
-    return (
-      <>
-        <IconButton>
-          <Icon icon={'dots'} />
-        </IconButton>
-        <Menu id={`basic-menu-${idx}`} anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <MenuItem onClick={handleClose}>Profile</MenuItem>
-          <MenuItem onClick={handleClose}>My account</MenuItem>
-          <MenuItem onClick={handleClose}>Logout</MenuItem>
-        </Menu>
-      </>
-    );
-  };
+  const Menu = (row: AttachedAnimal, idx: number): JSX.Element => (
+    <ActionsMenu
+      id={idx}
+      menuItems={[
+        {
+          label: 'Item one'
+        },
+        {
+          label: 'Item two'
+        }
+      ]}
+    />
+  );
   return (
     <ManageLayout>
       <SpeciesProvider>
@@ -88,6 +81,16 @@ export default function CritterPage(): JSX.Element {
               Manage My Animals
             </Button>
             {/* <BasicMenu /> */}
+            <ActionsMenu
+              menuItems={[
+                {
+                  label: 'Item one'
+                },
+                {
+                  label: 'Item two'
+                }
+              ]}
+            />
             <FullScreenDialog open={openManageAnimals} handleClose={inverseManageModal}>
               <Container maxWidth='xl'>
                 <h1>Manage My Animals</h1>
@@ -96,6 +99,7 @@ export default function CritterPage(): JSX.Element {
             </FullScreenDialog>
           </Box>
         </Box>
+        <NotificationBanner hiddenContent={[]} />
         <Box mb={4}>
           <QuickSummary />
         </Box>
@@ -151,7 +155,7 @@ export default function CritterPage(): JSX.Element {
                 deleted={deleted}
                 updated={updated}
                 title={'Collared Animals'}
-                customColumns={[{ column: ActionsMenu, header: <></> }]}
+                customColumns={[{ column: Menu, header: <></> }]}
                 exporter={
                   <>
                     <ModifyCritterWrapper
