@@ -18,6 +18,7 @@ type ExportModalProps = ModalBaseProps & {
     range: DateRange;
     exportType: TabNames;
     collarIDs: string[];
+    postGISstrings?: string[];
     critterIDs?: string[];
     children?: React.ReactNode;
 }
@@ -39,7 +40,7 @@ const useStyle = makeStyles((theme) => ({
     }
   }));
 
-export default function ExportDownloadModal({open, handleClose, rowEntries, range, exportType, collarIDs, critterIDs}: ExportModalProps): JSX.Element {
+export default function ExportDownloadModal({open, handleClose, rowEntries, range, exportType, collarIDs, critterIDs, postGISstrings}: ExportModalProps): JSX.Element {
     const api = useTelemetryApi();
     const [downloadType, setDownloadType] = useState({downloadType: ''});
     const styles = useStyle();
@@ -117,7 +118,7 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
     const {mutateAsync: mutateExport, reset: resetExport, isLoading: loadingExport} = api.useExport({onSuccess: onSuccessExport, onError: onErrorExport});
     
     const handleAdvancedExport = (): void => {
-        const body = {queries: [], range: {}};
+        const body = {queries: [], range: {}, polygons: []};
         for(const row of rowEntries) {
             body.queries.push({
                 key: row.column,
@@ -129,6 +130,11 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
             start: range.start.format(formatDay),
             end: range.end.format(formatDay)
         }
+
+        if(postGISstrings) {
+            body.polygons = postGISstrings;
+        }
+
         console.log("Sending this body: " + body);
         mutateExportAll(body);
     }

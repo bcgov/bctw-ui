@@ -48,7 +48,6 @@ export const exportStyles = makeStyles(() => ({
 
 export default function QueryBuilder<T extends ISelectMultipleData> (props: IQueryBuilderProps<T>) : JSX.Element {
     const { rows, operators, columns, handleColumnChange, handleOperatorChange, handleValueChange, handleAddRow, handleRemoveRow, handleExport, data, disabled} = props;
-    const [formsFilled, setFormsFilled] = useState(false);
     const styles = exportStyles();
 
     const getValidColumnChoices = (ownchoice?: string): string[] => {

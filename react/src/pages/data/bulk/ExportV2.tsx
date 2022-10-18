@@ -1,9 +1,16 @@
+import * as L from 'leaflet'; // must be imported first
+import 'leaflet.markercluster';
+import 'pages/map/MapPage.scss';
+import 'leaflet-draw';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet/dist/leaflet.css';
+
 import Box from '@mui/material/Box';
 import DataTable from 'components/table/DataTable';
 import { CritterStrings as CS, ExportStrings, MapStrings } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { AttachedAnimal } from 'types/animal';
 import { headerToColumn } from 'utils/common_helpers';
 import DateInput from 'components/form/Date';
@@ -11,11 +18,15 @@ import dayjs from 'dayjs';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { Button  } from 'components/common';
 import Checkbox from 'components/form/Checkbox';
-import { Grid, Tab, Tabs } from '@mui/material';
+import { Grid, Paper, Tab, Tabs } from '@mui/material';
 import ExportDownloadModal from './ExportDownloadModal';
 import { InfoBanner } from 'components/common/Banner';
 import ContainerLayout from 'pages/layouts/ContainerLayout';
 import QueryBuilder, { IFormRowEntry } from 'components/form/QueryBuilder';
+import { initMap } from 'pages/map/map_init';
+import makeStyles from '@mui/styles/makeStyles';
+import TextField from 'components/form/TextInput';
+import { FeatureCollection } from 'geojson';
 
 export interface DateRange {
     start: dayjs.Dayjs,
@@ -27,8 +38,19 @@ export enum TabNames {
     advanced = 'Advanced Export'
 }
 
+export const exportPageStyles = makeStyles(() => ({
+    containerDiv: {
+        height: '100px',
+        width: '100px'
+    }
+}));
+
 export default function ExportPageV2 (): JSX.Element {
     const api = useTelemetryApi();
+    const styles =  exportPageStyles();
+    const mapRef = useRef<L.Map>(null);
+    const drawnItemsRef = useRef<L.FeatureGroup>(null);
+
     const operators: string[] = ['Equals','Not Equals'];
     const columns: string[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
@@ -40,9 +62,96 @@ export default function ExportPageV2 (): JSX.Element {
     const [critterIDs, setCritterIDs] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedLifetime, setSelectedLifetime] = useState(false);
+    const layerGroupRef = useRef<L.Rectangle>(null);
 
+    const [boundingBox, setBoundingBox] = useState([0,0,0,0]);
+    const [currentGeometry, setCurrentGeometry] = useState<string[]>([]);
+    /*
+    * 0 - Min Lat, 1 -  Max Lat,  2 - Min Lon, 3-  Max Lon
+    */
+    console.log(mapRef?.current?.eachLayer(o => o));
+    const manualItems = new L.FeatureGroup();
+    //const drawnItems = drawnItemsRef?.current ?? new L.FeatureGroup();
+    if(drawnItemsRef.current == null) {
+        drawnItemsRef.current = new L.FeatureGroup();
+    }
+    const polygon: L.Polygon = null;
+    const drawnLines = [];
+
+    //const a = L.rectangle([ [50, -125], [55, -120] ]);
+    const addShape = () => {
+        //console.log("Has layer? " + drawnItems.hasLayer(a));
+        //drawnItems.removeLayer(a);
+        //a.setBounds([ [50, -125], [55, -120] ]);
+        //a = new L.Rectangle([ [50, -125], [55, -120] ]);
+        
+        /*if (myLayerRef.current == null) {
+            myLayerRef.current = a.addTo(drawnItems);
+        } else {
+            myLayerRef.current.setLatLng([ [50, -125], [55, -120] ]);
+        }
+        rerenderTheMap()*/
+
+       // handleDrawShape()
+    }
+
+    const removeShape = () => {
+       // drawnItems.removeLayer(a);
+    }
+
+    const handleBoundingBox = (idx: number, val: InboundObj) => {
+        
+        if(val['coord']) {
+            const bb = boundingBox;
+            bb[idx] = Number(val['coord']);
+            setBoundingBox(bb);
+            
+            if(bb.every(o => o != 0)) {
+                const [ minlat, maxlat, minlon, maxlon ] = bb;
+                const a = new L.Rectangle([[minlat, minlon], [maxlat, maxlon]]);
+
+                if (layerGroupRef.current == null || mapRef.current.hasLayer(layerGroupRef.current) == false) {
+                    layerGroupRef.current = a.addTo(drawnItemsRef.current);
+                }
+                layerGroupRef.current.setBounds([[minlat, minlon], [maxlat, maxlon]]);
+            }
+
+            handleDrawShape();
+        }
+
+    }
+
+    const handleDrawShape = (): void => {
+        const clipper: FeatureCollection = drawnItemsRef.current.toGeoJSON() as FeatureCollection;
+        if(clipper?.features?.length) {
+            const arr = [];
+            clipper.features.forEach(o => {
+                if(o.geometry.type == 'Polygon') {
+                    const pointsInPostGISformat = o.geometry.coordinates[0].map(o => o.join(' ')).join(', ');
+                    arr.push(`POLYGON ((${pointsInPostGISformat}))`);
+                }
+            })
+            console.log(JSON.stringify(arr));
+            setCurrentGeometry(arr);
+        }
+    }
+
+    useEffect(() => {
+        //console.log(currentGeometry);
+    }, [currentGeometry]);
 
     const {data: crittersData, isSuccess: critterSuccess} = api.useAssignedCritters(0);
+
+    useEffect(() => {
+        const updateComponent = (): void => {
+          if (isTab(TabNames.advanced)) {
+            initMap(mapRef, drawnItemsRef.current, new L.GeoJSON, handleDrawShape, () => {}, () => {});
+          }
+          //tracksLayer.bringToBack();
+        };
+        console.log('updateComponent')
+        updateComponent();
+    }, [tab]);
 
     useEffect(() => {
         areFieldsFilled();
@@ -236,8 +345,25 @@ export default function ExportPageV2 (): JSX.Element {
                 disabled={!formsFilled}
             />
         </Box>
+        <h2>Select Location</h2>
+        <Paper style={{padding: '30px'}} elevation={3}>
+            <Box display='flex'>
+                <Button variant='outlined' style={{marginBottom: '30px'}}> Upload Shapefile </Button>
+                <TextField type='number' style={{marginLeft: 'auto'}} label={'Min Latitude'} changeHandler={(o) => { handleBoundingBox(0, o) }} propName={'coord'} defaultValue={''+boundingBox[0]}/>
+                <TextField type='number' label={'Max Latitude'} changeHandler={(o) => { handleBoundingBox(1, o) }} propName={'coord'} defaultValue={''+boundingBox[1]} />
+                <TextField type='number' label={'Min Longitude'} changeHandler={(o) => { handleBoundingBox(2, o)}} propName={'coord'} defaultValue={''+boundingBox[2]} />
+                <TextField type='number' label={'Max Longitude'} changeHandler={(o) => { handleBoundingBox(3, o)}} propName={'coord'} defaultValue={''+boundingBox[3]} />
+            </Box>
+            <Box height={'500px'}>
+                <div style={{flex: '1 1 auto', position: 'relative'}}>
+                    <div style={{height: '500px'}} id = 'map'></div>
+                </div>
+            </Box>
+        </Paper>
+        
         </>
     )}
+
     <ExportDownloadModal 
         exportType={tab} 
         open={showModal} 
@@ -245,6 +371,7 @@ export default function ExportPageV2 (): JSX.Element {
         rowEntries={rows} 
         critterIDs={critterIDs}
         collarIDs={collarIDs}
+        postGISstrings={currentGeometry}
         range={{
             start: selectedLifetime ? dayjs('1970-01-01') : start,
             end: selectedLifetime ? dayjs() : end
