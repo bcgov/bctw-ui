@@ -5,16 +5,15 @@ import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import AddEditViewer from 'pages/data/common/AddEditViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import { useEffect, useState } from 'react';
+import { MutableRefObject, Ref, useEffect, useRef, useState } from 'react';
 import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
 import Icon from 'components/common/Icon';
-import { Alert, Button, Container, IconButton, Menu, MenuItem } from '@mui/material';
+import { Alert, Button, Container, IconButton, Menu, MenuItem, Select, TableCell } from '@mui/material';
 import { buttonProps } from 'components/component_constants';
 import { attachedAnimalNotification } from 'constants/formatted_string_components';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
@@ -28,13 +27,16 @@ import { ErrorBanner, InfoBanner, NotificationBanner, SuccessBanner } from 'comp
 import { InfoCard } from 'components/common/InfoCard';
 import { QuickSummary } from 'components/common/QuickSummary';
 import { ActionsMenu } from 'components/common/partials/ActionsMenu';
+import AddEditViewer from '../common/AddEditViewer';
+import { useHistory } from 'react-router-dom';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
+  const editDeleteRef = useRef();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
-  const [selectedIdx, setSelectedIdx] = useState(null);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
@@ -55,22 +57,45 @@ export default function CritterPage(): JSX.Element {
     addTooltip: CS.addTooltip,
     queryStatus: 'idle' as QueryStatus,
     disableAdd: true,
-    disableDelete: true
+    disableDelete: true,
+    modalControl: true
   };
 
-  const Menu = (row: AttachedAnimal, idx: number): JSX.Element => (
-    <ActionsMenu
-      id={idx}
-      menuItems={[
-        {
-          label: 'Item one'
-        },
-        {
-          label: 'Item two'
-        }
-      ]}
-    />
-  );
+  const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
+    const history = useHistory();
+    // const handleReportMortality = (): void => {};
+    // const handleShowOnMap = (): void => {};
+    // const handleRemoveDevice = (func: () => void): void => {};
+    const edit = () => setOpenEdit(true);
+    const map = () => history.push('/map');
+    return (
+      <ActionsMenu
+        disabled={row !== editObj}
+        menuItems={[
+          {
+            label: 'Show on Map',
+            icon: <Icon icon={'location'} />,
+            handleClick: map
+          },
+          {
+            label: 'Report Mortality',
+            icon: <Icon icon={'dead'} />
+            //handleClick:
+          },
+          {
+            label: 'Edit',
+            icon: <Icon icon={'edit'} />,
+            handleClick: edit
+          },
+          {
+            label: 'Remove Device',
+            icon: <Icon icon={'delete'} />
+            //handleClick: editDeleteRef!.current!.handleClickDelete()
+          }
+        ]}
+      />
+    );
+  };
   return (
     <ManageLayout>
       <SpeciesProvider>
@@ -80,17 +105,6 @@ export default function CritterPage(): JSX.Element {
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
               Manage My Animals
             </Button>
-            {/* <BasicMenu /> */}
-            <ActionsMenu
-              menuItems={[
-                {
-                  label: 'Item one'
-                },
-                {
-                  label: 'Item two'
-                }
-              ]}
-            />
             <FullScreenDialog open={openManageAnimals} handleClose={inverseManageModal}>
               <Container maxWidth='xl'>
                 <h1>Manage My Animals</h1>
@@ -103,46 +117,6 @@ export default function CritterPage(): JSX.Element {
         <Box mb={4}>
           <QuickSummary />
         </Box>
-        {/* <InfoBanner text={BannerStrings.exportDetails} />
-        <NotificationBanner
-          hiddenContent={[
-            attachedAnimalNotification({
-              device_status: 'Mortality',
-              device_id: 123,
-              frequency: 123,
-              animal_id: 'Cool Guy',
-              wlh_id: '123'
-            }),
-            attachedAnimalNotification({
-              device_status: 'Potential Mortality',
-              device_id: 1234,
-              frequency: 1234,
-              animal_id: 'Not Cool Guy',
-              wlh_id: '1234'
-            }),
-            attachedAnimalNotification({
-              device_status: 'Mortality',
-              device_id: 123,
-              frequency: 123,
-              animal_id: 'Cool Guy',
-              wlh_id: '123'
-            }),
-            attachedAnimalNotification({
-              device_status: 'Potential Mortality',
-              device_id: 1234,
-              frequency: 1234,
-              animal_id: 'Not Cool Guy',
-              wlh_id: '1234'
-            })
-          ]}
-        />
-        <SuccessBanner text={'hi'} hiddenContent={[<div>hello</div>]} />
-        <InfoBanner text='Info' />
-        <InfoBanner text={['hello', 'world']} />
-        <NotificationBanner hiddenContent={[<div>hello</div>]} />
-        <NotificationBanner hiddenContent={[]} />
-        <ErrorBanner text={'hi'} hiddenContent={[<div>hello</div>]} /> */}
-
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
         <RowSelectedProvider>
           <>
@@ -155,7 +129,7 @@ export default function CritterPage(): JSX.Element {
                 deleted={deleted}
                 updated={updated}
                 title={'Collared Animals'}
-                customColumns={[{ column: Menu, header: <></> }]}
+                customColumns={[{ column: Menu, header: <b>Actions</b> }]}
                 exporter={
                   <>
                     <ModifyCritterWrapper
@@ -163,9 +137,7 @@ export default function CritterPage(): JSX.Element {
                       onDelete={(critter_id: string): void => setDeleted(critter_id)}
                       onUpdate={(critter_id: string): void => setUpdated(critter_id)}
                       setCritter={setEditObj}>
-                      <AddEditViewer<AttachedAnimal> {...addEditProps}>
-                        <EditCritter {...editProps} />
-                      </AddEditViewer>
+                      <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
                     </ModifyCritterWrapper>
                     <ExportViewer<AttachedAnimal>
                       template={[

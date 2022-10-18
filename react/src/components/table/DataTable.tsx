@@ -26,6 +26,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
 import { AttachedAnimal } from 'types/animal';
 import { CritterStrings } from 'constants/strings';
+import { ActionsMenu } from 'components/common/partials/ActionsMenu';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;
@@ -177,7 +178,7 @@ export default function DataTable<T extends BCTWBase<T>>({
     }
   };
 
-  const handleClickRow = (event: React.MouseEvent<unknown>, id: string): void => {
+  const handleClickRow = (event: React.MouseEvent<unknown>, id: string, idx: number): void => {
     if (isMultiSelect && typeof onSelectMultiple === 'function') {
       handleClickRowMultiEnabled(event, id);
     }
@@ -185,7 +186,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       setSelected([id]);
       // a row can only be selected from the current pages data set
       // fixme: why ^?
-      const row = values.find((d) => d[rowIdentifier] === id);
+      const row = values[idx];
       if (row) {
         onSelect(row);
       }
@@ -270,6 +271,11 @@ export default function DataTable<T extends BCTWBase<T>>({
   };
 
   const TableContents = (): JSX.Element => {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const setAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget);
+      // setOpen(true);
+    };
     const noData = isSuccess && !data?.length;
     // useEffect(() => {
     //   if (noData && totalPages !== 1) {
@@ -302,17 +308,17 @@ export default function DataTable<T extends BCTWBase<T>>({
     const sortedResults = stableSort(perPage(), getComparator(order, orderBy));
     return (
       <TableBody>
-        {sortedResults.map((obj, prop: number) => {
+        {sortedResults.map((obj, idx: number) => {
           const isRowSelected = isSelected(obj[rowIdentifier]);
           const highlightValidRow = showValidRecord && !formatTableCell(obj, 'valid_to').value;
           return (
             <TableRow
               hover
-              onClick={(event): void => handleClickRow(event, obj[rowIdentifier])}
+              onClick={(event): void => handleClickRow(event, obj[rowIdentifier], idx)}
               role='checkbox'
               aria-checked={isRowSelected}
               tabIndex={-1}
-              key={`row${prop}`}
+              key={`row${idx}`}
               selected={isRowSelected || highlightValidRow}>
               {/* render checkbox column if multiselect is enabled */}
               {isMultiSelect ? (
@@ -335,8 +341,8 @@ export default function DataTable<T extends BCTWBase<T>>({
               })}
               {/* render additional columns from props */}
               {customColumns.map((c: ICustomTableColumn<T>) => {
-                const Col = c.column(obj, prop);
-                return <TableCell key={`add-col-${prop}`}>{Col}</TableCell>;
+                const Col = c.column(obj, idx);
+                return <TableCell key={`add-col-${idx}`}>{Col}</TableCell>;
               })}
             </TableRow>
           );

@@ -44,7 +44,8 @@ import {
   mdiEye,
   mdiEyePlus,
   mdiDotsHorizontal,
-  mdiCheckCircle
+  mdiCheckCircle,
+  mdiGraveStone
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -153,6 +154,8 @@ const getIconPath = (path: string): string => {
       return mdiDotsHorizontal;
     case 'check':
       return mdiCheckCircle;
+    case 'dead':
+      return mdiGraveStone;
   }
 };
 

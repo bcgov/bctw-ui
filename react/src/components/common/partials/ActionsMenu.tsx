@@ -1,6 +1,6 @@
 import { IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { Icon } from 'components/common';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 interface IMenuItem {
   label: string;
@@ -10,22 +10,22 @@ interface IMenuItem {
 interface IActionsMenu {
   menuItems: IMenuItem[];
   id?: number;
+  disabled?: boolean;
 }
-export const ActionsMenu = ({ menuItems, id }: IActionsMenu): JSX.Element => {
+export const ActionsMenu = ({ menuItems, id, disabled }: IActionsMenu): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [open, setOpen] = useState(false);
-  // const open = Boolean(anchorEl);
+  const open = Boolean(anchorEl);
   const setAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
+    //This line is important. Wont work without.
     setAnchorEl(event.currentTarget);
-    setOpen(true);
+    event.stopPropagation();
   };
   const handleClose = () => {
     setAnchorEl(null);
-    setOpen(false);
   };
   return (
     <>
-      <IconButton id={`action-button-${id}`} onClick={setAnchor}>
+      <IconButton id={`action-button-${id}`} onClick={setAnchor} disabled={disabled}>
         <Icon icon={'dots'} />
       </IconButton>
       <Menu id={`action-menu-${id}`} anchorEl={anchorEl} open={open} onClose={handleClose}>
