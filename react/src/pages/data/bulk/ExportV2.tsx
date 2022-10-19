@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { Button  } from 'components/common';
 import Checkbox from 'components/form/Checkbox';
-import { Grid, Paper, Tab, Tabs } from '@mui/material';
+import { Grid, Paper, Tab, Tabs, Button as MUIButton } from '@mui/material';
 import ExportDownloadModal from './ExportDownloadModal';
 import { InfoBanner } from 'components/common/Banner';
 import ContainerLayout from 'pages/layouts/ContainerLayout';
@@ -26,7 +26,11 @@ import QueryBuilder, { IFormRowEntry } from 'components/form/QueryBuilder';
 import { initMap } from 'pages/map/map_init';
 import makeStyles from '@mui/styles/makeStyles';
 import TextField from 'components/form/TextInput';
-import { FeatureCollection } from 'geojson';
+import { FeatureCollection, GeoJsonObject } from 'geojson';
+import FileInput from 'components/form/FileInput';
+import shpjs from 'shpjs';
+import simplify from '@turf/simplify';
+import { AllGeoJSON } from '@turf/helpers';
 
 export interface DateRange {
     start: dayjs.Dayjs,
@@ -48,8 +52,10 @@ export const exportPageStyles = makeStyles(() => ({
 export default function ExportPageV2 (): JSX.Element {
     const api = useTelemetryApi();
     const styles =  exportPageStyles();
+    
     const mapRef = useRef<L.Map>(null);
     const drawnItemsRef = useRef<L.FeatureGroup>(null);
+    const manualLayerRef = useRef<L.Rectangle>(null);
 
     const operators: string[] = ['Equals','Not Equals'];
     const columns: string[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
@@ -62,58 +68,38 @@ export default function ExportPageV2 (): JSX.Element {
     const [critterIDs, setCritterIDs] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedLifetime, setSelectedLifetime] = useState(false);
-    const layerGroupRef = useRef<L.Rectangle>(null);
+    
 
-    const [boundingBox, setBoundingBox] = useState([0,0,0,0]);
+    const [boundingBox, setBoundingBox] = useState(['','','','']);
     const [currentGeometry, setCurrentGeometry] = useState<string[]>([]);
     /*
     * 0 - Min Lat, 1 -  Max Lat,  2 - Min Lon, 3-  Max Lon
     */
-    console.log(mapRef?.current?.eachLayer(o => o));
-    const manualItems = new L.FeatureGroup();
-    //const drawnItems = drawnItemsRef?.current ?? new L.FeatureGroup();
     if(drawnItemsRef.current == null) {
         drawnItemsRef.current = new L.FeatureGroup();
     }
-    const polygon: L.Polygon = null;
-    const drawnLines = [];
-
-    //const a = L.rectangle([ [50, -125], [55, -120] ]);
-    const addShape = () => {
-        //console.log("Has layer? " + drawnItems.hasLayer(a));
-        //drawnItems.removeLayer(a);
-        //a.setBounds([ [50, -125], [55, -120] ]);
-        //a = new L.Rectangle([ [50, -125], [55, -120] ]);
-        
-        /*if (myLayerRef.current == null) {
-            myLayerRef.current = a.addTo(drawnItems);
-        } else {
-            myLayerRef.current.setLatLng([ [50, -125], [55, -120] ]);
-        }
-        rerenderTheMap()*/
-
-       // handleDrawShape()
-    }
-
-    const removeShape = () => {
-       // drawnItems.removeLayer(a);
-    }
 
     const handleBoundingBox = (idx: number, val: InboundObj) => {
-        
-        if(val['coord']) {
-            const bb = boundingBox;
-            bb[idx] = Number(val['coord']);
-            setBoundingBox(bb);
+        if(val['coord'] !== undefined) {
+            const newArr = [...boundingBox.slice(0, idx), String(val['coord']) , ...boundingBox.slice(idx+1)];
+            const bb = newArr.map(o => o === '' ? NaN : Number(o));
+            setBoundingBox(newArr);
             
-            if(bb.every(o => o != 0)) {
-                const [ minlat, maxlat, minlon, maxlon ] = bb;
+            if(bb.some(o => !Number.isNaN(o))) {
+                let [ minlat, maxlat, minlon, maxlon ] = bb;
+                minlat = (Number.isNaN(minlat)) ? -90 : minlat;
+                maxlat = (Number.isNaN(maxlat)) ?  90 : maxlat;
+                minlon = (Number.isNaN(minlon)) ? -180: minlon;
+                maxlon = (Number.isNaN(maxlon)) ?  180: maxlon;
                 const a = new L.Rectangle([[minlat, minlon], [maxlat, maxlon]]);
 
-                if (layerGroupRef.current == null || mapRef.current.hasLayer(layerGroupRef.current) == false) {
-                    layerGroupRef.current = a.addTo(drawnItemsRef.current);
+                if (manualLayerRef.current == null || mapRef.current.hasLayer(manualLayerRef.current) == false) {
+                    manualLayerRef.current = a.addTo(drawnItemsRef.current);
                 }
-                layerGroupRef.current.setBounds([[minlat, minlon], [maxlat, maxlon]]);
+                manualLayerRef.current.setBounds([[minlat, minlon], [maxlat, maxlon]]);
+            }
+            else if (mapRef.current.hasLayer(manualLayerRef.current) == true) {
+                drawnItemsRef.current.removeLayer(manualLayerRef.current);
             }
 
             handleDrawShape();
@@ -136,16 +122,18 @@ export default function ExportPageV2 (): JSX.Element {
         }
     }
 
-    useEffect(() => {
-        //console.log(currentGeometry);
-    }, [currentGeometry]);
-
     const {data: crittersData, isSuccess: critterSuccess} = api.useAssignedCritters(0);
 
     useEffect(() => {
         const updateComponent = (): void => {
           if (isTab(TabNames.advanced)) {
-            initMap(mapRef, drawnItemsRef.current, new L.GeoJSON, handleDrawShape, () => {}, () => {});
+            const drawOptions: L.Control.DrawOptions = {
+                circle: false,
+                circlemarker: false,
+                marker: false,
+                polyline: false
+            }
+            initMap(mapRef, drawnItemsRef.current, new L.GeoJSON, handleDrawShape, () => {}, () => {}, drawOptions);
           }
           //tracksLayer.bringToBack();
         };
@@ -178,10 +166,10 @@ export default function ExportPageV2 (): JSX.Element {
     const areFieldsFilled = (): void => {
         if(rows.some(o => o.operator == '' || o.value.length < 1)) {
             setFormsFilled(false);
-            return;
         }
-        setFormsFilled(true);
-        return;
+        else {
+            setFormsFilled(true);
+        }
     }
 
 
@@ -254,6 +242,21 @@ export default function ExportPageV2 (): JSX.Element {
 
     const handleChangeTab = (event: SyntheticEvent<Element>, newVal: TabNames): void => {
         setTab(newVal);
+    }
+
+    const onFileUpload = (field: string, files: FileList) => {
+        const file = files[0];
+        file.arrayBuffer().then((buff) => {
+            shpjs.parseZip(buff).then((geo) => {
+                const geoJsonObj = geo as FeatureCollection;
+                //geoJsonObj.features = geoJsonObj.features.map(o => convex(o as AllGeoJSON));
+                //const simplified = convex(geo as AllGeoJSON);
+                const simplified = simplify(geo as AllGeoJSON, {tolerance: 0.01, highQuality: true});
+                const geoLayerGroup = L.geoJSON(simplified as FeatureCollection);
+                geoLayerGroup.eachLayer(o => o.addTo(drawnItemsRef.current));
+                handleDrawShape();
+            });
+        }); 
     }
 
     //{CreateFormField(formFields, wfFields.get(rows[idx].column), () => {})}
@@ -348,13 +351,13 @@ export default function ExportPageV2 (): JSX.Element {
         <h2>Select Location</h2>
         <Paper style={{padding: '30px'}} elevation={3}>
             <Box display='flex'>
-                <Button variant='outlined' style={{marginBottom: '30px'}}> Upload Shapefile </Button>
-                <TextField type='number' style={{marginLeft: 'auto'}} label={'Min Latitude'} changeHandler={(o) => { handleBoundingBox(0, o) }} propName={'coord'} defaultValue={''+boundingBox[0]}/>
-                <TextField type='number' label={'Max Latitude'} changeHandler={(o) => { handleBoundingBox(1, o) }} propName={'coord'} defaultValue={''+boundingBox[1]} />
-                <TextField type='number' label={'Min Longitude'} changeHandler={(o) => { handleBoundingBox(2, o)}} propName={'coord'} defaultValue={''+boundingBox[2]} />
-                <TextField type='number' label={'Max Longitude'} changeHandler={(o) => { handleBoundingBox(3, o)}} propName={'coord'} defaultValue={''+boundingBox[3]} />
+                <FileInput accept={'.zip'} onFileChosen={onFileUpload}/>
+                <TextField style={{marginLeft: 'auto'}} label={'Min Latitude'} changeHandler={(o) => { handleBoundingBox(0, o) }} propName={'coord'} defaultValue={''+boundingBox[0]}/>
+                <TextField label={'Max Latitude'} changeHandler={(o) => { handleBoundingBox(1, o) }} propName={'coord'} defaultValue={''+boundingBox[1]} />
+                <TextField label={'Min Longitude'} changeHandler={(o) => { handleBoundingBox(2, o)}} propName={'coord'} defaultValue={''+boundingBox[2]} />
+                <TextField label={'Max Longitude'} changeHandler={(o) => { handleBoundingBox(3, o)}} propName={'coord'} defaultValue={''+boundingBox[3]} />
             </Box>
-            <Box height={'500px'}>
+            <Box marginTop={'1rem'} height={'500px'}>
                 <div style={{flex: '1 1 auto', position: 'relative'}}>
                     <div style={{height: '500px'}} id = 'map'></div>
                 </div>
