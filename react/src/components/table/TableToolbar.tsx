@@ -5,8 +5,9 @@ import TableFilter from './TableFilters';
 import { ITableFilter } from './table_interfaces';
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1)
+    display: 'flex',
+    alignItems: 'flex-end',
+    marginBottom: theme.spacing(2)
   },
   highlight:
     theme.palette.mode === 'light' ? { color: theme.palette.secondary.main } : { color: theme.palette.text.primary },
@@ -45,7 +46,7 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
   const classes = useToolbarStyles();
   const { numSelected, sibling, title, showTooltip } = props;
   return (
-    <Toolbar disableGutters>
+    <Toolbar disableGutters className={classes.root}>
       <Box className={classes.toolbarInner} width='100%'>
         {showTooltip && (
           <TableRow selected={true}>

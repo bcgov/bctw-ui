@@ -29,6 +29,7 @@ import { QuickSummary } from 'components/common/QuickSummary';
 import { ActionsMenu } from 'components/common/partials/ActionsMenu';
 import AddEditViewer from '../common/AddEditViewer';
 import { useHistory } from 'react-router-dom';
+import AssignmentHistory from './AssignmentHistory';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const editDeleteRef = useRef();
@@ -37,6 +38,7 @@ export default function CritterPage(): JSX.Element {
   const [updated, setUpdated] = useState('');
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openAssignment, setOpenAssignment] = useState(false);
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
@@ -63,11 +65,10 @@ export default function CritterPage(): JSX.Element {
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
     const history = useHistory();
-    // const handleReportMortality = (): void => {};
-    // const handleShowOnMap = (): void => {};
-    // const handleRemoveDevice = (func: () => void): void => {};
     const edit = () => setOpenEdit(true);
     const map = () => history.push('/map');
+    const remove = () => setOpenAssignment(true);
+    // const mortality = () => handleOpenWorkflow('mortality');
     return (
       <ActionsMenu
         disabled={row !== editObj}
@@ -89,8 +90,8 @@ export default function CritterPage(): JSX.Element {
           },
           {
             label: 'Remove Device',
-            icon: <Icon icon={'delete'} />
-            //handleClick: editDeleteRef!.current!.handleClickDelete()
+            icon: <Icon icon={'delete'} />,
+            handleClick: remove
           }
         ]}
       />
@@ -175,6 +176,12 @@ export default function CritterPage(): JSX.Element {
                 }
               />
             </Box>
+            <AssignmentHistory
+              open={openAssignment}
+              handleClose={(): void => setOpenAssignment(false)}
+              critter_id={editObj.critter_id}
+              permission_type={editObj.permission_type}
+            />
           </>
         </RowSelectedProvider>
       </SpeciesProvider>

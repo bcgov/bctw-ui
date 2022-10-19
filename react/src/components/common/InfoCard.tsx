@@ -2,25 +2,36 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/styles';
+import { useState } from 'react';
 
 interface InfoCardProps {
   element: JSX.Element;
   body?: string;
   subTitle?: string;
   size?: 'small' | 'large';
+  noMargin?: boolean;
+  hoverRaise?: boolean;
 }
-export const InfoCard = ({ element, body, subTitle, size }: InfoCardProps) => {
+export const InfoCard = ({ element, body, subTitle, size, noMargin, hoverRaise }: InfoCardProps) => {
+  const theme = useTheme();
+  const [raised, setRaised] = useState(false);
   return (
-    <Box mt={2}>
+    <Box>
       <Card
+        onMouseOver={() => setRaised(true)}
+        onMouseOut={() => setRaised(false)}
+        raised={hoverRaise ? raised : false}
         sx={{
-          width: size === 'small' ? '16rem' : '26rem',
+          width: size === 'small' ? '12rem' : '26rem',
           height: '8rem',
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
           p: 3,
-          boxShadow: 3
+          mr: noMargin ? 0 : theme.spacing(4),
+          boxShadow: hoverRaise ? null : 3,
+          marginTop: theme.spacing(2)
         }}>
         <Box>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
