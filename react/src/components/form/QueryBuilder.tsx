@@ -80,6 +80,15 @@ export default function QueryBuilder<T extends ISelectMultipleData> (props: IQue
         }
     }
 
+    /*
+    <Button
+        className={styles.rightJustifyButton}
+        disabled={disabled} 
+        onClick={() => handleExport()}>
+        Export
+    </Button>
+    */
+
     return (
         <>
         {rows.map((row, idx) => (
@@ -137,12 +146,6 @@ export default function QueryBuilder<T extends ISelectMultipleData> (props: IQue
                     onClick={() => onAddNewRow()}
                 >Add Parameter
                 </MUIButton>
-                <Button
-                    className={styles.rightJustifyButton}
-                    disabled={disabled} 
-                    onClick={() => handleExport()}>
-                    Export
-                </Button>
             </Box>
         </>
     )

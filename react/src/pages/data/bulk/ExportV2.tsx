@@ -61,7 +61,7 @@ export default function ExportPageV2 (): JSX.Element {
     const columns: string[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
     const [end, setEnd] = useState(dayjs());
-    const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: '', value: []}]);
+    const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: 'Equals', value: []}]);
     const [tab, setTab] = useState<TabNames>(TabNames.quick);
     const [formsFilled, setFormsFilled] = useState(false);
     const [collarIDs, setCollarIDs] = useState([]);
@@ -153,7 +153,7 @@ export default function ExportPageV2 (): JSX.Element {
     };
 
     const handleAddNewRow = (str): void => {
-        setRows([...rows, {column: str, operator: '', value: []}]);
+        setRows([...rows, {column: str, operator: 'Equals', value: []}]);
     }
 
     const handleRemoveRow = (idx: number): void => {
@@ -194,46 +194,7 @@ export default function ExportPageV2 (): JSX.Element {
         o.operator = newval;
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
-
-    /*
-    * Below, a new PossibleColumnValues is made everytime we change a Value field.
-    * This probably isn't really ideal, since it sort of duplicates data, but CreateFormField needs an object of this type to properly
-    * handle the defaultValue for the form and have that information persist between re-renders. 
-    * A partial refactor to better reflect this is on 710-refactored-row-data, but I shelved it since the fact that PossibleColumnValues is readonly 
-    * makes it hard to avoid just spawning more of them.
-    * 
-    * UPDATE 10/13/2022 - This part may not be needed, but it will depend on what is decided about the next bits of functionality for this page,
-    * so I'm leaving it in for now.
-    */
-    /*
-    const handleValueChange = (newval: Record<string, unknown>, idx: number): void => {
-        if(newval === undefined) {
-            return;
-        }
-        const o = rows[idx];
-        const strval = newval[o.column] as string;
-        //o.value = strval;
-        //console.log(`Handling ${o.column} change: ` + newval[o.column] as string);
-        if(['population_unit', 'species'].includes(o.column) === false) {
-            o.value = strval.replace(/\s+/g, '').split(',');
-            const ff = new PossibleColumnValues;
-            const key = o.column as keyof typeof PossibleColumnValues;
-            ff[key] = strval as string;
-            o.formField = ff;
-        }
-        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
-    }
     
-    const handleDropdownChange = (newval: ICodeFilter[], idx: number): void => {
-        const o = rows[idx];
-        o.value = newval.map(n => n.description.toString());
-        const ff = new PossibleColumnValues;
-        const key = o.column as keyof typeof PossibleColumnValues;
-        ff[key]= o.value;
-        o.formField = ff;
-        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
-    }
-    */
     const handleAutocompleteChange = (newVals, idx) => {
         const o = rows[idx];
         o.value = newVals.map(n => n.value);
@@ -349,9 +310,9 @@ export default function ExportPageV2 (): JSX.Element {
             />
         </Box>
         <h2>Select Location</h2>
-        <Paper style={{padding: '30px'}} elevation={3}>
+        <Paper style={{padding: '30px', marginBottom:'1rem'}} elevation={3}>
             <Box display='flex'>
-                <FileInput accept={'.zip'} onFileChosen={onFileUpload}/>
+                <FileInput buttonText='Upload Shapefile' buttonVariant='outlined' accept={'.zip'} onFileChosen={onFileUpload}/>
                 <TextField style={{marginLeft: 'auto'}} label={'Min Latitude'} changeHandler={(o) => { handleBoundingBox(0, o) }} propName={'coord'} defaultValue={''+boundingBox[0]}/>
                 <TextField label={'Max Latitude'} changeHandler={(o) => { handleBoundingBox(1, o) }} propName={'coord'} defaultValue={''+boundingBox[1]} />
                 <TextField label={'Min Longitude'} changeHandler={(o) => { handleBoundingBox(2, o)}} propName={'coord'} defaultValue={''+boundingBox[2]} />
@@ -363,7 +324,12 @@ export default function ExportPageV2 (): JSX.Element {
                 </div>
             </Box>
         </Paper>
-        
+        <Button
+            //className={styles.rightJustifyButton}
+            disabled={!formsFilled} 
+            onClick={() => setShowModal(true)}>
+            Export
+        </Button>
         </>
     )}
 
