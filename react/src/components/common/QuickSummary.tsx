@@ -81,7 +81,7 @@ export const QuickSummary = (): JSX.Element => {
             size='large'
             element={<Icon icon={'check'} htmlColor={theme.palette.success.main} size={4} />}
             body={LatestDataRetrieval.success}
-            noMargin
+            noRightMargin
           />
         </Box>
         <Box className={classes.cards}>
@@ -107,7 +107,7 @@ export const QuickSummary = (): JSX.Element => {
               element={<Typography variant={'h1'}>{animalPermsCount.editor}</Typography>}
               size='small'
               subTitle={'Editable Animals'}
-              noMargin
+              noRightMargin
             />
           </Box>
         </Box>

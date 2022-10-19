@@ -10,10 +10,10 @@ interface InfoCardProps {
   body?: string;
   subTitle?: string;
   size?: 'small' | 'large';
-  noMargin?: boolean;
+  noRightMargin?: boolean;
   hoverRaise?: boolean;
 }
-export const InfoCard = ({ element, body, subTitle, size, noMargin, hoverRaise }: InfoCardProps) => {
+export const InfoCard = ({ element, body, subTitle, size, noRightMargin, hoverRaise }: InfoCardProps) => {
   const theme = useTheme();
   const [raised, setRaised] = useState(false);
   return (
@@ -29,7 +29,7 @@ export const InfoCard = ({ element, body, subTitle, size, noMargin, hoverRaise }
           flexDirection: 'row',
           alignItems: 'center',
           p: 3,
-          mr: noMargin ? 0 : theme.spacing(4),
+          mr: noRightMargin ? 0 : theme.spacing(4),
           boxShadow: hoverRaise ? null : 3,
           marginTop: theme.spacing(2)
         }}>
