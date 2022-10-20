@@ -187,20 +187,15 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
           </Button>
         )} */}
 
-        <Button
-          {...btnProps}
-          disabled={editBtnProps.disabled}
-          onClick={handleClickEdit}
-          endIcon={cannotEdit ? <Icon icon='eye' /> : <Icon icon='edit' />}>
-          {cannotEdit ? 'View' : 'Edit'}
-          {/* {cannotEdit && <Icon icon='pen' />} `${editText ?? ''}` */}
-        </Button>
-
-        {/* <Tooltip title={editTooltip ?? ''} inline={true}>
-          <IconButton {...btnProps} disabled={cannotEdit && editBtnProps.disabled} onClick={handleClickEdit}>
-            {cannotEdit ? <Icon icon='eye' /> : <Icon icon='edit' />}
-          </IconButton>
-        </Tooltip> */}
+        {disableEdit ? null : (
+          <Button
+            {...btnProps}
+            disabled={editBtnProps.disabled}
+            onClick={handleClickEdit}
+            endIcon={cannotEdit ? <Icon icon='eye' /> : <Icon icon='edit' />}>
+            {cannotEdit ? 'View' : 'Edit'}
+          </Button>
+        )}
 
         {/* render delete button */}
         {/* // TODO Move delete btn to own component */}

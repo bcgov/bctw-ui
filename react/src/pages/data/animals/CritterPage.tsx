@@ -30,15 +30,21 @@ import { ActionsMenu } from 'components/common/partials/ActionsMenu';
 import AddEditViewer from '../common/AddEditViewer';
 import { useHistory } from 'react-router-dom';
 import AssignmentHistory from './AssignmentHistory';
+import { WorkflowType } from 'types/events/event';
+import { CritterWorkflow } from '../events/CritterWorkflow';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const editDeleteRef = useRef();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
+  const [workflowType, setWorkflowType] = useState<WorkflowType>();
+
+  // Modal Open States
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openAssignment, setOpenAssignment] = useState(false);
+  const [openWorkflow, setOpenWorkflow] = useState(false);
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
@@ -50,15 +56,16 @@ export default function CritterPage(): JSX.Element {
     editing: null,
     open: false,
     onSave: doNothingAsync,
-    handleClose: doNothing
+    handleClose: doNothing,
+    workflow: workflowType
   };
 
   const addEditProps = {
-    editing: new AttachedAnimal(),
+    editing: null,
     empty: new AttachedAnimal(),
     addTooltip: CS.addTooltip,
     queryStatus: 'idle' as QueryStatus,
-    disableAdd: true,
+    disableEdit: true,
     disableDelete: true,
     modalControl: true
   };
@@ -68,32 +75,47 @@ export default function CritterPage(): JSX.Element {
     const edit = () => setOpenEdit(true);
     const map = () => history.push('/map');
     const remove = () => setOpenAssignment(true);
-    // const mortality = () => handleOpenWorkflow('mortality');
+    const mortality = () => {
+      setWorkflowType('mortality');
+      setOpenWorkflow((o) => !o);
+    };
+    const defaultItems = [
+      {
+        label: 'Edit',
+        icon: <Icon icon={'edit'} />,
+        handleClick: edit
+      },
+      {
+        label: 'Show on Map',
+        icon: <Icon icon={'location'} />,
+        handleClick: map
+      }
+    ];
+    const animalItems = [
+      {
+        label: 'Attach Device',
+        icon: <Icon icon={'edit'} />,
+        handleClick: remove
+      }
+    ];
+    const attachedItems = [
+      {
+        label: 'Report Mortality',
+        icon: <Icon icon={'dead'} />,
+        handleClick: mortality
+      },
+      {
+        label: 'Remove Device',
+        icon: <Icon icon={'delete'} />,
+        handleClick: remove
+      }
+    ];
     return (
       <ActionsMenu
         disabled={row !== editObj}
-        menuItems={[
-          {
-            label: 'Show on Map',
-            icon: <Icon icon={'location'} />,
-            handleClick: map
-          },
-          {
-            label: 'Report Mortality',
-            icon: <Icon icon={'dead'} />
-            //handleClick:
-          },
-          {
-            label: 'Edit',
-            icon: <Icon icon={'edit'} />,
-            handleClick: edit
-          },
-          {
-            label: 'Remove Device',
-            icon: <Icon icon={'delete'} />,
-            handleClick: remove
-          }
-        ]}
+        menuItems={
+          row instanceof AttachedAnimal ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
+        }
       />
     );
   };
@@ -124,7 +146,6 @@ export default function CritterPage(): JSX.Element {
             <Box mb={4}>
               <DataTable
                 headers={AttachedAnimal.attachedCritterDisplayProps}
-                //title={CS.assignedTableTitle}
                 queryProps={{ query: api.useAssignedCritters }}
                 onSelect={handleSelect}
                 deleted={deleted}
@@ -133,13 +154,6 @@ export default function CritterPage(): JSX.Element {
                 customColumns={[{ column: Menu, header: <b>Actions</b> }]}
                 exporter={
                   <>
-                    <ModifyCritterWrapper
-                      editing={editObj}
-                      onDelete={(critter_id: string): void => setDeleted(critter_id)}
-                      onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-                      setCritter={setEditObj}>
-                      <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
-                    </ModifyCritterWrapper>
                     <ExportViewer<AttachedAnimal>
                       template={[
                         'critter_id',
@@ -166,22 +180,57 @@ export default function CritterPage(): JSX.Element {
                 //title={CS.unassignedTableTitle}
                 queryProps={{ query: api.useUnassignedCritters }}
                 onSelect={handleSelect}
+                updated={updated}
                 deleted={deleted}
                 title={'Non-collared Animals'}
+                customColumns={[{ column: Menu, header: <b>Actions</b> }]}
                 exporter={
-                  <ExportViewer<Animal>
-                    template={['critter_id', 'species', 'population_unit', 'wlh_id', 'animal_id', 'animal_id']}
-                    eTitle={CritterStrings.exportTitle}
-                  />
+                  <>
+                    {/* <ModifyCritterWrapper
+                      editing={editObj}
+                      onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+                      setCritter={setEditObj}>
+                      <AddEditViewer<Animal> {...addEditProps}>
+                        <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
+                      </AddEditViewer>
+                    </ModifyCritterWrapper> */}
+                    <ExportViewer<Animal>
+                      template={[
+                        'critter_id',
+                        'species',
+                        'population_unit',
+                        'wlh_id',
+                        'animal_id',
+                        'animal_id',
+                        'animal_status'
+                      ]}
+                      eTitle={CritterStrings.exportTitle}
+                    />
+                  </>
                 }
               />
             </Box>
+
+            {/* Wrapper to allow editing of Attached and Unattached animals */}
+
+            <ModifyCritterWrapper
+              editing={editObj}
+              onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+              setCritter={setEditObj}>
+              <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
+            </ModifyCritterWrapper>
+
+            {/* Modal for assigning a device to a critter */}
+
             <AssignmentHistory
               open={openAssignment}
               handleClose={(): void => setOpenAssignment(false)}
               critter_id={editObj.critter_id}
               permission_type={editObj.permission_type}
             />
+            {/* Modal for critter workflows */}
+
+            <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
           </>
         </RowSelectedProvider>
       </SpeciesProvider>

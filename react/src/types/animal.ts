@@ -272,12 +272,12 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   // con't overide since this class is inherited
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
     return [
+      'species',
+      'wlh_id',
       'animal_id',
       'device_status',
       'animal_status',
-      'wlh_id',
       'device_id',
-      'species',
       'frequency',
       'lastKnownLocation'
       // 'latitude',

@@ -66,6 +66,7 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
   });
   return stabilizedThis.map((el) => el[0]);
 }
+/** Renders the coloured tags for species and collars */
 
 const getTag = (value: string, color?: string): JSX.Element => {
   const { active, offline, potential_mortality, mortality, potential_malfunction, malfunction } = eDeviceStatus;
@@ -76,11 +77,14 @@ const getTag = (value: string, color?: string): JSX.Element => {
       return <Chip label={value} color={'success'} sx={style} />;
     case offline:
       return <Chip label={value} sx={{ backgroundColor: '#bdbdbd', color: '#ffff', ...style }} />;
-    case potential_malfunction || malfunction:
+    case potential_malfunction:
+    case malfunction:
       return <Chip label={malfunction} color={'warning'} sx={style} />;
-    case mortality || potential_mortality:
+    case mortality:
+    case potential_mortality:
       return <Chip label={mortality} color={'error'} sx={style} />;
     default:
+      console.log(value);
       return null;
   }
 };
