@@ -23,7 +23,6 @@ type IQueryBuilderProps<T extends ISelectMultipleData> = {
     handleValueChange: (str: T[], idx: number) => void;
     handleRemoveRow: (idx: number) => void;
     handleAddRow: (str) => void;
-    handleExport: () => void;
     disabled?: boolean;
 }
 
@@ -47,7 +46,7 @@ export const exportStyles = makeStyles(() => ({
 }));
 
 export default function QueryBuilder<T extends ISelectMultipleData> (props: IQueryBuilderProps<T>) : JSX.Element {
-    const { rows, operators, columns, handleColumnChange, handleOperatorChange, handleValueChange, handleAddRow, handleRemoveRow, handleExport, data, disabled} = props;
+    const { rows, operators, columns, handleColumnChange, handleOperatorChange, handleValueChange, handleAddRow, handleRemoveRow, data, disabled} = props;
     const styles = exportStyles();
 
     const getValidColumnChoices = (ownchoice?: string): string[] => {
@@ -79,15 +78,6 @@ export default function QueryBuilder<T extends ISelectMultipleData> (props: IQue
             return [{id: 0, value: "Loading...", displayLabel: "Loading..."}];
         }
     }
-
-    /*
-    <Button
-        className={styles.rightJustifyButton}
-        disabled={disabled} 
-        onClick={() => handleExport()}>
-        Export
-    </Button>
-    */
 
     return (
         <>

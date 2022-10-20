@@ -226,7 +226,6 @@ export default function ExportPageV2 (): JSX.Element {
                     handleValueChange={handleAutocompleteChange}
                     handleRemoveRow={handleRemoveRow}
                     handleAddRow={handleAddNewRow}
-                    handleExport={() => setShowModal(true)}
                     disabled={!formsFilled}
                 />
             </Box>
