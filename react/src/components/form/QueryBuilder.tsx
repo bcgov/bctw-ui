@@ -2,7 +2,7 @@ import Select from 'components/form/BasicSelect';
 import AutoComplete from 'components/form/Autocomplete';
 import { Button, Icon } from 'components/common';
 import { Box, IconButton, Button as MUIButton } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import makeStyles from '@mui/styles/makeStyles';
 import { ISelectMultipleData } from './MultiSelect';
@@ -14,16 +14,11 @@ export interface IFormRowEntry {
 }
 
 type IQueryBuilderProps<T extends ISelectMultipleData> = {
-    rows: IFormRowEntry[];
     operators: string[];
     columns: string[];
     data: any[];
-    handleColumnChange: (str: string, idx: number) => void;
-    handleOperatorChange: (str: string, idx: number) => void;
-    handleValueChange: (str: T[], idx: number) => void;
-    handleRemoveRow: (idx: number) => void;
-    handleAddRow: (str) => void;
     disabled?: boolean;
+    handleRowsUpdate?: (r: IFormRowEntry[]) => void;
 }
 
 export const exportStyles = makeStyles(() => ({
@@ -46,8 +41,20 @@ export const exportStyles = makeStyles(() => ({
 }));
 
 export default function QueryBuilder<T extends ISelectMultipleData> (props: IQueryBuilderProps<T>) : JSX.Element {
-    const { rows, operators, columns, handleColumnChange, handleOperatorChange, handleValueChange, handleAddRow, handleRemoveRow, data, disabled} = props;
+    const { operators, columns, handleRowsUpdate, /*handleColumnChange, handleOperatorChange, handleValueChange, handleAddRow, handleRemoveRow,*/ data, disabled} = props;
+    const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: 'Equals', value: []}]);
     const styles = exportStyles();
+
+    useEffect(() => {
+        handleRowsUpdate(rows);
+    }, [rows])
+
+    const handleRemoveRow = (idx: number): void => {
+        if(rows.length < 2) {
+            return;
+        }
+        setRows([...rows.slice(0, idx), ...rows.slice(idx+1)]);
+    }
 
     const getValidColumnChoices = (ownchoice?: string): string[] => {
         const chosen = rows.map(o => o.column);
@@ -57,9 +64,28 @@ export default function QueryBuilder<T extends ISelectMultipleData> (props: IQue
         return remaining;
     }
 
-    const onAddNewRow = (): void => {
+    const handleAddNewRow = (): void => {
         const firstRemaining = getValidColumnChoices()[0];
-        handleAddRow(firstRemaining);
+        setRows([...rows, {column: firstRemaining, operator: 'Equals', value: []}]);
+    }
+
+    const handleColumnChange = (newval: string, idx: number): void => {
+        const o = rows[idx];
+        o.column = headerToColumn(newval);
+        o.value = [];
+        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
+    }
+
+    const handleOperatorChange = (newval: string, idx: number): void => {
+        const o = rows[idx];
+        o.operator = newval;
+        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
+    }
+
+    const handleAutocompleteChange = (newVals, idx) => {
+        const o = rows[idx];
+        o.value = newVals.map(n => n.value);
+        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 
     const getUniqueValueOptions = (col) => {
@@ -103,7 +129,7 @@ export default function QueryBuilder<T extends ISelectMultipleData> (props: IQue
                 label={"Value"}
                 data={getUniqueValueOptions(row.column)}
                 defaultValue={ row.value.map((o, i) => { return {id: i, value: o, displayLabel: o} }) }
-                changeHandler={(o) => {handleValueChange(o as T[], idx)}}
+                changeHandler={(o) => {handleAutocompleteChange(o as T[], idx)}}
                 triggerReset={row.column}
                 isMultiSearch
                 resetToDefaultValue
@@ -133,7 +159,7 @@ export default function QueryBuilder<T extends ISelectMultipleData> (props: IQue
                     size='large'
                     startIcon={<Icon icon='plus'/>}
                     variant='text'
-                    onClick={() => onAddNewRow()}
+                    onClick={() => handleAddNewRow()}
                 >Add Parameter
                 </MUIButton>
             </Box>

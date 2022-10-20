@@ -59,7 +59,7 @@ export default function ExportPageV2 (): JSX.Element {
     const columns: string[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
     const [end, setEnd] = useState(dayjs());
-    const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: 'Equals', value: []}]);
+    const [builtRows, setBuiltRows] = useState<IFormRowEntry[]>([]);
     const [tab, setTab] = useState<TabNames>(TabNames.quick);
     const [formsFilled, setFormsFilled] = useState(false);
     const [collarIDs, setCollarIDs] = useState([]);
@@ -85,10 +85,6 @@ export default function ExportPageV2 (): JSX.Element {
 
     const {data: crittersData, isSuccess: critterSuccess} = api.useAssignedCritters(0);
 
-    useEffect(() => {
-        areFieldsFilled();
-    }, [rows]);
-
     const isTab = (tabName: TabNames): boolean => tabName === tab;
 
     const handleChangeDate = (v: InboundObj): void => {
@@ -96,19 +92,12 @@ export default function ExportPageV2 (): JSX.Element {
         key === 'tstart' ? setStart(dayjs(String(value))) : setEnd(dayjs(String(value)));
     };
 
-    const handleAddNewRow = (str): void => {
-        setRows([...rows, {column: str, operator: 'Equals', value: []}]);
-    }
-
-    const handleRemoveRow = (idx: number): void => {
-        if(rows.length < 2) {
-            return;
-        }
-        setRows([...rows.slice(0, idx), ...rows.slice(idx+1)]);
-    }
+    useEffect(() => {
+        areFieldsFilled();
+    }, [builtRows]);
 
     const areFieldsFilled = (): void => {
-        if(rows.some(o => o.operator == '' || o.value.length < 1)) {
+        if(builtRows.some(o => o.operator == '' || o.value.length < 1)) {
             setFormsFilled(false);
         }
         else {
@@ -122,25 +111,6 @@ export default function ExportPageV2 (): JSX.Element {
         const critters = selected.map(v => v.critter_id);
         setCollarIDs(ids); //<-- To remove, we probably do not want to do these queries by collar id anymore.
         setCritterIDs(critters);
-    }
-
-    const handleColumnChange = (newval: string, idx: number): void => {
-        const o = rows[idx];
-        o.column = headerToColumn(newval);
-        o.value = [];
-        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
-    }
-
-    const handleOperatorChange = (newval: string, idx: number): void => {
-        const o = rows[idx];
-        o.operator = newval;
-        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
-    }
-
-    const handleAutocompleteChange = (newVals, idx) => {
-        const o = rows[idx];
-        o.value = newVals.map(n => n.value);
-        setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 
     const handleChangeTab = (event: SyntheticEvent<Element>, newVal: TabNames): void => {
@@ -217,15 +187,10 @@ export default function ExportPageV2 (): JSX.Element {
             <h2>Build Query</h2>
             <Box className={styles.queryRegionBox}>
                 <QueryBuilder
-                    rows={rows}
                     operators={operators}
                     columns={columns}
                     data={crittersData}
-                    handleColumnChange={handleColumnChange}
-                    handleOperatorChange={handleOperatorChange}
-                    handleValueChange={handleAutocompleteChange}
-                    handleRemoveRow={handleRemoveRow}
-                    handleAddRow={handleAddNewRow}
+                    handleRowsUpdate={(r) => setBuiltRows(r)}
                     disabled={!formsFilled}
                 />
             </Box>
@@ -245,7 +210,7 @@ export default function ExportPageV2 (): JSX.Element {
                 exportType={tab} 
                 open={showModal} 
                 handleClose={() => {setShowModal(false)} } 
-                rowEntries={rows} 
+                rowEntries={builtRows} 
                 critterIDs={critterIDs}
                 collarIDs={collarIDs}
                 postGISstrings={currentGeometry}
