@@ -33,20 +33,21 @@ import AssignmentHistory from './AssignmentHistory';
 import { WorkflowType } from 'types/events/event';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import PerformAssignmentAction from './PerformAssignmentAction';
-import { CollarHistory } from 'types/collar_history';
+import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
-  const [workflowType, setWorkflowType] = useState<WorkflowType>();
 
   // Modal Open States
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [openAssignment, setOpenAssignment] = useState(false);
+  const [openAssignRemoveCollar, setOpenAssignRemoveCollar] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
-  const [openAttach, setOpenAttach] = useState(false);
+
+  const [workflowType, setWorkflowType] = useState<WorkflowType>();
+  const [assignmentModal, setAssignmentModal] = useState<'attach' | 'remove'>('attach');
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
@@ -77,13 +78,17 @@ export default function CritterPage(): JSX.Element {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
     const _edit = () => setOpenEdit(true);
     const _map = () => history.push('/map');
-    const _remove = () => setOpenAssignment(true);
+    const _remove = () => {
+      setAssignmentModal('remove');
+      setOpenAssignRemoveCollar(true);
+    };
     const _mortality = () => {
       setWorkflowType('mortality');
       setOpenWorkflow(true);
     };
     const _attach = () => {
-      setOpenAttach(true);
+      setAssignmentModal('attach');
+      setOpenAssignRemoveCollar(true);
     };
     const defaultItems = [
       {
@@ -188,7 +193,7 @@ export default function CritterPage(): JSX.Element {
                 onSelect={handleSelect}
                 updated={updated}
                 deleted={deleted}
-                title={CritterStrings.collaredAnimals}
+                title={CritterStrings.nonCollaredAnimals}
                 customColumns={[{ column: Menu, header: <b>Actions</b> }]}
                 exporter={
                   <>
@@ -222,6 +227,7 @@ export default function CritterPage(): JSX.Element {
             <ModifyCritterWrapper
               editing={editObj}
               onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+              onDelete={(critter_id: string): void => setDeleted(critter_id)}
               setCritter={setEditObj}>
               <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
             </ModifyCritterWrapper>
@@ -229,22 +235,23 @@ export default function CritterPage(): JSX.Element {
             {/* Modal for assigning a device to a critter */}
 
             <AssignmentHistory
-              open={openAssignment}
-              handleClose={(): void => setOpenAssignment(false)}
+              open={openAssignRemoveCollar}
+              handleClose={(): void => setOpenAssignRemoveCollar(false)}
               critter_id={editObj.critter_id}
               permission_type={editObj.permission_type}
+              onlyAssignment
             />
-            {/* Modal for critter workflows */}
 
+            {/* Modal for critter workflows */}
             <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
 
-            <PerformAssignmentAction
+            {/* <PerformAssignmentAction
               critter_id={editObj.critter_id}
               permission_type={editObj.permission_type}
-              current_attachment={new CollarHistory()}
-              openAttach={openAttach}
-              setOpenAttach={setOpenAttach}
-            />
+              current_attachment={currentAttachment}
+              open={openAssignRemoveCollar}
+              setOpen={setOpenAssignRemoveCollar}
+            /> */}
           </>
         </RowSelectedProvider>
       </SpeciesProvider>

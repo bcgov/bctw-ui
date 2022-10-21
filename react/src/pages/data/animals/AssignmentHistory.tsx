@@ -9,10 +9,12 @@ import { Button, Modal } from 'components/common';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import EditDataLifeModal from 'components/form/EditDataLifeModal';
 import { useAttachmentChanged } from 'contexts/DeviceAttachmentChangedContext';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 
 export type IAssignmentHistoryPageProps = Pick<ModalBaseProps, 'open' | 'handleClose'> & {
   critter_id: string;
   permission_type: eCritterPermission;
+  onlyAssignment?: boolean;
 };
 
 /**
@@ -21,8 +23,10 @@ export type IAssignmentHistoryPageProps = Pick<ModalBaseProps, 'open' | 'handleC
  * accessed from @function EditCritter main page
  */
 export default function AssignmentHistory(props: IAssignmentHistoryPageProps): JSX.Element {
-  const { critter_id, open, handleClose, permission_type } = props;
+  const { critter_id, open, handleClose, permission_type, onlyAssignment } = props;
   const api = useTelemetryApi();
+  //Use this when only displaying the assingment page (Remove / Attach collar modals)
+  // const { data, isSuccess } = api.useCollarAssignmentHistory(0, parseInt(critter_id), { enabled: false });
   const attachmentChanged = useAttachmentChanged();
   const [currentAttachment, setCurrentAttached] = useState<CollarHistory>(new CollarHistory());
   const [selectedAttachment, setSelectedAttachment] = useState<CollarHistory>(new CollarHistory());
@@ -64,22 +68,30 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
   };
 
   return (
-    <Modal open={open} handleClose={handleClose}>
-      <DataTable
-        title={CollarStrings.assignmentHistoryByAnimalTitle}
-        headers={CollarHistory.propsToDisplay}
-        queryProps={{ query: api.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
-        paginate={history?.length >= 10}
-        customColumns={[{ column: EditDatalifeColumn, header: <b>Modify Data Life</b> }]}
-        disableSearch
-      />
-      <PerformAssignmentAction current_attachment={currentAttachment} {...props} />
-      <EditDataLifeModal
-        attachment={selectedAttachment}
-        handleClose={(): void => setShowEditDL(false)}
-        open={showEditDL}
-        permission_type={permission_type}
-      />
-    </Modal>
+    <>
+      {onlyAssignment ? (
+        <PerformAssignmentAction current_attachment={currentAttachment} {...props} />
+      ) : (
+        <Modal open={open} handleClose={handleClose}>
+          <DataTable
+            title={CollarStrings.assignmentHistoryByAnimalTitle}
+            headers={CollarHistory.propsToDisplay}
+            queryProps={{ query: api.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
+            paginate={history?.length >= 10}
+            customColumns={[{ column: EditDatalifeColumn, header: <b>Modify Data Life</b> }]}
+            disableSearch
+          />
+          <PerformAssignmentAction current_attachment={currentAttachment} {...props} />
+          <EditDataLifeModal
+            attachment={selectedAttachment}
+            handleClose={(): void => setShowEditDL(false)}
+            open={showEditDL}
+            permission_type={permission_type}
+          />
+        </Modal>
+      )}
+    </>
+
+    // <PerformAssignmentAction current_attachment={currentAttachment} {...props} />
   );
 }

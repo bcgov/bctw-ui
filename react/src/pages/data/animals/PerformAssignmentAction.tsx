@@ -20,8 +20,8 @@ import { IAssignmentHistoryPageProps } from './AssignmentHistory';
 
 type PerformAssignmentPageProps = Pick<IAssignmentHistoryPageProps, 'permission_type' | 'critter_id'> & {
   current_attachment: CollarHistory;
-  openAttach?: boolean;
-  setOpenAttach?: React.Dispatch<React.SetStateAction<boolean>>;
+  open?: boolean;
+  handleClose?: (v: boolean) => void;
 };
 /**
  * handles attaching/removing devices from animals. Contains:
@@ -32,8 +32,8 @@ export default function PerformAssignmentAction({
   critter_id,
   current_attachment,
   permission_type,
-  openAttach,
-  setOpenAttach
+  open,
+  handleClose
 }: PerformAssignmentPageProps): JSX.Element {
   const api = useTelemetryApi();
   const notifyAttachment = useAttachmentDispatch();
@@ -149,45 +149,35 @@ export default function PerformAssignmentAction({
       <DataLifeInputForm dli={dli} enableEditEnd={true} enableEditStart={false} />
     </>
   );
-
+  console.log(isRemovingDevice);
   return (
     <>
       {isRemovingDevice ? (
-        <>
-          <ConfirmModal
-            handleClickYes={handleConfirmRemoveDevice}
-            handleClose={closeModals}
-            open={showConfirmUnattachModal}
-            message={ConfirmRemoval}
-            title={CS.collarRemovalTitle}
-          />
-          <AssignNewCollarModal
-            onSave={saveAttachDevice}
-            critter_id={critter_id}
-            show={showDevicesAvailableModal}
-            onClose={closeModals}
-            dli={dli}
-            saveStatus={attachmentStatus}
-          />
-          {isRemoving ? (
-            <CircularProgress />
-          ) : (
-            <Button disabled={!canEdit} onClick={handleClickShowModal}>
-              {isRemovingDevice ? 'Remove Device' : 'Assign Device'}
-            </Button>
-          )}
-        </>
+        <ConfirmModal
+          handleClickYes={handleConfirmRemoveDevice}
+          handleClose={() => handleClose(false)}
+          open={open}
+          message={ConfirmRemoval}
+          title={CS.collarRemovalTitle}
+        />
       ) : (
-        // Skip the device history section
         <AssignNewCollarModal
           onSave={saveAttachDevice}
           critter_id={critter_id}
-          show={openAttach}
-          onClose={() => setOpenAttach(false)}
+          show={open}
+          onClose={() => handleClose(false)}
           dli={dli}
           saveStatus={attachmentStatus}
         />
       )}
+
+      {/* {isRemoving ? (
+        <CircularProgress />
+      ) : (
+        <Button disabled={!canEdit} onClick={handleClickShowModal}>
+          {isRemovingDevice ? 'Remove Device' : 'Assign Device'}
+        </Button>
+      )} */}
     </>
   );
 }

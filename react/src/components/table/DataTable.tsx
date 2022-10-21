@@ -63,7 +63,6 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [rowIdentifier, setRowIdentifier] = useState('id');
 
   const [page, setPage] = useState(1);
-  const [queryPage, setQueryPage] = useState(1);
   //const [totalPages, setTotalPages] = useState<number | null>(1);
   const [totalRows, setTotalRows] = useState(0);
 

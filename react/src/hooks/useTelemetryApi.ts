@@ -251,7 +251,7 @@ export const useTelemetryApi = () => {
    */
   const useCollarAssignmentHistory = (
     page: number,
-    critterId: number,
+    critterId: string,
     config: Record<string, unknown>
   ): UseQueryResult<CollarHistory[]> => {
     return useQuery<CollarHistory[], AxiosError>(
