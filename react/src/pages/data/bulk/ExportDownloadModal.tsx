@@ -1,6 +1,6 @@
-import { ModalBaseProps } from "components/component_interfaces";
+import { INotificationMessage, ModalBaseProps } from "components/component_interfaces";
 import { Box, CircularProgress } from "@mui/material";
-import { Modal } from 'components/common';
+import { Icon, Modal } from 'components/common';
 import { DateRange, TabNames } from "./ExportV2";
 import download from "downloadjs";
 import { omitNull } from "utils/common_helpers";
@@ -12,6 +12,10 @@ import { LoadingButton } from "@mui/lab";
 import makeStyles from '@mui/styles/makeStyles';
 import useDidMountEffect from "hooks/useDidMountEffect";
 import { IFormRowEntry, QueryBuilderOperator } from "components/form/QueryBuilder";
+import { AxiosError } from "axios";
+import { formatAxiosError } from 'utils/errors';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { ExportStrings as constants, ExportStrings } from 'constants/strings';
 
 type ExportModalProps = ModalBaseProps & {
     rowEntries: IFormRowEntry[];
@@ -37,6 +41,14 @@ const useStyle = makeStyles((theme) => ({
       width: '20px !important',
       marginLeft: '-17px',
       marginTop: '-10px'
+    },
+    loadingButtonContainer: {
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center'
+    },
+    loadingButton : {
+        minWidth: '190px'
     }
   }));
 
@@ -47,8 +59,10 @@ const useStyle = makeStyles((theme) => ({
 */
 export default function ExportDownloadModal({open, handleClose, rowEntries, range, exportType, collarIDs, critterIDs, postGISstrings}: ExportModalProps): JSX.Element {
     const api = useTelemetryApi();
+    const showNotif = useResponseDispatch();
     const [downloadType, setDownloadType] = useState({downloadType: ''});
     const styles = useStyle();
+    const constants = ExportStrings.modal;
     //Duplicate from MapExport.tsx, so should probably be yanked out and imported from elsewhere-----------
     const formatResultAsCSV = (data: unknown[]): string => {
         const headers = Object.keys(data[0]).join();
@@ -76,7 +90,9 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
 
     const onSuccessExport = (data): void => {
         if(data && data.length) {
-            console.log("Read this download type: " + downloadType.downloadType);
+            const notif = {severity: 'success', message: constants.telemetrySuccessMsg} as INotificationMessage;
+            showNotif(notif);
+
             if(downloadType.downloadType == DownloadType.csv) {
                 const formatData = data.map((o) => {
                     o.geom_x = o.geom?.coordinates[0]; 
@@ -91,17 +107,17 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
             else {
                 const result = formatResultAsKML(data);
                 const filename = 'telemetry_export.kml';
-                download(result, filename, 'application/xml'); 
+                download(result, filename, 'application/xml');
             }
+            
+        }
+        else {
+            showNotif({severity: 'warning', message: constants.noTelemetryWarning})
         }
     }
 
-    const onErrorExportAll = (err): void => {
-        console.log(err);
-    }
-
-    const onErrorExport = (err): void => {
-        console.log(err);
+    const onErrorExportAll = (err: AxiosError): void => {
+        showNotif({ severity: 'error', message: formatAxiosError(err) });
     }
 
     const operatorTranslation = (operatorWord: QueryBuilderOperator | ""): string => {
@@ -119,8 +135,7 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
         startRequest();
     }, [downloadType]);
 
-    const {mutateAsync: mutateExportAll, reset: resetExportAll, isLoading: loadingExportAll } = api.useExportAll({onSuccess: onSuccessExport, onError: onErrorExportAll});
-    const {mutateAsync: mutateExport, reset: resetExport, isLoading: loadingExport} = api.useExport({onSuccess: onSuccessExport, onError: onErrorExport});
+    const {mutateAsync: mutateExportAll, isLoading: loadingExportAll } = api.useExportAll({onSuccess: onSuccessExport, onError: onErrorExportAll});
     
     const handleAdvancedExport = (): void => {
         const body = {queries: [], range: {}, polygons: []};
@@ -140,7 +155,6 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
             body.polygons = postGISstrings;
         }
 
-        console.log("Sending this body: " + body);
         mutateExportAll(body);
     }
 
@@ -152,7 +166,6 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
             end: range.end.format(formatDay)
         };
         body.polygons = [];
-        console.log("Sending this body: " + body);
         mutateExportAll(body);
     }
 
@@ -172,24 +185,33 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
     const handleKMLClick = (): void => {
         setDownloadType({downloadType: DownloadType.kml});
     }
-    
+
     return (
-        <Modal open={open} handleClose={handleClose} title={'Confirm Export Download'}>
-            <Box px={5} py={2} style={{backgroundColor: '#fff'}}>
-                <Box display={'flex'} columnGap={2}>
+        <Modal open={open} handleClose={handleClose} title={constants.modalTitle}>
+            <Box width={'500px'} px={5} py={2} style={{backgroundColor: '#fff'}}>
+                <Box className={styles.loadingButtonContainer} columnGap={2}>
                     <LoadingButton 
                     variant='contained'
-                    loading={loadingExport || loadingExportAll}
-                    disabled={loadingExport || loadingExportAll}
+                    className={styles.loadingButton}
+                    loading={loadingExportAll && downloadType.downloadType === 'csv'}
+                    disabled={loadingExportAll}
+                    endIcon={<Icon icon='arrow-down' />}
+                    loadingPosition='end'
                     loadingIndicator={<CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />} 
                     onClick={() => handleCSVClick() }>
-                        Export Data as CSV
+                         {loadingExportAll && downloadType.downloadType === 'csv' ? constants.csvButtonLoad : constants.csvButton}
                     </LoadingButton>
-                    <LoadingButton variant='contained'
-                    loading={loadingExport || loadingExportAll}
-                    disabled={loadingExport || loadingExportAll}
+                    <LoadingButton 
+                    variant='contained'
+                    className={styles.loadingButton}
+                    loadingPosition='end'
+                    loading={ loadingExportAll && downloadType.downloadType === 'kml'}
+                    disabled={loadingExportAll}
+                    endIcon={<Icon icon='arrow-down' />}
                     loadingIndicator={<CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />} 
-                    onClick={() => handleKMLClick() }>Export Data as KML</LoadingButton>
+                    onClick={() => handleKMLClick() }>
+                        { loadingExportAll && downloadType.downloadType === 'kml' ? constants.kmlButtonLoad : constants.kmlButton}
+                    </LoadingButton>
                 </Box>
             </Box>
         </Modal>

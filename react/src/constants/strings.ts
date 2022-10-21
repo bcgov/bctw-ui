@@ -271,7 +271,23 @@ const HomePageStrings = {
 };
 
 const ExportStrings = {
-  infoBannerMesgs: ['Use Quick Export to quickly get telemetry data for any of your animals.', 'Use Advanced Export to get data that matches custom query parameters.']
+  infoBannerMesgs: ['Use Quick Export to quickly get telemetry data for any of your animals.', 'Use Advanced Export to get data that matches custom query parameters.'],
+  quickTabLabel: 'Quick Export',
+  advancedTabLabel: 'Advanced Export',
+  checkboxLabel: 'All Telemetry',
+  dateRangeHeader: 'Specify Date Range',
+  animalTableHeader: 'Select Animals',
+  queryBuilderHeader: 'Build Query',
+  locationSelectHeader: 'Select Location',
+  modal : {
+    noTelemetryWarning: 'No telemetry data found. Try refining your search or choosing different dates.',
+    telemetrySuccessMsg: 'Successfully exported telemetry.',
+    modalTitle: 'Confirm Export Download',
+    csvButton: 'Export Data as CSV',
+    csvButtonLoad: 'Exporting CSV...',
+    kmlButton: 'Export Data as KML',
+    kmlButtonLoad: 'Exporting KML...'
+  }
 }
 
 const DelegationRequestStrings = {

@@ -33,8 +33,8 @@ export interface DateRange {
 }
 
 export enum TabNames {
-    quick = 'Quick Export',
-    advanced = 'Advanced Export'
+    quick,
+    advanced
 }
 
 export const exportPageStyles = makeStyles((theme) => ({
@@ -131,11 +131,11 @@ export default function ExportPageV2 (): JSX.Element {
         </Box>
         <ContainerLayout>
             <Tabs value={tab} className='tabs' onChange={handleChangeTab}>
-                <Tab label={"Quick Export"} value={TabNames.quick}/>
-                <Tab label={"Advanced Export"} value={TabNames.advanced} />
+                <Tab label={ExportStrings.quickTabLabel} value={TabNames.quick}/>
+                <Tab label={ExportStrings.advancedTabLabel} value={TabNames.advanced} />
             </Tabs>
             <Box className={styles.innerSection}>
-                <h2>Specify Date Range</h2>   
+                <h2>{ExportStrings.dateRangeHeader}</h2>   
                 <Grid container spacing={2}>
                     <Grid item sm={2}>
                         <DateInput
@@ -160,7 +160,7 @@ export default function ExportPageV2 (): JSX.Element {
                     <Grid item sm={2}>
                         <Checkbox
                         propName={"animalLifetime"}
-                        label={"All Telemetry"}
+                        label={ExportStrings.checkboxLabel}
                         initialValue={selectedLifetime}
                         changeHandler={() => setSelectedLifetime((o) => !o)}
                         />
@@ -170,7 +170,7 @@ export default function ExportPageV2 (): JSX.Element {
             {isTab(TabNames.quick) && (
                 <>
                 <Box className={styles.innerSection}>
-                    <h2>Select Animals</h2>
+                    <h2>{ExportStrings.animalTableHeader}</h2>
                     <DataTable
                     headers={AttachedAnimal.attachedCritterDisplayProps}
                     title={CS.assignedTableTitle}
@@ -190,7 +190,7 @@ export default function ExportPageV2 (): JSX.Element {
             }
             {isTab(TabNames.advanced) && (
             <>
-            <h2>Build Query</h2>
+            <h2>{ExportStrings.queryBuilderHeader}</h2>
             <Box className={styles.queryRegionBox}>
                 <QueryBuilder
                     operators={operators}
@@ -200,7 +200,7 @@ export default function ExportPageV2 (): JSX.Element {
                 />
             </Box>
             <Box className={styles.innerSection}>
-                <h2>Select Location</h2>
+                <h2>{ExportStrings.locationSelectHeader}</h2>
                 <LocationSelect handleDrawShape={handleDrawShape}/>
             </Box>
             <Button
