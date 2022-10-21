@@ -6,18 +6,22 @@ import { useEffect, useState } from 'react';
 import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import makeStyles from '@mui/styles/makeStyles';
 import { ISelectMultipleData } from './MultiSelect';
+import { Animal } from 'types/animal';
+import { Collar } from 'types/collar';
+
+export type ValidQueryOperator = "Equals" | "Not Equals";
+export type ValidQueryColumn = keyof Animal | keyof Collar;
 
 export interface IFormRowEntry {
-    column: string;
-    operator: string;
+    column: ValidQueryColumn;
+    operator: ValidQueryOperator | "";
     value: Array<string>;
 }
 
 type IQueryBuilderProps<T extends ISelectMultipleData> = {
-    operators: string[];
-    columns: string[];
+    operators: ValidQueryOperator[];
+    columns: ValidQueryColumn[];
     data: any[];
-    disabled?: boolean;
     handleRowsUpdate?: (r: IFormRowEntry[]) => void;
 }
 
@@ -40,8 +44,15 @@ export const exportStyles = makeStyles(() => ({
     }
 }));
 
+/*
+* Query Builder, originally made for the Export page.
+* This component is intended to assist in building custom DB queries from the frontend, but does not necessarily generate any SQL itself.
+* This component appears as a list of rows of three form fields, the first two being dropdowns and the last being an AutoSelect.
+* You are intended to pass props corresponding to columns in the table you intend to query, as well as operations to use on the Value Autocomplete field.
+* Autocomplete options are filled according to keys in the data prop which correspond to your columns.
+*/
 export default function QueryBuilder<T extends ISelectMultipleData> (props: IQueryBuilderProps<T>) : JSX.Element {
-    const { operators, columns, handleRowsUpdate, /*handleColumnChange, handleOperatorChange, handleValueChange, handleAddRow, handleRemoveRow,*/ data, disabled} = props;
+    const { operators, columns, handleRowsUpdate, data} = props;
     const [rows, setRows] = useState<IFormRowEntry[]>([{column: 'species', operator: 'Equals', value: []}]);
     const styles = exportStyles();
 
@@ -56,7 +67,7 @@ export default function QueryBuilder<T extends ISelectMultipleData> (props: IQue
         setRows([...rows.slice(0, idx), ...rows.slice(idx+1)]);
     }
 
-    const getValidColumnChoices = (ownchoice?: string): string[] => {
+    const getValidColumnChoices = (ownchoice?: ValidQueryColumn): ValidQueryColumn[] => {
         const chosen = rows.map(o => o.column);
         const remaining = columns.filter(o => !chosen.includes(o));
         if(ownchoice !== undefined)
@@ -71,14 +82,14 @@ export default function QueryBuilder<T extends ISelectMultipleData> (props: IQue
 
     const handleColumnChange = (newval: string, idx: number): void => {
         const o = rows[idx];
-        o.column = headerToColumn(newval);
+        o.column = headerToColumn(newval) as ValidQueryColumn;
         o.value = [];
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 
     const handleOperatorChange = (newval: string, idx: number): void => {
         const o = rows[idx];
-        o.operator = newval;
+        o.operator = newval as ValidQueryOperator;
         setRows([...rows.slice(0, idx), o , ...rows.slice(idx+1)]);
     }
 

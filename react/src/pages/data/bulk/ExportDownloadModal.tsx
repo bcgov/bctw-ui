@@ -11,7 +11,7 @@ import { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import makeStyles from '@mui/styles/makeStyles';
 import useDidMountEffect from "hooks/useDidMountEffect";
-import { IFormRowEntry } from "components/form/QueryBuilder";
+import { IFormRowEntry, ValidQueryOperator } from "components/form/QueryBuilder";
 
 type ExportModalProps = ModalBaseProps & {
     rowEntries: IFormRowEntry[];
@@ -40,6 +40,11 @@ const useStyle = makeStyles((theme) => ({
     }
   }));
 
+/*
+* Download modal for use with the Export page.
+* Will query the export-all endpoint based on the rowEntries passed as props.
+* Will format the resultant response in either CSV or KML format.
+*/
 export default function ExportDownloadModal({open, handleClose, rowEntries, range, exportType, collarIDs, critterIDs, postGISstrings}: ExportModalProps): JSX.Element {
     const api = useTelemetryApi();
     const [downloadType, setDownloadType] = useState({downloadType: ''});
@@ -99,7 +104,7 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
         console.log(err);
     }
 
-    const operatorTranslation = (operatorWord: string): string => {
+    const operatorTranslation = (operatorWord: ValidQueryOperator | ""): string => {
         switch(operatorWord) {
             case "Equals":
                 return "=";
@@ -146,17 +151,8 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
             start: range.start.format(formatDay),
             end: range.end.format(formatDay)
         };
-        /*const body = {
-            collar_ids: collarIDs,
-            type: 'movement',
-            range: {
-                start: range.start.format(formatDay),
-                end: range.end.format(formatDay)
-            }
-        }*/
         console.log("Sending this body: " + body);
         mutateExportAll(body);
-        //mutateExport(body);
     }
 
     const startRequest = (): void => {
@@ -170,13 +166,10 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
 
     const handleCSVClick = (): void => {
         setDownloadType({downloadType: DownloadType.csv});
-        //startRequest();
     }
 
     const handleKMLClick = (): void => {
         setDownloadType({downloadType: DownloadType.kml});
-        //console.log("KML click!");
-        //startRequest();
     }
     
     return (

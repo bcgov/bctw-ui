@@ -32,6 +32,13 @@ export const locationStyles = makeStyles((theme) => ({
     }
 }));
 
+/*
+* LocationSelect, originally for use with the Export page.
+* This component displays a Leaflet map, with fields for manual lat/lon entry and a upload button for shapefiles.
+* You can draw shapes by either using the Leaflet menus, entering at least one field value, or uploading a shapefile.
+* All shapes can be managed with leaflet controls, and shapes drawn with all three methods may coexist simultaneously.
+* Pass a handleDrawShape function that will be called every time a new shape is drawn on the map, regardless of drawing method.
+*/
 export default function LocationSelect (props: ILocationSelectProps) : JSX.Element {
     const { handleDrawShape, height} = props;
     const styles = locationStyles();

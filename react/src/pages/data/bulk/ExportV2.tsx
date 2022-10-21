@@ -22,7 +22,7 @@ import { Grid, Tab, Tabs, Button as MUIButton } from '@mui/material';
 import ExportDownloadModal from './ExportDownloadModal';
 import { InfoBanner } from 'components/common/Banner';
 import ContainerLayout from 'pages/layouts/ContainerLayout';
-import QueryBuilder, { IFormRowEntry } from 'components/form/QueryBuilder';
+import QueryBuilder, { IFormRowEntry, ValidQueryColumn, ValidQueryOperator } from 'components/form/QueryBuilder';
 import makeStyles from '@mui/styles/makeStyles';
 import { FeatureCollection } from 'geojson';
 import LocationSelect from 'components/form/LocationSelect';
@@ -51,12 +51,18 @@ export const exportPageStyles = makeStyles((theme) => ({
     }
 }));
 
+/*
+* The Export page is for downloading bulk telemtry points in either CSV or KML format.
+* The Quick tab of this page lets you select telemetry by critter, while the advanced tab lets you bulk
+* export data using the QueryBuilder and LocationSelect components. See those for more details.
+*/
+
 export default function ExportPageV2 (): JSX.Element {
     const api = useTelemetryApi();
     const styles =  exportPageStyles();
 
-    const operators: string[] = ['Equals','Not Equals'];
-    const columns: string[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+    const operators: ValidQueryOperator[] = ['Equals','Not Equals'];
+    const columns: ValidQueryColumn[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
     const [end, setEnd] = useState(dayjs());
     const [builtRows, setBuiltRows] = useState<IFormRowEntry[]>([]);
@@ -191,7 +197,6 @@ export default function ExportPageV2 (): JSX.Element {
                     columns={columns}
                     data={crittersData}
                     handleRowsUpdate={(r) => setBuiltRows(r)}
-                    disabled={!formsFilled}
                 />
             </Box>
             <Box className={styles.innerSection}>
