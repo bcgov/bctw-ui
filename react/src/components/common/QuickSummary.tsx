@@ -9,7 +9,7 @@ import { UserContext } from 'contexts/UserContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { eCritterPermission } from 'types/permission';
 import { Icon } from 'components/common';
-import { LatestDataRetrieval } from 'constants/strings';
+import { CritterStrings, LatestDataRetrieval, QuickSummaryStrings } from 'constants/strings';
 import { getToday } from 'utils/time';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -72,7 +72,7 @@ export const QuickSummary = (): JSX.Element => {
       <Box className={classes.root}>
         <Box>
           <Box className={classes.details}>
-            <SubHeader text={'Latest Data Retrieval'} />
+            <SubHeader text={LatestDataRetrieval.title} />
             <Button className={classes.btn} endIcon={<Icon icon={'next'} size={0.8} />}>
               See Details
             </Button>
@@ -86,11 +86,11 @@ export const QuickSummary = (): JSX.Element => {
         </Box>
         <Box className={classes.cards}>
           <Box>
-            <SubHeader text={'Quick Summary'} />
+            <SubHeader text={QuickSummaryStrings.title} />
             <InfoCard
               element={<Typography variant={'h1'}>{animalPermsCount.manager}</Typography>}
               size='small'
-              subTitle={'Managed Animals'}
+              subTitle={QuickSummaryStrings.manage}
             />
           </Box>
           <Box>
@@ -98,7 +98,7 @@ export const QuickSummary = (): JSX.Element => {
             <InfoCard
               element={<Typography variant={'h1'}>{animalPermsCount.observer}</Typography>}
               size='small'
-              subTitle={'Observed Animals'}
+              subTitle={QuickSummaryStrings.editable}
             />
           </Box>
           <Box>
@@ -106,7 +106,7 @@ export const QuickSummary = (): JSX.Element => {
             <InfoCard
               element={<Typography variant={'h1'}>{animalPermsCount.editor}</Typography>}
               size='small'
-              subTitle={'Editable Animals'}
+              subTitle={QuickSummaryStrings.observed}
               noRightMargin
             />
           </Box>

@@ -74,45 +74,46 @@ export default function CritterPage(): JSX.Element {
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
     const history = useHistory();
-    const edit = () => setOpenEdit(true);
-    const map = () => history.push('/map');
-    const remove = () => setOpenAssignment(true);
-    const mortality = () => {
+    const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
+    const _edit = () => setOpenEdit(true);
+    const _map = () => history.push('/map');
+    const _remove = () => setOpenAssignment(true);
+    const _mortality = () => {
       setWorkflowType('mortality');
       setOpenWorkflow(true);
     };
-    const attach = () => {
+    const _attach = () => {
       setOpenAttach(true);
     };
     const defaultItems = [
       {
-        label: 'Edit',
+        label: edit,
         icon: <Icon icon={'edit'} />,
-        handleClick: edit
+        handleClick: _edit
       },
       {
-        label: 'Show on Map',
+        label: map,
         icon: <Icon icon={'location'} />,
-        handleClick: map
+        handleClick: _map
       }
     ];
     const animalItems = [
       {
-        label: 'Attach Device',
+        label: attach,
         icon: <Icon icon={'edit'} />,
-        handleClick: attach
+        handleClick: _attach
       }
     ];
     const attachedItems = [
       {
-        label: 'Report Mortality',
+        label: mortality,
         icon: <Icon icon={'dead'} />,
-        handleClick: mortality
+        handleClick: _mortality
       },
       {
-        label: 'Remove Device',
+        label: removeCollar,
         icon: <Icon icon={'delete'} />,
-        handleClick: remove
+        handleClick: _remove
       }
     ];
     return (
@@ -128,14 +129,14 @@ export default function CritterPage(): JSX.Element {
     <ManageLayout>
       <SpeciesProvider>
         <Box className='manage-layout-titlebar'>
-          <h1>Animals</h1>
+          <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
-              Manage My Animals
+              {CritterStrings.manageMyAnimals}
             </Button>
             <FullScreenDialog open={openManageAnimals} handleClose={inverseManageModal}>
               <Container maxWidth='xl'>
-                <h1>Manage My Animals</h1>
+                <h1>{CritterStrings.manageMyAnimals}</h1>
                 <UserAnimalAccess />
               </Container>
             </FullScreenDialog>
@@ -155,7 +156,7 @@ export default function CritterPage(): JSX.Element {
                 onSelect={handleSelect}
                 deleted={deleted}
                 updated={updated}
-                title={'Collared Animals'}
+                title={CritterStrings.collaredAnimals}
                 customColumns={[{ column: Menu, header: <b>Actions</b> }]}
                 exporter={
                   <>
@@ -187,7 +188,7 @@ export default function CritterPage(): JSX.Element {
                 onSelect={handleSelect}
                 updated={updated}
                 deleted={deleted}
-                title={'Non-collared Animals'}
+                title={CritterStrings.collaredAnimals}
                 customColumns={[{ column: Menu, header: <b>Actions</b> }]}
                 exporter={
                   <>
