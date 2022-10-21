@@ -11,7 +11,7 @@ import { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import makeStyles from '@mui/styles/makeStyles';
 import useDidMountEffect from "hooks/useDidMountEffect";
-import { IFormRowEntry, ValidQueryOperator } from "components/form/QueryBuilder";
+import { IFormRowEntry, QueryBuilderOperator } from "components/form/QueryBuilder";
 
 type ExportModalProps = ModalBaseProps & {
     rowEntries: IFormRowEntry[];
@@ -104,7 +104,7 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
         console.log(err);
     }
 
-    const operatorTranslation = (operatorWord: ValidQueryOperator | ""): string => {
+    const operatorTranslation = (operatorWord: QueryBuilderOperator | ""): string => {
         switch(operatorWord) {
             case "Equals":
                 return "=";

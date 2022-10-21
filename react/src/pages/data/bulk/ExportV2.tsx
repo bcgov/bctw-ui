@@ -22,7 +22,7 @@ import { Grid, Tab, Tabs, Button as MUIButton } from '@mui/material';
 import ExportDownloadModal from './ExportDownloadModal';
 import { InfoBanner } from 'components/common/Banner';
 import ContainerLayout from 'pages/layouts/ContainerLayout';
-import QueryBuilder, { IFormRowEntry, ValidQueryColumn, ValidQueryOperator } from 'components/form/QueryBuilder';
+import QueryBuilder, { IFormRowEntry, QueryBuilderColumn, QueryBuilderOperator } from 'components/form/QueryBuilder';
 import makeStyles from '@mui/styles/makeStyles';
 import { FeatureCollection } from 'geojson';
 import LocationSelect from 'components/form/LocationSelect';
@@ -61,8 +61,8 @@ export default function ExportPageV2 (): JSX.Element {
     const api = useTelemetryApi();
     const styles =  exportPageStyles();
 
-    const operators: ValidQueryOperator[] = ['Equals','Not Equals'];
-    const columns: ValidQueryColumn[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+    const operators: QueryBuilderOperator[] = ['Equals','Not Equals'];
+    const columns: QueryBuilderColumn[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
     const [start, setStart] = useState(dayjs().subtract(3, 'month'));
     const [end, setEnd] = useState(dayjs());
     const [builtRows, setBuiltRows] = useState<IFormRowEntry[]>([]);
