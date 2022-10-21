@@ -145,12 +145,13 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
     }
 
     const handleSimpleExport = (): void => {
-        const body = {queries: [], range: {}};
+        const body = {queries: [], range: {}, polygons: []};
         body.queries = [{key: "critter_id", operator: "=", term: critterIDs }];
         body.range = {
             start: range.start.format(formatDay),
             end: range.end.format(formatDay)
         };
+        body.polygons = [];
         console.log("Sending this body: " + body);
         mutateExportAll(body);
     }
