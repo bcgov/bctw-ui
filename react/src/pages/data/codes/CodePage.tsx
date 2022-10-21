@@ -1,7 +1,6 @@
 import { ButtonGroup, Typography } from '@mui/material';
 import { Button, NotificationMessage } from 'components/common';
 import DataTable from 'components/table/DataTable';
-import { CodeStrings as S } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import React, { useState } from 'react';
 import { CodeFormFields, CodeHeader, CodeHeaderInput } from 'types/code';
@@ -32,7 +31,6 @@ const CodePage: React.FC = () => {
   };
 
   const handleClick = (c: CodeHeader): void => {
-    // setCodeHeader(c);
     setHeader(c.type);
     setTitle(c.title);
   };
@@ -44,11 +42,6 @@ const CodePage: React.FC = () => {
   }
 
   const { isFetching, isLoading, isError, error, data, status } = api.useCodeHeaders();
-
-  const importProps = {
-    iMsg: S.importText,
-    iTitle: S.importTitle
-  };
 
   const editProps = {
     editableProps: CodeFormFields.map((s) => s.prop),

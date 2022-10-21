@@ -41,7 +41,6 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
     }
     const oneWeekAfter = this.valid_to.add(7, 'day');
     const hasWeekElapsed = dayjs().isAfter(oneWeekAfter);
-    // console.log('request resubmission possible?', oneWeekAfter, hasWeekElapsed);
     return hasWeekElapsed;
   }
 

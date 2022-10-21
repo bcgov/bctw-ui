@@ -88,7 +88,6 @@ const getIconPath = (path: string): string => {
       return mdiKey;
     case 'location':
       return mdiMapMarker;
-    //case 'person':
     case 'profile':
       return mdiAccount;
     case 'personadd':

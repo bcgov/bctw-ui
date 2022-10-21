@@ -58,7 +58,6 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     if ((e as AxiosError)?.isAxiosError) {
       showNotif({ severity: 'error', message: formatAxiosError(e as AxiosError) });
     } else {
-      // console.log('sucess!!', e);
       showNotif({ severity: 'success', message: `${event.event_type} workflow form saved!` });
       // if the parent implements this, call it on a successful save.
       if (typeof onEventSaved === 'function') {
@@ -115,7 +114,6 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
    * still trigger the save. 
    */
   const handleExitWorkflow = (): void => {
-    // console.log('exiting workflow early!');
     saveEvent(event);
     setShowConfirmModal(false);
   };

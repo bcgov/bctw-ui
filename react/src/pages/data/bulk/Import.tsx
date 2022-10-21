@@ -66,7 +66,6 @@ export default function Import(): JSX.Element {
 
   // handle a successful csv upload response
   const onSuccess = (d: IBulkUploadResults<unknown>): void => {
-    // console.log('csv upload results:', d);
     if (d.errors.length) {
       onError()
     } else {

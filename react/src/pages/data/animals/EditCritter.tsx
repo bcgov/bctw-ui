@@ -51,9 +51,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     setHasBabies(false);
     updateSpecies(null);
   };
-  // useEffect(() => {
-  //   setLockSpecies(!isCreatingNew)
-  // },[isCreatingNew, species])
+
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event

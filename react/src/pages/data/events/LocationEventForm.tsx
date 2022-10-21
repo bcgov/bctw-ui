@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LocationEvent, eLocationPositionType } from 'types/events/location_event';
 import TextField from 'components/form/TextInput';
 import Radio from 'components/form/Radio';

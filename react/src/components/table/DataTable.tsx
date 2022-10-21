@@ -127,7 +127,6 @@ export default function DataTable<T extends BCTWBase<T>>({
       });
 
       setValues((o) => [...o, ...newV]);
-      //setRowsPerPage((o) => (isPaginate ? o : data.length));
     }
   }, [data]);
 
@@ -144,7 +143,6 @@ export default function DataTable<T extends BCTWBase<T>>({
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const handlerExists = typeof onSelectMultiple === 'function';
     if (event.target.checked && selected.length === 0) {
-      //const newIds = data.map((r) => r[rowIdentifier]);
       //Select by the page not by initial data.
       const newIds = perPage().map((r) => r[rowIdentifier]);
       setSelected(newIds);
@@ -260,9 +258,6 @@ export default function DataTable<T extends BCTWBase<T>>({
   // todo: why using memo for this?
   const headerProps = useMemo(() => headers, []);
   // fixme: fix excesssive rerenders
-  // const customCols = customColumns.map((cc,idx) => {
-  //   return (obj: T) => useMemo(() => cc.column(obj, idx), [obj]);
-  // })
 
   // called in the render function
   // determines which values to render, based on page and filters applied

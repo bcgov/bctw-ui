@@ -121,7 +121,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     setShowConfirmModal((o) => !o);
   };
 
-  //useEffect(()=>console.log(selectedMultiRequestIDs), [selectedMultiRequestIDs]);
   const handleSelectRow = (rows: IGroupedRequest[]): void => {
     if (rows.length) {
       setSelectedMultiRequestIDs(rows.map((u) => u.id));

@@ -52,7 +52,6 @@ export default function ReleaseEventForm({ event, handleFormChange }: WorkflowFo
           <LocationEventForm key='rl-loc' event={release.location_event} notifyChange={onChangeLocationProp} />,
           <Box key='bx-dev' {...boxSpreadRowProps} mt={2}>
             {CreateFormField(release, { ...fields.shouldUnattachDevice }, onChange)}
-            {/* {CreateFormField(release, { ...fields.data_life_start, required: isBeingUnattached }, onChange, { disabled: !isBeingUnattached })} */}
           </Box>,
           release.translocation && release.animal_status === 'In Translocation' ? (
             <Box key='bx-trsloc' {...boxSpreadRowProps} mt={2}>

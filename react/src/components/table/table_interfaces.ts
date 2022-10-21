@@ -1,5 +1,4 @@
 import { AxiosError } from 'axios';
-import { Dispatch, SetStateAction } from 'react';
 import { UseQueryResult } from 'react-query';
 
 type Order = 'asc' | 'desc';
@@ -32,7 +31,6 @@ interface ITableQueryProps<T> {
   defaultSort?: ITableSortProp<T>;
   param?: unknown;
   query: any;
-  // query: APIHandler;
   onNewData?: (data: T[]) => void;
 }
 

@@ -1,6 +1,5 @@
 import { INotificationMessage } from 'components/component_interfaces';
 import { useContext, createContext, useState, useEffect } from 'react';
-import { callbackify } from 'util';
 
 export const ApiResponseContext = createContext<INotificationMessage>(null);
 export const ApiResponseDispatch = createContext(null);

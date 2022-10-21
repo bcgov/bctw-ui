@@ -311,10 +311,6 @@ export const useTelemetryApi = () => {
   ): UseQueryResult<UserCritterAccess[], AxiosError> => {
     const { user, filter } = param;
     const queryKeys = ['critterAccess', page, user];
-    // const search = parseArgs(args);
-    // if (search) {
-    //   queryProps.push(search.term);
-    // }
 
     // note: what to consider changed?
     // term if its the search string, keys if its the filter type

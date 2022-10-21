@@ -1,4 +1,4 @@
-import { Button, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { getDeviceStatusIcon } from 'components/table/table_helpers';
 import { AttachedAnimal } from 'types/animal';
 import { eDeviceStatus } from 'types/collar';

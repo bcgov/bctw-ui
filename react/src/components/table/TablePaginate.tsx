@@ -26,9 +26,6 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
     onChangePage(event, page + 1);
   };
 
-  // const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
-  //   onChangePage(event, +totalPages);
-  // }
   return (
     <>
       <IconButton
@@ -51,12 +48,6 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         disabled={count < rowsPerPage}
         aria-label="next page"
         size="large"><Icon icon='next'/></IconButton>
-
-      {/* <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={count === totalPages}
-        aria-label="last page"
-        size="large"><Icon icon='last'/></IconButton> */}
     </>
 
   );

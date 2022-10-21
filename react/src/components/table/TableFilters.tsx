@@ -45,7 +45,6 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
   return (
     <TextField
       className='table-filter-input'
-      //defaultValue={term}
       onChange={(v): void => setTerm(v.target.value)}
       value={term}
       label={disabled ? 'Search - Select Column*' : 'Search'}

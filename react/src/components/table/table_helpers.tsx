@@ -4,7 +4,7 @@ import { Order, HeadCell } from 'components/table/table_interfaces';
 import { dateObjectToTimeStr, formatTime } from 'utils/time';
 import { Icon, Tooltip } from 'components/common';
 import { isDayjs } from 'dayjs';
-import { Collar, eDeviceStatus } from 'types/collar';
+import { eDeviceStatus } from 'types/collar';
 
 /**
  * converts an object to a list of HeadCells
@@ -18,7 +18,6 @@ function createHeadCell<T>(obj: T, propsToDisplay: (keyof T)[]): HeadCell<T>[] {
     return {
       disablePadding: false,
       id: k as keyof T,
-      // label: k,
       numeric: isNumber
     };
   });
@@ -138,7 +137,6 @@ function fuzzySearchMutipleWords<T>(rows: T[], keys: string[], filterValue: stri
   if (!terms) {
     return rows;
   }
-  // reduceRight will mean sorting is done by score for the _first_ entered word.
   return terms.reduceRight((results, term) => matchSorter(results, term, { keys }), rows);
 }
 
