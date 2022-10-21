@@ -39,12 +39,13 @@ type TableToolbarProps<T> = {
   isMultiSearch?: boolean;
   showTooltip?: boolean;
   setPage: (page: number) => void;
+  disableSearch?: boolean;
   //disabled: boolean;
 };
 
 export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Element {
   const classes = useToolbarStyles();
-  const { numSelected, sibling, title, showTooltip } = props;
+  const { numSelected, sibling, title, showTooltip, disableSearch } = props;
   return (
     <Toolbar disableGutters className={classes.root}>
       <Box className={classes.toolbarInner} width='100%'>
@@ -58,7 +59,7 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
           &nbsp;
           {numSelected > 0 && <span>({numSelected} Selected)</span>}
           <Box display={'flex'} alignItems={'center'} className={classes.actions}>
-            <TableFilter {...props} />
+            {disableSearch ? null : <TableFilter {...props} />}
             {sibling}
           </Box>
         </Box>

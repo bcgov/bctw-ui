@@ -6,14 +6,10 @@ import { Box, Container, IconButton } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateSpeciesFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
-import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
-import WorkflowWrapper from '../events/WorkflowWrapper';
-import MortalityEvent from 'types/events/mortality_event';
-import CaptureEvent from 'types/events/capture_event';
+import { WorkflowType, wfFields } from 'types/events/event';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
-import ReleaseEvent from 'types/events/release_event';
 import { Button, Icon } from 'components/common';
 import { eUDFType, IUDF } from 'types/udf';
 import AddUDF from 'pages/udf/AddUDF';
@@ -263,13 +259,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     open={showWorkflow}
                     setOpen={setShowWorkflow}
                   />
-                  {/* <WorkflowWrapper
-                    open={showWorkflowForm}
-                    event={event as any}
-                    handleClose={(): void => setShowWorkflowForm(false)}
-                    onEventSaved={handleWorkflowSaved}
-                    onEventChain={handleWorkflowChain}
-                  /> */}
                 </>
               ) : null}
             </>

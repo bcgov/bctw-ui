@@ -71,6 +71,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
         queryProps={{ query: api.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
         paginate={history?.length >= 10}
         customColumns={[{ column: EditDatalifeColumn, header: <b>Modify Data Life</b> }]}
+        disableSearch
       />
       <PerformAssignmentAction current_attachment={currentAttachment} {...props} />
       <EditDataLifeModal

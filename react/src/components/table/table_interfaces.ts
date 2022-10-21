@@ -73,6 +73,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   deleted?: string;
   updated?: string;
   exporter?: JSX.Element;
+  disableSearch?: boolean;
 };
 
 /**

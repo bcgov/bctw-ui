@@ -32,9 +32,10 @@ import { useHistory } from 'react-router-dom';
 import AssignmentHistory from './AssignmentHistory';
 import { WorkflowType } from 'types/events/event';
 import { CritterWorkflow } from '../events/CritterWorkflow';
+import PerformAssignmentAction from './PerformAssignmentAction';
+import { CollarHistory } from 'types/collar_history';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
-  const editDeleteRef = useRef();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
@@ -45,6 +46,7 @@ export default function CritterPage(): JSX.Element {
   const [openEdit, setOpenEdit] = useState(false);
   const [openAssignment, setOpenAssignment] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
+  const [openAttach, setOpenAttach] = useState(false);
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
@@ -77,7 +79,10 @@ export default function CritterPage(): JSX.Element {
     const remove = () => setOpenAssignment(true);
     const mortality = () => {
       setWorkflowType('mortality');
-      setOpenWorkflow((o) => !o);
+      setOpenWorkflow(true);
+    };
+    const attach = () => {
+      setOpenAttach(true);
     };
     const defaultItems = [
       {
@@ -95,7 +100,7 @@ export default function CritterPage(): JSX.Element {
       {
         label: 'Attach Device',
         icon: <Icon icon={'edit'} />,
-        handleClick: remove
+        handleClick: attach
       }
     ];
     const attachedItems = [
@@ -231,6 +236,14 @@ export default function CritterPage(): JSX.Element {
             {/* Modal for critter workflows */}
 
             <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
+
+            <PerformAssignmentAction
+              critter_id={editObj.critter_id}
+              permission_type={editObj.permission_type}
+              current_attachment={new CollarHistory()}
+              openAttach={openAttach}
+              setOpenAttach={setOpenAttach}
+            />
           </>
         </RowSelectedProvider>
       </SpeciesProvider>

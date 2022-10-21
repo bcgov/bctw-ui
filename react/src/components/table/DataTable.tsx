@@ -46,6 +46,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   updated,
   exporter,
   resetSelections,
+  disableSearch,
   paginate = true,
   isMultiSelect = false,
   isMultiSearch = false,
@@ -245,6 +246,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       isMultiSearch={isMultiSearch}
       setPage={setPage}
       showTooltip={showValidRecord}
+      disableSearch={disableSearch}
       //disabled={totalPages !== 1}
       sibling={<>{exporter}</>}
     />

@@ -1,4 +1,4 @@
-import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
+import { Animal, AttachedAnimal } from 'types/animal';
 import { useEffect, useState } from 'react';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
