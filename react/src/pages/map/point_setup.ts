@@ -3,8 +3,7 @@ import {
   getFillColorByStatus,
   getOutlineColor,
   MAP_COLOURS,
-  MAP_COLOURS_OUTLINE,
-  parseAnimalColour
+  MAP_COLOURS_OUTLINE
 } from 'pages/map/map_helpers';
 import { DEFAULT_MFV, ITelemetryPoint, MapFormValue } from 'types/map';
 
@@ -48,9 +47,6 @@ const getStyle = (event: L.LeafletEvent): PointStyle => {
     const [color, fillColor, opacity] = obj.icon.options.attribution.split(' ');
     return { color, fillColor, opacity };
   }
-  // const { color, fillColor, opacity } = obj?.color ? obj : obj.icon.options.attribution.split(' ');
-  // console.log(color, fillColor, opacity);
-  // return { color, fillColor, opacity };
 };
 
 const createLatestPingIcon = (fillColor: string, color = '#000', opacity = defaultPointStyle.opacity): L.DivIcon => {

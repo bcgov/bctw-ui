@@ -114,7 +114,6 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     setCanSave(!hasErr);
   }, [newObj]);
 
-  //useEffect(()=>{console.log('editing')},[editing]);
 
   const handleSave = async (): Promise<void> => {
     // use Object.assign to preserve class methods
@@ -129,9 +128,6 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   const handleChange = (newProp: InboundObj): void => {
     checkHasErr(newProp);
     // todo: determine if object has changed from original
-    // const [key, value] = parseFormChangeResult<typeof editing>(newProp);
-    // const isSame = editing[key] === value;
-    // console.log(newProp, editing[key], isSame)
     const modified = { ...newObj, ...newProp };
     setNewObj(modified);
   };

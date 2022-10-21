@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { DesktopDatePicker } from '@mui/lab';
 import { formatDay } from 'utils/time';
 import TextField, { StandardTextFieldProps } from '@mui/material/TextField';
@@ -16,9 +15,7 @@ export type DateInputProps = FormBaseProps &
 
 export default function DateInput(props: DateInputProps): JSX.Element {
   const { defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
-  // const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultValue.isValid() ? dayjs(defaultValue) : null);
   const handleDateChange = (d: Dayjs): void => {
-    //setSelectedDate(d);
     if (d) {
       changeHandler({ [propName]: d.format(formatDay) });
     }

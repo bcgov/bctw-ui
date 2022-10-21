@@ -27,9 +27,6 @@ type EditTableProps<T> = Omit<PlainTableProps<T>, 'headers'> & EditTableVisibili
   onSelectMultiple?: (n: T[]) => void;
   saveButtonText?: string;
   isMultiSelect?: boolean;
-  //selected: number[];
-  //numSelected?: number;
-  //onCheckAllClick?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 /**
@@ -40,7 +37,6 @@ type EditTableProps<T> = Omit<PlainTableProps<T>, 'headers'> & EditTableVisibili
  * @param onRowModified - call parent handler with the row clicked and @type {EditTableRowAction}
  * @param onSave - calls parent handler when save button clicked
  */
-//export default function EditTable<T>(props: EditTableProps<T>): JSX.Element {
 const EditTable = React.forwardRef( function<T> (props: EditTableProps<T>, ref): JSX.Element {
   const {
     canSave,
@@ -59,8 +55,6 @@ const EditTable = React.forwardRef( function<T> (props: EditTableProps<T>, ref):
     saveButtonText,
     isMultiSelect,
     onSelectMultiple
-    //onCheckAllClick,
-    //numSelected
   } = props;
 
   const [selected, setSelected] = React.useState<number[]>([]);

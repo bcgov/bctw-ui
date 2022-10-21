@@ -28,7 +28,6 @@ export const attachmentApi = (props: ApiProps): API => {
   /** given a critter_id, retrieve it's device attachment history */
   const getCollarAssignmentHistory = async (critterId: number, page = 1): Promise<CollarHistory[]> => {
     const url = createUrl({ api: `${getCollarAssignmentHistoryEndpoint}/${critterId}`, page });
-    // console.log(`requesting collar/critter assignment history`);
     const { data } = await api.get(url);
     const results = data.map((json: ICollarHistory) => plainToClass(CollarHistory, json));
     return results;

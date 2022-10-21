@@ -4,7 +4,6 @@ import {
   Divider,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
   IconButton,
   Radio,
@@ -20,14 +19,10 @@ import {
   Table,
   Paper,
   List,
-  ListItemText,
-  ListItemButton,
   ListSubheader,
   ListItem,
-  ButtonGroup,
   Slider,
   CircularProgress,
-  ThemeProvider
 } from '@mui/material';
 import AutoComplete from 'components/form/Autocomplete';
 import clsx from 'clsx';
@@ -48,7 +43,7 @@ import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { ITelemetryPoint } from 'types/map';
 import { getFormValues } from './map_helpers';
-import { MapWeekMonthPresets, SEARCH_PRESETS } from './map_constants';
+import { SEARCH_PRESETS } from './map_constants';
 import { getStartDate, StartDateKey } from 'utils/time';
 import makeStyles from '@mui/styles/makeStyles';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -63,9 +58,6 @@ enum TabNames {
 type MapFiltersProps = {
   start: string;
   end: string;
-  // uniqueDevices: number[];
-  // collectiveUnits: string[];
-  // pingsToDisplay: boolean;
   pings: ITelemetryPoint[];
   onCollapsePanel: () => void;
   onApplySearch: (r: MapRange, filters: ICodeFilter[]) => void;
@@ -75,7 +67,6 @@ type MapFiltersProps = {
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;
   isFetching: boolean;
-  // onShowUnassignedDevices: (o: ISelectMultipleData[]) => void;
 };
 const useMapStyles = makeStyles((theme) => ({
   presetBtn: {
@@ -161,8 +152,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // handler for when a date is changed
   useEffect(() => {
     const onChangeDate = (): void => {
-      console.log(fetchedEstimate);
-      console.log(fetchedEstimate === undefined);
       if (end !== props.end || start !== props.start) {
         setApplyButtonStatus(false);
         setWasDatesChanged(true);
@@ -282,7 +271,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   const handlePresets = (key: StartDateKey): void => {
     setStart(getStartDate(end, key));
-    // handleApplyFilters(null);
   };
 
   const createSearch = (): ReactNode => {

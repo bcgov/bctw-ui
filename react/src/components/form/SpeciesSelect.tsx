@@ -62,15 +62,11 @@ export const SpeciesSelect = ({ handleChange, value, useLock, useModal }: Specie
   return (
     <>
       <SelectCode
-        //style={style}
-        //key={`${label}-select`}
-        //label={label}
         disabled={lockSpecies}
         codeHeader={SPECIES_STR}
         defaultValue={typeof value === 'string' ? value : ''}
         changeHandler={handleChange}
         required={false}
-        //error={'Test error'}
         ref={myRef}
         inputRef={inputRef}
         propName={SPECIES_STR}

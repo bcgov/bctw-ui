@@ -47,7 +47,6 @@ export default function UserAdminPage(): JSX.Element {
 
   const deleteUser = async (): Promise<void> => {
     const payload: IDeleteType = { id: selectedUser.id, objType: 'user' };
-    // console.log('deleting user', payload);
     await deleteMutation(payload);
     setShowConfirmDelete(false);
   };

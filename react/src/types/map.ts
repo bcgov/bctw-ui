@@ -139,11 +139,6 @@ const padFrequency = (num: number): string => {
   return freq.padEnd(numToAdd, '0');
 };
 
-// type Symbolize = {
-//   item: ISelectMultipleData;
-//   colour: string;
-//   pointCount: number;
-// };
 type MapFormValue = {
   header: keyof TelemetryDetail;
   label: string;

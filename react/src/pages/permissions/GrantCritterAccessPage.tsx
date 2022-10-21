@@ -43,7 +43,6 @@ export default function GrantCritterAccessPage(): JSX.Element {
   const { mutateAsync } = api.useGrantCritterAccess({ onSuccess, onError });
 
   const handleSave = async (body: IUserCritterPermissionInput): Promise<void> => {
-    console.log(JSON.stringify(body, null, 2));
     await mutateAsync(body);
     setShowModal(false)
   };

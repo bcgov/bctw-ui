@@ -19,8 +19,7 @@ export default function MetabaseDashboard({ dashboardItems, lineBreaks }: Dashbo
   const [isLoading, setIsLoading] = useState(true);
   const { url } = useMetabaseDashboard(dashboardKey);
   const classes = manageLayoutStyles();
-  /* This retriggers a refresh when the window is resized. Prevents issue with page doubling in size. */
-  //window.onresize = () => location.reload();
+
   return (
     <>
       <Box className={'sidebar'} id='manage_sidebar' py={2} px={2}>
@@ -44,7 +43,6 @@ export default function MetabaseDashboard({ dashboardItems, lineBreaks }: Dashbo
         </List>
       </Box>
       <Box py={3} px={4} className={classes.manageLayoutContent}>
-        {/* <iframe src={url} scrolling='no' id='iframe' allow='fullscreen' frameBorder={0} style={{minWidth: '100%', minHeight:'100%'}}></iframe> */}
         <IframeResizer  src={url} frameBorder={0} style={{ minWidth: '100%'}} onInit={():void => setIsLoading(false)}/>
         {isLoading && <CircularProgress/>}
       </Box>

@@ -55,7 +55,6 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       isOptionEqualToValue={(option, value): boolean => option.id === value.id}
       // exclude selected values from the option list
       filterSelectedOptions={true}
-      //options={filteredData.filter(d => selected.findIndex(s => s.id === d.id) === -1)}
       options={data}
       renderTags={(value: T[], getTagProps): JSX.Element[] => {
         return value

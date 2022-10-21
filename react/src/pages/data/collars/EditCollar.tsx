@@ -54,7 +54,6 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
     await setShowWorkflowForm(false);
     if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved) {
-      // console.log('im supposed to show the retrieval form', e);
       const retrievalWF = editObjectToEvent(e, new RetrievalEvent(), ['event_type']);
       await updateEvent(retrievalWF as any); // fixme:
       await setShowWorkflowForm((o) => !o);

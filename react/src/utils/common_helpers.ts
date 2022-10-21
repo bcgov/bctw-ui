@@ -53,7 +53,6 @@ const columnToHeader = (prop: string): string => {
 
 const headerToColumn = (prop: string): string => {
   const asArr = prop
-    //.replaceAll(' ', '_')
     .replaceAll(' ID', ' id')
     .replaceAll('WLH', 'wlh')
     .replaceAll('UTM', 'utm') 

@@ -43,11 +43,8 @@ export const eventApi = (props: ApiProps): API => {
   };
 
   const _saveAnimal = async (critter: OptionalAnimal, type: WorkflowType): Promise<WorkflowAPIResponse> => {
-    // console.log('workflow event animal', critter);
-    // return true;
     try {
       const { data } = await postJSON(api, createUrl({ api: upsertCritterEndpoint }), critter);
-      console.log('animal results', data);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`${eventErr(type)} error saving animal', ${formatAxiosError(err)}`);
@@ -56,11 +53,8 @@ export const eventApi = (props: ApiProps): API => {
   };
 
   const _saveDevice = async (device: OptionalDevice, type: WorkflowType): Promise<WorkflowAPIResponse> => {
-    // console.log('workflow event device', device);
-    // return true;
     try {
       const { data } = await postJSON(api, createUrl({ api: upsertDeviceEndpoint }), device);
-      console.log('saving device results', data);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`${eventErr(type)} error saving device', ${formatAxiosError(err)}`);
@@ -69,11 +63,8 @@ export const eventApi = (props: ApiProps): API => {
   };
 
   const _addOrRemoveDevice = async (attachment: RemoveDeviceInput, isAdding: boolean): Promise<WorkflowAPIResponse> => {
-    // console.log('workflow event add or attach event', attachment)
-    // return true;
     try {
       const { data } = await postJSON(api, createUrl({ api: isAdding ? attachDeviceEndpoint : removeDeviceEndpoint }), attachment);
-      console.log('device add/remove status', data);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`error adding/removing device', ${formatAxiosError(err)}`);
@@ -82,11 +73,8 @@ export const eventApi = (props: ApiProps): API => {
   }
 
   const _updateDataLife = async(dli: ChangeDataLifeInput): Promise<WorkflowAPIResponse> => {
-    // console.log('workflow event update data life', dli);
-    // return;
     try {
       const { data } = await postJSON(api, createUrl({ api: updateDatalifeEndpoint}), dli);
-      console.log('update data life response', data);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`error updating data life', ${formatAxiosError(err)}`);

@@ -51,9 +51,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     setHasBabies(false);
     updateSpecies(null);
   };
-  // useEffect(() => {
-  //   setLockSpecies(!isCreatingNew)
-  // },[isCreatingNew, species])
+
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
@@ -96,7 +94,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
         // show the release form, populating the location and date fields
         const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'population_unit']);
         // set the new event directly, triggering the display of the release form
-        // console.log(rwf)
         updateEvent(rwf);
         setShowWorkflowForm((o) => !o);
       }
@@ -123,7 +120,6 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     }
     // there are only animal-related fields in capture workflows
     const next = editObjectToEvent(e.getAnimal(), newwf, []);
-    //console.log(`capture workflow chained to ${nextWorkflow} type`, next);
     await updateEvent(next);
     await setShowWorkflowForm((o) => !o);
   };

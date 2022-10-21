@@ -79,7 +79,6 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
     setValue,
     value
   }));
-  //useImperativeHandle(ref, () => value)
 
   // to handle React warning about not recognizing the prop on a DOM element
   const propsToPass = removeProps(props, [
@@ -113,9 +112,6 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
       // if a default value was provided, update it to the actual value
       const found = data.find((d) => d?.description === defaultValue);
       //Set the species context
-      // if (found && found?.code_header_title.toLowerCase() === SPECIES_STR) {
-      //   updateSpecies(formatCodeToSpecies(found));
-      // }
       // update the error status if found
       if (found?.description && hasError) {
         setHasError(false);

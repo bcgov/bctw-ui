@@ -95,8 +95,6 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
       .sort((a, b) => a.isBefore(b) ? 1 : 0);
     if (dates.length) {
       const minDate = dates[dates.length -1];
-      // eslint-disable-next-line no-console
-      // console.log('min retrieval date determined', minDate);
       return minDate;
     }
     return null;

@@ -60,7 +60,6 @@ const searchToQueryString = (search: ITableFilter[]): string => {
  */
 const createUrl = ({ api, query, page, noApiPrefix, search }: CreateUrlParams): string => {
   const baseUrl = getBaseUrl(noApiPrefix);
-  // console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
     url = _appendQueryToUrl(url, query);
@@ -75,7 +74,6 @@ const createUrl = ({ api, query, page, noApiPrefix, search }: CreateUrlParams): 
   if (search) {
     url += searchToQueryString(search);
   }
-  // console.log('created URL:', url)
   return url;
 };
 
@@ -134,7 +132,6 @@ const asJSON = <T>(o: T): T => {
 const postJSON = async <T>(api: AxiosInstance, url: string, body: T): Promise<AxiosResponse> => {
   const json = Array.isArray(body) ? body.map((b) => asJSON(b)) : asJSON(body);
   // eslint-disable-next-line no-console
-  console.log('json posted', json);
   return api.post(url, json);
 };
 

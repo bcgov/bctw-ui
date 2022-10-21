@@ -111,7 +111,6 @@ export default function VendorAPIPage(): JSX.Element {
   const DevicesSelected = (make: DeviceMake): JSX.Element => {
     const selected = 'devices selected: ';
     const filtered = devices.filter((d) => d.make === make);
-    //console.log(devices)
     if (!filtered.length) {
       return (
         <span>

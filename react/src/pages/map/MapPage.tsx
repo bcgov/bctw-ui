@@ -38,11 +38,9 @@ import { BCTWType } from 'types/common_types';
 import AddUDF from 'pages/udf/AddUDF';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import {
-  defaultPointStyle,
   getStyle,
   highlightLatestPings,
   highlightPings,
-  selectedPointStyle,
   setupLatestPingOptions,
   setupPingOptions,
   setupSelectedPings,
@@ -325,9 +323,6 @@ export default function MapPage(): JSX.Element {
   // triggered when side-panel filters are applied
   const handleApplyChangesFromFilterPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
     // if the timerange was changed, update that first. will trigger refetch
-    /*if (newRange.start !== range.start || newRange.end !== range.end) {
-      setRange(newRange);
-    }*/
     // otherwise, update the filter state and apply the filters
     setFilters(filters);
     applyFiltersToPings(filters);
@@ -352,7 +347,6 @@ export default function MapPage(): JSX.Element {
       return;
     }
     const groupedFilters = groupFilters(filters);
-    // console.log(groupedFilters, newFeatures.length);
     const filteredPings = applyFilter(groupedFilters, fetchedPings);
 
     setPings(filteredPings);
@@ -383,7 +377,6 @@ export default function MapPage(): JSX.Element {
     setOverviewType(type);
     setSelectedDetail(row);
     setShowModal((o) => !o);
-    console.log(type, row);
   };
 
   /**
@@ -413,7 +406,6 @@ export default function MapPage(): JSX.Element {
 
   const togglePings = (show: boolean): void => {
     const ref = mapRef.current;
-    // const layers = showUnassignedLayers ? getPingLayers() : getPingLayers().slice(0, 2);
     const layers = getPingLayers().slice(0, 2);
     layers.forEach((l) => (show ? ref.addLayer(l) : ref.removeLayer(l)));
   };
@@ -446,7 +438,6 @@ export default function MapPage(): JSX.Element {
   };
 
   const getAssignedLayers = (): L.Layer[] => [latestPingsLayer, pingsLayer, tracksLayer];
-  // const getUnassignedLayers = (): L.Layer[] => [latestUPingsLayer];
   const getTracksLayers = (): L.Layer[] => [tracksLayer];
   const getPingLayers = (): L.Layer[] => [pingsLayer, latestPingsLayer, latestUPingsLayer];
 
@@ -457,7 +448,6 @@ export default function MapPage(): JSX.Element {
   const handleShowUnassignedDevices = (o: ISelectMultipleData[]): void => {
     const values = o.map((s) => s.value);
     // setting this state will trigger visibility of unassigned layers
-    // setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
 
     const ref = mapRef.current;
     const layers = [0, 2].includes(values.length) ? [...getAssignedLayers()] : getAssignedLayers();
@@ -486,27 +476,14 @@ export default function MapPage(): JSX.Element {
     tracksLayer.addTo(mapRef.current);
   }, [tracksLayer]);
 
-  // useEffect(() => {
-  //   unassignedTracksLayer.addTo(mapRef.current);
-  //   unassignedTracksLayer.on('add', (l) => l.target.bringToBack());
-  // }, [unassignedTracksLayer]);
-
   // Add the ping layers
   useEffect(() => {
-    // cluster.addLayer(pingsLayer);
-    // cluster.addTo(mapRef.current);
     pingsLayer.addTo(mapRef.current);
   }, [pingsLayer]);
 
   useEffect(() => {
-    // cluster.addLayer(latestPingsLayer);
-    // cluster.addTo(mapRef.current);
     latestPingsLayer.addTo(mapRef.current);
   }, [latestPingsLayer]);
-
-  // useEffect(() => {
-  //   unassignedPingsLayer.addTo(mapRef.current);
-  // }, [unassignedPingsLayer]);
 
   // todo: move this to separate component / wrapper
   // resizable state & handlers
@@ -554,7 +531,6 @@ export default function MapPage(): JSX.Element {
           onShowLatestPings={handleShowLastKnownLocation}
           onShowLastFixes={handleShowLast10Fixes}
           isFetching={isLoadingPings}
-          // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
         />
         <div className={'map-container'}>
           {isLoadingPings ? <CircularProgress className='progress' color='secondary' /> : null}

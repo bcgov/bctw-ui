@@ -30,10 +30,8 @@ export type FormBaseProps = Pick<BaseTextFieldProps, 'label'> & {
  */
 export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled' | 'required'> & {
   prop: keyof T;
-  // prop: KeyType;
   type: eInputType;
   species?: string[];
-  //cast?: SpeciesCast // ex: {moose: 'wildlife_unit', grey_wolf: 'wildlife_unit'}
   codeName?: string;
   span?: boolean;
   tooltip?: ReactNode;

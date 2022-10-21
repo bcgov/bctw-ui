@@ -39,15 +39,12 @@ export default function ManagerRequestPermission(): JSX.Element {
   }, [emailList])
 
   const onSuccess = (data): void => {
-    // eslint-disable-next-line no-console
-    console.log('successful request submission', data);
     showNotif({severity: 'success', message: 'permission request submitted succssfully'});
     setError('');
     reset();
   }
 
   const onError = (err: AxiosError): void => {
-    // console.log(err)
     setError(err?.response?.data);
     showNotif({severity: 'error', message: formatAxiosError(err)});
   }
@@ -57,7 +54,6 @@ export default function ManagerRequestPermission(): JSX.Element {
 
   // set the selected permission state when saved from the picker modal
   const handleCrittersSelected = (ca: IUserCritterPermissionInput): void => {
-    // console.log(ca);
     setPermission(ca);
     setShowPickCritterModal(false);
   };
@@ -98,7 +94,6 @@ export default function ManagerRequestPermission(): JSX.Element {
       user_email_list: emailList,
       critter_permissions_list: permission.access,
     }
-    // console.log(JSON.stringify(body, null, 2))
     mutateAsync(body);
   }
 

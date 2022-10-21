@@ -22,7 +22,6 @@ export const userApi = (props: ApiProps): API => {
   };
 
   const invalidateAlerts = (): void => {
-    // console.log('refetching user alerts');
     queryClient.invalidateQueries('userAlert');
   };
 
@@ -44,7 +43,6 @@ export const userApi = (props: ApiProps): API => {
     }
     const url = createUrl({ api: 'session-info' });
     const { data } = await api.get(url);
-    //console.log('retrieve session info', data);
     return data;
   };
 
@@ -54,11 +52,9 @@ export const userApi = (props: ApiProps): API => {
    * note: returned user object will not have role_type
    */
   const addUser = async (user: User): Promise<User> => {
-    // console.log('posting user', user)
     const role = user.role_type ?? eUserRole.user;
     const { data } = await postJSON(api, createUrl({ api: 'add-user' }), { user, role });
     const ret = plainToClass(User, data);
-    // console.log('user upsert result:', ret);
     invalidateUsers();
     return ret;
   };
@@ -70,7 +66,6 @@ export const userApi = (props: ApiProps): API => {
     const url = createUrl({ api: 'get-user' });
     const { data } = await api.get(url);
     const user = plainToClass(User, data);
-    // console.log('fetched user info', user);
     return user;
   };
 

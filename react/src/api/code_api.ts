@@ -20,7 +20,6 @@ export const codeApi = (props: ApiProps): API => {
     const ch = `codeHeader=${codeHeader}`
     const s = species ? ch + `&species=${species}` : ch;
     const url = createUrl({ api: 'get-code', query: s, page });
-    // console.log(`requesting ${codeHeader} codes`);
     const { data } = await api.get(url);
     return data;
   };

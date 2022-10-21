@@ -25,14 +25,6 @@ const Home = (): JSX.Element => {
       </Typography>
       <Typography paragraph className={styles.callout} children={data ?? welcome} />
 
-      {/* <Grid container spacing={2} flexDirection='column' wrap='nowrap' alignItems='flex-end'> */}
-
-      {/* <Grid item xl={2} lg={3} xs={12} md={4}>
-          
-        </Grid>
-        <Grid item xl={2} lg={3} xs={12} md={4}>
-          
-        </Grid> */}
       <Stack direction='column' justifyContent='flex-start' alignItems='flex-end' spacing={2}>
         <Grid item xl={2} lg={3} xs={12} md={4}>
           <GovLinkBox title={resources.title} data={resources.data} />
