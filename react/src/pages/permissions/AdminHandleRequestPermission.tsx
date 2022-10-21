@@ -38,7 +38,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   const [isGrant, setIsGrant] = useState(false);
   const [denyReason, setDenyReason] = useState<PermissionWasDeniedReason>('Not given');
-  //const [selectedRequestID, setSelectedRequestID] = useState<number>();
   const [selectedMultiRequestIDs, setSelectedMultiRequestIDs] = useState<number[]>([]);
 
   const ref = useRef(null);
@@ -154,13 +153,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const RequestedBy = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].requested_by_email}</>;
   const RequestedAt = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].requested_date.format(formatDay)}</>;
   const Comment = (u: IGroupedRequest): JSX.Element => <>{u.requests[0].request_comment}</>;
-  /*const GrantPermission = (u: IGroupedRequest): JSX.Element => {
-    return (
-      <IconButton onClick={(): void => handleShowConfirm(u, true)} size="large">
-        <Icon icon='done' htmlColor='green' />
-      </IconButton>
-    );
-  };*/
 
   /**
    * when the admin chooses to deny, show a modal asking a reason for the denial
@@ -205,11 +197,9 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     'WLH ID',
     'Permission',
     'Comment'
-    //'Grant',
-    // 'Deny'
   ];
 
-  const columns = [RequestedBy, RequestedAt, Emails, AnimalID, WLHID, Perm, Comment]; //, GrantPermission];
+  const columns = [RequestedBy, RequestedAt, Emails, AnimalID, WLHID, Perm, Comment];
 
   // also show request id in development
   if (isDev()) {
@@ -239,7 +229,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
               onSave={doNothing}
               onSelectMultiple={(rows: IGroupedRequest[]): void => handleSelectRow(rows)}
               onRowModified={(u): void => {
-                //handleShowConfirm(u as IGroupedRequest, false);
               }}
               hideAdd={true}
               hideEdit={true}
@@ -248,14 +237,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
               isMultiSelect={true}
               ref={ref}
             />
-            /*<DataTable 
-            headers={PermissionRequest.requestHistoryPropsToDisplay}
-            title={'Requests'}
-            queryProps={tableProps}
-            onSelectMultiple={ () => {} }
-            isMultiSelect={true}
-            customColumns={[{ column:confirmColumn, header: (): JSX.Element => <b>Grant-Deny</b> }]}
-            />*/
           )}
           <Box mb={2} display='flex' justifyContent='flex-end' flexDirection='row' alignItems='center' columnGap={2}>
             <Button

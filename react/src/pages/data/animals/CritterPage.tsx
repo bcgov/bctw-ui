@@ -13,6 +13,7 @@ import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
+import { ErrorBanner, InfoBanner, NotificationBanner, SuccessBanner } from 'components/common/Banner';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
@@ -65,6 +66,12 @@ export default function CritterPage(): JSX.Element {
             />
           </Box>
         </Box>
+        <SuccessBanner text={'hi'} hiddenContent={[<div>hello</div>]} />
+        <InfoBanner text='Info' />
+        <InfoBanner text={['hello', 'world']} />
+        <NotificationBanner hiddenContent={[<div>hello</div>]} />
+        <NotificationBanner hiddenContent={[]} />
+        <ErrorBanner text={'hi'} hiddenContent={[<div>hello</div>]} />
 
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
         <RowSelectedProvider>

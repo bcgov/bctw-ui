@@ -155,7 +155,6 @@ export default function AddUDF(props: ManageUDFProps): JSX.Element {
   };
 
   const onClose = (): void => {
-    // setCanSave(false);
     handleClose(false);
   };
 

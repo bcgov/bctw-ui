@@ -18,7 +18,6 @@ import { columnToHeader, doNothing, headerToColumn } from 'utils/common_helpers'
 export default function EditUser(props: EditorProps<User>): JSX.Element {
   const { editing } = props;
   const [domain, setDomain] = useState<KeyCloakDomainType>('idir');
-  //const [roleType, setRoleType] = useState<eUserRole>(editing.role_type);
   useDidMountEffect(() => {
     editing.domain = domain;
   }, [editing, domain]);

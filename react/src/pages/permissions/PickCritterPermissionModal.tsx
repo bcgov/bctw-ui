@@ -80,17 +80,9 @@ export default function PickCritterPermissionModal({
   useDidMountEffect(() => {
     if (showSelectPermission) {
       // if the select dropdown is shown, user must have an option selected for the corresponding row to be able to save
-      // const selectedRows = Object.values(access).filter((a) => critterIDs.includes(a.critter_id) && a.wasSelected);
-      // if (critterIDs.length !== selectedRows.length) {
-      //   setCanSave(false);
-      //   return;
-      // }
       const onlySelected = Object.values(access).filter((a) => a.wasSelected);
       setCanSave(!!onlySelected.length);
     }
-
-    // at least one row has to be selected
-    // setCanSave(!!critterIDs.length);
   }, [critterIDs, access]);
 
   // when the table query finishes - update the access state
@@ -223,39 +215,3 @@ export default function PickCritterPermissionModal({
     </Modal>
   );
 }
-
-// when the custom table header "select all" is changed,
-// update all of the custom column selects
-/*
-  useEffect(() => {
-    const updateRows = (): void => {
-      setAccessTypes((prevState) => {
-        return prevState.map((c) => {
-          return { critter_id: c.critter_id, permission_type: tableHeaderCritterSelectOption as eCritterPermission };
-        });
-      });
-    };
-    updateRows();
-  }, [tableHeaderCritterSelectOption]);
-*/
-
-// a custom table header component. selecting an option from the dropdown
-// updates all of the newColumn selects above.
-// note: disable this as of new privileges workflow
-/*
-const newHeader = (): JSX.Element => {
-  return (
-    <Select
-      value={tableHeaderCritterSelectOption}
-      onChange={(e: React.ChangeEvent<{ value: unknown }>): void => {
-        setTableHeaderCritterSelectOption(e.target.value as eCritterPermission);
-      }}>
-      {Object.values(eCritterPermission).map((d) => (
-        <MenuItem key={`headermenuItem-${d}`} value={d}>
-          {d}
-        </MenuItem>
-      ))}
-    </Select>
-  );
-}
-*/
