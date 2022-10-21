@@ -280,7 +280,7 @@ const ExportStrings = {
   queryBuilderHeader: 'Build Query',
   locationSelectHeader: 'Select Location',
   modal : {
-    noTelemetryWarning: 'No telemetry data found. Try refining your search or choosing different dates.',
+    noTelemetryWarning: 'No telemetry data found. Try expanding your search or choosing different dates.',
     telemetrySuccessMsg: 'Successfully exported telemetry.',
     modalTitle: 'Confirm Export Download',
     csvButton: 'Export Data as CSV',
