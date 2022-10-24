@@ -11,14 +11,16 @@ export const mapApi = (props: ApiProps): API => {
     return data;
   }
 
-  const getTracks = async (start: string, end: string): Promise<ITelemetryLine[]> => {
-    const url = createUrl({ api: 'get-critter-tracks', query: `start=${start}&end=${end}` });
+  const getTracks = async (start: string, end: string, critter_id: string): Promise<ITelemetryLine[]> => {
+     const queryBody = critter_id ?  `start=${start}&end=${end}&critter_id=${critter_id}` : `start=${start}&end=${end}`;
+    const url = createUrl({ api: 'get-critter-tracks', query: queryBody });
     const { data } = await api.get(url);
     return data?.features;
   };
 
-  const getPings = async (start: string, end: string): Promise<ITelemetryPoint[]> => {
-    const url = createUrl({ api: 'get-critters', query: `start=${start}&end=${end}` });
+  const getPings = async (start: string, end: string, critter_id: string): Promise<ITelemetryPoint[]> => {
+    const queryBody = critter_id ?  `start=${start}&end=${end}&critter_id=${critter_id}` : `start=${start}&end=${end}`;
+    const url = createUrl({ api: 'get-critters', query: queryBody });
     const { data } = await api.get(url);
     return data?.features;
   };

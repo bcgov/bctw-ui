@@ -91,10 +91,10 @@ export const useTelemetryApi = () => {
     });
   };
 
-  const useTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
+  const useTracks = (start: string, end: string, critter_id: string = null): UseQueryResult<ITelemetryLine[], AxiosError> => {
     return useQuery<ITelemetryLine[], AxiosError>(
       ['tracks', start, end],
-      () => mapApi.getTracks(start, end),
+      () => mapApi.getTracks(start, end, critter_id),
       defaultQueryOptions
     );
   };
@@ -110,10 +110,10 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const usePings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+  const usePings = (start: string, end: string, critter_id: string = null): UseQueryResult<ITelemetryPoint[], AxiosError> => {
     return useQuery<ITelemetryPoint[], AxiosError>(
       ['pings', { start, end }],
-      () => mapApi.getPings(start, end),
+      () => mapApi.getPings(start, end, critter_id),
       defaultQueryOptions
     );
   };
