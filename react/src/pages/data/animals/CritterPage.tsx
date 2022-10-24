@@ -6,7 +6,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import { MutableRefObject, Ref, useEffect, useRef, useState } from 'react';
+import { MutableRefObject, Ref, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Animal, AttachedAnimal } from 'types/animal';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 import { QueryStatus } from 'react-query';
@@ -34,6 +34,10 @@ import { WorkflowType } from 'types/events/event';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import PerformAssignmentAction from './PerformAssignmentAction';
 import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
+import AssignNewCollarModal from './AssignNewCollar';
+import { AttachRemoveDevice } from './AttachRemoveDevice';
+import { AxiosError } from 'axios';
+import { formatAxiosError } from 'utils/errors';
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
@@ -43,17 +47,17 @@ export default function CritterPage(): JSX.Element {
   // Modal Open States
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [openAssignRemoveCollar, setOpenAssignRemoveCollar] = useState(false);
+  const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
 
   const [workflowType, setWorkflowType] = useState<WorkflowType>();
-  const [assignmentModal, setAssignmentModal] = useState<'attach' | 'remove'>('attach');
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
   const inverseManageModal = (): void => {
     setOpenManageAnimals((a) => !a);
   };
+
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
     editing: null,
@@ -79,27 +83,20 @@ export default function CritterPage(): JSX.Element {
     const _edit = () => setOpenEdit(true);
     const _map = () => history.push('/map');
     const _remove = () => {
-      setAssignmentModal('remove');
-      setOpenAssignRemoveCollar(true);
+      setOpenAttachRemoveCollar(true);
     };
     const _mortality = () => {
       setWorkflowType('mortality');
       setOpenWorkflow(true);
     };
     const _attach = () => {
-      setAssignmentModal('attach');
-      setOpenAssignRemoveCollar(true);
+      setOpenAttachRemoveCollar(true);
     };
     const defaultItems = [
       {
         label: edit,
         icon: <Icon icon={'edit'} />,
         handleClick: _edit
-      },
-      {
-        label: map,
-        icon: <Icon icon={'location'} />,
-        handleClick: _map
       }
     ];
     const animalItems = [
@@ -110,6 +107,11 @@ export default function CritterPage(): JSX.Element {
       }
     ];
     const attachedItems = [
+      {
+        label: map,
+        icon: <Icon icon={'location'} />,
+        handleClick: _map
+      },
       {
         label: mortality,
         icon: <Icon icon={'dead'} />,
@@ -221,7 +223,6 @@ export default function CritterPage(): JSX.Element {
                 }
               />
             </Box>
-
             {/* Wrapper to allow editing of Attached and Unattached animals */}
 
             <ModifyCritterWrapper
@@ -232,26 +233,17 @@ export default function CritterPage(): JSX.Element {
               <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
             </ModifyCritterWrapper>
 
-            {/* Modal for assigning a device to a critter */}
-
-            <AssignmentHistory
-              open={openAssignRemoveCollar}
-              handleClose={(): void => setOpenAssignRemoveCollar(false)}
+            {/* Modal for assigning or removing a device from a critter */}
+            <AttachRemoveDevice
               critter_id={editObj.critter_id}
               permission_type={editObj.permission_type}
-              onlyAssignment
+              current_attachment={new CollarHistory()}
+              openModal={openAttachRemoveCollar}
+              handleShowModal={setOpenAttachRemoveCollar}
+              onDelete={(critter_id: string): void => setDeleted(critter_id)}
             />
-
             {/* Modal for critter workflows */}
             <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
-
-            {/* <PerformAssignmentAction
-              critter_id={editObj.critter_id}
-              permission_type={editObj.permission_type}
-              current_attachment={currentAttachment}
-              open={openAssignRemoveCollar}
-              setOpen={setOpenAssignRemoveCollar}
-            /> */}
           </>
         </RowSelectedProvider>
       </SpeciesProvider>

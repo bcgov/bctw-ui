@@ -272,11 +272,6 @@ export default function DataTable<T extends BCTWBase<T>>({
   };
 
   const TableContents = (): JSX.Element => {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const setAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
-      setAnchorEl(event.currentTarget);
-      // setOpen(true);
-    };
     const noData = isSuccess && !data?.length;
     // useEffect(() => {
     //   if (noData && totalPages !== 1) {

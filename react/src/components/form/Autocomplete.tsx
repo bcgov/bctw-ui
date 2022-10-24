@@ -34,9 +34,6 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
   }, [defaultValue]);
 
   const handleChange = (value: T[]): void => {
-    // const len = value?.length;
-    // const lastElem = len > 0 ? [value[len - 1]] : value;
-    //const mutatedValue = isMultiSearch ? value : lastElem;
     setSelected(value ? value : []);
     changeHandler(value ? value : [], data[0]?.prop);
   };
@@ -52,7 +49,12 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       multiple={isMultiSearch}
       style={{ width }}
       limitTags={tagLimit ?? 3}
-      isOptionEqualToValue={(option, value): boolean => option.id === value.id}
+      isOptionEqualToValue={(option, value): boolean => {
+        if (Array.isArray(value) && !value?.length) {
+          return false;
+        }
+        return option.id === value.id;
+      }}
       // exclude selected values from the option list
       filterSelectedOptions={true}
       //options={filteredData.filter(d => selected.findIndex(s => s.id === d.id) === -1)}

@@ -155,7 +155,7 @@ const CollarStrings = {
     'device_deployment_status'
   ],
   exportTitle: 'device_export',
-  assignmentHistoryByAnimalTitle: 'Assigned Collars History',
+  assignmentHistoryByAnimalTitle: 'Collars History',
   assignmentHistoryByDeviceTitle: 'History of Animals Assigned',
   collarImportStartMsg: 'Device import - What do you want to do?',
   collarImportKeyX: 'Import Vectronic .keyx files',
