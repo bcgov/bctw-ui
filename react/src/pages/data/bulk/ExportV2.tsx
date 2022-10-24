@@ -12,13 +12,12 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { AttachedAnimal } from 'types/animal';
-import { headerToColumn } from 'utils/common_helpers';
 import DateInput from 'components/form/Date';
 import dayjs from 'dayjs';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { Button  } from 'components/common';
 import Checkbox from 'components/form/Checkbox';
-import { Grid, Tab, Tabs, Button as MUIButton } from '@mui/material';
+import { Tab, Tabs} from '@mui/material';
 import ExportDownloadModal from './ExportDownloadModal';
 import { InfoBanner } from 'components/common/Banner';
 import ContainerLayout from 'pages/layouts/ContainerLayout';
@@ -48,6 +47,15 @@ export const exportPageStyles = makeStyles((theme) => ({
     queryRegionBox: {
         marginBottom: theme.spacing(4),
         width: '800px'
+    },
+    dateBoxSpacing: {
+        display: 'flex',
+        flexDirection: 'row',
+    },
+    dateBoxInnerSpacing: {
+        display: 'flex',
+        flexDirection: 'row',
+        width: '400px'
     }
 }));
 
@@ -135,37 +143,32 @@ export default function ExportPageV2 (): JSX.Element {
                 <Tab label={ExportStrings.advancedTabLabel} value={TabNames.advanced} />
             </Tabs>
             <Box className={styles.innerSection}>
-                <h2>{ExportStrings.dateRangeHeader}</h2>   
-                <Grid container spacing={2}>
-                    <Grid item sm={2}>
+                <h2>{ExportStrings.dateRangeHeader}</h2>
+                <Box className={styles.dateBoxSpacing} columnGap={2}>
+                    <Box className={styles.dateBoxInnerSpacing} columnGap={1}>
                         <DateInput
-                        fullWidth
-                        propName='tstart'
-                        disabled={selectedLifetime}
-                        label={MapStrings.startDateLabel}
-                        defaultValue={dayjs(start)}
-                        changeHandler={handleChangeDate}
+                            propName='tstart'
+                            disabled={selectedLifetime}
+                            label={MapStrings.startDateLabel}
+                            defaultValue={dayjs(start)}
+                            changeHandler={handleChangeDate}
                         />
-                    </Grid>
-                    <Grid item sm={2}>
+
                         <DateInput
-                        fullWidth
-                        disabled={selectedLifetime}
-                        propName='tend'
-                        label={MapStrings.endDateLabel}
-                        defaultValue={dayjs(end)}
-                        changeHandler={handleChangeDate}
+                            disabled={selectedLifetime}
+                            propName='tend'
+                            label={MapStrings.endDateLabel}
+                            defaultValue={dayjs(end)}
+                            changeHandler={handleChangeDate}
                         />
-                    </Grid>
-                    <Grid item sm={2}>
-                        <Checkbox
+                    </Box>
+                    <Checkbox
                         propName={"animalLifetime"}
                         label={ExportStrings.checkboxLabel}
                         initialValue={selectedLifetime}
                         changeHandler={() => setSelectedLifetime((o) => !o)}
-                        />
-                    </Grid>
-                </Grid>
+                    />
+                </Box>
             </Box>
             {isTab(TabNames.quick) && (
                 <>

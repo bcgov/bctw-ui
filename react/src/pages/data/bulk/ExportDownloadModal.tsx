@@ -114,10 +114,12 @@ export default function ExportDownloadModal({open, handleClose, rowEntries, rang
         else {
             showNotif({severity: 'warning', message: constants.noTelemetryWarning})
         }
+        handleClose(false);
     }
 
     const onErrorExportAll = (err: AxiosError): void => {
         showNotif({ severity: 'error', message: formatAxiosError(err) });
+        handleClose(false);
     }
 
     const operatorTranslation = (operatorWord: QueryBuilderOperator | ""): string => {
