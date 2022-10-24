@@ -182,24 +182,32 @@ export const useTelemetryApi = () => {
   /**
    * retrieves critters that have a collar assigned
    */
-  const useAssignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+  const useAssignedCritters = (
+    page: number,
+    config?: Record<string, unknown>,
+    ...args: unknown[]
+  ): UseQueryResult<Animal[] | AttachedAnimal[]> => {
     const search = parseArgs(args);
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
       ['critters_assigned', page, search.map((s) => s?.term).join()],
       () => critterApi.getCritters(page, eCritterFetchType.assigned, search),
-      critterOptions
+      { ...critterOptions, ...config }
     );
   };
 
   /**
    * retrieves critters not assigned to a collar
    */
-  const useUnassignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+  const useUnassignedCritters = (
+    page: number,
+    config?: Record<string, unknown>,
+    ...args: unknown[]
+  ): UseQueryResult<Animal[] | AttachedAnimal[]> => {
     const search = parseArgs(args);
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
       ['critters_unassigned', page, search.map((s) => s?.term).join()],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned, search),
-      critterOptions
+      { ...critterOptions, ...config }
     );
   };
 

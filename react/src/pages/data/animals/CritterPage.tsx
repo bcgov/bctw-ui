@@ -82,15 +82,12 @@ export default function CritterPage(): JSX.Element {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
     const _edit = () => setOpenEdit(true);
     const _map = () => history.push('/map');
-    const _remove = () => {
+    const _removeAttach = () => {
       setOpenAttachRemoveCollar(true);
     };
     const _mortality = () => {
       setWorkflowType('mortality');
       setOpenWorkflow(true);
-    };
-    const _attach = () => {
-      setOpenAttachRemoveCollar(true);
     };
     const defaultItems = [
       {
@@ -103,7 +100,7 @@ export default function CritterPage(): JSX.Element {
       {
         label: attach,
         icon: <Icon icon={'edit'} />,
-        handleClick: _attach
+        handleClick: _removeAttach
       }
     ];
     const attachedItems = [
@@ -120,7 +117,7 @@ export default function CritterPage(): JSX.Element {
       {
         label: removeCollar,
         icon: <Icon icon={'delete'} />,
-        handleClick: _remove
+        handleClick: _removeAttach
       }
     ];
     return (

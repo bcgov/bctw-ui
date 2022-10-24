@@ -76,6 +76,9 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [values, setValues] = useState<T[]>([]);
 
   useEffect(() => {
+    console.log(page);
+  }, [page]);
+  useEffect(() => {
     setSelected([]);
   }, [resetSelections]);
 
