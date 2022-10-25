@@ -146,7 +146,9 @@ const initMap = (
   selectedPings: L.GeoJSON,
   drawSelectedLayer: () => void,
   handleDrawLine: (l) => void,
-  handleDeleteLine: () => void
+  handleDeleteLine: () => void,
+  handleDeleteLayer?: (layers: L.LayerGroup) => void,
+  drawToolOptions?: L.Control.DrawOptions
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
   const layerPicker = L.control.layers(null, null, { position: 'topleft' });
@@ -158,13 +160,11 @@ const initMap = (
   mapRef.current.addLayer(drawnItems);
   mapRef.current.addLayer(selectedPings);
 
+  const drawOptions = drawToolOptions ?? {marker: false, circle: false, circlemarker: false};
+
   const drawControl = new L.Control.Draw({
     position: 'topright',
-    draw: {
-      marker: false,
-      circle: false,
-      circlemarker: false
-    },
+    draw: drawOptions,
     edit: {
       featureGroup: drawnItems
     }
@@ -215,6 +215,10 @@ const initMap = (
         return line;
       }
       drawSelectedLayer();
+    })
+    .on('draw:deleted', (data: any) => {
+      //Leaflet Draw does not appear to have proper typing for this event type. Annoying!
+      handleDeleteLayer(data.layers);
     })
     .on('draw:edited', (e) => {
       drawSelectedLayer();

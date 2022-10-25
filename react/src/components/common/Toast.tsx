@@ -1,5 +1,5 @@
 import React from 'react';
-import Snackbar from '@mui/material/Snackbar';
+import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import { Portal } from '@mui/material';
 import Alert, { AlertProps } from '@mui/material/Alert';
 
@@ -11,6 +11,14 @@ type IToastProps = Pick<AlertProps, 'severity'> & {
 };
 
 export default function Toast({ message, show, action, onClose, severity }: IToastProps): JSX.Element {
+  const onCloseHandler = (event: React.SyntheticEvent<any, Event>, reason: SnackbarCloseReason): void => {
+      if(reason !== 'clickaway') {
+        onClose();
+      }
+      //Disables clickaway functionality^ Added this since clickaway is triggered on download completion, which would dismiss snackbars.
+      //I think this change is fine, since it does not affect autoHide timeout or the X buttons.
+  }
+
   return (
     <>
       <Portal>
@@ -21,7 +29,7 @@ export default function Toast({ message, show, action, onClose, severity }: IToa
           }}
           open={show}
           autoHideDuration={8000}
-          onClose={onClose}
+          onClose={onCloseHandler}
           action={action}>
           <Alert onClose={onClose} severity={severity}>
             {message}

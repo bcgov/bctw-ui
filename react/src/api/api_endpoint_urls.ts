@@ -5,6 +5,7 @@
 const importCSVEndpoint                  = 'import-csv';
 const importXMLEndpoint                  = 'import-xml';
 const exportEndpoint                     = 'export';
+const exportAllEndpoint                  = 'export-all';
 const getCollarAssignmentHistoryEndpoint = 'get-assignment-history';
 const attachDeviceEndpoint               = 'attach-device';
 const removeDeviceEndpoint               = 'unattach-device';
@@ -23,6 +24,7 @@ export {
   importCSVEndpoint,
   importXMLEndpoint,
   exportEndpoint,
+  exportAllEndpoint,
   getCollarAssignmentHistoryEndpoint,
   getCritterEndpoint,
   attachDeviceEndpoint,

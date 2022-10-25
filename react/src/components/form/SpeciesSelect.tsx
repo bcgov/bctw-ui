@@ -74,6 +74,7 @@ export const SpeciesSelect = ({ handleChange, value, useLock, useModal }: Specie
         ref={myRef}
         inputRef={inputRef}
         propName={SPECIES_STR}
+        isSpeciesSelect={true}
       />
       {useLock && (
         <IconButton key='udf-icon' onClick={(): void => setLockSpecies((l) => !l)}>

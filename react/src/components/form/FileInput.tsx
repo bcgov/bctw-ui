@@ -5,12 +5,13 @@ interface FileInputProps extends StandardTextFieldProps {
   buttonText?: string;
   multiple?: boolean;
   fileName?: string;
-  accept: '.keyx' | '.csv';
+  buttonVariant?: 'contained' | 'outlined' | 'text';
+  accept: '.keyx' | '.csv' | '.zip';
   onFileChosen: (fieldName: string, files: FileList) => void;
 }
 
 export default function FileInput(props: FileInputProps): JSX.Element {
-  const { buttonText, onFileChosen, multiple, fileName, accept, disabled } = props;
+  const { buttonText, onFileChosen, multiple, fileName, accept, disabled, buttonVariant } = props;
 
   const change = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const field = event.target.name;
@@ -30,7 +31,7 @@ export default function FileInput(props: FileInputProps): JSX.Element {
         onChange={change}
         disabled={disabled}
       />
-      <Button disabled={disabled} color='primary' variant='contained' component='span'>
+      <Button disabled={disabled} color='primary' variant={buttonVariant ?? 'contained'} component='span'>
         {buttonText ?? 'Upload'}
       </Button>
     </label>
