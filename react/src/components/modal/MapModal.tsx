@@ -8,7 +8,7 @@ import { ModalBaseProps } from 'components/component_interfaces';
 import modalStyles from 'components/modal/modal_styles';
 import { Modal } from 'components/common';
 import dayjs, { Dayjs } from 'dayjs';
-import { Box, Button } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -27,63 +27,98 @@ import {
 import { ITelemetryPoint } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
 import { splitPings } from 'pages/map/map_helpers';
+import makeStyles from '@mui/styles/makeStyles';
 
 /**
- * props for the simple yes/no style confirmation modal
- * @param btnNoText text to display in the 'no' button
- * @param message either a string or component to display as the main content of the modal
- * @param handleClickYes called when 'yes' is clicked
+ * Props for a map modal that can display critter points and tracks.
+ * @param width width of modal
+ * @param height height of modal
+ * @param critter_id this should be a uuid, queries will be made based off this value
+ * @param startDate start of the range on which to query for points
+ * @param endDate end of the range on which to query for points
  */
 type MapModalProps = ModalBaseProps & {
+  width: string;
+  height: string;
   critter_id: string;
-  days: Dayjs;
+  startDate?: Dayjs;
+  endDate?: Dayjs;
 };
+
+const useStyles = makeStyles((theme) => ({
+  progress: {
+    position: 'absolute', 
+    zIndex: 1000, 
+    marginTop: '30px'
+  }
+}));
 
 export default function MapModal({
   title,
   open,
   handleClose,
   critter_id,
-  days
+  width,
+  height,
+  startDate = dayjs().subtract(2, 'weeks'),
+  endDate = dayjs()
 }: MapModalProps): JSX.Element {
   const mapRef = useRef<L.Map>(null);
   const api = useTelemetryApi();
   const drawnItems = new L.FeatureGroup();
-  const drawnLines = [];
-  const [pings, setPings] = useState<ITelemetryPoint[]>([]);
+
+  const [latestPings, setLatestPings] = useState<ITelemetryPoint[]>([]);
   const [pingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Pings
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
   const [latestPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON());
+  
+  const styles = useStyles();
 
   const {
     isFetching: fetchingPings,
     isLoading: isLoadingPings,
     isError: isErrorPings,
     data: fetchedPings
-  } = api.usePings(days.format(formatDay), dayjs().format(formatDay));
+  } = api.usePingsPerCritter(startDate.format(formatDay), endDate.format(formatDay), critter_id, open);
 
   const { 
     isFetching: fetchingTracks, 
     isError: isErrorTracks, 
     data: fetchedTracks 
-  } = api.useTracks(days.format(formatDay), dayjs().format(formatDay));
+  } = api.useTracksPerCritter(startDate.format(formatDay), endDate.format(formatDay), critter_id, open);
 
+  const flyToLatestPings = (pings: ITelemetryPoint[]) => {
+    if(pings.length) {
+      const coord = pings[0]?.geometry.coordinates;
+      if(coord?.length >= 2)
+      {
+        mapRef.current?.flyTo([coord[1], coord[0]], 8);
+      }
+    }
+  }
+  
   const updateComponent = (): void => {
     if (document.getElementById('map')) {
+
       mapRef.current?.removeLayer(tracksLayer);
       mapRef.current?.removeLayer(latestPingsLayer);
       mapRef.current?.removeLayer(pingsLayer);
-      initMap(mapRef, drawnItems, new L.GeoJSON, () => {}, () => {}, () => {});
+
+      const drawOptions: L.Control.DrawOptions = { marker: false, circle: false, circlemarker: false, polygon: false, polyline: false, rectangle: false }
+      
+      initMap(mapRef, drawnItems, new L.GeoJSON, () => {}, () => {}, () => {}, () => {}, drawOptions, true);
+      
       tracksLayer.addTo(mapRef.current);
       latestPingsLayer.addTo(mapRef.current);
       pingsLayer.addTo(mapRef.current);
-      if(pings.length) {
-        const coord = pings[0].geometry.coordinates;
-        if(coord.length >= 2)
-        {
-          mapRef.current?.flyTo([coord[1], coord[0]], 8);
-        }
-        
+
+      if(fetchingPings || fetchingTracks) {
+        pingsLayer.clearLayers();
+        latestPingsLayer.clearLayers();
+        tracksLayer.clearLayers();
+      }
+      else {
+        flyToLatestPings(latestPings);
       }
       console.log("Update component fires");
     }
@@ -102,52 +137,50 @@ export default function MapModal({
 
   useEffect(() => {
     const update = (): void => {
-      if (fetchedPings && !isErrorPings) {
+      if (fetchedPings && !isErrorPings && critter_id) {
         pingsLayer.clearLayers();
         latestPingsLayer.clearLayers();
         setupPingOptions(pingsLayer, handlePointClick,  handlePointClose);
         setupLatestPingOptions(latestPingsLayer, handlePointClick, handlePointClose);
         
-        const crittersPings = fetchedPings.filter(p => p.properties.critter_id == critter_id);
-        setPings(crittersPings);
+        const crittersPings = fetchedPings;
+
         const { latest, other } = splitPings(crittersPings);
+        setLatestPings(latest);
         pingsLayer.addData(other as any);
         latestPingsLayer.addData(latest as any);
 
         console.log("Here is how many latest we had " + latest.length);
 
-        if(crittersPings.length) {
-          const coord = crittersPings[0].geometry.coordinates;
-          if(coord.length >= 2) {
-            mapRef.current?.flyTo([coord[1], coord[0]], 8);
-          }
-            
-        }
+        flyToLatestPings(latest);
+
         latestPingsLayer.bringToFront();
         tracksLayer.bringToBack();
       }
     }
     update();
-  }, [fetchedPings, critter_id]);
+  }, [fetchedPings]);
 
   useEffect(() => {
-    if (fetchedTracks && !isErrorTracks) {
+    if (fetchedTracks && !isErrorTracks && critter_id) {
       tracksLayer.clearLayers();
       setupTracksOptions(tracksLayer);
-      const crittersTracks = fetchedTracks.filter(p => p.properties.critter_id == critter_id);
+      const crittersTracks = fetchedTracks;
       tracksLayer.addData(crittersTracks as any);
       latestPingsLayer.bringToFront();
       tracksLayer.bringToBack();
     }
-  }, [fetchedTracks, critter_id]);
+  }, [fetchedTracks]);
 
   const classes = modalStyles();
   return (
     <Modal open={open} handleClose={handleClose} title={title} onEnteredCallback={() => {updateComponent()}}>
-        <Box width={'800px'} height={'600px'}>
-            <div style={{flex:'1 1 auto', position: 'relative'}}>
-                <div id='popup'/>
-                <div style={{height: '600px'}} id='map'></div>
+        <Box width={width} height={height}>
+            <div className='map-container'>
+                {fetchingPings || fetchingTracks ? <CircularProgress className={styles.progress} color='secondary' /> : null}
+                <div id='popup' style={{bottom: '-'+height}}/>
+                <div style={{height: height}} id='map'></div>
+                
             </div>
         </Box>
     </Modal>

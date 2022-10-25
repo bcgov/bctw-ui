@@ -249,8 +249,10 @@ export default function CritterPage(): JSX.Element {
             <MapModal 
               title={"Animal's Pings & Tracks"}
               open={openMap}
+              width='800px'
+              height='600px'
+              startDate={dayjs().subtract(2, 'year')}
               handleClose={() => {setOpenMap(false)}}
-              days={dayjs().subtract(4, 'year')}
               critter_id={editObj.critter_id}
             /> 
           </>

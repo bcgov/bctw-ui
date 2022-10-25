@@ -91,11 +91,19 @@ export const useTelemetryApi = () => {
     });
   };
 
-  const useTracks = (start: string, end: string, critter_id: string = null): UseQueryResult<ITelemetryLine[], AxiosError> => {
+  const useTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
     return useQuery<ITelemetryLine[], AxiosError>(
       ['tracks', start, end],
-      () => mapApi.getTracks(start, end, critter_id),
+      () => mapApi.getTracks(start, end),
       defaultQueryOptions
+    );
+  };
+
+  const useTracksPerCritter = (start: string, end: string, critter_id: string, enable = true): UseQueryResult<ITelemetryLine[], AxiosError> => {
+    return useQuery<ITelemetryLine[], AxiosError>(
+      ['tracks', start, end, critter_id],
+      () => mapApi.getTracks(start, end, critter_id),
+      {...defaultQueryOptions, enabled: enable}
     );
   };
 
@@ -110,13 +118,24 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const usePings = (start: string, end: string, critter_id: string = null): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+  const usePings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
     return useQuery<ITelemetryPoint[], AxiosError>(
       ['pings', { start, end }],
-      () => mapApi.getPings(start, end, critter_id),
+      () => mapApi.getPings(start, end),
       defaultQueryOptions
     );
   };
+
+   /**
+   *
+   */
+    const usePingsPerCritter = (start: string, end: string, critter_id: string, enable = true): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+      return useQuery<ITelemetryPoint[], AxiosError>(
+        ['pings', { start, end, critter_id }],
+        () => mapApi.getPings(start, end, critter_id),
+        {...defaultQueryOptions, enabled: enable}
+      );
+    };
 
   // the same as usePings, but doesn't auto fetch due to enabled: false setting
   const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
@@ -567,8 +586,10 @@ export const useTelemetryApi = () => {
     useCodeHeaders,
     useEstimate,
     useTracks,
+    useTracksPerCritter,
     useUnassignedTracks,
     usePings,
+    usePingsPerCritter,
     useUnassignedPings,
     useAllDevices,
     useAttachedDevices,
