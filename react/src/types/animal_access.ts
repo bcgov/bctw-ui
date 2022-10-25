@@ -1,4 +1,4 @@
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { Animal } from 'types/animal';
@@ -26,6 +26,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   device_type: string;
   frequency: number;
   device_make: string;
+  date_recorded: Dayjs;
   row_count?: number;
   get identifier(): string {
     return 'critter_id';

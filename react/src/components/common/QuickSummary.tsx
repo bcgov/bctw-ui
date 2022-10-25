@@ -4,13 +4,10 @@ import { SubHeader } from './partials/SubHeader';
 import makeStyles from '@mui/styles/makeStyles';
 import { useContext, useEffect, useState } from 'react';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { User } from 'types/user';
 import { UserContext } from 'contexts/UserContext';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { eCritterPermission } from 'types/permission';
 import { Icon } from 'components/common';
 import { CritterStrings, LatestDataRetrieval, QuickSummaryStrings } from 'constants/strings';
-import { getToday } from 'utils/time';
+import dayjs, { Dayjs } from 'dayjs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -53,18 +50,24 @@ export const QuickSummary = (): JSX.Element => {
     0, // load all values
     { user: useUser.user }
   );
-  const [animalPermsCount, setAnimalPermsCount] = useState({ manager: 0, observer: 0, editor: 0 });
+  const counts = {
+    manager: 0,
+    observer: 0,
+    editor: 0
+  };
+  const [animalPermsCount, setAnimalPermsCount] = useState(counts);
+  const [retrievalSuccess, setRetrievalSuccess] = useState(true);
   useEffect(() => {
     if (isSuccess && data?.length) {
-      let manager = 0;
-      let observer = 0;
-      let editor = 0;
       data.forEach((animal) => {
-        if (animal.permission_type === eCritterPermission.manager) manager += 1;
-        if (animal.permission_type === eCritterPermission.observer) observer += 1;
-        if (animal.permission_type === eCritterPermission.editor) editor += 1;
+        counts[animal.permission_type] += 1;
+        if (animal.date_recorded) {
+          if (!dayjs(animal.date_recorded).isSame(dayjs())) {
+            setRetrievalSuccess(false);
+          }
+        }
       });
-      setAnimalPermsCount({ manager, observer, editor });
+      setAnimalPermsCount(counts);
     }
   }, [data]);
   return (
@@ -79,8 +82,14 @@ export const QuickSummary = (): JSX.Element => {
           </Box>
           <InfoCard
             size='large'
-            element={<Icon icon={'check'} htmlColor={theme.palette.success.main} size={4} />}
-            body={LatestDataRetrieval.success}
+            element={
+              <Icon
+                icon={'circle'}
+                htmlColor={retrievalSuccess ? theme.palette.success.main : theme.palette.warning.main}
+                size={4}
+              />
+            }
+            body={retrievalSuccess ? LatestDataRetrieval.success : LatestDataRetrieval.failure}
             noRightMargin
           />
         </Box>
