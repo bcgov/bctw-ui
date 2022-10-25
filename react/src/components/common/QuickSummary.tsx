@@ -41,7 +41,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 0
   }
 }));
-export const QuickSummary = (): JSX.Element => {
+interface QuickSummaryProps {
+  handleDetails: (d: boolean) => void;
+}
+export const QuickSummary = ({ handleDetails }: QuickSummaryProps): JSX.Element => {
   const api = useTelemetryApi();
   const classes = useStyles();
   const theme = useTheme();
@@ -76,7 +79,12 @@ export const QuickSummary = (): JSX.Element => {
         <Box>
           <Box className={classes.details}>
             <SubHeader text={LatestDataRetrieval.title} />
-            <Button className={classes.btn} endIcon={<Icon icon={'next'} size={0.8} />}>
+            <Button
+              className={classes.btn}
+              onClick={() => handleDetails(true)}
+              endIcon={<Icon icon={'next'} size={0.8} />}
+              // startIcon={<Icon icon={'back'} size={0.8} />}
+            >
               See Details
             </Button>
           </Box>

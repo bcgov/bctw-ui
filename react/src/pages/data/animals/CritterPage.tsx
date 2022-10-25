@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import DataTable from 'components/table/DataTable';
-import { BannerStrings, CritterStrings, CritterStrings as CS } from 'constants/strings';
+import { BannerStrings, CollarStrings, CritterStrings, CritterStrings as CS } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
@@ -21,7 +21,7 @@ import { UserCritterAccess } from 'types/animal_access';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import UserProfile from 'pages/user/UserProfile';
 import { UserAnimalAccess } from './UserAnimalAccess';
-import { AttachedCollar } from 'types/collar';
+import { AttachedCollar, Collar } from 'types/collar';
 
 import { ErrorBanner, InfoBanner, NotificationBanner, SuccessBanner } from 'components/common/Banner';
 import { InfoCard } from 'components/common/InfoCard';
@@ -49,7 +49,7 @@ export default function CritterPage(): JSX.Element {
   const [openEdit, setOpenEdit] = useState(false);
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
-
+  const [showDataRetrieval, setShowDataRetrieval] = useState(true);
   const [workflowType, setWorkflowType] = useState<WorkflowType>();
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
@@ -148,101 +148,114 @@ export default function CritterPage(): JSX.Element {
         </Box>
         <NotificationBanner hiddenContent={[]} />
         <Box mb={4}>
-          <QuickSummary />
+          <QuickSummary handleDetails={(d: boolean) => setShowDataRetrieval((a) => !a)} />
         </Box>
         {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
-        <RowSelectedProvider>
-          <>
-            <Box mb={4}>
-              <DataTable
-                headers={AttachedAnimal.attachedCritterDisplayProps}
-                queryProps={{ query: api.useAssignedCritters }}
-                onSelect={handleSelect}
-                deleted={deleted}
-                updated={updated}
-                title={CritterStrings.collaredAnimals}
-                customColumns={[{ column: Menu, header: <b>Actions</b> }]}
-                exporter={
-                  <>
-                    <ExportViewer<AttachedAnimal>
-                      template={[
-                        'critter_id',
-                        'species',
-                        'population_unit',
-                        'wlh_id',
-                        'animal_id',
-                        'collar_id',
-                        'device_id',
-                        'frequency',
-                        'animal_id',
-                        'latitude',
-                        'longitude'
-                      ]}
-                      eTitle={CritterStrings.exportTitle}
-                    />
-                  </>
-                }
-              />
-            </Box>
-            <Box mb={4}>
-              <DataTable
-                headers={new Animal().displayProps}
-                //title={CS.unassignedTableTitle}
-                queryProps={{ query: api.useUnassignedCritters }}
-                onSelect={handleSelect}
-                updated={updated}
-                deleted={deleted}
-                title={CritterStrings.nonCollaredAnimals}
-                customColumns={[{ column: Menu, header: <b>Actions</b> }]}
-                exporter={
-                  <>
-                    {/* <ModifyCritterWrapper
-                      editing={editObj}
-                      onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-                      setCritter={setEditObj}>
-                      <AddEditViewer<Animal> {...addEditProps}>
-                        <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
-                      </AddEditViewer>
-                    </ModifyCritterWrapper> */}
-                    <ExportViewer<Animal>
-                      template={[
-                        'critter_id',
-                        'species',
-                        'population_unit',
-                        'wlh_id',
-                        'animal_id',
-                        'animal_id',
-                        'animal_status'
-                      ]}
-                      eTitle={CritterStrings.exportTitle}
-                    />
-                  </>
-                }
-              />
-            </Box>
-            {/* Wrapper to allow editing of Attached and Unattached animals */}
+        {showDataRetrieval ? (
+          <DataTable
+            headers={AttachedCollar.dataRetrievalPropsToDisplay}
+            title={'Data Retrieval'}
+            queryProps={{ query: api.useAttachedDevices }}
+          />
+        ) : (
+          <RowSelectedProvider>
+            <>
+              <Box mb={4}>
+                <DataTable
+                  headers={AttachedAnimal.attachedCritterDisplayProps}
+                  queryProps={{ query: api.useAssignedCritters }}
+                  onSelect={handleSelect}
+                  deleted={deleted}
+                  updated={updated}
+                  title={CritterStrings.collaredAnimals}
+                  customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+                  exporter={
+                    <>
+                      <ExportViewer<AttachedAnimal>
+                        template={[
+                          'critter_id',
+                          'species',
+                          'population_unit',
+                          'wlh_id',
+                          'animal_id',
+                          'collar_id',
+                          'device_id',
+                          'frequency',
+                          'animal_id',
+                          'latitude',
+                          'longitude'
+                        ]}
+                        eTitle={CritterStrings.exportTitle}
+                      />
+                    </>
+                  }
+                />
+              </Box>
+              <Box mb={4}>
+                <DataTable
+                  headers={new Animal().displayProps}
+                  //title={CS.unassignedTableTitle}
+                  queryProps={{ query: api.useUnassignedCritters }}
+                  onSelect={handleSelect}
+                  updated={updated}
+                  deleted={deleted}
+                  title={CritterStrings.nonCollaredAnimals}
+                  customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+                  exporter={
+                    <>
+                      {/* <ModifyCritterWrapper
+                    editing={editObj}
+                    onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+                    setCritter={setEditObj}>
+                    <AddEditViewer<Animal> {...addEditProps}>
+                      <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
+                    </AddEditViewer>
+                  </ModifyCritterWrapper> */}
+                      <ExportViewer<Animal>
+                        template={[
+                          'critter_id',
+                          'species',
+                          'population_unit',
+                          'wlh_id',
+                          'animal_id',
+                          'animal_id',
+                          'animal_status'
+                        ]}
+                        eTitle={CritterStrings.exportTitle}
+                      />
+                    </>
+                  }
+                />
+              </Box>
+              {/* Wrapper to allow editing of Attached and Unattached animals */}
 
-            <ModifyCritterWrapper
-              editing={editObj}
-              onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-              onDelete={(critter_id: string): void => setDeleted(critter_id)}
-              setCritter={setEditObj}>
-              <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
-            </ModifyCritterWrapper>
+              <ModifyCritterWrapper
+                editing={editObj}
+                onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+                onDelete={(critter_id: string): void => setDeleted(critter_id)}
+                setCritter={setEditObj}>
+                <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
+              </ModifyCritterWrapper>
 
-            {/* Modal for assigning or removing a device from a critter */}
-            <AttachRemoveDevice
-              critter_id={editObj.critter_id}
-              permission_type={editObj.permission_type}
-              current_attachment={new CollarHistory()}
-              openModal={openAttachRemoveCollar}
-              handleShowModal={setOpenAttachRemoveCollar}
-              onDelete={(critter_id: string): void => setDeleted(critter_id)}
-            />
-            {/* Modal for critter workflows */}
-            <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
-          </>
-        </RowSelectedProvider>
+              {/* Modal for assigning or removing a device from a critter */}
+              <AttachRemoveDevice
+                critter_id={editObj.critter_id}
+                permission_type={editObj.permission_type}
+                current_attachment={new CollarHistory()}
+                openModal={openAttachRemoveCollar}
+                handleShowModal={setOpenAttachRemoveCollar}
+                onDelete={(critter_id: string): void => setDeleted(critter_id)}
+              />
+              {/* Modal for critter workflows */}
+              <CritterWorkflow
+                editing={editObj}
+                workflow={workflowType}
+                open={openWorkflow}
+                setOpen={setOpenWorkflow}
+              />
+            </>
+          </RowSelectedProvider>
+        )}
       </SpeciesProvider>
     </ManageLayout>
   );

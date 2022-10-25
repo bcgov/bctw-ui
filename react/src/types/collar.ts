@@ -129,7 +129,7 @@ export class Collar implements BCTWBase<Collar>, ICollar {
   formatPropAsHeader(str: keyof Collar): string {
     switch (str) {
       case 'activation_status':
-        return 'Device is active with vendor?';
+        return 'Subscription';
       case 'camera_device_id':
         return 'Camera ID';
       case 'device_deployment_status':
@@ -170,7 +170,6 @@ export class Collar implements BCTWBase<Collar>, ICollar {
     const excludes = ['collar_id', 'collar_transaction_id'] as (keyof Collar)[];
     return classToArray(keys, startsWith, excludes);
   }
-
   static get toCSVHeaderTemplate(): string[] {
     const excluded: (keyof Collar)[] = ['collar_transaction_id'];
     const keys = Object.keys(new Collar()).filter((k) => !(excluded as string[]).includes(k));
@@ -192,10 +191,23 @@ export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<
   readonly animal_id: string;
   readonly critter_id: string;
   @Transform(nullToDayjs) last_transmission_date?: Dayjs;
+  @Transform(nullToDayjs) last_update_attempt?: Dayjs;
 
   // for attached collars, also display...
   static get attachedDevicePropsToDisplay(): (keyof AttachedCollar)[] {
     return [...super.propsToDisplay, 'wlh_id', 'animal_id'];
+  }
+
+  static get dataRetrievalPropsToDisplay(): (keyof AttachedCollar)[] {
+    return [
+      'device_id',
+      'last_transmission_date',
+      'last_update_attempt',
+      'device_status',
+      'activation_status',
+      'device_make',
+      'device_model'
+    ];
   }
 }
 
