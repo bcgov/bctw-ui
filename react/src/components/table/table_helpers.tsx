@@ -84,7 +84,6 @@ const getTag = (value: string, color?: string): JSX.Element => {
     case potential_mortality:
       return <Chip label={mortality} color={'error'} sx={style} />;
     default:
-      console.log(value);
       return null;
   }
 };
