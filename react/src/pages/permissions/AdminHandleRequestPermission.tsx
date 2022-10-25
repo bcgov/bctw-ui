@@ -25,8 +25,6 @@ import { formatDay } from 'utils/time';
 import { isDev } from 'api/api_helpers';
 import { eUserRole } from 'types/user';
 import { DelegationRequestStrings as msgStrings } from 'constants/strings';
-import MapModal from 'components/modal/MapModal';
-import dayjs, { Dayjs } from 'dayjs';
 
 /**
  * page that an admin uses to grant or deny permission requests from managers
@@ -283,15 +281,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
               }}>
               Deny Selected
             </Button>
-            <Button
-              color='primary'
-              className='form-buttons'
-              variant='contained'
-              onClick={() => {
-                setShowMapModal(true);
-              }}>
-                Open Map
-            </Button>
           </Box>
           {isLoading ? (
             <CircularProgress />
@@ -306,13 +295,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
           )}
         </>
       )}
-      <MapModal
-        title={"Map Modal"}
-        open={showMapModal}
-        handleClose={() => {setShowMapModal(false)}}
-        days={dayjs()}
-        critter_id={''}
-      />
     </AuthLayout>
   );
 }

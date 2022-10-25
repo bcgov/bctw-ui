@@ -38,6 +38,9 @@ import AssignNewCollarModal from './AssignNewCollar';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
+import MapModal from 'components/modal/MapModal';
+import dayjs, { Dayjs } from 'dayjs';
+
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
@@ -49,6 +52,7 @@ export default function CritterPage(): JSX.Element {
   const [openEdit, setOpenEdit] = useState(false);
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
+  const [openMap, setOpenMap] = useState(false);
 
   const [workflowType, setWorkflowType] = useState<WorkflowType>();
 
@@ -81,7 +85,7 @@ export default function CritterPage(): JSX.Element {
     const history = useHistory();
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
     const _edit = () => setOpenEdit(true);
-    const _map = () => history.push('/map');
+    const _map = () => setOpenMap(true); //history.push('/map');
     const _removeAttach = () => {
       setOpenAttachRemoveCollar(true);
     };
@@ -241,6 +245,14 @@ export default function CritterPage(): JSX.Element {
             />
             {/* Modal for critter workflows */}
             <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
+            {/* Modal that displays most recent pings and tracks for the selected critter */}
+            <MapModal 
+              title={"Animal's Pings & Tracks"}
+              open={openMap}
+              handleClose={() => {setOpenMap(false)}}
+              days={dayjs().subtract(4, 'year')}
+              critter_id={editObj.critter_id}
+            /> 
           </>
         </RowSelectedProvider>
       </SpeciesProvider>

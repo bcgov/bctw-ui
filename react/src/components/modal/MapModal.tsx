@@ -10,7 +10,7 @@ import { Modal } from 'components/common';
 import dayjs, { Dayjs } from 'dayjs';
 import { Box, Button } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import { initMap } from 'pages/map/map_init';
+import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import {
   defaultPointStyle,
@@ -26,6 +26,7 @@ import {
 } from 'pages/map/point_setup';
 import { ITelemetryPoint } from 'types/map';
 import { formatDay, getToday } from 'utils/time';
+import { splitPings } from 'pages/map/map_helpers';
 
 /**
  * props for the simple yes/no style confirmation modal
@@ -52,60 +53,103 @@ export default function MapModal({
   const [pings, setPings] = useState<ITelemetryPoint[]>([]);
   const [pingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Pings
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
+  const [latestPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON());
 
   const {
     isFetching: fetchingPings,
     isLoading: isLoadingPings,
     isError: isErrorPings,
     data: fetchedPings
-  } = api.usePings(dayjs().subtract(4, 'year').format(formatDay), dayjs().format(formatDay), 'f0dc2059-dc54-4ce2-8987-5f0e65bf807a');
+  } = api.usePings(days.format(formatDay), dayjs().format(formatDay));
 
   const { 
     isFetching: fetchingTracks, 
     isError: isErrorTracks, 
     data: fetchedTracks 
-  } = api.useTracks(dayjs().subtract(4, 'year').format(formatDay), dayjs().format(formatDay), 'f0dc2059-dc54-4ce2-8987-5f0e65bf807a');
+  } = api.useTracks(days.format(formatDay), dayjs().format(formatDay));
 
   const updateComponent = (): void => {
     if (document.getElementById('map')) {
+      mapRef.current?.removeLayer(tracksLayer);
+      mapRef.current?.removeLayer(latestPingsLayer);
+      mapRef.current?.removeLayer(pingsLayer);
       initMap(mapRef, drawnItems, new L.GeoJSON, () => {}, () => {}, () => {});
-      pingsLayer.addTo(mapRef.current);
       tracksLayer.addTo(mapRef.current);
+      latestPingsLayer.addTo(mapRef.current);
+      pingsLayer.addTo(mapRef.current);
+      if(pings.length) {
+        const coord = pings[0].geometry.coordinates;
+        if(coord.length >= 2)
+        {
+          mapRef.current?.flyTo([coord[1], coord[0]], 8);
+        }
+        
+      }
+      console.log("Update component fires");
     }
+  };
+
+  const handlePointClick = (event: L.LeafletEvent): void => {
+    const layer = event.target;
+    const feature: ITelemetryPoint = layer?.feature;
+    setPopupInnerHTML(feature);
+    event.target.prevStyle = getStyle(event);
+  };
+
+  const handlePointClose = (event: L.LeafletEvent): void => {
+    hidePopup();
   };
 
   useEffect(() => {
     const update = (): void => {
       if (fetchedPings && !isErrorPings) {
-        // must be called before adding data to pings layer
-        setupPingOptions(pingsLayer, () => {},  () => {});
-        //setupLatestPingOptions(latestPingsLayer, handlePointClick, handlePointClose);
-        // re-apply filters
-        setPings(fetchedPings);
-        pingsLayer.addData(fetchedPings as any);
+        pingsLayer.clearLayers();
+        latestPingsLayer.clearLayers();
+        setupPingOptions(pingsLayer, handlePointClick,  handlePointClose);
+        setupLatestPingOptions(latestPingsLayer, handlePointClick, handlePointClose);
+        
+        const crittersPings = fetchedPings.filter(p => p.properties.critter_id == critter_id);
+        setPings(crittersPings);
+        const { latest, other } = splitPings(crittersPings);
+        pingsLayer.addData(other as any);
+        latestPingsLayer.addData(latest as any);
+
+        console.log("Here is how many latest we had " + latest.length);
+
+        if(crittersPings.length) {
+          const coord = crittersPings[0].geometry.coordinates;
+          if(coord.length >= 2) {
+            mapRef.current?.flyTo([coord[1], coord[0]], 8);
+          }
+            
+        }
+        latestPingsLayer.bringToFront();
+        tracksLayer.bringToBack();
       }
-      
     }
     update();
-  }, [fetchedPings]);
+  }, [fetchedPings, critter_id]);
 
   useEffect(() => {
     if (fetchedTracks && !isErrorTracks) {
+      tracksLayer.clearLayers();
       setupTracksOptions(tracksLayer);
-      tracksLayer.addData(fetchedTracks as any);
+      const crittersTracks = fetchedTracks.filter(p => p.properties.critter_id == critter_id);
+      tracksLayer.addData(crittersTracks as any);
+      latestPingsLayer.bringToFront();
+      tracksLayer.bringToBack();
     }
-  }, [fetchedTracks]);
+  }, [fetchedTracks, critter_id]);
 
   const classes = modalStyles();
   return (
     <Modal open={open} handleClose={handleClose} title={title} onEnteredCallback={() => {updateComponent()}}>
         <Box width={'800px'} height={'600px'}>
             <div style={{flex:'1 1 auto', position: 'relative'}}>
+                <div id='popup'/>
                 <div style={{height: '600px'}} id='map'></div>
             </div>
         </Box>
-        {//<Button onClick={() => {updateComponent()}}>Click</Button>
-        }
     </Modal>
   );
 }
