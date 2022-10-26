@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 interface QuickSummaryProps {
-  handleDetails: (d: boolean) => void;
+  handleDetails: () => void;
 }
 export const QuickSummary = ({ handleDetails }: QuickSummaryProps): JSX.Element => {
   const api = useTelemetryApi();
@@ -81,7 +81,7 @@ export const QuickSummary = ({ handleDetails }: QuickSummaryProps): JSX.Element 
             <SubHeader text={LatestDataRetrieval.title} />
             <Button
               className={classes.btn}
-              onClick={() => handleDetails(true)}
+              onClick={handleDetails}
               endIcon={<Icon icon={'next'} size={0.8} />}
               // startIcon={<Icon icon={'back'} size={0.8} />}
             >
