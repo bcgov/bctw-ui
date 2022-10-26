@@ -68,7 +68,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
     activationFields,
     statusFields,
     retrievalFields,
-    malfunctionOfflineFields,
+    malfunctionOfflineFields
   } = collarFormFields;
 
   const Header = (
@@ -100,7 +100,12 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   );
 
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit} onReset={close} {...props} editing={new Collar(editing.collar_id)}>
+    <EditModal
+      headerComponent={Header}
+      hideSave={!canEdit}
+      onReset={close}
+      {...props}
+      editing={new Collar(editing.collar_id)}>
       <ChangeContext.Consumer>
         {(handlerFromContext): React.ReactNode => {
           // do form validation before passing change handler to EditModal
@@ -123,30 +128,35 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
               <FormSection id='d-sat' header='Satellite Network and Beacon Frequency' disabled={!canEdit}>
                 {[
                   CreateFormField(editing, wfFields.get('device_type'), onChange),
-                  CreateFormField(editing, wfFields.get('satellite_network'), onChange, {required: !isVHF, disabled: isVHF }),
+                  CreateFormField(editing, wfFields.get('satellite_network'), onChange, {
+                    required: !isVHF,
+                    disabled: isVHF
+                  }),
                   frequencyFields.map((f) => CreateFormField(editing, f, onChange))
                 ]}
-              </FormSection> 
+              </FormSection>
               <FormSection id='d-status' header='Device Status' disabled={!canEdit}>
                 {statusFields.map((f) => CreateFormField(editing, f, onChange))}
               </FormSection>
-              
+
               <FormSection id='d-add' header='Warranty & Activation Details' disabled={!canEdit}>
                 {[
-                  CreateFormField(editing, wfFields.get('activation_status'), onChange, {labelPlacement: 'start'}),
-                  activationFields.map((f) => CreateFormField(editing, {...f, required: isActive}, onChange)),
-                  CreateFormField(editing, wfFields.get('activation_comment'), onChange, { disabled: !isActive})
+                  CreateFormField(editing, wfFields.get('activation_status'), onChange, { labelPlacement: 'start' }),
+                  activationFields.map((f) => CreateFormField(editing, { ...f, required: isActive }, onChange)),
+                  CreateFormField(editing, wfFields.get('activation_comment'), onChange, { disabled: !isActive })
                 ]}
-              </FormSection> 
+              </FormSection>
               <FormSection id='d-activ' header='Additional Device Sensors and Beacons' disabled={!canEdit}>
                 {[
                   CreateFormField(editing, wfFields.get('camera_device_id'), onChange),
                   CreateFormField(editing, wfFields.get('dropoff_device_id'), onChange),
-                  deviceOptionFields.map((f) => CreateFormField(editing, f, onChange, {required: hasDropoff, disabled: !hasDropoff }))
+                  deviceOptionFields.map((f) =>
+                    CreateFormField(editing, f, onChange, { required: hasDropoff, disabled: !hasDropoff })
+                  )
                 ]}
-              </FormSection> 
+              </FormSection>
               <FormSection id='d-comment' header='Comments About this Device' disabled={!isActive}>
-                {CreateFormField(editing, wfFields.get('device_comment'), onChange, { disabled: !isActive})}
+                {CreateFormField(editing, wfFields.get('device_comment'), onChange, { disabled: !isActive })}
               </FormSection>
               {/**
                * hide the workflow related fields entirely when creating a new collar
@@ -155,7 +165,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                */}
               {!isCreatingNew ? (
                 <>
-                  <FormSection 
+                  <FormSection
                     id='d-ret'
                     header='Record Retrieval Details'
                     disabled={true}
@@ -169,7 +179,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                     }>
                     {retrievalFields.map((f) => CreateFormField(editing, f, onChange))}
                   </FormSection>
-                  
+
                   <FormSection
                     id='d-malf'
                     header='Record Malfunction & Offline Details'
@@ -182,7 +192,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                         Record Malfunction & Offline Details
                       </Button>
                     }>
-                    {malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange, ))}
+                    {malfunctionOfflineFields.map((f) => CreateFormField(editing, f, onChange))}
                   </FormSection>
                   <WorkflowWrapper
                     open={showWorkflowForm}

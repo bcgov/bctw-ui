@@ -10,17 +10,17 @@ import { CritterStrings, LatestDataRetrieval, QuickSummaryStrings } from 'consta
 import dayjs, { Dayjs } from 'dayjs';
 
 const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
   card: {
     marginRight: theme.spacing(4)
   },
   cards: {
     display: 'flex',
     flexDirection: 'row'
-  },
-  root: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between'
   },
   card3: {
     float: 'right'
@@ -43,8 +43,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 interface QuickSummaryProps {
   handleDetails: () => void;
+  showDetails: boolean;
 }
-export const QuickSummary = ({ handleDetails }: QuickSummaryProps): JSX.Element => {
+export const QuickSummary = ({ handleDetails, showDetails }: QuickSummaryProps): JSX.Element => {
   const api = useTelemetryApi();
   const classes = useStyles();
   const theme = useTheme();
@@ -60,6 +61,7 @@ export const QuickSummary = ({ handleDetails }: QuickSummaryProps): JSX.Element 
   };
   const [animalPermsCount, setAnimalPermsCount] = useState(counts);
   const [retrievalSuccess, setRetrievalSuccess] = useState(true);
+
   useEffect(() => {
     if (isSuccess && data?.length) {
       data.forEach((animal) => {
@@ -82,10 +84,9 @@ export const QuickSummary = ({ handleDetails }: QuickSummaryProps): JSX.Element 
             <Button
               className={classes.btn}
               onClick={handleDetails}
-              endIcon={<Icon icon={'next'} size={0.8} />}
-              // startIcon={<Icon icon={'back'} size={0.8} />}
-            >
-              See Details
+              endIcon={showDetails ? null : <Icon icon={'next'} size={0.8} />}
+              startIcon={showDetails ? <Icon icon={'back'} size={0.8} /> : null}>
+              {showDetails ? 'Back' : 'See Details'}
             </Button>
           </Box>
           <InfoCard

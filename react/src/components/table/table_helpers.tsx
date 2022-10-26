@@ -68,25 +68,44 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
 }
 /** Renders the coloured tags for species and collars */
 
-const getTag = (value: string, color?: string): JSX.Element => {
-  const { active, offline, potential_mortality, mortality, potential_malfunction, malfunction } = eDeviceStatus;
+const getTag = (value: string, color?: string, status?: 'error' | 'warning' | 'success'): JSX.Element => {
   const style = { width: '99px' };
   if (color) return <Chip label={value} sx={{ backgroundColor: color, color: '#ffff', ...style }} />;
-  switch (value) {
-    case active:
-      return <Chip label={value} color={'success'} sx={style} />;
-    case offline:
-      return <Chip label={value} sx={{ backgroundColor: '#bdbdbd', color: '#ffff', ...style }} />;
-    case potential_malfunction:
-    case malfunction:
-      return <Chip label={malfunction} color={'warning'} sx={style} />;
-    case mortality:
-    case potential_mortality:
-      return <Chip label={mortality} color={'error'} sx={style} />;
-    default:
-      console.log(value);
-      return null;
+  if (status) return <Chip label={value} sx={style} color={status} />;
+};
+
+const formatTag = (key: string, value: string): JSX.Element => {
+  const defaultColor = '#bdbdbd';
+  if (key === 'device_status') {
+    const { active, potential_mortality, mortality, potential_malfunction, malfunction } = eDeviceStatus;
+    switch (value) {
+      case active:
+        return getTag(value, null, 'success');
+      case potential_malfunction:
+      case malfunction:
+        return getTag(malfunction, null, 'warning');
+      case potential_mortality:
+      case mortality:
+        return getTag(mortality, null, 'error');
+    }
   }
+  if (key === 'species') {
+    switch (value) {
+      case 'Caribou':
+        return getTag(value, '#9575cd');
+      case 'Moose':
+        return getTag(value, '#64b5f6');
+      case 'Grey Wolf':
+        return getTag(value, '#4db6ac');
+      case 'Grizzly Bear':
+        return getTag(value, '#81c784');
+    }
+  }
+  if (key === 'last_transmission_date') {
+    getTag(value, null, 'success');
+  }
+
+  return getTag('Unknown', null, 'success');
 };
 
 interface ICellFormat {
@@ -102,13 +121,8 @@ interface ICellFormat {
 const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
   const value: unknown = obj[key];
-  if (key === 'device_status') {
-    const icon = getTag(value as string);
-    return icon ? { ...align, value: icon } : { ...align, value };
-  }
-  if (key === 'species' && obj instanceof Animal) {
-    const icon = getTag(value as string, obj.tagColor());
-    return icon ? { ...align, value: icon } : { ...align, value };
+  if (['device_status', 'species', 'last_transmission_date'].includes(key as string)) {
+    return { ...align, value: formatTag(key as string, value as string) };
   }
   if (typeof value === 'boolean') {
     return { ...align, value: <Icon icon={value ? 'done' : 'close'} /> };

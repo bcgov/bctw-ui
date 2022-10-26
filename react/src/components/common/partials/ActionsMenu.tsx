@@ -29,10 +29,11 @@ export const ActionsMenu = ({ menuItems, id, disabled }: IActionsMenu): JSX.Elem
         <Icon icon={'dots'} />
       </IconButton>
       <Menu id={`action-menu-${id}`} anchorEl={anchorEl} open={open} onClose={handleClose}>
-        {menuItems.map((item) => {
+        {menuItems.map((item, idx) => {
           const { label, icon, handleClick } = item;
           return (
             <MenuItem
+              key={`menu-item-${idx}`}
               onClick={() => {
                 if (handleClick) {
                   handleClick();

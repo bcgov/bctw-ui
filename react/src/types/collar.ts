@@ -148,6 +148,20 @@ export class Collar implements BCTWBase<Collar>, ICollar {
     }
   }
 
+  tagColor(): 'error' | 'success' | 'warning' {
+    const { mortality, active, malfunction, potential_mortality, potential_malfunction } = eDeviceStatus;
+    switch (this.device_status) {
+      case mortality:
+      case potential_mortality:
+        return 'error';
+      case active:
+        return 'success';
+      case malfunction:
+      case potential_malfunction:
+        return 'warning';
+    }
+  }
+
   static get propsToDisplay(): (keyof Collar)[] {
     return [
       'device_id',

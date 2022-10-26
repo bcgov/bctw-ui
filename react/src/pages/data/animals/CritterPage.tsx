@@ -13,10 +13,9 @@ import { UserAnimalAccess } from './UserAnimalAccess';
 import { NotificationBanner } from 'components/common/Banner';
 import { QuickSummary } from 'components/common/QuickSummary';
 import { CritterDataTables } from './CritterDataTables';
+import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 export default function CritterPage(): JSX.Element {
-  const api = useTelemetryApi();
-
-  const [showDataRetrieval, setShowDataRetrieval] = useState(true);
+  const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
   const inverseManageModal = (): void => {
     setOpenManageAnimals((a) => !a);
@@ -43,14 +42,10 @@ export default function CritterPage(): JSX.Element {
         </Box>
         <NotificationBanner hiddenContent={[]} />
         <Box mb={4}>
-          <QuickSummary handleDetails={inverseDataRetrieval} />
+          <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
         </Box>
         <Box style={showDataRetrieval ? {} : { display: 'none' }}>
-          <DataTable
-            headers={AttachedCollar.dataRetrievalPropsToDisplay}
-            title={'Data Retrieval'}
-            queryProps={{ query: api.useAttachedDevices }}
-          />
+          <DataRetrievalDataTable />
         </Box>
         <Box style={!showDataRetrieval ? {} : { display: 'none' }}>
           <CritterDataTables />

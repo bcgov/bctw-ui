@@ -129,8 +129,8 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 // props that any mortality event or alert should have.
 export interface IMortalityAlert
   extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'device_status'>,
-  Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id' | 'captivity_status' | 'species'>,
-  DataLife {}
+    Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id' | 'captivity_status' | 'species'>,
+    DataLife {}
 
 type MortalityAlertProp = keyof IMortalityAlert;
 /**
@@ -154,10 +154,18 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
   data_life_start: Dayjs;
   data_life_end: Dayjs;
   attachment_end: Dayjs;
-  
 
   static get displayableMortalityAlertProps(): (AlertProp | MortalityAlertProp)[] {
-    return ['wlh_id', 'animal_id','species', 'device_id', 'device_make', ...TelemetryAlert.displayableAlertProps, 'valid_from', 'last_transmission_date'];
+    return [
+      'wlh_id',
+      'animal_id',
+      'species',
+      'device_id',
+      'device_make',
+      ...TelemetryAlert.displayableAlertProps,
+      'valid_from',
+      'last_transmission_date'
+    ];
   }
 
   formatPropAsHeader(s: string): string {
@@ -171,8 +179,8 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
 }
 
 /**
- * the missing data alert is triggered when telemetry has not been received 
- * from a device for more than a certain time period (default 7 days). 
+ * the missing data alert is triggered when telemetry has not been received
+ * from a device for more than a certain time period (default 7 days).
  * The missing data event triggers the device malfunction workflow
  */
 export class MalfunctionAlert extends MortalityAlert {
