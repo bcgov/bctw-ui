@@ -40,6 +40,7 @@ import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import MapModal from 'components/modal/MapModal';
 import dayjs, { Dayjs } from 'dayjs';
+import { getTag } from 'components/table/table_helpers';
 
 export default function CritterPage(): JSX.Element {
   const api = useTelemetryApi();
@@ -246,15 +247,17 @@ export default function CritterPage(): JSX.Element {
             {/* Modal for critter workflows */}
             <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
             {/* Modal that displays most recent pings and tracks for the selected critter */}
-            <MapModal 
-              title={"Animal's Pings & Tracks"}
+            <MapModal
+              title={`Recent Animal Movement`}
               open={openMap}
-              width='800px'
-              height='600px'
+              width='50rem'
+              height='40rem'
               startDate={dayjs().subtract(2, 'year')}
-              handleClose={() => {setOpenMap(false)}}
+              handleClose={() => {
+                setOpenMap(false);
+              }}
               critter_id={editObj.critter_id}
-            /> 
+            />
           </>
         </RowSelectedProvider>
       </SpeciesProvider>
