@@ -18,6 +18,7 @@ import { CollarHistory } from 'types/collar_history';
 import { WorkflowType } from 'types/events/event';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
+import MapModal from 'components/modal/MapModal';
 
 export const CritterDataTables = (): JSX.Element => {
   const api = useTelemetryApi();
@@ -29,6 +30,8 @@ export const CritterDataTables = (): JSX.Element => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
+  const [openMap, setOpenMap] = useState(false);
+
   const [workflowType, setWorkflowType] = useState<WorkflowType>();
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
@@ -53,10 +56,9 @@ export const CritterDataTables = (): JSX.Element => {
   };
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
-    const history = useHistory();
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
     const _edit = () => setOpenEdit(true);
-    const _map = () => history.push('/map');
+    const _map = () => setOpenMap(true);
     const _removeAttach = () => {
       setOpenAttachRemoveCollar(true);
     };
@@ -175,6 +177,15 @@ export const CritterDataTables = (): JSX.Element => {
             }
           />
         </Box>
+
+        <MapModal
+          title={`Recent Animal Movement`}
+          open={openMap}
+          handleClose={(v: boolean) => setOpenMap(v)}
+          width={'800px'}
+          height={'600px'}
+          critter_id={editObj.critter_id}
+        />
         {/* Wrapper to allow editing of Attached and Unattached animals */}
 
         <ModifyCritterWrapper

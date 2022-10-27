@@ -107,6 +107,7 @@ const formatTag = (key: string, value: string): JSX.Element => {
     const today = dayjs();
     const daysDiff = today.diff(prevDate, 'day');
     const formatT = dayjs(value).fromNow();
+    if (!dayjs(value).isValid()) return getTag('Unknown');
     if (daysDiff <= 1) return getTag(formatT, null, 'success');
     if (daysDiff < 7) return getTag(formatT, null, 'warning');
     return getTag(formatT, null, 'error');
