@@ -99,6 +99,14 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const useTracksPerCritter = (start: string, end: string, critter_id: string, enable = true): UseQueryResult<ITelemetryLine[], AxiosError> => {
+    return useQuery<ITelemetryLine[], AxiosError>(
+      ['tracks', start, end, critter_id],
+      () => mapApi.getTracks(start, end, critter_id),
+      {...defaultQueryOptions, enabled: enable}
+    );
+  };
+
   const useUnassignedTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
     return useQuery<ITelemetryLine[], AxiosError>(
       ['unassigned_tracks', start, end],
@@ -117,6 +125,17 @@ export const useTelemetryApi = () => {
       defaultQueryOptions
     );
   };
+
+   /**
+   *
+   */
+    const usePingsPerCritter = (start: string, end: string, critter_id: string, enable = true): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+      return useQuery<ITelemetryPoint[], AxiosError>(
+        ['pings', { start, end, critter_id }],
+        () => mapApi.getPings(start, end, critter_id),
+        {...defaultQueryOptions, enabled: enable}
+      );
+    };
 
   // the same as usePings, but doesn't auto fetch due to enabled: false setting
   const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
@@ -567,8 +586,10 @@ export const useTelemetryApi = () => {
     useCodeHeaders,
     useEstimate,
     useTracks,
+    useTracksPerCritter,
     useUnassignedTracks,
     usePings,
+    usePingsPerCritter,
     useUnassignedPings,
     useAllDevices,
     useAttachedDevices,

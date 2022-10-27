@@ -14,6 +14,7 @@ type ModalBaseProps = {
   title?: string;
   disableBackdropClick?: boolean;
   useButton?: boolean;
+  onEnteredCallback?: () => void;
 };
 
 /**
