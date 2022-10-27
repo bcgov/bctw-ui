@@ -151,7 +151,6 @@ export default function MapModal({
         setupLatestPingOptions(latestPingsLayer, handlePointClick, handlePointClose);
         
         const crittersPings = fetchedPings;
-        console.log("Here is how many ings we had " + fetchedPings.length);
         const { latest, other } = splitPings(crittersPings);
         setLatestPings(latest);
         pingsLayer.addData(other as any);
