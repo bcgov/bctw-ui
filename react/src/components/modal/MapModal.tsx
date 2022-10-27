@@ -71,7 +71,12 @@ export default function MapModal({
   const [pingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Pings
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
   const [latestPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON());
+<<<<<<< HEAD
 
+=======
+  const [mapWasLoaded, setMapWasLoaded] = useState(false);
+  
+>>>>>>> origin/728-map-modal
   const styles = useStyles();
 
   const {
@@ -94,8 +99,19 @@ export default function MapModal({
         mapRef.current?.flyTo([coord[1], coord[0]], 8);
       }
     }
+<<<<<<< HEAD
   };
 
+=======
+  }
+
+  useEffect(() => {
+    if(!open) {
+      setMapWasLoaded(false);
+    } 
+  }, [open]);
+  
+>>>>>>> origin/728-map-modal
   const updateComponent = (): void => {
     if (document.getElementById('map')) {
       mapRef.current?.removeLayer(tracksLayer);
@@ -134,7 +150,11 @@ export default function MapModal({
       } else {
         flyToLatestPings(latestPings);
       }
+<<<<<<< HEAD
       console.log('Update component fires');
+=======
+      setMapWasLoaded(true);
+>>>>>>> origin/728-map-modal
     }
   };
 
@@ -151,21 +171,23 @@ export default function MapModal({
 
   useEffect(() => {
     const update = (): void => {
-      if (fetchedPings && !isErrorPings && critter_id) {
+      if (fetchedPings && !isErrorPings && critter_id && mapWasLoaded) {
         pingsLayer.clearLayers();
         latestPingsLayer.clearLayers();
         setupPingOptions(pingsLayer, handlePointClick, handlePointClose);
         setupLatestPingOptions(latestPingsLayer, handlePointClick, handlePointClose);
 
         const crittersPings = fetchedPings;
-
         const { latest, other } = splitPings(crittersPings);
         setLatestPings(latest);
         pingsLayer.addData(other as any);
         latestPingsLayer.addData(latest as any);
 
+<<<<<<< HEAD
         console.log('Here is how many latest we had ' + latest.length);
 
+=======
+>>>>>>> origin/728-map-modal
         flyToLatestPings(latest);
 
         latestPingsLayer.bringToFront();
@@ -173,10 +195,10 @@ export default function MapModal({
       }
     };
     update();
-  }, [fetchedPings]);
+  }, [fetchedPings, mapWasLoaded]);
 
   useEffect(() => {
-    if (fetchedTracks && !isErrorTracks && critter_id) {
+    if (fetchedTracks && !isErrorTracks && critter_id && mapWasLoaded) {
       tracksLayer.clearLayers();
       setupTracksOptions(tracksLayer);
       const crittersTracks = fetchedTracks;
@@ -184,7 +206,7 @@ export default function MapModal({
       latestPingsLayer.bringToFront();
       tracksLayer.bringToBack();
     }
-  }, [fetchedTracks]);
+  }, [fetchedTracks, mapWasLoaded]);
 
   const classes = modalStyles();
   return (
