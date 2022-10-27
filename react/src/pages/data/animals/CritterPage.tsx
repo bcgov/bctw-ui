@@ -41,14 +41,12 @@ export default function CritterPage(): JSX.Element {
           </Box>
         </Box>
         <NotificationBanner hiddenContent={[]} />
-        <Box mb={4}>
-          <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
+        <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
+        <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
+          <CritterDataTables />
         </Box>
         <Box style={showDataRetrieval ? {} : { display: 'none' }}>
           <DataRetrievalDataTable />
-        </Box>
-        <Box style={!showDataRetrieval ? {} : { display: 'none' }}>
-          <CritterDataTables />
         </Box>
       </SpeciesProvider>
     </ManageLayout>

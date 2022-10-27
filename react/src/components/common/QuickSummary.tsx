@@ -77,59 +77,60 @@ export const QuickSummary = ({ handleDetails, showDetails }: QuickSummaryProps):
   }, [data]);
   return (
     <>
-      <Box className={classes.root}>
-        <Box>
-          <Box className={classes.details}>
-            <SubHeader text={LatestDataRetrieval.title} />
-            <Button
-              className={classes.btn}
-              onClick={handleDetails}
-              endIcon={showDetails ? null : <Icon icon={'next'} size={0.8} />}
-              startIcon={showDetails ? <Icon icon={'back'} size={0.8} /> : null}>
-              {showDetails ? 'Back' : 'See Details'}
-            </Button>
-          </Box>
-          <InfoCard
-            size='large'
-            element={
-              <Icon
-                icon={'circle'}
-                htmlColor={retrievalSuccess ? theme.palette.success.main : theme.palette.warning.main}
-                size={4}
-              />
-            }
-            body={retrievalSuccess ? LatestDataRetrieval.success : LatestDataRetrieval.failure}
-            noRightMargin
-          />
-        </Box>
-        <Box className={classes.cards}>
+      {showDetails ? (
+        <Button onClick={handleDetails} size='large' startIcon={<Icon icon={'back'} size={0.8} />}>
+          Back
+        </Button>
+      ) : (
+        <Box className={classes.root}>
           <Box>
-            <SubHeader text={QuickSummaryStrings.title} />
+            <Box className={classes.details}>
+              <SubHeader text={LatestDataRetrieval.title} />
+            </Box>
             <InfoCard
-              element={<Typography variant={'h1'}>{animalPermsCount.manager}</Typography>}
-              size='small'
-              subTitle={QuickSummaryStrings.manage}
-            />
-          </Box>
-          <Box>
-            <SubHeader text={null} />
-            <InfoCard
-              element={<Typography variant={'h1'}>{animalPermsCount.observer}</Typography>}
-              size='small'
-              subTitle={QuickSummaryStrings.editable}
-            />
-          </Box>
-          <Box>
-            <SubHeader text={null} />
-            <InfoCard
-              element={<Typography variant={'h1'}>{animalPermsCount.editor}</Typography>}
-              size='small'
-              subTitle={QuickSummaryStrings.observed}
+              size='large'
+              element={
+                <Icon
+                  icon={'circle'}
+                  htmlColor={retrievalSuccess ? theme.palette.success.main : theme.palette.warning.main}
+                  size={2}
+                />
+              }
+              body={retrievalSuccess ? LatestDataRetrieval.success : LatestDataRetrieval.failure}
               noRightMargin
+              handleDetails={handleDetails}
+              hoverRaise
             />
           </Box>
+          <Box className={classes.cards}>
+            <Box>
+              <SubHeader text={QuickSummaryStrings.title} />
+              <InfoCard
+                element={<Typography variant={'h1'}>{animalPermsCount.manager}</Typography>}
+                size='small'
+                subTitle={QuickSummaryStrings.manage}
+              />
+            </Box>
+            <Box>
+              <SubHeader text={null} />
+              <InfoCard
+                element={<Typography variant={'h1'}>{animalPermsCount.observer}</Typography>}
+                size='small'
+                subTitle={QuickSummaryStrings.editable}
+              />
+            </Box>
+            <Box>
+              <SubHeader text={null} />
+              <InfoCard
+                element={<Typography variant={'h1'}>{animalPermsCount.editor}</Typography>}
+                size='small'
+                subTitle={QuickSummaryStrings.observed}
+                noRightMargin
+              />
+            </Box>
+          </Box>
         </Box>
-      </Box>
+      )}
     </>
   );
 };

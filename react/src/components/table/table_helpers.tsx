@@ -1,13 +1,14 @@
 import { matchSorter } from 'match-sorter';
 import { getProperty, countDecimals } from 'utils/common_helpers';
 import { Order, HeadCell } from 'components/table/table_interfaces';
-import { dateObjectToTimeStr, formatTime } from 'utils/time';
+import { dateObjectToTimeStr, formatT, formatTime } from 'utils/time';
 import { Icon, Tooltip } from 'components/common';
-import { isDayjs } from 'dayjs';
+import dayjs, { Dayjs, isDayjs } from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { Collar, eDeviceStatus } from 'types/collar';
 import { Chip } from '@mui/material';
 import { Animal } from 'types/animal';
-
+dayjs.extend(relativeTime);
 /**
  * converts an object to a list of HeadCells
  * @param obj
@@ -69,13 +70,13 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
 /** Renders the coloured tags for species and collars */
 
 const getTag = (value: string, color?: string, status?: 'error' | 'warning' | 'success'): JSX.Element => {
-  const style = { width: '99px' };
-  if (color) return <Chip label={value} sx={{ backgroundColor: color, color: '#ffff', ...style }} />;
+  const style = { width: '110px' };
+  const defaultColor = '#bdbdbd';
   if (status) return <Chip label={value} sx={style} color={status} />;
+  return <Chip label={value} sx={{ backgroundColor: color ? color : defaultColor, color: '#ffff', ...style }} />;
 };
 
 const formatTag = (key: string, value: string): JSX.Element => {
-  const defaultColor = '#bdbdbd';
   if (key === 'device_status') {
     const { active, potential_mortality, mortality, potential_malfunction, malfunction } = eDeviceStatus;
     switch (value) {
@@ -102,10 +103,18 @@ const formatTag = (key: string, value: string): JSX.Element => {
     }
   }
   if (key === 'last_transmission_date') {
-    getTag(value, null, 'success');
+    const prevDate = dayjs(value);
+    const today = dayjs();
+    const daysDiff = today.diff(prevDate, 'day');
+    const formatT = dayjs(value).fromNow();
+    if (daysDiff <= 1) return getTag(formatT, null, 'success');
+    if (daysDiff < 7) return getTag(formatT, null, 'warning');
+    return getTag(formatT, null, 'error');
   }
-
-  return getTag('Unknown', null, 'success');
+  // if (key === 'last_update_attempt') {
+  //   return getTag(formatT(dayjs()), null, 'success');
+  // }
+  return getTag('Unknown');
 };
 
 interface ICellFormat {
@@ -122,7 +131,10 @@ const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
   const value: unknown = obj[key];
   if (['device_status', 'species', 'last_transmission_date'].includes(key as string)) {
-    return { ...align, value: formatTag(key as string, value as string) };
+    return { ...align, value: formatTag(key as string, isDayjs(value) ? formatT(value) : (value as string)) };
+  }
+  if (key === 'last_update_attempt') {
+    return { ...align, value: formatT(dayjs()) };
   }
   if (typeof value === 'boolean') {
     return { ...align, value: <Icon icon={value ? 'done' : 'close'} /> };

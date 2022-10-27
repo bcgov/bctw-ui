@@ -4,6 +4,8 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/styles';
 import { useState } from 'react';
+import { Button, CardActions, CardContent } from '@mui/material';
+import { Icon } from 'components/common';
 
 interface InfoCardProps {
   element: JSX.Element;
@@ -12,35 +14,53 @@ interface InfoCardProps {
   size?: 'small' | 'large';
   noRightMargin?: boolean;
   hoverRaise?: boolean;
+  handleDetails?: () => void;
 }
-export const InfoCard = ({ element, body, subTitle, size, noRightMargin, hoverRaise }: InfoCardProps) => {
+export const InfoCard = ({
+  element,
+  body,
+  subTitle,
+  size,
+  noRightMargin,
+  hoverRaise,
+  handleDetails
+}: InfoCardProps) => {
   const theme = useTheme();
   const [raised, setRaised] = useState(false);
   return (
-    <Box>
-      <Card
-        onMouseOver={() => setRaised(true)}
-        onMouseOut={() => setRaised(false)}
-        raised={hoverRaise ? raised : false}
-        sx={{
-          width: size === 'small' ? '12rem' : '26rem',
-          height: '8rem',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          p: 3,
-          mr: noRightMargin ? 0 : theme.spacing(4),
-          boxShadow: hoverRaise ? null : 3,
-          marginTop: theme.spacing(2)
-        }}>
-        <Box>
-          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            {element}
-            <Box pl={1.5}>{body}</Box>
-          </Box>
-          <Box>{subTitle ? <Typography color='text.secondary'>{subTitle}</Typography> : null}</Box>
+    <Card
+      onMouseOver={() => hoverRaise && setRaised(true)}
+      onMouseOut={() => hoverRaise && setRaised(false)}
+      onClick={() => (handleDetails ? handleDetails() : null)}
+      raised={hoverRaise ? raised : false}
+      sx={{
+        width: size === 'small' ? '12rem' : '26rem',
+        height: '9rem',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        mr: noRightMargin ? 0 : theme.spacing(4),
+        cursor: raised ? 'pointer' : 'default',
+        marginTop: theme.spacing(2)
+      }}>
+      <>&#8205;</>
+      <Box px={3}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <Box>{element}</Box>
+          <Box pl={1.5}>{body}</Box>
         </Box>
-      </Card>
-    </Box>
+        {subTitle ? <Typography color='text.secondary'>{subTitle}</Typography> : null}
+      </Box>
+      <CardActions sx={{ py: 0 }}>
+        {handleDetails && (
+          <Button
+            disableRipple
+            sx={{ marginLeft: 'auto', pt: 0, '&:hover': { backgroundColor: 'transparent' } }}
+            endIcon={<Icon icon={'next'} size={0.8} />}>
+            See Details
+          </Button>
+        )}
+      </CardActions>
+    </Card>
   );
 };
