@@ -14,7 +14,7 @@ export default function Modal(props: ModalProps): JSX.Element {
     <Dialog
       className={'dialog-modal'}
       open={open}
-      onClose={handleClose}
+      onClose={() => handleClose(false)}
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{ timeout: 500 }}
