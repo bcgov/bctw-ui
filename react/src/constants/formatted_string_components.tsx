@@ -81,22 +81,6 @@ const animalBannerMortNotif = (notif: AnimalNotification) => (
   </ListItem>
 );
 
-const animalMenuMortNotif = (notif: MortalityAlert) => (
-  <ListItem>
-    <ListItemIcon>
-      <Icon icon={'circle'} />
-    </ListItemIcon>
-    <ListItemText
-      primary={
-        <Typography>
-          {notif.species} mortality alert from Device {notif.device_id} on Animal {notif.wlh_id}.
-        </Typography>
-      }
-      secondary={<>{notif.valid_from}</>}
-    />
-  </ListItem>
-);
-
 const speciesModalMessage = (currentSpecies: string, nextSpecies: string): JSX.Element => {
   const diff = (a?: string[], b?: string[]): string[] => (!a || !b ? null : a.filter((v) => !b.includes(v)));
   const WMU = 'Wildlife Management Unit';
@@ -134,6 +118,5 @@ export {
   pointImportMessage,
   releaseUnattachWarning,
   speciesModalMessage,
-  animalBannerMortNotif,
-  animalMenuMortNotif
+  animalBannerMortNotif
 };
