@@ -36,8 +36,6 @@ export const CritterDataTables = (): JSX.Element => {
   const [openMap, setOpenMap] = useState(false);
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
-  const [workflowType, setWorkflowType] = useState<WorkflowType>();
-
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
@@ -45,8 +43,7 @@ export const CritterDataTables = (): JSX.Element => {
     editing: null,
     open: false,
     onSave: doNothingAsync,
-    handleClose: doNothing,
-    workflow: workflowType
+    handleClose: doNothing
   };
 
   const addEditProps = {
@@ -67,7 +64,6 @@ export const CritterDataTables = (): JSX.Element => {
       setOpenAttachRemoveCollar(true);
     };
     const _mortality = () => {
-      setWorkflowType('mortality');
       setOpenWorkflow(true);
     };
     const defaultItems = [
@@ -227,7 +223,7 @@ export const CritterDataTables = (): JSX.Element => {
         />
 
         {/* Modal for critter workflows */}
-        <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
+        <CritterWorkflow editing={editObj} workflow={'mortality'} open={openWorkflow} setOpen={setOpenWorkflow} />
       </>
     </RowSelectedProvider>
   );

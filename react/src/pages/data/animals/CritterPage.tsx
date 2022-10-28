@@ -1,4 +1,4 @@
-import { Button, Container } from '@mui/material';
+import { Badge, Button, Container, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
 import DataTable from 'components/table/DataTable';
@@ -14,6 +14,7 @@ import { NotificationBanner } from 'components/common/Banner';
 import { QuickSummary } from 'components/common/QuickSummary';
 import { CritterDataTables } from './CritterDataTables';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
+import Icon from 'components/common/Icon';
 export default function CritterPage(): JSX.Element {
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
@@ -29,6 +30,13 @@ export default function CritterPage(): JSX.Element {
         <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
+            <Box mr={2}>
+              <IconButton>
+                <Badge badgeContent={1} color={'error'} overlap={'circular'}>
+                  <Icon icon={'bell'} size={1.5} />
+                </Badge>
+              </IconButton>
+            </Box>
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
               {CritterStrings.manageMyAnimals}
             </Button>

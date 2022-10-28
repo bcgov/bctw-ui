@@ -1,0 +1,1 @@
+const NotificationsMenu = (): JSX.Element => {};
