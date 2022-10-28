@@ -14,9 +14,12 @@ import { NotificationBanner } from 'components/common/Banner';
 import { QuickSummary } from 'components/common/QuickSummary';
 import { CritterDataTables } from './CritterDataTables';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
+import { CritterAlertPage } from './CritterAlertPage';
 export default function CritterPage(): JSX.Element {
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
+  const [openAlerts, setOpenAlerts] = useState(false);
+
   const inverseManageModal = (): void => {
     setOpenManageAnimals((a) => !a);
   };
@@ -29,6 +32,9 @@ export default function CritterPage(): JSX.Element {
         <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
+            <Button size='medium' variant='outlined' onClick={() => setOpenAlerts(true)}>
+              Go To Alerts
+            </Button>
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
               {CritterStrings.manageMyAnimals}
             </Button>
@@ -40,14 +46,30 @@ export default function CritterPage(): JSX.Element {
             </FullScreenDialog>
           </Box>
         </Box>
-        <NotificationBanner hiddenContent={[]} />
-        <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
-        <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
-          <CritterDataTables />
-        </Box>
-        <Box style={showDataRetrieval ? {} : { display: 'none' }}>
-          <DataRetrievalDataTable />
-        </Box>
+        {
+          !openAlerts && (
+            <>
+            <NotificationBanner hiddenContent={[]} />
+            <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
+            <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
+              <CritterDataTables />
+            </Box>
+            <Box style={showDataRetrieval ? {} : { display: 'none' }}>
+              <DataRetrievalDataTable />
+            </Box>
+            </>
+          )
+        }
+        {
+          openAlerts && (
+            <>
+              <CritterAlertPage
+                alerts={[]}
+              />
+            </>
+          )
+        }
+        
       </SpeciesProvider>
     </ManageLayout>
   );
