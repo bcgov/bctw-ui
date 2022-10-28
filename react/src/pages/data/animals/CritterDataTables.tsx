@@ -19,10 +19,13 @@ import { WorkflowType } from 'types/events/event';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
 import MapModal from 'components/modal/MapModal';
+import dayjs from 'dayjs';
+import { Button } from '@mui/material';
+import { buttonProps } from 'components/component_constants';
 
 export const CritterDataTables = (): JSX.Element => {
   const api = useTelemetryApi();
-  const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
+  const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as AttachedAnimal);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
 
@@ -161,6 +164,7 @@ export const CritterDataTables = (): JSX.Element => {
                       <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
                     </AddEditViewer>
                   </ModifyCritterWrapper> */}
+                <Button {...buttonProps}>Export</Button>
                 <ExportViewer<Animal>
                   template={[
                     'critter_id',
@@ -177,7 +181,6 @@ export const CritterDataTables = (): JSX.Element => {
             }
           />
         </Box>
-
         <MapModal
           title={`Recent Animal Movement`}
           open={openMap}
@@ -186,14 +189,15 @@ export const CritterDataTables = (): JSX.Element => {
           height={'600px'}
           critter_id={editObj.critter_id}
         />
+
         {/* Wrapper to allow editing of Attached and Unattached animals */}
 
         <ModifyCritterWrapper
-          editing={editObj}
+          editing={new AttachedAnimal()}
           onUpdate={(critter_id: string): void => setUpdated(critter_id)}
           onDelete={(critter_id: string): void => setDeleted(critter_id)}
           setCritter={setEditObj}>
-          <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
+          <EditCritter {...editProps} isCreatingNew open={openEdit} handleClose={() => setOpenEdit(false)} />
         </ModifyCritterWrapper>
 
         {/* Modal for assigning or removing a device from a critter */}

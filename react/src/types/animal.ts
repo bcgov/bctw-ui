@@ -262,6 +262,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   @Exclude(toPlainOnly) data_life_end: Dayjs;
   @Exclude(toPlainOnly) attachment_end: Dayjs;
   @Transform(nullToDayjs) last_transmission_date?: Dayjs;
+  @Transform(nullToDayjs) last_fetch_date?: Dayjs;
 
   get lastKnownLocation(): string {
     if (this.latitude && this.longitude) {
@@ -303,6 +304,8 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
           return 'Last Lat Long';
         case 'last_transmission_date':
           return 'Last Transmission';
+        case 'last_fetch_date':
+          return 'Last Update Attempt';
         default:
           return columnToHeader(str);
       }

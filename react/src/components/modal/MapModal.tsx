@@ -60,7 +60,7 @@ export default function MapModal({
   critter_id,
   width,
   height,
-  startDate = dayjs().subtract(10, 'weeks'),
+  startDate = dayjs().subtract(24, 'weeks'),
   endDate = dayjs()
 }: MapModalProps): JSX.Element {
   const mapRef = useRef<L.Map>(null);

@@ -111,6 +111,7 @@ export class Collar implements BCTWBase<Collar>, ICollar {
   @Exclude(toPlainOnly) @Transform(nullToDayjs) valid_from: Dayjs;
   @Exclude(toPlainOnly) @Transform(nullToDayjs) valid_to: Dayjs;
   @Exclude(toPlainOnly) owned_by_user_id: number;
+  @Transform(nullToDayjs) last_transmission_date?: Dayjs;
 
   get frequencyPadded(): string {
     const freq = this.frequency.toString();
@@ -205,7 +206,7 @@ export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<
   readonly animal_id: string;
   readonly critter_id: string;
   @Transform(nullToDayjs) last_transmission_date?: Dayjs;
-  @Transform(nullToDayjs) last_update_attempt?: Dayjs;
+  @Transform(nullToDayjs) last_fetch_date?: Dayjs;
 
   // for attached collars, also display...
   static get attachedDevicePropsToDisplay(): (keyof AttachedCollar)[] {
@@ -216,7 +217,7 @@ export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<
     return [
       'device_id',
       'last_transmission_date',
-      'last_update_attempt',
+      'last_fetch_date',
       'device_status',
       'activation_status',
       'device_make',
