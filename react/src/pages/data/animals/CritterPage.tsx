@@ -1,20 +1,17 @@
-import { Badge, Button, Container, IconButton } from '@mui/material';
+import { Button, Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
-import DataTable from 'components/table/DataTable';
 import { CritterStrings } from 'constants/strings';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { AttachedCollar } from 'types/collar';
 import { UserAnimalAccess } from './UserAnimalAccess';
 
 import { NotificationBanner } from 'components/common/Banner';
+import { NotificationsMenu } from 'components/common/partials/NotificationsMenu';
 import { QuickSummary } from 'components/common/QuickSummary';
-import { CritterDataTables } from './CritterDataTables';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
-import Icon from 'components/common/Icon';
+import { CritterDataTables } from './CritterDataTables';
 export default function CritterPage(): JSX.Element {
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
@@ -30,13 +27,7 @@ export default function CritterPage(): JSX.Element {
         <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
-            <Box mr={2}>
-              <IconButton>
-                <Badge badgeContent={1} color={'error'} overlap={'circular'}>
-                  <Icon icon={'bell'} size={1.5} />
-                </Badge>
-              </IconButton>
-            </Box>
+            <NotificationsMenu />
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
               {CritterStrings.manageMyAnimals}
             </Button>

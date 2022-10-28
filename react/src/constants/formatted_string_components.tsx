@@ -1,5 +1,7 @@
 import { Button, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Icon } from 'components/common';
 import { getTag } from 'components/table/table_helpers';
+import { AnimalNotification, MortalityAlert } from 'types/alert';
 import { AttachedAnimal } from 'types/animal';
 import { eDeviceStatus } from 'types/collar';
 
@@ -60,24 +62,37 @@ const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX
   </>
 );
 
-const attachedAnimalNotification = (
-  animalNotif: Pick<AttachedAnimal, 'device_status' | 'device_id' | 'frequency' | 'animal_id' | 'wlh_id'>
-) => (
+const animalBannerMortNotif = (notif: AnimalNotification) => (
   <ListItem>
-    <ListItemIcon>{getTag(animalNotif.device_status as eDeviceStatus)}</ListItemIcon>
+    <ListItemIcon>{getTag(notif.device_status as eDeviceStatus)}</ListItemIcon>
     <ListItemText
       primary={
         <Typography>
-          The status of <b>Device ID:</b> {animalNotif.device_id} changed from 'Alive' to '
-          <b>{animalNotif.device_status}</b>' on DATE
+          The status of <b>Device ID:</b> {notif.device_id} changed from 'Alive' to '<b>{notif.device_status}</b>' on
+          DATE
         </Typography>
       }
       secondary={
         <>
-          <b>Frequency:</b> {animalNotif.frequency} <b>Animal ID:</b> {animalNotif.animal_id} <b>WLH ID:</b>{' '}
-          {animalNotif.wlh_id}
+          <b>Frequency:</b> {notif.frequency} <b>Animal ID:</b> {notif.animal_id} <b>WLH ID:</b> {notif.wlh_id}
         </>
       }
+    />
+  </ListItem>
+);
+
+const animalMenuMortNotif = (notif: MortalityAlert) => (
+  <ListItem>
+    <ListItemIcon>
+      <Icon icon={'circle'} />
+    </ListItemIcon>
+    <ListItemText
+      primary={
+        <Typography>
+          {notif.species} mortality alert from Device {notif.device_id} on Animal {notif.wlh_id}.
+        </Typography>
+      }
+      secondary={<>{notif.valid_from}</>}
     />
   </ListItem>
 );
@@ -119,5 +134,6 @@ export {
   pointImportMessage,
   releaseUnattachWarning,
   speciesModalMessage,
-  attachedAnimalNotification
+  animalBannerMortNotif,
+  animalMenuMortNotif
 };
