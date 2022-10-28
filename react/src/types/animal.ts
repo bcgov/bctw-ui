@@ -164,6 +164,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   translocation: boolean;
   wlh_id: string;
   animal_comment: string;
+  @Transform(nullToDayjs) last_transmission_date?: Dayjs;
   @Exclude(toPlainOnly) @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) valid_from: Dayjs;
   @Exclude(toPlainOnly) @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) valid_to: Dayjs;
   @Exclude(toPlainOnly) owned_by_user_id: number;
@@ -261,7 +262,6 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   @Exclude(toPlainOnly) data_life_start: Dayjs;
   @Exclude(toPlainOnly) data_life_end: Dayjs;
   @Exclude(toPlainOnly) attachment_end: Dayjs;
-  @Transform(nullToDayjs) last_transmission_date?: Dayjs;
   @Transform(nullToDayjs) last_fetch_date?: Dayjs;
 
   get lastKnownLocation(): string {

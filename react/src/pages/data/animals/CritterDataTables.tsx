@@ -6,7 +6,7 @@ import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { QueryStatus } from 'react-query';
 import { Animal, AttachedAnimal } from 'types/animal';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
@@ -57,6 +57,10 @@ export const CritterDataTables = (): JSX.Element => {
     disableDelete: true,
     modalControl: true
   };
+
+  useEffect(() => {
+    console.log("EditObj last date " + editObj.last_transmission_date);
+  }, [editObj]);
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
@@ -185,6 +189,8 @@ export const CritterDataTables = (): JSX.Element => {
           title={`Recent Animal Movement`}
           open={openMap}
           handleClose={(v: boolean) => setOpenMap(v)}
+          startDate={ editObj.last_transmission_date?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks') }
+          endDate={ editObj.last_transmission_date ?? dayjs() }
           width={'800px'}
           height={'600px'}
           critter_id={editObj.critter_id}
