@@ -4,7 +4,7 @@ import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { CritterStrings } from 'constants/strings';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { UserAnimalAccess } from './UserAnimalAccess';
 
 import { NotificationBanner } from 'components/common/Banner';
@@ -12,7 +12,10 @@ import { NotificationsMenu } from 'components/common/partials/NotificationsMenu'
 import { QuickSummary } from 'components/common/QuickSummary';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 import { CritterDataTables } from './CritterDataTables';
+import { AlertContext } from 'contexts/UserAlertContext';
+import { FormatAlert } from 'components/common/partials/FormatAlert';
 export default function CritterPage(): JSX.Element {
+  const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
   const inverseManageModal = (): void => {
@@ -40,7 +43,11 @@ export default function CritterPage(): JSX.Element {
             </FullScreenDialog>
           </Box>
         </Box>
-        <NotificationBanner hiddenContent={[]} />
+        <NotificationBanner
+          hiddenContent={useAlert?.alerts?.map((alert) => (
+            <FormatAlert format='banner' {...alert} />
+          ))}
+        />
         <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
         <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
           <CritterDataTables />

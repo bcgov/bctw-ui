@@ -14,7 +14,7 @@ import UserAlert from 'pages/user/UserAlertPage';
 import { urls } from 'constants/external_urls';
 import { ENABLE_ALERTS } from 'api/api_helpers';
 import { NotificationsMenu } from './partials/NotificationsMenu';
-import { MortalityAlert } from 'types/alert';
+import { TelemetryAlert, MortalityAlert } from 'types/alert';
 
 type AppheaderProps = {
   children?: JSX.Element;
@@ -26,7 +26,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   const useAlert = useContext(AlertContext);
 
   const [user, setUser] = useState<User>();
-  const [mortAlerts, setMortAlerts] = useState<MortalityAlert[]>([]);
+  const [telemetryAlerts, setTelemetryAlerts] = useState<TelemetryAlert[]>([]);
   //const [alertCount, setAlertCount] = useState(0);
   const [showAlerts, setShowAlerts] = useState(false);
 
@@ -52,7 +52,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   useDidMountEffect(() => {
     const { alerts } = useAlert;
     if (alerts.length) {
-      setMortAlerts(alerts);
+      setTelemetryAlerts(alerts);
     } else {
       setShowAlerts(false);
     }
@@ -119,7 +119,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
               </li>
             ) : null} */}
             {/* New Alert Code */}
-            <NotificationsMenu alerts={mortAlerts} />
+            <NotificationsMenu alerts={telemetryAlerts} />
             <li className={'username'}>
               <a href='/profile'>
                 <IconButton size='large'>

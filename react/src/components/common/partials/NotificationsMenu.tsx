@@ -16,11 +16,12 @@ import {
 } from '@mui/material';
 import { Icon } from 'components/common';
 import { useState } from 'react';
-import { MortalityAlert } from 'types/alert';
+import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { ArrowButton } from './ArrowButton';
+import { FormatAlert } from './FormatAlert';
 import { SubHeader } from './SubHeader';
 interface NotificationsMenuProps {
-  alerts?: MortalityAlert[];
+  alerts?: TelemetryAlert[];
 }
 export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
   const theme = useTheme();
@@ -32,7 +33,7 @@ export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Eleme
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const notifications: MortalityAlert[] = [new MortalityAlert(), new MortalityAlert()];
+  // const notifications: MortalityAlert[] = [new MortalityAlert(), new MortalityAlert()];
   const alertsCount = alerts?.length;
   return (
     <>
@@ -60,27 +61,15 @@ export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Eleme
           </Box>
         </ListItem>
         <Divider />
-        {alerts?.map((notif, idx) => {
-          return (
-            //Change the selected prop to the appropriate value
-            //Maybe highlight the alerts that appeared today
-            <Box>
-              <MenuItem sx={{ py: 3 }} key={`menu-item-${idx}`} divider={idx < notifications.length} selected>
-                <ListItemIcon>
-                  <Icon icon={'circle'} htmlColor={theme.palette.error.main} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography>
-                      {`${notif.species} Mortality alert from Device ${notif.device_id} on Animal ${notif.wlh_id}`}
-                    </Typography>
-                  }
-                  secondary={`${notif.valid_from}`}
-                />
-              </MenuItem>
-            </Box>
-          );
-        })}
+        {alerts?.map((notif, idx) => (
+          //Change the selected prop to the appropriate value
+          //Maybe highlight the alerts that appeared today
+          <Box key={`menu-item-${idx}`}>
+            <MenuItem sx={{ py: 3 }} divider={idx < alerts?.length} selected>
+              <FormatAlert format='menu' alert={notif} />
+            </MenuItem>
+          </Box>
+        ))}
       </Menu>
     </>
   );

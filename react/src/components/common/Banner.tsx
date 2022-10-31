@@ -60,8 +60,10 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
         }>
         {Array.isArray(text) ? (
           <div>
-            {text.map((t) => (
-              <ListItem className={style.listItem}>{t}</ListItem>
+            {text.map((t, i) => (
+              <ListItem key={`list-item-${i}`} className={style.listItem}>
+                {t}
+              </ListItem>
             ))}
           </div>
         ) : (
@@ -71,8 +73,8 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
           {hiddenContent?.length ? (
             <List dense>
               <div>
-                {hiddenContent.map((content) => (
-                  <div>{content}</div>
+                {hiddenContent.map((content, idx) => (
+                  <div key={`hidden-content-${idx}`}>{content}</div>
                 ))}
               </div>
             </List>
@@ -107,7 +109,7 @@ export const InfoBanner = (props: InfoBannerProps) => <Banner variant='info' {..
  */
 type NotificationBannerProps = Pick<BannerProps, 'hiddenContent'>;
 export const NotificationBanner = (props: NotificationBannerProps) => {
-  const numNotifs = props.hiddenContent.length;
+  const numNotifs = props?.hiddenContent?.length;
   return numNotifs ? (
     <Banner
       variant='error'

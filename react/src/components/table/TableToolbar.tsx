@@ -12,10 +12,6 @@ const useToolbarStyles = makeStyles((theme) => ({
   highlight:
     theme.palette.mode === 'light' ? { color: theme.palette.secondary.main } : { color: theme.palette.text.primary },
 
-  toolbarInner: {
-    //paddingRight: theme.spacing(2)
-    //paddingLeft: theme.spacing(2)
-  },
   toolbarTitle: {
     fontWeight: 700,
     display: 'flex',
@@ -48,7 +44,7 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
   const { numSelected, sibling, title, showTooltip, disableSearch } = props;
   return (
     <Toolbar disableGutters className={classes.root}>
-      <Box className={classes.toolbarInner} width='100%'>
+      <Box width='100%'>
         {showTooltip && (
           <TableRow selected={true}>
             <TableCell style={{ color: 'black' }}>Current Record</TableCell>
