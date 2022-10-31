@@ -27,7 +27,8 @@ export default function CritterPage(): JSX.Element {
         <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
-            <NotificationsMenu />
+            {/* Might be adding this back */}
+            {/* <NotificationsMenu /> */}
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
               {CritterStrings.manageMyAnimals}
             </Button>
