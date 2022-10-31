@@ -4,7 +4,7 @@ import createStyles from '@mui/styles/createStyles';
 import { removeProps } from 'utils/common_helpers';
 
 const ttProps: Pick<TooltipProps, 'enterDelay' | 'placement'> = {
-  enterDelay: 750,
+  enterDelay: 500,
   placement: 'right-start'
 };
 
@@ -32,7 +32,11 @@ type TooltipProps = MuiTooltipProps & {
 export default function Tooltip(props: TooltipProps): JSX.Element {
   const classes = useStyles();
   return (
-    <MuiTooltip className={classes.tooltip} {...ttProps} {...removeProps(props, ['inline'])}>
+    <MuiTooltip
+      className={classes.tooltip}
+      {...ttProps}
+      {...removeProps(props, ['inline'])}
+      placement={props.placement}>
       <div style={{ display: props.inline ? 'inline' : 'block' }} className={props.nestedClass}>
         {props.children}
       </div>

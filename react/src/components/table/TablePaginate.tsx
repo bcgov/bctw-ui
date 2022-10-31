@@ -31,26 +31,26 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
   // }
   return (
     <>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 1}
-        aria-label="first page"
-        size="large"><Icon icon='first' /></IconButton>
+      <IconButton onClick={handleFirstPageButtonClick} disabled={page === 1} aria-label='first page' size='large'>
+        <Icon icon='first' />
+      </IconButton>
 
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 1}
-        aria-label="previous page"
-        size="large"><Icon icon='back'/></IconButton>
+      <IconButton onClick={handleBackButtonClick} disabled={page === 1} aria-label='previous page' size='large'>
+        <Icon icon='back' />
+      </IconButton>
 
-      <span><strong>{`Page: ${page} / ${totalPages}`}</strong></span>
+      <span>
+        <strong>{`Page: ${page} / ${totalPages}`}</strong>
+      </span>
 
       <IconButton
         onClick={handleNextButtonClick}
         //{page >= Math.ceil(count / rowsPerPage) - 1}
         disabled={count < rowsPerPage}
-        aria-label="next page"
-        size="large"><Icon icon='next'/></IconButton>
+        aria-label='next page'
+        size='large'>
+        <Icon icon='next' />
+      </IconButton>
 
       {/* <IconButton
         onClick={handleLastPageButtonClick}
@@ -58,6 +58,5 @@ export default function PaginationActions(props: TablePaginationActionsProps): J
         aria-label="last page"
         size="large"><Icon icon='last'/></IconButton> */}
     </>
-
   );
 }

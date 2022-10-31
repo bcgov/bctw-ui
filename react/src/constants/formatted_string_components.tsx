@@ -1,4 +1,9 @@
-import { Typography } from '@mui/material';
+import { Button, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Icon } from 'components/common';
+import { getTag } from 'components/table/table_helpers';
+import { AnimalNotification, MortalityAlert } from 'types/alert';
+import { AttachedAnimal } from 'types/animal';
+import { eDeviceStatus } from 'types/collar';
 
 const critterImportMessage = (
   <>
@@ -57,6 +62,25 @@ const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX
   </>
 );
 
+const animalBannerMortNotif = (notif: AnimalNotification) => (
+  <ListItem>
+    <ListItemIcon>{getTag(notif.device_status as eDeviceStatus)}</ListItemIcon>
+    <ListItemText
+      primary={
+        <Typography>
+          The status of <b>Device ID:</b> {notif.device_id} changed from 'Alive' to '<b>{notif.device_status}</b>' on
+          DATE
+        </Typography>
+      }
+      secondary={
+        <>
+          <b>Frequency:</b> {notif.frequency} <b>Animal ID:</b> {notif.animal_id} <b>WLH ID:</b> {notif.wlh_id}
+        </>
+      }
+    />
+  </ListItem>
+);
+
 const speciesModalMessage = (currentSpecies: string, nextSpecies: string): JSX.Element => {
   const diff = (a?: string[], b?: string[]): string[] => (!a || !b ? null : a.filter((v) => !b.includes(v)));
   const WMU = 'Wildlife Management Unit';
@@ -93,5 +117,6 @@ export {
   bothImportMessage,
   pointImportMessage,
   releaseUnattachWarning,
-  speciesModalMessage
+  speciesModalMessage,
+  animalBannerMortNotif
 };

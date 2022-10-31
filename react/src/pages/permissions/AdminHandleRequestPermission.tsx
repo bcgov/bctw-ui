@@ -36,6 +36,8 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const [requests, setRequests] = useState<IGroupedRequest[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  const [showMapModal, setShowMapModal] = useState(false);
+
   const [isGrant, setIsGrant] = useState(false);
   const [denyReason, setDenyReason] = useState<PermissionWasDeniedReason>('Not given');
   //const [selectedRequestID, setSelectedRequestID] = useState<number>();

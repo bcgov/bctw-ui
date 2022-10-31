@@ -18,8 +18,12 @@ import { formatAxiosError } from 'utils/errors';
 
 import { IAssignmentHistoryPageProps } from './AssignmentHistory';
 
-type PerformAssignmentPageProps = Pick<IAssignmentHistoryPageProps, 'permission_type' | 'critter_id'> & {
+export type PerformAssignmentPageProps = Pick<IAssignmentHistoryPageProps, 'permission_type' | 'critter_id'> & {
   current_attachment: CollarHistory;
+  openModal: boolean;
+  handleShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  disableBtn?: boolean;
+  onDelete?: (c: string) => void;
 };
 /**
  * handles attaching/removing devices from animals. Contains:
@@ -29,13 +33,17 @@ type PerformAssignmentPageProps = Pick<IAssignmentHistoryPageProps, 'permission_
 export default function PerformAssignmentAction({
   critter_id,
   current_attachment,
-  permission_type
+  permission_type,
+  openModal,
+  handleShowModal,
+  onDelete,
+  disableBtn = false
 }: PerformAssignmentPageProps): JSX.Element {
   const api = useTelemetryApi();
   const notifyAttachment = useAttachmentDispatch();
   const showNotif = useResponseDispatch();
-  const [showConfirmUnattachModal, setShowConfirmModal] = useState(false);
-  const [showDevicesAvailableModal, setShowAvailableModal] = useState(false);
+  // const [showConfirmUnattachModal, setShowConfirmModal] = useState(false);
+  // const [showDevicesAvailableModal, setShowAvailableModal] = useState(false);
   // is a device being attached or removed?
   const [isRemovingDevice, setIsRemovingDevice] = useState(!!current_attachment?.collar_id);
   const [canEdit, setCanEdit] = useState(false);
@@ -64,7 +72,7 @@ export default function PerformAssignmentAction({
   };
 
   // update data life class when the existing attachment is loaded
-  useDidMountEffect(() => {
+  useEffect(() => {
     if (current_attachment) {
       const isRemoving = !!current_attachment?.collar_id;
       setIsRemovingDevice(isRemoving);
@@ -76,6 +84,8 @@ export default function PerformAssignmentAction({
           return new DataLifeInput(attachment_start, data_life_start, null, null);
         }
       });
+    } else {
+      setIsRemovingDevice(false);
     }
   }, [current_attachment]);
 
@@ -91,15 +101,17 @@ export default function PerformAssignmentAction({
     // update state to indicate that the device can only be removed
     setIsRemovingDevice((o) => !o);
     onMutationComplete(record);
+    if (onDelete) onDelete(critter_id);
   };
 
   const onRemoveSuccess = (record: CollarHistory): void => {
     showNotif({ severity: 'success', message: `device ${current_attachment?.device_id} successfully removed` });
     onMutationComplete(record);
+    if (onDelete) onDelete(critter_id);
   };
 
   const onMutationComplete = (record: CollarHistory): void => {
-    closeModals();
+    closeModal();
     // update the context
     notifyAttachment(record);
   };
@@ -123,10 +135,10 @@ export default function PerformAssignmentAction({
   /* if there is a collar attached and user clicks the remove button, show the confirmation window
     otherwise, show the list of devices the user has access to
   */
-  const handleClickShowModal = (): void => (isRemovingDevice ? setShowConfirmModal(true) : setShowAvailableModal(true));
+  const handleClickShowModal = (): void => handleShowModal(true);
 
-  const closeModals = (): void => {
-    isRemovingDevice ? setShowConfirmModal(false) : setShowAvailableModal(false);
+  const closeModal = (): void => {
+    handleShowModal(false);
   };
 
   const handleConfirmRemoveDevice = (): void => {
@@ -135,7 +147,7 @@ export default function PerformAssignmentAction({
       ...dli.toRemoveDeviceJSON()
     };
     saveRemoveDevice(body);
-    setShowConfirmModal(false);
+    handleShowModal(false);
   };
 
   // componenet passed to the confirm device removal as the modal body.
@@ -145,29 +157,32 @@ export default function PerformAssignmentAction({
       <DataLifeInputForm dli={dli} enableEditEnd={true} enableEditStart={false} />
     </>
   );
-
   return (
     <>
-      <ConfirmModal
-        handleClickYes={handleConfirmRemoveDevice}
-        handleClose={closeModals}
-        open={showConfirmUnattachModal}
-        message={ConfirmRemoval}
-        title={CS.collarRemovalTitle}
-      />
-      <AssignNewCollarModal
-        onSave={saveAttachDevice}
-        critter_id={critter_id}
-        show={showDevicesAvailableModal}
-        onClose={closeModals}
-        dli={dli}
-        saveStatus={attachmentStatus}
-      />
-      {isRemoving ? (
+      {isRemovingDevice ? (
+        <ConfirmModal
+          handleClickYes={handleConfirmRemoveDevice}
+          handleClose={closeModal}
+          open={openModal}
+          message={ConfirmRemoval}
+          title={CS.collarRemovalTitle}
+        />
+      ) : (
+        <AssignNewCollarModal
+          onSave={saveAttachDevice}
+          critter_id={critter_id}
+          show={openModal}
+          onClose={closeModal}
+          dli={dli}
+          saveStatus={attachmentStatus}
+        />
+      )}
+
+      {disableBtn ? null : isRemoving ? (
         <CircularProgress />
       ) : (
         <Button disabled={!canEdit} onClick={handleClickShowModal}>
-          {isRemovingDevice ? 'Remove Device' : 'Assign Device'}
+          {isRemovingDevice ? `Remove Collar ${isRemovingDevice}` : `Assign Collar ${isRemoving}`}
         </Button>
       )}
     </>

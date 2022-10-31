@@ -1,95 +1,53 @@
+import { Button, Container } from '@mui/material';
 import Box from '@mui/material/Box';
-import DataTable from 'components/table/DataTable';
-import { CritterStrings, CritterStrings as CS } from 'constants/strings';
-import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import EditCritter from 'pages/data/animals/EditCritter';
-import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import AddEditViewer from 'pages/data/common/AddEditViewer';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
+import { CritterStrings } from 'constants/strings';
+import { SpeciesProvider } from 'contexts/SpeciesContext';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { Animal, AttachedAnimal } from 'types/animal';
-import ModifyCritterWrapper from './ModifyCritterWrapper';
-import { QueryStatus } from 'react-query';
-import { doNothing, doNothingAsync } from 'utils/common_helpers';
-import { SpeciesProvider } from 'contexts/SpeciesContext';
-import { ErrorBanner, InfoBanner, NotificationBanner, SuccessBanner } from 'components/common/Banner';
+import { UserAnimalAccess } from './UserAnimalAccess';
+
+import { NotificationBanner } from 'components/common/Banner';
+import { NotificationsMenu } from 'components/common/partials/NotificationsMenu';
+import { QuickSummary } from 'components/common/QuickSummary';
+import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
+import { CritterDataTables } from './CritterDataTables';
 export default function CritterPage(): JSX.Element {
-  const api = useTelemetryApi();
-  const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as Animal);
-  const [deleted, setDeleted] = useState('');
-  const [updated, setUpdated] = useState('');
-  const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
-  // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
-  const editProps = {
-    editing: null,
-    open: false,
-    onSave: doNothingAsync,
-    handleClose: doNothing
+  const [showDataRetrieval, setShowDataRetrieval] = useState(false);
+  const [openManageAnimals, setOpenManageAnimals] = useState(false);
+  const inverseManageModal = (): void => {
+    setOpenManageAnimals((a) => !a);
   };
-
-  const addEditProps = {
-    editing: new AttachedAnimal(),
-    empty: new AttachedAnimal(),
-    addTooltip: CS.addTooltip,
-    queryStatus: 'idle' as QueryStatus
+  const inverseDataRetrieval = (): void => {
+    setShowDataRetrieval((d) => !d);
   };
-
   return (
     <ManageLayout>
       <SpeciesProvider>
         <Box className='manage-layout-titlebar'>
-          <h1>My Animals</h1>
+          <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
-            <ModifyCritterWrapper
-              editing={editObj}
-              onDelete={(critter_id: string): void => setDeleted(critter_id)}
-              onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-              setCritter={setEditObj}>
-              <AddEditViewer<AttachedAnimal> {...addEditProps}>
-                <EditCritter {...editProps} />
-              </AddEditViewer>
-            </ModifyCritterWrapper>
-            <ExportViewer<AttachedAnimal>
-              template={[
-                'critter_id',
-                'species',
-                'population_unit',
-                'wlh_id',
-                'animal_id',
-                'collar_id',
-                'device_id',
-                'frequency',
-                'animal_id'
-              ]}
-              eTitle={CritterStrings.exportTitle}
-            />
+            {/* Might be adding this back */}
+            {/* <NotificationsMenu /> */}
+            <Button size='medium' variant='outlined' onClick={inverseManageModal}>
+              {CritterStrings.manageMyAnimals}
+            </Button>
+            <FullScreenDialog open={openManageAnimals} handleClose={inverseManageModal}>
+              <Container maxWidth='xl'>
+                <h1>{CritterStrings.manageMyAnimals}</h1>
+                <UserAnimalAccess />
+              </Container>
+            </FullScreenDialog>
           </Box>
         </Box>
-        {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
-        <RowSelectedProvider>
-          <>
-            <Box mb={4}>
-              <DataTable
-                headers={AttachedAnimal.attachedCritterDisplayProps}
-                title={CS.assignedTableTitle}
-                queryProps={{ query: api.useAssignedCritters }}
-                onSelect={handleSelect}
-                deleted={deleted}
-                updated={updated}
-              />
-            </Box>
-            <Box mb={4}>
-              <DataTable
-                headers={new Animal().displayProps}
-                title={CS.unassignedTableTitle}
-                queryProps={{ query: api.useUnassignedCritters }}
-                onSelect={handleSelect}
-                deleted={deleted}
-              />
-            </Box>
-          </>
-        </RowSelectedProvider>
+        <NotificationBanner hiddenContent={[]} />
+        <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
+        <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
+          <CritterDataTables />
+        </Box>
+        <Box style={showDataRetrieval ? {} : { display: 'none' }}>
+          <DataRetrievalDataTable />
+        </Box>
       </SpeciesProvider>
     </ManageLayout>
   );

@@ -148,7 +148,8 @@ const initMap = (
   handleDrawLine: (l) => void,
   handleDeleteLine: () => void,
   handleDeleteLayer?: (layers: L.LayerGroup) => void,
-  drawToolOptions?: L.Control.DrawOptions
+  drawToolOptions?: L.Control.DrawOptions,
+  drawToolDisable?: boolean
 ): void => {
   mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
   const layerPicker = L.control.layers(null, null, { position: 'topleft' });
@@ -170,7 +171,10 @@ const initMap = (
     }
   });
 
-  mapRef.current.addControl(drawControl);
+  if(!drawToolDisable) {
+    mapRef.current.addControl(drawControl);
+  }
+    
   mapRef.current.addControl(layerPicker);
 
   // line drawing control
@@ -218,7 +222,11 @@ const initMap = (
     })
     .on('draw:deleted', (data: any) => {
       //Leaflet Draw does not appear to have proper typing for this event type. Annoying!
+<<<<<<< HEAD
       handleDeleteLayer(data.layers);
+=======
+      handleDeleteLayer?.(data.layers);
+>>>>>>> latest-data-retrieval
     })
     .on('draw:edited', (e) => {
       drawSelectedLayer();

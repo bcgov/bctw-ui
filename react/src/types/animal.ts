@@ -17,6 +17,15 @@ import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 
+export enum eSpecies {
+  caribou = 'M-RATA',
+  grizzly_bear = 'M-URAR',
+  moose = 'M-ALAM',
+  grey_wolf = 'M-CALU'
+}
+
+const { caribou, grizzly_bear, moose, grey_wolf } = eSpecies;
+
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
   assigned = 'assigned',
@@ -155,6 +164,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   translocation: boolean;
   wlh_id: string;
   animal_comment: string;
+  @Transform(nullToDayjs) last_transmission_date?: Dayjs;
   @Exclude(toPlainOnly) @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) valid_from: Dayjs;
   @Exclude(toPlainOnly) @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) valid_to: Dayjs;
   @Exclude(toPlainOnly) owned_by_user_id: number;
@@ -216,6 +226,21 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
     return classToArray(keys, startsWith, excludes);
   }
 
+  tagColor(): string {
+    switch (this.species) {
+      case 'Caribou':
+        return '#9575cd';
+      case 'Moose':
+        return '#64b5f6';
+      case 'Grey Wolf':
+        return '#4db6ac';
+      case 'Grizzly Bear':
+        return '#81c784';
+      default:
+        return '#bdbdbd';
+    }
+  }
+
   constructor(critter_id = '') {
     this.critter_id = critter_id;
   }
@@ -230,31 +255,64 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   device_id: number;
   device_make: Code;
   frequency: number;
-
+  device_status: string;
+  latitude: number;
+  longitude: number;
   @Exclude(toPlainOnly) attachment_start: Dayjs;
   @Exclude(toPlainOnly) data_life_start: Dayjs;
   @Exclude(toPlainOnly) data_life_end: Dayjs;
   @Exclude(toPlainOnly) attachment_end: Dayjs;
+  @Transform(nullToDayjs) last_fetch_date?: Dayjs;
 
+  get lastKnownLocation(): string {
+    if (this.latitude && this.longitude) {
+      return `${this.latitude.toFixed(2)} ${this.longitude.toFixed(2)}`;
+    } else {
+      return null;
+    }
+  }
   // con't overide since this class is inherited
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
-    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+    return [
+      'species',
+      'wlh_id',
+      'animal_id',
+      'device_status',
+      'animal_status',
+      'device_id',
+      'frequency'
+      // 'telemetry_updated',
+      // 'last_fetch'
+      //'lastKnownLocation'
+      // 'latitude',
+      // 'longitude'
+    ];
   }
 
-  formatPropAsHeader(str: keyof Animal): string {
-    return super.formatPropAsHeader(str);
+  tagColor(): string {
+    return super.tagColor();
+  }
+
+  formatPropAsHeader(str: keyof Animal | keyof AttachedAnimal): string {
+    if (str in Animal) {
+      return super.formatPropAsHeader(str as keyof Animal);
+    } else {
+      switch (str) {
+        case 'device_status':
+          return 'Collar Status';
+        case 'lastKnownLocation':
+          return 'Last Lat Long';
+        case 'last_transmission_date':
+          return 'Last Transmission';
+        case 'last_fetch_date':
+          return 'Last Update Attempt';
+        default:
+          return columnToHeader(str);
+      }
+    }
   }
 }
 
-//Fixme: move this into a context that fetches from the DB to stay in sync.
-export enum eSpecies {
-  caribou = 'M-RATA',
-  grizzly_bear = 'M-URAR',
-  moose = 'M-ALAM',
-  grey_wolf = 'M-CALU'
-}
-
-const { caribou } = eSpecies;
 // species: [] represents field applies to all species, used for optimization on searching
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
   speciesField: [{ prop: 'species', type: eInputType.code, species: [], ...isRequired }],

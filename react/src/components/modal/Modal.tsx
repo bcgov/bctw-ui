@@ -7,19 +7,23 @@ import { Icon } from 'components/common';
 import { removeProps } from 'utils/common_helpers';
 
 export default function Modal(props: ModalProps): JSX.Element {
-  const { disableBackdropClick, open, title, handleClose, children, useButton } = props;
+  const { disableBackdropClick, open, title, handleClose, children, useButton, onEnteredCallback } = props;
   const propsToPass = removeProps(props, ['handleClose', 'disableBackdropClick', 'useButton']);
   const classes = modalStyles();
   return (
     <Dialog
       className={'dialog-modal'}
       open={open}
-      onClose={handleClose}
+      onClose={() => handleClose(false)}
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{ timeout: 500 }}
       {...propsToPass}>
-      <Fade in={open}>
+      <Fade
+        in={open}
+        onEntered={() => {
+          onEnteredCallback?.();
+        }}>
         <div className={classes.paper}>
           <div className={classes.title}>
             <h3>{title}</h3>

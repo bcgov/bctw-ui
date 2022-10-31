@@ -60,9 +60,10 @@ export default function AssignNewCollarModal({
         title={CS.collarAssignmentTitle}
         queryProps={{ query: bctwApi.useUnattachedDevices, param: eCollarAssignedStatus.Available }}
         onSelect={handleSelectDevice}
+        disableSearch
       />
       {/* disable editing of end of the attachment when attaching the device */}
-      <DataLifeInputForm dli={DLInput} enableEditStart={true} enableEditEnd={false} />
+      {/* <DataLifeInputForm dli={DLInput} enableEditStart={true} enableEditEnd={false} /> */}
       <Box>
         {saveStatus === 'loading' ? (
           <div>

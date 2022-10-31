@@ -1,18 +1,42 @@
 import { eUserRole } from 'types/user';
 
 const CritterStrings = {
+  title: 'Animals',
   wlh_id: 'Assigned by Provincial Wildlife Health Group',
   assignCollarBtnText: 'Assign Selected Device',
   assignedTableTitle: 'Animals Attached to a Device',
-  collarAssignmentTitle: 'Assign a Device',
+  collarAssignmentTitle: 'Attach Collar',
   collarRemovalText: (deviceid: number, make: string): string =>
     `Are you sure you wish to remove ${make} device ${deviceid}?`,
-  collarRemovalTitle: 'Confirm Device Unassignment',
+  collarRemovalTitle: 'Confirm Collar Unassignment',
   exportTitle: 'animal_export',
-  unassignedTableTitle: 'Animals Without a Device',
+  unassignedTableTitle: 'Animals Without a Collar',
   addTooltip: 'TODO: addTooltip',
   lockedSpeciesTooltip: 'Unlock to change species. Warning potential data loss.',
-  unlockedSpeciesTooltip: 'Lock species selection'
+  unlockedSpeciesTooltip: 'Lock species selection',
+  menuItems: {
+    edit: 'Edit',
+    map: 'Show on Map',
+    mortality: 'Report Mortality',
+    removeCollar: 'Remove Collar',
+    attach: 'Attach Collar'
+  },
+  collaredAnimals: 'Collared Animals',
+  nonCollaredAnimals: 'Non-collared Animals',
+  manageMyAnimals: 'Manage my Animals'
+};
+
+const LatestDataRetrieval = {
+  title: 'Latest Data Retrieval',
+  success: 'We successfully retrieved data from all your devices in our latest attempt.',
+  failure: 'We failed to retrieve data from one or more of your devices in our latest attempt.'
+};
+
+const QuickSummaryStrings = {
+  title: 'Quick Summary',
+  manage: 'Managed Animals',
+  observed: 'Observed Animals',
+  editable: 'Editable Animals'
 };
 
 const ImportSteps = [
@@ -131,7 +155,7 @@ const CollarStrings = {
     'device_deployment_status'
   ],
   exportTitle: 'device_export',
-  assignmentHistoryByAnimalTitle: 'History of Devices Assigned',
+  assignmentHistoryByAnimalTitle: 'Collars History',
   assignmentHistoryByDeviceTitle: 'History of Animals Assigned',
   collarImportStartMsg: 'Device import - What do you want to do?',
   collarImportKeyX: 'Import Vectronic .keyx files',
@@ -271,7 +295,10 @@ const HomePageStrings = {
 };
 
 const ExportStrings = {
-  infoBannerMesgs: ['Use Quick Export to quickly get telemetry data for any of your animals.', 'Use Advanced Export to get data that matches custom query parameters.'],
+  infoBannerMesgs: [
+    'Use Quick Export to quickly get telemetry data for any of your animals.',
+    'Use Advanced Export to get data that matches custom query parameters.'
+  ],
   quickTabLabel: 'Quick Export',
   advancedTabLabel: 'Advanced Export',
   checkboxLabel: 'All Telemetry',
@@ -279,7 +306,7 @@ const ExportStrings = {
   animalTableHeader: 'Select Animals',
   queryBuilderHeader: 'Build Query',
   locationSelectHeader: 'Select Location',
-  modal : {
+  modal: {
     noTelemetryWarning: 'No telemetry data found. Try expanding your search or choosing different dates.',
     telemetrySuccessMsg: 'Successfully exported telemetry.',
     modalTitle: 'Confirm Export Download',
@@ -288,7 +315,7 @@ const ExportStrings = {
     kmlButton: 'Export Data as KML',
     kmlButtonLoad: 'Exporting KML...'
   }
-}
+};
 
 const DelegationRequestStrings = {
   confirmDenyMesg: `Are you sure you wish to deny this permission request?`,
@@ -316,5 +343,7 @@ export {
   HomePageStrings,
   DelegationRequestStrings,
   BannerStrings,
-  ExportStrings
+  ExportStrings,
+  LatestDataRetrieval,
+  QuickSummaryStrings
 };

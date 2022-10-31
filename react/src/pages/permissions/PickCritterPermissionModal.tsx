@@ -211,9 +211,7 @@ export default function PickCritterPermissionModal({
         resetSelections={triggerReset}
         isMultiSelect={true}
         alreadySelected={alreadySelected}
-        customColumns={
-          showSelectPermission ? [{ column: NewColumn, header: (): JSX.Element => <b>Select Permission</b> }] : []
-        }
+        customColumns={showSelectPermission ? [{ column: NewColumn, header: <b>Select Permission</b> }] : []}
       />
       <div className={'admin-btn-row'}>
         <Button disabled={!canSave} onClick={handleSave}>

@@ -22,7 +22,7 @@ type TableFilterProps<T> = {
   onChangeFilter: (filter: ITableFilter) => void;
   isMultiSearch?: boolean;
   setPage: (page: number) => void;
-  disabled: boolean;
+  //disabled: boolean;
 };
 
 /**
@@ -50,9 +50,10 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
       value={term}
       label={disabled ? 'Search - Select Column*' : 'Search'}
       placeholder={`${rowCount} records...`}
-      disabled={disabled}
+      //disabled={disabled}
       size={'small'}
       inputRef={inputRef}
+      style={{ width: 200 }}
     />
   );
 }
@@ -61,27 +62,28 @@ function TextFilter({ disabled, rowCount, defaultFilter, handleTextChange, input
  * the search component visible in table toolbars
  */
 function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
-  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch, setPage, disabled } = props;
+  const { filterableProperties, onChangeFilter, rowCount, isMultiSearch, setPage } = props;
   const [selectedOption, setSelectedOption] = useState<string[] | null>(null);
   const [searchStr, setSearchStr] = useState('');
   const textInput = useRef(null);
-  const isDisabled = disabled && !selectedOption?.length;
-
+  //const isDisabled = disabled && !selectedOption?.length;
   useDidMountEffect(() => {
     const n: ITableFilter = { keys: selectedOption, operator: 'contains', term: searchStr };
     onChangeFilter(n);
   }, [searchStr, selectedOption]);
 
   const handleSelect = (v: ISelectMultipleData[]): void => {
-    const values = v.map((item) => item.value as keyof T);
+    const arrV = Array.isArray(v) ? v : [v];
+    const values = arrV.map((item) => item.value as keyof T);
     if (selectedOption && !values.length) {
       setSearchStr('');
     }
     setSelectedOption(values as string[]);
-
-    setTimeout(() => {
-      textInput.current.focus();
-    }, 100);
+    if (values?.length) {
+      setTimeout(() => {
+        textInput.current.focus();
+      }, 100);
+    }
   };
 
   const handleTextChange = (value: string): void => {
@@ -109,16 +111,18 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
         data={selectOptions}
         changeHandler={handleSelect}
         tagLimit={1}
-        width={300}
+        width={200}
         isMultiSearch={isMultiSearch}
       />
-      <TextFilter
-        rowCount={rowCount}
-        handleTextChange={handleTextChange}
-        defaultFilter={searchStr}
-        disabled={isDisabled}
-        inputRef={textInput}
-      />
+      {!!selectedOption?.length && (
+        <TextFilter
+          rowCount={rowCount}
+          handleTextChange={handleTextChange}
+          defaultFilter={searchStr}
+          //disabled={isDisabled}
+          inputRef={textInput}
+        />
+      )}
     </Box>
   );
 }

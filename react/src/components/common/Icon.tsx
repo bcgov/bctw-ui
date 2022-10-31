@@ -44,13 +44,19 @@ import {
   mdiChevronUp,
   mdiEye,
   mdiEyePlus,
-  mdiDotsHorizontal
+  mdiDotsHorizontal,
+  mdiCheckCircle,
+  mdiGraveStone,
+  mdiRefresh,
+  mdiKeyboardBackspace
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
 type IconProps = {
   icon: string;
   htmlColor?: string;
+  size?: number;
+  rotate?: number;
 };
 
 const getIconPath = (path: string): string => {
@@ -152,9 +158,17 @@ const getIconPath = (path: string): string => {
       return mdiEyePlus;
     case 'dots':
       return mdiDotsHorizontal;
+    case 'check':
+      return mdiCheckCircle;
+    case 'dead':
+      return mdiGraveStone;
+    case 'refresh':
+      return mdiRefresh;
+    case 'back-extended':
+      return mdiKeyboardBackspace;
   }
 };
 
-export default function BCTWIcon({ icon, htmlColor }: IconProps): JSX.Element {
-  return <Icon path={getIconPath(icon)} color={htmlColor} className={'icon'} size={1} />;
+export default function BCTWIcon({ icon, htmlColor, rotate, size = 1 }: IconProps): JSX.Element {
+  return <Icon path={getIconPath(icon)} color={htmlColor} className={'icon'} size={size} rotate={rotate} />;
 }

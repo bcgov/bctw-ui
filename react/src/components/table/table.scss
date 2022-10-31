@@ -1,9 +1,10 @@
-.table-container{
+.table-container {
   width: 100%;
-  min-width: 500px;
-  max-height: 500px;
+  min-width: 100%;
+  max-height: 30rem;
   // min-height: 500px;
   overflow-y: auto;
+  overflow-x: auto;
 }
 .paper {
   width: 100%;
@@ -15,6 +16,12 @@
 }
 .title {
   flex: 1 1 100%;
+}
+.table-footer {
+  position: sticky;
+  bottom: 0;
+  background-color: #ffff;
+  width: 100%;
 }
 .visuallyHidden {
   border: 0;

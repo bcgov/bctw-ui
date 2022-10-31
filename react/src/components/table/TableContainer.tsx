@@ -9,11 +9,13 @@ type TableContainerProps = {
  */
 export default function TableContainer({ children, toolbar }: TableContainerProps): JSX.Element {
   return (
-    <Paper className={'paper'}>
+    <>
       {toolbar}
-      <MUITableContainer className={'table-container'} component={Paper}>
-        {children}
-      </MUITableContainer>
-    </Paper>
+      <Paper className={'paper'} sx={{ boxShadow: 3 }}>
+        <MUITableContainer className={'table-container'} component={Paper}>
+          {children}
+        </MUITableContainer>
+      </Paper>
+    </>
   );
 }

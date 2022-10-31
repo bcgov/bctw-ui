@@ -13,6 +13,9 @@ import { Button, Icon } from 'components/common';
 import { urls } from 'constants/external_urls';
 
 const useStyles = makeStyles(() => ({
+  appBar: {
+    borderRadius: '0 0 0 0'
+  },
   fsDialogHeader: {
     height: '70px'
   },
@@ -42,7 +45,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
   const classes = useStyles();
   return (
     <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
-      <AppBar elevation={0}>
+      <AppBar elevation={0} className={classes.appBar}>
         <Container maxWidth='xl'>
           <Toolbar disableGutters className={classes.fsDialogHeader}>
             <Button

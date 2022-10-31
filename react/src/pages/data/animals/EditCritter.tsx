@@ -8,12 +8,8 @@ import { CreateSpeciesFormField } from 'components/form/create_form_components';
 import { permissionCanModify } from 'types/permission';
 import { useState } from 'react';
 import { editEventBtnProps, EditHeader, FormSection } from '../common/EditModalComponents';
-import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
-import WorkflowWrapper from '../events/WorkflowWrapper';
-import MortalityEvent from 'types/events/mortality_event';
-import CaptureEvent from 'types/events/capture_event';
+import { WorkflowType, wfFields } from 'types/events/event';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
-import ReleaseEvent from 'types/events/release_event';
 import { Button, Icon } from 'components/common';
 import { eUDFType, IUDF } from 'types/udf';
 import AddUDF from 'pages/udf/AddUDF';
@@ -23,6 +19,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useSpecies, useUpdateSpecies } from 'contexts/SpeciesContext';
 import { hideSection } from 'utils/species';
 import { SpeciesSelect } from 'components/form/SpeciesSelect';
+import { CritterWorkflow } from '../events/CritterWorkflow';
 
 /**
  * the main animal form
@@ -36,8 +33,8 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
   const isAttached = editing instanceof AttachedAnimal;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
-  const [showWorkflowForm, setShowWorkflowForm] = useState(false);
-  const [event, updateEvent] = useState<CaptureEvent | ReleaseEvent | MortalityEvent>(new MortalityEvent());
+  const [workflow, setWorkflow] = useState<WorkflowType>();
+  const [showWorkflow, setShowWorkflow] = useState(false);
   const [showUDFModal, setShowUDFModal] = useState(false);
   const [hasBabies, setHasBabies] = useState(false);
 
@@ -51,82 +48,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     setHasBabies(false);
     updateSpecies(null);
   };
-  // useEffect(() => {
-  //   setLockSpecies(!isCreatingNew)
-  // },[isCreatingNew, species])
-  /**
-   * when a workflow button is clicked, update the event type
-   * binding all properties of the @var editing to the event
-   */
-  const createEvent = (wfType: WorkflowType): CaptureEvent | ReleaseEvent | MortalityEvent => {
-    if (wfType === 'capture') {
-      return editObjectToEvent(editing, new CaptureEvent(), [
-        'species',
-        'translocation',
-        'recapture',
-        'region',
-        'population_unit'
-      ]);
-    } else if (wfType === 'release') {
-      return editObjectToEvent(editing, new ReleaseEvent(), ['region', 'population_unit']);
-    } else if (wfType === 'mortality') {
-      return editObjectToEvent(editing, new MortalityEvent(), ['animal_status']);
-    }
-  };
 
-  /**
-   * if a workflow button is clicked and the event type is the same, open or close the workflow modal.
-   * otherwise, update the workflow type which will trigger the modal state
-   */
-  const handleOpenWorkflow = (e: WorkflowType): void => {
-    updateEvent(createEvent(e));
-    setShowWorkflowForm((o) => !o);
-  };
-
-  /**
-   * when a capture workflow is saved, always show the release workflow unless a translocation is underway
-   * todo: is this still needed?
-   */
-  const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
-    setShowWorkflowForm(false);
-    if (e.event_type === 'capture' && e instanceof CaptureEvent) {
-      if (e.translocation && !e.isTranslocationComplete) {
-        // do nothing
-      } else {
-        // show the release form, populating the location and date fields
-        const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'population_unit']);
-        // set the new event directly, triggering the display of the release form
-        // console.log(rwf)
-        updateEvent(rwf);
-        setShowWorkflowForm((o) => !o);
-      }
-    }
-  };
-
-  /**
-   * the capture workflow has multiple exit points that chain to other workflows
-   * this is a separate handler because we do not want to save the form until the
-   * @param nextWorkflow is completed
-   */
-  const handleWorkflowChain = async (e: CaptureEvent, nextWorkflow: WorkflowType): Promise<void> => {
-    if (e.event_type !== 'capture') {
-      return;
-    }
-    let newwf;
-    if (nextWorkflow === 'mortality') {
-      newwf = new MortalityEvent(undefined, e);
-    } else if (nextWorkflow === 'release') {
-      newwf = new ReleaseEvent(e);
-    }
-    if (!newwf) {
-      return;
-    }
-    // there are only animal-related fields in capture workflows
-    const next = editObjectToEvent(e.getAnimal(), newwf, []);
-    //console.log(`capture workflow chained to ${nextWorkflow} type`, next);
-    await updateEvent(next);
-    await setShowWorkflowForm((o) => !o);
-  };
   const {
     associatedAnimalFields,
     captureFields,
@@ -165,6 +87,10 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
       )}
     </Container>
   );
+  const handleWorkflow = (wf: WorkflowType) => {
+    setWorkflow(wf);
+    setShowWorkflow(true);
+  };
   return (
     <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={new Animal(editing.critter_id)}>
       <ChangeContext.Consumer>
@@ -278,7 +204,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                       <Button
                         disabled={!isAttached}
                         {...editEventBtnProps}
-                        onClick={(): void => handleOpenWorkflow('capture')}>
+                        onClick={(): void => handleWorkflow('capture')}>
                         Add Capture Event
                       </Button>
                     }>
@@ -294,7 +220,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                       <Button
                         disabled={!isAttached}
                         {...editEventBtnProps}
-                        onClick={(): void => handleOpenWorkflow('release')}>
+                        onClick={(): void => handleWorkflow('release')}>
                         Add Release Event
                       </Button>
                     }>
@@ -311,7 +237,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                       <Button
                         disabled={!isAttached}
                         {...editEventBtnProps}
-                        onClick={(): void => handleOpenWorkflow('mortality')}>
+                        onClick={(): void => handleWorkflow('mortality')}>
                         Record Mortality Details
                       </Button>
                     }>
@@ -327,12 +253,11 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     critter_id={editing.critter_id}
                     permission_type={editing.permission_type}
                   />
-                  <WorkflowWrapper
-                    open={showWorkflowForm}
-                    event={event as any}
-                    handleClose={(): void => setShowWorkflowForm(false)}
-                    onEventSaved={handleWorkflowSaved}
-                    onEventChain={handleWorkflowChain}
+                  <CritterWorkflow
+                    editing={editing}
+                    workflow={workflow}
+                    open={showWorkflow}
+                    setOpen={setShowWorkflow}
                   />
                 </>
               ) : null}

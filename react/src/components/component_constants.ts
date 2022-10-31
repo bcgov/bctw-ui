@@ -7,7 +7,7 @@ const baseInputProps: Pick<OutlinedTextFieldProps, 'variant'> & Pick<StandardTex
 };
 
 const buttonProps: Pick<ButtonProps, 'size' | 'color'> = {
-  size: 'large',
+  size: 'medium',
   color: 'primary'
 };
 

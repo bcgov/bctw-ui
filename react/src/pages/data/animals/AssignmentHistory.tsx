@@ -28,6 +28,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
   const [selectedAttachment, setSelectedAttachment] = useState<CollarHistory>(new CollarHistory());
   const [history, setCollarHistory] = useState<CollarHistory[]>([]);
   const [showEditDL, setShowEditDL] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const onNewData = (d: CollarHistory[]): void => {
     setCollarHistory(d);
@@ -44,7 +45,7 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
   useEffect(() => {
     // console.log('assignment history page: device was assigned or removed', attachmentChanged);
     handleClose(false);
-  }, [attachmentChanged])
+  }, [attachmentChanged]);
 
   /**
    * Custom column button component passed to device assignment history data table.
@@ -70,11 +71,14 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
         headers={CollarHistory.propsToDisplay}
         queryProps={{ query: api.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
         paginate={history?.length >= 10}
-        customColumns={[{ column: EditDatalifeColumn, header: (): JSX.Element => <b>Modify Data Life</b> }]}
+        customColumns={[{ column: EditDatalifeColumn, header: <b>Modify Data Life</b> }]}
       />
       <PerformAssignmentAction
         current_attachment={currentAttachment}
-        {...props}
+        critter_id={critter_id}
+        permission_type={permission_type}
+        openModal={showModal}
+        handleShowModal={setShowModal}
       />
       <EditDataLifeModal
         attachment={selectedAttachment}

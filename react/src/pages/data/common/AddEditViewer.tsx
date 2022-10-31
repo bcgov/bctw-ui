@@ -3,7 +3,7 @@ import { EditorProps } from 'components/component_interfaces';
 import { IEditModalProps } from 'pages/data/common/EditModal';
 import { cloneElement, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
-import { Box, Button, ButtonProps } from '@mui/material';
+import { Box, Button, ButtonProps, IconButton } from '@mui/material';
 import { Icon, Tooltip } from 'components/common';
 import { QueryStatus } from 'react-query';
 import { buttonProps } from 'components/component_constants';
@@ -31,6 +31,7 @@ export type IAddEditProps<T> = {
   children: JSX.Element;
   disableAdd?: boolean;
   disableEdit?: boolean;
+  disableDelete?: boolean;
   editBtn?: JSX.Element;
   editing: T;
   empty: T;
@@ -51,6 +52,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
     cannotEdit,
     children,
     disableAdd,
+    disableDelete,
     disableEdit,
     editBtn,
     editing,
@@ -73,18 +75,18 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
   const deviceAttachmentChange = useAttachmentChanged();
 
   const inverseModalState = (): void => {
-    setShowModal(o => !o);
-  }
+    setShowModal((o) => !o);
+  };
 
   /**
-   * close the edit modal when editing an animal and 
-   * a device is attached or removed 
+   * close the edit modal when editing an animal and
+   * a device is attached or removed
    */
   useDidMountEffect(() => {
     if (editing instanceof AttachedAnimal || editing instanceof Animal) {
       inverseModalState();
     }
-  }, [deviceAttachmentChange])
+  }, [deviceAttachmentChange]);
 
   const handleClickAdd = (): void => {
     setIsCreatingNew(true);
@@ -124,7 +126,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
 
   // override the open/close handlers and props of the child EditModal component
   const editorProps: Pick<IEditModalProps<T>, 'editing' | 'open' | 'onSave' | 'handleClose' | 'disableHistory'> &
-  Pick<EditorProps<T>, 'isCreatingNew'> = {
+    Pick<EditorProps<T>, 'isCreatingNew'> = {
     // if this is a new instance - pass an empty object
     editing: isCreatingNew ? empty : editObj,
     // required in Edit components (ex. EditCritter)
@@ -164,6 +166,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
       {cloneElement(children, editorProps)}
       <Box className='button-bar'>
         {/* render add button */}
+        {/* // TODO: Move add btn to own component */}
         {disableAdd ? null : (
           <Tooltip title={addTooltip ?? ''} inline={true}>
             <Button {...btnProps} variant='contained' startIcon={<Icon icon='plus' />} onClick={handleClickAdd}>{`Add ${
@@ -171,22 +174,32 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
             }`}</Button>
           </Tooltip>
         )}
-
         {/* render edit button */}
-        <Tooltip title={editTooltip ?? ''} inline={true}>
-          {
-            queryStatus === 'loading' ? (
-              <LoadingButton loading loadingIndicator='Loading...'>Fetch data</LoadingButton>
-            ) : (
-              <Button {...btnProps} disabled={editBtnProps.disabled} onClick={handleClickEdit}>
-                {`${cannotEdit ? 'View' : 'View / Edit'} ${editText ?? ''}`}
-              </Button>
-            )
-          }
-        </Tooltip>
+
+        {/* // Old loading btn */}
+        {/* {queryStatus === 'loading' ? (
+          <LoadingButton loading loadingIndicator='Loading...'>
+            Fetch data
+          </LoadingButton>
+        ) : (
+          <Button {...btnProps} disabled={editBtnProps.disabled} onClick={handleClickEdit}>
+            {`${cannotEdit ? 'View' : 'View/Edit'} ${editText ?? ''}`}
+          </Button>
+        )} */}
+
+        {disableEdit ? null : (
+          <Button
+            {...btnProps}
+            disabled={editBtnProps.disabled}
+            onClick={handleClickEdit}
+            endIcon={cannotEdit ? <Icon icon='eye' /> : <Icon icon='edit' />}>
+            {cannotEdit ? 'View' : 'Edit'}
+          </Button>
+        )}
 
         {/* render delete button */}
-        {enableDelete() ? (
+        {/* // TODO Move delete btn to own component */}
+        {enableDelete() && !disableDelete ? (
           <Tooltip title={deleteTooltip ?? ''} inline={true}>
             <Button
               {...btnProps}

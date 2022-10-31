@@ -9,7 +9,9 @@ html {
   font-size: 16px;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
@@ -32,14 +34,14 @@ fieldset {
   flex: 1 1 auto;
 }
 
-// Button Bar 
+// Button Bar
 .button-bar {
   button {
     margin-left: 0.5rem;
   }
 }
 
-// Form 
+// Form
 .form-buttons {
   button {
     min-width: 100px;
@@ -60,7 +62,8 @@ fieldset {
   margin: 0;
   margin-left: 0.5rem;
 
-  dd, dt {
+  dd,
+  dt {
     display: inline-block;
     position: relative;
     margin: 0;
@@ -112,9 +115,9 @@ fieldset {
 }
 
 .cell-clickable {
-  color: #1A5A96;
+  color: #1a5a96;
   cursor: pointer;
-  text-decoration: underline
+  text-decoration: underline;
 }
 
 .cell-border-right {

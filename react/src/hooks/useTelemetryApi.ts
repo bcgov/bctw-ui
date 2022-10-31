@@ -85,11 +85,10 @@ export const useTelemetryApi = () => {
    *
    */
   const useEstimate = (start: string, end: string): UseQueryResult<any, AxiosError> => {
-    return useQuery<any, AxiosError>(
-      ['estimate', start, end],
-      () => mapApi.getEstimate(start, end),
-      {...defaultQueryOptions, retry: false}
-    );
+    return useQuery<any, AxiosError>(['estimate', start, end], () => mapApi.getEstimate(start, end), {
+      ...defaultQueryOptions,
+      retry: false
+    });
   };
 
   const useTracks = (start: string, end: string): UseQueryResult<ITelemetryLine[], AxiosError> => {
@@ -97,6 +96,14 @@ export const useTelemetryApi = () => {
       ['tracks', start, end],
       () => mapApi.getTracks(start, end),
       defaultQueryOptions
+    );
+  };
+
+  const useTracksPerCritter = (start: string, end: string, critter_id: string, enable = true): UseQueryResult<ITelemetryLine[], AxiosError> => {
+    return useQuery<ITelemetryLine[], AxiosError>(
+      ['tracks', start, end, critter_id],
+      () => mapApi.getTracks(start, end, critter_id),
+      {...defaultQueryOptions, enabled: enable}
     );
   };
 
@@ -118,6 +125,17 @@ export const useTelemetryApi = () => {
       defaultQueryOptions
     );
   };
+
+   /**
+   *
+   */
+    const usePingsPerCritter = (start: string, end: string, critter_id: string, enable = true): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+      return useQuery<ITelemetryPoint[], AxiosError>(
+        ['pings', { start, end, critter_id }],
+        () => mapApi.getPings(start, end, critter_id),
+        {...defaultQueryOptions, enabled: enable}
+      );
+    };
 
   // the same as usePings, but doesn't auto fetch due to enabled: false setting
   const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
@@ -183,24 +201,32 @@ export const useTelemetryApi = () => {
   /**
    * retrieves critters that have a collar assigned
    */
-  const useAssignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+  const useAssignedCritters = (
+    page: number,
+    config?: Record<string, unknown>,
+    ...args: unknown[]
+  ): UseQueryResult<Animal[] | AttachedAnimal[]> => {
     const search = parseArgs(args);
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
       ['critters_assigned', page, search.map((s) => s?.term).join()],
       () => critterApi.getCritters(page, eCritterFetchType.assigned, search),
-      critterOptions
+      { ...critterOptions, ...config }
     );
   };
 
   /**
    * retrieves critters not assigned to a collar
    */
-  const useUnassignedCritters = (page: number, ...args: unknown[]): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+  const useUnassignedCritters = (
+    page: number,
+    config?: Record<string, unknown>,
+    ...args: unknown[]
+  ): UseQueryResult<Animal[] | AttachedAnimal[]> => {
     const search = parseArgs(args);
     return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
       ['critters_unassigned', page, search.map((s) => s?.term).join()],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned, search),
-      critterOptions
+      { ...critterOptions, ...config }
     );
   };
 
@@ -252,7 +278,7 @@ export const useTelemetryApi = () => {
    */
   const useCollarAssignmentHistory = (
     page: number,
-    critterId: number,
+    critterId: string,
     config: Record<string, unknown>
   ): UseQueryResult<CollarHistory[]> => {
     return useQuery<CollarHistory[], AxiosError>(
@@ -532,7 +558,7 @@ export const useTelemetryApi = () => {
       config
     );
 
-    /*
+  /*
       const useTakeActionOnPermissionRequest = (
     config: UseMutationOptions<IUserCritterAccess, AxiosError, IExecutePermissionRequest>
   ): UseMutationResult<IUserCritterAccess> =>
@@ -566,8 +592,10 @@ export const useTelemetryApi = () => {
     useCodeHeaders,
     useEstimate,
     useTracks,
+    useTracksPerCritter,
     useUnassignedTracks,
     usePings,
+    usePingsPerCritter,
     useUnassignedPings,
     useAllDevices,
     useAttachedDevices,
