@@ -34,6 +34,7 @@ import {
   mdiMagnify,
   mdiFilterOutline,
   mdiBrush,
+  mdiArrowDownBold,
   mdiCancel,
   mdiCircle,
   mdiAlertRhombus,
@@ -47,7 +48,6 @@ import {
   mdiCheckCircle,
   mdiGraveStone,
   mdiRefresh,
-  mdiArrowTopLeft,
   mdiKeyboardBackspace
 } from '@mdi/js';
 import Icon from '@mdi/react';
@@ -69,6 +69,8 @@ const getIconPath = (path: string): string => {
       return mdiPaw;
     case 'arrow-up':
       return mdiArrowUpBold;
+    case 'arrow-down':
+      return mdiArrowDownBold;
     case 'cannotSnooze':
       return mdiAlarmOff;
     case 'backspace':
@@ -164,6 +166,8 @@ const getIconPath = (path: string): string => {
       return mdiGraveStone;
     case 'refresh':
       return mdiRefresh;
+    case 'back-extended':
+      return mdiKeyboardBackspace;
   }
 };
 

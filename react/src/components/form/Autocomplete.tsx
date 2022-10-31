@@ -1,5 +1,6 @@
 import { Chip, TextField } from '@mui/material';
 import { Autocomplete as MUIAutocomplete } from '@mui/material';
+import { SxProps } from '@mui/system';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useEffect, useState } from 'react';
 import { ISelectMultipleData } from './MultiSelect';
@@ -7,13 +8,15 @@ import { ISelectMultipleData } from './MultiSelect';
 type IAutocompleteProps<T extends ISelectMultipleData> = {
   label: string;
   changeHandler: (o: T[], p?: string) => void;
-  defaultValue?: T;
-  triggerReset?: boolean; // unselect of all values
+  defaultValue?: T[];
+  triggerReset?: any; // unselect of all values
+  resetToDefaultValue?: boolean;
   data: T[];
   width?: number;
   tagLimit?: number;
   isMultiSearch?: boolean;
   hidden?: boolean;
+  sx?: SxProps;
 };
 
 /**
@@ -21,17 +24,33 @@ type IAutocompleteProps<T extends ISelectMultipleData> = {
  * tag components when an option is selected
  */
 export default function Autocomplete<T extends ISelectMultipleData>(props: IAutocompleteProps<T>): JSX.Element {
-  const { label, data, triggerReset, changeHandler, defaultValue, width, tagLimit, isMultiSearch, hidden } = props;
+  const {
+    label,
+    data,
+    triggerReset,
+    changeHandler,
+    resetToDefaultValue,
+    defaultValue,
+    width,
+    tagLimit,
+    isMultiSearch,
+    hidden,
+    sx
+  } = props;
   const [selected, setSelected] = useState<T[]>([]);
   useEffect(() => {
-    setSelected([]);
+    if (resetToDefaultValue) {
+      setSelected(defaultValue ?? []);
+    } else {
+      setSelected([]);
+    }
   }, [triggerReset]);
 
-  useDidMountEffect(() => {
+  useEffect(() => {
     if (defaultValue) {
-      setSelected((o) => [...o, defaultValue]);
+      setSelected(defaultValue);
     }
-  }, [defaultValue]);
+  }, []);
 
   const handleChange = (value: T[]): void => {
     setSelected(value ? value : []);
@@ -46,7 +65,8 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
       disableCloseOnSelect={isMultiSearch}
       autoComplete
       size='small'
-      multiple={isMultiSearch}
+      multiple
+      sx={sx}
       style={{ width }}
       limitTags={tagLimit ?? 3}
       isOptionEqualToValue={(option, value): boolean => {
@@ -68,7 +88,12 @@ export default function Autocomplete<T extends ISelectMultipleData>(props: IAuto
             return -1;
           })
           .map((option: T, index: number) => (
-            <Chip key={`${option.prop}-${option.id}`} label={option.displayLabel} {...getTagProps({ index })} />
+            <Chip
+              key={`${option.prop}-${option.id}`}
+              label={option.displayLabel}
+              size='small'
+              {...getTagProps({ index })}
+            />
           ));
       }}
       getOptionLabel={(option: ISelectMultipleData): string => option.displayLabel ?? ''}

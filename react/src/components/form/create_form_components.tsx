@@ -15,6 +15,7 @@ import { Animal, AttachedAnimal } from 'types/animal';
 import { useSpecies } from 'contexts/SpeciesContext';
 import { WorkflowFormField } from 'types/events/event';
 import { showField } from 'utils/species';
+import { ICodeFilter } from 'types/code';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -33,6 +34,8 @@ type CreateInputProps = CreateInputBaseProps &
     span?: boolean;
     validate?: <T>(input: T) => string;
     maxwidth?: boolean;
+    multiple?: boolean;
+    handleChangeMultiple?:  (o: ICodeFilter[]) => void;
   };
 
 // text and number field handler
@@ -135,12 +138,14 @@ function CreateEditSelectField({
   value,
   prop,
   handleChange,
+  handleChangeMultiple,
   disabled,
   required,
   errorMessage,
   label,
   codeName,
-  style
+  style,
+  multiple
 }: CreateInputProps): ReactElement {
   return (
     <SelectCode
@@ -148,9 +153,12 @@ function CreateEditSelectField({
       key={`${label}-select`}
       label={label}
       disabled={disabled}
+      multiple={multiple}
       codeHeader={codeName ?? String(prop)}
       defaultValue={typeof value === 'string' ? value : ''}
+      defaultValues={multiple ? value as string[] : []}
       changeHandler={handleChange}
+      changeHandlerMultiple={handleChangeMultiple}
       required={required}
       error={!!errorMessage?.length}
       propName={String(prop)}
@@ -204,6 +212,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
     ...formField,
     ...inputProps
   };
+
   let Comp = getInputFnFromType(type)(toPass);
 
   if (tooltip) {
@@ -229,7 +238,7 @@ function CreateSpeciesFormField({
   handleChange,
   inputProps,
   displayBlock = false,
-  style = {}
+  style = {},
 }: ISpeciesFormField): JSX.Element {
   const species = useSpecies();
   if (!showField(formField, species)) {

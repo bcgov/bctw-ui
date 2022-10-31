@@ -37,6 +37,8 @@ type SelectCodeProps = FormBaseProps &
     changeHandlerMultiple?: (o: ICodeFilter[]) => void;
     addEmptyOption?: boolean;
     inputRef?: MutableRefObject<ChildRefs>;
+    isSpeciesSelect?: boolean;
+    defaultValues?: string[];
   };
 
 /**
@@ -56,6 +58,7 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
     addEmptyOption,
     codeHeader,
     defaultValue,
+    defaultValues,
     changeHandler,
     changeHandlerMultiple,
     multiple,
@@ -64,17 +67,18 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
     required,
     propName,
     disabled,
-    inputRef
+    inputRef,
+    isSpeciesSelect
   } = props;
   const api = useTelemetryApi();
   const species = useSpecies();
 
   const [value, setValue] = useState(defaultValue);
-  const [values, setValues] = useState<string[]>([]);
+  const [values, setValues] = useState<string[]>( defaultValues ? defaultValues : []);
   const [codes, setCodes] = useState<ICode[]>([]);
   //const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
-  const isSpeciesSelect = codeHeader === SPECIES_STR;
+  //const isSpeciesSelect = codeHeader === SPECIES_STR;
   useImperativeHandle(ref, () => ({
     setValue,
     value

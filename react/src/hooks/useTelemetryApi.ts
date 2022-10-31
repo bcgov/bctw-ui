@@ -417,6 +417,12 @@ export const useTelemetryApi = () => {
     return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
   };
 
+  const useExportAll = (
+    config: UseMutationOptions<string[], AxiosError, unknown>
+  ): UseMutationResult<string[]> => {
+    return useMutation<string[], AxiosError, unknown>((body) => bulkApi.getAllExportData(body), config);
+  };
+
   /**
    *
    * mutations - post/delete requests
@@ -604,6 +610,7 @@ export const useTelemetryApi = () => {
     useUsers,
     useCritterAccess,
     useExport,
+    useExportAll,
     useUDF,
     usePermissionRequests,
     usePermissionHistory,

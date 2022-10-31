@@ -1,20 +1,18 @@
 import { Button, Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
-import DataTable from 'components/table/DataTable';
 import { CritterStrings } from 'constants/strings';
 import { SpeciesProvider } from 'contexts/SpeciesContext';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useState } from 'react';
-import { AttachedCollar } from 'types/collar';
 import { UserAnimalAccess } from './UserAnimalAccess';
 
 import { NotificationBanner } from 'components/common/Banner';
+import { NotificationsMenu } from 'components/common/partials/NotificationsMenu';
 import { QuickSummary } from 'components/common/QuickSummary';
-import { CritterDataTables } from './CritterDataTables';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 import { CritterAlertPage } from './CritterAlertPage';
+import { CritterDataTables } from './CritterDataTables';
 export default function CritterPage(): JSX.Element {
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
@@ -35,6 +33,8 @@ export default function CritterPage(): JSX.Element {
             <Button size='medium' variant='outlined' onClick={() => setOpenAlerts(true)}>
               Go To Alerts
             </Button>
+            {/* Might be adding this back */}
+            {/* <NotificationsMenu /> */}
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
               {CritterStrings.manageMyAnimals}
             </Button>

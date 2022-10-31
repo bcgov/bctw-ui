@@ -34,8 +34,7 @@ export const CritterDataTables = (): JSX.Element => {
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
   const [openMap, setOpenMap] = useState(false);
-
-  const [workflowType, setWorkflowType] = useState<WorkflowType>();
+  const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
 
@@ -44,8 +43,7 @@ export const CritterDataTables = (): JSX.Element => {
     editing: null,
     open: false,
     onSave: doNothingAsync,
-    handleClose: doNothing,
-    workflow: workflowType
+    handleClose: doNothing
   };
 
   const addEditProps = {
@@ -70,7 +68,6 @@ export const CritterDataTables = (): JSX.Element => {
       setOpenAttachRemoveCollar(true);
     };
     const _mortality = () => {
-      setWorkflowType('mortality');
       setOpenWorkflow(true);
     };
     const defaultItems = [
@@ -113,6 +110,11 @@ export const CritterDataTables = (): JSX.Element => {
       />
     );
   };
+
+  const handleAddAnimal = (): void => {
+    setOpenAddAnimal((a) => !a);
+  };
+
   return (
     <RowSelectedProvider>
       {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
@@ -160,15 +162,15 @@ export const CritterDataTables = (): JSX.Element => {
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
             exporter={
               <>
-                {/* <ModifyCritterWrapper
-                    editing={editObj}
-                    onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-                    setCritter={setEditObj}>
-                    <AddEditViewer<Animal> {...addEditProps}>
-                      <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
-                    </AddEditViewer>
-                  </ModifyCritterWrapper> */}
-                <Button {...buttonProps}>Export</Button>
+                <Box ml={1}>
+                  <Button
+                    {...buttonProps}
+                    onClick={handleAddAnimal}
+                    variant='contained'
+                    startIcon={<Icon icon='plus' />}>
+                    Add
+                  </Button>
+                </Box>
                 <ExportViewer<Animal>
                   template={[
                     'critter_id',
@@ -185,6 +187,8 @@ export const CritterDataTables = (): JSX.Element => {
             }
           />
         </Box>
+
+        {/* Displays the recent animal telemetry map modal */}
         <MapModal
           title={`Recent Animal Movement`}
           open={openMap}
@@ -196,14 +200,22 @@ export const CritterDataTables = (): JSX.Element => {
           critter_id={editObj.critter_id}
         />
 
-        {/* Wrapper to allow editing of Attached and Unattached animals */}
-
+        {/* Wrapper for Adding Animal, could probably be moved into bottom wrapper. */}
         <ModifyCritterWrapper
           editing={new AttachedAnimal()}
           onUpdate={(critter_id: string): void => setUpdated(critter_id)}
           onDelete={(critter_id: string): void => setDeleted(critter_id)}
           setCritter={setEditObj}>
-          <EditCritter {...editProps} isCreatingNew open={openEdit} handleClose={() => setOpenEdit(false)} />
+          <EditCritter {...editProps} isCreatingNew={true} open={openAddAnimal} handleClose={handleAddAnimal} />
+        </ModifyCritterWrapper>
+
+        {/* Wrapper to allow editing of Attached and Unattached animals */}
+        <ModifyCritterWrapper
+          editing={editObj}
+          onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+          onDelete={(critter_id: string): void => setDeleted(critter_id)}
+          setCritter={setEditObj}>
+          <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
         </ModifyCritterWrapper>
 
         {/* Modal for assigning or removing a device from a critter */}
@@ -215,8 +227,9 @@ export const CritterDataTables = (): JSX.Element => {
           handleShowModal={setOpenAttachRemoveCollar}
           onDelete={(critter_id: string): void => setDeleted(critter_id)}
         />
+
         {/* Modal for critter workflows */}
-        <CritterWorkflow editing={editObj} workflow={workflowType} open={openWorkflow} setOpen={setOpenWorkflow} />
+        <CritterWorkflow editing={editObj} workflow={'mortality'} open={openWorkflow} setOpen={setOpenWorkflow} />
       </>
     </RowSelectedProvider>
   );
