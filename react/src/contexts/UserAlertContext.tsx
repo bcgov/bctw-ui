@@ -2,6 +2,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState, createContext, useEffect, useContext } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { UserContext } from 'contexts/UserContext';
+import { ENABLE_ALERTS } from 'api/api_helpers';
 
 /**
  * Context that children components can listen to.
@@ -36,9 +37,8 @@ export const AlertStateContextProvider: React.FC = (props) => {
   // until the user is loaded, don't bother fetching alerts
   useEffect(() => {
     // console.log('should fetch alerts', !!useUser?.user);
-    //Uncomment this line to enable user alerts again
     //Issue in get_user_telemetry_alerts query returning more than one result...
-    //setShouldFetchAlerts(!!useUser?.user);
+    ENABLE_ALERTS && setShouldFetchAlerts(!!useUser?.user);
   }, [useUser]);
 
   /**

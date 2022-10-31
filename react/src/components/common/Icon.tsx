@@ -46,7 +46,8 @@ import {
   mdiDotsHorizontal,
   mdiCheckCircle,
   mdiGraveStone,
-  mdiRefresh
+  mdiRefresh,
+  mdiKeyboardBackspace
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -54,6 +55,7 @@ type IconProps = {
   icon: string;
   htmlColor?: string;
   size?: number;
+  rotate?: number;
 };
 
 const getIconPath = (path: string): string => {
@@ -159,9 +161,11 @@ const getIconPath = (path: string): string => {
       return mdiGraveStone;
     case 'refresh':
       return mdiRefresh;
+    case 'back-extended':
+      return mdiKeyboardBackspace;
   }
 };
 
-export default function BCTWIcon({ icon, htmlColor, size = 1 }: IconProps): JSX.Element {
-  return <Icon path={getIconPath(icon)} color={htmlColor} className={'icon'} size={size} />;
+export default function BCTWIcon({ icon, htmlColor, rotate, size = 1 }: IconProps): JSX.Element {
+  return <Icon path={getIconPath(icon)} color={htmlColor} className={'icon'} size={size} rotate={rotate} />;
 }

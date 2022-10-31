@@ -7,12 +7,12 @@ import { formatTime } from 'utils/time';
 import { CreateUrlParams } from './api_interfaces';
 
 const IS_PROD = +window.location.port === 1111 ? false : true;
-if(!IS_PROD) {
+if (!IS_PROD) {
   dotenv.config();
 }
 
 //Disabled while fixing alerts bugs...
-export const ENABLE_ALERTS = false;
+export const ENABLE_ALERTS = true;
 
 /**
  * @param noApiPrefix if true, exclude '/api' beginning of the base url
@@ -27,7 +27,7 @@ const getBaseUrl = (noApiPrefix?: boolean): string => {
   return url;
 };
 
-/** 
+/**
  * appends the @param query to @param url
  */
 const _appendQueryToUrl = (url: string, query: string): string => {
@@ -43,14 +43,16 @@ const searchToQueryString = (search: ITableFilter[]): string => {
   if (!search) {
     return '';
   }
-  return search.map(s => {
-    const { term, keys } = s;
-    const termStr = `&term=${term}`;
-    if (Array.isArray(keys)) {
-      return `${keys.map(k => `&keys=${k}`).join('')}${termStr}`;
-    }
-    return `&keys=${keys}${termStr}`;
-  }).join('')
+  return search
+    .map((s) => {
+      const { term, keys } = s;
+      const termStr = `&term=${term}`;
+      if (Array.isArray(keys)) {
+        return `${keys.map((k) => `&keys=${k}`).join('')}${termStr}`;
+      }
+      return `&keys=${keys}${termStr}`;
+    })
+    .join('');
 };
 
 /**
@@ -127,7 +129,7 @@ const asJSON = <T>(o: T): T => {
 };
 
 /**
- * a post handler that uses the @function asJSON 
+ * a post handler that uses the @function asJSON
  * to convert @param body to JSON
  * @param api the api instance
  */

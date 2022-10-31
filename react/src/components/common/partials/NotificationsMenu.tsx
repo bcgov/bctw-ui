@@ -17,8 +17,12 @@ import {
 import { Icon } from 'components/common';
 import { useState } from 'react';
 import { MortalityAlert } from 'types/alert';
+import { ArrowButton } from './ArrowButton';
 import { SubHeader } from './SubHeader';
-export const NotificationsMenu = (): JSX.Element => {
+interface NotificationsMenuProps {
+  alerts?: MortalityAlert[];
+}
+export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -29,12 +33,13 @@ export const NotificationsMenu = (): JSX.Element => {
     setAnchorEl(null);
   };
   const notifications: MortalityAlert[] = [new MortalityAlert(), new MortalityAlert()];
+  const alertsCount = alerts?.length;
   return (
     <>
       <Box mr={2}>
         <IconButton onClick={setAnchor}>
-          <Badge badgeContent={1} color={'error'} overlap={'circular'}>
-            <Icon icon={'bell'} size={1.5} />
+          <Badge badgeContent={alertsCount} color={'error'} overlap={'circular'}>
+            <Icon icon={'bell'} />
           </Badge>
         </IconButton>
       </Box>
@@ -45,37 +50,35 @@ export const NotificationsMenu = (): JSX.Element => {
         onClose={handleClose}
         sx={{
           '&& .Mui-selected': {
-            backgroundColor: lighten(theme.palette.error.main, 0.8)
+            backgroundColor: lighten(theme.palette.error.light, 0.9)
           }
         }}>
-        <MenuItem divider autoFocus>
-          <ListItem>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-              <SubHeader text={'Alerts'} />
-              <Link variant={'h6'} underline='none' sx={{ display: 'flex', alignItems: 'center' }}>
-                See Alert History
-                <Icon icon={'next'} size={0.9} />
-              </Link>
-            </Box>
-          </ListItem>
-        </MenuItem>
-        {notifications.map((notif, idx) => {
+        <ListItem>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+            <SubHeader text={'Alerts'} />
+            <ArrowButton size={'large'} label={'See Alert History'} />
+          </Box>
+        </ListItem>
+        <Divider />
+        {alerts?.map((notif, idx) => {
           return (
-            <MenuItem key={`menu-item-${idx}`} divider={idx < notifications.length} selected>
-              <ListItem>
+            //Change the selected prop to the appropriate value
+            //Maybe highlight the alerts that appeared today
+            <Box>
+              <MenuItem sx={{ py: 3 }} key={`menu-item-${idx}`} divider={idx < notifications.length} selected>
                 <ListItemIcon>
                   <Icon icon={'circle'} htmlColor={theme.palette.error.main} />
                 </ListItemIcon>
                 <ListItemText
                   primary={
                     <Typography>
-                      {notif.species} mortality alert from Device {notif.device_id} on Animal {notif.wlh_id}.
+                      {`${notif.species} Mortality alert from Device ${notif.device_id} on Animal ${notif.wlh_id}`}
                     </Typography>
                   }
-                  secondary={<>Date {notif.valid_from}</>}
+                  secondary={`${notif.valid_from}`}
                 />
-              </ListItem>
-            </MenuItem>
+              </MenuItem>
+            </Box>
           );
         })}
       </Menu>
