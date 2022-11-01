@@ -26,7 +26,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
 import { AttachedAnimal } from 'types/animal';
 import { CritterStrings } from 'constants/strings';
-import { ActionsMenu } from 'components/common/partials/ActionsMenu';
+import { ActionsMenu } from 'components/common/ActionsMenu';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;

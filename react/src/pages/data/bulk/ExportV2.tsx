@@ -19,7 +19,7 @@ import { Button } from 'components/common';
 import Checkbox from 'components/form/Checkbox';
 import { Tab, Tabs } from '@mui/material';
 import ExportDownloadModal from './ExportDownloadModal';
-import { InfoBanner } from 'components/common/Banner';
+import { InfoBanner } from 'components/alerts/Banner';
 import ContainerLayout from 'pages/layouts/ContainerLayout';
 import QueryBuilder, { IFormRowEntry, QueryBuilderColumn, QueryBuilderOperator } from 'components/form/QueryBuilder';
 import makeStyles from '@mui/styles/makeStyles';

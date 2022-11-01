@@ -1,22 +1,11 @@
-import {
-  Badge,
-  Box,
-  Container,
-  Divider,
-  IconButton,
-  lighten,
-  ListItem,
-  Menu,
-  MenuItem,
-  useTheme
-} from '@mui/material';
+import { Badge, Box, Container, Divider, IconButton, lighten, ListItem, Menu, MenuItem, useTheme } from '@mui/material';
 import { Icon } from 'components/common';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { useState } from 'react';
 import { TelemetryAlert } from 'types/alert';
-import { ArrowButton } from './ArrowButton';
+import { ArrowButton } from '../common/partials/ArrowButton';
 import { FormatAlert } from './FormatAlert';
-import { SubHeader } from './SubHeader';
+import { SubHeader } from '../common/partials/SubHeader';
 import ViewAllAlerts from 'components/alerts/ViewAllAlerts';
 
 interface NotificationsMenuProps {
@@ -61,7 +50,7 @@ export const AlertMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
         <ListItem>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
             <SubHeader text={'Alerts'} />
-            <ArrowButton size={'large'} label={'See Alert History'} onClick={() => setShowingAlerts(true)}/>
+            <ArrowButton size={'large'} label={'See Alert History'} onClick={() => setShowingAlerts(true)} />
           </Box>
         </ListItem>
         <Divider />
@@ -76,9 +65,7 @@ export const AlertMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
         ))}
       </Menu>
       <FullScreenDialog open={showingAlerts} handleClose={() => setShowingAlerts(false)}>
-        <Container maxWidth='xl'>
-          {<ViewAllAlerts alerts={alerts}/>}
-        </Container>
+        <Container maxWidth='xl'>{<ViewAllAlerts alerts={alerts} />}</Container>
       </FullScreenDialog>
     </>
   );

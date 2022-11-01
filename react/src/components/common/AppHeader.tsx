@@ -13,7 +13,7 @@ import Modal from 'components/modal/Modal';
 import UserAlert from 'pages/user/UserAlertPage';
 import { urls } from 'constants/external_urls';
 import { ENABLE_ALERTS } from 'api/api_helpers';
-import { AlertMenu } from './partials/AlertMenu';
+import { AlertMenu } from '../alerts/AlertMenu';
 import { TelemetryAlert, MortalityAlert } from 'types/alert';
 
 type AppheaderProps = {

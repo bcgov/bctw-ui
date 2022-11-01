@@ -12,7 +12,7 @@ import { Animal, AttachedAnimal } from 'types/animal';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 
-import { ActionsMenu } from 'components/common/partials/ActionsMenu';
+import { ActionsMenu } from 'components/common/ActionsMenu';
 import { useHistory } from 'react-router-dom';
 import { CollarHistory } from 'types/collar_history';
 import { WorkflowType } from 'types/events/event';
@@ -57,7 +57,7 @@ export const CritterDataTables = (): JSX.Element => {
   };
 
   useEffect(() => {
-    console.log("EditObj last date " + editObj.last_transmission_date);
+    console.log('EditObj last date ' + editObj.last_transmission_date);
   }, [editObj]);
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
@@ -193,8 +193,8 @@ export const CritterDataTables = (): JSX.Element => {
           title={`Recent Animal Movement`}
           open={openMap}
           handleClose={(v: boolean) => setOpenMap(v)}
-          startDate={ editObj.last_transmission_date?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks') }
-          endDate={ editObj.last_transmission_date ?? dayjs() }
+          startDate={editObj.last_transmission_date?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks')}
+          endDate={editObj.last_transmission_date ?? dayjs()}
           width={'800px'}
           height={'600px'}
           critter_id={editObj.critter_id}

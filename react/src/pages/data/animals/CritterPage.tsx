@@ -6,15 +6,14 @@ import { SpeciesProvider } from 'contexts/SpeciesContext';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useContext, useEffect, useState } from 'react';
 import { UserAnimalAccess } from './UserAnimalAccess';
-
-import { NotificationBanner } from 'components/common/Banner';
-import { AlertMenu } from 'components/common/partials/AlertMenu';
+import { NotificationBanner } from 'components/alerts/Banner';
 import { QuickSummary } from 'components/common/QuickSummary';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 import { CritterDataTables } from './CritterDataTables';
 import { AlertContext } from 'contexts/UserAlertContext';
-import { FormatAlert } from 'components/common/partials/FormatAlert';
+import { FormatAlert } from 'components/alerts/FormatAlert';
 import { TelemetryAlert } from 'types/alert';
+
 export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);

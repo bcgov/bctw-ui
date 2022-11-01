@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import Icon from 'components/common/Icon';
-import { ActionsMenu } from 'components/common/partials/ActionsMenu';
+import { ActionsMenu } from 'components/common/ActionsMenu';
 import DataTable from 'components/table/DataTable';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import dayjs from 'dayjs';
