@@ -222,11 +222,7 @@ const initMap = (
     })
     .on('draw:deleted', (data: any) => {
       //Leaflet Draw does not appear to have proper typing for this event type. Annoying!
-<<<<<<< HEAD
-      handleDeleteLayer(data.layers);
-=======
       handleDeleteLayer?.(data.layers);
->>>>>>> latest-data-retrieval
     })
     .on('draw:edited', (e) => {
       drawSelectedLayer();
