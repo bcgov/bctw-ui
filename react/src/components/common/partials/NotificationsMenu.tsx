@@ -23,6 +23,11 @@ import { SubHeader } from './SubHeader';
 interface NotificationsMenuProps {
   alerts?: TelemetryAlert[];
 }
+/**
+ * @param alerts TelemetryAlerts array
+ * Returns JSX.Element menu object with bell + badge icon
+ * Badge shows the current number of alerts in the alerts array
+ */
 export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
