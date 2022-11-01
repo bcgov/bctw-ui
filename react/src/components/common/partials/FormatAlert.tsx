@@ -3,11 +3,19 @@ import { Icon } from 'components/common';
 import { getTag } from 'components/table/table_helpers';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eDeviceStatus } from 'types/collar';
+import { formatT } from 'utils/time';
 
 interface FormattedAlertProps {
   alert: TelemetryAlert;
   format: 'banner' | 'menu' | 'page';
 }
+/**
+ * Formats the inner html for the different alerts that are shown throughout the system
+ * @param alert TelemetryAlert -> MortalityAlert / MalfunctionAlert
+ * @param format The type styling for the alert
+ * Returns inner html for an alert
+ *
+ */
 export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element => {
   const theme = useTheme();
   if (alert instanceof MortalityAlert && format === 'menu') {
@@ -30,12 +38,12 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
   if (alert instanceof MortalityAlert && format === 'banner') {
     return (
       <ListItem>
-        <ListItemIcon>{getTag(alert.device_status as eDeviceStatus)}</ListItemIcon>
+        <ListItemIcon sx={{ pr: 2 }}>{getTag(alert.device_status as eDeviceStatus, null, 'error')}</ListItemIcon>
         <ListItemText
           primary={
             <Typography>
               The status of <b>Device ID:</b> {alert.device_id} changed from 'Alive' to '<b>{alert.device_status}</b>'
-              on DATE
+              on {formatT(alert.valid_from)}
             </Typography>
           }
           secondary={

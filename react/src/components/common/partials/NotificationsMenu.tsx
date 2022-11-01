@@ -33,7 +33,6 @@ export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Eleme
   const handleClose = () => {
     setAnchorEl(null);
   };
-  // const notifications: MortalityAlert[] = [new MortalityAlert(), new MortalityAlert()];
   const alertsCount = alerts?.length;
   return (
     <>
