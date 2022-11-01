@@ -8,6 +8,7 @@ import { UserContext } from 'contexts/UserContext';
 import { Icon } from 'components/common';
 import { CritterStrings, LatestDataRetrieval, QuickSummaryStrings } from 'constants/strings';
 import dayjs, { Dayjs } from 'dayjs';
+import { isToday } from 'date-fns/esm';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -67,7 +68,7 @@ export const QuickSummary = ({ handleDetails, showDetails }: QuickSummaryProps):
       data.forEach((animal) => {
         counts[animal.permission_type] += 1;
         if (animal.date_recorded) {
-          if (!dayjs(animal.date_recorded).isSame(dayjs())) {
+          if (!isToday(dayjs(animal.date_recorded))) {
             setRetrievalSuccess(false);
           }
         }

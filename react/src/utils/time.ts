@@ -11,6 +11,7 @@ const formatT = (d: Dayjs | null): string | null => d?.format(formatTime) ?? nul
 //
 const isInvalidDate = (d: Date): boolean => typeof d?.getFullYear === 'function' && d.getFullYear() <= 1900;
 
+const isToday = (d: Dayjs | null): boolean => (!d ? false : d.isSame(dayjs()));
 const getToday = (): string => dayjs().format(formatDay);
 const getNow = (): string => dayjs().format(formatTime);
 const asLocalTime = (dateStr: string): string => dayjs(dateStr).format('LLLL');
@@ -82,5 +83,6 @@ export {
   formatDateStr,
   formatWithUTCOffset,
   isInvalidDate,
-  getStartDate
+  getStartDate,
+  isToday
 };

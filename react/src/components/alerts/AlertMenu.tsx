@@ -7,6 +7,7 @@ import { ArrowButton } from '../common/partials/ArrowButton';
 import { FormatAlert } from './FormatAlert';
 import { SubHeader } from '../common/partials/SubHeader';
 import ViewAllAlerts from 'components/alerts/ViewAllAlerts';
+import { isToday } from 'utils/time';
 
 interface NotificationsMenuProps {
   alerts?: TelemetryAlert[];
@@ -58,7 +59,7 @@ export const AlertMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
           //Change the selected prop to the appropriate value
           //Maybe highlight the alerts that appeared today
           <Box key={`menu-item-${idx}`}>
-            <MenuItem sx={{ py: 3 }} divider={idx < alerts?.length} selected>
+            <MenuItem sx={{ py: 3 }} divider={idx < alerts?.length} selected={isToday(notif?.valid_from)}>
               <FormatAlert format='menu' alert={notif} />
             </MenuItem>
           </Box>
