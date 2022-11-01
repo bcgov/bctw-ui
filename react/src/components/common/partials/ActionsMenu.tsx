@@ -12,7 +12,14 @@ interface IActionsMenu {
   id?: number;
   disabled?: boolean;
 }
-export const ActionsMenu = ({ menuItems, id, disabled }: IActionsMenu): JSX.Element => {
+/**
+ * @param menuItems IMenuItem[]
+ * @param disabled disables the menu from being opened
+ * * Note: event.stopPropagation() needs to be added. Prevents multiple events from firing at the same time.
+ * * i.e: row selected + menu opened events, only allow one at a time.
+ *
+ */
+export const ActionsMenu = ({ menuItems, disabled }: IActionsMenu): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const setAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -25,10 +32,10 @@ export const ActionsMenu = ({ menuItems, id, disabled }: IActionsMenu): JSX.Elem
   };
   return (
     <>
-      <IconButton id={`action-button-${id}`} onClick={setAnchor} disabled={disabled}>
+      <IconButton onClick={setAnchor} disabled={disabled}>
         <Icon icon={'dots'} />
       </IconButton>
-      <Menu id={`action-menu-${id}`} anchorEl={anchorEl} open={open} onClose={handleClose}>
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {menuItems.map((item, idx) => {
           const { label, icon, handleClick } = item;
           return (

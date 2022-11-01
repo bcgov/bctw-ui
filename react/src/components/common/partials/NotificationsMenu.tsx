@@ -19,12 +19,18 @@ import { Icon } from 'components/common';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { CritterAlertPage } from 'pages/data/animals/CritterAlertPage';
 import { useState } from 'react';
-import { MortalityAlert } from 'types/alert';
+import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { ArrowButton } from './ArrowButton';
+import { FormatAlert } from './FormatAlert';
 import { SubHeader } from './SubHeader';
 interface NotificationsMenuProps {
-  alerts?: MortalityAlert[];
+  alerts?: TelemetryAlert[];
 }
+/**
+ * @param alerts TelemetryAlerts array
+ * Returns JSX.Element menu object with bell + badge icon
+ * Badge shows the current number of alerts in the alerts array
+ */
 export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -36,7 +42,6 @@ export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Eleme
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const notifications: MortalityAlert[] = [new MortalityAlert(), new MortalityAlert()];
   const alertsCount = alerts?.length;
   return (
     <>
@@ -64,27 +69,15 @@ export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Eleme
           </Box>
         </ListItem>
         <Divider />
-        {alerts?.map((notif, idx) => {
-          return (
-            //Change the selected prop to the appropriate value
-            //Maybe highlight the alerts that appeared today
-            <Box>
-              <MenuItem sx={{ py: 3 }} key={`menu-item-${idx}`} divider={idx < notifications.length} selected>
-                <ListItemIcon>
-                  <Icon icon={'circle'} htmlColor={theme.palette.error.main} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography>
-                      {`${notif.species} Mortality alert from Device ${notif.device_id} on Animal ${notif.wlh_id}`}
-                    </Typography>
-                  }
-                  secondary={`${notif.valid_from}`}
-                />
-              </MenuItem>
-            </Box>
-          );
-        })}
+        {alerts?.map((notif, idx) => (
+          //Change the selected prop to the appropriate value
+          //Maybe highlight the alerts that appeared today
+          <Box key={`menu-item-${idx}`}>
+            <MenuItem sx={{ py: 3 }} divider={idx < alerts?.length} selected>
+              <FormatAlert format='menu' alert={notif} />
+            </MenuItem>
+          </Box>
+        ))}
       </Menu>
       <FullScreenDialog open={showingAlerts} handleClose={() => setShowingAlerts(false)}>
         <Container maxWidth='xl'>

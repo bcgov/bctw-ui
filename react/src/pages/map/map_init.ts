@@ -161,7 +161,7 @@ const initMap = (
   mapRef.current.addLayer(drawnItems);
   mapRef.current.addLayer(selectedPings);
 
-  const drawOptions = drawToolOptions ?? {marker: false, circle: false, circlemarker: false};
+  const drawOptions = drawToolOptions ?? { marker: false, circle: false, circlemarker: false };
 
   const drawControl = new L.Control.Draw({
     position: 'topright',
@@ -171,10 +171,10 @@ const initMap = (
     }
   });
 
-  if(!drawToolDisable) {
+  if (!drawToolDisable) {
     mapRef.current.addControl(drawControl);
   }
-    
+
   mapRef.current.addControl(layerPicker);
 
   // line drawing control
