@@ -104,30 +104,26 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
           <Typography>{getTitleText(alert)}</Typography>
           <Typography textAlign={'right'}> {`${alert.valid_from.format("hh:mm a")}`}</Typography>
       </Box> 
-      {alert instanceof MortalityAlert && (
-          <>
 
-              <Typography className={styles.spacing}>{getCustomBodyText(alert)}</Typography>
-              <Grid container columnGap={2}>
-                  <Grid item>
-                      <Typography className={styles.spacing}>
-                      {`Species: ${alert.species}`}
-                      </Typography>
-                  </Grid>
-                  <Grid item>
-                      <Typography className={styles.spacing}>
-                      {`Animal ID: ${alert.animal_id.length ? alert.animal_id : 'None'}`}
-                      </Typography>
-                  </Grid>
-                  <Grid item>
-                      <Typography className={styles.spacing}>
-                      {`Wildlife Health ID: ${alert.wlh_id.length ? alert.wlh_id : 'None'}`}
-                      </Typography>
-                  </Grid>
-              </Grid>
-          
-          </>
-      )}
+      <Typography className={styles.spacing}>{getCustomBodyText(alert)}</Typography>
+      <Grid container columnGap={2}>
+          <Grid item>
+              <Typography className={styles.spacing}>
+              {`Species: ${alert.species}`}
+              </Typography>
+          </Grid>
+          <Grid item>
+              <Typography className={styles.spacing}>
+              {`Animal ID: ${alert.animal_id.length ? alert.animal_id : 'None'}`}
+              </Typography>
+          </Grid>
+          <Grid item>
+              <Typography className={styles.spacing}>
+              {`Wildlife Health ID: ${alert.wlh_id.length ? alert.wlh_id : 'None'}`}
+              </Typography>
+          </Grid>
+      </Grid>
+
       </>
     );
   }
