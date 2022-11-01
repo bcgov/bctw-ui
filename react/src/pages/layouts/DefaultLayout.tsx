@@ -71,7 +71,7 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
   }
   return (
     <>
-      /** Old alert modal. Disabled temporarily */
+      {/* Old alert modal. Disabled temporarily */}
       {/* <Modal
         title={useAlert?.getAlertTitle()}
         open={showAlerts}
