@@ -13,7 +13,7 @@ import Modal from 'components/modal/Modal';
 import UserAlert from 'pages/user/UserAlertPage';
 import { urls } from 'constants/external_urls';
 import { ENABLE_ALERTS } from 'api/api_helpers';
-import { NotificationsMenu } from './partials/NotificationsMenu';
+import { AlertMenu } from './partials/AlertMenu';
 import { TelemetryAlert, MortalityAlert } from 'types/alert';
 
 type AppheaderProps = {
@@ -119,7 +119,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
               </li>
             ) : null} */}
             {/* New Alert Code */}
-            <NotificationsMenu alerts={telemetryAlerts} />
+            <AlertMenu alerts={telemetryAlerts} />
             <li className={'username'}>
               <a href='/profile'>
                 <IconButton size='large'>

@@ -28,7 +28,7 @@ interface NotificationsMenuProps {
  * Returns JSX.Element menu object with bell + badge icon
  * Badge shows the current number of alerts in the alerts array
  */
-export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
+export const AlertMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);

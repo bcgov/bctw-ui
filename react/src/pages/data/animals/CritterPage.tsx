@@ -8,7 +8,7 @@ import { useContext, useEffect, useState } from 'react';
 import { UserAnimalAccess } from './UserAnimalAccess';
 
 import { NotificationBanner } from 'components/common/Banner';
-import { NotificationsMenu } from 'components/common/partials/NotificationsMenu';
+import { AlertMenu } from 'components/common/partials/AlertMenu';
 import { QuickSummary } from 'components/common/QuickSummary';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 import { CritterDataTables } from './CritterDataTables';
