@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 interface BannerProps {
   variant: 'info' | 'warning' | 'success' | 'error';
-  text: string | string[];
+  text: string | string[] | JSX.Element;
   icon?: JSX.Element;
   action?: 'close' | 'collapse' | 'both';
   hiddenContent?: JSX.Element[];

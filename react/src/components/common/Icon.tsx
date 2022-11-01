@@ -73,6 +73,8 @@ const getIconPath = (path: string): string => {
       return mdiArrowDownBold;
     case 'cannotSnooze':
       return mdiAlarmOff;
+    case 'backspace':
+      return mdiKeyboardBackspace;
     case 'back':
       return mdiArrowLeft;
     case 'next':
@@ -170,5 +172,5 @@ const getIconPath = (path: string): string => {
 };
 
 export default function BCTWIcon({ icon, htmlColor, rotate, size = 1 }: IconProps): JSX.Element {
-  return <Icon path={getIconPath(icon)} color={htmlColor} className={'icon'} size={size} rotate={rotate} />;
+  return <Icon path={getIconPath(icon)} rotate={rotate} color={htmlColor} className={'icon'} size={size} />;
 }
