@@ -1,28 +1,24 @@
 import {
   Badge,
   Box,
-  Button,
   Container,
   Divider,
   IconButton,
   lighten,
-  Link,
   ListItem,
-  ListItemIcon,
-  ListItemText,
   Menu,
   MenuItem,
-  Typography,
   useTheme
 } from '@mui/material';
 import { Icon } from 'components/common';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
-import { CritterAlertPage } from 'pages/data/animals/CritterAlertPage';
 import { useState } from 'react';
-import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
+import { TelemetryAlert } from 'types/alert';
 import { ArrowButton } from './ArrowButton';
 import { FormatAlert } from './FormatAlert';
 import { SubHeader } from './SubHeader';
+import ViewAllAlerts from 'components/alerts/ViewAllAlerts';
+
 interface NotificationsMenuProps {
   alerts?: TelemetryAlert[];
 }
@@ -81,7 +77,7 @@ export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Eleme
       </Menu>
       <FullScreenDialog open={showingAlerts} handleClose={() => setShowingAlerts(false)}>
         <Container maxWidth='xl'>
-          {<CritterAlertPage alerts={alerts}/>}
+          {<ViewAllAlerts alerts={alerts}/>}
         </Container>
       </FullScreenDialog>
     </>

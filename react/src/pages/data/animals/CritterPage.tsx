@@ -11,7 +11,6 @@ import { NotificationBanner } from 'components/common/Banner';
 import { NotificationsMenu } from 'components/common/partials/NotificationsMenu';
 import { QuickSummary } from 'components/common/QuickSummary';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
-import { CritterAlertPage } from './CritterAlertPage';
 import { CritterDataTables } from './CritterDataTables';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { FormatAlert } from 'components/common/partials/FormatAlert';
@@ -20,7 +19,6 @@ export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
-  const [openAlerts, setOpenAlerts] = useState(false);
 
   const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
   const inverseManageModal = (): void => {

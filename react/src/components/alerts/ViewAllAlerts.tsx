@@ -1,11 +1,16 @@
-import { Box, Grid, Typography } from "@mui/material";
-import { TelemetryAlert, MortalityAlert, eAlertType } from "types/alert"
+import { Box } from "@mui/material";
+import { TelemetryAlert, eAlertType } from "types/alert"
 import makeStyles from '@mui/styles/makeStyles';
 import { SubHeader } from "components/common/partials/SubHeader";
-import AlertCard from "components/common/AlertCard";
 import { FormatAlert } from "components/common/partials/FormatAlert";
-type CritterAlertProps = {
+import AlertCard from "./AlertCard";
+
+type ViewAllAlertsProps = {
     alerts: TelemetryAlert[];
+}
+
+interface AlertGroups {
+    [group: string] : TelemetryAlert[];
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -15,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
     header: {
         marginTop: theme.spacing(4),
         marginBottom: theme.spacing(2)
+    },
+    topHeader: {
+        marginTop: theme.spacing(4)
     }
   }));
 
@@ -23,9 +31,11 @@ const useStyles = makeStyles((theme) => ({
  * @param alerts Array of TelemetryAlerts, which in most cases are going to either be MortalityAlerts or MalfunctionAlerts 
  * @returns 
  */
-export const CritterAlertPage = ({alerts}: CritterAlertProps): JSX.Element => {
+export const ViewAllAlerts = ({alerts}: ViewAllAlertsProps): JSX.Element => {
+    const styles = useStyles();
+
     alerts.sort((a, b) => (a.valid_from.isAfter(b.valid_from) ? -1 : 1));
-    const grouped: unknown = {};
+    const grouped: AlertGroups = {};
     alerts.forEach((a) => {
         if(a.valid_from) {
             const category = a.valid_from.format("DD-MM-YYYY");
@@ -37,11 +47,10 @@ export const CritterAlertPage = ({alerts}: CritterAlertProps): JSX.Element => {
 
         
     });
-
-    const styles = useStyles();
+    
     return (
         <>
-        <h2>Alerts</h2>
+        <Box className={styles.topHeader}><SubHeader text={'Alerts'} /></Box>
         { Object.values(grouped).map(o => 
             {
                 return <>
@@ -63,3 +72,4 @@ export const CritterAlertPage = ({alerts}: CritterAlertProps): JSX.Element => {
         </>
     )
 }
+export default ViewAllAlerts;
