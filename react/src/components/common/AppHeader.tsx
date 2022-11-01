@@ -156,8 +156,7 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
           </ul>
         </nav>
       </div>
-      /** Old alert modal. Has snooze functionality */
-      {/* <Modal
+      {/* Old alert modal. Has snooze functionality <Modal
         title={useAlert?.getAlertTitle()}
         open={showAlerts}
         handleClose={(): void => setShowAlerts(false)}

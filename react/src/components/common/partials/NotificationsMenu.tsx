@@ -1,25 +1,24 @@
 import {
   Badge,
   Box,
-  Button,
+  Container,
   Divider,
   IconButton,
   lighten,
-  Link,
   ListItem,
-  ListItemIcon,
-  ListItemText,
   Menu,
   MenuItem,
-  Typography,
   useTheme
 } from '@mui/material';
 import { Icon } from 'components/common';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { useState } from 'react';
-import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
+import { TelemetryAlert } from 'types/alert';
 import { ArrowButton } from './ArrowButton';
 import { FormatAlert } from './FormatAlert';
 import { SubHeader } from './SubHeader';
+import ViewAllAlerts from 'components/alerts/ViewAllAlerts';
+
 interface NotificationsMenuProps {
   alerts?: TelemetryAlert[];
 }
@@ -31,6 +30,7 @@ interface NotificationsMenuProps {
 export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [showingAlerts, setShowingAlerts] = useState(false);
   const open = Boolean(anchorEl);
   const setAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -61,7 +61,7 @@ export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Eleme
         <ListItem>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
             <SubHeader text={'Alerts'} />
-            <ArrowButton size={'large'} label={'See Alert History'} />
+            <ArrowButton size={'large'} label={'See Alert History'} onClick={() => setShowingAlerts(true)}/>
           </Box>
         </ListItem>
         <Divider />
@@ -75,6 +75,11 @@ export const NotificationsMenu = ({ alerts }: NotificationsMenuProps): JSX.Eleme
           </Box>
         ))}
       </Menu>
+      <FullScreenDialog open={showingAlerts} handleClose={() => setShowingAlerts(false)}>
+        <Container maxWidth='xl'>
+          {<ViewAllAlerts alerts={alerts}/>}
+        </Container>
+      </FullScreenDialog>
     </>
   );
 };

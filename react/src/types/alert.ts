@@ -193,3 +193,10 @@ export class MalfunctionAlert extends MortalityAlert {
     return editObjectToEvent(this, workflow, ['device_status']);
   }
 }
+
+/* This workflow might not be correct. Just need a type for the battery malfunction. */
+export class BatteryAlert extends MortalityAlert {
+  toWorkflow<T>(workflow: T): T {
+    return editObjectToEvent(this, workflow, ['device_status']);
+  }
+}

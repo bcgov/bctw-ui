@@ -1,6 +1,6 @@
 import { createUrl, isDev, postJSON } from 'api/api_helpers';
 import { plainToClass } from 'class-transformer';
-import { eAlertType, ITelemetryAlert, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
+import { BatteryAlert, eAlertType, ITelemetryAlert, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { eUserRole, IKeyCloakSessionInfo, IUser, User } from 'types/user';
 import { upsertAlertEndpoint } from 'api/api_endpoint_urls';
@@ -98,6 +98,8 @@ export const userApi = (props: ApiProps): API => {
           return plainToClass(MortalityAlert, json);
         case eAlertType.malfunction:
           return plainToClass(MalfunctionAlert, json);
+        case eAlertType.battery:
+          return plainToClass(BatteryAlert, json);
         default:
           return plainToClass(TelemetryAlert, json);
       }

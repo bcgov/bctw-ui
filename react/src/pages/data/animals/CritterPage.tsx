@@ -19,6 +19,7 @@ export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
+
   const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
   const inverseManageModal = (): void => {
     setOpenManageAnimals((a) => !a);
