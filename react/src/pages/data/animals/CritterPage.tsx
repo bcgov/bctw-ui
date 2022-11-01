@@ -40,9 +40,6 @@ export default function CritterPage(): JSX.Element {
         <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
-            <Button size='medium' variant='outlined' onClick={() => setOpenAlerts(true)}>
-              Go To Alerts
-            </Button>
             {/* Might be adding this back */}
             {/* <NotificationsMenu /> */}
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>

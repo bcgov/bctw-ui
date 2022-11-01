@@ -20,6 +20,12 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
+/**
+ * Reusable alert card component, use it for notifications and the like.
+ * @param content What you want to be displayed in the main body of the card.
+ * @param variant Determins theming and icon of the card
+ * @returns 
+ */
 export const AlertCard = ({content, variant}: AlertCardProps): JSX.Element => {
     const styles = useStyles();
 
