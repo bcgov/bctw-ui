@@ -16,6 +16,7 @@ import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
+import { InfoBanner } from 'components/alerts/Banner';
 // import { UserContext } from 'contexts/UserContext';
 // import { eCritterPermission } from 'types/permission';
 
@@ -23,7 +24,10 @@ import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
  * modal component that shows current alerts
  * todo: use an existing table component
  */
-export default function AlertPage(): JSX.Element {
+interface AlertProps {
+  alert?: MortalityAlert | MalfunctionAlert;
+}
+export default function AlertPage({ alert }: AlertProps): JSX.Element {
   const api = useTelemetryApi();
 
   const showNotif = useResponseDispatch();
@@ -32,7 +36,7 @@ export default function AlertPage(): JSX.Element {
   // const eCritters = api.useCritterAccess(1, { user: useUser.user, filter: [eCritterPermission.editor] });
   const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
 
-  const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(null);
+  const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(alert ?? null);
   // display status of the modal that the user can perform the alert update from
   const [showEventModal, setShowEventModal] = useState(false);
   // display status of the modal that requires the user to confirm snoozing
@@ -136,13 +140,12 @@ export default function AlertPage(): JSX.Element {
 
   return (
     <div className={'container'}>
-      <Box>{UserAlertStrings.alertText}</Box>
-      <Box p={1}>
-        {/* is the alert being updated? */}
+      <InfoBanner text={UserAlertStrings.alertText} />
+      <Box py={1}>
         {isLoading ? (
           <CircularProgress />
         ) : (
-          <TableContainer component={Paper} style={{ padding: '3px' }}>
+          <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>

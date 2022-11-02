@@ -13,6 +13,7 @@ import { CritterDataTables } from './CritterDataTables';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { FormatAlert } from 'components/alerts/FormatAlert';
 import { TelemetryAlert } from 'types/alert';
+import dayjs from 'dayjs';
 
 export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
@@ -28,7 +29,8 @@ export default function CritterPage(): JSX.Element {
   };
   useEffect(() => {
     if (useAlert?.alerts?.length) {
-      setAlerts(useAlert.alerts);
+      //Set only the valid alerts where today is less than the alerts snoozed_to date
+      setAlerts(useAlert.alerts.filter((a) => !dayjs().diff(a.snoozed_to)));
     }
   }, [useAlert]);
   return (
