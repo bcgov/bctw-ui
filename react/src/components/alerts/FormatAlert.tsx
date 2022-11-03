@@ -73,6 +73,7 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
   const styles = useStyles();
   const [openMap, setOpenMap] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
+  const isManager = (alert: MortalityAlert): boolean => alert.permission_type === 'manager';
 
   if (alert instanceof MortalityAlert) {
     <UserAlertPage />;
@@ -99,24 +100,36 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
               <ListItemIcon sx={{ pr: 2 }}>{getTag(alert.device_status as eDeviceStatus, null, 'error')}</ListItemIcon>
               <ListItemText
                 primary={
+                  // <Typography>
+                  //   The status of <b>Device ID:</b> {alert.device_id} changed from 'Alive' to '
+                  //   <b>{alert.device_status}</b>' on {formatT(alert.valid_from)}
+                  // </Typography>
                   <Typography>
-                    The status of <b>Device ID:</b> {alert.device_id} changed from 'Alive' to '
-                    <b>{alert.device_status}</b>' on {formatT(alert.valid_from)}
+                    {`Device ${alert.device_id} has been in mortality for X days. ${
+                      isManager
+                        ? `Do you want to complete a 'Mortality Workflow'?`
+                        : 'Only the Manager of this animal can update the mortality status.'
+                    }`}
                   </Typography>
                 }
                 secondary={
                   <>
-                    <b>Animal ID:</b> {alert.animal_id} <b>WLH ID:</b> {alert.wlh_id}
+                    <b>Animal ID:</b> {alert?.animal_id ?? 'None'} <b>WLH ID:</b> {alert?.wlh_id ?? 'None'}
                   </>
                 }
               />
-              <Button variant={'contained'} onClick={() => setOpenMap(true)}>
-                View on Map
+              <Button
+                sx={{ mr: 2 }}
+                variant={'contained'}
+                size={'small'}
+                color={'secondary'}
+                onClick={() => setOpenWorkflow(true)}>
+                Update Mortality
+              </Button>
+              <Button variant={'contained'} size={'small'} onClick={() => setOpenMap(true)}>
+                Map
               </Button>
             </ListItem>
-            <Button sx={{ float: 'right' }} color={'inherit'} onClick={() => setOpenWorkflow(true)}>
-              Update Mortality
-            </Button>
           </Box>
         )}
         {format === 'page' && (

@@ -57,6 +57,7 @@ export default function CritterPage(): JSX.Element {
             <FormatAlert alert={alert} format='banner' />
           ))}
         />
+        {/* <NotificationBanner hiddenContent={[<Box sx={{ border: '1px solid' }}>Test</Box>]} /> */}
         <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
         <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
           <CritterDataTables />

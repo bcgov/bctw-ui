@@ -7,7 +7,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: 'flex',
     width: '100%',
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
+    '& .MuiAlert-message': {
+      flexGrow: 1
+    }
   },
   listItem: {
     display: 'list-item',
@@ -19,6 +22,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   spacing: {
     paddingTop: theme.spacing(2)
+  },
+  widthFix: {
+    '& .MuiAlert-message': {
+      flexGrow: 1
+    }
   }
 }));
 interface BannerProps {
