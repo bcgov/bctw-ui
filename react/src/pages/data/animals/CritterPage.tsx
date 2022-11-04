@@ -14,6 +14,7 @@ import { AlertContext } from 'contexts/UserAlertContext';
 import { FormatAlert } from 'components/alerts/FormatAlert';
 import { TelemetryAlert } from 'types/alert';
 import dayjs from 'dayjs';
+import AlertActions from 'pages/user/AlertActions';
 
 export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
@@ -52,6 +53,7 @@ export default function CritterPage(): JSX.Element {
             </FullScreenDialog>
           </Box>
         </Box>
+        {/* <UserAlertPage /> */}
         <NotificationBanner
           hiddenContent={alerts.map((alert) => (
             <FormatAlert alert={alert} format='banner' />

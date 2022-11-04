@@ -1,4 +1,16 @@
-import { Badge, Box, Container, Divider, IconButton, lighten, ListItem, Menu, MenuItem, useTheme } from '@mui/material';
+import {
+  Badge,
+  Box,
+  Container,
+  Divider,
+  IconButton,
+  lighten,
+  ListItem,
+  ListItemText,
+  Menu,
+  MenuItem,
+  useTheme
+} from '@mui/material';
 import { Icon } from 'components/common';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { useState } from 'react';
@@ -56,11 +68,14 @@ export const AlertMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
         </ListItem>
         <Divider />
         {alerts?.map((notif, idx) => (
-          //Change the selected prop to the appropriate value
-          //Maybe highlight the alerts that appeared today
+          // Highlight all un-handled (active) alerts
           <Box key={`menu-item-${idx}`}>
-            <MenuItem sx={{ py: 3 }} divider={idx < alerts?.length} selected={isToday(notif?.valid_from)}>
-              <FormatAlert format='menu' alert={notif} />
+            <MenuItem sx={{ py: 3 }} divider={idx < alerts?.length} selected={notif.valid_to !== null}>
+              {!alerts?.length ? (
+                <ListItemText primary={'No un-handled alerts to show.'} />
+              ) : (
+                <FormatAlert format='menu' alert={notif} />
+              )}
             </MenuItem>
           </Box>
         ))}

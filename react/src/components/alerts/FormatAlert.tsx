@@ -4,11 +4,12 @@ import { Icon } from 'components/common';
 import MapModal from 'components/modal/MapModal';
 import Modal from 'components/modal/Modal';
 import { getTag } from 'components/table/table_helpers';
-import UserAlertPage from 'pages/user/UserAlertPage';
+import dayjs from 'dayjs';
+import AlertActions from 'pages/user/AlertActions';
 import { useState } from 'react';
 import { eAlertType, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { eDeviceStatus } from 'types/collar';
-import { formatT } from 'utils/time';
+import { formatT, getDaysDiff } from 'utils/time';
 
 interface FormattedAlertProps {
   alert: TelemetryAlert;
@@ -74,15 +75,36 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
   const [openMap, setOpenMap] = useState(false);
   const [openWorkflow, setOpenWorkflow] = useState(false);
   const isManager = (alert: MortalityAlert): boolean => alert.permission_type === 'manager';
+  const Actions = () => (
+    <>
+      {isManager && (
+        <Button
+          sx={{ mr: 1 }}
+          variant={'contained'}
+          size={'small'}
+          color={'secondary'}
+          onClick={() => setOpenWorkflow(true)}>
+          Update Mortality
+        </Button>
+      )}
+      <Button variant={'contained'} size={'small'} onClick={() => setOpenMap(true)}>
+        Map
+      </Button>
+    </>
+  );
 
   if (alert instanceof MortalityAlert) {
-    <UserAlertPage />;
     return (
       <>
+        <AlertActions alert={alert} />
         {format === 'menu' && (
           <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             <ListItemIcon>
-              <Icon icon={'circle'} htmlColor={theme.palette.error.main} />
+              {alert.isSnoozed ? (
+                <Icon icon={'snooze'} />
+              ) : (
+                <Icon icon={'error'} htmlColor={theme.palette.error.main} />
+              )}
             </ListItemIcon>
             <ListItemText
               primary={
@@ -90,7 +112,12 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
                   {`${alert.species} Mortality alert for Device ${alert.device_id} on Animal ${alert.wlh_id}`}
                 </Typography>
               }
-              secondary={`${alert.valid_from}`}
+              secondary={
+                <>
+                  <Typography>{`Alert triggered: ${alert.valid_from}`}</Typography>
+                  {alert.isSnoozed && <Typography>{`Snoozed-to: ${alert.snoozed_to}`}</Typography>}
+                </>
+              }
             />
           </Box>
         )}
@@ -100,35 +127,26 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
               <ListItemIcon sx={{ pr: 2 }}>{getTag(alert.device_status as eDeviceStatus, null, 'error')}</ListItemIcon>
               <ListItemText
                 primary={
-                  // <Typography>
-                  //   The status of <b>Device ID:</b> {alert.device_id} changed from 'Alive' to '
-                  //   <b>{alert.device_status}</b>' on {formatT(alert.valid_from)}
-                  // </Typography>
-                  <Typography>
-                    {`Device ${alert.device_id} has been in mortality for X days. ${
-                      isManager
-                        ? `Do you want to complete a 'Mortality Workflow'?`
-                        : 'Only the Manager of this animal can update the mortality status.'
-                    }`}
-                  </Typography>
+                  <>
+                    <Typography>
+                      {`Device ${alert.device_id} detected a potential mortality ${
+                        getDaysDiff(alert.valid_from).asText
+                      }.`}
+                    </Typography>
+                    <Typography fontWeight='bold'>
+                      {isManager
+                        ? `Do you want to update this Animals mortality?`
+                        : 'Only the Manager of this animal can update the mortality status.'}
+                    </Typography>
+                  </>
                 }
                 secondary={
                   <>
-                    <b>Animal ID:</b> {alert?.animal_id ?? 'None'} <b>WLH ID:</b> {alert?.wlh_id ?? 'None'}
+                    <b>Alert Date:</b> {formatT(alert.valid_from)} <b> Animal ID:</b> {alert?.animal_id ?? 'None'}{' '}
+                    <b>WLH ID:</b> {alert?.wlh_id ?? 'None'}
                   </>
                 }
               />
-              <Button
-                sx={{ mr: 2 }}
-                variant={'contained'}
-                size={'small'}
-                color={'secondary'}
-                onClick={() => setOpenWorkflow(true)}>
-                Update Mortality
-              </Button>
-              <Button variant={'contained'} size={'small'} onClick={() => setOpenMap(true)}>
-                Map
-              </Button>
             </ListItem>
           </Box>
         )}
@@ -162,11 +180,13 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
           handleClose={() => setOpenMap(false)}
           width={'600px'}
           height={'500px'}
+          startDate={alert.valid_from?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks')}
+          endDate={alert.valid_from ?? dayjs()}
           critter_id={alert.critter_id}
         />
-        <Modal title={'Current Alerts'} open={openWorkflow} handleClose={() => setOpenWorkflow(false)}>
+        {/* <Modal title={'Current Alerts'} open={openWorkflow} handleClose={() => setOpenWorkflow(false)}>
           <UserAlertPage />
-        </Modal>
+        </Modal> */}
       </>
     );
   }
