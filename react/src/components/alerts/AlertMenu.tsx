@@ -70,7 +70,7 @@ export const AlertMenu = ({ alerts }: NotificationsMenuProps): JSX.Element => {
         {alerts?.map((notif, idx) => (
           // Highlight all un-handled (active) alerts
           <Box key={`menu-item-${idx}`}>
-            <MenuItem sx={{ py: 3 }} divider={idx < alerts?.length} selected={notif.valid_to !== null}>
+            <MenuItem sx={{ py: 3 }} divider={idx < alerts?.length} selected={isToday(notif.valid_from)}>
               {!alerts?.length ? (
                 <ListItemText primary={'No un-handled alerts to show.'} />
               ) : (

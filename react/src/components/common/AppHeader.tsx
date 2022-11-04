@@ -10,7 +10,7 @@ import headerImage from 'assets/images/gov3_bc_logo.png';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import Icon from '@mdi/react';
 import Modal from 'components/modal/Modal';
-import UserAlert from 'pages/user/AlertActions';
+import UserAlert from 'components/alerts/AlertActions';
 import { urls } from 'constants/external_urls';
 import { ENABLE_ALERTS } from 'api/api_helpers';
 import { AlertMenu } from '../alerts/AlertMenu';

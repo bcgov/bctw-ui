@@ -29,7 +29,7 @@ import dayjs from 'dayjs';
  */
 interface AlertActionsProps {
   alert: MalfunctionAlert | MortalityAlert;
-  showActions?: { map: boolean; edit: boolean; snooze: boolean };
+  showActions?: { map?: boolean; edit?: boolean; snooze?: boolean };
 }
 /**
  * @param alert Type of alert, currently only handling Malfunctions / Mortalities
@@ -54,7 +54,7 @@ export default function AlertActions({ alert, showActions }: AlertActionsProps):
   const [openMap, setOpenMap] = useState(false);
   // when an alert row is selected, clicking the 'update' button will trigger a workflow modal based on the alert type
   const [workflow, createWorkflow] = useState<IBCTWWorkflow | null>(null);
-
+  const isMortality = alert.alert_type === eAlertType.mortality;
   /**
    * when a new alert is passed as props:
    * a) update the workflow state
@@ -63,11 +63,8 @@ export default function AlertActions({ alert, showActions }: AlertActionsProps):
   useEffect(() => {
     if (alert) {
       createWorkflow(() => {
-        const type = alert.alert_type;
         const n = alert.toWorkflow(
-          type === eAlertType.malfunction
-            ? new MalfunctionEvent(alert.last_transmission_date)
-            : new MortalityEvent(alert.valid_from)
+          isMortality ? new MortalityEvent(alert.valid_from) : new MalfunctionEvent(alert.last_transmission_date)
         );
         return n;
       });
@@ -174,44 +171,50 @@ export default function AlertActions({ alert, showActions }: AlertActionsProps):
         ))}
       /> */}
       {/* Map Btn */}
+      <Box display='flex' alignItems='center'>
+        {isManager && (
+          <>
+            {/* Edit btn */}
 
-      {(!showActions || showActions?.map) && (
-        <Button
-          sx={{ mr: 1 }}
-          variant={'contained'}
-          size={'small'}
-          color={'primary'}
-          onClick={(): void => setOpenMap(true)}>
-          Map
-        </Button>
-      )}
-
-      {isManager && (
-        <>
-          {/* Edit btn */}
-
-          {(!showActions || showActions?.edit) && (
-            <Button
-              sx={{ mr: 1 }}
-              variant={'contained'}
-              size={'small'}
-              color={'secondary'}
-              onClick={(): void => editAlert()}>
-              Update Mortality
-            </Button>
-          )}
-
-          {/* Snooze Btn */}
-
-          {(!showActions || showActions?.snooze) && (
-            <Tooltip title={`${alert.snoozesAvailable} ${pluralize(alert.snoozesAvailable, 'snooze')} left`}>
-              <Button onClick={(): void => handleClickSnooze()} size={'small'} endIcon={<Icon icon='snooze' />}>
-                Snooze
+            {(!showActions || showActions?.edit) && (
+              <Button
+                sx={{ mr: 1, minWidth: '9rem' }}
+                variant={'contained'}
+                size={'small'}
+                color={'secondary'}
+                onClick={(): void => editAlert()}>
+                {isMortality ? 'Report Mortality' : 'Handle Malfunction'}
               </Button>
-            </Tooltip>
-          )}
-        </>
-      )}
+            )}
+
+            {/* Snooze Btn */}
+
+            {(!showActions || showActions?.snooze) && (
+              <Tooltip title={`${alert.snoozesAvailable} ${pluralize(alert.snoozesAvailable, 'snooze')} left`}>
+                <Button
+                  variant='outlined'
+                  sx={{ mr: 1 }}
+                  onClick={(): void => handleClickSnooze()}
+                  size={'small'}
+                  endIcon={<Icon icon='snooze' size={0.9} />}>
+                  Snooze
+                </Button>
+              </Tooltip>
+            )}
+          </>
+        )}
+        {(!showActions || showActions?.map) && (
+          <Button
+            sx={{ mr: 1 }}
+            variant={'contained'}
+            size={'small'}
+            color={'primary'}
+            onClick={(): void => setOpenMap(true)}>
+            Map
+          </Button>
+        )}
+      </Box>
+
       {/* {isManager && (
         <Button variant={'contained'} size={'small'} color={'secondary'} onClick={(): void => handleClickSnooze()}>
           Snooze

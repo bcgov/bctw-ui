@@ -1,9 +1,12 @@
-import { Box } from '@mui/material';
-import { TelemetryAlert, eAlertType } from 'types/alert';
+import { Box, capitalize, Typography } from '@mui/material';
+import { TelemetryAlert, eAlertType, MortalityAlert, MalfunctionAlert } from 'types/alert';
 import makeStyles from '@mui/styles/makeStyles';
 import { SubHeader } from 'components/common/partials/SubHeader';
-import { FormatAlert } from 'components/alerts/FormatAlert';
+import { FormatAlert, getTitle } from 'components/alerts/FormatAlert';
 import AlertCard from './AlertCard';
+import { useEffect, useState } from 'react';
+import Select from 'components/form/BasicSelect';
+import { formatT } from 'utils/time';
 
 type ViewAllAlertsProps = {
   alerts: TelemetryAlert[];
@@ -22,7 +25,10 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2)
   },
   topHeader: {
-    marginTop: theme.spacing(4)
+    marginTop: theme.spacing(4),
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   }
 }));
 
@@ -33,25 +39,49 @@ const useStyles = makeStyles((theme) => ({
  */
 export const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
   const styles = useStyles();
-
-  alerts.sort((a, b) => (a.valid_from.isAfter(b.valid_from) ? -1 : 1));
-  const grouped: AlertGroups = {};
-  alerts.forEach((a) => {
-    if (a.valid_from) {
-      const category = a.valid_from.format('DD-MM-YYYY');
-      if (!grouped[category]) {
-        grouped[category] = [];
-      }
-      grouped[category].push(a);
-    }
-  });
-
+  const SelectOptions = ['Date', 'Device', 'Type'];
+  const [sortBy, setSortBy] = useState(SelectOptions[0]);
+  const [alertGroup, setAlertGroup] = useState<AlertGroups>({});
+  useEffect(() => {
+    const sort = (): void => {
+      const group: AlertGroups = {};
+      alerts.sort((a, b) => (a.valid_from.isAfter(b.valid_from) ? -1 : 1));
+      alerts.forEach((a) => {
+        if (a instanceof MortalityAlert || a instanceof MalfunctionAlert) {
+          let category: string;
+          if (sortBy === 'Date') {
+            if (!a.valid_from) return;
+            category = a.valid_from.format('MMMM DD, YYYY');
+          }
+          if (sortBy === 'Device') {
+            category = `Device ID: ${a.device_id}`;
+          }
+          if (sortBy === 'Type') {
+            //Change this to getAlertTitle
+            category = getTitle(a);
+          }
+          if (!group[category]) {
+            group[category] = [];
+          }
+          group[category].push(a);
+        }
+      });
+      setAlertGroup(group);
+    };
+    sort();
+  }, [sortBy]);
   return (
     <>
       <Box className={styles.topHeader}>
         <SubHeader text={'Alerts'} />
+        <Select
+          label='Sort by'
+          defaultValue={SelectOptions[0]}
+          values={SelectOptions}
+          handleChange={(v: string): void => setSortBy(v)}
+        />
       </Box>
-      {Object.values(grouped).map((o) => {
+      {/* {Object.values(alertGroup).map((o) => {
         return (
           <>
             {
@@ -70,6 +100,30 @@ export const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
               );
             })}
           </>
+        );
+      })} */}
+      {Object.keys(alertGroup).map((a, i) => {
+        return (
+          <Box key={`alert-group-${i}`}>
+            <Box className={styles.header} textAlign='center'>
+              <SubHeader text={capitalize(a)} />
+            </Box>
+            {alertGroup[a].map((item, j) => (
+              <Box className={styles.mortalityCard} key={`alert-content-${j}`}>
+                <AlertCard
+                  variant={item.alert_type === eAlertType.mortality ? 'error' : 'warning'}
+                  content={
+                    <>
+                      <FormatAlert alert={item} format={'page'} />
+                      {sortBy !== 'Date' && (
+                        <Typography sx={{ fontWeight: 'light' }}>Alert Date: {formatT(item.valid_from)}</Typography>
+                      )}
+                    </>
+                  }
+                />
+              </Box>
+            ))}
+          </Box>
         );
       })}
     </>

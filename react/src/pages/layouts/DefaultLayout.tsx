@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { UserContext } from 'contexts/UserContext';
 import { AlertContext } from 'contexts/UserAlertContext';
-import UserAlert from 'pages/user/AlertActions';
+import UserAlert from 'components/alerts/AlertActions';
 // import Modal from "components/modal/Modal";
 import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';

@@ -64,7 +64,7 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   const [page, setPage] = useState(1);
   //const [totalPages, setTotalPages] = useState<number | null>(1);
-  const [totalRows, setTotalRows] = useState(0);
+  const [totalRows, setTotalRows] = useState<number>(0);
 
   const isPaginate = paginate && !DISABLE_PAGINATION;
 
@@ -112,7 +112,9 @@ export default function DataTable<T extends BCTWBase<T>>({
     }
     const rowCount = data[0]?.row_count;
     if (rowCount) {
-      setTotalRows(rowCount);
+      // This shouldnt have to be cast to a number
+      // TODO: Find in DB where row_count is string (should be a number)
+      setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
     }
   };
   useEffect(() => {
@@ -374,7 +376,7 @@ export default function DataTable<T extends BCTWBase<T>>({
               showFirstButton
               rowsPerPageOptions={[]}
               component='div'
-              count={totalRows as number}
+              count={totalRows}
               rowsPerPage={ROWS_PER_PAGE}
               page={page - 1}
               onPageChange={handlePageChange}
