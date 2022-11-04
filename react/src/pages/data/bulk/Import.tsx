@@ -1,8 +1,8 @@
-import { Button, CircularProgress, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, FormControlLabel, IconButton, Paper, Radio, RadioGroup, Typography } from '@mui/material';
 import { createFormData } from 'api/api_helpers';
-import { NotificationMessage } from 'components/common';
+import { Icon, NotificationMessage } from 'components/common';
 import FileInput from 'components/form/FileInput';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BasicTable from 'components/table/BasicTable';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -19,9 +19,13 @@ import { FileStrings, ImportSteps } from 'constants/strings';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { plainToClass } from 'class-transformer';
-import { IBulkUploadResults } from 'api/api_interfaces';
+import { IBulkUploadResults, ParsedXLSXResult } from 'api/api_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { eUserRole } from 'types/user';
+import { Banner, ErrorBanner, NotificationBanner, SuccessBanner } from 'components/common/Banner';
+import { SubHeader } from 'components/common/partials/SubHeader';
+import HighlightTable from 'components/table/HighlightTable';
+import makeStyles from '@mui/styles/makeStyles';
 
 enum eImportType {
   animal = 'animal',
@@ -36,6 +40,17 @@ const radios = [
   { value: eImportType.both, header: 'Animal and Device Metadata' }
 ];
 
+const useStyles = makeStyles((theme) => ({
+  spacing: {
+      marginTop: theme.spacing(2)
+  },
+  spacingTopBottom: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2)
+  }
+}));
+
+
 /**
  * @param message whats displayed as body of import modal
  * @param handleToast handler from parent, called when mutation is complete
@@ -45,6 +60,11 @@ export default function Import(): JSX.Element {
   const showNotif = useResponseDispatch();
   const [importType, setImportType] = useState<eImportType | null>(null);
   const [message, setMessage] = useState<React.ReactNode | string>('');
+  const [sanitizedImport, setSanitizedImport] = useState<ParsedXLSXResult[]>([]);
+  const [canFinalize, setCanFinalize] = useState(false);
+  const [fileName, setFilename] = useState('');
+  const [selectedError, setSelectedError] = useState(null);
+  const styles = useStyles();
 
   // change the import message displayed when user selects a radio option
   useDidMountEffect(() => {
@@ -65,21 +85,57 @@ export default function Import(): JSX.Element {
   }, [importType]);
 
   // handle a successful csv upload response
-  const onSuccess = (d: IBulkUploadResults<unknown>): void => {
+  const oldonSuccess = (d: IBulkUploadResults<unknown>): void => {
     // console.log('csv upload results:', d);
     if (d.errors.length) {
-      onError()
+      errorXLSX()
     } else {
       showNotif({severity: 'success', message: `a bulk upload was completed successfully`});
     }
   };
 
-  const onError = (): void => {
+  useEffect(() => {
+    if(!sanitizedImport || !sanitizedImport.length) {
+      setCanFinalize(false);
+      return;
+    }
+
+    if(sanitizedImport.every(o => o.success)) {
+      setCanFinalize(true);
+    }
+    else {
+      setCanFinalize(false);
+    }
+
+
+  }, [sanitizedImport]);
+
+
+  const successXLSX = (d: ParsedXLSXResult[]) => {
+    if(d.length) {
+      setSanitizedImport(d);
+    }
+    else {
+      showNotif({severity: 'error', message: 'The data sanitization process failed.'})
+    }
+    
+  } 
+
+  const errorXLSX = (): void => {
     showNotif({ severity: 'error', message: 'bulk upload failed' });
   };
 
+  const successFinalize = (d: IBulkUploadResults<unknown>): void => {
+    console.log(JSON.stringify(d, null, 2));
+  }
+
+  const errorFinalize = (): void => {
+    showNotif({severity: 'error', message: 'An error was encountered when trying to finalize the data upload.'});
+  }
+
   // setup the import mutation
-  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = api.useUploadCSV({ onSuccess, onError });
+  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = api.useUploadXLSX({ onSuccess: successXLSX, onError: errorXLSX });
+  const { mutateAsync: mutateFinalize, data: dataFinalize } = api.useFinalizeXLSX({ onSuccess: successFinalize, onError: errorFinalize });
 
   // download a template CSV file based on the import type selected, 
   const downloadTemplate = (): void => {
@@ -98,16 +154,30 @@ export default function Import(): JSX.Element {
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
     save(createFormData(fieldName, files));
+    setFilename(files[0]?.name);
   };
 
   // call the save mutation
-  const save = async (form: FormData): Promise<IBulkUploadResults<unknown>> => await mutateAsync(form);
+  const save = async (form: FormData): Promise<ParsedXLSXResult[]> => await mutateAsync(form);
 
   // the radio button handler
   const changeImportType = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.value as eImportType;
     setImportType(val);
   };
+
+  const collectErrorsFromResults = (results: ParsedXLSXResult[]): string[] => {
+    const errArr = [];
+    results.forEach((r,idx) => {
+      errArr.push(...r.errors.map(e => {
+        return e['identifier'] ?
+        `At row index ${idx}, your animal does not meet the unique identification criteria for this species.`
+        :
+        `At row index ${idx}, cell "${Object.keys(e)[0]}": ${Object.values(e)[0]}`
+    }));
+    })
+    return errArr;
+  }
 
   // renders the result/error table when the API returs result of the import
   const Results = (): JSX.Element => {
@@ -117,6 +187,26 @@ export default function Import(): JSX.Element {
     if (isIdle || !data) {
       return null;
     }
+    if(data) {
+      if(canFinalize) {
+        return  ( 
+        <Box>
+          <Typography>Data has been verified and is ready for submission.</Typography>
+          <Button onClick={() => {mutateFinalize(sanitizedImport)}} variant='contained'>Finalize Data Import</Button>
+        </Box>
+        );
+      }
+      else {
+        console.log(JSON.stringify(data, null, 2));
+        return (
+        <>
+        <Typography>This is where we would display a table with all your bad entries.</Typography>
+        {data.forEach(arr => { return (<>{arr.errors.map(o => { return ( <><Typography>{JSON.stringify(o)}</Typography></>) } )}</>)})}
+        </>
+        );
+      }
+    }
+    /*
     const { errors, results } = data;
     const toShow = [];
     const isErrors = !!errors.length;
@@ -131,17 +221,100 @@ export default function Import(): JSX.Element {
         }
       });
     }
-    return <BasicTable data={toShow} headers={Object.keys(toShow[0])} rowIdentifier={'id'} />;
+    return <BasicTable data={toShow} headers={Object.keys(toShow[0])} rowIdentifier={'id'} />;*/
   };
 
   return (
     <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Data Import</h1>
+        <Paper className={styles.spacing} style={{padding: '24px'}}>
+          <Box display='flex'>
+            <SubHeader text='Device Metadata'/>
+            <Button style={{marginLeft: 'auto'}} variant='outlined'>Download Template</Button>
+          </Box>
+          <Box className={styles.spacing}>
+            <Banner
+              variant='info'
+              text={['To add a new animal and collar, create a new row in the Device Metadata template and fill out the required fields.',
+                    'Device IDs already assigned to an Animal ID must first be released by their owner before they can be assigned to a new Animal ID.']}  
+            />
+          </Box>
+          <Paper elevation={3} className={styles.spacing} style={{padding: '16px', backgroundColor: 'text.secondary', display: 'flex', justifyContent: 'center'}}>
+            {sanitizedImport.length > 0 ?
+                (<>
+                  <Typography>{fileName}</Typography>
+                  <Icon htmlColor={canFinalize ? 'green' : 'red'} icon={canFinalize ? 'check' : 'error'}></Icon>
+                  <IconButton style={{padding: '0px'}} onClick={() => {setSanitizedImport([])}}>
+                    <Icon icon='delete'/>
+                  </IconButton>
+                </>)
+                :
+                (<FileInput buttonText='Upload Device Metadata Template' buttonVariant='text' accept='.xlsx' onFileChosen={handleFileChange} />)
+            } 
+          </Paper>
+          
+          {sanitizedImport.length > 0 && (
+            <>
+            <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
+            {canFinalize ?
+              (<SuccessBanner
+                text={'Your spreadsheet appears to be correctly formatted. Please double check that the information displayed below is what you wish to submit.'}
+              />)
+              : 
+              (<>
+              <Banner
+                variant='error'
+                text={'Hover over highlighted cells to view error info. Fix these errors in your spreadsheet application and re-upload.'} 
+                icon={<Icon icon='error'/>}
+                action='collapse'
+                hiddenContent={collectErrorsFromResults(sanitizedImport).map(a => <div>{a}</div>)} 
+              />
+              <Banner
+              variant='error'
+              text={selectedError ? `Selected error at row ${JSON.stringify(selectedError)}` : 'Click a cell for detailed information about that error.'}
+              icon={<Icon icon='help'/>}
+              />
+              </>)
+            }
+            <HighlightTable
+            data={sanitizedImport.map((o,idx) => {return {row_index: idx, ...o.row}}) as any[]}
+            headers={['row_index', ...Object.keys(sanitizedImport[0].row) as any]}
+            onSelectCell={(value, message) => setSelectedError(value)}
+            messages={sanitizedImport.map(o => Object.assign({}, ...o.errors))} 
+            rowIdentifier='row_index'
+            />
+            
+            </>
+          )}
+          <Box display='flex'><Button disabled={!canFinalize} className={styles.spacing} variant='contained' style={{marginLeft: 'auto'}}>Finalize Submission</Button></Box>
+        </Paper>
+        <Paper className={styles.spacing} style={{padding: '24px'}}>
+          <Box display='flex'>
+            <SubHeader text='Telemetry Data'/>
+            <Button style={{marginLeft: 'auto'}} variant='outlined'>Download Template</Button>
+          </Box>
+          <Box className={styles.spacing}>
+            <Banner
+              variant='info'
+              text={['Telemetry placeholder text. ',
+                    'Telemetry placeholder text.']}  
+            />
+          </Box>
+          <Paper className={styles.spacing} style={{padding: '16px', backgroundColor: 'text.secondary', display: 'flex', justifyContent: 'center'}}>
+            
+          </Paper>
+          <Box display='flex'>
+            <Button disabled={!canFinalize} className={styles.spacing} variant='contained' style={{marginLeft: 'auto'}}>Finalize Submission</Button>
+          </Box>
+        </Paper>
+
+
+        {/*
         <Typography mb={3} variant='body1' component='p'>Import metadata via CSV file.</Typography>
-        {/* save progress indicator */}
+        {/* save progress indicator }
         {isLoading ? <div>saving...<CircularProgress /></div> : null}
-        {/* import type options and instructions */}
+        {/* import type options and instructions *}
         <div className={'import-setup'}>
           <div className={'import-choice'}>
             <Typography variant='h5'>{'What do you want to import?'}</Typography>
@@ -168,19 +341,19 @@ export default function Import(): JSX.Element {
             </ol>
           </div>
         </div>{' '}
-        {/* import-setup */}
-        {/* upload/try again button */}
-        {isSuccess || isError ? (
+        {/* import-setup}
+        {/* upload/try again button}
+        {(isSuccess || isError) && !canFinalize ? (
           <Button color='primary' variant='contained' onClick={reset}>Upload Again</Button>
         ) : null}
         {isIdle ? <FileInput accept='.csv' disabled={!importType} onFileChosen={handleFileChange} /> : null}
-        {/* import type-specific message */}
+        {/* import type-specific message }
         <Typography style={{ minHeight: '200px', margin: '10px 0' }}>{message ?? ''}</Typography>
-        {/* import results table */}
+        {/* import results table }
         <div style={{ minHeight: '200px', maxWidth: '80%', margin: '10px 0', overflowY: 'auto', overflowX: 'auto' }}>
           <Results />
         </div>
-        {isError ? <NotificationMessage severity='error' message={formatAxiosError(error)} /> : null}
+        {isError ? <NotificationMessage severity='error' message={formatAxiosError(error)} /> : null}*/}
       </div>
     </AuthLayout>
   );

@@ -25,7 +25,7 @@ import { AttachedCollar, Collar, IVectronicUpsert } from 'types/collar';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, User } from 'types/user';
 
-import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
+import { IBulkUploadResults, IDeleteType, IUpsertPayload, ParsedXLSXResult } from 'api/api_interfaces';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
@@ -483,6 +483,16 @@ export const useTelemetryApi = () => {
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
+  const useFinalizeXLSX = <T>(
+      config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, ParsedXLSXResult[]>
+    ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
+      useMutation<IBulkUploadResults<T>, AxiosError, ParsedXLSXResult[]>((body) => bulkApi.finalizeXlsx(body), config);
+
+  const useUploadXLSX= <T>(
+    config: UseMutationOptions<ParsedXLSXResult[], AxiosError, FormData>
+  ): UseMutationResult<ParsedXLSXResult[], AxiosError> =>
+    useMutation<ParsedXLSXResult[], AxiosError, FormData>((form) => bulkApi.uploadXlsx(form), config);
+
   /** upload one or more .keyx files to create new Vectronic devices */
   const useUploadXML = (
     config: UseMutationOptions<IBulkUploadResults<IVectronicUpsert>, AxiosError, FormData>
@@ -622,6 +632,8 @@ export const useTelemetryApi = () => {
     // mutations
     useSaveCodeHeader,
     useUploadCSV,
+    useUploadXLSX,
+    useFinalizeXLSX,
     useUploadXML,
     useSaveDevice,
     useSaveAnimal,

@@ -4,7 +4,7 @@ import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
 import { exportEndpoint, exportAllEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
 import { useQueryClient } from 'react-query';
-import { API, IBulkUploadResults, IDeleteType } from './api_interfaces';
+import { API, IBulkUploadResults, IDeleteType, ParsedXLSXResult } from './api_interfaces';
 import { IVectronicUpsert } from 'types/collar';
 
 export const bulkApi = (api: AxiosInstance): API => {
@@ -28,6 +28,21 @@ export const bulkApi = (api: AxiosInstance): API => {
     const { data } = await api.post(url, form);
     invalidateDevices();
     invalidateCritters();
+    return data;
+  };
+
+  const finalizeXlsx = async<T,> (body: any): Promise<IBulkUploadResults<T>> => {
+    const url = createUrl({api: 'import-finalize'});
+    const { data } = await api.post(url, body);
+    invalidateDevices();
+    invalidateCritters();
+    return data;
+
+  }
+
+  const uploadXlsx = async <T,>(form: FormData): Promise<ParsedXLSXResult[]> => {
+    const url = createUrl({ api: importCSVEndpoint});
+    const { data } = await api.post(url, form);
     return data;
   };
 
@@ -85,6 +100,8 @@ export const bulkApi = (api: AxiosInstance): API => {
     getAllExportData,
     getType,
     uploadCsv,
+    uploadXlsx,
+    finalizeXlsx,
     uploadFiles,
   }
 }
