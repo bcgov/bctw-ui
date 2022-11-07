@@ -48,7 +48,8 @@ import {
   mdiCheckCircle,
   mdiGraveStone,
   mdiRefresh,
-  mdiKeyboardBackspace
+  mdiKeyboardBackspace,
+  mdiBattery20
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -168,6 +169,8 @@ const getIconPath = (path: string): string => {
       return mdiRefresh;
     case 'back-extended':
       return mdiKeyboardBackspace;
+    case 'low-battery':
+      return mdiBattery20;
   }
 };
 

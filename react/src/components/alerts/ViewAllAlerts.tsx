@@ -73,7 +73,8 @@ export const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
   return (
     <>
       <Box className={styles.topHeader}>
-        <SubHeader text={'Alerts'} />
+        {/* <SubHeader text={'Alerts'} /> */}
+        <h1>Alerts</h1>
         <Select
           label='Sort by'
           defaultValue={SelectOptions[0]}

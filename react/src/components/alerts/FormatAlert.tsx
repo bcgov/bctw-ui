@@ -12,6 +12,7 @@ import { eDeviceStatus } from 'types/collar';
 import { capitalize } from 'utils/common_helpers';
 import { formatT, getDaysDiff } from 'utils/time';
 import AlertActions from './AlertActions';
+import { AlertIcon } from './AlertIcon';
 
 interface FormattedAlertProps {
   alert: TelemetryAlert;
@@ -46,7 +47,6 @@ export const getTitle = (tAlert: TelemetryAlert) => {
  *
  */
 export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element => {
-  const theme = useTheme();
   const styles = useStyles();
   const [openMap, setOpenMap] = useState(false);
   const isManager = (alert: MortalityAlert): boolean => alert.permission_type === 'manager';
@@ -63,28 +63,34 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
     return (
       <>
         {format === 'menu' && (
-          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-            <ListItemIcon>
-              {alert.isSnoozed ? (
-                <Icon icon={'snooze'} />
-              ) : (
-                <Icon icon={'error'} htmlColor={theme.palette.error.main} />
-              )}
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography>
-                  {`${alert.species} '${getTitle(alert)}' alert for Device ${alert.device_id} on Animal ${
-                    alert.wlh_id
-                  }`}
-                </Typography>
-              }
-              secondary={
-                <Typography>{`Alert triggered: ${formatT(alert.valid_from)} ${
-                  alert.isSnoozed && `Snoozed-to: ${formatT(alert.snoozed_to)}`
-                }`}</Typography>
-              }
-            />
+          <Box display={'flex'} justifyContent={'space-between'} flexDirection={'row'} width={'100%'}>
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+              <ListItemIcon>{alert.isSnoozed ? <Icon icon={'snooze'} /> : <AlertIcon alert={alert} />}</ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography>
+                    <>
+                      {alert.species} <b>{getTitle(alert)}</b> alert for Device {alert?.device_id ?? 'Unknown'} on
+                      WLH-ID {alert?.wlh_id ?? 'Unknown'}
+                    </>
+                  </Typography>
+                }
+                secondary={
+                  <Typography>
+                    {
+                      <>
+                        <b>Alert triggered: </b> {formatT(alert.valid_from)}
+                        {alert.isSnoozed && (
+                          <>
+                            <b> Snoozed to: </b> {formatT(alert.snoozed_to)}
+                          </>
+                        )}
+                      </>
+                    }
+                  </Typography>
+                }
+              />
+            </Box>
             <Box pl={1}>{isManager && <AlertActions alert={alert} showActions={{ edit: true }} />}</Box>
           </Box>
         )}
@@ -116,25 +122,28 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
           </Box>
         )}
         {format === 'page' && (
-          <Box>
-            <Box display={'flex'} justifyContent={'space-between'}>
-              <Typography variant='h5' pt={0} pb={1} fontWeight='bold'>
-                {getTitle(alert)}
-              </Typography>
-              <Typography textAlign={'right'}> {`${alert.valid_from.format('hh:mm a')}`}</Typography>
+          <Box display={'flex'} flexDirection='row'>
+            <AlertIcon alert={alert} />
+            <Box width={'100%'} pl={1}>
+              <Box display={'flex'} justifyContent={'space-between'}>
+                <Typography variant='h5' pt={0} pb={1} fontWeight='bold'>
+                  {getTitle(alert)}
+                </Typography>
+                <Typography textAlign={'right'}> {`${alert.valid_from.format('hh:mm a')}`}</Typography>
+              </Box>
+              {HEADER}
+              <Grid container columnGap={2}>
+                <Grid item>
+                  <Typography className={styles.spacing}>{`Species: ${alert.species}`}</Typography>
+                </Grid>
+                <Grid item>
+                  <Typography className={styles.spacing}>{`Animal ID: ${alert?.animal_id ?? 'None'}`}</Typography>
+                </Grid>
+                <Grid item>
+                  <Typography className={styles.spacing}>{`Wildlife Health ID: ${alert?.wlh_id ?? 'None'}`}</Typography>
+                </Grid>
+              </Grid>
             </Box>
-            {HEADER}
-            <Grid container columnGap={2}>
-              <Grid item>
-                <Typography className={styles.spacing}>{`Species: ${alert.species}`}</Typography>
-              </Grid>
-              <Grid item>
-                <Typography className={styles.spacing}>{`Animal ID: ${alert?.animal_id ?? 'None'}`}</Typography>
-              </Grid>
-              <Grid item>
-                <Typography className={styles.spacing}>{`Wildlife Health ID: ${alert?.wlh_id ?? 'None'}`}</Typography>
-              </Grid>
-            </Grid>
           </Box>
         )}
         <MapModal

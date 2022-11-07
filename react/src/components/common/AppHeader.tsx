@@ -28,7 +28,6 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   const [user, setUser] = useState<User>();
   const [telemetryAlerts, setTelemetryAlerts] = useState<TelemetryAlert[]>([]);
   //const [alertCount, setAlertCount] = useState(0);
-  const [showAlerts, setShowAlerts] = useState(false);
 
   // when the UserContext is loaded, set the session info state
   useDidMountEffect(() => {
@@ -53,8 +52,6 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
     const { alerts } = useAlert;
     if (alerts.length) {
       setTelemetryAlerts(alerts);
-    } else {
-      setShowAlerts(false);
     }
   }, [useAlert]);
 

@@ -30,8 +30,11 @@ export default function CritterPage(): JSX.Element {
   };
   useEffect(() => {
     if (useAlert?.alerts?.length) {
-      //Set only the valid alerts where today is less than the alerts snoozed_to date
-      setAlerts(useAlert.alerts.filter((a) => !dayjs().diff(a.snoozed_to)));
+      //Set only the valid (null valid_to) alerts where snoozed_to date < today
+      const nonSnoozedValidAlerts = useAlert.alerts.filter(
+        (a) => !a.valid_to.isValid() && !(dayjs(a.snoozed_to).diff(dayjs()) > 0)
+      );
+      setAlerts(nonSnoozedValidAlerts);
     }
   }, [useAlert]);
   return (
