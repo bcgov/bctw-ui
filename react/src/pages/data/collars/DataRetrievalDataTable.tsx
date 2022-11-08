@@ -118,10 +118,7 @@ export const DataRetrievalDataTable = (): JSX.Element => {
         onSelect={handleSelect}
         customColumns={[{ column: Menu, header: <b>Actions</b> }]}
       />
-      <ModifyCollarWrapper
-        editing={editObj}
-        onDelete={(collar_id: string): void => setDeleted(collar_id)}
-        onUpdate={(collar_id: string): void => setUpdated(collar_id)}>
+      <ModifyCollarWrapper editing={editObj} onDelete={(collar_id: string): void => setDeleted(collar_id)}>
         <EditCollar {...editProps} open={openEdit} handleClose={inverseEdit} />
       </ModifyCollarWrapper>
     </>

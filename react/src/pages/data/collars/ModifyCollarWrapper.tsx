@@ -52,7 +52,6 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
     const collar = data.results[0];
     responseDispatch({ severity: 'success', message: `collar ${collar.device_id} saved` });
     onUpdate(collar.collar_id);
-    console.log(collar);
   };
 
   const onError = (error: AxiosError): void =>
