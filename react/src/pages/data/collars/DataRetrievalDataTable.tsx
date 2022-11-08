@@ -15,7 +15,6 @@ import { formatT } from 'utils/time';
 import AddEditViewer from '../common/AddEditViewer';
 import EditCollar from './EditCollar';
 import ModifyCollarWrapper from './ModifyCollarWrapper';
-
 export const DataRetrievalDataTable = (): JSX.Element => {
   const api = useTelemetryApi();
   const showAlert = useResponseDispatch();
@@ -25,6 +24,7 @@ export const DataRetrievalDataTable = (): JSX.Element => {
   const [openEdit, setOpenEdit] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [deleted, setDeleted] = useState('');
+  const [updated, setUpdated] = useState('');
 
   const editProps = {
     editing: new Collar(),
@@ -59,6 +59,11 @@ export const DataRetrievalDataTable = (): JSX.Element => {
     } else {
       showAlert({ severity: 'warning', message: 'No new telemetry found for this device.' });
     }
+    //This might be an issue if the user selects another collar before the fetch completes.
+    //Potentially will display an update of the wrong record in the UI.
+    //The correct record would have been updated in the backend
+    editObj.last_fetch_date = dayjs(rows[0].fetchDate);
+    setUpdated(editObj.collar_id);
   };
 
   const onError = (e: AxiosError): void => {
@@ -95,7 +100,8 @@ export const DataRetrievalDataTable = (): JSX.Element => {
       {
         label: 'Update Telemetry',
         icon: <Icon icon={'refresh'} />,
-        handleClick: _update
+        handleClick: _update,
+        disableMenuItem: !row?.last_fetch_date?.isValid()
       }
     ];
     return <ActionsMenu disabled={row !== editObj} menuItems={defaultItems} />;
@@ -107,17 +113,16 @@ export const DataRetrievalDataTable = (): JSX.Element => {
         headers={AttachedCollar.dataRetrievalPropsToDisplay}
         title={'Data Retrieval'}
         queryProps={{ query: api.useAttachedDevices }}
-        customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+        updated={updated}
+        deleted={deleted}
         onSelect={handleSelect}
+        customColumns={[{ column: Menu, header: <b>Actions</b> }]}
       />
-
-      <ModifyCollarWrapper editing={editObj} onDelete={(collar_id: string): void => setDeleted(collar_id)}>
-        {/* <AddEditViewer<AttachedCollar>
-          queryStatus='success'
-          editing={editObj as AttachedCollar}
-          empty={new AttachedCollar()}> */}
+      <ModifyCollarWrapper
+        editing={editObj}
+        onDelete={(collar_id: string): void => setDeleted(collar_id)}
+        onUpdate={(collar_id: string): void => setUpdated(collar_id)}>
         <EditCollar {...editProps} open={openEdit} handleClose={inverseEdit} />
-        {/* </AddEditViewer> */}
       </ModifyCollarWrapper>
     </>
   );

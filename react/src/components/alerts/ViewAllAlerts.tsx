@@ -57,7 +57,6 @@ export const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
             category = `Device ID: ${a.device_id}`;
           }
           if (sortBy === 'Type') {
-            //Change this to getAlertTitle
             category = getTitle(a);
           }
           if (!group[category]) {
@@ -73,7 +72,6 @@ export const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
   return (
     <>
       <Box className={styles.topHeader}>
-        {/* <SubHeader text={'Alerts'} /> */}
         <h1>Alerts</h1>
         <Select
           label='Sort by'
@@ -82,27 +80,6 @@ export const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
           handleChange={(v: string): void => setSortBy(v)}
         />
       </Box>
-      {/* {Object.values(alertGroup).map((o) => {
-        return (
-          <>
-            {
-              <Box className={styles.header} textAlign='center'>
-                <SubHeader text={o[0].valid_from.format('MMMM DD, YYYY')} />
-              </Box>
-            }
-            {o.map((a) => {
-              return (
-                <Box className={styles.mortalityCard}>
-                  <AlertCard
-                    variant={a.alert_type === eAlertType.mortality ? 'error' : 'warning'}
-                    content={<FormatAlert alert={a} format={'page'} />}
-                  />
-                </Box>
-              );
-            })}
-          </>
-        );
-      })} */}
       {Object.keys(alertGroup).map((a, i) => {
         return (
           <Box key={`alert-group-${i}`}>
