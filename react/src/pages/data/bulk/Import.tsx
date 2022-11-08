@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, FormControlLabel, IconButton, Paper, Radio, RadioGroup, Typography } from '@mui/material';
 import { createFormData } from 'api/api_helpers';
-import { Icon, NotificationMessage } from 'components/common';
+import { Icon, Modal, NotificationMessage } from 'components/common';
 import FileInput from 'components/form/FileInput';
 import { useEffect, useState } from 'react';
 import BasicTable from 'components/table/BasicTable';
@@ -19,13 +19,15 @@ import { FileStrings, ImportSteps } from 'constants/strings';
 import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { plainToClass } from 'class-transformer';
-import { IBulkUploadResults, ParsedXLSXResult } from 'api/api_interfaces';
+import { CellErrorDescriptor, IBulkUploadResults, ParsedXLSXCellError, ParsedXLSXRowResult, ParsedXLSXSheetResult } from 'api/api_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { eUserRole } from 'types/user';
 import { Banner, ErrorBanner, NotificationBanner, SuccessBanner } from 'components/common/Banner';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import HighlightTable from 'components/table/HighlightTable';
 import makeStyles from '@mui/styles/makeStyles';
+import Checkbox from 'components/form/Checkbox';
+import { AxiosError } from 'axios';
 
 enum eImportType {
   animal = 'animal',
@@ -50,6 +52,10 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+interface RowColPair {
+  row?: number;
+  col?: string;
+}
 
 /**
  * @param message whats displayed as body of import modal
@@ -60,10 +66,13 @@ export default function Import(): JSX.Element {
   const showNotif = useResponseDispatch();
   const [importType, setImportType] = useState<eImportType | null>(null);
   const [message, setMessage] = useState<React.ReactNode | string>('');
-  const [sanitizedImport, setSanitizedImport] = useState<ParsedXLSXResult[]>([]);
+  const [sanitizedImport, setSanitizedImport] = useState<ParsedXLSXSheetResult>(null);
   const [canFinalize, setCanFinalize] = useState(false);
   const [fileName, setFilename] = useState('');
-  const [selectedError, setSelectedError] = useState(null);
+  const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
+  const [selectedCell, setSelectedCell] = useState<RowColPair>({});
+  const [showingValueModal, setShowingValueModal] = useState(false);
+  const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const styles = useStyles();
 
   // change the import message displayed when user selects a radio option
@@ -95,12 +104,12 @@ export default function Import(): JSX.Element {
   };
 
   useEffect(() => {
-    if(!sanitizedImport || !sanitizedImport.length) {
+    if(!sanitizedImport || !sanitizedImport?.rows.length) {
       setCanFinalize(false);
       return;
     }
 
-    if(sanitizedImport.every(o => o.success)) {
+    if(sanitizedImport?.rows.every(o => o.success)) {
       setCanFinalize(true);
     }
     else {
@@ -111,8 +120,8 @@ export default function Import(): JSX.Element {
   }, [sanitizedImport]);
 
 
-  const successXLSX = (d: ParsedXLSXResult[]) => {
-    if(d.length) {
+  const successXLSX = (d: ParsedXLSXSheetResult) => {
+    if(d.rows.length) {
       setSanitizedImport(d);
     }
     else {
@@ -153,12 +162,25 @@ export default function Import(): JSX.Element {
   };
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
+    if(files[0].size > 31457280) {
+      showNotif({severity: 'error', message: 'This file exceeds the 30MB limit.'})
+      return;
+    }
     save(createFormData(fieldName, files));
     setFilename(files[0]?.name);
   };
 
   // call the save mutation
-  const save = async (form: FormData): Promise<ParsedXLSXResult[]> => await mutateAsync(form);
+  const save = async (form: FormData): Promise<ParsedXLSXSheetResult> => {
+    try {
+      return await mutateAsync(form);
+    }
+    catch (err) {
+      const e = err as AxiosError;
+      showNotif({severity: 'error', message: e.message});
+      return null;
+    }
+  }
 
   // the radio button handler
   const changeImportType = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -166,17 +188,55 @@ export default function Import(): JSX.Element {
     setImportType(val);
   };
 
-  const collectErrorsFromResults = (results: ParsedXLSXResult[]): string[] => {
+  const computeXLSXCol = (idx: number): string => {
+    let str = '';
+    const a = Math.trunc(idx / 26);
+    if(a > 0) {
+      str = str.concat(String.fromCharCode(65 + a - 1));
+    }
+    str = str.concat(String.fromCharCode(65 + (idx - a * 26)));
+    
+    return str;
+
+  }
+
+  const collectErrorsFromResults = (results: ParsedXLSXSheetResult): string[] => {
     const errArr = [];
-    results.forEach((r,idx) => {
-      errArr.push(...r.errors.map(e => {
-        return e['identifier'] ?
-        `At row index ${idx}, your animal does not meet the unique identification criteria for this species.`
+    results.rows.forEach((r,idx) => {
+      errArr.push(...Object.keys(r.errors).map(e => {
+        const headerIdx = sanitizedImport.headers.indexOf(e); /*...getAllUniqueKeys(results.rows)*/
+        return e === 'identifier' ? 
+        `Row ${idx + 2}: ${r.errors[e].desc}`
         :
-        `At row index ${idx}, cell "${Object.keys(e)[0]}": ${Object.values(e)[0]}`
+        `At cell ${computeXLSXCol(headerIdx)}${idx + 2}, header "${e}": ${r.errors[e].desc}`
     }));
     })
     return errArr;
+  }
+
+  const handleCellSelected = (row_idx, cellname) => {
+    setSelectedError(sanitizedImport.rows[row_idx].errors[cellname]);
+    setSelectedCell({row: row_idx, col: cellname});
+  }
+
+  const getHeaders = (hideEmpty: boolean): string[] => {
+    if(hideEmpty) {
+      return [...getAllUniqueKeys(sanitizedImport.rows)];
+    }
+    else {
+      return sanitizedImport.headers;
+    }
+  }
+
+  const getHelpMessage = (row_idx, cellname) => {
+    if(sanitizedImport.rows[row_idx].errors[cellname]) {
+      return sanitizedImport.rows[row_idx].errors[cellname].help;
+    }
+  }
+
+  const getAllUniqueKeys = (result: ParsedXLSXRowResult[]) => {
+    const keySet = new Set(result.map(o => Object.keys(o.row)).flat());
+    return sanitizedImport.headers.filter(o => keySet.has(o)); //Note that Set.has() is O(1), so I think this is fine.
   }
 
   // renders the result/error table when the API returs result of the import
@@ -201,7 +261,6 @@ export default function Import(): JSX.Element {
         return (
         <>
         <Typography>This is where we would display a table with all your bad entries.</Typography>
-        {data.forEach(arr => { return (<>{arr.errors.map(o => { return ( <><Typography>{JSON.stringify(o)}</Typography></>) } )}</>)})}
         </>
         );
       }
@@ -241,11 +300,11 @@ export default function Import(): JSX.Element {
             />
           </Box>
           <Paper elevation={3} className={styles.spacing} style={{padding: '16px', backgroundColor: 'text.secondary', display: 'flex', justifyContent: 'center'}}>
-            {sanitizedImport.length > 0 ?
+            {sanitizedImport?.rows.length > 0 ?
                 (<>
                   <Typography>{fileName}</Typography>
                   <Icon htmlColor={canFinalize ? 'green' : 'red'} icon={canFinalize ? 'check' : 'error'}></Icon>
-                  <IconButton style={{padding: '0px'}} onClick={() => {setSanitizedImport([])}}>
+                  <IconButton style={{padding: '0px'}} onClick={() => {setSanitizedImport(null)}}>
                     <Icon icon='delete'/>
                   </IconButton>
                 </>)
@@ -254,7 +313,7 @@ export default function Import(): JSX.Element {
             } 
           </Paper>
           
-          {sanitizedImport.length > 0 && (
+          {sanitizedImport?.rows.length > 0 && (
             <>
             <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
             {canFinalize ?
@@ -271,23 +330,31 @@ export default function Import(): JSX.Element {
                 hiddenContent={collectErrorsFromResults(sanitizedImport).map(a => <div>{a}</div>)} 
               />
               <Banner
-              variant='error'
-              text={selectedError ? `Selected error at row ${JSON.stringify(selectedError)}` : 'Click a cell for detailed information about that error.'}
+              variant='info'
+              text={
+                <Box alignItems={'center'} display='flex'>
+                  {selectedError ? `Row ${selectedCell.row} "${selectedCell.col}": ${selectedError.help}` : 'Click a cell for detailed information about that error.'}
+                  {selectedError?.valid_values ? <Button style={{height: '26px', marginLeft: 'auto'}} variant='contained' onClick={() => {setShowingValueModal(true)}}>Show Values</Button> : null}
+                </Box>
+              }
               icon={<Icon icon='help'/>}
               />
               </>)
             }
             <HighlightTable
-            data={sanitizedImport.map((o,idx) => {return {row_index: idx, ...o.row}}) as any[]}
-            headers={['row_index', ...Object.keys(sanitizedImport[0].row) as any]}
-            onSelectCell={(value, message) => setSelectedError(value)}
-            messages={sanitizedImport.map(o => Object.assign({}, ...o.errors))} 
+            data={sanitizedImport.rows.map((o,idx) => {return {row_index: idx + 2, ...o.row}}) as any[]}
+            headers={['row_index', ...getHeaders(hideEmptyColumns)]}
+            onSelectCell={handleCellSelected}
+            messages={sanitizedImport.rows.map(e => Object.entries(e.errors).reduce((prev, curr) => { return {...prev, [curr[0]]: curr[1].desc} }, {}))}
             rowIdentifier='row_index'
             />
             
             </>
           )}
-          <Box display='flex'><Button disabled={!canFinalize} className={styles.spacing} variant='contained' style={{marginLeft: 'auto'}}>Finalize Submission</Button></Box>
+          <Box display='flex'>
+            <Checkbox label={'Hide Empty Columns'} propName={'hide-empty-col'} initialValue={hideEmptyColumns} changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}/>
+            <Button disabled={!canFinalize} className={styles.spacing} variant='contained' style={{marginLeft: 'auto'}}>Finalize Submission</Button>
+          </Box>
         </Paper>
         <Paper className={styles.spacing} style={{padding: '24px'}}>
           <Box display='flex'>
@@ -308,6 +375,13 @@ export default function Import(): JSX.Element {
             <Button disabled={!canFinalize} className={styles.spacing} variant='contained' style={{marginLeft: 'auto'}}>Finalize Submission</Button>
           </Box>
         </Paper>
+        <Modal
+          open={showingValueModal}
+          handleClose={() => {setShowingValueModal(false)}}
+          title='Valid values for this field'
+        >
+          {selectedError?.valid_values?.map(o => { return(<><Typography>{o}</Typography></>)})}
+        </Modal>
 
 
         {/*

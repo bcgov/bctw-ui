@@ -14,7 +14,8 @@ export type HighlightTableProps<T> = PlainTableProps<T> & {
   data: T[];
   rowIdentifier: string;
   messages: any[];
-  onSelectCell: (cell, message) => void;
+  onSelectCell: (row_idx, cellname) => void;
+  dimFirstColumn: boolean;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -31,7 +32,8 @@ export default function HighlightTable<T extends BCTWBase<T>>({
   onSelect,
   onSelectCell,
   rowIdentifier,
-  messages
+  messages,
+  dimFirstColumn = false
 }: HighlightTableProps<T>): JSX.Element {
   const [selected, setSelected] = useState<T>();
   const [order, setOrder] = useState<Order>('asc');
@@ -48,11 +50,11 @@ export default function HighlightTable<T extends BCTWBase<T>>({
     return selected?.[rowIdentifier] === id;
   };
 
-  const handleClickCell = (value: any, message: any): void => {
+  const handleClickCell = (row_idx: any, cellname: any): void => {
     //setSelected(o);
     //console.log('Set selected to ' + JSON.stringify(value));
     if (typeof onSelectCell === 'function' && data?.length) {
-        onSelectCell(value, message);
+        onSelectCell(row_idx, cellname);
     }
   };
 
@@ -98,13 +100,13 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                   return (
                     <>
                         {isMessage ? 
-                            (<TableCell onClick={()=>handleClickCell(value, messages[prop][k])} className={style.badCell} key={`${String(k)}${i}`} align={'left'}>
+                            (<TableCell onClick={()=>handleClickCell(prop, k)} className={style.badCell} key={`${String(k)}${i}`} align={'left'}>
                                 <Tooltip title={messages[prop][k]}>
                                     <>{value}</>
                                 </Tooltip>
                             </TableCell>)
                             :
-                            (<TableCell onClick={()=>handleClickCell(value, '')} key={`${String(k)}${i}`} align={'left'}>
+                            (<TableCell onClick={()=>handleClickCell(prop, k)} key={`${String(k)}${i}`} align={'left'}>
                             {value}
                             </TableCell>)
                         }

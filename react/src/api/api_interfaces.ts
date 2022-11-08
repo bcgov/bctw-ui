@@ -34,16 +34,22 @@ interface IBulkUploadResults<T> {
 type CellErrorDescriptor = {
   desc: string;
   help: string;
+  valid_values?: string[];
 }
 
 type ParsedXLSXCellError = {
   [key in (keyof Animal | keyof Collar) | 'identifier']?: CellErrorDescriptor;
 }
 
-type ParsedXLSXResult = {
+type ParsedXLSXRowResult = {
   row: Animal | Collar;
-  errors: ParsedXLSXCellError[];
+  errors: ParsedXLSXCellError;
   success: boolean;
+}
+
+type ParsedXLSXSheetResult = {
+  headers: string[];
+  rows: ParsedXLSXRowResult[];
 }
 
 // models that can be deleted
@@ -75,5 +81,7 @@ export type {
   IUpsertPayload,
   IDeleteType,
   ParsedXLSXCellError,
-  ParsedXLSXResult
+  ParsedXLSXRowResult,
+  ParsedXLSXSheetResult,
+  CellErrorDescriptor
 };
