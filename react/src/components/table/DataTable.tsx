@@ -64,7 +64,7 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   const [page, setPage] = useState(1);
   //const [totalPages, setTotalPages] = useState<number | null>(1);
-  const [totalRows, setTotalRows] = useState(0);
+  const [totalRows, setTotalRows] = useState<number>(0);
 
   const isPaginate = paginate && !DISABLE_PAGINATION;
 
@@ -74,10 +74,8 @@ export default function DataTable<T extends BCTWBase<T>>({
    * this state is passed to the parent select handlers
    */
   const [values, setValues] = useState<T[]>([]);
+  const [originalValues, setOriginalValues] = useState<T[]>([]);
 
-  useEffect(() => {
-    console.log(page);
-  }, [page]);
   useEffect(() => {
     setSelected([]);
   }, [resetSelections]);
@@ -112,7 +110,9 @@ export default function DataTable<T extends BCTWBase<T>>({
     }
     const rowCount = data[0]?.row_count;
     if (rowCount) {
-      setTotalRows(rowCount);
+      // This shouldnt have to be cast to a number
+      // TODO: Find in DB where row_count is string (should be a number)
+      setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
     }
   };
   useEffect(() => {
@@ -189,10 +189,12 @@ export default function DataTable<T extends BCTWBase<T>>({
       setSelected([id]);
       // a row can only be selected from the current pages data set
       // fixme: why ^?
-      const row = values[idx];
+      const i = values.findIndex((v) => v[rowIdentifier] === id);
+      const row = values[i];
       if (row) {
         onSelect(row);
       }
+      // onSelect(selected.indexOf(id))
     }
     // will be null unless parent component wraps RowSelectedProvider
     if (typeof dispatchRowSelected === 'function') {
@@ -374,7 +376,7 @@ export default function DataTable<T extends BCTWBase<T>>({
               showFirstButton
               rowsPerPageOptions={[]}
               component='div'
-              count={totalRows as number}
+              count={totalRows}
               rowsPerPage={ROWS_PER_PAGE}
               page={page - 1}
               onPageChange={handlePageChange}

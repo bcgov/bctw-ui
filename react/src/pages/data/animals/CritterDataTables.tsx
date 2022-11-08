@@ -56,10 +56,6 @@ export const CritterDataTables = (): JSX.Element => {
     modalControl: true
   };
 
-  useEffect(() => {
-    console.log('EditObj last date ' + editObj.last_transmission_date);
-  }, [editObj]);
-
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
     const _edit = () => setOpenEdit(true);

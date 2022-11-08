@@ -10,7 +10,7 @@ import headerImage from 'assets/images/gov3_bc_logo.png';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import Icon from '@mdi/react';
 import Modal from 'components/modal/Modal';
-import UserAlert from 'pages/user/UserAlertPage';
+import UserAlert from 'components/alerts/AlertActions';
 import { urls } from 'constants/external_urls';
 import { ENABLE_ALERTS } from 'api/api_helpers';
 import { AlertMenu } from '../alerts/AlertMenu';
@@ -28,7 +28,6 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
   const [user, setUser] = useState<User>();
   const [telemetryAlerts, setTelemetryAlerts] = useState<TelemetryAlert[]>([]);
   //const [alertCount, setAlertCount] = useState(0);
-  const [showAlerts, setShowAlerts] = useState(false);
 
   // when the UserContext is loaded, set the session info state
   useDidMountEffect(() => {
@@ -53,8 +52,6 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
     const { alerts } = useAlert;
     if (alerts.length) {
       setTelemetryAlerts(alerts);
-    } else {
-      setShowAlerts(false);
     }
   }, [useAlert]);
 

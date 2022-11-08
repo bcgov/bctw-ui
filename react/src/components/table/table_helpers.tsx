@@ -1,7 +1,7 @@
 import { matchSorter } from 'match-sorter';
 import { getProperty, countDecimals } from 'utils/common_helpers';
 import { Order, HeadCell } from 'components/table/table_interfaces';
-import { dateObjectToTimeStr, formatT, formatTime } from 'utils/time';
+import { dateObjectToTimeStr, formatDaysStr, formatT, formatTime, getDaysDiff } from 'utils/time';
 import { Icon, Tooltip } from 'components/common';
 import dayjs, { Dayjs, isDayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -103,14 +103,11 @@ const formatTag = (key: string, value: string): JSX.Element => {
     }
   }
   if (key === 'last_transmission_date') {
-    const prevDate = dayjs(value);
-    const today = dayjs();
-    const daysDiff = today.diff(prevDate, 'day');
-    const formatT = dayjs(value).fromNow();
+    const { diff, asText } = getDaysDiff(dayjs(value));
     if (!dayjs(value).isValid()) return getTag('Unknown');
-    if (daysDiff <= 1) return getTag(formatT, null, 'success');
-    if (daysDiff < 7) return getTag(formatT, null, 'warning');
-    return getTag(formatT, null, 'error');
+    if (diff < 7) return getTag(asText, null, 'warning');
+    if (diff <= 1) return getTag(asText, null, 'success');
+    return getTag(asText, null, 'error');
   }
   // if (key === 'last_update_attempt') {
   //   return getTag(formatT(dayjs()), null, 'success');

@@ -10,17 +10,18 @@ const countDecimals = (value: number): number => {
 const formatLatLong = (lat: number, long: number): string => {
   return `${lat.toFixed(2)}\xb0 ${long.toFixed(2)}\xb0`;
 };
-
+// Appends ('s) to end of word if multiple n values
+const pluralize = (n: number, word: string) => (n > 1 || n == 0 ? `${word}'s` : word);
 //Capitalizes the first letter of a word
-const capitalize = (s: string):string => s && s[0].toUpperCase() + s.slice(1)
+const capitalize = (s: string): string => s && s[0].toUpperCase() + s.slice(1);
 
 // formats UTM nicely
 const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
 
 /**
- * given an array of type T, returns unique values of @param prop 
-*/
-const getUniqueValuesOfT = <T,>(arr: T[], prop: keyof T): string[] => {
+ * given an array of type T, returns unique values of @param prop
+ */
+const getUniqueValuesOfT = <T>(arr: T[], prop: keyof T): string[] => {
   const ret: string[] = [];
   arr.forEach((p) => {
     // fixme: always string?
@@ -33,7 +34,7 @@ const getUniqueValuesOfT = <T,>(arr: T[], prop: keyof T): string[] => {
 };
 
 /**
- * formats a property name as a table header ex. population_unit -> Population Unit 
+ * formats a property name as a table header ex. population_unit -> Population Unit
  * @param prop - property name to format
  */
 const columnToHeader = (prop: string): string => {
@@ -41,7 +42,7 @@ const columnToHeader = (prop: string): string => {
     .replaceAll('_', ' ')
     .replaceAll(' id', ' ID')
     .replaceAll('wlh', 'WLH')
-    .replaceAll('utm', 'UTM') 
+    .replaceAll('utm', 'UTM')
     .split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
@@ -56,31 +57,34 @@ const headerToColumn = (prop: string): string => {
     //.replaceAll(' ', '_')
     .replaceAll(' ID', ' id')
     .replaceAll('WLH', 'wlh')
-    .replaceAll('UTM', 'utm') 
+    .replaceAll('UTM', 'utm')
     .split(' ');
-  return asArr.map((a) => a.charAt(0).toLowerCase() + a.slice(1)).join(' ').replaceAll(' ', '_');
+  return asArr
+    .map((a) => a.charAt(0).toLowerCase() + a.slice(1))
+    .join(' ')
+    .replaceAll(' ', '_');
 };
-/** 
+/**
  * returns a copy of the provided object with null / undefined / empty string removed
-*/
-const omitNull = <T,>(obj: T): T => {
+ */
+const omitNull = <T>(obj: T): T => {
   const copy = Object.assign(obj, {});
   Object.keys(copy)
-    .filter(k => obj[k] === null || obj[k] === undefined || obj[k] === '' || obj[k] === 'null' || obj[k] === -1)
-    .forEach(k => delete (obj[k]));
+    .filter((k) => obj[k] === null || obj[k] === undefined || obj[k] === '' || obj[k] === 'null' || obj[k] === -1)
+    .forEach((k) => delete obj[k]);
   return copy;
-}
+};
 
 /**
- * used for removing props that shouldn't be passed on to material ui components 
+ * used for removing props that shouldn't be passed on to material ui components
  * @param object to remove from
  * @param propsToRemove string array of properties to delete
  */
-const removeProps = <T,>(obj: T, propsToRemove: string[]): T => {
-  const copyOfT = {...obj};
-  propsToRemove.forEach(p => delete copyOfT[p]);
+const removeProps = <T>(obj: T, propsToRemove: string[]): T => {
+  const copyOfT = { ...obj };
+  propsToRemove.forEach((p) => delete copyOfT[p]);
   return copyOfT;
-}
+};
 
 /** 
  * @param {K} key
@@ -98,17 +102,21 @@ function getProperty<T, K extends keyof T>(obj: T, key: K): unknown {
  * some components require a method prop that is overloaded in a parent component
  * ex. EditModal requires an onSave method.
  */
-const doNothingAsync = async(): Promise<void> => { /* do nothing */};
-const doNothing = (): void => { /* do nothing */};
+const doNothingAsync = async (): Promise<void> => {
+  /* do nothing */
+};
+const doNothing = (): void => {
+  /* do nothing */
+};
 
 // is the unknown object a table filter?
-const isSearchTerm = (obj: unknown): obj is ITableFilter=> {
+const isSearchTerm = (obj: unknown): obj is ITableFilter => {
   const props = Object.keys(obj); // safe for types that aren't objects, will be []
   return props.includes('keys') && props.includes('term');
-}
+};
 
 /**
- * iterates unknown function parameters (ex. ...args) 
+ * iterates unknown function parameters (ex. ...args)
  * returns @type { ITableFilter } if located
  */
 const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'>[] => {
@@ -119,29 +127,25 @@ const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'>[] => {
       if (isSearchTerm(element)) {
         const { term, keys } = element;
         if (term && keys) {
-          ret.push({keys, term })
+          ret.push({ keys, term });
         }
       }
     }
   }
   return ret;
-}
-/** 
-* Converts a class to an array of keys
-* @param keys class converted to its object keys. ie Object.keys(new Animal())
-* @param startsWith items which append the array
-* @param excluded array of items to exclude from final array.
-* 
-**/
-const classToArray = <T>(
-  keys: string[],
-  startsWith: (keyof T)[],
-  excluded?: (keyof T)[], 
-):(keyof T)[] => {
-  const filterOut = excluded ? [...startsWith,...excluded] : startsWith
-  const ke = keys.filter(k => !(filterOut as string[]).includes(k)) as unknown as (keyof T)[];
+};
+/**
+ * Converts a class to an array of keys
+ * @param keys class converted to its object keys. ie Object.keys(new Animal())
+ * @param startsWith items which append the array
+ * @param excluded array of items to exclude from final array.
+ *
+ **/
+const classToArray = <T>(keys: string[], startsWith: (keyof T)[], excluded?: (keyof T)[]): (keyof T)[] => {
+  const filterOut = excluded ? [...startsWith, ...excluded] : startsWith;
+  const ke = keys.filter((k) => !(filterOut as string[]).includes(k)) as unknown as (keyof T)[];
   return [...startsWith, ...ke];
-}
+};
 
 export {
   columnToHeader,
@@ -158,4 +162,5 @@ export {
   capitalize,
   classToArray,
   headerToColumn,
+  pluralize
 };

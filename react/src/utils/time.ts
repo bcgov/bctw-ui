@@ -7,10 +7,15 @@ const formatLocal = 'dddd, MMMM D, YYYY h:mm A';
 
 // if a valid dayjs is object is provided, format it normally. or return null
 const formatT = (d: Dayjs | null): string | null => d?.format(formatTime) ?? null;
+const formatDaysStr = (d: Dayjs) => dayjs(d).fromNow();
 
-//
 const isInvalidDate = (d: Date): boolean => typeof d?.getFullYear === 'function' && d.getFullYear() <= 1900;
 
+const getDaysDiff = (startDate: Dayjs, endDate = dayjs()): { diff: number; asText: string } => ({
+  diff: endDate.diff(startDate, 'day'),
+  asText: dayjs(startDate).fromNow()
+});
+const isToday = (d: Dayjs | null): boolean => (!d ? false : d.isSame(dayjs()));
 const getToday = (): string => dayjs().format(formatDay);
 const getNow = (): string => dayjs().format(formatTime);
 const asLocalTime = (dateStr: string): string => dayjs(dateStr).format('LLLL');
@@ -82,5 +87,8 @@ export {
   formatDateStr,
   formatWithUTCOffset,
   isInvalidDate,
-  getStartDate
+  getStartDate,
+  isToday,
+  formatDaysStr,
+  getDaysDiff
 };

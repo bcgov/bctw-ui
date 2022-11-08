@@ -112,6 +112,7 @@ export class Collar implements BCTWBase<Collar>, ICollar {
   @Exclude(toPlainOnly) @Transform(nullToDayjs) valid_to: Dayjs;
   @Exclude(toPlainOnly) owned_by_user_id: number;
   @Transform(nullToDayjs) last_transmission_date?: Dayjs;
+  @Transform(nullToDayjs) last_fetch_date?: Dayjs;
 
   get frequencyPadded(): string {
     const freq = this.frequency.toString();
