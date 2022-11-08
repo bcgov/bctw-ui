@@ -15,6 +15,7 @@ import { FormatAlert } from 'components/alerts/FormatAlert';
 import { TelemetryAlert } from 'types/alert';
 import dayjs from 'dayjs';
 import AlertActions from 'components/alerts/AlertActions';
+import { AlertBanner } from 'components/alerts/AlertBanner';
 
 export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
@@ -43,8 +44,6 @@ export default function CritterPage(): JSX.Element {
         <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
-            {/* Might be adding this back */}
-            {/* <NotificationsMenu /> */}
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
               {CritterStrings.manageMyAnimals}
             </Button>
@@ -56,13 +55,7 @@ export default function CritterPage(): JSX.Element {
             </FullScreenDialog>
           </Box>
         </Box>
-        {/* <UserAlertPage /> */}
-        <NotificationBanner
-          hiddenContent={alerts.map((alert) => (
-            <FormatAlert alert={alert} format='banner' />
-          ))}
-        />
-        {/* <NotificationBanner hiddenContent={[<Box sx={{ border: '1px solid' }}>Test</Box>]} /> */}
+        <AlertBanner />
         <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
         <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
           <CritterDataTables />

@@ -57,7 +57,7 @@ export const CritterDataTables = (): JSX.Element => {
   };
 
   useEffect(() => {
-    console.log('EditObj last date ' + editObj.last_transmission_date);
+    console.log(editObj.wlh_id);
   }, [editObj]);
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {

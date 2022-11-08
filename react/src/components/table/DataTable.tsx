@@ -74,10 +74,8 @@ export default function DataTable<T extends BCTWBase<T>>({
    * this state is passed to the parent select handlers
    */
   const [values, setValues] = useState<T[]>([]);
+  const [originalValues, setOriginalValues] = useState<T[]>([]);
 
-  useEffect(() => {
-    console.log(page);
-  }, [page]);
   useEffect(() => {
     setSelected([]);
   }, [resetSelections]);
@@ -191,10 +189,12 @@ export default function DataTable<T extends BCTWBase<T>>({
       setSelected([id]);
       // a row can only be selected from the current pages data set
       // fixme: why ^?
-      const row = values[idx];
+      const i = values.findIndex((v) => v[rowIdentifier] === id);
+      const row = values[i];
       if (row) {
         onSelect(row);
       }
+      // onSelect(selected.indexOf(id))
     }
     // will be null unless parent component wraps RowSelectedProvider
     if (typeof dispatchRowSelected === 'function') {

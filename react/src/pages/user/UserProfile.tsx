@@ -11,6 +11,7 @@ import { UserCritterAccess } from 'types/animal_access';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { UserAnimalAccess } from 'pages/data/animals/UserAnimalAccess';
+import { AlertBanner } from 'components/alerts/AlertBanner';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);
@@ -49,36 +50,37 @@ export default function UserProfile(): JSX.Element {
   );
   return (
     <ManageLayout>
-      <div className='container'>
+      <Box className='manage-layout-titlebar'>
         <h1>My Profile</h1>
-        <Box display={'grid'} my={2}>
-          <Span label={'Name:'} msg={user.name} />
-          <Span label={'Username:'} msg={user.username} />
-          <Span label={'Role:'} msg={user.role_type} />
-          <Span label={'Email:'} msg={user.email} />
-          <Span
-            label={'Phone:'}
-            msg={user.phone ?? 'No number on file'}
-            child={
-              <Button
-                disabled={!user.phone || !user.email}
-                color='secondary'
-                size='small'
-                onClick={(): void => setShowTestConfirm((o) => !o)}>
-                Send test notifications
-              </Button>
-            }
-          />
-        </Box>
-        <UserAnimalAccess />
-        <ConfirmModal
-          handleClickYes={handleClickTestNotifs}
-          handleClose={(): void => setShowTestConfirm(false)}
-          open={showTestConfirm}
-          title='You are about to trigger a simulated mortality alert'
-          message={`An email will be sent to ${user.email} and an SMS will be sent to ${user.phone}. Are you sure you want to proceed?`}
+      </Box>
+      <AlertBanner />
+      <Box display={'grid'} my={2}>
+        <Span label={'Name:'} msg={user.name} />
+        <Span label={'Username:'} msg={user.username} />
+        <Span label={'Role:'} msg={user.role_type} />
+        <Span label={'Email:'} msg={user.email} />
+        <Span
+          label={'Phone:'}
+          msg={user.phone ?? 'No number on file'}
+          child={
+            <Button
+              disabled={!user.phone || !user.email}
+              color='secondary'
+              size='small'
+              onClick={(): void => setShowTestConfirm((o) => !o)}>
+              Send test notifications
+            </Button>
+          }
         />
-      </div>
+      </Box>
+      <UserAnimalAccess />
+      <ConfirmModal
+        handleClickYes={handleClickTestNotifs}
+        handleClose={(): void => setShowTestConfirm(false)}
+        open={showTestConfirm}
+        title='You are about to trigger a simulated mortality alert'
+        message={`An email will be sent to ${user.email} and an SMS will be sent to ${user.phone}. Are you sure you want to proceed?`}
+      />
     </ManageLayout>
   );
 }

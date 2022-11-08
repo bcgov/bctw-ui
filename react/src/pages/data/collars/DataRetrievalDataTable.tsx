@@ -43,7 +43,6 @@ export const DataRetrievalDataTable = (): JSX.Element => {
       counts.found += row.records_found ?? 0;
       counts.inserted += row.records_inserted ?? 0;
       counts.errors += !row.error ? 0 : 1;
-      console.log(row);
     });
     if (counts.errors) {
       showAlert({
