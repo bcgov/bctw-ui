@@ -47,6 +47,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   exporter,
   resetSelections,
   disableSearch,
+  allRecords,
   paginate = true,
   isMultiSelect = false,
   isMultiSearch = false,
@@ -62,7 +63,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [rowIdentifier, setRowIdentifier] = useState('id');
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   //const [totalPages, setTotalPages] = useState<number | null>(1);
   const [totalRows, setTotalRows] = useState<number>(0);
 
@@ -74,7 +75,6 @@ export default function DataTable<T extends BCTWBase<T>>({
    * this state is passed to the parent select handlers
    */
   const [values, setValues] = useState<T[]>([]);
-  const [originalValues, setOriginalValues] = useState<T[]>([]);
 
   useEffect(() => {
     setSelected([]);
@@ -98,22 +98,29 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
-    page,
+    allRecords ? 0 : page,
     param,
     filter
   );
 
   const handleRows = (): void => {
-    if (!data?.length) {
-      setTotalRows(0);
-      return;
+    if (data?.length) {
+      const rowCount = data[0]?.row_count;
+      if (rowCount) {
+        setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
+      }
     }
-    const rowCount = data[0]?.row_count;
-    if (rowCount) {
-      // This shouldnt have to be cast to a number
-      // TODO: Find in DB where row_count is string (should be a number)
-      setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
-    }
+    // if (!data?.length) {
+    //   return;
+    // }
+
+    // if (rowCount) {
+    //   // This shouldnt have to be cast to a number
+    //   // TODO: Find in DB where row_count is string (should be a number)
+    //   setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
+    // } else {
+    //   setTotalRows(data.length);
+    // }
   };
   useEffect(() => {
     handleRows();
@@ -233,7 +240,8 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   const handlePageChange = (event: React.MouseEvent<unknown>, p: number): void => {
     // TablePagination is zero index. Adding 1 fixes second page results from not refreshing.
-    setPage(p + 1);
+    console.log(p);
+    setPage(p);
   };
 
   const handleFilter = (filter: ITableFilter): void => {
@@ -378,7 +386,7 @@ export default function DataTable<T extends BCTWBase<T>>({
               component='div'
               count={totalRows}
               rowsPerPage={ROWS_PER_PAGE}
-              page={page - 1}
+              page={page}
               onPageChange={handlePageChange}
             />
           </Box>
