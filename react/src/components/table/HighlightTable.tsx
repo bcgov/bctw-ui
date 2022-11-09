@@ -16,6 +16,7 @@ export type HighlightTableProps<T> = PlainTableProps<T> & {
   messages: any[];
   onSelectCell: (row_idx, cellname) => void;
   dimFirstColumn: boolean;
+  secondaryHeaders: string[];
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -33,6 +34,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
   onSelectCell,
   rowIdentifier,
   messages,
+  secondaryHeaders,
   dimFirstColumn = false
 }: HighlightTableProps<T>): JSX.Element {
   const [selected, setSelected] = useState<T>();
@@ -59,12 +61,13 @@ export default function HighlightTable<T extends BCTWBase<T>>({
   };
 
   return (
-    <TableContainer>
+    <TableContainer >
       <Table className={'table'}>
         {data === undefined ? null : (
           <TableHead
             headersToDisplay={headers}
             headerData={data && data[0]}
+            secondaryHeaders={secondaryHeaders}
             isMultiSelect={false}
             numSelected={selected ? 1 : 0}
             order={order}
@@ -73,6 +76,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
             onSelectAllClick={null}
             rowCount={data?.length ?? 0}
             customHeaders={undefined}
+            hiddenHeaders={dimFirstColumn ? [headers[0]] : []}
           />
         )}
         <TableBody>
@@ -94,6 +98,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                   if (!k) {
                     return null;
                   }
+
                   const { value } = formatTableCell(obj, k);
                   const isMessage = messages.length ? messages[prop][k] !== undefined : false;
 
@@ -106,7 +111,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                                 </Tooltip>
                             </TableCell>)
                             :
-                            (<TableCell onClick={()=>handleClickCell(prop, k)} key={`${String(k)}${i}`} align={'left'}>
+                            (<TableCell onClick={()=>handleClickCell(prop, k)} className={dimFirstColumn && i == 0  ? 'dimmed-cell' : undefined} key={`${String(k)}${i}`} align={'left'}>
                             {value}
                             </TableCell>)
                         }

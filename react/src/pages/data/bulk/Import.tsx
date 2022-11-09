@@ -28,12 +28,15 @@ import HighlightTable from 'components/table/HighlightTable';
 import makeStyles from '@mui/styles/makeStyles';
 import Checkbox from 'components/form/Checkbox';
 import { AxiosError } from 'axios';
+import { columnToHeader } from 'utils/common_helpers';
 
 enum eImportType {
   animal = 'animal',
   device = 'device',
   both = 'both',
 }
+
+const SIZE_LIMIT = 31457280;
 
 // rendered as the radio options
 const radios = [
@@ -162,7 +165,7 @@ export default function Import(): JSX.Element {
   };
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
-    if(files[0].size > 31457280) {
+    if(files[0].size > SIZE_LIMIT) {
       showNotif({severity: 'error', message: 'This file exceeds the 30MB limit.'})
       return;
     }
@@ -220,18 +223,41 @@ export default function Import(): JSX.Element {
   }
 
   const getHeaders = (hideEmpty: boolean): string[] => {
+    let headers = [];
     if(hideEmpty) {
-      return [...getAllUniqueKeys(sanitizedImport.rows)];
+      headers = [...getAllUniqueKeys(sanitizedImport.rows)];
     }
     else {
-      return sanitizedImport.headers;
+      headers = sanitizedImport.headers;
     }
+    return headers;
   }
 
-  const getHelpMessage = (row_idx, cellname) => {
-    if(sanitizedImport.rows[row_idx].errors[cellname]) {
-      return sanitizedImport.rows[row_idx].errors[cellname].help;
-    }
+  const getTableData = () => {
+    const rows = sanitizedImport.rows.map((o,idx) => {
+      return {row_index: idx + 2, ...o.row}
+    }) as any[];
+    return rows;
+  }
+
+  const computeExcelHeaderRow = (hideEmpty: boolean) => {
+    const headers = ['1'];
+    getHeaders(hideEmpty).forEach((o) => {
+      const idx = sanitizedImport.headers.indexOf(o);
+      headers.push( computeXLSXCol(idx) );
+    });
+
+    return headers as string[];
+  }
+
+  const getTableHelpMessages = () => {
+    const messages = sanitizedImport.rows.map((e, idx) => {
+       return Object.entries(e.errors).reduce((prev, curr) => { 
+        const headerIdx = sanitizedImport.headers.indexOf(curr[0]);
+        return {...prev, [curr[0]]: `${computeXLSXCol(headerIdx)}${idx + 2}: ${curr[1].desc}`} 
+      }, {}) 
+    });
+    return messages;
   }
 
   const getAllUniqueKeys = (result: ParsedXLSXRowResult[]) => {
@@ -342,11 +368,13 @@ export default function Import(): JSX.Element {
               </>)
             }
             <HighlightTable
-            data={sanitizedImport.rows.map((o,idx) => {return {row_index: idx + 2, ...o.row}}) as any[]}
-            headers={['row_index', ...getHeaders(hideEmptyColumns)]}
+            data={getTableData()/*sanitizedImport.rows.map((o,idx) => {return {row_index: idx + 2, ...o.row}}) as any[]*/}
+            headers={['row_index', ...getHeaders(hideEmptyColumns)] as any}
+            secondaryHeaders={computeExcelHeaderRow(hideEmptyColumns)}
             onSelectCell={handleCellSelected}
-            messages={sanitizedImport.rows.map(e => Object.entries(e.errors).reduce((prev, curr) => { return {...prev, [curr[0]]: curr[1].desc} }, {}))}
+            messages={getTableHelpMessages()}
             rowIdentifier='row_index'
+            dimFirstColumn={true}
             />
             
             </>
