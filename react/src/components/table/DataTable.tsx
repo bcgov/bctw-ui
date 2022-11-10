@@ -1,32 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
 import {
+  Box,
+  Checkbox,
+  CircularProgress,
+  Divider,
   Table,
   TableBody,
   TableCell,
-  TableRow,
-  Checkbox,
-  CircularProgress,
-  TableFooter,
   TablePagination,
-  Divider,
-  Box
+  TableRow
 } from '@mui/material';
+import { AxiosError } from 'axios';
 import TableContainer from 'components/table/TableContainer';
-import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
-import PaginationActions from 'components/table/TablePaginate';
-import { ICustomTableColumn, ITableFilter, DataTableProps, Order } from 'components/table/table_interfaces';
-import { AxiosError } from 'axios';
+import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
+import { DataTableProps, ICustomTableColumn, ITableFilter, Order } from 'components/table/table_interfaces';
+import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { useEffect, useMemo, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
-import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import { AttachedAnimal } from 'types/animal';
-import { CritterStrings } from 'constants/strings';
-import { ActionsMenu } from 'components/common/ActionsMenu';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;

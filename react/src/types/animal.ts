@@ -264,7 +264,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   @Exclude(toPlainOnly) attachment_end: Dayjs;
   @Transform(nullToDayjs) last_fetch_date?: Dayjs;
 
-  get lastKnownLocation(): string {
+  get lastLatLong(): string {
     if (this.latitude && this.longitude) {
       return `${this.latitude.toFixed(2)} ${this.longitude.toFixed(2)}`;
     } else {
@@ -280,7 +280,8 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
       'device_status',
       'animal_status',
       'device_id',
-      'frequency'
+      'frequency',
+      'lastLatLong'
       // 'telemetry_updated',
       // 'last_fetch'
       //'lastKnownLocation'
@@ -300,7 +301,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
       switch (str) {
         case 'device_status':
           return 'Collar Status';
-        case 'lastKnownLocation':
+        case 'lastLatLong':
           return 'Last Lat Long';
         case 'last_transmission_date':
           return 'Last Transmission';

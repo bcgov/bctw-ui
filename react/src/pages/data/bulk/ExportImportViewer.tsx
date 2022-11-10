@@ -34,7 +34,7 @@ export default function ExportViewer<T>({
   const exportProps = { title: eTitle, message: eMsg, handleClose, open: showExportModal, template, data };
   return (
     <Box ml={1}>
-      <Button onClick={handleClickExport} disabled={eDisabled} {...buttonProps}>
+      <Button onClick={handleClickExport} disabled={eDisabled || !data?.length} {...buttonProps}>
         Export
       </Button>
       {eDisabled ? null : <Export {...exportProps} />}
