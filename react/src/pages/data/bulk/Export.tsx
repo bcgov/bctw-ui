@@ -1,15 +1,10 @@
 import { CircularProgress } from '@mui/material';
-import { AxiosError } from 'axios';
 import { Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
-import { ITableQueryProps } from 'components/table/table_interfaces';
 import dayjs from 'dayjs';
 import download from 'downloadjs';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
-import { UseQueryResult } from 'react-query';
-import { Animal, AttachedAnimal } from 'types/animal';
 import { formatT } from 'utils/time';
 
 type ImportProps<T> = ModalBaseProps & { template: (keyof T)[]; data: T[] };

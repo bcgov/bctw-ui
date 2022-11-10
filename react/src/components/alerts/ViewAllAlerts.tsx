@@ -28,7 +28,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(4),
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'flex-end'
+  },
+  h: {
+    padding: 0,
+    margin: 0
   }
 }));
 
@@ -72,7 +77,7 @@ export const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
   return (
     <>
       <Box className={styles.topHeader}>
-        <h1>Alerts</h1>
+        <h1 className={styles.h}>Alerts</h1>
         <Select
           label='Sort by'
           defaultValue={SelectOptions[0]}
