@@ -40,6 +40,7 @@ export const CritterDataTables = (): JSX.Element => {
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
+  const lastDt = editObj?.last_transmission_date;
 
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
@@ -179,8 +180,8 @@ export const CritterDataTables = (): JSX.Element => {
           title={`Recent Animal Movement`}
           open={openMap}
           handleClose={(v: boolean) => setOpenMap(v)}
-          startDate={editObj.last_transmission_date?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks')}
-          endDate={editObj.last_transmission_date ?? dayjs()}
+          startDate={lastDt && lastDt.isValid() ? lastDt.subtract(24, 'weeks') : dayjs().subtract(24, 'weeks')}
+          endDate={lastDt && lastDt.isValid() ? lastDt : dayjs()}
           width={'800px'}
           height={'600px'}
           critter_id={editObj.critter_id}

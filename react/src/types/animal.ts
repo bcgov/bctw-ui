@@ -263,7 +263,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   @Exclude(toPlainOnly) data_life_end: Dayjs;
   @Exclude(toPlainOnly) attachment_end: Dayjs;
   @Transform(nullToDayjs) last_fetch_date?: Dayjs;
-  @Transform(nullToDayjs) last_transmission_date: Dayjs;
+  @Transform(nullToDayjs) last_transmission_date?: Dayjs;
 
   get lastLatLong(): string {
     if (this.latitude && this.longitude) {
