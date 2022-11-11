@@ -96,8 +96,8 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
         )}
         {format === 'banner' && (
           <Box minWidth={'100%'}>
-            <ListItem>
-              <ListItemIcon sx={{ pr: 2 }}>{getTag(alert.device_status as eDeviceStatus, null, 'error')}</ListItemIcon>
+            <ListItem sx={{ pl: 0 }}>
+              <ListItemIcon sx={{ pr: 2 }}>{getTag(capitalize(alert.alert_type), null, 'error')}</ListItemIcon>
               <ListItemText
                 primary={
                   <>
