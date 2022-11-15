@@ -492,6 +492,28 @@ export const useTelemetryApi = () => {
     config: UseMutationOptions<ParsedXLSXSheetResult, AxiosError, FormData>
   ): UseMutationResult<ParsedXLSXSheetResult, AxiosError> =>
     useMutation<ParsedXLSXSheetResult, AxiosError, FormData>((form) => bulkApi.uploadXlsx(form), config);
+    /**  const useCritterHistory = (page: number, critterId: string): UseQueryResult<Animal[]> => {
+    return useQuery<Animal[], AxiosError>(
+      ['critter_history', critterId, page],
+      () => critterApi.getCritterHistory(page, critterId),
+      critterOptions
+    );
+  }; */
+ const useGetTemplate = (file_key: string): UseQueryResult<any> => {
+    return useQuery<any, AxiosError> (
+      ['get_template', file_key],
+      () => bulkApi.getTemplateFile(file_key),
+      defaultQueryOptions
+    )
+ }
+
+ const useGetCollarKeyX = (): UseQueryResult<any> => {
+  return useQuery<any, AxiosError> (
+    'get_keyx',
+    () => bulkApi.getKeyX(),
+    defaultQueryOptions
+  )
+ }
 
   /** upload one or more .keyx files to create new Vectronic devices */
   const useUploadXML = (
@@ -615,6 +637,7 @@ export const useTelemetryApi = () => {
     useCritterHistory,
     useCollarAssignmentHistory,
     useCollarHistory,
+    useGetCollarKeyX,
     useType,
     useUser,
     useUsers,
@@ -635,6 +658,7 @@ export const useTelemetryApi = () => {
     useUploadXLSX,
     useFinalizeXLSX,
     useUploadXML,
+    useGetTemplate,
     useSaveDevice,
     useSaveAnimal,
     useAttachDevice,

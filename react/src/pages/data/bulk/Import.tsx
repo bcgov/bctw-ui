@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress, FormControlLabel, IconButton, Paper, Radio, RadioGroup, Typography } from '@mui/material';
-import { createFormData } from 'api/api_helpers';
+import { createFormData, createUrl } from 'api/api_helpers';
 import { Icon, Modal, NotificationMessage } from 'components/common';
 import FileInput from 'components/form/FileInput';
 import { useEffect, useState } from 'react';
@@ -148,7 +148,11 @@ export default function Import(): JSX.Element {
   // setup the import mutation
   const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = api.useUploadXLSX({ onSuccess: successXLSX, onError: errorXLSX });
   const { mutateAsync: mutateFinalize, data: dataFinalize } = api.useFinalizeXLSX({ onSuccess: successFinalize, onError: errorFinalize });
+  const { data: keyXdata } = api.useGetCollarKeyX();
 
+  useEffect(() => {
+    console.log(keyXdata);
+  }, [keyXdata])
   // download a template CSV file based on the import type selected, 
   const downloadTemplate = (): void => {
     switch (importType) {
@@ -305,7 +309,7 @@ export default function Import(): JSX.Element {
           toShow.push(plainToClass(Collar, r));
         }
       });
-    }
+    }a
     return <BasicTable data={toShow} headers={Object.keys(toShow[0])} rowIdentifier={'id'} />;*/
   };
 
@@ -316,7 +320,9 @@ export default function Import(): JSX.Element {
         <Paper className={styles.spacing} style={{padding: '24px'}}>
           <Box display='flex'>
             <SubHeader text='Device Metadata'/>
-            <Button style={{marginLeft: 'auto'}} variant='outlined'>Download Template</Button>
+            <Button href={createUrl({api: 'get-template', query: 'file_key=import_template'})} /*onClick={() => {downloadXLSXTemplate()}}*/ style={{marginLeft: 'auto'}} variant='outlined'>
+                Download Template
+            </Button>
           </Box>
           <Box className={styles.spacing}>
             <Banner
@@ -359,7 +365,7 @@ export default function Import(): JSX.Element {
               variant='info'
               text={
                 <Box alignItems={'center'} display='flex'>
-                  {selectedError ? `Row ${selectedCell.row} "${selectedCell.col}": ${selectedError.help}` : 'Click a cell for detailed information about that error.'}
+                  {selectedError ? `Row ${selectedCell.row + 2} "${selectedCell.col}": ${selectedError.help}` : 'Click a cell for detailed information about that error.'}
                   {selectedError?.valid_values ? <Button style={{height: '26px', marginLeft: 'auto'}} variant='contained' onClick={() => {setShowingValueModal(true)}}>Show Values</Button> : null}
                 </Box>
               }

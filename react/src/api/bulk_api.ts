@@ -94,6 +94,21 @@ export const bulkApi = (api: AxiosInstance): API => {
     return results;
   }
 
+  const getTemplateFile = async (file_key: string): Promise<any> => {
+    const body = `file_key=${file_key}`
+    const url = createUrl({ api: 'get-template', query: body})
+    const { data } = await api.get(url);
+    const results = data;
+    return results;
+  }
+
+  const getKeyX = async (): Promise<any> => {
+    const url = createUrl({api: 'get-collars-keyx'});
+    const { data } = await api.get(url);
+    const results = data;
+    return results;
+  }
+
   return {
     deleteType,
     getExportData,
@@ -103,5 +118,7 @@ export const bulkApi = (api: AxiosInstance): API => {
     uploadXlsx,
     finalizeXlsx,
     uploadFiles,
+    getTemplateFile,
+    getKeyX
   }
 }
