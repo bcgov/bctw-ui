@@ -1,4 +1,5 @@
 import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { isDev } from 'api/api_helpers';
 import { RouteKey } from 'AppRouter';
 import { Icon, Tooltip } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
@@ -45,6 +46,10 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       const dataAdminRoutes = ['import', 'animal-manager', 'delegation-requests', 'animal-manager', 'vendor'];
       curRoutes.push(...routes.filter((r) => dataAdminRoutes.includes(r.name)));
     }
+    if (isDev()) {
+      const testRoutes = ['playground'];
+      curRoutes.push(...routes.filter((r) => testRoutes.includes(r.name)));
+    }
     setVisibleRoutes(curRoutes);
   };
 
@@ -58,6 +63,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       case '/delegation-requests':
       case '/onboarding-requests':
       case '/profile':
+      case '/playground':
     }
     handleSetVisible(['animals', 'devices', 'profile', 'export']);
   }, [location, isAdmin, isCritterManager, isDataAdmin]); // only fire when these states change

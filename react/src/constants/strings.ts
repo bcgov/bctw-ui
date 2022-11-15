@@ -74,7 +74,8 @@ const BannerStrings = {
   exportDetails: [
     'Use Quick Export to quickly get telemetry data for any of your animals.',
     'Use Advanced Export to get data that matches custom query parameters.'
-  ]
+  ],
+  vectronicKeyxInfo: 'Vectronic collars must be validated with KeyX files before BCTW can collect telemetry data'
 };
 
 const WorkflowStrings = {
