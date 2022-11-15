@@ -58,19 +58,17 @@ interface KeyXPayload {
 const TempComponent = ({ deviceIds }: KeyXCardProps): JSX.Element => {
   const theme = useTheme();
   const [keyXPayload, setKeyXPayload] = useState<KeyXPayload>({});
+
   useEffect(() => {
     const tmp: KeyXPayload = {};
     deviceIds.forEach((device_id) => {
-      //Temp stuff
-      if (device_id === DEVICE_IDS[0] || device_id === DEVICE_IDS[3]) {
-        tmp[device_id] = true;
-      }
-      setKeyXPayload(tmp);
+      //Temp code to show how setting the keyx file would work
+      //Will eventually be the actual keyx file instead of boolean
+      tmp[device_id] = device_id === 84789;
     });
+    setKeyXPayload(tmp);
   }, [deviceIds]);
-  {
-    /* <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center'></Box> */
-  }
+
   return (
     <>
       <Card sx={{ width: '24rem' }}>
@@ -79,26 +77,20 @@ const TempComponent = ({ deviceIds }: KeyXCardProps): JSX.Element => {
         </CardContent>
         <Box px={5} pb={2} display='flex' flexDirection='row' justifyContent='space-between'>
           <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center'>
-            {deviceIds.map((id, i) => (
-              <>
-                {i == 0 && (
-                  <Typography pb={2} fontWeight='bold'>
-                    Device ID
-                  </Typography>
-                )}
-                <Typography>{id}</Typography>
-              </>
+            <Typography pb={2} fontWeight='bold'>
+              Device ID
+            </Typography>
+            {Object.keys(keyXPayload).map((dID, i) => (
+              <Typography>{dID}</Typography>
             ))}
           </Box>
           <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center'>
-            {deviceIds.map((id, i) => (
+            <Typography pb={2} fontWeight='bold'>
+              KeyX file
+            </Typography>
+            {Object.keys(keyXPayload).map((dID, i) => (
               <>
-                {i == 0 && (
-                  <Typography pb={2} fontWeight='bold'>
-                    KeyX file
-                  </Typography>
-                )}
-                {keyXPayload[id] ? (
+                {keyXPayload[dID] ? (
                   <Icon icon={'check'} htmlColor={theme.palette.success.main} />
                 ) : (
                   <Link underline='hover'>Browse files</Link>
@@ -111,21 +103,3 @@ const TempComponent = ({ deviceIds }: KeyXCardProps): JSX.Element => {
     </>
   );
 };
-
-{
-  /* <Box>
-  {i == 0 && (
-    <Typography pb={2} fontWeight='bold'>
-    KeyX File
-    </Typography>
-    )}
-    {keyXPayload[id] ? (
-      <Icon icon={'check'} htmlColor={theme.palette.success.main} />
-      ) : (
-        <Link underline='hover'>Browse files</Link>
-        )}
-      </Box> */
-}
-{
-  /* </Box> */
-}
