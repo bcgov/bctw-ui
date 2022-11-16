@@ -286,11 +286,16 @@ export const getDeviceFormFields = (): FormFieldObject<Collar>[] => {
   return Object.values(collarFormFields).reduce((previous, current) => [...previous, ...current], []);
 };
 
-// vectronic keys upload result
-export interface IVectronicUpsert {
+// vectronic keyX upload result
+export interface VectronicKeyX {
   collarkey: string;
   collartype: string;
   comptype: string;
   idcollar: number;
   idcom: string;
+}
+
+//Used in the keyX import
+export interface DeviceAndVectronicKeyX {
+  [device_id: number]: VectronicKeyX;
 }

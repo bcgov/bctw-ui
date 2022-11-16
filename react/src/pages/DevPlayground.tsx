@@ -4,14 +4,17 @@ import {
   ButtonBase,
   Card,
   CardContent,
+  CircularProgress,
   Divider,
   Grid,
   Link,
   List,
   ListItem,
+  Theme,
   Typography,
   useTheme
 } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -24,18 +27,48 @@ import { SubHeader } from 'components/common/partials/SubHeader';
 import Tooltip from 'components/common/Tooltip';
 import FileInput from 'components/form/FileInput';
 import { BannerStrings } from 'constants/strings';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { Collar } from 'types/collar';
 import ManageLayout from './layouts/ManageLayout';
-// Place component constants / objects here
 
+// Place constants here
 const TEST = 'Testing';
-const DEVICE_IDS = [84789, 12345, 98765, 223344];
+const DEVICE_IDS = [17822, 20502];
 const TEST_KEYX_PAYLOAD = {
   84789: true,
   12345: false,
   98789: true
 };
+
+// Modify styles here
+const useStyles = makeStyles((theme: Theme) => ({
+  table: {
+    [`& .${tableCellClasses.root}`]: {
+      borderBottom: 'none'
+    }
+  },
+  batchUploadBox: {
+    border: '3px dashed grey',
+    minWidth: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  cardWidth: {
+    width: '24rem'
+  }
+}));
+
+// Interfaces / Types here
+interface KeyXCardProps {
+  device_ids?: number[]; //Array of device_ids;
+}
+
+interface KeyXDeviceList {
+  [device_id: number]: boolean;
+}
+
 /**
  * Testing area for UI comoponents.
  * /playground route.
@@ -51,47 +84,56 @@ export const DevPlayground = (): JSX.Element => {
           {`White Background - ${background}`}
         </Button>
       </Box>
-      <Box height={'80%'} sx={{ backgroundColor: background ? '#ffff' : 'transparent' }}>
+      <Box sx={{ backgroundColor: background ? '#ffff' : 'transparent', display: 'flex', flexDirection: 'row' }}>
         {/* Place components below here */}
-        <TempComponent keyXs={TEST_KEYX_PAYLOAD} />
+        <Box sx={{ pr: 2 }}>
+          <TempComponent device_ids={DEVICE_IDS} />
+        </Box>
+        <TempComponent />
       </Box>
     </ManageLayout>
   );
 };
 
-interface KeyXCardProps {
-  keyXs: KeyXPayload;
-}
-
-interface KeyXPayload {
-  [device_id: number]: boolean;
-}
-
 // Temporarily build components down here for development
-const TempComponent = ({ keyXs }: KeyXCardProps): JSX.Element => {
+//Two types of this component
+// 1. That queries based off a list of device_ids provided
+// 2. One that queries all the devices that are assigned to a user
+const TempComponent = ({ device_ids }: KeyXCardProps): JSX.Element => {
+  const api = useTelemetryApi();
   const theme = useTheme();
-  const [keyXPayload, setKeyXPayload] = useState<KeyXPayload>(keyXs);
+  const styles = useStyles();
+
+  const [keyXPayload, setKeyXPayload] = useState<KeyXDeviceList>({});
+  const [deviceKeyXList, setDeviceKeyXList] = useState<KeyXDeviceList>({});
+  const { data, isSuccess, isLoading } = api.useGetCollarKeyX(device_ids);
+
+  useEffect(() => {
+    const tmp: KeyXDeviceList = {};
+    if (!data?.length) {
+      return;
+    }
+    console.log(data);
+    data.forEach((row) => {
+      tmp[row.device_id] = row?.keyx;
+    });
+    setDeviceKeyXList(tmp);
+  }, [isSuccess]);
 
   const handleSetPayload = (device_id: number): void => {
-    setKeyXPayload((k) => {
+    setDeviceKeyXList((k) => {
       k[device_id] = true;
       return { ...k };
     });
   };
 
-  const doNothing = (): void => {
+  const onBatchUpload = (): void => {
     console.log('doing nothing');
   };
 
   const KeyXList = (): JSX.Element => (
     <TableContainer sx={{ pb: 4 }}>
-      <Table
-        size='small'
-        sx={{
-          [`& .${tableCellClasses.root}`]: {
-            borderBottom: 'none'
-          }
-        }}>
+      <Table size='small' className={styles.table}>
         <TableHead>
           <TableRow>
             <TableCell align='center'>
@@ -103,18 +145,18 @@ const TempComponent = ({ keyXs }: KeyXCardProps): JSX.Element => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {Object.keys(keyXPayload).map((device_id, idx) => (
+          {Object.keys(deviceKeyXList).map((device_id, idx) => (
             <TableRow key={`keyx-${idx}`}>
               <TableCell align='center'>{device_id}</TableCell>
               <TableCell align='center'>
-                {keyXPayload[device_id] ? (
+                {deviceKeyXList[device_id] ? (
                   <Tooltip title={'Existing KeyX file for this device'}>
                     <Icon icon={'check'} htmlColor={theme.palette.success.main} />
                   </Tooltip>
                 ) : (
                   <FileInput
                     accept='.keyx'
-                    buttonText={'Browse Files'}
+                    buttonText={'Upload KeyX'}
                     buttonVariant='text'
                     fileName={''}
                     multiple={false}
@@ -133,13 +175,21 @@ const TempComponent = ({ keyXs }: KeyXCardProps): JSX.Element => {
   );
 
   return (
-    <>
-      <Card sx={{ width: '24rem' }}>
-        <CardContent sx={{ paddingBottom: 0 }}>
-          <InfoBanner text={BannerStrings.vectronicKeyxInfo} />
-        </CardContent>
-        <KeyXList />
-      </Card>
-    </>
+    <Card className={styles.cardWidth}>
+      <CardContent>
+        <InfoBanner text={BannerStrings.vectronicKeyxInfo} />
+        <Box p={1} className={styles.batchUploadBox}>
+          <FileInput
+            accept='.keyx'
+            buttonText={'Batch Upload KeyX Files'}
+            buttonVariant='text'
+            fileName={''}
+            multiple={false}
+            onFileChosen={onBatchUpload}
+          />
+        </Box>
+      </CardContent>
+      <KeyXList />
+    </Card>
   );
 };
