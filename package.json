@@ -18,5 +18,6 @@
   "bugs": {
     "url": "https://github.com/bcgov/bctw-ui/issues"
   },
-  "homepage": "https://github.com/bcgov/bctw-ui#readme"
+  "homepage": "https://github.com/bcgov/bctw-ui#readme",
+  "dependencies": {}
 }

@@ -108,6 +108,8 @@ type TableHeadProps<T> = {
   orderBy: string;
   rowCount: number;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  hiddenHeaders?: (keyof T)[];
+  secondaryHeaders?: (string | number | symbol)[];
 };
 
 type FilterOperator = 'equals' | 'contains';

@@ -1,5 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { ITableFilter } from 'components/table/table_interfaces';
+import { Animal } from 'types/animal';
+import { Collar } from 'types/collar';
 import { uuid } from 'types/common_types';
 
 // props required for all API hooks
@@ -29,6 +31,27 @@ interface IBulkUploadResults<T> {
   results: T[];
 }
 
+type CellErrorDescriptor = {
+  desc: string;
+  help: string;
+  valid_values?: string[];
+}
+
+type ParsedXLSXCellError = {
+  [key in (keyof Animal | keyof Collar) | 'identifier']?: CellErrorDescriptor;
+}
+
+type ParsedXLSXRowResult = {
+  row: Animal | Collar;
+  errors: ParsedXLSXCellError;
+  success: boolean;
+}
+
+type ParsedXLSXSheetResult = {
+  headers: string[];
+  rows: ParsedXLSXRowResult[];
+}
+
 // models that can be deleted
 interface IDeleteType {
   objType: 'animal' | 'collar' | 'user';
@@ -56,5 +79,9 @@ export type {
   IBulkUploadError,
   IBulkUploadResults,
   IUpsertPayload,
-  IDeleteType
+  IDeleteType,
+  ParsedXLSXCellError,
+  ParsedXLSXRowResult,
+  ParsedXLSXSheetResult,
+  CellErrorDescriptor
 };
