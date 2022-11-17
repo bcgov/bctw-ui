@@ -296,6 +296,7 @@ export interface VectronicKeyX {
 }
 
 //Used in the keyX import
-export interface DeviceAndVectronicKeyX {
-  [device_id: number]: VectronicKeyX;
+export interface DeviceWithVectronicKeyX {
+  device_id: number;
+  keyx: VectronicKeyX;
 }

@@ -5,7 +5,7 @@ import { ExportQueryParams } from 'types/export';
 import { exportEndpoint, exportAllEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
 import { useQueryClient } from 'react-query';
 import { API, IBulkUploadResults, IDeleteType, ParsedXLSXSheetResult } from './api_interfaces';
-import { VectronicKeyX } from 'types/collar';
+import { DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 
 export const bulkApi = (api: AxiosInstance): API => {
   const qc = useQueryClient();
@@ -101,7 +101,7 @@ export const bulkApi = (api: AxiosInstance): API => {
     return results;
   };
 
-  const getKeyX = async (device_ids?: number[]): Promise<any> => {
+  const getKeyX = async (device_ids?: number[]): Promise<DeviceWithVectronicKeyX[]> => {
     const body = `device_ids=${device_ids}`;
     const url = createUrl({ api: 'get-collars-keyx', query: device_ids && body });
     const { data } = await api.get(url);

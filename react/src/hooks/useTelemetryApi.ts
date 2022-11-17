@@ -21,7 +21,7 @@ import {
 } from 'react-query';
 import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
-import { AttachedCollar, Collar, VectronicKeyX } from 'types/collar';
+import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, User } from 'types/user';
 
@@ -515,8 +515,12 @@ export const useTelemetryApi = () => {
     );
   };
 
-  const useGetCollarKeyX = (device_ids?: number[]): UseQueryResult<any> => {
-    return useQuery<any, AxiosError>(['get_keyx', device_ids], () => bulkApi.getKeyX(device_ids), defaultQueryOptions);
+  const useGetCollarKeyX = (device_ids?: number[]): UseQueryResult<DeviceWithVectronicKeyX[], AxiosError> => {
+    return useQuery<DeviceWithVectronicKeyX[], AxiosError>(
+      ['get_keyx', device_ids],
+      () => bulkApi.getKeyX(device_ids),
+      defaultQueryOptions
+    );
   };
 
   /** upload one or more .keyx files to create new Vectronic devices */

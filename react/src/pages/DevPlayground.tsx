@@ -29,12 +29,15 @@ import FileInput from 'components/form/FileInput';
 import { BannerStrings } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
-import { Collar } from 'types/collar';
+import { Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import ManageLayout from './layouts/ManageLayout';
+import { createFormData } from 'api/api_helpers';
+import { IBulkUploadResults } from 'api/api_interfaces';
+import { AxiosError } from 'axios';
 
 // Place constants here
 const TEST = 'Testing';
-const DEVICE_IDS = [17822, 20502];
+const DEVICE_IDS = [17822, 20502, 45333];
 const TEST_KEYX_PAYLOAD = {
   84789: true,
   12345: false,
@@ -62,11 +65,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 // Interfaces / Types here
 interface KeyXCardProps {
-  device_ids?: number[]; //Array of device_ids;
+  //If no device_ids passed to componenet
+  //component defaults to all keyX files for collars assigned to that user
+  device_ids?: number[];
 }
 
-interface KeyXDeviceList {
-  [device_id: number]: boolean;
+interface DeviceKeyXObj {
+  [device_id: number]: VectronicKeyX;
 }
 
 /**
@@ -103,76 +108,58 @@ const TempComponent = ({ device_ids }: KeyXCardProps): JSX.Element => {
   const api = useTelemetryApi();
   const theme = useTheme();
   const styles = useStyles();
-
-  const [keyXPayload, setKeyXPayload] = useState<KeyXDeviceList>({});
-  const [deviceKeyXList, setDeviceKeyXList] = useState<KeyXDeviceList>({});
   const { data, isSuccess, isLoading } = api.useGetCollarKeyX(device_ids);
 
-  useEffect(() => {
-    const tmp: KeyXDeviceList = {};
-    if (!data?.length) {
-      return;
-    }
-    console.log(data);
-    data.forEach((row) => {
-      tmp[row.device_id] = row?.keyx;
+  const [deviceAndKeyXList, setDeviceAndKeyXList] = useState<DeviceWithVectronicKeyX[]>([]);
+  const [deviceAndKeyXObj, setDeviceAndKeyXObj] = useState<DeviceKeyXObj>({});
+
+  const onSuccessKeyX = (response: IBulkUploadResults<VectronicKeyX>): void => {
+    const { errors, results } = response;
+    console.log({ errors, results });
+    results.forEach((keyX) => {
+      if (deviceAndKeyXObj[keyX.idcollar]) {
+        const tmp = { [keyX.idcollar]: keyX };
+        setDeviceAndKeyXObj((k) => ({ ...k, ...tmp }));
+      }
     });
-    setDeviceKeyXList(tmp);
+  };
+
+  const onErrorKeyX = (e: AxiosError): void => {
+    console.log(e.message);
+  };
+
+  const {
+    mutateAsync: mutateKeyX,
+    reset,
+    isLoading: isPostingKeyX
+  } = api.useUploadXML({
+    onSuccess: onSuccessKeyX,
+    onError: onErrorKeyX
+  });
+
+  useEffect(() => {
+    if (!data?.length) return;
+    const tmp: DeviceKeyXObj = {};
+    setDeviceAndKeyXList(data);
+    data.forEach((row) => {
+      tmp[row.device_id] = row.keyx;
+    });
+    setDeviceAndKeyXObj(tmp);
   }, [isSuccess]);
 
-  const handleSetPayload = (device_id: number): void => {
-    setDeviceKeyXList((k) => {
-      k[device_id] = true;
-      return { ...k };
-    });
+  const handleUploadedKeyX = (name: string, files: FileList): void => {
+    console.log({ name }, { files });
+    const form = createFormData('xml', files);
+    mutateKeyX(form);
+    // setDeviceKeyXList((k) => {
+    //   k[device_id] = deviceKeyXList[device_id];
+    //   return { ...k };
+    // });
   };
 
   const onBatchUpload = (): void => {
     console.log('doing nothing');
   };
-
-  const KeyXList = (): JSX.Element => (
-    <TableContainer sx={{ pb: 4 }}>
-      <Table size='small' className={styles.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell align='center'>
-              <Typography fontWeight='bold'>Devices</Typography>
-            </TableCell>
-            <TableCell align='center'>
-              <Typography fontWeight='bold'>KeyX Files</Typography>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {Object.keys(deviceKeyXList).map((device_id, idx) => (
-            <TableRow key={`keyx-${idx}`}>
-              <TableCell align='center'>{device_id}</TableCell>
-              <TableCell align='center'>
-                {deviceKeyXList[device_id] ? (
-                  <Tooltip title={'Existing KeyX file for this device'}>
-                    <Icon icon={'check'} htmlColor={theme.palette.success.main} />
-                  </Tooltip>
-                ) : (
-                  <FileInput
-                    accept='.keyx'
-                    buttonText={'Upload KeyX'}
-                    buttonVariant='text'
-                    fileName={''}
-                    multiple={false}
-                    onFileChosen={() => handleSetPayload(parseInt(device_id))}
-                  />
-                  // <Link component='button' underline='hover' onClick={() => handleSetPayload(parseInt(device_id))}>
-                  //   Browse files
-                  // </Link>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
 
   return (
     <Card className={styles.cardWidth}>
@@ -184,12 +171,48 @@ const TempComponent = ({ device_ids }: KeyXCardProps): JSX.Element => {
             buttonText={'Batch Upload KeyX Files'}
             buttonVariant='text'
             fileName={''}
-            multiple={false}
-            onFileChosen={onBatchUpload}
+            multiple={true}
+            onFileChosen={handleUploadedKeyX}
           />
         </Box>
       </CardContent>
-      <KeyXList />
+      <TableContainer sx={{ pb: 4 }}>
+        <Table size='small' className={styles.table}>
+          <TableHead>
+            <TableRow>
+              <TableCell align='center'>
+                <Typography fontWeight='bold'>Devices</Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography fontWeight='bold'>KeyX Files</Typography>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Object.keys(deviceAndKeyXObj).map((dID, idx) => (
+              <TableRow key={`keyx-${idx}`}>
+                <TableCell align='center'>{dID}</TableCell>
+                <TableCell align='center'>
+                  {deviceAndKeyXObj[dID] ? (
+                    <Tooltip title={'Existing KeyX file for this device'}>
+                      <Icon icon={'check'} htmlColor={theme.palette.success.main} />
+                    </Tooltip>
+                  ) : (
+                    <FileInput
+                      accept='.keyx'
+                      buttonText={'Upload KeyX'}
+                      buttonVariant='text'
+                      fileName={''}
+                      multiple={false}
+                      onFileChosen={handleUploadedKeyX}
+                    />
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Card>
   );
 };
