@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, StandardTextFieldProps } from '@mui/material';
 
-interface FileInputProps extends StandardTextFieldProps {
+export interface FileInputProps extends StandardTextFieldProps {
   buttonText?: string;
   multiple?: boolean;
   fileName?: string;

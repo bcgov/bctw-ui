@@ -489,9 +489,9 @@ export const useTelemetryApi = () => {
       useMutation<IBulkUploadResults<T>, AxiosError, ParsedXLSXSheetResult>((body) => bulkApi.finalizeXlsx(body), config);
 
   const useUploadXLSX= <T>(
-    config: UseMutationOptions<ParsedXLSXSheetResult, AxiosError, FormData>
-  ): UseMutationResult<ParsedXLSXSheetResult, AxiosError> =>
-    useMutation<ParsedXLSXSheetResult, AxiosError, FormData>((form) => bulkApi.uploadXlsx(form), config);
+    config: UseMutationOptions<ParsedXLSXSheetResult[], AxiosError, FormData>
+  ): UseMutationResult<ParsedXLSXSheetResult[], AxiosError> =>
+    useMutation<ParsedXLSXSheetResult[], AxiosError, FormData>((form) => bulkApi.uploadXlsx(form), config);
     /**  const useCritterHistory = (page: number, critterId: string): UseQueryResult<Animal[]> => {
     return useQuery<Animal[], AxiosError>(
       ['critter_history', critterId, page],
