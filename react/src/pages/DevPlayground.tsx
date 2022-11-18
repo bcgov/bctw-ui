@@ -10,6 +10,7 @@ import {
   Link,
   List,
   ListItem,
+  TablePagination,
   Theme,
   Typography,
   useTheme
@@ -67,6 +68,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface KeyXCardProps {
   //If no device_ids passed to componenet
   //component defaults to all keyX files for collars assigned to that user
+  pageRows?: number;
   device_ids?: number[];
 }
 
@@ -104,22 +106,25 @@ export const DevPlayground = (): JSX.Element => {
 //Two types of this component
 // 1. That queries based off a list of device_ids provided
 // 2. One that queries all the devices that are assigned to a user
-const TempComponent = ({ device_ids }: KeyXCardProps): JSX.Element => {
+const TempComponent = ({ device_ids, pageRows = 10 }: KeyXCardProps): JSX.Element => {
   const api = useTelemetryApi();
   const theme = useTheme();
   const styles = useStyles();
   const { data, isSuccess, isLoading } = api.useGetCollarKeyX(device_ids);
 
-  const [deviceAndKeyXList, setDeviceAndKeyXList] = useState<DeviceWithVectronicKeyX[]>([]);
   const [deviceAndKeyXObj, setDeviceAndKeyXObj] = useState<DeviceKeyXObj>({});
+  const [page, setPage] = useState(0);
+
+  const ROWS_PER_PAGE = 10;
+  const HEADERS = ['Devices', 'KeyX Files'];
 
   const onSuccessKeyX = (response: IBulkUploadResults<VectronicKeyX>): void => {
+    //Currently not doing anything with errors on upload
     const { errors, results } = response;
-    console.log({ errors, results });
+    //Set the successfull results to the object
     results.forEach((keyX) => {
-      if (deviceAndKeyXObj[keyX.idcollar]) {
-        const tmp = { [keyX.idcollar]: keyX };
-        setDeviceAndKeyXObj((k) => ({ ...k, ...tmp }));
+      if (keyX.idcollar in deviceAndKeyXObj) {
+        setDeviceAndKeyXObj((k) => ({ ...k, [keyX.idcollar]: keyX }));
       }
     });
   };
@@ -137,10 +142,10 @@ const TempComponent = ({ device_ids }: KeyXCardProps): JSX.Element => {
     onError: onErrorKeyX
   });
 
+  //Parse data to object for efficiency
   useEffect(() => {
     if (!data?.length) return;
     const tmp: DeviceKeyXObj = {};
-    setDeviceAndKeyXList(data);
     data.forEach((row) => {
       tmp[row.device_id] = row.keyx;
     });
@@ -148,71 +153,73 @@ const TempComponent = ({ device_ids }: KeyXCardProps): JSX.Element => {
   }, [isSuccess]);
 
   const handleUploadedKeyX = (name: string, files: FileList): void => {
-    console.log({ name }, { files });
     const form = createFormData('xml', files);
     mutateKeyX(form);
-    // setDeviceKeyXList((k) => {
-    //   k[device_id] = deviceKeyXList[device_id];
-    //   return { ...k };
-    // });
   };
 
-  const onBatchUpload = (): void => {
-    console.log('doing nothing');
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, page: number): void => {
+    setPage(page);
   };
 
+  const UploadKeyXBtn = ({ text }: { text: string }): JSX.Element => (
+    <FileInput
+      accept='.keyx'
+      buttonText={text}
+      buttonVariant='text'
+      fileName={''}
+      multiple={true}
+      onFileChosen={handleUploadedKeyX}
+    />
+  );
   return (
     <Card className={styles.cardWidth}>
       <CardContent>
         <InfoBanner text={BannerStrings.vectronicKeyxInfo} />
         <Box p={1} className={styles.batchUploadBox}>
-          <FileInput
-            accept='.keyx'
-            buttonText={'Batch Upload KeyX Files'}
-            buttonVariant='text'
-            fileName={''}
-            multiple={true}
-            onFileChosen={handleUploadedKeyX}
-          />
+          <UploadKeyXBtn text={'Batch Upload KeyX Files'} />
         </Box>
       </CardContent>
-      <TableContainer sx={{ pb: 4 }}>
+      <TableContainer>
         <Table size='small' className={styles.table}>
           <TableHead>
             <TableRow>
-              <TableCell align='center'>
-                <Typography fontWeight='bold'>Devices</Typography>
-              </TableCell>
-              <TableCell align='center'>
-                <Typography fontWeight='bold'>KeyX Files</Typography>
-              </TableCell>
+              {HEADERS.map((h) => (
+                <TableCell key={`headers-${h}`} align='center'>
+                  <Typography fontWeight='bold'>{h}</Typography>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.keys(deviceAndKeyXObj).map((dID, idx) => (
-              <TableRow key={`keyx-${idx}`}>
-                <TableCell align='center'>{dID}</TableCell>
-                <TableCell align='center'>
-                  {deviceAndKeyXObj[dID] ? (
-                    <Tooltip title={'Existing KeyX file for this device'}>
-                      <Icon icon={'check'} htmlColor={theme.palette.success.main} />
-                    </Tooltip>
-                  ) : (
-                    <FileInput
-                      accept='.keyx'
-                      buttonText={'Upload KeyX'}
-                      buttonVariant='text'
-                      fileName={''}
-                      multiple={false}
-                      onFileChosen={handleUploadedKeyX}
-                    />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+            {Object.keys(deviceAndKeyXObj).map((dID, idx, arr) => {
+              //Sets the values range for the pagination
+              if (idx < pageRows * (page + 1) && idx > pageRows * page)
+                return (
+                  <TableRow key={`keyx-${idx}`}>
+                    <TableCell align='center'>{arr[idx]}</TableCell>
+                    <TableCell align='center'>
+                      {deviceAndKeyXObj[arr[idx]] ? (
+                        <Tooltip title={'Existing KeyX file for this device'}>
+                          <Icon icon={'check'} htmlColor={theme.palette.success.main} />
+                        </Tooltip>
+                      ) : (
+                        <UploadKeyXBtn text={'Upload KeyX'} />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        component='div'
+        count={Object.keys(deviceAndKeyXObj).length}
+        page={page}
+        rowsPerPageOptions={[]}
+        onPageChange={handleChangePage}
+        rowsPerPage={ROWS_PER_PAGE}
+      />
     </Card>
   );
 };

@@ -290,7 +290,7 @@ export const getDeviceFormFields = (): FormFieldObject<Collar>[] => {
 export interface VectronicKeyX {
   collarkey: string;
   collartype: string;
-  comptype: string;
+  comtype: string;
   idcollar: number;
   idcom: string;
 }
