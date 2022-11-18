@@ -1,21 +1,25 @@
 import { useContext, useEffect, useState } from 'react';
-import { CircularProgress, IconButton, TableHead } from '@mui/material';
+import { Badge, Button, CircularProgress, IconButton, TableHead } from '@mui/material';
 import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@mui/material';
 import { formatT } from 'utils/time';
-import { Icon } from 'components/common';
+import { Icon, Tooltip } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { UserAlertStrings } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { formatAxiosError } from 'utils/errors';
 import { AxiosError } from 'axios';
-import { capitalize, columnToHeader } from 'utils/common_helpers';
+import { capitalize, columnToHeader, pluralize } from 'utils/common_helpers';
 import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
+import { InfoBanner, NotificationBanner } from 'components/alerts/Banner';
+import { FormatAlert } from 'components/alerts/FormatAlert';
+import MapModal from 'components/modal/MapModal';
+import dayjs from 'dayjs';
 // import { UserContext } from 'contexts/UserContext';
 // import { eCritterPermission } from 'types/permission';
 
@@ -23,31 +27,59 @@ import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
  * modal component that shows current alerts
  * todo: use an existing table component
  */
-export default function AlertPage(): JSX.Element {
+interface AlertActionsProps {
+  alert: MalfunctionAlert | MortalityAlert;
+  showActions?: { map?: boolean; edit?: boolean; snooze?: boolean };
+}
+/**
+ * @param alert Type of alert, currently only handling Malfunctions / Mortalities
+ * @param showActions Optional object to enable specific btns. No prop defaults to all
+ * Only handling 'Show on Map', 'Edit Alert' (Do appropriate workflow i.e: Mortality Workflow), 'Snooze' (Disable alert for 1 day)
+ */
+export default function AlertActions({ alert, showActions }: AlertActionsProps): JSX.Element {
   const api = useTelemetryApi();
 
   const showNotif = useResponseDispatch();
-  const useAlerts = useContext(AlertContext);
+  //const useAlerts = useContext(AlertContext);
   // const useUser = useContext(UserContext);
   // const eCritters = api.useCritterAccess(1, { user: useUser.user, filter: [eCritterPermission.editor] });
-  const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
+  //const [alerts, setAlerts] = useState<MortalityAlert[]>([]);
 
-  const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(null);
+  //const [selectedAlert, setSelectedAlert] = useState<MortalityAlert | MalfunctionAlert | null>(null);
   // display status of the modal that the user can perform the alert update from
   const [showEventModal, setShowEventModal] = useState(false);
   // display status of the modal that requires the user to confirm snoozing
   const [showSnoozeModal, setShowSnoozeModal] = useState(false);
   const [snoozeMessage, setSnoozeMessage] = useState('');
+  const [openMap, setOpenMap] = useState(false);
   // when an alert row is selected, clicking the 'update' button will trigger a workflow modal based on the alert type
   const [workflow, createWorkflow] = useState<IBCTWWorkflow | null>(null);
-
+  const isMortality = alert.alert_type === eAlertType.mortality;
+  /**
+   * when a new alert is passed as props:
+   * a) update the workflow state
+   * note: for malfunction events: default the date to last_transmission
+   */
   useEffect(() => {
-    const update = (): void => {
-      const alerts = useAlerts.alerts;
-      setAlerts(alerts);
-    };
-    update();
-  }, [useAlerts]);
+    if (alert) {
+      createWorkflow(() => {
+        const n = alert.toWorkflow(
+          isMortality ? new MortalityEvent(alert.valid_from) : new MalfunctionEvent(alert.last_transmission_date)
+        );
+        return n;
+      });
+    }
+  }, [alert]);
+
+  // useEffect(() => {
+  //   const update = (): void => {
+  //     const alerts = useAlerts?.alerts;
+  //     if (alerts?.length) {
+  //       setAlerts(alerts);
+  //     }
+  //   };
+  //   update();
+  // }, [useAlerts]);
 
   const onSuccess = async (): Promise<void> => {
     showNotif({ severity: 'success', message: `telemetry alert saved` });
@@ -58,28 +90,21 @@ export default function AlertPage(): JSX.Element {
   // setup the mutation to update the alert status
   const { mutateAsync, isLoading } = api.useSaveUserAlert({ onSuccess, onError });
 
-  const isEditor = (alert: MortalityAlert): boolean => alert.permission_type === 'editor';
+  const isManager = (alert: MortalityAlert): boolean => alert.permission_type === 'manager';
 
-  /**
-   * when an alert row is selected from the table:
-   * a) set the selected row state
-   * b) based on the alert type, update the workflow state
-   *
-   * for malfunction events: default the date to last_transmission
-   */
-  const handleSelectRow = (aid: number): void => {
-    const selected = alerts.find((a) => a.alert_id === aid);
-    setSelectedAlert(selected);
-    const type = selected.alert_type;
-    createWorkflow(() => {
-      const n = selected.toWorkflow(
-        type === eAlertType.malfunction
-          ? new MalfunctionEvent(selected.last_transmission_date)
-          : new MortalityEvent(selected.valid_from)
-      );
-      return n;
-    });
-  };
+  // const handleSelectRow = (aid: number): void => {
+  //   //const selected = alerts.find((a) => a.alert_id === aid);
+  //   setSelectedAlert(selected);
+  //   const type = selected.alert_type;
+  //   createWorkflow(() => {
+  //     const n = selected.toWorkflow(
+  //       type === eAlertType.malfunction
+  //         ? new MalfunctionEvent(selected.last_transmission_date)
+  //         : new MortalityEvent(selected.valid_from)
+  //     );
+  //     return n;
+  //   });
+  // };
 
   // post the updated alert
   const updateAlert = async (alert: TelemetryAlert): Promise<void> => {
@@ -87,21 +112,21 @@ export default function AlertPage(): JSX.Element {
   };
 
   // user selected to take action on the alert, show the update modal
-  const editAlert = (row): void => {
-    setSelectedAlert(row);
+  const editAlert = (): void => {
+    //setSelectedAlert(row);
     setShowEventModal(true);
   };
 
   // make user confirm the snooze action
-  const handleClickSnooze = (alert): void => {
+  const handleClickSnooze = (): void => {
     setSnoozeMessage(UserAlertStrings.snoozeConfirmation(alert.snoozesMax - alert.snooze_count));
-    setSelectedAlert(alert);
+    //setSelectedAlert(alert);
     setShowSnoozeModal(true);
   };
 
   // when the snooze action is confirmed, update the snooze and save the alert
   const handleConfirmSnooze = async (): Promise<void> => {
-    const snoozed = Object.assign(new TelemetryAlert(), selectedAlert);
+    const snoozed = Object.assign(new TelemetryAlert(), alert);
     snoozed.performSnooze();
     await updateAlert(snoozed);
     setShowSnoozeModal(false);
@@ -114,35 +139,93 @@ export default function AlertPage(): JSX.Element {
    */
   const handleEventSaved = async (): Promise<void> => {
     //console.log('workflow saved, UserAlertPage handleEventSaved called with event', selectedAlert);
-    if (!selectedAlert) {
+    if (!alert) {
       return;
     }
-    selectedAlert.expireAlert();
-    await updateAlert(selectedAlert);
+    alert.expireAlert();
+    await updateAlert(alert);
     setShowEventModal(false);
   };
 
-  const propsToShow = [
-    ...MortalityAlert.displayableMortalityAlertProps,
-    'permission_type',
-    'update',
-    'status',
-    'snooze'
-  ];
+  // const propsToShow = [
+  //   ...MortalityAlert.displayableMortalityAlertProps,
+  //   'permission_type',
+  //   'update',
+  //   'status',
+  //   'snooze'
+  // ];
 
-  if (!alerts?.length) {
-    return <div>no alerts</div>;
-  }
+  // if (!alerts?.length) {
+  //   return <div>no alerts</div>;
+  // }
 
   return (
-    <div className={'container'}>
-      <Box>{UserAlertStrings.alertText}</Box>
-      <Box p={1}>
-        {/* is the alert being updated? */}
+    <div>
+      {/* <InfoBanner text={UserAlertStrings.alertText} /> */}
+      {/* <NotificationBanner
+        hiddenContent={alerts.map((alert) => (
+          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <FormatAlert alert={alert} format='banner' />
+            <div>hi</div>
+          </Box>
+        ))}
+      /> */}
+      {/* Map Btn */}
+      <Box display='flex' alignItems='center'>
+        {isManager && (
+          <>
+            {/* Edit btn */}
+
+            {(!showActions || showActions?.edit) && (
+              <Button
+                sx={{ mr: 1, minWidth: '9rem' }}
+                variant={'contained'}
+                size={'small'}
+                color={'secondary'}
+                onClick={(): void => editAlert()}>
+                {isMortality ? 'Report Mortality' : 'Handle Malfunction'}
+              </Button>
+            )}
+
+            {/* Snooze Btn */}
+
+            {(!showActions || showActions?.snooze) && (
+              <Tooltip title={`${alert.snoozesAvailable} ${pluralize(alert.snoozesAvailable, 'snooze')} left`}>
+                <Button
+                  variant='outlined'
+                  sx={{ mr: 1 }}
+                  onClick={(): void => handleClickSnooze()}
+                  size={'small'}
+                  endIcon={<Icon icon='snooze' size={0.9} />}>
+                  Snooze
+                </Button>
+              </Tooltip>
+            )}
+          </>
+        )}
+        {(!showActions || showActions?.map) && (
+          <Button
+            sx={{ mr: 1 }}
+            variant={'contained'}
+            size={'small'}
+            color={'primary'}
+            onClick={(): void => setOpenMap(true)}>
+            Map
+          </Button>
+        )}
+      </Box>
+
+      {/* {isManager && (
+        <Button variant={'contained'} size={'small'} color={'secondary'} onClick={(): void => handleClickSnooze()}>
+          Snooze
+        </Button>
+      )} */}
+
+      {/* <Box py={1}>
         {isLoading ? (
           <CircularProgress />
         ) : (
-          <TableContainer component={Paper} style={{ padding: '3px' }}>
+          <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -222,14 +305,24 @@ export default function AlertPage(): JSX.Element {
             </Table>
           </TableContainer>
         )}
-      </Box>
+      </Box> */}
+
+      <MapModal
+        open={openMap}
+        handleClose={() => setOpenMap(false)}
+        width={'600px'}
+        height={'500px'}
+        startDate={alert.valid_from?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks')}
+        endDate={alert.valid_from ?? dayjs()}
+        critter_id={alert.critter_id}
+      />
       <ConfirmModal
         handleClickYes={handleConfirmSnooze}
         handleClose={(): void => setShowSnoozeModal(false)}
         message={snoozeMessage}
         open={showSnoozeModal}
       />
-      {selectedAlert ? (
+      {workflow ? (
         <WorkflowWrapper
           event={workflow as BCTWWorkflow<typeof workflow>}
           open={showEventModal}

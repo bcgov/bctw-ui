@@ -1,4 +1,5 @@
-import { BCTWBase } from "types/common_types";
+import { Dayjs } from 'dayjs';
+import { BCTWBase } from 'types/common_types';
 
 /**
  * types related to the TriggerFetchTelemetry page
@@ -19,11 +20,11 @@ export type ResponseTelemetry = {
   records_inserted: number;
   vendor: DeviceMake;
   error: string;
-}
+  fetchDate: Dayjs;
+};
 
 export type TelemetryResultCounts = {
   found: number;
   inserted: number;
   errors: number;
-}
-
+};

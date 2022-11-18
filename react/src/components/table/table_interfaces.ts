@@ -74,6 +74,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   updated?: string;
   exporter?: JSX.Element;
   disableSearch?: boolean;
+  allRecords?: boolean;
 };
 
 /**

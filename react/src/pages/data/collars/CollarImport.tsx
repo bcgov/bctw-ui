@@ -7,7 +7,7 @@ import FileInput from 'components/form/FileInput';
 import { createFormData } from 'api/api_helpers';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { IBulkUploadError, IBulkUploadResults } from 'api/api_interfaces';
-import { Collar, IVectronicUpsert } from 'types/collar';
+import { Collar, VectronicKeyX } from 'types/collar';
 import { AxiosError } from 'axios';
 import bulkStyles from 'pages/data/bulk/bulk_styles';
 import { Button, Modal } from 'components/common';
@@ -19,7 +19,7 @@ export default function CollarImport({ open, handleClose }: ModalBaseProps): JSX
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<IBulkUploadError[]>([]);
 
-  const onSuccessKeyx = (response: IBulkUploadResults<IVectronicUpsert>): void => {
+  const onSuccessKeyx = (response: IBulkUploadResults<VectronicKeyX>): void => {
     const { errors, results } = response;
     if (errors.length) {
       setErrors(response.errors);
@@ -61,13 +61,21 @@ export default function CollarImport({ open, handleClose }: ModalBaseProps): JSX
   };
 
   // the bulk file handler mutation for importing .keyx files
-  const { mutateAsync: mutateKeyx, reset: resetKeyx, isLoading: isPostingKeyx } = api.useUploadXML({
+  const {
+    mutateAsync: mutateKeyx,
+    reset: resetKeyx,
+    isLoading: isPostingKeyx
+  } = api.useUploadXML({
     onSuccess: onSuccessKeyx,
     onError
   });
 
   // the single file mutation for importing a single .csv file with metadata
-  const { mutateAsync: mutateCsv, reset: resetCsv, isLoading: isPostingCsv } = api.useUploadCSV({
+  const {
+    mutateAsync: mutateCsv,
+    reset: resetCsv,
+    isLoading: isPostingCsv
+  } = api.useUploadCSV({
     onSuccess: onSuccessCsv,
     onError
   });
@@ -130,7 +138,7 @@ export default function CollarImport({ open, handleClose }: ModalBaseProps): JSX
         {errors.map((e) => {
           return (
             <div key={e.rownum}>
-              {importType === 'csv' ? (<span className={styles.errRow}>Row {e.rownum}</span>) : null}
+              {importType === 'csv' ? <span className={styles.errRow}>Row {e.rownum}</span> : null}
               <span className={styles.err}>{e.error}</span>
             </div>
           );

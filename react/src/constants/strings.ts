@@ -1,4 +1,5 @@
 import { eUserRole } from 'types/user';
+import { pluralize } from 'utils/common_helpers';
 
 const CritterStrings = {
   title: 'Animals',
@@ -69,11 +70,12 @@ const FileStrings = {
 };
 
 const BannerStrings = {
-  getNotifications: (n: number): string => `${n} Notifications`,
+  getNotifications: (n: number): string => `${n} ${pluralize(n, 'Notification')}`,
   exportDetails: [
     'Use Quick Export to quickly get telemetry data for any of your animals.',
     'Use Advanced Export to get data that matches custom query parameters.'
-  ]
+  ],
+  vectronicKeyxInfo: 'Vectronic collars must be validated with KeyX files before BCTW can collect telemetry data'
 };
 
 const WorkflowStrings = {

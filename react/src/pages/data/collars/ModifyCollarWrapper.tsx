@@ -14,6 +14,7 @@ type IModifyWrapperProps = {
   editing: AttachedCollar | Collar;
   children: JSX.Element;
   onDelete?: (v: string) => void;
+  onUpdate?: (v: string) => void;
 };
 
 // wraps the AddEditViewer to provide additional critter/user-specific functionality
@@ -21,14 +22,14 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   const api = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
 
-  const { children, editing, onDelete } = props;
+  const { children, editing, onDelete, onUpdate } = props;
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
 
   const [device, setDevice] = useState<typeof editing>(editing);
 
   // fetch the device if the currently selected row has a device id. assume it's an attached collar
-  const { data, status } = api.useType<AttachedCollar>('device', editing.collar_id, {enabled: !!(editing.collar_id)})
+  const { data, status } = api.useType<AttachedCollar>('device', editing.collar_id, { enabled: !!editing.collar_id });
 
   useEffect(() => {
     if (data || status === 'success') {
@@ -50,12 +51,14 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
     }
     const collar = data.results[0];
     responseDispatch({ severity: 'success', message: `collar ${collar.device_id} saved` });
+    onUpdate(collar.collar_id);
   };
 
-  const onError = (error: AxiosError): void => responseDispatch({ severity: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void =>
+    responseDispatch({ severity: 'error', message: formatAxiosError(error) });
 
   const onDeleteSuccess = async (): Promise<void> => {
-    responseDispatch({ severity: 'success', message: `collar deleted successfully`});
+    responseDispatch({ severity: 'success', message: `collar deleted successfully` });
     if (typeof onDelete === 'function') {
       onDelete(editing.collar_id);
     }
@@ -67,7 +70,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
 
   const saveCollar = async (payload: IUpsertPayload<Collar>): Promise<void> => {
     await saveMutation(payload);
-  }
+  };
 
   const deleteCollar = async (): Promise<void> => {
     const payload: IDeleteType = {
@@ -78,24 +81,25 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   };
 
   const createDeleteMessage = (): string => {
-    const base = editing instanceof AttachedCollar
-      ? `CAREFUL! An animal is attached to this collar. `
-      : '';
+    const base = editing instanceof AttachedCollar ? `CAREFUL! An animal is attached to this collar. ` : '';
     return `${base}Deleting this collar will prevent other users from accessing it. Are you sure you want to delete it?`;
   };
 
   const handleConfirmDelete = (): void => {
-    deleteCollar()
+    deleteCollar();
     setShowConfirmDelete(false);
-  }
+  };
 
-  const passTheseProps: Pick<IAddEditProps<Collar>, 'onDelete' | 'onSave' | 'cannotEdit' | 'editing' | 'queryStatus'> = {
+  const passTheseProps: Pick<
+    IAddEditProps<Collar>,
+    'onDelete' | 'onSave' | 'cannotEdit' | 'editing' | 'queryStatus'
+  > = {
     cannotEdit: !canEdit,
-    onDelete: (): void => setShowConfirmDelete(o => !o),
+    onDelete: (): void => setShowConfirmDelete((o) => !o),
     onSave: saveCollar,
     editing: device,
     queryStatus: status
-  }
+  };
 
   return (
     <>
@@ -108,5 +112,5 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
       />
       {cloneElement(children, passTheseProps)}
     </>
-  )
+  );
 }

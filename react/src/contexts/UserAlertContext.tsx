@@ -27,19 +27,21 @@ export const AlertContextDispatch = createContext(null);
 
 export const AlertStateContextProvider: React.FC = (props) => {
   const api = useTelemetryApi();
-  const useUser = useContext(UserContext);
+  //const useUser = useContext(UserContext);
 
   const [alertContext, setAlertContext] = useState<IAlertContext<any> | null>(null);
-  const [shouldFetchAlerts, setShouldFetchAlerts] = useState(false);
+  //const [shouldFetchAlerts, setShouldFetchAlerts] = useState(false);
 
-  const { data, status, error, dataUpdatedAt } = api.useAlert({ enabled: shouldFetchAlerts });
+  const { data, status, error, dataUpdatedAt } = api.useAlert({
+    enabled: ENABLE_ALERTS
+  });
 
   // until the user is loaded, don't bother fetching alerts
-  useEffect(() => {
-    // console.log('should fetch alerts', !!useUser?.user);
-    //Issue in get_user_telemetry_alerts query returning more than one result...
-    ENABLE_ALERTS && setShouldFetchAlerts(!!useUser?.user);
-  }, [useUser]);
+  // useEffect(() => {
+  //   // console.log('should fetch alerts', !!useUser?.user);
+  //   //Issue in get_user_telemetry_alerts query returning more than one result...
+  //   ENABLE_ALERTS && setShouldFetchAlerts(!!useUser?.user);
+  // }, [useUser]);
 
   /**
    * also watching @var dataUpdatedAt for query invalidations

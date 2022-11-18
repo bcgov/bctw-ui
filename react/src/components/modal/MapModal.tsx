@@ -1,33 +1,22 @@
-import * as L from 'leaflet'; // must be imported first
-import 'leaflet.markercluster';
-import 'pages/map/MapPage.scss';
-import 'leaflet-draw';
-import 'leaflet-draw/dist/leaflet.draw.css';
-import 'leaflet/dist/leaflet.css';
+import { Box, CircularProgress } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
 import modalStyles from 'components/modal/modal_styles';
-import { Modal } from 'components/common';
 import dayjs, { Dayjs } from 'dayjs';
-import { Box, Button, CircularProgress } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
-import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import {
-  defaultPointStyle,
-  getStyle,
-  highlightLatestPings,
-  highlightPings,
-  selectedPointStyle,
-  setupLatestPingOptions,
-  setupPingOptions,
-  setupSelectedPings,
-  setupTracksOptions,
-  symbolizePings
-} from 'pages/map/point_setup';
-import { ITelemetryPoint } from 'types/map';
-import { formatDay, getToday } from 'utils/time';
+import * as L from 'leaflet'; // must be imported first
+import 'leaflet-draw';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet.markercluster';
+import 'leaflet/dist/leaflet.css';
+import 'pages/map/MapPage.scss';
 import { splitPings } from 'pages/map/map_helpers';
-import makeStyles from '@mui/styles/makeStyles';
+import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
+import { getStyle, setupLatestPingOptions, setupPingOptions, setupTracksOptions } from 'pages/map/point_setup';
+import { useEffect, useRef, useState } from 'react';
+import { ITelemetryPoint } from 'types/map';
+import { formatDay } from 'utils/time';
 
 /**
  * Props for a map modal that can display critter points and tracks.

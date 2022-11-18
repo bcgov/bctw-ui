@@ -6,15 +6,17 @@ import { SpeciesProvider } from 'contexts/SpeciesContext';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useContext, useEffect, useState } from 'react';
 import { UserAnimalAccess } from './UserAnimalAccess';
-
-import { NotificationBanner } from 'components/common/Banner';
-import { NotificationsMenu } from 'components/common/partials/NotificationsMenu';
+import { NotificationBanner } from 'components/alerts/Banner';
 import { QuickSummary } from 'components/common/QuickSummary';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 import { CritterDataTables } from './CritterDataTables';
 import { AlertContext } from 'contexts/UserAlertContext';
-import { FormatAlert } from 'components/common/partials/FormatAlert';
+import { FormatAlert } from 'components/alerts/FormatAlert';
 import { TelemetryAlert } from 'types/alert';
+import dayjs from 'dayjs';
+import AlertActions from 'components/alerts/AlertActions';
+import { AlertBanner } from 'components/alerts/AlertBanner';
+
 export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
@@ -29,7 +31,11 @@ export default function CritterPage(): JSX.Element {
   };
   useEffect(() => {
     if (useAlert?.alerts?.length) {
-      setAlerts(useAlert.alerts);
+      //Set only the valid (null valid_to) alerts where snoozed_to date < today
+      const nonSnoozedValidAlerts = useAlert.alerts.filter(
+        (a) => !a.valid_to.isValid() && !(dayjs(a.snoozed_to).diff(dayjs()) > 0)
+      );
+      setAlerts(nonSnoozedValidAlerts);
     }
   }, [useAlert]);
   return (
@@ -38,8 +44,6 @@ export default function CritterPage(): JSX.Element {
         <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
-            {/* Might be adding this back */}
-            {/* <NotificationsMenu /> */}
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
               {CritterStrings.manageMyAnimals}
             </Button>
@@ -51,11 +55,7 @@ export default function CritterPage(): JSX.Element {
             </FullScreenDialog>
           </Box>
         </Box>
-        <NotificationBanner
-          hiddenContent={alerts.map((alert) => (
-            <FormatAlert alert={alert} format='banner' />
-          ))}
-        />
+        <AlertBanner />
         <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
         <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
           <CritterDataTables />

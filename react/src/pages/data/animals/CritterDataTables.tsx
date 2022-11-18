@@ -12,7 +12,7 @@ import { Animal, AttachedAnimal } from 'types/animal';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 
-import { ActionsMenu } from 'components/common/partials/ActionsMenu';
+import { ActionsMenu } from 'components/common/ActionsMenu';
 import { useHistory } from 'react-router-dom';
 import { CollarHistory } from 'types/collar_history';
 import { WorkflowType } from 'types/events/event';
@@ -25,6 +25,9 @@ import { buttonProps } from 'components/component_constants';
 
 export const CritterDataTables = (): JSX.Element => {
   const api = useTelemetryApi();
+  const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedAnimal[]>([]);
+  const [animalData, setAnimalData] = useState<Animal[]>([]);
+
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as AttachedAnimal);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
@@ -37,6 +40,7 @@ export const CritterDataTables = (): JSX.Element => {
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
+  const lastDt = editObj?.last_transmission_date;
 
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
@@ -55,10 +59,6 @@ export const CritterDataTables = (): JSX.Element => {
     disableDelete: true,
     modalControl: true
   };
-
-  useEffect(() => {
-    console.log("EditObj last date " + editObj.last_transmission_date);
-  }, [editObj]);
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
@@ -122,29 +122,22 @@ export const CritterDataTables = (): JSX.Element => {
         <Box mb={4}>
           <DataTable
             headers={AttachedAnimal.attachedCritterDisplayProps}
-            queryProps={{ query: api.useAssignedCritters }}
+            queryProps={{
+              query: api.useAssignedCritters,
+              onNewData: (data: AttachedAnimal[]) => setAttachedAnimalData(data)
+            }}
             onSelect={handleSelect}
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+            allRecords
             exporter={
               <>
                 <ExportViewer<AttachedAnimal>
-                  template={[
-                    'critter_id',
-                    'species',
-                    'population_unit',
-                    'wlh_id',
-                    'animal_id',
-                    'collar_id',
-                    'device_id',
-                    'frequency',
-                    'animal_id',
-                    'latitude',
-                    'longitude'
-                  ]}
+                  template={AttachedAnimal.attachedCritterDisplayProps}
                   eTitle={CritterStrings.exportTitle}
+                  data={attachedAnimalData}
                 />
               </>
             }
@@ -154,12 +147,13 @@ export const CritterDataTables = (): JSX.Element => {
           <DataTable
             headers={new Animal().displayProps}
             //title={CS.unassignedTableTitle}
-            queryProps={{ query: api.useUnassignedCritters }}
+            queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Animal[]) => setAnimalData(data) }}
             onSelect={handleSelect}
             updated={updated}
             deleted={deleted}
             title={CritterStrings.nonCollaredAnimals}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+            allRecords
             exporter={
               <>
                 <Box ml={1}>
@@ -172,16 +166,9 @@ export const CritterDataTables = (): JSX.Element => {
                   </Button>
                 </Box>
                 <ExportViewer<Animal>
-                  template={[
-                    'critter_id',
-                    'species',
-                    'population_unit',
-                    'wlh_id',
-                    'animal_id',
-                    'animal_id',
-                    'animal_status'
-                  ]}
+                  template={new Animal().displayProps}
                   eTitle={CritterStrings.exportTitle}
+                  data={animalData}
                 />
               </>
             }
@@ -193,8 +180,8 @@ export const CritterDataTables = (): JSX.Element => {
           title={`Recent Animal Movement`}
           open={openMap}
           handleClose={(v: boolean) => setOpenMap(v)}
-          startDate={ editObj.last_transmission_date?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks') }
-          endDate={ editObj.last_transmission_date ?? dayjs() }
+          startDate={lastDt && lastDt.isValid() ? lastDt.subtract(24, 'weeks') : dayjs().subtract(24, 'weeks')}
+          endDate={lastDt && lastDt.isValid() ? lastDt : dayjs()}
           width={'800px'}
           height={'600px'}
           critter_id={editObj.critter_id}

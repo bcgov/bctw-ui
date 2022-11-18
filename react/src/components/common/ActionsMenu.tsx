@@ -6,6 +6,8 @@ interface IMenuItem {
   label: string;
   icon?: JSX.Element;
   handleClick?: () => void;
+  disableMenuItem?: boolean;
+  disableMsg?: string;
 }
 interface IActionsMenu {
   menuItems: IMenuItem[];
@@ -37,10 +39,11 @@ export const ActionsMenu = ({ menuItems, disabled }: IActionsMenu): JSX.Element 
       </IconButton>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {menuItems.map((item, idx) => {
-          const { label, icon, handleClick } = item;
+          const { label, icon, handleClick, disableMenuItem } = item;
           return (
             <MenuItem
               key={`menu-item-${idx}`}
+              disabled={disableMenuItem}
               onClick={() => {
                 if (handleClick) {
                   handleClick();

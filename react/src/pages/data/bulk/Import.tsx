@@ -23,7 +23,7 @@ const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme) => ({
   spacing: {
-      marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2)
   },
   spacingTopBottom: {
     marginTop: theme.spacing(2),
@@ -73,8 +73,7 @@ export default function Import(): JSX.Element {
     }
     if(sanitizedImport?.every(sheet => sheet.rows.every(o => o.success))) {
       setCanFinalize(true);
-    }
-    else {
+    } else {
       setCanFinalize(false);
     }
   }, [sanitizedImport]);
@@ -84,6 +83,8 @@ export default function Import(): JSX.Element {
     if(d.length) {
       console.log(d);
       setSanitizedImport(d);
+    } else {
+      showNotif({ severity: 'error', message: 'The data sanitization process failed.' });
     }
     else {
       showNotif({severity: 'error', message: 'The data sanitization process failed.'})
@@ -96,20 +97,26 @@ export default function Import(): JSX.Element {
 
   const successFinalize = (d: IBulkUploadResults<unknown>): void => {
     console.log(JSON.stringify(d, null, 2));
-  }
+  };
 
   const errorFinalize = (): void => {
-    showNotif({severity: 'error', message: 'An error was encountered when trying to finalize the data upload.'});
-  }
+    showNotif({ severity: 'error', message: 'An error was encountered when trying to finalize the data upload.' });
+  };
 
   // setup the import mutation
-  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = api.useUploadXLSX({ onSuccess: successXLSX, onError: errorXLSX });
-  const { mutateAsync: mutateFinalize, data: dataFinalize } = api.useFinalizeXLSX({ onSuccess: successFinalize, onError: errorFinalize });
+  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = api.useUploadXLSX({
+    onSuccess: successXLSX,
+    onError: errorXLSX
+  });
+  const { mutateAsync: mutateFinalize, data: dataFinalize } = api.useFinalizeXLSX({
+    onSuccess: successFinalize,
+    onError: errorFinalize
+  });
   const { data: keyXdata } = api.useGetCollarKeyX();
  
   const handleFileChange = (fieldName: string, files: FileList): void => {
-    if(files[0].size > SIZE_LIMIT) {
-      showNotif({severity: 'error', message: 'This file exceeds the 30MB limit.'})
+    if (files[0].size > SIZE_LIMIT) {
+      showNotif({ severity: 'error', message: 'This file exceeds the 30MB limit.' });
       return;
     }
     save(createFormData(fieldName, files));
@@ -119,13 +126,12 @@ export default function Import(): JSX.Element {
   const save = async (form: FormData): Promise<ParsedXLSXSheetResult[]> => {
     try {
       return await mutateAsync(form);
-    }
-    catch (err) {
+    } catch (err) {
       const e = err as AxiosError;
-      showNotif({severity: 'error', message: e.message});
+      showNotif({ severity: 'error', message: e.message });
       return null;
     }
-  }
+  };
 
   const handleChangeTab = (event: SyntheticEvent<Element>, newVal: TabNames): void => {
     setCurrentTab(newVal);
@@ -150,7 +156,7 @@ export default function Import(): JSX.Element {
       headers = sheet.headers;
     }
     return headers;
-  }
+  };
 
   const getTableData = () => {
     const rows = getCurrentSheet().rows.map((o,idx) => {
@@ -159,7 +165,7 @@ export default function Import(): JSX.Element {
     console.log("For this: " + JSON.stringify(getCurrentSheet()));
     console.log({rows});
     return rows;
-  }
+  };
 
   const computeExcelHeaderRow = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean) => {
     const headers = ['1'];
@@ -169,7 +175,7 @@ export default function Import(): JSX.Element {
     });
 
     return headers as string[];
-  }
+  };
 
   const getTableHelpMessages = (sheet: ParsedXLSXSheetResult) => {
     const messages = sheet.rows.map((e, idx) => {
@@ -179,13 +185,13 @@ export default function Import(): JSX.Element {
       }, {}) 
     });
     return messages;
-  }
+  };
 
   return (
     <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Data Import</h1>
-        <Paper className={styles.spacing} style={{padding: '24px'}}>
+        <Paper className={styles.spacing} style={{ padding: '24px' }}>
           <Box display='flex'>
             <SubHeader text={constants.importToolHeader}/>
             <Button href={createUrl({api: 'get-template', query: 'file_key=import_template'})} style={{marginLeft: 'auto'}} variant='outlined'>
@@ -282,7 +288,6 @@ export default function Import(): JSX.Element {
         >
           {selectedError?.valid_values?.map(o => { return(<><Typography>{o}</Typography></>)})}
         </Modal>
-
 
         {/*
         <Typography mb={3} variant='body1' component='p'>Import metadata via CSV file.</Typography>

@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     width: '100%',
     marginBottom: theme.spacing(2),
-    '& .MuiAlert-message' : {
+    '& .MuiAlert-message': {
       flexGrow: 1
     }
   },
@@ -17,11 +17,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 2
   },
   info: {
-    alignItems: 'center',
-    flexWrap: 'wrap'
+    alignItems: 'center'
+    // flexWrap: 'wrap'
   },
   spacing: {
     paddingTop: theme.spacing(2)
+  },
+  widthFix: {
+    '& .MuiAlert-message': {
+      flexGrow: 1
+    }
   }
 }));
 interface BannerProps {
@@ -48,7 +53,6 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
       <Alert
         severity={variant}
         icon={icon}
-        className={style[variant]}
         action={
           action && hiddenContent ? (
             <IconButton

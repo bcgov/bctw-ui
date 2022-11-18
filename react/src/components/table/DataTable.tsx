@@ -1,32 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
 import {
+  Box,
+  Checkbox,
+  CircularProgress,
+  Divider,
   Table,
   TableBody,
   TableCell,
-  TableRow,
-  Checkbox,
-  CircularProgress,
-  TableFooter,
   TablePagination,
-  Divider,
-  Box
+  TableRow
 } from '@mui/material';
+import { AxiosError } from 'axios';
 import TableContainer from 'components/table/TableContainer';
-import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
-import PaginationActions from 'components/table/TablePaginate';
-import { ICustomTableColumn, ITableFilter, DataTableProps, Order } from 'components/table/table_interfaces';
-import { AxiosError } from 'axios';
+import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
+import { DataTableProps, ICustomTableColumn, ITableFilter, Order } from 'components/table/table_interfaces';
+import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { useEffect, useMemo, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
-import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import './table.scss';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import { AttachedAnimal } from 'types/animal';
-import { CritterStrings } from 'constants/strings';
-import { ActionsMenu } from 'components/common/partials/ActionsMenu';
 
 // note: const override for disabling pagination
 const DISABLE_PAGINATION = false;
@@ -47,6 +41,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   exporter,
   resetSelections,
   disableSearch,
+  allRecords,
   paginate = true,
   isMultiSelect = false,
   isMultiSearch = false,
@@ -62,9 +57,9 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [rowIdentifier, setRowIdentifier] = useState('id');
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   //const [totalPages, setTotalPages] = useState<number | null>(1);
-  const [totalRows, setTotalRows] = useState(0);
+  const [totalRows, setTotalRows] = useState<number>(0);
 
   const isPaginate = paginate && !DISABLE_PAGINATION;
 
@@ -75,9 +70,6 @@ export default function DataTable<T extends BCTWBase<T>>({
    */
   const [values, setValues] = useState<T[]>([]);
 
-  useEffect(() => {
-    console.log(page);
-  }, [page]);
   useEffect(() => {
     setSelected([]);
   }, [resetSelections]);
@@ -100,20 +92,29 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
-    page,
+    allRecords ? 0 : page,
     param,
     filter
   );
 
   const handleRows = (): void => {
-    if (!data?.length) {
-      setTotalRows(0);
-      return;
+    if (data?.length) {
+      const rowCount = data[0]?.row_count;
+      if (rowCount) {
+        setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
+      }
     }
-    const rowCount = data[0]?.row_count;
-    if (rowCount) {
-      setTotalRows(rowCount);
-    }
+    // if (!data?.length) {
+    //   return;
+    // }
+
+    // if (rowCount) {
+    //   // This shouldnt have to be cast to a number
+    //   // TODO: Find in DB where row_count is string (should be a number)
+    //   setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
+    // } else {
+    //   setTotalRows(data.length);
+    // }
   };
   useEffect(() => {
     handleRows();
@@ -189,10 +190,12 @@ export default function DataTable<T extends BCTWBase<T>>({
       setSelected([id]);
       // a row can only be selected from the current pages data set
       // fixme: why ^?
-      const row = values[idx];
+      const i = values.findIndex((v) => v[rowIdentifier] === id);
+      const row = values[i];
       if (row) {
         onSelect(row);
       }
+      // onSelect(selected.indexOf(id))
     }
     // will be null unless parent component wraps RowSelectedProvider
     if (typeof dispatchRowSelected === 'function') {
@@ -231,7 +234,8 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   const handlePageChange = (event: React.MouseEvent<unknown>, p: number): void => {
     // TablePagination is zero index. Adding 1 fixes second page results from not refreshing.
-    setPage(p + 1);
+    console.log(p);
+    setPage(p);
   };
 
   const handleFilter = (filter: ITableFilter): void => {
@@ -374,9 +378,9 @@ export default function DataTable<T extends BCTWBase<T>>({
               showFirstButton
               rowsPerPageOptions={[]}
               component='div'
-              count={totalRows as number}
+              count={totalRows}
               rowsPerPage={ROWS_PER_PAGE}
-              page={page - 1}
+              page={page}
               onPageChange={handlePageChange}
             />
           </Box>

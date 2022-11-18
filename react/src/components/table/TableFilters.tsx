@@ -88,7 +88,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
 
   const handleTextChange = (value: string): void => {
     setSearchStr(value);
-    setPage(1);
+    setPage(0);
   };
 
   // useMemo to minimize re-rendering
