@@ -9,7 +9,7 @@ import { Collar } from 'types/collar';
 import { CellErrorDescriptor, IBulkUploadResults, ParsedXLSXSheetResult } from 'api/api_interfaces';
 import AuthLayout from 'pages/layouts/AuthLayout';
 import { eUserRole } from 'types/user';
-import { Banner, SuccessBanner } from 'components/common/Banner';
+import { SuccessBanner, Banner } from 'components/alerts/Banner';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import HighlightTable from 'components/table/HighlightTable';
 import makeStyles from '@mui/styles/makeStyles';
@@ -17,7 +17,7 @@ import Checkbox from 'components/form/Checkbox';
 import { AxiosError } from 'axios';
 import FileInputValidation from 'components/form/FileInputValidation';
 import { ImportStrings as constants } from 'constants/strings';
-import {computeXLSXCol, collectErrorsFromResults, getAllUniqueKeys } from './xlsx_helpers'
+import { computeXLSXCol, collectErrorsFromResults, getAllUniqueKeys } from './xlsx_helpers';
 
 const SIZE_LIMIT = 31457280;
 
@@ -67,29 +67,25 @@ export default function Import(): JSX.Element {
   const styles = useStyles();
 
   useEffect(() => {
-    if(!sanitizedImport || !sanitizedImport?.length) {
+    if (!sanitizedImport || !sanitizedImport?.length) {
       setCanFinalize(false);
       return;
     }
-    if(sanitizedImport?.every(sheet => sheet.rows.every(o => o.success))) {
+    if (sanitizedImport?.every((sheet) => sheet.rows.every((o) => o.success))) {
       setCanFinalize(true);
     } else {
       setCanFinalize(false);
     }
   }, [sanitizedImport]);
 
-
   const successXLSX = (d: ParsedXLSXSheetResult[]) => {
-    if(d.length) {
+    if (d.length) {
       console.log(d);
       setSanitizedImport(d);
     } else {
       showNotif({ severity: 'error', message: 'The data sanitization process failed.' });
     }
-    else {
-      showNotif({severity: 'error', message: 'The data sanitization process failed.'})
-    }
-  } 
+  };
 
   const errorXLSX = (): void => {
     showNotif({ severity: 'error', message: 'bulk upload failed' });
@@ -113,7 +109,7 @@ export default function Import(): JSX.Element {
     onError: errorFinalize
   });
   const { data: keyXdata } = api.useGetCollarKeyX();
- 
+
   const handleFileChange = (fieldName: string, files: FileList): void => {
     if (files[0].size > SIZE_LIMIT) {
       showNotif({ severity: 'error', message: 'This file exceeds the 30MB limit.' });
@@ -139,31 +135,30 @@ export default function Import(): JSX.Element {
 
   const getCurrentSheet = (): ParsedXLSXSheetResult => {
     return currentTab === TabNames.metadata ? sanitizedImport[0] : sanitizedImport[1];
-  }
+  };
 
   const handleCellSelected = (row_idx, cellname) => {
     const sheet = getCurrentSheet();
     setSelectedError(sheet.rows[row_idx].errors[cellname]);
-    setSelectedCell({row: row_idx, col: cellname});
-  }
+    setSelectedCell({ row: row_idx, col: cellname });
+  };
 
   const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
     let headers = [];
-    if(hideEmpty) {
+    if (hideEmpty) {
       headers = [...getAllUniqueKeys(sheet)];
-    }
-    else {
+    } else {
       headers = sheet.headers;
     }
     return headers;
   };
 
   const getTableData = () => {
-    const rows = getCurrentSheet().rows.map((o,idx) => {
-      return {row_index: idx + 2, ...o.row}
+    const rows = getCurrentSheet().rows.map((o, idx) => {
+      return { row_index: idx + 2, ...o.row };
     }) as any[];
-    console.log("For this: " + JSON.stringify(getCurrentSheet()));
-    console.log({rows});
+    console.log('For this: ' + JSON.stringify(getCurrentSheet()));
+    console.log({ rows });
     return rows;
   };
 
@@ -171,7 +166,7 @@ export default function Import(): JSX.Element {
     const headers = ['1'];
     getHeaders(sheet, hideEmpty).forEach((o) => {
       const idx = sheet.headers.indexOf(o);
-      headers.push( computeXLSXCol(idx) );
+      headers.push(computeXLSXCol(idx));
     });
 
     return headers as string[];
@@ -179,10 +174,10 @@ export default function Import(): JSX.Element {
 
   const getTableHelpMessages = (sheet: ParsedXLSXSheetResult) => {
     const messages = sheet.rows.map((e, idx) => {
-       return Object.entries(e.errors).reduce((prev, curr) => { 
+      return Object.entries(e.errors).reduce((prev, curr) => {
         const headerIdx = sheet.headers.indexOf(curr[0]);
-        return {...prev, [curr[0]]: `${computeXLSXCol(headerIdx)}${idx + 2}: ${curr[1].desc}`} 
-      }, {}) 
+        return { ...prev, [curr[0]]: `${computeXLSXCol(headerIdx)}${idx + 2}: ${curr[1].desc}` };
+      }, {});
     });
     return messages;
   };
@@ -193,16 +188,16 @@ export default function Import(): JSX.Element {
         <h1>Data Import</h1>
         <Paper className={styles.spacing} style={{ padding: '24px' }}>
           <Box display='flex'>
-            <SubHeader text={constants.importToolHeader}/>
-            <Button href={createUrl({api: 'get-template', query: 'file_key=import_template'})} style={{marginLeft: 'auto'}} variant='outlined'>
-                {constants.downloadButton}
+            <SubHeader text={constants.importToolHeader} />
+            <Button
+              href={createUrl({ api: 'get-template', query: 'file_key=import_template' })}
+              style={{ marginLeft: 'auto' }}
+              variant='outlined'>
+              {constants.downloadButton}
             </Button>
           </Box>
           <Box className={styles.spacing}>
-            <Banner
-              variant='info'
-              text={constants.infoBullets}  
-            />
+            <Banner variant='info' text={constants.infoBullets} />
           </Box>
           <FileInputValidation
             onFileChosen={handleFileChange}
@@ -215,78 +210,95 @@ export default function Import(): JSX.Element {
           />
           {sanitizedImport?.length > 0 && (
             <>
-            <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
-            {canFinalize ?
-              (<SuccessBanner
-                text={constants.successBanner}
-              />)
-              : 
-              (<>
-              <Banner
-                variant='error'
-                text={constants.errorBanner} 
-                icon={<Icon icon='error'/>}
-                action='collapse'
-                hiddenContent={collectErrorsFromResults(getCurrentSheet()).map(a => <div>{a}</div>)} 
-              />
-              <Banner
-              variant='info'
-              text={
-                <Box alignItems={'center'} display='flex'>
-                  {selectedError ? `Row ${selectedCell.row + 2} "${selectedCell.col}": ${selectedError.help}` : constants.detailBannerIdle}
-                  {selectedError?.valid_values ? 
-                    <Button style={{height: '26px', marginLeft: 'auto'}} variant='contained' onClick={() => {setShowingValueModal(true)}}>Show Values</Button> 
-                    : 
-                    null
-                  }
-                </Box>
-              }
-              icon={<Icon icon='help'/>}
-              />
-              </>)
-            }
-            <Tabs value={currentTab} className='tabs' onChange={handleChangeTab}>
-              <Tab label={"Animal+Device Metadata"} value={TabNames.metadata} />
-              <Tab label={"Telemetry"} value={TabNames.telemetry} />
-            </Tabs>
-            {
-              getCurrentSheet().rows.length > 0 ?
-              (
+              <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
+              {canFinalize ? (
+                <SuccessBanner text={constants.successBanner} />
+              ) : (
                 <>
-                <HighlightTable
-                  data={getTableData()}
-                  headers={['row_index', ...getHeaders(getCurrentSheet(), hideEmptyColumns)] as any}
-                  secondaryHeaders={computeExcelHeaderRow(getCurrentSheet(), hideEmptyColumns)}
-                  onSelectCell={handleCellSelected}
-                  messages={getTableHelpMessages(getCurrentSheet())}
-                  rowIdentifier='row_index'
-                  dimFirstColumn={true}
-                />
+                  <Banner
+                    variant='error'
+                    text={constants.errorBanner}
+                    icon={<Icon icon='error' />}
+                    action='collapse'
+                    hiddenContent={collectErrorsFromResults(getCurrentSheet()).map((a) => (
+                      <div>{a}</div>
+                    ))}
+                  />
+                  <Banner
+                    variant='info'
+                    text={
+                      <Box alignItems={'center'} display='flex'>
+                        {selectedError
+                          ? `Row ${selectedCell.row + 2} "${selectedCell.col}": ${selectedError.help}`
+                          : constants.detailBannerIdle}
+                        {selectedError?.valid_values ? (
+                          <Button
+                            style={{ height: '26px', marginLeft: 'auto' }}
+                            variant='contained'
+                            onClick={() => {
+                              setShowingValueModal(true);
+                            }}>
+                            Show Values
+                          </Button>
+                        ) : null}
+                      </Box>
+                    }
+                    icon={<Icon icon='help' />}
+                  />
                 </>
-              )
-              : 
-              (
+              )}
+              <Tabs value={currentTab} className='tabs' onChange={handleChangeTab}>
+                <Tab label={'Animal+Device Metadata'} value={TabNames.metadata} />
+                <Tab label={'Telemetry'} value={TabNames.telemetry} />
+              </Tabs>
+              {getCurrentSheet().rows.length > 0 ? (
                 <>
-                <Paper className={styles.paper} >
-                  No data entered into this worksheet
-                </Paper>
+                  <HighlightTable
+                    data={getTableData()}
+                    headers={['row_index', ...getHeaders(getCurrentSheet(), hideEmptyColumns)] as any}
+                    secondaryHeaders={computeExcelHeaderRow(getCurrentSheet(), hideEmptyColumns)}
+                    onSelectCell={handleCellSelected}
+                    messages={getTableHelpMessages(getCurrentSheet())}
+                    rowIdentifier='row_index'
+                    dimFirstColumn={true}
+                  />
                 </>
-              )
-            }
-
+              ) : (
+                <>
+                  <Paper className={styles.paper}>No data entered into this worksheet</Paper>
+                </>
+              )}
             </>
           )}
           <Box display='flex'>
-            <Checkbox label={constants.checkboxLabel} propName={'hide-empty-col'} initialValue={hideEmptyColumns} changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}/>
-            <Button disabled={!canFinalize} className={styles.spacing} variant='contained' style={{marginLeft: 'auto'}}>Finalize Submission</Button>
+            <Checkbox
+              label={constants.checkboxLabel}
+              propName={'hide-empty-col'}
+              initialValue={hideEmptyColumns}
+              changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
+            />
+            <Button
+              disabled={!canFinalize}
+              className={styles.spacing}
+              variant='contained'
+              style={{ marginLeft: 'auto' }}>
+              Finalize Submission
+            </Button>
           </Box>
         </Paper>
         <Modal
           open={showingValueModal}
-          handleClose={() => {setShowingValueModal(false)}}
-          title={constants.validValuesModal}
-        >
-          {selectedError?.valid_values?.map(o => { return(<><Typography>{o}</Typography></>)})}
+          handleClose={() => {
+            setShowingValueModal(false);
+          }}
+          title={constants.validValuesModal}>
+          {selectedError?.valid_values?.map((o) => {
+            return (
+              <>
+                <Typography>{o}</Typography>
+              </>
+            );
+          })}
         </Modal>
 
         {/*
@@ -383,14 +395,14 @@ export default function Import(): JSX.Element {
     return <BasicTable data={toShow} headers={Object.keys(toShow[0])} rowIdentifier={'id'} />;
   };*/
 
-  /*
+/*
     // the radio button handler
   const changeImportType = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.value as eImportType;
     setImportType(val);
   };*/
 
-  /*
+/*
   useDidMountEffect(() => {
     const update = (): void => {
       switch (importType) {
@@ -424,7 +436,7 @@ export default function Import(): JSX.Element {
     }
   };*/
 
-  /*
+/*
   
 enum eImportType {
   animal = 'animal',
