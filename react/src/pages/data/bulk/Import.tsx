@@ -186,6 +186,11 @@ export default function Import(): JSX.Element {
     <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Data Import</h1>
+        <Tabs value={'a'} className='tabs' onChange={handleChangeTab} sx={{ backgroundColor: '#ffff' }}>
+          <Tab label={'Animal and Device'} value={'a'} />
+          <Tab label={'Telemetry'} value={'a'} />
+          <Tab label={'Vectronic KeyX'} value={'b'} />
+        </Tabs>
         <Paper className={styles.spacing} style={{ padding: '24px' }}>
           <Box display='flex'>
             <SubHeader text={constants.importToolHeader} />
