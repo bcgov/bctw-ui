@@ -18,7 +18,8 @@ export const PageTabs = ({ tabList, tab, handleTab, children }: PageTabsProps): 
   const firstTab = tab === 0;
   const tabIsSelected = (t: number): boolean => tab === t;
   return (
-    <Box width='100%' sx={{ ml: -1 }}>
+    //ml: -1 / mt: -1 is to prevent clipping issues with the boxShadow
+    <Box width='100%' sx={{ ml: -1, mt: -1 }}>
       <Tabs
         value={tab}
         sx={{
@@ -36,8 +37,9 @@ export const PageTabs = ({ tabList, tab, handleTab, children }: PageTabsProps): 
               boxShadow: tabIsSelected(i) ? 1 : 0,
               backgroundColor: tabIsSelected(i) && theme.palette.background.paper,
               //BR is same value paper override uses for borderRadius in appTheme
-              borderRadius: `${BR} ${BR} 0px 0px`,
-              ml: 1
+              borderRadius: `8px 8px 0px 0px`,
+              ml: 1,
+              mt: 1
             }}
           />
         ))}
@@ -49,7 +51,7 @@ export const PageTabs = ({ tabList, tab, handleTab, children }: PageTabsProps): 
           ml: 1,
           width: '100%',
           backgroundColor: theme.palette.background.paper,
-          borderRadius: firstTab ? `0px ${BR} ${BR} ${BR}` : `${BR} ${BR} ${BR} ${BR}`
+          borderRadius: firstTab ? `0px 8px 8px 8px` : `8px 8px 8px 8px`
         }}>
         {children}
       </Box>

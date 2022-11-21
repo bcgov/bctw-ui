@@ -18,6 +18,7 @@ import { AxiosError } from 'axios';
 import FileInputValidation from 'components/form/FileInputValidation';
 import { ImportStrings as constants } from 'constants/strings';
 import { computeXLSXCol, collectErrorsFromResults, getAllUniqueKeys } from './xlsx_helpers';
+import { PageTabs } from 'components/common/partials/PageTabs';
 
 const SIZE_LIMIT = 31457280;
 
@@ -64,6 +65,9 @@ export default function Import(): JSX.Element {
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [currentTab, setCurrentTab] = useState(TabNames.metadata);
 
+  const [tab, setTab] = useState(0);
+
+  const TABS = ['Animal and Device', 'Telemetry', 'Vectronic KeyX'];
   const styles = useStyles();
 
   useEffect(() => {
@@ -186,111 +190,111 @@ export default function Import(): JSX.Element {
     <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Data Import</h1>
-        <Tabs value={'a'} className='tabs' onChange={handleChangeTab} sx={{ backgroundColor: '#ffff' }}>
-          <Tab label={'Animal and Device'} value={'a'} />
-          <Tab label={'Telemetry'} value={'a'} />
-          <Tab label={'Vectronic KeyX'} value={'b'} />
-        </Tabs>
-        <Paper className={styles.spacing} style={{ padding: '24px' }}>
-          <Box display='flex'>
-            <SubHeader text={constants.importToolHeader} />
-            <Button
-              href={createUrl({ api: 'get-template', query: 'file_key=import_template' })}
-              style={{ marginLeft: 'auto' }}
-              variant='outlined'>
-              {constants.downloadButton}
-            </Button>
-          </Box>
-          <Box className={styles.spacing}>
-            <Banner variant='info' text={constants.infoBullets} />
-          </Box>
-          <FileInputValidation
-            onFileChosen={handleFileChange}
-            trashIconClick={() => setSanitizedImport(null)}
-            validationSuccess={canFinalize}
-            buttonText={constants.uploadButton}
-            buttonVariant='text'
-            accept='.xlsx'
-            isLoading={isLoading}
-          />
-          {sanitizedImport?.length > 0 && (
-            <>
-              <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
-              {canFinalize ? (
-                <SuccessBanner text={constants.successBanner} />
-              ) : (
+        <Box mt={2}>
+          <PageTabs tab={tab} tabList={TABS} handleTab={setTab}>
+            <Box className={styles.spacing} p={2}>
+              <Box display='flex'>
+                <SubHeader text={constants.importToolHeader} />
+                <Button
+                  href={createUrl({ api: 'get-template', query: 'file_key=import_template' })}
+                  style={{ marginLeft: 'auto' }}
+                  variant='outlined'>
+                  {constants.downloadButton}
+                </Button>
+              </Box>
+              <Box className={styles.spacing}>
+                <Banner variant='info' text={constants.infoBullets} />
+              </Box>
+              <FileInputValidation
+                onFileChosen={handleFileChange}
+                trashIconClick={() => setSanitizedImport(null)}
+                validationSuccess={canFinalize}
+                buttonText={constants.uploadButton}
+                buttonVariant='text'
+                accept='.xlsx'
+                isLoading={isLoading}
+              />
+              {sanitizedImport?.length > 0 && (
                 <>
-                  <Banner
-                    variant='error'
-                    text={constants.errorBanner}
-                    icon={<Icon icon='error' />}
-                    action='collapse'
-                    hiddenContent={collectErrorsFromResults(getCurrentSheet()).map((a) => (
-                      <div>{a}</div>
-                    ))}
-                  />
-                  <Banner
-                    variant='info'
-                    text={
-                      <Box alignItems={'center'} display='flex'>
-                        {selectedError
-                          ? `Row ${selectedCell.row + 2} "${selectedCell.col}": ${selectedError.help}`
-                          : constants.detailBannerIdle}
-                        {selectedError?.valid_values ? (
-                          <Button
-                            style={{ height: '26px', marginLeft: 'auto' }}
-                            variant='contained'
-                            onClick={() => {
-                              setShowingValueModal(true);
-                            }}>
-                            Show Values
-                          </Button>
-                        ) : null}
-                      </Box>
-                    }
-                    icon={<Icon icon='help' />}
-                  />
+                  <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
+                  {canFinalize ? (
+                    <SuccessBanner text={constants.successBanner} />
+                  ) : (
+                    <>
+                      <Banner
+                        variant='error'
+                        text={constants.errorBanner}
+                        icon={<Icon icon='error' />}
+                        action='collapse'
+                        hiddenContent={collectErrorsFromResults(getCurrentSheet()).map((a) => (
+                          <div>{a}</div>
+                        ))}
+                      />
+                      <Banner
+                        variant='info'
+                        text={
+                          <Box alignItems={'center'} display='flex'>
+                            {selectedError
+                              ? `Row ${selectedCell.row + 2} "${selectedCell.col}": ${selectedError.help}`
+                              : constants.detailBannerIdle}
+                            {selectedError?.valid_values ? (
+                              <Button
+                                style={{ height: '26px', marginLeft: 'auto' }}
+                                variant='contained'
+                                onClick={() => {
+                                  setShowingValueModal(true);
+                                }}>
+                                Show Values
+                              </Button>
+                            ) : null}
+                          </Box>
+                        }
+                        icon={<Icon icon='help' />}
+                      />
+                    </>
+                  )}
+                  <Tabs value={currentTab} className='tabs' onChange={handleChangeTab}>
+                    <Tab label={'Animal+Device Metadata'} value={TabNames.metadata} />
+                    <Tab label={'Telemetry'} value={TabNames.telemetry} />
+                  </Tabs>
+                  {getCurrentSheet().rows.length > 0 ? (
+                    <>
+                      <HighlightTable
+                        data={getTableData()}
+                        headers={['row_index', ...getHeaders(getCurrentSheet(), hideEmptyColumns)] as any}
+                        secondaryHeaders={computeExcelHeaderRow(getCurrentSheet(), hideEmptyColumns)}
+                        onSelectCell={handleCellSelected}
+                        messages={getTableHelpMessages(getCurrentSheet())}
+                        rowIdentifier='row_index'
+                        dimFirstColumn={true}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Paper className={styles.paper}>No data entered into this worksheet</Paper>
+                    </>
+                  )}
                 </>
               )}
-              <Tabs value={currentTab} className='tabs' onChange={handleChangeTab}>
-                <Tab label={'Animal+Device Metadata'} value={TabNames.metadata} />
-                <Tab label={'Telemetry'} value={TabNames.telemetry} />
-              </Tabs>
-              {getCurrentSheet().rows.length > 0 ? (
-                <>
-                  <HighlightTable
-                    data={getTableData()}
-                    headers={['row_index', ...getHeaders(getCurrentSheet(), hideEmptyColumns)] as any}
-                    secondaryHeaders={computeExcelHeaderRow(getCurrentSheet(), hideEmptyColumns)}
-                    onSelectCell={handleCellSelected}
-                    messages={getTableHelpMessages(getCurrentSheet())}
-                    rowIdentifier='row_index'
-                    dimFirstColumn={true}
-                  />
-                </>
-              ) : (
-                <>
-                  <Paper className={styles.paper}>No data entered into this worksheet</Paper>
-                </>
-              )}
-            </>
-          )}
-          <Box display='flex'>
-            <Checkbox
-              label={constants.checkboxLabel}
-              propName={'hide-empty-col'}
-              initialValue={hideEmptyColumns}
-              changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
-            />
-            <Button
-              disabled={!canFinalize}
-              className={styles.spacing}
-              variant='contained'
-              style={{ marginLeft: 'auto' }}>
-              Finalize Submission
-            </Button>
-          </Box>
-        </Paper>
+              <Box display='flex'>
+                <Checkbox
+                  label={constants.checkboxLabel}
+                  propName={'hide-empty-col'}
+                  initialValue={hideEmptyColumns}
+                  changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
+                />
+                <Button
+                  disabled={!canFinalize}
+                  className={styles.spacing}
+                  variant='contained'
+                  style={{ marginLeft: 'auto' }}>
+                  Finalize Submission
+                </Button>
+              </Box>
+            </Box>
+          </PageTabs>
+        </Box>
+
         <Modal
           open={showingValueModal}
           handleClose={() => {
