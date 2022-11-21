@@ -48,6 +48,7 @@ const TEST_KEYX_PAYLOAD = {
   12345: false,
   98789: true
 };
+const TAB_LIST = ['Device and Animal', 'Telemetry', 'Vectronic KeyX'];
 
 /**
  * Testing area for UI comoponents.
@@ -68,24 +69,27 @@ export const DevPlayground = (): JSX.Element => {
 
       <Box sx={{ backgroundColor: background ? '#ffff' : 'transparent', display: 'flex', flexDirection: 'row' }}>
         {/* Place components below here */}
-        <Box sx={{ pr: 2 }}>
-          <KeyXUploader device_ids={DEVICE_IDS} />
-        </Box>
-        {/* <KeyXUploader /> */}
-        <TempComponent handleTab={setTab} tab={tab} tabList={['Device and Animal', 'Telemetry', 'Vectronic KeyX']}>
-          <h1>test</h1>
+        <TempComponent handleTab={setTab} tab={tab} tabList={TAB_LIST}>
+          <>
+            <h1>{TAB_LIST[tab]}</h1>
+            <SubHeader text={'Placeholder text'} />
+          </>
         </TempComponent>
+        {/* <Box sx={{ pr: 2 }}>
+          <KeyXUploader device_ids={DEVICE_IDS} />
+        </Box> */}
+        {/* <KeyXUploader /> */}
       </Box>
     </ManageLayout>
   );
 };
 
 // Modify styles here
+const r = '8px';
+const TAB_RADIUS = `${r} ${r} 0px 0px`;
+const BOX_RADIUS = `0px ${r} ${r} ${r}`;
+const BOX_SECONDARY_RADIUS = `${r} ${r} ${r} ${r}`;
 const useStyles = makeStyles((theme: Theme) => {
-  const r = '8px';
-  const TAB_RADIUS = `${r} ${r} 0px 0px`;
-  const BOX_RADIUS = `0px ${r} ${r} ${r}`;
-  const BOX_SECONDARY_RADIUS = `${r} ${r} ${r} ${r}`;
   return {
     root: { width: '100%' },
     tabs: {
@@ -119,21 +123,41 @@ interface TempComponentProps {
 // Temporarily build components down here for development
 const TempComponent = ({ tabList, tab, handleTab, children }: TempComponentProps): JSX.Element => {
   const styles = useStyles();
+  const theme = useTheme();
   const firstTab = tab === 0;
+  const tabIsSelected = (t: number): boolean => tab === t;
   return (
-    <Box className={styles.root}>
-      <Tabs value={tab} className={styles.tabs} sx={{ display: 'flex' }}>
+    <Box width='100%' sx={{ ml: -1 }}>
+      <Tabs
+        value={tab}
+        sx={{
+          '& .MuiTabs-indicator': {
+            display: 'none'
+          }
+        }}>
         {tabList.map((t, i) => (
           <Tab
             key={`tab-${i}`}
             label={t}
             onClick={() => handleTab(i)}
-            className={tab === i ? styles.selectedTab : styles.tab}
-            sx={tab === i && { boxShadow: 1, ml: 1 }}
+            sx={{
+              boxShadow: tabIsSelected(i) ? 1 : 0,
+              backgroundColor: tabIsSelected(i) && theme.palette.background.paper,
+              borderRadius: TAB_RADIUS,
+              ml: 1
+            }}
           />
         ))}
       </Tabs>
-      <Box ml={1} className={firstTab ? styles.box : styles.boxSecondary} p={2} sx={{ boxShadow: 1 }}>
+      <Box
+        p={2}
+        sx={{
+          boxShadow: 1,
+          ml: 1,
+          width: '100%',
+          backgroundColor: theme.palette.background.paper,
+          borderRadius: firstTab ? BOX_RADIUS : BOX_SECONDARY_RADIUS
+        }}>
         {children}
       </Box>
     </Box>
