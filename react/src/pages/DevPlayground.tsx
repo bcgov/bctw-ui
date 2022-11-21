@@ -10,7 +10,10 @@ import {
   Link,
   List,
   ListItem,
+  Paper,
+  Tab,
   TablePagination,
+  Tabs,
   Theme,
   Typography,
   useTheme
@@ -45,11 +48,7 @@ const TEST_KEYX_PAYLOAD = {
   12345: false,
   98789: true
 };
-
-// Modify styles here
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {}
-}));
+const TAB_LIST = ['Device and Animal', 'Telemetry', 'Vectronic KeyX'];
 
 /**
  * Testing area for UI comoponents.
@@ -57,6 +56,7 @@ const useStyles = makeStyles((theme: Theme) => ({
  */
 export const DevPlayground = (): JSX.Element => {
   const [background, setBackground] = useState(false);
+  const [tab, setTab] = useState(0);
   return (
     <ManageLayout>
       <h1>Dev Playground</h1>
@@ -66,23 +66,100 @@ export const DevPlayground = (): JSX.Element => {
           {`White Background - ${background}`}
         </Button>
       </Box>
+
       <Box sx={{ backgroundColor: background ? '#ffff' : 'transparent', display: 'flex', flexDirection: 'row' }}>
         {/* Place components below here */}
-        <Box sx={{ pr: 2 }}>
+        <TempComponent handleTab={setTab} tab={tab} tabList={TAB_LIST}>
+          <>
+            <h1>{TAB_LIST[tab]}</h1>
+            <SubHeader text={'Placeholder text'} />
+          </>
+        </TempComponent>
+        {/* <Box sx={{ pr: 2 }}>
           <KeyXUploader device_ids={DEVICE_IDS} />
-        </Box>
-        <KeyXUploader />
+        </Box> */}
+        {/* <KeyXUploader /> */}
       </Box>
     </ManageLayout>
   );
 };
 
+// Modify styles here
+const r = '8px';
+const TAB_RADIUS = `${r} ${r} 0px 0px`;
+const BOX_RADIUS = `0px ${r} ${r} ${r}`;
+const BOX_SECONDARY_RADIUS = `${r} ${r} ${r} ${r}`;
+const useStyles = makeStyles((theme: Theme) => {
+  return {
+    root: { width: '100%' },
+    tabs: {
+      '& .MuiTabs-indicator': {
+        display: 'none'
+      }
+    },
+    tab: { borderRadius: TAB_RADIUS },
+    selectedTab: { backgroundColor: theme.palette.background.paper, borderRadius: TAB_RADIUS },
+    box: {
+      width: '100%',
+      backgroundColor: theme.palette.background.paper,
+      borderRadius: BOX_RADIUS
+    },
+    boxSecondary: {
+      width: '100%',
+      backgroundColor: theme.palette.background.paper,
+      borderRadius: BOX_SECONDARY_RADIUS
+    }
+  };
+});
+
 // Interfaces / Types here
 interface TempComponentProps {
-  temp: boolean;
+  tabList: string[];
+  handleTab: (tabIdx: number) => void;
+  tab: number;
+  children?: JSX.Element;
 }
 
 // Temporarily build components down here for development
-const TempComponent = ({ temp }: TempComponentProps): JSX.Element => {
-  return <></>;
+const TempComponent = ({ tabList, tab, handleTab, children }: TempComponentProps): JSX.Element => {
+  const styles = useStyles();
+  const theme = useTheme();
+  const firstTab = tab === 0;
+  const tabIsSelected = (t: number): boolean => tab === t;
+  return (
+    <Box width='100%' sx={{ ml: -1 }}>
+      <Tabs
+        value={tab}
+        sx={{
+          '& .MuiTabs-indicator': {
+            display: 'none'
+          }
+        }}>
+        {tabList.map((t, i) => (
+          <Tab
+            key={`tab-${i}`}
+            label={t}
+            onClick={() => handleTab(i)}
+            sx={{
+              boxShadow: tabIsSelected(i) ? 1 : 0,
+              backgroundColor: tabIsSelected(i) && theme.palette.background.paper,
+              borderRadius: TAB_RADIUS,
+              ml: 1
+            }}
+          />
+        ))}
+      </Tabs>
+      <Box
+        p={2}
+        sx={{
+          boxShadow: 1,
+          ml: 1,
+          width: '100%',
+          backgroundColor: theme.palette.background.paper,
+          borderRadius: firstTab ? BOX_RADIUS : BOX_SECONDARY_RADIUS
+        }}>
+        {children}
+      </Box>
+    </Box>
+  );
 };

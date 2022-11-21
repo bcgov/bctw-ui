@@ -25,11 +25,13 @@ import QueryBuilder, { IFormRowEntry, QueryBuilderColumn, QueryBuilderOperator }
 import makeStyles from '@mui/styles/makeStyles';
 import { FeatureCollection } from 'geojson';
 import LocationSelect from 'components/form/LocationSelect';
+import { PageTabs } from 'components/common/partials/PageTabs';
 
 export interface DateRange {
   start: dayjs.Dayjs;
   end: dayjs.Dayjs;
 }
+export type ExportTab = 'Quick Export' | 'Advanced Export';
 
 export enum TabNames {
   quick,
@@ -75,10 +77,11 @@ export default function ExportPageV2(): JSX.Element {
 
   const operators: QueryBuilderOperator[] = ['Equals', 'Not Equals'];
   const columns: QueryBuilderColumn[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+  const TABS: ExportTab[] = ['Quick Export', 'Advanced Export'];
   const [start, setStart] = useState(dayjs().subtract(3, 'month'));
   const [end, setEnd] = useState(dayjs());
   const [builtRows, setBuiltRows] = useState<IFormRowEntry[]>([]);
-  const [tab, setTab] = useState<TabNames>(TabNames.quick);
+  const [tab, setTab] = useState(0);
   const [formsFilled, setFormsFilled] = useState(false);
   const [collarIDs, setCollarIDs] = useState([]);
   const [critterIDs, setCritterIDs] = useState([]);
@@ -103,7 +106,7 @@ export default function ExportPageV2(): JSX.Element {
 
   const { data: crittersData, isSuccess: critterSuccess } = api.useAssignedCritters(0);
 
-  const isTab = (tabName: TabNames): boolean => tabName === tab;
+  const isTab = (tabName: ExportTab): boolean => TABS[tab] === tabName;
 
   const handleChangeDate = (v: InboundObj): void => {
     const [key, value] = parseFormChangeResult(v);
@@ -139,97 +142,95 @@ export default function ExportPageV2(): JSX.Element {
       <Box className={styles.section} /*marginTop={'15px'}*/>
         <InfoBanner text={ExportStrings.infoBannerMesgs} />
       </Box>
-      <ContainerLayout>
-        <Tabs value={tab} className='tabs' onChange={handleChangeTab}>
-          <Tab label={ExportStrings.quickTabLabel} value={TabNames.quick} />
-          <Tab label={ExportStrings.advancedTabLabel} value={TabNames.advanced} />
-        </Tabs>
-        <Box className={styles.innerSection}>
-          <h2>{ExportStrings.dateRangeHeader}</h2>
-          <Box className={styles.dateBoxSpacing} columnGap={2}>
-            <Box className={styles.dateBoxInnerSpacing} columnGap={1}>
-              <DateInput
-                propName='tstart'
-                disabled={selectedLifetime}
-                label={MapStrings.startDateLabel}
-                defaultValue={dayjs(start)}
-                changeHandler={handleChangeDate}
-              />
+      <PageTabs tab={tab} handleTab={setTab} tabList={TABS}>
+        <ContainerLayout>
+          <Box className={styles.innerSection}>
+            <h2>{ExportStrings.dateRangeHeader}</h2>
+            <Box className={styles.dateBoxSpacing} columnGap={2}>
+              <Box className={styles.dateBoxInnerSpacing} columnGap={1}>
+                <DateInput
+                  propName='tstart'
+                  disabled={selectedLifetime}
+                  label={MapStrings.startDateLabel}
+                  defaultValue={dayjs(start)}
+                  changeHandler={handleChangeDate}
+                />
 
-              <DateInput
-                disabled={selectedLifetime}
-                propName='tend'
-                label={MapStrings.endDateLabel}
-                defaultValue={dayjs(end)}
-                changeHandler={handleChangeDate}
+                <DateInput
+                  disabled={selectedLifetime}
+                  propName='tend'
+                  label={MapStrings.endDateLabel}
+                  defaultValue={dayjs(end)}
+                  changeHandler={handleChangeDate}
+                />
+              </Box>
+              <Checkbox
+                propName={'animalLifetime'}
+                label={ExportStrings.checkboxLabel}
+                initialValue={selectedLifetime}
+                changeHandler={() => setSelectedLifetime((o) => !o)}
               />
             </Box>
-            <Checkbox
-              propName={'animalLifetime'}
-              label={ExportStrings.checkboxLabel}
-              initialValue={selectedLifetime}
-              changeHandler={() => setSelectedLifetime((o) => !o)}
-            />
           </Box>
-        </Box>
-        {isTab(TabNames.quick) && (
-          <>
-            <Box>
-              <h2 className={styles.disableSpacing}>{ExportStrings.animalTableHeader}</h2>
-              <DataTable
-                headers={AttachedAnimal.attachedCritterDisplayProps}
-                title={CS.assignedTableTitle}
-                onSelectMultiple={handleDataTableSelect}
-                queryProps={{ query: api.useAssignedCritters }}
-                isMultiSelect
-              />
-            </Box>
-            <Button
-              className='form-buttons'
-              disabled={!collarIDs.length}
-              onClick={() => {
-                setShowModal(true);
-              }}>
-              Export
-            </Button>
-          </>
-        )}
-        {isTab(TabNames.advanced) && (
-          <>
-            <h2>{ExportStrings.queryBuilderHeader}</h2>
-            <Box className={styles.queryRegionBox}>
-              <QueryBuilder
-                operators={operators}
-                columns={columns}
-                data={crittersData}
-                handleRowsUpdate={(r) => setBuiltRows(r)}
-              />
-            </Box>
-            <Box className={styles.innerSection}>
-              <h2>{ExportStrings.locationSelectHeader}</h2>
-              <LocationSelect handleDrawShape={handleDrawShape} />
-            </Box>
-            <Button disabled={!formsFilled} onClick={() => setShowModal(true)}>
-              Export
-            </Button>
-          </>
-        )}
+          {isTab('Quick Export') && (
+            <>
+              <Box>
+                <h2 className={styles.disableSpacing}>{ExportStrings.animalTableHeader}</h2>
+                <DataTable
+                  headers={AttachedAnimal.attachedCritterDisplayProps}
+                  title={CS.assignedTableTitle}
+                  onSelectMultiple={handleDataTableSelect}
+                  queryProps={{ query: api.useAssignedCritters }}
+                  isMultiSelect
+                />
+              </Box>
+              <Button
+                className='form-buttons'
+                disabled={!collarIDs.length}
+                onClick={() => {
+                  setShowModal(true);
+                }}>
+                Export
+              </Button>
+            </>
+          )}
+          {isTab('Advanced Export') && (
+            <>
+              <h2>{ExportStrings.queryBuilderHeader}</h2>
+              <Box className={styles.queryRegionBox}>
+                <QueryBuilder
+                  operators={operators}
+                  columns={columns}
+                  data={crittersData}
+                  handleRowsUpdate={(r) => setBuiltRows(r)}
+                />
+              </Box>
+              <Box className={styles.innerSection}>
+                <h2>{ExportStrings.locationSelectHeader}</h2>
+                <LocationSelect handleDrawShape={handleDrawShape} />
+              </Box>
+              <Button disabled={!formsFilled} onClick={() => setShowModal(true)}>
+                Export
+              </Button>
+            </>
+          )}
 
-        <ExportDownloadModal
-          exportType={tab}
-          open={showModal}
-          handleClose={() => {
-            setShowModal(false);
-          }}
-          rowEntries={builtRows}
-          critterIDs={critterIDs}
-          collarIDs={collarIDs}
-          postGISstrings={currentGeometry}
-          range={{
-            start: selectedLifetime ? dayjs('1970-01-01') : start,
-            end: selectedLifetime ? dayjs() : end
-          }}></ExportDownloadModal>
-      </ContainerLayout>
+          <ExportDownloadModal
+            exportType={TABS[tab]}
+            open={showModal}
+            handleClose={() => {
+              setShowModal(false);
+            }}
+            rowEntries={builtRows}
+            critterIDs={critterIDs}
+            collarIDs={collarIDs}
+            postGISstrings={currentGeometry}
+            range={{
+              start: selectedLifetime ? dayjs('1970-01-01') : start,
+              end: selectedLifetime ? dayjs() : end
+            }}></ExportDownloadModal>
+        </ContainerLayout>
+      </PageTabs>
     </ManageLayout>
   );
 }
