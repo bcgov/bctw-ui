@@ -1,6 +1,8 @@
 import { Box, Tab, Tabs, useTheme } from '@mui/material';
 import { BR } from 'themes/appTheme';
 
+// export const isTab = <T,>(tab: T, currentTab: T): boolean => tab === currentTab;
+
 interface PageTabsProps {
   tabList: string[];
   handleTab: (tabIdx: number) => void;
