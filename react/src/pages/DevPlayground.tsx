@@ -38,7 +38,7 @@ import ManageLayout from './layouts/ManageLayout';
 import { createFormData } from 'api/api_helpers';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
-import { KeyXUploader } from './vendor/KeyXUploader';
+import { KeyXUploader } from './data/bulk/ImportTabs/KeyXUploader';
 
 // Place constants here
 const TEST = 'Testing';
