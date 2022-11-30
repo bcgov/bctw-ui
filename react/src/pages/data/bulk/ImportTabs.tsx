@@ -2,7 +2,7 @@ import { Box, Button, Paper, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
 import { CellErrorDescriptor, ParsedXLSXSheetResult } from 'api/api_interfaces';
-import { Banner, SuccessBanner } from 'components/alerts/Banner';
+import { Banner, InfoBanner, SuccessBanner } from 'components/alerts/Banner';
 import { Icon } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import Checkbox from 'components/form/Checkbox';
@@ -101,8 +101,8 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 
   return (
     <Box p={2}>
-      <Box display='flex'>
-        <Box pb={2}>
+      <Box display='flex' alignItems='center'>
+        <Box>
           <SubHeader text={`${title} Import`} />
         </Box>
         <Button
@@ -111,6 +111,12 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
           variant='outlined'>
           {constants.downloadButton}
         </Button>
+      </Box>
+      <Box className={styles.spacing}>
+        <InfoBanner
+          //Dont love this, but enums are dumb
+          text={sheetIndex === SheetNames.Telemetry ? constants['Telemetry'] : constants['Animal and Device']}
+        />
       </Box>
       <FileInputValidation
         onFileChosen={setFile}
