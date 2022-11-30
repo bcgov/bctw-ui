@@ -19,9 +19,10 @@ import FileInputValidation from 'components/form/FileInputValidation';
 import { ImportStrings as constants } from 'constants/strings';
 import { computeXLSXCol, collectErrorsFromResults, getAllUniqueKeys } from './xlsx_helpers';
 import { PageTabs } from 'components/common/partials/PageTabs';
-import { KeyXUploader } from 'pages/data/bulk/ImportTabs/KeyXUploader';
 import useTabs from 'hooks/useTabs';
-import { ImportContainer } from './ImportTabs/ImportContainer';
+import { AnimalAndDeviceImportTab } from './ImportTabs';
+import { TelemetryImportTab } from './ImportTabs';
+import { KeyXImportTab } from './ImportTabs';
 
 const SIZE_LIMIT = 31457280;
 
@@ -188,7 +189,19 @@ export default function Import(): JSX.Element {
   };
 
   return (
-    <ImportContainer />
+    <AuthLayout required_user_role={eUserRole.data_administrator}>
+      <div className='container'>
+        <h1>Data Import</h1>
+        <Box mt={2}>
+          <PageTabs tabLabels={['Animal and Device', 'Telemetry', 'Vectronic KeyX']}>
+            <AnimalAndDeviceImportTab />
+            <TelemetryImportTab />
+            <KeyXImportTab />
+          </PageTabs>
+        </Box>
+      </div>
+    </AuthLayout>
+
     // <AuthLayout required_user_role={eUserRole.data_administrator}>
     //   <div className='container'>
     //     <h1>Data Import</h1>
@@ -220,71 +233,71 @@ export default function Import(): JSX.Element {
     //               isLoading={isLoading}
     //             />
     //           )}
-    //           {/* Animal and Device */}
-    //           {!isTab('Vectronic KeyX') && (
-    //             <>
-    //               {sanitizedImport?.length > 0 && (
-    //                 <>
-    //                   <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
-    //                   {canFinalize ? (
-    //                     <SuccessBanner text={constants.successBanner} />
-    //                   ) : (
-    //                     <>
-    //                       <Banner
-    //                         variant='error'
-    //                         text={constants.errorBanner}
-    //                         icon={<Icon icon='error' />}
-    //                         action='collapse'
-    //                         hiddenContent={collectErrorsFromResults(getCurrentSheet()).map((a) => (
-    //                           <div>{a}</div>
-    //                         ))}
-    //                       />
-    //                       <Banner
-    //                         variant='info'
-    //                         text={
-    //                           <Box alignItems={'center'} display='flex'>
-    //                             {selectedError
-    //                               ? `Row ${selectedCell.row + 2} "${selectedCell.col}": ${selectedError.help}`
-    //                               : constants.detailBannerIdle}
-    //                             {selectedError?.valid_values ? (
-    //                               <Button
-    //                                 style={{ height: '26px', marginLeft: 'auto' }}
-    //                                 variant='contained'
-    //                                 onClick={() => {
-    //                                   setShowingValueModal(true);
-    //                                 }}>
-    //                                 Show Values
-    //                               </Button>
-    //                             ) : null}
-    //                           </Box>
-    //                         }
-    //                         icon={<Icon icon='help' />}
-    //                       />
-    //                     </>
-    //                   )}
-    //                   {/* <Tabs value={currentTab} className='tabs' onChange={handleChangeTab}>
-    //                     <Tab label={'Animal+Device Metadata'} value={TabNames.metadata} />
-    //                     <Tab label={'Telemetry'} value={TabNames.telemetry} />
-    //                   </Tabs> */}
-    //                   {getCurrentSheet().rows.length > 0 ? (
-    //                     <>
-    //                       <HighlightTable
-    //                         data={getTableData()}
-    //                         headers={['row_index', ...getHeaders(getCurrentSheet(), hideEmptyColumns)] as any}
-    //                         secondaryHeaders={computeExcelHeaderRow(getCurrentSheet(), hideEmptyColumns)}
-    //                         onSelectCell={handleCellSelected}
-    //                         messages={getTableHelpMessages(getCurrentSheet())}
-    //                         rowIdentifier='row_index'
-    //                         dimFirstColumn={true}
-    //                       />
-    //                     </>
-    //                   ) : (
-    //                     <>
-    //                       <Paper className={styles.paper}>No data entered into this worksheet</Paper>
-    //                     </>
-    //                   )}
-    //                 </>
-    //               )}
+    // {/* Animal and Device */}
+    // {!isTab('Vectronic KeyX') && (
+    //   <>
+    //     {sanitizedImport?.length > 0 && (
+    //       <>
+    //         <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
+    //         {canFinalize ? (
+    //           <SuccessBanner text={constants.successBanner} />
+    //         ) : (
+    //           <>
+    //             <Banner
+    //               variant='error'
+    //               text={constants.errorBanner}
+    //               icon={<Icon icon='error' />}
+    //               action='collapse'
+    //               hiddenContent={collectErrorsFromResults(getCurrentSheet()).map((a) => (
+    //                 <div>{a}</div>
+    //               ))}
+    //             />
+    //             <Banner
+    //               variant='info'
+    //               text={
+    //                 <Box alignItems={'center'} display='flex'>
+    //                   {selectedError
+    //                     ? `Row ${selectedCell.row + 2} "${selectedCell.col}": ${selectedError.help}`
+    //                     : constants.detailBannerIdle}
+    //                   {selectedError?.valid_values ? (
+    //                     <Button
+    //                       style={{ height: '26px', marginLeft: 'auto' }}
+    //                       variant='contained'
+    //                       onClick={() => {
+    //                         setShowingValueModal(true);
+    //                       }}>
+    //                       Show Values
+    //                     </Button>
+    //                   ) : null}
+    //                 </Box>
+    //               }
+    //               icon={<Icon icon='help' />}
+    //             />
+    //           </>
+    //         )}
+    //         {/* <Tabs value={currentTab} className='tabs' onChange={handleChangeTab}>
+    //           <Tab label={'Animal+Device Metadata'} value={TabNames.metadata} />
+    //           <Tab label={'Telemetry'} value={TabNames.telemetry} />
+    //         </Tabs> */}
+    //         {getCurrentSheet().rows.length > 0 ? (
+    //           <>
+    //             <HighlightTable
+    //               data={getTableData()}
+    //               headers={['row_index', ...getHeaders(getCurrentSheet(), hideEmptyColumns)] as any}
+    //               secondaryHeaders={computeExcelHeaderRow(getCurrentSheet(), hideEmptyColumns)}
+    //               onSelectCell={handleCellSelected}
+    //               messages={getTableHelpMessages(getCurrentSheet())}
+    //               rowIdentifier='row_index'
+    //               dimFirstColumn={true}
+    //             />
+    //           </>
+    //         ) : (
+    //           <>
+    //             <Paper className={styles.paper}>No data entered into this worksheet</Paper>
+    //           </>
+    //         )}
+    //       </>
+    //     )}
     //               <Box display='flex'>
     //                 <Checkbox
     //                   label={constants.checkboxLabel}
