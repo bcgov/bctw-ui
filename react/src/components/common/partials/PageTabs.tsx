@@ -1,13 +1,15 @@
 import { Box, Tab, Tabs, useTheme } from '@mui/material';
+import React from 'react';
+import { useState } from 'react';
 import { BR } from 'themes/appTheme';
 
 // export const isTab = <T,>(tab: T, currentTab: T): boolean => tab === currentTab;
 
 interface PageTabsProps {
-  tabList: string[];
-  handleTab: (tabIdx: number) => void;
-  tab: number;
-  children?: JSX.Element;
+  tabLabels: string[];
+  //handleTab: (tabIdx: number) => void;
+  //tab: number;
+  children?: JSX.Element[] | JSX.Element;
 }
 /**
  * @param tabList Array of tab names
@@ -15,7 +17,8 @@ interface PageTabsProps {
  * @param handleTab Sets the tab index
  * @param children Html elements to render
  */
-export const PageTabs = ({ tabList, tab, handleTab, children }: PageTabsProps): JSX.Element => {
+export const PageTabs = ({ tabLabels, children }: PageTabsProps): JSX.Element => {
+  const [tab, setTab] = useState(0);
   const theme = useTheme();
   const firstTab = tab === 0;
   const tabIsSelected = (t: number): boolean => tab === t;
@@ -29,11 +32,11 @@ export const PageTabs = ({ tabList, tab, handleTab, children }: PageTabsProps): 
             display: 'none'
           }
         }}>
-        {tabList.map((t, i) => (
+        {tabLabels.map((t, i) => (
           <Tab
             key={`tab-${i}`}
             label={t}
-            onClick={() => handleTab(i)}
+            onClick={() => setTab(i)}
             sx={{
               //Using inline styling to simplify issues with boxShadow not available in makeStyles.
               boxShadow: tabIsSelected(i) ? 1 : 0,
@@ -55,7 +58,7 @@ export const PageTabs = ({ tabList, tab, handleTab, children }: PageTabsProps): 
           backgroundColor: theme.palette.background.paper,
           borderRadius: firstTab ? `0px 8px 8px 8px` : `8px 8px 8px 8px`
         }}>
-        {children}
+        {React.cloneElement(children[tab], { title: tabLabels[tab] })}
       </Box>
     </Box>
   );

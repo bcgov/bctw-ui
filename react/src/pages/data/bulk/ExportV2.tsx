@@ -142,7 +142,7 @@ export default function ExportPageV2(): JSX.Element {
       <Box className={styles.section} /*marginTop={'15px'}*/>
         <InfoBanner text={ExportStrings.infoBannerMesgs} />
       </Box>
-      <PageTabs tab={tab} handleTab={setTab} tabList={TABS}>
+      <PageTabs tabLabels={TABS}>
         <ContainerLayout>
           <Box className={styles.innerSection}>
             <h2>{ExportStrings.dateRangeHeader}</h2>

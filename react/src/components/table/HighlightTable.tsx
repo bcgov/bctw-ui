@@ -20,12 +20,12 @@ export type HighlightTableProps<T> = PlainTableProps<T> & {
 };
 
 const useStyles = makeStyles((theme) => ({
-    badCell: {
-        backgroundColor: lighten(theme.palette.error.light, 0.9), 
-        borderLeft: '1px solid white', 
-        borderRight: '1px solid white'
-    }
-  }));
+  badCell: {
+    backgroundColor: lighten(theme.palette.error.light, 0.9),
+    borderLeft: '1px solid white',
+    borderRight: '1px solid white'
+  }
+}));
 
 export default function HighlightTable<T extends BCTWBase<T>>({
   headers,
@@ -56,12 +56,12 @@ export default function HighlightTable<T extends BCTWBase<T>>({
     //setSelected(o);
     //console.log('Set selected to ' + JSON.stringify(value));
     if (typeof onSelectCell === 'function' && data?.length) {
-        onSelectCell(row_idx, cellname);
+      onSelectCell(row_idx, cellname);
     }
   };
 
   return (
-    <TableContainer >
+    <TableContainer>
       <Table className={'table'}>
         {data === undefined ? null : (
           <TableHead
@@ -93,7 +93,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                 tabIndex={-1}
                 key={`row${prop}`}
                 //selected={isRowSelected}
-                >
+              >
                 {headers.map((k, i) => {
                   if (!k) {
                     return null;
@@ -104,17 +104,25 @@ export default function HighlightTable<T extends BCTWBase<T>>({
 
                   return (
                     <>
-                        {isMessage ? 
-                            (<TableCell onClick={()=>handleClickCell(prop, k)} className={style.badCell} key={`${String(k)}${i}`} align={'left'}>
-                                <Tooltip title={messages[prop][k]}>
-                                    <>{value}</>
-                                </Tooltip>
-                            </TableCell>)
-                            :
-                            (<TableCell onClick={()=>handleClickCell(prop, k)} className={dimFirstColumn && i == 0  ? 'dimmed-cell' : undefined} key={`${String(k)}${i}`} align={'left'}>
-                            {value}
-                            </TableCell>)
-                        }
+                      {isMessage ? (
+                        <TableCell
+                          onClick={() => handleClickCell(prop, k)}
+                          className={style.badCell}
+                          key={`${String(k)}${i}`}
+                          align={'left'}>
+                          <Tooltip title={messages[prop][k]}>
+                            <>{value}</>
+                          </Tooltip>
+                        </TableCell>
+                      ) : (
+                        <TableCell
+                          onClick={() => handleClickCell(prop, k)}
+                          className={dimFirstColumn && i == 0 ? 'dimmed-cell' : undefined}
+                          key={`${String(k)}${i}`}
+                          align={'left'}>
+                          {value}
+                        </TableCell>
+                      )}
                     </>
                   );
                 })}
