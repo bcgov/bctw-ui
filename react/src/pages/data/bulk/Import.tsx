@@ -323,21 +323,6 @@ export default function Import(): JSX.Element {
     //       </PageTabs>
     //     </Box>
 
-    //     <Modal
-    //       open={showingValueModal}
-    //       handleClose={() => {
-    //         setShowingValueModal(false);
-    //       }}
-    //       title={constants.validValuesModal}>
-    //       {selectedError?.valid_values?.map((o) => {
-    //         return (
-    //           <>
-    //             <Typography>{o}</Typography>
-    //           </>
-    //         );
-    //       })}
-    //     </Modal>
-
     //     {/*
     //     <Typography mb={3} variant='body1' component='p'>Import metadata via CSV file.</Typography>
     //     {/* save progress indicator }
