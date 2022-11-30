@@ -46,7 +46,9 @@ interface ImportTabProps {
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
   const { title, sheetIndex, handleSubmit } = props;
-  const { isFileValidated, setSanitizedFile, sanitizedFile, isFileLoading, setFile } = useImported_XLSX_File();
+
+  const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
+
   const styles = useStyles();
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
@@ -112,18 +114,18 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
       </Box>
       <FileInputValidation
         onFileChosen={setFile}
-        trashIconClick={() => setSanitizedFile(null)}
-        validationSuccess={isFileValidated}
+        trashIconClick={reset}
+        validationSuccess={isValidated}
         buttonText={`Upload ${title} Template`}
         buttonVariant='text'
         accept='.xlsx'
-        isLoading={isFileLoading}
+        isLoading={isLoading}
       />
       <>
         {sanitizedFile?.length > 0 && (
           <>
             <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
-            {isFileValidated ? (
+            {isValidated ? (
               <SuccessBanner text={constants.successBanner} />
             ) : (
               <>
@@ -187,7 +189,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
           />
           <Button
             onClick={handleSubmit}
-            disabled={!isFileValidated}
+            disabled={!isValidated}
             className={styles.spacing}
             variant='contained'
             style={{ marginLeft: 'auto' }}>

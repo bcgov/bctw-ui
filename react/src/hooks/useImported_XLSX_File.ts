@@ -6,18 +6,18 @@ import { useEffect, useState } from 'react';
 import { useTelemetryApi } from './useTelemetryApi';
 const SIZE_LIMIT = 31457280;
 interface SanitizeAndFinalize {
-  isFileValidated: boolean;
-  setSanitizedFile: React.Dispatch<React.SetStateAction<ParsedXLSXSheetResult[]>>;
+  isValidated: boolean;
+  reset: () => void;
   sanitizedFile: ParsedXLSXSheetResult[];
-  isFileLoading: boolean;
+  isLoading: boolean;
   setFile: (fieldName: string, files: FileList) => void;
 }
 
 export default function useImported_XLSX_File(): SanitizeAndFinalize {
   const api = useTelemetryApi();
-
-  const [isFileValidated, setValidation] = useState(false);
   const showNotif = useResponseDispatch();
+
+  const [isValidated, setValidation] = useState(false);
   const [sanitizedFile, setSanitizedFile] = useState<ParsedXLSXSheetResult[]>(null);
 
   const successXLSX = (d: ParsedXLSXSheetResult[]) => {
@@ -33,19 +33,21 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
   const errorXLSX = (): void => {
     showNotif({ severity: 'error', message: 'bulk upload failed' });
   };
+
   const {
     mutateAsync,
     isIdle,
-    isLoading: isFileLoading,
+    isLoading,
     isSuccess,
     isError,
     error,
     data,
-    reset
+    reset: mutateReset
   } = api.useUploadXLSX({
     onSuccess: successXLSX,
     onError: errorXLSX
   });
+
   const save = async (form: FormData): Promise<ParsedXLSXSheetResult[]> => {
     try {
       return await mutateAsync(form);
@@ -55,6 +57,7 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
       return null;
     }
   };
+
   const setFile = (fieldName: string, files: FileList): void => {
     if (files[0].size > SIZE_LIMIT) {
       showNotif({ severity: 'error', message: 'This file exceeds the 30MB limit.' });
@@ -62,6 +65,7 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
     }
     save(createFormData(fieldName, files));
   };
+
   useEffect(() => {
     if (!sanitizedFile || !sanitizedFile?.length) {
       setValidation(false);
@@ -73,5 +77,11 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
       setValidation(false);
     }
   }, [sanitizedFile]);
-  return { isFileValidated, setSanitizedFile, sanitizedFile, setFile, isFileLoading };
+
+  const reset = (): void => {
+    setSanitizedFile(null);
+    setValidation(false);
+  };
+
+  return { isValidated, reset, sanitizedFile, setFile, isLoading };
 }
