@@ -31,7 +31,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'center'
   }
 }));
-
+enum SheetNames {
+  AnimalAndDevice,
+  Telemetry
+}
 interface RowColPair {
   row?: number;
   col?: string;
@@ -41,10 +44,10 @@ interface ImportTabProps {
   title?: string;
 }
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
-export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: 0 | 1 }) => {
-  const { title, sheetIndex } = props;
-  const styles = useStyles();
+export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
+  const { title, sheetIndex, handleSubmit } = props;
   const { isFileValidated, setSanitizedFile, sanitizedFile, isFileLoading, setFile } = useImported_XLSX_File();
+  const styles = useStyles();
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
@@ -98,7 +101,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: 0 | 1 
     <Box p={2}>
       <Box display='flex'>
         <Box pb={2}>
-          <SubHeader text={title} />
+          <SubHeader text={`${title} Import`} />
         </Box>
         <Button
           href={createUrl({ api: 'get-template', query: 'file_key=import_template' })}
@@ -183,6 +186,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: 0 | 1 
             changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
           />
           <Button
+            onClick={handleSubmit}
             disabled={!isFileValidated}
             className={styles.spacing}
             variant='contained'
@@ -195,14 +199,24 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: 0 | 1 
   );
 };
 
-export const AnimalAndDeviceImportTab = (props: ImportTabProps) => <ImportAndPreviewTab {...props} sheetIndex={0} />;
-export const TelemetryImportTab = (props: ImportTabProps) => <ImportAndPreviewTab {...props} sheetIndex={1} />;
+export const AnimalAndDeviceImportTab = (props: ImportTabProps) => {
+  const handleSubmit = (): void => {
+    console.log('submitting animal and device');
+  };
+  return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.AnimalAndDevice} handleSubmit={handleSubmit} />;
+};
+export const TelemetryImportTab = (props: ImportTabProps) => {
+  const handleSubmit = (): void => {
+    console.log('submitting telemetry');
+  };
+  return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.Telemetry} handleSubmit={handleSubmit} />;
+};
 export const KeyXImportTab = (props: ImportTabProps) => {
   const { title } = props;
   return (
     <Box p={2}>
       <Box pb={2}>
-        <SubHeader text={title} />
+        <SubHeader text={`${title} Import`} />
       </Box>
       <KeyXUploader />
     </Box>

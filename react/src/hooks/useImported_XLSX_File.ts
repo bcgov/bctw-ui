@@ -24,6 +24,7 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
     if (d.length) {
       console.log(d);
       setSanitizedFile(d);
+      showNotif({ severity: 'success', message: 'File uploaded and sanitized' });
     } else {
       showNotif({ severity: 'error', message: 'The data sanitization process failed.' });
     }
