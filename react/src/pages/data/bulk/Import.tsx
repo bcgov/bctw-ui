@@ -23,6 +23,7 @@ import useTabs from 'hooks/useTabs';
 import { AnimalAndDeviceImportTab } from './ImportTabs';
 import { TelemetryImportTab } from './ImportTabs';
 import { KeyXImportTab } from './ImportTabs';
+import { ImportTabsValidationProvider } from 'contexts/ImportTabContext';
 
 const SIZE_LIMIT = 31457280;
 
@@ -193,7 +194,7 @@ export default function Import(): JSX.Element {
       <div className='container'>
         <h1>Data Import</h1>
         <Box mt={2}>
-          <PageTabs tabLabels={['Animal and Device', 'Telemetry', 'Vectronic KeyX']}>
+          <PageTabs keepMounted tabLabels={['Animal and Device', 'Telemetry', 'Vectronic KeyX']}>
             <AnimalAndDeviceImportTab />
             <TelemetryImportTab />
             <KeyXImportTab />

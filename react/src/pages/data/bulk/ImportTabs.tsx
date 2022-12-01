@@ -14,6 +14,7 @@ import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
 import { useState } from 'react';
 import { collectErrorsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
+import { useImportTabsValidationState } from 'contexts/ImportTabContext';
 const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -43,12 +44,14 @@ interface RowColPair {
 interface ImportTabProps {
   // children: JSX.Element;
   title?: string;
+  show?: boolean;
 }
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
-  const { title, sheetIndex, handleSubmit } = props;
+  const { title, sheetIndex, handleSubmit, show } = props;
 
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
+  const { tabsValidation, setTabsValidation } = useImportTabsValidationState();
 
   const styles = useStyles();
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
@@ -103,7 +106,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 
   return (
     <>
-      <Box p={2}>
+      <Box p={2} display={!show && 'none'}>
         <Box display='flex' alignItems='center'>
           <Box>
             <SubHeader text={`${title} Import`} />
@@ -190,12 +193,15 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
             </>
           )}
           <Box display='flex'>
-            <Checkbox
-              label={constants.checkboxLabel}
-              propName={'hide-empty-col'}
-              initialValue={hideEmptyColumns}
-              changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
-            />
+            {sanitizedFile && (
+              <Checkbox
+                label={constants.checkboxLabel}
+                propName={'hide-empty-col'}
+                initialValue={hideEmptyColumns}
+                changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
+              />
+            )}
+
             <Button
               onClick={handleSubmit}
               disabled={!isValidated}
@@ -238,9 +244,9 @@ export const TelemetryImportTab = (props: ImportTabProps) => {
   return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.Telemetry} handleSubmit={handleSubmit} />;
 };
 export const KeyXImportTab = (props: ImportTabProps) => {
-  const { title } = props;
+  const { title, show } = props;
   return (
-    <Box p={2}>
+    <Box p={2} display={!show && 'none'}>
       <Box pb={2}>
         <SubHeader text={`${title} Import`} />
       </Box>
