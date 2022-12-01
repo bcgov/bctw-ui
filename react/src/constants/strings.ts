@@ -320,18 +320,26 @@ const ExportStrings = {
 };
 
 const ImportStrings = {
-
   importToolHeader: 'Animal+Device Metadata and Telemetry',
   uploadButton: 'Upload Animal+Device/Telemetry Template',
   downloadButton: 'Download Template',
   validValuesModal: 'Valid values for this field',
   checkboxLabel: 'Hide Empty Columns',
-  successBanner: 'Your spreadsheet appears to be correctly formatted. Please double check that the information displayed below is what you wish to submit.',
-  errorBanner: 'Hover over highlighted cells to view error info. Fix these errors in your spreadsheet application and re-upload.',
+  successBanner:
+    'Your spreadsheet appears to be correctly formatted. Please double check that the information displayed below is what you wish to submit.',
+  errorBanner:
+    'Hover over highlighted cells to view error info. Fix these errors in your spreadsheet application and re-upload.',
   detailBannerIdle: 'Click a cell for detailed information on that error.',
-  infoBullets: ['To add a new animal and collar, create a new row in the Device Metadata template and fill out the required fields.',
-  'Device IDs already assigned to an Animal ID must first be released by their owner before they can be assigned to a new Animal ID.']
-}
+  ['Animal and Device']: [
+    'To add a new animal and collar, create a new row in the Device Metadata template and fill out the required fields.',
+    'Device IDs already assigned to an Animal ID must first be released by their owner before they can be assigned to a new Animal ID.'
+  ],
+  ['Telemetry']: [
+    'Telemetry import used for missing Telemetry of existing tracked vendor devices',
+    'Placeholder for additional text'
+  ],
+  ['Vectronic KeyX']: 'placeholder'
+};
 
 const DelegationRequestStrings = {
   confirmDenyMesg: `Are you sure you wish to deny this permission request?`,

@@ -91,10 +91,12 @@ export const KeyXUploader = ({ device_ids, pageRows = 10 }: KeyXCardProps): JSX.
   useEffect(() => {
     if (!data?.length) return;
     const tmp: DeviceKeyXObj = {};
+    console.log(data);
     data.forEach((row) => {
       tmp[row.device_id] = row.keyx;
     });
     setDeviceAndKeyXObj(tmp);
+    console.log(tmp);
   }, [isSuccess]);
 
   const handleUploadedKeyX = (name: string, files: FileList): void => {
@@ -121,7 +123,7 @@ export const KeyXUploader = ({ device_ids, pageRows = 10 }: KeyXCardProps): JSX.
       <CardContent>
         <InfoBanner text={BannerStrings.vectronicKeyxInfo} />
         <Box p={1} className={styles.batchUploadBox}>
-          <UploadKeyXBtn text={'Batch Upload KeyX Files'} />
+          <UploadKeyXBtn text={'Upload Multiple KeyX Files'} />
         </Box>
       </CardContent>
       <TableContainer>
@@ -138,13 +140,13 @@ export const KeyXUploader = ({ device_ids, pageRows = 10 }: KeyXCardProps): JSX.
           <TableBody>
             {Object.keys(deviceAndKeyXObj).map((dID, idx, arr) => {
               //Sets the values range for the pagination
-              if (idx < pageRows * (page + 1) && idx > pageRows * page)
+              if (idx < pageRows * (page + 1) && idx >= pageRows * page)
                 return (
                   <TableRow key={`keyx-${idx}`}>
-                    <TableCell align='center'>{arr[idx]}</TableCell>
+                    <TableCell align='center'>{dID}</TableCell>
                     <TableCell align='center'>
-                      {deviceAndKeyXObj[arr[idx]] ? (
-                        <Tooltip title={'Existing KeyX file for this device'}>
+                      {deviceAndKeyXObj[dID] ? (
+                        <Tooltip title={`Device ${dID} has KeyX file`}>
                           <Icon icon={'check'} htmlColor={theme.palette.success.main} />
                         </Tooltip>
                       ) : (
