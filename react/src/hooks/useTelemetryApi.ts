@@ -492,9 +492,9 @@ export const useTelemetryApi = () => {
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
   const useFinalizeXLSX = <T>(
-    config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, ParsedXLSXSheetResult>
+    config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, (Animal | Collar)[]>
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
-    useMutation<IBulkUploadResults<T>, AxiosError, ParsedXLSXSheetResult>((body) => bulkApi.finalizeXlsx(body), config);
+    useMutation<IBulkUploadResults<T>, AxiosError, (Animal | Collar)[]>((body) => bulkApi.finalizeXlsx(body), config);
 
   const useUploadXLSX = <T>(
     config: UseMutationOptions<ParsedXLSXSheetResult[], AxiosError, FormData>

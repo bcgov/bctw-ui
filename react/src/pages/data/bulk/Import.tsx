@@ -17,7 +17,9 @@ import Checkbox from 'components/form/Checkbox';
 import { AxiosError } from 'axios';
 import FileInputValidation from 'components/form/FileInputValidation';
 import { ImportStrings as constants } from 'constants/strings';
-import { computeXLSXCol, collectErrorsFromResults, getAllUniqueKeys } from './xlsx_helpers';
+import { computeXLSXCol, collectErrorsFromResults, getAllUniqueKeys, collectWarningsFromResults } from './xlsx_helpers';
+import ConfirmModal from 'components/modal/ConfirmModal';
+import WarningPrompts from './WarningPrompts';
 
 const SIZE_LIMIT = 31457280;
 
@@ -61,6 +63,8 @@ export default function Import(): JSX.Element {
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
   const [showingValueModal, setShowingValueModal] = useState(false);
+  const [showingWarningPrompts, setShowingWarningPrompts] = useState(false);
+  const [warningPromptQueue, setWarningPromptQueue] = useState([]);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [currentTab, setCurrentTab] = useState(TabNames.metadata);
 
@@ -82,6 +86,12 @@ export default function Import(): JSX.Element {
     if (d.length) {
       console.log(d);
       setSanitizedImport(d);
+      const prompts = [];
+      d[0].rows.forEach((r, idx) => prompts.push(...r.warnings.filter(w => w.prompt).map(w => `At row ${idx + 2}: ${w.message}`)));
+      if(prompts.length > 0) {
+        setWarningPromptQueue(prompts);
+        setShowingWarningPrompts(true);
+      }
     } else {
       showNotif({ severity: 'error', message: 'The data sanitization process failed.' });
     }
@@ -108,7 +118,22 @@ export default function Import(): JSX.Element {
     onSuccess: successFinalize,
     onError: errorFinalize
   });
-  const { data: keyXdata } = api.useGetCollarKeyX();
+
+  const handleWarningQueue = () => {
+    if(warningPromptQueue.length > 0) {
+      setWarningPromptQueue(warningPromptQueue.slice(1));
+    }
+    else {
+      setShowingWarningPrompts(false);
+    }
+  }
+
+  const handleFinalizeMetadata = () => {
+    if(sanitizedImport && canFinalize) {
+      const rows = sanitizedImport[0].rows.map(o => o.row);
+      mutateFinalize(rows);
+    }
+  }
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
     if (files[0].size > SIZE_LIMIT) {
@@ -225,6 +250,13 @@ export default function Import(): JSX.Element {
                     ))}
                   />
                   <Banner
+                    variant='warning'
+                    text={'There may be unintended consequences to this import.'}
+                    icon={<Icon icon='warning'/>}
+                    action='collapse'
+                    hiddenContent={[WarningPrompts({prompts: collectWarningsFromResults(getCurrentSheet())})]}
+                  />
+                  <Banner
                     variant='info'
                     text={
                       <Box alignItems={'center'} display='flex'>
@@ -281,7 +313,9 @@ export default function Import(): JSX.Element {
               disabled={!canFinalize}
               className={styles.spacing}
               variant='contained'
-              style={{ marginLeft: 'auto' }}>
+              style={{ marginLeft: 'auto' }}
+              onClick={() => handleFinalizeMetadata()}
+            >
               Finalize Submission
             </Button>
           </Box>
@@ -300,7 +334,19 @@ export default function Import(): JSX.Element {
             );
           })}
         </Modal>
-
+        <ConfirmModal
+          open={showingWarningPrompts && warningPromptQueue.length > 0}
+          handleClose={() => {
+            setShowingWarningPrompts(false);
+          }}
+          handleClickYes={() => {
+            handleWarningQueue();
+          }}
+          title={'Please acknowledge that submission will trigger the following.'}
+          btnYesText={'Confirm'}
+          btnNoText={'Cancel'}
+          message={warningPromptQueue.length > 0 ? warningPromptQueue[0] : null}
+        />
         {/*
         <Typography mb={3} variant='body1' component='p'>Import metadata via CSV file.</Typography>
         {/* save progress indicator }
