@@ -11,24 +11,24 @@ interface TabsState {
   [key: string]: Tab;
 }
 
-interface ImportTabContext {
+interface ITabContext {
   setTabsValidation: Dispatch<SetStateAction<TabsState>>;
   tabsValidation: TabsState;
 }
-const ImportTabContext = createContext<TabsState>(null);
-const ImportTabUpdateContext = createContext<Dispatch<SetStateAction<TabsState>> | null>(null);
+const TabContext = createContext<TabsState>(null);
+const TabUpdateContext = createContext<Dispatch<SetStateAction<TabsState>> | null>(null);
 
-export const useImportTabsValidationState = (): ImportTabContext => ({
-  setTabsValidation: useContext(ImportTabUpdateContext),
-  tabsValidation: useContext(ImportTabContext)
+export const useTabsValidation = (): ITabContext => ({
+  setTabsValidation: useContext(TabUpdateContext),
+  tabsValidation: useContext(TabContext)
 });
 
-export const ImportTabsValidationProvider = (props: { children: ReactNode }): JSX.Element => {
+export const TabsValidationProvider = (props: { children: ReactNode }): JSX.Element => {
   const [tabState, setTabState] = useState<TabsState | null>(null);
 
   return (
-    <ImportTabContext.Provider value={tabState}>
-      <ImportTabUpdateContext.Provider value={setTabState}>{props.children}</ImportTabUpdateContext.Provider>
-    </ImportTabContext.Provider>
+    <TabContext.Provider value={tabState}>
+      <TabUpdateContext.Provider value={setTabState}>{props.children}</TabUpdateContext.Provider>
+    </TabContext.Provider>
   );
 };

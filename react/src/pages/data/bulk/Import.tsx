@@ -23,7 +23,6 @@ import useTabs from 'hooks/useTabs';
 import { AnimalAndDeviceImportTab } from './ImportTabs';
 import { TelemetryImportTab } from './ImportTabs';
 import { KeyXImportTab } from './ImportTabs';
-import { ImportTabsValidationProvider } from 'contexts/ImportTabContext';
 
 const SIZE_LIMIT = 31457280;
 

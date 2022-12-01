@@ -14,7 +14,7 @@ import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
 import { useState } from 'react';
 import { collectErrorsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
-import { useImportTabsValidationState } from 'contexts/ImportTabContext';
+import { useTabsValidation } from 'contexts/ImportTabContext';
 const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -51,7 +51,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const { title, sheetIndex, handleSubmit, show } = props;
 
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
-  const { tabsValidation, setTabsValidation } = useImportTabsValidationState();
+  const { tabsValidation, setTabsValidation } = useTabsValidation();
 
   const styles = useStyles();
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);

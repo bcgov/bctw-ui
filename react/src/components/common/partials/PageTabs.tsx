@@ -1,6 +1,6 @@
 import { Box, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { Icon } from 'components/common';
-import { ImportTabsValidationProvider, useImportTabsValidationState } from 'contexts/ImportTabContext';
+import { TabsValidationProvider, useTabsValidation } from 'contexts/ImportTabContext';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { BR } from 'themes/appTheme';
@@ -19,9 +19,9 @@ interface PageTabsProps {
 // Prevents having to add prop for validation to all potential children components
 // Used to add indicator icon state for tabs
 export const PageTabs = (props: PageTabsProps): JSX.Element => (
-  <ImportTabsValidationProvider>
+  <TabsValidationProvider>
     <PT {...props} />
-  </ImportTabsValidationProvider>
+  </TabsValidationProvider>
 );
 
 /**
@@ -32,7 +32,7 @@ export const PageTabs = (props: PageTabsProps): JSX.Element => (
  */
 const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element => {
   const theme = useTheme();
-  const { tabsValidation, setTabsValidation } = useImportTabsValidationState();
+  const { tabsValidation, setTabsValidation } = useTabsValidation();
   const [tab, setTab] = useState(0);
 
   const firstTab = tab === 0;
