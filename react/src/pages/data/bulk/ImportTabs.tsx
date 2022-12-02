@@ -15,6 +15,7 @@ import { KeyXUploader } from 'pages/vendor/KeyXUploader';
 import { useState } from 'react';
 import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
 import WarningPrompts from './WarningPrompts';
+import WarningPromptsBanner from './WarningPromptsBanner';
 const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -54,6 +55,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const styles = useStyles();
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
+  const [confirmedWarnings, setConfirmedWarnings] = useState(false);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
@@ -136,7 +138,13 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
             <>
               <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
               {isValidated ? (
-                <SuccessBanner text={constants.successBanner} />
+                <WarningPromptsBanner 
+                  allClearText={constants.successBanner} 
+                  text={constants.warningBanner} 
+                  prompts={collectWarningsFromResults(currentSheet)} 
+                  onAllChecked={() => setConfirmedWarnings(true) } 
+                  onNotAllChecked={() => setConfirmedWarnings(false) } 
+                  />
               ) : (
                 <>
                   <Banner
@@ -147,13 +155,6 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                     hiddenContent={collectErrorsFromResults(currentSheet).map((a) => (
                       <div>{a}</div>
                     ))}
-                  />
-                  <Banner
-                    variant='warning'
-                    text={'There may be unintended consequences to this import.'}
-                    icon={<Icon icon='warning'/>}
-                    action='collapse'
-                    hiddenContent={[WarningPrompts({prompts: collectWarningsFromResults(currentSheet)})]}
                   />
                   <Banner
                     variant='info'
@@ -206,7 +207,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
             />
             <Button
               onClick={handleSubmit}
-              disabled={!isValidated}
+              disabled={!isValidated || !confirmedWarnings}
               className={styles.spacing}
               variant='contained'
               style={{ marginLeft: 'auto' }}>
