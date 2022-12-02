@@ -1,6 +1,6 @@
-import { Box, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import { Badge, Box, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { Icon } from 'components/common';
-import { TabsValidationProvider, useTabsValidation } from 'contexts/ImportTabContext';
+import { TabsProvider, useTabs } from 'contexts/TabsContext';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { BR } from 'themes/appTheme';
@@ -17,11 +17,11 @@ interface PageTabsProps {
 // Wrapper to add validation provider for page tabs
 // Validation provider adds another level of state to children components
 // Prevents having to add prop for validation to all potential children components
-// Used to add indicator icon state for tabs
+// Used to add indicator logic for tab icon state
 export const PageTabs = (props: PageTabsProps): JSX.Element => (
-  <TabsValidationProvider>
+  <TabsProvider>
     <PT {...props} />
-  </TabsValidationProvider>
+  </TabsProvider>
 );
 
 /**
@@ -32,22 +32,17 @@ export const PageTabs = (props: PageTabsProps): JSX.Element => (
  */
 const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element => {
   const theme = useTheme();
-  const { tabsValidation, setTabsValidation } = useTabsValidation();
-  const [tab, setTab] = useState(0);
+  const { tabsValidation, setTabsValidation, tab, setTab } = useTabs();
+  //const [tab, setTab] = useState(0);
 
   const firstTab = tab === 0;
   const tabIsSelected = (t: number): boolean => tab === t;
   const passTheseProps = { title: tabLabels[tab] };
-  const getColor = (tabValidation: boolean | null): string => {
-    if (tabValidation === null) return theme.palette.grey[500];
-    if (tabValidation) return theme.palette.success.main;
-    return theme.palette.error.main;
-  };
   useEffect(() => {
-    tabLabels.forEach((label) =>
+    tabLabels.forEach((label, idx) =>
       setTabsValidation((validation) => ({
         ...validation,
-        [label]: null
+        [idx]: null
       }))
     );
   }, [tabLabels]);
@@ -63,17 +58,25 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
           }
         }}>
         {tabLabels.map((t, i) => {
-          const validation = tabsValidation && tabsValidation[t];
+          const tabStatus = tabsValidation && tabsValidation[i];
+          console.log(tabStatus);
           return (
             <Tab
               key={`tab-${i}`}
               label={
-                <Box display='flex' alignItems='center'>
-                  <Typography fontWeight='bold' pr={0.5}>
+                <Badge
+                  variant='dot'
+                  // color={tabStatus}
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      backgroundColor: theme.palette[tabStatus]?.main
+                    }
+                  }}>
+                  <Typography fontWeight='bold' pr={1}>
                     {t}
                   </Typography>
-                  <Icon icon='circle' size={0.8} htmlColor={getColor(validation)} />
-                </Box>
+                  {/* <Icon icon='circle' size={0.8} htmlColor={getColor(validation)} /> */}
+                </Badge>
               }
               onClick={() => setTab(i)}
               sx={{

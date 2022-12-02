@@ -12,9 +12,9 @@ import HighlightTable from 'components/table/HighlightTable';
 import { ImportStrings as constants } from 'constants/strings';
 import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { collectErrorsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
-import { useTabsValidation } from 'contexts/ImportTabContext';
+import { useTabs } from 'contexts/TabsContext';
 const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -51,7 +51,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const { title, sheetIndex, handleSubmit, show } = props;
 
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
-  const { tabsValidation, setTabsValidation } = useTabsValidation();
+  const { tabsValidation, setTabsValidation } = useTabs();
 
   const styles = useStyles();
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
@@ -59,6 +59,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
+  const isTelemetrySheet = sheetIndex === SheetNames.Telemetry;
 
   const handleCellSelected = (row_idx, cellname) => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
@@ -103,7 +104,16 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     });
     return messages;
   };
-
+  useEffect(() => {
+    // const sheetHasErrors = !collectErrorsFromResults(currentSheet)?.length;
+    // const tabValidated =
+    // if (sanitizedFile) {
+    //   setTabsValidation((v) => ({ ...v, [title]: sheetHasErrors }));
+    // }
+    // if (isValidated) {
+    //   setTabsValidation((v) => ({ ...v, [title]: 'success' }));
+    // }
+  }, [isValidated]);
   return (
     <>
       <Box p={2} display={!show && 'none'}>
