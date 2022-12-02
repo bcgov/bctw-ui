@@ -19,40 +19,39 @@ import FileInputValidation from 'components/form/FileInputValidation';
 import { ImportStrings as constants } from 'constants/strings';
 import { computeXLSXCol, collectErrorsFromResults, getAllUniqueKeys } from './xlsx_helpers';
 import { PageTabs } from 'components/common/partials/PageTabs';
-import useTabs from 'hooks/useTabs';
 import { AnimalAndDeviceImportTab } from './ImportTabs';
 import { TelemetryImportTab } from './ImportTabs';
 import { KeyXImportTab } from './ImportTabs';
 
-const SIZE_LIMIT = 31457280;
+// const SIZE_LIMIT = 31457280;
 
-const useStyles = makeStyles((theme) => ({
-  spacing: {
-    marginTop: theme.spacing(2)
-  },
-  spacingTopBottom: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2)
-  },
-  paper: {
-    marginTop: theme.spacing(2),
-    padding: '16px',
-    backgroundColor: 'text.secondary',
-    display: 'flex',
-    justifyContent: 'center'
-  }
-}));
+// const useStyles = makeStyles((theme) => ({
+//   spacing: {
+//     marginTop: theme.spacing(2)
+//   },
+//   spacingTopBottom: {
+//     marginTop: theme.spacing(2),
+//     marginBottom: theme.spacing(2)
+//   },
+//   paper: {
+//     marginTop: theme.spacing(2),
+//     padding: '16px',
+//     backgroundColor: 'text.secondary',
+//     display: 'flex',
+//     justifyContent: 'center'
+//   }
+// }));
 
-interface RowColPair {
-  row?: number;
-  col?: string;
-}
+// interface RowColPair {
+//   row?: number;
+//   col?: string;
+// }
 
-type ImportTab = 'Animal and Device' | 'Telemetry' | 'Vectronic KeyX';
-enum TabNames {
-  metadata,
-  telemetry
-}
+// type ImportTab = 'Animal and Device' | 'Telemetry' | 'Vectronic KeyX';
+// enum TabNames {
+//   metadata,
+//   telemetry
+// }
 
 /**
  * @param message whats displayed as body of import modal
@@ -61,41 +60,41 @@ enum TabNames {
 export default function Import(): JSX.Element {
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
-  const { tab, setTab, tabList } = useTabs(['Animal and Device', 'Telemetry', 'Vectronic KeyX']);
+  // const { tab, setTab, tabList } = useTabs(['Animal and Device', 'Telemetry', 'Vectronic KeyX']);
 
-  const [sanitizedImport, setSanitizedImport] = useState<ParsedXLSXSheetResult[]>(null);
-  const [canFinalize, setCanFinalize] = useState(false);
-  const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
-  const [selectedCell, setSelectedCell] = useState<RowColPair>({});
-  const [showingValueModal, setShowingValueModal] = useState(false);
-  const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
-  const [currentTab, setCurrentTab] = useState(TabNames.metadata);
-  const styles = useStyles();
+  // const [sanitizedImport, setSanitizedImport] = useState<ParsedXLSXSheetResult[]>(null);
+  // const [canFinalize, setCanFinalize] = useState(false);
+  // const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
+  // const [selectedCell, setSelectedCell] = useState<RowColPair>({});
+  // const [showingValueModal, setShowingValueModal] = useState(false);
+  // const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
+  // const [currentTab, setCurrentTab] = useState(TabNames.metadata);
+  // const styles = useStyles();
 
-  useEffect(() => {
-    if (!sanitizedImport || !sanitizedImport?.length) {
-      setCanFinalize(false);
-      return;
-    }
-    if (sanitizedImport?.every((sheet) => sheet.rows.every((o) => o.success))) {
-      setCanFinalize(true);
-    } else {
-      setCanFinalize(false);
-    }
-  }, [sanitizedImport]);
+  // useEffect(() => {
+  //   if (!sanitizedImport || !sanitizedImport?.length) {
+  //     setCanFinalize(false);
+  //     return;
+  //   }
+  //   if (sanitizedImport?.every((sheet) => sheet.rows.every((o) => o.success))) {
+  //     setCanFinalize(true);
+  //   } else {
+  //     setCanFinalize(false);
+  //   }
+  // }, [sanitizedImport]);
 
-  const successXLSX = (d: ParsedXLSXSheetResult[]) => {
-    if (d.length) {
-      console.log(d);
-      setSanitizedImport(d);
-    } else {
-      showNotif({ severity: 'error', message: 'The data sanitization process failed.' });
-    }
-  };
+  // const successXLSX = (d: ParsedXLSXSheetResult[]) => {
+  //   if (d.length) {
+  //     console.log(d);
+  //     setSanitizedImport(d);
+  //   } else {
+  //     showNotif({ severity: 'error', message: 'The data sanitization process failed.' });
+  //   }
+  // };
 
-  const errorXLSX = (): void => {
-    showNotif({ severity: 'error', message: 'bulk upload failed' });
-  };
+  // const errorXLSX = (): void => {
+  //   showNotif({ severity: 'error', message: 'bulk upload failed' });
+  // };
 
   const successFinalize = (d: IBulkUploadResults<unknown>): void => {
     console.log(JSON.stringify(d, null, 2));
@@ -105,97 +104,98 @@ export default function Import(): JSX.Element {
     showNotif({ severity: 'error', message: 'An error was encountered when trying to finalize the data upload.' });
   };
 
-  // setup the import mutation
-  const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = api.useUploadXLSX({
-    onSuccess: successXLSX,
-    onError: errorXLSX
-  });
+  // // setup the import mutation
+  // const { mutateAsync, isIdle, isLoading, isSuccess, isError, error, data, reset } = api.useUploadXLSX({
+  //   onSuccess: successXLSX,
+  //   onError: errorXLSX
+  // });
   const { mutateAsync: mutateFinalize, data: dataFinalize } = api.useFinalizeXLSX({
     onSuccess: successFinalize,
     onError: errorFinalize
   });
-  const { data: keyXdata } = api.useGetCollarKeyX();
+  // const { data: keyXdata } = api.useGetCollarKeyX();
 
-  const handleFileChange = (fieldName: string, files: FileList): void => {
-    if (files[0].size > SIZE_LIMIT) {
-      showNotif({ severity: 'error', message: 'This file exceeds the 30MB limit.' });
-      return;
-    }
-    save(createFormData(fieldName, files));
-  };
+  // const handleFileChange = (fieldName: string, files: FileList): void => {
+  //   if (files[0].size > SIZE_LIMIT) {
+  //     showNotif({ severity: 'error', message: 'This file exceeds the 30MB limit.' });
+  //     return;
+  //   }
+  //   save(createFormData(fieldName, files));
+  // };
 
-  // call the save mutation
-  const save = async (form: FormData): Promise<ParsedXLSXSheetResult[]> => {
-    try {
-      return await mutateAsync(form);
-    } catch (err) {
-      const e = err as AxiosError;
-      showNotif({ severity: 'error', message: e.message });
-      return null;
-    }
-  };
+  // // call the save mutation
+  // const save = async (form: FormData): Promise<ParsedXLSXSheetResult[]> => {
+  //   try {
+  //     return await mutateAsync(form);
+  //   } catch (err) {
+  //     const e = err as AxiosError;
+  //     showNotif({ severity: 'error', message: e.message });
+  //     return null;
+  //   }
+  // };
 
-  const handleChangeTab = (event: SyntheticEvent<Element>, newVal: TabNames): void => {
-    setCurrentTab(newVal);
-  };
+  // const handleChangeTab = (event: SyntheticEvent<Element>, newVal: TabNames): void => {
+  //   setCurrentTab(newVal);
+  // };
 
-  const getCurrentSheet = (): ParsedXLSXSheetResult => {
-    return sanitizedImport[tab.idx];
-  };
+  // const getCurrentSheet = (): ParsedXLSXSheetResult => {
+  //   return sanitizedImport[tab.idx];
+  // };
 
-  const handleCellSelected = (row_idx, cellname) => {
-    const sheet = getCurrentSheet();
-    setSelectedError(sheet.rows[row_idx].errors[cellname]);
-    setSelectedCell({ row: row_idx, col: cellname });
-  };
+  // const handleCellSelected = (row_idx, cellname) => {
+  //   const sheet = getCurrentSheet();
+  //   setSelectedError(sheet.rows[row_idx].errors[cellname]);
+  //   setSelectedCell({ row: row_idx, col: cellname });
+  // };
 
-  const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
-    let headers = [];
-    if (hideEmpty) {
-      headers = [...getAllUniqueKeys(sheet)];
-    } else {
-      headers = sheet.headers;
-    }
-    return headers;
-  };
+  // const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
+  //   let headers = [];
+  //   if (hideEmpty) {
+  //     headers = [...getAllUniqueKeys(sheet)];
+  //   } else {
+  //     headers = sheet.headers;
+  //   }
+  //   return headers;
+  // };
 
-  const getTableData = () => {
-    const rows = getCurrentSheet().rows.map((o, idx) => {
-      return { row_index: idx + 2, ...o.row };
-    }) as any[];
-    console.log('For this: ' + JSON.stringify(getCurrentSheet()));
-    console.log({ rows });
-    return rows;
-  };
+  // const getTableData = () => {
+  //   const rows = getCurrentSheet().rows.map((o, idx) => {
+  //     return { row_index: idx + 2, ...o.row };
+  //   }) as any[];
+  //   console.log('For this: ' + JSON.stringify(getCurrentSheet()));
+  //   console.log({ rows });
+  //   return rows;
+  // };
 
-  const computeExcelHeaderRow = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean) => {
-    const headers = ['1'];
-    getHeaders(sheet, hideEmpty).forEach((o) => {
-      const idx = sheet.headers.indexOf(o);
-      headers.push(computeXLSXCol(idx));
-    });
+  // const computeExcelHeaderRow = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean) => {
+  //   const headers = ['1'];
+  //   getHeaders(sheet, hideEmpty).forEach((o) => {
+  //     const idx = sheet.headers.indexOf(o);
+  //     headers.push(computeXLSXCol(idx));
+  //   });
 
-    return headers as string[];
-  };
+  //   return headers as string[];
+  // };
 
-  const getTableHelpMessages = (sheet: ParsedXLSXSheetResult) => {
-    const messages = sheet.rows.map((e, idx) => {
-      return Object.entries(e.errors).reduce((prev, curr) => {
-        const headerIdx = sheet.headers.indexOf(curr[0]);
-        return { ...prev, [curr[0]]: `${computeXLSXCol(headerIdx)}${idx + 2}: ${curr[1].desc}` };
-      }, {});
-    });
-    return messages;
-  };
+  // const getTableHelpMessages = (sheet: ParsedXLSXSheetResult) => {
+  //   const messages = sheet.rows.map((e, idx) => {
+  //     return Object.entries(e.errors).reduce((prev, curr) => {
+  //       const headerIdx = sheet.headers.indexOf(curr[0]);
+  //       return { ...prev, [curr[0]]: `${computeXLSXCol(headerIdx)}${idx + 2}: ${curr[1].desc}` };
+  //     }, {});
+  //   });
+  //   return messages;
+  // };
 
   return (
     <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Data Import</h1>
         <Box mt={2}>
-          <PageTabs tabLabels={['Animal and Device', 'Telemetry', 'Vectronic KeyX']}>
+          {/* Missing telemetry tab until more information about new table */}
+          <PageTabs keepMounted tabLabels={['Animal and Device', 'Vectronic KeyX']}>
             <AnimalAndDeviceImportTab />
-            <TelemetryImportTab />
+            {/* <TelemetryImportTab /> */}
             <KeyXImportTab />
           </PageTabs>
         </Box>

@@ -12,8 +12,9 @@ import HighlightTable from 'components/table/HighlightTable';
 import { ImportStrings as constants } from 'constants/strings';
 import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { collectErrorsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
+import { useTabs } from 'contexts/TabsContext';
 const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -21,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(2)
   },
   spacingTopBottom: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(4),
     marginBottom: theme.spacing(2)
   },
   paper: {
@@ -43,10 +44,12 @@ interface RowColPair {
 interface ImportTabProps {
   // children: JSX.Element;
   title?: string;
+  tabIndex?: number;
+  show?: boolean;
 }
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
-  const { title, sheetIndex, handleSubmit } = props;
+  const { title, sheetIndex, handleSubmit, show } = props;
 
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
 
@@ -56,6 +59,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
+  const isTelemetrySheet = sheetIndex === SheetNames.Telemetry;
 
   const handleCellSelected = (row_idx, cellname) => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
@@ -100,10 +104,9 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     });
     return messages;
   };
-
   return (
     <>
-      <Box p={2}>
+      <Box p={2} display={!show && 'none'}>
         <Box display='flex' alignItems='center'>
           <Box>
             <SubHeader text={`${title} Import`} />
@@ -133,7 +136,10 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
         <>
           {sanitizedFile?.length > 0 && (
             <>
-              <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
+              <Box className={styles.spacingTopBottom}>
+                <SubHeader size='small' text='Upload Preview' />
+              </Box>
+              {/* <Typography className={styles.spacingTopBottom}>Upload Preview</Typography> */}
               {isValidated ? (
                 <SuccessBanner text={constants.successBanner} />
               ) : (
@@ -190,12 +196,15 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
             </>
           )}
           <Box display='flex'>
-            <Checkbox
-              label={constants.checkboxLabel}
-              propName={'hide-empty-col'}
-              initialValue={hideEmptyColumns}
-              changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
-            />
+            {sanitizedFile && (
+              <Checkbox
+                label={constants.checkboxLabel}
+                propName={'hide-empty-col'}
+                initialValue={hideEmptyColumns}
+                changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
+              />
+            )}
+
             <Button
               onClick={handleSubmit}
               disabled={!isValidated}
@@ -238,13 +247,17 @@ export const TelemetryImportTab = (props: ImportTabProps) => {
   return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.Telemetry} handleSubmit={handleSubmit} />;
 };
 export const KeyXImportTab = (props: ImportTabProps) => {
-  const { title } = props;
+  const { title, show, tabIndex } = props;
+  const { setTabStatus, tabsValidation } = useTabs();
+  const handleAllKeyXUploaded = (status: boolean): void => {
+    setTabStatus(tabIndex, status ? 'success' : 'warning');
+  };
   return (
-    <Box p={2}>
+    <Box p={2} display={!show && 'none'}>
       <Box pb={2}>
         <SubHeader text={`${title} Import`} />
       </Box>
-      <KeyXUploader />
+      <KeyXUploader handleAllKeyXUploaded={handleAllKeyXUploaded} />
     </Box>
   );
 };
