@@ -12,8 +12,9 @@ import HighlightTable from 'components/table/HighlightTable';
 import { ImportStrings as constants } from 'constants/strings';
 import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
+import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
+import WarningPromptsBanner from './WarningPromptsBanner';
 import { useEffect, useState } from 'react';
-import { collectErrorsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
 import { useTabs } from 'contexts/TabsContext';
 const SIZE_LIMIT = 31457280;
 
@@ -56,6 +57,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const styles = useStyles();
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
+  const [confirmedWarnings, setConfirmedWarnings] = useState(false);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
@@ -141,7 +143,13 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               </Box>
               {/* <Typography className={styles.spacingTopBottom}>Upload Preview</Typography> */}
               {isValidated ? (
-                <SuccessBanner text={constants.successBanner} />
+                <WarningPromptsBanner 
+                  allClearText={constants.successBanner} 
+                  text={constants.warningBanner} 
+                  prompts={collectWarningsFromResults(currentSheet)} 
+                  onAllChecked={() => setConfirmedWarnings(true) } 
+                  onNotAllChecked={() => setConfirmedWarnings(false) } 
+                  />
               ) : (
                 <>
                   <Banner
@@ -207,7 +215,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 
             <Button
               onClick={handleSubmit}
-              disabled={!isValidated}
+              disabled={!isValidated || !confirmedWarnings}
               className={styles.spacing}
               variant='contained'
               style={{ marginLeft: 'auto' }}>

@@ -38,12 +38,18 @@ type CellErrorDescriptor = {
 }
 
 type ParsedXLSXCellError = {
-  [key in (keyof Animal | keyof Collar) | 'identifier']?: CellErrorDescriptor;
+  [key in (keyof Animal | keyof Collar) | 'identifier' | 'missing_data']?: CellErrorDescriptor;
+}
+
+type WarningInfo = {
+  message: string;
+  prompt: boolean;
 }
 
 type ParsedXLSXRowResult = {
   row: Animal | Collar;
   errors: ParsedXLSXCellError;
+  warnings: WarningInfo[];
   success: boolean;
 }
 

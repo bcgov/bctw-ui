@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
   }
 }));
-interface BannerProps {
+export interface BannerProps {
   variant: 'info' | 'warning' | 'success' | 'error';
   text: string | string[] | JSX.Element;
   icon?: JSX.Element;
