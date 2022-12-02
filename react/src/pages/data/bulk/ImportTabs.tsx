@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(2)
   },
   spacingTopBottom: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(4),
     marginBottom: theme.spacing(2)
   },
   paper: {
@@ -44,6 +44,7 @@ interface RowColPair {
 interface ImportTabProps {
   // children: JSX.Element;
   title?: string;
+  tabIndex?: number;
   show?: boolean;
 }
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
@@ -51,7 +52,6 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const { title, sheetIndex, handleSubmit, show } = props;
 
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
-  const { tabsValidation, setTabsValidation } = useTabs();
 
   const styles = useStyles();
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
@@ -104,16 +104,6 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     });
     return messages;
   };
-  useEffect(() => {
-    // const sheetHasErrors = !collectErrorsFromResults(currentSheet)?.length;
-    // const tabValidated =
-    // if (sanitizedFile) {
-    //   setTabsValidation((v) => ({ ...v, [title]: sheetHasErrors }));
-    // }
-    // if (isValidated) {
-    //   setTabsValidation((v) => ({ ...v, [title]: 'success' }));
-    // }
-  }, [isValidated]);
   return (
     <>
       <Box p={2} display={!show && 'none'}>
@@ -146,7 +136,10 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
         <>
           {sanitizedFile?.length > 0 && (
             <>
-              <Typography className={styles.spacingTopBottom}>Upload Preview</Typography>
+              <Box className={styles.spacingTopBottom}>
+                <SubHeader size='small' text='Upload Preview' />
+              </Box>
+              {/* <Typography className={styles.spacingTopBottom}>Upload Preview</Typography> */}
               {isValidated ? (
                 <SuccessBanner text={constants.successBanner} />
               ) : (
@@ -254,13 +247,17 @@ export const TelemetryImportTab = (props: ImportTabProps) => {
   return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.Telemetry} handleSubmit={handleSubmit} />;
 };
 export const KeyXImportTab = (props: ImportTabProps) => {
-  const { title, show } = props;
+  const { title, show, tabIndex } = props;
+  const { setTabStatus, tabsValidation } = useTabs();
+  const handleAllKeyXUploaded = (status: boolean): void => {
+    setTabStatus(tabIndex, status ? 'success' : 'warning');
+  };
   return (
     <Box p={2} display={!show && 'none'}>
       <Box pb={2}>
         <SubHeader text={`${title} Import`} />
       </Box>
-      <KeyXUploader />
+      <KeyXUploader handleAllKeyXUploaded={handleAllKeyXUploaded} />
     </Box>
   );
 };

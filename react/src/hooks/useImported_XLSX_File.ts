@@ -17,7 +17,7 @@ interface SanitizeAndFinalize {
 export default function useImported_XLSX_File(): SanitizeAndFinalize {
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
-  const { setTabsValidation, tab } = useTabs();
+  const { setTabStatus, tab } = useTabs();
 
   const [isValidated, setValidation] = useState(false);
   const [sanitizedFile, setSanitizedFile] = useState<ParsedXLSXSheetResult[]>(null);
@@ -76,18 +76,19 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
     }
     if (sanitizedFile?.every((sheet) => sheet.rows.every((o) => o.success))) {
       setValidation(true);
-      setTabsValidation((t) => ({ ...t, [tab]: 'success' }));
+      setTabStatus(tab, 'success');
       //console.log(sanitizedFile);
       // setTabsValidation((validation) => ({ ...validation }));
     } else {
       setValidation(false);
+      setTabStatus(tab, 'error');
     }
   }, [sanitizedFile]);
 
   const reset = (): void => {
     setSanitizedFile(null);
     setValidation(false);
-    setTabsValidation((t) => ({ ...t, [tab]: null }));
+    setTabStatus(tab, null);
   };
 
   return { isValidated, reset, sanitizedFile, setFile, isLoading };

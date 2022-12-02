@@ -46,7 +46,6 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
       }))
     );
   }, [tabLabels]);
-  console.log(tabsValidation);
   return (
     //ml: -1 / mt: -1 is to prevent clipping issues with the boxShadow
     <Box width='100%' sx={{ ml: -1, mt: -1 }}>
@@ -59,7 +58,6 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
         }}>
         {tabLabels.map((t, i) => {
           const tabStatus = tabsValidation && tabsValidation[i];
-          console.log(tabStatus);
           return (
             <Tab
               key={`tab-${i}`}
@@ -101,8 +99,8 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
           backgroundColor: theme.palette.background.paper,
           borderRadius: firstTab ? `0px 8px 8px 8px` : `8px 8px 8px 8px`
         }}>
-        {React.Children.map(children, (child) =>
-          React.cloneElement(child, { ...passTheseProps, show: children[tab] === child })
+        {React.Children.map(children, (child, idx) =>
+          React.cloneElement(child, { ...passTheseProps, show: children[tab] === child, tabIndex: idx })
         )}
         {/* {keepMounted ? childrenArray.map(childs, child => React) : React.cloneElement(children[tab], passTheseProps)} */}
       </Box>

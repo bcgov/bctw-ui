@@ -1,6 +1,7 @@
-import { CircularProgress, IconButton, Paper, Typography } from '@mui/material';
+import { Box, CircularProgress, IconButton, Paper, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
+import { DottedBorderBox } from 'components/common/partials/DottedBorderBox';
 import { useTabs } from 'contexts/TabsContext';
 import { useState } from 'react';
 import FileInput, { FileInputProps } from './FileInput';
@@ -13,11 +14,11 @@ interface FileInputValidation extends FileInputProps {
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(2),
-    padding: '16px',
-    backgroundColor: 'text.secondary',
-    display: 'flex',
-    justifyContent: 'center',
+    // marginTop: theme.spacing(2),
+    // padding: '16px',
+    // backgroundColor: 'text.secondary',
+    // display: 'flex',
+    // justifyContent: 'center',
     '& .MuiCircularProgress-root': {
       display: 'inline-block',
       top: '0%',
@@ -35,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function FileInputValidation(props: FileInputValidation): JSX.Element {
   const { onFileChosen, trashIconClick, validationSuccess, buttonText, buttonVariant, accept, isLoading } = props;
-  const { tabsValidation, setTabsValidation } = useTabs();
   const [filename, setFilename] = useState('');
   const styles = useStyles();
 
@@ -75,8 +75,11 @@ export default function FileInputValidation(props: FileInputValidation): JSX.Ele
   };
 
   return (
-    <Paper elevation={3} className={styles.paper}>
-      {conditionalRender()}
-    </Paper>
+    <Box className={styles.paper}>
+      <DottedBorderBox>{conditionalRender()}</DottedBorderBox>
+    </Box>
+    // <Paper elevation={3} className={styles.paper}>
+
+    // </Paper>
   );
 }
