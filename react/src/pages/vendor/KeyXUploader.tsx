@@ -106,7 +106,6 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
         hasAllKeyXFiles = false;
       }
     });
-    console.log(hasAllKeyXFiles);
     handleAllKeyXUploaded?.(hasAllKeyXFiles);
   }, [deviceAndKeyXObj]);
 
