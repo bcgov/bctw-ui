@@ -11,6 +11,7 @@ import { IBulkUploadResults } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { InfoBanner } from 'components/alerts/Banner';
 import Icon from 'components/common/Icon';
+import { DottedBorderBox } from 'components/common/partials/DottedBorderBox';
 import Tooltip from 'components/common/Tooltip';
 import FileInput from 'components/form/FileInput';
 import { BannerStrings } from 'constants/strings';
@@ -39,6 +40,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface KeyXCardProps {
   pageRows?: number;
   device_ids?: number[];
+  handleAllKeyXUploaded?: (status: boolean) => void;
 }
 
 interface DeviceKeyXObj {
@@ -51,7 +53,7 @@ interface DeviceKeyXObj {
  * @param pageRows Optional param for number of rows for pagination
  * @Returns Paginated list of keyX files and controls to upload inline or batch
  */
-export const KeyXUploader = ({ device_ids, pageRows = 10 }: KeyXCardProps): JSX.Element => {
+export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded }: KeyXCardProps): JSX.Element => {
   const api = useTelemetryApi();
   const theme = useTheme();
   const styles = useStyles();
@@ -91,12 +93,15 @@ export const KeyXUploader = ({ device_ids, pageRows = 10 }: KeyXCardProps): JSX.
   useEffect(() => {
     if (!data?.length) return;
     const tmp: DeviceKeyXObj = {};
-    console.log(data);
+    let allDevicesHaveKeyX = true;
     data.forEach((row) => {
+      if (!row.keyx) {
+        allDevicesHaveKeyX = false;
+      }
       tmp[row.device_id] = row.keyx;
     });
     setDeviceAndKeyXObj(tmp);
-    console.log(tmp);
+    handleAllKeyXUploaded?.(allDevicesHaveKeyX);
   }, [isSuccess]);
 
   const handleUploadedKeyX = (name: string, files: FileList): void => {
@@ -122,9 +127,9 @@ export const KeyXUploader = ({ device_ids, pageRows = 10 }: KeyXCardProps): JSX.
     <Card className={styles.cardWidth}>
       <CardContent>
         <InfoBanner text={BannerStrings.vectronicKeyxInfo} />
-        <Box p={1} className={styles.batchUploadBox}>
+        <DottedBorderBox>
           <UploadKeyXBtn text={'Upload Multiple KeyX Files'} />
-        </Box>
+        </DottedBorderBox>
       </CardContent>
       <TableContainer>
         <Table size='small' className={styles.table}>

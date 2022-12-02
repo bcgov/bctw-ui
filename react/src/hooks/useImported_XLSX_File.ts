@@ -2,6 +2,7 @@ import { createFormData } from 'api/api_helpers';
 import { ParsedXLSXSheetResult } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { useTabs } from 'contexts/TabsContext';
 import { useEffect, useState } from 'react';
 import { useTelemetryApi } from './useTelemetryApi';
 const SIZE_LIMIT = 31457280;
@@ -16,6 +17,7 @@ interface SanitizeAndFinalize {
 export default function useImported_XLSX_File(): SanitizeAndFinalize {
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
+  const { setTabStatus, tab } = useTabs();
 
   const [isValidated, setValidation] = useState(false);
   const [sanitizedFile, setSanitizedFile] = useState<ParsedXLSXSheetResult[]>(null);
@@ -25,6 +27,7 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
       console.log(d);
       setSanitizedFile(d);
       showNotif({ severity: 'success', message: 'File uploaded and sanitized' });
+      // setTabsValidation(validation => ({...validation}))
     } else {
       showNotif({ severity: 'error', message: 'The data sanitization process failed.' });
     }
@@ -73,14 +76,19 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
     }
     if (sanitizedFile?.every((sheet) => sheet.rows.every((o) => o.success))) {
       setValidation(true);
+      setTabStatus(tab, 'success');
+      //console.log(sanitizedFile);
+      // setTabsValidation((validation) => ({ ...validation }));
     } else {
       setValidation(false);
+      setTabStatus(tab, 'error');
     }
   }, [sanitizedFile]);
 
   const reset = (): void => {
     setSanitizedFile(null);
     setValidation(false);
+    setTabStatus(tab, null);
   };
 
   return { isValidated, reset, sanitizedFile, setFile, isLoading };
