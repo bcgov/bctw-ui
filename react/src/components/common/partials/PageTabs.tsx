@@ -91,7 +91,7 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
         })}
       </Tabs>
       <Box
-        p={2}
+        p={6}
         sx={{
           boxShadow: 1,
           ml: 1,
@@ -99,9 +99,12 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
           backgroundColor: theme.palette.background.paper,
           borderRadius: firstTab ? `0px 8px 8px 8px` : `8px 8px 8px 8px`
         }}>
-        {React.Children.map(children, (child, idx) =>
-          React.cloneElement(child, { ...passTheseProps, show: children[tab] === child, tabIndex: idx })
-        )}
+        {keepMounted
+          ? React.Children.map(children, (child, idx) =>
+              React.cloneElement(child, { ...passTheseProps, show: children[tab] === child, tabIndex: idx })
+            )
+          : React.cloneElement(children[tab], { ...passTheseProps })}
+        {}
         {/* {keepMounted ? childrenArray.map(childs, child => React) : React.cloneElement(children[tab], passTheseProps)} */}
       </Box>
     </Box>

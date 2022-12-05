@@ -108,7 +108,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   };
   return (
     <>
-      <Box p={2} display={!show && 'none'}>
+      <Box display={!show && 'none'}>
         <Box display='flex' alignItems='center'>
           <Box>
             <SubHeader text={`${title} Import`} />
@@ -143,13 +143,13 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               </Box>
               {/* <Typography className={styles.spacingTopBottom}>Upload Preview</Typography> */}
               {isValidated ? (
-                <WarningPromptsBanner 
-                  allClearText={constants.successBanner} 
-                  text={constants.warningBanner} 
-                  prompts={collectWarningsFromResults(currentSheet)} 
-                  onAllChecked={() => setConfirmedWarnings(true) } 
-                  onNotAllChecked={() => setConfirmedWarnings(false) } 
-                  />
+                <WarningPromptsBanner
+                  allClearText={constants.successBanner}
+                  text={constants.warningBanner}
+                  prompts={collectWarningsFromResults(currentSheet)}
+                  onAllChecked={() => setConfirmedWarnings(true)}
+                  onNotAllChecked={() => setConfirmedWarnings(false)}
+                />
               ) : (
                 <>
                   <Banner
@@ -261,7 +261,7 @@ export const KeyXImportTab = (props: ImportTabProps) => {
     setTabStatus(tabIndex, status ? 'success' : 'warning');
   };
   return (
-    <Box p={2} display={!show && 'none'}>
+    <Box display={!show && 'none'}>
       <Box pb={2}>
         <SubHeader text={`${title} Import`} />
       </Box>
