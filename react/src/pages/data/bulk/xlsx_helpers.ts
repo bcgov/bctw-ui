@@ -1,4 +1,4 @@
-import { ParsedXLSXSheetResult } from "api/api_interfaces";
+import { WarningInfo, ParsedXLSXSheetResult } from "api/api_interfaces";
 
 const computeXLSXCol = (idx: number): string => {
     let str = '';
@@ -25,10 +25,10 @@ const collectErrorsFromResults = (results: ParsedXLSXSheetResult): string[] => {
     return errArr;
 }
 
-const collectWarningsFromResults = (results: ParsedXLSXSheetResult): string[] => {
+const collectWarningsFromResults = (results: ParsedXLSXSheetResult): WarningInfo[] => {
     const warnArr = [];
     results.rows.forEach((r, idx) => {
-        warnArr.push(...r.warnings.map(warnobj => `Row ${idx + 2}: ${warnobj.message}`));
+        warnArr.push(...r.warnings.map(warnobj => { return {message: `Row ${idx + 2}: ${warnobj.message}`, help: warnobj.help, prompt: warnobj.prompt} }));
     });
     return warnArr;
 }

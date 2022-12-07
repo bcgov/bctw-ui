@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Theme, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/material';
 import { Modal } from 'components/common';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
@@ -16,6 +16,9 @@ import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, g
 import WarningPromptsBanner from './WarningPromptsBanner';
 import { useEffect, useState } from 'react';
 import { useTabs } from 'contexts/TabsContext';
+import { LoadingButton } from '@mui/lab';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
 const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -32,6 +35,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: 'text.secondary',
     display: 'flex',
     justifyContent: 'center'
+  },
+  circularProgress: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      height: '20px !important',
+      width: '20px !important',
+      marginLeft: '-17px',
+      marginTop: '-10px'
   }
 }));
 enum SheetNames {
@@ -51,7 +63,8 @@ interface ImportTabProps {
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
   const { title, sheetIndex, handleSubmit, show } = props;
-
+  const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
 
   const styles = useStyles();
@@ -60,13 +73,30 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const [confirmedWarnings, setConfirmedWarnings] = useState(false);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
+  const [finalizedSubmission, setFinalizedSubmission] = useState(false);
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
   const isTelemetrySheet = sheetIndex === SheetNames.Telemetry;
+
+  const onSuccessFinalize = (d): void => {
+    showNotif( {severity: 'success', message: 'Your import was successful.'});
+    setFinalizedSubmission(true);
+  };
+
+  const onErrorFinalize = (): void => {
+    showNotif({ severity: 'error', message: 'An error was encountered when trying to finalize the data upload.' });
+  };
+
+  const { isLoading: isLoadingFinalize, mutateAsync: mutateFinalize } = api.useFinalizeXLSX({onSuccess: onSuccessFinalize, onError: onErrorFinalize });
+
+  useEffect(() => {
+    setFinalizedSubmission(false);
+  }, [sanitizedFile])
 
   const handleCellSelected = (row_idx, cellname) => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
     setSelectedCell({ row: row_idx, col: cellname });
   };
+
 
   const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
     let headers = [];
@@ -212,15 +242,19 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                 changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
               />
             )}
-
-            <Button
-              onClick={handleSubmit}
-              disabled={!isValidated || !confirmedWarnings}
+            <LoadingButton
+              onClick={() => mutateFinalize(currentSheet.rows.map(r => r.row))}
+              disabled={!isValidated || !confirmedWarnings || isLoadingFinalize || finalizedSubmission}
               className={styles.spacing}
               variant='contained'
-              style={{ marginLeft: 'auto' }}>
-              Finalize Submission
-            </Button>
+              loading={isLoadingFinalize}
+              loadingIndicator={ <CircularProgress color='inherit' className={styles.circularProgress} /> }
+              loadingPosition={'end'}
+              endIcon={<Icon icon='send'/>}
+              style={{ marginLeft: 'auto' }}
+            >
+              {finalizedSubmission ? (<text>Success</text>) : (<text>Finalize Submission</text>)}
+            </LoadingButton>
           </Box>
         </>
       </Box>

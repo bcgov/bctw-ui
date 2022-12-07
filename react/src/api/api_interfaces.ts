@@ -43,6 +43,7 @@ type ParsedXLSXCellError = {
 
 type WarningInfo = {
   message: string;
+  help: string;
   prompt: boolean;
 }
 
@@ -89,5 +90,6 @@ export type {
   ParsedXLSXCellError,
   ParsedXLSXRowResult,
   ParsedXLSXSheetResult,
+  WarningInfo,
   CellErrorDescriptor
 };

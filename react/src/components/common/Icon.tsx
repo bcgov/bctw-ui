@@ -50,7 +50,8 @@ import {
   mdiRefresh,
   mdiKeyboardBackspace,
   mdiBattery20,
-  mdiDevTo
+  mdiDevTo,
+  mdiSend
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -174,6 +175,8 @@ const getIconPath = (path: string): string => {
       return mdiBattery20;
     case 'dev':
       return mdiDevTo;
+    case 'send':
+      return mdiSend;
   }
 };
 

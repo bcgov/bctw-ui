@@ -1,10 +1,11 @@
 import { Box, Checkbox, Tooltip, Typography } from "@mui/material";
+import { WarningInfo } from "api/api_interfaces";
 import { Icon } from "components/common";
 import { useState } from "react";
 
 
 export type WarningPromptsProps = {
-    prompts: string[];
+    prompts: WarningInfo[];
     onAllChecked: () => void;
     onNotAllChecked: () => void;
 }
@@ -26,52 +27,20 @@ export default function WarningPrompts (props: WarningPromptsProps): JSX.Element
     }
 
     return (
-        <>
+        <Box display='flex' flexDirection='column'>
             {
-                prompts.map((str, idx) => 
+                prompts.map((obj, idx) => 
 
                         <Box gap={'10px'} alignItems={'center'} display={'inline-flex'}>
                             <Checkbox onChange={(e, b) => handleCheck(b, idx)} />
-                            <p>{str}</p>
-                            <Tooltip arrow placement="top"  title={'Placeholder text paragraph where we would instruct the user that they are being warned big time about the bad things that they might be doing to our Caribou database full of critters.'}>
+                            <p>{obj.message}</p>
+                            <Tooltip arrow placement="top"  title={obj.help}>
                                 <div><Icon icon='help' /></div>
                             </Tooltip>
                             
                         </Box>
                     )
             }
-        </>
+        </Box>
     )
 }
-
-/*
- <>
-        <table id='warning-prompt-table'>
-            <thead>
-                <tr>
-                    <td><b>Warning Prompt</b></td>
-                    <td><b>Confirm</b></td>
-                </tr>
-            </thead>
-            <tbody id='warning-prompt-body'>
-            {
-                prompts.map((str, idx) => 
-                <tr id={`row${str}${idx}`}>
-                    <td id={`cell${str}${idx}`}>
-                        <Box gap={'10px'} alignItems={'center'} display={'inline-flex'}>
-                            <p>{str}</p>
-                            <Tooltip title={'Placeholder text paragraph where we would instruct the user that they are being warned big time about the bad things that they might be doing to our Caribou database full of critters.'}>
-                                <div><Icon icon='help' /></div>
-                            </Tooltip>
-                            
-                        </Box>
-                    </td>
-                    <td>
-                        <Checkbox onChange={(e, b) => handleCheck(b, idx)} />
-                    </td>
-                </tr>)
-            }
-            </tbody>
-        </table>
-        </>
-        */
