@@ -174,10 +174,6 @@ export default function ExportPageV2(): JSX.Element {
   const quickExport = () => {
     return (
       <Box>
-        {/* <Box pb={4}>
-          <SubHeader text='Quick Animal Export' />
-          <Divider />
-        </Box> */}
         {datePicker()}
         <Box className={styles.innerSection}>
           <DataTable

@@ -5,6 +5,7 @@ import { PageTabs } from 'components/common/partials/PageTabs';
 import { AnimalAndDeviceImportTab } from './ImportTabs';
 import { TelemetryImportTab } from './ImportTabs';
 import { KeyXImportTab } from './ImportTabs';
+import ManageLayout from 'pages/layouts/ManageLayout';
 
 // const SIZE_LIMIT = 31457280;
 
@@ -41,9 +42,8 @@ import { KeyXImportTab } from './ImportTabs';
  * @param handleToast handler from parent, called when mutation is complete
  */
 export default function Import(): JSX.Element {
-
   return (
-    <AuthLayout required_user_role={eUserRole.data_administrator}>
+    <ManageLayout>
       <div className='container'>
         <h1>Data Import</h1>
         <Box mt={2}>
@@ -55,6 +55,6 @@ export default function Import(): JSX.Element {
           </PageTabs>
         </Box>
       </div>
-    </AuthLayout>
-  )
+    </ManageLayout>
+  );
 }
