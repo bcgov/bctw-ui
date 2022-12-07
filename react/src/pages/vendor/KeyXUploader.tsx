@@ -93,16 +93,21 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
   useEffect(() => {
     if (!data?.length) return;
     const tmp: DeviceKeyXObj = {};
-    let allDevicesHaveKeyX = true;
     data.forEach((row) => {
-      if (!row.keyx) {
-        allDevicesHaveKeyX = false;
-      }
       tmp[row.device_id] = row.keyx;
     });
     setDeviceAndKeyXObj(tmp);
-    handleAllKeyXUploaded?.(allDevicesHaveKeyX);
   }, [isSuccess]);
+
+  useEffect(() => {
+    let hasAllKeyXFiles = true;
+    Object.keys(deviceAndKeyXObj).forEach((key) => {
+      if (!deviceAndKeyXObj[key]) {
+        hasAllKeyXFiles = false;
+      }
+    });
+    handleAllKeyXUploaded?.(hasAllKeyXFiles);
+  }, [deviceAndKeyXObj]);
 
   const handleUploadedKeyX = (name: string, files: FileList): void => {
     const form = createFormData('xml', files);
