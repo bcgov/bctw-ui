@@ -12,7 +12,7 @@ export default function TableContainer({ children, toolbar }: TableContainerProp
   return (
     <>
       {toolbar}
-      <Paper sx={{ width: '100%', overflow: 'hidden', border: 1, borderColor: theme.palette.divider }} elevation={0}>
+      <Paper sx={{ width: '100%', overflow: 'hidden' }} variant='outlined'>
         <MUITableContainer component={Paper} sx={{ maxHeight: '30rem' }}>
           {children}
         </MUITableContainer>

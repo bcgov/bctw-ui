@@ -52,6 +52,7 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
   const manualLayerRef = useRef<L.Rectangle>(null);
 
   const [boundingBox, setBoundingBox] = useState(['', '', '', '']);
+  const Labels = ['Min Latitude', 'Max Latitude', 'Min Longitude', 'Max Longitude'];
   /*
    * 0 - Min Lat, 1 -  Max Lat,  2 - Min Lon, 3-  Max Lon
    */
@@ -157,10 +158,25 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
   };
 
   return (
-    <Paper className={styles.paper} elevation={0} sx={{ border: 1, borderColor: theme.palette.divider }}>
+    <Paper className={styles.paper} variant='outlined'>
       <Box display='flex'>
         <FileInput buttonText='Upload Shapefile' buttonVariant='outlined' accept={'.zip'} onFileChosen={onFileUpload} />
-        <TextField
+        <Box pl={1} />
+        {Labels.map((label, idx) => (
+          <TextField
+            {...baseInputProps}
+            style={{ ...baseInputStyle }}
+            value={boundingBox[idx]}
+            className={styles.button}
+            label={label}
+            error={Number.isNaN(Number(boundingBox[idx]))}
+            onChange={(o) => {
+              handleBoundingBox(idx, o.target.value);
+            }}
+            defaultValue={'' + boundingBox[idx]}
+          />
+        ))}
+        {/* <TextField
           {...baseInputProps}
           style={{ ...baseInputStyle }}
           value={boundingBox[0]}
@@ -204,7 +220,7 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
             handleBoundingBox(3, o.target.value);
           }}
           defaultValue={'' + boundingBox[3]}
-        />
+        /> */}
       </Box>
       <Box className={styles.mapContainerBox} height={height ?? '500px'}>
         <div className={styles.mapContainerDiv}>

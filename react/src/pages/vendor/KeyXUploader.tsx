@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, TablePagination, Theme, Typography, useTheme } from '@mui/material';
+import { Box, Card, CardContent, Paper, TablePagination, Theme, Typography, useTheme } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -129,7 +129,7 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
     />
   );
   return (
-    <Card className={styles.cardWidth}>
+    <Paper className={styles.cardWidth} variant='outlined'>
       <CardContent>
         <InfoBanner text={BannerStrings.vectronicKeyxInfo} />
         <DottedBorderBox>
@@ -177,6 +177,6 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
         onPageChange={handleChangePage}
         rowsPerPage={ROWS_PER_PAGE}
       />
-    </Card>
+    </Paper>
   );
 };
