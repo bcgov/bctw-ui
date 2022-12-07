@@ -17,7 +17,7 @@ import dayjs from 'dayjs';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { Button } from 'components/common';
 import Checkbox from 'components/form/Checkbox';
-import { Tab, Tabs } from '@mui/material';
+import { Divider, Tab, Tabs } from '@mui/material';
 import ExportDownloadModal from './ExportDownloadModal';
 import { InfoBanner } from 'components/alerts/Banner';
 import ContainerLayout from 'pages/layouts/ContainerLayout';
@@ -45,10 +45,11 @@ export const exportPageStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2)
   },
   innerSection: {
-    marginBottom: theme.spacing(6)
+    marginBottom: theme.spacing(4)
   },
   queryRegionBox: {
     marginBottom: theme.spacing(4),
+    marginTop: theme.spacing(4),
     width: '800px'
   },
   dateBoxSpacing: {
@@ -138,98 +139,77 @@ export default function ExportPageV2(): JSX.Element {
     setTab(newVal);
   };
 
-  return (
-    <ManageLayout>
-      <h1>Export My Animal Telemetry</h1>
-      <Box className={styles.section} /*marginTop={'15px'}*/>
-        <InfoBanner text={ExportStrings.infoBannerMesgs} />
-      </Box>
-      <PageTabs tabLabels={TABS}>
-        {/**Quick Export */}
-        <Box>
-          <SubHeader text='Quick Animal Export' />
-          <Box className={styles.innerSection}>
-            <h2>{ExportStrings.dateRangeHeader}</h2>
-            <Box className={styles.dateBoxSpacing} columnGap={2}>
-              <Box className={styles.dateBoxInnerSpacing} columnGap={1}>
-                <DateInput
-                  propName='tstart'
-                  disabled={selectedLifetime}
-                  label={MapStrings.startDateLabel}
-                  defaultValue={dayjs(start)}
-                  changeHandler={handleChangeDate}
-                />
+  const datePicker = (): JSX.Element => {
+    return (
+      <Box>
+        <SubHeader dark size='small' text={ExportStrings.dateRangeHeader} />
+        <Box className={styles.dateBoxSpacing} columnGap={2}>
+          <Box className={styles.dateBoxInnerSpacing} columnGap={1}>
+            <DateInput
+              propName='tstart'
+              disabled={selectedLifetime}
+              label={MapStrings.startDateLabel}
+              defaultValue={dayjs(start)}
+              changeHandler={handleChangeDate}
+            />
 
-                <DateInput
-                  disabled={selectedLifetime}
-                  propName='tend'
-                  label={MapStrings.endDateLabel}
-                  defaultValue={dayjs(end)}
-                  changeHandler={handleChangeDate}
-                />
-              </Box>
-              <Checkbox
-                propName={'animalLifetime'}
-                label={ExportStrings.checkboxLabel}
-                initialValue={selectedLifetime}
-                changeHandler={() => setSelectedLifetime((o) => !o)}
-              />
-            </Box>
+            <DateInput
+              disabled={selectedLifetime}
+              propName='tend'
+              label={MapStrings.endDateLabel}
+              defaultValue={dayjs(end)}
+              changeHandler={handleChangeDate}
+            />
           </Box>
-          <Box>
-            <Box>
-              <h2 className={styles.disableSpacing}>{ExportStrings.animalTableHeader}</h2>
-              <DataTable
-                headers={AttachedAnimal.attachedCritterDisplayProps}
-                title={CS.assignedTableTitle}
-                onSelectMultiple={handleDataTableSelect}
-                queryProps={{ query: api.useAssignedCritters }}
-                isMultiSelect
-              />
-            </Box>
-            <Button
-              className='form-buttons'
-              disabled={!collarIDs.length}
-              onClick={() => {
-                setShowModal(true);
-              }}>
-              Export
-            </Button>
-          </Box>
+          <Checkbox
+            propName={'animalLifetime'}
+            label={ExportStrings.checkboxLabel}
+            initialValue={selectedLifetime}
+            changeHandler={() => setSelectedLifetime((o) => !o)}
+          />
         </Box>
-        {/* Advanced Export */}
-        <Box>
+      </Box>
+    );
+  };
+  const quickExport = () => {
+    return (
+      <Box>
+        {/* <Box pb={4}>
+          <SubHeader text='Quick Animal Export' />
+          <Divider />
+        </Box> */}
+        {datePicker()}
+        <Box className={styles.innerSection}>
+          <DataTable
+            headers={AttachedAnimal.attachedCritterDisplayProps}
+            title={<SubHeader text={ExportStrings.animalTableHeader} size='small' dark />}
+            onSelectMultiple={handleDataTableSelect}
+            queryProps={{ query: api.useAssignedCritters }}
+            isMultiSelect
+          />
+        </Box>
+        <Button
+          className='form-buttons'
+          disabled={!collarIDs.length}
+          onClick={() => {
+            setShowModal(true);
+          }}>
+          Export
+        </Button>
+      </Box>
+    );
+  };
+  const advancedExport = () => {
+    return (
+      <Box>
+        {/* <Box pb={4}>
           <SubHeader text='Advanced Animal Export' />
-          <Box className={styles.innerSection}>
-            <SubHeader size='small' text={ExportStrings.dateRangeHeader} />
-            <Box className={styles.dateBoxSpacing} columnGap={2}>
-              <Box className={styles.dateBoxInnerSpacing} columnGap={1}>
-                <DateInput
-                  propName='tstart'
-                  disabled={selectedLifetime}
-                  label={MapStrings.startDateLabel}
-                  defaultValue={dayjs(start)}
-                  changeHandler={handleChangeDate}
-                />
-
-                <DateInput
-                  disabled={selectedLifetime}
-                  propName='tend'
-                  label={MapStrings.endDateLabel}
-                  defaultValue={dayjs(end)}
-                  changeHandler={handleChangeDate}
-                />
-              </Box>
-              <Checkbox
-                propName={'animalLifetime'}
-                label={ExportStrings.checkboxLabel}
-                initialValue={selectedLifetime}
-                changeHandler={() => setSelectedLifetime((o) => !o)}
-              />
-            </Box>
-          </Box>
-          <SubHeader size='small' text={ExportStrings.queryBuilderHeader} />
-          <Box className={styles.queryRegionBox}>
+          <Divider />
+        </Box> */}
+        {datePicker()}
+        <Box className={styles.queryRegionBox}>
+          <SubHeader dark size='small' text={ExportStrings.queryBuilderHeader} />
+          <Box pt={2}>
             <QueryBuilder
               operators={operators}
               columns={columns}
@@ -237,14 +217,30 @@ export default function ExportPageV2(): JSX.Element {
               handleRowsUpdate={(r) => setBuiltRows(r)}
             />
           </Box>
-          <Box className={styles.innerSection}>
-            <h2>{ExportStrings.locationSelectHeader}</h2>
-            <LocationSelect handleDrawShape={handleDrawShape} />
-          </Box>
-          <Button disabled={!formsFilled} onClick={() => setShowModal(true)}>
-            Export
-          </Button>
         </Box>
+        <Box className={styles.innerSection}>
+          <Box pb={2}>
+            <SubHeader dark size='small' text={ExportStrings.locationSelectHeader} />
+          </Box>
+          <LocationSelect handleDrawShape={handleDrawShape} />
+        </Box>
+        <Button disabled={!formsFilled} onClick={() => setShowModal(true)}>
+          Export
+        </Button>
+      </Box>
+    );
+  };
+  return (
+    <ManageLayout>
+      <h1>Export My Animal Telemetry</h1>
+      <Box className={styles.section} /*marginTop={'15px'}*/>
+        <InfoBanner text={ExportStrings.infoBannerMesgs} />
+      </Box>
+      <PageTabs tabLabels={TABS}>
+        {quickExport()}
+        {advancedExport()}
+        {/* Advanced Export */}
+
         {/* <DatePicker />
         <h1>test</h1> */}
         {/* <DatePicker /> */}

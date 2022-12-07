@@ -56,9 +56,7 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
               align={'left'}
               padding={headCell.disablePadding ? 'none' : 'normal'}
               sortDirection={orderBy === headCell.id ? order : false}
-              style={secondaryHeaders ? {borderBottom: '0px'} : null}
-              >
-              
+              style={secondaryHeaders ? { borderBottom: '0px' } : null}>
               <TableSortLabel
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : 'asc'}
@@ -81,25 +79,15 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
             : null}
         </TableRow>
       )}
-       {secondaryHeaders 
-            ? (
-            <TableRow>
-              {secondaryHeaders.map((o) => (
-              <TableCell
-                className='dimmed-cell'
-                key={String(o)}
-                align={'left'}
-                style={{paddingTop: '2px'}}
-                >
-                  {o}
-              </TableCell>
-            ))}
-            </TableRow> 
-            )
-            :
-            null
-            
-      }
+      {secondaryHeaders ? (
+        <TableRow>
+          {secondaryHeaders.map((o) => (
+            <TableCell className='dimmed-cell' key={String(o)} align={'left'} style={{ paddingTop: '2px' }}>
+              {o}
+            </TableCell>
+          ))}
+        </TableRow>
+      ) : null}
     </MuiTableHead>
   );
 }

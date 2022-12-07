@@ -48,7 +48,7 @@ interface ICustomTableColumn<T> {
  */
 type PlainTableProps<T> = {
   headers: (keyof T)[];
-  title?: string;
+  title?: string | JSX.Element;
   onSelect?: (row: T) => void;
 };
 

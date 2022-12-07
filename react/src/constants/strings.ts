@@ -304,8 +304,8 @@ const ExportStrings = {
   quickTabLabel: 'Quick Export',
   advancedTabLabel: 'Advanced Export',
   checkboxLabel: 'All Telemetry',
-  dateRangeHeader: 'Specify Date Range',
-  animalTableHeader: 'Select Animals',
+  dateRangeHeader: 'Select Date Range',
+  animalTableHeader: 'Select Attached Animals',
   queryBuilderHeader: 'Build Query',
   locationSelectHeader: 'Select Location',
   modal: {
@@ -326,8 +326,9 @@ const ImportStrings = {
   validValuesModal: 'Valid values for this field',
   checkboxLabel: 'Hide Empty Columns',
   successBanner:
-    'Your spreadsheet appears to be ready for submission. Press the \'Finalize Submission\' button at the bottom of the page to import your data.',
-  warningBanner: 'Importing this data may have unintended effects. You must confirm that you understand each item below will be actioned before you finalize your import.',
+    "Your spreadsheet appears to be ready for submission. Press the 'Finalize Submission' button at the bottom of the page to import your data.",
+  warningBanner:
+    'Importing this data may have unintended effects. You must confirm that you understand each item below will be actioned before you finalize your import.',
   errorBanner:
     'Hover over highlighted cells to view error info. Fix these errors in your spreadsheet application and re-upload.',
   detailBannerIdle: 'Click a cell for detailed information on that error.',
