@@ -202,10 +202,6 @@ export default function ExportPageV2(): JSX.Element {
   const advancedExport = () => {
     return (
       <Box>
-        {/* <Box pb={4}>
-          <SubHeader text='Advanced Animal Export' />
-          <Divider />
-        </Box> */}
         {datePicker()}
         <Box className={styles.queryRegionBox}>
           <SubHeader dark size='small' text={ExportStrings.queryBuilderHeader} />
