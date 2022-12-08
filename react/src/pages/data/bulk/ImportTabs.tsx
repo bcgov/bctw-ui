@@ -20,7 +20,6 @@ import { LoadingButton } from '@mui/lab';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { columnToHeader } from 'utils/common_helpers';
-const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
   spacing: {
