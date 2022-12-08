@@ -2,7 +2,7 @@ import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/ma
 import { Modal } from 'components/common';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
-import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
+import { AnimalCollar, CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
 import { Banner, InfoBanner, SuccessBanner } from 'components/alerts/Banner';
 import { Icon } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
@@ -46,6 +46,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: '-10px'
   }
 }));
+
 enum SheetNames {
   AnimalAndDevice,
   Telemetry
@@ -55,7 +56,6 @@ interface RowColPair {
   col?: string;
 }
 interface ImportTabProps {
-  // children: JSX.Element;
   title?: string;
   tabIndex?: number;
   show?: boolean;
@@ -66,14 +66,11 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
-
   const styles = useStyles();
 
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
   const [warnings, setWarnings] = useState<WarningInfo[]>([]);
-  // const [confirmedWarnings, setConfirmedWarnings] = useState(false);
-  // const [unhandledWarningRows, setUnhandledWarningRows] = useState<number[]>([]);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
   const [filename, setFilename] = useState('');
@@ -81,7 +78,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
   const warningsAllConfirmed = warnings?.length && warnings.every((warning) => !!warning.checked);
 
-  const onSuccessFinalize = (d): void => {
+  const onSuccessFinalize = (): void => {
     showNotif({ severity: 'success', message: 'Your import was successful.' });
     handleFileClear();
   };
@@ -98,16 +95,11 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   useEffect(() => {
     if (currentSheet) {
       const warnings = collectWarningsFromResults(currentSheet);
-      //setUnhandledWarningRows(warningsIdxs);
       setWarnings(warnings);
     }
   }, [currentSheet]);
 
-  // useEffect(() => {
-  //   setConfirmedWarnings(false);
-  // }, [sanitizedFile]);
-
-  const handleCellSelected = (row_idx, cellname) => {
+  const handleCellSelected = (row_idx: number, cellname) => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
     setSelectedCell({ row: row_idx, col: cellname });
   };
@@ -132,7 +124,10 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     return headers;
   };
 
-  const getTableData = () => {
+  /**
+   * TODO Add correct type for this.
+   */
+  const getTableData = (): any => {
     const rows = currentSheet.rows.map((o, idx) => {
       return { row_index: idx + 2, ...o.row };
     }) as any[];
@@ -164,9 +159,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     tmp[idx].checked = checked;
     setWarnings([...tmp]);
   };
-  // useEffect(() => {
-  //   console.log({ warnings }, { warningsAllConfirmed });
-  // }, [warnings]);
+
   return (
     <>
       <Box display={!show && 'none'}>
@@ -203,15 +196,12 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               <Box className={styles.spacingTopBottom}>
                 <SubHeader size='small' text='Upload Preview' />
               </Box>
-              {/* <Typography className={styles.spacingTopBottom}>Upload Preview</Typography> */}
               {isValidated ? (
                 <WarningPromptsBanner
                   allClearText={constants.successBanner}
                   text={constants.warningBanner}
                   prompts={warnings}
                   allChecked={warningsAllConfirmed}
-                  // onAllChecked={() => setConfirmedWarnings(true)}
-                  // onNotAllChecked={() => setConfirmedWarnings(false)}
                   setWarningChecked={handleCheckWarning}
                 />
               ) : (
@@ -250,6 +240,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               )}
               {currentSheet.rows.length > 0 ? (
                 <>
+                  {/* TODO Add correct type for the headers */}
                   <HighlightTable
                     data={getTableData()}
                     headers={['row_index', ...getHeaders(currentSheet, hideEmptyColumns)] as any}
@@ -313,7 +304,8 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     </>
   );
 };
-
+//Move the mutate / state to these wrapper components
+//Make sure the reset/handleFileClear is called after both the telemetry and animalDevice
 export const AnimalAndDeviceImportTab = (props: ImportTabProps) => {
   const handleSubmit = (): void => {
     console.log('submitting animal and device');

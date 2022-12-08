@@ -8,7 +8,9 @@ type WarningPromptsBannerProps = WarningPromptsProps &
     allClearText: string;
     allChecked: boolean;
   };
-
+/**
+ *
+ */
 export default function WarningPromptsBanner(props: WarningPromptsBannerProps): JSX.Element {
   const { allClearText, text, prompts, setWarningChecked, allChecked } = props;
   return (
