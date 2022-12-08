@@ -1,6 +1,4 @@
 import { Box } from '@mui/material';
-import AuthLayout from 'pages/layouts/AuthLayout';
-import { eUserRole } from 'types/user';
 import { PageTabs } from 'components/common/partials/PageTabs';
 import { AnimalAndDeviceImportTab } from './ImportTabs';
 import { TelemetryImportTab } from './ImportTabs';

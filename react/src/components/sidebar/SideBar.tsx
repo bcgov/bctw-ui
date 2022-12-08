@@ -36,7 +36,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
-      const adminRoutes = ['import', 'animal-manager', 'delegation-requests', 'onboarding-admin', 'users', 'vendor'];
+      const adminRoutes = ['animal-manager', 'delegation-requests', 'onboarding-admin', 'users', 'vendor'];
       curRoutes.push(...routes.filter((r) => adminRoutes.includes(r.name)));
     }
     if (isCritterManager) {
