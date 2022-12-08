@@ -76,14 +76,16 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
           .filter((r) => r.name !== 'notFound' && r.icon)
           .map((route: RouteKey, idx: number) => {
             return (
-              <Tooltip key={idx} title={route.title}>
+              <>
+                {/*<Tooltip key={idx} title={route.title}>*/}
                 <ListItem className='side-bar-item' button {...{ component: Link, to: route.path }}>
                   <ListItemIcon>
                     <Icon icon={route.icon} />
                   </ListItemIcon>
                   <ListItemText className={'list-item-txt'} primary={route.title} />
                 </ListItem>
-              </Tooltip>
+                {/* </Tooltip> */}
+              </>
             );
           })}
       </List>

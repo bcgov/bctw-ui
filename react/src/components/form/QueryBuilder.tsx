@@ -169,7 +169,6 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
       ))}
       <Box display='flex'>
         <MUIButton
-          //   className='form-buttons'
           disabled={rows.length == columns.length}
           size='large'
           startIcon={<Icon icon='plus' />}

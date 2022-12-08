@@ -1,18 +1,14 @@
-import * as L from 'leaflet';
 import { Box, Paper, TextField, useTheme } from '@mui/material';
-//import TextField from 'components/form/TextInput';
-import { inputPropsToRemove } from 'components/form/TextInput';
-import { InboundObj } from 'types/form_types';
-import FileInput from './FileInput';
 import makeStyles from '@mui/styles/makeStyles';
-import { initMap } from 'pages/map/map_init';
-import shpjs from 'shpjs';
-import { FeatureCollection } from 'geojson';
 import { AllGeoJSON } from '@turf/helpers';
 import simplify from '@turf/simplify';
-import { useEffect, useRef, useState } from 'react';
 import { baseInputProps, baseInputStyle } from 'components/component_constants';
-import { removeProps } from 'utils/common_helpers';
+import { FeatureCollection } from 'geojson';
+import * as L from 'leaflet';
+import { initMap } from 'pages/map/map_init';
+import { useEffect, useRef, useState } from 'react';
+import shpjs from 'shpjs';
+import FileInput from './FileInput';
 
 type ILocationSelectProps = {
   handleDrawShape: (features: L.FeatureGroup) => void;
@@ -100,12 +96,12 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
     });
   };
 
-  const isValidInput = (str: string): boolean => {
-    if (str.trim() === '') {
-      return true;
-    }
-    return !Number.isNaN(Number(str));
-  };
+  // const isValidInput = (str: string): boolean => {
+  //   if (str.trim() === '') {
+  //     return true;
+  //   }
+  //   return !Number.isNaN(Number(str));
+  // };
 
   const handleDeleteLayers = (layers: L.LayerGroup) => {
     layers.eachLayer((l) => {
@@ -119,7 +115,6 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
     if (val !== undefined) {
       const newArr = [...boundingBox.slice(0, idx), val, ...boundingBox.slice(idx + 1)];
       let shouldUpdateState = true;
-      //const bb = newArr.map(o => o === '' ? NaN : Number(o));
       const bb = [];
       for (const b of newArr) {
         const n = b === '' ? NaN : Number(b);
@@ -176,51 +171,6 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
             defaultValue={'' + boundingBox[idx]}
           />
         ))}
-        {/* <TextField
-          {...baseInputProps}
-          style={{ ...baseInputStyle }}
-          value={boundingBox[0]}
-          className={styles.button}
-          label={'Min Latitude'}
-          error={Number.isNaN(Number(boundingBox[0]))}
-          onChange={(o) => {
-            handleBoundingBox(0, o.target.value);
-          }}
-          defaultValue={'' + boundingBox[0]}
-        />
-        <TextField
-          {...baseInputProps}
-          style={{ ...baseInputStyle }}
-          value={boundingBox[1]}
-          label={'Max Latitude'}
-          error={Number.isNaN(Number(boundingBox[1]))}
-          onChange={(o) => {
-            handleBoundingBox(1, o.target.value);
-          }}
-          defaultValue={'' + boundingBox[1]}
-        />
-        <TextField
-          {...baseInputProps}
-          style={{ ...baseInputStyle }}
-          value={boundingBox[2]}
-          label={'Min Longitude'}
-          error={Number.isNaN(Number(boundingBox[2]))}
-          onChange={(o) => {
-            handleBoundingBox(2, o.target.value);
-          }}
-          defaultValue={'' + boundingBox[2]}
-        />
-        <TextField
-          {...baseInputProps}
-          style={{ ...baseInputStyle }}
-          value={boundingBox[3]}
-          label={'Max Longitude'}
-          error={Number.isNaN(Number(boundingBox[3]))}
-          onChange={(o) => {
-            handleBoundingBox(3, o.target.value);
-          }}
-          defaultValue={'' + boundingBox[3]}
-        /> */}
       </Box>
       <Box className={styles.mapContainerBox} height={height ?? '500px'}>
         <div className={styles.mapContainerDiv}>
