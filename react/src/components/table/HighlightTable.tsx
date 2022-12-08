@@ -1,4 +1,4 @@
-import { lighten, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { darken, lighten, Table, TableBody, TableCell, TableRow, useTheme } from '@mui/material';
 import TableContainer from 'components/table/TableContainer';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
 import { PlainTableProps, Order } from 'components/table/table_interfaces';
@@ -39,6 +39,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
   dimFirstColumn = false,
   warningRows
 }: HighlightTableProps<T>): JSX.Element {
+  const theme = useTheme();
   const [selected, setSelected] = useState<T>();
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>();
@@ -61,7 +62,6 @@ export default function HighlightTable<T extends BCTWBase<T>>({
       onSelectCell(row_idx, cellname);
     }
   };
-
   return (
     <TableContainer>
       <Table className={'table'} size='small'>
@@ -83,7 +83,6 @@ export default function HighlightTable<T extends BCTWBase<T>>({
         )}
         <TableBody>
           {stableSort(data, getComparator(order, orderBy)).map((obj: T, prop: number) => {
-            //const isRowSelected = isSelected(obj);
             return (
               <TableRow
                 hover
@@ -94,6 +93,16 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                 //aria-checked={isRowSelected}
                 tabIndex={-1}
                 key={`row${prop}`}
+                selected={warningRows.includes(prop)}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: lighten(theme.palette.warning.light, 0.9),
+                    color: '#ffffff'
+                  },
+                  '&.Mui-selected:hover': {
+                    backgroundColor: lighten(theme.palette.warning.main, 0.9)
+                  }
+                }}
                 //selected={isRowSelected}
               >
                 {headers.map((k, i) => {

@@ -2,7 +2,7 @@ import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/ma
 import { Modal } from 'components/common';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
-import { CellErrorDescriptor, ParsedXLSXSheetResult } from 'api/api_interfaces';
+import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
 import { Banner, InfoBanner, SuccessBanner } from 'components/alerts/Banner';
 import { Icon } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
@@ -20,7 +20,6 @@ import { LoadingButton } from '@mui/lab';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { columnToHeader } from 'utils/common_helpers';
-const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
   spacing: {
@@ -38,13 +37,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'center'
   },
   circularProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      height: '20px !important',
-      width: '20px !important',
-      marginLeft: '-17px',
-      marginTop: '-10px'
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    height: '20px !important',
+    width: '20px !important',
+    marginLeft: '-17px',
+    marginTop: '-10px'
   }
 }));
 enum SheetNames {
@@ -72,16 +71,18 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
-  const [confirmedWarnings, setConfirmedWarnings] = useState(false);
+  const [warnings, setWarnings] = useState<WarningInfo[]>([]);
+  // const [confirmedWarnings, setConfirmedWarnings] = useState(false);
+  // const [unhandledWarningRows, setUnhandledWarningRows] = useState<number[]>([]);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
   const [filename, setFilename] = useState('');
-  
+
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
-  const isTelemetrySheet = sheetIndex === SheetNames.Telemetry;
+  const warningsAllConfirmed = warnings?.length && warnings.every((warning) => !!warning.checked);
 
   const onSuccessFinalize = (d): void => {
-    showNotif( {severity: 'success', message: 'Your import was successful.'});
+    showNotif({ severity: 'success', message: 'Your import was successful.' });
     handleFileClear();
   };
 
@@ -89,11 +90,22 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     showNotif({ severity: 'error', message: 'An error was encountered when trying to finalize the data upload.' });
   };
 
-  const { isLoading: isLoadingFinalize, mutateAsync: mutateFinalize } = api.useFinalizeXLSX({onSuccess: onSuccessFinalize, onError: onErrorFinalize });
+  const { isLoading: isLoadingFinalize, mutateAsync: mutateFinalize } = api.useFinalizeXLSX({
+    onSuccess: onSuccessFinalize,
+    onError: onErrorFinalize
+  });
 
   useEffect(() => {
-    setConfirmedWarnings(false);
-  }, [sanitizedFile])
+    if (currentSheet) {
+      const warnings = collectWarningsFromResults(currentSheet);
+      //setUnhandledWarningRows(warningsIdxs);
+      setWarnings(warnings);
+    }
+  }, [currentSheet]);
+
+  // useEffect(() => {
+  //   setConfirmedWarnings(false);
+  // }, [sanitizedFile]);
 
   const handleCellSelected = (row_idx, cellname) => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
@@ -103,12 +115,12 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const handleFileUpload = (fieldname: string, files: FileList) => {
     setFilename(files[0].name);
     setFile(fieldname, files);
-  }
+  };
 
   const handleFileClear = () => {
     setFilename('');
     reset();
-  }
+  };
 
   const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
     let headers = [];
@@ -146,6 +158,15 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     });
     return messages;
   };
+
+  const handleCheckWarning = (idx: number, checked: boolean) => {
+    const tmp = warnings;
+    tmp[idx].checked = checked;
+    setWarnings([...tmp]);
+  };
+  // useEffect(() => {
+  //   console.log({ warnings }, { warningsAllConfirmed });
+  // }, [warnings]);
   return (
     <>
       <Box display={!show && 'none'}>
@@ -187,9 +208,11 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                 <WarningPromptsBanner
                   allClearText={constants.successBanner}
                   text={constants.warningBanner}
-                  prompts={collectWarningsFromResults(currentSheet)}
-                  onAllChecked={() => setConfirmedWarnings(true)}
-                  onNotAllChecked={() => setConfirmedWarnings(false)}
+                  prompts={warnings}
+                  allChecked={warningsAllConfirmed}
+                  // onAllChecked={() => setConfirmedWarnings(true)}
+                  // onNotAllChecked={() => setConfirmedWarnings(false)}
+                  setWarningChecked={handleCheckWarning}
                 />
               ) : (
                 <>
@@ -235,6 +258,11 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                     messages={getTableHelpMessages(currentSheet)}
                     rowIdentifier='row_index'
                     dimFirstColumn={true}
+                    warningRows={warnings.map((w) => {
+                      if (!w.checked && isValidated) {
+                        return w.row;
+                      }
+                    })}
                   />
                 </>
               ) : (
@@ -254,16 +282,15 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               />
             )}
             <LoadingButton
-              onClick={() => mutateFinalize(currentSheet.rows.map(r => r.row))}
-              disabled={!isValidated || !confirmedWarnings || isLoadingFinalize}
+              onClick={() => mutateFinalize(currentSheet.rows.map((r) => r.row))}
+              disabled={!isValidated || !warningsAllConfirmed || isLoadingFinalize}
               className={styles.spacing}
               variant='contained'
               loading={isLoadingFinalize}
-              loadingIndicator={ <CircularProgress color='inherit' className={styles.circularProgress} /> }
+              loadingIndicator={<CircularProgress color='inherit' className={styles.circularProgress} />}
               loadingPosition={'end'}
-              endIcon={<Icon icon='send'/>}
-              style={{ marginLeft: 'auto' }}
-            >
+              endIcon={<Icon icon='send' />}
+              style={{ marginLeft: 'auto' }}>
               Finalize Submission
             </LoadingButton>
           </Box>
