@@ -1,10 +1,16 @@
 .table-container {
   width: 100%;
   min-width: 100%;
-  max-height: 30rem;
+  display: block;
+  //max-height: 30rem;
   // min-height: 500px;
+  // overflow-y: auto;
+  // overflow-x: auto;
+}
+.table-body {
+  display: block;
   overflow-y: auto;
-  overflow-x: auto;
+  max-height: 30rem;
 }
 .paper {
   width: 100%;
@@ -36,7 +42,7 @@
 }
 
 .dimmed-cell {
-  color:rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.4);
 }
 /*
 .paginate {

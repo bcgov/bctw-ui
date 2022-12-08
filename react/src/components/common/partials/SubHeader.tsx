@@ -2,12 +2,13 @@ import { Typography } from '@mui/material';
 interface SubHeaderProps {
   text: string;
   size?: 'large' | 'small';
+  dark?: boolean;
 }
 /**
  * @param text Subheader text
  * Returns a stylized subheader, used with data tables and ui layouts.
  */
-export const SubHeader = ({ text, size = 'large' }: SubHeaderProps) => (
+export const SubHeader = ({ text, size = 'large', dark = false }: SubHeaderProps) => (
   <Typography
     sx={{
       margin: 0,
@@ -15,7 +16,7 @@ export const SubHeader = ({ text, size = 'large' }: SubHeaderProps) => (
       verticalAlign: 'bottom'
     }}
     variant={size === 'small' ? 'h5' : 'h4'}
-    color='text.secondary'>
+    color={dark ? 'text.primary' : 'text.secondary'}>
     {text ?? <span>&nbsp;</span>}
   </Typography>
 );

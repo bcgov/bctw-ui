@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import React from 'react';
 
 interface DottedBorderBoxProps {
@@ -6,16 +6,18 @@ interface DottedBorderBoxProps {
 }
 
 export const DottedBorderBox = (props: DottedBorderBoxProps) => {
+  const theme = useTheme();
   const { children } = props;
   return (
     <Box
       sx={{
-        border: '3px dashed grey',
+        border: '2px dashed grey',
+        backgroundColor: 'grey.100',
         minWidth: '100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '4rem'
+        height: '5rem'
       }}>
       {children}
     </Box>
