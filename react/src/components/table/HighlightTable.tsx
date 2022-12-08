@@ -64,7 +64,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
 
   return (
     <TableContainer>
-      <Table className={'table'}>
+      <Table className={'table'} size='small'>
         {data === undefined ? null : (
           <TableHead
             headersToDisplay={headers}
@@ -94,7 +94,6 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                 //aria-checked={isRowSelected}
                 tabIndex={-1}
                 key={`row${prop}`}
-                selected={true}
                 //selected={isRowSelected}
               >
                 {headers.map((k, i) => {
