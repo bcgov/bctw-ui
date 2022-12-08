@@ -61,7 +61,6 @@ export default function HighlightTable<T extends BCTWBase<T>>({
       onSelectCell(row_idx, cellname);
     }
   };
-
   return (
     <TableContainer>
       <Table className={'table'}>
@@ -83,7 +82,6 @@ export default function HighlightTable<T extends BCTWBase<T>>({
         )}
         <TableBody>
           {stableSort(data, getComparator(order, orderBy)).map((obj: T, prop: number) => {
-            //const isRowSelected = isSelected(obj);
             return (
               <TableRow
                 hover
@@ -94,7 +92,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                 //aria-checked={isRowSelected}
                 tabIndex={-1}
                 key={`row${prop}`}
-                selected={true}
+                selected={warningRows.includes(prop)}
                 //selected={isRowSelected}
               >
                 {headers.map((k, i) => {

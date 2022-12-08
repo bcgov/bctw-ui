@@ -38,13 +38,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'center'
   },
   circularProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      height: '20px !important',
-      width: '20px !important',
-      marginLeft: '-17px',
-      marginTop: '-10px'
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    height: '20px !important',
+    width: '20px !important',
+    marginLeft: '-17px',
+    marginTop: '-10px'
   }
 }));
 enum SheetNames {
@@ -73,15 +73,16 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
   const [confirmedWarnings, setConfirmedWarnings] = useState(false);
+  const [unhandledWarningRows, setUnhandledWarningRows] = useState<number[]>([]);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
   const [filename, setFilename] = useState('');
-  
+
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
   const isTelemetrySheet = sheetIndex === SheetNames.Telemetry;
 
   const onSuccessFinalize = (d): void => {
-    showNotif( {severity: 'success', message: 'Your import was successful.'});
+    showNotif({ severity: 'success', message: 'Your import was successful.' });
     handleFileClear();
   };
 
@@ -89,11 +90,21 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     showNotif({ severity: 'error', message: 'An error was encountered when trying to finalize the data upload.' });
   };
 
-  const { isLoading: isLoadingFinalize, mutateAsync: mutateFinalize } = api.useFinalizeXLSX({onSuccess: onSuccessFinalize, onError: onErrorFinalize });
+  const { isLoading: isLoadingFinalize, mutateAsync: mutateFinalize } = api.useFinalizeXLSX({
+    onSuccess: onSuccessFinalize,
+    onError: onErrorFinalize
+  });
+
+  useEffect(() => {
+    if (currentSheet) {
+      const warningsIdxs = collectWarningsFromResults(currentSheet).map((warning) => warning.row);
+      setUnhandledWarningRows(warningsIdxs);
+    }
+  }, [currentSheet]);
 
   useEffect(() => {
     setConfirmedWarnings(false);
-  }, [sanitizedFile])
+  }, [sanitizedFile]);
 
   const handleCellSelected = (row_idx, cellname) => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
@@ -103,12 +114,12 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const handleFileUpload = (fieldname: string, files: FileList) => {
     setFilename(files[0].name);
     setFile(fieldname, files);
-  }
+  };
 
   const handleFileClear = () => {
     setFilename('');
     reset();
-  }
+  };
 
   const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
     let headers = [];
@@ -146,6 +157,19 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     });
     return messages;
   };
+
+  const handleWarningWasChecked = (value: number, checked: boolean) => {
+    const index = unhandledWarningRows.indexOf(value);
+    //If checked is true remove the warning index from the array
+    checked
+      ? setUnhandledWarningRows((warningRows) => {
+          warningRows.splice(index, 1);
+          return [...warningRows];
+        })
+      : //If checked is false add the warning back to the array
+        setUnhandledWarningRows((warningRows) => [...warningRows, value]);
+  };
+
   return (
     <>
       <Box display={!show && 'none'}>
@@ -190,6 +214,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                   prompts={collectWarningsFromResults(currentSheet)}
                   onAllChecked={() => setConfirmedWarnings(true)}
                   onNotAllChecked={() => setConfirmedWarnings(false)}
+                  handledWarning={handleWarningWasChecked}
                 />
               ) : (
                 <>
@@ -235,6 +260,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                     messages={getTableHelpMessages(currentSheet)}
                     rowIdentifier='row_index'
                     dimFirstColumn={true}
+                    warningRows={unhandledWarningRows}
                   />
                 </>
               ) : (
@@ -254,16 +280,15 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               />
             )}
             <LoadingButton
-              onClick={() => mutateFinalize(currentSheet.rows.map(r => r.row))}
+              onClick={() => mutateFinalize(currentSheet.rows.map((r) => r.row))}
               disabled={!isValidated || !confirmedWarnings || isLoadingFinalize}
               className={styles.spacing}
               variant='contained'
               loading={isLoadingFinalize}
-              loadingIndicator={ <CircularProgress color='inherit' className={styles.circularProgress} /> }
+              loadingIndicator={<CircularProgress color='inherit' className={styles.circularProgress} />}
               loadingPosition={'end'}
-              endIcon={<Icon icon='send'/>}
-              style={{ marginLeft: 'auto' }}
-            >
+              endIcon={<Icon icon='send' />}
+              style={{ marginLeft: 'auto' }}>
               Finalize Submission
             </LoadingButton>
           </Box>
