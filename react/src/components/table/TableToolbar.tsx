@@ -28,7 +28,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 type TableToolbarProps<T> = {
   numSelected: number;
   rowCount: number;
-  title: string;
+  title: string | JSX.Element;
   filterableProperties: (keyof T)[];
   onChangeFilter: (filter: ITableFilter) => void;
   sibling?: JSX.Element;
@@ -36,12 +36,13 @@ type TableToolbarProps<T> = {
   showTooltip?: boolean;
   setPage: (page: number) => void;
   disableSearch?: boolean;
+  darkHeader?: boolean;
   //disabled: boolean;
 };
 
 export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Element {
   const classes = useToolbarStyles();
-  const { numSelected, sibling, title, showTooltip, disableSearch } = props;
+  const { numSelected, sibling, title, showTooltip, disableSearch, darkHeader } = props;
   return (
     <Toolbar disableGutters className={classes.root}>
       <Box width='100%'>
@@ -51,7 +52,7 @@ export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Elemen
           </TableRow>
         )}
         <Box className={classes.toolbarTitle}>
-          <SubHeader text={title} />
+          {typeof title === 'string' ? <SubHeader text={title} size='small' /> : title}
           &nbsp;
           {numSelected > 0 && <span>({numSelected} Selected)</span>}
           <Box display={'flex'} alignItems={'center'} className={classes.actions}>

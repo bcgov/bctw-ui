@@ -28,7 +28,6 @@ const appTheme = createTheme(
     typography: {
       fontFamily: ['BCSans', 'Verdana', 'Arial', 'sans-serif'].join(',')
     },
-
     overrides: {
       MuiTypography: {
         // https://material-ui.com/api/typography/
@@ -54,7 +53,7 @@ const appTheme = createTheme(
       },
       MuiPaper: {
         root: {
-          borderRadius: BR
+          borderRadius: 8
         }
       },
       MuiButton: {

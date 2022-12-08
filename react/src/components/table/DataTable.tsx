@@ -3,6 +3,7 @@ import {
   Checkbox,
   CircularProgress,
   Divider,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -356,7 +357,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   return (
     <TableContainer toolbar={Toolbar()}>
       <>
-        <Table stickyHeader>
+        <Table stickyHeader size='small'>
           <TableHead
             headersToDisplay={headerProps}
             headerData={data && data[0]}

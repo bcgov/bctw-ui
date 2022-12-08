@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, TablePagination, Theme, Typography, useTheme } from '@mui/material';
+import { Box, Card, CardContent, Paper, TablePagination, Theme, Typography, useTheme } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -15,9 +15,11 @@ import { DottedBorderBox } from 'components/common/partials/DottedBorderBox';
 import Tooltip from 'components/common/Tooltip';
 import FileInput from 'components/form/FileInput';
 import { BannerStrings } from 'constants/strings';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { VectronicKeyX } from 'types/collar';
+import { formatAxiosError } from 'utils/errors';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -55,6 +57,7 @@ interface DeviceKeyXObj {
  */
 export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded }: KeyXCardProps): JSX.Element => {
   const api = useTelemetryApi();
+  const showNotif = useResponseDispatch();
   const theme = useTheme();
   const styles = useStyles();
   const { data, isSuccess, isLoading } = api.useGetCollarKeyX(device_ids);
@@ -68,6 +71,9 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
   const onSuccessKeyX = (response: IBulkUploadResults<VectronicKeyX>): void => {
     //Currently not doing anything with errors on upload
     const { errors, results } = response;
+    results.length
+      ? showNotif({ severity: 'success', message: `Successfully imported ${results.length} Vectronic KeyX files` })
+      : showNotif({ severity: 'warning', message: `No new Vectronic KeyX files were imported` });
     //Set the successfull results to the object
     results.forEach((keyX) => {
       if (keyX.idcollar in deviceAndKeyXObj) {
@@ -78,6 +84,7 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
 
   const onErrorKeyX = (e: AxiosError): void => {
     console.log(e.message);
+    showNotif({ severity: 'error', message: formatAxiosError(e) });
   };
 
   const {
@@ -129,7 +136,7 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
     />
   );
   return (
-    <Card className={styles.cardWidth}>
+    <Paper className={styles.cardWidth} variant='outlined'>
       <CardContent>
         <InfoBanner text={BannerStrings.vectronicKeyxInfo} />
         <DottedBorderBox>
@@ -177,6 +184,6 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
         onPageChange={handleChangePage}
         rowsPerPage={ROWS_PER_PAGE}
       />
-    </Card>
+    </Paper>
   );
 };

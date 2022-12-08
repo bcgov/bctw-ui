@@ -43,7 +43,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       curRoutes.push(...routes.filter((r) => ['delegation'].includes(r.name)));
     }
     if (isDataAdmin) {
-      const dataAdminRoutes = ['import', 'animal-manager', 'delegation-requests', 'animal-manager', 'vendor'];
+      const dataAdminRoutes = ['animal-manager', 'delegation-requests', 'animal-manager', 'vendor'];
       curRoutes.push(...routes.filter((r) => dataAdminRoutes.includes(r.name)));
     }
     if (isDev()) {
@@ -65,7 +65,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       case '/profile':
       case '/playground':
     }
-    handleSetVisible(['animals', 'devices', 'profile', 'export']);
+    handleSetVisible(['animals', 'devices', 'profile', 'export', 'import']);
   }, [location, isAdmin, isCritterManager, isDataAdmin]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
