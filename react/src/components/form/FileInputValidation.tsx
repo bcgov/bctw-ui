@@ -2,8 +2,6 @@ import { Box, CircularProgress, IconButton, Paper, Typography } from '@mui/mater
 import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
 import { DottedBorderBox } from 'components/common/partials/DottedBorderBox';
-import { useTabs } from 'contexts/TabsContext';
-import { useState } from 'react';
 import FileInput, { FileInputProps } from './FileInput';
 
 interface FileInputValidation extends FileInputProps {
@@ -15,11 +13,6 @@ interface FileInputValidation extends FileInputProps {
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    // marginTop: theme.spacing(2),
-    // padding: '16px',
-    // backgroundColor: 'text.secondary',
-    // display: 'flex',
-    // justifyContent: 'center',
     '& .MuiCircularProgress-root': {
       display: 'inline-block',
       top: '0%',
@@ -35,19 +28,22 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+/**
+ * @param filename
+ * @param onFileChosen handler for the uploaded file
+ * @param trashIconClick handler for the delete / remove of the file
+ */
 export default function FileInputValidation(props: FileInputValidation): JSX.Element {
-  const { filename, onFileChosen, trashIconClick, validationSuccess, buttonText, buttonVariant, accept, isLoading } = props;
-  //const [filename, setFilename] = useState('');
+  const { filename, onFileChosen, trashIconClick, validationSuccess, buttonText, buttonVariant, accept, isLoading } =
+    props;
   const styles = useStyles();
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
     onFileChosen(fieldName, files);
-    //setFilename(files[0]?.name);
   };
 
   const handleFileRemove = () => {
     trashIconClick();
-    //setFilename('');
   };
 
   const conditionalRender = (): JSX.Element => {
@@ -79,8 +75,5 @@ export default function FileInputValidation(props: FileInputValidation): JSX.Ele
     <Box className={styles.paper}>
       <DottedBorderBox>{conditionalRender()}</DottedBorderBox>
     </Box>
-    // <Paper elevation={3} className={styles.paper}>
-
-    // </Paper>
   );
 }
