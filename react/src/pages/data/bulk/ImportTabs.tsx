@@ -1,25 +1,24 @@
+import { LoadingButton } from '@mui/lab';
 import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/material';
-import { Modal } from 'components/common';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
-import { AnimalCollar, CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
-import { Banner, InfoBanner, SuccessBanner } from 'components/alerts/Banner';
-import { Icon } from 'components/common';
+import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
+import { Banner, InfoBanner } from 'components/alerts/Banner';
+import { Icon, Modal } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import Checkbox from 'components/form/Checkbox';
 import FileInputValidation from 'components/form/FileInputValidation';
 import HighlightTable from 'components/table/HighlightTable';
 import { ImportStrings as constants } from 'constants/strings';
-import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
-import { KeyXUploader } from 'pages/vendor/KeyXUploader';
-import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
-import WarningPromptsBanner from './WarningPromptsBanner';
-import { useEffect, useRef, useState } from 'react';
-import { useTabs } from 'contexts/TabsContext';
-import { LoadingButton } from '@mui/lab';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { useTabs } from 'contexts/TabsContext';
+import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { KeyXUploader } from 'pages/vendor/KeyXUploader';
+import { useEffect, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
+import WarningPromptsBanner from './WarningPromptsBanner';
+import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
 
 const useStyles = makeStyles((theme: Theme) => ({
   spacing: {
@@ -99,7 +98,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     }
   }, [currentSheet]);
 
-  const handleCellSelected = (row_idx: number, cellname) => {
+  const handleCellSelected = (row_idx: number, cellname: string) => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
     setSelectedCell({ row: row_idx, col: cellname });
   };
