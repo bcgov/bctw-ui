@@ -272,6 +272,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                 changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
               />
             )}
+            {/* TODO: Move the mutation for this outside this component */}
             <LoadingButton
               onClick={() => mutateFinalize(currentSheet.rows.map((r) => r.row))}
               disabled={!isValidated || !warningsAllConfirmed || isLoadingFinalize}

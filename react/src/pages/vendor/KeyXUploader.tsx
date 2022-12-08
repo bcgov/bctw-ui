@@ -60,7 +60,7 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
   const showNotif = useResponseDispatch();
   const theme = useTheme();
   const styles = useStyles();
-  const { data, isSuccess, isLoading } = api.useGetCollarKeyX(device_ids);
+  const { data, isSuccess } = api.useGetCollarKeyX(device_ids);
 
   const [deviceAndKeyXObj, setDeviceAndKeyXObj] = useState<DeviceKeyXObj>({});
   const [page, setPage] = useState(0);
@@ -87,11 +87,7 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
     showNotif({ severity: 'error', message: formatAxiosError(e) });
   };
 
-  const {
-    mutateAsync: mutateKeyX
-    // reset,
-    // isLoading: isPostingKeyX
-  } = api.useUploadXML({
+  const { mutateAsync: mutateKeyX } = api.useUploadXML({
     onSuccess: onSuccessKeyX,
     onError: onErrorKeyX
   });
