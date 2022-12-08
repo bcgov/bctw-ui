@@ -7,6 +7,7 @@ import { useState } from 'react';
 import FileInput, { FileInputProps } from './FileInput';
 
 interface FileInputValidation extends FileInputProps {
+  filename: string;
   trashIconClick: () => void;
   validationSuccess: boolean;
   isLoading?: boolean;
@@ -35,18 +36,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function FileInputValidation(props: FileInputValidation): JSX.Element {
-  const { onFileChosen, trashIconClick, validationSuccess, buttonText, buttonVariant, accept, isLoading } = props;
-  const [filename, setFilename] = useState('');
+  const { filename, onFileChosen, trashIconClick, validationSuccess, buttonText, buttonVariant, accept, isLoading } = props;
+  //const [filename, setFilename] = useState('');
   const styles = useStyles();
 
   const handleFileChange = (fieldName: string, files: FileList): void => {
     onFileChosen(fieldName, files);
-    setFilename(files[0]?.name);
+    //setFilename(files[0]?.name);
   };
 
   const handleFileRemove = () => {
     trashIconClick();
-    setFilename('');
+    //setFilename('');
   };
 
   const conditionalRender = (): JSX.Element => {

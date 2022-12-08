@@ -14,11 +14,12 @@ import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
 import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
 import WarningPromptsBanner from './WarningPromptsBanner';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTabs } from 'contexts/TabsContext';
 import { LoadingButton } from '@mui/lab';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { columnToHeader } from 'utils/common_helpers';
 const SIZE_LIMIT = 31457280;
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -68,18 +69,20 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
 
   const styles = useStyles();
+
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
   const [confirmedWarnings, setConfirmedWarnings] = useState(false);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
-  const [finalizedSubmission, setFinalizedSubmission] = useState(false);
+  const [filename, setFilename] = useState('');
+  
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
   const isTelemetrySheet = sheetIndex === SheetNames.Telemetry;
 
   const onSuccessFinalize = (d): void => {
     showNotif( {severity: 'success', message: 'Your import was successful.'});
-    setFinalizedSubmission(true);
+    handleFileClear();
   };
 
   const onErrorFinalize = (): void => {
@@ -89,7 +92,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const { isLoading: isLoadingFinalize, mutateAsync: mutateFinalize } = api.useFinalizeXLSX({onSuccess: onSuccessFinalize, onError: onErrorFinalize });
 
   useEffect(() => {
-    setFinalizedSubmission(false);
+    setConfirmedWarnings(false);
   }, [sanitizedFile])
 
   const handleCellSelected = (row_idx, cellname) => {
@@ -97,6 +100,15 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     setSelectedCell({ row: row_idx, col: cellname });
   };
 
+  const handleFileUpload = (fieldname: string, files: FileList) => {
+    setFilename(files[0].name);
+    setFile(fieldname, files);
+  }
+
+  const handleFileClear = () => {
+    setFilename('');
+    reset();
+  }
 
   const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
     let headers = [];
@@ -112,8 +124,6 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     const rows = currentSheet.rows.map((o, idx) => {
       return { row_index: idx + 2, ...o.row };
     }) as any[];
-    console.log('For this: ' + JSON.stringify(currentSheet));
-    console.log({ rows });
     return rows;
   };
 
@@ -157,8 +167,9 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
           />
         </Box>
         <FileInputValidation
-          onFileChosen={setFile}
-          trashIconClick={reset}
+          filename={filename}
+          onFileChosen={handleFileUpload}
+          trashIconClick={handleFileClear}
           validationSuccess={isValidated}
           buttonText={`Upload ${title} Template`}
           buttonVariant='text'
@@ -196,7 +207,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                     text={
                       <Box alignItems={'center'} display='flex'>
                         {selectedError
-                          ? `Row ${selectedCell.row + 2} "${selectedCell.col}": ${selectedError.help}`
+                          ? `Row ${selectedCell.row + 2} "${columnToHeader(selectedCell.col)}": ${selectedError.help}`
                           : constants.detailBannerIdle}
                         {selectedError?.valid_values ? (
                           <Button
@@ -244,7 +255,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
             )}
             <LoadingButton
               onClick={() => mutateFinalize(currentSheet.rows.map(r => r.row))}
-              disabled={!isValidated || !confirmedWarnings || isLoadingFinalize || finalizedSubmission}
+              disabled={!isValidated || !confirmedWarnings || isLoadingFinalize}
               className={styles.spacing}
               variant='contained'
               loading={isLoadingFinalize}
@@ -253,7 +264,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               endIcon={<Icon icon='send'/>}
               style={{ marginLeft: 'auto' }}
             >
-              {finalizedSubmission ? (<text>Success</text>) : (<text>Finalize Submission</text>)}
+              Finalize Submission
             </LoadingButton>
           </Box>
         </>

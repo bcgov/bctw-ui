@@ -1,4 +1,5 @@
 import { WarningInfo, ParsedXLSXSheetResult } from "api/api_interfaces";
+import { columnToHeader } from "utils/common_helpers";
 
 const computeXLSXCol = (idx: number): string => {
     let str = '';
@@ -19,7 +20,7 @@ const collectErrorsFromResults = (results: ParsedXLSXSheetResult): string[] => {
         return e === 'identifier' || e === 'missing_data' ? 
         `Row ${idx + 2}: ${r.errors[e].desc}`
         :
-        `At cell ${computeXLSXCol(headerIdx)}${idx + 2}, header "${e}": ${r.errors[e].desc}`
+        `At cell ${computeXLSXCol(headerIdx)}${idx + 2} in column "${columnToHeader(e)}": ${r.errors[e].desc}`
         }));
     })
     return errArr;
