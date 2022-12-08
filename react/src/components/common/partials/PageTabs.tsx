@@ -96,6 +96,7 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
           boxShadow: 1,
           ml: 1,
           display: 'inline-block',
+          maxWidth: '100%',
           backgroundColor: theme.palette.background.paper,
           borderRadius: firstTab ? `0px 8px 8px 8px` : `8px 8px 8px 8px`
         }}>

@@ -17,6 +17,7 @@ export type HighlightTableProps<T> = PlainTableProps<T> & {
   onSelectCell: (row_idx, cellname) => void;
   dimFirstColumn: boolean;
   secondaryHeaders: string[];
+  warningRows?: number[];
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -35,7 +36,8 @@ export default function HighlightTable<T extends BCTWBase<T>>({
   rowIdentifier,
   messages,
   secondaryHeaders,
-  dimFirstColumn = false
+  dimFirstColumn = false,
+  warningRows
 }: HighlightTableProps<T>): JSX.Element {
   const [selected, setSelected] = useState<T>();
   const [order, setOrder] = useState<Order>('asc');
@@ -92,6 +94,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                 //aria-checked={isRowSelected}
                 tabIndex={-1}
                 key={`row${prop}`}
+                selected={true}
                 //selected={isRowSelected}
               >
                 {headers.map((k, i) => {
