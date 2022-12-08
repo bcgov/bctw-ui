@@ -6,39 +6,41 @@ import WarningPrompts, { WarningPromptsProps } from './WarningPrompts';
 type WarningPromptsBannerProps = WarningPromptsProps &
   Pick<BannerProps, 'text'> & {
     allClearText: string;
+    allChecked: boolean;
   };
 
 export default function WarningPromptsBanner(props: WarningPromptsBannerProps): JSX.Element {
-  const { allClearText, text, prompts, onAllChecked, onNotAllChecked, handledWarning } = props;
-  const [allClear, setAllClear] = useState(false);
+  const { allClearText, text, prompts, setWarningChecked, allChecked } = props;
+  //const [allClear, setAllClear] = useState(false);
 
-  const handleAllChecked = () => {
-    setAllClear(true);
-    onAllChecked();
-  };
+  //   const handleAllChecked = () => {
+  //     setAllClear(true);
+  //     onAllChecked();
+  //   };
 
-  const handleNotAllChecked = () => {
-    setAllClear(false);
-    onNotAllChecked();
-  };
+  //   const handleNotAllChecked = () => {
+  //     setAllClear(false);
+  //     onNotAllChecked();
+  //   };
 
-  useEffect(() => {
-    if (prompts.length == 0) {
-      handleAllChecked();
-    }
-  }, [prompts]);
+  //   useEffect(() => {
+  //     if (prompts.length == 0) {
+  //       handleAllChecked();
+  //     }
+  //   }, [prompts]);
 
   return (
     <Banner
-      variant={allClear ? 'success' : 'warning'}
-      text={allClear ? allClearText : text}
+      variant={allChecked ? 'success' : 'warning'}
+      text={allChecked ? allClearText : text}
       action={prompts.length > 0 ? 'collapse' : null}
       hiddenContent={[
         <WarningPrompts
           prompts={prompts}
-          onAllChecked={handleAllChecked}
-          onNotAllChecked={handleNotAllChecked}
-          handledWarning={handledWarning}
+          //   onAllChecked={handleAllChecked}
+          //   onNotAllChecked={handleNotAllChecked}
+          //handledWarning={handledWarning}
+          setWarningChecked={setWarningChecked}
         />
       ]}
     />

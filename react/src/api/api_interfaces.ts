@@ -46,7 +46,10 @@ type WarningInfo = {
   help: string;
   prompt: boolean;
   row: number; //The row index
+  checked: boolean;
 };
+
+type CheckedWarningInfo = WarningInfo & { checked: boolean };
 
 type ParsedXLSXRowResult = {
   row: Animal | Collar;
@@ -91,5 +94,6 @@ export type {
   ParsedXLSXRowResult,
   ParsedXLSXSheetResult,
   WarningInfo,
-  CellErrorDescriptor
+  CellErrorDescriptor,
+  CheckedWarningInfo
 };

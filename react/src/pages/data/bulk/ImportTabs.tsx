@@ -2,7 +2,7 @@ import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/ma
 import { Modal } from 'components/common';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
-import { CellErrorDescriptor, ParsedXLSXSheetResult } from 'api/api_interfaces';
+import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
 import { Banner, InfoBanner, SuccessBanner } from 'components/alerts/Banner';
 import { Icon } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
@@ -72,14 +72,15 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
-  const [confirmedWarnings, setConfirmedWarnings] = useState(false);
-  const [unhandledWarningRows, setUnhandledWarningRows] = useState<number[]>([]);
+  const [warnings, setWarnings] = useState<WarningInfo[]>([]);
+  // const [confirmedWarnings, setConfirmedWarnings] = useState(false);
+  // const [unhandledWarningRows, setUnhandledWarningRows] = useState<number[]>([]);
   const [hideEmptyColumns, setHideEmptyColumns] = useState(true);
   const [showingValueModal, setShowingValueModal] = useState(false);
   const [filename, setFilename] = useState('');
 
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
-  const isTelemetrySheet = sheetIndex === SheetNames.Telemetry;
+  const warningsAllConfirmed = warnings?.length && warnings.every((warning) => !!warning.checked);
 
   const onSuccessFinalize = (d): void => {
     showNotif({ severity: 'success', message: 'Your import was successful.' });
@@ -97,14 +98,15 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 
   useEffect(() => {
     if (currentSheet) {
-      const warningsIdxs = collectWarningsFromResults(currentSheet).map((warning) => warning.row);
-      setUnhandledWarningRows(warningsIdxs);
+      const warnings = collectWarningsFromResults(currentSheet);
+      //setUnhandledWarningRows(warningsIdxs);
+      setWarnings(warnings);
     }
   }, [currentSheet]);
 
-  useEffect(() => {
-    setConfirmedWarnings(false);
-  }, [sanitizedFile]);
+  // useEffect(() => {
+  //   setConfirmedWarnings(false);
+  // }, [sanitizedFile]);
 
   const handleCellSelected = (row_idx, cellname) => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
@@ -158,18 +160,14 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     return messages;
   };
 
-  const handleWarningWasChecked = (value: number, checked: boolean) => {
-    const index = unhandledWarningRows.indexOf(value);
-    //If checked is true remove the warning index from the array
-    checked
-      ? setUnhandledWarningRows((warningRows) => {
-          warningRows.splice(index, 1);
-          return [...warningRows];
-        })
-      : //If checked is false add the warning back to the array
-        setUnhandledWarningRows((warningRows) => [...warningRows, value]);
+  const handleCheckWarning = (idx: number, checked: boolean) => {
+    const tmp = warnings;
+    tmp[idx].checked = checked;
+    setWarnings([...tmp]);
   };
-
+  // useEffect(() => {
+  //   console.log({ warnings }, { warningsAllConfirmed });
+  // }, [warnings]);
   return (
     <>
       <Box display={!show && 'none'}>
@@ -211,10 +209,11 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                 <WarningPromptsBanner
                   allClearText={constants.successBanner}
                   text={constants.warningBanner}
-                  prompts={collectWarningsFromResults(currentSheet)}
-                  onAllChecked={() => setConfirmedWarnings(true)}
-                  onNotAllChecked={() => setConfirmedWarnings(false)}
-                  handledWarning={handleWarningWasChecked}
+                  prompts={warnings}
+                  allChecked={warningsAllConfirmed}
+                  // onAllChecked={() => setConfirmedWarnings(true)}
+                  // onNotAllChecked={() => setConfirmedWarnings(false)}
+                  setWarningChecked={handleCheckWarning}
                 />
               ) : (
                 <>
@@ -260,7 +259,11 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                     messages={getTableHelpMessages(currentSheet)}
                     rowIdentifier='row_index'
                     dimFirstColumn={true}
-                    warningRows={unhandledWarningRows}
+                    warningRows={warnings.map((w) => {
+                      if (!w.checked && isValidated) {
+                        return w.row;
+                      }
+                    })}
                   />
                 </>
               ) : (
@@ -281,7 +284,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
             )}
             <LoadingButton
               onClick={() => mutateFinalize(currentSheet.rows.map((r) => r.row))}
-              disabled={!isValidated || !confirmedWarnings || isLoadingFinalize}
+              disabled={!isValidated || !warningsAllConfirmed || isLoadingFinalize}
               className={styles.spacing}
               variant='contained'
               loading={isLoadingFinalize}

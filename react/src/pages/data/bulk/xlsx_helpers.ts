@@ -1,4 +1,4 @@
-import { WarningInfo, ParsedXLSXSheetResult } from 'api/api_interfaces';
+import { WarningInfo, ParsedXLSXSheetResult, CheckedWarningInfo } from 'api/api_interfaces';
 import { columnToHeader } from 'utils/common_helpers';
 
 const computeXLSXCol = (idx: number): string => {
@@ -36,6 +36,7 @@ const collectWarningsFromResults = (results: ParsedXLSXSheetResult): WarningInfo
           message: `Row ${idx + 2}: ${warnobj.message}`,
           help: warnobj.help,
           prompt: warnobj.prompt,
+          checked: false,
           row: idx //Not + 2 indexed. Used in UI table
         };
       })
