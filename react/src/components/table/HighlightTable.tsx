@@ -14,7 +14,7 @@ export type HighlightTableProps<T> = PlainTableProps<T> & {
   data: T[];
   rowIdentifier: string;
   messages: any[];
-  onSelectCell: (row_idx, cellname) => void;
+  onSelectCell: (row_idx: number, cellname: string) => void;
   dimFirstColumn: boolean;
   secondaryHeaders: string[];
   warningRows?: number[];
@@ -31,16 +31,13 @@ const useStyles = makeStyles((theme) => ({
 export default function HighlightTable<T extends BCTWBase<T>>({
   headers,
   data,
-  onSelect,
   onSelectCell,
-  rowIdentifier,
   messages,
   secondaryHeaders,
   dimFirstColumn = false,
   warningRows
 }: HighlightTableProps<T>): JSX.Element {
   const theme = useTheme();
-  const [selected, setSelected] = useState<T>();
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>();
   const style = useStyles();
@@ -51,13 +48,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
     setOrderBy(property);
   };
 
-  const isSelected = (id): boolean => {
-    return selected?.[rowIdentifier] === id;
-  };
-
   const handleClickCell = (row_idx: any, cellname: any): void => {
-    //setSelected(o);
-    //console.log('Set selected to ' + JSON.stringify(value));
     if (typeof onSelectCell === 'function' && data?.length) {
       onSelectCell(row_idx, cellname);
     }
@@ -71,7 +62,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
             headerData={data && data[0]}
             secondaryHeaders={secondaryHeaders}
             isMultiSelect={false}
-            numSelected={selected ? 1 : 0}
+            numSelected={0}
             order={order}
             orderBy={(orderBy as string) ?? ''}
             onRequestSort={handleSort}
@@ -86,11 +77,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
             return (
               <TableRow
                 hover
-                /*onClick={(): void => {
-                  handleClickRow(obj);
-                }}*/
                 role='checkbox'
-                //aria-checked={isRowSelected}
                 tabIndex={-1}
                 key={`row${prop}`}
                 selected={warningRows.includes(prop)}
@@ -102,17 +89,13 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                   '&.Mui-selected:hover': {
                     backgroundColor: lighten(theme.palette.warning.main, 0.9)
                   }
-                }}
-                //selected={isRowSelected}
-              >
+                }}>
                 {headers.map((k, i) => {
                   if (!k) {
                     return null;
                   }
-
                   const { value } = formatTableCell(obj, k);
                   const isMessage = messages.length ? messages[prop][k] !== undefined : false;
-
                   return (
                     <>
                       {isMessage ? (

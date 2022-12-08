@@ -35,7 +35,6 @@ const collectWarningsFromResults = (results: ParsedXLSXSheetResult): WarningInfo
         return {
           message: `Row ${idx + 2}: ${warnobj.message}`,
           help: warnobj.help,
-          prompt: warnobj.prompt,
           checked: false,
           row: idx //Not + 2 indexed. Used in UI table
         };

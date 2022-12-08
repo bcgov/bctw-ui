@@ -44,7 +44,6 @@ type ParsedXLSXCellError = {
 type WarningInfo = {
   message: string;
   help: string;
-  prompt: boolean;
   row: number; //The row index
   checked: boolean;
 };
