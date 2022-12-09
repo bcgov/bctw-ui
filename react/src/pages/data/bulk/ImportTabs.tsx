@@ -103,17 +103,17 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     }
   }, [currentSheet]);
 
-  const handleCellSelected = (row_idx: number, cellname: string) => {
+  const handleCellSelected = (row_idx: number, cellname: string): void => {
     setSelectedError(currentSheet.rows[row_idx].errors[cellname]);
     setSelectedCell({ row: row_idx, col: cellname });
   };
 
-  const handleFileUpload = (fieldname: string, files: FileList) => {
+  const handleFileUpload = (fieldname: string, files: FileList): void => {
     setFilename(files[0].name);
     setFile(fieldname, files);
   };
 
-  const handleFileClear = () => {
+  const handleFileClear = (): void => {
     setFilename('');
     reset();
   };
@@ -145,9 +145,9 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
       headers.push(computeXLSXCol(idx));
     });
 
-    return headers as string[];
+    return headers;
   };
-
+  //What is the return type of this function?
   const getTableHelpMessages = (sheet: ParsedXLSXSheetResult) => {
     const messages = sheet.rows.map((e, idx) => {
       return Object.entries(e.errors).reduce((prev, curr) => {
