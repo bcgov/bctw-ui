@@ -79,6 +79,7 @@ export default function ExportPageV2(): JSX.Element {
   const operators: QueryBuilderOperator[] = ['Equals', 'Not Equals'];
   const columns: QueryBuilderColumn[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
   const TABS: ExportTab[] = ['Quick Export', 'Advanced Export'];
+  const [exportType, setExportType] = useState<ExportTab>(TABS[0]);
   const [start, setStart] = useState(dayjs().subtract(3, 'month'));
   const [end, setEnd] = useState(dayjs());
   const [builtRows, setBuiltRows] = useState<IFormRowEntry[]>([]);
@@ -179,6 +180,7 @@ export default function ExportPageV2(): JSX.Element {
           className='form-buttons'
           disabled={!collarIDs.length}
           onClick={() => {
+            setExportType('Quick Export');
             setShowModal(true);
           }}>
           Export
@@ -207,7 +209,12 @@ export default function ExportPageV2(): JSX.Element {
           </Box>
           <LocationSelect handleDrawShape={handleDrawShape} />
         </Box>
-        <Button disabled={!formsFilled} onClick={() => setShowModal(true)}>
+        <Button
+          disabled={!formsFilled}
+          onClick={() => {
+            setExportType('Advanced Export');
+            setShowModal(true);
+          }}>
           Export
         </Button>
       </Box>
@@ -224,8 +231,7 @@ export default function ExportPageV2(): JSX.Element {
         {advancedExport()}
       </PageTabs>
       <ExportDownloadModal
-        //TODO: FIXME Use correct export type
-        exportType={'Quick Export'}
+        exportType={exportType}
         open={showModal}
         handleClose={() => {
           setShowModal(false);
