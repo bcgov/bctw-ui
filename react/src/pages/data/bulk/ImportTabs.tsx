@@ -80,7 +80,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const [filename, setFilename] = useState('');
 
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
-  const warningsAllConfirmed = warnings?.length && warnings.every((warning) => !!warning.checked);
+  const warningsAllConfirmed = warnings?.length == 0 || warnings.every((warning) => !!warning.checked);
 
   const onSuccessFinalize = (): void => {
     showNotif({ severity: 'success', message: 'Your import was successful.' });
