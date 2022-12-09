@@ -2,7 +2,7 @@ import { createUrl } from 'api/api_helpers';
 import { AxiosInstance } from 'axios';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
-import { exportEndpoint, exportAllEndpoint, importCSVEndpoint, importXMLEndpoint } from './api_endpoint_urls';
+import { exportEndpoint, exportAllEndpoint, importCSVEndpoint, importXMLEndpoint, importXLSXEndpoint, importFinalizeEndpoint } from './api_endpoint_urls';
 import { useQueryClient } from 'react-query';
 import { API, IBulkUploadResults, IDeleteType, ParsedXLSXSheetResult } from './api_interfaces';
 import { DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
@@ -32,7 +32,7 @@ export const bulkApi = (api: AxiosInstance): API => {
   };
 
   const finalizeXlsx = async <T>(body: any): Promise<IBulkUploadResults<T>> => {
-    const url = createUrl({ api: 'import-finalize' });
+    const url = createUrl({ api: importFinalizeEndpoint });
     const { data } = await api.post(url, body);
     invalidateDevices();
     invalidateCritters();
@@ -40,7 +40,7 @@ export const bulkApi = (api: AxiosInstance): API => {
   };
 
   const uploadXlsx = async <T>(form: FormData): Promise<ParsedXLSXSheetResult> => {
-    const url = createUrl({ api: importCSVEndpoint });
+    const url = createUrl({ api: importXLSXEndpoint });
     const { data } = await api.post(url, form);
     return data;
   };

@@ -2,7 +2,7 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
-import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
+import { AnimalCollar, CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
 import { Banner, InfoBanner } from 'components/alerts/Banner';
 import { Icon, Modal } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
@@ -16,6 +16,7 @@ import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
 import { useEffect, useState } from 'react';
+import { BCTWBase } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import WarningPromptsBanner from './WarningPromptsBanner';
 import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
@@ -58,6 +59,10 @@ interface ImportTabProps {
   title?: string;
   tabIndex?: number;
   show?: boolean;
+}
+
+type AnimalCollarRow = AnimalCollar & {
+  row_index: number;
 }
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
@@ -126,14 +131,14 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   /**
    * TODO Add correct type for this.
    */
-  const getTableData = (): any => {
+  const getTableData = (): any[] => {
     const rows = currentSheet.rows.map((o, idx) => {
-      return { row_index: idx + 2, ...o.row };
-    }) as any[];
+      return { row_index: idx + 2, ...o.row } as AnimalCollarRow;
+    });
     return rows;
   };
 
-  const computeExcelHeaderRow = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean) => {
+  const computeExcelHeaderRow = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
     const headers = ['1'];
     getHeaders(sheet, hideEmpty).forEach((o) => {
       const idx = sheet.headers.indexOf(o);
@@ -153,7 +158,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     return messages;
   };
 
-  const handleCheckWarning = (idx: number, checked: boolean) => {
+  const handleCheckWarning = (idx: number, checked: boolean): void => {
     const tmp = warnings;
     tmp[idx].checked = checked;
     setWarnings([...tmp]);
@@ -242,7 +247,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                   {/* TODO Add correct type for the headers */}
                   <HighlightTable
                     data={getTableData()}
-                    headers={['row_index', ...getHeaders(currentSheet, hideEmptyColumns)] as any}
+                    headers={['row_index', ...getHeaders(currentSheet, hideEmptyColumns)] as (keyof BCTWBase<AnimalCollarRow>)[]}
                     secondaryHeaders={computeExcelHeaderRow(currentSheet, hideEmptyColumns)}
                     onSelectCell={handleCellSelected}
                     messages={getTableHelpMessages(currentSheet)}

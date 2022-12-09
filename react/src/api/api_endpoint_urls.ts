@@ -3,7 +3,9 @@
 */
 
 const importCSVEndpoint                  = 'import-csv';
+const importXLSXEndpoint                 = 'import-xlsx';
 const importXMLEndpoint                  = 'import-xml';
+const importFinalizeEndpoint             = 'import-finalize';
 const exportEndpoint                     = 'export';
 const exportAllEndpoint                  = 'export-all';
 const getCollarAssignmentHistoryEndpoint = 'get-assignment-history';
@@ -22,6 +24,8 @@ const triggerTelemetryFetch              = 'fetch-telemetry';
 
 export {
   importCSVEndpoint,
+  importXLSXEndpoint,
+  importFinalizeEndpoint,
   importXMLEndpoint,
   exportEndpoint,
   exportAllEndpoint,
