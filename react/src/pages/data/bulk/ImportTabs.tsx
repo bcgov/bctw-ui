@@ -172,7 +172,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
             <SubHeader text={`${title} Import`} />
           </Box>
           <Button
-            download
+            download={constants.templateFileName}
             href={createUrl({ api: 'get-template', query: 'file_key=import_template' })}
             style={{ marginLeft: 'auto' }}
             variant='outlined'>
