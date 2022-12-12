@@ -151,18 +151,20 @@ const proxyApi = function (req, res, next) {
     res.status(response.status).json({ error: response.data });
   };
 
-  const successHandler = (response) => {
-    if (
-      response.header.contentType ===
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ) {
-      console.log(`Returning as response.data: ${response.data}`);
-      return response.data;
-    }
-    console.log(`Returning as response.json: ${res.json(response.data)}`);
-    return res.json(response.data);
-    //res.json(response.data)
-  };
+  const successHandler = (response) => res.json(response.data);
+
+  //{
+  //   if (
+  //     response?.header?.contentType ===
+  //     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  //   ) {
+  //     console.log(`Returning as response.data: ${response.data}`);
+  //     return response.data;
+  //   }
+  //   console.log(`Returning as response.json: ${res.json(response.data)}`);
+  //   return res.json(response.data);
+  //   //res.json(response.data)
+  // };
 
   if (req.method === "POST") {
     const { file, files } = req;
@@ -291,6 +293,7 @@ if (isProd) {
 if (isProd) {
   app
     .get("/", keycloak.protect(), pageHandler)
+    .get("/api/get-template", keycloak.protect())
     // .get('/api/session-info', retrieveSessionInfo)
     .get("/api/:endpoint", keycloak.protect(), proxyApi)
     .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
