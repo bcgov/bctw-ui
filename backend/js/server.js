@@ -151,7 +151,16 @@ const proxyApi = function (req, res, next) {
     res.status(response.status).json({ error: response.data });
   };
 
-  const successHandler = (response) => res.json(response.data);
+  const successHandler = (response) => {
+    if (
+      response.header.contentType ==
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
+      return response.data;
+    }
+    return res.json(response.data);
+    //res.json(response.data)
+  };
 
   if (req.method === "POST") {
     const { file, files } = req;
