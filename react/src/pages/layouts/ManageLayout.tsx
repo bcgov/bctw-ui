@@ -14,7 +14,8 @@ export const manageLayoutStyles = makeStyles(() => ({
     '& h1': {
       marginTop: 0,
       marginBottom: 0
-    }
+    },
+    minWidth: 0
   }
 }));
 

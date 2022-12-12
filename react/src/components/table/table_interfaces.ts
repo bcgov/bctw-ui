@@ -48,7 +48,7 @@ interface ICustomTableColumn<T> {
  */
 type PlainTableProps<T> = {
   headers: (keyof T)[];
-  title?: string;
+  title?: string | JSX.Element;
   onSelect?: (row: T) => void;
 };
 
@@ -108,6 +108,8 @@ type TableHeadProps<T> = {
   orderBy: string;
   rowCount: number;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  hiddenHeaders?: (keyof T)[];
+  secondaryHeaders?: (string | number | symbol)[];
 };
 
 type FilterOperator = 'equals' | 'contains';
