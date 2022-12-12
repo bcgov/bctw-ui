@@ -62,6 +62,7 @@ export default function FileInputValidation(props: FileInputValidation): JSX.Ele
     } else {
       return (
         <FileInput
+          fileName='validated-file'
           buttonText={buttonText}
           buttonVariant={buttonVariant}
           accept={accept}
