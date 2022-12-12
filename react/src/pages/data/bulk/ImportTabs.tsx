@@ -185,7 +185,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               api: 'get-template',
               query: `file_key=import_template&responseType=arrayBuffer&responseEncoding=binary`
             })}
-            //onClick={() => refetch()}
+            download={constants.templateFileName}
             style={{ marginLeft: 'auto' }}
             variant='outlined'>
             {constants.downloadButton}

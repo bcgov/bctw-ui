@@ -340,7 +340,8 @@ const ImportStrings = {
     'Telemetry import used for missing Telemetry of existing tracked vendor devices',
     'Placeholder for additional text'
   ],
-  ['Vectronic KeyX']: 'placeholder'
+  ['Vectronic KeyX']: 'placeholder',
+  templateFileName: 'bctw_data_import_template.xlsx'
 };
 
 const DelegationRequestStrings = {
