@@ -60,6 +60,10 @@ interface ImportTabProps {
   tabIndex?: number;
   show?: boolean;
 }
+
+type AnimalCollarRow = AnimalCollar & {
+  row_index: number;
+}
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
   const { title, sheetIndex, handleSubmit, show } = props;
@@ -76,7 +80,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const [filename, setFilename] = useState('');
 
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
-  const warningsAllConfirmed = warnings?.length && warnings.every((warning) => !!warning.checked);
+  const warningsAllConfirmed = warnings?.length == 0 || warnings.every((warning) => !!warning.checked);
 
   const onSuccessFinalize = (): void => {
     showNotif({ severity: 'success', message: 'Your import was successful.' });
@@ -127,8 +131,10 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   /**
    * TODO Add correct type for this.
    */
-  const getTableData = (): any => {
-    const rows = currentSheet.rows.map((o, idx) => ({ row_index: idx + 2, ...o.row }));
+  const getTableData = (): any[] => {
+    const rows = currentSheet.rows.map((o, idx) => {
+      return { row_index: idx + 2, ...o.row } as AnimalCollarRow;
+    });
     return rows;
   };
 
@@ -241,9 +247,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                   {/* TODO Add correct type for the headers */}
                   <HighlightTable
                     data={getTableData()}
-                    headers={
-                      ['row_index', ...getHeaders(currentSheet, hideEmptyColumns)] as (keyof BCTWBase<AnimalCollar>)[]
-                    }
+                    headers={['row_index', ...getHeaders(currentSheet, hideEmptyColumns)] as (keyof BCTWBase<AnimalCollarRow>)[]}
                     secondaryHeaders={computeExcelHeaderRow(currentSheet, hideEmptyColumns)}
                     onSelectCell={handleCellSelected}
                     messages={getTableHelpMessages(currentSheet)}
