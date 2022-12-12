@@ -63,7 +63,7 @@ interface ImportTabProps {
 
 type AnimalCollarRow = AnimalCollar & {
   row_index: number;
-}
+};
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
   const { title, sheetIndex, handleSubmit, show } = props;
@@ -71,6 +71,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   const showNotif = useResponseDispatch();
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
   const styles = useStyles();
+  const { isSuccess, data: importData, error, refetch } = api.useGetTemplate('import_template');
 
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
@@ -81,6 +82,14 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 
   const currentSheet = sanitizedFile?.length ? sanitizedFile[sheetIndex] : null;
   const warningsAllConfirmed = warnings?.length == 0 || warnings.every((warning) => !!warning.checked);
+
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     console.log('Import Template downloaded');
+  //     const b = importData.blob();
+  //     URL.createObjectURL(b);
+  //   }
+  // }, [importData, isSuccess]);
 
   const onSuccessFinalize = (): void => {
     showNotif({ severity: 'success', message: 'Your import was successful.' });
@@ -172,7 +181,11 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
             <SubHeader text={`${title} Import`} />
           </Box>
           <Button
-            href={createUrl({ api: 'get-template', query: 'file_key=import_template' })}
+            href={createUrl({
+              api: 'get-template',
+              query: `file_key=import_template&responseType=arrayBuffer&responseEncoding=binary`
+            })}
+            //onClick={() => refetch()}
             style={{ marginLeft: 'auto' }}
             variant='outlined'>
             {constants.downloadButton}
@@ -247,7 +260,12 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                   {/* TODO Add correct type for the headers */}
                   <HighlightTable
                     data={getTableData()}
-                    headers={['row_index', ...getHeaders(currentSheet, hideEmptyColumns)] as (keyof BCTWBase<AnimalCollarRow>)[]}
+                    headers={
+                      [
+                        'row_index',
+                        ...getHeaders(currentSheet, hideEmptyColumns)
+                      ] as (keyof BCTWBase<AnimalCollarRow>)[]
+                    }
                     secondaryHeaders={computeExcelHeaderRow(currentSheet, hideEmptyColumns)}
                     onSelectCell={handleCellSelected}
                     messages={getTableHelpMessages(currentSheet)}
