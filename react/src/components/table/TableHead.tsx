@@ -15,7 +15,9 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     numSelected,
     onSelectAllClick,
     rowCount,
-    isMultiSelect
+    isMultiSelect,
+    hiddenHeaders,
+    secondaryHeaders
   } = props;
 
   const createSortHandler =
@@ -53,12 +55,13 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
               key={String(headCell.id)}
               align={'left'}
               padding={headCell.disablePadding ? 'none' : 'normal'}
-              sortDirection={orderBy === headCell.id ? order : false}>
+              sortDirection={orderBy === headCell.id ? order : false}
+              style={secondaryHeaders ? { borderBottom: '0px' } : null}>
               <TableSortLabel
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}>
-                {formatHeader(headCell.id)}
+                {hiddenHeaders?.includes(headCell.id) ? ' ' : formatHeader(headCell.id)}
                 {orderBy === headCell.id ? (
                   <span className={'visuallyHidden'}>
                     {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
@@ -76,6 +79,15 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
             : null}
         </TableRow>
       )}
+      {secondaryHeaders ? (
+        <TableRow>
+          {secondaryHeaders.map((o) => (
+            <TableCell className='dimmed-cell' key={String(o)} align={'left'} style={{ paddingTop: '2px' }}>
+              {o}
+            </TableCell>
+          ))}
+        </TableRow>
+      ) : null}
     </MuiTableHead>
   );
 }

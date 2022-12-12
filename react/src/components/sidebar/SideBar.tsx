@@ -1,4 +1,5 @@
 import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { isDev } from 'api/api_helpers';
 import { RouteKey } from 'AppRouter';
 import { Icon, Tooltip } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
@@ -35,15 +36,19 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
   const handleSetVisible = (routeNames: string[]): void => {
     const curRoutes = routes.filter((r) => routeNames.includes(r.name));
     if (isAdmin) {
-      const adminRoutes = ['import', 'animal-manager', 'delegation-requests', 'onboarding-admin', 'users', 'vendor'];
+      const adminRoutes = ['animal-manager', 'delegation-requests', 'onboarding-admin', 'users', 'vendor'];
       curRoutes.push(...routes.filter((r) => adminRoutes.includes(r.name)));
     }
     if (isCritterManager) {
       curRoutes.push(...routes.filter((r) => ['delegation'].includes(r.name)));
     }
     if (isDataAdmin) {
-      const dataAdminRoutes = ['import', 'animal-manager', 'delegation-requests', 'animal-manager', 'vendor'];
+      const dataAdminRoutes = ['animal-manager', 'delegation-requests', 'animal-manager', 'vendor'];
       curRoutes.push(...routes.filter((r) => dataAdminRoutes.includes(r.name)));
+    }
+    if (isDev()) {
+      const testRoutes = ['playground'];
+      curRoutes.push(...routes.filter((r) => testRoutes.includes(r.name)));
     }
     setVisibleRoutes(curRoutes);
   };
@@ -58,8 +63,9 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
       case '/delegation-requests':
       case '/onboarding-requests':
       case '/profile':
+      case '/playground':
     }
-    handleSetVisible(['animals', 'devices', 'profile', 'export']);
+    handleSetVisible(['animals', 'devices', 'profile', 'export', 'import']);
   }, [location, isAdmin, isCritterManager, isDataAdmin]); // only fire when these states change
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
@@ -70,14 +76,16 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
           .filter((r) => r.name !== 'notFound' && r.icon)
           .map((route: RouteKey, idx: number) => {
             return (
-              <Tooltip key={idx} title={route.title}>
+              <>
+                {/*<Tooltip key={idx} title={route.title}>*/}
                 <ListItem className='side-bar-item' button {...{ component: Link, to: route.path }}>
                   <ListItemIcon>
                     <Icon icon={route.icon} />
                   </ListItemIcon>
                   <ListItemText className={'list-item-txt'} primary={route.title} />
                 </ListItem>
-              </Tooltip>
+                {/* </Tooltip> */}
+              </>
             );
           })}
       </List>

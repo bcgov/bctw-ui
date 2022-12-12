@@ -1,5 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { ITableFilter } from 'components/table/table_interfaces';
+import { Animal } from 'types/animal';
+import { Collar } from 'types/collar';
 import { uuid } from 'types/common_types';
 
 // props required for all API hooks
@@ -29,17 +31,49 @@ interface IBulkUploadResults<T> {
   results: T[];
 }
 
+type CellErrorDescriptor = {
+  desc: string;
+  help: string;
+  valid_values?: string[];
+};
+
+type ParsedXLSXCellError = {
+  [key in (keyof Animal | keyof Collar) | 'identifier' | 'missing_data']?: CellErrorDescriptor;
+};
+
+type WarningInfo = {
+  message: string;
+  help: string;
+  row: number; //The row index
+  checked: boolean;
+};
+
+type CheckedWarningInfo = WarningInfo & { checked: boolean };
+
+type AnimalCollar = Animal | Collar;
+
+type ParsedXLSXRowResult = {
+  row: AnimalCollar;
+  errors: ParsedXLSXCellError;
+  warnings: WarningInfo[];
+  success: boolean;
+};
+
+type ParsedXLSXSheetResult = {
+  headers: string[];
+  rows: ParsedXLSXRowResult[];
+};
+
 // models that can be deleted
 interface IDeleteType {
   objType: 'animal' | 'collar' | 'user';
   id: uuid | number; // users have number ids
 }
 
-// an API object 
+// an API object
 // todo: improve typing
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type API = Record<string, (...args: any) => Promise<any>>;
-
 
 interface CreateUrlParams {
   api: string;
@@ -56,5 +90,12 @@ export type {
   IBulkUploadError,
   IBulkUploadResults,
   IUpsertPayload,
-  IDeleteType
+  IDeleteType,
+  ParsedXLSXCellError,
+  ParsedXLSXRowResult,
+  ParsedXLSXSheetResult,
+  WarningInfo,
+  CellErrorDescriptor,
+  CheckedWarningInfo,
+  AnimalCollar
 };

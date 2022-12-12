@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button, StandardTextFieldProps } from '@mui/material';
 
-interface FileInputProps extends StandardTextFieldProps {
+export interface FileInputProps extends StandardTextFieldProps {
   buttonText?: string;
   multiple?: boolean;
   fileName?: string;
   buttonVariant?: 'contained' | 'outlined' | 'text';
-  accept: '.keyx' | '.csv' | '.zip';
+  accept: '.keyx' | '.csv' | '.zip' | '.xlsx';
   onFileChosen: (fieldName: string, files: FileList) => void;
 }
 

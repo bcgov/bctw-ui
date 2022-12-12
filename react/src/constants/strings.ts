@@ -74,7 +74,8 @@ const BannerStrings = {
   exportDetails: [
     'Use Quick Export to quickly get telemetry data for any of your animals.',
     'Use Advanced Export to get data that matches custom query parameters.'
-  ]
+  ],
+  vectronicKeyxInfo: 'Vectronic collars must be validated with KeyX files before BCTW can collect telemetry data'
 };
 
 const WorkflowStrings = {
@@ -303,8 +304,8 @@ const ExportStrings = {
   quickTabLabel: 'Quick Export',
   advancedTabLabel: 'Advanced Export',
   checkboxLabel: 'All Telemetry',
-  dateRangeHeader: 'Specify Date Range',
-  animalTableHeader: 'Select Animals',
+  dateRangeHeader: 'Select Date Range',
+  animalTableHeader: 'Select Attached Animals',
   queryBuilderHeader: 'Build Query',
   locationSelectHeader: 'Select Location',
   modal: {
@@ -316,6 +317,30 @@ const ExportStrings = {
     kmlButton: 'Export Data as KML',
     kmlButtonLoad: 'Exporting KML...'
   }
+};
+
+const ImportStrings = {
+  importToolHeader: 'Animal+Device Metadata and Telemetry',
+  uploadButton: 'Upload Animal+Device/Telemetry Template',
+  downloadButton: 'Download Template',
+  validValuesModal: 'Valid values for this field',
+  checkboxLabel: 'Hide Empty Columns',
+  successBanner:
+    "Your spreadsheet appears to be ready for submission. Press the 'Finalize Submission' button at the bottom of the page to import your data.",
+  warningBanner:
+    'Importing this data may have unintended effects. You must confirm that you understand each item below will be actioned before you finalize your import.',
+  errorBanner:
+    'Hover over highlighted cells to view error info. Fix these errors in your spreadsheet application and re-upload.',
+  detailBannerIdle: 'Click a cell for detailed information on that error.',
+  ['Animal and Device']: [
+    'To add a new animal and collar, create a new row in the Device Metadata template and fill out the required fields.',
+    'Device IDs already assigned to an Animal ID must first be released by their owner before they can be assigned to a new Animal ID.'
+  ],
+  ['Telemetry']: [
+    'Telemetry import used for missing Telemetry of existing tracked vendor devices',
+    'Placeholder for additional text'
+  ],
+  ['Vectronic KeyX']: 'placeholder'
 };
 
 const DelegationRequestStrings = {
@@ -345,6 +370,7 @@ export {
   DelegationRequestStrings,
   BannerStrings,
   ExportStrings,
+  ImportStrings,
   LatestDataRetrieval,
   QuickSummaryStrings
 };

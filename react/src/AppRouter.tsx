@@ -1,3 +1,4 @@
+
 import AdminHandleRequestPermissionPage from 'pages/permissions/AdminHandleRequestPermission';
 import CollarPage from 'pages/data/collars/CollarPage';
 import CritterPage from 'pages/data/animals/CritterPage';
@@ -16,6 +17,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import OnboardingAdmin from 'pages/admin/OnboardingAdmin';
 import VendorAPIPage from 'pages/vendor/TriggerFetchTelemetry';
 import ExportV2 from 'pages/data/bulk/ExportV2';
+import { DevPlayground } from 'pages/DevPlayground';
 
 export type RouteKey = {
   path: string;
@@ -43,6 +45,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'animal-manager', path: '/animal-manager', title: 'Set Animal Manager', component: GrantCritterAccessPage, sort: 103, icon: 'key' },
   { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: UserOnboarding, sort: 201 },
   { name: 'vendor', path: '/vendor', title: 'Telemetry Retrieval', component: VendorAPIPage, sort: 202, icon: 'devices' },
+  { name: 'playground', path: '/playground', title: 'Playground', component: DevPlayground, sort: 203, icon: 'dev' },
   { name: 'notFound', path: '/*', title: 'React: Not Found', component: (): JSX.Element => <div>React AppRouter.tsx says: Page not found!</div>, sort: 404 }
 ];
 

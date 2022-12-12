@@ -15,6 +15,7 @@ interface InfoCardProps {
   noRightMargin?: boolean;
   hoverRaise?: boolean;
   handleDetails?: () => void;
+  outlined?: boolean;
 }
 export const InfoCard = ({
   element,
@@ -33,6 +34,7 @@ export const InfoCard = ({
       onMouseOut={() => hoverRaise && setRaised(false)}
       onClick={() => (handleDetails ? handleDetails() : null)}
       raised={hoverRaise ? raised : false}
+      variant={hoverRaise ? 'elevation' : 'outlined'}
       sx={{
         width: size === 'small' ? '12rem' : '26rem',
         height: '9rem',

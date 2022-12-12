@@ -21,11 +21,11 @@ import {
 } from 'react-query';
 import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
-import { AttachedCollar, Collar, IVectronicUpsert } from 'types/collar';
+import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, User } from 'types/user';
 
-import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
+import { IBulkUploadResults, IDeleteType, IUpsertPayload, ParsedXLSXSheetResult } from 'api/api_interfaces';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
@@ -99,11 +99,16 @@ export const useTelemetryApi = () => {
     );
   };
 
-  const useTracksPerCritter = (start: string, end: string, critter_id: string, enable = true): UseQueryResult<ITelemetryLine[], AxiosError> => {
+  const useTracksPerCritter = (
+    start: string,
+    end: string,
+    critter_id: string,
+    enable = true
+  ): UseQueryResult<ITelemetryLine[], AxiosError> => {
     return useQuery<ITelemetryLine[], AxiosError>(
       ['tracks', start, end, critter_id],
       () => mapApi.getTracks(start, end, critter_id),
-      {...defaultQueryOptions, enabled: enable}
+      { ...defaultQueryOptions, enabled: enable }
     );
   };
 
@@ -126,16 +131,21 @@ export const useTelemetryApi = () => {
     );
   };
 
-   /**
+  /**
    *
    */
-    const usePingsPerCritter = (start: string, end: string, critter_id: string, enable = true): UseQueryResult<ITelemetryPoint[], AxiosError> => {
-      return useQuery<ITelemetryPoint[], AxiosError>(
-        ['pings', { start, end, critter_id }],
-        () => mapApi.getPings(start, end, critter_id),
-        {...defaultQueryOptions, enabled: enable}
-      );
-    };
+  const usePingsPerCritter = (
+    start: string,
+    end: string,
+    critter_id: string,
+    enable = true
+  ): UseQueryResult<ITelemetryPoint[], AxiosError> => {
+    return useQuery<ITelemetryPoint[], AxiosError>(
+      ['pings', { start, end, critter_id }],
+      () => mapApi.getPings(start, end, critter_id),
+      { ...defaultQueryOptions, enabled: enable }
+    );
+  };
 
   // the same as usePings, but doesn't auto fetch due to enabled: false setting
   const useUnassignedPings = (start: string, end: string): UseQueryResult<ITelemetryPoint[], AxiosError> => {
@@ -417,9 +427,7 @@ export const useTelemetryApi = () => {
     return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
   };
 
-  const useExportAll = (
-    config: UseMutationOptions<string[], AxiosError, unknown>
-  ): UseMutationResult<string[]> => {
+  const useExportAll = (config: UseMutationOptions<string[], AxiosError, unknown>): UseMutationResult<string[]> => {
     return useMutation<string[], AxiosError, unknown>((body) => bulkApi.getAllExportData(body), config);
   };
 
@@ -483,11 +491,43 @@ export const useTelemetryApi = () => {
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
+  const useFinalizeXLSX = <T>(
+    config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, (Animal | Collar)[]>
+  ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
+    useMutation<IBulkUploadResults<T>, AxiosError, (Animal | Collar)[]>((body) => bulkApi.finalizeXlsx(body), config);
+
+  const useUploadXLSX = <T>(
+    config: UseMutationOptions<ParsedXLSXSheetResult[], AxiosError, FormData>
+  ): UseMutationResult<ParsedXLSXSheetResult[], AxiosError> =>
+    useMutation<ParsedXLSXSheetResult[], AxiosError, FormData>((form) => bulkApi.uploadXlsx(form), config);
+  /**  const useCritterHistory = (page: number, critterId: string): UseQueryResult<Animal[]> => {
+    return useQuery<Animal[], AxiosError>(
+      ['critter_history', critterId, page],
+      () => critterApi.getCritterHistory(page, critterId),
+      critterOptions
+    );
+  }; */
+  const useGetTemplate = (file_key: string): UseQueryResult<any> => {
+    return useQuery<any, AxiosError>(
+      ['get_template', file_key],
+      () => bulkApi.getTemplateFile(file_key),
+      defaultQueryOptions
+    );
+  };
+
+  const useGetCollarKeyX = (device_ids?: number[]): UseQueryResult<DeviceWithVectronicKeyX[], AxiosError> => {
+    return useQuery<DeviceWithVectronicKeyX[], AxiosError>(
+      ['get_keyx', device_ids],
+      () => bulkApi.getKeyX(device_ids),
+      defaultQueryOptions
+    );
+  };
+
   /** upload one or more .keyx files to create new Vectronic devices */
   const useUploadXML = (
-    config: UseMutationOptions<IBulkUploadResults<IVectronicUpsert>, AxiosError, FormData>
-  ): UseMutationResult<IBulkUploadResults<IVectronicUpsert>, AxiosError> =>
-    useMutation<IBulkUploadResults<IVectronicUpsert>, AxiosError, FormData>(
+    config: UseMutationOptions<IBulkUploadResults<VectronicKeyX>, AxiosError, FormData>
+  ): UseMutationResult<IBulkUploadResults<VectronicKeyX>, AxiosError> =>
+    useMutation<IBulkUploadResults<VectronicKeyX>, AxiosError, FormData>(
       (formData) => bulkApi.uploadFiles(formData),
       config
     );
@@ -605,6 +645,7 @@ export const useTelemetryApi = () => {
     useCritterHistory,
     useCollarAssignmentHistory,
     useCollarHistory,
+    useGetCollarKeyX,
     useType,
     useUser,
     useUsers,
@@ -622,7 +663,10 @@ export const useTelemetryApi = () => {
     // mutations
     useSaveCodeHeader,
     useUploadCSV,
+    useUploadXLSX,
+    useFinalizeXLSX,
     useUploadXML,
+    useGetTemplate,
     useSaveDevice,
     useSaveAnimal,
     useAttachDevice,

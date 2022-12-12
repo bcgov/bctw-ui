@@ -17,8 +17,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 2
   },
   info: {
-    alignItems: 'center',
-    flexWrap: 'wrap'
+    alignItems: 'center'
+    // flexWrap: 'wrap'
   },
   spacing: {
     paddingTop: theme.spacing(2)
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
   }
 }));
-interface BannerProps {
+export interface BannerProps {
   variant: 'info' | 'warning' | 'success' | 'error';
   text: string | string[] | JSX.Element;
   icon?: JSX.Element;
@@ -53,7 +53,6 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
       <Alert
         severity={variant}
         icon={icon}
-        className={style[variant]}
         action={
           action && hiddenContent ? (
             <IconButton
