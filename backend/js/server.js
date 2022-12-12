@@ -156,8 +156,10 @@ const proxyApi = function (req, res, next) {
       response.header.contentType ==
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ) {
+      console.log(`Returning as response.data: ${response.data}`);
       return response.data;
     }
+    console.log(`Returning as response.json: ${res.json(response.data)}`);
     return res.json(response.data);
     //res.json(response.data)
   };
