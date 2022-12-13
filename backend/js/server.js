@@ -18,6 +18,7 @@ const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
 
+console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt });
 // use Express memory store for session and Keycloak object
 var memoryStore = new expressSession.MemoryStore();
 
@@ -109,6 +110,7 @@ const retrieveSessionInfo = function (req, res, next) {
 // TODO: move into separate package?
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
+  console.log("inside proxyApi");
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
   // create a string of key-value pairs from the parameters passed
@@ -265,16 +267,18 @@ const denied = function (req, res) {
   Redirect traffic to the React dev server 
 */
 const devServerRedirect = function (_, res) {
-  res.redirect("locahost:1111");
+  res.redirect("localhost:1111");
 };
 
 // use enhanced logging in non-production environments
 const logger = isProd ? "combined" : "dev";
 
+const ops = { origin: `https://localhost:1111` };
+
 // Server configuration
 var app = express()
   .use(helmet())
-  .use(cors())
+  .use(cors(ops))
   .use(morgan(logger))
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
@@ -336,9 +340,6 @@ if (isProd) {
 } else {
   app.get("*", devServerRedirect);
 }
-
-// For testing development purposes
-// if (!isProd) app.get('*', devServerRedirect);
 
 // start Express server on port 8080
 http.createServer(app).listen(8080);
