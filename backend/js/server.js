@@ -116,7 +116,7 @@ const retrieveSessionInfo = function (req, res, next) {
 const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
-  //console.log(`endpoint: ${endpoint}`);
+  console.log(`endpoint: ${endpoint} res.json: ${res.json}`);
   // create a string of key-value pairs from the parameters passed
   const parameters = Object.keys(req.query)
     .map((key) => {
