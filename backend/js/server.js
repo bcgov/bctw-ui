@@ -273,8 +273,6 @@ const devServerRedirect = function (_, res) {
 // use enhanced logging in non-production environments
 const logger = isProd ? "combined" : "dev";
 
-const ops = { origin: `https://localhost:1111` };
-
 // Server configuration
 var app = express()
   .use(helmet())
