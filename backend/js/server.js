@@ -151,7 +151,16 @@ const proxyApi = function (req, res, next) {
     res.status(response.status).json({ error: response.data });
   };
 
-  const successHandler = (response) => res.json(response.data);
+  const successHandler = (response) => {
+    const isTemplateEndpoint = endpoint === "get-template";
+    console.log(`Success Handler: ${response.data}`);
+
+    if (isTemplateEndpoint) {
+      console.log("/get-template endpoint hit");
+      return response.data;
+    }
+    return res.json(response.data);
+  };
 
   if (req.method === "POST") {
     const { file, files } = req;
