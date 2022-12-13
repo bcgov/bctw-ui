@@ -276,7 +276,7 @@ const logger = isProd ? "combined" : "dev";
 // Server configuration
 var app = express()
   .use(helmet())
-  .use(cors(ops))
+  .use(cors())
   .use(morgan(logger))
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
