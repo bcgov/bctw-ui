@@ -159,7 +159,7 @@ const proxyApi = function (req, res, next) {
       console.log("[LOG] Endpoint /get-template hit!");
       //console.log(`[LOG] Response headers are: ${response.headers}`);
       console.log(Buffer.from(response.data).toString('base64'));
-      return res.json(response.data);
+      return res.blob(response.data);
     }
     return res.json(response.data);
   };
