@@ -153,18 +153,16 @@ const proxyApi = function (req, res, next) {
 
   const successHandler = (response) => {
     const isTemplateEndpoint = endpoint === "get-template";
-    console.log(`Success Handler: ${response.data}`);
+    console.log("[LOG] successHandler() called!");
 
     if (isTemplateEndpoint) {
-      console.log("/get-template endpoint hit");     
-      response.set({
-        'Cache-Control': 'no-cache',
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': 'attachment',
-        'Content-Length': response.data.length
+      console.log("[LOG] Endpoint /get-template hit!");
+      console.log(`[LOG] Response headers are: ${response.headers}`);
+
+      const myBlob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
-      return response;
-      // return response.data;
+      return res.blob(myBlob);
     }
     return res.json(response.data);
   };
