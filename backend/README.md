@@ -4,7 +4,7 @@
 - Will have to log in via idir / keycloak to gain access to the application
 - Useful for debugging keycloak or proxy api endpoint issues
 
-# 1. Add .env file and include
+# 1. Add .env file to bctw/bctw-ui/backend and populate with:
 
 NODE_ENV=production
 BCTW_API_HOST=localhost
