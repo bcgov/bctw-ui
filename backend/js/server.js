@@ -196,7 +196,7 @@ const proxyApi = function (req, res, next) {
 const handleFile = function (file) {
   if (file) {
     const form = new formData();
-    form.append("csv", file.buffer, file.originalname);
+    form.append("validated-file", file.buffer, file.originalname);
     return { form, config: { headers: form.getHeaders() } };
   }
 };
