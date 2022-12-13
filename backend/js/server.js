@@ -91,7 +91,7 @@ const retrieveSessionInfo = function (req, res, next) {
   }
   // get contents of the current Keycloak access token
   const data = req.kauth.grant.access_token.content;
-    if (!data) {
+  if (!data) {
     return res
       .status(500)
       .send("Error: Unable to retrieve Keycloak session information");
@@ -174,20 +174,20 @@ const proxyApi = function (req, res, next) {
       // res.set('Content-Type', 'image/png');
       // res.send(buf);
       axios({
-        method: 'get',
+        method: "get",
         url: url,
-        responseType: "arraybuffer"
-      })
-      .then(function(response) {
-        res.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        responseType: "arraybuffer",
+      }).then(function (response) {
+        res.set(
+          "Content-Type",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
         res.send(Buffer.from(response.data));
       });
-
     } else {
       axios.get(url).then(successHandler).catch(errHandler);
     }
   }
-  
 };
 
 /**
@@ -302,6 +302,12 @@ if (isProd) {
     .get("/api/:endpoint", keycloak.protect(), proxyApi)
     .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
     // bulk file import handlers
+    .post(
+      "/api/import-xlsx",
+      upload.single("validated-file"),
+      keycloak.protect(),
+      pageHandler
+    )
     .post(
       "/api/import-csv",
       upload.single("csv"),
