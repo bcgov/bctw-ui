@@ -158,11 +158,7 @@ const proxyApi = function (req, res, next) {
     if (isTemplateEndpoint) {
       console.log("[LOG] Endpoint /get-template hit!");
       console.log(`[LOG] Response headers are: ${response.headers}`);
-
-      const myBlob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      return res.blob(myBlob);
+      return res.blob(response.data);
     }
     return res.json(response.data);
   };
