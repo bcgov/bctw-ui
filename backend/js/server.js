@@ -116,7 +116,7 @@ const retrieveSessionInfo = function (req, res, next) {
 const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
-
+  //console.log(`endpoint: ${endpoint}`);
   // create a string of key-value pairs from the parameters passed
   const parameters = Object.keys(req.query)
     .map((key) => {
@@ -152,19 +152,6 @@ const proxyApi = function (req, res, next) {
   };
 
   const successHandler = (response) => res.json(response.data);
-
-  //{
-  //   if (
-  //     response?.header?.contentType ===
-  //     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  //   ) {
-  //     console.log(`Returning as response.data: ${response.data}`);
-  //     return response.data;
-  //   }
-  //   console.log(`Returning as response.json: ${res.json(response.data)}`);
-  //   return res.json(response.data);
-  //   //res.json(response.data)
-  // };
 
   if (req.method === "POST") {
     const { file, files } = req;
