@@ -196,7 +196,7 @@ const proxyApi = function (req, res, next) {
 const handleFile = function (file) {
   if (file) {
     const form = new formData();
-    form.append("validated-file", file.buffer, file.originalname);
+    form.append(file.fieldname, file.buffer, file.originalname);
     return { form, config: { headers: form.getHeaders() } };
   }
 };
@@ -290,6 +290,7 @@ if (isProd) {
     .all("*", keycloak.protect(), pageHandler);
 } else {
   app
+    .post("/api/import-xlsx", upload.single("validated-file"), pageHandler)
     .post("/api/import-csv", upload.single("csv"), pageHandler)
     .post("/api/import-xml", upload.array("xml"), pageHandler)
     .post("/api/:endpoint", proxyApi);
