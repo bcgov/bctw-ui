@@ -156,8 +156,15 @@ const proxyApi = function (req, res, next) {
     console.log(`Success Handler: ${response.data}`);
 
     if (isTemplateEndpoint) {
-      console.log("/get-template endpoint hit");
-      return response.data;
+      console.log("/get-template endpoint hit");     
+      response.set({
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': 'attachment',
+        'Content-Length': response.data.length
+      });
+      return response;
+      // return response.data;
     }
     return res.json(response.data);
   };
