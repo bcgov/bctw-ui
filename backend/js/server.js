@@ -152,13 +152,14 @@ const proxyApi = function (req, res, next) {
   };
 
   const successHandler = (response) => {
-    const isTemplateEndpoint = endpoint === "get-template";
     console.log("[LOG] successHandler() called!");
 
+    const isTemplateEndpoint = endpoint === "get-template";
     if (isTemplateEndpoint) {
       console.log("[LOG] Endpoint /get-template hit!");
       console.log(`[LOG] Response headers are: ${response.headers}`);
-      return res.blob(response.data);
+      consle.log("[LOG] base64 file = " + Buffer.from(response.data).toString('base64');
+      return res.json(response.data);
     }
     return res.json(response.data);
   };
