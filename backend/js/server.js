@@ -110,7 +110,6 @@ const retrieveSessionInfo = function (req, res, next) {
 // TODO: move into separate package?
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
-  console.log("inside proxyApi");
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
   // create a string of key-value pairs from the parameters passed

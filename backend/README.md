@@ -30,5 +30,6 @@ KEYCLOAK_CLIENT_SECRET=<find in openshift secrets for UI pod>
 # 4. Run the proxy / keycloak server
 
 - bctw/bctw-ui/backend `npm run start`
+(may need to also run `npm run reload`)
 
 # 5. http://localhost:8080
