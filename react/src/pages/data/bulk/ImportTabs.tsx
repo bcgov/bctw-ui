@@ -6,6 +6,7 @@ import { AnimalCollar, CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo }
 import { Banner, InfoBanner } from 'components/alerts/Banner';
 import { Icon, Modal } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
+import Select from 'components/form/BasicSelect';
 import Checkbox from 'components/form/Checkbox';
 import FileInputValidation from 'components/form/FileInputValidation';
 import HighlightTable from 'components/table/HighlightTable';
@@ -14,6 +15,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTabs } from 'contexts/TabsContext';
 import useImported_XLSX_File from 'hooks/useImported_XLSX_File';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import useUser from 'hooks/useUser';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
 import { useEffect, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
@@ -22,6 +24,10 @@ import WarningPromptsBanner from './WarningPromptsBanner';
 import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
 
 const useStyles = makeStyles((theme: Theme) => ({
+  userSelect: {
+    // minWidth: '12rem'
+    marginRight: theme.spacing(2)
+  },
   spacing: {
     marginTop: theme.spacing(2)
   },
@@ -68,6 +74,12 @@ type AnimalCollarRow = AnimalCollar & {
 export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
   const { title, sheetIndex, handleSubmit, show } = props;
   const api = useTelemetryApi();
+
+  const user = useUser();
+  const { data: users, isLoading: loadingUsers } = api.useUsers(0);
+  const [importUserID, setImportUserID] = useState<number>(null);
+  const userID = importUserID ?? user?.id;
+
   const showNotif = useResponseDispatch();
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
   const styles = useStyles();
@@ -285,28 +297,42 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               )}
             </>
           )}
-          <Box display='flex'>
-            {sanitizedFile && (
-              <Checkbox
-                label={constants.checkboxLabel}
-                propName={'hide-empty-col'}
-                initialValue={hideEmptyColumns}
-                changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
-              />
-            )}
+          <Box className={styles.spacing} display='flex' justifyContent='space-between'>
+            <Box>
+              {sanitizedFile && (
+                <Checkbox
+                  label={constants.checkboxLabel}
+                  propName={'hide-empty-col'}
+                  initialValue={hideEmptyColumns}
+                  changeHandler={() => setHideEmptyColumns(!hideEmptyColumns)}
+                />
+              )}
+            </Box>
             {/* TODO: Move the mutation for this outside this component */}
-            <LoadingButton
-              onClick={() => mutateFinalize(currentSheet.rows.map((r) => r.row))}
-              disabled={!isValidated || !warningsAllConfirmed || isLoadingFinalize}
-              className={styles.spacing}
-              variant='contained'
-              loading={isLoadingFinalize}
-              loadingIndicator={<CircularProgress color='inherit' className={styles.circularProgress} />}
-              loadingPosition={'end'}
-              endIcon={<Icon icon='send' />}
-              style={{ marginLeft: 'auto' }}>
-              Finalize Submission
-            </LoadingButton>
+            <Box>
+              {user?.is_admin ? (
+                <Select
+                  className={styles.userSelect}
+                  defaultValue={user?.nameID}
+                  label='Assign data to'
+                  values={users ? users.map((u) => u.nameID) : [user?.nameID]}
+                  handleChange={(n: string): void => {
+                    const [name, id] = n.split(' - ');
+                    setImportUserID(parseInt(id));
+                  }}
+                />
+              ) : null}
+              <LoadingButton
+                onClick={() => mutateFinalize({ user_id: userID, payload: currentSheet.rows.map((r) => r.row) })}
+                disabled={!isValidated || !warningsAllConfirmed || isLoadingFinalize || !userID}
+                variant='contained'
+                loading={isLoadingFinalize}
+                loadingIndicator={<CircularProgress color='inherit' className={styles.circularProgress} />}
+                loadingPosition={'end'}
+                endIcon={<Icon icon='send' />}>
+                Finalize Submission
+              </LoadingButton>
+            </Box>
           </Box>
         </>
       </Box>

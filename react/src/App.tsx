@@ -13,8 +13,9 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ResponseProvider } from 'contexts/ApiResponseContext';
 import { SnackbarWrapper } from 'components/common';
 import { UserContext, UserStateContextProvider } from 'contexts/UserContext';
-import { Theme, StyledEngineProvider } from '@mui/material';
+import { Theme, StyledEngineProvider, CircularProgress } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
+import { Suspense } from 'react';
 // import { ReactQueryDevtools } from 'react-query/devtools'
 
 declare module '@mui/styles/defaultTheme' {
@@ -55,7 +56,9 @@ export default function App(): JSX.Element {
                                   <div className='app-body__inner'>
                                     <SnackbarWrapper>
                                       <DefaultLayout>
-                                        <AppRouter />
+                                        <Suspense fallback={<CircularProgress />}>
+                                          <AppRouter />
+                                        </Suspense>
                                       </DefaultLayout>
                                     </SnackbarWrapper>
                                   </div>

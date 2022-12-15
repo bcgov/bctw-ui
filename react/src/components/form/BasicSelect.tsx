@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 export type SharedSelectProps = SelectProps & {
   defaultValue: string;
   triggerReset?: any;
-}
+};
 
 type BasicSelectProps = SharedSelectProps & {
   values: string[];
@@ -14,12 +14,20 @@ type BasicSelectProps = SharedSelectProps & {
 /**
  * a simple single select component that takes a list of values as a string array
  */
-export default function Select({handleChange, label, values, triggerReset, sx, defaultValue = '', className = 'select-control-small'}: BasicSelectProps): JSX.Element {
+export default function Select({
+  handleChange,
+  label,
+  values,
+  triggerReset,
+  sx,
+  defaultValue = '',
+  className = 'select-control-small'
+}: BasicSelectProps): JSX.Element {
   const [selected, setSelected] = useState(defaultValue);
 
   useEffect(() => {
     setSelected(defaultValue);
-  }, [triggerReset]);
+  }, [triggerReset, defaultValue]);
 
   const onChange = (event: SelectChangeEvent<string>): void => {
     const val = event.target.value;
@@ -30,7 +38,11 @@ export default function Select({handleChange, label, values, triggerReset, sx, d
     <FormControl className={className} size='small' sx={sx}>
       <InputLabel>{label}</InputLabel>
       <MUISelect onChange={onChange} value={selected} required={true}>
-        {values.map((v, idx) => (<MenuItem key={`${idx}-${v}`} value={v}>{v}</MenuItem>))}
+        {values.map((v, idx) => (
+          <MenuItem key={`${idx}-${v}`} value={v}>
+            {v}
+          </MenuItem>
+        ))}
       </MUISelect>
     </FormControl>
   );
