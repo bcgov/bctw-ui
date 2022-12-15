@@ -331,7 +331,7 @@ export const useTelemetryApi = () => {
    * requires admin role
    * @returns a list of all users
    */
-  const useUsers = (page: number): UseQueryResult =>
+  const useUsers = (page: number): UseQueryResult<User[], AxiosError> =>
     useQuery<User[], AxiosError>('all_users', () => userApi.getUsers(page), defaultQueryOptions);
 
   /**
