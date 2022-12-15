@@ -52,6 +52,11 @@ type CheckedWarningInfo = WarningInfo & { checked: boolean };
 
 type AnimalCollar = Animal | Collar;
 
+type XLSXPayload = {
+  user_id: number;
+  payload: AnimalCollar[];
+};
+
 type ParsedXLSXRowResult = {
   row: AnimalCollar;
   errors: ParsedXLSXCellError;
@@ -97,5 +102,6 @@ export type {
   WarningInfo,
   CellErrorDescriptor,
   CheckedWarningInfo,
-  AnimalCollar
+  AnimalCollar,
+  XLSXPayload
 };

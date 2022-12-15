@@ -323,7 +323,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                 />
               ) : null}
               <LoadingButton
-                onClick={() => mutateFinalize(currentSheet.rows.map((r) => r.row))}
+                onClick={() => mutateFinalize({ user_id: userID, payload: currentSheet.rows.map((r) => r.row) })}
                 disabled={!isValidated || !warningsAllConfirmed || isLoadingFinalize || !userID}
                 variant='contained'
                 loading={isLoadingFinalize}
