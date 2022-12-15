@@ -309,6 +309,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
               )}
             </Box>
             {/* TODO: Move the mutation for this outside this component */}
+            <p>{user?.is_admin}</p>
             <Box>
               {user?.is_admin ? (
                 <Select
