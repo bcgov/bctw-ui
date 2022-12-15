@@ -81,13 +81,18 @@ export class User extends UserBase implements BCTWBase<User>, IUser {
   }
 
   get name(): string {
-    return this.firstname && this.lastname ? capitalize(`${this.firstname} ${this.lastname}`) : 'unknown';
+    return this.firstname && this.lastname ? capitalize(`${this.firstname} ${this.lastname}`) : 'Unknown';
   }
 
   get identifier(): string {
     return 'id';
   }
 
+  get nameID(): string {
+    return this.firstname && this.lastname
+      ? capitalize(`${this.firstname} ${this.lastname} - ${this.id}`)
+      : 'Unknown - ?';
+  }
   formatPropAsHeader(str: string): string {
     switch (str) {
       case 'idir':

@@ -25,7 +25,13 @@ import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from '
 import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, User } from 'types/user';
 
-import { IBulkUploadResults, IDeleteType, IUpsertPayload, ParsedXLSXSheetResult } from 'api/api_interfaces';
+import {
+  IBulkUploadResults,
+  IDeleteType,
+  IUpsertPayload,
+  ParsedXLSXSheetResult,
+  XLSXPayload
+} from 'api/api_interfaces';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { BCTWType } from 'types/common_types';
 import { ExportQueryParams } from 'types/export';
@@ -331,7 +337,7 @@ export const useTelemetryApi = () => {
    * requires admin role
    * @returns a list of all users
    */
-  const useUsers = (page: number): UseQueryResult =>
+  const useUsers = (page: number): UseQueryResult<User[], AxiosError> =>
     useQuery<User[], AxiosError>('all_users', () => userApi.getUsers(page), defaultQueryOptions);
 
   /**
@@ -492,9 +498,9 @@ export const useTelemetryApi = () => {
     useMutation<IBulkUploadResults<T>, AxiosError, FormData>((form) => bulkApi.uploadCsv(form), config);
 
   const useFinalizeXLSX = <T>(
-    config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, (Animal | Collar)[]>
+    config: UseMutationOptions<IBulkUploadResults<T>, AxiosError, XLSXPayload>
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
-    useMutation<IBulkUploadResults<T>, AxiosError, (Animal | Collar)[]>((body) => bulkApi.finalizeXlsx(body), config);
+    useMutation<IBulkUploadResults<T>, AxiosError, XLSXPayload>((body) => bulkApi.finalizeXlsx(body), config);
 
   const useUploadXLSX = <T>(
     config: UseMutationOptions<ParsedXLSXSheetResult[], AxiosError, FormData>
