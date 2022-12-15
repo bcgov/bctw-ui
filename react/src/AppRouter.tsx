@@ -1,24 +1,24 @@
-
 import { FunctionComponent, lazy } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 
 //Lazy load page components
-const Home = lazy(()=> import('pages/Home'));
-const MapPage = lazy(()=> import('pages/map/MapPage'));
-const SummaryPage = lazy(()=> import('pages/summary/SummaryPage'));
-const CritterPage = lazy(()=> import('pages/data/animals/CritterPage'));
-const CollarPage = lazy(()=> import('pages/data/collars/CollarPage'));
-const UserProfile = lazy(()=> import('pages/user/UserProfile'));
+const Home = lazy(() => import('pages/Home'));
+const MapPage = lazy(() => import('pages/map/MapPage'));
+const SummaryPage = lazy(() => import('pages/summary/SummaryPage'));
+const CritterPage = lazy(() => import('pages/data/animals/CritterPage'));
+const CollarPage = lazy(() => import('pages/data/collars/CollarPage'));
+const UserProfile = lazy(() => import('pages/user/UserProfile'));
 const ManagerRequestPermission = lazy(()=> import('pages/permissions/ManagerRequestPermission'));
-const Import = lazy(()=> import('pages/data/bulk/Import'));
-const ExportV2 = lazy(()=> import('pages/data/bulk/ExportV2'));
+const Import = lazy(() => import('pages/data/bulk/Import'));
+const ExportV2 = lazy(() => import('pages/data/bulk/ExportV2'));
 const AdminHandleRequestPermissionPage = lazy(()=> import('pages/permissions/AdminHandleRequestPermission'));
-const UserAdminPage = lazy(()=> import('pages/admin/UserAdmin'));
-const OnboardingAdmin = lazy(()=> import('pages/admin/OnboardingAdmin'));
+const UserAdminPage = lazy(() => import('pages/admin/UserAdmin'));
+const OnboardingAdmin = lazy(() => import('pages/admin/OnboardingAdmin'));
 const GrantCritterAccessPage = lazy(()=> import('pages/permissions/GrantCritterAccessPage'));
-const UserOnboarding = lazy(()=> import('pages/onboarding/UserOnboarding'));
-const VendorAPIPage = lazy(()=> import('pages/vendor/TriggerFetchTelemetry'));
-const DevPlayground = lazy(()=> import('pages/DevPlayground'));
+const UserOnboarding = lazy(() => import('pages/onboarding/UserOnboarding'));
+const VendorAPIPage = lazy(() => import('pages/vendor/TriggerFetchTelemetry'));
+const DevPlayground = lazy(() => import('pages/DevPlayground'));
+
 //import AdminHandleRequestPermissionPage from 'pages/permissions/AdminHandleRequestPermission';
 //import CollarPage from 'pages/data/collars/CollarPage';
 //import CritterPage from 'pages/data/animals/CritterPage';
@@ -70,16 +70,6 @@ const AppRoutes: RouteKey[] = [
 ];
 
 const AppRouter = (): JSX.Element => {
-
-  /*
-  const history = useHistory();
-  useEffect(() => {
-    return history.listen((location) => {
-      // wipe the sidebar content when navigation to new page
-      onContentChange(null);
-    });
-  }, [history]);
-  */
 
   return (
     <BrowserRouter>
