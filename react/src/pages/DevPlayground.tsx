@@ -54,7 +54,7 @@ const TAB_LIST = ['Device and Animal', 'Telemetry', 'Vectronic KeyX'];
  * Testing area for UI comoponents.
  * /playground route.
  */
-export const DevPlayground = (): JSX.Element => {
+const DevPlayground = (): JSX.Element => {
   const [background, setBackground] = useState(false);
   const [tab, setTab] = useState(0);
   return (
@@ -163,3 +163,5 @@ const TempComponent = ({ tabList, tab, handleTab, children }: TempComponentProps
     </Box>
   );
 };
+
+export default DevPlayground;

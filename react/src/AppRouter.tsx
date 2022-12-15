@@ -1,23 +1,43 @@
 
-import AdminHandleRequestPermissionPage from 'pages/permissions/AdminHandleRequestPermission';
-import CollarPage from 'pages/data/collars/CollarPage';
-import CritterPage from 'pages/data/animals/CritterPage';
-import ExportPageV2 from 'pages/data/bulk/ExportV2';
-import GrantCritterAccessPage from 'pages/permissions/GrantCritterAccessPage';
-import Home from 'pages/Home';
-import Import from 'pages/data/bulk/Import';
-import MapPage from 'pages/map/MapPage';
-import ManagerRequestPermission from 'pages/permissions/ManagerRequestPermission';
-import UserAdminPage from 'pages/admin/UserAdmin';
-import UserOnboarding from 'pages/onboarding/UserOnboarding'
-import SummaryPage from 'pages/summary/SummaryPage';
-import UserProfile from 'pages/user/UserProfile';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, lazy } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
-import OnboardingAdmin from 'pages/admin/OnboardingAdmin';
-import VendorAPIPage from 'pages/vendor/TriggerFetchTelemetry';
-import ExportV2 from 'pages/data/bulk/ExportV2';
-import { DevPlayground } from 'pages/DevPlayground';
+
+//Lazy load page components
+const Home = lazy(()=> import('pages/Home'));
+const MapPage = lazy(()=> import('pages/map/MapPage'));
+const SummaryPage = lazy(()=> import('pages/summary/SummaryPage'));
+const CritterPage = lazy(()=> import('pages/data/animals/CritterPage'));
+const CollarPage = lazy(()=> import('pages/data/collars/CollarPage'));
+const UserProfile = lazy(()=> import('pages/user/UserProfile'));
+const ManagerRequestPermission = lazy(()=> import('pages/permissions/ManagerRequestPermission'));
+const Import = lazy(()=> import('pages/data/bulk/Import'));
+const ExportV2 = lazy(()=> import('pages/data/bulk/ExportV2'));
+const AdminHandleRequestPermissionPage = lazy(()=> import('pages/permissions/AdminHandleRequestPermission'));
+const UserAdminPage = lazy(()=> import('pages/admin/UserAdmin'));
+const OnboardingAdmin = lazy(()=> import('pages/admin/OnboardingAdmin'));
+const GrantCritterAccessPage = lazy(()=> import('pages/permissions/GrantCritterAccessPage'));
+const UserOnboarding = lazy(()=> import('pages/onboarding/UserOnboarding'));
+const VendorAPIPage = lazy(()=> import('pages/vendor/TriggerFetchTelemetry'));
+const DevPlayground = lazy(()=> import('pages/DevPlayground'));
+//import AdminHandleRequestPermissionPage from 'pages/permissions/AdminHandleRequestPermission';
+//import CollarPage from 'pages/data/collars/CollarPage';
+//import CritterPage from 'pages/data/animals/CritterPage';
+//import ExportPageV2 from 'pages/data/bulk/ExportV2';
+//import GrantCritterAccessPage from 'pages/permissions/GrantCritterAccessPage';
+//import Home from 'pages/Home';
+//import Import from 'pages/data/bulk/Import';
+//import MapPage from 'pages/map/MapPage';
+//import ManagerRequestPermission from 'pages/permissions/ManagerRequestPermission';
+//import UserAdminPage from 'pages/admin/UserAdmin';
+//import UserOnboarding from 'pages/onboarding/UserOnboarding'
+//import SummaryPage from 'pages/summary/SummaryPage';
+//import UserProfile from 'pages/user/UserProfile';
+//import OnboardingAdmin from 'pages/admin/OnboardingAdmin';
+//import VendorAPIPage from 'pages/vendor/TriggerFetchTelemetry';
+//import ExportV2 from 'pages/data/bulk/ExportV2';
+//import { DevPlayground } from 'pages/DevPlayground';
+
+
 
 export type RouteKey = {
   path: string;
