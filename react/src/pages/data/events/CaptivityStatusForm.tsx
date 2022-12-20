@@ -15,7 +15,7 @@ type CaptivityStatusFormProps<T extends IBCTWWorkflow> = WorkflowFormProps<T> & 
  *
  */
 export default function CaptivityStatusForm<
-  T extends BCTWWorkflow<T> & Pick<OptionalAnimal, 'captivity_status_ind' | 'mortality_captivity_status'>
+  T extends BCTWWorkflow<T> & Pick<OptionalAnimal, 'captivity_status_ind' | 'mortality_captivity_status_ind'>
 >({ event, handleFormChange, disabled = false, hideMortStatus = false }: CaptivityStatusFormProps<T>): JSX.Element {
   // only disable captivity status in mortality workflow
   const isDisabled = event instanceof MortalityEvent;
@@ -26,8 +26,8 @@ export default function CaptivityStatusForm<
     tooltip: <p>{`${WorkflowStrings.captivity.captivity} ${isDisabled ? '(cannot edit in this workflow)' : ''}`}</p>
   };
 
-  const mortality_captivity_status: FormFieldObject<T> = {
-    prop: 'mortality_captivity_status',
+  const mortality_captivity_status_ind: FormFieldObject<T> = {
+    prop: 'mortality_captivity_status_ind',
     type: eInputType.code,
     codeName: 'mortality_habitat',
     tooltip: <p>{WorkflowStrings.captivity.mort_captivity_status}</p>
@@ -38,7 +38,7 @@ export default function CaptivityStatusForm<
       {CreateFormField(event, captivity_status_ind, handleFormChange, { disabled: isDisabled || disabled })}
       {hideMortStatus
         ? null
-        : CreateFormField(event, mortality_captivity_status, handleFormChange, {
+        : CreateFormField(event, mortality_captivity_status_ind, handleFormChange, {
             disabled: disabled,
             style: { width: '250px' }
           })}

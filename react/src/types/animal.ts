@@ -85,7 +85,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   mortality_report: boolean;
   mortality_investigation: Code;
   captivity_status_ind: boolean;
-  mortality_captivity_status: Code;
+  mortality_captivity_status_ind: Code;
 
   permission_type?: eCritterPermission; // critters should contain this
   predator_known_ind: boolean;
@@ -172,7 +172,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   mortality_report: boolean;
   mortality_investigation: Code;
   captivity_status_ind: boolean;
-  mortality_captivity_status: Code;
+  mortality_captivity_status_ind: Code;
 
   @Exclude(toPlainOnly) permission_type: eCritterPermission;
 

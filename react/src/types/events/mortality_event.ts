@@ -49,7 +49,7 @@ export type MortalityAnimalEventProps = Pick<
   | 'captivity_status_ind'
   | 'mortality_investigation'
   | 'mortality_report'
-  | 'mortality_captivity_status'
+  | 'mortality_captivity_status_ind'
 >;
 
 type MortalitySpecificProps = Pick<IBCTWWorkflow, 'shouldUnattachDevice'> &
@@ -112,7 +112,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   mortality_investigation: Code;
   mortality_report: boolean;
   readonly captivity_status_ind: boolean; // cannot be changed
-  mortality_captivity_status: Code;
+  mortality_captivity_status_ind: Code;
   predator_known_ind: boolean;
   readonly capture_date: Dayjs;
   location_event: LocationEvent;
@@ -130,7 +130,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     'captivity_status_ind',
     'mortality_investigation',
     'mortality_report',
-    'mortality_captivity_status'
+    'mortality_captivity_status_ind'
   ];
 
   constructor(mort_date = dayjs(), capture?: CaptureEvent) {
