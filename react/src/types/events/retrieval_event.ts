@@ -12,12 +12,12 @@ import { eInputType, FormFieldObject } from 'types/form_types';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { WorkflowStrings } from 'constants/strings';
 
-interface IRetrievalEvent extends 
-  Omit<MortalityDeviceEventProps, 'device_status'>,
-  Pick<CollarHistory, 'assignment_id'>,
-  Readonly<Pick<Collar, 'malfunction_date' | 'retrieval_comment'>>,
-  Readonly<Pick<Animal, 'capture_date' | 'mortality_date' | 'wlh_id' | 'animal_id'>>,
-  DataLife { }
+interface IRetrievalEvent
+  extends Omit<MortalityDeviceEventProps, 'device_status'>,
+    Pick<CollarHistory, 'assignment_id'>,
+    Readonly<Pick<Collar, 'malfunction_date' | 'retrieval_comment'>>,
+    Readonly<Pick<Animal, 'capture_date' | 'mortality_date' | 'wlh_id' | 'animal_id'>>,
+    DataLife {}
 
 export type RetrievalFormField = {
   [Property in keyof RetrievalEvent]+?: FormFieldObject<RetrievalEvent>;
@@ -25,10 +25,10 @@ export type RetrievalFormField = {
 
 /**
  * retrieved is not a code
- * todo: display as checkbox if retrieved is no??
+ * todo: display as checkbox if retrieved_ind is no??
  * todo: need to preserve is_retrievable?
  */
-export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<RetrievalEvent>{
+export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<RetrievalEvent> {
   readonly event_type: WorkflowType;
   shouldUnattachDevice: boolean;
   readonly shouldSaveAnimal = false;
@@ -39,14 +39,14 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
   readonly device_make: Code;
   activation_status: boolean;
   readonly malfunction_date: Dayjs; // fixme: use this for min date
-  retrieved: boolean;
+  retrieved_ind: boolean;
   is_retrievable: boolean;
-  // required if retrieved, cannot be earlier than capture/mort/malf date
-  retrieval_date: Dayjs; 
-  // required if retrieved, default to device not deployed if retrieved
-  device_deployment_status: Code; 
+  // required if retrieved_ind, cannot be earlier than capture/mort/malf date
+  retrieval_date: Dayjs;
+  // required if retrieved_ind, default to device not deployed if retrieved_ind
+  device_deployment_status: Code;
   //required ...always?
-  device_condition: Code; 
+  device_condition: Code;
   retrieval_comment: string;
 
   // data life
@@ -64,7 +64,7 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
 
   constructor() {
     this.event_type = 'retrieval';
-    this.retrieved = true;
+    this.retrieved_ind = true;
     this.retrieval_date = getEndOfPreviousDay();
     this.shouldUnattachDevice = false;
     this.device_deployment_status = 'Not Deployed';
@@ -90,22 +90,22 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
   determineMinRetrievalDate = (): Dayjs => {
     const { capture_date, malfunction_date, mortality_date } = this;
     const dates: Dayjs[] = [capture_date, malfunction_date, mortality_date]
-      .map(d => d ? dayjs(d) : null)
-      .filter(d => d)
-      .sort((a, b) => a.isBefore(b) ? 1 : 0);
+      .map((d) => (d ? dayjs(d) : null))
+      .filter((d) => d)
+      .sort((a, b) => (a.isBefore(b) ? 1 : 0));
     if (dates.length) {
-      const minDate = dates[dates.length -1];
+      const minDate = dates[dates.length - 1];
       // eslint-disable-next-line no-console
       // console.log('min retrieval date determined', minDate);
       return minDate;
     }
     return null;
-  }
+  };
 
   fields: RetrievalFormField = {
     is_retrievable: { prop: 'is_retrievable', type: eInputType.check },
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
-    data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
+    data_life_end: { prop: 'data_life_end', type: eInputType.datetime }
   };
 
   getWorkflowTitle(): string {
@@ -116,13 +116,13 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
     const props: (keyof RetrievalEvent)[] = [
       'activation_status',
       'retrieval_comment',
-      'retrieved',
+      'retrieved_ind',
       'retrieval_date',
       'device_deployment_status',
-      'device_condition',
+      'device_condition'
     ];
     const ret = eventToJSON(props, this);
-    if (this.retrieved) {
+    if (this.retrieved_ind) {
       ret.retrieval_date = this.retrieval_date.format(formatTime);
     } else {
       delete ret.retrieval_date;

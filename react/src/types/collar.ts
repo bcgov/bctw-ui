@@ -69,7 +69,7 @@ export interface ICollar extends ICollarTelemetryBase {
   offline_comment: string;
   permission_type?: eCritterPermission; // fetched collars should contain this
   retrieval_date: Dayjs;
-  retrieved: boolean;
+  retrieved_ind: boolean;
   retrieval_comment: string;
   satellite_network: Code;
 }
@@ -104,7 +104,7 @@ export class Collar implements BCTWBase<Collar>, ICollar {
   offline_comment: string;
   @Exclude(toPlainOnly) permission_type: eCritterPermission;
   @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) retrieval_date: Dayjs;
-  retrieved: boolean;
+  retrieved_ind: boolean;
   retrieval_comment: string;
   satellite_network: Code;
   device_comment: string;
@@ -259,7 +259,7 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'device_condition', type: eInputType.code, ...isRequired }
   ],
   retrievalFields: [
-    { prop: 'retrieved', type: eInputType.check },
+    { prop: 'retrieved_ind', type: eInputType.check },
     { prop: 'retrieval_date', type: eInputType.datetime },
     { prop: 'retrieval_comment', type: eInputType.multiline }
   ],

@@ -26,7 +26,7 @@ export type MortalityDeviceEventProps = Pick<
   | 'collar_id'
   | 'device_id'
   | 'device_make'
-  | 'retrieved'
+  | 'retrieved_ind'
   | 'retrieval_date'
   | 'activation_status'
   | 'device_condition'
@@ -87,7 +87,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly collar_id: uuid;
   readonly device_id: number;
   readonly device_make: Code;
-  retrieved: boolean;
+  retrieved_ind: boolean;
   retrieval_date: Dayjs;
   activation_status: boolean;
   device_condition: Code;
@@ -141,7 +141,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.onlySaveAnimalStatus = false;
     // retrieval date is defaulted to end of previous day (business requirement)
     this.retrieval_date = getEndOfPreviousDay();
-    this.retrieved = false;
+    this.retrieved_ind = false;
     this.activation_status = true;
     // workflow defaulted fields
     this.shouldUnattachDevice = false;
@@ -178,7 +178,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
         return 'Capture Date';
       case 'mortality_report_ind':
         return WorkflowStrings.mortality.mort_wildlife;
-      case 'retrieved':
+      case 'retrieved_ind':
         return WorkflowStrings.device.was_retrieved;
       case 'activation_status':
         return WorkflowStrings.device.vendor_activation;
@@ -234,7 +234,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   getDevice(): OptionalDevice {
     const props: (keyof Collar)[] = [
       'collar_id',
-      'retrieved',
+      'retrieved_ind',
       'activation_status',
       'device_condition',
       'device_deployment_status',
@@ -242,7 +242,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       'device_status'
     ];
     const ret = eventToJSON(props, this);
-    if (this.retrieved) {
+    if (this.retrieved_ind) {
       ret.retrieval_date = this.retrieval_date.format(formatTime);
     } else {
       delete ret.retrieval_date;

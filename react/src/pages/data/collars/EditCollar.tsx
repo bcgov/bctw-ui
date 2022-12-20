@@ -31,7 +31,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   const createEvent = (type: WorkflowType): MalfunctionEvent | RetrievalEvent => {
     if (type === 'retrieval') {
       return editObjectToEvent(editing, new RetrievalEvent(), [
-        'retrieved',
+        'retrieved_ind',
         'retrieval_date',
         'device_deployment_status'
       ]);
@@ -53,7 +53,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   // if a malfunction event is saved and the device is retrieved, open the retrieval workflow
   const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
     await setShowWorkflowForm(false);
-    if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved) {
+    if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved_ind) {
       // console.log('im supposed to show the retrieval form', e);
       const retrievalWF = editObjectToEvent(e, new RetrievalEvent(), ['event_type']);
       await updateEvent(retrievalWF as any); // fixme:

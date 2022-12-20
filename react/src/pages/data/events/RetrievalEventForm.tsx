@@ -31,8 +31,8 @@ export default function RetrievalEventForm({
   const onChange = (v: Record<keyof RetrievalEvent, unknown>): void => {
     handleFormChange(v);
     const [key, value] = parseFormChangeResult<RetrievalEvent>(v);
-    // retrieved checkbox state enables/disables the retrieval date datetime picker
-    if (key === 'retrieved') {
+    // retrieved_ind checkbox state enables/disables the retrieval date datetime picker
+    if (key === 'retrieved_ind') {
       setIsRetrieved(value as boolean);
     } else if (key === 'shouldUnattachDevice') {
       // make attachment end state required if user is removing device
@@ -49,7 +49,7 @@ export default function RetrievalEventForm({
     <FormSection id='retrieval-device' header='Device Details'>
       {[
         <Box key='bx-ret' {...boxSpreadRowProps} mb={1}>
-          {CreateFormField(retrieval, wfFields.get('retrieved'), onChange)}
+          {CreateFormField(retrieval, wfFields.get('retrieved_ind'), onChange)}
           {CreateFormField(
             retrieval,
             wfFields.get('retrieval_date'),
@@ -61,7 +61,8 @@ export default function RetrievalEventForm({
         <Box key='bx-dev' {...boxSpreadRowProps}>
           {CreateFormField(retrieval, fields.shouldUnattachDevice, onChange, {}, true)}
           {CreateFormField(retrieval, fields.data_life_end, onChange, {
-            disabled: !isBeingUnattached, required: isBeingUnattached 
+            disabled: !isBeingUnattached,
+            required: isBeingUnattached
           })}
         </Box>,
         <Box key='bx-cdn' {...boxSpreadRowProps} mt={2} mb={1}>
@@ -71,14 +72,18 @@ export default function RetrievalEventForm({
         <Box key='bx-status' {...boxSpreadRowProps} mb={1}>
           {CreateFormField(
             retrieval,
-            {...wfFields.get('activation_status'),
+            {
+              ...wfFields.get('activation_status'),
               tooltip: (
                 <p>
                   <span style={{ color: 'orangered' }}>Reminder: </span>
                   {`${WorkflowStrings.device.activation_warning}`}
                 </p>
               )
-            }, onChange, {}, true
+            },
+            onChange,
+            {},
+            true
           )}
         </Box>,
         CreateFormField(retrieval, wfFields.get('retrieval_comment'), onChange)

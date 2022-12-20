@@ -39,7 +39,7 @@ export default function MalfunctionEventForm({
     if (key === 'device_status') {
       setDeviceStatus(value as string);
       setDeviceActive(value === 'Active');
-    } else if (key === 'retrieved') {
+    } else if (key === 'retrieved_ind') {
       if (value) {
         setShowNotif(true);
       }
@@ -140,7 +140,7 @@ export default function MalfunctionEventForm({
             <span key='empty'></span>
           ),
           <Box key='mf-act' mt={2}>
-            {CreateFormField(malfunction, wfFields.get('retrieved'), onChange, { disabled: deviceIsActive })}
+            {CreateFormField(malfunction, wfFields.get('retrieved_ind'), onChange, { disabled: deviceIsActive })}
           </Box>
         ]}
       </FormSection>

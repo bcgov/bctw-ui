@@ -1,5 +1,11 @@
 /* eslint-disable no-console */
-import { attachDeviceEndpoint, removeDeviceEndpoint, updateDatalifeEndpoint, upsertCritterEndpoint, upsertDeviceEndpoint } from 'api/api_endpoint_urls';
+import {
+  attachDeviceEndpoint,
+  removeDeviceEndpoint,
+  updateDatalifeEndpoint,
+  upsertCritterEndpoint,
+  upsertDeviceEndpoint
+} from 'api/api_endpoint_urls';
 import { createUrl, postJSON } from 'api/api_helpers';
 import { AxiosError } from 'axios';
 import { RemoveDeviceInput } from 'types/collar_history';
@@ -19,15 +25,14 @@ export const eventApi = (props: ApiProps): API => {
   const { api } = props;
   const queryClient = useQueryClient();
 
-
   // since saving an event can affect many queries, invalidate everything
   const invalidate = (): void => {
     queryClient.invalidateQueries();
-  }
+  };
 
   /**
    * when an event form is saved, there are potentiall multiple post requests that need to be handled
-   * if the device is marked as retrieved, the device may need to be removed
+   * if the device is marked as retrieved_ind, the device may need to be removed
    * the animal
    * the collar
    * fixme: if a later api post fails...how to handle form?
@@ -72,27 +77,31 @@ export const eventApi = (props: ApiProps): API => {
     // console.log('workflow event add or attach event', attachment)
     // return true;
     try {
-      const { data } = await postJSON(api, createUrl({ api: isAdding ? attachDeviceEndpoint : removeDeviceEndpoint }), attachment);
+      const { data } = await postJSON(
+        api,
+        createUrl({ api: isAdding ? attachDeviceEndpoint : removeDeviceEndpoint }),
+        attachment
+      );
       console.log('device add/remove status', data);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`error adding/removing device', ${formatAxiosError(err)}`);
       return err;
     }
-  }
+  };
 
-  const _updateDataLife = async(dli: ChangeDataLifeInput): Promise<WorkflowAPIResponse> => {
+  const _updateDataLife = async (dli: ChangeDataLifeInput): Promise<WorkflowAPIResponse> => {
     // console.log('workflow event update data life', dli);
     // return;
     try {
-      const { data } = await postJSON(api, createUrl({ api: updateDatalifeEndpoint}), dli);
+      const { data } = await postJSON(api, createUrl({ api: updateDatalifeEndpoint }), dli);
       console.log('update data life response', data);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`error updating data life', ${formatAxiosError(err)}`);
       return err;
     }
-  }
+  };
 
   const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
     // capture events can change the data life start
@@ -106,7 +115,7 @@ export const eventApi = (props: ApiProps): API => {
     //
     if (typeof event.getAttachment === 'function' && event.shouldUnattachDevice) {
       const attachment = event.getAttachment();
-      const s = await _addOrRemoveDevice(attachment as RemoveDeviceInput, false); 
+      const s = await _addOrRemoveDevice(attachment as RemoveDeviceInput, false);
       if (typeof s !== 'boolean') {
         return s;
       }

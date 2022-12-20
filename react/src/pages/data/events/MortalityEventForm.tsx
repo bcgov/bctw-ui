@@ -54,8 +54,8 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
   const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
     handleFormChange(v);
     const [key, value] = parseFormChangeResult<MortalityEvent>(v);
-    // retrieved checkbox state enables/disables the retrieval date datetime picker
-    if (key === 'retrieved') {
+    // retrieved_ind checkbox state enables/disables the retrieval date datetime picker
+    if (key === 'retrieved_ind') {
       setIsRetrieved(!!value);
     } else if (key === 'proximate_cause_of_death') {
       setUcodDisabled(false); // enable ucod when a proximate cause is chosen
@@ -115,7 +115,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
               <>
                 {/* device retrieval */}
                 <Box mb={1} {...boxSpreadRowProps}>
-                  {CreateFormField(mortality, wfFields.get('retrieved'), onChange, isDisabled)}
+                  {CreateFormField(mortality, wfFields.get('retrieved_ind'), onChange, isDisabled)}
                   {CreateFormField(mortality, { ...wfFields.get('retrieval_date'), required: isRetrieved }, onChange, {
                     disabled: !isRetrieved || critterIsAlive
                   })}

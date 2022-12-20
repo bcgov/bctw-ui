@@ -11,18 +11,18 @@ import { uuid } from 'types/common_types';
 import { AttachedCollar, Collar } from 'types/collar';
 
 type MalfunctionDeviceProps = Pick<
-AttachedCollar,
-| 'collar_id'
-| 'device_id'
-| 'device_malfunction_type'
-| 'malfunction_date'
-| 'malfunction_comment'
-| 'device_status'
-| 'offline_comment'
-| 'offline_date'
-| 'offline_type'
-| 'last_transmission_date'
-| 'retrieved'
+  AttachedCollar,
+  | 'collar_id'
+  | 'device_id'
+  | 'device_malfunction_type'
+  | 'malfunction_date'
+  | 'malfunction_comment'
+  | 'device_status'
+  | 'offline_comment'
+  | 'offline_date'
+  | 'offline_type'
+  | 'last_transmission_date'
+  | 'retrieved_ind'
 >;
 
 export type MalfunctionFormField = {
@@ -31,9 +31,9 @@ export type MalfunctionFormField = {
 
 interface IMalfunctionEvent
   extends MalfunctionDeviceProps,
-  Readonly<Pick<CollarHistory, 'assignment_id'>>,
-  Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
-  IDataLifeEndProps {}
+    Readonly<Pick<CollarHistory, 'assignment_id'>>,
+    Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
+    IDataLifeEndProps {}
 
 export type MalfunctionDeviceStatus = 'Potential Malfunction' | 'Active' | 'Offline' | 'Malfunction';
 
@@ -64,13 +64,13 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
   offline_date: Dayjs; // fields enabled if device_status -> offline
   offline_type: Code;
   offline_comment: string;
-  retrieved: boolean;
+  retrieved_ind: boolean;
   readonly last_transmission_date: Dayjs;
 
   constructor(last_transmission = dayjs()) {
     this.onlySaveDeviceStatus = false;
     this.event_type = 'malfunction';
-    // pass true as the disableDate param. 
+    // pass true as the disableDate param.
     this.location_event = new LocationEvent('malfunction', last_transmission ?? dayjs(), true);
     this.device_status = 'Potential Malfunction';
   }
@@ -79,7 +79,7 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
     switch (s) {
       case 'shouldUnattachDevice':
         return WorkflowStrings.release.isNewDevice;
-      case 'retrieved':
+      case 'retrieved_ind':
         return WorkflowStrings.malfunction.isRetrieved;
       case 'device_malfunction_type':
         return 'Malfunction Type';
@@ -100,13 +100,9 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
       const { collar_id, device_status } = this;
       return { collar_id, device_status };
     }
-    const props: (keyof Collar)[] = [
-      'collar_id',
-      'device_status',
-      'retrieved'
-    ];
+    const props: (keyof Collar)[] = ['collar_id', 'device_status', 'retrieved_ind'];
     // get the coordinate type properties from the location event
-    // note that date is not included 
+    // note that date is not included
     const locs = this.location_event.toJSON();
     let ret;
     if (this.device_status === 'Malfunction') {
@@ -122,6 +118,6 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
       delete locs.malfunction_comment;
       delete locs.malfunction_date;
     }
-    return omitNull({...ret, ...locs})
+    return omitNull({ ...ret, ...locs });
   }
 }
