@@ -50,7 +50,7 @@ interface DeviceKeyXObj {
 }
 
 /**
- * @param deviceids List of deviceids to query the api_vectronics_collar_data,
+ * @param deviceids List of deviceids to query the api_vectronic_credential,
  * If none provided defaults to all the keyX files for users assigned collars
  * @param pageRows Optional param for number of rows for pagination
  * @Returns Paginated list of keyX files and controls to upload inline or batch
