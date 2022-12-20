@@ -28,7 +28,7 @@ export type MortalityDeviceEventProps = Pick<
   | 'device_make'
   | 'retrieved_ind'
   | 'retrieval_date'
-  | 'activation_status'
+  | 'activation_status_ind'
   | 'device_condition'
   | 'device_status'
   | 'device_deployment_status'
@@ -89,7 +89,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly device_make: Code;
   retrieved_ind: boolean;
   retrieval_date: Dayjs;
-  activation_status: boolean;
+  activation_status_ind: boolean;
   device_condition: Code;
   device_deployment_status: DeploymentStatusNotDeployed;
   device_status: MortalityDeviceStatus;
@@ -142,7 +142,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     // retrieval date is defaulted to end of previous day (business requirement)
     this.retrieval_date = getEndOfPreviousDay();
     this.retrieved_ind = false;
-    this.activation_status = true;
+    this.activation_status_ind = true;
     // workflow defaulted fields
     this.shouldUnattachDevice = false;
     this.device_status = 'Mortality';
@@ -180,7 +180,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
         return WorkflowStrings.mortality.mort_wildlife;
       case 'retrieved_ind':
         return WorkflowStrings.device.was_retrieved;
-      case 'activation_status':
+      case 'activation_status_ind':
         return WorkflowStrings.device.vendor_activation;
       case 'predator_known_ind':
         return WorkflowStrings.mortality.mort_predator_pcod;
@@ -235,7 +235,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     const props: (keyof Collar)[] = [
       'collar_id',
       'retrieved_ind',
-      'activation_status',
+      'activation_status_ind',
       'device_condition',
       'device_deployment_status',
       'device_id',

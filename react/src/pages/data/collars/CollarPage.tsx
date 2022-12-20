@@ -51,7 +51,7 @@ export default function CollarPage(): JSX.Element {
               'frequency',
               'device_type',
               'device_make',
-              'activation_status',
+              'activation_status_ind',
               'device_model',
               'wlh_id',
               'animal_id',

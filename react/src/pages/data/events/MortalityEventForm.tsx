@@ -136,7 +136,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             {CreateFormField(mortality, wfFields.get('device_deployment_status'), onChange, isDisabled)}
           </Box>,
           <Box key='bx-act-status'>
-            {CreateFormField(mortality, wfFields.get('activation_status'), onChange, isDisabled, true)}
+            {CreateFormField(mortality, wfFields.get('activation_status_ind'), onChange, isDisabled, true)}
           </Box>
         ]}
       </FormSection>

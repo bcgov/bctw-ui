@@ -73,7 +73,7 @@ export default function RetrievalEventForm({
           {CreateFormField(
             retrieval,
             {
-              ...wfFields.get('activation_status'),
+              ...wfFields.get('activation_status_ind'),
               tooltip: (
                 <p>
                   <span style={{ color: 'orangered' }}>Reminder: </span>

@@ -114,7 +114,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
             const [key, value] = parseFormChangeResult<Collar>(v);
             if (key === 'device_type') {
               setIsVHF(value === 'VHF');
-            } else if (key === 'activation_status') {
+            } else if (key === 'activation_status_ind') {
               setIsActive(!!value);
             } else if (key === 'dropoff_device_id') {
               setHasDropoff(!!value);
@@ -141,7 +141,9 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
 
               <FormSection id='d-add' header='Warranty & Activation Details' disabled={!canEdit}>
                 {[
-                  CreateFormField(editing, wfFields.get('activation_status'), onChange, { labelPlacement: 'start' }),
+                  CreateFormField(editing, wfFields.get('activation_status_ind'), onChange, {
+                    labelPlacement: 'start'
+                  }),
                   activationFields.map((f) => CreateFormField(editing, { ...f, required: isActive }, onChange)),
                   CreateFormField(editing, wfFields.get('activation_comment'), onChange, { disabled: !isActive })
                 ]}

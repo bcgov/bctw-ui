@@ -37,7 +37,7 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
   readonly collar_id: uuid;
   readonly device_id: number;
   readonly device_make: Code;
-  activation_status: boolean;
+  activation_status_ind: boolean;
   readonly malfunction_date: Dayjs; // fixme: use this for min date
   retrieved_ind: boolean;
   is_retrievable: boolean;
@@ -114,7 +114,7 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
 
   getDevice(): OptionalDevice {
     const props: (keyof RetrievalEvent)[] = [
-      'activation_status',
+      'activation_status_ind',
       'retrieval_comment',
       'retrieved_ind',
       'retrieval_date',

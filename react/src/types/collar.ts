@@ -44,7 +44,7 @@ export interface ICollarTelemetryBase extends ICollarBase {
 // export interface ICollar extends ICollarTelemetryBase, BCTW, BCTWBaseType {
 export interface ICollar extends ICollarTelemetryBase {
   activation_comment: string;
-  activation_status: boolean;
+  activation_status_ind: boolean;
   camera_device_id: number;
   readonly collar_transaction_id: uuid;
   device_comment: string;
@@ -76,7 +76,7 @@ export interface ICollar extends ICollarTelemetryBase {
 
 export class Collar implements BCTWBase<Collar>, ICollar {
   activation_comment: string;
-  activation_status: boolean;
+  activation_status_ind: boolean;
   readonly collar_id: uuid;
   camera_device_id: number;
   @Exclude(toPlainOnly) collar_transaction_id: uuid;
@@ -130,7 +130,7 @@ export class Collar implements BCTWBase<Collar>, ICollar {
 
   formatPropAsHeader(str: keyof Collar): string {
     switch (str) {
-      case 'activation_status':
+      case 'activation_status_ind':
         return 'Subscription';
       case 'camera_device_id':
         return 'Camera ID';
@@ -171,7 +171,7 @@ export class Collar implements BCTWBase<Collar>, ICollar {
       'frequency',
       'device_type',
       'device_make',
-      'activation_status',
+      'activation_status_ind',
       'device_model'
     ];
   }
@@ -220,7 +220,7 @@ export class AttachedCollar extends Collar implements IAttachedCollar, BCTWBase<
       'last_transmission_date',
       'last_fetch_date',
       'device_status',
-      'activation_status',
+      'activation_status_ind',
       'device_make',
       'device_model'
     ];
@@ -246,7 +246,7 @@ export const collarFormFields: Record<string, FormFieldObject<Collar>[]> = {
     { prop: 'device_model', type: eInputType.text, ...isRequired }
   ],
   isActiveField: [
-    { prop: 'activation_status', type: eInputType.check },
+    { prop: 'activation_status_ind', type: eInputType.check },
     { prop: 'activation_comment', type: eInputType.multiline }
   ],
   activationFields: [
