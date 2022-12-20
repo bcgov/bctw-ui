@@ -88,7 +88,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   mortality_captivity_status: Code;
 
   permission_type?: eCritterPermission; // critters should contain this
-  predator_known: boolean;
+  predator_known_ind: boolean;
   predator_species_pcod: Code;
   predator_species_ucod: Code;
   proximate_cause_of_death: Code;
@@ -142,7 +142,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
-  predator_known: boolean;
+  predator_known_ind: boolean;
   predator_species_pcod: Code;
   predator_species_ucod: Code;
   proximate_cause_of_death: Code;
@@ -373,7 +373,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'predator_species_ucod', type: eInputType.code, species: [caribou], codeName: 'predator_species' },
     { prop: 'mortality_investigation', type: eInputType.code, species: [caribou] },
     { prop: 'mortality_report', type: eInputType.check, species: [caribou] },
-    { prop: 'predator_known', type: eInputType.check, species: [caribou] },
+    { prop: 'predator_known_ind', type: eInputType.check, species: [caribou] },
     { prop: 'mortality_comment', type: eInputType.multiline, species: [] }
   ],
   releaseFields: [
