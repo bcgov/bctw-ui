@@ -27,10 +27,10 @@ export default function CaptureEventForm({
 }: WorkflowFormProps<CaptureEvent>): JSX.Element {
   const [capture, setCaptureEvent] = useState(event);
   const [isTransloc, setIsTransloc] = useState(false);
-  // controls the status of the notification when the translocation field is unchecked
+  // controls the status of the notification when the translocation_ind field is unchecked
   const [showNotif, setShowNotif] = useState(false);
   /**
-   * controls the state of the population/region selectors, if the translocation
+   * controls the state of the population/region selectors, if the translocation_ind
    * is not complete, these will be filled out at a later time when the animal is released
    */
   const [isTranslocComplete, setIsTranslocComplete] = useState(true);
@@ -45,7 +45,7 @@ export default function CaptureEventForm({
   const onChange = (v: Record<keyof CaptureEvent, unknown>): void => {
     handleFormChange(v);
     const [key, value] = parseFormChangeResult<CaptureEvent>(v);
-    if (key === 'translocation') {
+    if (key === 'translocation_ind') {
       setIsTransloc(!!value);
     }
     if (key === 'isTranslocationComplete') {
@@ -148,7 +148,7 @@ export default function CaptureEventForm({
           <Box key='bx-transloc' {...boxSpreadRowProps}>
             {<span>{strIsTransloc}</span>}
             {/* translocation checkbox, controls disabled status of other fields in section */}
-            {CreateFormField(capture, wfFields.get('translocation'), onChange)}
+            {CreateFormField(capture, wfFields.get('translocation_ind'), onChange)}
           </Box>,
           <Box key='bx-rel' {...boxSpreadRowProps} mt={1}>
             {<span>{isTranslocCompleted}</span>}
@@ -160,7 +160,7 @@ export default function CaptureEventForm({
             </Button>
           </Box>,
           <Box key='bx-mort' {...boxSpreadRowProps}>
-            {<span>{diedDuring('translocation')}</span>}
+            {<span>{diedDuring('translocation_ind')}</span>}
             <Button onClick={(): void => handlePostponeSave('mortality')} disabled={!isTransloc || !canSave}>
               {WorkflowStrings.capture.btnContinueTo('Mortality')}
             </Button>

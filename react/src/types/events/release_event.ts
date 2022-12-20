@@ -13,7 +13,7 @@ import { Collar } from 'types/collar';
 import { formatTime } from 'utils/time';
 import CaptureEvent from './capture_event';
 
-type ReleaseProps = Pick<Animal, 'species' | 'translocation' | 'region' | 'population_unit' | 'animal_status'>;
+type ReleaseProps = Pick<Animal, 'species' | 'translocation_ind' | 'region' | 'population_unit' | 'animal_status'>;
 
 export type ReleaseFormField = {
   [Property in keyof ReleaseEvent]+?: FormFieldObject<ReleaseEvent>;
@@ -21,10 +21,10 @@ export type ReleaseFormField = {
 
 interface IReleaseEvent
   extends ReleaseProps,
-  Readonly<Pick<CollarHistory, 'assignment_id'>>,
-  Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
-  Pick<Collar, 'device_id' | 'collar_id'>,
-  IDataLifeEndProps {}
+    Readonly<Pick<CollarHistory, 'assignment_id'>>,
+    Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
+    Pick<Collar, 'device_id' | 'collar_id'>,
+    IDataLifeEndProps {}
 
 /**
  * todo:
@@ -45,7 +45,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   readonly animal_id: string;
   readonly animal_status: Code;
   readonly species: Code;
-  translocation: boolean;
+  translocation_ind: boolean;
   region: Code;
   population_unit: Code;
 
@@ -57,7 +57,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   constructor(capture?: CaptureEvent) {
     this.event_type = 'release';
     if (capture) {
-      this.location_event = Object.assign(capture.location_event, {location_type: 'release'});
+      this.location_event = Object.assign(capture.location_event, { location_type: 'release' });
       this.critterPropsToSave = capture.captureCritterPropsToSave;
     } else {
       this.location_event = new LocationEvent(this.event_type, dayjs());
@@ -75,7 +75,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     }
   }
   get displayProps(): (keyof ReleaseEvent)[] {
-    return ['species', 'wlh_id', 'animal_id', 'animal_status', 'translocation'];
+    return ['species', 'wlh_id', 'animal_id', 'animal_status', 'translocation_ind'];
   }
   getWorkflowTitle(): string {
     return WorkflowStrings.release.workflowTitle;
@@ -92,12 +92,12 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   getAnimal(): OptionalAnimal {
     const props = [...this.critterPropsToSave];
     // if the critter was being translocated, preserve the region/population unit
-    if (this.translocation) {
+    if (this.translocation_ind) {
       props.push('region', 'population_unit');
     }
     const ret = eventToJSON(props, this);
-    // if translocation an the animal status was 'in translocation', revert it to alive.
-    if (this.translocation && this.animal_status === 'In Translocation') {
+    // if translocation_ind an the animal status was 'in translocation', revert it to alive.
+    if (this.translocation_ind && this.animal_status === 'In Translocation') {
       ret['animal_status'] = 'Alive';
     }
     return omitNull({ ...ret, ...this.location_event.toJSON() });

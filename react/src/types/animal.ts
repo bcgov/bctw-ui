@@ -106,7 +106,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   release_utm_zone: number;
 
   sex: Code;
-  translocation: boolean;
+  translocation_ind: boolean;
   ultimate_cause_of_death: Code;
 }
 
@@ -161,7 +161,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   release_utm_zone: number;
   sex: Code;
   species: Code;
-  translocation: boolean;
+  translocation_ind: boolean;
   wlh_id: string;
   animal_comment: string;
   @Transform(nullToDayjs) last_transmission_date?: Dayjs;
@@ -383,7 +383,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'release_utm_zone', type: eInputType.number, species: [] },
     { prop: 'release_utm_easting', type: eInputType.number, species: [] },
     { prop: 'release_utm_northing', type: eInputType.number, species: [] },
-    { prop: 'translocation', type: eInputType.check, species: [] },
+    { prop: 'translocation_ind', type: eInputType.check, species: [] },
     { prop: 'release_comment', type: eInputType.multiline, species: [] }
   ],
   animalCommentField: [{ prop: 'animal_comment', type: eInputType.multiline, species: [] }]

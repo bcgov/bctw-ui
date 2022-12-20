@@ -17,7 +17,7 @@ type CaptureAnimalEventProps = Pick<
   | 'wlh_id'
   | 'species'
   | 'recapture_ind'
-  | 'translocation'
+  | 'translocation_ind'
   | 'associated_animal_id'
   | 'associated_animal_relationship'
   | 'region'
@@ -84,7 +84,7 @@ export default class CaptureEvent
   readonly animal_id: string;
   species: Code;
   recapture_ind: boolean;
-  translocation: boolean;
+  translocation_ind: boolean;
   associated_animal_id: string;
   associated_animal_relationship: Code; // required if associated_animal_id populated
   // region & popunit are enabled when animal is translocated
@@ -104,7 +104,7 @@ export default class CaptureEvent
   constructor() {
     this.event_type = 'capture';
     this.recapture_ind = false;
-    this.translocation = false;
+    this.translocation_ind = false;
     this.isTranslocationComplete = true;
     this.location_event = new LocationEvent('capture', dayjs());
   }
@@ -132,7 +132,7 @@ export default class CaptureEvent
     return [
       'critter_id',
       'recapture_ind',
-      'translocation',
+      'translocation_ind',
       'species',
       'associated_animal_id',
       'associated_animal_relationship',
@@ -150,7 +150,7 @@ export default class CaptureEvent
 
   getAnimal(): OptionalAnimal {
     const props = this.captureCritterPropsToSave;
-    if (this.translocation) {
+    if (this.translocation_ind) {
       // if the translocation is completed, save the new region/population unit.
       // otherwise, need to update animal_status to 'in translocation';
       if (this.isTranslocationComplete) {
@@ -163,7 +163,7 @@ export default class CaptureEvent
     if (!this.juvenile_at_heel) {
       delete ret.juvenile_at_heel_count;
     }
-    if (this.translocation && !this.isTranslocationComplete) {
+    if (this.translocation_ind && !this.isTranslocationComplete) {
       ret['animal_status'] = 'In Translocation';
     }
     if (!ret.associated_animal_id) {

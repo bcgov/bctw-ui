@@ -23,7 +23,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
     if (wfType === 'capture') {
       return editObjectToEvent(editing, new CaptureEvent(), [
         'species',
-        'translocation',
+        'translocation_ind',
         'recapture_ind',
         'region',
         'population_unit'
@@ -50,13 +50,13 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
     }
   }, [workflow]);
   /**
-   * when a capture workflow is saved, always show the release workflow unless a translocation is underway
+   * when a capture workflow is saved, always show the release workflow unless a translocation_ind is underway
    * todo: is this still needed?
    */
   const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
     setOpen(false);
     if (e.event_type === 'capture' && e instanceof CaptureEvent) {
-      if (e.translocation && !e.isTranslocationComplete) {
+      if (e.translocation_ind && !e.isTranslocationComplete) {
         // do nothing
       } else {
         // show the release form, populating the location and date fields

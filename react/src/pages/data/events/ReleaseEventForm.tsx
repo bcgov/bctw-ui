@@ -54,13 +54,15 @@ export default function ReleaseEventForm({ event, handleFormChange }: WorkflowFo
             {CreateFormField(release, { ...fields.shouldUnattachDevice }, onChange)}
             {/* {CreateFormField(release, { ...fields.data_life_start, required: isBeingUnattached }, onChange, { disabled: !isBeingUnattached })} */}
           </Box>,
-          release.translocation && release.animal_status === 'In Translocation' ? (
+          release.translocation_ind && release.animal_status === 'In Translocation' ? (
             <Box key='bx-trsloc' {...boxSpreadRowProps} mt={2}>
               <h4>Update translocation details:</h4>
               {CreateFormField(release, { ...wfFields.get('region'), required: true }, onChange)}
               {CreateFormField(release, { ...wfFields.get('population_unit'), required: true }, onChange)}
             </Box>
-          ) : <span key='empty'></span>
+          ) : (
+            <span key='empty'></span>
+          )
         ]}
       </FormSection>
       <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>

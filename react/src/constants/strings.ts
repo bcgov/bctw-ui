@@ -118,7 +118,7 @@ const WorkflowStrings = {
     associatedID: 'What is the associated animal’s WLHID?',
     associatedRel: 'What is the relationship of the individual to the captured individual?',
     beenReleased: 'Has the animal been released?',
-    diedDuring: (wf: 'capture' | 'translocation'): string => `Did the animal die during ${wf}?`,
+    diedDuring: (wf: 'capture' | 'translocation_ind'): string => `Did the animal die during ${wf}?`,
     btnContinueTo: (wf: 'Mortality' | 'Release'): string => `Continue to ${wf} Workflow`
   },
   retrieval: {
