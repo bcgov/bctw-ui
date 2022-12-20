@@ -19,7 +19,12 @@ import { Button } from 'components/common';
  * todo: deal with data life
  * devices not assigned here?
  */
-export default function CaptureEventForm({ canSave, event, handlePostponeSave, handleFormChange }: WorkflowFormProps<CaptureEvent>): JSX.Element {
+export default function CaptureEventForm({
+  canSave,
+  event,
+  handlePostponeSave,
+  handleFormChange
+}: WorkflowFormProps<CaptureEvent>): JSX.Element {
   const [capture, setCaptureEvent] = useState(event);
   const [isTransloc, setIsTransloc] = useState(false);
   // controls the status of the notification when the translocation field is unchecked
@@ -69,27 +74,36 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
 
   // strings used
   const {
-    areUpdates, associated, associatedID,
-    beenReleased, btnContinueTo, diedDuring, isTransloc: strIsTransloc,
-    isRecapture, isTranslocCompleted, shouldReviewNotif, translocNotif
+    areUpdates,
+    associated,
+    associatedID,
+    beenReleased,
+    btnContinueTo,
+    diedDuring,
+    isTransloc: strIsTransloc,
+    isRecapture,
+    isTranslocCompleted,
+    shouldReviewNotif,
+    translocNotif
   } = WorkflowStrings.capture;
 
   return (
     <>
       <FormSection id='a' header='Capture Details'>
         {[
-          <LocationEventForm
-            key='ce-loc'
-            event={capture.location_event}
-            notifyChange={onChangeLocationProp}
-          />,
-          // recapture field
+          <LocationEventForm key='ce-loc' event={capture.location_event} notifyChange={onChangeLocationProp} />,
+          // recapture_ind field
           <Box key='bx-rec' {...boxSpreadRowProps} mt={1}>
             {<span>{isRecapture}</span>}
-            {CreateFormField(capture, wfFields.get('recapture'), onChange)}
+            {CreateFormField(capture, wfFields.get('recapture_ind'), onChange)}
           </Box>,
           // captivity status section
-          <CaptivityStatusForm key='ce-capt' event={capture} handleFormChange={handleFormChange} hideMortStatus={true} />,
+          <CaptivityStatusForm
+            key='ce-capt'
+            event={capture}
+            handleFormChange={handleFormChange}
+            hideMortStatus={true}
+          />,
           // associated animal section
           <Box key='bx-acc' {...boxSpreadRowProps} mt={1}>
             {<span style={{ marginRight: '0.5rem' }}>{associated}</span>}
@@ -97,11 +111,16 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
           </Box>,
           <Box key='bx-rel' {...boxSpreadRowProps} mt={1}>
             {<span>{associatedID}</span>}
-            {CreateFormField(capture, wfFields.get('associated_animal_relationship'), onChange, {required: hasAssociation, disabled: !hasAssociation })}
+            {CreateFormField(capture, wfFields.get('associated_animal_relationship'), onChange, {
+              required: hasAssociation,
+              disabled: !hasAssociation
+            })}
           </Box>,
           // animal characteristics section, with subheader tooltip indicating user should review other metadata
           <Tooltip key='tt-rev' title={shouldReviewNotif}>
-            <Box mt={2}><span>{areUpdates}</span></Box>
+            <Box mt={2}>
+              <span>{areUpdates}</span>
+            </Box>
           </Tooltip>,
           <Box key='bx-et-l' {...boxSpreadRowProps} mt={1}>
             {CreateFormField(capture, wfFields.get('ear_tag_left_id'), onChange)}
@@ -113,7 +132,10 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
           </Box>,
           <Box key='bx-juv' {...boxSpreadRowProps} mt={1}>
             {CreateFormField(capture, wfFields.get('juvenile_at_heel'), onChange)}
-            {CreateFormField(capture, wfFields.get('juvenile_at_heel_count'), onChange, { required: hasBabies, disabled: !hasBabies })}
+            {CreateFormField(capture, wfFields.get('juvenile_at_heel_count'), onChange, {
+              required: hasBabies,
+              disabled: !hasBabies
+            })}
           </Box>,
           <Box key='bx-life' {...boxSpreadRowProps} mt={1}>
             {CreateFormField(capture, wfFields.get('animal_colouration'), onChange)}
@@ -121,24 +143,37 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
           </Box>
         ]}
       </FormSection>
-      <FormSection id='c' header='Translocation Details'> 
+      <FormSection id='c' header='Translocation Details'>
         {[
           <Box key='bx-transloc' {...boxSpreadRowProps}>
             {<span>{strIsTransloc}</span>}
             {/* translocation checkbox, controls disabled status of other fields in section */}
             {CreateFormField(capture, wfFields.get('translocation'), onChange)}
-          </Box >,
+          </Box>,
           <Box key='bx-rel' {...boxSpreadRowProps} mt={1}>
             {<span>{isTranslocCompleted}</span>}
-            <Button onClick={(): void => handlePostponeSave('release')} disabled={!isTransloc || !canSave} style={{paddingInline: '15px'}}>{WorkflowStrings.capture.btnContinueTo('Release')}</Button>
+            <Button
+              onClick={(): void => handlePostponeSave('release')}
+              disabled={!isTransloc || !canSave}
+              style={{ paddingInline: '15px' }}>
+              {WorkflowStrings.capture.btnContinueTo('Release')}
+            </Button>
           </Box>,
           <Box key='bx-mort' {...boxSpreadRowProps}>
             {<span>{diedDuring('translocation')}</span>}
-            <Button onClick={(): void => handlePostponeSave('mortality')} disabled={!isTransloc || !canSave}>{WorkflowStrings.capture.btnContinueTo('Mortality')}</Button>
+            <Button onClick={(): void => handlePostponeSave('mortality')} disabled={!isTransloc || !canSave}>
+              {WorkflowStrings.capture.btnContinueTo('Mortality')}
+            </Button>
           </Box>,
           <Box key='bx-f' {...boxSpreadRowProps} mt={1}>
-            {CreateFormField(capture, wfFields.get('region'), onChange, {required: mustPopulate, disabled: !isTransloc || !isTranslocComplete })}
-            {CreateFormField(capture, wfFields.get('population_unit'), onChange, {required: mustPopulate, disabled: !isTransloc || !isTranslocComplete })}
+            {CreateFormField(capture, wfFields.get('region'), onChange, {
+              required: mustPopulate,
+              disabled: !isTransloc || !isTranslocComplete
+            })}
+            {CreateFormField(capture, wfFields.get('population_unit'), onChange, {
+              required: mustPopulate,
+              disabled: !isTransloc || !isTranslocComplete
+            })}
           </Box>
         ]}
       </FormSection>
@@ -146,11 +181,15 @@ export default function CaptureEventForm({ canSave, event, handlePostponeSave, h
         {[
           <Box key='bx-goto-rel' {...boxSpreadRowProps}>
             {<span>{beenReleased}</span>}
-            <Button disabled={!canSave} onClick={(): void => handlePostponeSave('release')}>{btnContinueTo('Release')}</Button>
-          </Box >,
+            <Button disabled={!canSave} onClick={(): void => handlePostponeSave('release')}>
+              {btnContinueTo('Release')}
+            </Button>
+          </Box>,
           <Box key='bx-goto-capt' {...boxSpreadRowProps} mt={1}>
             {<span>{diedDuring('capture')}</span>}
-            <Button disabled={!canSave} onClick={(): void => handlePostponeSave('mortality')}>{btnContinueTo('Mortality')}</Button>
+            <Button disabled={!canSave} onClick={(): void => handlePostponeSave('mortality')}>
+              {btnContinueTo('Mortality')}
+            </Button>
           </Box>
         ]}
       </FormSection>

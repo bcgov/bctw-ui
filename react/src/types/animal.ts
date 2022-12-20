@@ -94,7 +94,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   proximate_cause_of_death: Code;
   ucod_confidence: Code;
   pcod_confidence: Code;
-  recapture: boolean;
+  recapture_ind: boolean;
   region: Code;
 
   release_comment: string;
@@ -150,7 +150,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   pcod_confidence: Code;
   ultimate_cause_of_death: Code;
   population_unit: Code;
-  recapture: boolean;
+  recapture_ind: boolean;
   region: Code;
   release_comment: string;
   @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) release_date: Dayjs;
@@ -329,7 +329,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'capture_utm_zone', type: eInputType.number, species: [] },
     { prop: 'capture_utm_easting', type: eInputType.number, species: [] },
     { prop: 'capture_utm_northing', type: eInputType.number, species: [] },
-    { prop: 'recapture', type: eInputType.check, species: [] },
+    { prop: 'recapture_ind', type: eInputType.check, species: [] },
     { prop: 'captivity_status', type: eInputType.check, species: [caribou] },
     { prop: 'capture_comment', type: eInputType.multiline, species: [] }
   ],

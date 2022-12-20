@@ -24,7 +24,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
       return editObjectToEvent(editing, new CaptureEvent(), [
         'species',
         'translocation',
-        'recapture',
+        'recapture_ind',
         'region',
         'population_unit'
       ]);

@@ -10,42 +10,43 @@ import { WorkflowStrings } from 'constants/strings';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 
-type CaptureAnimalEventProps = Pick<Animal, 
-| 'critter_id'
-| 'animal_id'
-| 'wlh_id'
-| 'species'
-| 'recapture'
-| 'translocation'
-| 'associated_animal_id'
-| 'associated_animal_relationship'
-| 'region'
-| 'population_unit'
-| 'captivity_status'
+type CaptureAnimalEventProps = Pick<
+  Animal,
+  | 'critter_id'
+  | 'animal_id'
+  | 'wlh_id'
+  | 'species'
+  | 'recapture_ind'
+  | 'translocation'
+  | 'associated_animal_id'
+  | 'associated_animal_relationship'
+  | 'region'
+  | 'population_unit'
+  | 'captivity_status'
 >;
 
-type ReleaseAnimalProps = Pick<Animal,
-| 'ear_tag_left_id'
-| 'ear_tag_right_id'
-| 'ear_tag_left_colour'
-| 'ear_tag_right_colour'
-| 'juvenile_at_heel'
-| 'juvenile_at_heel_count'
-| 'animal_colouration'
-| 'life_stage'
+type ReleaseAnimalProps = Pick<
+  Animal,
+  | 'ear_tag_left_id'
+  | 'ear_tag_right_id'
+  | 'ear_tag_left_colour'
+  | 'ear_tag_right_colour'
+  | 'juvenile_at_heel'
+  | 'juvenile_at_heel_count'
+  | 'animal_colouration'
+  | 'life_stage'
 >;
 
 type CaptureReleaseProps = {
   // workflow should proceed to release workflow
   wasReleased: boolean;
   // workflow should proceed to mortality workflow
-  didDieDuringCapture: boolean; 
+  didDieDuringCapture: boolean;
   didDieDuringTransloc: boolean;
   // indicates the animal was released after successful translocation
   // workflow should proceed to release
-  isTranslocationComplete: boolean; 
-}
-
+  isTranslocationComplete: boolean;
+};
 
 export type CaptureFormField = {
   [Property in keyof CaptureEvent]+?: FormFieldObject<CaptureEvent>;
@@ -54,11 +55,15 @@ export type CaptureFormField = {
  * capture date / data life ??!?
  * assume data life is the capture date?
  */
-export default class CaptureEvent implements 
-CaptureAnimalEventProps, ReleaseAnimalProps,
-Readonly<Pick<CollarHistory, 'assignment_id'>>,
-IDataLifeStartProps, BCTWWorkflow<CaptureEvent>,
-CaptureReleaseProps {
+export default class CaptureEvent
+  implements
+    CaptureAnimalEventProps,
+    ReleaseAnimalProps,
+    Readonly<Pick<CollarHistory, 'assignment_id'>>,
+    IDataLifeStartProps,
+    BCTWWorkflow<CaptureEvent>,
+    CaptureReleaseProps
+{
   // workflow props
   readonly event_type: WorkflowType;
   shouldSaveDevice: boolean;
@@ -78,7 +83,7 @@ CaptureReleaseProps {
   readonly wlh_id: string;
   readonly animal_id: string;
   species: Code;
-  recapture: boolean;
+  recapture_ind: boolean;
   translocation: boolean;
   associated_animal_id: string;
   associated_animal_relationship: Code; // required if associated_animal_id populated
@@ -98,7 +103,7 @@ CaptureReleaseProps {
 
   constructor() {
     this.event_type = 'capture';
-    this.recapture = false;
+    this.recapture_ind = false;
     this.translocation = false;
     this.isTranslocationComplete = true;
     this.location_event = new LocationEvent('capture', dayjs());
@@ -124,19 +129,32 @@ CaptureReleaseProps {
   }
 
   get captureCritterPropsToSave(): (keyof Animal)[] {
-    return ['critter_id', 'recapture', 'translocation', 'species',
-      'associated_animal_id', 'associated_animal_relationship', 'captivity_status', 
-      'ear_tag_left_colour', 'ear_tag_left_id', 'ear_tag_right_colour', 'ear_tag_right_id',
-      'juvenile_at_heel', 'juvenile_at_heel_count', 'animal_colouration', 'life_stage' ]
+    return [
+      'critter_id',
+      'recapture_ind',
+      'translocation',
+      'species',
+      'associated_animal_id',
+      'associated_animal_relationship',
+      'captivity_status',
+      'ear_tag_left_colour',
+      'ear_tag_left_id',
+      'ear_tag_right_colour',
+      'ear_tag_right_id',
+      'juvenile_at_heel',
+      'juvenile_at_heel_count',
+      'animal_colouration',
+      'life_stage'
+    ];
   }
 
   getAnimal(): OptionalAnimal {
     const props = this.captureCritterPropsToSave;
-    if (this.translocation ) {
+    if (this.translocation) {
       // if the translocation is completed, save the new region/population unit.
       // otherwise, need to update animal_status to 'in translocation';
       if (this.isTranslocationComplete) {
-        props.push('region', 'population_unit')
+        props.push('region', 'population_unit');
       } else {
         props.push('animal_status');
       }
@@ -149,9 +167,9 @@ CaptureReleaseProps {
       ret['animal_status'] = 'In Translocation';
     }
     if (!ret.associated_animal_id) {
-      delete ret.associated_animal_relationship
+      delete ret.associated_animal_relationship;
     }
-    return omitNull({ ...ret, ...this.location_event.toJSON()});
+    return omitNull({ ...ret, ...this.location_event.toJSON() });
   }
 
   // todo: should data life be updated??
@@ -169,6 +187,6 @@ CaptureReleaseProps {
 
   fields: CaptureFormField = {
     isTranslocationComplete: { prop: 'isTranslocationComplete', type: eInputType.check },
-    didDieDuringTransloc: { prop: 'didDieDuringTransloc', type: eInputType.check },
-  }
+    didDieDuringTransloc: { prop: 'didDieDuringTransloc', type: eInputType.check }
+  };
 }
