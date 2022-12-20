@@ -19,7 +19,7 @@ export enum eCollarAssignedStatus {
 export enum eNewCollarType {
   Other = '',
   VHF = 'VHF',
-  Vect = 'Vectronics'
+  Vect = 'Vectronic'
 }
 //Used in table_helpers
 export enum eDeviceStatus {
