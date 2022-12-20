@@ -46,7 +46,7 @@ export type MortalityAnimalEventProps = Pick<
   | 'animal_id'
   | 'wlh_id'
   | 'predator_known_ind'
-  | 'captivity_status'
+  | 'captivity_status_ind'
   | 'mortality_investigation'
   | 'mortality_report'
   | 'mortality_captivity_status'
@@ -111,7 +111,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   pcod_confidence: Code;
   mortality_investigation: Code;
   mortality_report: boolean;
-  readonly captivity_status: boolean; // cannot be changed
+  readonly captivity_status_ind: boolean; // cannot be changed
   mortality_captivity_status: Code;
   predator_known_ind: boolean;
   readonly capture_date: Dayjs;
@@ -127,7 +127,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     'ultimate_cause_of_death',
     'pcod_confidence',
     'ucod_confidence',
-    'captivity_status',
+    'captivity_status_ind',
     'mortality_investigation',
     'mortality_report',
     'mortality_captivity_status'

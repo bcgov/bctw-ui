@@ -22,7 +22,7 @@ type CaptureAnimalEventProps = Pick<
   | 'associated_animal_relationship'
   | 'region'
   | 'population_unit'
-  | 'captivity_status'
+  | 'captivity_status_ind'
 >;
 
 type ReleaseAnimalProps = Pick<
@@ -90,7 +90,7 @@ export default class CaptureEvent
   // region & popunit are enabled when animal is translocated
   region: Code;
   population_unit: Code;
-  captivity_status: boolean;
+  captivity_status_ind: boolean;
   // characteristic fields
   ear_tag_left_id: string;
   ear_tag_right_id: string;
@@ -111,7 +111,7 @@ export default class CaptureEvent
 
   formatPropAsHeader(s: keyof CaptureEvent): string {
     switch (s) {
-      case 'captivity_status':
+      case 'captivity_status_ind':
         return WorkflowStrings.captivity.isCaptive;
       case 'associated_animal_relationship':
         return 'Associated Relationship';
@@ -136,7 +136,7 @@ export default class CaptureEvent
       'species',
       'associated_animal_id',
       'associated_animal_relationship',
-      'captivity_status',
+      'captivity_status_ind',
       'ear_tag_left_colour',
       'ear_tag_left_id',
       'ear_tag_right_colour',

@@ -84,7 +84,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   mortality_utm_zone: number;
   mortality_report: boolean;
   mortality_investigation: Code;
-  captivity_status: boolean;
+  captivity_status_ind: boolean;
   mortality_captivity_status: Code;
 
   permission_type?: eCritterPermission; // critters should contain this
@@ -171,7 +171,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
 
   mortality_report: boolean;
   mortality_investigation: Code;
-  captivity_status: boolean;
+  captivity_status_ind: boolean;
   mortality_captivity_status: Code;
 
   @Exclude(toPlainOnly) permission_type: eCritterPermission;
@@ -330,7 +330,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'capture_utm_easting', type: eInputType.number, species: [] },
     { prop: 'capture_utm_northing', type: eInputType.number, species: [] },
     { prop: 'recapture_ind', type: eInputType.check, species: [] },
-    { prop: 'captivity_status', type: eInputType.check, species: [caribou] },
+    { prop: 'captivity_status_ind', type: eInputType.check, species: [caribou] },
     { prop: 'capture_comment', type: eInputType.multiline, species: [] }
   ],
   characteristicsFields: [
