@@ -82,7 +82,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   mortality_utm_easting: number;
   mortality_utm_northing: number;
   mortality_utm_zone: number;
-  mortality_report: boolean;
+  mortality_report_ind: boolean;
   mortality_investigation: Code;
   captivity_status_ind: boolean;
   mortality_captivity_status_ind: Code;
@@ -169,7 +169,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   @Exclude(toPlainOnly) @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) valid_to: Dayjs;
   @Exclude(toPlainOnly) owned_by_user_id: number;
 
-  mortality_report: boolean;
+  mortality_report_ind: boolean;
   mortality_investigation: Code;
   captivity_status_ind: boolean;
   mortality_captivity_status_ind: Code;
@@ -372,7 +372,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'predator_species_pcod', type: eInputType.code, species: [caribou], codeName: 'predator_species' },
     { prop: 'predator_species_ucod', type: eInputType.code, species: [caribou], codeName: 'predator_species' },
     { prop: 'mortality_investigation', type: eInputType.code, species: [caribou] },
-    { prop: 'mortality_report', type: eInputType.check, species: [caribou] },
+    { prop: 'mortality_report_ind', type: eInputType.check, species: [caribou] },
     { prop: 'predator_known_ind', type: eInputType.check, species: [caribou] },
     { prop: 'mortality_comment', type: eInputType.multiline, species: [] }
   ],

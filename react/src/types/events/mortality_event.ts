@@ -48,7 +48,7 @@ export type MortalityAnimalEventProps = Pick<
   | 'predator_known_ind'
   | 'captivity_status_ind'
   | 'mortality_investigation'
-  | 'mortality_report'
+  | 'mortality_report_ind'
   | 'mortality_captivity_status_ind'
 >;
 
@@ -110,7 +110,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   ucod_confidence: Code;
   pcod_confidence: Code;
   mortality_investigation: Code;
-  mortality_report: boolean;
+  mortality_report_ind: boolean;
   readonly captivity_status_ind: boolean; // cannot be changed
   mortality_captivity_status_ind: Code;
   predator_known_ind: boolean;
@@ -129,7 +129,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     'ucod_confidence',
     'captivity_status_ind',
     'mortality_investigation',
-    'mortality_report',
+    'mortality_report_ind',
     'mortality_captivity_status_ind'
   ];
 
@@ -176,7 +176,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     switch (s) {
       case 'attachment_start':
         return 'Capture Date';
-      case 'mortality_report':
+      case 'mortality_report_ind':
         return WorkflowStrings.mortality.mort_wildlife;
       case 'retrieved':
         return WorkflowStrings.device.was_retrieved;

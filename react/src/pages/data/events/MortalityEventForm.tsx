@@ -151,7 +151,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             })}
           </Box>,
           <Box key='bx-mort-rep'>
-            {CreateFormField(mortality, wfFields.get('mortality_report'), onChange, isDisabled, true)}
+            {CreateFormField(mortality, wfFields.get('mortality_report_ind'), onChange, isDisabled, true)}
           </Box>,
           <Box key='bx-cod' mt={1} display='flex' columnGap={1}>
             {CreateFormField(mortality, wfFields.get('proximate_cause_of_death'), onChange, isDisabled)}
