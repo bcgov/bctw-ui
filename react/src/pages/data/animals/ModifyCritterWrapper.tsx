@@ -63,14 +63,14 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
       const critter = results[0];
       showNotif({ severity: 'success', message: `${critter.animal_id} saved!` });
       setCritter(results[0]);
-      onUpdate(results[0].critter_id)
+      onUpdate?.(results[0].critter_id)
     }
   };
 
   const handleDeleteResult = async (): Promise<void> => {
     showNotif({ severity: 'success', message: `critter deleted successfully` });
     if (typeof onDelete === 'function') {
-      onDelete(editing.critter_id);
+      onDelete?.(editing.critter_id);
     }
   };
 

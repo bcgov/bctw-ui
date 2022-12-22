@@ -51,7 +51,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
     }
     const collar = data.results[0];
     responseDispatch({ severity: 'success', message: `collar ${collar.device_id} saved` });
-    onUpdate(collar.collar_id);
+    onUpdate?.(collar.collar_id);
   };
 
   const onError = (error: AxiosError): void =>
@@ -60,7 +60,7 @@ export default function ModifyCollarWrapper(props: IModifyWrapperProps): JSX.Ele
   const onDeleteSuccess = async (): Promise<void> => {
     responseDispatch({ severity: 'success', message: `collar deleted successfully` });
     if (typeof onDelete === 'function') {
-      onDelete(editing.collar_id);
+      onDelete?.(editing.collar_id);
     }
   };
 
