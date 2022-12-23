@@ -29,7 +29,7 @@
     "downloadjs": "^1.4.7",
     "esri-leaflet": "^3.0.0",
     "iframe-resizer-react": "^1.1.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "leaflet": "^1.7.1",
     "leaflet-draw": "^1.0.4",
     "leaflet-labeled-circle": "^1.0.3",
