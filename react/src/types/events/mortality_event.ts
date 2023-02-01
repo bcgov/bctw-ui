@@ -112,7 +112,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   mortality_investigation: Code;
   mortality_report_ind: boolean;
   readonly captivity_status_ind: boolean; // cannot be changed
-  mortality_captivity_status_ind: Code;
+  mortality_captivity_status_ind: boolean;
   predator_known_ind: boolean;
   readonly capture_date: Dayjs;
   location_event: LocationEvent;

@@ -48,7 +48,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
     if (workflow) {
       updateEvent(createEvent(workflow));
     }
-  }, [workflow]);
+  }, [workflow, open]);
   /**
    * when a capture workflow is saved, always show the release workflow unless a translocation_ind is underway
    * todo: is this still needed?

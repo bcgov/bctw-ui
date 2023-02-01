@@ -28,8 +28,7 @@ export default function CaptivityStatusForm<
 
   const mortality_captivity_status_ind: FormFieldObject<T> = {
     prop: 'mortality_captivity_status_ind',
-    type: eInputType.code,
-    codeName: 'mortality_habitat',
+    type: eInputType.check,
     tooltip: <p>{WorkflowStrings.captivity.mort_captivity_status}</p>
   };
 
