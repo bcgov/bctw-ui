@@ -31,7 +31,6 @@ export const CritterDataTables = (): JSX.Element => {
   const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as AttachedAnimal);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
-  const [workflow, setWorkflow] = useState<WorkflowType>('unknown');
 
   // Modal Open States
   const [openEdit, setOpenEdit] = useState(false);
