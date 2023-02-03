@@ -5,7 +5,6 @@ import { Animal } from 'types/animal';
 import { Collar } from 'types/collar';
 import { BCTWBase, nullToDayjs, PartialPick } from 'types/common_types';
 import { eCritterPermission } from 'types/permission';
-import internal from 'stream';
 
 export interface IUserCritterAccess
   extends Required<Pick<Animal, 'permission_type'>>,
