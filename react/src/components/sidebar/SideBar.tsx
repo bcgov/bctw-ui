@@ -1,6 +1,5 @@
-import 'styles/SideBar.scss';
-
 import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { isDev } from 'api/api_helpers';
 import { RouteKey } from 'AppRouter';
 import { Icon, Tooltip } from 'components/common';
@@ -15,7 +14,16 @@ type SideBarProps = {
   collapseAble: boolean;
 };
 
+const useStyles = makeStyles({
+  sidebarAlert:{
+    marginTop: '-2em',
+    marginLeft: '0em',
+    marginRight: '-3em',
+  },
+});
+
 export default function SideBar({ routes }: SideBarProps): JSX.Element {
+  const styles = useStyles();
   const location = useLocation();
   const api = useTelemetryApi();
   const { data: onboardingData, isSuccess: onboardingDataSuccess } = api.useOnboardRequests(0);
@@ -96,7 +104,7 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
                   <ListItemText className={'list-item-txt'} primary={route.title} />
                   { route.title === 'Onboarding Requests' &&
                     userOnboardPending &&
-                  <Box className={'SideBarAlert'} >
+                  <Box className={styles.sidebarAlert} >
                     <ListItemIcon>                    
                       <Icon icon='exclaim' htmlColor='red' size={0.75}/> 
                     </ListItemIcon>
