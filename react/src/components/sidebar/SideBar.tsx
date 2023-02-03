@@ -1,4 +1,5 @@
 import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { isDev } from 'api/api_helpers';
 import { RouteKey } from 'AppRouter';
 import { Icon, Tooltip } from 'components/common';
@@ -6,14 +7,27 @@ import { UserContext } from 'contexts/UserContext';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { eUserRole } from 'types/user';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
   collapseAble: boolean;
 };
 
+const useStyles = makeStyles({
+  sidebarAlert:{
+    marginTop: '-2em',
+    marginLeft: '0em',
+    marginRight: '-3em',
+  },
+});
+
 export default function SideBar({ routes }: SideBarProps): JSX.Element {
+  const styles = useStyles();
   const location = useLocation();
+  const api = useTelemetryApi();
+  const { data: onboardingData, isSuccess: onboardingDataSuccess } = api.useOnboardRequests(0);
+  const [userOnboardPending, setUserOnboardPending] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCritterManager, setIsCritterManager] = useState(false);
   const [isDataAdmin, setIsDataAdmin] = useState(false);
@@ -68,6 +82,11 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
     handleSetVisible(['animals', 'devices', 'profile', 'export', 'import']);
   }, [location, isAdmin, isCritterManager, isDataAdmin]); // only fire when these states change
 
+  useEffect(() => {
+    if (onboardingDataSuccess){
+      setUserOnboardPending(onboardingData.some(user => user.access === 'pending'));}
+  }, [onboardingData])
+
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
     <Box className={'sidebar'} id='manage_sidebar' py={2} px={1}>
@@ -78,11 +97,18 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
             return (
               <div key={`sidebar-${idx}`}>
                 {/*<Tooltip key={idx} title={route.title}>*/}
-                <ListItem className='side-bar-item' button {...{ component: Link, to: route.path }}>
+                <ListItem className='side-bar-item' alignItems='center' button {...{ component: Link, to: route.path }}>
                   <ListItemIcon>
                     <Icon icon={route.icon} />
                   </ListItemIcon>
                   <ListItemText className={'list-item-txt'} primary={route.title} />
+                  { route.title === 'Onboarding Requests' &&
+                    userOnboardPending &&
+                  <Box className={styles.sidebarAlert} >
+                    <ListItemIcon>                    
+                      <Icon icon='exclaim' htmlColor='red' size={0.75}/> 
+                    </ListItemIcon>
+                  </Box>}
                 </ListItem>
                 {/* </Tooltip> */}
               </div>
