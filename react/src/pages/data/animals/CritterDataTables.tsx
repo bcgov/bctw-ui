@@ -103,7 +103,6 @@ export const CritterDataTables = (): JSX.Element => {
     ];
     return (
       <ActionsMenu
-        disabled={false}
         menuItems={
           row instanceof AttachedAnimal ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
         }
