@@ -103,7 +103,7 @@ export const CritterDataTables = (): JSX.Element => {
     ];
     return (
       <ActionsMenu
-        disabled={row !== editObj}
+        disabled={false}
         menuItems={
           row instanceof AttachedAnimal ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
         }
