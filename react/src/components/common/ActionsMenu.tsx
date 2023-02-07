@@ -7,11 +7,9 @@ interface IMenuItem {
   icon?: JSX.Element;
   handleClick?: () => void;
   disableMenuItem?: boolean;
-  disableMsg?: string;
 }
 interface IActionsMenu {
   menuItems: IMenuItem[];
-  id?: number;
   disabled?: boolean;
 }
 /**
