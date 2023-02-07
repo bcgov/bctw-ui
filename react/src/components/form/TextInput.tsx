@@ -60,6 +60,9 @@ export default function TextField(props: TextInputProps): JSX.Element {
     if (!v && required) {
       setErr(FormStrings.isRequired);
     }
+    else if (!!v && required) {
+      setErr('');
+    }
   };
 
   const handleChangeEmail = (email: string): void => {
