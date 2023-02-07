@@ -28,7 +28,7 @@ export const CritterDataTables = (): JSX.Element => {
   const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedAnimal[]>([]);
   const [animalData, setAnimalData] = useState<Animal[]>([]);
 
-  const [editObj, setEditObj] = useState<Animal | AttachedAnimal>({} as AttachedAnimal);
+  const [editObj, setEditObj] = useState<Animal | AttachedAnimal>(new AttachedAnimal());
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
 
@@ -103,7 +103,6 @@ export const CritterDataTables = (): JSX.Element => {
     ];
     return (
       <ActionsMenu
-        disabled={row !== editObj}
         menuItems={
           row instanceof AttachedAnimal ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
         }
