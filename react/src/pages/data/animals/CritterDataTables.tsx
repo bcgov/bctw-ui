@@ -103,7 +103,6 @@ export const CritterDataTables = (): JSX.Element => {
     ];
     return (
       <ActionsMenu
-        //canOpen={!!editObj.critter_id}
         menuItems={
           row instanceof AttachedAnimal ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
         }
