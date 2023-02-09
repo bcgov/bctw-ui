@@ -201,13 +201,12 @@ const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue, includeLatest: bool
 
 // tracks setup
 const setupTracksOptions = (tracks: L.GeoJSON): void => {
-  const color = MAP_COLOURS.track;
   tracks.options = {
-    style: (): Record<string, string> => {
+    style: (feature: ITelemetryPoint) => {
+      const { fillColor } = parseAnimalColour(feature.properties.map_colour)
       return {
-        weight: '2.0',
-        color
-      };
+        color: fillColor,
+        weight: 2.0};
     }
   };
   tracks.setZIndex(0);

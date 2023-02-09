@@ -39,7 +39,7 @@ interface ITelemetryPoint extends GeoJsonObject {
 // represents a track
 interface ITelemetryLine extends GeoJsonObject {
   type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'species'>;
+  properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'species' | 'map_colour'>;
   geometry: LineString;
 }
 
