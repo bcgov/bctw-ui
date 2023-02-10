@@ -291,6 +291,20 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
     ];
   }
 
+  static get attachedCritterExportProps(): (keyof AttachedAnimal)[] {
+    return [
+      'species',
+      'wlh_id',
+      'animal_id',
+      'device_status',
+      'animal_status',
+      'device_id',
+      'frequency',
+      'latitude',
+      'longitude'
+    ];
+  }
+
   tagColor(): string {
     return super.tagColor();
   }

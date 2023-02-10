@@ -134,7 +134,7 @@ export const CritterDataTables = (): JSX.Element => {
             exporter={
               <>
                 <ExportViewer<AttachedAnimal>
-                  template={AttachedAnimal.attachedCritterDisplayProps}
+                  template={AttachedAnimal.attachedCritterExportProps}
                   eTitle={CritterStrings.exportTitle}
                   data={attachedAnimalData}
                 />
