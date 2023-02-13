@@ -204,7 +204,7 @@ export default function PickCritterPermissionModal({
   return (
     <Modal open={open} handleClose={beforeClose}>
       <DataTable
-        headers={UserCritterAccess.propsToDisplay}
+        headers={UserCritterAccess.animalManagerDisplayProps}
         title={title}
         queryProps={tableProps}
         onSelectMultiple={handleSelect}
