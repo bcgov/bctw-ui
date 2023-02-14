@@ -23,6 +23,7 @@ type PickCritterProps = ModalBaseProps & {
   showSelectPermission?: boolean;
   userToLoad?: User;
   headersToShow?: string[];
+  headers?: (keyof UserCritterAccess)[]
 };
 
 /**
@@ -48,7 +49,8 @@ export default function PickCritterPermissionModal({
   title,
   alreadySelected,
   showSelectPermission,
-  userToLoad
+  userToLoad,
+  headers=UserCritterAccess.propsToDisplay
 }: PickCritterProps): JSX.Element {
   const useUser = useContext(UserContext);
   const api = useTelemetryApi();
@@ -204,7 +206,7 @@ export default function PickCritterPermissionModal({
   return (
     <Modal open={open} handleClose={beforeClose}>
       <DataTable
-        headers={UserCritterAccess.animalManagerDisplayProps}
+        headers={headers}
         title={title}
         queryProps={tableProps}
         onSelectMultiple={handleSelect}
@@ -212,6 +214,8 @@ export default function PickCritterPermissionModal({
         isMultiSelect={true}
         alreadySelected={alreadySelected}
         customColumns={showSelectPermission ? [{ column: NewColumn, header: <b>Select Permission</b> }] : []}
+        paginate={false}
+        allRecords={true}
       />
       <div className={'admin-btn-row'}>
         <Button disabled={!canSave} onClick={handleSave}>
