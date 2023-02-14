@@ -1,5 +1,6 @@
 import DataTable from 'components/table/DataTable';
 import { Button, Modal } from 'components/common';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
@@ -23,7 +24,9 @@ type PickCritterProps = ModalBaseProps & {
   showSelectPermission?: boolean;
   userToLoad?: User;
   headersToShow?: string[];
-  headers?: (keyof UserCritterAccess)[]
+  headers?: (keyof UserCritterAccess)[];
+  paginate?: boolean;
+  allRecords?: boolean;
 };
 
 /**
@@ -50,7 +53,9 @@ export default function PickCritterPermissionModal({
   alreadySelected,
   showSelectPermission,
   userToLoad,
-  headers=UserCritterAccess.propsToDisplay
+  headers=UserCritterAccess.propsToDisplay,
+  paginate=true,
+  allRecords=false
 }: PickCritterProps): JSX.Element {
   const useUser = useContext(UserContext);
   const api = useTelemetryApi();
@@ -204,7 +209,7 @@ export default function PickCritterPermissionModal({
   };
 
   return (
-    <Modal open={open} handleClose={beforeClose}>
+    <FullScreenDialog open={open} handleClose={beforeClose}>
       <DataTable
         headers={headers}
         title={title}
@@ -214,15 +219,16 @@ export default function PickCritterPermissionModal({
         isMultiSelect={true}
         alreadySelected={alreadySelected}
         customColumns={showSelectPermission ? [{ column: NewColumn, header: <b>Select Permission</b> }] : []}
-        paginate={false}
-        allRecords={true}
+        paginate={paginate}
+        allRecords={allRecords}
+        fullScreenHeight={true}
       />
       <div className={'admin-btn-row'}>
         <Button disabled={!canSave} onClick={handleSave}>
           Save
         </Button>
       </div>
-    </Modal>
+    </FullScreenDialog>
   );
 }
 

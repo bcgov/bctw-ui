@@ -75,6 +75,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   exporter?: JSX.Element;
   disableSearch?: boolean;
   allRecords?: boolean;
+  fullScreenHeight?: boolean;
 };
 
 /**

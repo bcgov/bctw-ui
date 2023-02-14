@@ -73,6 +73,8 @@ export default function GrantCritterAccessPage(): JSX.Element {
           showSelectPermission={true}
           userToLoad={user}
           headers={UserCritterAccess.animalManagerDisplayProps}
+          paginate={false}
+          allRecords={true}
         />
       </div>
     </AuthLayout>

@@ -47,7 +47,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   isMultiSelect = false,
   isMultiSearch = false,
   alreadySelected = [],
-  showValidRecord = false
+  showValidRecord = false,
+  fullScreenHeight = false
 }: DataTableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
@@ -355,7 +356,7 @@ export default function DataTable<T extends BCTWBase<T>>({
     );
   };
   return (
-    <TableContainer toolbar={Toolbar()}>
+    <TableContainer toolbar={Toolbar()} fullScreenHeight={fullScreenHeight}>
       <>
         <Table stickyHeader size='small'>
           <TableHead
