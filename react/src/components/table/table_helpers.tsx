@@ -58,14 +58,14 @@ function getComparator<Key extends keyof any>(
 /*
   sorts an array of T with the provided comparator
 */
-function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
+function stableSort<T>(array: T[], comparator: (a: T, b: T) => number, truncate?): T[] {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  return stabilizedThis.map((el) => el[0]);
+  return truncate ? stabilizedThis.slice(0, truncate).map((el) => el[0]) : stabilizedThis.map((el) => el[0]);
 }
 /** Renders the coloured tags for species and collars */
 

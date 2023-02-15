@@ -170,7 +170,7 @@ export default function DataTable<T extends BCTWBase<T>>({
     if (event.target.checked && selected.length === 0) {
       //const newIds = data.map((r) => r[rowIdentifier]);
       //Select by the page not by initial data.
-      const newIds = perPage().map((r) => r[rowIdentifier]);
+      const newIds = isPaginate ? perPage().map((r) => r[rowIdentifier]) : allData().map((r) => r[rowIdentifier]);
       setSelected(newIds);
       if (handlerExists) {
         const multi = values.filter((d) => newIds.includes(d[rowIdentifier]));
@@ -280,6 +280,14 @@ export default function DataTable<T extends BCTWBase<T>>({
     return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
   };
 
+  const allData = (): T[] => {
+    const results =
+      filter && filter.term
+        ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headerProps as string[]), filter.term)
+        : values;
+    return results;
+  };
+
   const TableContents = (): JSX.Element => {
     const noData = isSuccess && !data?.length;
     // useEffect(() => {
@@ -310,7 +318,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       );
     }
     // if (isSuccess) {
-    const sortedResults = stableSort(perPage(), getComparator(order, orderBy));
+    const sortedResults = stableSort(isPaginate ? perPage() : allData(), getComparator(order, orderBy), ROWS_PER_PAGE);
     return (
       <TableBody>
         {sortedResults.map((obj, idx: number) => {
