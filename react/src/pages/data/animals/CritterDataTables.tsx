@@ -130,7 +130,6 @@ export const CritterDataTables = (): JSX.Element => {
             updated={updated}
             title={CritterStrings.collaredAnimals}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
-            allRecords
             exporter={
               <>
                 <ExportViewer<AttachedAnimal>
@@ -152,7 +151,6 @@ export const CritterDataTables = (): JSX.Element => {
             deleted={deleted}
             title={CritterStrings.nonCollaredAnimals}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
-            allRecords
             exporter={
               <>
                 <Box ml={1}>

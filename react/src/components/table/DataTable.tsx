@@ -23,8 +23,6 @@ import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
 import './table.scss';
 
-// note: const override for disabling pagination
-const DISABLE_PAGINATION = false;
 export const ROWS_PER_PAGE = 100;
 /**
  * Data table component, fetches data to display from @param {queryProps}
@@ -42,8 +40,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   exporter,
   resetSelections,
   disableSearch,
-  allRecords,
-  paginate = true,
+  requestDataByPage = false,
+  paginationFooter = true,
   isMultiSelect = false,
   isMultiSearch = false,
   alreadySelected = [],
@@ -59,10 +57,7 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [rowIdentifier, setRowIdentifier] = useState('id');
 
   const [page, setPage] = useState(0);
-  //const [totalPages, setTotalPages] = useState<number | null>(1);
   const [totalRows, setTotalRows] = useState<number>(0);
-
-  const isPaginate = paginate && !DISABLE_PAGINATION;
 
   /**
    * since data is updated when the page is changed, use the 'values'
@@ -93,7 +88,7 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
-    allRecords ? 0 : page,
+    requestDataByPage ? page : null,
     param,
     filter
   );
@@ -105,17 +100,6 @@ export default function DataTable<T extends BCTWBase<T>>({
         setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
       }
     }
-    // if (!data?.length) {
-    //   return;
-    // }
-
-    // if (rowCount) {
-    //   // This shouldnt have to be cast to a number
-    //   // TODO: Find in DB where row_count is string (should be a number)
-    //   setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
-    // } else {
-    //   setTotalRows(data.length);
-    // }
   };
   useEffect(() => {
     handleRows();
@@ -281,11 +265,6 @@ export default function DataTable<T extends BCTWBase<T>>({
 
   const TableContents = (): JSX.Element => {
     const noData = isSuccess && !data?.length;
-    // useEffect(() => {
-    //   if (noData && totalPages !== 1) {
-    //     setTotalPages(1);
-    //   }
-    // }, []);
     if (isLoading || isError) {
       return (
         <TableBody>
@@ -308,7 +287,6 @@ export default function DataTable<T extends BCTWBase<T>>({
         </TableBody>
       );
     }
-    // if (isSuccess) {
     const sortedResults = stableSort(perPage(), getComparator(order, orderBy));
     return (
       <TableBody>
@@ -372,7 +350,7 @@ export default function DataTable<T extends BCTWBase<T>>({
           />
           <TableContents />
         </Table>
-        {!isPaginate || isError || values.length < ROWS_PER_PAGE ? null : (
+        {!paginationFooter || isError || values.length < ROWS_PER_PAGE ? null : (
           <Box className={'table-footer'}>
             <Divider />
             <TablePagination

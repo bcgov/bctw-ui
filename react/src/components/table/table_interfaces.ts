@@ -67,14 +67,14 @@ type DataTableProps<T> = PlainTableProps<T> & {
   showValidRecord?: boolean;
   alreadySelected?: string[];
   resetSelections?: number; //Placeholder to trigger reset
-  paginate?: boolean;
   queryProps: ITableQueryProps<T>;
   onSelectMultiple?: (rows: T[]) => void;
   deleted?: string;
   updated?: string;
   exporter?: JSX.Element;
   disableSearch?: boolean;
-  allRecords?: boolean;
+  paginationFooter?: boolean;
+  requestDataByPage?: boolean;
 };
 
 /**
