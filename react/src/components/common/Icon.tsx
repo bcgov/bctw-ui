@@ -51,7 +51,8 @@ import {
   mdiKeyboardBackspace,
   mdiBattery20,
   mdiDevTo,
-  mdiSend
+  mdiSend,
+  mdiWifi
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -177,6 +178,8 @@ const getIconPath = (path: string): string => {
       return mdiDevTo;
     case 'send':
       return mdiSend;
+    case 'signal':
+      return mdiWifi;
   }
 };
 

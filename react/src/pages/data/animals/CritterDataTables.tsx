@@ -22,6 +22,7 @@ import MapModal from 'components/modal/MapModal';
 import dayjs from 'dayjs';
 import { Button } from '@mui/material';
 import { buttonProps } from 'components/component_constants';
+import { Tooltip } from 'components/common';
 
 export const CritterDataTables = (): JSX.Element => {
   const api = useTelemetryApi();
@@ -59,6 +60,19 @@ export const CritterDataTables = (): JSX.Element => {
     disableDelete: true,
     modalControl: true
   };
+
+  const Status = (row: AttachedAnimal, idx: number): JSX.Element => {
+    if(row.last_fetch_date.isValid()) {
+      return (
+      <Tooltip title="BCTW is receiving telemetry for this animal's device">
+        <Icon icon='signal'></Icon>
+      </Tooltip>
+      );
+    }
+    else {
+      return (<></>);
+    }
+  }
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
@@ -130,7 +144,7 @@ export const CritterDataTables = (): JSX.Element => {
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
-            customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+            customColumns={[{ column: Menu, header: <b>Actions</b>}, {column: Status, header: <p>Status</p>, prepend: true} ]}
             allRecords
             exporter={
               <>

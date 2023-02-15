@@ -279,6 +279,9 @@ export default function DataTable<T extends BCTWBase<T>>({
     return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
   };
 
+  const customColumnsAppend = customColumns.filter(c => !c.prepend);
+  const customColumnsPrepend = customColumns.filter(c => c.prepend);
+
   const TableContents = (): JSX.Element => {
     const noData = isSuccess && !data?.length;
     // useEffect(() => {
@@ -310,6 +313,8 @@ export default function DataTable<T extends BCTWBase<T>>({
     }
     // if (isSuccess) {
     const sortedResults = stableSort(perPage(), getComparator(order, orderBy));
+
+
     return (
       <TableBody>
         {sortedResults.map((obj, idx: number) => {
@@ -330,6 +335,11 @@ export default function DataTable<T extends BCTWBase<T>>({
                   <Checkbox checked={isRowSelected} />
                 </TableCell>
               ) : null}
+              {/* render additional columns from props */}
+              {customColumnsPrepend.map((c: ICustomTableColumn<T>) => {
+                const Col = c.column(obj, idx);
+                return <TableCell key={`pre-col-${idx}`}>{Col}</TableCell>;
+              })}
               {/* render main columns from data fetched from api */}
               {headerProps.map((k, i) => {
                 if (!k) {
@@ -344,7 +354,7 @@ export default function DataTable<T extends BCTWBase<T>>({
                 );
               })}
               {/* render additional columns from props */}
-              {customColumns.map((c: ICustomTableColumn<T>) => {
+              {customColumnsAppend.map((c: ICustomTableColumn<T>) => {
                 const Col = c.column(obj, idx);
                 return <TableCell key={`add-col-${idx}`}>{Col}</TableCell>;
               })}
@@ -368,7 +378,8 @@ export default function DataTable<T extends BCTWBase<T>>({
             onRequestSort={handleSort}
             onSelectAllClick={handleSelectAll}
             rowCount={values?.length ?? 0}
-            customHeaders={customColumns?.map((c) => c.header) ?? []}
+            customHeaders={customColumnsAppend?.map((c) => c.header) ?? []}
+            customHeadersPrepend={customColumnsPrepend?.map((c) => c.header) ?? []}
           />
           <TableContents />
         </Table>

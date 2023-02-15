@@ -39,6 +39,7 @@ interface ITableQueryProps<T> {
 interface ICustomTableColumn<T> {
   header: JSX.Element;
   column: (row: T, idx: number) => JSX.Element;
+  prepend?: boolean;
 }
 
 /**
@@ -99,6 +100,7 @@ interface HeadCell<T> {
  */
 type TableHeadProps<T> = {
   customHeaders: JSX.Element[];
+  customHeadersPrepend?: JSX.Element[];
   headerData: T;
   headersToDisplay: (keyof T)[];
   isMultiSelect: boolean;

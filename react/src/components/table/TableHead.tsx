@@ -7,6 +7,7 @@ import { HeadCell, TableHeadProps } from 'components/table/table_interfaces';
 export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T>): JSX.Element {
   const {
     customHeaders,
+    customHeadersPrepend,
     order,
     orderBy,
     onRequestSort,
@@ -49,6 +50,12 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
               />
             </TableCell>
           ) : null}
+          {/* if any custom columns were supplied to the table, render their headers */}
+          {customHeadersPrepend
+            ? customHeadersPrepend.map((header, idx): JSX.Element => {
+                return <TableCell key={`pre-h-${idx}`}>{header}</TableCell>;
+              })
+          : null}
           {/* render the rest of the header row */}
           {createHeadCell(headerData, headersToDisplay).map((headCell: HeadCell<T>) => (
             <TableCell
