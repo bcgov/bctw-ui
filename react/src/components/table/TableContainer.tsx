@@ -14,7 +14,7 @@ export default function TableContainer({ children, toolbar, fullScreenHeight=fal
     <>
       {toolbar}
       <Paper sx={{ width: '100%', overflow: 'hidden' }} variant='outlined'>
-        <MUITableContainer component={Paper} sx={{ maxHeight: fullScreenHeight ? '100%':'30rem' }}>
+        <MUITableContainer component={Paper} sx={fullScreenHeight ? { maxHeight: '75vh' }:{ maxHeight: '30rem' }}>
           {children}
         </MUITableContainer>
       </Paper>
