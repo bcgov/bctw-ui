@@ -76,6 +76,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   disableSearch?: boolean;
   allRecords?: boolean;
   fullScreenHeight?: boolean;
+  showIndex?: boolean;
 };
 
 /**
@@ -111,6 +112,7 @@ type TableHeadProps<T> = {
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   hiddenHeaders?: (keyof T)[];
   secondaryHeaders?: (string | number | symbol)[];
+  showIndex?: boolean;
 };
 
 type FilterOperator = 'equals' | 'contains';

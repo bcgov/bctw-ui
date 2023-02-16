@@ -226,6 +226,7 @@ export default function PickCritterPermissionModal({
           paginate={paginate}
           allRecords={allRecords}
           fullScreenHeight={true}
+          showIndex={true}
         />
         <div className={'admin-btn-row'}>
           <Button disabled={!canSave} onClick={handleSave}>

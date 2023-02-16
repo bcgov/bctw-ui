@@ -49,7 +49,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   isMultiSearch = false,
   alreadySelected = [],
   showValidRecord = false,
-  fullScreenHeight = false
+  fullScreenHeight = false,
+  showIndex = false
 }: DataTableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
@@ -354,6 +355,10 @@ export default function DataTable<T extends BCTWBase<T>>({
                   <Checkbox checked={isRowSelected} />
                 </TableCell>
               ) : null}
+              {/* render index column if showIndex enabled */}
+              {showIndex ? (
+                <TableCell align={'left'}>{idx + 1}</TableCell>
+              ) : null}
               {/* render main columns from data fetched from api */}
               {headerProps.map((k, i) => {
                 if (!k) {
@@ -393,6 +398,7 @@ export default function DataTable<T extends BCTWBase<T>>({
             onSelectAllClick={handleSelectAll}
             rowCount={values?.length ?? 0}
             customHeaders={customColumns?.map((c) => c.header) ?? []}
+            showIndex={showIndex}
           />
           <TableContents />
         </Table>

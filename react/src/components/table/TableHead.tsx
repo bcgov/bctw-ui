@@ -17,7 +17,8 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     rowCount,
     isMultiSelect,
     hiddenHeaders,
-    secondaryHeaders
+    secondaryHeaders,
+    showIndex
   } = props;
 
   const createSortHandler =
@@ -48,6 +49,9 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
                 inputProps={{ 'aria-label': 'select all' }}
               />
             </TableCell>
+          ) : null}          
+          {showIndex ? (
+            <TableCell>Index</TableCell>
           ) : null}
           {/* render the rest of the header row */}
           {createHeadCell(headerData, headersToDisplay).map((headCell: HeadCell<T>) => (
