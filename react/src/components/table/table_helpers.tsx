@@ -168,6 +168,8 @@ function fuzzySearchMutipleWords<T>(rows: T[], keys: string[], filterValue: stri
   return terms.reduceRight((results, term) => matchSorter(results, term, { keys }), rows);
 }
 
+const isFunction = (f: any): boolean => typeof f === 'function';
+
 export {
   fuzzySearchMutipleWords,
   getTag,
@@ -175,5 +177,6 @@ export {
   getComparator,
   stableSort,
   createHeadCell,
-  formatTableCell
+  formatTableCell,
+  isFunction
 };

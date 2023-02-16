@@ -69,6 +69,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   resetSelections?: number; //Placeholder to trigger reset
   queryProps: ITableQueryProps<T>;
   onSelectMultiple?: (rows: T[]) => void;
+  onSelectTemp?: (rows: T[]) => void;
   deleted?: string;
   updated?: string;
   exporter?: JSX.Element;
@@ -108,6 +109,7 @@ type TableHeadProps<T> = {
   orderBy: string;
   rowCount: number;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  selectAll?: boolean;
   hiddenHeaders?: (keyof T)[];
   secondaryHeaders?: (string | number | symbol)[];
 };

@@ -40,6 +40,7 @@ export const CritterDataTables = (): JSX.Element => {
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
   const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
+  const handleSelectTemp = <T extends Animal>(row: T[]): void => setEditObj(row.length ? row[0] : new AttachedAnimal());
   const lastDt = editObj?.last_transmission_date;
 
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
@@ -114,6 +115,10 @@ export const CritterDataTables = (): JSX.Element => {
     setOpenAddAnimal((a) => !a);
   };
 
+  // const handleSelectMultiple = (rows: T[]) => {
+  //   console.log();
+  // };
+
   return (
     <RowSelectedProvider>
       {/* wrapped in RowSelectedProvider to only allow one selected row between tables */}
@@ -125,11 +130,13 @@ export const CritterDataTables = (): JSX.Element => {
               query: api.useAssignedCritters,
               onNewData: (data: AttachedAnimal[]) => setAttachedAnimalData(data)
             }}
-            onSelect={handleSelect}
+            //onSelect={handleSelect}
+            onSelectTemp={handleSelectTemp}
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
-            paginationFooter={false}
+            isMultiSelect={true}
+            paginationFooter={true}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
             exporter={
               <>
