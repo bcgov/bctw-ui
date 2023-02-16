@@ -129,6 +129,7 @@ export const CritterDataTables = (): JSX.Element => {
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
+            paginationFooter={false}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
             exporter={
               <>
@@ -142,7 +143,7 @@ export const CritterDataTables = (): JSX.Element => {
           />
         </Box>
         <Box mb={4}>
-          <DataTable
+          {/* <DataTable
             headers={new Animal().displayProps}
             //title={CS.unassignedTableTitle}
             queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Animal[]) => setAnimalData(data) }}
@@ -169,7 +170,7 @@ export const CritterDataTables = (): JSX.Element => {
                 />
               </>
             }
-          />
+          /> */}
         </Box>
 
         {/* Displays the recent animal telemetry map modal */}
