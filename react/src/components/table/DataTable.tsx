@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Checkbox,
   CircularProgress,
   Divider,
@@ -62,6 +63,9 @@ export default function DataTable<T extends BCTWBase<T>>({
   const [page, setPage] = useState(0);
   //const [totalPages, setTotalPages] = useState<number | null>(1);
   const [totalRows, setTotalRows] = useState<number>(0);
+
+  const [filteredRowCount, setFilteredRowCount] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(ROWS_PER_PAGE);
 
   const isPaginate = paginate && !DISABLE_PAGINATION;
 
@@ -274,10 +278,10 @@ export default function DataTable<T extends BCTWBase<T>>({
       filter && filter.term
         ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headerProps as string[]), filter.term)
         : values;
-    const start = (ROWS_PER_PAGE + page - ROWS_PER_PAGE - 1) * ROWS_PER_PAGE;
-    const end = ROWS_PER_PAGE * page - 1;
+    const start = (rowsPerPage + page - rowsPerPage - 1) * rowsPerPage;
+    const end = rowsPerPage * page - 1;
     // console.log(`slice start ${start}, slice end ${end}`);
-    return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
+    return results.length > rowsPerPage ? results.slice(start, end) : results;
   };
 
   const allData = (): T[] => {
@@ -285,8 +289,19 @@ export default function DataTable<T extends BCTWBase<T>>({
       filter && filter.term
         ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headerProps as string[]), filter.term)
         : values;
+      setFilteredRowCount(results.length)
     return results;
   };
+
+  const handleLoadAll = (): void => {
+    setRowsPerPage(filteredRowCount);
+    setPage(0);
+  }
+
+  const handleLoadPreview = (): void => {
+    setRowsPerPage(ROWS_PER_PAGE);
+    setPage(0);
+  }
 
   const TableContents = (): JSX.Element => {
     const noData = isSuccess && !data?.length;
@@ -318,7 +333,7 @@ export default function DataTable<T extends BCTWBase<T>>({
       );
     }
     // if (isSuccess) {
-    const sortedResults = stableSort(isPaginate ? perPage() : allData(), getComparator(order, orderBy), ROWS_PER_PAGE);
+    const sortedResults = stableSort(isPaginate ? perPage() : allData(), getComparator(order, orderBy), rowsPerPage);
     return (
       <TableBody>
         {sortedResults.map((obj, idx: number) => {
@@ -381,7 +396,7 @@ export default function DataTable<T extends BCTWBase<T>>({
           />
           <TableContents />
         </Table>
-        {!isPaginate || isError || values.length < ROWS_PER_PAGE ? null : (
+        {!isPaginate || isError || values.length < rowsPerPage ? null : (
           <Box className={'table-footer'}>
             <Divider />
             <TablePagination
@@ -389,10 +404,24 @@ export default function DataTable<T extends BCTWBase<T>>({
               rowsPerPageOptions={[]}
               component='div'
               count={totalRows}
-              rowsPerPage={ROWS_PER_PAGE}
+              rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handlePageChange}
             />
+          </Box>
+        )}
+        {isPaginate ? null : (
+          <Box>
+            <Divider />
+            {rowsPerPage === filteredRowCount ? (
+              <Button onClick={handleLoadPreview}>
+                Display Only {ROWS_PER_PAGE} Results
+              </Button>
+            ) : (
+              <Button onClick={handleLoadAll}>
+                Display All {filteredRowCount} Results
+              </Button>
+            )}
           </Box>
         )}
       </>
