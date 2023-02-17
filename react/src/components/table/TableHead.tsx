@@ -36,6 +36,10 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     <MuiTableHead>
       {!headerData ? null : (
         <TableRow>
+          {/* render a blank header for the index */}
+          {showIndex ? (
+            <TableCell padding='none'/>
+          ) : null}
           {/* render the select all checkbox if the table is multi-select mode */}
           {isMultiSelect ? (
             <TableCell padding='checkbox'>
@@ -50,9 +54,6 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
               />
             </TableCell>
           ) : null}          
-          {showIndex ? (
-            <TableCell>Index</TableCell>
-          ) : null}
           {/* render the rest of the header row */}
           {createHeadCell(headerData, headersToDisplay).map((headCell: HeadCell<T>) => (
             <TableCell

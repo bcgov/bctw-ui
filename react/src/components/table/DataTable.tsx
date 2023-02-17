@@ -349,15 +349,17 @@ export default function DataTable<T extends BCTWBase<T>>({
               tabIndex={-1}
               key={`row${idx}`}
               selected={isRowSelected || highlightValidRow}>
+              {/* render index column if showIndex enabled */}
+              {showIndex ? (
+                <TableCell align={'right'} className={'dimmed-cell'} padding={'none'}>
+                  {idx + 1}
+                </TableCell>
+              ) : null}
               {/* render checkbox column if multiselect is enabled */}
               {isMultiSelect ? (
                 <TableCell padding='checkbox'>
                   <Checkbox checked={isRowSelected} />
                 </TableCell>
-              ) : null}
-              {/* render index column if showIndex enabled */}
-              {showIndex ? (
-                <TableCell align={'left'}>{idx + 1}</TableCell>
               ) : null}
               {/* render main columns from data fetched from api */}
               {headerProps.map((k, i) => {
