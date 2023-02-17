@@ -48,7 +48,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     title,
     onSelect,
     onSelectMultiple,
-    onSelectTemp,
+    // onSelectTemp,
     deleted,
     updated,
     exporter,
@@ -56,7 +56,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     disableSearch,
     requestDataByPage = false,
     paginationFooter = true,
-    isMultiSelect = false,
+    //isMultiSelect = false,
     isMultiSearch = false,
     alreadySelected = [],
     showValidRecord = false
@@ -312,7 +312,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       toolbar={
         <TableToolbar
           rowCount={totalRows}
-          numSelected={isMultiSelect ? selected.length : 0}
+          numSelected={isFunction(onSelectMultiple) ? selected.length : 0}
           title={title}
           onChangeFilter={handleFilter}
           filterableProperties={headers}
@@ -329,7 +329,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           <TableHead
             headersToDisplay={headers}
             headerData={data && data[0]}
-            isMultiSelect={isMultiSelect}
+            isMultiSelect={isFunction(onSelectMultiple)}
             numSelected={selected.length}
             order={order}
             orderBy={(orderBy as string) ?? ''}
@@ -377,7 +377,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   );
 }
 
-type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'isMultiSelect' | 'customColumns' | 'onSelectTemp'> & {
+type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' | 'onSelect' | 'onSelectMultiple'> & {
   row: { [key in keyof T]: any };
   index: number;
   selected: boolean;
@@ -390,12 +390,12 @@ type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'isMultiSelect' 
 function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowProps<T>) {
   const {
     headers,
-    isMultiSelect,
     customColumns,
     selected,
     row,
     index,
-    onSelectTemp,
+    onSelect,
+    onSelectMultiple,
     rowIdentifier,
     setSelectedRows,
     selectedRows
@@ -408,65 +408,61 @@ function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowProps<T>) {
   }, [selected]);
 
   useEffect(() => {
-    if (isSelectedStatus) {
-      const rows = selectedRows;
-      rows.push(row);
-      console.log(rows);
-      setSelectedRows(rows);
-      onSelectTemp(rows);
-    }
+    const actionRows = () => {
+      if (isFunction(dispatchRowSelected)) {
+        dispatchRowSelected(row[rowIdentifier]);
+      }
+      if (isFunction(onSelect) && isSelectedStatus) {
+        handleAddSingleSelect();
+      }
+      if (isFunction(onSelectMultiple)) {
+        isSelectedStatus ? handleAddMultiSelect() : handleRemoveMultiSelect();
+      }
+    };
+    actionRows();
   }, [isSelectedStatus]);
 
+  const handleSetMulti = (rows: T[]): void => {
+    setSelectedRows(rows);
+    onSelectMultiple(rows);
+  };
+
+  const handleAddMultiSelect = (): void => {
+    const rows = selectedRows;
+    rows.push(row);
+    handleSetMulti(rows);
+    console.log(rows);
+  };
+
+  const handleRemoveMultiSelect = (): void => {
+    // if (!isSelectedStatus) return;
+    if (!selectedRows.includes(row)) return;
+    const indexOfRow = selectedRows.indexOf(row);
+    if (indexOfRow == -1) return;
+    const rows = selectedRows;
+    rows.splice(indexOfRow, 1);
+    handleSetMulti(rows);
+    console.log(rows);
+  };
+
+  const handleAddSingleSelect = (): void => {
+    onSelect(row);
+  };
+
   const handleClickAway = (): void => {
-    if (!isMultiSelect) {
+    if (!isFunction(onSelectMultiple)) {
       setSelectedStatus(false);
     }
   };
 
-  // const handleClickRow = (): void => {
-  //   console.log(row);
-  //   if (!isFunction(onSelectTemp)) return;
-  //   if (isFunction(dispatchRowSelected)) {
-  //     dispatchRowSelected(row[rowIdentifier]);
-  //   }
-  //   if (!isMultiSelect) {
-  //     onSelectTemp([row]);
-  //     setSelectedStatus((s) => !s);
-  //     return;
-  //   }
-
-  //   const rows = selectedRows;
-  //   if (!isSelectedStatus && !rows.includes(row)) {
-  //     rows.push(row);
-  //   }
-  //   if (isSelectedStatus && rows.includes(row)) {
-  //     const indexOfRow = rows.indexOf(row);
-  //     if (indexOfRow > -1) {
-  //       rows.splice(indexOfRow, 1);
-  //     }
-  //   }
-  //   console.log(rows);
-  //   setSelectedRows(rows);
-  //   onSelectTemp(rows);
-  //   setSelectedStatus((s) => !s);
-  // };
-
   const handleClickRow = () => {
-    if (!isFunction(onSelectTemp)) return;
-    if (isFunction(dispatchRowSelected)) {
-      dispatchRowSelected(row[rowIdentifier]);
-    }
-    if (isSelectedStatus && selectedRows.includes(row)) {
-      const indexOfRow = selectedRows.indexOf(row);
-      if (indexOfRow > -1) {
-        const rows = selectedRows;
-        rows.splice(indexOfRow, 1);
-        setSelectedRows(rows);
-        onSelectTemp(rows);
-      }
+    if (!isFunction(onSelect) && !isFunction(onSelectMultiple)) {
+      console.log('Must pass onSelect OR onSelectMultiple to DataTable');
+      return;
     }
     setSelectedStatus((s) => !s);
   };
+
   return (
     <ClickAwayListener onClickAway={() => handleClickAway()}>
       <TableRow
@@ -475,7 +471,7 @@ function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowProps<T>) {
         onClick={() => handleClickRow()}
         role='checkbox'
         selected={isSelectedStatus || selected}>
-        {isMultiSelect ? (
+        {isFunction(onSelectMultiple) ? (
           <TableCell padding='checkbox'>
             <Checkbox checked={isSelectedStatus || selected} />
           </TableCell>

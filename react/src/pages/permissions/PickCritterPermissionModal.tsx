@@ -209,7 +209,6 @@ export default function PickCritterPermissionModal({
         queryProps={tableProps}
         onSelectMultiple={handleSelect}
         resetSelections={triggerReset}
-        isMultiSelect={true}
         alreadySelected={alreadySelected}
         customColumns={showSelectPermission ? [{ column: NewColumn, header: <b>Select Permission</b> }] : []}
       />

@@ -51,7 +51,15 @@ type PlainTableProps<T> = {
   title?: string | JSX.Element;
   onSelect?: (row: T) => void;
 };
-
+//Only one select handler at a time to this component
+type ConditionalOnSelect<T> =
+  | (Pick<PlainTableProps<T>, 'onSelect'> & {
+      onSelectMultiple?: never;
+    })
+  | {
+      onSelect?: never;
+      onSelectMultiple: (rows: T[]) => void;
+    };
 /**
  * @param customColumns array of functions that return components to add as additional columns
  * @param isMultiSelect renders a row of checkboxes and a special toolbar if true
@@ -60,23 +68,24 @@ type PlainTableProps<T> = {
  * @param onSelectMultiple parent handler triggered when a row is checked if @param isMultiSelect
  * @param deleted notify the datatable that a row with this identifier has been removed
  */
-type DataTableProps<T> = PlainTableProps<T> & {
-  customColumns?: ICustomTableColumn<T>[];
-  isMultiSelect?: boolean;
-  isMultiSearch?: boolean;
-  showValidRecord?: boolean;
-  alreadySelected?: string[];
-  resetSelections?: number; //Placeholder to trigger reset
-  queryProps: ITableQueryProps<T>;
-  onSelectMultiple?: (rows: T[]) => void;
-  onSelectTemp?: (rows: T[]) => void;
-  deleted?: string;
-  updated?: string;
-  exporter?: JSX.Element;
-  disableSearch?: boolean;
-  paginationFooter?: boolean;
-  requestDataByPage?: boolean;
-};
+type DataTableProps<T> = PlainTableProps<T> &
+  ConditionalOnSelect<T> & {
+    customColumns?: ICustomTableColumn<T>[];
+    //isMultiSelect?: boolean;
+    isMultiSearch?: boolean;
+    showValidRecord?: boolean;
+    alreadySelected?: string[];
+    resetSelections?: number; //Placeholder to trigger reset
+    queryProps: ITableQueryProps<T>;
+    //onSelectMultiple?: (rows: T[]) => void;
+    //onSelectTemp?: (rows: T[]) => void;
+    deleted?: string;
+    updated?: string;
+    exporter?: JSX.Element;
+    disableSearch?: boolean;
+    paginationFooter?: boolean;
+    requestDataByPage?: boolean;
+  };
 
 /**
  * interface used to generate headers in TableHead

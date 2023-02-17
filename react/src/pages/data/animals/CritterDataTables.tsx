@@ -130,12 +130,13 @@ export const CritterDataTables = (): JSX.Element => {
               query: api.useAssignedCritters,
               onNewData: (data: AttachedAnimal[]) => setAttachedAnimalData(data)
             }}
+            onSelectMultiple={() => console.log('hi')}
             //onSelect={handleSelect}
-            onSelectTemp={handleSelectTemp}
+            //onSelectTemp={handleSelectTemp}
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
-            isMultiSelect={true}
+            //isMultiSelect={true}
             paginationFooter={true}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
             exporter={
