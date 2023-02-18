@@ -171,6 +171,7 @@ function fuzzySearchMutipleWords<T>(rows: T[], keys: string[], filterValue: stri
 export {
   fuzzySearchMutipleWords,
   getTag,
+  formatTag,
   descendingComparator,
   getComparator,
   stableSort,
