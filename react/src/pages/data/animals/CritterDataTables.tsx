@@ -20,11 +20,12 @@ import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
 import MapModal from 'components/modal/MapModal';
 import dayjs from 'dayjs';
-import { Button } from '@mui/material';
+import { Button, Container } from '@mui/material';
 import { buttonProps } from 'components/component_constants';
 import { Tooltip } from 'components/common';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
 
-export const CritterDataTables = (): JSX.Element => {
+export const CritterDataTables = ({detailViewAction}): JSX.Element => {
   const api = useTelemetryApi();
   const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedAnimal[]>([]);
   const [animalData, setAnimalData] = useState<Animal[]>([]);
@@ -78,6 +79,11 @@ export const CritterDataTables = (): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
     const _edit = () => setOpenEdit(true);
     const _map = () => setOpenMap(true);
+    const _detail = () => { 
+      console.log(typeof detailViewAction);
+      console.log(JSON.stringify(detailViewAction))
+      detailViewAction(row);
+    }
     const _removeAttach = () => {
       setOpenAttachRemoveCollar(true);
     };
@@ -113,6 +119,11 @@ export const CritterDataTables = (): JSX.Element => {
         label: removeCollar,
         icon: <Icon icon={'delete'} />,
         handleClick: _removeAttach
+      },
+      {
+        label: 'Detailed View',
+        icon: <Icon icon={'signal'}/>,
+        handleClick: _detail
       }
     ];
     return (

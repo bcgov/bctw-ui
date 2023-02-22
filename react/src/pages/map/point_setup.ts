@@ -29,8 +29,9 @@ const selectedPointStyle = (): L.CircleMarkerOptions => {
   };
 };
 
-const animalColoredPointStyle = (ping: ITelemetryPoint): L.CircleMarkerOptions => {
-  const fillColor = getFillColorByStatus(ping);
+const animalColoredPointStyle = (ping: ITelemetryPoint, colorHandler?: (p: ITelemetryPoint, s?: boolean) => string): L.CircleMarkerOptions => {
+  if (!colorHandler) colorHandler = getFillColorByStatus;
+  const fillColor = colorHandler(ping);
   const color = getOutlineColor(ping);
   return {
     ...defaultPointStyle,
@@ -96,11 +97,15 @@ const latestSelectedPingIcon = createLatestPingIcon(MAP_COLOURS.selected);
 const setupLatestPingOptions = (
   pings: L.GeoJSON,
   clickHandler: L.LeafletEventHandlerFn,
-  closeHandler: L.LeafletEventHandlerFn
+  closeHandler: L.LeafletEventHandlerFn,
+  colorHandler?: (p: ITelemetryPoint, s?: boolean) => string
 ): void => {
+  if(!colorHandler) {
+    colorHandler = getFillColorByStatus;
+  }
   pings.options = {
     pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
-      const unselectedIcon = createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature));
+      const unselectedIcon = createLatestPingIcon(colorHandler(feature), getOutlineColor(feature));
       const marker = new L.Marker(latlng, { icon: unselectedIcon });
       // make a hidden popup that will help deal with click events
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
@@ -123,11 +128,12 @@ const setupLatestPingOptions = (
 const setupPingOptions = (
   pings: L.GeoJSON,
   clickHandler: L.LeafletEventHandlerFn,
-  closeHandler: L.LeafletEventHandlerFn
+  closeHandler: L.LeafletEventHandlerFn,
+  colorHandler?: (p: ITelemetryPoint, s?: boolean) => string
 ): void => {
   pings.options = {
     pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
-      const critterStyle = animalColoredPointStyle(feature);
+      const critterStyle = animalColoredPointStyle(feature, colorHandler);
       const marker = L.circleMarker(latlng, critterStyle);
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
