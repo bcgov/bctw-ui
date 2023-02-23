@@ -202,7 +202,7 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
         </Box>
 
         {/* Displays the recent animal telemetry map modal */}
-        <MapModal
+        {/*<MapModal
           title={`Recent Animal Movement`}
           open={openMap}
           handleClose={(v: boolean) => setOpenMap(v)}
@@ -211,7 +211,7 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
           width={'800px'}
           height={'600px'}
           critter_id={editObj?.current.critter_id}
-        />
+          />*/}
 
         {/* Wrapper for Adding Animal, could probably be moved into bottom wrapper. */}
         <ModifyCritterWrapper
