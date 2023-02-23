@@ -74,7 +74,7 @@ export default function CritterPage(): JSX.Element {
     return (
       <Box width='100%' sx={{ ml: -1 }}>
         <Button startIcon={<Icon icon='back'/>} onClick={() => {setDetailAnimal(null)}}>Back to My Animals</Button>
-        <DetailedAnimalView detailAnimal={detailAnimal}/>
+        <DetailedAnimalView detailAnimal={detailAnimal} height={'500px'}/>
       </Box>
     );
   }

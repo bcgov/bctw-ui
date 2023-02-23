@@ -1,8 +1,10 @@
 import { Box, Grid, Paper } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
+import { style } from "@mui/system";
 import { DetailedStatusCard } from "components/common/DetailedCard";
 import { SubHeader } from "components/common/partials/SubHeader";
 import SimpleMap from "components/common/SimpleMap";
+import { AttachedAnimal } from "types/animal";
 
 const useStyles = makeStyles((theme) => ({
   topHeader: {
@@ -11,10 +13,18 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     padding: '12px'
+  },
+  gridContainer: {
+    marginTop: theme.spacing(4)
   }
 }));
 
-export default function DetailedAnimalView({detailAnimal}) {
+interface DetailedAnimalViewProps {
+  detailAnimal: AttachedAnimal;
+  height: string;
+}
+
+export default function DetailedAnimalView({detailAnimal, height}: DetailedAnimalViewProps) {
   const styles = useStyles();
 
   const headerOverrides = {
@@ -25,7 +35,7 @@ export default function DetailedAnimalView({detailAnimal}) {
   }
 
   return (
-  <Grid marginTop={'12px'} container spacing={4}>
+  <Grid className={styles.gridContainer} container spacing={4}>
     <Grid item md={12} lg={6}>
     <Box className={styles.topHeader}>
         <SubHeader size='small' text='Animal Details'/>
@@ -54,7 +64,7 @@ export default function DetailedAnimalView({detailAnimal}) {
     </Box>
     <Paper className={styles.paper}>
         <SimpleMap 
-        height={'500px'}
+        height={height}
         animal={detailAnimal}
         startDate={detailAnimal ? detailAnimal.attachment_start : null}
         endDate={detailAnimal ? detailAnimal.attachment_end : null}

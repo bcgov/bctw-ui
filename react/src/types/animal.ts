@@ -261,6 +261,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   collar_id: uuid;
   device_id: number;
   device_make: Code;
+  device_type: Code;
   frequency: number;
   device_status: string;
   latitude: number;

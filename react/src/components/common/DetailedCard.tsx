@@ -28,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     overflow: 'auto',
     maxHeight: '100px'
+  },
+  valueSize: {
+    variant: "h5"
   }
 }) );
 
@@ -63,7 +66,7 @@ const DetailedStatusCard = <T extends Record<string, any>,>({displayObject, disp
       retElement = obj[key] === undefined || obj[key] === null || String(obj[key]) === 'Invalid Date' ? 'None' : String(obj[key]);
     }
 
-    return <Box className={style.gridElement}><Typography variant="h5">{retElement}</Typography></Box>
+    return <Box className={style.gridElement}><Typography className={style.valueSize}>{retElement}</Typography></Box>
   }
 
   return (
@@ -84,7 +87,7 @@ const DetailedStatusCard = <T extends Record<string, any>,>({displayObject, disp
           <Grid item xs={12}>
             <SubHeader size='extra-small' text={formatHeader(m) }/>
             <Box className={style.boxElement}>
-              <Typography variant={'h5'}>{displayObject[m] && String(displayObject[m]).length ? displayObject[m] : 'None'}</Typography>
+              <Typography className={style.valueSize}>{displayObject[m] && String(displayObject[m]).length ? displayObject[m] : 'None'}</Typography>
             </Box>
           </Grid>
           </>)
