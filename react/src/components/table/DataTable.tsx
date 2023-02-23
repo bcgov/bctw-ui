@@ -47,7 +47,8 @@ export default function DataTable<T extends BCTWBase<T>>({
   isMultiSelect = false,
   isMultiSearch = false,
   alreadySelected = [],
-  showValidRecord = false
+  showValidRecord = false,
+  disableHighlightOnSelect = false
 }: DataTableProps<T>): JSX.Element {
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const useRowState = useTableRowSelectedState();
@@ -328,7 +329,7 @@ export default function DataTable<T extends BCTWBase<T>>({
               aria-checked={isRowSelected}
               tabIndex={-1}
               key={`row${idx}`}
-              selected={isRowSelected || highlightValidRow}>
+              selected={!disableHighlightOnSelect && (isRowSelected || highlightValidRow)}>
               {/* render checkbox column if multiselect is enabled */}
               {isMultiSelect ? (
                 <TableCell padding='checkbox'>

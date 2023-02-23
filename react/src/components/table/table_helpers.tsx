@@ -7,7 +7,7 @@ import dayjs, { Dayjs, isDayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Collar, eDeviceStatus } from 'types/collar';
 import { Chip } from '@mui/material';
-import { Animal } from 'types/animal';
+import { Animal, eAnimalStatus } from 'types/animal';
 dayjs.extend(relativeTime);
 /**
  * converts an object to a list of HeadCells
@@ -86,6 +86,19 @@ const formatTag = (key: string, value: string): JSX.Element => {
       case malfunction:
         return getTag(malfunction, null, 'warning');
       case potential_mortality:
+      case mortality:
+        return getTag(mortality, null, 'error');
+    }
+  }
+  if (key === 'animal_status') {
+    const {alive, mortality, in_translocation, potential_mortality} = eAnimalStatus;
+    switch(value) {
+      case alive:
+        return getTag(value, null, 'success');
+      case in_translocation:
+        return getTag(in_translocation, null, 'warning');
+      case potential_mortality:
+        return getTag('P. Mortality', null, 'warning');
       case mortality:
         return getTag(mortality, null, 'error');
     }

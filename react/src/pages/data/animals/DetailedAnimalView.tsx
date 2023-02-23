@@ -6,7 +6,7 @@ import SimpleMap from "components/common/SimpleMap";
 
 const useStyles = makeStyles((theme) => ({
   topHeader: {
-    marginBottom: '6px',
+    marginBottom: theme.spacing(1),
     marginLeft: '6px'
   },
   paper: {
@@ -16,6 +16,14 @@ const useStyles = makeStyles((theme) => ({
 
 export default function DetailedAnimalView({detailAnimal}) {
   const styles = useStyles();
+
+  const headerOverrides = {
+    'attachment_start' : 'Deployment Date',
+    'attachment_end' : 'Retrieval Date',
+    'last_fetch_date' : 'Last Data Retrieval',
+    'capture_comment' : 'Deployment Comment'
+  }
+
   return (
   <Grid marginTop={'12px'} container spacing={4}>
     <Grid item md={12} lg={6}>
@@ -25,7 +33,8 @@ export default function DetailedAnimalView({detailAnimal}) {
     <DetailedStatusCard 
         displayObject={detailAnimal} 
         displayKeysInGrid={['species','animal_status', 'wlh_id', 'animal_id', 'population_unit', 'sex', 'capture_date', 'mortality_date']}
-        displayKeysInBox={['animal_comment']}          
+        displayKeysInBox={['animal_comment']} 
+        headerOverride={headerOverrides}         
     />
     </Grid>
     <Grid item md={12} lg={6}>
@@ -34,8 +43,9 @@ export default function DetailedAnimalView({detailAnimal}) {
     </Box>
     <DetailedStatusCard 
         displayObject={detailAnimal} 
-        displayKeysInGrid={['device_id','device_status','last_fetch_date','device_make','frequency','attachment_start', 'attachment_end']}
-        displayKeysInBox={['capture_comment']}          
+        displayKeysInGrid={['device_id','device_status','device_type','last_fetch_date','device_make','frequency','attachment_start', 'attachment_end']}
+        displayKeysInBox={['capture_comment']}
+        headerOverride={headerOverrides}       
     />
     </Grid>
     <Grid item xs={12}>

@@ -76,6 +76,7 @@ type DataTableProps<T> = PlainTableProps<T> & {
   exporter?: JSX.Element;
   disableSearch?: boolean;
   allRecords?: boolean;
+  disableHighlightOnSelect?: boolean;
 };
 
 /**
