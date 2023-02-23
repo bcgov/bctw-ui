@@ -102,17 +102,21 @@ const setupLatestPingOptions = (
     pointToLayer: (feature: ITelemetryPoint, latlng: L.LatLngExpression): L.Layer => {
       const unselectedIcon = createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature));
       const marker = new L.Marker(latlng, { icon: unselectedIcon });
+      const enableClick = () => {
+        marker.once('click', (e) => {
+          clickHandler(e);
+          e.target.setIcon(latestSelectedPingIcon);
+        });
+      } 
       // make a hidden popup that will help deal with click events
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
+        // marker can only be clicked once, re-enabled after pop-up closes
+        enableClick();
         closeHandler(e);
-        const { color, fillColor, opacity } = e.target.prevStyle;
-        e.target.setIcon(createLatestPingIcon(fillColor, color, opacity));
+        e.target.setIcon(unselectedIcon);
       });
-      marker.on('click', (e) => {
-        clickHandler(e);
-        e.target.setIcon(latestSelectedPingIcon);
-      });
+      enableClick();
       return marker;
     }
   };
