@@ -71,7 +71,7 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
     if(row.last_fetch_date.isValid()) {
       return (
       <Tooltip title="BCTW is receiving telemetry for this animal's device">
-        <Icon icon='signal'></Icon>
+        <Icon size={1.5} icon='signal'></Icon>
       </Tooltip>
       );
     }
@@ -106,11 +106,11 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
       }
     ];
     const attachedItems = [
-      {
+      /*{
         label: map,
         icon: <Icon icon={'location'} />,
         handleClick: _map
-      },
+      },*/
       {
         label: mortality,
         icon: <Icon icon={'dead'} />,

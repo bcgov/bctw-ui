@@ -52,7 +52,8 @@ import {
   mdiBattery20,
   mdiDevTo,
   mdiSend,
-  mdiWifi
+  mdiWifi,
+  mdiAccessPoint
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -179,7 +180,7 @@ const getIconPath = (path: string): string => {
     case 'send':
       return mdiSend;
     case 'signal':
-      return mdiWifi;
+      return mdiAccessPoint;
   }
 };
 
