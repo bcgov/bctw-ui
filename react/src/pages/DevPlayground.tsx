@@ -39,6 +39,8 @@ import { createFormData } from 'api/api_helpers';
 import { IBulkUploadResults } from 'api/api_interfaces';
 import { AxiosError } from 'axios';
 import { KeyXUploader } from './vendor/KeyXUploader';
+import MortalityEventForm from './data/events/MortalityEventFormNew';
+import MortalityEvent from 'types/events/mortality_event';
 
 // Place constants here
 const TEST = 'Testing';
@@ -48,7 +50,10 @@ const TEST_KEYX_PAYLOAD = {
   12345: false,
   98789: true
 };
-const TAB_LIST = ['Device and Animal', 'Telemetry', 'Vectronic KeyX'];
+const TAB_LIST = ['Report an Animal Mortality', 'Remove a Device from an Animal'];
+const TAB_CAPTIONS = ['You are about to report the following animal as deceased. Please confirm that these details are correct and make necessary edits before proceeding.', 
+                      'You are about to end the following animal-device deployment. Please confirm that these details are correct and make necessary edits before removing the device.'];
+const TAB_EVENTS = [new MortalityEvent, null];
 
 /**
  * Testing area for UI comoponents.
@@ -72,7 +77,8 @@ const DevPlayground = (): JSX.Element => {
         <TempComponent handleTab={setTab} tab={tab} tabList={TAB_LIST}>
           <>
             <h1>{TAB_LIST[tab]}</h1>
-            <SubHeader text={'Placeholder text'} />
+            <SubHeader text={TAB_CAPTIONS[tab]} />
+            <MortalityEventForm event={TAB_EVENTS[tab]} handleFormChange={null}/>
           </>
         </TempComponent>
         {/* <Box sx={{ pr: 2 }}>
