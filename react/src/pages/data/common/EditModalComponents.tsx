@@ -1,3 +1,4 @@
+import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 import { Box, ButtonProps, Grid } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
 import { cloneElement, Children, Key, ReactElement, ReactNode } from 'react';
@@ -25,6 +26,7 @@ const EditTabPanel = (props: TabPanelProps): JSX.Element => {
 
 type EditHeaderProps<T> = {
   title: ReactNode;
+  caption?:string;
   headers: (keyof T)[];
   obj: T;
   format: (k: keyof T) => string;
@@ -34,12 +36,15 @@ type EditHeaderProps<T> = {
 /**
  * edit modals can generate the header component using this function
  */
-const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>): JSX.Element => {
+const EditHeader = <T,>({ title, caption, headers, obj, format, btn }: EditHeaderProps<T>): JSX.Element => {
   return (
     <Box display='flex' justifyContent='space-between' alignItems='top' pt={3} mx={3}>
       <Box>
         <Box component='h1' mt={0} mb={1}>
           {title}
+        </Box>
+        <Box>
+          {caption}
         </Box>
         <dl className='headergroup-dl'>
           {headers.map((p, idx: number) => {

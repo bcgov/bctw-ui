@@ -35,6 +35,7 @@ export interface IBCTWWorkflow {
   readonly event_type: WorkflowType;
   // headers displayed in the workflow modal title
   getWorkflowTitle(): string;
+  getWorkflowCaption?(): string;
   // methods the workflow needs to save specific properties
   getAnimal?(): OptionalAnimal;
   getDevice?(): OptionalDevice;

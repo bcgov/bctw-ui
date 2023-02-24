@@ -145,7 +145,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       <form className={'event-modal'} autoComplete={'off'}>
         <EditHeader<T>
           title={event?.getWorkflowTitle()}
-          headers={event.displayProps}
+          caption={event?.getWorkflowCaption()}
+          headers={!(event instanceof MortalityEvent) ? event.displayProps : [] as (keyof T)[]}
           obj={event}
           format={event.formatPropAsHeader}
         />
