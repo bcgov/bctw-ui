@@ -130,8 +130,8 @@ export const CritterDataTables = (): JSX.Element => {
               query: api.useAssignedCritters,
               onNewData: (data: AttachedAnimal[]) => setAttachedAnimalData(data)
             }}
-            onSelectMultiple={() => console.log('hi')}
-            //onSelect={handleSelect}
+            //onSelectMultiple={() => console.log('hi')}
+            onSelect={handleSelect}
             //onSelectTemp={handleSelectTemp}
             deleted={deleted}
             updated={updated}
@@ -151,7 +151,7 @@ export const CritterDataTables = (): JSX.Element => {
           />
         </Box>
         <Box mb={4}>
-          {/* <DataTable
+          <DataTable
             headers={new Animal().displayProps}
             //title={CS.unassignedTableTitle}
             queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Animal[]) => setAnimalData(data) }}
@@ -178,7 +178,7 @@ export const CritterDataTables = (): JSX.Element => {
                 />
               </>
             }
-          /> */}
+          />
         </Box>
 
         {/* Displays the recent animal telemetry map modal */}

@@ -33,6 +33,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
+import DataTableRow from './DataTableRow';
 import './table.scss';
 
 export const ROWS_PER_PAGE = 100;
@@ -42,13 +43,11 @@ export const ROWS_PER_PAGE = 100;
  */
 export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T>): JSX.Element {
   const {
-    customColumns = [],
     headers,
     queryProps,
     title,
     onSelect,
     onSelectMultiple,
-    // onSelectTemp,
     deleted,
     updated,
     exporter,
@@ -56,26 +55,27 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     disableSearch,
     requestDataByPage = false,
     paginationFooter = true,
-    //isMultiSelect = false,
     isMultiSearch = false,
+    showValidRecord = false,
     alreadySelected = [],
-    showValidRecord = false
+    customColumns = []
   } = props;
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
   const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
-  const [selected, setSelected] = useState<string[]>(alreadySelected);
+  //const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [rowIdentifier, setRowIdentifier] = useState('id');
-
   const [selectedRows, setSelectedRows] = useState<T[]>([]);
-  //const [selectedIndex, setSelectedIndex] = useState(null);
-  //const [selectedIds, setSelectedIds] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
-
   const [page, setPage] = useState(0);
   const [totalRows, setTotalRows] = useState<number>(0);
+  //console.log(`table: ${selectedRows.length}`);
+
+  useEffect(() => {
+    console.log(`table: ${selectedRows.length}`);
+  }, [JSON.stringify(selectedRows)]);
 
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
@@ -83,11 +83,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     param,
     filter
   );
-
-  useEffect(() => {
-    console.log(selected);
-  }, [selected]);
-
   const noPagination = !requestDataByPage && !paginationFooter;
   const noData = isSuccess && !data?.length;
 
@@ -98,16 +93,16 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
    */
   const [values, setValues] = useState<T[]>([]);
 
-  useEffect(() => {
-    setSelected([]);
-  }, [resetSelections]);
+  // useEffect(() => {
+  //   setSelected([]);
+  // }, [resetSelections]);
 
   // if a row is selected in a different table, unselect all rows in this table
   useDidMountEffect(() => {
     if (useRowState && data?.length) {
       const found = data.findIndex((p) => p[rowIdentifier] === useRowState);
       if (found === -1) {
-        setSelected([]);
+        //setSelected([]);
       }
     }
   }, [useRowState]);
@@ -126,9 +121,10 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       }
     }
   };
-  // useEffect(() => {
-  //   handleRows();
-  // }, [values]);
+
+  useEffect(() => {
+    handleRows();
+  }, [values]);
 
   useDidMountEffect(() => {
     if (isSuccess) {
@@ -161,7 +157,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           return;
         }
       });
-      //queryPage === 1 && setQueryPage(0);
       setValues((o) => [...o, ...newV]);
       handleRows();
     }
@@ -179,7 +174,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     if (noPagination) {
       return results;
     }
-    // console.log(`slice start ${start}, slice end ${end}`);
     return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
   }, [values, filter, page]);
 
@@ -193,90 +187,10 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     setOrderBy(property);
   };
 
-  // const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>): void => {
-  //   const handlerExists = typeof onSelectMultiple === 'function';
-  //   if (event.target.checked && selected.length === 0) {
-  //     //const newIds = data.map((r) => r[rowIdentifier]);
-  //     //Select by the page not by initial data.
-  //     const newIds = perPage.map((r) => r[rowIdentifier]);
-  //     setSelected(newIds);
-  //     if (handlerExists) {
-  //       const multi = values.filter((d) => newIds.includes(d[rowIdentifier]));
-  //       onSelectMultiple(multi);
-  //     }
-  //   } else {
-  //     if (handlerExists) {
-  //       onSelectMultiple([]);
-  //     }
-  //     setSelected([]);
-  //   }
-  // };
-
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectAll(event.target.checked);
     //setSelectedIndexes(perPage.map((r, i) => i));
   };
-  // const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>): void => {
-  //   if (!event.target.checked) return;
-  //   const ids = perPage.map((r) => r[rowIdentifier]);
-  //   const filterIds = values.filter((d) => ids.includes(d[rowIdentifier]));
-  //   if (isFunction(onSelectMultiple)) {
-  //     console.log('called');
-  //     onSelectMultiple(filterIds);
-  //   }
-  // };
-
-  // const handleClickRow = (id: string, idx: number): void => {
-  //   if (isMultiSelect && typeof onSelectMultiple === 'function') {
-  //     handleClickRowMultiEnabled(id);
-  //   }
-  //   if (typeof onSelect === 'function' && data?.length) {
-  //     setSelected([id]);
-  //     if (noPagination) {
-  //       onSelect(values[idx]);
-  //       //setSelectedIndex(idx);
-  //       return;
-  //     }
-  //     // a row can only be selected from the current pages data set
-  //     // fixme: why ^?
-  //     // const i = values.findIndex((v) => v[rowIdentifier] === id);
-  //     // const row = values[i];
-  //     // if (row) {
-  //     //   onSelect(row);
-  //     // }
-  //   }
-  //   // will be null unless parent component wraps RowSelectedProvider
-  //   // if (typeof dispatchRowSelected === 'function') {
-  //   //   dispatchRowSelected(id);
-  //   // }
-  // };
-
-  // const handleClickRowMultiEnabled = (id: string): void => {
-  //   if (!isFunction(onSelectMultiple)) return;
-  //   const selectedIndex = selected.indexOf(id);
-  //   let newSelected = [];
-  //   if (selectedIndex === -1) {
-  //     newSelected = newSelected.concat(selected, id);
-  //   } else if (selectedIndex === 0) {
-  //     newSelected = newSelected.concat(selected.slice(1));
-  //   } else if (selectedIndex === selected.length - 1) {
-  //     newSelected = newSelected.concat(selected.slice(0, -1));
-  //   } else if (selectedIndex > 0) {
-  //     newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-  //   }
-  //   setSelected(newSelected);
-  //   if (alreadySelected.length) {
-  //     onSelectMultiple(newSelected);
-  //   } else {
-  //     // send T[] not just the identifiers
-  //     onSelectMultiple(values.filter((d) => newSelected.includes(d[rowIdentifier])));
-  //   }
-  // };
-
-  // const isSelected = (id: string): boolean => {
-  //   const checkIsSelected = selected.indexOf(id) !== -1;
-  //   return checkIsSelected;
-  // };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, p: number): void => {
     // TablePagination is zero index. Adding 1 fixes second page results from not refreshing.
@@ -300,7 +214,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             selected={selectAll || (showValidRecord && !formatTableCell(obj, 'valid_to').value)}
             rowIdentifier={rowIdentifier}
             setSelectedRows={setSelectedRows}
-            selectedRows={selectedRows}
           />
         ))}
       </>
@@ -312,15 +225,14 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       toolbar={
         <TableToolbar
           rowCount={totalRows}
-          numSelected={isFunction(onSelectMultiple) ? selected.length : 0}
           title={title}
           onChangeFilter={handleFilter}
+          numSelected={selectedRows.length}
           filterableProperties={headers}
           isMultiSearch={isMultiSearch}
           setPage={setPage}
           showTooltip={showValidRecord}
           disableSearch={disableSearch}
-          //disabled={totalPages !== 1}
           sibling={<>{exporter}</>}
         />
       }>
@@ -330,13 +242,12 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             headersToDisplay={headers}
             headerData={data && data[0]}
             isMultiSelect={isFunction(onSelectMultiple)}
-            numSelected={selected.length}
+            numSelected={selectedRows.length}
             order={order}
             orderBy={(orderBy as string) ?? ''}
             onRequestSort={handleSort}
             onSelectAllClick={handleSelectAll}
             selectAll={selectAll}
-            //onSelectAllClick={() => console.log('placeholder for select all')}
             rowCount={values?.length ?? 0}
             customHeaders={customColumns?.map((c) => c.header) ?? []}
           />
@@ -374,126 +285,5 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         )}
       </>
     </TableContainer>
-  );
-}
-
-type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' | 'onSelect' | 'onSelectMultiple'> & {
-  row: { [key in keyof T]: any };
-  index: number;
-  selected: boolean;
-  rowIdentifier: string;
-  key?: number | string;
-  setSelectedRows: React.Dispatch<React.SetStateAction<T[]>>;
-  selectedRows: T[];
-};
-
-function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowProps<T>) {
-  const {
-    headers,
-    customColumns,
-    selected,
-    row,
-    index,
-    onSelect,
-    onSelectMultiple,
-    rowIdentifier,
-    setSelectedRows,
-    selectedRows
-  } = props;
-  const dispatchRowSelected = useTableRowSelectedDispatch();
-  const [isSelectedStatus, setSelectedStatus] = useState(false);
-
-  useEffect(() => {
-    setSelectedStatus(selected);
-  }, [selected]);
-
-  useEffect(() => {
-    const actionRows = () => {
-      if (isFunction(dispatchRowSelected)) {
-        dispatchRowSelected(row[rowIdentifier]);
-      }
-      if (isFunction(onSelect) && isSelectedStatus) {
-        handleAddSingleSelect();
-      }
-      if (isFunction(onSelectMultiple)) {
-        isSelectedStatus ? handleAddMultiSelect() : handleRemoveMultiSelect();
-      }
-    };
-    actionRows();
-  }, [isSelectedStatus]);
-
-  const handleSetMulti = (rows: T[]): void => {
-    setSelectedRows(rows);
-    onSelectMultiple(rows);
-  };
-
-  const handleAddMultiSelect = (): void => {
-    const rows = selectedRows;
-    rows.push(row);
-    handleSetMulti(rows);
-    console.log(rows);
-  };
-
-  const handleRemoveMultiSelect = (): void => {
-    // if (!isSelectedStatus) return;
-    if (!selectedRows.includes(row)) return;
-    const indexOfRow = selectedRows.indexOf(row);
-    if (indexOfRow == -1) return;
-    const rows = selectedRows;
-    rows.splice(indexOfRow, 1);
-    handleSetMulti(rows);
-    console.log(rows);
-  };
-
-  const handleAddSingleSelect = (): void => {
-    onSelect(row);
-  };
-
-  const handleClickAway = (): void => {
-    if (!isFunction(onSelectMultiple)) {
-      setSelectedStatus(false);
-    }
-  };
-
-  const handleClickRow = () => {
-    if (!isFunction(onSelect) && !isFunction(onSelectMultiple)) {
-      console.log('Must pass onSelect OR onSelectMultiple to DataTable');
-      return;
-    }
-    setSelectedStatus((s) => !s);
-  };
-
-  return (
-    <ClickAwayListener onClickAway={() => handleClickAway()}>
-      <TableRow
-        tabIndex={-1}
-        hover
-        onClick={() => handleClickRow()}
-        role='checkbox'
-        selected={isSelectedStatus || selected}>
-        {isFunction(onSelectMultiple) ? (
-          <TableCell padding='checkbox'>
-            <Checkbox checked={isSelectedStatus || selected} />
-          </TableCell>
-        ) : null}
-        {/* render main columns from data fetched from api */}
-        {headers.map((k, i) => {
-          if (!k) {
-            return null;
-          }
-          const { value } = formatTableCell(row, k);
-
-          return (
-            <TableCell key={`${String(k)}${i}`} align={'left'}>
-              {value}
-            </TableCell>
-          );
-        })}
-        {customColumns?.map((c: ICustomTableColumn<T>) => {
-          const Col = c.column(row, index);
-          return <TableCell key={`add-col-${index}`}>{Col}</TableCell>;
-        })}
-      </TableRow>
-    </ClickAwayListener>
   );
 }
