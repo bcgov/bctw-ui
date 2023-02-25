@@ -76,8 +76,8 @@ const DevPlayground = (): JSX.Element => {
         {/* Place components below here */}
         <TempComponent handleTab={setTab} tab={tab} tabList={TAB_LIST}>
           <>
-            <h1>{TAB_LIST[tab]}</h1>
-            <SubHeader text={TAB_CAPTIONS[tab]} />
+            <h2>{TAB_LIST[tab]}</h2>
+            <p>{TAB_CAPTIONS[tab]}</p>
             <MortalityEventForm event={TAB_EVENTS[tab]} handleFormChange={null}/>
           </>
         </TempComponent>

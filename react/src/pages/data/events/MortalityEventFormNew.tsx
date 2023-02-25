@@ -43,28 +43,30 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     }
 
     return (
-      <Box>
-        <FormSection 
-          id='animal-details' 
-          header='Animal' 
-          btn={<Button variant='text' onClick={handleEditAnimal}>Edit</Button>} 
-          disabled={!editAnimalDetails}
+      <Box mt={2} mb={2}>
+        <Box style={{ backgroundColor: '#f7f8fa' }}>
+          <FormSection 
+            id='animal-details' 
+            header='Animal' 
+            btn={<Button variant='text' onClick={handleEditAnimal}>Edit</Button>} 
+            disabled={!editAnimalDetails}
+            >
+            {CreateFormField(mortality, wfFields.get('animal_id'), onChange)}
+            {CreateFormField(mortality, wfFields.get('wlh_id'), onChange)}
+            {CreateFormField(mortality, wfFields.get('species'), onChange)}
+            {CreateFormField(mortality, wfFields.get('region'), onChange)}
+          </FormSection>
+          <FormSection 
+            id='device-details' 
+            header='Device'
+            btn={<Button variant='text' onClick={handleEditDevice}>Edit</Button>}
+            disabled={!editDeviceDetails}
           >
-          {CreateFormField(mortality, wfFields.get('animal_id'), onChange)}
-          {CreateFormField(mortality, wfFields.get('wlh_id'), onChange)}
-          {CreateFormField(mortality, wfFields.get('species'), onChange)}
-          {CreateFormField(mortality, wfFields.get('region'), onChange)}
-        </FormSection>
-        <FormSection 
-          id='device-details' 
-          header='Device'
-          btn={<Button variant='text' onClick={handleEditDevice}>Edit</Button>}
-          disabled={!editDeviceDetails}
-        >
-          {CreateFormField(mortality, wfFields.get('device_id'), onChange)}
-          {CreateFormField(mortality, wfFields.get('device_make'), onChange)}
-          {CreateFormField(mortality, wfFields.get('activation_comment'), onChange) /*these are placeholders for now*/}
-        </FormSection>
+            {CreateFormField(mortality, wfFields.get('device_id'), onChange)}
+            {CreateFormField(mortality, wfFields.get('device_make'), onChange)}
+            {CreateFormField(mortality, wfFields.get('activation_comment'), onChange) /*these are placeholders for now*/}
+          </FormSection>
+        </Box>
       </Box>
     );
   }
@@ -83,16 +85,29 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     )
   }
 
-  const LocationInputTabs = (): JSX.Element => {
-
+  const QuestionBlock = ({ question, subheading }): JSX.Element => {
     return (
       <>
-
+        <h4>{question}</h4>
+        <p>{subheading}</p>
       </>
     )
   }
 
-  const mortality_status = true;
+  const LocationInputTabs = (): JSX.Element => {
+
+    return (
+      <>
+        <QuestionBlock 
+          question='Where did the animal die?'
+          subheading='If this is unknown, select a general location on the map with a large buffer area to represent uncertainty in the location.'  
+        />
+        
+      </>
+    )
+  }
+
+  const mortality_status = false;
 
   return ( 
       <>
