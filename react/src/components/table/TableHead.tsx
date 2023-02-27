@@ -3,6 +3,7 @@ import { createHeadCell } from 'components/table/table_helpers';
 import { BCTWBase } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { HeadCell, TableHeadProps } from 'components/table/table_interfaces';
+import { useState } from 'react';
 
 export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T>): JSX.Element {
   const {
@@ -15,11 +16,17 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     headersToDisplay,
     numSelected,
     onSelectAllClick,
+    selectAll,
     rowCount,
     isMultiSelect,
     hiddenHeaders,
     secondaryHeaders
   } = props;
+
+  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean): void => {
+  //   onSelectAllClick(event);
+  //   setCheckedVal(checked);
+  // };
 
   const createSortHandler =
     (property: keyof T) =>
@@ -43,8 +50,9 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
                 /* 
                   renders a dash when 'some' values are checked. 
                 */
-                indeterminate={numSelected > 0 && numSelected < rowCount}
-                checked={rowCount > 0 && numSelected === rowCount}
+                //indeterminate={numSelected > 0 && numSelected < rowCount}
+                //checked={rowCount > 0 && numSelected === rowCount}
+                checked={selectAll}
                 onChange={onSelectAllClick}
                 inputProps={{ 'aria-label': 'select all' }}
               />

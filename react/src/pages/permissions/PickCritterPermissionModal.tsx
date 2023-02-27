@@ -126,6 +126,8 @@ export default function PickCritterPermissionModal({
       typeof selected[0] === 'string'
         ? (selected as string[])
         : (selected as UserCritterAccess[]).map((v) => v[v.identifier]);
+    console.log(ids);
+
     setCritterIDs(ids);
   };
 
@@ -209,7 +211,6 @@ export default function PickCritterPermissionModal({
         queryProps={tableProps}
         onSelectMultiple={handleSelect}
         resetSelections={triggerReset}
-        isMultiSelect={true}
         alreadySelected={alreadySelected}
         customColumns={showSelectPermission ? [{ column: NewColumn, header: <b>Select Permission</b> }] : []}
       />

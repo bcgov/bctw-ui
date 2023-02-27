@@ -1,7 +1,9 @@
+import { mdiConsoleNetworkOutline } from '@mdi/js';
 import {
   Box,
   Checkbox,
   CircularProgress,
+  ClickAwayListener,
   Divider,
   Paper,
   Table,
@@ -14,56 +16,75 @@ import { AxiosError } from 'axios';
 import TableContainer from 'components/table/TableContainer';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
-import { formatTableCell, fuzzySearchMutipleWords, getComparator, stableSort } from 'components/table/table_helpers';
+import {
+  formatTableCell,
+  fuzzySearchMutipleWords,
+  getComparator,
+  isFunction,
+  stableSort
+} from 'components/table/table_helpers';
 import { DataTableProps, ICustomTableColumn, ITableFilter, Order } from 'components/table/table_interfaces';
-import { useTableRowSelectedDispatch, useTableRowSelectedState } from 'contexts/TableRowSelectContext';
+import {
+  RowSelectedProvider,
+  useTableRowSelectedDispatch,
+  useTableRowSelectedState
+} from 'contexts/TableRowSelectContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
+import DataTableRow from './DataTableRow';
 import './table.scss';
 
-// note: const override for disabling pagination
-const DISABLE_PAGINATION = false;
 export const ROWS_PER_PAGE = 100;
 /**
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
  */
-export default function DataTable<T extends BCTWBase<T>>({
-  customColumns = [],
-  headers,
-  queryProps,
-  title,
-  onSelect,
-  onSelectMultiple,
-  deleted,
-  updated,
-  exporter,
-  resetSelections,
-  disableSearch,
-  allRecords,
-  paginate = true,
-  isMultiSelect = false,
-  isMultiSearch = false,
-  alreadySelected = [],
-  showValidRecord = false,
-  disableHighlightOnSelect = false
-}: DataTableProps<T>): JSX.Element {
-  const dispatchRowSelected = useTableRowSelectedDispatch();
+export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T>): JSX.Element {
+  const {
+    headers,
+    queryProps,
+    title,
+    onSelect,
+    onSelectMultiple,
+    deleted,
+    updated,
+    exporter,
+    resetSelections,
+    disableSearch,
+    requestDataByPage = false,
+    paginationFooter = true,
+    isMultiSearch = false,
+    showValidRecord = false,
+    alreadySelected = [],
+    customColumns = []
+  } = props;
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
   const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
-  const [selected, setSelected] = useState<string[]>(alreadySelected);
+  //const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [rowIdentifier, setRowIdentifier] = useState('id');
-
+  const [selectedRows, setSelectedRows] = useState<T[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
   const [page, setPage] = useState(0);
-  //const [totalPages, setTotalPages] = useState<number | null>(1);
   const [totalRows, setTotalRows] = useState<number>(0);
+  //console.log(`table: ${selectedRows.length}`);
 
-  const isPaginate = paginate && !DISABLE_PAGINATION;
+  useEffect(() => {
+    console.log(`table: ${selectedRows.length}`);
+  }, [JSON.stringify(selectedRows)]);
+
+  // fetch the data from the props query
+  const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
+    requestDataByPage ? page : null,
+    param,
+    filter
+  );
+  const noPagination = !requestDataByPage && !paginationFooter;
+  const noData = isSuccess && !data?.length;
 
   /**
    * since data is updated when the page is changed, use the 'values'
@@ -72,16 +93,16 @@ export default function DataTable<T extends BCTWBase<T>>({
    */
   const [values, setValues] = useState<T[]>([]);
 
-  useEffect(() => {
-    setSelected([]);
-  }, [resetSelections]);
+  // useEffect(() => {
+  //   setSelected([]);
+  // }, [resetSelections]);
 
   // if a row is selected in a different table, unselect all rows in this table
   useDidMountEffect(() => {
     if (useRowState && data?.length) {
       const found = data.findIndex((p) => p[rowIdentifier] === useRowState);
       if (found === -1) {
-        setSelected([]);
+        //setSelected([]);
       }
     }
   }, [useRowState]);
@@ -92,13 +113,6 @@ export default function DataTable<T extends BCTWBase<T>>({
     }
   }, [deleted]);
 
-  // fetch the data from the props query
-  const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
-    allRecords ? 0 : page,
-    param,
-    filter
-  );
-
   const handleRows = (): void => {
     if (data?.length) {
       const rowCount = data[0]?.row_count;
@@ -106,21 +120,12 @@ export default function DataTable<T extends BCTWBase<T>>({
         setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
       }
     }
-    // if (!data?.length) {
-    //   return;
-    // }
-
-    // if (rowCount) {
-    //   // This shouldnt have to be cast to a number
-    //   // TODO: Find in DB where row_count is string (should be a number)
-    //   setTotalRows(typeof rowCount === 'string' ? parseInt(rowCount) : rowCount);
-    // } else {
-    //   setTotalRows(data.length);
-    // }
   };
+
   useEffect(() => {
     handleRows();
   }, [values]);
+
   useDidMountEffect(() => {
     if (isSuccess) {
       // update the row identifier
@@ -148,12 +153,29 @@ export default function DataTable<T extends BCTWBase<T>>({
           //If updated identifier is set, insert new data into array
           values[i] = d;
           setValues(values);
+          handleRows();
+          return;
         }
       });
-      //queryPage === 1 && setQueryPage(0);
       setValues((o) => [...o, ...newV]);
+      handleRows();
     }
   }, [data]);
+
+  const perPage = useMemo((): T[] => {
+    console.log('perPage called');
+    const results =
+      filter && filter.term
+        ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headers as string[]), filter.term)
+        : values;
+    const start = (ROWS_PER_PAGE + page - ROWS_PER_PAGE - 1) * ROWS_PER_PAGE;
+    const end = ROWS_PER_PAGE * page - 1;
+
+    if (noPagination) {
+      return results;
+    }
+    return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
+  }, [values, filter, page]);
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -165,226 +187,89 @@ export default function DataTable<T extends BCTWBase<T>>({
     setOrderBy(property);
   };
 
-  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const handlerExists = typeof onSelectMultiple === 'function';
-    if (event.target.checked && selected.length === 0) {
-      //const newIds = data.map((r) => r[rowIdentifier]);
-      //Select by the page not by initial data.
-      const newIds = perPage().map((r) => r[rowIdentifier]);
-      setSelected(newIds);
-      if (handlerExists) {
-        const multi = values.filter((d) => newIds.includes(d[rowIdentifier]));
-        onSelectMultiple(multi);
-      }
-    } else {
-      if (handlerExists) {
-        onSelectMultiple([]);
-      }
-      setSelected([]);
-    }
-  };
-
-  const handleClickRow = (event: React.MouseEvent<unknown>, id: string, idx: number): void => {
-    if (isMultiSelect && typeof onSelectMultiple === 'function') {
-      handleClickRowMultiEnabled(event, id);
-    }
-    if (typeof onSelect === 'function' && data?.length) {
-      setSelected([id]);
-      // a row can only be selected from the current pages data set
-      // fixme: why ^?
-      const i = values.findIndex((v) => v[rowIdentifier] === id);
-      const row = values[i];
-      if (row) {
-        onSelect(row);
-      }
-      // onSelect(selected.indexOf(id))
-    }
-    // will be null unless parent component wraps RowSelectedProvider
-    if (typeof dispatchRowSelected === 'function') {
-      dispatchRowSelected(id);
-    }
-  };
-
-  const handleClickRowMultiEnabled = (event: React.MouseEvent<unknown>, id: string): void => {
-    if (typeof onSelectMultiple !== 'function') {
-      return;
-    }
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-    if (alreadySelected.length) {
-      onSelectMultiple(newSelected);
-    } else {
-      // send T[] not just the identifiers
-      onSelectMultiple(values.filter((d) => newSelected.includes(d[rowIdentifier])));
-    }
-  };
-
-  const isSelected = (id: string): boolean => {
-    const checkIsSelected = selected.indexOf(id) !== -1;
-    return checkIsSelected;
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectAll(event.target.checked);
+    //setSelectedIndexes(perPage.map((r, i) => i));
   };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, p: number): void => {
     // TablePagination is zero index. Adding 1 fixes second page results from not refreshing.
-    console.log(p);
     setPage(p);
+    setSelectAll(false);
   };
 
   const handleFilter = (filter: ITableFilter): void => {
     setFilter(filter);
   };
 
-  const Toolbar = (): JSX.Element => (
-    <TableToolbar
-      rowCount={totalRows}
-      numSelected={isMultiSelect ? selected.length : 0}
-      title={title}
-      onChangeFilter={handleFilter}
-      filterableProperties={headers}
-      isMultiSearch={isMultiSearch}
-      setPage={setPage}
-      showTooltip={showValidRecord}
-      disableSearch={disableSearch}
-      //disabled={totalPages !== 1}
-      sibling={<>{exporter}</>}
-    />
-  );
-
-  // todo: why using memo for this?
-  const headerProps = useMemo(() => headers, []);
-  // fixme: fix excesssive rerenders
-  // const customCols = customColumns.map((cc,idx) => {
-  //   return (obj: T) => useMemo(() => cc.column(obj, idx), [obj]);
-  // })
-
-  // called in the render function
-  // determines which values to render, based on page and filters applied
-  const perPage = (): T[] => {
-    const results =
-      filter && filter.term
-        ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headerProps as string[]), filter.term)
-        : values;
-    const start = (ROWS_PER_PAGE + page - ROWS_PER_PAGE - 1) * ROWS_PER_PAGE;
-    const end = ROWS_PER_PAGE * page - 1;
-    // console.log(`slice start ${start}, slice end ${end}`);
-    return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
-  };
-
-  const customColumnsAppend = customColumns.filter(c => !c.prepend);
-  const customColumnsPrepend = customColumns.filter(c => c.prepend);
-
-  const TableContents = (): JSX.Element => {
-    const noData = isSuccess && !data?.length;
-    // useEffect(() => {
-    //   if (noData && totalPages !== 1) {
-    //     setTotalPages(1);
-    //   }
-    // }, []);
-    if (isLoading || isError) {
-      return (
-        <TableBody>
-          <TableRow>
-            <TableCell>
-              <CircularProgress />
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      );
-    }
-    if (noData) {
-      return (
-        <TableBody>
-          <TableRow>
-            <TableCell>
-              <strong>No data found...</strong>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      );
-    }
-    // if (isSuccess) {
-    const sortedResults = stableSort(perPage(), getComparator(order, orderBy));
-
-
+  const memoRows = useMemo(() => {
     return (
-      <TableBody>
-        {sortedResults.map((obj, idx: number) => {
-          const isRowSelected = isSelected(obj[rowIdentifier]);
-          const highlightValidRow = showValidRecord && !formatTableCell(obj, 'valid_to').value;
-          return (
-            <TableRow
-              hover
-              onClick={(event): void => handleClickRow(event, obj[rowIdentifier], idx)}
-              role='checkbox'
-              aria-checked={isRowSelected}
-              tabIndex={-1}
-              key={`row${idx}`}
-              selected={!disableHighlightOnSelect && (isRowSelected || highlightValidRow)}>
-              {/* render checkbox column if multiselect is enabled */}
-              {isMultiSelect ? (
-                <TableCell padding='checkbox'>
-                  <Checkbox checked={isRowSelected} />
-                </TableCell>
-              ) : null}
-              {/* render additional columns from props */}
-              {customColumnsPrepend.map((c: ICustomTableColumn<T>) => {
-                const Col = c.column(obj, idx);
-                return <TableCell key={`pre-col-${idx}`}>{Col}</TableCell>;
-              })}
-              {/* render main columns from data fetched from api */}
-              {headerProps.map((k, i) => {
-                if (!k) {
-                  return null;
-                }
-                const { value } = formatTableCell(obj, k);
-
-                return (
-                  <TableCell key={`${String(k)}${i}`} align={'left'}>
-                    {value}
-                  </TableCell>
-                );
-              })}
-              {/* render additional columns from props */}
-              {customColumnsAppend.map((c: ICustomTableColumn<T>) => {
-                const Col = c.column(obj, idx);
-                return <TableCell key={`add-col-${idx}`}>{Col}</TableCell>;
-              })}
-            </TableRow>
-          );
-        })}
-      </TableBody>
+      <>
+        {stableSort(perPage, getComparator(order, orderBy))?.map((obj, idx: number) => (
+          <DataTableRow
+            {...props}
+            key={`table-row-${idx}`}
+            index={idx}
+            row={obj}
+            selected={selectAll || (showValidRecord && !formatTableCell(obj, 'valid_to').value)}
+            rowIdentifier={rowIdentifier}
+            setSelectedRows={setSelectedRows}
+          />
+        ))}
+      </>
     );
-  };
+  }, [perPage, selectAll]);
+
   return (
-    <TableContainer toolbar={Toolbar()}>
+    <TableContainer
+      toolbar={
+        <TableToolbar
+          rowCount={totalRows}
+          title={title}
+          onChangeFilter={handleFilter}
+          numSelected={selectedRows.length}
+          filterableProperties={headers}
+          isMultiSearch={isMultiSearch}
+          setPage={setPage}
+          showTooltip={showValidRecord}
+          disableSearch={disableSearch}
+          sibling={<>{exporter}</>}
+        />
+      }>
       <>
         <Table stickyHeader size='small'>
           <TableHead
-            headersToDisplay={headerProps}
+            headersToDisplay={headers}
             headerData={data && data[0]}
-            isMultiSelect={isMultiSelect}
-            numSelected={selected.length}
+            isMultiSelect={isFunction(onSelectMultiple)}
+            numSelected={selectedRows.length}
             order={order}
             orderBy={(orderBy as string) ?? ''}
             onRequestSort={handleSort}
             onSelectAllClick={handleSelectAll}
+            selectAll={selectAll}
             rowCount={values?.length ?? 0}
-            customHeaders={customColumnsAppend?.map((c) => c.header) ?? []}
-            customHeadersPrepend={customColumnsPrepend?.map((c) => c.header) ?? []}
+            customHeaders={customColumns?.map((c) => c.header) ?? []}
           />
-          <TableContents />
+          <TableBody>
+            {isLoading || isError ? (
+              <TableRow>
+                <TableCell>
+                  <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : noData ? (
+              <TableRow>
+                <TableCell>
+                  <strong>No data found...</strong>
+                </TableCell>
+              </TableRow>
+            ) : (
+              <>{memoRows}</>
+            )}
+          </TableBody>
         </Table>
-        {!isPaginate || isError || values.length < ROWS_PER_PAGE ? null : (
+        {!paginationFooter || isError || values.length < ROWS_PER_PAGE ? null : (
           <Box className={'table-footer'}>
             <Divider />
             <TablePagination

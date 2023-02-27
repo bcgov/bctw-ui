@@ -42,7 +42,7 @@ export default function VendorAPIPage(): JSX.Element {
   const [startTime, setStartTime] = useState<Dayjs | null>();
   const [endTime, setEndTime] = useState<Dayjs | null>();
 
-  const handleFetchButton = ():void => {
+  const handleFetchButton = (): void => {
     setResults([]);
     setShowConfirmFetch((o) => !o);
   };
@@ -151,7 +151,6 @@ export default function VendorAPIPage(): JSX.Element {
             param: { keys: 'device_make', term: 'lotek' }
           }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
-          isMultiSelect={true}
         />
         <DataTable<Collar>
           headers={headers}
@@ -161,7 +160,6 @@ export default function VendorAPIPage(): JSX.Element {
             param: { keys: 'device_make', term: 'vectronic' }
           }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
-          isMultiSelect={true}
         />
         <Box>
           <h4>

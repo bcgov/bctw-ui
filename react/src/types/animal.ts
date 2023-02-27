@@ -92,7 +92,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
   mortality_report_ind: boolean;
   mortality_investigation: Code;
   captivity_status_ind: boolean;
-  mortality_captivity_status_ind: Code;
+  mortality_captivity_status_ind: boolean;
 
   permission_type?: eCritterPermission; // critters should contain this
   predator_known_ind: boolean;
@@ -179,7 +179,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   mortality_report_ind: boolean;
   mortality_investigation: Code;
   captivity_status_ind: boolean;
-  mortality_captivity_status_ind: Code;
+  mortality_captivity_status_ind: boolean;
 
   @Exclude(toPlainOnly) permission_type: eCritterPermission;
 
@@ -296,6 +296,20 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
       //'lastKnownLocation'
       // 'latitude',
       // 'longitude'
+    ];
+  }
+
+  static get attachedCritterExportProps(): (keyof AttachedAnimal)[] {
+    return [
+      'species',
+      'wlh_id',
+      'animal_id',
+      'device_status',
+      'animal_status',
+      'device_id',
+      'frequency',
+      'latitude',
+      'longitude'
     ];
   }
 

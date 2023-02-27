@@ -53,7 +53,9 @@ import {
   mdiDevTo,
   mdiSend,
   mdiWifi,
-  mdiAccessPoint
+  mdiAccessPoint,
+  mdiExclamation,
+  mdiExclamationThick
 } from '@mdi/js';
 import Icon from '@mdi/react';
 
@@ -181,6 +183,8 @@ const getIconPath = (path: string): string => {
       return mdiSend;
     case 'signal':
       return mdiAccessPoint;
+    case 'exclaim':
+      return mdiExclamationThick;
   }
 };
 
