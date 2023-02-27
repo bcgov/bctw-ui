@@ -30,30 +30,79 @@ import Icon from 'components/common/Icon';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import Tooltip from 'components/common/Tooltip';
 import FileInput from 'components/form/FileInput';
-import { BannerStrings } from 'constants/strings';
+import { WorkflowStrings } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
-import { Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import ManageLayout from './layouts/ManageLayout';
-import { createFormData } from 'api/api_helpers';
-import { IBulkUploadResults } from 'api/api_interfaces';
-import { AxiosError } from 'axios';
-import { KeyXUploader } from './vendor/KeyXUploader';
-import MortalityEventForm from './data/events/MortalityEventFormNew';
-import MortalityEvent from 'types/events/mortality_event';
+import MortalityEventFormNew from './data/events/MortalityEventFormNew';
+import MortalityEvent, { IMortalityEvent } from 'types/events/mortality_event';
+import dayjs from 'dayjs';
+import { eLocationPositionType, LocationEvent } from 'types/events/location_event';
+import { columnToHeader } from 'utils/common_helpers';
 
 // Place constants here
-const TEST = 'Testing';
-const DEVICE_IDS = [17822, 20502, 45333];
-const TEST_KEYX_PAYLOAD = {
-  84789: true,
-  12345: false,
-  98789: true
+const mockLocationEvent = new LocationEvent(
+  'mortality',   // location_type parameter
+  dayjs(),       // date parameter
+  false,         // disable_date parameter
+  eLocationPositionType.utm, // coordinate_type parameter
+);
+
+// Now you can modify the properties of the mockLocationEvent object as needed for your test case.
+mockLocationEvent.comment = 'test comment';
+mockLocationEvent.latitude = 42.12345;
+mockLocationEvent.longitude = -71.98765;
+mockLocationEvent.utm_easting = 123456;
+mockLocationEvent.utm_northing = 654321;
+mockLocationEvent.utm_zone = 18;
+
+
+const mockMortalityEvent: Partial<MortalityEvent> = {
+  critter_id: '123456',
+  animal_id: '789012',
+  wlh_id: '345678',
+  species: 'Caribou',
+  device_id: 314159,
+  device_make: '',
+  formatPropAsHeader(s: keyof MortalityEvent): string {
+    switch (s) {
+      case 'attachment_start':
+        return 'Capture Date';
+      case 'mortality_report_ind':
+        return WorkflowStrings.mortality.mort_wildlife;
+      case 'retrieved_ind':
+        return WorkflowStrings.device.was_retrieved;
+      case 'activation_status_ind':
+        return WorkflowStrings.device.vendor_activation;
+      case 'predator_known_ind':
+        return WorkflowStrings.mortality.mort_predator_pcod;
+      case 'isUCODSpeciesKnown':
+        return WorkflowStrings.mortality.mort_predator_ucod;
+      case 'shouldUnattachDevice':
+        return WorkflowStrings.device.should_unattach;
+      case 'proximate_cause_of_death':
+        return 'PCOD';
+      case 'ultimate_cause_of_death':
+        return 'UCOD';
+      case 'predator_species_ucod':
+        return 'Predator UCOD';
+      case 'predator_species_pcod':
+        return 'Predator PCOD';
+      case 'pcod_confidence':
+      case 'ucod_confidence':
+        return 'Confidence';
+      default:
+        return columnToHeader(s);
+    }
+  }
 };
+
+
+
 const TAB_LIST = ['Report an Animal Mortality', 'Remove a Device from an Animal'];
 const TAB_CAPTIONS = ['You are about to report the following animal as deceased. Please confirm that these details are correct and make necessary edits before proceeding.', 
                       'You are about to end the following animal-device deployment. Please confirm that these details are correct and make necessary edits before removing the device.'];
-const TAB_EVENTS = [new MortalityEvent, null];
+const TAB_EVENTS = [mockMortalityEvent, null];
 
 /**
  * Testing area for UI comoponents.
@@ -78,7 +127,8 @@ const DevPlayground = (): JSX.Element => {
           <>
             <h2>{TAB_LIST[tab]}</h2>
             <p>{TAB_CAPTIONS[tab]}</p>
-            <MortalityEventForm event={TAB_EVENTS[tab]} handleFormChange={null}/>
+            {!tab   ? <MortalityEventFormNew event={TAB_EVENTS[tab]} handleFormChange={null}/>
+                    : <p>remove device form goes here...</p>}
           </>
         </TempComponent>
         {/* <Box sx={{ pr: 2 }}>

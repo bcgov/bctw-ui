@@ -90,8 +90,7 @@ const WorkflowStrings = {
       'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?'
   },
   mortality: {
-    workflowTitle: 'Report an Animal Mortality',
-    workflowCaption: 'You are about to report the following animal as deceased. Please confirm that these details are correct and make necessary edits before proceeding.',
+    workflowTitle: 'Mortality Event Workflow',
     unassignDeviceTooltip:
       'If you unassign the device, no new telemetry from this device will be connected to this animal.',
     exitEarly: 'You have set the animal mortality status to Alive. Do you wish to exit the workflow now?',

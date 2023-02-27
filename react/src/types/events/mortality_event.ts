@@ -172,10 +172,6 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     return WorkflowStrings.mortality.workflowTitle;
   }
 
-  getWorkflowCaption(): string {
-    return WorkflowStrings.mortality.workflowCaption;
-  }
-
   formatPropAsHeader(s: keyof MortalityEvent): string {
     switch (s) {
       case 'attachment_start':

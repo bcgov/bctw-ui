@@ -102,7 +102,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
           question='Where did the animal die?'
           subheading='If this is unknown, select a general location on the map with a large buffer area to represent uncertainty in the location.'  
         />
-        
+
       </>
     )
   }
