@@ -202,6 +202,9 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     setFilter(filter);
   };
 
+  const customColumnsAppend = customColumns?.filter(c => !c.prepend)
+  const customColumnsPrepend = customColumns?.filter(c => c.prepend);
+
   const memoRows = useMemo(() => {
     return (
       <>
@@ -249,7 +252,8 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             onSelectAllClick={handleSelectAll}
             selectAll={selectAll}
             rowCount={values?.length ?? 0}
-            customHeaders={customColumns?.map((c) => c.header) ?? []}
+            customHeaders={customColumnsAppend?.map((c) => c.header) ?? []}
+            customHeadersPrepend={customColumnsPrepend?.map((c) => c.header) ?? []}
           />
           <TableBody>
             {isLoading || isError ? (

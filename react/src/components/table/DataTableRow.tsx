@@ -75,6 +75,16 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
     setSelectedStatus((s) => !s);
   };
 
+  const customColumnsAppend = customColumns?.filter(c => !c.prepend)
+  const customColumnsPrepend = customColumns?.filter(c => c.prepend);
+
+  const mapCustomColumns = (c: ICustomTableColumn<T>[]): JSX.Element[] => {
+    return c.map((c: ICustomTableColumn<T>) => {
+      const Col = c.column(row, index);
+      return <TableCell key={`add-col-${index}`}>{Col}</TableCell>;
+    })
+  }
+
   return (
     <ClickAwayListener onClickAway={() => handleClickAway()}>
       <TableRow tabIndex={-1} hover onClick={() => handleClickRow()} role='checkbox' selected={isSelectedStatus}>
@@ -83,6 +93,7 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
             <Checkbox checked={isSelectedStatus} />
           </TableCell>
         ) : null}
+        {customColumnsPrepend && mapCustomColumns(customColumnsPrepend)}
         {/* render main columns from data fetched from api */}
         {headers.map((k, i) => {
           if (!k) {
@@ -96,10 +107,7 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
             </TableCell>
           );
         })}
-        {customColumns?.map((c: ICustomTableColumn<T>) => {
-          const Col = c.column(row, index);
-          return <TableCell key={`add-col-${index}`}>{Col}</TableCell>;
-        })}
+        {customColumnsAppend && mapCustomColumns(customColumnsAppend)}
       </TableRow>
     </ClickAwayListener>
   );
