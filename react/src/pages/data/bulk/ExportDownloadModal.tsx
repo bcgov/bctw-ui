@@ -25,6 +25,7 @@ type ExportModalProps = ModalBaseProps & {
   postGISstrings?: string[];
   critterIDs?: string[];
   children?: React.ReactNode;
+  lastTelemetryOnly: boolean;
 };
 
 enum DownloadType {

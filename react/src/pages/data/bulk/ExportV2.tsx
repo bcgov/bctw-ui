@@ -21,10 +21,11 @@ import dayjs from 'dayjs';
 import { FeatureCollection } from 'geojson';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import { useEffect, useState } from 'react';
+import React, { MouseEventHandler, useEffect, useState } from 'react';
 import { AttachedAnimal } from 'types/animal';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import ExportDownloadModal from './ExportDownloadModal';
+import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 
 export interface DateRange {
   start: dayjs.Dayjs;
@@ -36,6 +37,8 @@ export enum TabNames {
   quick,
   advanced
 }
+
+export type ExportRangeType = 'lifetime' | 'last_telemetry' | 'date_range';
 
 export const exportPageStyles = makeStyles((theme) => ({
   section: {
@@ -87,7 +90,8 @@ export default function ExportPageV2(): JSX.Element {
   const [collarIDs, setCollarIDs] = useState([]);
   const [critterIDs, setCritterIDs] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedLifetime, setSelectedLifetime] = useState(false);
+  //const [selectedLifetime, setSelectedLifetime] = useState(false);
+  const [exportRangeType, setExportRangeType] = useState<ExportRangeType>('date_range');
   const [currentGeometry, setCurrentGeometry] = useState<string[]>([]);
 
   const handleDrawShape = (features: L.FeatureGroup): void => {
@@ -131,6 +135,17 @@ export default function ExportPageV2(): JSX.Element {
     setCritterIDs(critters);
   };
 
+  const handleRadioChange = (event) => {
+    const newVal = (event.target as HTMLInputElement).value as ExportRangeType;
+    if(newVal === exportRangeType) {
+      setExportRangeType('date_range');
+    }
+    else {
+      setExportRangeType(newVal);
+    }
+    
+  }
+
   const datePicker = (): JSX.Element => {
     return (
       <Box>
@@ -139,26 +154,36 @@ export default function ExportPageV2(): JSX.Element {
           <Box className={styles.dateBoxInnerSpacing} columnGap={1}>
             <DateInput
               propName='tstart'
-              disabled={selectedLifetime}
+              disabled={exportRangeType !== 'date_range'}
               label={MapStrings.startDateLabel}
               defaultValue={dayjs(start)}
               changeHandler={handleChangeDate}
             />
 
             <DateInput
-              disabled={selectedLifetime}
+              disabled={exportRangeType !== 'date_range'}
               propName='tend'
               label={MapStrings.endDateLabel}
               defaultValue={dayjs(end)}
               changeHandler={handleChangeDate}
             />
           </Box>
-          <Checkbox
+          <RadioGroup
+            row
+            name="export-radio"
+            value={exportRangeType}
+          >
+            <FormControlLabel value='lifetime' control={<Radio onClick={handleRadioChange}/>} label="All Telemetry"/>
+            <FormControlLabel value='last_telemetry' control={<Radio onClick={handleRadioChange} />} label="Last Telemetry"/>
+          </RadioGroup>
+          {
+            /*<Checkbox
             propName={'animalLifetime'}
             label={ExportStrings.checkboxLabel}
             initialValue={selectedLifetime}
             changeHandler={() => setSelectedLifetime((o) => !o)}
-          />
+          />*/
+        }
         </Box>
       </Box>
     );
@@ -240,9 +265,10 @@ export default function ExportPageV2(): JSX.Element {
         critterIDs={critterIDs}
         collarIDs={collarIDs}
         postGISstrings={currentGeometry}
+        lastTelemetryOnly={exportRangeType === 'last_telemetry'}
         range={{
-          start: selectedLifetime ? dayjs('1970-01-01') : start,
-          end: selectedLifetime ? dayjs() : end
+          start: exportRangeType !== 'date_range' ? dayjs('1970-01-01') : start,
+          end: exportRangeType !== 'date_range' ? dayjs() : end
         }}></ExportDownloadModal>
     </ManageLayout>
   );
