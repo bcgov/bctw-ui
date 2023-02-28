@@ -65,7 +65,7 @@ export default function DetailedAnimalView({detailAnimal, height}: DetailedAnima
     <Paper className={styles.paper}>
         <SimpleMap 
         height={height}
-        animal={detailAnimal}
+        critter_id={detailAnimal.critter_id}
         startDate={detailAnimal ? detailAnimal.attachment_start : null}
         endDate={detailAnimal ? detailAnimal.attachment_end : null}
         />

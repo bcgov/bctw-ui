@@ -12,7 +12,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import { formatDay } from 'utils/time';
 
 interface SimpleMapProps {
-    animal?: AttachedAnimal;
+    critter_id?: string;
     height: string;
     startDate?: Dayjs;
     endDate?: Dayjs;
@@ -26,9 +26,8 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-export default function SimpleMap({animal, height, startDate, endDate}: SimpleMapProps): JSX.Element {
-    const [detailAnimal, setDetailAnimal] = useState<AttachedAnimal>(animal);
-    
+export default function SimpleMap({critter_id, height, startDate, endDate}: SimpleMapProps): JSX.Element {
+    //const [detailAnimal, setDetailAnimal] = useState<string>(animal);
     const mapRef = useRef<L.Map>(null);
     const api = useTelemetryApi();
     const drawnItems = new L.FeatureGroup();
@@ -48,8 +47,8 @@ export default function SimpleMap({animal, height, startDate, endDate}: SimpleMa
     } = api.usePingsPerCritter(
         startDate.isValid() ? startDate.format(formatDay) : '1980-01-01',//detailAnimal?.attachment_start ? detailAnimal.attachment_start.format(formatDay) : null, 
         endDate.isValid() ? endDate.format(formatDay) : dayjs().format(formatDay),//detailAnimal?.attachment_end ? detailAnimal.attachment_end.format(formatDay) : null, 
-        detailAnimal?.critter_id, 
-        detailAnimal !== null
+        critter_id, 
+        critter_id !== null
       );
   
     const {
@@ -59,8 +58,8 @@ export default function SimpleMap({animal, height, startDate, endDate}: SimpleMa
     } = api.useTracksPerCritter(
         startDate.isValid() ? startDate.format(formatDay) : '1980-01-01',//detailAnimal?.attachment_start ? detailAnimal.attachment_start.format(formatDay) : null, 
         endDate.isValid() ? endDate.format(formatDay) : dayjs().format(formatDay),//detailAnimal?.attachment_end ? detailAnimal.attachment_end.format(formatDay) : null, 
-        detailAnimal?.critter_id, 
-        detailAnimal !== null
+        critter_id, 
+        critter_id !== null
     );
   
     const flyToLatestPings = (pings: ITelemetryPoint[]) => {
@@ -85,7 +84,7 @@ export default function SimpleMap({animal, height, startDate, endDate}: SimpleMa
   
     useEffect(() => {
       const update = (): void => {
-        if (fetchedPings && !isErrorPings && detailAnimal) {
+        if (fetchedPings && !isErrorPings && critter_id) {
           pingsLayer.clearLayers();
           latestPingsLayer.clearLayers();
           setupPingOptions(pingsLayer, handlePointClick, handlePointClose, getFillColorByDeviceStatus);
@@ -109,7 +108,7 @@ export default function SimpleMap({animal, height, startDate, endDate}: SimpleMa
     }, [fetchedPings]);
   
     useEffect(() => {
-      if (fetchedTracks && !isErrorTracks && detailAnimal) {
+      if (fetchedTracks && !isErrorTracks && critter_id) {
         tracksLayer.clearLayers();
         setupTracksOptions(tracksLayer);
         const crittersTracks = fetchedTracks;
@@ -134,6 +133,7 @@ export default function SimpleMap({animal, height, startDate, endDate}: SimpleMa
             marker: false,
             polyline: false
           };
+
           initMap(
             mapRef,
             drawnItems,
@@ -155,12 +155,12 @@ export default function SimpleMap({animal, height, startDate, endDate}: SimpleMa
           }
         }
       };
-      if(detailAnimal)
+      if(critter_id)
       {
         updateComponent();
       }
   
-    }, [detailAnimal]);
+    }, [critter_id]);
 
     return (
     <Box height={height}>
