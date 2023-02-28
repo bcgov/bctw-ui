@@ -34,7 +34,7 @@ import {
 } from 'api/api_interfaces';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { BCTWType } from 'types/common_types';
-import { ExportQueryParams } from 'types/export';
+import { ExportAllParams, ExportQueryParams } from 'types/export';
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { ITelemetryPoint, ITelemetryLine } from 'types/map';
 import {
@@ -433,8 +433,8 @@ export const useTelemetryApi = () => {
     return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
   };
 
-  const useExportAll = (config: UseMutationOptions<string[], AxiosError, unknown>): UseMutationResult<string[]> => {
-    return useMutation<string[], AxiosError, unknown>((body) => bulkApi.getAllExportData(body), config);
+  const useExportAll = (config: UseMutationOptions<string[], AxiosError, ExportAllParams>): UseMutationResult<string[]> => {
+    return useMutation<string[], AxiosError, ExportAllParams>((body) => bulkApi.getAllExportData(body), config);
   };
 
   /**

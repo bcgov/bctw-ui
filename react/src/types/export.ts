@@ -14,6 +14,21 @@ interface ExportQueryParams {
   range?: MapRange;
 }
 
+interface ExportQuery {
+  key: string,
+  operator: string,
+  term: string[]
+}
+
+interface ExportAllParams {
+  queries: ExportQuery[];
+  range: MapRange;
+  polygons: string[];
+  lastTelemetryOnly: boolean;
+  attachedOnly: boolean;
+}
+
 export type {
-  ExportQueryParams
+  ExportQueryParams,
+  ExportAllParams
 }

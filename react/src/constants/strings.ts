@@ -316,7 +316,10 @@ const ExportStrings = {
     csvButtonLoad: 'Exporting CSV...',
     kmlButton: 'Export Data as KML',
     kmlButtonLoad: 'Exporting KML...'
-  }
+  },
+  allTelemetryButton: 'All Telemetry',
+  mostRecentTelemetryButton: 'Last Known Location',
+  attachedAnimalsOnlyCheck: 'Ongoing Deployments Only'
 };
 
 const ImportStrings = {

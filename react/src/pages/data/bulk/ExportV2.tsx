@@ -93,6 +93,7 @@ export default function ExportPageV2(): JSX.Element {
   //const [selectedLifetime, setSelectedLifetime] = useState(false);
   const [exportRangeType, setExportRangeType] = useState<ExportRangeType>('date_range');
   const [currentGeometry, setCurrentGeometry] = useState<string[]>([]);
+  const [attachedOnly, setAttachedOnly] = useState<boolean>(false);
 
   const handleDrawShape = (features: L.FeatureGroup): void => {
     const clipper = features.toGeoJSON() as FeatureCollection;
@@ -173,17 +174,17 @@ export default function ExportPageV2(): JSX.Element {
             name="export-radio"
             value={exportRangeType}
           >
-            <FormControlLabel value='lifetime' control={<Radio onClick={handleRadioChange}/>} label="All Telemetry"/>
-            <FormControlLabel value='last_telemetry' control={<Radio onClick={handleRadioChange} />} label="Last Telemetry"/>
+            <FormControlLabel 
+              value='lifetime' 
+              control={<Radio onClick={handleRadioChange}/>} 
+              label={ExportStrings.allTelemetryButton}
+            />
+            <FormControlLabel 
+              value='last_telemetry' 
+              control={<Radio onClick={handleRadioChange} />} 
+              label={ExportStrings.mostRecentTelemetryButton}
+            />
           </RadioGroup>
-          {
-            /*<Checkbox
-            propName={'animalLifetime'}
-            label={ExportStrings.checkboxLabel}
-            initialValue={selectedLifetime}
-            changeHandler={() => setSelectedLifetime((o) => !o)}
-          />*/
-        }
         </Box>
       </Box>
     );
@@ -217,6 +218,12 @@ export default function ExportPageV2(): JSX.Element {
     return (
       <Box>
         {datePicker()}
+        <Checkbox 
+          propName={'attached-only-checkbox'}
+          label={ExportStrings.attachedAnimalsOnlyCheck} 
+          initialValue={false} 
+          changeHandler={() => setAttachedOnly(!attachedOnly)}        
+        />
         <Box className={styles.queryRegionBox}>
           <SubHeader dark size='small' text={ExportStrings.queryBuilderHeader} />
           <Box pt={2}>
@@ -266,6 +273,7 @@ export default function ExportPageV2(): JSX.Element {
         collarIDs={collarIDs}
         postGISstrings={currentGeometry}
         lastTelemetryOnly={exportRangeType === 'last_telemetry'}
+        attachedOnly={attachedOnly}
         range={{
           start: exportRangeType !== 'date_range' ? dayjs('1970-01-01') : start,
           end: exportRangeType !== 'date_range' ? dayjs() : end

@@ -16,6 +16,7 @@ import { AxiosError } from 'axios';
 import { formatAxiosError } from 'utils/errors';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { ExportStrings as constants, ExportStrings } from 'constants/strings';
+import { ExportAllParams } from 'types/export';
 
 type ExportModalProps = ModalBaseProps & {
   rowEntries: IFormRowEntry[];
@@ -26,6 +27,7 @@ type ExportModalProps = ModalBaseProps & {
   critterIDs?: string[];
   children?: React.ReactNode;
   lastTelemetryOnly: boolean;
+  attachedOnly: boolean;
 };
 
 enum DownloadType {
@@ -67,7 +69,8 @@ export default function ExportDownloadModal({
   collarIDs,
   critterIDs,
   postGISstrings,
-  lastTelemetryOnly
+  lastTelemetryOnly,
+  attachedOnly
 }: ExportModalProps): JSX.Element {
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
@@ -151,7 +154,7 @@ export default function ExportDownloadModal({
   });
 
   const handleAdvancedExport = (): void => {
-    const body = { queries: [], range: {}, polygons: [], lastTelemetryOnly: lastTelemetryOnly };
+    const body: ExportAllParams = { queries: [], range: {start: null, end: null}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: attachedOnly };
     for (const row of rowEntries) {
       body.queries.push({
         key: row.column,
@@ -172,7 +175,7 @@ export default function ExportDownloadModal({
   };
 
   const handleSimpleExport = (): void => {
-    const body = { queries: [], range: {}, polygons: [], lastTelemetryOnly: lastTelemetryOnly };
+    const body = { queries: [], range: {}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: false };
     body.queries = [{ key: 'critter_id', operator: '=', term: critterIDs }];
     body.range = {
       start: range.start.format(formatDay),
