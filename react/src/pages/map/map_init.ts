@@ -149,9 +149,16 @@ const initMap = (
   handleDeleteLine: () => void,
   handleDeleteLayer?: (layers: L.LayerGroup) => void,
   drawToolOptions?: L.Control.DrawOptions,
-  drawToolDisable?: boolean
+  drawToolDisable?: boolean,
+  divID?: string
 ): void => {
-  mapRef.current = L.map('map', { zoomControl: true }).setView([55, -128], 6);
+  const DIV_ID = divID ?? 'map';
+  const container = L.DomUtil.get(DIV_ID);
+  if (container) {
+    container['_leaflet_id'] = null;
+  }
+  mapRef.current = L.map(DIV_ID, { zoomControl: true }).setView([55, -128], 6);
+  console.log('initMap: ' + DIV_ID);
   const layerPicker = L.control.layers(null, null, { position: 'topleft' });
   L.drawLocal.draw.toolbar.buttons.polyline = MapStrings.drawLineLabel;
   L.drawLocal.draw.toolbar.buttons.polygon = MapStrings.drawPolygonLabel;

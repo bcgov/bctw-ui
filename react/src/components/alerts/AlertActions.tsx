@@ -4,7 +4,7 @@ import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'ty
 import { AlertContext } from 'contexts/UserAlertContext';
 import { TableRow, TableCell, TableBody, Table, Box, TableContainer, Paper } from '@mui/material';
 import { formatT } from 'utils/time';
-import { Icon, Tooltip } from 'components/common';
+import { Icon, Modal, Tooltip } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { UserAlertStrings } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -20,6 +20,7 @@ import { InfoBanner, NotificationBanner } from 'components/alerts/Banner';
 import { FormatAlert } from 'components/alerts/FormatAlert';
 import MapModal from 'components/modal/MapModal';
 import dayjs from 'dayjs';
+import SimpleMap from 'components/common/SimpleMap';
 // import { UserContext } from 'contexts/UserContext';
 // import { eCritterPermission } from 'types/permission';
 
@@ -307,15 +308,16 @@ export default function AlertActions({ alert, showActions }: AlertActionsProps):
         )}
       </Box> */}
 
-      <MapModal
-        open={openMap}
-        handleClose={() => setOpenMap(false)}
-        width={'600px'}
-        height={'500px'}
-        startDate={alert.valid_from?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks')}
-        endDate={alert.valid_from ?? dayjs()}
-        critter_id={alert.critter_id}
-      />
+      <Modal open={openMap} handleClose={() => setOpenMap(false)}>
+        <SimpleMap
+          divID={'alertMap'}
+          height={'500px'}
+          width={'500px'}
+          startDate={alert.valid_from?.subtract(24, 'weeks') ?? dayjs().subtract(24, 'weeks')}
+          endDate={alert.valid_from ?? dayjs()}
+          critter_id={alert.critter_id}
+        />
+      </Modal>
       <ConfirmModal
         handleClickYes={handleConfirmSnooze}
         handleClose={(): void => setShowSnoozeModal(false)}
