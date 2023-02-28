@@ -66,7 +66,8 @@ export default function ExportDownloadModal({
   exportType,
   collarIDs,
   critterIDs,
-  postGISstrings
+  postGISstrings,
+  lastTelemetryOnly
 }: ExportModalProps): JSX.Element {
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
@@ -150,7 +151,7 @@ export default function ExportDownloadModal({
   });
 
   const handleAdvancedExport = (): void => {
-    const body = { queries: [], range: {}, polygons: [] };
+    const body = { queries: [], range: {}, polygons: [], lastTelemetryOnly: lastTelemetryOnly };
     for (const row of rowEntries) {
       body.queries.push({
         key: row.column,
@@ -171,7 +172,7 @@ export default function ExportDownloadModal({
   };
 
   const handleSimpleExport = (): void => {
-    const body = { queries: [], range: {}, polygons: [] };
+    const body = { queries: [], range: {}, polygons: [], lastTelemetryOnly: lastTelemetryOnly };
     body.queries = [{ key: 'critter_id', operator: '=', term: critterIDs }];
     body.range = {
       start: range.start.format(formatDay),
