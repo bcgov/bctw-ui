@@ -55,7 +55,6 @@ export default function PickCritterPermissionModal({
   const [user, setUser] = useState<User>(userToLoad ?? useUser.user);
   // table row selected state
   const [critterIDs, setCritterIDs] = useState<string[]>([]);
-  const [canSave, setCanSave] = useState(false);
 
   const [triggerReset, setTriggerReset] = useState(0);
   /**
@@ -68,6 +67,8 @@ export default function PickCritterPermissionModal({
    * depends on the user role - admin vs critter manager
    */
   const [permissionsAccessible, setPermissionsAccessible] = useState<eCritterPermission[]>([]);
+
+  const canSave = showSelectPermission && Object.values(access).filter((a) => a.wasSelected);
 
   // if a user is not passed in as a prop, default the state to the current user
   useEffect(() => {
@@ -155,7 +156,6 @@ export default function PickCritterPermissionModal({
 
   const beforeClose = (): void => {
     setCritterIDs([]);
-    setCanSave(false);
     handleClose(false);
   };
 
@@ -164,13 +164,12 @@ export default function PickCritterPermissionModal({
    * allows the user to select a permission type for the animal row
    * fixme: using a hook in this component triggers hook error in datatable
    */
-  const NewColumn = (row: UserCritterAccess): JSX.Element => {
+  const NewColumn = (row: UserCritterAccess, idx: number, isSelected: boolean): JSX.Element => {
     const hasAccess = access[row.critter_id];
     // set default in this order
     const defaultPermission = hasAccess?.permission_type ?? row?.permission_type ?? eCritterPermission.observer;
     // show an error if the select isn't filled out but the row is selected
     const isError = !hasAccess ? false : critterIDs.includes(hasAccess.critter_id) && !hasAccess.wasSelected;
-    const [perm, setPerm] = useState(defaultPermission);
 
     return (
       <Select
@@ -178,10 +177,14 @@ export default function PickCritterPermissionModal({
         //error={isError}
         size='small'
         value={defaultPermission}
-        disabled={!critterIDs.includes(row.critter_id)}
+        disabled={!isSelected}
         sx={{ minWidth: 120 }}
         // dont propagate the event to the row selected handler
-        //onClick={(event): void => event.stopPropagation()}
+        // onClick={(event): void => {
+        //   if (isSelected) {
+        //     event.stopPropagation();
+        //   }
+        // }}
         // onChange={(e) => {
         //   const permission = e.target.value as eCritterPermission;
         //   //setPerm(permission);

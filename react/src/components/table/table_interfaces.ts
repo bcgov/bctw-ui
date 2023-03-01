@@ -38,7 +38,7 @@ interface ITableQueryProps<T> {
 
 interface ICustomTableColumn<T> {
   header: JSX.Element;
-  column: (row: T, idx: number) => JSX.Element;
+  column: (row: T, idx: number, isSelected?: boolean) => JSX.Element;
   prepend?: boolean;
 }
 

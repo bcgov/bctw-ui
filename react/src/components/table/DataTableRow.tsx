@@ -86,7 +86,7 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
 
   const mapCustomColumns = (c: ICustomTableColumn<T>[]): JSX.Element[] => {
     return c.map((c: ICustomTableColumn<T>) => {
-      const Col = c.column(row, index);
+      const Col = c.column(row, index, isSelectedStatus);
       return (
         <TableCell key={`add-col-${index}`} onClick={triggerUpdate}>
           {Col}

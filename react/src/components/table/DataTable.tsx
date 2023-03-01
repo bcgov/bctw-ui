@@ -72,6 +72,8 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const isMultiSelect = isFunction(onSelectMultiple);
 
+  const triggerMultiUpdate = isMultiSelect && JSON.stringify(selectedRows);
+
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
     requestDataByPage ? page : null,
@@ -203,7 +205,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         ))}
       </>
     );
-  }, [perPage, selectAll, JSON.stringify(selectedRows)]);
+  }, [perPage, selectAll, triggerMultiUpdate]);
 
   return (
     <TableContainer
