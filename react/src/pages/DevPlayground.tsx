@@ -42,20 +42,17 @@ import { columnToHeader } from 'utils/common_helpers';
 
 // Place constants here
 const mockLocationEvent = new LocationEvent(
-  'mortality',   // location_type parameter
-  dayjs(),       // date parameter
-  false,         // disable_date parameter
-  eLocationPositionType.utm, // coordinate_type parameter
+  'mortality', // location_type parameter
+  dayjs(), // date parameter
+  true, // disable_date parameter
+  eLocationPositionType.utm // coordinate_type parameter
 );
-
-// Now you can modify the properties of the mockLocationEvent object as needed for your test case.
 mockLocationEvent.comment = 'test comment';
 mockLocationEvent.latitude = 42.12345;
 mockLocationEvent.longitude = -71.98765;
 mockLocationEvent.utm_easting = 123456;
-mockLocationEvent.utm_northing = 654321;
+mockLocationEvent.utm_northing = 6543210;
 mockLocationEvent.utm_zone = 18;
-
 
 const mockMortalityEvent: Partial<MortalityEvent> = {
   critter_id: '123456',
@@ -63,7 +60,9 @@ const mockMortalityEvent: Partial<MortalityEvent> = {
   wlh_id: '345678',
   species: 'Caribou',
   device_id: 314159,
-  device_make: '',
+  device_make: 'Lotek',
+  retrieval_date: dayjs(),
+  location_event: mockLocationEvent,
   formatPropAsHeader(s: keyof MortalityEvent): string {
     switch (s) {
       case 'attachment_start':
@@ -97,11 +96,11 @@ const mockMortalityEvent: Partial<MortalityEvent> = {
   }
 };
 
-
-
 const TAB_LIST = ['Report an Animal Mortality', 'Remove a Device from an Animal'];
-const TAB_CAPTIONS = ['You are about to report the following animal as deceased. Please confirm that these details are correct and make necessary edits before proceeding.', 
-                      'You are about to end the following animal-device deployment. Please confirm that these details are correct and make necessary edits before removing the device.'];
+const TAB_CAPTIONS = [
+  'You are about to report the following animal as deceased. Please confirm that these details are correct and make necessary edits before proceeding.',
+  'You are about to end the following animal-device deployment. Please confirm that these details are correct and make necessary edits before removing the device.'
+];
 const TAB_EVENTS = [mockMortalityEvent, null];
 
 /**
@@ -127,8 +126,11 @@ const DevPlayground = (): JSX.Element => {
           <>
             <h2>{TAB_LIST[tab]}</h2>
             <p>{TAB_CAPTIONS[tab]}</p>
-            {!tab   ? <MortalityEventFormNew event={TAB_EVENTS[tab]} handleFormChange={null}/>
-                    : <p>remove device form goes here...</p>}
+            {!tab ? (
+              <MortalityEventFormNew event={TAB_EVENTS[tab]} handleFormChange={null} />
+            ) : (
+              <p>remove device form goes here...</p>
+            )}
           </>
         </TempComponent>
         {/* <Box sx={{ pr: 2 }}>

@@ -19,6 +19,7 @@ type LocationEventProps = {
   children?: ReactNode;
   childNextToDate?: ReactNode;
   disabled?: boolean;
+  showComment?: boolean;
 };
 
 export default function LocationEventForm({
@@ -26,7 +27,8 @@ export default function LocationEventForm({
   notifyChange,
   children,
   childNextToDate,
-  disabled = false
+  disabled = false,
+  showComment = true
 }: LocationEventProps): JSX.Element {
   const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
 
@@ -83,7 +85,8 @@ export default function LocationEventForm({
         changeHandler={changeCoordinateType}
         values={[
           { value: 'utm', disabled, label: WorkflowStrings.location.coordTypeUTM },
-          { value: 'coord', disabled, label: WorkflowStrings.location.coordTypeLatLong }
+          { value: 'coord', disabled, label: WorkflowStrings.location.coordTypeLatLong },
+          { value: 'albers', disabled, label: 'BC Albers' }
         ]}
       />
       <Box>
@@ -124,19 +127,21 @@ export default function LocationEventForm({
           </>
         )}
       </Box>
-      <Box marginTop={1}>
-        <TextField
-          style={{ width: '100%' }}
-          multiline={true}
-          rows={1}
-          key={commentField.prop}
-          propName={commentField.prop}
-          defaultValue={event.comment}
-          label={event.formatPropAsHeader(commentField.prop)}
-          disabled={disabled}
-          changeHandler={changeHandler}
-        />
-      </Box>
+      {showComment ? (
+        <Box marginTop={1}>
+          <TextField
+            style={{ width: '100%' }}
+            multiline={true}
+            rows={1}
+            key={commentField.prop}
+            propName={commentField.prop}
+            defaultValue={event.comment}
+            label={event.formatPropAsHeader(commentField.prop)}
+            disabled={disabled}
+            changeHandler={changeHandler}
+          />
+        </Box>
+      ) : null}
     </>
   );
 }
