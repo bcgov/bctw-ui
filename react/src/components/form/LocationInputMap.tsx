@@ -20,19 +20,13 @@ export default function LocationInputMap(props: ILocationInputMapProps): JSX.Ele
 
   const mapRef = useRef<L.Map>(null);
   const markerRef = useRef<L.FeatureGroup>(null);
+  const draggingRef = useRef<boolean>(false);
 
-  const [location, setLocation] = useState(['', '', '']);
+  const [location, setLocation] = useState(['', '']);
   const [radius, setRadius] = useState<number>(10000);
   const Labels = ['Latitude', 'Longitude', 'Uncertainty'];
 
-  // const updateMarker = (coords: L.LatLng) => {
-  //   if (markerRef.current) {
-  //     markerRef.current.clearLayers(); // remove old marker
-  //   }
-  //   new L.Circle(coords, { radius }).addTo(markerRef.current); // add new marker
-  // };
-
-  //WORKS, BUT NOT WELL
+  //Fix me: clicking to make new circle is broken after resizing a circle
   const updateMarker = (coords: L.LatLng) => {
     if (markerRef.current) {
       markerRef.current.clearLayers(); // remove old marker
@@ -41,37 +35,53 @@ export default function LocationInputMap(props: ILocationInputMapProps): JSX.Ele
     const circle = new L.Circle(coords, { radius });
     circle.addTo(markerRef.current); // add new marker
 
-    let isDragging = false;
+    //let isDragging = false;
     let dragStartPoint: L.LatLng | null = null;
 
     circle.on('mousedown', (event: L.LeafletEvent | any) => {
       console.log('mousedown');
-      isDragging = true;
+      //isDragging = true;
+      draggingRef.current = true;
       dragStartPoint = event.latlng;
       mapRef.current?.dragging.disable(); // disable map dragging while dragging circle
       L.DomEvent.stopPropagation(event); // stop event propagation to prevent map click
-    });
-
-    circle.on('mousemove', (event: L.LeafletEvent | any) => {
-      console.log('mousemove');
-      if (isDragging && dragStartPoint) {
-        const distance = 1.2 * circle.getLatLng().distanceTo(event.latlng);
+      mapRef.current.on('mousemove', function (e: any) {
+        const distance = circle.getLatLng().distanceTo(e.latlng);
         setRadius(distance);
         circle.setRadius(distance);
-      }
+      });
     });
 
-    circle.on('mouseup', () => {
-      console.log('mouseup');
-      isDragging = false;
-      dragStartPoint = null;
+    mapRef.current.on('mouseup', function (e) {
+      mapRef.current.removeEventListener('mousemove');
       mapRef.current?.dragging.enable(); // re-enable map dragging after dragging circle
+      dragStartPoint = null;
     });
+
+    // circle.on('mousemove', (event: L.LeafletEvent | any) => {
+    //   console.log('mousemove');
+    //   if (draggingRef.current && dragStartPoint) {
+    //     const distance = 1.2 * circle.getLatLng().distanceTo(event.latlng);
+    //     setRadius(distance);
+    //     circle.setRadius(distance);
+    //   }
+    // });
+
+    // circle.on('mouseup', () => {
+    //   console.log('mouseup');
+    //   // isDragging = false;
+    //   draggingRef.current = false;
+    //   dragStartPoint = null;
+    //   mapRef.current?.dragging.enable(); // re-enable map dragging after dragging circle
+    // });
   };
 
   const handleMapClick = (event: L.LeafletEvent | any) => {
-    setLocation([event.latlng.lat, event.latlng.lng, '']);
-    updateMarker(event.latlng);
+    if (!draggingRef.current) {
+      console.log('mapClick');
+      setLocation([event.latlng.lat, event.latlng.lng]);
+      updateMarker(event.latlng);
+    }
   };
 
   useEffect(() => {
@@ -122,10 +132,9 @@ export default function LocationInputMap(props: ILocationInputMapProps): JSX.Ele
           <TextField
             {...baseInputProps}
             style={{ ...baseInputStyle }}
-            value={location[idx]}
+            value={idx === 2 ? radius : location[idx]}
             className={styles.button}
             label={label}
-            error={Number.isNaN(Number(location[idx]))}
             onChange={(o) => {}}
             defaultValue={'' + location[idx]}
           />
