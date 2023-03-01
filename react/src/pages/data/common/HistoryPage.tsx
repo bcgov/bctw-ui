@@ -9,19 +9,17 @@ export type IHistoryPageProps<T> = ITableQueryProps<T> & {
 export default function HistoryPage<T extends BCTWBase<T>>(props: IHistoryPageProps<T>): JSX.Element {
   const { query, param, propsToDisplay } = props;
 
-  const defaultSort: ITableSortProp<T> = { property: 'valid_to', order: 'desc' }
+  const defaultSort: ITableSortProp<T> = { property: 'valid_to', order: 'desc' };
 
   const tblProps = {
     query,
     param,
     defaultSort
-  }
+  };
 
   if (!props.query) {
     return <div>no history to display.</div>;
   }
 
-  return (
-    <DataTable headers={propsToDisplay} queryProps={tblProps} showValidRecord={true}/>
-  );
+  return <DataTable headers={propsToDisplay} queryProps={tblProps} />;
 }

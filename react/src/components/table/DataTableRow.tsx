@@ -14,6 +14,7 @@ type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' 
   rowIdentifier: string;
   key?: number | string;
   setSelectedRows: React.Dispatch<React.SetStateAction<T[]>>;
+  selectedRows: T[];
 };
 
 export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowProps<T>) {
@@ -21,10 +22,15 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
     props;
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const [isSelectedStatus, setSelectedStatus] = useState(false);
+  const [updateRow, setUpdateRow] = useState(false);
 
   const isMulti = isFunction(onSelectMultiple);
   const isSingle = isFunction(onSelect);
   const isDispatch = isFunction(dispatchRowSelected);
+
+  const triggerUpdate = () => {
+    setUpdateRow((u) => !u);
+  };
 
   useDidMountEffect(() => {
     setSelectedStatus(selected);
@@ -75,15 +81,19 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
     setSelectedStatus((s) => !s);
   };
 
-  const customColumnsAppend = customColumns?.filter(c => !c.prepend)
-  const customColumnsPrepend = customColumns?.filter(c => c.prepend);
+  const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
+  const customColumnsPrepend = customColumns?.filter((c) => c.prepend);
 
   const mapCustomColumns = (c: ICustomTableColumn<T>[]): JSX.Element[] => {
     return c.map((c: ICustomTableColumn<T>) => {
       const Col = c.column(row, index);
-      return <TableCell key={`add-col-${index}`}>{Col}</TableCell>;
-    })
-  }
+      return (
+        <TableCell key={`add-col-${index}`} onClick={triggerUpdate}>
+          {Col}
+        </TableCell>
+      );
+    });
+  };
 
   return (
     <ClickAwayListener onClickAway={() => handleClickAway()}>

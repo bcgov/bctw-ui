@@ -56,7 +56,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     requestDataByPage = false,
     paginationFooter = true,
     isMultiSearch = false,
-    showValidRecord = false,
     alreadySelected = [],
     customColumns = []
   } = props;
@@ -65,17 +64,13 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
-  //const [selected, setSelected] = useState<string[]>(alreadySelected);
   const [rowIdentifier, setRowIdentifier] = useState('id');
   const [selectedRows, setSelectedRows] = useState<T[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [page, setPage] = useState(0);
   const [totalRows, setTotalRows] = useState<number>(0);
-  //console.log(`table: ${selectedRows.length}`);
 
-  useEffect(() => {
-    console.log(`table: ${selectedRows.length}`);
-  }, [JSON.stringify(selectedRows)]);
+  const isMultiSelect = isFunction(onSelectMultiple);
 
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
@@ -92,20 +87,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
    * this state is passed to the parent select handlers
    */
   const [values, setValues] = useState<T[]>([]);
-
-  // useEffect(() => {
-  //   setSelected([]);
-  // }, [resetSelections]);
-
-  // if a row is selected in a different table, unselect all rows in this table
-  useDidMountEffect(() => {
-    if (useRowState && data?.length) {
-      const found = data.findIndex((p) => p[rowIdentifier] === useRowState);
-      if (found === -1) {
-        //setSelected([]);
-      }
-    }
-  }, [useRowState]);
 
   useDidMountEffect(() => {
     if (deleted) {
@@ -189,21 +170,21 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectAll(event.target.checked);
-    //setSelectedIndexes(perPage.map((r, i) => i));
   };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, p: number): void => {
-    // TablePagination is zero index. Adding 1 fixes second page results from not refreshing.
     setPage(p);
     setSelectAll(false);
+    //setSelectedRows([]);
+    //setSelectedRows([]);
   };
 
   const handleFilter = (filter: ITableFilter): void => {
     setFilter(filter);
   };
 
-  const customColumnsAppend = customColumns?.filter(c => !c.prepend)
-  const customColumnsPrepend = customColumns?.filter(c => c.prepend);
+  const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
+  const customColumnsPrepend = customColumns?.filter((c) => c.prepend);
 
   const memoRows = useMemo(() => {
     return (
@@ -214,14 +195,15 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             key={`table-row-${idx}`}
             index={idx}
             row={obj}
-            selected={selectAll || (showValidRecord && !formatTableCell(obj, 'valid_to').value)}
+            selected={selectAll}
             rowIdentifier={rowIdentifier}
             setSelectedRows={setSelectedRows}
+            selectedRows={selectedRows}
           />
         ))}
       </>
     );
-  }, [perPage, selectAll]);
+  }, [perPage, selectAll, JSON.stringify(selectedRows)]);
 
   return (
     <TableContainer
@@ -234,7 +216,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           filterableProperties={headers}
           isMultiSearch={isMultiSearch}
           setPage={setPage}
-          showTooltip={showValidRecord}
+          //showTooltip={showValidRecord}
           disableSearch={disableSearch}
           sibling={<>{exporter}</>}
         />

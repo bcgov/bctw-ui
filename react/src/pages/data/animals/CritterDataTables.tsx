@@ -25,7 +25,7 @@ import { buttonProps } from 'components/component_constants';
 import { Tooltip } from 'components/common';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
 
-export const CritterDataTables = ({detailViewAction}): JSX.Element => {
+export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
   const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedAnimal[]>([]);
   const [animalData, setAnimalData] = useState<Animal[]>([]);
@@ -44,7 +44,7 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
   const handleSelect = <T extends Animal>(row: T): void => {
     //setEditObj(row);
     detailViewAction(row);
-  }
+  };
   const handleSelectTemp = <T extends Animal>(row: T[]): void => setEditObj(row.length ? row[0] : new AttachedAnimal());
   //const lastDt = editObj?.last_transmission_date;
 
@@ -67,17 +67,15 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
   };
 
   const Status = (row: AttachedAnimal, idx: number): JSX.Element => {
-    if(row.last_fetch_date.isValid()) {
+    if (row.last_fetch_date.isValid()) {
       return (
-      <Tooltip title="BCTW is receiving telemetry for this animal's device">
-        <Icon size={1.5} icon='signal'></Icon>
-      </Tooltip>
+        <Tooltip title="BCTW is receiving telemetry for this animal's device">
+          <Icon size={1.5} icon='signal'></Icon>
+        </Tooltip>
       );
     }
-    else {
-      return (<></>);
-    }
-  }
+    return null;
+  };
 
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
@@ -129,7 +127,7 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
         }
         onOpen={() => {
           setEditObj(row);
-        } }
+        }}
       />
     );
   };
@@ -137,10 +135,6 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
   const handleAddAnimal = (): void => {
     setOpenAddAnimal((a) => !a);
   };
-
-  // const handleSelectMultiple = (rows: T[]) => {
-  //   console.log();
-  // };
 
   return (
     <RowSelectedProvider>
@@ -153,17 +147,14 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
               query: api.useAssignedCritters,
               onNewData: (data: AttachedAnimal[]) => setAttachedAnimalData(data)
             }}
-            //disableHighlightOnSelect
-            //onSelectMultiple={() => console.log('hi')}
             onSelect={handleSelect}
-            //onSelectTemp={handleSelectTemp}
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
-            customColumns={[{ column: Menu, header: <b>Actions</b>}, {column: Status, header: <p>Status</p>, prepend: true} ]}
-            //allRecords
-            //isMultiSelect={true}
-            paginationFooter={true}
+            customColumns={[
+              { column: Menu, header: <b>Actions</b> },
+              { column: Status, header: <p>Status</p>, prepend: true }
+            ]}
             exporter={
               <>
                 <ExportViewer<AttachedAnimal>
@@ -178,8 +169,6 @@ export const CritterDataTables = ({detailViewAction}): JSX.Element => {
         <Box mb={4}>
           <DataTable
             headers={new Animal().displayProps}
-            //title={CS.unassignedTableTitle}
-            //disableHighlightOnSelect
             queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Animal[]) => setAnimalData(data) }}
             onSelect={() => {}}
             updated={updated}

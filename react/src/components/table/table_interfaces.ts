@@ -68,18 +68,16 @@ type ConditionalOnSelect<T> =
  * @param queryProps which query to use - see @type {ITableQuery}
  * @param onSelectMultiple parent handler triggered when a row is checked if @param isMultiSelect
  * @param deleted notify the datatable that a row with this identifier has been removed
+ * @param paginationFooter renders the pagination controls on the bottom of the table
+ * @param requestDataByPage paginates the request from the DB
  */
 type DataTableProps<T> = PlainTableProps<T> &
   ConditionalOnSelect<T> & {
     customColumns?: ICustomTableColumn<T>[];
-    //isMultiSelect?: boolean;
     isMultiSearch?: boolean;
-    showValidRecord?: boolean;
     alreadySelected?: string[];
     resetSelections?: number; //Placeholder to trigger reset
     queryProps: ITableQueryProps<T>;
-    //onSelectMultiple?: (rows: T[]) => void;
-    //onSelectTemp?: (rows: T[]) => void;
     deleted?: string;
     updated?: string;
     exporter?: JSX.Element;

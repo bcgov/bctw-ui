@@ -76,22 +76,22 @@ export default function PickCritterPermissionModal({
     setPermissionsAccessible(useUser?.user?.is_admin ? adminPermissionOptions : managerPermissionOptions);
   }, [userToLoad, useUser]);
 
-  // when the selected state changes, update the save button's disabled state
-  useDidMountEffect(() => {
-    if (showSelectPermission) {
-      // if the select dropdown is shown, user must have an option selected for the corresponding row to be able to save
-      // const selectedRows = Object.values(access).filter((a) => critterIDs.includes(a.critter_id) && a.wasSelected);
-      // if (critterIDs.length !== selectedRows.length) {
-      //   setCanSave(false);
-      //   return;
-      // }
-      const onlySelected = Object.values(access).filter((a) => a.wasSelected);
-      setCanSave(!!onlySelected.length);
-    }
+  // // when the selected state changes, update the save button's disabled state
+  // useDidMountEffect(() => {
+  //   if (showSelectPermission) {
+  //     // if the select dropdown is shown, user must have an option selected for the corresponding row to be able to save
+  //     // const selectedRows = Object.values(access).filter((a) => critterIDs.includes(a.critter_id) && a.wasSelected);
+  //     // if (critterIDs.length !== selectedRows.length) {
+  //     //   setCanSave(false);
+  //     //   return;
+  //     // }
+  //     const onlySelected = Object.values(access).filter((a) => a.wasSelected);
+  //     setCanSave(!!onlySelected.length);
+  //   }
 
-    // at least one row has to be selected
-    // setCanSave(!!critterIDs.length);
-  }, [critterIDs, access]);
+  //   // at least one row has to be selected
+  //   // setCanSave(!!critterIDs.length);
+  // }, [critterIDs, access]);
 
   // when the table query finishes - update the access state
   const onNewData = (rows: UserCritterAccess[]): void => {
@@ -170,17 +170,23 @@ export default function PickCritterPermissionModal({
     const defaultPermission = hasAccess?.permission_type ?? row?.permission_type ?? eCritterPermission.observer;
     // show an error if the select isn't filled out but the row is selected
     const isError = !hasAccess ? false : critterIDs.includes(hasAccess.critter_id) && !hasAccess.wasSelected;
+    const [perm, setPerm] = useState(defaultPermission);
 
     return (
       <Select
         required={true}
-        error={isError}
+        //error={isError}
         size='small'
         value={defaultPermission}
         disabled={!critterIDs.includes(row.critter_id)}
         sx={{ minWidth: 120 }}
         // dont propagate the event to the row selected handler
-        onClick={(event): void => event.stopPropagation()}
+        //onClick={(event): void => event.stopPropagation()}
+        // onChange={(e) => {
+        //   const permission = e.target.value as eCritterPermission;
+        //   //setPerm(permission);
+        //   //handleChange(permission);
+        // }}
         onChange={(v: SelectChangeEvent<eCritterPermission>): void => {
           const permission = v.target.value as eCritterPermission;
           setAccess((prevState) => {
