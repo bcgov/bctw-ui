@@ -56,7 +56,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     disableSearch,
     requestDataByPage = false,
     paginationFooter = false,
-    isMultiSearch = false,
     fullScreenHeight = false,
     alreadySelected = [],
     customColumns = []
@@ -223,7 +222,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           onChangeFilter={handleFilter}
           numSelected={selectedRows.length}
           filterableProperties={headers}
-          isMultiSearch={isMultiSearch}
+          isMultiSearch={isMultiSelect}
           setPage={setPage}
           //showTooltip={showValidRecord}
           disableSearch={disableSearch}

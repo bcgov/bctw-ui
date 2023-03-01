@@ -225,7 +225,7 @@ export default function PickCritterPermissionModal({
     <FullScreenDialog open={open} handleClose={beforeClose}>
       <Box py={1} px={4} className={classes.manageLayoutContent}>
         <DataTable
-          headers={UserCritterAccess.propsToDisplay}
+          headers={UserCritterAccess.animalManagerDisplayProps}
           title={title}
           queryProps={tableProps}
           onSelectMultiple={handleSelect}
