@@ -20,7 +20,8 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     rowCount,
     isMultiSelect,
     hiddenHeaders,
-    secondaryHeaders
+    secondaryHeaders,
+    showIndex
   } = props;
 
   // const handleChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean): void => {
@@ -63,7 +64,7 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
             ? customHeadersPrepend.map((header, idx): JSX.Element => {
                 return <TableCell key={`pre-h-${idx}`}>{header}</TableCell>;
               })
-          : null}
+            : null}
           {/* render the rest of the header row */}
           {createHeadCell(headerData, headersToDisplay).map((headCell: HeadCell<T>) => (
             <TableCell

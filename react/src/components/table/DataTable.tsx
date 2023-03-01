@@ -1,6 +1,7 @@
 import { mdiConsoleNetworkOutline } from '@mdi/js';
 import {
   Box,
+  Button,
   Checkbox,
   CircularProgress,
   ClickAwayListener,
@@ -54,8 +55,9 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     resetSelections,
     disableSearch,
     requestDataByPage = false,
-    paginationFooter = true,
+    paginationFooter = false,
     isMultiSearch = false,
+    fullScreenHeight = false,
     alreadySelected = [],
     customColumns = []
   } = props;
@@ -82,6 +84,11 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   );
   const noPagination = !requestDataByPage && !paginationFooter;
   const noData = isSuccess && !data?.length;
+
+  // const [filteredRowCount, setFilteredRowCount] = useState<number>(0);
+  // const [rowsPerPage, setRowsPerPage] = useState<number>(ROWS_PER_PAGE);
+
+  // const isPaginate = paginate && !DISABLE_PAGINATION;
 
   /**
    * since data is updated when the page is changed, use the 'values'
@@ -271,6 +278,16 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             />
           </Box>
         )}
+        {/* {isPaginate ? null : (
+          <Box>
+            <Divider />
+            {rowsPerPage === filteredRowCount ? (
+              <Button onClick={handleLoadPreview}>Display Only {ROWS_PER_PAGE} Results</Button>
+            ) : (
+              <Button onClick={handleLoadAll}>Display All {filteredRowCount} Results</Button>
+            )}
+          </Box>
+        )} */}
       </>
     </TableContainer>
   );

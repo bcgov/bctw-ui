@@ -84,6 +84,7 @@ type DataTableProps<T> = PlainTableProps<T> &
     disableSearch?: boolean;
     paginationFooter?: boolean;
     requestDataByPage?: boolean;
+    fullScreenHeight?: boolean;
   };
 
 /**
@@ -121,6 +122,7 @@ type TableHeadProps<T> = {
   selectAll?: boolean;
   hiddenHeaders?: (keyof T)[];
   secondaryHeaders?: (string | number | symbol)[];
+  showIndex?: boolean;
 };
 
 type FilterOperator = 'equals' | 'contains';

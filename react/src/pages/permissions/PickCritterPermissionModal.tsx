@@ -1,5 +1,6 @@
 import DataTable from 'components/table/DataTable';
 import { Button, Modal } from 'components/common';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { ModalBaseProps } from 'components/component_interfaces';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
@@ -12,9 +13,10 @@ import {
   managerPermissionOptions
 } from 'types/permission';
 import { User } from 'types/user';
-import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { Select, MenuItem, SelectChangeEvent, Box } from '@mui/material';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
+import { manageLayoutStyles } from 'pages/layouts/ManageLayout';
 
 type PickCritterProps = ModalBaseProps & {
   alreadySelected: string[];
@@ -23,6 +25,9 @@ type PickCritterProps = ModalBaseProps & {
   showSelectPermission?: boolean;
   userToLoad?: User;
   headersToShow?: string[];
+  headers?: (keyof UserCritterAccess)[];
+  paginate?: boolean;
+  allRecords?: boolean;
 };
 
 /**
@@ -48,7 +53,10 @@ export default function PickCritterPermissionModal({
   title,
   alreadySelected,
   showSelectPermission,
-  userToLoad
+  userToLoad,
+  headers = UserCritterAccess.propsToDisplay,
+  paginate = true,
+  allRecords = false
 }: PickCritterProps): JSX.Element {
   const useUser = useContext(UserContext);
   const api = useTelemetryApi();
@@ -69,6 +77,7 @@ export default function PickCritterPermissionModal({
   const [permissionsAccessible, setPermissionsAccessible] = useState<eCritterPermission[]>([]);
 
   const canSave = showSelectPermission && Object.values(access).filter((a) => a.wasSelected);
+  const classes = manageLayoutStyles();
 
   // if a user is not passed in as a prop, default the state to the current user
   useEffect(() => {
@@ -213,22 +222,25 @@ export default function PickCritterPermissionModal({
   };
 
   return (
-    <Modal open={open} handleClose={beforeClose}>
-      <DataTable
-        headers={UserCritterAccess.propsToDisplay}
-        title={title}
-        queryProps={tableProps}
-        onSelectMultiple={handleSelect}
-        resetSelections={triggerReset}
-        alreadySelected={alreadySelected}
-        customColumns={showSelectPermission ? [{ column: NewColumn, header: <b>Select Permission</b> }] : []}
-      />
-      <div className={'admin-btn-row'}>
-        <Button disabled={!canSave} onClick={handleSave}>
-          Save
-        </Button>
-      </div>
-    </Modal>
+    <FullScreenDialog open={open} handleClose={beforeClose}>
+      <Box py={1} px={4} className={classes.manageLayoutContent}>
+        <DataTable
+          headers={UserCritterAccess.propsToDisplay}
+          title={title}
+          queryProps={tableProps}
+          onSelectMultiple={handleSelect}
+          resetSelections={triggerReset}
+          alreadySelected={alreadySelected}
+          customColumns={showSelectPermission ? [{ column: NewColumn, header: <b>Select Permission</b> }] : []}
+          fullScreenHeight={true}
+        />
+        <div className={'admin-btn-row'}>
+          <Button disabled={!canSave} onClick={handleSave}>
+            Save
+          </Button>
+        </div>
+      </Box>
+    </FullScreenDialog>
   );
 }
 

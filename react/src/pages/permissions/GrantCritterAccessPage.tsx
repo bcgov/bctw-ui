@@ -12,6 +12,7 @@ import { AxiosError } from 'axios';
 import { adminPermissionOptions, IUserCritterPermissionInput } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
 import { IGrantCritterAccessResults } from 'api/permission_api';
+import { UserCritterAccess } from 'types/animal_access';
 
 /**
  * admin-access only page that allows an admin to grant user-critter permissions
@@ -71,6 +72,9 @@ export default function GrantCritterAccessPage(): JSX.Element {
           alreadySelected={[]}
           showSelectPermission={true}
           userToLoad={user}
+          headers={UserCritterAccess.animalManagerDisplayProps}
+          paginate={false}
+          allRecords={true}
         />
       </div>
     </AuthLayout>
