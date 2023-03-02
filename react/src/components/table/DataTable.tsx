@@ -171,7 +171,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     }
     
     return !requestDataByPage || noPagination
-      ? truncateRows(stableSort(results, getComparator(order, orderBy))) // Truncates the rows after the data is sorted
+      ? stableSort(results, getComparator(order, orderBy)) // Truncates the rows after the data is sorted (in memoRows)
       : stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
   }, [values, filter, page, rowsPerPage, order, orderBy]);
 
@@ -186,16 +186,22 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   };
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectAll = event.target.checked;
-    if(selectAll) {
+    const selected = event.target.checked;
+    if(selected) {
       console.log('Set selected to all true')
-      setSelectedIDs(new Array(values.length).fill(true));
+      const updatedIds = [...selectedIDs];
+      displayedRows.forEach((row) => {
+        if (row['global_id'] < selectedIDs.length) {
+          updatedIds[row['global_id']] = true;
+        }
+      });
+      setSelectedIDs(updatedIds);
     }
     else {
       console.log('Set selected to all false')
-      setSelectedIDs(new Array(values.length).fill(false));
+      setSelectedIDs(new Array(data.length).fill(false));
     }
-    setSelectAll(selectAll);
+    setSelectAll(selected);
   };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, p: number): void => {
@@ -229,7 +235,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const memoRows = useMemo(() => {
     return (
       <>
-        {displayedRows?.map((obj, idx: number) => (
+        {(!requestDataByPage || noPagination ? truncateRows(displayedRows) : displayedRows)?.map((obj, idx: number) => (
           <DataTableRow
             {...props}
             key={`table-row-${idx}`}
