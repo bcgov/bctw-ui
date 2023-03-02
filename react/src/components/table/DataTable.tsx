@@ -153,20 +153,21 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     }
   }, [data]);
 
-  const perPage = useMemo((): T[] => {
-    console.log('perPage called');
+  const truncateRows = (rows: T[]): T[] => {
+    const start = page * rowsPerPage;
+    const end = rowsPerPage * (page + 1);
+    return rows.length < rowsPerPage ? rows : rows.splice(start, end);
+  };
+
+  const displayedRows = useMemo((): T[] => {
     const results =
       filter && filter.term
         ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headers as string[]), filter.term)
         : values;
-    const start = page * rowsPerPage;
-    const end = rowsPerPage * (page + 1);
-    console.log(`Start ${start} and end ${end}`)
-    if (noPagination) {
-      return results;
-    }
-    return results.length > rowsPerPage ? results.slice(start, end) : results;
-  }, [values, filter, page, rowsPerPage]);
+    return !requestDataByPage || noPagination
+      ? truncateRows(stableSort(results, getComparator(order, orderBy))) // Truncates the rows after the data is sorted
+      : stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
+  }, [values, filter, page, rowsPerPage, order, orderBy, rowsPerPage]);
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -192,7 +193,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value));
     setPage(0);
-  }
+  };
 
   const handleFilter = (filter: ITableFilter): void => {
     setFilter(filter);
@@ -204,7 +205,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const memoRows = useMemo(() => {
     return (
       <>
-        {stableSort(perPage, getComparator(order, orderBy))?.map((obj, idx: number) => (
+        {displayedRows?.map((obj, idx: number) => (
           <DataTableRow
             {...props}
             key={`table-row-${idx}`}
@@ -218,7 +219,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         ))}
       </>
     );
-  }, [perPage, selectAll, triggerMultiUpdate, order, orderBy]);
+  }, [displayedRows, selectAll, triggerMultiUpdate, order, orderBy]);
 
   return (
     <TableContainer
