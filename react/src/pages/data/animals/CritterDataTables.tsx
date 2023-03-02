@@ -164,6 +164,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
                 />
               </>
             }
+            paginationFooter
           />
         </Box>
         <Box mb={4}>

@@ -31,13 +31,13 @@ import {
   useTableRowSelectedState
 } from 'contexts/TableRowSelectContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
 import DataTableRow from './DataTableRow';
 import './table.scss';
 
-export const ROWS_PER_PAGE = 100;
+//export const rowsPerPage = 100;
 /**
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
@@ -60,6 +60,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     alreadySelected = [],
     customColumns = []
   } = props;
+  const rowsPerPageOptions = [20, 50, 100, 250, 500];
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
   const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
@@ -70,6 +71,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const [selectAll, setSelectAll] = useState(false);
   const [page, setPage] = useState(0);
   const [totalRows, setTotalRows] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
 
   const isMultiSelect = isFunction(onSelectMultiple);
 
@@ -157,14 +159,14 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       filter && filter.term
         ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headers as string[]), filter.term)
         : values;
-    const start = (ROWS_PER_PAGE + page - ROWS_PER_PAGE - 1) * ROWS_PER_PAGE;
-    const end = ROWS_PER_PAGE * page - 1;
-
+    const start = page * rowsPerPage;
+    const end = rowsPerPage * (page + 1);
+    console.log(`Start ${start} and end ${end}`)
     if (noPagination) {
       return results;
     }
-    return results.length > ROWS_PER_PAGE ? results.slice(start, end) : results;
-  }, [values, filter, page]);
+    return results.length > rowsPerPage ? results.slice(start, end) : results;
+  }, [values, filter, page, rowsPerPage]);
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -186,6 +188,11 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     //setSelectedRows([]);
     //setSelectedRows([]);
   };
+
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value));
+    setPage(0);
+  }
 
   const handleFilter = (filter: ITableFilter): void => {
     setFilter(filter);
@@ -263,17 +270,18 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             )}
           </TableBody>
         </Table>
-        {!paginationFooter || isError || values.length < ROWS_PER_PAGE ? null : (
+        {!paginationFooter || isError || values.length < rowsPerPage ? null : (
           <Box className={'table-footer'}>
             <Divider />
             <TablePagination
               showFirstButton
-              rowsPerPageOptions={[]}
+              rowsPerPageOptions={rowsPerPageOptions}
               component='div'
               count={totalRows}
-              rowsPerPage={ROWS_PER_PAGE}
+              rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
             />
           </Box>
         )}
