@@ -156,7 +156,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const truncateRows = (rows: T[]): T[] => {
     const start = page * rowsPerPage;
     const end = rowsPerPage * (page + 1);
-    return rows.length < rowsPerPage ? rows : rows.splice(start, end);
+    return rows.length < rowsPerPage ? rows : rows.slice(start, end);
   };
 
   const displayedRows = useMemo((): T[] => {
@@ -167,7 +167,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     return !requestDataByPage || noPagination
       ? truncateRows(stableSort(results, getComparator(order, orderBy))) // Truncates the rows after the data is sorted
       : stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
-  }, [values, filter, page, rowsPerPage, order, orderBy, rowsPerPage]);
+  }, [values, filter, page, rowsPerPage, order, orderBy]);
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -219,7 +219,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         ))}
       </>
     );
-  }, [displayedRows, selectAll, triggerMultiUpdate, order, orderBy]);
+  }, [displayedRows, selectAll, triggerMultiUpdate]);
 
   return (
     <TableContainer
