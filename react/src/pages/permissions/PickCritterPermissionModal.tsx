@@ -136,7 +136,6 @@ export default function PickCritterPermissionModal({
       typeof selected[0] === 'string'
         ? (selected as string[])
         : (selected as UserCritterAccess[]).map((v) => v[v.identifier]);
-    console.log(ids);
 
     setCritterIDs(ids);
   };
