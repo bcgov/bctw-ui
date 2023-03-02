@@ -247,7 +247,7 @@ export default function PickCritterPermissionModal({
           }
           fullScreenHeight={true}
           paginationFooter={true}
-          requestDataByPage={true}
+          requestDataByPage={false}
         />
         <div className={'admin-btn-row'}>
           <Button disabled={!canSave} onClick={handleSave}>

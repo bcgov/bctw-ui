@@ -151,6 +151,7 @@ export default function VendorAPIPage(): JSX.Element {
             param: { keys: 'device_make', term: 'lotek' }
           }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Lotek')}
+          paginationFooter
         />
         <DataTable<Collar>
           headers={headers}
@@ -160,6 +161,7 @@ export default function VendorAPIPage(): JSX.Element {
             param: { keys: 'device_make', term: 'vectronic' }
           }}
           onSelectMultiple={(rows: Collar[]): void => handleSelectRow(rows, 'Vectronic')}
+          paginationFooter
         />
         <Box>
           <h4>

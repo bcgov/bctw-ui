@@ -60,7 +60,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     alreadySelected = [],
     customColumns = []
   } = props;
-  const rowsPerPageOptions = [20, 50, 100, 250, 500];
+  const rowsPerPageOptions = [100, 250, 500, 1000];
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
   const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
@@ -271,7 +271,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             )}
           </TableBody>
         </Table>
-        {!paginationFooter || isError || values.length < rowsPerPage ? null : (
+        {!paginationFooter || isError ? null : (
           <Box className={'table-footer'}>
             <Divider />
             <TablePagination

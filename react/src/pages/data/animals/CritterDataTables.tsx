@@ -176,6 +176,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             deleted={deleted}
             title={CritterStrings.nonCollaredAnimals}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+            paginationFooter
             exporter={
               <>
                 <Box ml={1}>
