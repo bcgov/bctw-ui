@@ -136,7 +136,6 @@ export default function PickCritterPermissionModal({
       typeof selected[0] === 'string'
         ? (selected as string[])
         : (selected as UserCritterAccess[]).map((v) => v[v.identifier]);
-    console.log(ids);
 
     setCritterIDs(ids);
   };
@@ -221,6 +220,13 @@ export default function PickCritterPermissionModal({
     );
   };
 
+  /**
+   * adds a compact index column to the table
+   */
+  const IdxColumn = (row: UserCritterAccess, idx: number): JSX.Element => {
+    return <Box className={'dimmed-cell'} padding={'none'}>{idx + 1} </Box>;
+  };
+
   return (
     <FullScreenDialog open={open} handleClose={beforeClose}>
       <Box py={1} px={4} className={classes.manageLayoutContent}>
@@ -231,8 +237,17 @@ export default function PickCritterPermissionModal({
           onSelectMultiple={handleSelect}
           resetSelections={triggerReset}
           alreadySelected={alreadySelected}
-          customColumns={showSelectPermission ? [{ column: NewColumn, header: <b>Select Permission</b> }] : []}
+          customColumns={
+            showSelectPermission
+              ? [
+                  { column: NewColumn, header: <b>Select Permission</b> },
+                  { column: IdxColumn, header: <b></b>, prepend: true }
+                ]
+              : []
+          }
           fullScreenHeight={true}
+          paginationFooter={true}
+          requestDataByPage={true}
         />
         <div className={'admin-btn-row'}>
           <Button disabled={!canSave} onClick={handleSave}>

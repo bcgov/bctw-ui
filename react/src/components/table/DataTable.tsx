@@ -222,6 +222,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   return (
     <TableContainer
+      fullScreenHeight={fullScreenHeight}
       toolbar={
         <TableToolbar
           rowCount={totalRows}

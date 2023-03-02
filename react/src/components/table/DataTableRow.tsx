@@ -98,12 +98,12 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
   return (
     <ClickAwayListener onClickAway={() => handleClickAway()}>
       <TableRow tabIndex={-1} hover onClick={() => handleClickRow()} role='checkbox' selected={isSelectedStatus}>
+        {customColumnsPrepend && mapCustomColumns(customColumnsPrepend)}
         {isMulti ? (
           <TableCell padding='checkbox'>
             <Checkbox checked={isSelectedStatus} />
           </TableCell>
         ) : null}
-        {customColumnsPrepend && mapCustomColumns(customColumnsPrepend)}
         {/* render main columns from data fetched from api */}
         {headers.map((k, i) => {
           if (!k) {
