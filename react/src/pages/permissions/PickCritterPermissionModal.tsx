@@ -64,7 +64,8 @@ export default function PickCritterPermissionModal({
   // table row selected state
   const [critterIDs, setCritterIDs] = useState<string[]>([]);
 
-  const [triggerReset, setTriggerReset] = useState(0);
+  const [forceRefresh, setForceRefresh] = useState<boolean>(false);
+  //const [triggerReset, setTriggerReset] = useState(0);
   /**
    * state for each of the column select components rendered in the table
    * only used when @param showSelectPermission is true
@@ -136,9 +137,12 @@ export default function PickCritterPermissionModal({
       typeof selected[0] === 'string'
         ? (selected as string[])
         : (selected as UserCritterAccess[]).map((v) => v[v.identifier]);
-    console.log(ids);
     setCritterIDs(ids);
   };
+
+  useEffect(() => {
+    console.log('The internal critterID state of permmision modal has length ' +critterIDs.length )
+  })
 
   const handleSave = (): void => {
     if (!showSelectPermission) {
@@ -163,7 +167,7 @@ export default function PickCritterPermissionModal({
   };
 
   const beforeClose = (): void => {
-    setCritterIDs([]);
+    //setCritterIDs([]);
     handleClose(false);
   };
 
@@ -178,7 +182,22 @@ export default function PickCritterPermissionModal({
     const defaultPermission = hasAccess?.permission_type ?? row?.permission_type ?? eCritterPermission.observer;
     // show an error if the select isn't filled out but the row is selected
     const isError = !hasAccess ? false : critterIDs.includes(hasAccess.critter_id) && !hasAccess.wasSelected;
-
+    const changeHandler = (e: any, p: eCritterPermission) => {
+          e.stopPropagation();
+          e.preventDefault();
+          const permission = p;//v.target.value as eCritterPermission;
+          setAccess((prevState) => {
+            const cp = { ...prevState };
+            console.log('Setting access for the following critters: ' + critterIDs);
+            critterIDs.forEach((id) => {
+              cp[id].permission_type = permission;
+              cp[id].wasSelected = true;
+            });
+            return cp;
+          });
+          setForceRefresh((o) => !o);
+       // setTriggerReset((prev) => prev + 1);
+    }
     return (
       <Select
         required={true}
@@ -187,6 +206,7 @@ export default function PickCritterPermissionModal({
         value={defaultPermission}
         disabled={!isSelected}
         sx={{ minWidth: 120 }}
+        onClick={(e) => e.stopPropagation()}
         // dont propagate the event to the row selected handler
         // onClick={(event): void => {
         //   if (isSelected) {
@@ -199,22 +219,13 @@ export default function PickCritterPermissionModal({
         //   //handleChange(permission);
         // }}
         //onClick={(e) => e.stopPropagation()}
-        onChange={(v: SelectChangeEvent<eCritterPermission>): void => {
-         // v.stopPropagation();
-          const permission = v.target.value as eCritterPermission;
-          setAccess((prevState) => {
-            const cp = { ...prevState };
-            critterIDs.forEach((id) => {
-              cp[id].permission_type = permission;
-              cp[id].wasSelected = true;
-            });
-            return cp;
-          });
-          setTriggerReset((prev) => prev + 1);
-        }}>
+        //onChange={(v: SelectChangeEvent<eCritterPermission>): void => {
+          
+        //}}
+        >
         {/* show select dropdown options based on user role */}
         {permissionsAccessible.sort().map((d) => (
-          <MenuItem key={`menuItem-${d}`} value={d}>
+          <MenuItem key={`menuItem-${d}`} value={d} onClick={(e) => changeHandler(e, d)}>
             {d}
           </MenuItem>
         ))}
@@ -237,8 +248,9 @@ export default function PickCritterPermissionModal({
           title={title}
           queryProps={tableProps}
           onSelectMultiple={handleSelect}
-          resetSelections={triggerReset}
+          //resetSelections={triggerReset}
           alreadySelected={alreadySelected}
+          forceRowRefresh={forceRefresh}
           customColumns={
             showSelectPermission
               ? [
