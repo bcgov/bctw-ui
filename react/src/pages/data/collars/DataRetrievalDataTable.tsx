@@ -117,6 +117,7 @@ export const DataRetrievalDataTable = (): JSX.Element => {
         deleted={deleted}
         onSelect={handleSelect}
         customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+        paginationFooter
       />
       <ModifyCollarWrapper editing={editObj} onDelete={(collar_id: string): void => setDeleted(collar_id)}>
         <EditCollar {...editProps} open={openEdit} handleClose={inverseEdit} />
