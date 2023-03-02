@@ -58,7 +58,8 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     paginationFooter = false,
     fullScreenHeight = false,
     alreadySelected = [],
-    customColumns = []
+    customColumns = [],
+    forceRowRefresh = false
   } = props;
   const rowsPerPageOptions = [100, 250, 500, 1000];
   const useRowState = useTableRowSelectedState();
@@ -115,6 +116,10 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   };
 
   useEffect(() => {
+    setSelectedIDs(new Array(values.length).fill(false));
+  }, [resetSelections])
+
+  useEffect(() => {
     handleRows();
   }, [values]);
 
@@ -161,13 +166,10 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     return rows.length < rowsPerPage ? rows : rows.slice(start, end);
   };
 
-  type globalRow =  T & {global_id: number}
   const displayedRows = useMemo((): T[] => {
     let results = values.map((r,idx) => {return {...r, global_id: idx}})
     if(filter && filter.term) {
       results = fuzzySearchMutipleWords(results, filter.keys ? filter.keys : (headers as string[]), filter.term)
-      console.log('Filtered results')
-      console.log(results);
     }
     
     return !requestDataByPage || noPagination
@@ -216,11 +218,10 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   useEffect(() => {
     const selected = values.filter((f, idx) => { 
-      return selectedIDs[idx] == true;
+      return selectedIDs[idx] === true;
     })
     onSelectMultiple?.(selected);
-    console.log('Selected = ')
-    console.log(selectedIDs)
+    console.log('Selected IDs was called, length: ' + selected.length)
   }, [selectedIDs])
 
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
@@ -247,7 +248,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         ))}
       </>
     );
-  }, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs]);
+  }, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs, forceRowRefresh]);
 
   return (
     <TableContainer
