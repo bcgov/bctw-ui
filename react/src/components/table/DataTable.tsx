@@ -218,7 +218,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         ))}
       </>
     );
-  }, [perPage, selectAll, triggerMultiUpdate]);
+  }, [perPage, selectAll, triggerMultiUpdate, orderBy]);
 
   return (
     <TableContainer
