@@ -131,6 +131,12 @@ export default function ExportPageV2(): JSX.Element {
     setCritterIDs(critters);
   };
 
+  useEffect(() => {
+    console.log('useEffect in Export')
+    console.log(collarIDs);
+    console.log(critterIDs);
+  }, [collarIDs, critterIDs])
+
   const datePicker = (): JSX.Element => {
     return (
       <Box>

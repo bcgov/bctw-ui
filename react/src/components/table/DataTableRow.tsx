@@ -13,8 +13,8 @@ type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' 
   selected: boolean;
   rowIdentifier: string;
   key?: number | string;
-  setSelectedRows: React.Dispatch<React.SetStateAction<T[]>>;
-  selectedRows: T[];
+  setSelectedRows: (s: boolean) => void;// React.Dispatch<React.SetStateAction<T[]>>;
+  selectedRows: number[];
 };
 
 export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowProps<T>) {
@@ -32,7 +32,7 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
     setUpdateRow((u) => !u);
   };
 
-  useDidMountEffect(() => {
+  useEffect(() => {
     setSelectedStatus(selected);
   }, [selected]);
 
@@ -51,8 +51,8 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
   }, [isSelectedStatus]);
 
   const handleAddRemoveMultiSelect = (add: boolean) => {
-    let rows = [];
-    setSelectedRows((r) => {
+    const rows = [];
+    /*setSelectedRows((r) => {
       rows = r;
       if (add) {
         rows.push(row);
@@ -63,8 +63,9 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
         }
       }
       return rows;
-    });
-    onSelectMultiple(rows);
+    });*/
+    //console.log('Called selectMultiple in DataTableRows')
+    //onSelectMultiple(rows);
   };
 
   const handleAddSingleSelect = (): void => {
@@ -78,7 +79,17 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
   };
 
   const handleClickRow = () => {
+    console.log('Click row will set to ' + !selected);
+    if(isMulti) {
+      setSelectedRows(!selected);
+    }
+    else {
+      console.log('Gonna call onSelect');
+      console.log('Contents of item: ' + JSON.stringify(row))
+      onSelect(row);
+    }
     setSelectedStatus((s) => !s);
+    
   };
 
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);

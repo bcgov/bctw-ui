@@ -67,7 +67,8 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [rowIdentifier, setRowIdentifier] = useState('id');
-  const [selectedRows, setSelectedRows] = useState<T[]>([]);
+  //const [selectedRows, setSelectedRows] = useState<T[]>([]);
+  const [selectedIDs, setSelectedIDs] = useState<boolean[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [page, setPage] = useState(0);
   const [totalRows, setTotalRows] = useState<number>(0);
@@ -75,7 +76,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const isMultiSelect = isFunction(onSelectMultiple);
 
-  const triggerMultiUpdate = isMultiSelect && JSON.stringify(selectedRows);
+  const triggerMultiUpdate = isMultiSelect && JSON.stringify(selectedIDs);
 
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
@@ -148,6 +149,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           return;
         }
       });
+      setSelectedIDs(new Array(data.length).fill(false));
       setValues((o) => [...o, ...newV]);
       handleRows();
     }
@@ -155,10 +157,11 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const perPage = useMemo((): T[] => {
     console.log('perPage called');
-    const results =
+    let results =
       filter && filter.term
         ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headers as string[]), filter.term)
         : values;
+    results = results.map((r, idx) => {return {...r, global_id: idx}});
     const start = page * rowsPerPage;
     const end = rowsPerPage * (page + 1);
     console.log(`Start ${start} and end ${end}`)
@@ -179,12 +182,21 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   };
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectAll(event.target.checked);
+    const selectAll = event.target.checked;
+    if(selectAll) {
+      console.log('Set selected to all true')
+      setSelectedIDs(new Array(values.length).fill(true));
+    }
+    else {
+      console.log('Set selected to all false')
+      setSelectedIDs(new Array(values.length).fill(false));
+    }
+    setSelectAll(selectAll);
   };
 
   const handlePageChange = (event: React.MouseEvent<unknown>, p: number): void => {
     setPage(p);
-    setSelectAll(false);
+    //setSelectAll(false);
     //setSelectedRows([]);
     //setSelectedRows([]);
   };
@@ -198,6 +210,15 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     setFilter(filter);
   };
 
+  useEffect(() => {
+    const selected = values.filter((f, idx) => { 
+      return selectedIDs[idx] == true;
+    })
+    onSelectMultiple?.(selected);
+    console.log('Selected = ')
+    console.log(selectedIDs)
+  }, [selectedIDs])
+
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
   const customColumnsPrepend = customColumns?.filter((c) => c.prepend);
 
@@ -208,17 +229,21 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           <DataTableRow
             {...props}
             key={`table-row-${idx}`}
-            index={idx}
+            index={obj['global_id']}
             row={obj}
-            selected={selectAll}
+            selected={selectedIDs.length ? selectedIDs[obj['global_id']] : false}
             rowIdentifier={rowIdentifier}
-            setSelectedRows={setSelectedRows}
-            selectedRows={selectedRows}
+            setSelectedRows={(b) => {
+              const copy = selectedIDs.slice();
+              copy[obj['global_id']] = b;
+              setSelectedIDs(copy);
+            }}
+            selectedRows={[]}
           />
         ))}
       </>
     );
-  }, [perPage, selectAll, triggerMultiUpdate, orderBy]);
+  }, [perPage, selectAll, triggerMultiUpdate, orderBy, selectedIDs]);
 
   return (
     <TableContainer
@@ -228,7 +253,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           rowCount={totalRows}
           title={title}
           onChangeFilter={handleFilter}
-          numSelected={selectedRows.length}
+          numSelected={selectedIDs.filter(f => f === true).length}
           filterableProperties={headers}
           isMultiSearch={isMultiSelect}
           setPage={setPage}
@@ -243,7 +268,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             headersToDisplay={headers}
             headerData={data && data[0]}
             isMultiSelect={isFunction(onSelectMultiple)}
-            numSelected={selectedRows.length}
+            numSelected={selectedIDs.filter(x => x === true).length}
             order={order}
             orderBy={(orderBy as string) ?? ''}
             onRequestSort={handleSort}

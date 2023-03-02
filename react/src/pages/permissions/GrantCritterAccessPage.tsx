@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DataTable from 'components/table/DataTable';
 import { Button } from 'components/common';
 import { eUserRole, User } from 'types/user';
@@ -49,13 +49,14 @@ export default function GrantCritterAccessPage(): JSX.Element {
     setShowModal(false)
   };
 
+
   return (
     <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Set Animal Manager</h1>
         <Typography mb={3} variant='body1' component='p'>A user has access to devices through the user-animal association.</Typography>
         <DataTable
-          headers={user.displayProps.filter(prop => !['idir', 'bceid'].includes(prop))}
+          headers={new User().displayProps.filter(prop => !['idir', 'bceid'].includes(prop))}
           title='Users'
           queryProps={{ query: api.useUsers }}
           onSelect={(u: User): void => setUser(u)}

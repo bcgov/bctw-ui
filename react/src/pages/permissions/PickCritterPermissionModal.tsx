@@ -136,7 +136,7 @@ export default function PickCritterPermissionModal({
       typeof selected[0] === 'string'
         ? (selected as string[])
         : (selected as UserCritterAccess[]).map((v) => v[v.identifier]);
-
+    console.log(ids);
     setCritterIDs(ids);
   };
 
@@ -198,7 +198,9 @@ export default function PickCritterPermissionModal({
         //   //setPerm(permission);
         //   //handleChange(permission);
         // }}
+        //onClick={(e) => e.stopPropagation()}
         onChange={(v: SelectChangeEvent<eCritterPermission>): void => {
+         // v.stopPropagation();
           const permission = v.target.value as eCritterPermission;
           setAccess((prevState) => {
             const cp = { ...prevState };
