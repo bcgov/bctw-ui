@@ -81,6 +81,7 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
   const handleClickRow = () => {
     console.log('Click row will set to ' + !selected);
     if(isMulti) {
+      console.log('Global ID was ' + row['global_id'])
       setSelectedRows(!selected);
     }
     else {

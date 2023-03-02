@@ -161,12 +161,15 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     return rows.length < rowsPerPage ? rows : rows.slice(start, end);
   };
 
+  type globalRow =  T & {global_id: number}
   const displayedRows = useMemo((): T[] => {
-    let results =
-      filter && filter.term
-        ? fuzzySearchMutipleWords(values, filter.keys ? filter.keys : (headers as string[]), filter.term)
-        : values;
-    results = results.map((r,idx) => {return {...r, global_id: idx}})
+    let results = values.map((r,idx) => {return {...r, global_id: idx}})
+    if(filter && filter.term) {
+      results = fuzzySearchMutipleWords(results, filter.keys ? filter.keys : (headers as string[]), filter.term)
+      console.log('Filtered results')
+      console.log(results);
+    }
+    
     return !requestDataByPage || noPagination
       ? truncateRows(stableSort(results, getComparator(order, orderBy))) // Truncates the rows after the data is sorted
       : stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
