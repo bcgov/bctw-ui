@@ -32,6 +32,16 @@ function createHeadCell<T>(obj: T, propsToDisplay: (keyof T)[]): HeadCell<T>[] {
  * string or number to sort successfully
  */
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
+  const emptyA = a[orderBy] == null || String(a[orderBy]) === '';
+  const emptyB = b[orderBy] == null || String(b[orderBy]) === '';
+  if(!emptyB && emptyA){
+    return -1;
+  }
+  if(emptyB && !emptyA) {
+    return 1;
+  }
+
+
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -59,13 +69,17 @@ function getComparator<Key extends keyof any>(
   sorts an array of T with the provided comparator
 */
 function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+  /*const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  return stabilizedThis.map((el) => el[0]);
+  return stabilizedThis.map((el) => el[0]);*/
+  const sortedArr = array.slice().sort(comparator);
+  console.log('sortedArr')
+  console.log(sortedArr.map(a => a['species']));
+  return sortedArr;
 }
 /** Renders the coloured tags for species and collars */
 

@@ -180,20 +180,16 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const displayedRows = (): T[] => {
     const results = filterRows(values);
-    
+    let r;
      if(!requestDataByPage || noPagination)
      {
-        const r = stableSort(results, getComparator(order, orderBy)) // Truncates the rows after the data is sorted (in memoRows)
-        console.log('Top block len ' + r.length);
-        return r;
+        r = stableSort(results, getComparator(order, orderBy)) // Truncates the rows after the data is sorted (in memoRows)
      }
      else 
      {
-        const r = stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
-        console.log('Bottom block len ' + r.length);
-        return r;
+        r = stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
      }
-      
+     return r;
       
   };//, [values, filter, page, rowsPerPage, order, orderBy]);
 
@@ -205,6 +201,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+    console.log('We set orderBy to ' + property);
   };
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,20 +213,16 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       if(filter && filter.term) {
         filterRows(data).forEach((row) => {
           if (row['global_id'] < selectedIDs.length) {
-            console.log(`Setting global id ${row['global_id']}`)
             updatedIds[row['global_id']] = true;
           }
         });
-        console.log('set filter select all')
         setSelectedIDs(updatedIds);
       }
       else {
-        console.log('set everything select all')
         setSelectedIDs(new Array(data.length).fill(true));
       }
     }
     else {
-      console.log('Set selected to all false')
       setSelectedIDs(new Array(data.length).fill(false));
     }
     setSelectAll(selected);
@@ -256,7 +249,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       return selectedIDs[idx] === true;
     })
     onSelectMultiple?.(selected);
-    console.log('Selected IDs was called, length: ' + selected.length)
+    //console.log('Selected IDs was called, length: ' + selected.length)
   }, [selectedIDs])
 
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);

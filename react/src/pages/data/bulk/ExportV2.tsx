@@ -131,10 +131,10 @@ export default function ExportPageV2(): JSX.Element {
     setCritterIDs(critters);
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log('useEffect in Export')
     console.log(critterIDs);
-  }, [collarIDs, critterIDs])
+  }, [collarIDs, critterIDs])*/
 
   const datePicker = (): JSX.Element => {
     return (
