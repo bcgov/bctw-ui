@@ -171,7 +171,7 @@ export default function SimpleMap({
     <Box height={height}>
       <div className='map-container'>
         {fetchingPings || fetchingTracks ? <CircularProgress className={styles.progress} color='secondary' /> : null}
-        <div id='popup' style={{ bottom: height }} />
+        <div id='popup' style={{ bottom: '0px' }} />
         <div style={{ height: height, width: width ?? '100%' }} id={DIV_ID}></div>
       </div>
     </Box>
