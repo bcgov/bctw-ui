@@ -1,11 +1,5 @@
-import { mdiConsoleNetworkOutline } from '@mdi/js';
 import {
-  Box,
-  Button,
-  Checkbox,
   CircularProgress,
-  ClickAwayListener,
-  Divider,
   Paper,
   Table,
   TableBody,
@@ -13,29 +7,39 @@ import {
   TablePagination,
   TableRow
 } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { AxiosError } from 'axios';
 import TableContainer from 'components/table/TableContainer';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import {
-  formatTableCell,
   fuzzySearchMutipleWords,
   getComparator,
   isFunction,
   stableSort
 } from 'components/table/table_helpers';
-import { DataTableProps, ICustomTableColumn, ITableFilter, Order } from 'components/table/table_interfaces';
+import { DataTableProps, ITableFilter, Order } from 'components/table/table_interfaces';
 import {
-  RowSelectedProvider,
-  useTableRowSelectedDispatch,
   useTableRowSelectedState
 } from 'contexts/TableRowSelectContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
 import DataTableRow from './DataTableRow';
 import './table.scss';
+
+
+const useStyles = makeStyles((theme) => ({
+  bottomOfTableBody: {
+    borderBottomRightRadius: '0px', 
+    borderBottomLeftRadius: '0px'
+  },
+  topOfTableFooter: {
+    borderTopLeftRadius: '0px', 
+    borderTopRightRadius: '0px'
+  }
+}));
 
 /**
  * Data table component, fetches data to display from @param {queryProps}
@@ -59,6 +63,9 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     alreadySelected = [],
     customColumns = []
   } = props;
+
+  const styles = useStyles();
+
   const rowsPerPageOptions = [100, 250, 500, 1000];
   const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
@@ -72,7 +79,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const [page, setPage] = useState(0);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
-
+  
   const isMultiSelect = isFunction(onSelectMultiple);
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
@@ -145,7 +152,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           return;
         }
       });
-      console.log('Calling setValues from useDidMountEffect')
       setSelectedIDs(new Array(values.length).fill(false));
       setValues((o) => [...o, ...newV]);
       handleRows();
@@ -201,9 +207,9 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         const r = filterRows(values);
         console.log(r);
         r.forEach((row) => {
-          //if ( row['global_id'] < selectedIDs.length ) {
+          if ( row['global_id'] < selectedIDs.length ) {
             updatedIds[row['global_id']] = true;
-          //}
+          }
         });
         
         console.log('Select All Filter');
@@ -246,7 +252,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
   const customColumnsPrepend = customColumns?.filter((c) => c.prepend);
 
-  const memoRows = () => {
+  const renderRows = () => {
     return (
       <>
         {(!requestDataByPage || noPagination ? truncateRows(displayedRows()) : displayedRows())?.map((obj, idx: number) => (
@@ -272,7 +278,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   return (
     <>
     <TableContainer
-      sx={{borderBottomRightRadius: '0px', borderBottomLeftRadius: '0px'}} 
+      sx={{borderBottomLeftRadius: '0px', borderBottomRightRadius: '0px'}}
       fullScreenHeight={fullScreenHeight}
       toolbar={
         <TableToolbar
@@ -318,7 +324,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
                 </TableCell>
               </TableRow>
             ) : (
-              <>{memoRows()}</>
+              <>{renderRows()}</>
             )}
           </TableBody>
         </Table>
@@ -336,7 +342,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       </>
     </TableContainer>
     {!paginationFooter || isError ? null : (
-            <Paper sx={{borderTopLeftRadius: '0px', borderTopRightRadius: '0px'}}>
+            <Paper className={styles.topOfTableFooter}>
             <TablePagination
               showFirstButton
               rowsPerPageOptions={rowsPerPageOptions}

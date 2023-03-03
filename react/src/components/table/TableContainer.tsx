@@ -10,13 +10,13 @@ type TableContainerProps = {
 /**
  * wraps table components
  */
-export default function TableContainer({ children, toolbar, fullScreenHeight=false, sx={} }: TableContainerProps): JSX.Element {
+export default function TableContainer({ children, toolbar, fullScreenHeight=false, sx={}}: TableContainerProps): JSX.Element {
   const theme = useTheme();
   return (
     <>
       {toolbar}
       <Paper sx={{ width: '100%', overflow: 'hidden' , ...sx}} variant='outlined'>
-        <MUITableContainer component={Paper} sx={fullScreenHeight ? {...sx, maxHeight: 'calc(100vh - 286px)' }:{ ...sx, maxHeight: '30rem' }}>
+        <MUITableContainer  component={Paper} sx={fullScreenHeight ? {...sx, maxHeight: 'calc(100vh - 286px)' }:{ ...sx, maxHeight: '30rem' }}>
           {children}
         </MUITableContainer>
       </Paper>
