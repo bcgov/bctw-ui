@@ -236,7 +236,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const memoRows = useMemo(() => {
     return (
       <>
-        {(!requestDataByPage || noPagination ? truncateRows(displayedRows) : displayedRows)?.map((obj, idx: number) => (
+        {(!requestDataByPage ? truncateRows(displayedRows) : displayedRows)?.map((obj, idx: number) => (
           <DataTableRow
             {...props}
             key={`table-row-${idx}`}
@@ -254,7 +254,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         ))}
       </>
     );
-  }, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs, forceRowRefresh]);
+  }, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs, forceRowRefresh, page]);
 
   return (
     <TableContainer
