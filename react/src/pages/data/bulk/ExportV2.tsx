@@ -199,7 +199,8 @@ export default function ExportPageV2(): JSX.Element {
             title={<SubHeader text={ExportStrings.animalTableHeader} size='small' dark />}
             onSelectMultiple={handleDataTableSelect}
             queryProps={{ query: api.useAssignedCritters }}
-            isMultiSelect
+            paginationFooter
+            //isMultiSelect
           />
         </Box>
         <Button

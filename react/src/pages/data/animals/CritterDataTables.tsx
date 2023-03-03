@@ -6,7 +6,7 @@ import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { QueryStatus } from 'react-query';
 import { Animal, AttachedAnimal } from 'types/animal';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
@@ -20,10 +20,12 @@ import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
 import MapModal from 'components/modal/MapModal';
 import dayjs from 'dayjs';
-import { Button } from '@mui/material';
+import { Button, Container } from '@mui/material';
 import { buttonProps } from 'components/component_constants';
+import { Tooltip } from 'components/common';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
 
-export const CritterDataTables = (): JSX.Element => {
+export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
   const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedAnimal[]>([]);
   const [animalData, setAnimalData] = useState<Animal[]>([]);
@@ -39,8 +41,12 @@ export const CritterDataTables = (): JSX.Element => {
   const [openMap, setOpenMap] = useState(false);
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
-  const handleSelect = <T extends Animal>(row: T): void => setEditObj(row);
-  const lastDt = editObj?.last_transmission_date;
+  const handleSelect = <T extends Animal>(row: T): void => {
+    //setEditObj(row);
+    detailViewAction(row);
+  };
+  const handleSelectTemp = <T extends Animal>(row: T[]): void => setEditObj(row.length ? row[0] : new AttachedAnimal());
+  //const lastDt = editObj?.last_transmission_date;
 
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
   const editProps = {
@@ -60,10 +66,22 @@ export const CritterDataTables = (): JSX.Element => {
     modalControl: true
   };
 
+  const Status = (row: AttachedAnimal, idx: number): JSX.Element => {
+    if (row.last_fetch_date.isValid()) {
+      return (
+        <Tooltip title="BCTW is receiving telemetry for this animal's device">
+          <Icon size={1.5} icon='signal'></Icon>
+        </Tooltip>
+      );
+    }
+    return null;
+  };
+
   const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
     const _edit = () => setOpenEdit(true);
     const _map = () => setOpenMap(true);
+
     const _removeAttach = () => {
       setOpenAttachRemoveCollar(true);
     };
@@ -85,11 +103,11 @@ export const CritterDataTables = (): JSX.Element => {
       }
     ];
     const attachedItems = [
-      {
+      /*{
         label: map,
         icon: <Icon icon={'location'} />,
         handleClick: _map
-      },
+      },*/
       {
         label: mortality,
         icon: <Icon icon={'dead'} />,
@@ -103,9 +121,13 @@ export const CritterDataTables = (): JSX.Element => {
     ];
     return (
       <ActionsMenu
+        //disabled={row !== editObj}
         menuItems={
           row instanceof AttachedAnimal ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
         }
+        onOpen={() => {
+          setEditObj(row);
+        }}
       />
     );
   };
@@ -129,8 +151,10 @@ export const CritterDataTables = (): JSX.Element => {
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
-            customColumns={[{ column: Menu, header: <b>Actions</b> }]}
-            allRecords
+            customColumns={[
+              { column: Menu, header: <b>Actions</b> },
+              { column: Status, header: <div>Status</div>, prepend: true }
+            ]}
             exporter={
               <>
                 <ExportViewer<AttachedAnimal>
@@ -140,19 +164,19 @@ export const CritterDataTables = (): JSX.Element => {
                 />
               </>
             }
+            paginationFooter
           />
         </Box>
         <Box mb={4}>
           <DataTable
             headers={new Animal().displayProps}
-            //title={CS.unassignedTableTitle}
             queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Animal[]) => setAnimalData(data) }}
-            onSelect={handleSelect}
+            onSelect={() => {}}
             updated={updated}
             deleted={deleted}
             title={CritterStrings.nonCollaredAnimals}
             customColumns={[{ column: Menu, header: <b>Actions</b> }]}
-            allRecords
+            paginationFooter
             exporter={
               <>
                 <Box ml={1}>
@@ -175,7 +199,7 @@ export const CritterDataTables = (): JSX.Element => {
         </Box>
 
         {/* Displays the recent animal telemetry map modal */}
-        <MapModal
+        {/*<MapModal
           title={`Recent Animal Movement`}
           open={openMap}
           handleClose={(v: boolean) => setOpenMap(v)}
@@ -183,8 +207,8 @@ export const CritterDataTables = (): JSX.Element => {
           endDate={lastDt && lastDt.isValid() ? lastDt : dayjs()}
           width={'800px'}
           height={'600px'}
-          critter_id={editObj.critter_id}
-        />
+          critter_id={editObj?.current.critter_id}
+          />*/}
 
         {/* Wrapper for Adding Animal, could probably be moved into bottom wrapper. */}
         <ModifyCritterWrapper

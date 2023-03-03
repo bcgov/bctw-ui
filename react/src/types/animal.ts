@@ -24,6 +24,13 @@ export enum eSpecies {
   grey_wolf = 'M-CALU'
 }
 
+export enum eAnimalStatus {
+  alive = 'Alive',
+  in_translocation = 'In Translocation',
+  mortality = 'Mortality',
+  potential_mortality = 'Potential Mortality'
+}
+
 const { caribou, grizzly_bear, moose, grey_wolf } = eSpecies;
 
 // used in critter getters to specify collar attachment status
@@ -254,6 +261,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   collar_id: uuid;
   device_id: number;
   device_make: Code;
+  device_type: Code;
   frequency: number;
   device_status: string;
   latitude: number;

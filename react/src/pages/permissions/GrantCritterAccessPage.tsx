@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DataTable from 'components/table/DataTable';
 import { Button } from 'components/common';
 import { eUserRole, User } from 'types/user';
@@ -12,6 +12,7 @@ import { AxiosError } from 'axios';
 import { adminPermissionOptions, IUserCritterPermissionInput } from 'types/permission';
 import { formatAxiosError } from 'utils/errors';
 import { IGrantCritterAccessResults } from 'api/permission_api';
+import { UserCritterAccess } from 'types/animal_access';
 
 /**
  * admin-access only page that allows an admin to grant user-critter permissions
@@ -48,13 +49,14 @@ export default function GrantCritterAccessPage(): JSX.Element {
     setShowModal(false)
   };
 
+
   return (
     <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
         <h1>Set Animal Manager</h1>
         <Typography mb={3} variant='body1' component='p'>A user has access to devices through the user-animal association.</Typography>
         <DataTable
-          headers={user.displayProps.filter(prop => !['idir', 'bceid'].includes(prop))}
+          headers={new User().displayProps.filter(prop => !['idir', 'bceid'].includes(prop))}
           title='Users'
           queryProps={{ query: api.useUsers }}
           onSelect={(u: User): void => setUser(u)}
@@ -71,6 +73,9 @@ export default function GrantCritterAccessPage(): JSX.Element {
           alreadySelected={[]}
           showSelectPermission={true}
           userToLoad={user}
+          headers={UserCritterAccess.animalManagerDisplayProps}
+          paginate={false}
+          allRecords={true}
         />
       </div>
     </AuthLayout>

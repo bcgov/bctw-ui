@@ -3,10 +3,12 @@ import { createHeadCell } from 'components/table/table_helpers';
 import { BCTWBase } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { HeadCell, TableHeadProps } from 'components/table/table_interfaces';
+import { useState } from 'react';
 
 export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T>): JSX.Element {
   const {
     customHeaders,
+    customHeadersPrepend,
     order,
     orderBy,
     onRequestSort,
@@ -14,11 +16,18 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     headersToDisplay,
     numSelected,
     onSelectAllClick,
+    selectAll,
     rowCount,
     isMultiSelect,
     hiddenHeaders,
-    secondaryHeaders
+    secondaryHeaders,
+    showIndex
   } = props;
+
+  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean): void => {
+  //   onSelectAllClick(event);
+  //   setCheckedVal(checked);
+  // };
 
   const createSortHandler =
     (property: keyof T) =>
@@ -35,15 +44,22 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     <MuiTableHead>
       {!headerData ? null : (
         <TableRow>
+          {/* if any custom columns were supplied to the table, render their headers */}
+          {customHeadersPrepend
+            ? customHeadersPrepend.map((header, idx): JSX.Element => {
+                return <TableCell key={`pre-h-${idx}`}>{header}</TableCell>;
+              })
+            : null}
           {/* render the select all checkbox if the table is multi-select mode */}
           {isMultiSelect ? (
             <TableCell padding='checkbox'>
               <Checkbox
                 /* 
-                  renders a dash when 'some' values are checked. 
-                */
-                indeterminate={numSelected > 0 && numSelected < rowCount}
-                checked={rowCount > 0 && numSelected === rowCount}
+                    renders a dash when 'some' values are checked. 
+                  */
+                //indeterminate={numSelected > 0 && numSelected < rowCount}
+                //checked={rowCount > 0 && numSelected === rowCount}
+                checked={selectAll}
                 onChange={onSelectAllClick}
                 inputProps={{ 'aria-label': 'select all' }}
               />

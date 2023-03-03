@@ -74,6 +74,7 @@ export default function CollarPage(): JSX.Element {
               queryProps={{ query: api.useAttachedDevices }}
               onSelect={handleSelect}
               deleted={deleted}
+              paginationFooter
             />
           </Box>
           <Box mb='3'>
@@ -83,6 +84,7 @@ export default function CollarPage(): JSX.Element {
               queryProps={{ query: api.useUnattachedDevices }}
               onSelect={handleSelect}
               deleted={deleted}
+              paginationFooter
             />
           </Box>
         </>

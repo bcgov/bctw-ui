@@ -21,6 +21,9 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   wlh_id: string;
   species: string;
   population_unit: string;
+  managed_by: string;
+  edited_by: string;
+  observed_by: string;
   @Transform(nullToDayjs) valid_from: Dayjs;
   @Transform(nullToDayjs) valid_to: Dayjs;
   device_id: number;
@@ -60,4 +63,13 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   get displayProps(): (keyof UserCritterAccess)[] {
     return UserCritterAccess.propsToDisplay;
   }
+
+  static get animalManagerDisplayProps(): (keyof UserCritterAccess)[] {
+    return [...UserCritterAccess.propsToDisplay, 'managed_by', 'edited_by', 'observed_by'];
+  }
+
+  get animalManagerDisplayProps(): (keyof UserCritterAccess)[] {
+    return UserCritterAccess.animalManagerDisplayProps;
+  }
+  
 }

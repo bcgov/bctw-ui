@@ -38,7 +38,8 @@ interface ITableQueryProps<T> {
 
 interface ICustomTableColumn<T> {
   header: JSX.Element;
-  column: (row: T, idx: number) => JSX.Element;
+  column: (row: T, idx: number, isSelected?: boolean) => JSX.Element;
+  prepend?: boolean;
 }
 
 /**
@@ -51,7 +52,15 @@ type PlainTableProps<T> = {
   title?: string | JSX.Element;
   onSelect?: (row: T) => void;
 };
-
+//Only one select handler at a time to this component
+type ConditionalOnSelect<T> =
+  | (Pick<PlainTableProps<T>, 'onSelect'> & {
+      onSelectMultiple?: never;
+    })
+  | {
+      onSelect?: never;
+      onSelectMultiple: (rows: T[]) => void;
+    };
 /**
  * @param customColumns array of functions that return components to add as additional columns
  * @param isMultiSelect renders a row of checkboxes and a special toolbar if true
@@ -59,23 +68,24 @@ type PlainTableProps<T> = {
  * @param queryProps which query to use - see @type {ITableQuery}
  * @param onSelectMultiple parent handler triggered when a row is checked if @param isMultiSelect
  * @param deleted notify the datatable that a row with this identifier has been removed
+ * @param paginationFooter renders the pagination controls on the bottom of the table
+ * @param requestDataByPage paginates the request from the DB
  */
-type DataTableProps<T> = PlainTableProps<T> & {
-  customColumns?: ICustomTableColumn<T>[];
-  isMultiSelect?: boolean;
-  isMultiSearch?: boolean;
-  showValidRecord?: boolean;
-  alreadySelected?: string[];
-  resetSelections?: number; //Placeholder to trigger reset
-  paginate?: boolean;
-  queryProps: ITableQueryProps<T>;
-  onSelectMultiple?: (rows: T[]) => void;
-  deleted?: string;
-  updated?: string;
-  exporter?: JSX.Element;
-  disableSearch?: boolean;
-  allRecords?: boolean;
-};
+type DataTableProps<T> = PlainTableProps<T> &
+  ConditionalOnSelect<T> & {
+    customColumns?: ICustomTableColumn<T>[];
+    isMultiSearch?: boolean;
+    alreadySelected?: string[];
+    resetSelections?: number; //Placeholder to trigger reset
+    queryProps: ITableQueryProps<T>;
+    deleted?: string;
+    updated?: string;
+    exporter?: JSX.Element;
+    disableSearch?: boolean;
+    paginationFooter?: boolean;
+    requestDataByPage?: boolean;
+    fullScreenHeight?: boolean;
+  };
 
 /**
  * interface used to generate headers in TableHead
@@ -99,6 +109,7 @@ interface HeadCell<T> {
  */
 type TableHeadProps<T> = {
   customHeaders: JSX.Element[];
+  customHeadersPrepend?: JSX.Element[];
   headerData: T;
   headersToDisplay: (keyof T)[];
   isMultiSelect: boolean;
@@ -108,8 +119,10 @@ type TableHeadProps<T> = {
   orderBy: string;
   rowCount: number;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  selectAll?: boolean;
   hiddenHeaders?: (keyof T)[];
   secondaryHeaders?: (string | number | symbol)[];
+  showIndex?: boolean;
 };
 
 type FilterOperator = 'equals' | 'contains';

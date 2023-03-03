@@ -52,6 +52,8 @@ import {
   mdiBattery20,
   mdiDevTo,
   mdiSend,
+  mdiWifi,
+  mdiAccessPoint,
   mdiExclamation,
   mdiExclamationThick
 } from '@mdi/js';
@@ -179,6 +181,8 @@ const getIconPath = (path: string): string => {
       return mdiDevTo;
     case 'send':
       return mdiSend;
+    case 'signal':
+      return mdiAccessPoint;
     case 'exclaim':
       return mdiExclamationThick;
   }

@@ -83,6 +83,28 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
   return parseAnimalColour(properties.map_colour)?.fillColor ?? MAP_COLOURS.point;
 };
 
+/**
+ * @returns the hex colour value to show as the fill colour
+ */
+const getFillColorByDeviceStatus = (point: ITelemetryPoint, selected = false): string => {
+  if (selected) {
+    return MAP_COLOURS.selected;
+  }
+  if (!point) {
+    return MAP_COLOURS.point;
+  }
+  const { properties } = point;
+  if (properties?.device_status === 'Mortality') {
+    const { date_recorded, mortality_date } = properties;
+    // if the mortality date is not set, fill all points red
+    // otherwise only fill points red after the mortality date
+    if (!mortality_date || dayjs(date_recorded) > dayjs(mortality_date)) {
+      return MAP_COLOURS.mortality;
+    }
+  }
+  return parseAnimalColour(properties.map_colour)?.fillColor ?? MAP_COLOURS.point;
+};
+
 // same as getFillColorByStatus - but for the point border/outline color
 const getOutlineColor = (feature: ITelemetryPoint): string => {
   if (feature.id < 0) {
@@ -417,6 +439,7 @@ export {
   getEarliestPing,
   getOutlineColor,
   getFillColorByStatus,
+  getFillColorByDeviceStatus,
   getLatestPingsFromTelemetryGroup,
   getLast10Fixes,
   getLast10Points,

@@ -1,44 +1,24 @@
 import {
   Box,
   Button,
-  ButtonBase,
-  Card,
-  CardContent,
-  CircularProgress,
-  Divider,
   Grid,
-  Link,
-  List,
-  ListItem,
   Paper,
   Tab,
-  TablePagination,
   Tabs,
   Theme,
   Typography,
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import { InfoBanner } from 'components/alerts/Banner';
-import Icon from 'components/common/Icon';
+import { AnimalCollar } from 'api/api_interfaces';
 import { SubHeader } from 'components/common/partials/SubHeader';
-import Tooltip from 'components/common/Tooltip';
-import FileInput from 'components/form/FileInput';
-import { BannerStrings } from 'constants/strings';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useEffect, useState } from 'react';
-import { Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
+import { formatTag } from 'components/table/table_helpers';
+import dayjs, { Dayjs } from 'dayjs';
+import { useState } from 'react';
+import { Animal } from 'types/animal';
+import { AttachedCollar, Collar } from 'types/collar';
+import { columnToHeader } from 'utils/common_helpers';
 import ManageLayout from './layouts/ManageLayout';
-import { createFormData } from 'api/api_helpers';
-import { IBulkUploadResults } from 'api/api_interfaces';
-import { AxiosError } from 'axios';
-import { KeyXUploader } from './vendor/KeyXUploader';
 
 // Place constants here
 const TEST = 'Testing';
@@ -120,46 +100,122 @@ interface TempComponentProps {
   children?: JSX.Element;
 }
 
+interface DetailedStatusCardProps<T> {
+  displayObject: T;
+  displayKeysInGrid: Array<keyof T>;
+  displayKeysInBox: Array<keyof T>;
+}
+
+const DetailedStatusCard = <T,>({displayObject, displayKeysInGrid, displayKeysInBox}: DetailedStatusCardProps<T>): JSX.Element => {
+
+  return (
+    <Paper sx={{padding: '16px'}}>
+      <Grid container xs={12} spacing={2}>
+        {displayKeysInGrid.map(m => {
+            return (<>
+            <Grid item xs={6} spacing={2}>
+              <SubHeader size='small' text={columnToHeader(m as string) }/>
+              {
+                ['species', 'device_status'].includes(m as string)
+                ?
+                formatTag(m as string, String(displayObject[m]))
+                :
+                <Typography>{ displayObject[m] === undefined || displayObject[m] === null ? 'None' : String(displayObject[m])}</Typography>
+              }
+              
+            </Grid>
+            </>);
+        })}
+        {displayKeysInBox.map(m => {
+          return (<>
+          <Grid item xs={12}>
+            <SubHeader size='small' text={columnToHeader(m as string) }/>
+            <Box maxHeight={'100px'} overflow={'auto'}>
+              <Typography>{displayObject[m]}</Typography>
+            </Box>
+          </Grid>
+          </>)
+        })}
+      </Grid>
+
+
+    </Paper>
+  )
+}
+
 // Temporarily build components down here for development
 const TempComponent = ({ tabList, tab, handleTab, children }: TempComponentProps): JSX.Element => {
   const styles = useStyles();
   const theme = useTheme();
   const firstTab = tab === 0;
   const tabIsSelected = (t: number): boolean => tab === t;
+
+  const testAnimal: Animal = new Animal();
+  testAnimal.species = 'Caribou';
+  testAnimal.animal_status = 'Alive';
+  testAnimal.wlh_id = '12345';
+  testAnimal.animal_id = 'BC78301';
+  testAnimal.population_unit = 'Calendar';
+  testAnimal.sex = 'Female';
+  testAnimal.capture_date = dayjs('2022-07-02');
+  testAnimal.mortality_date = null;
+  testAnimal.animal_comment = `I've never had to knock on wood
+  But I know someone who has
+  Which makes me wonder if I could
+  It makes me wonder if I've
+  Never had to knock on wood
+  And I'm glad I haven't yet
+  Because I'm sure it isn't good
+  That's the impression that I get
+  Have you ever had the odds stacked up so high
+You need a strength most don't possess?
+Or has it ever come down to do or die?
+You've got to rise above the rest
+No, well`;
+
+const testDevice: AttachedCollar = new AttachedCollar();
+testDevice.device_id = 12345;
+testDevice.device_status = 'Mortality';
+testDevice.device_type = 'GPS';
+testDevice.last_fetch_date = dayjs('2022-07-02');
+testDevice.device_make = 'Vectronic';
+testDevice.frequency = 192.18;
+testDevice.attachment_start = dayjs('2022-07-02');
+testDevice.attachment_end = dayjs('2022-07-02');
+testDevice.activation_comment = `I've never had to knock on wood
+But I know someone who has
+Which makes me wonder if I could
+It makes me wonder if I've
+Never had to knock on wood
+And I'm glad I haven't yet
+Because I'm sure it isn't good
+That's the impression that I get
+Have you ever had the odds stacked up so high
+You need a strength most don't possess?
+Or has it ever come down to do or die?
+You've got to rise above the rest
+No, well`
+
   return (
     <Box width='100%' sx={{ ml: -1 }}>
-      <Tabs
-        value={tab}
-        sx={{
-          '& .MuiTabs-indicator': {
-            display: 'none'
-          }
-        }}>
-        {tabList.map((t, i) => (
-          <Tab
-            key={`tab-${i}`}
-            label={t}
-            onClick={() => handleTab(i)}
-            sx={{
-              boxShadow: tabIsSelected(i) ? 1 : 0,
-              backgroundColor: tabIsSelected(i) && theme.palette.background.paper,
-              borderRadius: TAB_RADIUS,
-              ml: 1
-            }}
+      <Grid container xs={12} spacing={4}>
+        <Grid item xs={6}>
+          <SubHeader size='small' text='Animal Details'/>
+          <DetailedStatusCard 
+            displayObject={testAnimal} 
+            displayKeysInGrid={['species','animal_status', 'wlh_id', 'animal_id', 'population_unit', 'sex', 'capture_date', 'mortality_date']}
+            displayKeysInBox={['animal_comment']}          
           />
-        ))}
-      </Tabs>
-      <Box
-        p={2}
-        sx={{
-          boxShadow: 1,
-          ml: 1,
-          width: '100%',
-          backgroundColor: theme.palette.background.paper,
-          borderRadius: firstTab ? BOX_RADIUS : BOX_SECONDARY_RADIUS
-        }}>
-        {children}
-      </Box>
+        </Grid>
+        <Grid item xs={6}>
+          <SubHeader size='small' text='Deployment Details'/>
+          <DetailedStatusCard 
+            displayObject={testDevice} 
+            displayKeysInGrid={['device_id','device_status','device_type','last_fetch_date','device_make','frequency','attachment_start', 'attachment_end']}
+            displayKeysInBox={['activation_comment']}          
+          />
+        </Grid>
+      </Grid>
     </Box>
   );
 };

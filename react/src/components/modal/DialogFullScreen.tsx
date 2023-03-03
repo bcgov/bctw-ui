@@ -11,6 +11,7 @@ import './modal.scss';
 import makeStyles from '@mui/styles/makeStyles';
 import { Button, Icon } from 'components/common';
 import { urls } from 'constants/external_urls';
+import { Box } from '@mui/material';
 
 const useStyles = makeStyles(() => ({
   appBar: {

@@ -1,6 +1,6 @@
 import { IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { Icon } from 'components/common';
-import { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface IMenuItem {
   label: string;
@@ -11,6 +11,7 @@ interface IMenuItem {
 interface IActionsMenu {
   menuItems: IMenuItem[];
   disabled?: boolean;
+  onOpen?: () => void;
 }
 /**
  * @param menuItems IMenuItem[]
@@ -19,16 +20,21 @@ interface IActionsMenu {
  * * i.e: row selected + menu opened events, only allow one at a time.
  *
  */
-export const ActionsMenu = ({ menuItems, disabled }: IActionsMenu): JSX.Element => {
+export const ActionsMenu = ({ menuItems, disabled, onOpen }: IActionsMenu): JSX.Element => {
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const setAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
     //This line is important. Wont work without.
+    onOpen?.();
     setAnchorEl(event.currentTarget);
+    //onOpen?.();
     event.stopPropagation();
+    
   };
-  const handleClose = () => {
+  const handleClose = (event: React.MouseEvent<HTMLLIElement>) => {
     setAnchorEl(null);
+    event.stopPropagation();
   };
   return (
     <>
@@ -42,11 +48,11 @@ export const ActionsMenu = ({ menuItems, disabled }: IActionsMenu): JSX.Element 
             <MenuItem
               key={`menu-item-${idx}`}
               disabled={disableMenuItem}
-              onClick={() => {
+              onClick={(event) => {
                 if (handleClick) {
                   handleClick();
                 }
-                handleClose();
+                handleClose(event);
               }}>
               {icon && <ListItemIcon>{icon}</ListItemIcon>}
               <ListItemText>{label}</ListItemText>

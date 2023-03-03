@@ -70,7 +70,6 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
         title={CollarStrings.assignmentHistoryByAnimalTitle}
         headers={CollarHistory.propsToDisplay}
         queryProps={{ query: api.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
-        paginate={history?.length >= 10}
         customColumns={[{ column: EditDatalifeColumn, header: <b>Modify Data Life</b> }]}
       />
       <PerformAssignmentAction
