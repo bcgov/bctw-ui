@@ -113,6 +113,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     handleRows();
   }, [values]);
 
+
   useDidMountEffect(() => {
     if (isSuccess) {
       // update the row identifier
@@ -144,6 +145,8 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           return;
         }
       });
+      console.log('Calling setValues from useDidMountEffect')
+      setSelectedIDs(new Array(values.length).fill(false));
       setValues((o) => [...o, ...newV]);
       handleRows();
     }
@@ -195,11 +198,16 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       const updatedIds = [...selectedIDs];
 
       if(filter && filter.term) {
-        filterRows(data).forEach((row) => {
-          if (row['global_id'] < selectedIDs.length) {
+        const r = filterRows(values);
+        console.log(r);
+        r.forEach((row) => {
+          //if ( row['global_id'] < selectedIDs.length ) {
             updatedIds[row['global_id']] = true;
-          }
+          //}
         });
+        
+        console.log('Select All Filter');
+        console.log(updatedIds.filter(a => a === true).length)
         setSelectedIDs(updatedIds);
       }
       else {
@@ -262,7 +270,9 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   }//, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs, forceRowRefresh]);
 
   return (
+    <>
     <TableContainer
+      sx={{borderBottomRightRadius: '0px', borderBottomLeftRadius: '0px'}} 
       fullScreenHeight={fullScreenHeight}
       toolbar={
         <TableToolbar
@@ -312,21 +322,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             )}
           </TableBody>
         </Table>
-        {!paginationFooter || isError ? null : (
-          <Box className={'table-footer'}>
-            <Divider />
-            <TablePagination
-              showFirstButton
-              rowsPerPageOptions={rowsPerPageOptions}
-              component='div'
-              count={totalRows}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-            />
-          </Box>
-        )}
+        
         {/* {isPaginate ? null : (
           <Box>
             <Divider />
@@ -339,5 +335,20 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         )} */}
       </>
     </TableContainer>
+    {!paginationFooter || isError ? null : (
+            <Paper sx={{borderTopLeftRadius: '0px', borderTopRightRadius: '0px'}}>
+            <TablePagination
+              showFirstButton
+              rowsPerPageOptions={rowsPerPageOptions}
+              component='div'
+              count={totalRows}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+            />
+            </Paper>
+        )}
+    </>
   );
 }
