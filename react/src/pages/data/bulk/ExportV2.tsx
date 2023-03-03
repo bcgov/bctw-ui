@@ -133,7 +133,6 @@ export default function ExportPageV2(): JSX.Element {
 
   useEffect(() => {
     console.log('useEffect in Export')
-    console.log(collarIDs);
     console.log(critterIDs);
   }, [collarIDs, critterIDs])
 

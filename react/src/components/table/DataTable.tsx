@@ -73,6 +73,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const [selectAll, setSelectAll] = useState(false);
   const [page, setPage] = useState(0);
   const [totalRows, setTotalRows] = useState<number>(0);
+  const [rowsForSelectAll, setRowsForSelectAll] = useState<T[]>([]); 
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
 
   const isMultiSelect = isFunction(onSelectMultiple);
@@ -83,7 +84,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
     requestDataByPage ? page : null,
     param,
-    filter
+    //filter
   );
   const noPagination = !requestDataByPage && !paginationFooter;
   const noData = isSuccess && !data?.length;
@@ -121,6 +122,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   useEffect(() => {
     handleRows();
+    console.log('Values has changed.')
   }, [values]);
 
   useDidMountEffect(() => {
@@ -154,9 +156,11 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           return;
         }
       });
-      setSelectedIDs(new Array(data.length).fill(false));
+      //console.log('Resetting from useDidMountEffect')
+      //setSelectedIDs(new Array(data.length).fill(false));
       setValues((o) => [...o, ...newV]);
       handleRows();
+      console.log('Called useDidMountEffect')
     }
   }, [data]);
 
@@ -166,16 +170,32 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     return rows.length < rowsPerPage ? rows : rows.slice(start, end);
   };
 
-  const displayedRows = useMemo((): T[] => {
-    let results = values.map((r,idx) => {return {...r, global_id: idx}})
+  const filterRows = (rows: T[]): T[] => {
+    let results = rows.map((r,idx) => {return {...r, global_id: idx}})
     if(filter && filter.term) {
       results = fuzzySearchMutipleWords(results, filter.keys ? filter.keys : (headers as string[]), filter.term)
     }
+    return results;
+  }
+
+  const displayedRows = (): T[] => {
+    const results = filterRows(values);
     
-    return !requestDataByPage || noPagination
-      ? stableSort(results, getComparator(order, orderBy)) // Truncates the rows after the data is sorted (in memoRows)
-      : stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
-  }, [values, filter, page, rowsPerPage, order, orderBy]);
+     if(!requestDataByPage || noPagination)
+     {
+        const r = stableSort(results, getComparator(order, orderBy)) // Truncates the rows after the data is sorted (in memoRows)
+        console.log('Top block len ' + r.length);
+        return r;
+     }
+     else 
+     {
+        const r = stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
+        console.log('Bottom block len ' + r.length);
+        return r;
+     }
+      
+      
+  };//, [values, filter, page, rowsPerPage, order, orderBy]);
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -190,14 +210,23 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.checked;
     if(selected) {
-      console.log('Set selected to all true')
+      
       const updatedIds = [...selectedIDs];
-      displayedRows.forEach((row) => {
-        if (row['global_id'] < selectedIDs.length) {
-          updatedIds[row['global_id']] = true;
-        }
-      });
-      setSelectedIDs(updatedIds);
+
+      if(filter && filter.term) {
+        filterRows(data).forEach((row) => {
+          if (row['global_id'] < selectedIDs.length) {
+            console.log(`Setting global id ${row['global_id']}`)
+            updatedIds[row['global_id']] = true;
+          }
+        });
+        console.log('set filter select all')
+        setSelectedIDs(updatedIds);
+      }
+      else {
+        console.log('set everything select all')
+        setSelectedIDs(new Array(data.length).fill(true));
+      }
     }
     else {
       console.log('Set selected to all false')
@@ -233,10 +262,10 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
   const customColumnsPrepend = customColumns?.filter((c) => c.prepend);
 
-  const memoRows = useMemo(() => {
+  const memoRows = () => {
     return (
       <>
-        {(!requestDataByPage || noPagination ? truncateRows(displayedRows) : displayedRows)?.map((obj, idx: number) => (
+        {(!requestDataByPage || noPagination ? truncateRows(displayedRows()) : displayedRows())?.map((obj, idx: number) => (
           <DataTableRow
             {...props}
             key={`table-row-${idx}`}
@@ -254,7 +283,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         ))}
       </>
     );
-  }, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs, forceRowRefresh]);
+  }//, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs, forceRowRefresh]);
 
   return (
     <TableContainer
@@ -303,7 +332,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
                 </TableCell>
               </TableRow>
             ) : (
-              <>{memoRows}</>
+              <>{memoRows()}</>
             )}
           </TableBody>
         </Table>
