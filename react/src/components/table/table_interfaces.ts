@@ -85,7 +85,6 @@ type DataTableProps<T> = PlainTableProps<T> &
     paginationFooter?: boolean;
     requestDataByPage?: boolean;
     fullScreenHeight?: boolean;
-    forceRowRefresh?: boolean;
   };
 
 /**

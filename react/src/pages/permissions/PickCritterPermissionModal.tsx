@@ -64,7 +64,7 @@ export default function PickCritterPermissionModal({
   // table row selected state
   const [critterIDs, setCritterIDs] = useState<string[]>([]);
 
-  const [forceRefresh, setForceRefresh] = useState<boolean>(false);
+  //const [forceRefresh, setForceRefresh] = useState<boolean>(false);
   //const [triggerReset, setTriggerReset] = useState(0);
   /**
    * state for each of the column select components rendered in the table
@@ -86,23 +86,6 @@ export default function PickCritterPermissionModal({
     setUser(u);
     setPermissionsAccessible(useUser?.user?.is_admin ? adminPermissionOptions : managerPermissionOptions);
   }, [userToLoad, useUser]);
-
-  // // when the selected state changes, update the save button's disabled state
-  // useDidMountEffect(() => {
-  //   if (showSelectPermission) {
-  //     // if the select dropdown is shown, user must have an option selected for the corresponding row to be able to save
-  //     // const selectedRows = Object.values(access).filter((a) => critterIDs.includes(a.critter_id) && a.wasSelected);
-  //     // if (critterIDs.length !== selectedRows.length) {
-  //     //   setCanSave(false);
-  //     //   return;
-  //     // }
-  //     const onlySelected = Object.values(access).filter((a) => a.wasSelected);
-  //     setCanSave(!!onlySelected.length);
-  //   }
-
-  //   // at least one row has to be selected
-  //   // setCanSave(!!critterIDs.length);
-  // }, [critterIDs, access]);
 
   // when the table query finishes - update the access state
   const onNewData = (rows: UserCritterAccess[]): void => {
@@ -139,10 +122,6 @@ export default function PickCritterPermissionModal({
         : (selected as UserCritterAccess[]).map((v) => v[v.identifier]);
     setCritterIDs(ids);
   };
-
-  useEffect(() => {
-    console.log('The internal critterID state of permmision modal has length ' +critterIDs.length )
-  })
 
   const handleSave = (): void => {
     if (!showSelectPermission) {
@@ -188,15 +167,14 @@ export default function PickCritterPermissionModal({
           const permission = p;//v.target.value as eCritterPermission;
           setAccess((prevState) => {
             const cp = { ...prevState };
-            console.log('Setting access for the following critters: ' + critterIDs);
             critterIDs.forEach((id) => {
               cp[id].permission_type = permission;
               cp[id].wasSelected = true;
             });
             return cp;
           });
-          setForceRefresh((o) => !o);
-       // setTriggerReset((prev) => prev + 1);
+          // setForceRefresh((o) => !o);
+        //setTriggerReset((prev) => prev + 1);
     }
     return (
       <Select
@@ -207,21 +185,6 @@ export default function PickCritterPermissionModal({
         disabled={!isSelected}
         sx={{ minWidth: 120 }}
         onClick={(e) => e.stopPropagation()}
-        // dont propagate the event to the row selected handler
-        // onClick={(event): void => {
-        //   if (isSelected) {
-        //     event.stopPropagation();
-        //   }
-        // }}
-        // onChange={(e) => {
-        //   const permission = e.target.value as eCritterPermission;
-        //   //setPerm(permission);
-        //   //handleChange(permission);
-        // }}
-        //onClick={(e) => e.stopPropagation()}
-        //onChange={(v: SelectChangeEvent<eCritterPermission>): void => {
-          
-        //}}
         >
         {/* show select dropdown options based on user role */}
         {permissionsAccessible.sort().map((d) => (
@@ -250,7 +213,7 @@ export default function PickCritterPermissionModal({
           onSelectMultiple={handleSelect}
           //resetSelections={triggerReset}
           alreadySelected={alreadySelected}
-          forceRowRefresh={forceRefresh}
+          //forceRowRefresh={forceRefresh}
           customColumns={
             showSelectPermission
               ? [
@@ -272,39 +235,3 @@ export default function PickCritterPermissionModal({
     </FullScreenDialog>
   );
 }
-
-// when the custom table header "select all" is changed,
-// update all of the custom column selects
-/*
-  useEffect(() => {
-    const updateRows = (): void => {
-      setAccessTypes((prevState) => {
-        return prevState.map((c) => {
-          return { critter_id: c.critter_id, permission_type: tableHeaderCritterSelectOption as eCritterPermission };
-        });
-      });
-    };
-    updateRows();
-  }, [tableHeaderCritterSelectOption]);
-*/
-
-// a custom table header component. selecting an option from the dropdown
-// updates all of the newColumn selects above.
-// note: disable this as of new privileges workflow
-/*
-const newHeader = (): JSX.Element => {
-  return (
-    <Select
-      value={tableHeaderCritterSelectOption}
-      onChange={(e: React.ChangeEvent<{ value: unknown }>): void => {
-        setTableHeaderCritterSelectOption(e.target.value as eCritterPermission);
-      }}>
-      {Object.values(eCritterPermission).map((d) => (
-        <MenuItem key={`headermenuItem-${d}`} value={d}>
-          {d}
-        </MenuItem>
-      ))}
-    </Select>
-  );
-}
-*/

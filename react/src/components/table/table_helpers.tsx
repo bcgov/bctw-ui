@@ -76,9 +76,10 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
     return a[1] - b[1];
   });
   return stabilizedThis.map((el) => el[0]);*/
+  /** No idea why the above was done when you can just pass the comparator to the sort function directly.
+   * Leaving it commented just in case it's relevant again eventually.
+   */
   const sortedArr = array.slice().sort(comparator);
-  console.log('sortedArr')
-  console.log(sortedArr.map(a => a['species']));
   return sortedArr;
 }
 /** Renders the coloured tags for species and collars */

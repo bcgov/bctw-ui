@@ -37,7 +37,6 @@ import { BCTWBase } from 'types/common_types';
 import DataTableRow from './DataTableRow';
 import './table.scss';
 
-//export const rowsPerPage = 100;
 /**
  * Data table component, fetches data to display from @param {queryProps}
  * supports pagination, sorting, single or multiple selection
@@ -58,8 +57,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     paginationFooter = false,
     fullScreenHeight = false,
     alreadySelected = [],
-    customColumns = [],
-    forceRowRefresh = false
+    customColumns = []
   } = props;
   const rowsPerPageOptions = [100, 250, 500, 1000];
   const useRowState = useTableRowSelectedState();
@@ -73,13 +71,9 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const [selectAll, setSelectAll] = useState(false);
   const [page, setPage] = useState(0);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [rowsForSelectAll, setRowsForSelectAll] = useState<T[]>([]); 
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
 
   const isMultiSelect = isFunction(onSelectMultiple);
-
-  const triggerMultiUpdate = isMultiSelect && JSON.stringify(selectedIDs);
-
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
     requestDataByPage ? page : null,
@@ -88,11 +82,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   );
   const noPagination = !requestDataByPage && !paginationFooter;
   const noData = isSuccess && !data?.length;
-
-  // const [filteredRowCount, setFilteredRowCount] = useState<number>(0);
-  // const [rowsPerPage, setRowsPerPage] = useState<number>(ROWS_PER_PAGE);
-
-  // const isPaginate = paginate && !DISABLE_PAGINATION;
 
   /**
    * since data is updated when the page is changed, use the 'values'
@@ -122,7 +111,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   useEffect(() => {
     handleRows();
-    console.log('Values has changed.')
   }, [values]);
 
   useDidMountEffect(() => {
@@ -156,11 +144,8 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           return;
         }
       });
-      //console.log('Resetting from useDidMountEffect')
-      //setSelectedIDs(new Array(data.length).fill(false));
       setValues((o) => [...o, ...newV]);
       handleRows();
-      console.log('Called useDidMountEffect')
     }
   }, [data]);
 
@@ -201,7 +186,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-    console.log('We set orderBy to ' + property);
   };
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -249,7 +233,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
       return selectedIDs[idx] === true;
     })
     onSelectMultiple?.(selected);
-    //console.log('Selected IDs was called, length: ' + selected.length)
   }, [selectedIDs])
 
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
