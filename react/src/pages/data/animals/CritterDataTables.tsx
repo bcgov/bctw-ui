@@ -153,7 +153,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             title={CritterStrings.collaredAnimals}
             customColumns={[
               { column: Menu, header: <b>Actions</b> },
-              { column: Status, header: <p>Status</p>, prepend: true }
+              { column: Status, header: <div>Status</div>, prepend: true }
             ]}
             exporter={
               <>
