@@ -24,6 +24,7 @@ import { Button, Container } from '@mui/material';
 import { buttonProps } from 'components/component_constants';
 import { Tooltip } from 'components/common';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
+import { ITableSortProp, Order } from 'components/table/table_interfaces';
 
 export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
@@ -145,7 +146,11 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             headers={AttachedAnimal.attachedCritterDisplayProps}
             queryProps={{
               query: api.useAssignedCritters,
-              onNewData: (data: AttachedAnimal[]) => setAttachedAnimalData(data)
+              onNewData: (data: AttachedAnimal[]) => setAttachedAnimalData(data),
+              defaultSort: { 
+                property: "device_status", 
+                order: "asc"
+              }
             }}
             onSelect={handleSelect}
             deleted={deleted}
