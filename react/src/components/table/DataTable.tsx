@@ -152,7 +152,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           return;
         }
       });
-      setSelectedIDs(new Array(values.length).fill(false));
+      setSelectedIDs(new Array(data.length).fill(false));
       setValues((o) => [...o, ...newV]);
       handleRows();
     }
@@ -183,6 +183,12 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
      {
         r = stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
      }
+     if(r.length != totalRows) 
+     {
+      //Crashes the page unless guarded by this condition for some reason.
+      setTotalRows(r.length);
+     }
+      
      return r;
       
   };//, [values, filter, page, rowsPerPage, order, orderBy]);
