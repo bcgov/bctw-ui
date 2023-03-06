@@ -77,7 +77,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
     return null;
   };
 
-  const Menu = (row: AttachedAnimal, idx: number): JSX.Element => {
+  const Menu = (row: AttachedAnimal | Animal, idx: number, attached: boolean): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
     const _edit = () => setOpenEdit(true);
     const _map = () => setOpenMap(true);
@@ -123,7 +123,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
       <ActionsMenu
         //disabled={row !== editObj}
         menuItems={
-          row instanceof AttachedAnimal ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
+          attached ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
         }
         onOpen={() => {
           setEditObj(row);
@@ -152,7 +152,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             updated={updated}
             title={CritterStrings.collaredAnimals}
             customColumns={[
-              { column: Menu, header: <b>Actions</b> },
+              { column: (row,idx) => Menu(row, idx, true) , header: <b>Actions</b> },
               { column: Status, header: <div>Status</div>, prepend: true }
             ]}
             exporter={
@@ -175,7 +175,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             updated={updated}
             deleted={deleted}
             title={CritterStrings.nonCollaredAnimals}
-            customColumns={[{ column: Menu, header: <b>Actions</b> }]}
+            customColumns={[{ column: (row,idx) => Menu(row, idx, false), header: <b>Actions</b> }]}
             paginationFooter
             exporter={
               <>
