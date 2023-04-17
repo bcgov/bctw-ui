@@ -17,7 +17,7 @@ import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 
-export enum eSpecies {
+export enum etaxon {
   caribou = 'M-RATA',
   grizzly_bear = 'M-URAR',
   moose = 'M-ALAM',
@@ -31,7 +31,7 @@ export enum eAnimalStatus {
   potential_mortality = 'Potential Mortality'
 }
 
-const { caribou, grizzly_bear, moose, grey_wolf } = eSpecies;
+const { caribou, grizzly_bear, moose, grey_wolf } = etaxon;
 
 // used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
@@ -39,7 +39,7 @@ export enum eCritterFetchType {
   unassigned = 'unassigned'
 }
 
-export interface ISpecies {
+export interface Itaxon {
   id: string;
   //key: string,
   name: string;
@@ -53,7 +53,7 @@ export interface IAnimalTelemetryBase {
   capture_date: Dayjs | Date;
   collective_unit: string;
   map_colour: Code;
-  species: Code;
+  taxon: string;
   population_unit: Code;
   wlh_id: string;
 }
@@ -96,8 +96,8 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 
   permission_type?: eCritterPermission; // critters should contain this
   predator_known_ind: boolean;
-  predator_species_pcod: Code;
-  predator_species_ucod: Code;
+  predator_taxon_pcod: Code;
+  predator_taxon_ucod: Code;
   proximate_cause_of_death: Code;
   ucod_confidence: Code;
   pcod_confidence: Code;
@@ -150,8 +150,8 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   mortality_utm_northing: number;
   mortality_utm_zone: number;
   predator_known_ind: boolean;
-  predator_species_pcod: Code;
-  predator_species_ucod: Code;
+  predator_taxon_pcod: Code;
+  predator_taxon_ucod: Code;
   proximate_cause_of_death: Code;
   ucod_confidence: Code;
   pcod_confidence: Code;
@@ -167,7 +167,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   release_utm_northing: number;
   release_utm_zone: number;
   sex: Code;
-  species: Code;
+  taxon: string;
   translocation_ind: boolean;
   wlh_id: string;
   animal_comment: string;
@@ -222,7 +222,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   }
 
   get displayProps(): (keyof Animal)[] {
-    return ['species', 'population_unit', 'wlh_id', 'animal_id', 'animal_status'];
+    return ['taxon', 'population_unit', 'wlh_id', 'animal_id', 'animal_status'];
     //return Animal.toCSVHeaderTemplate;
   }
 
@@ -234,14 +234,14 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   }
 
   tagColor(): string {
-    switch (this.species) {
-      case 'Caribou':
+    switch (this.taxon.toLowerCase()) {
+      case 'caribou':
         return '#9575cd';
-      case 'Moose':
+      case 'moose':
         return '#64b5f6';
-      case 'Grey Wolf':
+      case 'grey wolf':
         return '#4db6ac';
-      case 'Grizzly Bear':
+      case 'grizzly bear':
         return '#81c784';
       default:
         return '#bdbdbd';
@@ -283,7 +283,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   // con't overide since this class is inherited
   static get attachedCritterDisplayProps(): (keyof AttachedAnimal)[] {
     return [
-      'species',
+      'taxon',
       'wlh_id',
       'animal_id',
       'device_status',
@@ -301,7 +301,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
 
   static get attachedCritterExportProps(): (keyof AttachedAnimal)[] {
     return [
-      'species',
+      'taxon',
       'wlh_id',
       'animal_id',
       'device_status',
@@ -337,78 +337,78 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
   }
 }
 
-// species: [] represents field applies to all species, used for optimization on searching
+// taxon: [] represents field applies to all taxon, used for optimization on searching
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
-  speciesField: [{ prop: 'species', type: eInputType.code, species: [], ...isRequired }],
+  taxonField: [{ prop: 'taxon', type: eInputType.code, taxon: [], ...isRequired }],
   associatedAnimalFields: [
-    { prop: 'associated_animal_id', type: eInputType.text, species: [] },
-    { prop: 'associated_animal_relationship', type: eInputType.code, species: [] }
+    { prop: 'associated_animal_id', type: eInputType.text, taxon: [] },
+    { prop: 'associated_animal_relationship', type: eInputType.code, taxon: [] }
   ],
   captureFields: [
-    { prop: 'capture_date', type: eInputType.datetime, species: [] },
-    { prop: 'capture_latitude', type: eInputType.number, species: [] },
-    { prop: 'capture_longitude', type: eInputType.number, species: [] },
-    { prop: 'capture_utm_zone', type: eInputType.number, species: [] },
-    { prop: 'capture_utm_easting', type: eInputType.number, species: [] },
-    { prop: 'capture_utm_northing', type: eInputType.number, species: [] },
-    { prop: 'recapture_ind', type: eInputType.check, species: [] },
-    { prop: 'captivity_status_ind', type: eInputType.check, species: [caribou] },
-    { prop: 'capture_comment', type: eInputType.multiline, species: [] }
+    { prop: 'capture_date', type: eInputType.datetime, taxon: [] },
+    { prop: 'capture_latitude', type: eInputType.number, taxon: [] },
+    { prop: 'capture_longitude', type: eInputType.number, taxon: [] },
+    { prop: 'capture_utm_zone', type: eInputType.number, taxon: [] },
+    { prop: 'capture_utm_easting', type: eInputType.number, taxon: [] },
+    { prop: 'capture_utm_northing', type: eInputType.number, taxon: [] },
+    { prop: 'recapture_ind', type: eInputType.check, taxon: [] },
+    { prop: 'captivity_status_ind', type: eInputType.check, taxon: [caribou] },
+    { prop: 'capture_comment', type: eInputType.multiline, taxon: [] }
   ],
   characteristicsFields: [
-    { prop: 'animal_status', type: eInputType.code, species: [], ...isRequired },
-    //{ prop: 'species', type: eInputType.code, species: [...ALL_SPECIES], ...isRequired },
-    { prop: 'sex', type: eInputType.code, species: [], ...isRequired },
-    { prop: 'animal_colouration', type: eInputType.text, species: [] },
-    { prop: 'estimated_age', type: eInputType.number, species: [], validate: mustbePositiveNumber },
-    { prop: 'life_stage', type: eInputType.code, species: [] } //Species dependant, with code table
+    { prop: 'animal_status', type: eInputType.code, taxon: [], ...isRequired },
+    //{ prop: 'taxon', type: eInputType.code, taxon: [...ALL_taxon], ...isRequired },
+    { prop: 'sex', type: eInputType.code, taxon: [], ...isRequired },
+    { prop: 'animal_colouration', type: eInputType.text, taxon: [] },
+    { prop: 'estimated_age', type: eInputType.number, taxon: [], validate: mustbePositiveNumber },
+    { prop: 'life_stage', type: eInputType.code, taxon: [] } //taxon dependant, with code table
   ],
   characteristicFields2: [
-    { prop: 'juvenile_at_heel', type: eInputType.code, species: [] },
-    { prop: 'juvenile_at_heel_count', type: eInputType.number, species: [], validate: mustbePositiveNumber }
+    { prop: 'juvenile_at_heel', type: eInputType.code, taxon: [] },
+    { prop: 'juvenile_at_heel_count', type: eInputType.number, taxon: [], validate: mustbePositiveNumber }
   ],
   identifierFields1: [
-    { prop: 'wlh_id', type: eInputType.text, species: [] },
-    { prop: 'animal_id', type: eInputType.text, species: [], ...isRequired },
+    { prop: 'wlh_id', type: eInputType.text, taxon: [] },
+    { prop: 'animal_id', type: eInputType.text, taxon: [], ...isRequired },
     //Add nickname field for bears
-    { prop: 'region', type: eInputType.code, species: [], ...isRequired },
-    { prop: 'population_unit', type: eInputType.code, species: [] } //Population unit needs to be species dependant, surface with code table
+    { prop: 'region', type: eInputType.code, taxon: [], ...isRequired },
+    { prop: 'population_unit', type: eInputType.code, taxon: [] } //Population unit needs to be taxon dependant, surface with code table
   ],
   identifierFields2: [
-    { prop: 'ear_tag_left_colour', type: eInputType.text, species: [] },
-    { prop: 'ear_tag_right_colour', type: eInputType.text, species: [] },
-    { prop: 'ear_tag_left_id', type: eInputType.text, species: [] },
-    { prop: 'ear_tag_right_id', type: eInputType.text, species: [] }
+    { prop: 'ear_tag_left_colour', type: eInputType.text, taxon: [] },
+    { prop: 'ear_tag_right_colour', type: eInputType.text, taxon: [] },
+    { prop: 'ear_tag_left_id', type: eInputType.text, taxon: [] },
+    { prop: 'ear_tag_right_id', type: eInputType.text, taxon: [] }
   ],
   mortalityFields: [
-    { prop: 'mortality_date', type: eInputType.datetime, species: [] },
-    { prop: 'mortality_latitude', type: eInputType.number, species: [] },
-    { prop: 'mortality_longitude', type: eInputType.number, species: [] },
-    { prop: 'mortality_utm_zone', type: eInputType.number, species: [] },
-    { prop: 'mortality_utm_easting', type: eInputType.number, species: [] },
-    { prop: 'mortality_utm_northing', type: eInputType.number, species: [] },
-    { prop: 'proximate_cause_of_death', type: eInputType.code, species: [caribou] },
-    { prop: 'ultimate_cause_of_death', type: eInputType.code, species: [caribou] },
-    { prop: 'pcod_confidence', type: eInputType.code, species: [caribou], codeName: 'cod_confidence' },
-    { prop: 'ucod_confidence', type: eInputType.code, species: [caribou], codeName: 'cod_confidence' },
-    { prop: 'predator_species_pcod', type: eInputType.code, species: [caribou], codeName: 'predator_species' },
-    { prop: 'predator_species_ucod', type: eInputType.code, species: [caribou], codeName: 'predator_species' },
-    { prop: 'mortality_investigation', type: eInputType.code, species: [caribou] },
-    { prop: 'mortality_report_ind', type: eInputType.check, species: [caribou] },
-    { prop: 'predator_known_ind', type: eInputType.check, species: [caribou] },
-    { prop: 'mortality_comment', type: eInputType.multiline, species: [] }
+    { prop: 'mortality_date', type: eInputType.datetime, taxon: [] },
+    { prop: 'mortality_latitude', type: eInputType.number, taxon: [] },
+    { prop: 'mortality_longitude', type: eInputType.number, taxon: [] },
+    { prop: 'mortality_utm_zone', type: eInputType.number, taxon: [] },
+    { prop: 'mortality_utm_easting', type: eInputType.number, taxon: [] },
+    { prop: 'mortality_utm_northing', type: eInputType.number, taxon: [] },
+    { prop: 'proximate_cause_of_death', type: eInputType.code, taxon: [caribou] },
+    { prop: 'ultimate_cause_of_death', type: eInputType.code, taxon: [caribou] },
+    { prop: 'pcod_confidence', type: eInputType.code, taxon: [caribou], codeName: 'cod_confidence' },
+    { prop: 'ucod_confidence', type: eInputType.code, taxon: [caribou], codeName: 'cod_confidence' },
+    { prop: 'predator_taxon_pcod', type: eInputType.code, taxon: [caribou], codeName: 'predator_taxon' },
+    { prop: 'predator_taxon_ucod', type: eInputType.code, taxon: [caribou], codeName: 'predator_taxon' },
+    { prop: 'mortality_investigation', type: eInputType.code, taxon: [caribou] },
+    { prop: 'mortality_report_ind', type: eInputType.check, taxon: [caribou] },
+    { prop: 'predator_known_ind', type: eInputType.check, taxon: [caribou] },
+    { prop: 'mortality_comment', type: eInputType.multiline, taxon: [] }
   ],
   releaseFields: [
-    { prop: 'release_date', type: eInputType.datetime, species: [] },
-    { prop: 'release_latitude', type: eInputType.number, species: [] },
-    { prop: 'release_longitude', type: eInputType.number, species: [] },
-    { prop: 'release_utm_zone', type: eInputType.number, species: [] },
-    { prop: 'release_utm_easting', type: eInputType.number, species: [] },
-    { prop: 'release_utm_northing', type: eInputType.number, species: [] },
-    { prop: 'translocation_ind', type: eInputType.check, species: [] },
-    { prop: 'release_comment', type: eInputType.multiline, species: [] }
+    { prop: 'release_date', type: eInputType.datetime, taxon: [] },
+    { prop: 'release_latitude', type: eInputType.number, taxon: [] },
+    { prop: 'release_longitude', type: eInputType.number, taxon: [] },
+    { prop: 'release_utm_zone', type: eInputType.number, taxon: [] },
+    { prop: 'release_utm_easting', type: eInputType.number, taxon: [] },
+    { prop: 'release_utm_northing', type: eInputType.number, taxon: [] },
+    { prop: 'translocation_ind', type: eInputType.check, taxon: [] },
+    { prop: 'release_comment', type: eInputType.multiline, taxon: [] }
   ],
-  animalCommentField: [{ prop: 'animal_comment', type: eInputType.multiline, species: [] }]
+  animalCommentField: [{ prop: 'animal_comment', type: eInputType.multiline, taxon: [] }]
 };
 
 // a 'flatteneed' critterFormFields array

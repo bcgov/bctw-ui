@@ -2,7 +2,7 @@ import { BaseTextFieldProps } from '@mui/material';
 import { ReactNode } from 'react';
 
 export type KeyType = string | number | symbol;
-//export type SpeciesCast = {[key in keyof typeof eSpecies]?: string};
+//export type taxonCast = {[key in keyof typeof etaxon]?: string};
 export enum eInputType {
   text = 'text',
   number = 'number',
@@ -32,8 +32,8 @@ export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled' | 'required
   prop: keyof T;
   // prop: KeyType;
   type: eInputType;
-  species?: string[];
-  //cast?: SpeciesCast // ex: {moose: 'wildlife_unit', grey_wolf: 'wildlife_unit'}
+  taxon?: string[];
+  //cast?: taxonCast // ex: {moose: 'wildlife_unit', grey_wolf: 'wildlife_unit'}
   codeName?: string;
   span?: boolean;
   tooltip?: ReactNode;

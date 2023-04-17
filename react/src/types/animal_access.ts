@@ -8,7 +8,7 @@ import { eCritterPermission } from 'types/permission';
 
 export interface IUserCritterAccess
   extends Required<Pick<Animal, 'permission_type'>>,
-    Pick<Animal, 'critter_id' | 'animal_id' | 'species' | 'wlh_id' | 'population_unit' | 'valid_from' | 'valid_to' >,
+    Pick<Animal, 'critter_id' | 'animal_id' | 'taxon' | 'wlh_id' | 'population_unit' | 'valid_from' | 'valid_to'>,
     Pick<Collar, 'device_id' | 'device_make' | 'device_type' | 'frequency'> {}
 
 export type IUserCritterAccessInput = Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> &
@@ -19,7 +19,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   critter_id: string;
   animal_id: string;
   wlh_id: string;
-  species: string;
+  taxon: string;
   population_unit: string;
   managed_by: string;
   edited_by: string;
@@ -52,7 +52,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
       'permission_type',
       'wlh_id',
       'animal_id',
-      'species',
+      'taxon',
       'population_unit',
       'device_id',
       'frequency',
@@ -71,5 +71,4 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   get animalManagerDisplayProps(): (keyof UserCritterAccess)[] {
     return UserCritterAccess.animalManagerDisplayProps;
   }
-  
 }

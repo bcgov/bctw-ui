@@ -22,7 +22,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
   const createEvent = (wfType: WorkflowType): CaptureEvent | ReleaseEvent | MortalityEvent => {
     if (wfType === 'capture') {
       return editObjectToEvent(editing, new CaptureEvent(), [
-        'species',
+        'taxon',
         'translocation_ind',
         'recapture_ind',
         'region',

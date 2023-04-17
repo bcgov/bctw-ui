@@ -1,14 +1,14 @@
 import { getBaseUrl } from 'api/api_helpers';
+import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
-import { onboardingApi as onboarding_api } from 'api/onboarding_api';
 import { mapApi as map_api } from 'api/map_api';
-import { attachmentApi as attachment_api } from 'api/attachment_api';
-import { userApi as user_api } from 'api/user_api';
+import { onboardingApi as onboarding_api } from 'api/onboarding_api';
 import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
+import { userApi as user_api } from 'api/user_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import {
@@ -22,7 +22,7 @@ import {
 import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
-import { CollarHistory, AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
+import { AttachDeviceInput, CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { IKeyCloakSessionInfo, User } from 'types/user';
 
 import {
@@ -33,10 +33,14 @@ import {
   XLSXPayload
 } from 'api/api_interfaces';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
+import { UserCritterAccess } from 'types/animal_access';
 import { BCTWType } from 'types/common_types';
+import { ChangeDataLifeInput } from 'types/data_life';
+import { BCTWWorkflow } from 'types/events/event';
+import { FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
 import { ExportAllParams, ExportQueryParams } from 'types/export';
-import { eUDFType, IUDF, UDF } from 'types/udf';
-import { ITelemetryPoint, ITelemetryLine } from 'types/map';
+import { ITelemetryLine, ITelemetryPoint } from 'types/map';
+import { HandleOnboardInput, IOnboardUser, OnboardUser, OnboardUserRequest } from 'types/onboarding';
 import {
   eCritterPermission,
   IExecutePermissionRequest,
@@ -44,13 +48,8 @@ import {
   IUserCritterPermissionInput,
   PermissionRequest
 } from 'types/permission';
-import { ChangeDataLifeInput } from 'types/data_life';
-import { BCTWWorkflow } from 'types/events/event';
-import { IOnboardUser, HandleOnboardInput, OnboardUser, OnboardUserRequest } from 'types/onboarding';
-import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
+import { eUDFType, IUDF, UDF } from 'types/udf';
 import { parseArgs } from 'utils/common_helpers';
-import { FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
-import { useSpecies } from 'contexts/SpeciesContext';
 
 /**
  * Returns an instance of axios with baseURL set.
@@ -267,10 +266,10 @@ export const useTelemetryApi = () => {
   const useCodes = <T>(
     page: number,
     codeHeader: string,
-    species?: string | null,
+    taxon?: string | null,
     options?: T
   ): UseQueryResult<ICode[], AxiosError> => {
-    const props = { page, codeHeader, species };
+    const props = { page, codeHeader, taxon };
     return useQuery<ICode[], AxiosError>(['codes', props], () => codeApi.getCodes(props), {
       ...codeOptions,
       ...options
@@ -433,7 +432,9 @@ export const useTelemetryApi = () => {
     return useMutation<string[], AxiosError, ExportQueryParams>((body) => bulkApi.getExportData(body), config);
   };
 
-  const useExportAll = (config: UseMutationOptions<string[], AxiosError, ExportAllParams>): UseMutationResult<string[]> => {
+  const useExportAll = (
+    config: UseMutationOptions<string[], AxiosError, ExportAllParams>
+  ): UseMutationResult<string[]> => {
     return useMutation<string[], AxiosError, ExportAllParams>((body) => bulkApi.getAllExportData(body), config);
   };
 

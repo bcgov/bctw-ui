@@ -123,9 +123,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
     return (
       <ActionsMenu
         //disabled={row !== editObj}
-        menuItems={
-          attached ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]
-        }
+        menuItems={attached ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]}
         onOpen={() => {
           setEditObj(row);
         }}
@@ -146,32 +144,36 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             headers={AttachedAnimal.attachedCritterDisplayProps}
             queryProps={{
               query: api.useAssignedCritters,
-              onNewData: (data: AttachedAnimal[]) => setAttachedAnimalData(data),
-              defaultSort: { 
-                property: "device_status", 
-                order: "asc"
+              onNewData: (data: AttachedAnimal[]): void => setAttachedAnimalData(data),
+              defaultSort: {
+                property: 'device_status',
+                order: 'asc'
               }
             }}
             onSelect={handleSelect}
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
-            customColumns={[
-              { column: (row,idx) => Menu(row, idx, true) , header: <b>Actions</b> },
-              { column: Status, header: <div>Status</div>, prepend: true }
-            ]}
-            exporter={
-              <>
-                <ExportViewer<AttachedAnimal>
-                  template={AttachedAnimal.attachedCritterExportProps}
-                  eTitle={CritterStrings.exportTitle}
-                  data={attachedAnimalData}
-                />
-              </>
-            }
+            //TODO add this back
+            // customColumns={[
+            //   { column: (row, idx) => Menu(row, idx, true), header: <b>Actions</b> },
+            //   { column: Status, header: <div>Status</div>, prepend: true }
+            // ]}
+            //TODO add this back
+            // exporter={
+            //   <>
+            //     <ExportViewer<AttachedAnimal>
+            //       template={AttachedAnimal.attachedCritterExportProps}
+            //       eTitle={CritterStrings.exportTitle}
+            //       data={attachedAnimalData}
+            //     />
+            //   </>
+            // }
             paginationFooter
           />
         </Box>
+        {/*
+        //TODO remove old code related to unattached animals table
         <Box mb={4}>
           <DataTable
             headers={new Animal().displayProps}
@@ -201,7 +203,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
               </>
             }
           />
-        </Box>
+        </Box> */}
 
         {/* Displays the recent animal telemetry map modal */}
         {/*<MapModal

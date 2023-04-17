@@ -15,7 +15,7 @@ type CaptureAnimalEventProps = Pick<
   | 'critter_id'
   | 'animal_id'
   | 'wlh_id'
-  | 'species'
+  | 'taxon'
   | 'recapture_ind'
   | 'translocation_ind'
   | 'associated_animal_id'
@@ -82,7 +82,7 @@ export default class CaptureEvent
   readonly critter_id: uuid;
   readonly wlh_id: string;
   readonly animal_id: string;
-  species: Code;
+  taxon: Code;
   recapture_ind: boolean;
   translocation_ind: boolean;
   associated_animal_id: string;
@@ -133,7 +133,7 @@ export default class CaptureEvent
       'critter_id',
       'recapture_ind',
       'translocation_ind',
-      'species',
+      'taxon',
       'associated_animal_id',
       'associated_animal_relationship',
       'captivity_status_ind',

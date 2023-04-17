@@ -391,7 +391,7 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
   let undefinedCount = 0;
   const formated = merged.map((d, i) => {
     let displayLabel = PLACEHOLDER;
-    let species = PLACEHOLDER;
+    let taxon = PLACEHOLDER;
     let colour: string;
     if (d) {
       displayLabel = d.toString();
@@ -405,14 +405,14 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
           : (colour = MAP_COLOURS['unassigned point']);
       }
       if (IS_POPUNIT && p.properties[propName] === displayLabel) {
-        species = p.properties.species;
+        taxon = p.properties.taxon;
       }
       return p.properties[propName] === d;
     }).length;
     return {
       id: d,
       value: d ?? displayLabel,
-      displayLabel: IS_POPUNIT ? `${capitalize(species)}: ${displayLabel}` : displayLabel,
+      displayLabel: IS_POPUNIT ? `${capitalize(taxon)}: ${displayLabel}` : displayLabel,
       prop: propName,
       colour: colour ? colour : getEvenlySpacedColour(i),
       pointCount

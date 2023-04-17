@@ -19,7 +19,7 @@ const DEVICE_STATUS_OPTIONS = [
 // dropdown filters displayed in map filters panel
 const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: string[] }[] = [
   { header: 'device_id', label: 'Device ID (Default)' },
-  { header: 'species' },
+  { header: 'taxon' },
   { header: 'animal_status' },
   { header: 'device_status' },
   { header: 'sex' },

@@ -26,7 +26,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
   const [projectRole, setProjectRole] = useState('');
   const [reason, setReason] = useState('');
   const [region, setRegion] = useState('');
-  const [species, setSpecies] = useState('');
+  const [taxon, settaxon] = useState('');
   const [textMessageNumber, setTextMessageNumber] = useState('');
 
   const useKeycloakUser = useContext(UserContext);
@@ -81,7 +81,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
     emailInfo.projectName = projectName;
     emailInfo.projectRole = projectRole;
     emailInfo.region = region;
-    emailInfo.species = species;
+    emailInfo.taxon = taxon;
     console.log(`UserOnboarding: Request: submitRequest: submitting onboarding request`, newUser);
     await saveMutation(newUser);
   };
@@ -130,7 +130,7 @@ const UserAccessRequest = ({ children }: UserAccessRequestProps): JSX.Element =>
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField label='Target Species' onChange={(e): void => setSpecies(e.target.value)} {...textProps} />
+            <TextField label='Target taxon' onChange={(e): void => settaxon(e.target.value)} {...textProps} />
           </Grid>
           <Grid item xs={12}>
             <TextField label='Region' onChange={(e): void => setRegion(e.target.value)} {...textProps} />

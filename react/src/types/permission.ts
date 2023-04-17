@@ -16,7 +16,7 @@ export enum eCritterPermission {
   manager = 'manager', // the user created this object
   editor = 'editor', // previously 'subowner'
   observer = 'observer', // previously 'view'
-  none = 'none', // 
+  none = 'none', //
   admin = 'admin' // technically not an option
 }
 
@@ -30,7 +30,7 @@ export const permissionDeniedReasons: PermissionWasDeniedReason[] = ['Not given'
 const filterOutNonePermissions: eCritterPermission[] = [
   eCritterPermission.manager,
   eCritterPermission.editor,
-  eCritterPermission.observer,
+  eCritterPermission.observer
 ];
 
 // an manager can delegate these animal permissions to other users
@@ -41,7 +41,7 @@ const adminPermissionOptions: eCritterPermission[] = [...filterOutNonePermission
 /**
  * the type that an 'manager' will submit a request for other
  * users to receive animal permissions
-*/
+ */
 export interface IPermissionRequestInput {
   user_email_list: string[];
   critter_permissions_list: IUserCritterAccessInput[];
@@ -59,9 +59,10 @@ export class PermissionRequestInput implements IPermissionRequestInput {
  * interface that represents:
  * a) what an admin sees in the requests page - from the API schema view permission_request_v
  * b) what an manager sees in the request history table (some fields)
-*/
-export interface IPermissionRequest extends 
-  Pick<Animal, 'animal_id' | 'wlh_id' | 'species'>, Pick<BCTWValidDates, 'valid_to'> {
+ */
+export interface IPermissionRequest
+  extends Pick<Animal, 'animal_id' | 'wlh_id' | 'taxon'>,
+    Pick<BCTWValidDates, 'valid_to'> {
   readonly request_id: number;
   requested_by: string; // idir or bceid
   requested_by_email: string;
@@ -75,11 +76,10 @@ export interface IPermissionRequest extends
   status: PermissionRequestStatus;
 }
 
-
 export class PermissionRequest implements IPermissionRequest, BCTWBase<PermissionRequest> {
   animal_id: string;
   wlh_id: string;
-  species: string;
+  taxon: string;
   request_id: number;
   requested_by: string;
   requested_by_email: string;
@@ -97,24 +97,35 @@ export class PermissionRequest implements IPermissionRequest, BCTWBase<Permissio
     return [];
   }
 
-  get identifier(): string { return 'request_id' }
+  get identifier(): string {
+    return 'request_id';
+  }
 
   formatPropAsHeader(str: keyof PermissionRequest): string {
     return columnToHeader(str);
   }
 
-  toJSON(): PermissionRequest { return this }
+  toJSON(): PermissionRequest {
+    return this;
+  }
 
   /**
    * headers displayed in the delegation history table
    */
   static get managerHistoryPropsToDisplay(): (keyof PermissionRequest)[] {
-    return [ 'wlh_id', 'animal_id', 'species', 'requested_date',
-      'requested_for_name', 'requested_for_email',
-      'permission_type', 'status', 'was_denied_reason' ];
+    return [
+      'wlh_id',
+      'animal_id',
+      'taxon',
+      'requested_date',
+      'requested_for_name',
+      'requested_for_email',
+      'permission_type',
+      'status',
+      'was_denied_reason'
+    ];
   }
 }
-
 
 /**
  * the requests view splits one permission request into multiple rows
@@ -128,23 +139,23 @@ export interface IGroupedRequest {
 
 const groupPermissionRequests = (r: PermissionRequest[]): IGroupedRequest[] => {
   const result: IGroupedRequest[] = [];
-  r.forEach(req => {
+  r.forEach((req) => {
     const id = req.request_id;
-    const found = result.find(f => f.id === id);
+    const found = result.find((f) => f.id === id);
     if (found) {
       found.requests.push(req);
     } else {
-      const n = {id, requests: [req]}
+      const n = { id, requests: [req] };
       result.push(n);
     }
-  })
+  });
   return result;
-}
+};
 
 /**
  * the object the admin submits to grant / denty a permission request
  * in the permission API @function {takeActionOnPermissionRequest}
-*/
+ */
 export interface IExecutePermissionRequest extends Pick<IPermissionRequest, 'request_id'> {
   is_grant: boolean; // whether or not to approve or deny
   was_denied_reason: string; // optional message if the request is being denied
@@ -158,7 +169,7 @@ const permissionCanModify = (p: eCritterPermission): boolean => {
 };
 
 const canRemoveDeviceFromAnimal = (p: eCritterPermission): boolean => {
-  return p === eCritterPermission.manager|| p === eCritterPermission.admin;
+  return p === eCritterPermission.manager || p === eCritterPermission.admin;
 };
 
 export {
@@ -167,5 +178,5 @@ export {
   permissionCanModify,
   canRemoveDeviceFromAnimal,
   filterOutNonePermissions,
-  groupPermissionRequests,
+  groupPermissionRequests
 };

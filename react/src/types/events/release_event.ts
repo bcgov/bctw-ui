@@ -13,7 +13,7 @@ import { Collar } from 'types/collar';
 import { formatTime } from 'utils/time';
 import CaptureEvent from './capture_event';
 
-type ReleaseProps = Pick<Animal, 'species' | 'translocation_ind' | 'region' | 'population_unit' | 'animal_status'>;
+type ReleaseProps = Pick<Animal, 'taxon' | 'translocation_ind' | 'region' | 'population_unit' | 'animal_status'>;
 
 export type ReleaseFormField = {
   [Property in keyof ReleaseEvent]+?: FormFieldObject<ReleaseEvent>;
@@ -44,7 +44,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   readonly wlh_id: string;
   readonly animal_id: string;
   readonly animal_status: Code;
-  readonly species: Code;
+  readonly taxon: Code;
   translocation_ind: boolean;
   region: Code;
   population_unit: Code;
@@ -75,7 +75,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     }
   }
   get displayProps(): (keyof ReleaseEvent)[] {
-    return ['species', 'wlh_id', 'animal_id', 'animal_status', 'translocation_ind'];
+    return ['taxon', 'wlh_id', 'animal_id', 'animal_status', 'translocation_ind'];
   }
   getWorkflowTitle(): string {
     return WorkflowStrings.release.workflowTitle;

@@ -39,7 +39,7 @@ interface ITelemetryPoint extends GeoJsonObject {
 // represents a track
 interface ITelemetryLine extends GeoJsonObject {
   type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'species' | 'map_colour'>;
+  properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'taxon' | 'map_colour'>;
   geometry: LineString;
 }
 
@@ -62,7 +62,7 @@ interface ITelemetryGroup {
 // represents the jsonb object in the get_telemetry pg function
 export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDetail> {
   critter_id: string;
-  species: string;
+  taxon: string;
   wlh_id: string;
   animal_id: string;
   animal_status: string;

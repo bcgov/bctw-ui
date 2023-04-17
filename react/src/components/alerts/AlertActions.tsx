@@ -253,7 +253,7 @@ export default function AlertActions({ alert, showActions }: AlertActionsProps):
                       key={a.alert_id}>
                       <TableCell>{a.wlh_id}</TableCell>
                       <TableCell>{a.animal_id}</TableCell>
-                      <TableCell>{a.species}</TableCell>
+                      <TableCell>{a.taxon}</TableCell>
                       <TableCell>{a.device_id}</TableCell>
                       <TableCell>{a.device_make}</TableCell>
                       <TableCell style={{ color: 'orangered' }}>

@@ -12,10 +12,10 @@ import { BCTWFormat } from 'types/common_types';
 import { Tooltip } from 'components/common';
 import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
 import { Animal, AttachedAnimal } from 'types/animal';
-import { useSpecies } from 'contexts/SpeciesContext';
 import { WorkflowFormField } from 'types/events/event';
-import { showField } from 'utils/species';
 import { ICodeFilter } from 'types/code';
+import { showField } from 'utils/taxon';
+import { useTaxon } from 'contexts/TaxonContext';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -35,7 +35,7 @@ type CreateInputProps = CreateInputBaseProps &
     validate?: <T>(input: T) => string;
     maxwidth?: boolean;
     multiple?: boolean;
-    handleChangeMultiple?:  (o: ICodeFilter[]) => void;
+    handleChangeMultiple?: (o: ICodeFilter[]) => void;
   };
 
 // text and number field handler
@@ -156,7 +156,7 @@ function CreateEditSelectField({
       multiple={multiple}
       codeHeader={codeName ?? String(prop)}
       defaultValue={typeof value === 'string' ? value : ''}
-      defaultValues={multiple ? value as string[] : []}
+      defaultValues={multiple ? (value as string[]) : []}
       changeHandler={handleChange}
       changeHandlerMultiple={handleChangeMultiple}
       required={required}
@@ -224,7 +224,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
-interface ISpeciesFormField {
+interface ItaxonFormField {
   obj: Animal | AttachedAnimal;
   formField: WorkflowFormField;
   handleChange: FormChangeEvent;
@@ -232,16 +232,16 @@ interface ISpeciesFormField {
   displayBlock?: boolean;
   style?: CSSProperties;
 }
-function CreateSpeciesFormField({
+function CreatetaxonFormField({
   obj,
   formField,
   handleChange,
   inputProps,
   displayBlock = false,
-  style = {},
-}: ISpeciesFormField): JSX.Element {
-  const species = useSpecies();
-  if (!showField(formField, species)) {
+  style = {}
+}: ItaxonFormField): JSX.Element {
+  const taxon = useTaxon();
+  if (!showField(formField, taxon)) {
     return null;
   } else {
     return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
@@ -253,5 +253,5 @@ export {
   CreateEditCheckboxField,
   CreateEditSelectField,
   CreateFormField,
-  CreateSpeciesFormField
+  CreatetaxonFormField
 };

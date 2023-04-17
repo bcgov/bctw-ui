@@ -13,8 +13,8 @@ const CritterStrings = {
   exportTitle: 'animal_export',
   unassignedTableTitle: 'Animals Without a Collar',
   addTooltip: 'TODO: addTooltip',
-  lockedSpeciesTooltip: 'Unlock to change species. Warning potential data loss.',
-  unlockedSpeciesTooltip: 'Lock species selection',
+  lockedtaxonTooltip: 'Unlock to change taxon. Warning potential data loss.',
+  unlockedtaxonTooltip: 'Lock taxon selection',
   menuItems: {
     edit: 'Edit',
     map: 'Show on Map',
@@ -96,8 +96,8 @@ const WorkflowStrings = {
     exitEarly: 'You have set the animal mortality status to Alive. Do you wish to exit the workflow now?',
     mort_investigation: 'Was a mortality investigation undertaken?',
     mort_wildlife: 'Was the Wildlife Health Group mortality form completed?',
-    mort_predator_pcod: 'Is the PCOD predator species known?',
-    mort_predator_ucod: 'Is the UCOD predator species known?'
+    mort_predator_pcod: 'Is the PCOD predator taxon known?',
+    mort_predator_ucod: 'Is the UCOD predator taxon known?'
   },
   release: {
     workflowTitle: 'Release Event Workflow',
@@ -193,7 +193,7 @@ const MapStrings = {
   deviceListTooltip: 'Filter for specific device within date range',
   codeFiltersTooltips: {
     device_id: 'Filter for specific device within date range',
-    species: 'Select species to filter',
+    taxon: 'Select taxon to filter',
     animal_status: 'Animal status filter',
     device_status: 'Device status filter',
     sex: 'Filter critter sex',
@@ -283,12 +283,12 @@ const HomePageStrings = {
       {
         textPrefix: 'Search for ',
         link: 'wildlife data and information',
-        href: 'https://www.gov.bc.ca/wildlife-species-information'
+        href: 'https://www.gov.bc.ca/wildlife-taxon-information'
       },
       {
         textPrefix: 'Use the ',
         textSuffix:
-          ' to access publicly available telemetry data layers derived from the BC Telemetry Warehouse and Wildlife Species Inventory (SPI) database for desktop GIS analyses.',
+          ' to access publicly available telemetry data layers derived from the BC Telemetry Warehouse and Wildlife taxon Inventory (SPI) database for desktop GIS analyses.',
         link: 'DataBC Data Catalogue',
         href: 'https://catalogue.data.gov.bc.ca/dataset?q=wsi&download_audience=Public&sort=score+desc%2C+record_publish_date+desc'
       }

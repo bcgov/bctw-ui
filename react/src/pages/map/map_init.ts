@@ -23,7 +23,7 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const { coordinates } = feature.geometry;
   const t = dayjs(p.date_recorded).format(formatLocal);
   const text = `
-    ${p.species ? 'Species: ' + p.species + '<br>' : ''}
+    ${p.taxon ? 'Taxon: ' + p.taxon + '<br>' : ''}
     ${p.wlh_id ? 'WLH ID: ' + p.wlh_id + '<br>' : ''}
     ${p.animal_id ? 'Animal ID: ' + p.animal_id + '<br>' : ''}
     Device ID: ${p.formattedDevice}<br>

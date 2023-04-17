@@ -34,13 +34,12 @@ function createHeadCell<T>(obj: T, propsToDisplay: (keyof T)[]): HeadCell<T>[] {
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   const emptyA = a[orderBy] == null || String(a[orderBy]) === '';
   const emptyB = b[orderBy] == null || String(b[orderBy]) === '';
-  if(!emptyB && emptyA){
+  if (!emptyB && emptyA) {
     return -1;
   }
-  if(emptyB && !emptyA) {
+  if (emptyB && !emptyA) {
     return 1;
   }
-
 
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -82,7 +81,7 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
   const sortedArr = array.slice().sort(comparator);
   return sortedArr;
 }
-/** Renders the coloured tags for species and collars */
+/** Renders the coloured tags for taxon and collars */
 
 const getTag = (value: string, color?: string, status?: 'error' | 'warning' | 'success'): JSX.Element => {
   const style = { width: '110px' };
@@ -106,8 +105,8 @@ const formatTag = (key: string, value: string): JSX.Element => {
     }
   }
   if (key === 'animal_status') {
-    const {alive, mortality, in_translocation, potential_mortality} = eAnimalStatus;
-    switch(value) {
+    const { alive, mortality, in_translocation, potential_mortality } = eAnimalStatus;
+    switch (value) {
       case alive:
         return getTag(value, null, 'success');
       case in_translocation:
@@ -118,7 +117,7 @@ const formatTag = (key: string, value: string): JSX.Element => {
         return getTag(mortality, null, 'error');
     }
   }
-  if (key === 'species') {
+  if (key === 'taxon') {
     switch (value) {
       case 'Caribou':
         return getTag(value, '#9575cd');
@@ -156,7 +155,7 @@ interface ICellFormat {
 const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
   const value: unknown = obj[key];
-  if (['device_status', 'species', 'last_transmission_date'].includes(key as string)) {
+  if (['device_status', 'taxon', 'last_transmission_date'].includes(key as string)) {
     return { ...align, value: formatTag(key as string, isDayjs(value) ? formatT(value) : (value as string)) };
   }
   if (key === 'last_update_attempt') {

@@ -68,7 +68,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     } else if (key === 'shouldUnattachDevice') {
       // make attachment end state required if user is removing device
       setIsBeingUnattached(!!value);
-    } else if (key === 'isUCODSpeciesKnown') {
+    } else if (key === 'isUCODtaxonKnown') {
       setIsUCODKnown(!!value);
     } else if (key === 'animal_status') {
       if (value === 'Mortality' || value === 'Alive') {
@@ -163,7 +163,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             {CreateFormField(mortality, wfFields.get('predator_known_ind'), onChange, {
               disabled: !isPredation || critterIsAlive
             })}
-            {CreateFormField(mortality, wfFields.get('predator_species_pcod'), onChange, {
+            {CreateFormField(mortality, wfFields.get('predator_taxon_pcod'), onChange, {
               disabled: !isPredatorKnown || critterIsAlive
             })}
             {CreateFormField(mortality, wfFields.get('pcod_confidence'), onChange, {
@@ -171,10 +171,10 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             })}
           </Box>,
           <Box key='bx=ucod' mt={1} {...boxSpreadRowProps}>
-            {CreateFormField(mortality, { ...fields.isUCODSpeciesKnown }, onChange, {
+            {CreateFormField(mortality, { ...fields.isUCODtaxonKnown }, onChange, {
               disabled: !isPredatorKnown || critterIsAlive
             })}
-            {CreateFormField(mortality, wfFields.get('predator_species_ucod'), onChange, {
+            {CreateFormField(mortality, wfFields.get('predator_taxon_ucod'), onChange, {
               disabled: !(isPredatorKnown && isUCODKnown) || critterIsAlive
             })}
             {CreateFormField(mortality, wfFields.get('ucod_confidence'), onChange, {
