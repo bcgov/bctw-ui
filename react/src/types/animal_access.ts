@@ -8,8 +8,8 @@ import { eCritterPermission } from 'types/permission';
 
 export interface IUserCritterAccess
   extends Required<Pick<Animal, 'permission_type'>>,
-    Pick<Animal, 'critter_id' | 'animal_id' | 'species' | 'wlh_id' | 'population_unit' | 'valid_from' | 'valid_to' >,
-    Pick<Collar, 'device_id' | 'device_make' | 'device_type' | 'frequency'> {}
+    Pick<Animal, 'critter_id' | 'animal_id' | 'species' | 'wlh_id' | 'valid_from' | 'valid_to' >,
+    Pick<Collar, 'device_id' | 'device_make' | 'device_type' | 'frequency'> { collection_unit: string; } //TODO: make collection_unit part of Animal type
 
 export type IUserCritterAccessInput = Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> &
   PartialPick<IUserCritterAccess, 'animal_id' | 'wlh_id'>;
@@ -20,7 +20,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   animal_id: string;
   wlh_id: string;
   species: string;
-  population_unit: string;
+  collection_unit: string;
   managed_by: string;
   edited_by: string;
   observed_by: string;
@@ -53,7 +53,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
       'wlh_id',
       'animal_id',
       'species',
-      'population_unit',
+      'collection_unit',
       'device_id',
       'frequency',
       'device_type',

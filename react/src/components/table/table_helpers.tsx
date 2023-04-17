@@ -129,6 +129,7 @@ const formatTag = (key: string, value: string): JSX.Element => {
       case 'Grizzly Bear':
         return getTag(value, '#81c784');
     }
+    return getTag(value);
   }
   if (key === 'last_transmission_date') {
     const { diff, asText } = getDaysDiff(dayjs(value));
