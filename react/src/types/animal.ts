@@ -157,6 +157,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   pcod_confidence: Code;
   ultimate_cause_of_death: Code;
   population_unit: Code;
+  collection_unit: unknown[];
   recapture_ind: boolean;
   region: Code;
   release_comment: string;

@@ -156,7 +156,11 @@ interface ICellFormat {
  */
 const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
+  console.log(String(key), ": ", obj[key])
   const value: unknown = obj[key];
+  if(key === 'collection_unit') {
+    return { ...align, value: JSON.stringify(value)}
+  }
   if (['device_status', 'species', 'last_transmission_date'].includes(key as string)) {
     return { ...align, value: formatTag(key as string, isDayjs(value) ? formatT(value) : (value as string)) };
   }
