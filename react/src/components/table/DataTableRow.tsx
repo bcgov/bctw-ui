@@ -1,4 +1,5 @@
-import { Checkbox, ClickAwayListener, TableCell, TableRow } from '@mui/material';
+import { Checkbox, ClickAwayListener, TableCell, TableRow, Theme, lighten } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { formatTableCell, isFunction } from 'components/table/table_helpers';
 import { DataTableProps, ICustomTableColumn } from 'components/table/table_interfaces';
 import { useTableRowSelectedDispatch } from 'contexts/TableRowSelectContext';
@@ -16,11 +17,27 @@ type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' 
   setSelectedRows: (s: boolean) => void; // React.Dispatch<React.SetStateAction<T[]>>;
   selectedRows: number[];
 };
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    '&$hover:hover': {
+      // Set hover color
+      backgroundColor: lighten(theme.palette.warning.light, 0.9)
+    }
+  },
 
+  /* Pseudo-class applied to the root element if `hover={true}`. */
+  hover: {}
+  // nonMergedRow: {
+  //   '&$hover:hover': {
+  //     backgroundColor: lighten(theme.palette.warning.light, 0.9)
+  //   }
+  // }
+}));
 export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowProps<T>) {
   const { headers, customColumns, selected, row, index, onSelect, onSelectMultiple, rowIdentifier, setSelectedRows } =
     props;
   const dispatchRowSelected = useTableRowSelectedDispatch();
+  const styles = useStyles();
   const [isSelectedStatus, setSelectedStatus] = useState(false);
   const [updateRow, setUpdateRow] = useState(false);
 
@@ -100,15 +117,16 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
       );
     });
   };
-  const test = row?._merged === false;
+  const rowNotMerged = row?._merged === false;
   return (
-    <ClickAwayListener onClickAway={() => handleClickAway()}>
+    <ClickAwayListener onClickAway={(): void => handleClickAway()}>
       <TableRow
         tabIndex={-1}
         hover
         onClick={() => handleClickRow()}
         role='checkbox'
-        selected={test || isSelectedStatus}>
+        classes={rowNotMerged && styles}
+        selected={!rowNotMerged && isSelectedStatus}>
         {customColumnsPrepend && mapCustomColumns(customColumnsPrepend)}
         {isMulti ? (
           <TableCell padding='checkbox'>

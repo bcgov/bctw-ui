@@ -155,20 +155,20 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             updated={updated}
             title={CritterStrings.collaredAnimals}
             //TODO add this back
-            // customColumns={[
-            //   { column: (row, idx) => Menu(row, idx, true), header: <b>Actions</b> },
-            //   { column: Status, header: <div>Status</div>, prepend: true }
-            // ]}
+            customColumns={[
+              { column: (row, idx): JSX.Element => Menu(row, idx, true), header: <b>Actions</b> },
+              { column: Status, header: <div>Status</div>, prepend: true }
+            ]}
             //TODO add this back
-            // exporter={
-            //   <>
-            //     <ExportViewer<AttachedAnimal>
-            //       template={AttachedAnimal.attachedCritterExportProps}
-            //       eTitle={CritterStrings.exportTitle}
-            //       data={attachedAnimalData}
-            //     />
-            //   </>
-            // }
+            exporter={
+              <>
+                <ExportViewer<AttachedAnimal>
+                  template={AttachedAnimal.attachedCritterExportProps}
+                  eTitle={CritterStrings.exportTitle}
+                  data={attachedAnimalData}
+                />
+              </>
+            }
             paginationFooter
           />
         </Box>
