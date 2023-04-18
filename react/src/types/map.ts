@@ -1,7 +1,7 @@
 import { Type, Expose } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
-import { IAnimalTelemetryBase } from 'types/animal';
+import { IAnimalTelemetryBase, eCritterStatus } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
@@ -65,7 +65,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   taxon: string;
   wlh_id: string;
   animal_id: string;
-  animal_status: string;
+  critter_status: eCritterStatus;
   @Type(() => Date) capture_date: Date;
   sex: string;
   population_unit: string;

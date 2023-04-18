@@ -50,7 +50,7 @@ const DetailedStatusCard = <T extends Record<string, any>>({
   };
 
   const formatData = (obj: T, key: keyof T): JSX.Element => {
-    if (['taxon', 'device_status', 'animal_status'].includes(key as string)) {
+    if (['taxon', 'device_status', 'critter_status'].includes(key as string)) {
       return <Box className={style.gridElement}>{formatTag(key as string, String(obj[key]))}</Box>;
     }
 

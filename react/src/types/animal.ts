@@ -24,11 +24,11 @@ export enum etaxon {
   grey_wolf = 'M-CALU'
 }
 
-export enum eAnimalStatus {
+export enum eCritterStatus {
   alive = 'Alive',
-  in_translocation = 'In Translocation',
-  mortality = 'Mortality',
-  potential_mortality = 'Potential Mortality'
+  //in_translocation = 'In Translocation',
+  mortality = 'Mortality'
+  //potential_mortality = 'Potential Mortality'
 }
 
 const { caribou, grizzly_bear, moose, grey_wolf } = etaxon;
@@ -49,7 +49,7 @@ export interface Itaxon {
  */
 export interface IAnimalTelemetryBase {
   animal_id: string;
-  animal_status: Code;
+  critter_status: eCritterStatus;
   capture_date: Dayjs | Date;
   collective_unit: string;
   map_colour: Code;
@@ -121,7 +121,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   readonly critter_id: uuid;
   @Exclude(toPlainOnly) critter_transaction_id: uuid;
   animal_id: string;
-  animal_status: Code;
+  critter_status: eCritterStatus;
   associated_animal_id: string;
   associated_animal_relationship: Code;
   capture_comment: string;
@@ -222,7 +222,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   }
 
   get displayProps(): (keyof Animal)[] {
-    return ['taxon', 'population_unit', 'wlh_id', 'animal_id', 'animal_status'];
+    return ['taxon', 'population_unit', 'wlh_id', 'animal_id', 'critter_status'];
     //return Animal.toCSVHeaderTemplate;
   }
 
@@ -258,6 +258,7 @@ export interface IAttachedAnimal extends IAnimal, ICollarHistory, DataLife {}
 
 export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<AttachedAnimal> {
   @Exclude(toPlainOnly) assignment_id: uuid;
+  _merged: boolean;
   collar_id: uuid;
   device_id: number;
   device_make: Code;
@@ -287,7 +288,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
       'wlh_id',
       'animal_id',
       'device_status',
-      'animal_status',
+      'critter_status',
       'device_id',
       'frequency',
       'lastLatLong'
@@ -305,7 +306,7 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
       'wlh_id',
       'animal_id',
       'device_status',
-      'animal_status',
+      'critter_status',
       'device_id',
       'frequency',
       'latitude',
@@ -356,7 +357,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'capture_comment', type: eInputType.multiline, taxon: [] }
   ],
   characteristicsFields: [
-    { prop: 'animal_status', type: eInputType.code, taxon: [], ...isRequired },
+    { prop: 'critter_status', type: eInputType.code, taxon: [], ...isRequired },
     //{ prop: 'taxon', type: eInputType.code, taxon: [...ALL_taxon], ...isRequired },
     { prop: 'sex', type: eInputType.code, taxon: [], ...isRequired },
     { prop: 'animal_colouration', type: eInputType.text, taxon: [] },

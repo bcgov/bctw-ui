@@ -16,7 +16,7 @@ import ManageLayout from 'pages/layouts/ManageLayout';
  * note: deprecated / not accessible
  */
 const CodePage: React.FC = () => {
-  const [header, setHeader] = useState('animal_status');
+  const [header, setHeader] = useState('critter_status');
   const [title, setTitle] = useState('');
   const api = useTelemetryApi();
   const responseDispatch = useResponseDispatch();
@@ -41,7 +41,7 @@ const CodePage: React.FC = () => {
 
   const handleSave = async (p: IUpsertPayload<CodeHeaderInput>): Promise<void> => {
     await mutateAsync(p.body);
-  }
+  };
 
   const { isFetching, isLoading, isError, error, data, status } = api.useCodeHeaders();
 
@@ -86,7 +86,7 @@ const CodePage: React.FC = () => {
               title={`${title} Codes`}
               queryProps={{
                 query: api.useCodes,
-                param: header,
+                param: header
               }}
             />
             <div className='button-row'>

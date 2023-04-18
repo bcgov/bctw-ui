@@ -70,7 +70,7 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
     return MAP_COLOURS.point;
   }
   const { properties } = point;
-  if (properties?.animal_status === 'Mortality') {
+  if (properties?.critter_status === 'Mortality') {
     const { date_recorded, mortality_date } = properties;
     // if the mortality date is not set, fill all points red
     // otherwise only fill points red after the mortality date

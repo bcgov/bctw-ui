@@ -152,11 +152,11 @@ export default class CaptureEvent
     const props = this.captureCritterPropsToSave;
     if (this.translocation_ind) {
       // if the translocation is completed, save the new region/population unit.
-      // otherwise, need to update animal_status to 'in translocation';
+      // otherwise, need to update critter_status to 'in translocation';
       if (this.isTranslocationComplete) {
         props.push('region', 'population_unit');
       } else {
-        props.push('animal_status');
+        props.push('critter_status');
       }
     }
     const ret = eventToJSON(props, this);
@@ -164,7 +164,7 @@ export default class CaptureEvent
       delete ret.juvenile_at_heel_count;
     }
     if (this.translocation_ind && !this.isTranslocationComplete) {
-      ret['animal_status'] = 'In Translocation';
+      ret['critter_status'] = 'In Translocation';
     }
     if (!ret.associated_animal_id) {
       delete ret.associated_animal_relationship;

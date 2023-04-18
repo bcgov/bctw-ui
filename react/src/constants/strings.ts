@@ -194,7 +194,7 @@ const MapStrings = {
   codeFiltersTooltips: {
     device_id: 'Filter for specific device within date range',
     taxon: 'Select taxon to filter',
-    animal_status: 'Animal status filter',
+    critter_status: 'Animal status filter',
     device_status: 'Device status filter',
     sex: 'Filter critter sex',
     population_unit: 'Filter by population unit',

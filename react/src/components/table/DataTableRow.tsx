@@ -13,7 +13,7 @@ type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' 
   selected: boolean;
   rowIdentifier: string;
   key?: number | string;
-  setSelectedRows: (s: boolean) => void;// React.Dispatch<React.SetStateAction<T[]>>;
+  setSelectedRows: (s: boolean) => void; // React.Dispatch<React.SetStateAction<T[]>>;
   selectedRows: number[];
 };
 
@@ -79,14 +79,12 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
   };
 
   const handleClickRow = () => {
-    if(isMulti) {
+    if (isMulti) {
       setSelectedRows(!selected);
-    }
-    else {
+    } else {
       onSelect(row);
     }
     setSelectedStatus((s) => !s);
-    
   };
 
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
@@ -102,10 +100,15 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
       );
     });
   };
-
+  const test = row?._merged === false;
   return (
     <ClickAwayListener onClickAway={() => handleClickAway()}>
-      <TableRow tabIndex={-1} hover onClick={() => handleClickRow()} role='checkbox' selected={isSelectedStatus}>
+      <TableRow
+        tabIndex={-1}
+        hover
+        onClick={() => handleClickRow()}
+        role='checkbox'
+        selected={test || isSelectedStatus}>
         {customColumnsPrepend && mapCustomColumns(customColumnsPrepend)}
         {isMulti ? (
           <TableCell padding='checkbox'>

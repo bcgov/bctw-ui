@@ -163,7 +163,7 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       ) : (
         <TableCell></TableCell>
       )}
-      <TableCell>{row.animal_status}</TableCell>
+      <TableCell>{row.critter_status}</TableCell>
       <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('device', row)} />
       <TableCell>{row.device_status}</TableCell>
       <TableCell>{row.paddedFrequency}</TableCell>

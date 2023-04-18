@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Animal, AttachedAnimal, eCritterStatus } from 'types/animal';
 import { Collar, IAttachedCollar } from 'types/collar';
 import { BCTWBase, BCTWValidDates, nullToDayjs, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
@@ -129,7 +129,7 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 // props that any mortality event or alert should have.
 export interface IMortalityAlert
   extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'device_status'>,
-    Pick<Animal, 'critter_id' | 'animal_id' | 'animal_status' | 'wlh_id' | 'captivity_status_ind' | 'taxon'>,
+    Pick<Animal, 'critter_id' | 'animal_id' | 'critter_status' | 'wlh_id' | 'captivity_status_ind' | 'taxon'>,
     DataLife {}
 
 export type AnimalNotification = Pick<
@@ -150,7 +150,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
 
   critter_id: uuid;
   animal_id: string;
-  animal_status: Code;
+  critter_status: eCritterStatus;
   captivity_status_ind: boolean;
   wlh_id: string;
   taxon: string;
@@ -179,7 +179,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
 
   toWorkflow<T>(workflow: T): T {
     // don't preserve animal status from the alert.
-    return editObjectToEvent(this, workflow, ['animal_status']);
+    return editObjectToEvent(this, workflow, ['critter_status']);
   }
 }
 

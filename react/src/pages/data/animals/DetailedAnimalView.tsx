@@ -44,7 +44,7 @@ export default function DetailedAnimalView({ detailAnimal, height }: DetailedAni
           displayObject={detailAnimal}
           displayKeysInGrid={[
             'taxon',
-            'animal_status',
+            'critter_status',
             'wlh_id',
             'animal_id',
             'population_unit',

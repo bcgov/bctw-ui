@@ -20,7 +20,7 @@ const DEVICE_STATUS_OPTIONS = [
 const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: string[] }[] = [
   { header: 'device_id', label: 'Device ID (Default)' },
   { header: 'taxon' },
-  { header: 'animal_status' },
+  { header: 'critter_status' },
   { header: 'device_status' },
   { header: 'sex' },
   { header: 'population_unit', filter: [] },

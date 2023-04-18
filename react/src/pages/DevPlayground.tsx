@@ -4,7 +4,7 @@ import { SubHeader } from 'components/common/partials/SubHeader';
 import { formatTag } from 'components/table/table_helpers';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Animal, AttachedAnimal, eCritterStatus } from 'types/animal';
 import { AttachedCollar } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
 import { CritterDataTables } from './data/animals/CritterDataTables';
@@ -149,7 +149,7 @@ const TempComponent = ({ tabList, tab, handleTab, children }: TempComponentProps
 
   const testAnimal: Animal = new Animal();
   testAnimal.taxon = 'Caribou';
-  testAnimal.animal_status = 'Alive';
+  testAnimal.critter_status = eCritterStatus.alive;
   testAnimal.wlh_id = '12345';
   testAnimal.animal_id = 'BC78301';
   testAnimal.population_unit = 'Calendar';
@@ -202,7 +202,7 @@ No, well`;
             displayObject={testAnimal}
             displayKeysInGrid={[
               'taxon',
-              'animal_status',
+              'critter_status',
               'wlh_id',
               'animal_id',
               'population_unit',

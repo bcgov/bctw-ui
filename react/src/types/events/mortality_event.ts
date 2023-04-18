@@ -1,5 +1,5 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { Animal } from 'types/animal';
+import { Animal, eCritterStatus } from 'types/animal';
 import { Collar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
@@ -69,7 +69,6 @@ export interface IMortalityEvent
 // codes defaulted in this workflow
 type MortalityDeviceStatus = 'Mortality';
 export type DeploymentStatusNotDeployed = 'Not Deployed';
-export type MortalityAnimalStatus = 'Mortality' | 'Alive';
 
 /**
  * todo: when a device removal is performed...what happens in the ui?
@@ -102,7 +101,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly animal_id: string;
   readonly wlh_id: string;
   taxon: string;
-  animal_status: MortalityAnimalStatus;
+  critter_status: eCritterStatus;
   predator_taxon_pcod: Code;
   predator_taxon_ucod: Code;
   proximate_cause_of_death: Code;
@@ -119,7 +118,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
 
   private critterPropsToSave: (keyof Animal)[] = [
     'critter_id',
-    'animal_status',
+    'critter_status',
     'predator_known_ind',
     'predator_taxon_pcod',
     'predator_taxon_ucod',
@@ -147,7 +146,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.shouldUnattachDevice = false;
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
-    this.animal_status = 'Mortality';
+    this.critter_status = eCritterStatus.mortality;
     this.wasInvestigated = false;
     this.predator_known_ind = false;
     this.location_event = new LocationEvent('mortality', mort_date);
@@ -161,7 +160,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   }
 
   get mortCritterPropsToSave(): (keyof Animal)[] {
-    return this.onlySaveAnimalStatus ? ['critter_id', 'animal_status'] : this.critterPropsToSave;
+    return this.onlySaveAnimalStatus ? ['critter_id', 'critter_status'] : this.critterPropsToSave;
   }
 
   get displayProps(): (keyof MortalityEvent)[] {

@@ -3,7 +3,7 @@ import { Code } from 'types/code';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON, IBCTWWorkflow } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { Animal } from 'types/animal';
+import { Animal, eCritterStatus } from 'types/animal';
 import { IDataLifeEndProps } from 'types/data_life';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
@@ -13,7 +13,7 @@ import { Collar } from 'types/collar';
 import { formatTime } from 'utils/time';
 import CaptureEvent from './capture_event';
 
-type ReleaseProps = Pick<Animal, 'taxon' | 'translocation_ind' | 'region' | 'population_unit' | 'animal_status'>;
+type ReleaseProps = Pick<Animal, 'taxon' | 'translocation_ind' | 'region' | 'population_unit' | 'critter_status'>;
 
 export type ReleaseFormField = {
   [Property in keyof ReleaseEvent]+?: FormFieldObject<ReleaseEvent>;
@@ -43,7 +43,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   // critter props
   readonly wlh_id: string;
   readonly animal_id: string;
-  readonly animal_status: Code;
+  readonly critter_status: eCritterStatus;
   readonly taxon: Code;
   translocation_ind: boolean;
   region: Code;
@@ -75,7 +75,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     }
   }
   get displayProps(): (keyof ReleaseEvent)[] {
-    return ['taxon', 'wlh_id', 'animal_id', 'animal_status', 'translocation_ind'];
+    return ['taxon', 'wlh_id', 'animal_id', 'critter_status', 'translocation_ind'];
   }
   getWorkflowTitle(): string {
     return WorkflowStrings.release.workflowTitle;
@@ -97,9 +97,9 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     }
     const ret = eventToJSON(props, this);
     // if translocation_ind an the animal status was 'in translocation', revert it to alive.
-    if (this.translocation_ind && this.animal_status === 'In Translocation') {
-      ret['animal_status'] = 'Alive';
-    }
+    // if (this.translocation_ind && this.critter_status === 'In Translocation') {
+    //   ret['critter_status'] = 'Alive';
+    // }
     return omitNull({ ...ret, ...this.location_event.toJSON() });
   }
 

@@ -4,7 +4,7 @@ import { formatTime } from 'utils/time';
 export interface BCTWValidDates {
   valid_from: Date | Dayjs;
   // a null valid_to indicates the 'current' record
-  valid_to: Date | Dayjs; 
+  valid_to: Date | Dayjs;
 }
 
 // most database tables contain these columns for transactional history
@@ -20,7 +20,7 @@ export type BCTWFormat<T> = {
   formatPropAsHeader(k: keyof T): string;
   get displayProps(): (keyof T)[];
   historyDisplayProps?(): (keyof T)[];
-}
+};
 
 /**
  * extended primarily by other types/classes that are used in table components
@@ -28,7 +28,8 @@ export type BCTWFormat<T> = {
 export interface BCTWBase<T> extends BaseTimestamps, BCTWFormat<T> {
   // Animal/Collar types may include this
   owned_by_user_id?: number;
-  
+  //used in cross join queries with critterbase
+  _merged?: boolean;
   row_count?: number;
   // used in tables to identify unique rows
   get identifier(): string;

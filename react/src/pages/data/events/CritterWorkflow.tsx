@@ -31,7 +31,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
     } else if (wfType === 'release') {
       return editObjectToEvent(editing, new ReleaseEvent(), ['region', 'population_unit']);
     } else if (wfType === 'mortality') {
-      return editObjectToEvent(editing, new MortalityEvent(), ['animal_status']);
+      return editObjectToEvent(editing, new MortalityEvent(), ['critter_status']);
     }
   };
 
