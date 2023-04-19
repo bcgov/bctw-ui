@@ -56,7 +56,7 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
  * @param {Key} orderBy
   calls the descendingComparator with provided order
 **/
-function getComparator<Key extends keyof unknown>(
+function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key
 ): (a: { [key in Key] }, b: { [key in Key] }) => number {
