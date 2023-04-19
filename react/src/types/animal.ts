@@ -120,6 +120,7 @@ export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 export class Animal implements BCTWBase<Animal>, IAnimal {
   readonly critter_id: uuid;
   @Exclude(toPlainOnly) critter_transaction_id: uuid;
+  readonly _merged?: boolean;
   animal_id: string;
   critter_status: eCritterStatus;
   associated_animal_id: string;

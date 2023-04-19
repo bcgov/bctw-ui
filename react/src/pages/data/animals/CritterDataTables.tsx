@@ -6,25 +6,19 @@ import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { QueryStatus } from 'react-query';
 import { Animal, AttachedAnimal } from 'types/animal';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 
 import { ActionsMenu } from 'components/common/ActionsMenu';
-import { useHistory } from 'react-router-dom';
+import { ConditionalWrapper } from 'components/common/ConditionalWrapper';
 import { CollarHistory } from 'types/collar_history';
-import { WorkflowType } from 'types/events/event';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
-import MapModal from 'components/modal/MapModal';
-import dayjs from 'dayjs';
-import { Button, Container } from '@mui/material';
+import { Button, Tooltip } from 'components/common';
 import { buttonProps } from 'components/component_constants';
-import { Tooltip } from 'components/common';
-import FullScreenDialog from 'components/modal/DialogFullScreen';
-import { ITableSortProp, Order } from 'components/table/table_interfaces';
 
 export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
@@ -80,6 +74,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
 
   const Menu = (row: AttachedAnimal | Animal, idx: number, attached: boolean): JSX.Element => {
     const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
+    const rowNotMerged = row?._merged === false;
     const _edit = () => setOpenEdit(true);
     const _map = () => setOpenMap(true);
 
@@ -121,13 +116,17 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
       }
     ];
     return (
-      <ActionsMenu
-        //disabled={row !== editObj}
-        menuItems={attached ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]}
-        onOpen={() => {
-          setEditObj(row);
-        }}
-      />
+      <ConditionalWrapper
+        condition={rowNotMerged}
+        wrapper={(children) => <Tooltip title={'No Critterbase reference found'}>{children}</Tooltip>}>
+        <ActionsMenu
+          disabled={rowNotMerged}
+          menuItems={attached ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]}
+          onOpen={() => {
+            setEditObj(row);
+          }}
+        />
+      </ConditionalWrapper>
     );
   };
 
@@ -146,43 +145,37 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
               query: api.useAssignedCritters,
               onNewData: (data: AttachedAnimal[]): void => setAttachedAnimalData(data),
               defaultSort: {
-                property: 'device_status',
-                order: 'asc'
+                property: '_merged',
+                order: 'desc'
               }
             }}
             onSelect={handleSelect}
             deleted={deleted}
             updated={updated}
             title={CritterStrings.collaredAnimals}
-            //TODO add this back
             customColumns={[
               { column: (row, idx): JSX.Element => Menu(row, idx, true), header: <b>Actions</b> },
               { column: Status, header: <div>Status</div>, prepend: true }
             ]}
-            //TODO add this back
             exporter={
-              <>
-                <ExportViewer<AttachedAnimal>
-                  template={AttachedAnimal.attachedCritterExportProps}
-                  eTitle={CritterStrings.exportTitle}
-                  data={attachedAnimalData}
-                />
-              </>
+              <ExportViewer<AttachedAnimal>
+                template={AttachedAnimal.attachedCritterExportProps}
+                eTitle={CritterStrings.exportTitle}
+                data={attachedAnimalData}
+              />
             }
             paginationFooter
           />
         </Box>
-        {/*
-        //TODO remove old code related to unattached animals table
+
         <Box mb={4}>
           <DataTable
             headers={new Animal().displayProps}
-            queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Animal[]) => setAnimalData(data) }}
-            onSelect={() => {}}
+            queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Animal[]): void => setAnimalData(data) }}
             updated={updated}
             deleted={deleted}
             title={CritterStrings.nonCollaredAnimals}
-            customColumns={[{ column: (row,idx) => Menu(row, idx, false), header: <b>Actions</b> }]}
+            customColumns={[{ column: (row, idx): JSX.Element => Menu(row, idx, false), header: <b>Actions</b> }]}
             paginationFooter
             exporter={
               <>
@@ -203,7 +196,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
               </>
             }
           />
-        </Box> */}
+        </Box>
 
         {/* Displays the recent animal telemetry map modal */}
         {/*<MapModal

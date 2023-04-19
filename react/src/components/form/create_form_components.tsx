@@ -232,7 +232,7 @@ interface ItaxonFormField {
   displayBlock?: boolean;
   style?: CSSProperties;
 }
-function CreatetaxonFormField({
+function CreateTaxonFormField({
   obj,
   formField,
   handleChange,
@@ -253,5 +253,5 @@ export {
   CreateEditCheckboxField,
   CreateEditSelectField,
   CreateFormField,
-  CreatetaxonFormField
+  CreateTaxonFormField
 };

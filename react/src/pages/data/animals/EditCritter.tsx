@@ -2,7 +2,7 @@ import { Box, Container, IconButton } from '@mui/material';
 import { Button, Icon } from 'components/common';
 import { EditorProps } from 'components/component_interfaces';
 import SelectUDF from 'components/form/SelectUDF';
-import { CreatetaxonFormField } from 'components/form/create_form_components';
+import { CreateTaxonFormField } from 'components/form/create_form_components';
 import { MapStrings } from 'constants/strings';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useUpdateTaxon, useTaxon } from 'contexts/TaxonContext';
@@ -26,7 +26,8 @@ import { TaxonSelect } from 'components/form/TaxonSelect';
  */
 export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
   const { isCreatingNew, editing, open } = props;
-  const updatetaxon = useUpdateTaxon();
+  //TODO integration add this back
+  //const updateTaxon = useUpdateTaxon();
   const taxon = useTaxon();
 
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
@@ -46,7 +47,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
 
   const reset = (): void => {
     setHasBabies(false);
-    updatetaxon(null);
+    //updateTaxon(null);
   };
 
   const {
@@ -130,7 +131,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 hide={hideSection([...identifierFields2, ...identifierFields2], taxon)}>
                 {[
                   ...identifierFields1.map((f, i) => (
-                    <CreatetaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
+                    <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                   )),
                   <Box display='inline' key='udf-cu'>
                     <SelectUDF
@@ -150,7 +151,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                   </Box>,
                   //FIXME
                   ...identifierFields2.map((f, i) => (
-                    <CreatetaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
+                    <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                   ))
                 ]}
               </FormSection>
@@ -160,14 +161,14 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 disabled={!canEdit}
                 hide={hideSection(characteristicsFields, taxon)}>
                 {characteristicsFields.map((f, i) => (
-                  <CreatetaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
+                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
-                <CreatetaxonFormField
+                <CreateTaxonFormField
                   obj={editing}
                   formField={wfFields.get('juvenile_at_heel')}
                   handleChange={onChange}
                 />
-                <CreatetaxonFormField
+                <CreateTaxonFormField
                   obj={editing}
                   formField={wfFields.get('juvenile_at_heel_count')}
                   handleChange={onChange}
@@ -180,7 +181,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 disabled={!canEdit}
                 hide={hideSection(associatedAnimalFields, taxon)}>
                 {associatedAnimalFields.map((f, i) => (
-                  <CreatetaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
+                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
               {/* {associatedAnimalFields.map((f) => displaytaxonFormFields(f, 'caribou' as etaxon) && CreateFormField(editing, f, onChange))} */}
@@ -190,12 +191,14 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 disabled={!canEdit}
                 hide={hideSection(animalCommentField, taxon)}>
                 {animalCommentField.map((f, i) => (
-                  <CreatetaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
+                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
               {/* hide all workflow related fields when creating a new animal */}
               {!isCreatingNew ? (
                 <>
+                  {/* 
+                  //TODO integration potentially add this back or move to row actions
                   <FormSection
                     id='cr-cap'
                     header='Latest Capture Details'
@@ -211,7 +214,9 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     {captureFields.map((f, i) => (
                       <CreatetaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                     ))}
-                  </FormSection>
+                  </FormSection> */}
+
+                  {/* //TODO integration potentially add this back or move to row actions
                   <FormSection
                     id='cr-rel'
                     header='Latest Release Details'
@@ -227,8 +232,10 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     {releaseFields.map((f, i) => (
                       <CreatetaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                     ))}
-                  </FormSection>
+                  </FormSection> */}
 
+                  {/* 
+                  //TODO integration potentially add this back or move to row actions
                   <FormSection
                     id='cr-mort'
                     header='Mortality Details'
@@ -244,7 +251,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                     {mortalityFields.map((f, i) => (
                       <CreatetaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                     ))}
-                  </FormSection>
+                  </FormSection> */}
 
                   {/* hide device assignment history for new critters */}
                   <AssignmentHistory

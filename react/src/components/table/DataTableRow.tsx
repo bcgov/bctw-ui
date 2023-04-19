@@ -7,6 +7,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useEffect, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
 import './table.scss';
+import { ClassNames } from '@emotion/react';
 
 type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' | 'onSelect' | 'onSelectMultiple'> & {
   row: { [key in keyof T]: any };
@@ -125,7 +126,7 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
         hover
         onClick={() => handleClickRow()}
         role='checkbox'
-        classes={rowNotMerged && styles}
+        classes={rowNotMerged ? styles : {}}
         selected={!rowNotMerged && isSelectedStatus}>
         {customColumnsPrepend && mapCustomColumns(customColumnsPrepend)}
         {isMulti ? (

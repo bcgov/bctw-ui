@@ -49,19 +49,17 @@ export default function CritterPage(): JSX.Element {
     }
   }, [useAlert]);
 
-  const dataTables = (): JSX.Element => {
-    return (
-      <>
-        <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
-        <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
-          <CritterDataTables detailViewAction={setDetailAnimal} />
-        </Box>
-        <Box style={showDataRetrieval ? {} : { display: 'none' }}>
-          <DataRetrievalDataTable />
-        </Box>
-      </>
-    );
-  };
+  const dataTables = (): JSX.Element => (
+    <Box>
+      <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
+      <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
+        <CritterDataTables detailViewAction={setDetailAnimal} />
+      </Box>
+      <Box style={showDataRetrieval ? {} : { display: 'none' }}>
+        <DataRetrievalDataTable />
+      </Box>
+    </Box>
+  );
 
   const detailedView = (): JSX.Element => {
     if (!detailAnimal) {
@@ -87,8 +85,8 @@ export default function CritterPage(): JSX.Element {
 
   return (
     <ManageLayout>
-      <TaxonProvider>
-        <Box className='manage-layout-titlebar'>
+      {/* <TaxonProvider> */}
+      {/* <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
@@ -101,15 +99,15 @@ export default function CritterPage(): JSX.Element {
               </Container>
             </FullScreenDialog>
           </Box>
-        </Box>
-        <AlertBanner />
-        <Box display={detailAnimal === null ? 'none' : 'contents'}>{detailedView()}</Box>
-        <Box display={detailAnimal !== null ? 'none' : 'contents'}>{dataTables()}</Box>
-        {/*The above hack is in place so that the 
+        </Box> */}
+      <AlertBanner />
+      <Box display={detailAnimal === null ? 'none' : 'contents'}>{detailedView()}</Box>
+      <Box display={detailAnimal !== null ? 'none' : 'contents'}>{dataTables()}</Box>
+      {/*The above hack is in place so that the 
         data tables do not need to reload / re-query 
         anytime you wanna go back and forth between
         the detailed view and the data tables*/}
-      </TaxonProvider>
+      {/* </TaxonProvider> */}
     </ManageLayout>
   );
 }

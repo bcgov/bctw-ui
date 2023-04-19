@@ -43,11 +43,12 @@ export const TaxonSelect = ({ handleChange, value, useLock, useModal }: TaxonSel
   };
 
   const handleChangeTaxon = (): void => {
-    const found = allTaxon.find((s) => s.name === (selection ?? value));
-    if (found) {
-      updateTaxon(found);
-      setLockTaxon(useLock);
-    }
+    //TODO integration add this back
+    // const found = allTaxon.find((s) => s.name === (selection ?? value));
+    // if (found) {
+    //   updateTaxon(found);
+    //   setLockTaxon(useLock);
+    // }
   };
 
   const handleStates = (): void => {
