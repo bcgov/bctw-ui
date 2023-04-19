@@ -165,10 +165,6 @@ interface ICellFormat {
  * @param obj object being displayed
  * @param key the property to render in this table cell
  */
-const TableCollectionUnit = ({ collectionUnits }: { collectionUnits: ICollectionUnit[] }): JSX.Element => {
-  const temp = collectionUnits;
-  return <div>hi</div>;
-};
 
 const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
