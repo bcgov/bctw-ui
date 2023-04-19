@@ -1,5 +1,5 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { Animal } from 'types/animal';
+import { Animal, eCritterStatus } from 'types/animal';
 import { Collar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
@@ -39,8 +39,8 @@ export type MortalityAnimalEventProps = Pick<
   | 'critter_id'
   | 'proximate_cause_of_death'
   | 'ultimate_cause_of_death'
-  | 'predator_species_pcod'
-  | 'predator_species_ucod'
+  | 'predator_taxon_pcod'
+  | 'predator_taxon_ucod'
   | 'pcod_confidence'
   | 'ucod_confidence'
   | 'animal_id'
@@ -55,7 +55,7 @@ export type MortalityAnimalEventProps = Pick<
 type MortalitySpecificProps = Pick<IBCTWWorkflow, 'shouldUnattachDevice'> &
   Pick<DataLife, 'data_life_end'> & {
     wasInvestigated: boolean;
-    isUCODSpeciesKnown: boolean;
+    isUCODtaxonKnown: boolean;
     onlySaveAnimalStatus: boolean;
   };
 
@@ -69,7 +69,6 @@ export interface IMortalityEvent
 // codes defaulted in this workflow
 type MortalityDeviceStatus = 'Mortality';
 export type DeploymentStatusNotDeployed = 'Not Deployed';
-export type MortalityAnimalStatus = 'Mortality' | 'Alive';
 
 /**
  * todo: when a device removal is performed...what happens in the ui?
@@ -81,7 +80,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   shouldSaveAnimal: boolean;
   shouldSaveDevice: boolean;
   wasInvestigated: boolean;
-  isUCODSpeciesKnown: boolean;
+  isUCODtaxonKnown: boolean;
   onlySaveAnimalStatus: boolean;
   // device props
   readonly collar_id: uuid;
@@ -101,10 +100,10 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly critter_id: uuid;
   readonly animal_id: string;
   readonly wlh_id: string;
-  species: string;
-  animal_status: MortalityAnimalStatus;
-  predator_species_pcod: Code;
-  predator_species_ucod: Code;
+  taxon: string;
+  critter_status: eCritterStatus;
+  predator_taxon_pcod: Code;
+  predator_taxon_ucod: Code;
   proximate_cause_of_death: Code;
   ultimate_cause_of_death: Code;
   ucod_confidence: Code;
@@ -119,10 +118,10 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
 
   private critterPropsToSave: (keyof Animal)[] = [
     'critter_id',
-    'animal_status',
+    'critter_status',
     'predator_known_ind',
-    'predator_species_pcod',
-    'predator_species_ucod',
+    'predator_taxon_pcod',
+    'predator_taxon_ucod',
     'proximate_cause_of_death',
     'ultimate_cause_of_death',
     'pcod_confidence',
@@ -147,7 +146,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.shouldUnattachDevice = false;
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
-    this.animal_status = 'Mortality';
+    this.critter_status = eCritterStatus.mortality;
     this.wasInvestigated = false;
     this.predator_known_ind = false;
     this.location_event = new LocationEvent('mortality', mort_date);
@@ -161,7 +160,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   }
 
   get mortCritterPropsToSave(): (keyof Animal)[] {
-    return this.onlySaveAnimalStatus ? ['critter_id', 'animal_status'] : this.critterPropsToSave;
+    return this.onlySaveAnimalStatus ? ['critter_id', 'critter_status'] : this.critterPropsToSave;
   }
 
   get displayProps(): (keyof MortalityEvent)[] {
@@ -184,7 +183,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
         return WorkflowStrings.device.vendor_activation;
       case 'predator_known_ind':
         return WorkflowStrings.mortality.mort_predator_pcod;
-      case 'isUCODSpeciesKnown':
+      case 'isUCODtaxonKnown':
         return WorkflowStrings.mortality.mort_predator_ucod;
       case 'shouldUnattachDevice':
         return WorkflowStrings.device.should_unattach;
@@ -192,9 +191,9 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
         return 'PCOD';
       case 'ultimate_cause_of_death':
         return 'UCOD';
-      case 'predator_species_ucod':
+      case 'predator_taxon_ucod':
         return 'Predator UCOD';
-      case 'predator_species_pcod':
+      case 'predator_taxon_pcod':
         return 'Predator PCOD';
       case 'pcod_confidence':
       case 'ucod_confidence':
@@ -207,7 +206,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   // mortality event specific fields
   fields: { [Property in keyof MortalitySpecificProps]+?: FormFieldObject<MortalitySpecificProps> } = {
     data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
-    isUCODSpeciesKnown: { prop: 'isUCODSpeciesKnown', type: eInputType.check },
+    isUCODtaxonKnown: { prop: 'isUCODtaxonKnown', type: eInputType.check },
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check }
   };
 
@@ -219,11 +218,11 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       return ret;
     }
     if (!this.predator_known_ind) {
-      delete ret.predator_species_pcod;
+      delete ret.predator_taxon_pcod;
       delete ret.pcod_confidence;
     }
-    if (!this.isUCODSpeciesKnown) {
-      delete ret.predator_species_ucod;
+    if (!this.isUCODtaxonKnown) {
+      delete ret.predator_taxon_ucod;
       delete ret.ucod_confidence;
     }
     const locationFields = this.location_event.toJSON();

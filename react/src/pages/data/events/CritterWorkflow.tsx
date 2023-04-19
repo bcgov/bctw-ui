@@ -22,16 +22,16 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
   const createEvent = (wfType: WorkflowType): CaptureEvent | ReleaseEvent | MortalityEvent => {
     if (wfType === 'capture') {
       return editObjectToEvent(editing, new CaptureEvent(), [
-        'species',
+        'taxon',
         'translocation_ind',
         'recapture_ind',
         'region',
-        'population_unit'
+        'collection_unit'
       ]);
     } else if (wfType === 'release') {
-      return editObjectToEvent(editing, new ReleaseEvent(), ['region', 'population_unit']);
+      return editObjectToEvent(editing, new ReleaseEvent(), ['region', 'collection_unit']);
     } else if (wfType === 'mortality') {
-      return editObjectToEvent(editing, new MortalityEvent(), ['animal_status']);
+      return editObjectToEvent(editing, new MortalityEvent(), ['critter_status']);
     }
   };
 
@@ -60,7 +60,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
         // do nothing
       } else {
         // show the release form, populating the location and date fields
-        const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'population_unit']);
+        const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'collection_unit']);
         // set the new event directly, triggering the display of the release form
         updateEvent(rwf);
         setOpen((o) => !o);

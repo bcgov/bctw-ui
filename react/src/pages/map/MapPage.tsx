@@ -1,59 +1,58 @@
 import * as L from 'leaflet'; // must be imported first
-import 'leaflet.markercluster';
-import './MapPage.scss';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet.markercluster';
 import 'leaflet/dist/leaflet.css';
+import './MapPage.scss';
 
-import { CircularProgress, Paper } from '@mui/material';
 import { mdiDragHorizontalVariant } from '@mdi/js';
+import Icon from '@mdi/react';
+import { CircularProgress, Paper } from '@mui/material';
 import pointsWithinPolygon from '@turf/points-within-polygon';
+import { ISelectMultipleData } from 'components/form/MultiSelect';
+import { MapStrings } from 'constants/strings';
 import dayjs from 'dayjs';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import MapFilters from 'pages/map/MapFilters';
+import MapLayerToggleControl from 'pages/map/MapLayerToggle';
+import MapOverView from 'pages/map/MapOverview';
 import MapDetails from 'pages/map/details/MapDetails';
-import { initMap, setPopupInnerHTML, hidePopup } from 'pages/map/map_init';
 import {
   applyFilter,
   fillPoint,
   getLast10Fixes,
+  getUniqueCritterIDsFromSelectedPings,
   groupFilters,
-  splitPings,
-  getUniqueCritterIDsFromSelectedPings
+  splitPings
 } from 'pages/map/map_helpers';
-import Icon from '@mdi/react';
-import MapFilters from 'pages/map/MapFilters';
-import MapOverView from 'pages/map/MapOverview';
-import React, { useEffect, useRef, useState } from 'react';
-import { ICodeFilter } from 'types/code';
+import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import {
-  ITelemetryDetail,
-  ITelemetryPoint,
-  ITelemetryLine,
-  MapRange,
-  OnlySelectedCritters,
-  MapFormValue
-} from 'types/map';
-import { formatDay, getToday } from 'utils/time';
-import { BCTWType } from 'types/common_types';
-import AddUDF from 'pages/udf/AddUDF';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import {
-  defaultPointStyle,
   getStyle,
   highlightLatestPings,
   highlightPings,
-  selectedPointStyle,
   setupLatestPingOptions,
   setupPingOptions,
   setupSelectedPings,
   setupTracksOptions,
   symbolizePings
 } from 'pages/map/point_setup';
-import { ISelectMultipleData } from 'components/form/MultiSelect';
-import { MapStrings } from 'constants/strings';
-import MapLayerToggleControl from 'pages/map/MapLayerToggle';
+import AddUDF from 'pages/udf/AddUDF';
+import React, { useEffect, useRef, useState } from 'react';
+import { ICodeFilter } from 'types/code';
+import { BCTWType } from 'types/common_types';
+import {
+  ITelemetryDetail,
+  ITelemetryLine,
+  ITelemetryPoint,
+  MapFormValue,
+  MapRange,
+  OnlySelectedCritters
+} from 'types/map';
 import { eUDFType } from 'types/udf';
-import { SpeciesProvider } from 'contexts/SpeciesContext';
+import { formatDay, getToday } from 'utils/time';
+import { TaxonProvider } from 'contexts/TaxonContext';
+
 /**
   there are several forms of state in this page:
     a) the fetched pings/tracks state from the API 
@@ -121,7 +120,7 @@ export default function MapPage(): JSX.Element {
   } = api.usePings(start, end);
   // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
-  
+
   // refetch pings when start/end times are changed
   useEffect(() => {
     // wipe the attribute panel state on refresh
@@ -539,7 +538,7 @@ export default function MapPage(): JSX.Element {
     }
   };
   return (
-    <SpeciesProvider>
+    <TaxonProvider>
       <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
         <MapFilters
           start={range.start}
@@ -603,6 +602,6 @@ export default function MapPage(): JSX.Element {
           />
         </div>
       </div>
-    </SpeciesProvider>
+    </TaxonProvider>
   );
 }

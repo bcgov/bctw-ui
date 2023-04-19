@@ -70,8 +70,8 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
                 primary={
                   <Typography>
                     <>
-                      {alert.species} <b>{getTitle(alert)}</b> alert for Device {alert?.device_id ?? 'Unknown'} on
-                      WLH-ID {alert?.wlh_id ?? 'Unknown'}
+                      {alert.taxon} <b>{getTitle(alert)}</b> alert for Device {alert?.device_id ?? 'Unknown'} on WLH-ID{' '}
+                      {alert?.wlh_id ?? 'Unknown'}
                     </>
                   </Typography>
                 }
@@ -134,7 +134,7 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
               {HEADER}
               <Grid container columnGap={2}>
                 <Grid item>
-                  <Typography className={styles.spacing}>{`Species: ${alert.species}`}</Typography>
+                  <Typography className={styles.spacing}>{`taxon: ${alert.taxon}`}</Typography>
                 </Grid>
                 <Grid item>
                   <Typography className={styles.spacing}>{`Animal ID: ${alert?.animal_id ?? 'None'}`}</Typography>

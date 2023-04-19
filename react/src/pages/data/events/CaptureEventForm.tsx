@@ -170,7 +170,7 @@ export default function CaptureEventForm({
               required: mustPopulate,
               disabled: !isTransloc || !isTranslocComplete
             })}
-            {CreateFormField(capture, wfFields.get('population_unit'), onChange, {
+            {CreateFormField(capture, wfFields.get('collection_unit'), onChange, {
               required: mustPopulate,
               disabled: !isTransloc || !isTranslocComplete
             })}

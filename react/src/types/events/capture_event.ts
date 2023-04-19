@@ -3,7 +3,7 @@ import { Code } from 'types/code';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { Animal } from 'types/animal';
+import { Animal, ICollectionUnit } from 'types/animal';
 import { IDataLifeStartProps } from 'types/data_life';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
@@ -15,13 +15,13 @@ type CaptureAnimalEventProps = Pick<
   | 'critter_id'
   | 'animal_id'
   | 'wlh_id'
-  | 'species'
+  | 'taxon'
   | 'recapture_ind'
   | 'translocation_ind'
   | 'associated_animal_id'
   | 'associated_animal_relationship'
   | 'region'
-  | 'population_unit'
+  | 'collection_unit'
   | 'captivity_status_ind'
 >;
 
@@ -82,14 +82,14 @@ export default class CaptureEvent
   readonly critter_id: uuid;
   readonly wlh_id: string;
   readonly animal_id: string;
-  species: Code;
+  taxon: Code;
   recapture_ind: boolean;
   translocation_ind: boolean;
   associated_animal_id: string;
   associated_animal_relationship: Code; // required if associated_animal_id populated
   // region & popunit are enabled when animal is translocated
   region: Code;
-  population_unit: Code;
+  collection_unit: ICollectionUnit[];
   captivity_status_ind: boolean;
   // characteristic fields
   ear_tag_left_id: string;
@@ -133,7 +133,7 @@ export default class CaptureEvent
       'critter_id',
       'recapture_ind',
       'translocation_ind',
-      'species',
+      'taxon',
       'associated_animal_id',
       'associated_animal_relationship',
       'captivity_status_ind',
@@ -152,11 +152,11 @@ export default class CaptureEvent
     const props = this.captureCritterPropsToSave;
     if (this.translocation_ind) {
       // if the translocation is completed, save the new region/population unit.
-      // otherwise, need to update animal_status to 'in translocation';
+      // otherwise, need to update critter_status to 'in translocation';
       if (this.isTranslocationComplete) {
-        props.push('region', 'population_unit');
+        props.push('region', 'collection_unit');
       } else {
-        props.push('animal_status');
+        props.push('critter_status');
       }
     }
     const ret = eventToJSON(props, this);
@@ -164,7 +164,7 @@ export default class CaptureEvent
       delete ret.juvenile_at_heel_count;
     }
     if (this.translocation_ind && !this.isTranslocationComplete) {
-      ret['animal_status'] = 'In Translocation';
+      ret['critter_status'] = 'In Translocation';
     }
     if (!ret.associated_animal_id) {
       delete ret.associated_animal_relationship;

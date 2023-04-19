@@ -53,16 +53,17 @@ export default function ReleaseEventForm({ event, handleFormChange }: WorkflowFo
           <Box key='bx-dev' {...boxSpreadRowProps} mt={2}>
             {CreateFormField(release, { ...fields.shouldUnattachDevice }, onChange)}
             {/* {CreateFormField(release, { ...fields.data_life_start, required: isBeingUnattached }, onChange, { disabled: !isBeingUnattached })} */}
-          </Box>,
-          release.translocation_ind && release.animal_status === 'In Translocation' ? (
-            <Box key='bx-trsloc' {...boxSpreadRowProps} mt={2}>
-              <h4>Update translocation details:</h4>
-              {CreateFormField(release, { ...wfFields.get('region'), required: true }, onChange)}
-              {CreateFormField(release, { ...wfFields.get('population_unit'), required: true }, onChange)}
-            </Box>
-          ) : (
-            <span key='empty'></span>
-          )
+          </Box>
+          //TODO critterbase doesnt support translocation yet
+          // release.translocation_ind && release.critter_status === 'In Translocation' ? (
+          //   <Box key='bx-trsloc' {...boxSpreadRowProps} mt={2}>
+          //     <h4>Update translocation details:</h4>
+          //     {CreateFormField(release, { ...wfFields.get('region'), required: true }, onChange)}
+          //     {CreateFormField(release, { ...wfFields.get('collection_unit'), required: true }, onChange)}
+          //   </Box>
+          // ) : (
+          //   <span key='empty'></span>
+          // )
         ]}
       </FormSection>
       <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>

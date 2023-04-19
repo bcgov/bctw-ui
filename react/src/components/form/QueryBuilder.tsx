@@ -54,7 +54,7 @@ export const exportStyles = makeStyles(() => ({
  */
 export default function QueryBuilder<T extends ISelectMultipleData>(props: IQueryBuilderProps<T>): JSX.Element {
   const { operators, columns, handleRowsUpdate, data } = props;
-  const [rows, setRows] = useState<IFormRowEntry[]>([{ column: 'species', operator: 'Equals', value: [] }]);
+  const [rows, setRows] = useState<IFormRowEntry[]>([{ column: 'taxon', operator: 'Equals', value: [] }]);
   const styles = exportStyles();
 
   useEffect(() => {

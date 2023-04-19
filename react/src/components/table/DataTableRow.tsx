@@ -1,4 +1,5 @@
-import { Checkbox, ClickAwayListener, TableCell, TableRow } from '@mui/material';
+import { Checkbox, ClickAwayListener, TableCell, TableRow, Theme, lighten } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { formatTableCell, isFunction } from 'components/table/table_helpers';
 import { DataTableProps, ICustomTableColumn } from 'components/table/table_interfaces';
 import { useTableRowSelectedDispatch } from 'contexts/TableRowSelectContext';
@@ -6,6 +7,7 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useEffect, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
 import './table.scss';
+import { ClassNames } from '@emotion/react';
 
 type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' | 'onSelect' | 'onSelectMultiple'> & {
   row: { [key in keyof T]: any };
@@ -13,14 +15,30 @@ type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' 
   selected: boolean;
   rowIdentifier: string;
   key?: number | string;
-  setSelectedRows: (s: boolean) => void;// React.Dispatch<React.SetStateAction<T[]>>;
+  setSelectedRows: (s: boolean) => void; // React.Dispatch<React.SetStateAction<T[]>>;
   selectedRows: number[];
 };
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    '&$hover:hover': {
+      // Set hover color
+      backgroundColor: lighten(theme.palette.warning.light, 0.9)
+    }
+  },
 
+  /* Pseudo-class applied to the root element if `hover={true}`. */
+  hover: {}
+  // nonMergedRow: {
+  //   '&$hover:hover': {
+  //     backgroundColor: lighten(theme.palette.warning.light, 0.9)
+  //   }
+  // }
+}));
 export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowProps<T>) {
   const { headers, customColumns, selected, row, index, onSelect, onSelectMultiple, rowIdentifier, setSelectedRows } =
     props;
   const dispatchRowSelected = useTableRowSelectedDispatch();
+  const styles = useStyles();
   const [isSelectedStatus, setSelectedStatus] = useState(false);
   const [updateRow, setUpdateRow] = useState(false);
 
@@ -79,14 +97,12 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
   };
 
   const handleClickRow = () => {
-    if(isMulti) {
+    if (isMulti) {
       setSelectedRows(!selected);
-    }
-    else {
+    } else {
       onSelect(row);
     }
     setSelectedStatus((s) => !s);
-    
   };
 
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
@@ -102,10 +118,16 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
       );
     });
   };
-
+  const rowNotMerged = row?._merged === false;
   return (
-    <ClickAwayListener onClickAway={() => handleClickAway()}>
-      <TableRow tabIndex={-1} hover onClick={() => handleClickRow()} role='checkbox' selected={isSelectedStatus}>
+    <ClickAwayListener onClickAway={(): void => handleClickAway()}>
+      <TableRow
+        tabIndex={-1}
+        hover
+        onClick={() => handleClickRow()}
+        role='checkbox'
+        classes={rowNotMerged ? styles : {}}
+        selected={!rowNotMerged && isSelectedStatus}>
         {customColumnsPrepend && mapCustomColumns(customColumnsPrepend)}
         {isMulti ? (
           <TableCell padding='checkbox'>

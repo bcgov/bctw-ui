@@ -1,23 +1,13 @@
-import {
-  Box,
-  Button,
-  Grid,
-  Paper,
-  Tab,
-  Tabs,
-  Theme,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Box, Button, Grid, Paper, Theme, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { AnimalCollar } from 'api/api_interfaces';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import { formatTag } from 'components/table/table_helpers';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { useState } from 'react';
-import { Animal } from 'types/animal';
-import { AttachedCollar, Collar } from 'types/collar';
+import { Animal, AttachedAnimal, eCritterStatus } from 'types/animal';
+import { AttachedCollar } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
+import { CritterDataTables } from './data/animals/CritterDataTables';
 import ManageLayout from './layouts/ManageLayout';
 
 // Place constants here
@@ -37,6 +27,8 @@ const TAB_LIST = ['Device and Animal', 'Telemetry', 'Vectronic KeyX'];
 const DevPlayground = (): JSX.Element => {
   const [background, setBackground] = useState(false);
   const [tab, setTab] = useState(0);
+  const [detailAnimal, setDetailAnimal] = useState<AttachedAnimal>(null);
+
   return (
     <ManageLayout>
       <h1>Dev Playground</h1>
@@ -49,12 +41,13 @@ const DevPlayground = (): JSX.Element => {
 
       <Box sx={{ backgroundColor: background ? '#ffff' : 'transparent', display: 'flex', flexDirection: 'row' }}>
         {/* Place components below here */}
-        <TempComponent handleTab={setTab} tab={tab} tabList={TAB_LIST}>
+        {/* <TempComponent handleTab={setTab} tab={tab} tabList={TAB_LIST}>
           <>
             <h1>{TAB_LIST[tab]}</h1>
             <SubHeader text={'Placeholder text'} />
           </>
-        </TempComponent>
+        </TempComponent> */}
+        <CritterDataTables detailViewAction={setDetailAnimal} />
         {/* <Box sx={{ pr: 2 }}>
           <KeyXUploader device_ids={DEVICE_IDS} />
         </Box> */}
@@ -106,42 +99,46 @@ interface DetailedStatusCardProps<T> {
   displayKeysInBox: Array<keyof T>;
 }
 
-const DetailedStatusCard = <T,>({displayObject, displayKeysInGrid, displayKeysInBox}: DetailedStatusCardProps<T>): JSX.Element => {
-
+const DetailedStatusCard = <T,>({
+  displayObject,
+  displayKeysInGrid,
+  displayKeysInBox
+}: DetailedStatusCardProps<T>): JSX.Element => {
   return (
-    <Paper sx={{padding: '16px'}}>
+    <Paper sx={{ padding: '16px' }}>
       <Grid container xs={12} spacing={2}>
-        {displayKeysInGrid.map(m => {
-            return (<>
-            <Grid item xs={6} spacing={2}>
-              <SubHeader size='small' text={columnToHeader(m as string) }/>
-              {
-                ['species', 'device_status'].includes(m as string)
-                ?
-                formatTag(m as string, String(displayObject[m]))
-                :
-                <Typography>{ displayObject[m] === undefined || displayObject[m] === null ? 'None' : String(displayObject[m])}</Typography>
-              }
-              
-            </Grid>
-            </>);
+        {displayKeysInGrid.map((m) => {
+          return (
+            <>
+              <Grid item xs={6} spacing={2}>
+                <SubHeader size='small' text={columnToHeader(m as string)} />
+                {['taxon', 'device_status'].includes(m as string) ? (
+                  formatTag(m as string, String(displayObject[m]))
+                ) : (
+                  <Typography>
+                    {displayObject[m] === undefined || displayObject[m] === null ? 'None' : String(displayObject[m])}
+                  </Typography>
+                )}
+              </Grid>
+            </>
+          );
         })}
-        {displayKeysInBox.map(m => {
-          return (<>
-          <Grid item xs={12}>
-            <SubHeader size='small' text={columnToHeader(m as string) }/>
-            <Box maxHeight={'100px'} overflow={'auto'}>
-              <Typography>{displayObject[m]}</Typography>
-            </Box>
-          </Grid>
-          </>)
+        {displayKeysInBox.map((m) => {
+          return (
+            <>
+              <Grid item xs={12}>
+                <SubHeader size='small' text={columnToHeader(m as string)} />
+                <Box maxHeight={'100px'} overflow={'auto'}>
+                  <Typography>{displayObject[m]}</Typography>
+                </Box>
+              </Grid>
+            </>
+          );
         })}
       </Grid>
-
-
     </Paper>
-  )
-}
+  );
+};
 
 // Temporarily build components down here for development
 const TempComponent = ({ tabList, tab, handleTab, children }: TempComponentProps): JSX.Element => {
@@ -151,11 +148,11 @@ const TempComponent = ({ tabList, tab, handleTab, children }: TempComponentProps
   const tabIsSelected = (t: number): boolean => tab === t;
 
   const testAnimal: Animal = new Animal();
-  testAnimal.species = 'Caribou';
-  testAnimal.animal_status = 'Alive';
+  testAnimal.taxon = 'Caribou';
+  testAnimal.critter_status = eCritterStatus.alive;
   testAnimal.wlh_id = '12345';
   testAnimal.animal_id = 'BC78301';
-  testAnimal.population_unit = 'Calendar';
+  testAnimal.collection_unit = [{ 'Population Unit': 'testing' }];
   testAnimal.sex = 'Female';
   testAnimal.capture_date = dayjs('2022-07-02');
   testAnimal.mortality_date = null;
@@ -173,16 +170,16 @@ Or has it ever come down to do or die?
 You've got to rise above the rest
 No, well`;
 
-const testDevice: AttachedCollar = new AttachedCollar();
-testDevice.device_id = 12345;
-testDevice.device_status = 'Mortality';
-testDevice.device_type = 'GPS';
-testDevice.last_fetch_date = dayjs('2022-07-02');
-testDevice.device_make = 'Vectronic';
-testDevice.frequency = 192.18;
-testDevice.attachment_start = dayjs('2022-07-02');
-testDevice.attachment_end = dayjs('2022-07-02');
-testDevice.activation_comment = `I've never had to knock on wood
+  const testDevice: AttachedCollar = new AttachedCollar();
+  testDevice.device_id = 12345;
+  testDevice.device_status = 'Mortality';
+  testDevice.device_type = 'GPS';
+  testDevice.last_fetch_date = dayjs('2022-07-02');
+  testDevice.device_make = 'Vectronic';
+  testDevice.frequency = 192.18;
+  testDevice.attachment_start = dayjs('2022-07-02');
+  testDevice.attachment_end = dayjs('2022-07-02');
+  testDevice.activation_comment = `I've never had to knock on wood
 But I know someone who has
 Which makes me wonder if I could
 It makes me wonder if I've
@@ -194,25 +191,43 @@ Have you ever had the odds stacked up so high
 You need a strength most don't possess?
 Or has it ever come down to do or die?
 You've got to rise above the rest
-No, well`
+No, well`;
 
   return (
     <Box width='100%' sx={{ ml: -1 }}>
       <Grid container xs={12} spacing={4}>
         <Grid item xs={6}>
-          <SubHeader size='small' text='Animal Details'/>
-          <DetailedStatusCard 
-            displayObject={testAnimal} 
-            displayKeysInGrid={['species','animal_status', 'wlh_id', 'animal_id', 'population_unit', 'sex', 'capture_date', 'mortality_date']}
-            displayKeysInBox={['animal_comment']}          
+          <SubHeader size='small' text='Animal Details' />
+          <DetailedStatusCard
+            displayObject={testAnimal}
+            displayKeysInGrid={[
+              'taxon',
+              'critter_status',
+              'wlh_id',
+              'animal_id',
+              'collection_unit',
+              'sex',
+              'capture_date',
+              'mortality_date'
+            ]}
+            displayKeysInBox={['animal_comment']}
           />
         </Grid>
         <Grid item xs={6}>
-          <SubHeader size='small' text='Deployment Details'/>
-          <DetailedStatusCard 
-            displayObject={testDevice} 
-            displayKeysInGrid={['device_id','device_status','device_type','last_fetch_date','device_make','frequency','attachment_start', 'attachment_end']}
-            displayKeysInBox={['activation_comment']}          
+          <SubHeader size='small' text='Deployment Details' />
+          <DetailedStatusCard
+            displayObject={testDevice}
+            displayKeysInGrid={[
+              'device_id',
+              'device_status',
+              'device_type',
+              'last_fetch_date',
+              'device_make',
+              'frequency',
+              'attachment_start',
+              'attachment_end'
+            ]}
+            displayKeysInBox={['activation_comment']}
           />
         </Grid>
       </Grid>

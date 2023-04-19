@@ -22,8 +22,7 @@ import { FormBaseProps } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
-import { useSpecies } from 'contexts/SpeciesContext';
-import { SPECIES_STR } from 'utils/species';
+import { useTaxon } from 'contexts/TaxonContext';
 
 /* eslint-disable indent */
 type ChildRefs = {
@@ -37,7 +36,7 @@ type SelectCodeProps = FormBaseProps &
     changeHandlerMultiple?: (o: ICodeFilter[]) => void;
     addEmptyOption?: boolean;
     inputRef?: MutableRefObject<ChildRefs>;
-    isSpeciesSelect?: boolean;
+    istaxonSelect?: boolean;
     defaultValues?: string[];
   };
 
@@ -68,17 +67,17 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
     propName,
     disabled,
     inputRef,
-    isSpeciesSelect
+    istaxonSelect
   } = props;
   const api = useTelemetryApi();
-  const species = useSpecies();
+  const taxon = useTaxon();
 
   const [value, setValue] = useState(defaultValue);
-  const [values, setValues] = useState<string[]>( defaultValues ? defaultValues : []);
+  const [values, setValues] = useState<string[]>(defaultValues ? defaultValues : []);
   const [codes, setCodes] = useState<ICode[]>([]);
   //const [canFetch, setCanFetch] = useState(true);
   const [hasError, setHasError] = useState(required && !defaultValue ? true : false);
-  //const isSpeciesSelect = codeHeader === SPECIES_STR;
+  //const istaxonSelect = codeHeader === taxon_STR;
   useImperativeHandle(ref, () => ({
     setValue,
     value
@@ -97,10 +96,10 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
     'defaultValue'
   ]);
   // load the codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader, species?.id, {
-    // cacheTime set to zero to prevent weird caching behaviour with species selection
+  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader, taxon?.id, {
+    // cacheTime set to zero to prevent weird caching behaviour with taxon selection
     cacheTime: ref ? 0 : 5000,
-    enabled: !isSpeciesSelect
+    enabled: !istaxonSelect
   });
 
   // when data is successfully fetched
@@ -116,9 +115,9 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
       setCodes(data);
       // if a default value was provided, update it to the actual value
       const found = data.find((d) => d?.description === defaultValue);
-      //Set the species context
-      // if (found && found?.code_header_title.toLowerCase() === SPECIES_STR) {
-      //   updateSpecies(formatCodeToSpecies(found));
+      //Set the taxon context
+      // if (found && found?.code_header_title.toLowerCase() === taxon_STR) {
+      //   updatetaxon(formatCodeTotaxon(found));
       // }
       // update the error status if found
       if (found?.description && hasError) {
@@ -225,7 +224,7 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
   };
   return (
     <>
-      {/* <SpeciesModal codeHeader={codeHeader} value={value} codes={codes} setValue={setValue} setCanFetch={setCanFetch} /> */}
+      {/* <taxonModal codeHeader={codeHeader} value={value} codes={codes} setValue={setValue} setCanFetch={setCanFetch} /> */}
       {isError ? (
         <NotificationMessage severity='error' message={formatAxiosError(error)} />
       ) : isLoading || isFetching ? (
