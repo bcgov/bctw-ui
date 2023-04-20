@@ -20,6 +20,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { buttonProps } from 'components/component_constants';
 import { Typography } from '@mui/material';
+import { PageTabs } from 'components/common/partials/PageTabs';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: ReactNode;
@@ -174,6 +175,8 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
           <Box py={3}>
             {disableTabs ? null : (
               <Box mb={4}>
+                {/* 
+                //TODO critterbase integration old implementation of tabs
                 <Tabs
                   value={currentTabID}
                   onChange={(e, v): void => handleSwitchTab(v)}
@@ -182,38 +185,36 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
                   textColor='primary'>
                   <Tab label='Details' {...a11yProps(0)} />
                   {!disableHistory ? <Tab label='History' {...a11yProps(1)} /> : null}
-                </Tabs>
+                </Tabs> */}
+                <PageTabs tabLabels={['Details', 'History']}>
+                  {/* tab 1 */}
+                  <Box>
+                    {children}
+                    <Box my={1} mx={3}>
+                      <Divider></Divider>
+                    </Box>
+                    <Box p={3}>
+                      <Box display='flex' alignItems={'center'} justifyContent='flex-end' className='form-buttons'>
+                        {hideSave ? null : (
+                          <>
+                            {hasErr ? <Typography mr={1}>Fields marked with * are required</Typography> : null}
+                            <Button {...buttonProps} onClick={handleSave} disabled={!canSave}>
+                              Save
+                            </Button>
+                          </>
+                        )}
+                        <Button {...buttonProps} variant='outlined' onClick={(): void => onClose()}>
+                          Cancel and Exit
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  {/* tab 2 */}
+                  <HistoryPage {...historyParams} />
+                </PageTabs>
               </Box>
             )}
-            <EditTabPanel value={currentTabID} index={0}>
-              <Paper>
-                {children}
-
-                <Box my={1} mx={3}>
-                  <Divider></Divider>
-                </Box>
-
-                <Box p={3}>
-                  <Box display='flex' alignItems={'center'} justifyContent='flex-end' className='form-buttons'>
-                    {hideSave ? null : (
-                      <>
-                        {hasErr ? <Typography mr={1}>Fields marked with * are required</Typography> : null}
-                        <Button {...buttonProps} onClick={handleSave} disabled={!canSave}>
-                          Save
-                        </Button>
-                      </>
-                    )}
-                    <Button {...buttonProps} variant='outlined' onClick={(): void => onClose()}>
-                      Cancel and Exit
-                    </Button>
-                  </Box>
-                </Box>
-              </Paper>
-            </EditTabPanel>
-
-            <EditTabPanel value={currentTabID} index={1}>
-              <HistoryPage {...historyParams} />
-            </EditTabPanel>
           </Box>
         </Container>
       </form>

@@ -73,7 +73,7 @@ export default function CritterPage(): JSX.Element {
       <Box width='100%' sx={{ ml: -1 }}>
         <Button
           startIcon={<Icon icon='back' />}
-          onClick={() => {
+          onClick={(): void => {
             setDetailAnimal(null);
           }}>
           Back to My Animals
@@ -86,7 +86,9 @@ export default function CritterPage(): JSX.Element {
   return (
     <ManageLayout>
       {/* <TaxonProvider> */}
-      {/* <Box className='manage-layout-titlebar'>
+      {/*
+      //TODO critterbase integration this might be not needed 
+      <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>

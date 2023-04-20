@@ -376,7 +376,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'region', type: eInputType.code, taxon: [], ...isRequired },
     { prop: 'population_unit', type: eInputType.code, taxon: [] } //Population unit needs to be taxon dependant, surface with code table
   ],
-  identifierFields2: [
+  markingFields: [
     { prop: 'ear_tag_left_colour', type: eInputType.text, taxon: [] },
     { prop: 'ear_tag_right_colour', type: eInputType.text, taxon: [] },
     { prop: 'ear_tag_left_id', type: eInputType.text, taxon: [] },
@@ -400,16 +400,17 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'predator_known_ind', type: eInputType.check, taxon: [caribou] },
     { prop: 'mortality_comment', type: eInputType.multiline, taxon: [] }
   ],
-  releaseFields: [
-    { prop: 'release_date', type: eInputType.datetime, taxon: [] },
-    { prop: 'release_latitude', type: eInputType.number, taxon: [] },
-    { prop: 'release_longitude', type: eInputType.number, taxon: [] },
-    { prop: 'release_utm_zone', type: eInputType.number, taxon: [] },
-    { prop: 'release_utm_easting', type: eInputType.number, taxon: [] },
-    { prop: 'release_utm_northing', type: eInputType.number, taxon: [] },
-    { prop: 'translocation_ind', type: eInputType.check, taxon: [] },
-    { prop: 'release_comment', type: eInputType.multiline, taxon: [] }
-  ],
+  //TODO critterbase integration does not support release values in the same way
+  // releaseFields: [
+  //   { prop: 'release_date', type: eInputType.datetime, taxon: [] },
+  //   { prop: 'release_latitude', type: eInputType.number, taxon: [] },
+  //   { prop: 'release_longitude', type: eInputType.number, taxon: [] },
+  //   { prop: 'release_utm_zone', type: eInputType.number, taxon: [] },
+  //   { prop: 'release_utm_easting', type: eInputType.number, taxon: [] },
+  //   { prop: 'release_utm_northing', type: eInputType.number, taxon: [] },
+  //   { prop: 'translocation_ind', type: eInputType.check, taxon: [] },
+  //   { prop: 'release_comment', type: eInputType.multiline, taxon: [] }
+  // ],
   animalCommentField: [{ prop: 'animal_comment', type: eInputType.multiline, taxon: [] }]
 };
 

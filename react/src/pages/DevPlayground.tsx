@@ -6,9 +6,10 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import { Animal, AttachedAnimal, eCritterStatus } from 'types/animal';
 import { AttachedCollar } from 'types/collar';
-import { columnToHeader } from 'utils/common_helpers';
+import { columnToHeader, doNothingAsync } from 'utils/common_helpers';
 import { CritterDataTables } from './data/animals/CritterDataTables';
 import ManageLayout from './layouts/ManageLayout';
+import EditCritter from './data/animals/EditCritter';
 
 // Place constants here
 const TEST = 'Testing';
@@ -28,7 +29,7 @@ const DevPlayground = (): JSX.Element => {
   const [background, setBackground] = useState(false);
   const [tab, setTab] = useState(0);
   const [detailAnimal, setDetailAnimal] = useState<AttachedAnimal>(null);
-
+  const [bool, setBool] = useState(true);
   return (
     <ManageLayout>
       <h1>Dev Playground</h1>
@@ -47,7 +48,13 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
-        <CritterDataTables detailViewAction={setDetailAnimal} />
+        <EditCritter
+          open={bool}
+          editing={new AttachedAnimal('c6b0a6c7-71ca-421a-96d6-1878fec07b05')}
+          handleClose={(): void => setBool(false)}
+          onSave={doNothingAsync}
+        />
+        {/* <CritterDataTables detailViewAction={setDetailAnimal} /> */}
         {/* <Box sx={{ pr: 2 }}>
           <KeyXUploader device_ids={DEVICE_IDS} />
         </Box> */}
