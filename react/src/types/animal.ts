@@ -45,80 +45,80 @@ export interface Itaxon {
   name: string;
 }
 export type ICollectionUnit = Record<string, string>;
-/**
- * Animal properties that are re-used in Telemetry classes (map.ts)
- */
-export interface IAnimalTelemetryBase {
-  animal_id: string;
-  critter_status: eCritterStatus;
-  capture_date: Dayjs | Date;
-  collective_unit: string;
-  map_colour: Code;
-  taxon: string;
-  collection_unit: ICollectionUnit[];
-  wlh_id: string;
-}
+// /**
+//  * Animal properties that are re-used in Telemetry classes (map.ts)
+//  */
+// export interface IAnimalTelemetryBase {
+//   animal_id: string;
+//   critter_status: eCritterStatus;
+//   capture_date: Dayjs | Date;
+//   collective_unit: string;
+//   map_colour: Code;
+//   taxon: string;
+//   collection_unit: ICollectionUnit[];
+//   wlh_id: string;
+// }
 
-export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
-  animal_colouration: string;
-  animal_comment: string;
-  associated_animal_id: string;
-  associated_animal_relationship: Code;
+// export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
+//   animal_colouration: string;
+//   animal_comment: string;
+//   associated_animal_id: string;
+//   associated_animal_relationship: Code;
 
-  capture_comment: string;
-  capture_latitude: number;
-  capture_longitude: number;
-  capture_utm_easting: number;
-  capture_utm_northing: number;
-  capture_utm_zone: number;
+//   capture_comment: string;
+//   capture_latitude: number;
+//   capture_longitude: number;
+//   capture_utm_easting: number;
+//   capture_utm_northing: number;
+//   capture_utm_zone: number;
 
-  readonly critter_id: uuid;
-  readonly critter_transaction_id: uuid;
-  ear_tag_left_id: string;
-  ear_tag_right_id: string;
-  ear_tag_left_colour: string;
-  ear_tag_right_colour: string;
-  estimated_age: number;
-  juvenile_at_heel: Code;
-  juvenile_at_heel_count: number;
-  life_stage: Code;
+//   readonly critter_id: uuid;
+//   readonly critter_transaction_id: uuid;
+//   ear_tag_left_id: string;
+//   ear_tag_right_id: string;
+//   ear_tag_left_colour: string;
+//   ear_tag_right_colour: string;
+//   estimated_age: number;
+//   juvenile_at_heel: Code;
+//   juvenile_at_heel_count: number;
+//   life_stage: Code;
 
-  mortality_comment: string;
-  mortality_date: Dayjs;
-  mortality_latitude: number;
-  mortality_longitude: number;
-  mortality_utm_easting: number;
-  mortality_utm_northing: number;
-  mortality_utm_zone: number;
-  mortality_report_ind: boolean;
-  mortality_investigation: Code;
-  captivity_status_ind: boolean;
-  mortality_captivity_status_ind: boolean;
+//   mortality_comment: string;
+//   mortality_date: Dayjs;
+//   mortality_latitude: number;
+//   mortality_longitude: number;
+//   mortality_utm_easting: number;
+//   mortality_utm_northing: number;
+//   mortality_utm_zone: number;
+//   mortality_report_ind: boolean;
+//   mortality_investigation: Code;
+//   captivity_status_ind: boolean;
+//   mortality_captivity_status_ind: boolean;
 
-  permission_type?: eCritterPermission; // critters should contain this
-  predator_known_ind: boolean;
-  predator_taxon_pcod: Code;
-  predator_taxon_ucod: Code;
-  proximate_cause_of_death: Code;
-  ucod_confidence: Code;
-  pcod_confidence: Code;
-  recapture_ind: boolean;
-  region: Code;
+//   permission_type?: eCritterPermission; // critters should contain this
+//   predator_known_ind: boolean;
+//   predator_taxon_pcod: Code;
+//   predator_taxon_ucod: Code;
+//   proximate_cause_of_death: Code;
+//   ucod_confidence: Code;
+//   pcod_confidence: Code;
+//   recapture_ind: boolean;
+//   region: Code;
 
-  release_comment: string;
-  release_date: Dayjs;
-  release_latitude: number;
-  release_longitude: number;
-  release_utm_easting: number;
-  release_utm_northing: number;
-  release_utm_zone: number;
+//   release_comment: string;
+//   release_date: Dayjs;
+//   release_latitude: number;
+//   release_longitude: number;
+//   release_utm_easting: number;
+//   release_utm_northing: number;
+//   release_utm_zone: number;
 
-  sex: Code;
-  translocation_ind: boolean;
-  ultimate_cause_of_death: Code;
-}
+//   sex: Code;
+//   translocation_ind: boolean;
+//   ultimate_cause_of_death: Code;
+// }
 
-export class Animal implements BCTWBase<Animal>, IAnimal {
+export class Animal implements BCTWBase<Animal> {
   readonly critter_id: uuid;
   @Exclude(toPlainOnly) critter_transaction_id: uuid;
   readonly _merged?: boolean;
@@ -256,7 +256,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
 }
 
 // animals attached to devices should have additional properties
-export interface IAttachedAnimal extends IAnimal, ICollarHistory, DataLife {}
+export interface IAttachedAnimal extends ICollarHistory, DataLife {}
 
 export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<AttachedAnimal> {
   @Exclude(toPlainOnly) assignment_id: uuid;
@@ -343,37 +343,38 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
 // taxon: [] represents field applies to all taxon, used for optimization on searching
 export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
   taxonField: [{ prop: 'taxon', type: eInputType.code, taxon: [], ...isRequired }],
-  associatedAnimalFields: [
-    { prop: 'associated_animal_id', type: eInputType.text, taxon: [] },
-    { prop: 'associated_animal_relationship', type: eInputType.code, taxon: [] }
-  ],
+  //TODO critterbase integration does not support these in the same way
+  // associatedAnimalFields: [
+  //   { prop: 'associated_animal_id', type: eInputType.text, taxon: [] },
+  //   { prop: 'associated_animal_relationship', type: eInputType.code, taxon: [] }
+  // ],
   captureFields: [
-    { prop: 'capture_date', type: eInputType.datetime, taxon: [] },
+    { prop: 'capture_date', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
     { prop: 'capture_latitude', type: eInputType.number, taxon: [] },
     { prop: 'capture_longitude', type: eInputType.number, taxon: [] },
-    { prop: 'capture_utm_zone', type: eInputType.number, taxon: [] },
-    { prop: 'capture_utm_easting', type: eInputType.number, taxon: [] },
-    { prop: 'capture_utm_northing', type: eInputType.number, taxon: [] },
-    { prop: 'recapture_ind', type: eInputType.check, taxon: [] },
-    { prop: 'captivity_status_ind', type: eInputType.check, taxon: [caribou] },
+    //TODO critterbase integration does not support these in the same way
+    // { prop: 'capture_utm_zone', type: eInputType.number, taxon: [] },
+    // { prop: 'capture_utm_easting', type: eInputType.number, taxon: [] },
+    // { prop: 'capture_utm_northing', type: eInputType.number, taxon: [] },
+    // { prop: 'recapture_ind', type: eInputType.check, taxon: [] },
+    // { prop: 'captivity_status_ind', type: eInputType.check, taxon: [caribou] },
     { prop: 'capture_comment', type: eInputType.multiline, taxon: [] }
   ],
   characteristicsFields: [
     { prop: 'critter_status', type: eInputType.code, taxon: [], ...isRequired },
-    //{ prop: 'taxon', type: eInputType.code, taxon: [...ALL_taxon], ...isRequired },
     { prop: 'sex', type: eInputType.code, taxon: [], ...isRequired },
     { prop: 'animal_colouration', type: eInputType.text, taxon: [] },
     { prop: 'estimated_age', type: eInputType.number, taxon: [], validate: mustbePositiveNumber },
     { prop: 'life_stage', type: eInputType.code, taxon: [] } //taxon dependant, with code table
   ],
-  characteristicFields2: [
-    { prop: 'juvenile_at_heel', type: eInputType.code, taxon: [] },
-    { prop: 'juvenile_at_heel_count', type: eInputType.number, taxon: [], validate: mustbePositiveNumber }
-  ],
+  //TODO critterbase integration does not support these in the same way
+  // characteristicFields2: [
+  //   { prop: 'juvenile_at_heel', type: eInputType.code, taxon: [] },
+  //   { prop: 'juvenile_at_heel_count', type: eInputType.number, taxon: [], validate: mustbePositiveNumber }
+  // ],
   identifierFields1: [
     { prop: 'wlh_id', type: eInputType.text, taxon: [] },
     { prop: 'animal_id', type: eInputType.text, taxon: [], ...isRequired },
-    //Add nickname field for bears
     { prop: 'region', type: eInputType.code, taxon: [], ...isRequired },
     { prop: 'collection_unit', type: eInputType.code, taxon: [] } //Population unit needs to be taxon dependant, surface with code table
   ],
@@ -384,7 +385,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'ear_tag_right_id', type: eInputType.text, taxon: [] }
   ],
   mortalityFields: [
-    { prop: 'mortality_date', type: eInputType.datetime, taxon: [] },
+    { prop: 'mortality_date', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to mortality_timestamp
     { prop: 'mortality_latitude', type: eInputType.number, taxon: [] },
     { prop: 'mortality_longitude', type: eInputType.number, taxon: [] },
     { prop: 'mortality_utm_zone', type: eInputType.number, taxon: [] },
