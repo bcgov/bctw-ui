@@ -59,7 +59,7 @@ export default function ReleaseEventForm({ event, handleFormChange }: WorkflowFo
           //   <Box key='bx-trsloc' {...boxSpreadRowProps} mt={2}>
           //     <h4>Update translocation details:</h4>
           //     {CreateFormField(release, { ...wfFields.get('region'), required: true }, onChange)}
-          //     {CreateFormField(release, { ...wfFields.get('population_unit'), required: true }, onChange)}
+          //     {CreateFormField(release, { ...wfFields.get('collection_unit'), required: true }, onChange)}
           //   </Box>
           // ) : (
           //   <span key='empty'></span>

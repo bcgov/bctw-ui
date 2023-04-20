@@ -151,7 +151,7 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
           }}></Box>
       </TableCell>
       <TableCell>{row.taxon}</TableCell>
-      <TableCell>{row.population_unit}</TableCell>
+      <TableCell>{row.collection_unit}</TableCell>
       <TableCell>{row.collective_unit}</TableCell>
       {row.critter_id ? (
         <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />

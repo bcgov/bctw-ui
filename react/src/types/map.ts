@@ -1,7 +1,7 @@
 import { Type, Expose } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
-import { IAnimalTelemetryBase, eCritterStatus } from 'types/animal';
+import { IAnimalTelemetryBase, ICollectionUnit, eCritterStatus } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
@@ -39,7 +39,7 @@ interface ITelemetryPoint extends GeoJsonObject {
 // represents a track
 interface ITelemetryLine extends GeoJsonObject {
   type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'critter_id' | 'population_unit' | 'taxon' | 'map_colour'>;
+  properties: Pick<ITelemetryDetail, 'critter_id' | 'collection_unit' | 'taxon' | 'map_colour'>;
   geometry: LineString;
 }
 
@@ -68,7 +68,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   critter_status: eCritterStatus;
   @Type(() => Date) capture_date: Date;
   sex: string;
-  population_unit: string;
+  collection_unit: ICollectionUnit[];
   collar_id: string;
   device_id: number;
   device_vendor: string;

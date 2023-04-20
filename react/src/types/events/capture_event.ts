@@ -3,7 +3,7 @@ import { Code } from 'types/code';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { Animal } from 'types/animal';
+import { Animal, ICollectionUnit } from 'types/animal';
 import { IDataLifeStartProps } from 'types/data_life';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
@@ -21,7 +21,7 @@ type CaptureAnimalEventProps = Pick<
   | 'associated_animal_id'
   | 'associated_animal_relationship'
   | 'region'
-  | 'population_unit'
+  | 'collection_unit'
   | 'captivity_status_ind'
 >;
 
@@ -89,7 +89,7 @@ export default class CaptureEvent
   associated_animal_relationship: Code; // required if associated_animal_id populated
   // region & popunit are enabled when animal is translocated
   region: Code;
-  population_unit: Code;
+  collection_unit: ICollectionUnit[];
   captivity_status_ind: boolean;
   // characteristic fields
   ear_tag_left_id: string;
@@ -154,7 +154,7 @@ export default class CaptureEvent
       // if the translocation is completed, save the new region/population unit.
       // otherwise, need to update critter_status to 'in translocation';
       if (this.isTranslocationComplete) {
-        props.push('region', 'population_unit');
+        props.push('region', 'collection_unit');
       } else {
         props.push('critter_status');
       }
