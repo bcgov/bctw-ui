@@ -151,17 +151,12 @@ const formatTag = (key: string, value: string): JSX.Element => {
   return getTag('Unknown');
 };
 
-// interface Unit {
-//   unit_name: string;
-// }
-
 interface ICellFormat {
   align: 'inherit' | 'left' | 'center' | 'right' | 'justify';
   value: unknown;
 }
 /**
  * * CRITTERBASE INTEGRATED *
- * TODO: add support for keys other than 'unit_name'
  * @param obj object being displayed
  * @param key the property to render in this table cell
  */
@@ -169,17 +164,6 @@ interface ICellFormat {
 const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
   const value: unknown = obj[key];
-  //TODO find solution for table search with collection units
-  if (key === 'collection_unit') {
-    const collectionUnits = [];
-    const collectionUnit = value as ICollectionUnit[];
-    collectionUnit?.forEach((unit) => {
-      const [category] = Object.keys(unit);
-      collectionUnits.push(`${category}: ${unit[category]}`);
-    });
-    // maps array of collection units to comma delimited string
-    return { ...align, value: collectionUnits.join(', ') };
-  }
   if (['device_status', 'taxon', 'last_transmission_date'].includes(key as string)) {
     return { ...align, value: formatTag(key as string, isDayjs(value) ? formatT(value) : (value as string)) };
   }
@@ -213,11 +197,17 @@ function fuzzySearchMutipleWords<T>(rows: T[], keys: string[], filterValue: stri
     return rows;
   }
   const terms = filterValue.split(' ');
-  if (!terms) {
-    return rows;
-  }
-  // reduceRight will mean sorting is done by score for the _first_ entered word.
-  return terms.reduceRight((results, term) => matchSorter(results, term, { keys }), rows);
+
+  // customKeyFn combines the getter and static property values for each row
+  const customKeyFn = (item: T) => {
+    const values = keys.map((key) => {
+      const value = item[key];
+      return typeof value === 'function' ? value.call(item) : value;
+    });
+    return values.join(' ');
+  };
+
+  return terms.reduceRight((results, term) => matchSorter(results, term, { keys: [customKeyFn] }), rows);
 }
 
 const isFunction = (f: unknown): boolean => typeof f === 'function';

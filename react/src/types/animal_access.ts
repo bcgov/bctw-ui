@@ -38,6 +38,19 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   get name(): string {
     return this.animal_id ?? this.wlh_id;
   }
+  // Get a comma-separated string of collection_unit's keys and values
+  // TODO: Decide on the exact format we want for this
+  get collection_unit_display(): string {
+    const collectionUnitArray = this.collection_unit?.map(unit => {
+      const unitString = Object.entries(unit).map(([key, value]) => `${key}: ${value}`);
+      return unitString;
+    });
+    return collectionUnitArray?.join(', ') ?? '';
+  }
+  // Get the permission_type value or 'none' if it does not exist
+  get permission_type_display(): eCritterPermission {
+    return this.permission_type ?? eCritterPermission.none;
+  }
   toJSON(): UserCritterAccess {
     return this;
   }
@@ -49,11 +62,11 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   // displayed as fields 'user/critter permission' table modals
   static get propsToDisplay(): (keyof UserCritterAccess)[] {
     return [
-      'permission_type',
+      'permission_type_display',
       'wlh_id',
       'animal_id',
       'taxon',
-      'collection_unit',
+      'collection_unit_display',
       'device_id',
       'frequency',
       'device_type',

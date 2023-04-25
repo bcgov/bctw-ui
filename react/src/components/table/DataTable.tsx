@@ -149,7 +149,9 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const filterRows = (rows: T[]): T[] => {
     let results = rows.map((r, idx) => {
-      return { ...r, global_id: idx };
+      const newRow = Object.assign(Object.create(Object.getPrototypeOf(r)), r);
+      newRow.global_id = idx;
+      return newRow;
     });
     if (filter && filter.term) {
       results = fuzzySearchMutipleWords(results, filter.keys ? filter.keys : (headers as string[]), filter.term);

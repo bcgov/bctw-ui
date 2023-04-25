@@ -39,6 +39,7 @@ const getUniqueValuesOfT = <T>(arr: T[], prop: keyof T): string[] => {
  */
 const columnToHeader = (prop: string): string => {
   const asArr = prop
+    .replaceAll('_display', '')
     .replaceAll('_', ' ')
     .replaceAll(' id', ' ID')
     .replaceAll('wlh', 'WLH')
