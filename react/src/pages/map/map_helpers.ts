@@ -385,7 +385,7 @@ const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelem
 const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoint[]): ISelectMultipleData[] => {
   const PLACEHOLDER = 'Undefined';
   const IS_DEFAULT = propName === DEFAULT_MFV.header;
-  const IS_COLLECTION_UNIT = propName === 'collection_unit';
+  const IS_COLLECTION_UNIT = propName === 'collection_units';
   const unique = getUniquePropFromPings(pings ?? [], propName, true) as number[];
   const merged = [...unique].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
   let undefinedCount = 0;

@@ -23,7 +23,7 @@ const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: st
   { header: 'critter_status' },
   { header: 'device_status' },
   { header: 'sex' },
-  { header: 'collection_unit', filter: [] },
+  { header: 'collection_units', filter: [] },
   { header: 'collective_unit' }
 ];
 

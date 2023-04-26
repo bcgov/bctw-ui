@@ -13,7 +13,7 @@ import { Collar } from 'types/collar';
 import { formatTime } from 'utils/time';
 import CaptureEvent from './capture_event';
 
-type ReleaseProps = Pick<Animal, 'taxon' | 'translocation_ind' | 'region' | 'collection_unit' | 'critter_status'>;
+type ReleaseProps = Pick<Animal, 'taxon' | 'translocation_ind' | 'region' | 'collection_units' | 'critter_status'>;
 
 export type ReleaseFormField = {
   [Property in keyof ReleaseEvent]+?: FormFieldObject<ReleaseEvent>;
@@ -47,7 +47,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
   readonly taxon: Code;
   translocation_ind: boolean;
   region: Code;
-  collection_unit: ICollectionUnit[];
+  collection_units: ICollectionUnit[];
 
   readonly collar_id: uuid;
   readonly device_id: number;
@@ -93,7 +93,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     const props = [...this.critterPropsToSave];
     // if the critter was being translocated, preserve the region/population unit
     if (this.translocation_ind) {
-      props.push('region', 'collection_unit');
+      props.push('region', 'collection_units');
     }
     const ret = eventToJSON(props, this);
     // if translocation_ind an the animal status was 'in translocation', revert it to alive.

@@ -21,7 +21,7 @@ type CaptureAnimalEventProps = Pick<
   | 'associated_animal_id'
   | 'associated_animal_relationship'
   | 'region'
-  | 'collection_unit'
+  | 'collection_units'
   | 'captivity_status_ind'
 >;
 
@@ -89,7 +89,7 @@ export default class CaptureEvent
   associated_animal_relationship: Code; // required if associated_animal_id populated
   // region & popunit are enabled when animal is translocated
   region: Code;
-  collection_unit: ICollectionUnit[];
+  collection_units: ICollectionUnit[];
   captivity_status_ind: boolean;
   // characteristic fields
   ear_tag_left_id: string;
@@ -154,7 +154,7 @@ export default class CaptureEvent
       // if the translocation is completed, save the new region/population unit.
       // otherwise, need to update critter_status to 'in translocation';
       if (this.isTranslocationComplete) {
-        props.push('region', 'collection_unit');
+        props.push('region', 'collection_units');
       } else {
         props.push('critter_status');
       }

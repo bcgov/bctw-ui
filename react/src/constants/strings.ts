@@ -197,7 +197,7 @@ const MapStrings = {
     critter_status: 'Animal status filter',
     device_status: 'Device status filter',
     sex: 'Filter critter sex',
-    collection_unit: 'Filter by population unit',
+    collection_units: 'Filter by population unit',
     collective_unit: 'Filter by collection unit'
   },
   collectiveUnitLabel: 'Collective Unit',

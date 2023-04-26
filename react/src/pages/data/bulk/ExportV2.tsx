@@ -80,7 +80,7 @@ export default function ExportPageV2(): JSX.Element {
   const styles = exportPageStyles();
 
   const operators: QueryBuilderOperator[] = ['Equals', 'Not Equals'];
-  const columns: QueryBuilderColumn[] = ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+  const columns: QueryBuilderColumn[] = ['taxon', 'collection_units', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
   const TABS: ExportTab[] = ['Quick Export', 'Advanced Export'];
   const [exportType, setExportType] = useState<ExportTab>(TABS[0]);
   const [start, setStart] = useState(dayjs().subtract(3, 'month'));

@@ -102,6 +102,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   useEffect(() => {
     handleRows();
+    console.log(values)
   }, [values]);
 
   useDidMountEffect(() => {

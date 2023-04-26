@@ -39,7 +39,7 @@ interface ITelemetryPoint extends GeoJsonObject {
 // represents a track
 interface ITelemetryLine extends GeoJsonObject {
   type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'critter_id' | 'collection_unit' | 'taxon' | 'map_colour'>;
+  properties: Pick<ITelemetryDetail, 'critter_id' | 'collection_units' | 'taxon' | 'map_colour'>;
   geometry: LineString;
 }
 
@@ -68,7 +68,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   critter_status: eCritterStatus;
   @Type(() => Date) capture_date: Date;
   sex: string;
-  collection_unit: ICollectionUnit[];
+  collection_units: ICollectionUnit[];
   collar_id: string;
   device_id: number;
   device_vendor: string;

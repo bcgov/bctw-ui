@@ -8,7 +8,7 @@ import { eCritterPermission } from 'types/permission';
 
 export interface IUserCritterAccess
   extends Required<Pick<Animal, 'permission_type'>>,
-    Pick<Animal, 'critter_id' | 'animal_id' | 'taxon' | 'wlh_id' | 'valid_from' | 'valid_to' | 'collection_unit'>,
+    Pick<Animal, 'critter_id' | 'animal_id' | 'taxon' | 'wlh_id' | 'valid_from' | 'valid_to' | 'collection_units'>,
     Pick<Collar, 'device_id' | 'device_make' | 'device_type' | 'frequency'> {}
 
 export type IUserCritterAccessInput = Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> &
@@ -20,7 +20,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   animal_id: string;
   wlh_id: string;
   taxon: string;
-  collection_unit: ICollectionUnit[];
+  collection_units: ICollectionUnit[];
   managed_by: string;
   edited_by: string;
   observed_by: string;
@@ -41,7 +41,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   // Get a comma-separated string of collection_unit's keys and values
   // TODO: Decide on the exact format we want for this
   get collection_unit_display(): string {
-    const collectionUnitArray = this.collection_unit?.map(unit => {
+    const collectionUnitArray = this.collection_units?.map(unit => {
       const unitString = Object.entries(unit).map(([key, value]) => `${key}: ${value}`);
       return unitString;
     });

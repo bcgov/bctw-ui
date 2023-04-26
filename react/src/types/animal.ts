@@ -55,7 +55,7 @@ export interface IAnimalTelemetryBase {
   collective_unit: string;
   map_colour: Code;
   taxon: string;
-  collection_unit: ICollectionUnit[];
+  collection_units: ICollectionUnit[];
   wlh_id: string;
 }
 
@@ -158,7 +158,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   ucod_confidence: Code;
   pcod_confidence: Code;
   ultimate_cause_of_death: Code;
-  collection_unit: ICollectionUnit[];
+  collection_units: ICollectionUnit[];
   recapture_ind: boolean;
   region: Code;
   release_comment: string;
@@ -224,7 +224,7 @@ export class Animal implements BCTWBase<Animal>, IAnimal {
   }
 
   get displayProps(): (keyof Animal)[] {
-    return ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'critter_status'];
+    return ['taxon', 'collection_units', 'wlh_id', 'animal_id', 'critter_status'];
     //return Animal.toCSVHeaderTemplate;
   }
 
@@ -375,7 +375,7 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
     { prop: 'animal_id', type: eInputType.text, taxon: [], ...isRequired },
     //Add nickname field for bears
     { prop: 'region', type: eInputType.code, taxon: [], ...isRequired },
-    { prop: 'collection_unit', type: eInputType.code, taxon: [] } //Population unit needs to be taxon dependant, surface with code table
+    { prop: 'collection_units', type: eInputType.code, taxon: [] } //Population unit needs to be taxon dependant, surface with code table
   ],
   identifierFields2: [
     { prop: 'ear_tag_left_colour', type: eInputType.text, taxon: [] },

@@ -47,7 +47,7 @@ export default function DetailedAnimalView({ detailAnimal, height }: DetailedAni
             'critter_status',
             'wlh_id',
             'animal_id',
-            'collection_unit',
+            'collection_units',
             'sex',
             'capture_date',
             'mortality_date'

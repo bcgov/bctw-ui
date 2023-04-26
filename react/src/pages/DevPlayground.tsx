@@ -152,7 +152,7 @@ const TempComponent = ({ tabList, tab, handleTab, children }: TempComponentProps
   testAnimal.critter_status = eCritterStatus.alive;
   testAnimal.wlh_id = '12345';
   testAnimal.animal_id = 'BC78301';
-  testAnimal.collection_unit = [{ 'Population Unit': 'testing' }];
+  testAnimal.collection_units = [{ 'Population Unit': 'testing' }];
   testAnimal.sex = 'Female';
   testAnimal.capture_date = dayjs('2022-07-02');
   testAnimal.mortality_date = null;
@@ -205,7 +205,7 @@ No, well`;
               'critter_status',
               'wlh_id',
               'animal_id',
-              'collection_unit',
+              'collection_units',
               'sex',
               'capture_date',
               'mortality_date'
