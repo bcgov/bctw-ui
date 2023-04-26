@@ -1,6 +1,8 @@
 import React from 'react';
 
-interface CritterbaseSelectProps {}
+// interface CritterbaseSelectProps {
+//   route: 
+// }
 
 export const CritterbaseSelect = (props: CritterbaseSelectProps) => {
   const {} = props;

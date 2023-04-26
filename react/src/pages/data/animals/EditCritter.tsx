@@ -54,7 +54,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
     associatedAnimalFields,
     captureFields,
     characteristicsFields,
-    identifierFields1,
+    identifierFields,
     markingFields,
     mortalityFields,
     releaseFields,
@@ -113,33 +113,33 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
           return (
             <>
               <FormSection id='identifiers' header='Identifiers' disabled={true}>
-                {identifierFields1.map((f, i) => (
+                {identifierFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
-                {markingFields.map((f, i) => (
+                {/* {markingFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))}
+                ))} */}
               </FormSection>
               <FormSection id='characteristics' header='Characteristics' disabled={true}>
-                {characteristicsFields.map((f, i) => (
+                {characteristicsFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
-              <FormSection id='markings' header='Markings' disabled={true}>
-                {characteristicsFields.map((f, i) => (
+              {/* <FormSection id='markings' header='Markings' disabled={true}>
+                {characteristicsFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
               <FormSection id='capture-details' header='Latest Capture Details' disabled={true}>
-                {captureFields.map((f, i) => (
+                {captureFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
               <FormSection id='Mortality-details' header='Mortality Details' disabled={true}>
-                {mortalityFields.map((f, i) => (
+                {mortalityFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
-              </FormSection>
+              </FormSection> */}
             </>
           );
         }}

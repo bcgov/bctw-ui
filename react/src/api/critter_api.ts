@@ -2,9 +2,9 @@ import { getCritterEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls
 import { createUrl, postJSON } from 'api/api_helpers';
 import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { plainToClass } from 'class-transformer';
-import { Animal, AttachedAnimal, eCritterFetchType, IAnimal, IAttachedAnimal } from 'types/animal';
-import { useQueryClient } from 'react-query';
 import { ITableFilter } from 'components/table/table_interfaces';
+import { useQueryClient } from 'react-query';
+import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
 
 export const critterApi = (props: ApiProps): API => {
   const { api } = props;
@@ -21,10 +21,10 @@ export const critterApi = (props: ApiProps): API => {
    * converts json to the class instance of the animals
    */
   const _handleGetResults = (
-    data: IAnimal[] | IAttachedAnimal[],
+    data: Animal[] | AttachedAnimal[],
     type: eCritterFetchType
   ): Animal[] | AttachedAnimal[] => {
-    const results = data.map((json: IAnimal) =>
+    const results = data.map((json: AttachedAnimal) =>
       type === eCritterFetchType.assigned ? plainToClass(AttachedAnimal, json) : plainToClass(Animal, json)
     );
     return type === eCritterFetchType.assigned ? (results as AttachedAnimal[]) : (results as Animal[]);
@@ -58,7 +58,7 @@ export const critterApi = (props: ApiProps): API => {
   const getCritterHistory = async (page: number, id: string): Promise<Animal[]> => {
     const url = createUrl({ api: `get-animal-history/${id}`, page });
     const { data } = await api.get(url);
-    return data.map((json: IAnimal[]) => plainToClass(Animal, json));
+    return data.map((json: Animal[]) => plainToClass(Animal, json));
   };
 
   return {

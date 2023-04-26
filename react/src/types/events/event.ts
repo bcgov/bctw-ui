@@ -1,32 +1,32 @@
 import { ReactNode } from 'react';
-import { Animal, getAnimalFormFields, IAnimal } from 'types/animal';
+import { Animal, CritterDetailsForm, getAnimalFormFields } from 'types/animal';
 import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
-import { BCTWFormat} from 'types/common_types';
+import { BCTWFormat } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { FormChangeEvent, FormFieldObject } from 'types/form_types';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 
 export type WorkflowFormProps<T extends IBCTWWorkflow> = {
-  event: T
+  event: T;
   handleFormChange: FormChangeEvent;
   // workflows can exit early by calling the following functions
   handleExitEarly?: (message: ReactNode) => void;
   handlePostponeSave?: (wft: WorkflowType) => void;
   // this state is managed in WorkflowWrapper, but some forms may want to know about it
   canSave?: boolean;
-}
+};
 
 // make all properties optional
 // todo: make critter_id etc required
-export type OptionalAnimal = { [Property in keyof IAnimal]+?: IAnimal[Property] };
+export type OptionalAnimal = { [Property in keyof Animal]+?: Animal[Property] };
 export type OptionalDevice = { [Property in keyof ICollar]+?: ICollar[Property] };
 
-// 
-export type WorkflowFormField = FormFieldObject<Partial<Collar> & Partial<Animal>>;
+//
+export type WorkflowFormField = FormFieldObject<Partial<Collar> & Partial<CritterDetailsForm>>;
 const allFields: WorkflowFormField[] = [...getDeviceFormFields(), ...getAnimalFormFields()];
-export const wfFields = new Map(allFields?.map(f => [f.prop, f])); 
+export const wfFields = new Map(allFields?.map((f) => [f.prop, f]));
 
 /**
  * interface that BCTW workflows implement
@@ -40,14 +40,14 @@ export interface IBCTWWorkflow {
   getDevice?(): OptionalDevice;
   getAttachment?(): AttachDeviceInput | RemoveDeviceInput;
   getDataLife?(): ChangeDataLifeInput;
-  // multiple events implement this 
+  // multiple events implement this
   shouldUnattachDevice?: boolean;
   // must implement this to determine how the workflow should be saved
   shouldSaveAnimal: boolean;
   shouldSaveDevice: boolean;
 }
 
-export type BCTWWorkflow<T> = IBCTWWorkflow & BCTWFormat<T>
+export type BCTWWorkflow<T> = IBCTWWorkflow & BCTWFormat<T>;
 
 /**
  * converts an event to json for posting to API
@@ -65,22 +65,22 @@ export const eventToJSON = <T>(keys: string[], event: T): Record<string, unknown
   return ret;
 };
 
-/** used to create new workflow events and not have properties overwritten 
+/** used to create new workflow events and not have properties overwritten
  * @param editing - the original object, usually an @type {Animal} or @type {Collar}
- * @param workflow - instance of the workflow event 
+ * @param workflow - instance of the workflow event
  * @param toRemove - keys of the @param editing type that shouldn't end up in the workflow instance
-*/
+ */
 export const editObjectToEvent = <WF, E>(editing: E, workflow: WF, toRemove: (keyof E)[]): WF => {
   const cp = Object.assign({}, editing);
   // always remove these fields
-  delete cp['fields']; 
+  delete cp['fields'];
   delete cp['event_type'];
   delete cp['shouldUnattachDevice'];
   delete cp['shouldSaveAnimal'];
   delete cp['shouldSaveDevice'];
   // remove all fields included in toRemove
   for (let index = 0; index < toRemove.length; index++) {
-    delete cp[toRemove[index]]
+    delete cp[toRemove[index]];
   }
   return Object.assign(workflow, cp);
-}
+};

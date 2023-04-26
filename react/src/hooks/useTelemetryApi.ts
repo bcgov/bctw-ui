@@ -5,6 +5,7 @@ import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
 import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
+import { critterbaseApi as critterbase_api } from 'api/critterbase_api';
 import { mapApi as map_api } from 'api/map_api';
 import { onboardingApi as onboarding_api } from 'api/onboarding_api';
 import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
@@ -51,7 +52,12 @@ import {
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { parseArgs } from 'utils/common_helpers';
 
-/**
+/**const critterbase = axios.create({
+  baseURL: CB_API_URL,
+  headers: {
+    'API-KEY': CB_API_KEY,
+  },
+});
  * Returns an instance of axios with baseURL set.
  * @return {AxiosInstance}
  */
@@ -64,6 +70,17 @@ const useApi = (): AxiosInstance => {
   return instance;
 };
 
+const useCritterbaseApi = (): AxiosInstance => {
+  const instance = useMemo(() => {
+    return axios.create({
+      baseURL: process.env.REACT_APP_CRITTERBASE_API,
+      headers: {
+        'API-KEY': process.env.REACT_APP_CRITTERBASE_API_KEY
+      }
+    });
+  }, []);
+  return instance;
+};
 type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
 
 /**
@@ -72,6 +89,7 @@ type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
  */
 export const useTelemetryApi = () => {
   const api = useApi();
+  const cb_api = useCritterbaseApi();
 
   const collarApi = collar_api({ api });
   const critterApi = critter_api({ api });
@@ -83,6 +101,7 @@ export const useTelemetryApi = () => {
   const permissionApi = permission_api({ api });
   const attachmentApi = attachment_api({ api });
   const onboardApi = onboarding_api({ api });
+  const critterbaseApi = critterbase_api({ api: cb_api });
 
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
 

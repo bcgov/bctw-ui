@@ -166,6 +166,12 @@ function CreateEditSelectField({
   );
 }
 
+// function CreateCritterbaseSelectField({
+//   return (
+
+//   )
+// })
+
 // returns the funtion to create the form component based on input type
 const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
   switch (inputType) {
@@ -179,6 +185,8 @@ const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactEl
       return CreateEditSelectField;
     case eInputType.multiline:
       return CreateEditMultilineTextField;
+    // case eInputType.cb_select:
+    //   return CreateCritterbaseSelectField;
     default:
       return CreateEditTextField;
   }

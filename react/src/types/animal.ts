@@ -17,47 +17,107 @@ import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 
-export enum etaxon {
-  caribou = 'M-RATA',
-  grizzly_bear = 'M-URAR',
-  moose = 'M-ALAM',
-  grey_wolf = 'M-CALU'
+export enum eTaxon {
+  caribou = 'caribou',
+  grizzly_bear = 'grizzly bear',
+  moose = 'moose',
+  grey_wolf = 'grey wolf'
 }
 
-export enum eCritterStatus {
-  alive = 'Alive',
-  //in_translocation = 'In Translocation',
-  mortality = 'Mortality'
-  //potential_mortality = 'Potential Mortality'
+const { caribou, grizzly_bear, moose, grey_wolf } = eTaxon;
+
+// // used in critter getters to specify collar attachment status
+
+export interface Itaxon {
+  id: string;
+  name: string;
 }
 
-const { caribou, grizzly_bear, moose, grey_wolf } = etaxon;
-
-// used in critter getters to specify collar attachment status
 export enum eCritterFetchType {
   assigned = 'assigned',
   unassigned = 'unassigned'
 }
 
-export interface Itaxon {
-  id: string;
-  //key: string,
-  name: string;
+export enum eCritterStatus {
+  alive = 'Alive',
+  mortality = 'Mortality'
 }
+
 export type ICollectionUnit = Record<string, string>;
-// /**
-//  * Animal properties that are re-used in Telemetry classes (map.ts)
-//  */
-// export interface IAnimalTelemetryBase {
-//   animal_id: string;
-//   critter_status: eCritterStatus;
-//   capture_date: Dayjs | Date;
-//   collective_unit: string;
-//   map_colour: Code;
-//   taxon: string;
-//   collection_unit: ICollectionUnit[];
-//   wlh_id: string;
-// }
+
+// * CRITTERBASE INTEGRATION *
+export class Critter {
+  readonly critter_id: uuid;
+  wlh_id: string;
+  animal_id: string;
+  sex: string;
+  taxon: string;
+  collection_units: ICollectionUnit[];
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
+
+  get critter_status(): string {
+    return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
+  }
+
+  get collection_unit(): string {
+    return this.collection_units
+      ?.map((unit) => {
+        const [category] = Object.keys(unit);
+        `${category}: ${unit[category]}`;
+      })
+      .join(', ');
+  }
+
+  tagColor(): string {
+    switch (this.taxon.toLowerCase()) {
+      case 'caribou' || 'rangifer tarandus':
+        return '#9575cd';
+      case 'moose' || 'alces alces':
+        return '#64b5f6';
+      case 'grey wolf' || 'canis lupus':
+        return '#4db6ac';
+      case 'grizzly bear' || 'usrsus arctos':
+        return '#81c784';
+      default:
+        return '#bdbdbd';
+    }
+  }
+
+  constructor(critter_id = '') {
+    this.critter_id = critter_id;
+  }
+}
+
+// * CRITTERBASE INTEGRATION *
+export class CritterDetails extends Critter {
+  responsible_region_nr_id: uuid;
+  responsible_region: string;
+  system_origin: string;
+  create_user: uuid;
+  update_user: uuid;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) create_timestamp: Dayjs;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) update_timestamp: Dayjs;
+  critter_comment: string;
+  //Finish these types;
+  mortality: unknown[];
+  capture: unknown[];
+  marking: unknown[];
+  measurement: Record<string, unknown>;
+}
+
+/**
+ * Animal properties that are re-used in Telemetry classes (map.ts)
+ */
+export interface IAnimalTelemetryBase {
+  animal_id: string;
+  critter_status: eCritterStatus;
+  capture_date: Dayjs | Date;
+  collective_unit: string;
+  map_colour: Code;
+  taxon: string;
+  collection_unit: ICollectionUnit[];
+  wlh_id: string;
+}
 
 // export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 //   animal_colouration: string;
@@ -260,7 +320,6 @@ export interface IAttachedAnimal extends ICollarHistory, DataLife {}
 
 export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<AttachedAnimal> {
   @Exclude(toPlainOnly) assignment_id: uuid;
-  _merged: boolean;
   collar_id: uuid;
   device_id: number;
   device_make: Code;
@@ -341,67 +400,72 @@ export class AttachedAnimal extends Animal implements IAttachedAnimal, BCTWBase<
 }
 
 // taxon: [] represents field applies to all taxon, used for optimization on searching
-export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[]> = {
+export type CritterDetailsForm = Partial<CritterDetails> &
+  Partial<Pick<CritterDetails, 'capture' | 'mortality' | 'marking' | 'measurement'>>;
+export const critterFormFields: Record<string, FormFieldObject<CritterDetailsForm>[]> = {
   taxonField: [{ prop: 'taxon', type: eInputType.code, taxon: [], ...isRequired }],
   //TODO critterbase integration does not support these in the same way
   // associatedAnimalFields: [
   //   { prop: 'associated_animal_id', type: eInputType.text, taxon: [] },
   //   { prop: 'associated_animal_relationship', type: eInputType.code, taxon: [] }
   // ],
-  captureFields: [
-    { prop: 'capture_date', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
-    { prop: 'capture_latitude', type: eInputType.number, taxon: [] },
-    { prop: 'capture_longitude', type: eInputType.number, taxon: [] },
-    //TODO critterbase integration does not support these in the same way
-    // { prop: 'capture_utm_zone', type: eInputType.number, taxon: [] },
-    // { prop: 'capture_utm_easting', type: eInputType.number, taxon: [] },
-    // { prop: 'capture_utm_northing', type: eInputType.number, taxon: [] },
-    // { prop: 'recapture_ind', type: eInputType.check, taxon: [] },
-    // { prop: 'captivity_status_ind', type: eInputType.check, taxon: [caribou] },
-    { prop: 'capture_comment', type: eInputType.multiline, taxon: [] }
-  ],
+  //! Add capture fields to detailed critter
+  // captureFields: [
+  //   { prop: 'capture_date', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
+  //   { prop: 'capture_latitude', type: eInputType.number, taxon: [] },
+  //   { prop: 'capture_longitude', type: eInputType.number, taxon: [] },
+  //   //TODO critterbase integration does not support these in the same way
+  //   // { prop: 'capture_utm_zone', type: eInputType.number, taxon: [] },
+  //   // { prop: 'capture_utm_easting', type: eInputType.number, taxon: [] },
+  //   // { prop: 'capture_utm_northing', type: eInputType.number, taxon: [] },
+  //   // { prop: 'recapture_ind', type: eInputType.check, taxon: [] },
+  //   // { prop: 'captivity_status_ind', type: eInputType.check, taxon: [caribou] },
+  //   { prop: 'capture_comment', type: eInputType.multiline, taxon: [] }
+  // ],
   characteristicsFields: [
-    { prop: 'critter_status', type: eInputType.code, taxon: [], ...isRequired },
-    { prop: 'sex', type: eInputType.code, taxon: [], ...isRequired },
-    { prop: 'animal_colouration', type: eInputType.text, taxon: [] },
-    { prop: 'estimated_age', type: eInputType.number, taxon: [], validate: mustbePositiveNumber },
-    { prop: 'life_stage', type: eInputType.code, taxon: [] } //taxon dependant, with code table
+    { prop: 'critter_status', type: eInputType.cb_select, taxon: [], ...isRequired },
+    { prop: 'responsible_region', type: eInputType.cb_select, taxon: [] },
+    { prop: 'collection_unit', type: eInputType.cb_select, taxon: [] } //This select will need additional work, array of objects. Flatten and display multiple selects for array
+    //TODO these properties do not exist on critterbase critter in the same way
+    // { prop: 'animal_colouration', type: eInputType.text, taxon: [] },
+    // { prop: 'estimated_age', type: eInputType.number, taxon: [], validate: mustbePositiveNumber },
+    // { prop: 'life_stage', type: eInputType.code, taxon: [] } //taxon dependant, with code table
   ],
   //TODO critterbase integration does not support these in the same way
   // characteristicFields2: [
   //   { prop: 'juvenile_at_heel', type: eInputType.code, taxon: [] },
   //   { prop: 'juvenile_at_heel_count', type: eInputType.number, taxon: [], validate: mustbePositiveNumber }
   // ],
-  identifierFields1: [
+  identifierFields: [
     { prop: 'wlh_id', type: eInputType.text, taxon: [] },
-    { prop: 'animal_id', type: eInputType.text, taxon: [], ...isRequired },
-    { prop: 'region', type: eInputType.code, taxon: [], ...isRequired },
-    { prop: 'collection_unit', type: eInputType.code, taxon: [] } //Population unit needs to be taxon dependant, surface with code table
+    { prop: 'animal_id', type: eInputType.text, taxon: [] },
+    { prop: 'sex', type: eInputType.cb_select, taxon: [], ...isRequired }
   ],
-  markingFields: [
-    { prop: 'ear_tag_left_colour', type: eInputType.text, taxon: [] },
-    { prop: 'ear_tag_right_colour', type: eInputType.text, taxon: [] },
-    { prop: 'ear_tag_left_id', type: eInputType.text, taxon: [] },
-    { prop: 'ear_tag_right_id', type: eInputType.text, taxon: [] }
-  ],
-  mortalityFields: [
-    { prop: 'mortality_date', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to mortality_timestamp
-    { prop: 'mortality_latitude', type: eInputType.number, taxon: [] },
-    { prop: 'mortality_longitude', type: eInputType.number, taxon: [] },
-    { prop: 'mortality_utm_zone', type: eInputType.number, taxon: [] },
-    { prop: 'mortality_utm_easting', type: eInputType.number, taxon: [] },
-    { prop: 'mortality_utm_northing', type: eInputType.number, taxon: [] },
-    { prop: 'proximate_cause_of_death', type: eInputType.code, taxon: [caribou] },
-    { prop: 'ultimate_cause_of_death', type: eInputType.code, taxon: [caribou] },
-    { prop: 'pcod_confidence', type: eInputType.code, taxon: [caribou], codeName: 'cod_confidence' },
-    { prop: 'ucod_confidence', type: eInputType.code, taxon: [caribou], codeName: 'cod_confidence' },
-    { prop: 'predator_taxon_pcod', type: eInputType.code, taxon: [caribou], codeName: 'predator_taxon' },
-    { prop: 'predator_taxon_ucod', type: eInputType.code, taxon: [caribou], codeName: 'predator_taxon' },
-    { prop: 'mortality_investigation', type: eInputType.code, taxon: [caribou] },
-    { prop: 'mortality_report_ind', type: eInputType.check, taxon: [caribou] },
-    { prop: 'predator_known_ind', type: eInputType.check, taxon: [caribou] },
-    { prop: 'mortality_comment', type: eInputType.multiline, taxon: [] }
-  ],
+  // markingFields: [
+  //   { prop: 'ear_tag_left_colour', type: eInputType.text, taxon: [] },
+  //   { prop: 'ear_tag_right_colour', type: eInputType.text, taxon: [] },
+  //   { prop: 'ear_tag_left_id', type: eInputType.text, taxon: [] },
+  //   { prop: 'ear_tag_right_id', type: eInputType.text, taxon: [] }
+  // ],
+  //TODO add mortality fields back
+  // mortalityFields: [
+  //   { prop: 'mortality_date', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to mortality_timestamp
+  //   { prop: 'mortality_latitude', type: eInputType.number, taxon: [] },
+  //   { prop: 'mortality_longitude', type: eInputType.number, taxon: [] },
+  //   { prop: 'mortality_utm_zone', type: eInputType.number, taxon: [] },
+  //   { prop: 'mortality_utm_easting', type: eInputType.number, taxon: [] },
+  //   { prop: 'mortality_utm_northing', type: eInputType.number, taxon: [] },
+  //   { prop: 'proximate_cause_of_death', type: eInputType.code, taxon: [caribou] },
+  //   { prop: 'ultimate_cause_of_death', type: eInputType.code, taxon: [caribou] },
+  //   { prop: 'pcod_confidence', type: eInputType.code, taxon: [caribou], codeName: 'cod_confidence' },
+  //   { prop: 'ucod_confidence', type: eInputType.code, taxon: [caribou], codeName: 'cod_confidence' },
+  //   { prop: 'predator_taxon_pcod', type: eInputType.code, taxon: [caribou], codeName: 'predator_taxon' },
+  //   { prop: 'predator_taxon_ucod', type: eInputType.code, taxon: [caribou], codeName: 'predator_taxon' },
+  //   { prop: 'mortality_investigation', type: eInputType.code, taxon: [caribou] },
+  //   { prop: 'mortality_report_ind', type: eInputType.check, taxon: [caribou] },
+  //   { prop: 'predator_known_ind', type: eInputType.check, taxon: [caribou] },
+  //   { prop: 'mortality_comment', type: eInputType.multiline, taxon: [] }
+  // ],
   //TODO critterbase integration does not support release values in the same way
   // releaseFields: [
   //   { prop: 'release_date', type: eInputType.datetime, taxon: [] },
@@ -413,10 +477,10 @@ export const critterFormFields: Record<string, FormFieldObject<Partial<Animal>>[
   //   { prop: 'translocation_ind', type: eInputType.check, taxon: [] },
   //   { prop: 'release_comment', type: eInputType.multiline, taxon: [] }
   // ],
-  animalCommentField: [{ prop: 'animal_comment', type: eInputType.multiline, taxon: [] }]
+  animalCommentField: [{ prop: 'critter_comment', type: eInputType.multiline, taxon: [] }]
 };
 
 // a 'flatteneed' critterFormFields array
-export const getAnimalFormFields = (): FormFieldObject<Partial<Animal>>[] => {
+export const getAnimalFormFields = (): FormFieldObject<Partial<CritterDetails>>[] => {
   return Object.values(critterFormFields).reduce((previous, current) => [...previous, ...current], []);
 };

@@ -11,8 +11,10 @@ export enum eInputType {
   date = 'date',
   datetime = 'datetime',
   time = 'time',
-  code = 'code',
-  multiline = 'multiline'
+  code = 'code', //might be deprecated
+  multiline = 'multiline',
+  select = 'select',
+  cb_select = 'cb_select' //critterbase select field
 }
 
 /**
@@ -30,10 +32,8 @@ export type FormBaseProps = Pick<BaseTextFieldProps, 'label'> & {
  */
 export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled' | 'required'> & {
   prop: keyof T;
-  // prop: KeyType;
   type: eInputType;
   taxon?: string[];
-  //cast?: taxonCast // ex: {moose: 'wildlife_unit', grey_wolf: 'wildlife_unit'}
   codeName?: string;
   span?: boolean;
   tooltip?: ReactNode;

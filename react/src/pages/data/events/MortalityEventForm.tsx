@@ -90,105 +90,107 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
 
   const isDisabled = { disabled: critterIsAlive };
   return (
-    <>
-      <FormSection id='mort-a-st' header={event.formatPropAsHeader('critter_status')} disabled={critterIsAlive}>
-        {[
-          <Radio
-            key='mort-rad-status'
-            propName={wfFields.get('critter_status').prop}
-            changeHandler={onChange}
-            defaultSelectedValue={'Mortality'}
-            values={['Mortality', 'Alive'].map((p) => ({ label: p, value: p }))}
-          />
-        ]}
-      </FormSection>
-      {/* location events, nesting some other components inside */}
-      <FormSection id='mort-device' header='Event Details' disabled={critterIsAlive}>
-        {[
-          <LocationEventForm
-            key='mort-loc'
-            disabled={critterIsAlive}
-            event={mortality.location_event}
-            notifyChange={onChangeLocationProp}
-            childNextToDate={CreateFormField(mortality, wfFields.get('device_status'), onChange, isDisabled)}
-            children={
-              <>
-                {/* device retrieval */}
-                <Box mb={1} {...boxSpreadRowProps}>
-                  {CreateFormField(mortality, wfFields.get('retrieved_ind'), onChange, isDisabled)}
-                  {CreateFormField(mortality, { ...wfFields.get('retrieval_date'), required: isRetrieved }, onChange, {
-                    disabled: !isRetrieved || critterIsAlive
-                  })}
-                </Box>
-                {/* data life / remove device */}
-                <Box mb={1} {...boxSpreadRowProps}>
-                  {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
-                  {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
-                    disabled: !isBeingUnattached || critterIsAlive
-                  })}
-                </Box>
-              </>
-            }
-          />,
-          <Box key='bx-devcond' mt={2} display='flex' columnGap={1}>
-            {/* device status */}
-            {CreateFormField(mortality, wfFields.get('device_condition'), onChange, isDisabled)}
-            {CreateFormField(mortality, wfFields.get('device_deployment_status'), onChange, isDisabled)}
-          </Box>,
-          <Box key='bx-act-status'>
-            {CreateFormField(mortality, wfFields.get('activation_status_ind'), onChange, isDisabled, true)}
-          </Box>
-        ]}
-      </FormSection>
-      {/* critter status fields */}
-      <FormSection id='mort-critter' header='Animal Details' disabled={critterIsAlive}>
-        {[
-          <Box key='bx-invest' {...boxSpreadRowProps}>
-            {<span>{WorkflowStrings.mortality.mort_investigation}</span>}
-            {CreateFormField(mortality, { required: true, ...wfFields.get('mortality_investigation') }, onChange, {
-              disabled: critterIsAlive,
-              style: { width: '250px' }
-            })}
-          </Box>,
-          <Box key='bx-mort-rep'>
-            {CreateFormField(mortality, wfFields.get('mortality_report_ind'), onChange, isDisabled, true)}
-          </Box>,
-          <Box key='bx-cod' mt={1} display='flex' columnGap={1}>
-            {CreateFormField(mortality, wfFields.get('proximate_cause_of_death'), onChange, isDisabled)}
-            {CreateFormField(mortality, wfFields.get('ultimate_cause_of_death'), onChange, {
-              disabled: ucodDisabled || critterIsAlive
-            })}
-          </Box>,
-          <Box key='bx-pred' mt={1} {...boxSpreadRowProps}>
-            {CreateFormField(mortality, wfFields.get('predator_known_ind'), onChange, {
-              disabled: !isPredation || critterIsAlive
-            })}
-            {CreateFormField(mortality, wfFields.get('predator_taxon_pcod'), onChange, {
-              disabled: !isPredatorKnown || critterIsAlive
-            })}
-            {CreateFormField(mortality, wfFields.get('pcod_confidence'), onChange, {
-              disabled: !isPredatorKnown || critterIsAlive
-            })}
-          </Box>,
-          <Box key='bx=ucod' mt={1} {...boxSpreadRowProps}>
-            {CreateFormField(mortality, { ...fields.isUCODtaxonKnown }, onChange, {
-              disabled: !isPredatorKnown || critterIsAlive
-            })}
-            {CreateFormField(mortality, wfFields.get('predator_taxon_ucod'), onChange, {
-              disabled: !(isPredatorKnown && isUCODKnown) || critterIsAlive
-            })}
-            {CreateFormField(mortality, wfFields.get('ucod_confidence'), onChange, {
-              disabled: !(isPredatorKnown && isUCODKnown) || critterIsAlive
-            })}
-          </Box>,
-          <CaptivityStatusForm
-            key='mort-capt-form'
-            event={mortality}
-            handleFormChange={handleFormChange}
-            disabled={critterIsAlive}
-          />
-        ]}
-      </FormSection>
-    </>
+    <></>
+    //TODO add this back CRITTERBASE INTEGRATION
+    // <>
+    //   <FormSection id='mort-a-st' header={event.formatPropAsHeader('critter_status')} disabled={critterIsAlive}>
+    //     {[
+    //       <Radio
+    //         key='mort-rad-status'
+    //         propName={wfFields.get('critter_status').prop}
+    //         changeHandler={onChange}
+    //         defaultSelectedValue={'Mortality'}
+    //         values={['Mortality', 'Alive'].map((p) => ({ label: p, value: p }))}
+    //       />
+    //     ]}
+    //   </FormSection>
+    //   {/* location events, nesting some other components inside */}
+    //   <FormSection id='mort-device' header='Event Details' disabled={critterIsAlive}>
+    //     {[
+    //       <LocationEventForm
+    //         key='mort-loc'
+    //         disabled={critterIsAlive}
+    //         event={mortality.location_event}
+    //         notifyChange={onChangeLocationProp}
+    //         childNextToDate={CreateFormField(mortality, wfFields.get('device_status'), onChange, isDisabled)}
+    //         children={
+    //           <>
+    //             {/* device retrieval */}
+    //             <Box mb={1} {...boxSpreadRowProps}>
+    //               {CreateFormField(mortality, wfFields.get('retrieved_ind'), onChange, isDisabled)}
+    //               {CreateFormField(mortality, { ...wfFields.get('retrieval_date'), required: isRetrieved }, onChange, {
+    //                 disabled: !isRetrieved || critterIsAlive
+    //               })}
+    //             </Box>
+    //             {/* data life / remove device */}
+    //             <Box mb={1} {...boxSpreadRowProps}>
+    //               {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
+    //               {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
+    //                 disabled: !isBeingUnattached || critterIsAlive
+    //               })}
+    //             </Box>
+    //           </>
+    //         }
+    //       />,
+    //       <Box key='bx-devcond' mt={2} display='flex' columnGap={1}>
+    //         {/* device status */}
+    //         {CreateFormField(mortality, wfFields.get('device_condition'), onChange, isDisabled)}
+    //         {CreateFormField(mortality, wfFields.get('device_deployment_status'), onChange, isDisabled)}
+    //       </Box>,
+    //       <Box key='bx-act-status'>
+    //         {CreateFormField(mortality, wfFields.get('activation_status_ind'), onChange, isDisabled, true)}
+    //       </Box>
+    //     ]}
+    //   </FormSection>
+    //   {/* critter status fields */}
+    //   <FormSection id='mort-critter' header='Animal Details' disabled={critterIsAlive}>
+    //     {[
+    //       <Box key='bx-invest' {...boxSpreadRowProps}>
+    //         {<span>{WorkflowStrings.mortality.mort_investigation}</span>}
+    //         {CreateFormField(mortality, { required: true, ...wfFields.get('mortality_investigation') }, onChange, {
+    //           disabled: critterIsAlive,
+    //           style: { width: '250px' }
+    //         })}
+    //       </Box>,
+    //       <Box key='bx-mort-rep'>
+    //         {CreateFormField(mortality, wfFields.get('mortality_report_ind'), onChange, isDisabled, true)}
+    //       </Box>,
+    //       <Box key='bx-cod' mt={1} display='flex' columnGap={1}>
+    //         {CreateFormField(mortality, wfFields.get('proximate_cause_of_death'), onChange, isDisabled)}
+    //         {CreateFormField(mortality, wfFields.get('ultimate_cause_of_death'), onChange, {
+    //           disabled: ucodDisabled || critterIsAlive
+    //         })}
+    //       </Box>,
+    //       <Box key='bx-pred' mt={1} {...boxSpreadRowProps}>
+    //         {CreateFormField(mortality, wfFields.get('predator_known_ind'), onChange, {
+    //           disabled: !isPredation || critterIsAlive
+    //         })}
+    //         {CreateFormField(mortality, wfFields.get('predator_taxon_pcod'), onChange, {
+    //           disabled: !isPredatorKnown || critterIsAlive
+    //         })}
+    //         {CreateFormField(mortality, wfFields.get('pcod_confidence'), onChange, {
+    //           disabled: !isPredatorKnown || critterIsAlive
+    //         })}
+    //       </Box>,
+    //       <Box key='bx=ucod' mt={1} {...boxSpreadRowProps}>
+    //         {CreateFormField(mortality, { ...fields.isUCODtaxonKnown }, onChange, {
+    //           disabled: !isPredatorKnown || critterIsAlive
+    //         })}
+    //         {CreateFormField(mortality, wfFields.get('predator_taxon_ucod'), onChange, {
+    //           disabled: !(isPredatorKnown && isUCODKnown) || critterIsAlive
+    //         })}
+    //         {CreateFormField(mortality, wfFields.get('ucod_confidence'), onChange, {
+    //           disabled: !(isPredatorKnown && isUCODKnown) || critterIsAlive
+    //         })}
+    //       </Box>,
+    //       <CaptivityStatusForm
+    //         key='mort-capt-form'
+    //         event={mortality}
+    //         handleFormChange={handleFormChange}
+    //         disabled={critterIsAlive}
+    //       />
+    //     ]}
+    //   </FormSection>
+    // </>
   );
 }
