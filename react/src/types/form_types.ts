@@ -1,4 +1,5 @@
 import { BaseTextFieldProps } from '@mui/material';
+import { ICbRoutesKey } from 'critterbase/types';
 import { ReactNode } from 'react';
 
 export type KeyType = string | number | symbol;
@@ -35,6 +36,7 @@ export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled' | 'required
   type: eInputType;
   taxon?: string[];
   codeName?: string;
+  cbRouteKey?: ICbRoutesKey;
   span?: boolean;
   tooltip?: ReactNode;
   validate?: <T>(input: T) => string;

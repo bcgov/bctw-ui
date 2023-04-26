@@ -4,8 +4,8 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
-import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
 import { critterbaseApi as critterbase_api } from 'api/critterbase_api';
+import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { onboardingApi as onboarding_api } from 'api/onboarding_api';
 import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
@@ -33,6 +33,8 @@ import {
   ParsedXLSXSheetResult,
   XLSXPayload
 } from 'api/api_interfaces';
+import { CbRoutes } from 'critterbase/routes';
+import { ICbRoutesKey, ICbSelect } from 'critterbase/types';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { UserCritterAccess } from 'types/animal_access';
 import { BCTWType } from 'types/common_types';
@@ -101,9 +103,19 @@ export const useTelemetryApi = () => {
   const permissionApi = permission_api({ api });
   const attachmentApi = attachment_api({ api });
   const onboardApi = onboarding_api({ api });
-  const critterbaseApi = critterbase_api({ api: cb_api });
+  const cbApi = critterbase_api({ api: cb_api });
 
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
+
+  const useCritterbaseSelectOptions = (prop: ICbRoutesKey): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
+    return useQuery<Array<ICbSelect | string>, AxiosError>(
+      ['lookup-table-options', prop],
+      () => cbApi.getLookupTableOptions(CbRoutes[prop], true),
+      {
+        ...defaultQueryOptions
+      }
+    );
+  };
 
   /**
    *
@@ -686,6 +698,7 @@ export const useTelemetryApi = () => {
     useOnboardStatus,
     useTestNotifications,
     useAllDevicesWithUnassignedCollarIds,
+    useCritterbaseSelectOptions,
     // mutations
     useSaveCodeHeader,
     useUploadCSV,

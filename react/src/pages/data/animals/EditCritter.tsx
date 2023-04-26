@@ -52,7 +52,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
 
   const {
     associatedAnimalFields,
-    captureFields,
+    captureReleaseFields,
     characteristicsFields,
     identifierFields,
     markingFields,

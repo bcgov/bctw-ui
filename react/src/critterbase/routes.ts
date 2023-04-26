@@ -12,7 +12,7 @@ const regionEnvRoute = `${CbRouters.lookups}/region-envs`;
 const wmuRoute = `${CbRouters.lookups}/wmus`;
 const codsRoute = `${CbRouters.lookups}/cods`;
 const markingMaterialsRoute = `${CbRouters.lookups}/marking-materials`;
-const markingtypesRoute = `${CbRouters.lookups}/marking-types`;
+const markingTypesRoute = `${CbRouters.lookups}/marking-types`;
 const collectionUnitCategoriesRoute = `${CbRouters.lookups}/collection-unit-categories`;
 
 //Enum Routes
@@ -22,13 +22,48 @@ const codConfidenceRoute = `${lookupEnumRoute}/cod-confidence`;
 const coordURoute = `${lookupEnumRoute}/coordinate-uncertainty-unit`;
 const measurementUnitsRoute = `${lookupEnumRoute}/measurement-units`;
 const supportedSystemsRoute = `${lookupEnumRoute}/supported-systems`;
-const frequencyUnitsRoute = `${lookupEnumRoute}/supported-systems`;
+const frequencyUnitsRoute = `${lookupEnumRoute}/frequency-units`;
 const critterStatusRoute = `${lookupEnumRoute}/critter-status`;
 
 const CbRoutes: ICbRoutes = {
   responsible_region: {
     route: regionNrRoute,
     formatRoute: `${regionNrRoute}${selectQuery}`,
+    formatResponse: 'select'
+  },
+  region_env: {
+    route: regionEnvRoute,
+    formatRoute: `${regionEnvRoute}${selectQuery}`,
+    formatResponse: 'select'
+  },
+  region_nr: {
+    route: regionNrRoute,
+    formatRoute: `${regionNrRoute}${selectQuery}`,
+    formatResponse: 'select'
+  },
+  wmu: {
+    route: wmuRoute,
+    formatRoute: `${wmuRoute}${selectQuery}`,
+    formatResponse: 'select'
+  },
+  cod_id: {
+    route: codsRoute,
+    formatRoute: `${codsRoute}${selectQuery}`,
+    formatResponse: 'select'
+  },
+  marking_materials_id: {
+    route: markingMaterialsRoute,
+    formatRoute: `${markingMaterialsRoute}${selectQuery}`,
+    formatResponse: 'select'
+  },
+  marking_type_id: {
+    route: markingTypesRoute,
+    formatRoute: `${markingTypesRoute}${selectQuery}`,
+    formatResponse: 'select'
+  },
+  collection_category_id: {
+    route: collectionUnitCategoriesRoute,
+    formatRoute: `${collectionUnitCategoriesRoute}${selectQuery}`,
     formatResponse: 'select'
   },
   //Enums
@@ -69,3 +104,5 @@ const CbRoutes: ICbRoutes = {
     formatResponse: 'enum'
   }
 };
+
+export { CbRoutes };
