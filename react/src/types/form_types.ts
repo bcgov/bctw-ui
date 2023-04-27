@@ -1,5 +1,5 @@
 import { BaseTextFieldProps } from '@mui/material';
-import { ICbRoutesKey } from 'critterbase/types';
+import { ICbRouteKey } from 'critterbase/types';
 import { ReactNode } from 'react';
 
 export type KeyType = string | number | symbol;
@@ -12,7 +12,7 @@ export enum eInputType {
   date = 'date',
   datetime = 'datetime',
   time = 'time',
-  code = 'code', //might be deprecated
+  code = 'code',
   multiline = 'multiline',
   select = 'select',
   cb_select = 'cb_select' //critterbase select field
@@ -36,7 +36,7 @@ export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled' | 'required
   type: eInputType;
   taxon?: string[];
   codeName?: string;
-  cbRouteKey?: ICbRoutesKey;
+  cbRouteKey?: ICbRouteKey;
   span?: boolean;
   tooltip?: ReactNode;
   validate?: <T>(input: T) => string;

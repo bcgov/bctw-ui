@@ -498,33 +498,26 @@ export const critterFormFields: Record<string, FormFieldObject<CritterDetailsFor
   //   { prop: 'associated_animal_relationship', type: eInputType.code, taxon: [] }
   // ],
   //! Add capture fields to detailed critter
-  captureReleaseFields: [
+  captureFields: [
     { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
+    { prop: 'latitude', type: eInputType.number, taxon: []},
+    { prop: 'longitude', type: eInputType.number, taxon: []},
+    { prop: 'region_env_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
+    { prop: 'region_nr_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+    { prop: 'wmu_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
+  ],
+  releaseFields: [
     { prop: 'release_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
-    { prop: 'latitude', type: eInputType.number, taxon: [], codeName: 'Capture Latitude' },
-    { prop: 'longitude', type: eInputType.number, taxon: [], codeName: 'Capture Longitude' },
-    { prop: 'region_env_name', type: eInputType.cb_select, taxon: [], codeName: 'Capture Env Region' },
-    { prop: 'region_nr_name', type: eInputType.cb_select, taxon: [], codeName: 'Capture Nr Region', cbRouteKey: 'region_nr' },
-    { prop: 'wmu_name', type: eInputType.cb_select, taxon: [], codeName: 'Capture WMU', cbRouteKey: 'wmu'},
-    { prop: 'latitude', type: eInputType.number, taxon: [], codeName: 'Release Latitude' },
-    { prop: 'longitude', type: eInputType.number, taxon: [], codeName: 'Release Longitude' },
-    { prop: 'region_env_name', type: eInputType.cb_select, taxon: [], codeName: 'Release Env Region' },
-    { prop: 'region_nr_name', type: eInputType.cb_select, taxon: [], codeName: 'Release Nr Region', cbRouteKey: 'region_nr' },
-    { prop: 'wmu_name', type: eInputType.cb_select, taxon: [], codeName: 'Release WMU', cbRouteKey: 'wmu'},
-    // { prop: 'capture_latitude', type: eInputType.number, taxon: [] },
-    // { prop: 'capture_longitude', type: eInputType.number, taxon: [] },
-    //TODO critterbase integration does not support these in the same way
-    // { prop: 'capture_utm_zone', type: eInputType.number, taxon: [] },
-    // { prop: 'capture_utm_easting', type: eInputType.number, taxon: [] },
-    // { prop: 'capture_utm_northing', type: eInputType.number, taxon: [] },
-    // { prop: 'recapture_ind', type: eInputType.check, taxon: [] },
-    // { prop: 'captivity_status_ind', type: eInputType.check, taxon: [caribou] },
-    // { prop: 'capture_comment', type: eInputType.multiline, taxon: [] }
+    { prop: 'latitude', type: eInputType.number, taxon: []},
+    { prop: 'longitude', type: eInputType.number, taxon: []},
+    { prop: 'region_env_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
+    { prop: 'region_nr_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+    { prop: 'wmu_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
   ],
   characteristicsFields: [
-    { prop: 'critter_status', type: eInputType.cb_select, taxon: [], ...isRequired },
-    { prop: 'responsible_region', type: eInputType.cb_select, taxon: [] },
-    { prop: 'collection_unit', type: eInputType.cb_select, taxon: [] } //This select will need additional work, array of objects. Flatten and display multiple selects for array
+    { prop: 'critter_status', type: eInputType.cb_select, taxon: [], ...isRequired, cbRouteKey: 'critter_status' },
+    { prop: 'responsible_region', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+    //{ prop: 'collection_unit', type: eInputType.cb_select, taxon: [] } //This select will need additional work, array of objects. Flatten and display multiple selects for array
     //TODO these properties do not exist on critterbase critter in the same way
     // { prop: 'animal_colouration', type: eInputType.text, taxon: [] },
     // { prop: 'estimated_age', type: eInputType.number, taxon: [], validate: mustbePositiveNumber },
@@ -538,7 +531,7 @@ export const critterFormFields: Record<string, FormFieldObject<CritterDetailsFor
   identifierFields: [
     { prop: 'wlh_id', type: eInputType.text, taxon: [] },
     { prop: 'animal_id', type: eInputType.text, taxon: [] },
-    { prop: 'sex', type: eInputType.cb_select, taxon: [], ...isRequired }
+    { prop: 'sex', type: eInputType.cb_select, taxon: [], ...isRequired, cbRouteKey: 'sex' }
   ],
   // markingFields: [
   //   { prop: 'ear_tag_left_colour', type: eInputType.text, taxon: [] },

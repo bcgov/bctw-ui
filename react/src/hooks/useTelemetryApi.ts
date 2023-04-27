@@ -34,7 +34,7 @@ import {
   XLSXPayload
 } from 'api/api_interfaces';
 import { CbRoutes } from 'critterbase/routes';
-import { ICbRoutesKey, ICbSelect } from 'critterbase/types';
+import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { UserCritterAccess } from 'types/animal_access';
 import { BCTWType } from 'types/common_types';
@@ -107,10 +107,10 @@ export const useTelemetryApi = () => {
 
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
 
-  const useCritterbaseSelectOptions = (prop: ICbRoutesKey): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
+  const useCritterbaseSelectOptions = (prop: ICbRouteKey): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
     return useQuery<Array<ICbSelect | string>, AxiosError>(
       ['lookup-table-options', prop],
-      () => cbApi.getLookupTableOptions(CbRoutes[prop], true),
+      () => cbApi.getLookupTableOptions(prop, true),
       {
         ...defaultQueryOptions
       }

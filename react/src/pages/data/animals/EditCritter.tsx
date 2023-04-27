@@ -129,13 +129,13 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
                 {characteristicsFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
-              </FormSection>
-              <FormSection id='capture-details' header='Latest Capture Details' disabled={true}>
-                {captureFields?.map((f, i) => (
+              </FormSection> */}
+              <FormSection id='capture-release-details' header='Latest Capture & Release Details' disabled={true}>
+                {captureReleaseFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
-              <FormSection id='Mortality-details' header='Mortality Details' disabled={true}>
+              {/* <FormSection id='Mortality-details' header='Mortality Details' disabled={true}>
                 {mortalityFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}

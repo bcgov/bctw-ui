@@ -1,21 +1,23 @@
-import TextField from 'components/form/TextInput';
-import NumberField from 'components/form/NumberInput';
-import SelectCode from './SelectCode';
+import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
+import { Tooltip } from 'components/common';
+import CheckBox from 'components/form/Checkbox';
 import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
-import CheckBox from 'components/form/Checkbox';
-import { CSSProperties, ReactElement, ReactNode } from 'react';
-import { removeProps } from 'utils/common_helpers';
-import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap } from 'types/form_types';
-import dayjs, { Dayjs } from 'dayjs';
-import { BCTWFormat } from 'types/common_types';
-import { Tooltip } from 'components/common';
-import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
-import { Animal, AttachedAnimal } from 'types/animal';
-import { WorkflowFormField } from 'types/events/event';
-import { ICodeFilter } from 'types/code';
-import { showField } from 'utils/taxon';
+import NumberField from 'components/form/NumberInput';
+import TextField from 'components/form/TextInput';
 import { useTaxon } from 'contexts/TaxonContext';
+import { CbSelect } from 'critterbase/components/CbSelect';
+import { ICbRouteKey } from 'critterbase/types';
+import dayjs, { Dayjs } from 'dayjs';
+import { CSSProperties, ReactElement, ReactNode } from 'react';
+import { Animal, AttachedAnimal } from 'types/animal';
+import { ICodeFilter } from 'types/code';
+import { BCTWFormat } from 'types/common_types';
+import { WorkflowFormField } from 'types/events/event';
+import { FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
+import { removeProps } from 'utils/common_helpers';
+import { showField } from 'utils/taxon';
+import SelectCode from './SelectCode';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -165,6 +167,10 @@ function CreateEditSelectField({
     />
   );
 }
+type CbSelectInputProps = Pick<CreateInputProps, 'prop' | 'codeName'> & { cbRouteKey: ICbRouteKey };
+function CreateCbSelectField({ prop, codeName, cbRouteKey }: CbSelectInputProps): ReactElement {
+  return <CbSelect label={codeName} routeKey={cbRouteKey} />;
+}
 
 // function CreateCritterbaseSelectField({
 //   return (
@@ -185,8 +191,8 @@ const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactEl
       return CreateEditSelectField;
     case eInputType.multiline:
       return CreateEditMultilineTextField;
-    // case eInputType.cb_select:
-    //   return CreateCritterbaseSelectField;
+    case eInputType.cb_select:
+      return CreateCbSelectField;
     default:
       return CreateEditTextField;
   }

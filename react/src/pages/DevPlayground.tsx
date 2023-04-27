@@ -2,17 +2,16 @@ import { Box, Button, Grid, Paper, Theme, Typography, useTheme } from '@mui/mate
 import makeStyles from '@mui/styles/makeStyles';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import { formatTag } from 'components/table/table_helpers';
+import { CbSelect } from 'critterbase/components/CbSelect';
+import { CbRoutes } from 'critterbase/routes';
+import { ICbRouteKey } from 'critterbase/types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { Animal, AttachedAnimal, eCritterStatus } from 'types/animal';
 import { AttachedCollar } from 'types/collar';
 import { columnToHeader, doNothingAsync } from 'utils/common_helpers';
-import { CritterDataTables } from './data/animals/CritterDataTables';
-import ManageLayout from './layouts/ManageLayout';
 import EditCritter from './data/animals/EditCritter';
-import { CbSelect } from 'critterbase/components/CbSelect';
-import { CbRoutes } from 'critterbase/routes';
-import { ICbRoutesKey } from 'critterbase/types';
+import ManageLayout from './layouts/ManageLayout';
 
 // Place constants here
 const TEST = 'Testing';
@@ -53,14 +52,14 @@ const DevPlayground = (): JSX.Element => {
         </TempComponent> */}
 
         <EditCritter
-          open={false} // THIS is false
+          open={true} // THIS is false
           editing={new AttachedAnimal('c6b0a6c7-71ca-421a-96d6-1878fec07b05')}
           handleClose={(): void => setBool(false)}
           onSave={doNothingAsync}
         />
         <Box flexDirection='column'>
           {Object.keys(CbRoutes).map((key) => (
-            <CbSelect formProp={key as ICbRoutesKey} />
+            <CbSelect key={key} routeKey={key as ICbRouteKey} />
           ))}
         </Box>
 
