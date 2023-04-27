@@ -10,7 +10,7 @@ import { CbSelect, CbSelectProps } from 'critterbase/components/CbSelect';
 import { ICbRouteKey } from 'critterbase/types';
 import dayjs, { Dayjs } from 'dayjs';
 import { CSSProperties, ReactElement, ReactNode } from 'react';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Critter, AttachedCritter } from 'types/animal';
 import { ICodeFilter } from 'types/code';
 import { BCTWFormat } from 'types/common_types';
 import { WorkflowFormField } from 'types/events/event';
@@ -233,7 +233,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
 interface ItaxonFormField {
-  obj: Animal | AttachedAnimal;
+  obj: Critter | AttachedCritter;
   formField: WorkflowFormField;
   handleChange: FormChangeEvent;
   inputProps?: Partial<CreateInputProps>;

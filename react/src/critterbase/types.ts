@@ -1,4 +1,3 @@
-import { CritterDetails } from 'types/animal';
 import { uuid } from 'types/common_types';
 import { CbRoutes } from './routes';
 

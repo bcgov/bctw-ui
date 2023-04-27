@@ -84,7 +84,7 @@ const WorkflowStrings = {
     coordTypeUTM: 'Use UTM'
   },
   captivity: {
-    captivity: 'Animal is or has been part of a captivity program',
+    captivity: 'Critter is or has been part of a captivity program',
     isCaptive: 'Is the animal in a captivity program?',
     mort_captivity_status:
       'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?'
@@ -194,7 +194,7 @@ const MapStrings = {
   codeFiltersTooltips: {
     device_id: 'Filter for specific device within date range',
     taxon: 'Select taxon to filter',
-    critter_status: 'Animal status filter',
+    critter_status: 'Critter status filter',
     device_status: 'Device status filter',
     sex: 'Filter critter sex',
     collection_unit: 'Filter by population unit',
@@ -202,7 +202,7 @@ const MapStrings = {
   },
   collectiveUnitLabel: 'Collective Unit',
   collectiveUnitTooltip: 'Filter by collection unit ',
-  customAnimalGroupLabel: 'Custom Animal Group',
+  customAnimalGroupLabel: 'Custom Critter Group',
   customAnimalGroupTooltip: 'Filter by existing animal group, or click pencil to create one',
   showOnlyCheckedLabel: 'Show Selected Records Only',
   showOnlyCheckedTooltip: 'Show only selected records in attribute table',
@@ -323,8 +323,8 @@ const ExportStrings = {
 };
 
 const ImportStrings = {
-  importToolHeader: 'Animal+Device Metadata and Telemetry',
-  uploadButton: 'Upload Animal+Device/Telemetry Template',
+  importToolHeader: 'Critter+Device Metadata and Telemetry',
+  uploadButton: 'Upload Critter+Device/Telemetry Template',
   downloadButton: 'Download Template',
   validValuesModal: 'Valid values for this field',
   checkboxLabel: 'Hide Empty Columns',
@@ -335,9 +335,9 @@ const ImportStrings = {
   errorBanner:
     'Hover over highlighted cells to view error info. Fix these errors in your spreadsheet application and re-upload.',
   detailBannerIdle: 'Click a cell for detailed information on that error.',
-  ['Animal and Device']: [
+  ['Critter and Device']: [
     'To add a new animal and collar, create a new row in the Device Metadata template and fill out the required fields.',
-    'Device IDs already assigned to an Animal ID must first be released by their owner before they can be assigned to a new Animal ID.'
+    'Device IDs already assigned to an Critter ID must first be released by their owner before they can be assigned to a new Critter ID.'
   ],
   ['Telemetry']: [
     'Telemetry import used for missing Telemetry of existing tracked vendor devices',

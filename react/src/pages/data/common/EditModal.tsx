@@ -2,7 +2,7 @@ import { IUpsertPayload } from 'api/api_interfaces';
 import { EditModalBaseProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
 import { ReactNode, useState } from 'react';
-import { Animal } from 'types/animal';
+import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
 import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
@@ -89,7 +89,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       param: editing[editing.identifier],
       propsToDisplay: editing.displayProps
     };
-    if (editing instanceof Animal) {
+    if (editing instanceof Critter) {
       params.propsToDisplay = editing.historyDisplayProps();
       setHistoryParams({ query: api.useCritterHistory, ...params });
     } else if (editing instanceof Collar) {

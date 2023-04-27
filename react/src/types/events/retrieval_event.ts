@@ -4,7 +4,7 @@ import { uuid } from 'types/common_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { BCTWWorkflow, eventToJSON, WorkflowType, OptionalDevice } from 'types/events/event';
 import { MortalityDeviceEventProps } from 'types/events/mortality_event';
-import { Animal } from 'types/animal';
+import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
 import { DataLife } from 'types/data_life';
@@ -16,7 +16,7 @@ interface IRetrievalEvent
   extends Omit<MortalityDeviceEventProps, 'device_status'>,
     Pick<CollarHistory, 'assignment_id'>,
     Readonly<Pick<Collar, 'malfunction_date' | 'retrieval_comment'>>,
-    Readonly<Pick<Animal, 'capture_date' | 'mortality_date' | 'wlh_id' | 'animal_id'>>,
+    Readonly<Pick<Critter, 'wlh_id' | 'animal_id'>>,
     DataLife {}
 
 export type RetrievalFormField = {

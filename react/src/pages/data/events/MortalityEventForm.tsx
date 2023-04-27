@@ -143,7 +143,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     //     ]}
     //   </FormSection>
     //   {/* critter status fields */}
-    //   <FormSection id='mort-critter' header='Animal Details' disabled={critterIsAlive}>
+    //   <FormSection id='mort-critter' header='Critter Details' disabled={critterIsAlive}>
     //     {[
     //       <Box key='bx-invest' {...boxSpreadRowProps}>
     //         {<span>{WorkflowStrings.mortality.mort_investigation}</span>}

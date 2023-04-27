@@ -137,7 +137,7 @@ const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'>[] => {
 };
 /**
  * Converts a class to an array of keys
- * @param keys class converted to its object keys. ie Object.keys(new Animal())
+ * @param keys class converted to its object keys. ie Object.keys(new Critter())
  * @param startsWith items which append the array
  * @param excluded array of items to exclude from final array.
  *

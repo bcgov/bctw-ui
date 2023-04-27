@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import dayjs, { Dayjs } from 'dayjs';
-import { AttachedAnimal } from 'types/animal';
+import { AttachedCritter } from 'types/animal';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ITelemetryPoint } from 'types/map';
 import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';

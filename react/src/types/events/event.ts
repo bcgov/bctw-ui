@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Animal, CritterDetailsForm, getAnimalFormFields } from 'types/animal';
+import { Critter, CritterDetailsForm, getAnimalFormFields } from 'types/animal';
 import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat } from 'types/common_types';
@@ -20,7 +20,7 @@ export type WorkflowFormProps<T extends IBCTWWorkflow> = {
 
 // make all properties optional
 // todo: make critter_id etc required
-export type OptionalAnimal = { [Property in keyof Animal]+?: Animal[Property] };
+export type OptionalAnimal = { [Property in keyof Critter]+?: Critter[Property] };
 export type OptionalDevice = { [Property in keyof ICollar]+?: ICollar[Property] };
 
 //
@@ -66,7 +66,7 @@ export const eventToJSON = <T>(keys: string[], event: T): Record<string, unknown
 };
 
 /** used to create new workflow events and not have properties overwritten
- * @param editing - the original object, usually an @type {Animal} or @type {Collar}
+ * @param editing - the original object, usually an @type {Critter} or @type {Collar}
  * @param workflow - instance of the workflow event
  * @param toRemove - keys of the @param editing type that shouldn't end up in the workflow instance
  */

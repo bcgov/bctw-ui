@@ -3,7 +3,7 @@ import { Code } from 'types/code';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { Animal, ICollectionUnit } from 'types/animal';
+import { Critter, ICollectionUnit } from 'types/animal';
 import { IDataLifeStartProps } from 'types/data_life';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
@@ -11,30 +11,32 @@ import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 
 type CaptureAnimalEventProps = Pick<
-  Animal,
+  Critter,
   | 'critter_id'
   | 'animal_id'
   | 'wlh_id'
   | 'taxon'
-  | 'recapture_ind'
-  | 'translocation_ind'
-  | 'associated_animal_id'
-  | 'associated_animal_relationship'
-  | 'region'
+  // | 'recapture_ind'
+  // | 'translocation_ind'
+  // | 'associated_animal_id'
+  // | 'associated_animal_relationship'
+  // | 'region'
   | 'collection_unit'
-  | 'captivity_status_ind'
+  // | 'captivity_status_ind'
 >;
 
 type ReleaseAnimalProps = Pick<
-  Animal,
-  | 'ear_tag_left_id'
-  | 'ear_tag_right_id'
-  | 'ear_tag_left_colour'
-  | 'ear_tag_right_colour'
-  | 'juvenile_at_heel'
-  | 'juvenile_at_heel_count'
-  | 'animal_colouration'
-  | 'life_stage'
+  Critter,
+  // | 'ear_tag_left_id'
+  // | 'ear_tag_right_id'
+  // | 'ear_tag_left_colour'
+  // | 'ear_tag_right_colour'
+  // | 'juvenile_at_heel'
+  // | 'juvenile_at_heel_count'
+  // | 'animal_colouration'
+  // | 'life_stage'
+  //TODO CRITTERBASE INTEGRATION temp fix
+  'critter_id'
 >;
 
 type CaptureReleaseProps = {
@@ -89,7 +91,7 @@ export default class CaptureEvent
   associated_animal_relationship: Code; // required if associated_animal_id populated
   // region & popunit are enabled when animal is translocated
   region: Code;
-  collection_unit: ICollectionUnit[];
+  collection_unit: string;
   captivity_status_ind: boolean;
   // characteristic fields
   ear_tag_left_id: string;
@@ -128,23 +130,23 @@ export default class CaptureEvent
     return WorkflowStrings.capture.workflowTitle;
   }
 
-  get captureCritterPropsToSave(): (keyof Animal)[] {
+  get captureCritterPropsToSave(): (keyof Critter)[] {
     return [
       'critter_id',
-      'recapture_ind',
-      'translocation_ind',
-      'taxon',
-      'associated_animal_id',
-      'associated_animal_relationship',
-      'captivity_status_ind',
-      'ear_tag_left_colour',
-      'ear_tag_left_id',
-      'ear_tag_right_colour',
-      'ear_tag_right_id',
-      'juvenile_at_heel',
-      'juvenile_at_heel_count',
-      'animal_colouration',
-      'life_stage'
+      // 'recapture_ind',
+      // 'translocation_ind',
+      'taxon'
+      // 'associated_animal_id',
+      // 'associated_animal_relationship',
+      // 'captivity_status_ind',
+      // 'ear_tag_left_colour',
+      // 'ear_tag_left_id',
+      // 'ear_tag_right_colour',
+      // 'ear_tag_right_id',
+      // 'juvenile_at_heel',
+      // 'juvenile_at_heel_count',
+      // 'animal_colouration',
+      // 'life_stage'
     ];
   }
 
@@ -154,7 +156,7 @@ export default class CaptureEvent
       // if the translocation is completed, save the new region/population unit.
       // otherwise, need to update critter_status to 'in translocation';
       if (this.isTranslocationComplete) {
-        props.push('region', 'collection_unit');
+        props.push('responsible_region', 'collection_unit');
       } else {
         props.push('critter_status');
       }

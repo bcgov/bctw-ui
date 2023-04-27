@@ -15,7 +15,7 @@ export default function Import(): JSX.Element {
       <h1>Data Import</h1>
       <Box mt={2}>
         {/* Missing telemetry tab until more information about new table */}
-        <PageTabs keepMounted tabLabels={['Animal and Device', 'Vectronic KeyX']}>
+        <PageTabs keepMounted tabLabels={['Critter and Device', 'Vectronic KeyX']}>
           <AnimalAndDeviceImportTab />
           {/* <TelemetryImportTab /> */}
           <KeyXImportTab />

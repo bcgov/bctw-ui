@@ -112,7 +112,7 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
                 }
                 secondary={
                   <>
-                    <b>Alert Date:</b> {formatT(alert.valid_from)} <b> Animal ID:</b> {alert?.animal_id ?? 'None'}{' '}
+                    <b>Alert Date:</b> {formatT(alert.valid_from)} <b> Critter ID:</b> {alert?.animal_id ?? 'None'}{' '}
                     <b>WLH ID:</b> {alert?.wlh_id ?? 'None'}
                   </>
                 }
@@ -137,7 +137,7 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
                   <Typography className={styles.spacing}>{`taxon: ${alert.taxon}`}</Typography>
                 </Grid>
                 <Grid item>
-                  <Typography className={styles.spacing}>{`Animal ID: ${alert?.animal_id ?? 'None'}`}</Typography>
+                  <Typography className={styles.spacing}>{`Critter ID: ${alert?.animal_id ?? 'None'}`}</Typography>
                 </Grid>
                 <Grid item>
                   <Typography className={styles.spacing}>{`Wildlife Health ID: ${alert?.wlh_id ?? 'None'}`}</Typography>

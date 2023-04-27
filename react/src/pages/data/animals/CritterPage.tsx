@@ -13,7 +13,7 @@ import { AlertContext } from 'contexts/UserAlertContext';
 import { TelemetryAlert } from 'types/alert';
 import dayjs from 'dayjs';
 import { AlertBanner } from 'components/alerts/AlertBanner';
-import { AttachedAnimal } from 'types/animal';
+import { AttachedCritter } from 'types/animal';
 import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
 import DetailedAnimalView from './DetailedAnimalView';
@@ -30,7 +30,7 @@ export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
-  const [detailAnimal, setDetailAnimal] = useState<AttachedAnimal>(null);
+  const [detailAnimal, setDetailAnimal] = useState<AttachedCritter>(null);
 
   const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
   const inverseManageModal = (): void => {

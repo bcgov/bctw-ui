@@ -595,7 +595,7 @@ export default function MapPage(): JSX.Element {
             />
           ) : null}
           <AddUDF
-            title={'Custom Animal Groups'}
+            title={'Custom Critter Groups'}
             udf_type={eUDFType.critter_group}
             open={showUdfEdit}
             handleClose={(): void => setShowUdfEdit(false)}

@@ -11,7 +11,7 @@ import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
 import EditModal from 'pages/data/common/EditModal';
 import AddUDF from 'pages/udf/AddUDF';
 import { useState } from 'react';
-import { Animal, AttachedAnimal, critterFormFields } from 'types/animal';
+import { Critter, AttachedCritter, critterFormFields } from 'types/animal';
 import { WorkflowType, wfFields } from 'types/events/event';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { permissionCanModify } from 'types/permission';
@@ -24,15 +24,15 @@ import { TaxonSelect } from 'components/form/TaxonSelect';
 /**
  * the main animal form
  */
-export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>): JSX.Element {
+export default function EditCritter(props: EditorProps<Critter | AttachedCritter>): JSX.Element {
   const { isCreatingNew, editing, open } = props;
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();
   const taxon = useTaxon();
 
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
-  const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
-  const isAttached = editing instanceof AttachedAnimal;
+  //const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
+  const isAttached = editing instanceof AttachedCritter;
   const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
   const [workflow, setWorkflow] = useState<WorkflowType>();
   const [showWorkflow, setShowWorkflow] = useState(false);
@@ -66,20 +66,20 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
   //     {isCreatingNew ? (
   //       <Box pt={3}>
   //         <Box component='h1' mt={0} mb={0}>
-  //           Add Animal
+  //           Add Critter
   //         </Box>
   //       </Box>
   //     ) : (
-  //       <EditHeader<AttachedAnimal>
+  //       <EditHeader<AttachedCritter>
   //         title={
   //           <>
-  //             WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Animal ID:{' '}
+  //             WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Critter ID:{' '}
   //             {editing?.animal_id ?? '-'}
   //           </>
   //         }
   //         headers={['taxon', 'device_id', 'critter_id', 'permission_type']}
-  //         format={(editing as AttachedAnimal).formatPropAsHeader}
-  //         obj={editing as AttachedAnimal}
+  //         format={(editing as AttachedCritter).formatPropAsHeader}
+  //         obj={editing as AttachedCritter}
   //         btn={
   //           <Button variant='outlined' className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
   //             Device Assignment
@@ -98,13 +98,13 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
       headerComponent={<div>Critter Details</div>}
       hideSave={!canEdit}
       {...props}
-      editing={new Animal(editing.critter_id)}>
+      editing={new Critter(editing.critter_id)}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: InboundObj): void => {
             //TODO critterbase integration does not support juevnile_at_heel the same way
-            // const [key, value] = parseFormChangeResult<Animal>(v);
+            // const [key, value] = parseFormChangeResult<Critter>(v);
             // if (key === 'juvenile_at_heel' && value) {
             //   setHasBabies(String(value).toLowerCase() === 'y');
             // }
@@ -174,7 +174,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
 //   {(handlerFromContext): JSX.Element => {
 //     // override the modal's onChange function
 //     const onChange = (v: InboundObj): void => {
-//       const [key, value] = parseFormChangeResult<Animal>(v);
+//       const [key, value] = parseFormChangeResult<Critter>(v);
 //       if (key === 'juvenile_at_heel' && value) {
 //         setHasBabies(String(value).toLowerCase() === 'y');
 //       }
@@ -256,7 +256,7 @@ export default function EditCritter(props: EditorProps<Animal | AttachedAnimal>)
 //         {/* {associatedAnimalFields.map((f) => displaytaxonFormFields(f, 'caribou' as etaxon) && CreateFormField(editing, f, onChange))} */}
 //         <FormSection
 //           id='cr-comm'
-//           header='Comments About This Animal'
+//           header='Comments About This Critter'
 //           disabled={!canEdit}
 //           hide={hideSection(animalCommentField, taxon)}>
 //           {animalCommentField.map((f, i) => (
