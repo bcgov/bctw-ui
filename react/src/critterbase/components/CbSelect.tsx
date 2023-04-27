@@ -16,7 +16,7 @@ export const CbSelect = (props: CbSelectProps): JSX.Element => {
   const { cbRouteKey, required, value } = props;
   const cbApi = useTelemetryApi();
   const { data, isError } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
-  const [selected, setSelected] = useState<uuid | string>(value);
+  const [selected, setSelected] = useState<uuid | string>(value ?? '');
 
   const hasError = isError || (required && !selected) || !cbRouteKey;
   const label = !cbRouteKey ? 'Missing Route Key' : columnToHeader(cbRouteKey);
