@@ -22,7 +22,9 @@ type ICbRouteKey =
   | 'coordinate_uncertainty_unit'
   | 'frequency_units'
   | 'measurement_units'
-  | 'supported_systems';
+  | 'supported_systems'
+  | 'taxons'
+  | 'species';
 
 // interface ICbRoute {
 //   route: string;

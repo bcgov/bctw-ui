@@ -6,7 +6,7 @@ import DateTimeInput from 'components/form/DateTimeInput';
 import NumberField from 'components/form/NumberInput';
 import TextField from 'components/form/TextInput';
 import { useTaxon } from 'contexts/TaxonContext';
-import { CbSelect } from 'critterbase/components/CbSelect';
+import { CbSelect, CbSelectProps } from 'critterbase/components/CbSelect';
 import { ICbRouteKey } from 'critterbase/types';
 import dayjs, { Dayjs } from 'dayjs';
 import { CSSProperties, ReactElement, ReactNode } from 'react';
@@ -167,16 +167,10 @@ function CreateEditSelectField({
     />
   );
 }
-type CbSelectInputProps = Pick<CreateInputProps, 'prop' | 'codeName'> & { cbRouteKey: ICbRouteKey };
-function CreateCbSelectField({ prop, codeName, cbRouteKey }: CbSelectInputProps): ReactElement {
-  return <CbSelect label={codeName} routeKey={cbRouteKey} />;
+
+function CreateCbSelectField(props: CbSelectProps & Pick<CreateInputProps, 'value'>): ReactElement {
+  return <CbSelect {...props} />;
 }
-
-// function CreateCritterbaseSelectField({
-//   return (
-
-//   )
-// })
 
 // returns the funtion to create the form component based on input type
 const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {

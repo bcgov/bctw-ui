@@ -4,13 +4,17 @@ const selectFormat = `?format=asSelect`;
 
 const CbRouters = {
   lookups: '/lookups',
+
   get lookupsEnum(): string {
     return this.lookups + '/enum';
+  },
+  get lookupsTaxons(): string {
+    return this.lookups + '/taxons';
   }
 };
-const { lookups, lookupsEnum } = CbRouters;
+const { lookups, lookupsEnum, lookupsTaxons } = CbRouters;
 const CbRoutes: ICbRoutes = {
-  //Lookups
+  //? lookups
   region_env: `${lookups}/region-envs`,
   region_nr: `${lookups}/region-nrs`,
   wmu: `${lookups}/wmus`,
@@ -18,7 +22,9 @@ const CbRoutes: ICbRoutes = {
   marking_materials: `${lookups}/marking-materials`,
   marking_type: `${lookups}/marking-types`,
   collection_category: `${lookups}/collection-unit-categories`,
-  //Enums
+  taxons: lookupsTaxons,
+  species: `${lookupsTaxons}/species`,
+  //? lookups/enum
   sex: `${lookupsEnum}/sex`,
   critter_status: `${lookupsEnum}/critter-status`,
   cause_of_death_confidence: `${lookupsEnum}/cod-confidence`,

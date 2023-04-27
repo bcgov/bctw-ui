@@ -4,19 +4,22 @@ import { ICbRouteKey } from 'critterbase/types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
 import { uuid } from 'types/common_types';
-import { capitalize } from 'utils/common_helpers';
+import { capitalize, columnToHeader } from 'utils/common_helpers';
 
-interface CbSelectProps {
-  routeKey: ICbRouteKey;
-  label?: string;
+export interface CbSelectProps {
+  cbRouteKey: ICbRouteKey;
+  required: boolean;
+  value?: string;
 }
 
 export const CbSelect = (props: CbSelectProps): JSX.Element => {
-  const { routeKey, label } = props;
+  const { cbRouteKey, required, value } = props;
   const cbApi = useTelemetryApi();
-  const { data, isError } = cbApi.useCritterbaseSelectOptions(routeKey);
-  const [selected, setSelected] = useState<uuid | string>('');
+  const { data, isError } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
+  const [selected, setSelected] = useState<uuid | string>(value);
 
+  const hasError = isError || (required && !selected) || !cbRouteKey;
+  const label = !cbRouteKey ? 'Missing Route Key' : columnToHeader(cbRouteKey);
   const handleSelect = (event: SelectChangeEvent): void => {
     setSelected(event.target.value);
   };
@@ -24,10 +27,11 @@ export const CbSelect = (props: CbSelectProps): JSX.Element => {
     <FormControl
       size='small'
       style={{ ...baseInputStyle }}
+      required={required}
       className={`select-control ${isError ? 'input-error' : ''}`}
-      error={isError}
-      disabled={isError}>
-      <InputLabel>{label ? label : routeKey}</InputLabel>
+      error={hasError}
+      disabled={isError || !cbRouteKey}>
+      <InputLabel>{label}</InputLabel>
       <Select value={selected} onChange={handleSelect}>
         {data?.map((val, idx) => {
           const valueId = typeof val === 'string' ? val : val.id;
