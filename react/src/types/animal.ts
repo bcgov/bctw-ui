@@ -30,8 +30,8 @@ export enum eCritterFetchType {
 }
 
 export enum eCritterStatus {
-  alive = 'Alive',
-  mortality = 'Mortality'
+  alive = 'alive',
+  mortality = 'mortality'
 }
 
 export type ICollectionUnit = Record<string, string>;
@@ -116,11 +116,12 @@ export class Critter implements BCTWBase<Critter>{
   wlh_id: string;
   animal_id: string;
   sex: string;
-  taxon: string;
+  taxon_id: uuid;
+  readonly taxon: string;
   collection_units: ICollectionUnit[];
   @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
   responsible_region_nr_id?: uuid;
-  responsible_region?: string;
+  readonly responsible_region?: string;
   system_origin?: string;
   create_user?: uuid;
   update_user?: uuid;
@@ -132,7 +133,8 @@ export class Critter implements BCTWBase<Critter>{
   capture?: CritterCapture[];
   marking?: CritterMarking[];
   measurement?: CritterMeasurement[];
-
+  
+  //Leftovers from previous animal class
   _merged?: boolean;
   permission_type?: eCritterPermission;
 
@@ -287,17 +289,10 @@ CritterCapture['capture_location'] &
 CritterCapture['release_location'] & 
 CritterMarking & 
 CritterMeasurement
-  // Critter['marking'][0] &
-  // Critter['capture'][0] &
-  // Critter['capture'][0] &
-  // Critter['capture'][0]['capture_location'] &
-  // Critter['mortality'][0] &
-  // Critter['measurement'][''][0] &
-  // Critter['measurement']['quantitative'][0];
 
 export const critterFormFields: Record<string, FormFieldObject<CritterDetailsForm>[]> = {
   identifierFields: [
-    { prop: 'taxon', type: eInputType.cb_select, taxon: [], cbRouteKey: 'species', ...isRequired },
+    { prop: 'taxon_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'species', ...isRequired },
     { prop: 'wlh_id', type: eInputType.text, taxon: [] },
     { prop: 'animal_id', type: eInputType.text, taxon: [] },
     { prop: 'sex', type: eInputType.cb_select, taxon: [], ...isRequired, cbRouteKey: 'sex' }

@@ -11,6 +11,7 @@ import { MapTileLayers } from 'constants/strings';
 import { formatLocal } from 'utils/time';
 import { plainToClass } from 'class-transformer';
 import { Point } from 'geojson';
+import { eCritterStatus } from 'types/animal';
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
   doc.innerHTML = '';
@@ -32,7 +33,7 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
     Elevation: ${p.elevation + ' meters' + '<br>'}
     Frequency (MHz): ${p.paddedFrequency}<br>
     ${p.critter_status ? 'Critter Status: ' + '<b>' + p.critter_status + '</b><br>' : ''}
-    ${p.critter_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
+    ${p.critter_status === eCritterStatus.mortality ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
     ${p.sex ? 'Sex: ' + p.sex + '<br>' : ''}
     ${p.device_status ? 'Device Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
     Time: ${dayjs(t).format('MMMM D, YYYY h:mm A')} UTC<br>

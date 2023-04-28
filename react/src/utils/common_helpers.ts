@@ -44,6 +44,7 @@ const columnToHeader = (prop: string): string => {
     .replaceAll('wlh', 'WLH')
     .replaceAll('utm', 'UTM')
     .replaceAll('wmu', 'Wildlife Management Unit')
+    .replaceAll('cod', 'Cause Of Death')
     .split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };

@@ -59,7 +59,14 @@ const DevPlayground = (): JSX.Element => {
         />
         <Box flexDirection='column'>
           {Object.keys(CbRoutes).map((key) => (
-            <CbSelect key={key} cbRouteKey={key as ICbRouteKey} required={false} />
+            <CbSelect
+              prop={key}
+              value={''}
+              handleChange={() => console.log('updating')}
+              key={key}
+              cbRouteKey={key as ICbRouteKey}
+              required={false}
+            />
           ))}
         </Box>
 

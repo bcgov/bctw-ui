@@ -1,4 +1,4 @@
-import { Box, Container, IconButton } from '@mui/material';
+import { Box, Container, Grid, IconButton } from '@mui/material';
 import { Button, Icon } from 'components/common';
 import { EditorProps } from 'components/component_interfaces';
 import SelectUDF from 'components/form/SelectUDF';
@@ -61,44 +61,40 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
     animalCommentField
   } = critterFormFields;
   //TODO critterbase integration add this back
-  // const Header = (
-  //   <Container maxWidth='xl'>
-  //     {isCreatingNew ? (
-  //       <Box pt={3}>
-  //         <Box component='h1' mt={0} mb={0}>
-  //           Add Critter
-  //         </Box>
-  //       </Box>
-  //     ) : (
-  //       <EditHeader<AttachedCritter>
-  //         title={
-  //           <>
-  //             WLH ID: {editing?.wlh_id ?? '-'} &nbsp;<span style={{ fontWeight: 100 }}>/</span>&nbsp; Critter ID:{' '}
-  //             {editing?.animal_id ?? '-'}
-  //           </>
-  //         }
-  //         headers={['taxon', 'device_id', 'critter_id', 'permission_type']}
-  //         format={(editing as AttachedCritter).formatPropAsHeader}
-  //         obj={editing as AttachedCritter}
-  //         btn={
-  //           <Button variant='outlined' className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
-  //             Device Assignment
-  //           </Button>
-  //         }
-  //       />
-  //     )}
-  //   </Container>
-  // );
+  const Header = (
+    <Container maxWidth='xl'>
+      {isCreatingNew ? (
+        <Box pt={3}>
+          <Box component='h1' mt={0} mb={0}>
+            Add Critter
+          </Box>
+        </Box>
+      ) : (
+        <EditHeader<AttachedCritter>
+          title={
+            <Grid container flexDirection='row'>
+              <Grid item>WLH ID: {editing?.wlh_id ?? '-'}</Grid>
+              {editing.animal_id && <Grid item>&nbsp;/ Animal ID: {editing.animal_id}</Grid>}
+            </Grid>
+          }
+          headers={['taxon', 'device_id', 'critter_id', 'permission_type']}
+          format={(editing as AttachedCritter).formatPropAsHeader}
+          obj={editing as AttachedCritter}
+          // btn={
+          //   <Button variant='outlined' className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
+          //     Device Assignment
+          //   </Button>
+          // }
+        />
+      )}
+    </Container>
+  );
   const handleWorkflow = (wf: WorkflowType) => {
     setWorkflow(wf);
     setShowWorkflow(true);
   };
   return (
-    <EditModal
-      headerComponent={<div>Critter Details</div>}
-      hideSave={!canEdit}
-      {...props}
-      editing={new Critter(editing.critter_id)}>
+    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={new Critter(editing.critter_id)}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function

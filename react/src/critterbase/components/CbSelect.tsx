@@ -1,38 +1,59 @@
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { baseInputStyle } from 'components/component_constants';
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, capitalize } from '@mui/material';
+import { baseInputStyle, selectMenuProps } from 'components/component_constants';
+import { CreateInputProps } from 'components/form/create_form_components';
+import { isFunction } from 'components/table/table_helpers';
 import { ICbRouteKey } from 'critterbase/types';
+import { is } from 'date-fns/locale';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';
-import { capitalize, columnToHeader } from 'utils/common_helpers';
+import { columnToHeader } from 'utils/common_helpers';
 
-export interface CbSelectProps {
-  cbRouteKey: ICbRouteKey;
-  required: boolean;
-  value?: string;
-}
-
-export const CbSelect = (props: CbSelectProps): JSX.Element => {
-  const { cbRouteKey, required, value } = props;
+// export type CbSelectProps = {
+//   cbRouteKey: ICbRouteKey;
+// } & Partial<Pick<CreateInputProps, 'value' | 'required'>> &
+//   Pick<CreateInputProps, 'prop'> &
+//   Pick<FormBaseProps, 'changeHandler'>;
+export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
+export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
-  const { data, isError } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
-  const [selected, setSelected] = useState<uuid | string>(value ?? '');
+  const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
+  const [selected, setSelected] = useState<uuid | string>('');
 
-  const hasError = isError || (required && !selected) || !cbRouteKey;
-  const label = !cbRouteKey ? 'Missing Route Key' : columnToHeader(cbRouteKey);
-  const handleSelect = (event: SelectChangeEvent): void => {
-    setSelected(event.target.value);
+  const isRequired = required && !selected;
+  const hasError = isError || isRequired || !cbRouteKey;
+  const isDisabled = isLoading || isError || !cbRouteKey;
+  const label = cbRouteKey ? columnToHeader(cbRouteKey) : 'Missing Route Key';
+
+  useEffect(() => {
+    if (typeof value !== 'string') return;
+    if (!data?.length) return;
+    setSelected(value);
+  }, [isSuccess]);
+
+  const pushChange = (v: string): void => {
+    if (!isFunction(handleChange)) return;
+    const ret = { [prop]: v, error: false };
+    handleChange(ret);
+    console.log(ret);
   };
+
+  const handleSelect = (event: SelectChangeEvent): void => {
+    const { value } = event.target;
+    setSelected(value);
+    pushChange(value);
+  };
+
   return (
     <FormControl
       size='small'
-      style={{ ...baseInputStyle }}
-      required={required}
-      className={`select-control ${isError ? 'input-error' : ''}`}
-      error={hasError}
-      disabled={isError || !cbRouteKey}>
+      style={{ ...baseInputStyle, marginBottom: baseInputStyle.marginRight }}
+      required={isRequired}
+      className={`select-control ${hasError ? 'input-error' : ''}`}
+      error={!isLoading && hasError}
+      disabled={isDisabled}>
       <InputLabel>{label}</InputLabel>
-      <Select value={selected} onChange={handleSelect}>
+      <Select value={selected} onChange={handleSelect} MenuProps={selectMenuProps}>
         {data?.map((val, idx) => {
           const valueId = typeof val === 'string' ? val : val.id;
           const value = typeof val === 'string' ? val : val.value;

@@ -18,6 +18,7 @@ import { FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from '
 import { removeProps } from 'utils/common_helpers';
 import { showField } from 'utils/taxon';
 import SelectCode from './SelectCode';
+import { type } from 'os';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -26,7 +27,7 @@ type CreateInputBaseProps = {
   handleChange: FormChangeEvent;
 };
 
-type CreateInputProps = CreateInputBaseProps &
+export type CreateInputProps = CreateInputBaseProps &
   Pick<InputProps, 'rows' | 'multiline' | 'disabled' | 'required' | 'style'> &
   Pick<DateInputProps, 'minDate' | 'maxDate'> &
   Pick<BaseTextFieldProps, 'label'> &
@@ -168,7 +169,7 @@ function CreateEditSelectField({
   );
 }
 
-function CreateCbSelectField(props: CbSelectProps & Pick<CreateInputProps, 'value'>): ReactElement {
+function CreateCbSelectField(props: CbSelectProps): ReactElement {
   return <CbSelect {...props} />;
 }
 
