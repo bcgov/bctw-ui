@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { Critter, AttachedCritter, critterFormFields } from 'types/animal';
 import { WorkflowType, wfFields } from 'types/events/event';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
-import { permissionCanModify } from 'types/permission';
+import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { IUDF, eUDFType } from 'types/udf';
 import { hideSection } from 'utils/taxon';
 import { EditHeader, FormSection, editEventBtnProps } from '../common/EditModalComponents';
@@ -26,6 +26,7 @@ import { TaxonSelect } from 'components/form/TaxonSelect';
  */
 export default function EditCritter(props: EditorProps<Critter | AttachedCritter>): JSX.Element {
   const { isCreatingNew, editing, open } = props;
+  editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();
   const taxon = useTaxon();
@@ -50,17 +51,8 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
     //updateTaxon(null);
   };
 
-  const {
-    associatedAnimalFields,
-    captureFields,
-    characteristicsFields,
-    identifierFields,
-    markingFields,
-    mortalityFields,
-    releaseFields,
-    animalCommentField
-  } = critterFormFields;
-  //TODO critterbase integration add this back
+  const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
+
   const Header = (
     <Container maxWidth='xl'>
       {isCreatingNew ? (
@@ -78,13 +70,8 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
             </Grid>
           }
           headers={['taxon', 'device_id', 'critter_id', 'permission_type']}
-          format={(editing as AttachedCritter).formatPropAsHeader}
+          format={editing.formatPropAsHeader}
           obj={editing as AttachedCritter}
-          // btn={
-          //   <Button variant='outlined' className='button' onClick={(): void => setShowAssignmentHistory((o) => !o)}>
-          //     Device Assignment
-          //   </Button>
-          // }
         />
       )}
     </Container>
@@ -94,7 +81,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
     setShowWorkflow(true);
   };
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={new Critter(editing.critter_id)}>
+    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
@@ -107,25 +94,17 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
             handlerFromContext(v);
           };
           return (
-            <>
+            <Box>
               <FormSection id='identifiers' header='Identifiers' disabled={true}>
                 {identifierFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
-                {/* {markingFields?.map((f, i) => (
-                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))} */}
               </FormSection>
               <FormSection id='characteristics' header='Characteristics' disabled={true}>
                 {characteristicsFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
-              {/* <FormSection id='markings' header='Markings' disabled={true}>
-                {characteristicsFields?.map((f, i) => (
-                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))}
-              </FormSection> */}
               <FormSection id='capture-details' header='Latest Capture Details' disabled={true}>
                 {captureFields?.map((f, i) => (
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
@@ -136,12 +115,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                   <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
                 ))}
               </FormSection>
-              {/* <FormSection id='Mortality-details' header='Mortality Details' disabled={true}>
-                {mortalityFields?.map((f, i) => (
-                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))}
-              </FormSection> */}
-            </>
+            </Box>
           );
         }}
       </ChangeContext.Consumer>

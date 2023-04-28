@@ -1,9 +1,11 @@
 import { ICbRoutes, ICbSelect } from './types';
 
 const selectFormat = `?format=asSelect`;
+const detailedFormat = `?format=detailed`;
 
-const CbRouters = {
+export const CbRouters = {
   lookups: '/lookups',
+  critters: '/critters',
 
   get lookupsEnum(): string {
     return this.lookups + '/enum';
@@ -12,6 +14,7 @@ const CbRouters = {
     return this.lookups + '/taxons';
   }
 };
+
 const { lookups, lookupsEnum, lookupsTaxons } = CbRouters;
 const CbRoutes: ICbRoutes = {
   //? lookups
@@ -34,4 +37,4 @@ const CbRoutes: ICbRoutes = {
   supported_systems: `${lookupsEnum}/supported-systems`
 } as const;
 
-export { CbRoutes, selectFormat };
+export { CbRoutes, selectFormat, detailedFormat };

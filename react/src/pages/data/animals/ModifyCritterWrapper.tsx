@@ -39,12 +39,13 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     enabled: !!editing.critter_id
   });
 
+  // console.log(data);
   /**
    * note: if data has been previously fetched, 'status' will not be updated.
    * in that case, check if @var data exists and call @function setAnimal
    */
   useEffect(() => {
-    if (data || status === 'success') {
+    if (data && status === 'success') {
       if (data.assignment_id) {
         setAnimal(plainToClass(AttachedCritter, data));
       } else {
@@ -52,13 +53,15 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
       }
     }
     setHasCollar(editing instanceof AttachedCritter);
-    setCanEdit(permissionCanModify(editing.permission_type));
-  }, [editing, status]);
+    setCanEdit(true);
+  }, [status, editing]);
 
   // must be defined before mutation declarations
   const handleSaveResult = async (data: IBulkUploadResults<Critter>): Promise<void> => {
     const { errors, results } = data;
-    if (errors.length) {
+    console.log(data);
+    //The response of this mutation should not be BulkResponse
+    if (errors?.length) {
       showNotif({ severity: 'error', message: `${errors.map((e) => e.error)}` });
     } else {
       const critter = results[0];
@@ -78,7 +81,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const onError = (error: AxiosError): void => showNotif({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutations
-  const { mutateAsync: saveMutation } = api.useSaveAnimal({ onSuccess: handleSaveResult, onError });
+  const { mutateAsync: saveMutation } = api.useSaveCritterbaseCritter({ onSuccess: handleSaveResult, onError });
   const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: handleDeleteResult, onError });
 
   const saveCritter = async (a: IUpsertPayload<Critter | AttachedCritter>): Promise<void> => {
@@ -121,7 +124,6 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     editing: animal,
     queryStatus: status
   };
-
   return (
     <>
       <ConfirmModal

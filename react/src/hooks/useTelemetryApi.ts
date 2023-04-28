@@ -4,7 +4,7 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
-import { critterbaseApi as critterbase_api } from 'api/critterbase_api';
+import { critterbaseApi as critterbase_api, critterbaseApi } from 'api/critterbase_api';
 import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { onboardingApi as onboarding_api } from 'api/onboarding_api';
@@ -103,19 +103,29 @@ export const useTelemetryApi = () => {
   const permissionApi = permission_api({ api });
   const attachmentApi = attachment_api({ api });
   const onboardApi = onboarding_api({ api });
-  const cbApi = critterbase_api({ api: cb_api });
+  const critterbaseApi = critterbase_api({ api: cb_api });
 
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
 
+  //CRITTERBASE HOOKS
   const useCritterbaseSelectOptions = (prop: ICbRouteKey): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
     return useQuery<Array<ICbSelect | string>, AxiosError>(
       ['lookup-table-options', prop],
-      () => cbApi.getLookupTableOptions(prop, true),
+      () => critterbaseApi.getLookupTableOptions(prop, true),
       {
         ...defaultQueryOptions
       }
     );
   };
+
+  /** upsert an animal */
+  const useSaveCritterbaseCritter = (
+    config: UseMutationOptions<IBulkUploadResults<Critter>, AxiosError, IUpsertPayload<Critter>>
+  ): UseMutationResult<IBulkUploadResults<Critter>> =>
+    useMutation<IBulkUploadResults<Critter>, AxiosError, IUpsertPayload<Critter>>(
+      (critter) => critterbaseApi.upsertCritter(critter),
+      config
+    );
 
   /**
    *
@@ -409,7 +419,7 @@ export const useTelemetryApi = () => {
 
   // default getter for individual animals or collars
   const useType = <T>(type: BCTWType, id: string, options?: QueryEnabled): UseQueryResult<T> => {
-    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
+    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id)[0], {
       ...defaultQueryOptions,
       ...options
     });
@@ -700,6 +710,7 @@ export const useTelemetryApi = () => {
     useAllDevicesWithUnassignedCollarIds,
     useCritterbaseSelectOptions,
     // mutations
+    useSaveCritterbaseCritter,
     useSaveCodeHeader,
     useUploadCSV,
     useUploadXLSX,

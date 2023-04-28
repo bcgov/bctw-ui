@@ -9,19 +9,14 @@ import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 
-// export type CbSelectProps = {
-//   cbRouteKey: ICbRouteKey;
-// } & Partial<Pick<CreateInputProps, 'value' | 'required'>> &
-//   Pick<CreateInputProps, 'prop'> &
-//   Pick<FormBaseProps, 'changeHandler'>;
 export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
 export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
   const [selected, setSelected] = useState<uuid | string>('');
+  // const [hasError, setHasError] = useState((required && !selected) || !cbRouteKey);
 
-  const isRequired = required && !selected;
-  const hasError = isError || isRequired || !cbRouteKey;
+  const hasError = isError || (required && !selected) || !cbRouteKey;
   const isDisabled = isLoading || isError || !cbRouteKey;
   const label = cbRouteKey ? columnToHeader(cbRouteKey) : 'Missing Route Key';
 
@@ -48,7 +43,7 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
     <FormControl
       size='small'
       style={{ ...baseInputStyle, marginBottom: baseInputStyle.marginRight }}
-      required={isRequired}
+      required={required}
       className={`select-control ${hasError ? 'input-error' : ''}`}
       error={!isLoading && hasError}
       disabled={isDisabled}>

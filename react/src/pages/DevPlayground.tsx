@@ -12,6 +12,8 @@ import { AttachedCollar } from 'types/collar';
 import { columnToHeader, doNothingAsync } from 'utils/common_helpers';
 import EditCritter from './data/animals/EditCritter';
 import ManageLayout from './layouts/ManageLayout';
+import ModifyCritterWrapper from './data/animals/ModifyCritterWrapper';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 // Place constants here
 const TEST = 'Testing';
@@ -28,10 +30,13 @@ const TAB_LIST = ['Device and Critter', 'Telemetry', 'Vectronic KeyX'];
  * /playground route.
  */
 const DevPlayground = (): JSX.Element => {
+  const api = useTelemetryApi();
   const [background, setBackground] = useState(false);
   const [tab, setTab] = useState(0);
   const [detailAnimal, setDetailAnimal] = useState<AttachedCritter>(null);
   const [bool, setBool] = useState(true);
+  // const { data, status } = api.useType<AttachedCritter>('animal', 'c6b0a6c7-71ca-421a-96d6-1878fec07b05');
+  // console.log(data);
   return (
     <ManageLayout>
       <h1>Dev Playground</h1>
@@ -50,13 +55,15 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
+        <ModifyCritterWrapper editing={new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05')}>
+          <EditCritter
+            open={true} // THIS is false
+            editing={null}
+            handleClose={(): void => setBool(false)}
+            onSave={doNothingAsync}
+          />
+        </ModifyCritterWrapper>
 
-        <EditCritter
-          open={true} // THIS is false
-          editing={new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05')}
-          handleClose={(): void => setBool(false)}
-          onSave={doNothingAsync}
-        />
         <Box flexDirection='column'>
           {Object.keys(CbRoutes).map((key) => (
             <CbSelect

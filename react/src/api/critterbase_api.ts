@@ -1,11 +1,13 @@
-import { CbRoutes, selectFormat } from 'critterbase/routes';
+import { CbRouters, CbRoutes, detailedFormat, selectFormat } from 'critterbase/routes';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
-import { API, ApiProps } from './api_interfaces';
+import { API, ApiProps, IUpsertPayload } from './api_interfaces';
+import { uuid } from 'types/common_types';
+import { Critter } from 'types/animal';
 
 export const critterbaseApi = (props: ApiProps): API => {
   const { api } = props;
   /**
-   * retrieve the metadata history of an animal, given a @param id (critter_id)
+   * retrieve critterbase lookup table information, optionally formatted
    */
   const getLookupTableOptions = async (
     cbRouteKey: ICbRouteKey,
@@ -16,7 +18,14 @@ export const critterbaseApi = (props: ApiProps): API => {
     return data;
   };
 
+  const upsertCritter = async (critter: IUpsertPayload<Critter>): Promise<Critter> => {
+    // critter.body.sex = 'test';
+    const { data } = await api.put(`${CbRouters.critters}/${critter.body.critter_id}${detailedFormat}`, critter.body);
+    return data;
+  };
+
   return {
-    getLookupTableOptions
+    getLookupTableOptions,
+    upsertCritter
   };
 };

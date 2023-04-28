@@ -38,26 +38,38 @@ export type ICollectionUnit = Record<string, string>;
 
 export type Critters = Critter | AttachedCritter;
 
+interface CritterLocation {
+  latitude: number;
+  longitude: number;
+  region_env_name: string;
+  region_nr_name: string;
+  wmu_name: string;
+}
+
+interface CritterReleaseLocation extends CritterLocation {
+  release_latitude: never;
+  release_longitude: never;
+  release_region_env_id: never;
+  release_region_nr_id: never;
+  release_wmu_id: never;
+}
+
+interface CritterCaptureLocation extends CritterLocation {
+  capture_latitude: never;
+  capture_longitude: never;
+  capture_region_env_id: never;
+  capture_region_nr_id: never;
+  capture_wmu_id: never;
+  
+}
 interface CritterCapture {
   capture_id: uuid;
   capture_location_id: uuid;
   relase_location_id: uuid;
   capture_timestamp: Dayjs;
   release_timestamp: Dayjs;
-  capture_location: {
-    latitude: number;
-    longitude: number;
-    region_env_name: string;
-    region_nr_name: string;
-    wmu_name: string;
-  };
-  release_location: {
-    latitude: number;
-    longitude: number;
-    region_env_name: string;
-    region_nr_name: string;
-    wmu_name: string;
-  };
+  capture_location: CritterCaptureLocation;
+  release_location: CritterReleaseLocation;
 }
 
 interface CritterMarking {
@@ -79,29 +91,33 @@ interface CritterMarking {
   text_colour: string;
 }
 
+interface CritterQualitativeMeasurement {
+  measurement_qualitative_id: uuid;
+  taxon_measurement_id: uuid;
+  capture_id: uuid;
+  mortality_id: uuid | null;
+  qualitative_option_id: uuid;
+  measurement_comment: string;
+  measured_timestamp: Dayjs | null;
+  measurement_name: string;
+  option_label: string;
+  option_value: number;
+}
+
+interface CritterQuantitativeMeasurement {
+  measurement_quantitative_id: uuid;
+  taxon_measurement_id: uuid;
+  capture_id: uuid;
+  mortality_id: uuid | null;
+  value: number;
+  measurement_comment: string;
+  measured_timestamp: Dayjs;
+  measurement_name: string;
+}
+
 interface CritterMeasurement {
-  qualitative: {
-    measurement_qualitative_id: uuid;
-    taxon_measurement_id: uuid;
-    capture_id: uuid;
-    mortality_id: uuid | null;
-    qualitative_option_id: uuid;
-    measurement_comment: string;
-    measured_timestamp: Dayjs | null;
-    measurement_name: string;
-    option_label: string;
-    option_value: number;
-  }[];
-  quantitative: {
-    measurement_quantitative_id: uuid;
-    taxon_measurement_id: uuid;
-    capture_id: uuid;
-    mortality_id: uuid | null;
-    value: number;
-    measurement_comment: string;
-    measured_timestamp: Dayjs;
-    measurement_name: string;
-  }[];
+  qualitative: CritterQualitativeMeasurement[];
+  quantitative: CritterQuantitativeMeasurement[];
 }
 
 /**
@@ -133,6 +149,8 @@ export class Critter implements BCTWBase<Critter>{
   capture?: CritterCapture[];
   marking?: CritterMarking[];
   measurement?: CritterMeasurement[];
+
+  //ids
   
   //Leftovers from previous animal class
   _merged?: boolean;
@@ -299,7 +317,7 @@ export const critterFormFields: Record<string, FormFieldObject<CritterDetailsFor
   ],
   characteristicsFields: [
     { prop: 'critter_status', type: eInputType.cb_select, taxon: [], ...isRequired, cbRouteKey: 'critter_status' },
-    { prop: 'responsible_region', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+    { prop: 'responsible_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
     { prop: 'critter_comment', type: eInputType.multiline, taxon: [] }
     //{ prop: 'collection_unit', type: eInputType.cb_select, taxon: [] } //This select will need additional work, array of objects. Flatten and display multiple selects for array
   ],
@@ -307,17 +325,17 @@ export const critterFormFields: Record<string, FormFieldObject<CritterDetailsFor
     { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
     { prop: 'latitude', type: eInputType.number, taxon: []},
     { prop: 'longitude', type: eInputType.number, taxon: []},
-    { prop: 'region_env_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
-    { prop: 'region_nr_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
-    { prop: 'wmu_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
+    { prop: 'capture_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
+    { prop: 'capture_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+    { prop: 'capture_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
   ],
   releaseFields: [
     { prop: 'release_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
     { prop: 'latitude', type: eInputType.number, taxon: []},
     { prop: 'longitude', type: eInputType.number, taxon: []},
-    { prop: 'region_env_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
-    { prop: 'region_nr_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
-    { prop: 'wmu_name', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
+    { prop: 'release_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
+    { prop: 'release_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+    { prop: 'release_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
   ],
   //TODO critterbase integration does not support these in the same way
   // characteristicFields2: [
