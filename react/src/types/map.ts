@@ -100,6 +100,16 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
     return 'device_id';
   }
 
+    // Get a comma-separated string of collection_unit's keys and values
+  // TODO: Decide on the exact format we want for this
+  get collection_unit_display(): string {
+    const collectionUnitArray = this.collection_units?.map(unit => {
+      const unitString = Object.entries(unit).map(([key, value]) => `${key}: ${value}`);
+      return unitString;
+    });
+    return collectionUnitArray?.join(', ') ?? '';
+  }
+
   get displayProps(): (keyof TelemetryDetail)[] {
     return [];
   }

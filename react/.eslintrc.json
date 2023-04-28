@@ -14,7 +14,7 @@
   "parserOptions": {
     "ecmaVersion": 5,
     "sourceType": "module",
-    "project": "./tsconfig.json"
+    "project": "./react/tsconfig.json"
   },
   "rules": {
     "no-console": "warn",

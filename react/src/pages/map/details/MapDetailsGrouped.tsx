@@ -25,9 +25,9 @@ type GroupedCheckedStatus = {
 
 const rows_to_render = [
   'Colour',
-  'taxon',
-  'Population Unit',
-  'Collective Unit',
+  'Taxon',
+  'Collection Unit',
+  // 'Collective Unit',
   'WLH ID',
   'Animal ID',
   'Animal Status',
@@ -79,7 +79,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   };
 
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
-
+  console.log(plainToClass(TelemetryDetail, pings[0].features[0].properties))
   return (
     <TableContainer component={Paper} className={'map-detail-table-container'}>
       <Table stickyHeader size='small'>
@@ -151,8 +151,8 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
           }}></Box>
       </TableCell>
       <TableCell>{row.taxon}</TableCell>
-      <TableCell>{row.collection_units}</TableCell>
-      <TableCell>{row.collective_unit}</TableCell>
+      <TableCell>{row.collection_unit_display}</TableCell>
+      {/* <TableCell>{row.collective_unit}</TableCell> */}
       {row.critter_id ? (
         <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
       ) : (
