@@ -60,7 +60,7 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
       this.location_event = Object.assign(capture.location_event, { location_type: 'release' });
       this.critterPropsToSave = capture.captureCritterPropsToSave;
     } else {
-      this.location_event = new LocationEvent(this.event_type, dayjs());
+      this.location_event = new LocationEvent(this.event_type);
       this.critterPropsToSave = ['critter_id'];
     }
     this.shouldUnattachDevice = false;
@@ -100,7 +100,9 @@ export default class ReleaseEvent implements IReleaseEvent, BCTWWorkflow<Release
     // if (this.translocation_ind && this.critter_status === 'In Translocation') {
     //   ret['critter_status'] = 'Alive';
     // }
-    return omitNull({ ...ret, ...this.location_event.toJSON() });
+    //TODO critterbase integration old code
+    //return omitNull({ ...ret, ...this.location_event.toJSON() });
+    return omitNull({ ...ret });
   }
 
   getAttachment(): RemoveDeviceInput {

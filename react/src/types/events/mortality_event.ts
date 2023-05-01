@@ -149,7 +149,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.critter_status = eCritterStatus.mortality;
     this.wasInvestigated = false;
     this.predator_known_ind = false;
-    this.location_event = new LocationEvent('mortality', mort_date);
+    this.location_event = new LocationEvent('mortality');
     if (capture) {
       this.mortCritterPropsToSave = [...this.critterPropsToSave, ...capture.captureCritterPropsToSave];
     }
@@ -226,7 +226,9 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       delete ret.ucod_confidence;
     }
     const locationFields = this.location_event.toJSON();
-    return omitNull({ ...ret, ...locationFields });
+    //TODO critterbase integration
+    //return omitNull({ ...ret, ...locationFields });
+    return omitNull({ ...ret });
   }
 
   // retrieve the collar metadata fields from the event

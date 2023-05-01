@@ -138,11 +138,11 @@ export class Critter implements BCTWBase<Critter>{
   @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
   responsible_region_nr_id?: uuid;
   readonly responsible_region?: string;
-  system_origin?: string;
-  create_user?: uuid;
-  update_user?: uuid;
-  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) create_timestamp?: Dayjs;
-  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) update_timestamp?: Dayjs;
+  readonly system_origin?: string;
+  readonly create_user?: uuid;
+  readonly update_user?: uuid;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) readonly create_timestamp?: Dayjs;
+  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) readonly update_timestamp?: Dayjs;
   critter_comment?: string;
   //Extra details
   mortality?: unknown[];
@@ -150,10 +150,7 @@ export class Critter implements BCTWBase<Critter>{
   marking?: CritterMarking[];
   measurement?: CritterMeasurement[];
 
-  //ids
-  
-  //Leftovers from previous animal class
-  _merged?: boolean;
+  readonly _merged?: boolean;
   permission_type?: eCritterPermission;
 
   get identifier(): keyof Critter {
@@ -213,7 +210,6 @@ export class Critter implements BCTWBase<Critter>{
 
   toJSON(): Critter {
     const n = Object.assign(new Critter(), this);
-    delete n._merged;
     delete n.permission_type;
     return n;
   }

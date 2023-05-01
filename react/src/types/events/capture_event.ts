@@ -108,7 +108,7 @@ export default class CaptureEvent
     this.recapture_ind = false;
     this.translocation_ind = false;
     this.isTranslocationComplete = true;
-    this.location_event = new LocationEvent('capture', dayjs());
+    this.location_event = new LocationEvent('capture');
   }
 
   formatPropAsHeader(s: keyof CaptureEvent): string {
@@ -171,7 +171,9 @@ export default class CaptureEvent
     if (!ret.associated_animal_id) {
       delete ret.associated_animal_relationship;
     }
-    return omitNull({ ...ret, ...this.location_event.toJSON() });
+    //TODO Critterbase integration old code
+    //return omitNull({ ...ret, ...this.location_event.toJSON() });
+    return omitNull({ ...ret });
   }
 
   // todo: should data life be updated??

@@ -19,6 +19,7 @@ import { buttonProps } from 'components/component_constants';
 import { CollarHistory } from 'types/collar_history';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
+import { WorkflowType } from 'types/events/event';
 
 export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
@@ -32,6 +33,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   // Modal Open States
   const [openEdit, setOpenEdit] = useState(false);
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
+  const [workflow, setWorkflow] = useState<WorkflowType>('mortality');
   const [openWorkflow, setOpenWorkflow] = useState(false);
   const [openMap, setOpenMap] = useState(false);
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
@@ -74,16 +76,23 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   };
 
   const Menu = (row: Critters, idx: number, attached: boolean): JSX.Element => {
-    const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
+    const { edit, map, attach, mortality, removeCollar, capture } = CritterStrings.menuItems;
     const rowNotMerged = row?._merged === false;
     const _edit = () => setOpenEdit(true);
     const _map = () => setOpenMap(true);
 
-    const _removeAttach = () => {
+    const handleWorkflow = (wf: WorkflowType): void => {
+      setWorkflow(wf);
+      setOpenWorkflow(true);
+    };
+    const _removeAttach = (): void => {
       setOpenAttachRemoveCollar(true);
     };
-    const _mortality = () => {
-      setOpenWorkflow(true);
+    const _mortality = (): void => {
+      handleWorkflow('mortality');
+    };
+    const _capture = (): void => {
+      handleWorkflow('capture');
     };
     const defaultItems = [
       {
@@ -109,6 +118,11 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         label: mortality,
         icon: <Icon icon={'dead'} />,
         handleClick: _mortality
+      },
+      {
+        label: capture,
+        icon: <Icon icon={'edit'} />,
+        handleClick: _capture
       },
       {
         label: removeCollar,
@@ -240,7 +254,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         />
 
         {/* Modal for critter workflows */}
-        <CritterWorkflow editing={editObj} workflow={'mortality'} open={openWorkflow} setOpen={setOpenWorkflow} />
+        <CritterWorkflow editing={editObj} workflow={workflow} open={openWorkflow} setOpen={setOpenWorkflow} />
       </>
     </RowSelectedProvider>
   );

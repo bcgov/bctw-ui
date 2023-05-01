@@ -71,7 +71,7 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
     this.onlySaveDeviceStatus = false;
     this.event_type = 'malfunction';
     // pass true as the disableDate param.
-    this.location_event = new LocationEvent('malfunction', last_transmission ?? dayjs(), true);
+    //this.location_event = new LocationEvent('malfunction', last_transmission ?? dayjs(), true);
     this.device_status = 'Potential Malfunction';
   }
 
@@ -113,10 +113,10 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
     else if (this.device_status === 'Offline') {
       props.push('offline_type', 'offline_date');
       ret = eventToJSON(props, this);
-      locs.offline_comment = locs.malfunction_comment;
-      locs.offline_date = locs.malfunction_date;
-      delete locs.malfunction_comment;
-      delete locs.malfunction_date;
+      // locs.offline_comment = locs.malfunction_comment;
+      // locs.offline_date = locs.malfunction_date;
+      // delete locs.malfunction_comment;
+      // delete locs.malfunction_date;
     }
     return omitNull({ ...ret, ...locs });
   }

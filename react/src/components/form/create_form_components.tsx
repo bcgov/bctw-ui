@@ -174,7 +174,7 @@ function CreateCbSelectField(props: CbSelectProps): ReactElement {
 }
 
 // returns the funtion to create the form component based on input type
-const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
+export const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
   switch (inputType) {
     case eInputType.check:
       return CreateEditCheckboxField;

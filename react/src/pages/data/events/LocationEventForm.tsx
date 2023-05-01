@@ -12,6 +12,8 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { ReactNode } from 'react';
 import { boxSpreadRowProps } from './EventComponents';
 import { isDev } from 'api/api_helpers';
+import { CreateFormField, CreateTaxonFormField, getInputFnFromType } from 'components/form/create_form_components';
+import { AttachedCritter } from 'types/animal';
 
 type LocationEventProps = {
   event: LocationEvent;
@@ -31,20 +33,21 @@ export default function LocationEventForm({
   const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
 
   // create the form inputs
-  const fields = event.fields;
-  const latField = fields.latlon[0];
-  const longField = fields.latlon[1];
-  const utmFields = fields.utm as FormFieldObject<LocationEvent>[];
-  const dateField = fields.date as FormFieldObject<LocationEvent>;
-  const commentField = fields.comment as FormFieldObject<LocationEvent>;
-  const radioID = 'coord_type';
+  const { regions, comment, latlon } = event.fields;
+  // const fields = event.fields;
+  // const latField = fields.latlon[0];
+  // const longField = fields.latlon[1];
+  // const utmFields = fields.utm as FormFieldObject<LocationEvent>[];
+  // const dateField = fields.date as FormFieldObject<LocationEvent>;
+  // const commentField = fields.comment as FormFieldObject<LocationEvent>;
+  // const radioID = 'coord_type';
 
   // radio button control on whether to show UTM or lat long fields
-  const changeCoordinateType = (e: InboundObj): void => {
-    const ct = e[radioID] as eLocationPositionType;
-    event.coordinate_type = ct;
-    setShowUtm(ct);
-  };
+  // const changeCoordinateType = (e: InboundObj): void => {
+  //   const ct = e[radioID] as eLocationPositionType;
+  //   event.coordinate_type = ct;
+  //   setShowUtm(ct);
+  // };
 
   const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];
@@ -55,14 +58,18 @@ export default function LocationEventForm({
   };
 
   // notify parent error handler that required errors need to update when utm/lat long is changed
-  useDidMountEffect(() => {
-    notifyChange({ reset: true, toReset: showUtm ? event.utm_keys : event.coord_keys });
-  }, [showUtm]);
+  //TODO add this back
+  // useDidMountEffect(() => {
+  //   notifyChange({ reset: true, toReset: showUtm ? event.utm_keys : event.coord_keys });
+  // }, [showUtm]);
 
   const baseInputProps = { changeHandler, required: !isDev(), disabled };
   return (
     <>
-      {event.disable_date ? null : (
+      {regions.map((f, i) => (
+        <>{getInputFnFromType(f.type)}</>
+      ))}
+      {/* {event.disable_date ? null : (
         <Box {...boxSpreadRowProps} mb={1}>
           {childNextToDate}
           <DateTimeInput
@@ -73,11 +80,11 @@ export default function LocationEventForm({
             disabled={disabled}
           />
         </Box>
-      )}
+      )} */}
       {/* optionally render children below the date component */}
       {children}
       {/* show the UTM or Lat/Long fields depending on this checkbox state */}
-      <Radio
+      {/* <Radio
         propName={'coord_type'}
         defaultSelectedValue={showUtm}
         changeHandler={changeCoordinateType}
@@ -85,10 +92,10 @@ export default function LocationEventForm({
           { value: 'utm', disabled, label: WorkflowStrings.location.coordTypeUTM },
           { value: 'coord', disabled, label: WorkflowStrings.location.coordTypeLatLong }
         ]}
-      />
+      /> */}
       <Box>
         {/* render either the utm (default) or coordinate fields */}
-        {showUtm === 'utm' ? (
+        {/* {showUtm === 'utm' ? (
           utmFields.map((f, idx) => {
             const val = event[f.prop] as number;
             const numberProps = {
@@ -122,10 +129,10 @@ export default function LocationEventForm({
               {...baseInputProps}
             />
           </>
-        )}
+        )} */}
       </Box>
       <Box marginTop={1}>
-        <TextField
+        {/* <TextField
           style={{ width: '100%' }}
           multiline={true}
           rows={1}
@@ -135,7 +142,7 @@ export default function LocationEventForm({
           label={event.formatPropAsHeader(commentField.prop)}
           disabled={disabled}
           changeHandler={changeHandler}
-        />
+        /> */}
       </Box>
     </>
   );

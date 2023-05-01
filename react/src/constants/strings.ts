@@ -19,6 +19,7 @@ const CritterStrings = {
     edit: 'Edit',
     map: 'Show on Map',
     mortality: 'Report Mortality',
+    capture: 'Add Capture & Release event',
     removeCollar: 'Remove Collar',
     attach: 'Attach Collar'
   },
