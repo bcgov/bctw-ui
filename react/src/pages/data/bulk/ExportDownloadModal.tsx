@@ -181,8 +181,8 @@ export default function ExportDownloadModal({
   };
 
   const handleSimpleExport = (): void => {
-    const body = { queries: [], range: {}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: false };
-    body.queries = [{ key: 'critter_id', operator: '=', term: critterIDs }];
+    const body: ExportAllParams = { bctw_queries: [], range: {start: null, end: null}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: false };
+    body['critter_id'] = {body: critterIDs, negate: false};
     body.range = {
       start: range.start.format(formatDay),
       end: range.end.format(formatDay)
