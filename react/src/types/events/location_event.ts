@@ -1,35 +1,36 @@
-import dayjs, { Dayjs } from 'dayjs';
-import { eInputType, FormFieldObject } from 'types/form_types';
-import { columnToHeader } from 'utils/common_helpers';
+import { Dayjs } from 'dayjs';
+import { uuid } from 'types/common_types';
 import { WorkflowType } from 'types/events/event';
+import { eInputType, FormCommentStyle, FormFieldObject } from 'types/form_types';
+import { columnToHeader } from 'utils/common_helpers';
 
 export enum eLocationPositionType {
   utm = 'utm',
   coord = 'coord'
 }
 
-interface ILocationEvent {
-  coordinate_type: eLocationPositionType;
-  date: Dayjs;
-  comment: string;
-  latitude: number;
-  longitude: number;
-  utm_easting: number;
-  utm_northing: number;
-  utm_zone: number;
-}
+// interface ILocationEvent {
+//   coordinate_type: eLocationPositionType;
+//   date: Dayjs;
+//   comment: string;
+//   latitude: number;
+//   longitude: number;
+//   utm_easting: number;
+//   utm_northing: number;
+//   utm_zone: number;
+// }
 
 export class LocationEvent {
   readonly location_type: WorkflowType;
-  latitude: number;
-  longitude: number;
-  region_env_name: string;
-  region_nr_name: string;
-  wmu_name: string;
-  coordinate_uncertainty: number;
-  coordinate_uncertainty_unit: string;
-  temperature: number;
-  location_comment: string;
+  latitude?: number;
+  longitude?: number;
+  region_env_name?: string;
+  region_nr_name?: string;
+  wmu_name?: string;
+  coordinate_uncertainty?: number;
+  coordinate_uncertainty_unit?: string;
+  temperature?: number;
+  location_comment?: string;
   //TODO old LocationEvent details
   // comment: string;
   // latitude: number;
@@ -40,7 +41,9 @@ export class LocationEvent {
 
   constructor(
     location_type: WorkflowType // public date: Dayjs = dayjs(), // public disable_date = false, // public coordinate_type = eLocationPositionType.utm
-  ) {}
+  ) {
+    this.location_type = location_type;
+  }
 
   // utm_keys: (keyof this)[] = ['utm_easting', 'utm_northing', 'utm_zone'];
   // coord_keys: (keyof this)[] = ['latitude', 'longitude'];
@@ -68,16 +71,25 @@ export class LocationEvent {
     return Object.assign(new LocationEvent(this.location_type), this);
   }
 
-  // formatPropAsHeader(str: keyof LocationEvent): string {
-  //   if (['date', 'comment'].includes(str)) {
-  //     return columnToHeader(`${this.location_type}_${str}`);
-  //   }
-  //   return columnToHeader(str.replace('utm', 'UTM'));
+  // toCritterbasePayload() {
+  //   return {
+  //     ...this
+  //   };
   // }
+
+  formatPropAsHeader(k: keyof LocationEvent): string {
+    if (['date', 'comment'].includes(k)) {
+      return columnToHeader(`${this.location_type}_${k}`);
+    }
+    return columnToHeader(k.replace('utm', 'UTM'));
+  }
+
+  get displayProps(): (keyof LocationEvent)[] {
+    return [];
+  }
 
   get fields(): Record<string, FormFieldObject<LocationEvent>[]> {
     return {
-      // date: { prop: 'date', type: eInputType.datetime, required: true },
       latlon: [
         { prop: 'latitude', type: eInputType.number },
         { prop: 'longitude', type: eInputType.number },
@@ -95,7 +107,7 @@ export class LocationEvent {
       //   { prop: 'utm_northing', type: eInputType.number },
       //   { prop: 'utm_zone', type: eInputType.number }
       // ],
-      comment: [{ prop: 'location_comment', type: eInputType.text }]
+      comment: [{ prop: 'location_comment', type: eInputType.text, style: FormCommentStyle }]
     };
   }
 }

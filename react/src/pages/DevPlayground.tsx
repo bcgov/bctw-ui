@@ -14,6 +14,8 @@ import EditCritter from './data/animals/EditCritter';
 import ManageLayout from './layouts/ManageLayout';
 import ModifyCritterWrapper from './data/animals/ModifyCritterWrapper';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import WorkflowWrapper from './data/events/WorkflowWrapper';
+import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
 
 // Place constants here
 const TEST = 'Testing';
@@ -57,12 +59,20 @@ const DevPlayground = (): JSX.Element => {
         </TempComponent> */}
         <ModifyCritterWrapper editing={new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05')}>
           <EditCritter
-            open={true} // THIS is false
+            open={false} // THIS is false
             editing={null}
             handleClose={(): void => setBool(false)}
             onSave={doNothingAsync}
           />
         </ModifyCritterWrapper>
+
+        <WorkflowWrapper
+          open={bool}
+          event={new CaptureEvent2(dayjs())}
+          handleClose={(): void => setBool(false)}
+          onEventSaved={() => console.log('saved')}
+          onEventChain={() => console.log('chain')}
+        />
 
         <Box flexDirection='column'>
           {Object.keys(CbRoutes).map((key) => (

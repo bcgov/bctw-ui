@@ -2,7 +2,7 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, capitaliz
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
 import { CreateInputProps } from 'components/form/create_form_components';
 import { isFunction } from 'components/table/table_helpers';
-import { ICbRouteKey } from 'critterbase/types';
+import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { is } from 'date-fns/locale';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
@@ -18,11 +18,17 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
 
   const hasError = isError || (required && !selected) || !cbRouteKey;
   const isDisabled = isLoading || isError || !cbRouteKey;
+  // console.log({ cbRouteKey }, { isLoading }, { isError });
   const label = cbRouteKey ? columnToHeader(cbRouteKey) : 'Missing Route Key';
 
   useEffect(() => {
-    if (typeof value !== 'string') return;
     if (!data?.length) return;
+    if (data.length === 1) {
+      //Default to first item if only one item in data array
+      setSelected(typeof data[0] === 'string' ? data[0] : data[0].id);
+      return;
+    }
+    if (typeof value !== 'string') return;
     setSelected(value);
   }, [isSuccess]);
 

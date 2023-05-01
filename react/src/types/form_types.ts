@@ -1,6 +1,6 @@
 import { BaseTextFieldProps } from '@mui/material';
 import { ICbRouteKey } from 'critterbase/types';
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
@@ -40,7 +40,10 @@ export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled' | 'required
   span?: boolean;
   tooltip?: ReactNode;
   validate?: <T>(input: T) => string;
+  style?: CSSProperties;
 };
+
+export const FormCommentStyle: CSSProperties = { display: 'flex', flexGrow: 1 };
 
 // spread in form field constructors to make a field required
 export const isRequired = { required: true };

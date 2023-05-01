@@ -107,7 +107,7 @@ const WorkflowStrings = {
       'The previous device has been unassigned from this animal, you must assign a new device to the animal'
   },
   capture: {
-    workflowTitle: 'Capture Event Workflow',
+    workflowTitle: 'Capture & Release Event Workflow',
     areUpdates: 'Are there updates to the animal identifiers or characteristics?',
     shouldReviewNotif: 'Please review the entire metadata for this animal for updates not captured in this form',
     isRecapture: 'Is this a recapture?',

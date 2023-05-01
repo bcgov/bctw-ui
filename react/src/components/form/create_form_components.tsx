@@ -205,7 +205,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   handleChange: FormChangeEvent,
   inputProps?: Partial<CreateInputProps>,
   displayBlock = false,
-  style = {}
+  style: CSSProperties = {}
 ): ReactNode {
   if (formField === undefined) {
     return null;

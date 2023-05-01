@@ -17,7 +17,7 @@ import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEventForm from './RetrievalEventForm';
 import RetrievalEvent from 'types/events/retrieval_event';
 import ConfirmModal from 'components/modal/ConfirmModal';
-import CaptureEvent from 'types/events/capture_event';
+import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
 import ReleaseEvent from 'types/events/release_event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import MalfunctionEventForm from './MalfunctionEventForm';
@@ -30,8 +30,8 @@ type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
 
 /**
  * wraps all of the workflow components that handles:
-    * modal open state
-    * saving
+ * modal open state
+ * saving
  */
 export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   event,
@@ -101,18 +101,18 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   };
 
   /**
-   * if the postpone flag is set, skip the confirmation modal and 
+   * if the postpone flag is set, skip the confirmation modal and
    * close this workflow and immediately call the @param onEventSaved handler
    * which 'continues' to the next workflow
    */
   const handlePostponeSave = (wft: WorkflowType): void => {
     handleClose(false);
     onEventChain(event, wft);
-  }
+  };
 
   /**
    * when 'yes' is selected to confirm the workflow early exit,
-   * still trigger the save. 
+   * still trigger the save.
    */
   const handleExitWorkflow = (): void => {
     // console.log('exiting workflow early!');
@@ -124,11 +124,16 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
    * based on the event class, render the workflow form
    */
   const determineWorkflow = (): JSX.Element => {
-    const props = { canSave, handleFormChange: handleChildFormUpdated, handleExitEarly: handleShowExitWorkflow, handlePostponeSave };
+    const props = {
+      canSave,
+      handleFormChange: handleChildFormUpdated,
+      handleExitEarly: handleShowExitWorkflow,
+      handlePostponeSave
+    };
 
     if (event instanceof ReleaseEvent) {
       return <ReleaseEventForm {...props} event={event} />;
-    } else if (event instanceof CaptureEvent) {
+    } else if (event instanceof CaptureEvent2) {
       return <CaptureEventForm {...props} event={event} />;
     } else if (event instanceof MortalityEvent) {
       return <MortalityEventForm {...props} event={event} />;
@@ -143,16 +148,15 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   return (
     <Modal open={open} handleClose={handleClose}>
       <form className={'event-modal'} autoComplete={'off'}>
-        <EditHeader<T>
-          title={event?.getWorkflowTitle()}
-          headers={event.displayProps}
-          obj={event}
-          format={event.formatPropAsHeader}
-        />
-
         <Container maxWidth='xl'>
-          <Box py={3}>
-            <Paper>
+          <EditHeader<T>
+            title={event?.getWorkflowTitle()}
+            headers={event.displayProps}
+            obj={event}
+            format={event.formatPropAsHeader}
+          />
+          <Box>
+            <Paper sx={{ padding: 3 }}>
               {determineWorkflow()}
               <Box my={1} mx={3}>
                 <Divider></Divider>
@@ -168,7 +172,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
                     </Button>
                   )}
                   <Button variant='outlined' onClick={(): void => handleClose(false)}>
-                    Cancel and Exit
+                    Cancel
                   </Button>
                 </Box>
               </Box>

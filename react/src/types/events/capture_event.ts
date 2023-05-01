@@ -1,14 +1,59 @@
-import dayjs, { Dayjs } from 'dayjs';
-import { Code } from 'types/code';
-import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON } from 'types/events/event';
-import { LocationEvent } from 'types/events/location_event';
-import { Critter, ICollectionUnit } from 'types/animal';
-import { IDataLifeStartProps } from 'types/data_life';
-import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
+import { Dayjs } from 'dayjs';
+import { Critter } from 'types/animal';
+import { Code } from 'types/code';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
+import { IDataLifeStartProps } from 'types/data_life';
+import { BCTWWorkflow, OptionalAnimal, WorkflowType, eventToJSON } from 'types/events/event';
+import { LocationEvent } from 'types/events/location_event';
+import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
+
+export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2> {
+  readonly event_type: WorkflowType;
+  readonly critter_id: uuid;
+  capture_id: uuid;
+  capture_timestamp: Dayjs;
+  capture_comment: string;
+  release_comment: string;
+  capture_location: LocationEvent;
+  release_location: LocationEvent;
+  release_timestamp: Dayjs;
+  //Leftovers from BCTW implementation. Are these needed?
+  shouldSaveAnimal: boolean;
+  shouldSaveDevice: boolean;
+
+  constructor(capture_timestamp: Dayjs) {
+    this.event_type = 'capture';
+    this.capture_timestamp = capture_timestamp;
+    this.capture_location = new LocationEvent('capture');
+    this.release_location = new LocationEvent('release');
+  }
+
+  get displayProps(): (keyof CaptureEvent2)[] {
+    return ['critter_id'];
+  }
+
+  formatPropAsHeader(s: keyof CaptureEvent2): string {
+    return columnToHeader(s);
+  }
+
+  getWorkflowTitle(): string {
+    return WorkflowStrings.capture.workflowTitle;
+  }
+
+  getCritterbasePayload() {
+    return this;
+  }
+
+  fields: CaptureFormField2 = {
+    capture_timestamp: { prop: 'capture_timestamp', type: eInputType.date },
+    capture_comment: { prop: 'capture_comment', type: eInputType.text, style: FormCommentStyle },
+    release_timestamp: { prop: 'release_timestamp', type: eInputType.date },
+    release_comment: { prop: 'release_comment', type: eInputType.text, style: FormCommentStyle }
+  };
+}
 
 type CaptureAnimalEventProps = Pick<
   Critter,
@@ -48,6 +93,10 @@ type CaptureReleaseProps = {
   // indicates the animal was released after successful translocation
   // workflow should proceed to release
   isTranslocationComplete: boolean;
+};
+
+export type CaptureFormField2 = {
+  [Property in keyof CaptureEvent2]+?: FormFieldObject<CaptureEvent2>;
 };
 
 export type CaptureFormField = {
