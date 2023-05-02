@@ -80,7 +80,7 @@ export default function ExportPageV2(): JSX.Element {
   const styles = exportPageStyles();
 
   const operators: QueryBuilderOperator[] = ['Equals', 'Not Equals'];
-  const columns: QueryBuilderColumn[] = ['species', 'population_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+  const columns: QueryBuilderColumn[] = ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
   const TABS: ExportTab[] = ['Quick Export', 'Advanced Export'];
   const [exportType, setExportType] = useState<ExportTab>(TABS[0]);
   const [start, setStart] = useState(dayjs().subtract(3, 'month'));
@@ -138,14 +138,12 @@ export default function ExportPageV2(): JSX.Element {
 
   const handleRadioChange = (event) => {
     const newVal = (event.target as HTMLInputElement).value as ExportRangeType;
-    if(newVal === exportRangeType) {
+    if (newVal === exportRangeType) {
       setExportRangeType('date_range');
-    }
-    else {
+    } else {
       setExportRangeType(newVal);
     }
-    
-  }
+  };
 
   const datePicker = (): JSX.Element => {
     return (
@@ -169,19 +167,15 @@ export default function ExportPageV2(): JSX.Element {
               changeHandler={handleChangeDate}
             />
           </Box>
-          <RadioGroup
-            row
-            name="export-radio"
-            value={exportRangeType}
-          >
-            <FormControlLabel 
-              value='lifetime' 
-              control={<Radio onClick={handleRadioChange}/>} 
+          <RadioGroup row name='export-radio' value={exportRangeType}>
+            <FormControlLabel
+              value='lifetime'
+              control={<Radio onClick={handleRadioChange} />}
               label={ExportStrings.allTelemetryButton}
             />
-            <FormControlLabel 
-              value='last_telemetry' 
-              control={<Radio onClick={handleRadioChange} />} 
+            <FormControlLabel
+              value='last_telemetry'
+              control={<Radio onClick={handleRadioChange} />}
               label={ExportStrings.mostRecentTelemetryButton}
             />
           </RadioGroup>
@@ -219,11 +213,11 @@ export default function ExportPageV2(): JSX.Element {
     return (
       <Box>
         {datePicker()}
-        <Checkbox 
+        <Checkbox
           propName={'attached-only-checkbox'}
-          label={ExportStrings.attachedAnimalsOnlyCheck} 
-          initialValue={false} 
-          changeHandler={() => setAttachedOnly(!attachedOnly)}        
+          label={ExportStrings.attachedAnimalsOnlyCheck}
+          initialValue={false}
+          changeHandler={() => setAttachedOnly(!attachedOnly)}
         />
         <Box className={styles.queryRegionBox}>
           <SubHeader dark size='small' text={ExportStrings.queryBuilderHeader} />

@@ -29,7 +29,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
   const [ucodDisabled, setUcodDisabled] = useState(true);
   const [isUCODKnown, setIsUCODKnown] = useState(false);
-  // setting animal_status to alive disables the form.
+  // setting critter_status to alive disables the form.
   const [critterIsAlive, setCritterIsAlive] = useState(false);
 
   useDidMountEffect(() => {
@@ -68,9 +68,9 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     } else if (key === 'shouldUnattachDevice') {
       // make attachment end state required if user is removing device
       setIsBeingUnattached(!!value);
-    } else if (key === 'isUCODSpeciesKnown') {
+    } else if (key === 'isUCODtaxonKnown') {
       setIsUCODKnown(!!value);
-    } else if (key === 'animal_status') {
+    } else if (key === 'critter_status') {
       if (value === 'Mortality' || value === 'Alive') {
         setCritterIsAlive(value === 'Alive');
       }
@@ -91,11 +91,11 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
   const isDisabled = { disabled: critterIsAlive };
   return (
     <>
-      <FormSection id='mort-a-st' header={event.formatPropAsHeader('animal_status')} disabled={critterIsAlive}>
+      <FormSection id='mort-a-st' header={event.formatPropAsHeader('critter_status')} disabled={critterIsAlive}>
         {[
           <Radio
             key='mort-rad-status'
-            propName={wfFields.get('animal_status').prop}
+            propName={wfFields.get('critter_status').prop}
             changeHandler={onChange}
             defaultSelectedValue={'Mortality'}
             values={['Mortality', 'Alive'].map((p) => ({ label: p, value: p }))}
@@ -163,7 +163,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             {CreateFormField(mortality, wfFields.get('predator_known_ind'), onChange, {
               disabled: !isPredation || critterIsAlive
             })}
-            {CreateFormField(mortality, wfFields.get('predator_species_pcod'), onChange, {
+            {CreateFormField(mortality, wfFields.get('predator_taxon_pcod'), onChange, {
               disabled: !isPredatorKnown || critterIsAlive
             })}
             {CreateFormField(mortality, wfFields.get('pcod_confidence'), onChange, {
@@ -171,10 +171,10 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             })}
           </Box>,
           <Box key='bx=ucod' mt={1} {...boxSpreadRowProps}>
-            {CreateFormField(mortality, { ...fields.isUCODSpeciesKnown }, onChange, {
+            {CreateFormField(mortality, { ...fields.isUCODtaxonKnown }, onChange, {
               disabled: !isPredatorKnown || critterIsAlive
             })}
-            {CreateFormField(mortality, wfFields.get('predator_species_ucod'), onChange, {
+            {CreateFormField(mortality, wfFields.get('predator_taxon_ucod'), onChange, {
               disabled: !(isPredatorKnown && isUCODKnown) || critterIsAlive
             })}
             {CreateFormField(mortality, wfFields.get('ucod_confidence'), onChange, {

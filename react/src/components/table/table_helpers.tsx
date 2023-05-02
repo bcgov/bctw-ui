@@ -1,13 +1,13 @@
 import { matchSorter } from 'match-sorter';
 import { getProperty, countDecimals } from 'utils/common_helpers';
 import { Order, HeadCell } from 'components/table/table_interfaces';
-import { dateObjectToTimeStr, formatDaysStr, formatT, formatTime, getDaysDiff } from 'utils/time';
+import { dateObjectToTimeStr, formatT, formatTime, getDaysDiff } from 'utils/time';
 import { Icon, Tooltip } from 'components/common';
-import dayjs, { Dayjs, isDayjs } from 'dayjs';
+import dayjs, { isDayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Collar, eDeviceStatus } from 'types/collar';
+import { eDeviceStatus } from 'types/collar';
 import { Chip } from '@mui/material';
-import { Animal, eAnimalStatus } from 'types/animal';
+import { Animal, ICollectionUnit, eCritterStatus } from 'types/animal';
 dayjs.extend(relativeTime);
 /**
  * converts an object to a list of HeadCells
@@ -34,13 +34,12 @@ function createHeadCell<T>(obj: T, propsToDisplay: (keyof T)[]): HeadCell<T>[] {
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   const emptyA = a[orderBy] == null || String(a[orderBy]) === '';
   const emptyB = b[orderBy] == null || String(b[orderBy]) === '';
-  if(!emptyB && emptyA){
+  if (!emptyB && emptyA) {
     return -1;
   }
-  if(emptyB && !emptyA) {
+  if (emptyB && !emptyA) {
     return 1;
   }
-
 
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -82,7 +81,7 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
   const sortedArr = array.slice().sort(comparator);
   return sortedArr;
 }
-/** Renders the coloured tags for species and collars */
+/** Renders the coloured tags for taxon and collars */
 
 const getTag = (value: string, color?: string, status?: 'error' | 'warning' | 'success'): JSX.Element => {
   const style = { width: '110px' };
@@ -91,6 +90,13 @@ const getTag = (value: string, color?: string, status?: 'error' | 'warning' | 's
   return <Chip label={value} sx={{ backgroundColor: color ? color : defaultColor, color: '#ffff', ...style }} />;
 };
 
+/**
+ * * CRITTERBASE INTEGRATED *
+ * TODO: add support for more taxons, change species -> taxon
+ * @param {string} key
+ * @param {string} value
+ * @return {*}  {JSX.Element}
+ */
 const formatTag = (key: string, value: string): JSX.Element => {
   if (key === 'device_status') {
     const { active, potential_mortality, mortality, potential_malfunction, malfunction } = eDeviceStatus;
@@ -105,20 +111,21 @@ const formatTag = (key: string, value: string): JSX.Element => {
         return getTag(mortality, null, 'error');
     }
   }
-  if (key === 'animal_status') {
-    const {alive, mortality, in_translocation, potential_mortality} = eAnimalStatus;
-    switch(value) {
-      case alive:
-        return getTag(value, null, 'success');
-      case in_translocation:
-        return getTag(in_translocation, null, 'warning');
-      case potential_mortality:
-        return getTag('P. Mortality', null, 'warning');
-      case mortality:
-        return getTag(mortality, null, 'error');
-    }
+  if (key === 'mortality') {
+    //const { alive, mortality } = eAnimalStatus;
+    return value ? getTag('alive', null, 'success') : getTag('mortality', null, 'error');
+    // switch (value) {
+    //   case alive:
+    //     return getTag(value, null, 'success');
+    //   case mortality:
+    //     return getTag(mortality, null, 'error');
+    //   // case in_translocation:
+    //   //   return getTag(in_translocation, null, 'warning');
+    //   // case potential_mortality:
+    //   //   return getTag('P. Mortality', null, 'warning');
+    // }
   }
-  if (key === 'species') {
+  if (key === 'taxon') {
     switch (value) {
       case 'Caribou':
         return getTag(value, '#9575cd');
@@ -129,6 +136,7 @@ const formatTag = (key: string, value: string): JSX.Element => {
       case 'Grizzly Bear':
         return getTag(value, '#81c784');
     }
+    return getTag(value); // returns default tag color for unknown values
   }
   if (key === 'last_transmission_date') {
     const { diff, asText } = getDaysDiff(dayjs(value));
@@ -143,20 +151,36 @@ const formatTag = (key: string, value: string): JSX.Element => {
   return getTag('Unknown');
 };
 
+// interface Unit {
+//   unit_name: string;
+// }
+
 interface ICellFormat {
   align: 'inherit' | 'left' | 'center' | 'right' | 'justify';
   value: unknown;
 }
 /**
- *
+ * * CRITTERBASE INTEGRATED *
+ * TODO: add support for keys other than 'unit_name'
  * @param obj object being displayed
  * @param key the property to render in this table cell
- * todo: ...not using align just return value?
  */
+
 const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
   const value: unknown = obj[key];
-  if (['device_status', 'species', 'last_transmission_date'].includes(key as string)) {
+  //TODO find solution for table search with collection units
+  if (key === 'collection_unit') {
+    const collectionUnits = [];
+    const collectionUnit = value as ICollectionUnit[];
+    collectionUnit?.forEach((unit) => {
+      const [category] = Object.keys(unit);
+      collectionUnits.push(`${category}: ${unit[category]}`);
+    });
+    // maps array of collection units to comma delimited string
+    return { ...align, value: collectionUnits.join(', ') };
+  }
+  if (['device_status', 'taxon', 'last_transmission_date'].includes(key as string)) {
     return { ...align, value: formatTag(key as string, isDayjs(value) ? formatT(value) : (value as string)) };
   }
   if (key === 'last_update_attempt') {
@@ -196,7 +220,7 @@ function fuzzySearchMutipleWords<T>(rows: T[], keys: string[], filterValue: stri
   return terms.reduceRight((results, term) => matchSorter(results, term, { keys }), rows);
 }
 
-const isFunction = (f: any): boolean => typeof f === 'function';
+const isFunction = (f: unknown): boolean => typeof f === 'function';
 
 export {
   fuzzySearchMutipleWords,

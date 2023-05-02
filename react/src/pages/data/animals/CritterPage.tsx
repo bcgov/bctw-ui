@@ -2,7 +2,7 @@ import { Button, Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { CritterStrings } from 'constants/strings';
-import { SpeciesProvider } from 'contexts/SpeciesContext';
+import { TaxonProvider } from 'contexts/TaxonContext';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useContext, useEffect, useState } from 'react';
 import { UserAnimalAccess } from './UserAnimalAccess';
@@ -48,41 +48,45 @@ export default function CritterPage(): JSX.Element {
       setAlerts(nonSnoozedValidAlerts);
     }
   }, [useAlert]);
-  
-  const dataTables = (): JSX.Element => {
-    return (
-      <>
-        <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
-        <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
-          <CritterDataTables detailViewAction={setDetailAnimal} />
-        </Box>
-        <Box style={showDataRetrieval ? {} : { display: 'none' }}>
-          <DataRetrievalDataTable />
-        </Box>
-      </>
-    )
-  }
+
+  const dataTables = (): JSX.Element => (
+    <Box>
+      <QuickSummary handleDetails={inverseDataRetrieval} showDetails={showDataRetrieval} />
+      <Box style={!showDataRetrieval ? {} : { display: 'none' }} mt={4}>
+        <CritterDataTables detailViewAction={setDetailAnimal} />
+      </Box>
+      <Box style={showDataRetrieval ? {} : { display: 'none' }}>
+        <DataRetrievalDataTable />
+      </Box>
+    </Box>
+  );
 
   const detailedView = (): JSX.Element => {
-    if(!detailAnimal) {
+    if (!detailAnimal) {
       return null;
     }
 
     detailAnimal.attachment_start = dayjs(detailAnimal.attachment_start);
     detailAnimal.attachment_end = dayjs(detailAnimal.attachment_end);
-    
+
     return (
       <Box width='100%' sx={{ ml: -1 }}>
-        <Button startIcon={<Icon icon='back'/>} onClick={() => {setDetailAnimal(null)}}>Back to My Animals</Button>
-        <DetailedAnimalView detailAnimal={detailAnimal} height={'500px'}/>
+        <Button
+          startIcon={<Icon icon='back' />}
+          onClick={() => {
+            setDetailAnimal(null);
+          }}>
+          Back to My Animals
+        </Button>
+        <DetailedAnimalView detailAnimal={detailAnimal} height={'500px'} />
       </Box>
     );
-  }
+  };
 
   return (
     <ManageLayout>
-      <SpeciesProvider>
-        <Box className='manage-layout-titlebar'>
+      {/* <TaxonProvider> */}
+      {/* <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
@@ -95,19 +99,15 @@ export default function CritterPage(): JSX.Element {
               </Container>
             </FullScreenDialog>
           </Box>
-        </Box>
-        <AlertBanner />
-        <Box display={detailAnimal === null ? 'none' : 'contents'}>
-          {detailedView()}
-        </Box>
-        <Box display={detailAnimal !== null ? 'none' : 'contents'}>
-          {dataTables()}
-        </Box>
-        {/*The above hack is in place so that the 
+        </Box> */}
+      <AlertBanner />
+      <Box display={detailAnimal === null ? 'none' : 'contents'}>{detailedView()}</Box>
+      <Box display={detailAnimal !== null ? 'none' : 'contents'}>{dataTables()}</Box>
+      {/*The above hack is in place so that the 
         data tables do not need to reload / re-query 
         anytime you wanna go back and forth between
         the detailed view and the data tables*/}
-      </SpeciesProvider>
+      {/* </TaxonProvider> */}
     </ManageLayout>
   );
 }

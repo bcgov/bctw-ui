@@ -6,19 +6,19 @@ import { API, ApiProps, IBulkUploadResults } from './api_interfaces';
 export interface IGetCodeProps {
   page: number;
   codeHeader: string;
-  species?: string | null;
+  taxon?: string | null;
 }
 
 export const codeApi = (props: ApiProps): API => {
   const { api } = props;
 
   /**
-   * fetches codes for a code header 
+   * fetches codes for a code header
    */
   const getCodes = async (props: IGetCodeProps): Promise<ICode[]> => {
-    const { page, codeHeader, species } = props;
-    const ch = `codeHeader=${codeHeader}`
-    const s = species ? ch + `&species=${species}` : ch;
+    const { page, codeHeader, taxon } = props;
+    const ch = `codeHeader=${codeHeader}`;
+    const s = taxon ? ch + `&taxon=${taxon}` : ch;
     const url = createUrl({ api: 'get-code', query: s, page });
     // console.log(`requesting ${codeHeader} codes`);
     const { data } = await api.get(url);
@@ -27,14 +27,14 @@ export const codeApi = (props: ApiProps): API => {
 
   /**
    * fetches long description for a code name
-   * used in frontend ui for updateable text 
+   * used in frontend ui for updateable text
    */
   const getCodeLongDesc = async (codeName: string): Promise<string> => {
-    const url = createUrl({api: 'get-code-long-desc', query: `codeName=${codeName}`});
-    const {data} = await api.get(url);
-    
+    const url = createUrl({ api: 'get-code-long-desc', query: `codeName=${codeName}` });
+    const { data } = await api.get(url);
+
     return data;
-  }
+  };
   /**
    * fetches a list of code headers
    * note: not currently in use
@@ -59,6 +59,6 @@ export const codeApi = (props: ApiProps): API => {
     addCodeHeader,
     getCodes,
     getCodeHeaders,
-    getCodeLongDesc,
+    getCodeLongDesc
   };
 };

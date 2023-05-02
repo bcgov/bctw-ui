@@ -25,7 +25,7 @@ type GroupedCheckedStatus = {
 
 const rows_to_render = [
   'Colour',
-  'Species',
+  'taxon',
   'Population Unit',
   'Collective Unit',
   'WLH ID',
@@ -136,20 +136,22 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
   };
 
   return (
-    <TableRow
-      hover={!isSelectedInMap}
-      className={`map-bottom-panel-row ${isSelectedInMap ? 'row-selected' : ''}`}>
+    <TableRow hover={!isSelectedInMap} className={`map-bottom-panel-row ${isSelectedInMap ? 'row-selected' : ''}`}>
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
       <TableCell>
-        <Box className='colour-swatch'
-          style={{ width: '32px', height: '32px', border: '1px solid #999999',
-            backgroundColor: parseAnimalColour(row.map_colour).fillColor}}>
-        </Box>
+        <Box
+          className='colour-swatch'
+          style={{
+            width: '32px',
+            height: '32px',
+            border: '1px solid #999999',
+            backgroundColor: parseAnimalColour(row.map_colour).fillColor
+          }}></Box>
       </TableCell>
-      <TableCell>{row.species}</TableCell>
-      <TableCell>{row.population_unit}</TableCell>
+      <TableCell>{row.taxon}</TableCell>
+      <TableCell>{row.collection_unit}</TableCell>
       <TableCell>{row.collective_unit}</TableCell>
       {row.critter_id ? (
         <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
@@ -161,7 +163,7 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       ) : (
         <TableCell></TableCell>
       )}
-      <TableCell>{row.animal_status}</TableCell>
+      <TableCell>{row.critter_status}</TableCell>
       <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('device', row)} />
       <TableCell>{row.device_status}</TableCell>
       <TableCell>{row.paddedFrequency}</TableCell>

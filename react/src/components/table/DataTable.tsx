@@ -1,27 +1,12 @@
-import {
-  CircularProgress,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TablePagination,
-  TableRow
-} from '@mui/material';
+import { CircularProgress, Paper, Table, TableBody, TableCell, TablePagination, TableRow } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { AxiosError } from 'axios';
 import TableContainer from 'components/table/TableContainer';
 import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
-import {
-  fuzzySearchMutipleWords,
-  getComparator,
-  isFunction,
-  stableSort
-} from 'components/table/table_helpers';
+import { fuzzySearchMutipleWords, getComparator, isFunction, stableSort } from 'components/table/table_helpers';
 import { DataTableProps, ITableFilter, Order } from 'components/table/table_interfaces';
-import {
-  useTableRowSelectedState
-} from 'contexts/TableRowSelectContext';
+import { useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import React, { useEffect, useState } from 'react';
 import { UseQueryResult } from 'react-query';
@@ -29,14 +14,13 @@ import { BCTWBase } from 'types/common_types';
 import DataTableRow from './DataTableRow';
 import './table.scss';
 
-
 const useStyles = makeStyles((theme) => ({
   bottomOfTableBody: {
-    borderBottomRightRadius: '0px', 
+    borderBottomRightRadius: '0px',
     borderBottomLeftRadius: '0px'
   },
   topOfTableFooter: {
-    borderTopLeftRadius: '0px', 
+    borderTopLeftRadius: '0px',
     borderTopRightRadius: '0px'
   }
 }));
@@ -79,12 +63,12 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const [page, setPage] = useState(0);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
-  
+
   const isMultiSelect = isFunction(onSelectMultiple);
   // fetch the data from the props query
   const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
     requestDataByPage ? page : null,
-    param,
+    param
     //filter
   );
   const noPagination = !requestDataByPage && !paginationFooter;
@@ -114,12 +98,11 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   useEffect(() => {
     setSelectedIDs(new Array(values.length).fill(false));
-  }, [resetSelections])
+  }, [resetSelections]);
 
   useEffect(() => {
     handleRows();
   }, [values]);
-
 
   useDidMountEffect(() => {
     if (isSuccess) {
@@ -165,33 +148,30 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   };
 
   const filterRows = (rows: T[]): T[] => {
-    let results = rows.map((r,idx) => {return {...r, global_id: idx}})
-    if(filter && filter.term) {
-      results = fuzzySearchMutipleWords(results, filter.keys ? filter.keys : (headers as string[]), filter.term)
+    let results = rows.map((r, idx) => {
+      return { ...r, global_id: idx };
+    });
+    if (filter && filter.term) {
+      results = fuzzySearchMutipleWords(results, filter.keys ? filter.keys : (headers as string[]), filter.term);
     }
     return results;
-  }
+  };
 
   const displayedRows = (): T[] => {
     const results = filterRows(values);
     let r;
-     if(!requestDataByPage || noPagination)
-     {
-        r = stableSort(results, getComparator(order, orderBy)) // Truncates the rows after the data is sorted (in memoRows)
-     }
-     else 
-     {
-        r = stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
-     }
-     if(r.length != totalRows) 
-     {
+    if (!requestDataByPage || noPagination) {
+      r = stableSort(results, getComparator(order, orderBy)); // Truncates the rows after the data is sorted (in memoRows)
+    } else {
+      r = stableSort(truncateRows(results), getComparator(order, orderBy)); // Truncates the rows before data is sorted
+    }
+    if (r.length != totalRows) {
       //Crashes the page unless guarded by this condition for some reason.
       setTotalRows(r.length);
-     }
-      
-     return r;
-      
-  };//, [values, filter, page, rowsPerPage, order, orderBy]);
+    }
+
+    return r;
+  }; //, [values, filter, page, rowsPerPage, order, orderBy]);
 
   const handleRowDeleted = (id: string): void => {
     setValues((o) => o.filter((f) => String(f[rowIdentifier]) !== id));
@@ -205,28 +185,25 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.checked;
-    if(selected) {
-      
+    if (selected) {
       const updatedIds = [...selectedIDs];
 
-      if(filter && filter.term) {
+      if (filter && filter.term) {
         const r = filterRows(values);
         console.log(r);
         r.forEach((row) => {
-          if ( row['global_id'] < selectedIDs.length ) {
+          if (row['global_id'] < selectedIDs.length) {
             updatedIds[row['global_id']] = true;
           }
         });
-        
+
         console.log('Select All Filter');
-        console.log(updatedIds.filter(a => a === true).length)
+        console.log(updatedIds.filter((a) => a === true).length);
         setSelectedIDs(updatedIds);
-      }
-      else {
+      } else {
         setSelectedIDs(new Array(data.length).fill(true));
       }
-    }
-    else {
+    } else {
       setSelectedIDs(new Array(data.length).fill(false));
     }
     setSelectAll(selected);
@@ -249,11 +226,11 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   };
 
   useEffect(() => {
-    const selected = values.filter((f, idx) => { 
+    const selected = values.filter((f, idx) => {
       return selectedIDs[idx] === true;
-    })
+    });
     onSelectMultiple?.(selected);
-  }, [selectedIDs])
+  }, [selectedIDs]);
 
   const customColumnsAppend = customColumns?.filter((c) => !c.prepend);
   const customColumnsPrepend = customColumns?.filter((c) => c.prepend);
@@ -261,81 +238,83 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const renderRows = () => {
     return (
       <>
-        {(!requestDataByPage || noPagination ? truncateRows(displayedRows()) : displayedRows())?.map((obj, idx: number) => (
-          <DataTableRow
-            {...props}
-            key={`table-row-${idx}`}
-            index={obj['global_id']}
-            row={obj}
-            selected={selectedIDs.length ? selectedIDs[obj['global_id']] : false}
-            rowIdentifier={rowIdentifier}
-            setSelectedRows={(b) => {
-              const copy = selectedIDs.slice();
-              copy[obj['global_id']] = b;
-              setSelectedIDs(copy);
-            }}
-            selectedRows={[]}
-          />
-        ))}
+        {(!requestDataByPage || noPagination ? truncateRows(displayedRows()) : displayedRows())?.map(
+          (obj, idx: number) => (
+            <DataTableRow
+              {...props}
+              key={`table-row-${idx}`}
+              index={obj['global_id']}
+              row={obj}
+              selected={selectedIDs.length ? selectedIDs[obj['global_id']] : false}
+              rowIdentifier={rowIdentifier}
+              setSelectedRows={(b) => {
+                const copy = selectedIDs.slice();
+                copy[obj['global_id']] = b;
+                setSelectedIDs(copy);
+              }}
+              selectedRows={[]}
+            />
+          )
+        )}
       </>
     );
-  }//, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs, forceRowRefresh]);
+  }; //, [displayedRows, selectAll, triggerMultiUpdate, selectedIDs, forceRowRefresh]);
 
   return (
     <>
-    <TableContainer
-      sx={{borderBottomLeftRadius: '0px', borderBottomRightRadius: '0px'}}
-      fullScreenHeight={fullScreenHeight}
-      toolbar={
-        <TableToolbar
-          rowCount={totalRows}
-          title={title}
-          onChangeFilter={handleFilter}
-          numSelected={selectedIDs.filter(f => f === true).length}
-          filterableProperties={headers}
-          isMultiSearch={isMultiSelect}
-          setPage={setPage}
-          //showTooltip={showValidRecord}
-          disableSearch={disableSearch}
-          sibling={<>{exporter}</>}
-        />
-      }>
-      <>
-        <Table stickyHeader size='small'>
-          <TableHead
-            headersToDisplay={headers}
-            headerData={data && data[0]}
-            isMultiSelect={isFunction(onSelectMultiple)}
-            numSelected={selectedIDs.filter(x => x === true).length}
-            order={order}
-            orderBy={(orderBy as string) ?? ''}
-            onRequestSort={handleSort}
-            onSelectAllClick={handleSelectAll}
-            selectAll={selectAll}
-            rowCount={values?.length ?? 0}
-            customHeaders={customColumnsAppend?.map((c) => c.header) ?? []}
-            customHeadersPrepend={customColumnsPrepend?.map((c) => c.header) ?? []}
+      <TableContainer
+        sx={{ borderBottomLeftRadius: '0px', borderBottomRightRadius: '0px' }}
+        fullScreenHeight={fullScreenHeight}
+        toolbar={
+          <TableToolbar
+            rowCount={totalRows}
+            title={title}
+            onChangeFilter={handleFilter}
+            numSelected={selectedIDs.filter((f) => f === true).length}
+            filterableProperties={headers}
+            isMultiSearch={isMultiSelect}
+            setPage={setPage}
+            //showTooltip={showValidRecord}
+            disableSearch={disableSearch}
+            sibling={<>{exporter}</>}
           />
-          <TableBody>
-            {isLoading || isError ? (
-              <TableRow>
-                <TableCell>
-                  <CircularProgress />
-                </TableCell>
-              </TableRow>
-            ) : noData ? (
-              <TableRow>
-                <TableCell>
-                  <strong>No data found...</strong>
-                </TableCell>
-              </TableRow>
-            ) : (
-              <>{renderRows()}</>
-            )}
-          </TableBody>
-        </Table>
-        
-        {/* {isPaginate ? null : (
+        }>
+        <>
+          <Table stickyHeader size='small'>
+            <TableHead
+              headersToDisplay={headers}
+              headerData={data && data[0]}
+              isMultiSelect={isFunction(onSelectMultiple)}
+              numSelected={selectedIDs.filter((x) => x === true).length}
+              order={order}
+              orderBy={(orderBy as string) ?? ''}
+              onRequestSort={handleSort}
+              onSelectAllClick={handleSelectAll}
+              selectAll={selectAll}
+              rowCount={values?.length ?? 0}
+              customHeaders={customColumnsAppend?.map((c) => c.header) ?? []}
+              customHeadersPrepend={customColumnsPrepend?.map((c) => c.header) ?? []}
+            />
+            <TableBody>
+              {isLoading || isError ? (
+                <TableRow>
+                  <TableCell>
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : noData ? (
+                <TableRow>
+                  <TableCell>
+                    <strong>No data found...</strong>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <>{renderRows()}</>
+              )}
+            </TableBody>
+          </Table>
+
+          {/* {isPaginate ? null : (
           <Box>
             <Divider />
             {rowsPerPage === filteredRowCount ? (
@@ -345,22 +324,22 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
             )}
           </Box>
         )} */}
-      </>
-    </TableContainer>
-    {!paginationFooter || isError ? null : (
-            <Paper className={styles.topOfTableFooter}>
-            <TablePagination
-              showFirstButton
-              rowsPerPageOptions={rowsPerPageOptions}
-              component='div'
-              count={totalRows}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-            />
-            </Paper>
-        )}
+        </>
+      </TableContainer>
+      {!paginationFooter || isError ? null : (
+        <Paper className={styles.topOfTableFooter}>
+          <TablePagination
+            showFirstButton
+            rowsPerPageOptions={rowsPerPageOptions}
+            component='div'
+            count={totalRows}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
+        </Paper>
+      )}
     </>
   );
 }

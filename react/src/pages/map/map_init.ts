@@ -23,7 +23,7 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const { coordinates } = feature.geometry;
   const t = dayjs(p.date_recorded).format(formatLocal);
   const text = `
-    ${p.species ? 'Species: ' + p.species + '<br>' : ''}
+    ${p.taxon ? 'Taxon: ' + p.taxon + '<br>' : ''}
     ${p.wlh_id ? 'WLH ID: ' + p.wlh_id + '<br>' : ''}
     ${p.animal_id ? 'Animal ID: ' + p.animal_id + '<br>' : ''}
     Device ID: ${p.formattedDevice}<br>
@@ -31,8 +31,8 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
     Longitude: ${coordinates[0] + '<br>'}
     Elevation: ${p.elevation + ' meters' + '<br>'}
     Frequency (MHz): ${p.paddedFrequency}<br>
-    ${p.animal_status ? 'Animal Status: ' + '<b>' + p.animal_status + '</b><br>' : ''}
-    ${p.animal_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
+    ${p.critter_status ? 'Animal Status: ' + '<b>' + p.critter_status + '</b><br>' : ''}
+    ${p.critter_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
     ${p.sex ? 'Sex: ' + p.sex + '<br>' : ''}
     ${p.device_status ? 'Device Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
     Time: ${dayjs(t).format('MMMM D, YYYY h:mm A')} UTC<br>

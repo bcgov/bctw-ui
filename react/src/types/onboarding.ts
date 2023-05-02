@@ -80,7 +80,7 @@ export interface IOnboardEmailDetails {
   projectName?: string;
   projectRole?: string;
   region?: string;
-  species?: string;
+  taxon?: string;
 }
 
 export class OnboardUserRequest {

@@ -34,7 +34,7 @@ const getUniqueValuesOfT = <T>(arr: T[], prop: keyof T): string[] => {
 };
 
 /**
- * formats a property name as a table header ex. population_unit -> Population Unit
+ * formats a property name as a table header ex. collection_unit -> Population Unit
  * @param prop - property name to format
  */
 const columnToHeader = (prop: string): string => {
@@ -48,7 +48,7 @@ const columnToHeader = (prop: string): string => {
 };
 
 /**
- * formats a header to a property name ex.Population Unit -> population_unit
+ * formats a header to a property name ex.Population Unit -> collection_unit
  * @param prop - header name to format backwards
  */
 

@@ -70,7 +70,7 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
     return MAP_COLOURS.point;
   }
   const { properties } = point;
-  if (properties?.animal_status === 'Mortality') {
+  if (properties?.critter_status === 'Mortality') {
     const { date_recorded, mortality_date } = properties;
     // if the mortality date is not set, fill all points red
     // otherwise only fill points red after the mortality date
@@ -385,13 +385,13 @@ const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelem
 const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoint[]): ISelectMultipleData[] => {
   const PLACEHOLDER = 'Undefined';
   const IS_DEFAULT = propName === DEFAULT_MFV.header;
-  const IS_POPUNIT = propName === 'population_unit';
+  const IS_COLLECTION_UNIT = propName === 'collection_unit';
   const unique = getUniquePropFromPings(pings ?? [], propName, true) as number[];
   const merged = [...unique].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
   let undefinedCount = 0;
   const formated = merged.map((d, i) => {
     let displayLabel = PLACEHOLDER;
-    let species = PLACEHOLDER;
+    const taxon = PLACEHOLDER;
     let colour: string;
     if (d) {
       displayLabel = d.toString();
@@ -404,15 +404,16 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
           ? (colour = parseAnimalColour(p.properties.map_colour).fillColor)
           : (colour = MAP_COLOURS['unassigned point']);
       }
-      if (IS_POPUNIT && p.properties[propName] === displayLabel) {
-        species = p.properties.species;
-      }
+      //TODO critterbase integration add this back
+      // if (IS_COLLECTION_UNIT && p.properties[propName] === displayLabel) {
+      //   taxon = p.properties.taxon;
+      // }
       return p.properties[propName] === d;
     }).length;
     return {
       id: d,
       value: d ?? displayLabel,
-      displayLabel: IS_POPUNIT ? `${capitalize(species)}: ${displayLabel}` : displayLabel,
+      displayLabel: IS_COLLECTION_UNIT ? `${capitalize(taxon)}: ${displayLabel}` : displayLabel,
       prop: propName,
       colour: colour ? colour : getEvenlySpacedColour(i),
       pointCount

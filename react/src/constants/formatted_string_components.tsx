@@ -81,7 +81,7 @@ const animalBannerMortNotif = (notif: AnimalNotification) => (
   </ListItem>
 );
 
-const speciesModalMessage = (currentSpecies: string, nextSpecies: string): JSX.Element => {
+const taxonModalMessage = (currenttaxon: string, nexttaxon: string): JSX.Element => {
   const diff = (a?: string[], b?: string[]): string[] => (!a || !b ? null : a.filter((v) => !b.includes(v)));
   const WMU = 'Wildlife Management Unit';
   const MLS = 'Moose Life Stage';
@@ -93,10 +93,10 @@ const speciesModalMessage = (currentSpecies: string, nextSpecies: string): JSX.E
     'Grey Wolf': [WMU],
     'Grizzly Bear': [WMU]
   };
-  const sArr = diff(values[currentSpecies], values[nextSpecies]);
+  const sArr = diff(values[currenttaxon], values[nexttaxon]);
   return (
     <Typography variant='subtitle1' style={{ textAlign: 'center', margin: 20 }}>
-      Switching to species <b>{`'${nextSpecies}'`}</b> could remove previously saved attributes
+      Switching to taxon <b>{`'${nexttaxon}'`}</b> could remove previously saved attributes
       {sArr && !!sArr?.length && (
         <Typography style={{ textAlign: 'center' }}>
           {sArr.map((s: string) => `'${s}' `).join(', ')}
@@ -117,6 +117,6 @@ export {
   bothImportMessage,
   pointImportMessage,
   releaseUnattachWarning,
-  speciesModalMessage,
+  taxonModalMessage,
   animalBannerMortNotif
 };
