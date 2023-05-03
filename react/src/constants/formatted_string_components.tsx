@@ -2,7 +2,7 @@ import { Button, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/m
 import { Icon } from 'components/common';
 import { getTag } from 'components/table/table_helpers';
 import { AnimalNotification, MortalityAlert } from 'types/alert';
-import { AttachedAnimal } from 'types/animal';
+import { AttachedCritter } from 'types/animal';
 import { eDeviceStatus } from 'types/collar';
 
 const critterImportMessage = (
@@ -74,7 +74,7 @@ const animalBannerMortNotif = (notif: AnimalNotification) => (
       }
       secondary={
         <>
-          <b>Frequency:</b> {notif.frequency} <b>Animal ID:</b> {notif.animal_id} <b>WLH ID:</b> {notif.wlh_id}
+          <b>Frequency:</b> {notif.frequency} <b>Critter ID:</b> {notif.animal_id} <b>WLH ID:</b> {notif.wlh_id}
         </>
       }
     />

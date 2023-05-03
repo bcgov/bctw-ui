@@ -107,7 +107,7 @@ export default function MalfunctionEventForm({
                 onChange,
                 { disabled: deviceIsActive }
               )}
-              <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
+              {/* <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
                 <DateTimeInput
                   propName={'offline_date'}
                   label={'Offline Date'}
@@ -116,7 +116,7 @@ export default function MalfunctionEventForm({
                   disabled={deviceIsActive}
                   required={true}
                 />
-              </Tooltip>
+              </Tooltip> */}
             </Box>
           ) : deviceStatus === 'Malfunction' ? (
             <Box key='mf-mf' mt={2} {...boxSpreadRowProps}>
@@ -126,7 +126,7 @@ export default function MalfunctionEventForm({
                 onChange,
                 { disabled: deviceIsActive }
               )}
-              <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
+              {/* <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
                 <DateTimeInput
                   propName={'malfunction_date'}
                   label={'Malfunction Date'}
@@ -134,7 +134,7 @@ export default function MalfunctionEventForm({
                   changeHandler={onChange}
                   disabled={deviceIsActive}
                 />
-              </Tooltip>
+              </Tooltip> */}
             </Box>
           ) : (
             <span key='empty'></span>

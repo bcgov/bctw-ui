@@ -43,7 +43,7 @@ const MAP_COLOURS_OUTLINE = {
  */
 export const getEvenlySpacedColour = (index: number): string => `hsl(${(index + 1) * 137.508},50%,70%)`;
 /**
- * @param colourString the @type {Animal} animal_colour string
+ * @param colourString the @type {Critter} animal_colour string
  * which in the @file {map_api.ts} -> @function {getPings} is returned
  * in a concatted format of `${fill_collour},${border_colour}`
  * @returns an object with point border and fill colours

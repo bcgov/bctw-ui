@@ -62,7 +62,7 @@ const AppRoutes: RouteKey[] = [
   { name: 'delegation-requests', path: '/delegation-requests', title: 'Delegation Requests', component: AdminHandleRequestPermissionPage, sort: 100, icon: 'edit' },
   { name: 'users', path: '/users', title: 'BCTW Users', component: UserAdminPage, sort: 101, icon: 'admin' },
   { name: 'onboarding-admin', path: '/admin-onboarding', title: 'Onboarding Requests', component: OnboardingAdmin, sort: 102, icon: 'personAdd' },
-  { name: 'animal-manager', path: '/animal-manager', title: 'Set Animal Manager', component: GrantCritterAccessPage, sort: 103, icon: 'key' },
+  { name: 'animal-manager', path: '/animal-manager', title: 'Set Critter Manager', component: GrantCritterAccessPage, sort: 103, icon: 'key' },
   { name: 'onboarding', path: '/onboarding', title: 'Onboarding', component: UserOnboarding, sort: 201 },
   { name: 'vendor', path: '/vendor', title: 'Telemetry Retrieval', component: VendorAPIPage, sort: 202, icon: 'devices' },
   { name: 'playground', path: '/playground', title: 'Playground', component: DevPlayground, sort: 203, icon: 'dev' },

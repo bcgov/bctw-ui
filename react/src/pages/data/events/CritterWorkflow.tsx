@@ -1,4 +1,4 @@
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Critter, AttachedCritter } from 'types/animal';
 import { useEffect, useState } from 'react';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
@@ -7,7 +7,7 @@ import CaptureEvent from 'types/events/capture_event';
 import ReleaseEvent from 'types/events/release_event';
 
 type CritterWorkflowProps = {
-  editing: Animal | AttachedAnimal;
+  editing: Critter | AttachedCritter;
   workflow: WorkflowType;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,13 +23,14 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
     if (wfType === 'capture') {
       return editObjectToEvent(editing, new CaptureEvent(), [
         'taxon',
-        'translocation_ind',
-        'recapture_ind',
-        'region',
-        'collection_units'
+        //TODO CRITTERBASE INTEGRATION
+        // 'translocation_ind',
+        // 'recapture_ind',
+        // 'region',
+        'collection_unit'
       ]);
     } else if (wfType === 'release') {
-      return editObjectToEvent(editing, new ReleaseEvent(), ['region', 'collection_units']);
+      return editObjectToEvent(editing, new ReleaseEvent(), ['collection_unit']);
     } else if (wfType === 'mortality') {
       return editObjectToEvent(editing, new MortalityEvent(), ['critter_status']);
     }

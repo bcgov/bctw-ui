@@ -1,5 +1,6 @@
 import { BaseTextFieldProps } from '@mui/material';
-import { ReactNode } from 'react';
+import { ICbRouteKey } from 'critterbase/types';
+import { CSSProperties, ReactNode } from 'react';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
@@ -12,7 +13,9 @@ export enum eInputType {
   datetime = 'datetime',
   time = 'time',
   code = 'code',
-  multiline = 'multiline'
+  multiline = 'multiline',
+  select = 'select',
+  cb_select = 'cb_select' //critterbase select field
 }
 
 /**
@@ -30,15 +33,17 @@ export type FormBaseProps = Pick<BaseTextFieldProps, 'label'> & {
  */
 export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled' | 'required'> & {
   prop: keyof T;
-  // prop: KeyType;
   type: eInputType;
   taxon?: string[];
-  //cast?: taxonCast // ex: {moose: 'wildlife_unit', grey_wolf: 'wildlife_unit'}
   codeName?: string;
+  cbRouteKey?: ICbRouteKey;
   span?: boolean;
   tooltip?: ReactNode;
   validate?: <T>(input: T) => string;
+  style?: CSSProperties;
 };
+
+export const FormCommentStyle: CSSProperties = { display: 'flex', flexGrow: 1 };
 
 // spread in form field constructors to make a field required
 export const isRequired = { required: true };

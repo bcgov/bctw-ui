@@ -6,19 +6,19 @@ import { columnToHeader } from 'utils/common_helpers';
 import { DataLife, IDataLifeStartProps, IDataLifeEndProps, DataLifeInput } from 'types/data_life';
 import { isDev } from 'api/api_helpers';
 import { Code } from 'types/code';
-import { Animal } from './animal';
+import { Critter } from './animal';
 import { IHistoricalTelemetryInput } from './point_import';
 
 export interface ICollarHistory
   extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'frequency' | 'device_status'>,
     DataLife,
     Pick<IHistoricalTelemetryInput, 'latitude' | 'longitude'>,
-    Pick<Animal, 'critter_id'> {
+    Pick<Critter, 'critter_id'> {
   assignment_id: uuid;
 }
 
 // passed to the API when attaching a device to an animal
-export type AttachDeviceInput = Pick<Animal, 'critter_id'> &
+export type AttachDeviceInput = Pick<Critter, 'critter_id'> &
   Pick<Collar, 'collar_id'> & { [Property in keyof IDataLifeStartProps]: string } & {
     [Property in keyof IDataLifeEndProps]: string;
   } & PartialPick<Collar, 'device_id'>;

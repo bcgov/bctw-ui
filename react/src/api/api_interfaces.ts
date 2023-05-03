@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { ITableFilter } from 'components/table/table_interfaces';
-import { Animal } from 'types/animal';
+import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { uuid } from 'types/common_types';
 
@@ -38,7 +38,7 @@ type CellErrorDescriptor = {
 };
 
 type ParsedXLSXCellError = {
-  [key in (keyof Animal | keyof Collar) | 'identifier' | 'missing_data']?: CellErrorDescriptor;
+  [key in (keyof Critter | keyof Collar) | 'identifier' | 'missing_data']?: CellErrorDescriptor;
 };
 
 type WarningInfo = {
@@ -50,7 +50,7 @@ type WarningInfo = {
 
 type CheckedWarningInfo = WarningInfo & { checked: boolean };
 
-type AnimalCollar = Animal | Collar;
+type AnimalCollar = Critter | Collar;
 
 type XLSXPayload = {
   user_id: number;

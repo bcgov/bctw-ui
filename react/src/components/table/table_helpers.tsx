@@ -7,7 +7,7 @@ import dayjs, { isDayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { eDeviceStatus } from 'types/collar';
 import { Chip } from '@mui/material';
-import { Animal, ICollectionUnit, eCritterStatus } from 'types/animal';
+import { Critter, ICollectionUnit, eCritterStatus } from 'types/animal';
 dayjs.extend(relativeTime);
 /**
  * converts an object to a list of HeadCells

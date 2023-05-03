@@ -26,7 +26,7 @@ export type BCTWFormat<T> = {
  * extended primarily by other types/classes that are used in table components
  */
 export interface BCTWBase<T> extends BaseTimestamps, BCTWFormat<T> {
-  // Animal/Collar types may include this
+  // Critter/Collar types may include this
   owned_by_user_id?: number;
   //used in cross join queries with critterbase
   _merged?: boolean;

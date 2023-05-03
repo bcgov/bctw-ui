@@ -62,8 +62,8 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   const onSuccess = (data: IExecutePermissionRequest[]): void => {
     const successfulRequests: number[] = [];
-    for(const item of data) {
-      if('errormsg' in item === false) {
+    for (const item of data) {
+      if ('errormsg' in item === false) {
         successfulRequests.push(item.request_id);
       }
     }
@@ -170,11 +170,11 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
    */
   const DenyConfirmMessage = (
     <>
-      <Typography>{
-        selectedMultiRequestIDs.length > 1 ? 
-        msgStrings.confirmDenyMesgMulti(selectedMultiRequestIDs.length)
-         : msgStrings.confirmDenyMesg}
-        </Typography>
+      <Typography>
+        {selectedMultiRequestIDs.length > 1
+          ? msgStrings.confirmDenyMesgMulti(selectedMultiRequestIDs.length)
+          : msgStrings.confirmDenyMesg}
+      </Typography>
       <Typography>Please select a reason you are denying the request:</Typography>
       <Select
         variant={'outlined'}
@@ -204,7 +204,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     'Requested By',
     'Date',
     'Email',
-    'Animal ID',
+    'Critter ID',
     'WLH ID',
     'Permission',
     'Comment'
@@ -226,7 +226,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
         <NotificationMessage severity={'error'} message={formatAxiosError(error)} />
       ) : (
         <>
-          <h1>Animal Access Delegation Requests</h1>
+          <h1>Critter Access Delegation Requests</h1>
           <Typography mb={3} variant='body1' component='p'>
             Grant or deny animal access requests from managers.
           </Typography>

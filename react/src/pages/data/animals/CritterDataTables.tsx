@@ -8,39 +8,42 @@ import EditCritter from 'pages/data/animals/EditCritter';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
 import { useState } from 'react';
 import { QueryStatus } from 'react-query';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { AttachedCritter, Critter, Critters } from 'types/animal';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 
+import { Button, Tooltip } from 'components/common';
 import { ActionsMenu } from 'components/common/ActionsMenu';
 import { ConditionalWrapper } from 'components/common/ConditionalWrapper';
+import { buttonProps } from 'components/component_constants';
 import { CollarHistory } from 'types/collar_history';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
-import { Button, Tooltip } from 'components/common';
-import { buttonProps } from 'components/component_constants';
+import { WorkflowType } from 'types/events/event';
 
 export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
-  const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedAnimal[]>([]);
-  const [animalData, setAnimalData] = useState<Animal[]>([]);
+  const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedCritter[]>([]);
+  const [animalData, setAnimalData] = useState<Critter[]>([]);
 
-  const [editObj, setEditObj] = useState<Animal | AttachedAnimal>(new AttachedAnimal());
+  const [editObj, setEditObj] = useState<Critters>(new AttachedCritter());
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
 
   // Modal Open States
   const [openEdit, setOpenEdit] = useState(false);
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
+  const [workflow, setWorkflow] = useState<WorkflowType>('mortality');
   const [openWorkflow, setOpenWorkflow] = useState(false);
   const [openMap, setOpenMap] = useState(false);
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
-  const handleSelect = <T extends Animal>(row: T): void => {
+  const handleSelect = <T extends Critter>(row: T): void => {
     //setEditObj(row);
     detailViewAction(row);
   };
-  const handleSelectTemp = <T extends Animal>(row: T[]): void => setEditObj(row.length ? row[0] : new AttachedAnimal());
+  const handleSelectTemp = <T extends Critter>(row: T[]): void =>
+    setEditObj(row.length ? row[0] : new AttachedCritter());
   //const lastDt = editObj?.last_transmission_date;
 
   // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
@@ -53,7 +56,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
 
   const addEditProps = {
     editing: null,
-    empty: new AttachedAnimal(),
+    empty: new AttachedCritter(),
     addTooltip: CS.addTooltip,
     queryStatus: 'idle' as QueryStatus,
     disableEdit: true,
@@ -61,7 +64,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
     modalControl: true
   };
 
-  const Status = (row: AttachedAnimal, idx: number): JSX.Element => {
+  const Status = (row: AttachedCritter, idx: number): JSX.Element => {
     if (row.last_fetch_date.isValid()) {
       return (
         <Tooltip title="BCTW is receiving telemetry for this animal's device">
@@ -72,17 +75,24 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
     return null;
   };
 
-  const Menu = (row: AttachedAnimal | Animal, idx: number, attached: boolean): JSX.Element => {
-    const { edit, map, attach, mortality, removeCollar } = CritterStrings.menuItems;
+  const Menu = (row: Critters, idx: number, attached: boolean): JSX.Element => {
+    const { edit, map, attach, mortality, removeCollar, capture } = CritterStrings.menuItems;
     const rowNotMerged = row?._merged === false;
     const _edit = () => setOpenEdit(true);
     const _map = () => setOpenMap(true);
 
-    const _removeAttach = () => {
+    const handleWorkflow = (wf: WorkflowType): void => {
+      setWorkflow(wf);
+      setOpenWorkflow(true);
+    };
+    const _removeAttach = (): void => {
       setOpenAttachRemoveCollar(true);
     };
-    const _mortality = () => {
-      setOpenWorkflow(true);
+    const _mortality = (): void => {
+      handleWorkflow('mortality');
+    };
+    const _capture = (): void => {
+      handleWorkflow('capture');
     };
     const defaultItems = [
       {
@@ -108,6 +118,11 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         label: mortality,
         icon: <Icon icon={'dead'} />,
         handleClick: _mortality
+      },
+      {
+        label: capture,
+        icon: <Icon icon={'edit'} />,
+        handleClick: _capture
       },
       {
         label: removeCollar,
@@ -140,10 +155,10 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
       <>
         <Box mb={4}>
           <DataTable
-            headers={AttachedAnimal.attachedCritterDisplayProps}
+            headers={AttachedCritter.attachedCritterDisplayProps}
             queryProps={{
               query: api.useAssignedCritters,
-              onNewData: (data: AttachedAnimal[]): void => setAttachedAnimalData(data),
+              onNewData: (data: AttachedCritter[]): void => setAttachedAnimalData(data),
               defaultSort: {
                 property: '_merged',
                 order: 'desc'
@@ -158,8 +173,8 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
               { column: Status, header: <div>Status</div>, prepend: true }
             ]}
             exporter={
-              <ExportViewer<AttachedAnimal>
-                template={AttachedAnimal.attachedCritterExportProps}
+              <ExportViewer<AttachedCritter>
+                template={AttachedCritter.attachedCritterExportProps}
                 eTitle={CritterStrings.exportTitle}
                 data={attachedAnimalData}
               />
@@ -170,8 +185,8 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
 
         <Box mb={4}>
           <DataTable
-            headers={new Animal().displayProps}
-            queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Animal[]): void => setAnimalData(data) }}
+            headers={new Critter().displayProps}
+            queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Critter[]): void => setAnimalData(data) }}
             updated={updated}
             deleted={deleted}
             title={CritterStrings.nonCollaredAnimals}
@@ -188,8 +203,8 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
                     Add
                   </Button>
                 </Box>
-                <ExportViewer<Animal>
-                  template={new Animal().displayProps}
+                <ExportViewer<Critter>
+                  template={new Critter().displayProps}
                   eTitle={CritterStrings.exportTitle}
                   data={animalData}
                 />
@@ -200,7 +215,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
 
         {/* Displays the recent animal telemetry map modal */}
         {/*<MapModal
-          title={`Recent Animal Movement`}
+          title={`Recent Critter Movement`}
           open={openMap}
           handleClose={(v: boolean) => setOpenMap(v)}
           startDate={lastDt && lastDt.isValid() ? lastDt.subtract(24, 'weeks') : dayjs().subtract(24, 'weeks')}
@@ -210,9 +225,9 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           critter_id={editObj?.current.critter_id}
           />*/}
 
-        {/* Wrapper for Adding Animal, could probably be moved into bottom wrapper. */}
+        {/* Wrapper for Adding Critter, could probably be moved into bottom wrapper. */}
         <ModifyCritterWrapper
-          editing={new AttachedAnimal()}
+          editing={new AttachedCritter()}
           onUpdate={(critter_id: string): void => setUpdated(critter_id)}
           onDelete={(critter_id: string): void => setDeleted(critter_id)}
           setCritter={setEditObj}>
@@ -231,7 +246,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         {/* Modal for assigning or removing a device from a critter */}
         <AttachRemoveDevice
           critter_id={editObj.critter_id}
-          permission_type={editObj.permission_type}
+          permission_type={editObj?.permission_type}
           current_attachment={new CollarHistory()}
           openModal={openAttachRemoveCollar}
           handleShowModal={setOpenAttachRemoveCollar}
@@ -239,7 +254,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         />
 
         {/* Modal for critter workflows */}
-        <CritterWorkflow editing={editObj} workflow={'mortality'} open={openWorkflow} setOpen={setOpenWorkflow} />
+        <CritterWorkflow editing={editObj} workflow={workflow} open={openWorkflow} setOpen={setOpenWorkflow} />
       </>
     </RowSelectedProvider>
   );

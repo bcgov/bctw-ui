@@ -1,7 +1,7 @@
 import { Type, Expose } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
-import { IAnimalTelemetryBase, ICollectionUnit, eCritterStatus } from 'types/animal';
+import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
@@ -22,7 +22,7 @@ type DetailsSortOption = 'wlh_id' | 'device_id' | 'frequency' | 'date_recorded';
 type OnPanelRowSelect = (ids: number[]) => void;
 type OnMapRowCellClick = (type: BCTWType, row: ITelemetryDetail) => void;
 
-interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
+interface ITelemetryDetail extends ICollarTelemetryBase, ICritterTelemetryBase {
   critter_id: string;
   mortality_date: Date;
   date_recorded: Date;
@@ -69,6 +69,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   @Type(() => Date) capture_date: Date;
   sex: string;
   collection_units: ICollectionUnit[];
+  collection_unit: string;
   collar_id: string;
   device_id: number;
   device_vendor: string;

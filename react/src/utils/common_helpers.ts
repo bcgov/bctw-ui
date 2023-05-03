@@ -41,9 +41,11 @@ const columnToHeader = (prop: string): string => {
   const asArr = prop
     .replaceAll('_display', '')
     .replaceAll('_', ' ')
+    .replaceAll('wmu', 'Wildlife Management Unit')
     .replaceAll(' id', ' ID')
     .replaceAll('wlh', 'WLH')
     .replaceAll('utm', 'UTM')
+    .replaceAll('cod', 'Cause Of Death')
     .split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
@@ -137,7 +139,7 @@ const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'>[] => {
 };
 /**
  * Converts a class to an array of keys
- * @param keys class converted to its object keys. ie Object.keys(new Animal())
+ * @param keys class converted to its object keys. ie Object.keys(new Critter())
  * @param startsWith items which append the array
  * @param excluded array of items to exclude from final array.
  *

@@ -1,21 +1,24 @@
-import TextField from 'components/form/TextInput';
-import NumberField from 'components/form/NumberInput';
-import SelectCode from './SelectCode';
+import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
+import { Tooltip } from 'components/common';
+import CheckBox from 'components/form/Checkbox';
 import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
-import CheckBox from 'components/form/Checkbox';
-import { CSSProperties, ReactElement, ReactNode } from 'react';
-import { removeProps } from 'utils/common_helpers';
-import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap } from 'types/form_types';
-import dayjs, { Dayjs } from 'dayjs';
-import { BCTWFormat } from 'types/common_types';
-import { Tooltip } from 'components/common';
-import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
-import { Animal, AttachedAnimal } from 'types/animal';
-import { WorkflowFormField } from 'types/events/event';
-import { ICodeFilter } from 'types/code';
-import { showField } from 'utils/taxon';
+import NumberField from 'components/form/NumberInput';
+import TextField from 'components/form/TextInput';
 import { useTaxon } from 'contexts/TaxonContext';
+import { CbSelect, CbSelectProps } from 'critterbase/components/CbSelect';
+import { ICbRouteKey } from 'critterbase/types';
+import dayjs, { Dayjs } from 'dayjs';
+import { CSSProperties, ReactElement, ReactNode } from 'react';
+import { Critter, AttachedCritter } from 'types/animal';
+import { ICodeFilter } from 'types/code';
+import { BCTWFormat } from 'types/common_types';
+import { WorkflowFormField } from 'types/events/event';
+import { FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
+import { removeProps } from 'utils/common_helpers';
+import { showField } from 'utils/taxon';
+import SelectCode from './SelectCode';
+import { type } from 'os';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -24,7 +27,7 @@ type CreateInputBaseProps = {
   handleChange: FormChangeEvent;
 };
 
-type CreateInputProps = CreateInputBaseProps &
+export type CreateInputProps = CreateInputBaseProps &
   Pick<InputProps, 'rows' | 'multiline' | 'disabled' | 'required' | 'style'> &
   Pick<DateInputProps, 'minDate' | 'maxDate'> &
   Pick<BaseTextFieldProps, 'label'> &
@@ -166,8 +169,12 @@ function CreateEditSelectField({
   );
 }
 
+function CreateCbSelectField(props: CbSelectProps): ReactElement {
+  return <CbSelect {...props} />;
+}
+
 // returns the funtion to create the form component based on input type
-const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
+export const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
   switch (inputType) {
     case eInputType.check:
       return CreateEditCheckboxField;
@@ -179,6 +186,8 @@ const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactEl
       return CreateEditSelectField;
     case eInputType.multiline:
       return CreateEditMultilineTextField;
+    case eInputType.cb_select:
+      return CreateCbSelectField;
     default:
       return CreateEditTextField;
   }
@@ -196,7 +205,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   handleChange: FormChangeEvent,
   inputProps?: Partial<CreateInputProps>,
   displayBlock = false,
-  style = {}
+  style: CSSProperties = {}
 ): ReactNode {
   if (formField === undefined) {
     return null;
@@ -225,7 +234,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
 interface ItaxonFormField {
-  obj: Animal | AttachedAnimal;
+  obj: Critter | AttachedCritter;
   formField: WorkflowFormField;
   handleChange: FormChangeEvent;
   inputProps?: Partial<CreateInputProps>;

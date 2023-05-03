@@ -206,7 +206,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
         <Box className={styles.spacing}>
           <InfoBanner
             //Dont love this, but enums are dumb
-            text={sheetIndex === SheetNames.Telemetry ? constants['Telemetry'] : constants['Animal and Device']}
+            text={sheetIndex === SheetNames.Telemetry ? constants['Telemetry'] : constants['Critter and Device']}
           />
         </Box>
         <FileInputValidation

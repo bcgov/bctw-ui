@@ -1,5 +1,5 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { Animal, eCritterStatus } from 'types/animal';
+import { Critter, eCritterStatus } from 'types/animal';
 import { Collar } from 'types/collar';
 import { eInputType, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
@@ -35,21 +35,21 @@ export type MortalityDeviceEventProps = Pick<
 >;
 
 export type MortalityAnimalEventProps = Pick<
-  Animal,
+  Critter,
   | 'critter_id'
-  | 'proximate_cause_of_death'
-  | 'ultimate_cause_of_death'
-  | 'predator_taxon_pcod'
-  | 'predator_taxon_ucod'
-  | 'pcod_confidence'
-  | 'ucod_confidence'
+  // | 'proximate_cause_of_death'
+  // | 'ultimate_cause_of_death'
+  // | 'predator_taxon_pcod'
+  // | 'predator_taxon_ucod'
+  // | 'pcod_confidence'
+  // | 'ucod_confidence'
   | 'animal_id'
   | 'wlh_id'
-  | 'predator_known_ind'
-  | 'captivity_status_ind'
-  | 'mortality_investigation'
-  | 'mortality_report_ind'
-  | 'mortality_captivity_status_ind'
+  // | 'predator_known_ind'
+  // | 'captivity_status_ind'
+  // | 'mortality_investigation'
+  // | 'mortality_report_ind'
+  // | 'mortality_captivity_status_ind'
 >;
 
 type MortalitySpecificProps = Pick<IBCTWWorkflow, 'shouldUnattachDevice'> &
@@ -116,20 +116,20 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly capture_date: Dayjs;
   location_event: LocationEvent;
 
-  private critterPropsToSave: (keyof Animal)[] = [
+  private critterPropsToSave: (keyof Critter)[] = [
     'critter_id',
-    'critter_status',
-    'predator_known_ind',
-    'predator_taxon_pcod',
-    'predator_taxon_ucod',
-    'proximate_cause_of_death',
-    'ultimate_cause_of_death',
-    'pcod_confidence',
-    'ucod_confidence',
-    'captivity_status_ind',
-    'mortality_investigation',
-    'mortality_report_ind',
-    'mortality_captivity_status_ind'
+    'critter_status'
+    // 'predator_known_ind',
+    // 'predator_taxon_pcod',
+    // 'predator_taxon_ucod',
+    // 'proximate_cause_of_death',
+    // 'ultimate_cause_of_death',
+    // 'pcod_confidence',
+    // 'ucod_confidence',
+    // 'captivity_status_ind',
+    // 'mortality_investigation',
+    // 'mortality_report_ind',
+    // 'mortality_captivity_status_ind'
   ];
 
   constructor(mort_date = dayjs(), capture?: CaptureEvent) {
@@ -149,17 +149,17 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.critter_status = eCritterStatus.mortality;
     this.wasInvestigated = false;
     this.predator_known_ind = false;
-    this.location_event = new LocationEvent('mortality', mort_date);
+    this.location_event = new LocationEvent('mortality');
     if (capture) {
       this.mortCritterPropsToSave = [...this.critterPropsToSave, ...capture.captureCritterPropsToSave];
     }
   }
 
-  set mortCritterPropsToSave(props: (keyof Animal)[]) {
+  set mortCritterPropsToSave(props: (keyof Critter)[]) {
     this.critterPropsToSave = props;
   }
 
-  get mortCritterPropsToSave(): (keyof Animal)[] {
+  get mortCritterPropsToSave(): (keyof Critter)[] {
     return this.onlySaveAnimalStatus ? ['critter_id', 'critter_status'] : this.critterPropsToSave;
   }
 
@@ -226,7 +226,9 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       delete ret.ucod_confidence;
     }
     const locationFields = this.location_event.toJSON();
-    return omitNull({ ...ret, ...locationFields });
+    //TODO critterbase integration
+    //return omitNull({ ...ret, ...locationFields });
+    return omitNull({ ...ret });
   }
 
   // retrieve the collar metadata fields from the event

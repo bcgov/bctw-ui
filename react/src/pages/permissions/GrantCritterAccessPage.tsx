@@ -39,35 +39,38 @@ export default function GrantCritterAccessPage(): JSX.Element {
   const onError = (error: AxiosError): void => {
     console.error(error);
     showNotif({ severity: 'error', message: formatAxiosError(error) });
-  }
+  };
 
   const { mutateAsync } = api.useGrantCritterAccess({ onSuccess, onError });
 
   const handleSave = async (body: IUserCritterPermissionInput): Promise<void> => {
     console.log(JSON.stringify(body, null, 2));
     await mutateAsync(body);
-    setShowModal(false)
+    setShowModal(false);
   };
-
 
   return (
     <AuthLayout required_user_role={eUserRole.data_administrator}>
       <div className='container'>
-        <h1>Set Animal Manager</h1>
-        <Typography mb={3} variant='body1' component='p'>A user has access to devices through the user-animal association.</Typography>
+        <h1>Set Critter Manager</h1>
+        <Typography mb={3} variant='body1' component='p'>
+          A user has access to devices through the user-animal association.
+        </Typography>
         <DataTable
-          headers={new User().displayProps.filter(prop => !['idir', 'bceid'].includes(prop))}
+          headers={new User().displayProps.filter((prop) => !['idir', 'bceid'].includes(prop))}
           title='Users'
           queryProps={{ query: api.useUsers }}
           onSelect={(u: User): void => setUser(u)}
         />
         <div className={'button-row'}>
-          <Button disabled={!user?.id} onClick={(): void => setShowModal(true)}>Edit User Animal Access</Button>
+          <Button disabled={!user?.id} onClick={(): void => setShowModal(true)}>
+            Edit User Critter Access
+          </Button>
         </div>
         <PickCritterPermissionModal
           open={showModal}
           handleClose={(): void => setShowModal(false)}
-          title={`Modifying ${user.username}'s Animal Access`}
+          title={`Modifying ${user.username}'s Critter Access`}
           onSave={handleSave}
           filter={adminPermissionOptions}
           alreadySelected={[]}

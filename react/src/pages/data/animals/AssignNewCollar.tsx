@@ -5,13 +5,13 @@ import { CritterStrings as CS } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import DataLifeInputForm from 'components/form/DataLifeInputForm';
 import { AttachDeviceInput } from 'types/collar_history';
-import { Animal } from 'types/animal';
+import { Critter } from 'types/animal';
 import { DataLifeInput } from 'types/data_life';
 import { Button, Modal } from 'components/common';
 import { MutationStatus } from 'react-query';
 import { Box, CircularProgress } from '@mui/material';
 
-type IAssignNewCollarModal = Pick<Animal, 'critter_id'> & {
+type IAssignNewCollarModal = Pick<Critter, 'critter_id'> & {
   show: boolean;
   onClose: (close: boolean) => void;
   onSave: (obj: AttachDeviceInput) => void;
