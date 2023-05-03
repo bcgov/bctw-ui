@@ -36,7 +36,7 @@ type EditHeaderProps<T> = {
  */
 const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>): JSX.Element => {
   return (
-    <Box display='flex' justifyContent='space-between' alignItems='top' pt={3}>
+    <Box display='flex' justifyContent='space-between' alignItems='top' py={2}>
       <Box>
         <Box component='h1' mt={0} mb={1}>
           {title}
@@ -44,12 +44,15 @@ const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>
         <dl className='headergroup-dl'>
           {headers.map((p, idx: number) => {
             const { value } = formatTableCell<T>(obj, p);
-            return (
-              <Box key={`header-${idx}`} display='inline' mr={2}>
-                <dd>{format(p)}:</dd>
-                <dt>{value}</dt>
-              </Box>
-            );
+            //Checks if value exists so no empty properties displayed in header
+            if (value) {
+              return (
+                <Box key={`header-${idx}`} display='inline' mr={2}>
+                  <dd>{format(p)}:</dd>
+                  <dt>{value}</dt>
+                </Box>
+              );
+            }
           })}
         </dl>
       </Box>

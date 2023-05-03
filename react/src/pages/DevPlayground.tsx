@@ -16,6 +16,8 @@ import ModifyCritterWrapper from './data/animals/ModifyCritterWrapper';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import WorkflowWrapper from './data/events/WorkflowWrapper';
 import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
+import { editObjectToEvent } from 'types/events/event';
+import { plainToClass } from 'class-transformer';
 
 // Place constants here
 const TEST = 'Testing';
@@ -68,7 +70,15 @@ const DevPlayground = (): JSX.Element => {
 
         <WorkflowWrapper
           open={bool}
-          event={new CaptureEvent2(dayjs())}
+          event={editObjectToEvent(
+            plainToClass(Critter, {
+              critter_id: 'c6b0a6c7-71ca-421a-96d6-1878fec07b05',
+              taxon: 'Moose',
+              wlh_id: '12-345'
+            }),
+            new CaptureEvent2(),
+            []
+          )}
           handleClose={(): void => setBool(false)}
           onEventSaved={() => console.log('saved')}
           onEventChain={() => console.log('chain')}

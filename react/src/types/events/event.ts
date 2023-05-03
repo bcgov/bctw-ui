@@ -40,7 +40,6 @@ export interface IBCTWWorkflow {
   getDevice?(): OptionalDevice;
   getAttachment?(): AttachDeviceInput | RemoveDeviceInput;
   getDataLife?(): ChangeDataLifeInput;
-  getCritterbasePayload?(): any;
   // multiple events implement this
   shouldUnattachDevice?: boolean;
   // must implement this to determine how the workflow should be saved

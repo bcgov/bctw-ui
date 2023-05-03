@@ -23,11 +23,6 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
 
   useEffect(() => {
     if (!data?.length) return;
-    if (data.length === 1) {
-      //Default to first item if only one item in data array
-      setSelected(typeof data[0] === 'string' ? data[0] : data[0].id);
-      return;
-    }
     if (typeof value !== 'string') return;
     setSelected(value);
   }, [isSuccess]);
@@ -44,7 +39,6 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
     setSelected(value);
     pushChange(value);
   };
-
   return (
     <FormControl
       size='small'
@@ -52,6 +46,7 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
       required={required}
       className={`select-control ${hasError ? 'input-error' : ''}`}
       error={!isLoading && hasError}
+      key={`${cbRouteKey}-${String(prop)}`}
       disabled={isDisabled}>
       <InputLabel>{label}</InputLabel>
       <Select value={selected} onChange={handleSelect} MenuProps={selectMenuProps}>

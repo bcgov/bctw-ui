@@ -65,23 +65,35 @@ export default function LocationEventForm({
   //   notifyChange({ reset: true, toReset: showUtm ? event.utm_keys : event.coord_keys });
   // }, [showUtm]);
 
+  const LocationFormField = ({ fields }: { fields: FormFieldObject<LocationEvent>[] }) => {
+    return (
+      <>
+        {fields.map((f, i) => (
+          <React.Fragment key={`${i}-${String(f.prop)}`}>{CreateFormField(event, f, changeHandler)}</React.Fragment>
+        ))}
+      </>
+    );
+  };
+
   const baseInputProps = { changeHandler, required: !isDev(), disabled };
   return (
     <>
-      <FormSection id='latlon' header={`${capitalize(event.location_type)} Date`} {...baseInputProps}>
-        {children}
-      </FormSection>
+      {children ? (
+        <FormSection id='latlon' header={`${capitalize(event.location_type)} Date`} {...baseInputProps}>
+          {children}
+        </FormSection>
+      ) : null}
       <FormSection id='latlon' header={`${capitalize(event.location_type)} Location`} {...baseInputProps}>
-        {latlon.map((f, i) => CreateFormField(event, f, changeHandler))}
-        <Box key='bx-rec' {...boxSpreadRowProps} mt={1}>
-          {comment.map((f, i) => CreateFormField(event, f, changeHandler))}
+        <LocationFormField fields={latlon} />
+        <Box key='bx-rec' {...boxSpreadRowProps}>
+          <LocationFormField fields={comment} />
         </Box>
       </FormSection>
       <FormSection id='Region' header={`${capitalize(event.location_type)} Region`} {...baseInputProps}>
-        {regions.map((f, i) => CreateFormField(event, f, changeHandler))}
+        <LocationFormField fields={regions} />
       </FormSection>
       <FormSection id='environment' header={`${capitalize(event.location_type)} Environment`} {...baseInputProps}>
-        {extra.map((f, i) => CreateFormField(event, f, changeHandler))}
+        <LocationFormField fields={extra} />
       </FormSection>
 
       {/* <FormSection id='Comment' header={`${capitalize(event.location_type)} Comment`} {...baseInputProps}>

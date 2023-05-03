@@ -107,7 +107,8 @@ const WorkflowStrings = {
       'The previous device has been unassigned from this animal, you must assign a new device to the animal'
   },
   capture: {
-    workflowTitle: 'Capture & Release Event Workflow',
+    workflowTitle: 'Capture & Release Event',
+    differentReleaseDetails: 'Are the release details different than the capture?',
     areUpdates: 'Are there updates to the animal identifiers or characteristics?',
     shouldReviewNotif: 'Please review the entire metadata for this animal for updates not captured in this form',
     isRecapture: 'Is this a recapture?',
@@ -119,7 +120,7 @@ const WorkflowStrings = {
     associatedID: 'What is the associated animal’s WLHID?',
     associatedRel: 'What is the relationship of the individual to the captured individual?',
     beenReleased: 'Has the animal been released?',
-    diedDuring: (wf: 'capture' | 'translocation_ind'): string => `Did the animal die during ${wf}?`,
+    diedDuring: (wf: 'capture' | 'release' | 'translocation_ind'): string => `Did the animal die during the ${wf}?`,
     btnContinueTo: (wf: 'Mortality' | 'Release'): string => `Continue to ${wf} Workflow`
   },
   retrieval: {

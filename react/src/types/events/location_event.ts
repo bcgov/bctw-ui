@@ -1,3 +1,4 @@
+import { mustBeValidTemp } from 'components/form/form_validators';
 import { Dayjs } from 'dayjs';
 import { uuid } from 'types/common_types';
 import { WorkflowType } from 'types/events/event';
@@ -24,9 +25,9 @@ export class LocationEvent {
   readonly location_type: WorkflowType;
   latitude?: number;
   longitude?: number;
-  region_env_name?: string;
-  region_nr_name?: string;
-  wmu_name?: string;
+  region_env_id?: string;
+  region_nr_id?: string;
+  wmu_id?: string;
   coordinate_uncertainty?: number;
   coordinate_uncertainty_unit?: string;
   temperature?: number;
@@ -71,21 +72,12 @@ export class LocationEvent {
     return Object.assign(new LocationEvent(this.location_type), this);
   }
 
-  // toCritterbasePayload() {
-  //   return {
-  //     ...this
-  //   };
-  // }
-
   formatPropAsHeader(k: keyof LocationEvent): string {
-    if (['date', 'comment'].includes(k)) {
-      return columnToHeader(`${this.location_type}_${k}`);
-    }
-    return columnToHeader(k.replace('utm', 'UTM'));
+    return columnToHeader(k);
   }
 
   get displayProps(): (keyof LocationEvent)[] {
-    return [];
+    return ['latitude', 'longitude'];
   }
 
   get fields(): Record<string, FormFieldObject<LocationEvent>[]> {
@@ -97,11 +89,11 @@ export class LocationEvent {
         { prop: 'coordinate_uncertainty_unit', type: eInputType.cb_select, cbRouteKey: 'coordinate_uncertainty_unit' }
       ],
       regions: [
-        { prop: 'region_env_name', type: eInputType.cb_select, cbRouteKey: 'region_env' },
-        { prop: 'region_nr_name', type: eInputType.cb_select, cbRouteKey: 'region_nr' },
-        { prop: 'wmu_name', type: eInputType.cb_select, cbRouteKey: 'wmu' }
+        { prop: 'region_env_id', type: eInputType.cb_select, cbRouteKey: 'region_env' },
+        { prop: 'region_nr_id', type: eInputType.cb_select, cbRouteKey: 'region_nr' },
+        { prop: 'wmu_id', type: eInputType.cb_select, cbRouteKey: 'wmu' }
       ],
-      extra: [{ prop: 'temperature', type: eInputType.number }],
+      extra: [{ prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp }],
       // utm: [
       //   { prop: 'utm_easting', type: eInputType.number },
       //   { prop: 'utm_northing', type: eInputType.number },

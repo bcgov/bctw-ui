@@ -7,7 +7,7 @@ import { eInputType, parseFormChangeResult } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
 import { wfFields, WorkflowFormProps, WorkflowType } from 'types/events/event';
 import { CreateEditCheckboxField, CreateFormField } from 'components/form/create_form_components';
-import { Box, Checkbox, FormControlLabel } from '@mui/material';
+import { Box, Checkbox, FormControlLabel, Switch } from '@mui/material';
 import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
 import CaptivityStatusForm from './CaptivityStatusForm';
@@ -26,6 +26,8 @@ export default function CaptureEventForm({
 }: WorkflowFormProps<CaptureEvent2>): JSX.Element {
   const [capture, setCaptureEvent] = useState(event);
   const [showRelease, setShowRelease] = useState(false);
+  const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
+  const { diedDuring, differentReleaseDetails } = WorkflowStrings.capture;
   // const [isTransloc, setIsTransloc] = useState(false);
   // // controls the status of the notification when the translocation_ind field is unchecked
   // const [showNotif, setShowNotif] = useState(false);
@@ -38,36 +40,23 @@ export default function CaptureEventForm({
   // const [hasAssociation, setHasAssociation] = useState(false);
   // const [mustPopulate, setMustPopulate] = useState(false);
 
-  useDidMountEffect(() => {
-    setCaptureEvent(event);
-  }, [event]);
-
-  const onChange = (v: Record<keyof CaptureEvent, unknown>): void => {
+  const onChange = (v: Record<keyof CaptureEvent2 | keyof LocationEvent, unknown>): void => {
+    const [key, value] = parseFormChangeResult<CaptureEvent2>(v);
+    switch (key) {
+      case 'capture_mortality':
+        setMortalityCheck(value ? 'capture' : 'unknown');
+        handleFormChange({ release_mortality: false });
+        break;
+      case 'release_mortality':
+        setMortalityCheck(value ? 'release' : 'unknown');
+        handleFormChange({ capture_mortality: false });
+        break;
+    }
     handleFormChange(v);
-    // const [key, value] = parseFormChangeResult<CaptureEvent>(v);
-    // if (key === 'translocation_ind') {
-    //   setIsTransloc(!!value);
-    // }
-    // if (key === 'isTranslocationComplete') {
-    //   setShowNotif(!value);
-    //   setIsTranslocComplete(!!value);
-    // } else if (key === 'associated_animal_id') {
-    //   setHasAssociation(!!(value as string).length);
-    // } else if (key === 'juvenile_at_heel') {
-    //   setHasBabies(String(value).toLowerCase() === 'y');
-    // }
+    // setCaptureEvent(Object.assign(event, v));
   };
 
-  // useDidMountEffect(() => {
-  //   setMustPopulate(!!(isTransloc && isTranslocComplete));
-  // }, [isTranslocComplete, isTransloc]);
-
-  // when the location event form changes, also notify wrapper about errors
-  const onChangeLocationProp = (v: Record<keyof LocationEvent, unknown>): void => {
-    handleFormChange(v);
-  };
-
-  const handleShowRelease = () => {
+  const handleShowRelease = (): void => {
     setShowRelease((r) => !r);
   };
 
@@ -76,44 +65,46 @@ export default function CaptureEventForm({
     return <p>unable to load capture workflow</p>;
   }
 
-  // strings used
-  // const {
-  //   areUpdates,
-  //   associated,
-  //   associatedID,
-  //   beenReleased,
-  //   btnContinueTo,
-  //   diedDuring,
-  //   isTransloc: strIsTransloc,
-  //   isRecapture,
-  //   isTranslocCompleted,
-  //   shouldReviewNotif,
-  //   translocNotif
-  // } = WorkflowStrings.capture;
-
   return (
-    <>
-      <LocationEventForm key='ce-loc' event={capture.capture_location} notifyChange={onChangeLocationProp}>
+    <Box>
+      {/* Capture Date -> Capture Environment */}
+      <LocationEventForm key='ce-loc' event={capture.capture_location} notifyChange={onChange}>
         <Box key='bx-rec' {...boxSpreadRowProps}>
           {CreateFormField(capture, capture.fields.capture_timestamp, onChange)}
           {CreateFormField(capture, capture.fields.capture_comment, onChange)}
         </Box>
       </LocationEventForm>
-      <FormSection id='release-checkbox' header=''>
-        <FormControlLabel
-          control={<Checkbox defaultChecked={showRelease} onChange={handleShowRelease} />}
-          label='Are the release details different than the capture?'
-        />
+
+      {/* Capture Information*/}
+      <FormSection id='release-details-check-1' header='Capture Information'>
+        {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
       </FormSection>
-      {showRelease ? (
-        <LocationEventForm key='ce-loc-b' event={capture.release_location} notifyChange={onChangeLocationProp}>
-          <Box key='bx-rec' {...boxSpreadRowProps}>
-            {CreateFormField(capture, capture.fields.release_timestamp, onChange)}
-            {CreateFormField(capture, capture.fields.release_comment, onChange)}
-          </Box>
-        </LocationEventForm>
+      {showMortalityCheck == 'unknown' || showMortalityCheck == 'capture' ? (
+        <FormSection id='died-during-checkbox' header=''>
+          {CreateFormField(capture, capture.fields.capture_mortality, onChange, { label: diedDuring('capture') })}
+        </FormSection>
       ) : null}
-    </>
+
+      {/* Release Date */}
+      <FormSection id='release-date' header='Release Date'>
+        <Box key='bx-rec' {...boxSpreadRowProps}>
+          {CreateFormField(capture, capture.fields.release_timestamp, onChange)}
+          {CreateFormField(capture, capture.fields.release_comment, onChange)}
+        </Box>
+      </FormSection>
+
+      {/* Release Location -> Release Environment*/}
+      {showRelease ? (
+        <Box>
+          <LocationEventForm key='ce-loc-b' event={capture.release_location} notifyChange={onChange} />
+          {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
+            <FormSection id='died-during-checkbox-2' header=''>
+              {CreateFormField(capture, capture.fields.release_mortality, onChange, { label: diedDuring('release') })}
+            </FormSection>
+          ) : null}
+        </Box>
+      ) : null}
+    </Box>
     // <>
     // TODO old critterbase integration
     //   <FormSection id='a' header='Capture Details'>

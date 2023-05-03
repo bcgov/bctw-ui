@@ -40,10 +40,10 @@ const getUniqueValuesOfT = <T>(arr: T[], prop: keyof T): string[] => {
 const columnToHeader = (prop: string): string => {
   const asArr = prop
     .replaceAll('_', ' ')
+    .replaceAll('wmu', 'Wildlife Management Unit')
     .replaceAll(' id', ' ID')
     .replaceAll('wlh', 'WLH')
     .replaceAll('utm', 'UTM')
-    .replaceAll('wmu', 'Wildlife Management Unit')
     .replaceAll('cod', 'Cause Of Death')
     .split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');

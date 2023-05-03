@@ -146,39 +146,42 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   };
 
   return (
-    <Modal open={open} handleClose={handleClose}>
+    <Modal
+      open={open}
+      handleClose={handleClose}
+      useButton
+      headerComp={
+        <EditHeader<T>
+          title={event?.getWorkflowTitle()}
+          headers={event.displayProps}
+          obj={event}
+          format={event.formatPropAsHeader}
+        />
+      }>
       <form className={'event-modal'} autoComplete={'off'}>
-        <Container maxWidth='xl'>
-          <EditHeader<T>
-            title={event?.getWorkflowTitle()}
-            headers={event.displayProps}
-            obj={event}
-            format={event.formatPropAsHeader}
-          />
-          <Box>
-            <Paper sx={{ padding: 3 }}>
-              {determineWorkflow()}
-              <Box my={1} mx={3}>
-                <Divider></Divider>
-              </Box>
+        <Box>
+          <Paper sx={{ padding: 3 }}>
+            {determineWorkflow()}
+            <Box my={1} mx={3}>
+              <Divider></Divider>
+            </Box>
 
-              <Box p={3}>
-                <Box display='flex' justifyContent='flex-end' className='form-buttons'>
-                  {isLoading ? (
-                    <CircularProgress />
-                  ) : (
-                    <Button onClick={handleSave} disabled={!canSave}>
-                      Save
-                    </Button>
-                  )}
-                  <Button variant='outlined' onClick={(): void => handleClose(false)}>
-                    Cancel
+            <Box p={3}>
+              <Box display='flex' justifyContent='flex-end' className='form-buttons'>
+                {isLoading ? (
+                  <CircularProgress />
+                ) : (
+                  <Button onClick={handleSave} disabled={!canSave}>
+                    Save
                   </Button>
-                </Box>
+                )}
+                <Button variant='outlined' onClick={(): void => handleClose(false)}>
+                  Cancel
+                </Button>
               </Box>
-            </Paper>
-          </Box>
-        </Container>
+            </Box>
+          </Paper>
+        </Box>
       </form>
       <ConfirmModal
         message={confirmMessage}

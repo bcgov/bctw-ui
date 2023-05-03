@@ -1,5 +1,7 @@
+import { classToPlain, plainToClass } from 'class-transformer';
+import { mustBeLessThan50Words } from 'components/form/form_validators';
 import { WorkflowStrings } from 'constants/strings';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Critter } from 'types/animal';
 import { Code } from 'types/code';
 import { CollarHistory } from 'types/collar_history';
@@ -10,9 +12,15 @@ import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 
-export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2> {
+export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimalEventProps {
   readonly event_type: WorkflowType;
   readonly critter_id: uuid;
+  readonly wlh_id: string;
+  readonly taxon: string;
+  readonly animal_id: string;
+  readonly collection_unit: string; // This will probably need to be changed to collection_units: ICollectionUnit[]
+
+  //Critterbase fields
   capture_id: uuid;
   capture_timestamp: Dayjs;
   capture_comment: string;
@@ -20,19 +28,36 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2> {
   capture_location: LocationEvent;
   release_location: LocationEvent;
   release_timestamp: Dayjs;
+
   //Leftovers from BCTW implementation. Are these needed?
   shouldSaveAnimal: boolean;
   shouldSaveDevice: boolean;
 
-  constructor(capture_timestamp: Dayjs) {
+  //Additional workflow fields
+  capture_mortality: boolean;
+  release_mortality: boolean;
+  show_release: boolean;
+  get captureCritterbaseProps(): (keyof CaptureEvent2)[] {
+    return [
+      'capture_id',
+      'capture_timestamp',
+      'capture_comment',
+      'release_location',
+      'release_timestamp',
+      'release_comment',
+      'release_location'
+    ];
+  }
+
+  constructor() {
     this.event_type = 'capture';
-    this.capture_timestamp = capture_timestamp;
+    // this.capture_timestamp = capture_timestamp ?? dayjs();
     this.capture_location = new LocationEvent('capture');
     this.release_location = new LocationEvent('release');
   }
 
   get displayProps(): (keyof CaptureEvent2)[] {
-    return ['critter_id'];
+    return ['taxon', 'wlh_id', 'critter_id'];
   }
 
   formatPropAsHeader(s: keyof CaptureEvent2): string {
@@ -42,16 +67,37 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2> {
   getWorkflowTitle(): string {
     return WorkflowStrings.capture.workflowTitle;
   }
-
-  getCritterbasePayload() {
-    return this;
-  }
+  // getCritterbasePayload() {
+  //   const payload = {
+  //     critter_id: this.critter_id,
+  //     capture_timestamp: this.capture_timestamp,
+  //     capture_comment: this.capture_comment,
+  //     release_comment: this.release_comment,
+  //     capture_location: this.capture_location,
+  //     release_location: this.release_location,
+  //     release_timestamp: this.release_timestamp
+  //   };
+  //   return omitNull(payload);
+  // }
 
   fields: CaptureFormField2 = {
-    capture_timestamp: { prop: 'capture_timestamp', type: eInputType.date },
-    capture_comment: { prop: 'capture_comment', type: eInputType.text, style: FormCommentStyle },
-    release_timestamp: { prop: 'release_timestamp', type: eInputType.date },
-    release_comment: { prop: 'release_comment', type: eInputType.text, style: FormCommentStyle }
+    capture_timestamp: { prop: 'capture_timestamp', type: eInputType.date, required: true },
+    capture_mortality: { prop: 'capture_mortality', type: eInputType.check },
+    capture_comment: {
+      prop: 'capture_comment',
+      type: eInputType.text,
+      style: FormCommentStyle,
+      validate: mustBeLessThan50Words
+    },
+    release_timestamp: { prop: 'release_timestamp', type: eInputType.date, required: true },
+    release_comment: {
+      prop: 'release_comment',
+      type: eInputType.text,
+      style: FormCommentStyle,
+      validate: mustBeLessThan50Words
+    },
+    release_mortality: { prop: 'release_mortality', type: eInputType.check },
+    show_release: { prop: 'show_release', type: eInputType.check }
   };
 }
 
