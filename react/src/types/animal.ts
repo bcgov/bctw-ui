@@ -123,7 +123,7 @@ interface CritterMeasurement {
 /**
  * Critter properties that are re-used in Telemetry classes (map.ts)
  */
-export type ICritterTelemetryBase = {map_colour: Code} & Pick<Critter, 'animal_id' | 'critter_status' | 'taxon' | 'collection_unit' | 'wlh_id'>
+export type ICritterTelemetryBase = {map_colour: Code} & Pick<Critter, 'animal_id' | 'critter_status' | 'taxon' | 'collection_unit' | 'collection_units' | 'wlh_id'>
 
 
 // * CRITTERBASE INTEGRATION *

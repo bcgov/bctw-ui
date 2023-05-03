@@ -61,7 +61,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
         // do nothing
       } else {
         // show the release form, populating the location and date fields
-        const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'collection_units']);
+        const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'collection_unit']);
         // set the new event directly, triggering the display of the release form
         updateEvent(rwf);
         setOpen((o) => !o);
