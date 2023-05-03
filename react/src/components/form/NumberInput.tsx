@@ -24,12 +24,11 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
 
   const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : '');
   const [err, setErr] = useState('');
-  const reset = '';
   const isTextboxEmpty = val === '';
-
-  useEffect(() => {
-    console.log({ err }, { val });
-  }, [err, val]);
+  const noError = '';
+  // useEffect(() => {
+  //   console.log({ err }, { val });
+  // }, [err, val]);
 
   useEffect(() => {
     setVal(typeof defaultValue === 'number' ? defaultValue : '');
@@ -49,29 +48,28 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
   const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue', 'type', 'style']);
 
   const handleChange = (event): void => {
-    //setErr('');
     const target = event.target.value;
-    // setVal(target);
-    // allow the - sign at the start of input
-    // if (target === '-') {
-    //   setVal(target);
-    //   return;
-    // }
-
     const n = parseFloat(target);
+    let error = noError;
+    // allow the - sign at the start of input
+    if (target === '-') {
+      setVal(target);
+      return;
+    }
+
     if (isNaN(n)) {
       setVal('');
       setErr(FormStrings.validateNumber);
       return;
+    } else if (isFunction(validate)) {
+      error = validate(n);
+      // setErr(error);
     }
-    // if (isFunction(validate)) {
-    //   console.log(target);
-    //   const error = validate(target);
-    //   setErr(error);
-    // }
+    const newVal = target[target.length - 1] === '.' ? target : n;
     // parseFloat will remove the '.' if inputted individually.
-    // setVal(target[target.length - 1] === '.' ? target : n);
-    // handleIsRequired(target);
+    setVal(newVal);
+    setErr(error);
+    handleIsRequired(target);
   };
 
   const handleIsRequired = (v: number | ''): void => {
@@ -81,6 +79,12 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
   };
   // only update the parent when blur event is triggered, reducing rerenders
   const handleBlur = (): void => {
+    const error = noError;
+    if (isTextboxEmpty) {
+      setErr(error);
+    }
+    changeHandler({ [propName]: val, error: !!error });
+    // callParentHandler();
     // let error = '';
     // if (isTextboxEmpty) {
     //   setErr(error);
