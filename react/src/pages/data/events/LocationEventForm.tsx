@@ -32,24 +32,8 @@ export default function LocationEventForm({
   childNextToDate,
   disabled = false
 }: LocationEventProps): JSX.Element {
-  // const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
-
   // create the form inputs
   const { regions, comment, latlon, extra } = event.fields;
-  // const fields = event.fields;
-  // const latField = fields.latlon[0];
-  // const longField = fields.latlon[1];
-  // const utmFields = fields.utm as FormFieldObject<LocationEvent>[];
-  // const dateField = fields.date as FormFieldObject<LocationEvent>;
-  // const commentField = fields.comment as FormFieldObject<LocationEvent>;
-  // const radioID = 'coord_type';
-
-  // radio button control on whether to show UTM or lat long fields
-  // const changeCoordinateType = (e: InboundObj): void => {
-  //   const ct = e[radioID] as eLocationPositionType;
-  //   event.coordinate_type = ct;
-  //   setShowUtm(ct);
-  // };
 
   const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];

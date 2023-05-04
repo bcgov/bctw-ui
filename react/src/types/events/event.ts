@@ -45,18 +45,13 @@ export interface IBCTWWorkflow {
   // multiple events implement this
   shouldUnattachDevice?: boolean;
   // must implement this to determine how the workflow should be saved
-  shouldSaveAnimal: boolean;
-  shouldSaveDevice: boolean;
+  shouldSaveAnimal?: boolean;
+  shouldSaveDevice?: boolean;
 }
 
 export type CbPayload<T> = Partial<Record<keyof T, unknown>>;
 
-export type CritterbaseWorkflow<T> = {
-  critterbasePayload: CbPayload<T>;
-} & Pick<IBCTWWorkflow, 'event_type' | 'getWorkflowTitle'> &
-  BCTWFormat<T>;
-
-export type BCTWWorkflow<T> = IBCTWWorkflow & BCTWFormat<T>;
+export type BCTWWorkflow<T> = IBCTWWorkflow & { critterbasePayload?: CbPayload<T> } & BCTWFormat<T>;
 
 /**
  * converts an event to json for posting to API

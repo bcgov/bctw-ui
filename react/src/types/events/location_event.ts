@@ -1,10 +1,7 @@
 import { classToPlain } from 'class-transformer';
 import { mustBeLatitude, mustBeLongitude, mustBeValidTemp } from 'components/form/form_validators';
-import { Dayjs } from 'dayjs';
-import { get } from 'http';
-import { uuid } from 'types/common_types';
-import { CbPayload, CritterbaseWorkflow, WorkflowType } from 'types/events/event';
-import { eInputType, FormCommentStyle, FormFieldObject } from 'types/form_types';
+import { BCTWWorkflow, CbPayload, WorkflowType } from 'types/events/event';
+import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 
 export enum eLocationPositionType {
@@ -12,7 +9,7 @@ export enum eLocationPositionType {
   coord = 'coord'
 }
 
-export class LocationEvent implements CritterbaseWorkflow<LocationEvent> {
+export class LocationEvent implements BCTWWorkflow<LocationEvent> {
   readonly event_type: WorkflowType;
   latitude: number;
   longitude: number;
@@ -29,9 +26,12 @@ export class LocationEvent implements CritterbaseWorkflow<LocationEvent> {
   }
 
   get critterbasePayload(): CbPayload<LocationEvent> {
+    console.log(this);
     const tmp = classToPlain(this);
     delete tmp.event_type;
-    return omitNull(tmp);
+    return omitNull({
+      latitude: this.latitude
+    });
   }
   //Temp might remove after looking at malfunction workflow
   toJSON() {
