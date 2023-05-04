@@ -12,6 +12,7 @@ type ModalBaseProps = {
   open: boolean;
   handleClose: (v: boolean) => void;
   title?: string;
+  headerComp?: JSX.Element;
   disableBackdropClick?: boolean;
   useButton?: boolean;
   onEnteredCallback?: () => void;

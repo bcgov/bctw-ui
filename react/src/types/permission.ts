@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
-import { Animal } from 'types/animal';
+import { Critter } from 'types/animal';
 import { BCTWBase, BCTWValidDates, nullToDayjs } from 'types/common_types';
 import { IUserCritterAccessInput } from 'types/animal_access';
 
@@ -61,7 +61,7 @@ export class PermissionRequestInput implements IPermissionRequestInput {
  * b) what an manager sees in the request history table (some fields)
  */
 export interface IPermissionRequest
-  extends Pick<Animal, 'animal_id' | 'wlh_id' | 'taxon'>,
+  extends Pick<Critter, 'animal_id' | 'wlh_id' | 'taxon'>,
     Pick<BCTWValidDates, 'valid_to'> {
   readonly request_id: number;
   requested_by: string; // idir or bceid

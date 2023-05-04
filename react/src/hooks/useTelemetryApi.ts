@@ -4,6 +4,7 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
+import { critterbaseApi as critterbase_api, critterbaseApi } from 'api/critterbase_api';
 import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { onboardingApi as onboarding_api } from 'api/onboarding_api';
@@ -19,7 +20,7 @@ import {
   UseQueryOptions,
   UseQueryResult
 } from 'react-query';
-import { Animal, AttachedAnimal, eCritterFetchType } from 'types/animal';
+import { Critter, AttachedCritter, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import { AttachDeviceInput, CollarHistory, RemoveDeviceInput } from 'types/collar_history';
@@ -32,6 +33,8 @@ import {
   ParsedXLSXSheetResult,
   XLSXPayload
 } from 'api/api_interfaces';
+import { CbRoutes } from 'critterbase/routes';
+import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { UserCritterAccess } from 'types/animal_access';
 import { BCTWType } from 'types/common_types';
@@ -51,7 +54,12 @@ import {
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { parseArgs } from 'utils/common_helpers';
 
-/**
+/**const critterbase = axios.create({
+  baseURL: CB_API_URL,
+  headers: {
+    'API-KEY': CB_API_KEY,
+  },
+});
  * Returns an instance of axios with baseURL set.
  * @return {AxiosInstance}
  */
@@ -64,6 +72,17 @@ const useApi = (): AxiosInstance => {
   return instance;
 };
 
+const useCritterbaseApi = (): AxiosInstance => {
+  const instance = useMemo(() => {
+    return axios.create({
+      baseURL: process.env.REACT_APP_CRITTERBASE_API,
+      headers: {
+        'API-KEY': process.env.REACT_APP_CRITTERBASE_API_KEY
+      }
+    });
+  }, []);
+  return instance;
+};
 type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
 
 /**
@@ -72,6 +91,7 @@ type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
  */
 export const useTelemetryApi = () => {
   const api = useApi();
+  const cb_api = useCritterbaseApi();
 
   const collarApi = collar_api({ api });
   const critterApi = critter_api({ api });
@@ -83,8 +103,29 @@ export const useTelemetryApi = () => {
   const permissionApi = permission_api({ api });
   const attachmentApi = attachment_api({ api });
   const onboardApi = onboarding_api({ api });
+  const critterbaseApi = critterbase_api({ api: cb_api });
 
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
+
+  //CRITTERBASE HOOKS
+  const useCritterbaseSelectOptions = (prop: ICbRouteKey): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
+    return useQuery<Array<ICbSelect | string>, AxiosError>(
+      ['lookup-table-options', prop],
+      () => critterbaseApi.getLookupTableOptions(prop, true),
+      {
+        ...defaultQueryOptions
+      }
+    );
+  };
+
+  /** upsert an animal */
+  const useSaveCritterbaseCritter = (
+    config: UseMutationOptions<IBulkUploadResults<Critter>, AxiosError, IUpsertPayload<Critter>>
+  ): UseMutationResult<IBulkUploadResults<Critter>> =>
+    useMutation<IBulkUploadResults<Critter>, AxiosError, IUpsertPayload<Critter>>(
+      (critter) => critterbaseApi.upsertCritter(critter),
+      config
+    );
 
   /**
    *
@@ -220,9 +261,9 @@ export const useTelemetryApi = () => {
     page: number,
     config?: Record<string, unknown>,
     ...args: unknown[]
-  ): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+  ): UseQueryResult<Critter[] | AttachedCritter[]> => {
     const search = parseArgs(args);
-    return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
+    return useQuery<Critter[] | AttachedCritter[], AxiosError>(
       ['critters_assigned', page, search.map((s) => s?.term).join()],
       () => critterApi.getCritters(page, eCritterFetchType.assigned, search),
       { ...critterOptions, ...config }
@@ -236,9 +277,9 @@ export const useTelemetryApi = () => {
     page: number,
     config?: Record<string, unknown>,
     ...args: unknown[]
-  ): UseQueryResult<Animal[] | AttachedAnimal[]> => {
+  ): UseQueryResult<Critter[] | AttachedCritter[]> => {
     const search = parseArgs(args);
-    return useQuery<Animal[] | AttachedAnimal[], AxiosError>(
+    return useQuery<Critter[] | AttachedCritter[], AxiosError>(
       ['critters_unassigned', page, search.map((s) => s?.term).join()],
       () => critterApi.getCritters(page, eCritterFetchType.unassigned, search),
       { ...critterOptions, ...config }
@@ -248,8 +289,8 @@ export const useTelemetryApi = () => {
   /**
    * @returns a list of critters representing the audit history of @param critterId
    */
-  const useCritterHistory = (page: number, critterId: string): UseQueryResult<Animal[]> => {
-    return useQuery<Animal[], AxiosError>(
+  const useCritterHistory = (page: number, critterId: string): UseQueryResult<Critter[]> => {
+    return useQuery<Critter[], AxiosError>(
       ['critter_history', critterId, page],
       () => critterApi.getCritterHistory(page, critterId),
       critterOptions
@@ -378,7 +419,7 @@ export const useTelemetryApi = () => {
 
   // default getter for individual animals or collars
   const useType = <T>(type: BCTWType, id: string, options?: QueryEnabled): UseQueryResult<T> => {
-    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
+    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id)[0], {
       ...defaultQueryOptions,
       ...options
     });
@@ -464,9 +505,9 @@ export const useTelemetryApi = () => {
 
   /** upsert an animal */
   const useSaveAnimal = (
-    config: UseMutationOptions<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>
-  ): UseMutationResult<IBulkUploadResults<Animal>> =>
-    useMutation<IBulkUploadResults<Animal>, AxiosError, IUpsertPayload<Animal>>(
+    config: UseMutationOptions<IBulkUploadResults<Critter>, AxiosError, IUpsertPayload<Critter>>
+  ): UseMutationResult<IBulkUploadResults<Critter>> =>
+    useMutation<IBulkUploadResults<Critter>, AxiosError, IUpsertPayload<Critter>>(
       (critter) => critterApi.upsertCritter(critter),
       config
     );
@@ -507,8 +548,8 @@ export const useTelemetryApi = () => {
     config: UseMutationOptions<ParsedXLSXSheetResult[], AxiosError, FormData>
   ): UseMutationResult<ParsedXLSXSheetResult[], AxiosError> =>
     useMutation<ParsedXLSXSheetResult[], AxiosError, FormData>((form) => bulkApi.uploadXlsx(form), config);
-  /**  const useCritterHistory = (page: number, critterId: string): UseQueryResult<Animal[]> => {
-    return useQuery<Animal[], AxiosError>(
+  /**  const useCritterHistory = (page: number, critterId: string): UseQueryResult<Critter[]> => {
+    return useQuery<Critter[], AxiosError>(
       ['critter_history', critterId, page],
       () => critterApi.getCritterHistory(page, critterId),
       critterOptions
@@ -667,7 +708,9 @@ export const useTelemetryApi = () => {
     useOnboardStatus,
     useTestNotifications,
     useAllDevicesWithUnassignedCollarIds,
+    useCritterbaseSelectOptions,
     // mutations
+    useSaveCritterbaseCritter,
     useSaveCodeHeader,
     useUploadCSV,
     useUploadXLSX,

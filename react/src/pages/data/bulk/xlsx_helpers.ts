@@ -1,5 +1,5 @@
 import { WarningInfo, ParsedXLSXSheetResult, CheckedWarningInfo } from 'api/api_interfaces';
-import { Animal } from 'types/animal';
+import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
 
@@ -30,44 +30,44 @@ const collectErrorsFromResultsOld = (results: ParsedXLSXSheetResult): string[] =
 };
 
 interface FormattedErrorEntry {
-    desc: string;
-    cells: string[];
-    type: 'cell' | 'row';
+  desc: string;
+  cells: string[];
+  type: 'cell' | 'row';
 }
 
 type FormattedErrorDict = {
-    [key in (keyof Animal | keyof Collar)]?: FormattedErrorEntry;
-}
+  [key in keyof Critter | keyof Collar]?: FormattedErrorEntry;
+};
 
 const collectErrorsFromResults = (results: ParsedXLSXSheetResult): string[] => {
-    const dict: FormattedErrorDict = {};
-    results.rows.forEach((r, idx) => {
-        Object.keys(r.errors).forEach(errKey => {
-            const headerIdx = results.headers.indexOf(errKey);
-            if(!dict[errKey]) {
-                dict[errKey] = {desc: r.errors[errKey].desc, cells: []};
-                dict[errKey].type = errKey === 'identifier' || errKey === 'missing_data' ? 'row' : 'cell';
-            }
+  const dict: FormattedErrorDict = {};
+  results.rows.forEach((r, idx) => {
+    Object.keys(r.errors).forEach((errKey) => {
+      const headerIdx = results.headers.indexOf(errKey);
+      if (!dict[errKey]) {
+        dict[errKey] = { desc: r.errors[errKey].desc, cells: [] };
+        dict[errKey].type = errKey === 'identifier' || errKey === 'missing_data' ? 'row' : 'cell';
+      }
 
-            if(dict[errKey].type == 'cell')
-                dict[errKey].cells.push(`${computeXLSXCol(headerIdx)}${idx + 2}`);
-            else
-                dict[errKey].cells.push(`${idx + 2}`);
-        });
+      if (dict[errKey].type == 'cell') dict[errKey].cells.push(`${computeXLSXCol(headerIdx)}${idx + 2}`);
+      else dict[errKey].cells.push(`${idx + 2}`);
     });
-    
-    const retStr = [];
-    for(const _key of Object.keys(dict)) {
-        const entries = dict[_key].cells.length > 3 ? `${dict[_key].cells.slice(0,4).join(', ')} and ${dict[_key].cells.length - 3} others` : dict[_key].cells.join(', ');
-        if(dict[_key].type == 'cell') {
-            retStr.push(`At cell ${entries} in column "${columnToHeader(_key)}": ${dict[_key].desc}`)
-        }
-        else {
-            retStr.push(`Row ${entries}: ${dict[_key].desc}`)
-        }
+  });
+
+  const retStr = [];
+  for (const _key of Object.keys(dict)) {
+    const entries =
+      dict[_key].cells.length > 3
+        ? `${dict[_key].cells.slice(0, 4).join(', ')} and ${dict[_key].cells.length - 3} others`
+        : dict[_key].cells.join(', ');
+    if (dict[_key].type == 'cell') {
+      retStr.push(`At cell ${entries} in column "${columnToHeader(_key)}": ${dict[_key].desc}`);
+    } else {
+      retStr.push(`Row ${entries}: ${dict[_key].desc}`);
     }
-    return retStr;
-}
+  }
+  return retStr;
+};
 
 const collectWarningsFromResults = (results: ParsedXLSXSheetResult): WarningInfo[] => {
   const warnArr = [];

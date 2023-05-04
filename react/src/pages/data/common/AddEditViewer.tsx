@@ -10,7 +10,7 @@ import { buttonProps } from 'components/component_constants';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useAttachmentChanged } from 'contexts/DeviceAttachmentChangedContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Critter, AttachedCritter } from 'types/animal';
 
 /**
  * handles the show/hide functionality of the childEditComponent
@@ -83,7 +83,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
    * a device is attached or removed
    */
   useDidMountEffect(() => {
-    if (editing instanceof AttachedAnimal || editing instanceof Animal) {
+    if (editing instanceof AttachedCritter || editing instanceof Critter) {
       inverseModalState();
     }
   }, [deviceAttachmentChange]);

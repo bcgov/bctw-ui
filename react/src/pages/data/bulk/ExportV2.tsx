@@ -22,7 +22,7 @@ import { FeatureCollection } from 'geojson';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import React, { MouseEventHandler, useEffect, useState } from 'react';
-import { AttachedAnimal } from 'types/animal';
+import { AttachedCritter } from 'types/animal';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import ExportDownloadModal from './ExportDownloadModal';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
@@ -129,7 +129,7 @@ export default function ExportPageV2(): JSX.Element {
     }
   };
 
-  const handleDataTableSelect = (selected: AttachedAnimal[]): void => {
+  const handleDataTableSelect = (selected: AttachedCritter[]): void => {
     const ids = selected.map((v) => v.collar_id);
     const critters = selected.map((v) => v.critter_id);
     setCollarIDs(ids); //<-- To remove, we probably do not want to do these queries by collar id anymore.
@@ -189,7 +189,7 @@ export default function ExportPageV2(): JSX.Element {
         {datePicker()}
         <Box className={styles.innerSection}>
           <DataTable
-            headers={AttachedAnimal.attachedCritterDisplayProps}
+            headers={AttachedCritter.attachedCritterDisplayProps}
             title={<SubHeader text={ExportStrings.animalTableHeader} size='small' dark />}
             onSelectMultiple={handleDataTableSelect}
             queryProps={{ query: api.useAssignedCritters }}
@@ -249,7 +249,7 @@ export default function ExportPageV2(): JSX.Element {
   };
   return (
     <ManageLayout>
-      <h1>Export My Animal Telemetry</h1>
+      <h1>Export My Critter Telemetry</h1>
       <Box className={styles.section}>
         <InfoBanner text={ExportStrings.infoBannerMesgs} />
       </Box>

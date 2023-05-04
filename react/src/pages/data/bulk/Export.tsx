@@ -23,8 +23,8 @@ export default function Export<T, J>({ handleClose, open, template, title, data 
   // fixme: better way to determine which page
   // const isCritter = template[0] === 'critter_id';
   // const templateString = JSON.stringify(template);
-  // const isUnattachedCritter = templateString === JSON.stringify(new Animal().displayProps);
-  // const isAttachedCritter = templateString === JSON.stringify(AttachedAnimal.attachedCritterDisplayProps);
+  // const isUnattachedCritter = templateString === JSON.stringify(new Critter().displayProps);
+  // const isAttachedCritter = templateString === JSON.stringify(AttachedCritter.attachedCritterDisplayProps);
   //Old code
   // const {
   //   isError: isAError,

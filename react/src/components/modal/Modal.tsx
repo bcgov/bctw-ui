@@ -1,4 +1,4 @@
-import { Button, Dialog, IconButton } from '@mui/material';
+import { Box, Button, Dialog, Grid, IconButton } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
 import modalStyles from 'components/modal/modal_styles';
@@ -7,7 +7,7 @@ import { Icon } from 'components/common';
 import { removeProps } from 'utils/common_helpers';
 
 export default function Modal(props: ModalProps): JSX.Element {
-  const { disableBackdropClick, open, title, handleClose, children, useButton, onEnteredCallback } = props;
+  const { disableBackdropClick, open, title, handleClose, children, useButton, onEnteredCallback, headerComp } = props;
   const propsToPass = removeProps(props, ['handleClose', 'disableBackdropClick', 'useButton']);
   const classes = modalStyles();
   return (
@@ -25,19 +25,22 @@ export default function Modal(props: ModalProps): JSX.Element {
           onEnteredCallback?.();
         }}>
         <div className={classes.paper}>
-          <div className={classes.title}>
-            <h3>{title}</h3>
-            {/* if this prop was passed, dont show the close button */}
-            {disableBackdropClick ? null : useButton ? (
-              <Button variant='outlined' onClick={(): void => handleClose(false)} size='small'>
-                Close
-              </Button>
-            ) : (
-              <IconButton style={{ float: 'right' }} onClick={(): void => handleClose(false)} size='large'>
-                <Icon icon='close' />
-              </IconButton>
-            )}
-          </div>
+          <Grid container alignItems='center' justifyContent='space-between'>
+            <Grid item>{headerComp ? headerComp : <h3>{title}</h3>}</Grid>
+            <Grid item>
+              {/* if this prop was passed, dont show the close button */}
+              {/* <div className={classes.headerBox}> */}
+              {disableBackdropClick ? null : useButton ? (
+                <Button variant='outlined' onClick={(): void => handleClose(false)} size='small'>
+                  Close
+                </Button>
+              ) : (
+                <IconButton onClick={(): void => handleClose(false)}>
+                  <Icon icon='close' />
+                </IconButton>
+              )}
+            </Grid>
+          </Grid>
           <div>{children}</div>
         </div>
       </Fade>

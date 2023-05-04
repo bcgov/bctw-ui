@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
-import { Animal, AttachedAnimal, eCritterStatus } from 'types/animal';
+import { Critter, AttachedCritter, eCritterStatus } from 'types/animal';
 import { Collar, IAttachedCollar } from 'types/collar';
 import { BCTWBase, BCTWValidDates, nullToDayjs, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
@@ -129,11 +129,11 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
 // props that any mortality event or alert should have.
 export interface IMortalityAlert
   extends Pick<Collar, 'collar_id' | 'device_id' | 'device_make' | 'device_status'>,
-    Pick<Animal, 'critter_id' | 'animal_id' | 'critter_status' | 'wlh_id' | 'captivity_status_ind' | 'taxon'>,
+    Pick<Critter, 'critter_id' | 'animal_id' | 'critter_status' | 'wlh_id' | 'taxon'>,
     DataLife {}
 
 export type AnimalNotification = Pick<
-  AttachedAnimal,
+  AttachedCritter,
   'device_status' | 'device_id' | 'frequency' | 'taxon' | 'animal_id' | 'wlh_id'
 >;
 

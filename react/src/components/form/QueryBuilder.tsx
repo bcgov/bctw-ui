@@ -6,12 +6,12 @@ import { useEffect, useState } from 'react';
 import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import makeStyles from '@mui/styles/makeStyles';
 import { ISelectMultipleData } from './MultiSelect';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { Critter, AttachedCritter } from 'types/animal';
 import { AttachedCollar, Collar } from 'types/collar';
 
 export type QueryBuilderOperator = 'Equals' | 'Not Equals';
-export type QueryBuilderColumn = keyof Animal | keyof Collar;
-export type QueryBuilderData = Animal | AttachedAnimal | Collar | AttachedCollar;
+export type QueryBuilderColumn = keyof Critter | keyof Collar;
+export type QueryBuilderData = Critter | AttachedCritter | Collar | AttachedCollar;
 
 export interface IFormRowEntry {
   column: QueryBuilderColumn;

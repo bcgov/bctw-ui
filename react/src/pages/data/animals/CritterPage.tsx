@@ -13,7 +13,7 @@ import { AlertContext } from 'contexts/UserAlertContext';
 import { TelemetryAlert } from 'types/alert';
 import dayjs from 'dayjs';
 import { AlertBanner } from 'components/alerts/AlertBanner';
-import { AttachedAnimal } from 'types/animal';
+import { AttachedCritter } from 'types/animal';
 import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
 import DetailedAnimalView from './DetailedAnimalView';
@@ -30,7 +30,7 @@ export default function CritterPage(): JSX.Element {
   const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
   const [openManageAnimals, setOpenManageAnimals] = useState(false);
-  const [detailAnimal, setDetailAnimal] = useState<AttachedAnimal>(null);
+  const [detailAnimal, setDetailAnimal] = useState<AttachedCritter>(null);
 
   const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
   const inverseManageModal = (): void => {
@@ -73,7 +73,7 @@ export default function CritterPage(): JSX.Element {
       <Box width='100%' sx={{ ml: -1 }}>
         <Button
           startIcon={<Icon icon='back' />}
-          onClick={() => {
+          onClick={(): void => {
             setDetailAnimal(null);
           }}>
           Back to My Animals
@@ -86,7 +86,9 @@ export default function CritterPage(): JSX.Element {
   return (
     <ManageLayout>
       {/* <TaxonProvider> */}
-      {/* <Box className='manage-layout-titlebar'>
+      {/*
+      //TODO critterbase integration this might be not needed 
+      <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
