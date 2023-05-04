@@ -10,6 +10,14 @@ const mustBeLessThan50Words = <T>(t: T): string => {
   return typeof t === 'string' && t.split(' ').length < 2 ? '' : 'must be less than 100 words';
 };
 
+const mustBeLatitude = <T>(t: T): string => {
+  return typeof t === 'number' && t <= 90 && t >= -90 ? '' : 'Latitude must be between -90 and 90';
+};
+
+const mustBeLongitude = <T>(t: T): string => {
+  return typeof t === 'number' && t <= 180 && t >= -180 ? '' : 'Longitude must be between -180 and 180';
+};
+
 const mustBeXDigits = (v: number, numDigits: number): string =>
   v?.toString().length === numDigits ? '' : `Field must be ${numDigits} digits`;
 
@@ -28,5 +36,7 @@ export {
   mustBeXDigits,
   mustBeEmail,
   mustBeValidTemp,
-  mustBeLessThan50Words
+  mustBeLessThan50Words,
+  mustBeLatitude,
+  mustBeLongitude
 };

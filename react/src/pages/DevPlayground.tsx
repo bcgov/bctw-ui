@@ -85,7 +85,7 @@ const DevPlayground = (): JSX.Element => {
             []
           )}
           handleClose={(): void => setCapture(false)}
-          onEventSaved={() => console.log('saved')}
+          onEventSaved={(e) => console.log(e.critterbasePayload)}
           onEventChain={() => console.log('chain')}
         />
 

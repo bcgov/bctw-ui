@@ -32,24 +32,8 @@ export default function LocationEventForm({
   childNextToDate,
   disabled = false
 }: LocationEventProps): JSX.Element {
-  // const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
-
   // create the form inputs
   const { regions, comment, latlon, extra } = event.fields;
-  // const fields = event.fields;
-  // const latField = fields.latlon[0];
-  // const longField = fields.latlon[1];
-  // const utmFields = fields.utm as FormFieldObject<LocationEvent>[];
-  // const dateField = fields.date as FormFieldObject<LocationEvent>;
-  // const commentField = fields.comment as FormFieldObject<LocationEvent>;
-  // const radioID = 'coord_type';
-
-  // radio button control on whether to show UTM or lat long fields
-  // const changeCoordinateType = (e: InboundObj): void => {
-  //   const ct = e[radioID] as eLocationPositionType;
-  //   event.coordinate_type = ct;
-  //   setShowUtm(ct);
-  // };
 
   const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];
@@ -79,20 +63,20 @@ export default function LocationEventForm({
   return (
     <>
       {children ? (
-        <FormSection id='latlon' header={`${capitalize(event.location_type)} Date`} {...baseInputProps}>
+        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`} {...baseInputProps}>
           {children}
         </FormSection>
       ) : null}
-      <FormSection id='latlon' header={`${capitalize(event.location_type)} Location`} {...baseInputProps}>
+      <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`} {...baseInputProps}>
         <LocationFormField fields={latlon} />
         <Box key='bx-rec' {...boxSpreadRowProps}>
           <LocationFormField fields={comment} />
         </Box>
       </FormSection>
-      <FormSection id='Region' header={`${capitalize(event.location_type)} Region`} {...baseInputProps}>
+      <FormSection id='Region' header={`${capitalize(event.event_type)} Region`} {...baseInputProps}>
         <LocationFormField fields={regions} />
       </FormSection>
-      <FormSection id='environment' header={`${capitalize(event.location_type)} Environment`} {...baseInputProps}>
+      <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`} {...baseInputProps}>
         <LocationFormField fields={extra} />
       </FormSection>
 

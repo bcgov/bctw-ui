@@ -7,7 +7,7 @@ import { Code } from 'types/code';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 import { IDataLifeStartProps } from 'types/data_life';
-import { BCTWWorkflow, OptionalAnimal, WorkflowType, eventToJSON } from 'types/events/event';
+import { BCTWWorkflow, CbPayload, OptionalAnimal, WorkflowType, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
@@ -24,12 +24,12 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   capture_id: uuid;
   capture_timestamp: Dayjs;
   capture_comment: string;
-  release_comment: string;
   capture_location: LocationEvent;
-  release_location: LocationEvent;
   release_timestamp: Dayjs;
+  release_comment: string;
+  release_location: LocationEvent;
 
-  //Leftovers from BCTW implementation. Are these needed?
+  //TODO Leftovers from BCTW implementation. Are these needed?
   shouldSaveAnimal: boolean;
   shouldSaveDevice: boolean;
 
@@ -37,16 +37,18 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   capture_mortality: boolean;
   release_mortality: boolean;
   show_release: boolean;
-  get captureCritterbaseProps(): (keyof CaptureEvent2)[] {
-    return [
-      'capture_id',
-      'capture_timestamp',
-      'capture_comment',
-      'release_location',
-      'release_timestamp',
-      'release_comment',
-      'release_location'
-    ];
+
+  get critterbasePayload(): CbPayload<CaptureEvent2> {
+    return omitNull({
+      //capture_id might need this...
+      capture_timestamp: this.capture_timestamp,
+      capture_comment: this.capture_comment,
+      capture_location: this.capture_location.critterbasePayload,
+      capture_mortality: this.capture_mortality,
+      release_comment: this.release_comment,
+      release_location: this.release_location.critterbasePayload,
+      release_mortality: this.release_mortality
+    });
   }
 
   constructor() {
@@ -67,35 +69,13 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   getWorkflowTitle(): string {
     return WorkflowStrings.capture.workflowTitle;
   }
-  // getCritterbasePayload() {
-  //   const payload = {
-  //     critter_id: this.critter_id,
-  //     capture_timestamp: this.capture_timestamp,
-  //     capture_comment: this.capture_comment,
-  //     release_comment: this.release_comment,
-  //     capture_location: this.capture_location,
-  //     release_location: this.release_location,
-  //     release_timestamp: this.release_timestamp
-  //   };
-  //   return omitNull(payload);
-  // }
 
   fields: CaptureFormField2 = {
     capture_timestamp: { prop: 'capture_timestamp', type: eInputType.date, required: true },
     capture_mortality: { prop: 'capture_mortality', type: eInputType.check },
-    capture_comment: {
-      prop: 'capture_comment',
-      type: eInputType.text,
-      style: FormCommentStyle,
-      validate: mustBeLessThan50Words
-    },
+    capture_comment: { prop: 'capture_comment', type: eInputType.text, style: FormCommentStyle, required: true },
     release_timestamp: { prop: 'release_timestamp', type: eInputType.date, required: true },
-    release_comment: {
-      prop: 'release_comment',
-      type: eInputType.text,
-      style: FormCommentStyle,
-      validate: mustBeLessThan50Words
-    },
+    release_comment: { prop: 'release_comment', type: eInputType.text, style: FormCommentStyle },
     release_mortality: { prop: 'release_mortality', type: eInputType.check },
     show_release: { prop: 'show_release', type: eInputType.check }
   };

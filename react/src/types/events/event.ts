@@ -1,8 +1,10 @@
+import { Dayjs } from 'dayjs';
+import { LocationEvent } from 'leaflet';
 import { ReactNode } from 'react';
 import { Critter, CritterDetailsForm, getAnimalFormFields } from 'types/animal';
 import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
-import { BCTWFormat } from 'types/common_types';
+import { BCTWFormat, uuid } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { FormChangeEvent, FormFieldObject } from 'types/form_types';
 
@@ -43,11 +45,13 @@ export interface IBCTWWorkflow {
   // multiple events implement this
   shouldUnattachDevice?: boolean;
   // must implement this to determine how the workflow should be saved
-  shouldSaveAnimal: boolean;
-  shouldSaveDevice: boolean;
+  shouldSaveAnimal?: boolean;
+  shouldSaveDevice?: boolean;
 }
 
-export type BCTWWorkflow<T> = IBCTWWorkflow & BCTWFormat<T>;
+export type CbPayload<T> = Partial<Record<keyof T, unknown>>;
+
+export type BCTWWorkflow<T> = IBCTWWorkflow & { critterbasePayload?: CbPayload<T> } & BCTWFormat<T>;
 
 /**
  * converts an event to json for posting to API

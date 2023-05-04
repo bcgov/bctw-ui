@@ -1,26 +1,26 @@
-import { Box, CircularProgress, Container, Divider, Paper } from '@mui/material';
+import { Box, CircularProgress, Divider, Paper } from '@mui/material';
 import { AxiosError } from 'axios';
 import { Button, Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
+import ConfirmModal from 'components/modal/ConfirmModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import useFormHasError from 'hooks/useFormHasError';
-import { InboundObj } from 'types/form_types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ReactNode, useEffect, useState } from 'react';
+import { CaptureEvent2 } from 'types/events/capture_event';
 import { BCTWWorkflow, IBCTWWorkflow, WorkflowType } from 'types/events/event';
+import MalfunctionEvent from 'types/events/malfunction_event';
+import MortalityEvent from 'types/events/mortality_event';
+import ReleaseEvent from 'types/events/release_event';
+import RetrievalEvent from 'types/events/retrieval_event';
+import { InboundObj } from 'types/form_types';
 import { formatAxiosError } from 'utils/errors';
 import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
+import MalfunctionEventForm from './MalfunctionEventForm';
 import MortalityEventForm from './MortalityEventForm';
 import ReleaseEventForm from './ReleaseEventForm';
-import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEventForm from './RetrievalEventForm';
-import RetrievalEvent from 'types/events/retrieval_event';
-import ConfirmModal from 'components/modal/ConfirmModal';
-import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
-import ReleaseEvent from 'types/events/release_event';
-import MalfunctionEvent from 'types/events/malfunction_event';
-import MalfunctionEventForm from './MalfunctionEventForm';
 
 type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
   event: T;
@@ -84,8 +84,10 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   // update the event when form components change
   const handleChildFormUpdated = (v: InboundObj): void => {
+    console.log(v);
     checkHasErr(v);
     const k = Object.keys(v)[0];
+    if (event.event_type === 'capture') console.log('capture');
     if (k && k !== 'displayProps') {
       event[k] = Object.values(v)[0];
     }
@@ -150,7 +152,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       open={open}
       handleClose={handleClose}
       useButton
-      headerComp={
+      headercomp={
         <EditHeader<T>
           title={event?.getWorkflowTitle()}
           headers={event.displayProps}

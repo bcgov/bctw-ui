@@ -1,14 +1,12 @@
 import { StandardTextFieldProps, TextField } from '@mui/material';
 import { baseInputStyle } from 'components/component_constants';
-import { useEffect } from 'react';
-import { removeProps } from 'utils/common_helpers';
-import { useState } from 'react';
 import { inputPropsToRemove } from 'components/form/TextInput';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { FormStrings } from 'constants/strings';
-import { FormBaseProps } from 'types/form_types';
 import { isFunction } from 'components/table/table_helpers';
-import { error } from 'console';
+import { FormStrings } from 'constants/strings';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { useEffect, useState } from 'react';
+import { FormBaseProps } from 'types/form_types';
+import { removeProps } from 'utils/common_helpers';
 
 type NumberInputProps = FormBaseProps &
   StandardTextFieldProps & {
@@ -22,82 +20,87 @@ type NumberInputProps = FormBaseProps &
 export default function NumberField(props: NumberInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, validate, required } = props;
 
-  const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : '');
-  const [err, setErr] = useState('');
-  const isTextboxEmpty = val === '';
-  const noError = '';
-  // useEffect(() => {
-  //   console.log({ err }, { val });
-  // }, [err, val]);
+  const empty = '';
+  const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : empty);
+  const [err, setErr] = useState(required ? FormStrings.isRequired : empty);
 
   useEffect(() => {
-    setVal(typeof defaultValue === 'number' ? defaultValue : '');
-    handleIsRequired(defaultValue);
+    if (!defaultValue && required) {
+      setValueError(empty, FormStrings.isRequired);
+      return;
+    }
+
+    if (typeof defaultValue === 'number') {
+      if (isFunction(validate)) {
+        setValueError(defaultValue, validate(defaultValue));
+        return;
+      }
+    }
+    //setVal(empty);
   }, [defaultValue]);
 
-  useDidMountEffect(() => {
-    handleIsRequired(val);
-  }, [required]);
+  //To minimize the changeHandler from being called infinite times
+  useEffect(() => {
+    if (defaultValue !== val) {
+      changeHandler({ [propName]: val, error: !!err });
+    }
+  }, [defaultValue]);
 
-  // useDidMountEffect(() => {
-  //   callParentHandler();
-  // }, [err]);
-
-  // will receive warnings if these are not deleted
-  // note: removing 'type' prop to disable input number +-
-  const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue', 'type', 'style']);
+  const setValueError = (value: number | '', error: string): void => {
+    setVal(value);
+    setErr(error);
+  };
 
   const handleChange = (event): void => {
     const target = event.target.value;
     const n = parseFloat(target);
-    let error = noError;
-    // allow the - sign at the start of input
+
+    //Check if target is empty string
+    if (target === empty) {
+      setValueError(empty, empty);
+      return;
+    }
+
+    //Checks if negative input
     if (target === '-') {
-      setVal(target);
+      setValueError(target, empty);
       return;
     }
-
+    //Check if target is not a number
     if (isNaN(n)) {
-      setVal('');
-      setErr(FormStrings.validateNumber);
+      setValueError(empty, FormStrings.validateNumber);
       return;
-    } else if (isFunction(validate)) {
-      error = validate(n);
-      // setErr(error);
     }
+
+    if (!target && required) {
+      setValueError(empty, FormStrings.isRequired);
+      return;
+    }
+
+    if (isFunction(validate)) {
+      setValueError(n, validate(n));
+      return;
+    }
+
     const newVal = target[target.length - 1] === '.' ? target : n;
-    // parseFloat will remove the '.' if inputted individually.
-    setVal(newVal);
-    setErr(error);
-    handleIsRequired(target);
+    setValueError(newVal, empty);
   };
 
-  const handleIsRequired = (v: number | ''): void => {
-    if (!v && required) {
-      setErr(FormStrings.isRequired);
-    }
-  };
   // only update the parent when blur event is triggered, reducing rerenders
   const handleBlur = (): void => {
-    const error = noError;
-    if (isTextboxEmpty) {
-      setErr(error);
+    let value = val;
+    let error = err;
+    if (!val && required) {
+      value = empty;
+      error = FormStrings.isRequired;
     }
-    changeHandler({ [propName]: val, error: !!error });
-    // callParentHandler();
-    // let error = '';
-    // if (isTextboxEmpty) {
-    //   setErr(error);
-    // } else if (isFunction(validate)) {
-    //   error = validate(val as number);
-    //   setErr(error);
-    // }
-    // callParentHandler();
+    setValueError(value, error);
+    changeHandler({ [propName]: value, error: !!error });
   };
 
-  const callParentHandler = (): void => {
-    changeHandler({ [propName]: val, error: !!err });
-  };
+  // will receive warnings if these are not deleted
+  // note: removing 'type' prop to disable input number +-
+  const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue', 'type', 'style']);
 
   return (
     <TextField
