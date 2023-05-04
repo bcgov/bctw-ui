@@ -1,6 +1,6 @@
 import { StandardTextFieldProps, TextField } from '@mui/material';
 import { baseInputStyle } from 'components/component_constants';
-import { useEffect } from 'react';
+import React, { MouseEvent, useEffect } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import { useState } from 'react';
 import { inputPropsToRemove } from 'components/form/TextInput';
@@ -22,77 +22,83 @@ type NumberInputProps = FormBaseProps &
 export default function NumberField(props: NumberInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, validate, required } = props;
 
-  const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : '');
-  const [err, setErr] = useState('');
-  const isTextboxEmpty = val === '';
-  const noError = '';
-  // useEffect(() => {
-  //   console.log({ err }, { val });
-  // }, [err, val]);
+  const empty = '';
+  const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : empty);
+  const [err, setErr] = useState(empty);
 
   useEffect(() => {
-    setVal(typeof defaultValue === 'number' ? defaultValue : '');
+    if (typeof defaultValue === 'number') {
+      if (isFunction(validate)) {
+        setValueError(defaultValue, validate(defaultValue));
+        return;
+      }
+    }
+    setVal(empty);
+    //handleValidate(defaultValue);
     handleIsRequired(defaultValue);
   }, [defaultValue]);
+
+  useEffect(() => {
+    if (propName === 'temperature') console.log({ props });
+  }, [err]);
 
   useDidMountEffect(() => {
     handleIsRequired(val);
   }, [required]);
 
-  // useDidMountEffect(() => {
-  //   callParentHandler();
-  // }, [err]);
-
   // will receive warnings if these are not deleted
   // note: removing 'type' prop to disable input number +-
   const propsToPass = removeProps(props, [...inputPropsToRemove, 'defaultValue', 'type', 'style']);
 
+  const setValueError = (value: number | '', error: string): void => {
+    setVal(value);
+    setErr(error);
+  };
+
   const handleChange = (event): void => {
     const target = event.target.value;
     const n = parseFloat(target);
-    let error = noError;
-    // allow the - sign at the start of input
+
+    //Check if target is empty string
+    if (target === empty) {
+      setValueError(empty, empty);
+      return;
+    }
+
+    //Checks if negative input
     if (target === '-') {
-      setVal(target);
+      setValueError(target, empty);
       return;
     }
-
+    //Check if target is not a number
     if (isNaN(n)) {
-      setVal('');
-      setErr(FormStrings.validateNumber);
+      setValueError(empty, FormStrings.validateNumber);
       return;
-    } else if (isFunction(validate)) {
-      error = validate(n);
-      // setErr(error);
     }
-    const newVal = target[target.length - 1] === '.' ? target : n;
-    // parseFloat will remove the '.' if inputted individually.
-    setVal(newVal);
-    setErr(error);
-    handleIsRequired(target);
-  };
 
+    if (isFunction(validate)) {
+      setValueError(n, validate(n));
+      return;
+    }
+
+    const newVal = target[target.length - 1] === '.' ? target : n;
+    setValueError(newVal, empty);
+  };
+  // const handleValidate = (v: number | ''): void => {};
   const handleIsRequired = (v: number | ''): void => {
     if (!v && required) {
       setErr(FormStrings.isRequired);
     }
   };
+
   // only update the parent when blur event is triggered, reducing rerenders
   const handleBlur = (): void => {
-    const error = noError;
-    if (isTextboxEmpty) {
-      setErr(error);
-    }
-    changeHandler({ [propName]: val, error: !!error });
-    // callParentHandler();
-    // let error = '';
     // if (isTextboxEmpty) {
-    //   setErr(error);
-    // } else if (isFunction(validate)) {
-    //   error = validate(val as number);
-    //   setErr(error);
+    //   setErr(noError);
+    //   changeHandler({ [propName]: val, error: !!noError });
+    //   return;
     // }
-    // callParentHandler();
+    callParentHandler();
   };
 
   const callParentHandler = (): void => {
