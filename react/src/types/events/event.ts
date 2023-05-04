@@ -1,8 +1,10 @@
+import { Dayjs } from 'dayjs';
+import { LocationEvent } from 'leaflet';
 import { ReactNode } from 'react';
 import { Critter, CritterDetailsForm, getAnimalFormFields } from 'types/animal';
 import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
-import { BCTWFormat } from 'types/common_types';
+import { BCTWFormat, uuid } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { FormChangeEvent, FormFieldObject } from 'types/form_types';
 
@@ -46,6 +48,13 @@ export interface IBCTWWorkflow {
   shouldSaveAnimal: boolean;
   shouldSaveDevice: boolean;
 }
+
+export type CbPayload<T> = Partial<Record<keyof T, unknown>>;
+
+export type CritterbaseWorkflow<T> = {
+  critterbasePayload: CbPayload<T>;
+} & Pick<IBCTWWorkflow, 'event_type' | 'getWorkflowTitle'> &
+  BCTWFormat<T>;
 
 export type BCTWWorkflow<T> = IBCTWWorkflow & BCTWFormat<T>;
 

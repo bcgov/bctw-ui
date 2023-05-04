@@ -79,20 +79,20 @@ export default function LocationEventForm({
   return (
     <>
       {children ? (
-        <FormSection id='latlon' header={`${capitalize(event.location_type)} Date`} {...baseInputProps}>
+        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`} {...baseInputProps}>
           {children}
         </FormSection>
       ) : null}
-      <FormSection id='latlon' header={`${capitalize(event.location_type)} Location`} {...baseInputProps}>
+      <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`} {...baseInputProps}>
         <LocationFormField fields={latlon} />
         <Box key='bx-rec' {...boxSpreadRowProps}>
           <LocationFormField fields={comment} />
         </Box>
       </FormSection>
-      <FormSection id='Region' header={`${capitalize(event.location_type)} Region`} {...baseInputProps}>
+      <FormSection id='Region' header={`${capitalize(event.event_type)} Region`} {...baseInputProps}>
         <LocationFormField fields={regions} />
       </FormSection>
-      <FormSection id='environment' header={`${capitalize(event.location_type)} Environment`} {...baseInputProps}>
+      <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`} {...baseInputProps}>
         <LocationFormField fields={extra} />
       </FormSection>
 

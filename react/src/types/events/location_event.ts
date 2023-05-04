@@ -1,28 +1,19 @@
+import { classToPlain } from 'class-transformer';
 import { mustBeLatitude, mustBeLongitude, mustBeValidTemp } from 'components/form/form_validators';
 import { Dayjs } from 'dayjs';
+import { get } from 'http';
 import { uuid } from 'types/common_types';
-import { WorkflowType } from 'types/events/event';
+import { CbPayload, CritterbaseWorkflow, WorkflowType } from 'types/events/event';
 import { eInputType, FormCommentStyle, FormFieldObject } from 'types/form_types';
-import { columnToHeader } from 'utils/common_helpers';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
 
 export enum eLocationPositionType {
   utm = 'utm',
   coord = 'coord'
 }
 
-// interface ILocationEvent {
-//   coordinate_type: eLocationPositionType;
-//   date: Dayjs;
-//   comment: string;
-//   latitude: number;
-//   longitude: number;
-//   utm_easting: number;
-//   utm_northing: number;
-//   utm_zone: number;
-// }
-
-export class LocationEvent {
-  readonly location_type: WorkflowType;
+export class LocationEvent implements CritterbaseWorkflow<LocationEvent> {
+  readonly event_type: WorkflowType;
   latitude: number;
   longitude: number;
   region_env_id: string;
@@ -32,44 +23,22 @@ export class LocationEvent {
   coordinate_uncertainty_unit: string;
   temperature: number;
   location_comment: string;
-  //TODO old LocationEvent details
-  // comment: string;
-  // latitude: number;
-  // longitude: number;
-  // utm_easting: number;
-  // utm_northing: number;
-  // utm_zone: number;
 
-  constructor(
-    location_type: WorkflowType // public date: Dayjs = dayjs(), // public disable_date = false, // public coordinate_type = eLocationPositionType.utm
-  ) {
-    this.location_type = location_type;
+  constructor(event_type: WorkflowType) {
+    this.event_type = event_type;
   }
 
-  // utm_keys: (keyof this)[] = ['utm_easting', 'utm_northing', 'utm_zone'];
-  // coord_keys: (keyof this)[] = ['latitude', 'longitude'];
-  // private json_keys: (keyof this)[] = [...this.utm_keys, ...this.coord_keys, 'comment', 'date'];
-
-  // /**
-  //  * returns the location event as a new object.
-  //  * depending on the coordinate type used, removes the keys not in use
-  //  */
+  get critterbasePayload(): CbPayload<LocationEvent> {
+    const tmp = classToPlain(this);
+    delete tmp.event_type;
+    return omitNull(tmp);
+  }
+  //Temp might remove after looking at malfunction workflow
   toJSON() {
-    // const o = {};
-    // for (let i = 0; i < this.json_keys.length; i++) {
-    //   const k = this.json_keys[i];
-    //   if (k === 'date' && this.disable_date) {
-    //     continue;
-    //   }
-    //   if (this.coordinate_type === 'utm' && this.coord_keys.includes(k)) {
-    //     continue;
-    //   } else if (this.coordinate_type === 'coord' && this.utm_keys.includes(k)) {
-    //     continue;
-    //   }
-    //   const key = `${this.location_type}_${k}`;
-    //   o[key] = this[k];
-    // }
-    return Object.assign(new LocationEvent(this.location_type), this);
+    return this;
+  }
+  getWorkflowTitle(): string {
+    return 'Temp location Title';
   }
 
   formatPropAsHeader(k: keyof LocationEvent): string {
@@ -93,12 +62,7 @@ export class LocationEvent {
         { prop: 'region_nr_id', type: eInputType.cb_select, cbRouteKey: 'region_nr' },
         { prop: 'wmu_id', type: eInputType.cb_select, cbRouteKey: 'wmu' }
       ],
-      extra: [{ prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp, required: true }],
-      // utm: [
-      //   { prop: 'utm_easting', type: eInputType.number },
-      //   { prop: 'utm_northing', type: eInputType.number },
-      //   { prop: 'utm_zone', type: eInputType.number }
-      // ],
+      extra: [{ prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp }],
       comment: [{ prop: 'location_comment', type: eInputType.text, style: FormCommentStyle }]
     };
   }

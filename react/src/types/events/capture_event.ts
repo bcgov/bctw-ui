@@ -7,12 +7,19 @@ import { Code } from 'types/code';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 import { IDataLifeStartProps } from 'types/data_life';
-import { BCTWWorkflow, OptionalAnimal, WorkflowType, eventToJSON } from 'types/events/event';
+import {
+  BCTWWorkflow,
+  CbPayload,
+  CritterbaseWorkflow,
+  OptionalAnimal,
+  WorkflowType,
+  eventToJSON
+} from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 
-export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimalEventProps {
+export class CaptureEvent2 implements CritterbaseWorkflow<CaptureEvent2>, CaptureAnimalEventProps {
   readonly event_type: WorkflowType;
   readonly critter_id: uuid;
   readonly wlh_id: string;
@@ -24,10 +31,10 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   capture_id: uuid;
   capture_timestamp: Dayjs;
   capture_comment: string;
-  release_comment: string;
   capture_location: LocationEvent;
-  release_location: LocationEvent;
   release_timestamp: Dayjs;
+  release_comment: string;
+  release_location: LocationEvent;
 
   //TODO Leftovers from BCTW implementation. Are these needed?
   shouldSaveAnimal: boolean;
@@ -37,16 +44,18 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   capture_mortality: boolean;
   release_mortality: boolean;
   show_release: boolean;
-  get captureCritterbaseProps(): (keyof CaptureEvent2)[] {
-    return [
-      'capture_id',
-      'capture_timestamp',
-      'capture_comment',
-      'release_location',
-      'release_timestamp',
-      'release_comment',
-      'release_location'
-    ];
+
+  get critterbasePayload(): CbPayload<CaptureEvent2> {
+    return omitNull({
+      //capture_id might need this...
+      capture_timestamp: this.capture_timestamp,
+      capture_comment: this.capture_comment,
+      capture_location: this.capture_location.critterbasePayload,
+      capture_mortality: this.capture_mortality,
+      release_comment: this.release_comment,
+      release_location: this.release_location.critterbasePayload,
+      release_mortality: this.release_mortality
+    });
   }
 
   constructor() {

@@ -28,17 +28,6 @@ export default function CaptureEventForm({
   const [showRelease, setShowRelease] = useState(false);
   const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
   const { diedDuring, differentReleaseDetails } = WorkflowStrings.capture;
-  // const [isTransloc, setIsTransloc] = useState(false);
-  // // controls the status of the notification when the translocation_ind field is unchecked
-  // const [showNotif, setShowNotif] = useState(false);
-  /**
-   * controls the state of the population/region selectors, if the translocation_ind
-   * is not complete, these will be filled out at a later time when the animal is released
-   */
-  // const [isTranslocComplete, setIsTranslocComplete] = useState(true);
-  // const [hasBabies, setHasBabies] = useState(false);
-  // const [hasAssociation, setHasAssociation] = useState(false);
-  // const [mustPopulate, setMustPopulate] = useState(false);
 
   const onChange = (v: Record<keyof CaptureEvent2 | keyof LocationEvent, unknown>): void => {
     const [key, value] = parseFormChangeResult<CaptureEvent2>(v);
@@ -53,7 +42,6 @@ export default function CaptureEventForm({
         break;
     }
     handleFormChange(v);
-    // setCaptureEvent(Object.assign(event, v));
   };
 
   const handleShowRelease = (): void => {
@@ -65,6 +53,7 @@ export default function CaptureEventForm({
     return <p>unable to load capture workflow</p>;
   }
 
+  //TODO the form doesnt currently null entries in the release section if showRelease is set to false
   return (
     <Box>
       {/* Capture Date -> Capture Environment */}
@@ -76,11 +65,8 @@ export default function CaptureEventForm({
       </LocationEventForm>
 
       {/* Capture Information*/}
-      <FormSection id='release-details-check-1' header='Capture Information'>
-        {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
-      </FormSection>
       {showMortalityCheck == 'unknown' || showMortalityCheck == 'capture' ? (
-        <FormSection id='died-during-checkbox' header=''>
+        <FormSection id='died-during-checkbox' header='Capture Information'>
           {CreateFormField(capture, capture.fields.capture_mortality, onChange, { label: diedDuring('capture') })}
         </FormSection>
       ) : null}
@@ -95,14 +81,15 @@ export default function CaptureEventForm({
 
       {/* Release Location -> Release Environment*/}
       {showRelease ? (
-        <Box>
-          <LocationEventForm key='ce-loc-b' event={capture.release_location} notifyChange={onChange} />
-          {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
-            <FormSection id='died-during-checkbox-2' header=''>
-              {CreateFormField(capture, capture.fields.release_mortality, onChange, { label: diedDuring('release') })}
-            </FormSection>
-          ) : null}
-        </Box>
+        <LocationEventForm key='ce-loc-b' event={capture.release_location} notifyChange={onChange} />
+      ) : null}
+
+      {/* Release Information */}
+      {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
+        <FormSection id='died-during-checkbox-2' header='Release Information'>
+          {CreateFormField(capture, capture.fields.release_mortality, onChange, { label: diedDuring('release') })}
+          {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
+        </FormSection>
       ) : null}
     </Box>
     // <>

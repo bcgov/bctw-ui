@@ -80,7 +80,7 @@ const DevPlayground = (): JSX.Element => {
             []
           )}
           handleClose={(): void => setBool(false)}
-          onEventSaved={() => console.log('saved')}
+          onEventSaved={(e) => console.log(e)}
           onEventChain={() => console.log('chain')}
         />
 
