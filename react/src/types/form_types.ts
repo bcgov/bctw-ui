@@ -1,6 +1,7 @@
 import { BaseTextFieldProps } from '@mui/material';
 import { ICbRouteKey } from 'critterbase/types';
 import { CSSProperties, ReactNode } from 'react';
+import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
@@ -54,6 +55,7 @@ export const isDisabled = { disabled: true };
 export type InboundObj = {
   [key: string]: unknown;
   error?: boolean;
+  nestedEventKey?: keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'>;
 };
 
 /**

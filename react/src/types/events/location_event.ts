@@ -26,12 +26,13 @@ export class LocationEvent implements BCTWWorkflow<LocationEvent> {
   }
 
   get critterbasePayload(): CbPayload<LocationEvent> {
-    console.log(this);
     const tmp = classToPlain(this);
     delete tmp.event_type;
-    return omitNull({
-      latitude: this.latitude
-    });
+    const ret = omitNull(tmp);
+    if (!Object.keys(ret).length) {
+      return;
+    }
+    return ret;
   }
   //Temp might remove after looking at malfunction workflow
   toJSON() {

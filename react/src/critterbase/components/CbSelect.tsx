@@ -31,7 +31,6 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
     if (!isFunction(handleChange)) return;
     const ret = { [prop]: v, error: false };
     handleChange(ret);
-    console.log(ret);
   };
 
   const handleSelect = (event: SelectChangeEvent): void => {

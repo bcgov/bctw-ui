@@ -34,11 +34,11 @@ export default function CaptureEventForm({
     switch (key) {
       case 'capture_mortality':
         setMortalityCheck(value ? 'capture' : 'unknown');
-        handleFormChange({ release_mortality: false });
+        handleFormChange({ release_mortality: undefined });
         break;
       case 'release_mortality':
         setMortalityCheck(value ? 'release' : 'unknown');
-        handleFormChange({ capture_mortality: false });
+        handleFormChange({ capture_mortality: undefined });
         break;
     }
     handleFormChange(v);
@@ -85,10 +85,12 @@ export default function CaptureEventForm({
       ) : null}
 
       {/* Release Information */}
+      <FormSection id='died-during-checkbox-2' header='Release Information'>
+        {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
+      </FormSection>
       {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
-        <FormSection id='died-during-checkbox-2' header='Release Information'>
+        <FormSection id='died-during-checkbox-3' header=''>
           {CreateFormField(capture, capture.fields.release_mortality, onChange, { label: diedDuring('release') })}
-          {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
         </FormSection>
       ) : null}
     </Box>

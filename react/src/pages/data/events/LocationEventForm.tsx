@@ -39,15 +39,17 @@ export default function LocationEventForm({
     const key = Object.keys(v)[0];
     const value = Object.values(v)[0];
     event[key] = value;
+    if (event.event_type === 'release') {
+      notifyChange({ ...v, nestedEventKey: 'release_location' });
+      return;
+    }
+    if (event.event_type === 'capture') {
+      notifyChange({ ...v, nestedEventKey: 'capture_location' });
+      return;
+    }
     // notify parent that the location event changed
     notifyChange(v);
   };
-
-  // notify parent error handler that required errors need to update when utm/lat long is changed
-  //TODO add this back
-  // useDidMountEffect(() => {
-  //   notifyChange({ reset: true, toReset: showUtm ? event.utm_keys : event.coord_keys });
-  // }, [showUtm]);
 
   const LocationFormField = ({ fields }: { fields: FormFieldObject<LocationEvent>[] }) => {
     return (
