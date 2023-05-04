@@ -93,7 +93,7 @@ export class LocationEvent {
         { prop: 'region_nr_id', type: eInputType.cb_select, cbRouteKey: 'region_nr' },
         { prop: 'wmu_id', type: eInputType.cb_select, cbRouteKey: 'wmu' }
       ],
-      extra: [{ prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp }],
+      extra: [{ prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp, required: true }],
       // utm: [
       //   { prop: 'utm_easting', type: eInputType.number },
       //   { prop: 'utm_northing', type: eInputType.number },

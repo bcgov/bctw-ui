@@ -7,10 +7,12 @@ import { mustBeEmail } from 'components/form/form_validators';
 import { FormStrings } from 'constants/strings';
 import { FormBaseProps } from 'types/form_types';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { isFunction } from 'components/table/table_helpers';
 
 export type TextInputProps = FormBaseProps &
   StandardTextFieldProps & {
     defaultValue: string;
+    validate?: (v: string) => string;
   };
 
 export const inputPropsToRemove = [
@@ -24,13 +26,19 @@ export const inputPropsToRemove = [
 ];
 
 export default function TextField(props: TextInputProps): JSX.Element {
-  const { changeHandler, propName, defaultValue, style, required } = props;
+  const { changeHandler, propName, defaultValue, style, required, validate } = props;
   const [val, setVal] = useState(defaultValue ?? '');
   const [err, setErr] = useState('');
+  const empty = '';
 
   // update when defaultValue is changed
   useEffect(() => {
-    const n = defaultValue ?? '';
+    const n = defaultValue ?? empty;
+    if (n !== empty) {
+      if (isFunction(validate)) {
+        setErr(validate(n));
+      }
+    }
     setVal(n);
     handleIsRequired(n);
   }, [defaultValue]);
@@ -46,7 +54,7 @@ export default function TextField(props: TextInputProps): JSX.Element {
 
   const handleChange = (event): void => {
     const target = event.target.value;
-    setErr('');
+    setErr(empty);
     setVal(target);
 
     if (String(propName).toLowerCase().includes('email')) {
@@ -59,9 +67,8 @@ export default function TextField(props: TextInputProps): JSX.Element {
   const handleIsRequired = (v: string): void => {
     if (!v && required) {
       setErr(FormStrings.isRequired);
-    }
-    else if (!!v && required) {
-      setErr('');
+    } else if (!!v && required) {
+      setErr(empty);
     }
   };
 

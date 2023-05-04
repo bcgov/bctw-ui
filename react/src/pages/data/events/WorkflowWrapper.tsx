@@ -150,7 +150,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       open={open}
       handleClose={handleClose}
       useButton
-      headerComp={
+      headercomp={
         <EditHeader<T>
           title={event?.getWorkflowTitle()}
           headers={event.displayProps}
