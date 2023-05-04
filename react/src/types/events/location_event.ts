@@ -1,4 +1,4 @@
-import { mustBeValidTemp } from 'components/form/form_validators';
+import { mustBeLatitude, mustBeLongitude, mustBeValidTemp } from 'components/form/form_validators';
 import { Dayjs } from 'dayjs';
 import { uuid } from 'types/common_types';
 import { WorkflowType } from 'types/events/event';
@@ -23,15 +23,15 @@ export enum eLocationPositionType {
 
 export class LocationEvent {
   readonly location_type: WorkflowType;
-  latitude?: number;
-  longitude?: number;
-  region_env_id?: string;
-  region_nr_id?: string;
-  wmu_id?: string;
-  coordinate_uncertainty?: number;
-  coordinate_uncertainty_unit?: string;
-  temperature?: number;
-  location_comment?: string;
+  latitude: number;
+  longitude: number;
+  region_env_id: string;
+  region_nr_id: string;
+  wmu_id: string;
+  coordinate_uncertainty: number;
+  coordinate_uncertainty_unit: string;
+  temperature: number;
+  location_comment: string;
   //TODO old LocationEvent details
   // comment: string;
   // latitude: number;
@@ -83,8 +83,8 @@ export class LocationEvent {
   get fields(): Record<string, FormFieldObject<LocationEvent>[]> {
     return {
       latlon: [
-        { prop: 'latitude', type: eInputType.number },
-        { prop: 'longitude', type: eInputType.number },
+        { prop: 'latitude', type: eInputType.number, validate: mustBeLatitude },
+        { prop: 'longitude', type: eInputType.number, validate: mustBeLongitude },
         { prop: 'coordinate_uncertainty', type: eInputType.number },
         { prop: 'coordinate_uncertainty_unit', type: eInputType.cb_select, cbRouteKey: 'coordinate_uncertainty_unit' }
       ],

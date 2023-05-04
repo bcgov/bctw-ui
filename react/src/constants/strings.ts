@@ -236,7 +236,7 @@ const FormStrings = {
   emptySelectValue: 'Blank',
   validateNegativeLongitude: 'Longitude must be negative',
   validateNumber: 'Must be a number',
-  isRequired: 'Required', // can't be an empty string
+  isRequired: ' ', // can't be an empty string
   filterColumnsLabel: 'Search Columns'
 };
 

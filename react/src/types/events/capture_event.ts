@@ -29,7 +29,7 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   release_location: LocationEvent;
   release_timestamp: Dayjs;
 
-  //Leftovers from BCTW implementation. Are these needed?
+  //TODO Leftovers from BCTW implementation. Are these needed?
   shouldSaveAnimal: boolean;
   shouldSaveDevice: boolean;
 
@@ -67,35 +67,13 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   getWorkflowTitle(): string {
     return WorkflowStrings.capture.workflowTitle;
   }
-  // getCritterbasePayload() {
-  //   const payload = {
-  //     critter_id: this.critter_id,
-  //     capture_timestamp: this.capture_timestamp,
-  //     capture_comment: this.capture_comment,
-  //     release_comment: this.release_comment,
-  //     capture_location: this.capture_location,
-  //     release_location: this.release_location,
-  //     release_timestamp: this.release_timestamp
-  //   };
-  //   return omitNull(payload);
-  // }
 
   fields: CaptureFormField2 = {
     capture_timestamp: { prop: 'capture_timestamp', type: eInputType.date, required: true },
     capture_mortality: { prop: 'capture_mortality', type: eInputType.check },
-    capture_comment: {
-      prop: 'capture_comment',
-      type: eInputType.text,
-      style: FormCommentStyle,
-      validate: mustBeLessThan50Words
-    },
+    capture_comment: { prop: 'capture_comment', type: eInputType.text, style: FormCommentStyle, required: true },
     release_timestamp: { prop: 'release_timestamp', type: eInputType.date, required: true },
-    release_comment: {
-      prop: 'release_comment',
-      type: eInputType.text,
-      style: FormCommentStyle,
-      validate: mustBeLessThan50Words
-    },
+    release_comment: { prop: 'release_comment', type: eInputType.text, style: FormCommentStyle },
     release_mortality: { prop: 'release_mortality', type: eInputType.check },
     show_release: { prop: 'show_release', type: eInputType.check }
   };
