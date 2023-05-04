@@ -18,6 +18,7 @@ import WorkflowWrapper from './data/events/WorkflowWrapper';
 import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
 import { editObjectToEvent } from 'types/events/event';
 import { plainToClass } from 'class-transformer';
+import MortalityEvent from 'types/events/mortality_event';
 
 // Place constants here
 const TEST = 'Testing';
@@ -38,7 +39,8 @@ const DevPlayground = (): JSX.Element => {
   const [background, setBackground] = useState(false);
   const [tab, setTab] = useState(0);
   const [detailAnimal, setDetailAnimal] = useState<AttachedCritter>(null);
-  const [bool, setBool] = useState(true);
+  const [openCapture, setCapture] = useState(false);
+  const [openMortality, setMortality] = useState(false);
   // const { data, status } = api.useType<AttachedCritter>('animal', 'c6b0a6c7-71ca-421a-96d6-1878fec07b05');
   // console.log(data);
   return (
@@ -63,13 +65,16 @@ const DevPlayground = (): JSX.Element => {
           <EditCritter
             open={false} // THIS is false
             editing={null}
-            handleClose={(): void => setBool(false)}
+            handleClose={(): void => setCapture(false)}
             onSave={doNothingAsync}
           />
         </ModifyCritterWrapper>
 
+        <Button variant='contained' onClick={() => {setCapture(true)}}>Open Capture</Button>
+        <Button variant='contained' onClick={() => {setMortality(true)}}>Open Mortality</Button>
+
         <WorkflowWrapper
-          open={bool}
+          open={openCapture}
           event={editObjectToEvent(
             plainToClass(Critter, {
               critter_id: 'c6b0a6c7-71ca-421a-96d6-1878fec07b05',
@@ -79,10 +84,27 @@ const DevPlayground = (): JSX.Element => {
             new CaptureEvent2(),
             []
           )}
-          handleClose={(): void => setBool(false)}
+          handleClose={(): void => setCapture(false)}
           onEventSaved={() => console.log('saved')}
           onEventChain={() => console.log('chain')}
         />
+
+        <WorkflowWrapper
+          open={openMortality}
+          event={editObjectToEvent(
+            plainToClass(Critter, {
+              critter_id: 'c6b0a6c7-71ca-421a-96d6-1878fec07b05',
+              taxon: 'Moose',
+              wlh_id: '12-345'
+            }),
+            new MortalityEvent(),
+            []
+          )}
+          handleClose={(): void => setMortality(false)}
+          onEventSaved={() => console.log('saved')}
+          onEventChain={() => console.log('chain')}
+        />
+        
 
         <Box flexDirection='column'>
           {Object.keys(CbRoutes).map((key) => (
