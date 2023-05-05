@@ -14,6 +14,8 @@ export default function DateTimeInput(props: DateInputProps): JSX.Element {
   const { defaultValue, label, changeHandler, propName, minDate, maxDate, required } = props;
   const [selectedTime, setSelectedTime] = useState<Dayjs | null>(defaultValue?.isValid() ? defaultValue : null);
 
+  console.log(defaultValue);
+
   const checkForErr = (d: Dayjs | null): boolean => required && (!d || !d?.isValid());
 
   const [hasError, setHasError] = useState(checkForErr(selectedTime));

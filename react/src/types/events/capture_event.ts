@@ -47,7 +47,8 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
       capture_mortality: this.capture_mortality,
       release_comment: this.release_comment,
       release_location: this.release_location.critterbasePayload,
-      release_mortality: this.release_mortality
+      release_mortality: this.release_mortality,
+      release_timestamp: this.release_timestamp
     });
   }
 

@@ -75,7 +75,15 @@ function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
 }
 
 // date field handler
-function CreateEditDateField({ prop, value, handleChange, label, disabled }: CreateInputProps): ReactElement {
+function CreateEditDateField({
+  prop,
+  value,
+  handleChange,
+  label,
+  disabled,
+  minDate,
+  maxDate
+}: CreateInputProps): ReactElement {
   return (
     <DateInput
       propName={prop}
@@ -83,6 +91,8 @@ function CreateEditDateField({ prop, value, handleChange, label, disabled }: Cre
       defaultValue={value as Dayjs}
       changeHandler={handleChange}
       disabled={disabled}
+      minDate={minDate}
+      maxDate={maxDate}
       key={`input-date-${String(prop)}`}
     />
   );

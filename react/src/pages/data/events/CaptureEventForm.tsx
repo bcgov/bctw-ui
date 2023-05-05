@@ -1,30 +1,25 @@
+import { Box } from '@mui/material';
+import { CreateFormField } from 'components/form/create_form_components';
 import { WorkflowStrings } from 'constants/strings';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { CSSProperties, useState } from 'react';
-import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
+import { useEffect, useState } from 'react';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import { WorkflowFormProps } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { eInputType, parseFormChangeResult } from 'types/form_types';
+import { parseFormChangeResult } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
-import { wfFields, WorkflowFormProps, WorkflowType } from 'types/events/event';
-import { CreateEditCheckboxField, CreateFormField } from 'components/form/create_form_components';
-import { Box, Checkbox, FormControlLabel, Switch } from '@mui/material';
 import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
-import CaptivityStatusForm from './CaptivityStatusForm';
-import { Tooltip } from 'components/common';
-import OkayModal from 'components/modal/OkayModal';
-import { Button } from 'components/common';
+import { Dayjs } from 'dayjs';
 /**
  * todo: deal with data life
  * devices not assigned here?
  */
 export default function CaptureEventForm({
   canSave,
-  event,
+  event: capture,
   handlePostponeSave,
   handleFormChange
 }: WorkflowFormProps<CaptureEvent2>): JSX.Element {
-  const [capture, setCaptureEvent] = useState(event);
   const [showRelease, setShowRelease] = useState(false);
   const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
   const { diedDuring, differentReleaseDetails } = WorkflowStrings.capture;

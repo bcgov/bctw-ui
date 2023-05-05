@@ -6,7 +6,7 @@ import ConfirmModal from 'components/modal/ConfirmModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import useFormHasError from 'hooks/useFormHasError';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { BCTWWorkflow, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import MalfunctionEvent from 'types/events/malfunction_event';
@@ -21,6 +21,7 @@ import MalfunctionEventForm from './MalfunctionEventForm';
 import MortalityEventForm from './MortalityEventForm';
 import ReleaseEventForm from './ReleaseEventForm';
 import RetrievalEventForm from './RetrievalEventForm';
+import { classToPlain } from 'class-transformer';
 
 type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
   event: T;
@@ -138,14 +139,13 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   /**
    * based on the event class, render the workflow form
    */
+  const props = {
+    canSave,
+    handleFormChange: handleChildFormUpdated,
+    handleExitEarly: handleShowExitWorkflow,
+    handlePostponeSave
+  };
   const determineWorkflow = (): JSX.Element => {
-    const props = {
-      canSave,
-      handleFormChange: handleChildFormUpdated,
-      handleExitEarly: handleShowExitWorkflow,
-      handlePostponeSave
-    };
-
     if (statefulEvent instanceof ReleaseEvent) {
       return <ReleaseEventForm {...props} event={statefulEvent} />;
     } else if (statefulEvent instanceof CaptureEvent2) {

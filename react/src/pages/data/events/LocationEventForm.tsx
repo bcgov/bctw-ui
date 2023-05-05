@@ -34,11 +34,22 @@ export default function LocationEventForm({
 }: LocationEventProps): JSX.Element {
   // create the form inputs
   const { regions, comment, latlon, extra } = event.fields;
+  const [isRequired, setIsRequired] = useState({ required: false });
+
+  const requiredLocationInputs: Array<keyof LocationEvent> = [
+    'latitude',
+    'longitude',
+    'coordinate_uncertainty',
+    'coordinate_uncertainty_unit'
+  ];
 
   const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];
     const value = Object.values(v)[0];
     event[key] = value;
+    if (requiredLocationInputs.includes(key as keyof LocationEvent) && value) {
+      setIsRequired({ required: true });
+    }
     if (event.event_type === 'release') {
       notifyChange({ ...v, nestedEventKey: 'release_location' });
       return;
@@ -51,34 +62,42 @@ export default function LocationEventForm({
     notifyChange(v);
   };
 
-  const LocationFormField = ({ fields }: { fields: FormFieldObject<LocationEvent>[] }) => {
+  const LocationFormField = ({
+    fields,
+    inputProps
+  }: {
+    fields: FormFieldObject<LocationEvent>[];
+    inputProps?: { required: boolean };
+  }): JSX.Element => {
     return (
       <>
         {fields.map((f, i) => (
-          <React.Fragment key={`${i}-${String(f.prop)}`}>{CreateFormField(event, f, changeHandler)}</React.Fragment>
+          <React.Fragment key={`${i}-${String(f.prop)}`}>
+            {CreateFormField(event, f, changeHandler, inputProps)}
+          </React.Fragment>
         ))}
       </>
     );
   };
 
-  const baseInputProps = { changeHandler, required: !isDev(), disabled };
+  // const baseInputProps = { changeHandler, required: !isDev(), disabled };
   return (
     <>
       {children ? (
-        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`} {...baseInputProps}>
+        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`}>
           {children}
         </FormSection>
       ) : null}
-      <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`} {...baseInputProps}>
-        <LocationFormField fields={latlon} />
+      <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`}>
+        <LocationFormField fields={latlon} inputProps={isRequired} />
         <Box key='bx-rec' {...boxSpreadRowProps}>
           <LocationFormField fields={comment} />
         </Box>
       </FormSection>
-      <FormSection id='Region' header={`${capitalize(event.event_type)} Region`} {...baseInputProps}>
+      <FormSection id='Region' header={`${capitalize(event.event_type)} Region`}>
         <LocationFormField fields={regions} />
       </FormSection>
-      <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`} {...baseInputProps}>
+      <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`}>
         <LocationFormField fields={extra} />
       </FormSection>
 
