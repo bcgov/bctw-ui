@@ -6,6 +6,7 @@ const detailedFormat = `?format=detailed`;
 export const CbRouters = {
   lookups: '/lookups',
   critters: '/critters',
+  captures: '/captures',
 
   get lookupsEnum(): string {
     return this.lookups + '/enum';

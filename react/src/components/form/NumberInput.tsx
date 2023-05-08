@@ -27,14 +27,12 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
   useEffect(() => {
     if (!defaultValue && required) {
       setValueError(empty, FormStrings.isRequired);
-      console.log('1');
       return;
     }
 
     if (typeof defaultValue === 'number') {
       if (isFunction(validate)) {
         setValueError(defaultValue, validate(defaultValue));
-        console.log('2');
         return;
       }
     }

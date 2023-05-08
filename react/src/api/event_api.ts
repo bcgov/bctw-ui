@@ -7,13 +7,16 @@ import {
   upsertDeviceEndpoint
 } from 'api/api_endpoint_urls';
 import { createUrl, postJSON } from 'api/api_helpers';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosInstance } from 'axios';
 import { RemoveDeviceInput } from 'types/collar_history';
 import { ChangeDataLifeInput } from 'types/data_life';
-import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice, CbPayload } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { API, IBulkUploadResults, ApiProps } from './api_interfaces';
 import { useQueryClient } from 'react-query';
+import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
+import { critterbaseApi } from './critterbase_api';
+import { CbRouters } from 'critterbase/routes';
 
 /**
  * API for saving workflow events @type {EventType}
@@ -21,8 +24,8 @@ import { useQueryClient } from 'react-query';
 
 export type WorkflowAPIResponse = true | AxiosError;
 
-export const eventApi = (props: ApiProps): API => {
-  const { api } = props;
+export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
+  const { api, cb_api } = props;
   const queryClient = useQueryClient();
 
   // since saving an event can affect many queries, invalidate everything
@@ -103,7 +106,20 @@ export const eventApi = (props: ApiProps): API => {
     }
   };
 
+  const _saveCbCapture = async (payload: CbPayload<CaptureEvent2>) => {
+    return await cb_api.post(`${CbRouters.captures}/create`, payload);
+  };
+
   const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
+    if (event.event_type === 'capture') {
+      try {
+        const { data } = await _saveCbCapture(event.critterbasePayload);
+        return data;
+      } catch (err) {
+        console.error(`error creating critterbase capture & release event ${formatAxiosError(err)}`);
+        return err;
+      }
+    }
     // capture events can change the data life start
     if (typeof event.getDataLife === 'function') {
       const dli = event.getDataLife();
