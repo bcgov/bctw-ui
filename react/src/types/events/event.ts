@@ -49,7 +49,7 @@ export interface IBCTWWorkflow {
   shouldSaveDevice?: boolean;
 }
 
-export type CbPayload<T> = Partial<Record<keyof T, unknown>>;
+export type CbPayload<T> = Partial<Record<keyof T, unknown>> | undefined;
 
 export type BCTWWorkflow<T> = IBCTWWorkflow & { critterbasePayload?: CbPayload<T> } & BCTWFormat<T>;
 

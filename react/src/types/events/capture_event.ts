@@ -41,19 +41,20 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   get critterbasePayload(): CbPayload<CaptureEvent2> {
     return omitNull({
       //capture_id might need this...
+      critter_id: this.critter_id,
       capture_timestamp: this.capture_timestamp,
       capture_comment: this.capture_comment,
       capture_location: this.capture_location.critterbasePayload,
       capture_mortality: this.capture_mortality,
       release_comment: this.release_comment,
       release_location: this.release_location.critterbasePayload,
-      release_mortality: this.release_mortality
+      release_mortality: this.release_mortality,
+      release_timestamp: this.release_timestamp
     });
   }
 
   constructor() {
     this.event_type = 'capture';
-    // this.capture_timestamp = capture_timestamp ?? dayjs();
     this.capture_location = new LocationEvent('capture');
     this.release_location = new LocationEvent('release');
   }

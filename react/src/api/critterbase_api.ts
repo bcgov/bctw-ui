@@ -3,6 +3,8 @@ import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { API, ApiProps, IUpsertPayload } from './api_interfaces';
 import { uuid } from 'types/common_types';
 import { Critter } from 'types/animal';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import { CbPayload } from 'types/events/event';
 
 export const critterbaseApi = (props: ApiProps): API => {
   const { api } = props;

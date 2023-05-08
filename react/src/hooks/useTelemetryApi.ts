@@ -99,7 +99,7 @@ export const useTelemetryApi = () => {
   const bulkApi = bulk_api(api);
   const mapApi = map_api({ api });
   const userApi = user_api({ api });
-  const eventApi = event_api({ api });
+  const eventApi = event_api({ api, cb_api });
   const permissionApi = permission_api({ api });
   const attachmentApi = attachment_api({ api });
   const onboardApi = onboarding_api({ api });

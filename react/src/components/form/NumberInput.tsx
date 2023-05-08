@@ -36,7 +36,7 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
         return;
       }
     }
-    //setVal(empty);
+    setValueError(defaultValue, empty);
   }, [defaultValue]);
 
   //To minimize the changeHandler from being called infinite times
@@ -104,7 +104,7 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
 
   return (
     <TextField
-      value={val}
+      value={val ?? ''}
       size={'small'}
       style={{ ...style, ...baseInputStyle }}
       onChange={handleChange}

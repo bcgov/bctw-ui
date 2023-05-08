@@ -1,30 +1,25 @@
+import { Box } from '@mui/material';
+import { CreateFormField } from 'components/form/create_form_components';
 import { WorkflowStrings } from 'constants/strings';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { CSSProperties, useState } from 'react';
-import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
+import { useEffect, useState } from 'react';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import { WorkflowFormProps } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { eInputType, parseFormChangeResult } from 'types/form_types';
+import { parseFormChangeResult } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
-import { wfFields, WorkflowFormProps, WorkflowType } from 'types/events/event';
-import { CreateEditCheckboxField, CreateFormField } from 'components/form/create_form_components';
-import { Box, Checkbox, FormControlLabel, Switch } from '@mui/material';
 import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
-import CaptivityStatusForm from './CaptivityStatusForm';
-import { Tooltip } from 'components/common';
-import OkayModal from 'components/modal/OkayModal';
-import { Button } from 'components/common';
+import { Dayjs } from 'dayjs';
 /**
  * todo: deal with data life
  * devices not assigned here?
  */
 export default function CaptureEventForm({
   canSave,
-  event,
+  event: capture,
   handlePostponeSave,
   handleFormChange
 }: WorkflowFormProps<CaptureEvent2>): JSX.Element {
-  const [capture, setCaptureEvent] = useState(event);
   const [showRelease, setShowRelease] = useState(false);
   const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
   const { diedDuring, differentReleaseDetails } = WorkflowStrings.capture;
@@ -34,11 +29,11 @@ export default function CaptureEventForm({
     switch (key) {
       case 'capture_mortality':
         setMortalityCheck(value ? 'capture' : 'unknown');
-        handleFormChange({ release_mortality: false });
+        handleFormChange({ release_mortality: undefined });
         break;
       case 'release_mortality':
         setMortalityCheck(value ? 'release' : 'unknown');
-        handleFormChange({ capture_mortality: false });
+        handleFormChange({ capture_mortality: undefined });
         break;
     }
     handleFormChange(v);
@@ -85,122 +80,14 @@ export default function CaptureEventForm({
       ) : null}
 
       {/* Release Information */}
+      <FormSection id='died-during-checkbox-2' header='Release Information'>
+        {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
+      </FormSection>
       {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
-        <FormSection id='died-during-checkbox-2' header='Release Information'>
+        <FormSection id='died-during-checkbox-3' header=''>
           {CreateFormField(capture, capture.fields.release_mortality, onChange, { label: diedDuring('release') })}
-          {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
         </FormSection>
       ) : null}
     </Box>
-    // <>
-    // TODO old critterbase integration
-    //   <FormSection id='a' header='Capture Details'>
-    //     {[
-    //       <LocationEventForm key='ce-loc' event={capture.location_event} notifyChange={onChangeLocationProp} />,
-    //       // recapture_ind field
-    //       <Box key='bx-rec' {...boxSpreadRowProps} mt={1}>
-    //         {/* {<span>{isRecapture}</span>} */}
-    //         {/* {CreateFormField(capture, wfFields.get('recapture_ind'), onChange)} */}
-    //       </Box>,
-    //       // captivity status section
-    //       <CaptivityStatusForm
-    //         key='ce-capt'
-    //         event={capture}
-    //         handleFormChange={handleFormChange}
-    //         hideMortStatus={true}
-    //       />,
-    //       // associated animal section
-    //       <Box key='bx-acc' {...boxSpreadRowProps} mt={1}>
-    //         {<span style={{ marginRight: '0.5rem' }}>{associated}</span>}
-    //         {/* {CreateFormField(capture, wfFields.get('associated_animal_id'), onChange)} */}
-    //       </Box>,
-    //       <Box key='bx-rel' {...boxSpreadRowProps} mt={1}>
-    //         {<span>{associatedID}</span>}
-    //         {/* {CreateFormField(capture, wfFields.get('associated_animal_relationship'), onChange, {
-    //           required: hasAssociation,
-    //           disabled: !hasAssociation
-    //         })} */}
-    //       </Box>,
-    //       // animal characteristics section, with subheader tooltip indicating user should review other metadata
-    //       <Tooltip key='tt-rev' title={shouldReviewNotif}>
-    //         <Box mt={2}>
-    //           <span>{areUpdates}</span>
-    //         </Box>
-    //       </Tooltip>,
-    //       <Box key='bx-et-l' {...boxSpreadRowProps} mt={1}>
-    //         {/* {CreateFormField(capture, wfFields.get('ear_tag_left_id'), onChange)}
-    //         {CreateFormField(capture, wfFields.get('ear_tag_left_colour'), onChange)} */}
-    //       </Box>,
-    //       <Box key='bx-et-r' {...boxSpreadRowProps} mt={1}>
-    //         {/* {CreateFormField(capture, wfFields.get('ear_tag_right_id'), onChange)}
-    //         {CreateFormField(capture, wfFields.get('ear_tag_right_colour'), onChange)} */}
-    //       </Box>,
-    //       <Box key='bx-juv' {...boxSpreadRowProps} mt={1}>
-    //         {/* {CreateFormField(capture, wfFields.get('juvenile_at_heel'), onChange)}
-    //         {CreateFormField(capture, wfFields.get('juvenile_at_heel_count'), onChange, {
-    //           required: hasBabies,
-    //           disabled: !hasBabies
-    //         })} */}
-    //       </Box>,
-    //       <Box key='bx-life' {...boxSpreadRowProps} mt={1}>
-    //         {/* {CreateFormField(capture, wfFields.get('animal_colouration'), onChange)}
-    //         {CreateFormField(capture, wfFields.get('life_stage'), onChange)} */}
-    //       </Box>
-    //     ]}
-    //   </FormSection>
-    //   <FormSection id='c' header='Translocation Details'>
-    //     {[
-    //       <Box key='bx-transloc' {...boxSpreadRowProps}>
-    //         {<span>{strIsTransloc}</span>}
-    //         {/* translocation checkbox, controls disabled status of other fields in section */}
-    //         {/* {CreateFormField(capture, wfFields.get('translocation_ind'), onChange)} */}
-    //       </Box>,
-    //       <Box key='bx-rel' {...boxSpreadRowProps} mt={1}>
-    //         {<span>{isTranslocCompleted}</span>}
-    //         <Button
-    //           onClick={(): void => handlePostponeSave('release')}
-    //           disabled={!isTransloc || !canSave}
-    //           style={{ paddingInline: '15px' }}>
-    //           {WorkflowStrings.capture.btnContinueTo('Release')}
-    //         </Button>
-    //       </Box>,
-    //       <Box key='bx-mort' {...boxSpreadRowProps}>
-    //         {<span>{diedDuring('translocation_ind')}</span>}
-    //         <Button onClick={(): void => handlePostponeSave('mortality')} disabled={!isTransloc || !canSave}>
-    //           {WorkflowStrings.capture.btnContinueTo('Mortality')}
-    //         </Button>
-    //       </Box>,
-    //       <Box key='bx-f' {...boxSpreadRowProps} mt={1}>
-    //         {/* {CreateFormField(capture, wfFields.get('region'), onChange, {
-    //           required: mustPopulate,
-    //           disabled: !isTransloc || !isTranslocComplete
-    //         })} */}
-    //         {CreateFormField(capture, wfFields.get('collection_unit'), onChange, {
-    //           required: mustPopulate,
-    //           disabled: !isTransloc || !isTranslocComplete
-    //         })}
-    //       </Box>
-    //     ]}
-    //   </FormSection>
-    //   <FormSection id='b' header='Release Details'>
-    //     {[
-    //       <Box key='bx-goto-rel' {...boxSpreadRowProps}>
-    //         {<span>{beenReleased}</span>}
-    //         <Button disabled={!canSave} onClick={(): void => handlePostponeSave('release')}>
-    //           {btnContinueTo('Release')}
-    //         </Button>
-    //       </Box>,
-    //       <Box key='bx-goto-capt' {...boxSpreadRowProps} mt={1}>
-    //         {<span>{diedDuring('capture')}</span>}
-    //         <Button disabled={!canSave} onClick={(): void => handlePostponeSave('mortality')}>
-    //           {btnContinueTo('Mortality')}
-    //         </Button>
-    //       </Box>
-    //     ]}
-    //   </FormSection>
-    //   <OkayModal open={showNotif} handleClose={(): void => setShowNotif(false)}>
-    //     {translocNotif}
-    //   </OkayModal>
-    // </>
   );
 }
