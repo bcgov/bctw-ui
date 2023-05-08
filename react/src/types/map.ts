@@ -1,11 +1,12 @@
-import { Type, Expose } from 'class-transformer';
+import { Type, Expose, Transform } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
-import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus } from 'types/animal';
+import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus, formatCollectionUnits } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
-import { BCTWBase, BCTWType } from './common_types';
+import { BCTWBase, BCTWType, DayjsToPlain, nullOrDayjs, toClassOnly, toPlainOnly } from './common_types';
+import { Dayjs } from 'dayjs';
 
 interface MapRange {
   start: string;
@@ -33,7 +34,7 @@ interface ITelemetryPoint extends GeoJsonObject {
   type: 'Feature';
   geometry: Point;
   id: number;
-  properties: ITelemetryDetail;
+  properties: TelemetryDetail;
 }
 
 // represents a track
@@ -60,12 +61,12 @@ interface ITelemetryGroup {
 }
 
 // represents the jsonb object in the get_telemetry pg function
+// TODO: find a better solution to inherit common functions/properties like "mortality_timestamp" and "formatCollectionUnits"
 export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDetail> {
   critter_id: string;
   taxon: string;
   wlh_id: string;
   animal_id: string;
-  critter_status: eCritterStatus;
   @Type(() => Date) capture_date: Date;
   sex: string;
   collection_units: ICollectionUnit[];
@@ -78,6 +79,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   frequency_unit: string;
   device_status: string;
   collective_unit: string;
+  @Transform(nullOrDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
   @Type(() => Date) date_recorded: Date;
   @Type(() => Date) mortality_date: Date;
   @Expose() get formattedDevice(): string {
@@ -101,14 +103,13 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
     return 'device_id';
   }
 
-    // Get a comma-separated string of collection_unit's keys and values
-  // TODO: Decide on the exact format we want for this
   get collection_unit_display(): string {
-    const collectionUnitArray = this.collection_units?.map(unit => {
-      const unitString = Object.entries(unit).map(([key, value]) => `${key}: ${value}`);
-      return unitString;
-    });
-    return collectionUnitArray?.join(', ') ?? '';
+    return formatCollectionUnits(this.collection_units);
+  }
+
+  get critter_status(): string {
+    // console.log(`mort timestamp: ${this.mortality_timestamp}`)
+    return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
   get displayProps(): (keyof TelemetryDetail)[] {

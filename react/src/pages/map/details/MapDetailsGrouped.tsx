@@ -4,7 +4,6 @@ import { getComparator } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { Order } from 'components/table/table_interfaces';
-import { plainToClass } from 'class-transformer';
 import {
   getPointIDsFromTelemetryGroup,
   getLatestPing,
@@ -34,7 +33,7 @@ const rows_to_render = [
   'Device ID',
   'Device Status',
   'Frequency (MHz)',
-  'Capture Date',
+  // 'Capture Date',
   'Last Transmit Date'
 ];
 
@@ -79,14 +78,14 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   };
 
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
-  console.log(plainToClass(TelemetryDetail, pings[0].features[0].properties))
+  // console.log(plainToClass(TelemetryDetail, pings[0].features[0].properties))
   return (
     <TableContainer component={Paper} className={'map-detail-table-container'}>
       <Table stickyHeader size='small'>
         {pings && pings.length ? (
           <TableHead
             headersToDisplay={[...rows_to_render, `Point Count (${totalPointCount()})`] as any}
-            headerData={plainToClass(TelemetryDetail, pings[0].features[0].properties) as TelemetryDetail}
+            headerData={pings[0].features[0].properties}
             numSelected={checkedGroups.length}
             order={order}
             orderBy={orderBy ?? ''}
@@ -106,7 +105,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 isChecked={checkedGroups.includes(u.critter_id)}
                 isSelectedInMap={crittersSelected.indexOf(u.critter_id) !== -1}
                 // fixme: should it be the latest props that are displayed?
-                row={plainToClass(TelemetryDetail, getLatestPing(u.features)?.properties)}
+                row={getLatestPing(u.features)?.properties}
                 handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
               />
@@ -167,7 +166,7 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('device', row)} />
       <TableCell>{row.device_status}</TableCell>
       <TableCell>{row.paddedFrequency}</TableCell>
-      <TableCell>{row.formattedCaptureDate}</TableCell>
+      {/* <TableCell>{row.formattedCaptureDate}</TableCell> */}
       <TableCell>{row.formattedDate}</TableCell>
       <TableCell>{pingCount}</TableCell>
     </TableRow>

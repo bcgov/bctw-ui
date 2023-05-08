@@ -24,7 +24,8 @@ import {
   getLast10Fixes,
   getUniqueCritterIDsFromSelectedPings,
   groupFilters,
-  splitPings
+  splitPings,
+  updatePings
 } from 'pages/map/map_helpers';
 import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import {
@@ -90,6 +91,9 @@ export default function MapPage(): JSX.Element {
   const [pings, setPings] = useState<ITelemetryPoint[]>([]);
   const [selectedPingIDs, setSelectedPingIDs] = useState<number[]>([]);
 
+  // holds the most recently fetched pings data
+  const [fetchedPings, setFetchedPings] = useState<ITelemetryPoint[]>([]);
+
   // modal states - overview, export, udf editing
   const [showOverviewModal, setShowModal] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
@@ -116,10 +120,17 @@ export default function MapPage(): JSX.Element {
     isFetching: fetchingPings,
     isLoading: isLoadingPings,
     isError: isErrorPings,
-    data: fetchedPings
+    data: baseFetchedPings
   } = api.usePings(start, end);
   // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
+
+  // Update the fetchedPings using helper function to instatiate TelemetryDetail classes
+  useEffect(() => {
+    if (baseFetchedPings && !isErrorPings) {
+      setFetchedPings(updatePings(baseFetchedPings));
+    }
+  }, [baseFetchedPings]);
 
   // refetch pings when start/end times are changed
   useEffect(() => {

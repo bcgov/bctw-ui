@@ -1,7 +1,7 @@
 import { Exclude, Transform } from 'class-transformer';
 import { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
+import { BCTWBase, DayjsToPlain, nullOrDayjs, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { FormFieldObject, eInputType, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader } from 'utils/common_helpers';
@@ -123,8 +123,15 @@ interface CritterMeasurement {
 /**
  * Critter properties that are re-used in Telemetry classes (map.ts)
  */
-export type ICritterTelemetryBase = {map_colour: Code} & Pick<Critter, 'animal_id' | 'critter_status' | 'taxon' | 'collection_unit' | 'collection_units' | 'wlh_id'>
+export type ICritterTelemetryBase = {map_colour: Code} & Pick<Critter, 'animal_id' | 'critter_status' | 'taxon' | 'collection_unit' | 'collection_units' | 'wlh_id' | 'mortality_timestamp'>
 
+export const formatCollectionUnits = (collection_units: ICollectionUnit[]): string => {
+  return collection_units
+    ?.map((unit) => {
+      return `${unit.category_name}: ${unit.unit_name}`;
+    })
+    .join(', ');
+}
 
 // * CRITTERBASE INTEGRATION *
 export class Critter implements BCTWBase<Critter>{
@@ -135,7 +142,7 @@ export class Critter implements BCTWBase<Critter>{
   taxon_id: uuid;
   readonly taxon: string;
   collection_units: ICollectionUnit[];
-  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
+  @Transform(nullOrDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
   responsible_region_nr_id?: uuid;
   readonly responsible_region?: string;
   readonly system_origin?: string;
@@ -170,12 +177,7 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   get collection_unit(): string {
-    return this.collection_units
-      ?.map((unit) => {
-        const [category] = Object.keys(unit);
-        `${category}: ${unit[category]}`;
-      })
-      .join(', ');
+    return formatCollectionUnits(this.collection_units)
   }
 
   tagColor(): string {

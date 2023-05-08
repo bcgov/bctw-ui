@@ -16,6 +16,7 @@ import {
 } from 'types/map';
 import { capitalize, columnToHeader } from 'utils/common_helpers';
 import { CODE_FILTERS } from './map_constants';
+import { plainToClass } from 'class-transformer';
 
 const MAP_COLOURS = {
   point: '#00ff44',
@@ -433,6 +434,15 @@ const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] => {
   }));
 };
 
+// Converts the properties of each ITelemetryPoint to an instance of TelemetryDetail
+const updatePings = (newPings: ITelemetryPoint[]): ITelemetryPoint[] => {
+  return newPings.map((point) => ({
+    ...point,
+    properties: plainToClass(TelemetryDetail, point.properties),
+  }));
+}
+
+
 export {
   applyFilter,
   fillPoint,
@@ -456,5 +466,6 @@ export {
   sortGroupedTelemetry,
   splitPings,
   createUniqueList,
-  getFormValues
+  getFormValues,
+  updatePings
 };
