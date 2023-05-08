@@ -10,16 +10,16 @@ import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 
 export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
-export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: CbSelectProps): JSX.Element => {
+export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, label, disabled }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
   const [selected, setSelected] = useState<uuid | string>('');
   // const [hasError, setHasError] = useState((required && !selected) || !cbRouteKey);
 
   const hasError = isError || (required && !selected) || !cbRouteKey;
-  const isDisabled = isLoading || isError || !cbRouteKey;
+  const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   // console.log({ cbRouteKey }, { isLoading }, { isError });
-  const label = cbRouteKey ? columnToHeader(cbRouteKey) : 'Missing Route Key';
+  const labelOverride = label ?? columnToHeader(cbRouteKey);
 
   useEffect(() => {
     if (!data?.length) return;
@@ -27,18 +27,24 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
     setSelected(value);
   }, [isSuccess]);
 
-  const pushChange = (v: string): void => {
+  const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
     const ret = { [prop]: v, error: false };
     handleChange(ret);
-    console.log(ret);
   };
 
-  const handleSelect = (event: SelectChangeEvent): void => {
+  /*const handleSelect = (event: SelectChangeEvent): void => {
     const { value } = event.target;
     setSelected(value);
     pushChange(value);
-  };
+  };*/
+
+  const handleSelect = (id: string, label: string) => { 
+    const a = { id: id, label: label};
+    setSelected(a.id);
+    pushChange(a);
+  }
+
   return (
     <FormControl
       size='small'
@@ -48,13 +54,13 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
       error={!isLoading && hasError}
       key={`${cbRouteKey}-${String(prop)}`}
       disabled={isDisabled}>
-      <InputLabel>{label}</InputLabel>
-      <Select value={selected} onChange={handleSelect} MenuProps={selectMenuProps}>
+      <InputLabel>{labelOverride}</InputLabel>
+      <Select value={selected} /*onChange={handleSelect}*/ MenuProps={selectMenuProps}>
         {data?.map((val, idx) => {
           const valueId = typeof val === 'string' ? val : val.id;
           const value = typeof val === 'string' ? val : val.value;
           return (
-            <MenuItem value={valueId} key={`${val}-${idx}`}>
+            <MenuItem value={valueId} key={`${val}-${idx}`} onClick={() => handleSelect(valueId, value)}>
               {capitalize(value)}
             </MenuItem>
           );
