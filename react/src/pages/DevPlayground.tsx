@@ -72,8 +72,6 @@ const DevPlayground = (): JSX.Element => {
           open={bool}
           event={editObjectToEvent({ critter_id: '12323234', taxon: 'Moose' }, new CaptureEvent2(), [])}
           handleClose={(): void => setBool(false)}
-          onEventSaved={(e) => console.log(e.critterbasePayload)}
-          onEventChain={() => console.log('chain')}
         />
 
         <Box flexDirection='column'>

@@ -106,18 +106,21 @@ export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
     }
   };
 
-  const _saveCbCapture = async (payload: CbPayload<CaptureEvent2>) => {
-    return await cb_api.post(`${CbRouters.captures}/create`, payload);
+  const _saveCbCapture = async (payload: CbPayload<CaptureEvent2>): Promise<WorkflowAPIResponse> => {
+    try {
+      const { data } = await cb_api.post(`${CbRouters.captures}/create`, payload);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`error creating critterbase capture & release event ${formatAxiosError(err)}`);
+      return err;
+    }
   };
 
   const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
     if (event.event_type === 'capture') {
-      try {
-        const { data } = await _saveCbCapture(event.critterbasePayload);
-        return data;
-      } catch (err) {
-        console.error(`error creating critterbase capture & release event ${formatAxiosError(err)}`);
-        return err;
+      const c = await _saveCbCapture(event.critterbasePayload);
+      if (typeof c !== 'boolean') {
+        return c;
       }
     }
     // capture events can change the data life start
