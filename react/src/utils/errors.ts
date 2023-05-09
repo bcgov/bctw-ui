@@ -1,15 +1,16 @@
 import { AxiosError } from 'axios';
+import { map } from 'leaflet';
 
 /**
  * formats an Axios error to a string
  */
 const formatAxiosError = (err: AxiosError): string => {
   const e = err?.response?.data;
-  const zodErrors = Object.entries(e?.errors);
+
   //This might need tweaking if other responses return with errors: {}
-  if (zodErrors) {
+  if (e?.errors) {
     //Formatted zod error
-    return zodErrors
+    return Object?.entries(e?.errors)
       .map(
         ([key, valueArr]) =>
           `${key.replace('_', ' ').replace('id', 'ID').toUpperCase()}: ${valueArr ? valueArr[0] : 'error'}`

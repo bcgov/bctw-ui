@@ -70,7 +70,12 @@ const DevPlayground = (): JSX.Element => {
 
         <WorkflowWrapper
           open={bool}
-          event={editObjectToEvent({ critter_id: '12323234', taxon: 'Moose' }, new CaptureEvent2(), [])}
+          event={editObjectToEvent(
+            { critter_id: '0e634a79-de08-4db0-8a33-71dfdfdd9405', taxon: 'Moose' },
+            new CaptureEvent2(),
+            []
+          )}
+          onEventSaved={(e) => console.log(e.critterbasePayload)}
           handleClose={(): void => setBool(false)}
         />
 

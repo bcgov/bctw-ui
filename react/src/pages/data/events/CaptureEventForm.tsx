@@ -9,7 +9,7 @@ import { parseFormChangeResult } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 /**
  * todo: deal with data life
  * devices not assigned here?
@@ -22,11 +22,16 @@ export default function CaptureEventForm({
 }: WorkflowFormProps<CaptureEvent2>): JSX.Element {
   const [showRelease, setShowRelease] = useState(false);
   const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
+  const [minReleaseDate, setMinReleaseDate] = useState(capture.capture_timestamp);
+
   const { diedDuring, differentReleaseDetails } = WorkflowStrings.capture;
 
   const onChange = (v: Record<keyof CaptureEvent2 | keyof LocationEvent, unknown>): void => {
     const [key, value] = parseFormChangeResult<CaptureEvent2>(v);
     switch (key) {
+      case 'capture_timestamp':
+        setMinReleaseDate(value as Dayjs);
+        break;
       case 'capture_mortality':
         setMortalityCheck(value ? 'capture' : 'unknown');
         handleFormChange({ release_mortality: undefined });
@@ -54,7 +59,7 @@ export default function CaptureEventForm({
       {/* Capture Date -> Capture Environment */}
       <LocationEventForm key='ce-loc' event={capture.capture_location} notifyChange={onChange}>
         <Box key='bx-rec' {...boxSpreadRowProps}>
-          {CreateFormField(capture, capture.fields.capture_timestamp, onChange)}
+          {CreateFormField(capture, capture.fields.capture_timestamp, onChange, { value: dayjs() })}
           {CreateFormField(capture, capture.fields.capture_comment, onChange)}
         </Box>
       </LocationEventForm>
@@ -69,7 +74,7 @@ export default function CaptureEventForm({
       {/* Release Date */}
       <FormSection id='release-date' header='Release Date'>
         <Box key='bx-rec' {...boxSpreadRowProps}>
-          {CreateFormField(capture, capture.fields.release_timestamp, onChange)}
+          {CreateFormField(capture, capture.fields.release_timestamp, onChange, { minDate: minReleaseDate })}
           {CreateFormField(capture, capture.fields.release_comment, onChange)}
         </Box>
       </FormSection>

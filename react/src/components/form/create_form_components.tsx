@@ -113,7 +113,7 @@ function CreateEditDateTimeField({
     <DateTimeInput
       propName={prop}
       label={label}
-      defaultValue={dayjs(value as Date)}
+      defaultValue={value as Dayjs}
       changeHandler={handleChange}
       disabled={disabled}
       key={`input-dt-${String(prop)}`}
