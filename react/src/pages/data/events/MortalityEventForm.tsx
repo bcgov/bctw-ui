@@ -66,14 +66,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     //     setIsPredation(true);
     //   }
     } else if (key === 'proximate_cause_of_death_id') {
-      const isPredation = value['label'] === 'Predation';
-      setIsPredatorKnown(isPredation);
-      /*if(!isPredation) {
-        const tempMortality = mortality;
-        tempMortality.proximate_predated_by_taxon_id = '';
-        setMortalityEvent(tempMortality);
-        console.log('Just set the mortality state')
-      }*/
+      setIsPredatorKnown(value['label'] === 'Predation');
     } else if (key === 'ultimate_cause_of_death_id') {
       setIsUcodPredatorKnown(value['label'] === 'Predation')
     } else if (key === 'shouldUnattachDevice') {
@@ -120,7 +113,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
         <Box>
           {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_id, onChange)}
           {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_confidence, onChange)}
-          {CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, {disabled: !isUcodPredatorKnown})}
+          {CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, isUcodPredatorKnown ? {} : {disabled: !isUcodPredatorKnown, value: ''})}
         </Box>
       </FormSection>
       <FormSection id={'mort-dev'} header={'Device Information'}>

@@ -72,6 +72,18 @@ interface CritterCapture {
   release_location: CritterReleaseLocation;
 }
 
+interface CritterMortality {
+  mortality_id: uuid;
+  location_id: uuid;
+  mortality_timestamp: Dayjs;
+  proximate_cause_of_death_id: uuid;
+  proximate_cause_of_death_confidence: 'Probable' | 'Definite';
+  proximate_predated_by_taxon_id: uuid;
+  ultimate_cause_of_death_id: uuid;
+  ultimate_cause_of_death_confidence: 'Probable' | 'Definite';
+  ultimate_predated_by_taxon_id: uuid;
+}
+
 interface CritterMarking {
   marking_id: uuid;
   capture_id: uuid | null;
@@ -145,7 +157,7 @@ export class Critter implements BCTWBase<Critter>{
   @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) readonly update_timestamp?: Dayjs;
   critter_comment?: string;
   //Extra details
-  mortality?: unknown[];
+  mortality?: CritterMortality[];
   capture?: CritterCapture[];
   marking?: CritterMarking[];
   measurement?: CritterMeasurement[];
@@ -162,7 +174,7 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   get critter_status(): string {
-    return eCritterStatus.alive;//this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
+    return this.mortality?.length ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
   get displayProps(): (keyof Critter)[] {
