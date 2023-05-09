@@ -43,6 +43,14 @@ export class LocationEvent implements BCTWWorkflow<LocationEvent> {
   }
 
   formatPropAsHeader(k: keyof LocationEvent): string {
+    switch (k) {
+      case 'region_env_id':
+        return 'ENV Region';
+      case 'region_nr_id':
+        return 'NR Region';
+      case 'wmu_id':
+        return 'Wildlife Management Unit';
+    }
     return columnToHeader(k);
   }
 

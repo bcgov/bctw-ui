@@ -9,7 +9,7 @@ import { useTaxon } from 'contexts/TaxonContext';
 import { CbSelect, CbSelectProps } from 'critterbase/components/CbSelect';
 import { ICbRouteKey } from 'critterbase/types';
 import dayjs, { Dayjs } from 'dayjs';
-import { CSSProperties, ReactElement, ReactNode } from 'react';
+import { CSSProperties, ReactElement, ReactNode, useEffect } from 'react';
 import { Critter, AttachedCritter } from 'types/animal';
 import { ICodeFilter } from 'types/code';
 import { BCTWFormat } from 'types/common_types';
@@ -220,6 +220,10 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   if (formField === undefined) {
     return null;
   }
+
+  useEffect(() => {
+    console.log('Detected obj change in CreateFormField ' + JSON.stringify(obj, null, 2))
+  })
 
   const { prop, type, tooltip } = formField;
   const toPass = {

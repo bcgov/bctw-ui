@@ -135,7 +135,7 @@ export class Critter implements BCTWBase<Critter>{
   taxon_id: uuid;
   readonly taxon: string;
   collection_units: ICollectionUnit[];
-  @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
+  //@Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
   responsible_region_nr_id?: uuid;
   readonly responsible_region?: string;
   readonly system_origin?: string;
@@ -162,7 +162,7 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   get critter_status(): string {
-    return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
+    return eCritterStatus.alive;//this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
   get displayProps(): (keyof Critter)[] {

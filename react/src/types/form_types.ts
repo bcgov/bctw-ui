@@ -2,6 +2,7 @@ import { BaseTextFieldProps } from '@mui/material';
 import { ICbRouteKey } from 'critterbase/types';
 import { CSSProperties, ReactNode } from 'react';
 import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
+import MortalityEvent from './events/mortality_event';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
@@ -53,9 +54,11 @@ export const isDisabled = { disabled: true };
 // what a form component passes when it's changed
 // ex: {name: 'bill', error: false}
 export type InboundObj = {
-  [key: string]: unknown;
+  [key: string]: unknown | {id: string, label: string};
+  label?: string;
+  id?: string;
   error?: boolean;
-  nestedEventKey?: keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'>;
+  nestedEventKey?: keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'> | keyof Pick<MortalityEvent, 'location'>;
 };
 
 /**

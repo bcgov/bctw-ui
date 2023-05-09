@@ -11,7 +11,8 @@ import {
   WorkflowType,
   OptionalAnimal,
   OptionalDevice,
-  IBCTWWorkflow
+  IBCTWWorkflow,
+  CbPayload
 } from 'types/events/event';
 import { IMortalityAlert } from 'types/alert';
 import { uuid } from 'types/common_types';
@@ -20,6 +21,7 @@ import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { DataLife } from 'types/data_life';
 import { WorkflowStrings } from 'constants/strings';
 import CaptureEvent from './capture_event';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 export type MortalityDeviceEventProps = Pick<
   Collar,
@@ -152,8 +154,24 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     // 'mortality_captivity_status_ind'
   ];
 
+  get critterbasePayload(): CbPayload<MortalityEvent> {
+    return omitNull({
+      critter_id: this.critter_id,
+      mortality_timestamp: this.mortality_timestamp,
+      mortality_comment: this.mortality_comment,
+      location: this.location.critterbasePayload,
+      proximate_cause_of_death_id: this.proximate_cause_of_death_id,
+      proximate_cause_of_death_confidence: this.proximate_cause_of_death_confidence,
+      proximate_predated_by_taxon_id: this.proximate_predated_by_taxon_id,
+      ultimate_cause_of_death_id: this.ultimate_cause_of_death_id,
+      ultimate_cause_of_death_confidence: this.ultimate_cause_of_death_confidence,
+      ultimate_predated_by_taxon_id: this.ultimate_predated_by_taxon_id
+    })
+  }
+
   constructor(mort_date = dayjs(), capture?: CaptureEvent) {
     this.event_type = 'mortality';
+    this.mortality_timestamp = dayjs();
     this.shouldSaveAnimal = true;
     this.shouldSaveDevice = true;
     this.shouldUnattachDevice = false;

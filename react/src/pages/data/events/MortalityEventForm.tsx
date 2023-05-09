@@ -25,8 +25,8 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
   // business logic workflow state
   const [isRetrieved, setIsRetrieved] = useState(false);
   const [isPredation, setIsPredation] = useState(false);
-  const [isPredatorKnown, setIsPredatorKnown] = useState(false);
-  const [isUcodPredatorKnown, setIsUcodPredatorKnown] = useState(false);
+  const [isPredatorKnown, setIsPredatorKnown] = useState(!!event.proximate_predated_by_taxon_id ?? false);
+  const [isUcodPredatorKnown, setIsUcodPredatorKnown] = useState(!!event.ultimate_predated_by_taxon_id ?? false);
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
   const [ucodDisabled, setUcodDisabled] = useState(true);
   const [isUCODKnown, setIsUCODKnown] = useState(false);
@@ -66,7 +66,13 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     //     setIsPredation(true);
     //   }
     } else if (key === 'proximate_cause_of_death_id') {
-      setIsPredatorKnown(value['label'] === 'Predation')
+      const isPredation = value['label'] === 'Predation';
+      setIsPredatorKnown(isPredation);
+      if(!isPredation) {
+        const tempMortality = mortality;
+        delete tempMortality.proximate_predated_by_taxon_id;
+        setMortalityEvent(tempMortality);
+      }
     } else if (key === 'ultimate_cause_of_death_id') {
       setIsUcodPredatorKnown(value['label'] === 'Predation')
     } else if (key === 'shouldUnattachDevice') {
@@ -116,7 +122,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
           {CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, {disabled: !isUcodPredatorKnown})}
         </Box>
       </FormSection>
-      <FormSection id={''} header={'Device Information'}>
+      <FormSection id={'mort-dev'} header={'Device Information'}>
       <Box mb={1} {...boxSpreadRowProps}>
           {CreateFormField(mortality, mortality.fields.retrieval_date, onChange, {
             disabled: !isRetrieved || critterIsAlive

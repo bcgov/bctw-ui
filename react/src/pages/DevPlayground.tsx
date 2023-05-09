@@ -92,11 +92,11 @@ const DevPlayground = (): JSX.Element => {
         <WorkflowWrapper
           open={openMortality}
           event={editObjectToEvent(
-            plainToClass(Critter, {
+            {
               critter_id: 'c6b0a6c7-71ca-421a-96d6-1878fec07b05',
               taxon: 'Moose',
               wlh_id: '12-345'
-            }),
+            },
             new MortalityEvent(),
             []
           )}

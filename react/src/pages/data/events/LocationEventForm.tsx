@@ -58,6 +58,10 @@ export default function LocationEventForm({
       notifyChange({ ...v, nestedEventKey: 'capture_location' });
       return;
     }
+    if(event.event_type === 'mortality') {
+      notifyChange({ ...v, nestedEventKey: 'location'})
+      return;
+    }
     // notify parent that the location event changed
     notifyChange(v);
   };

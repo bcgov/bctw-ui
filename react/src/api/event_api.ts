@@ -16,7 +16,8 @@ import { API, IBulkUploadResults, ApiProps } from './api_interfaces';
 import { useQueryClient } from 'react-query';
 import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
 import { critterbaseApi } from './critterbase_api';
-import { CbRouters } from 'critterbase/routes';
+import { CbRouters, CbRoutes } from 'critterbase/routes';
+import MortalityEvent from 'types/events/mortality_event';
 
 /**
  * API for saving workflow events @type {EventType}
@@ -116,11 +117,36 @@ export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
     }
   };
 
+  const _saveCbMortality = async (payload: CbPayload<MortalityEvent>): Promise<WorkflowAPIResponse> => {
+    try {
+      const { data: cods } = await cb_api.get(`${CbRoutes.cod}`);
+      const predation_id = cods.find(a => a.cod_category === 'Predation')?.cod_id;
+      if(payload.proximate_cause_of_death_id !== predation_id) {
+        delete payload.proximate_predated_by_taxon_id;
+      }
+      if(payload.ultimate_cause_of_death_id !== predation_id) {
+        delete payload.ultimate_predated_by_taxon_id;
+      }
+      const { data } = await cb_api.post(`${CbRouters.mortality}/create`, payload);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`error creating critterbase mortality event ${formatAxiosError(err)}`);
+      return err;
+    }
+  }
+
   const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
     if (event.event_type === 'capture') {
       const c = await _saveCbCapture(event.critterbasePayload);
       if (typeof c !== 'boolean') {
         return c;
+      }
+    }
+    if (event.event_type === 'mortality') {
+      console.log('Mortality cb payload ' + JSON.stringify(event.critterbasePayload, null, 2))
+      const m = await _saveCbMortality(event.critterbasePayload);
+      if (typeof m !== 'boolean') {
+        return m;
       }
     }
     // capture events can change the data life start
