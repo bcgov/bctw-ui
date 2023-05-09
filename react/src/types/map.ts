@@ -70,7 +70,6 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   @Type(() => Date) capture_date: Date;
   sex: string;
   collection_units: ICollectionUnit[];
-  collection_unit: string;
   collar_id: string;
   device_id: number;
   device_vendor: string;
@@ -157,7 +156,7 @@ const padFrequency = (num: number): string => {
 //   pointCount: number;
 // };
 type MapFormValue = {
-  header: keyof TelemetryDetail;
+  header: keyof TelemetryDetail | string;
   label: string;
   values: ISelectMultipleData[];
 };

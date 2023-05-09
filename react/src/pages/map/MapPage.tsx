@@ -176,6 +176,7 @@ export default function MapPage(): JSX.Element {
       }
     };
     update();
+    console.log(fetchedPings)
   }, [fetchedPings]);
 
   // assigned tracks
@@ -339,6 +340,7 @@ export default function MapPage(): JSX.Element {
       setRange(newRange);
     }*/
     // otherwise, update the filter state and apply the filters
+    console.log('filters: ', filters)
     setFilters(filters);
     applyFiltersToPings(filters);
   };

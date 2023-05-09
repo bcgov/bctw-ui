@@ -17,6 +17,7 @@ import {
 import { capitalize, columnToHeader } from 'utils/common_helpers';
 import { CODE_FILTERS } from './map_constants';
 import { plainToClass } from 'class-transformer';
+import { log } from 'console';
 
 const MAP_COLOURS = {
   point: '#00ff44',
@@ -187,6 +188,7 @@ const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
       groupObj[f.code_header].push(f.description);
     }
   });
+  console.log('group filters: ', groupObj)
   return Object.keys(groupObj).map((k) => {
     return { code_header: k, descriptions: groupObj[k] };
   });
@@ -252,6 +254,7 @@ const getUniqueCritterIDsFromSelectedPings = (features: ITelemetryPoint[], selec
   return grped.map((g) => g.critter_id);
 };
 
+// Gets unique properties from an array of telemetry points
 const getUniquePropFromPings = (
   features: ITelemetryPoint[],
   prop: keyof TelemetryDetail = 'device_id',
@@ -427,21 +430,61 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
 
 //Formats a MapFormValues array.
 const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] => {
-  return CODE_FILTERS.map((cf) => ({
+  const staticFilters: MapFormValue[] = CODE_FILTERS.map((cf) => ({
     header: cf.header,
     label: columnToHeader(cf?.label ?? cf.header),
     values: createUniqueList(cf.header, pings)
   }));
+  console.log('static filters: ', staticFilters)
+
+  const collection_units = getUniqueData(pings.map((p) => p.properties.collection_units).flat());
+  console.log('collection_units: ', collection_units)
+
+  const dynamicFilters = collection_units.map((df: { category_name: string; unit_name: string[] }) => ({
+    header: df.category_name,
+    label: df.category_name,
+    values: df.unit_name.map((name) => ({id: name, value: name, displayLabel: name, prop: df.category_name})),
+  }));
+  
+
+  return staticFilters.concat(dynamicFilters);
 };
 
 // Converts the properties of each ITelemetryPoint to an instance of TelemetryDetail
 const updatePings = (newPings: ITelemetryPoint[]): ITelemetryPoint[] => {
   return newPings.map((point) => ({
     ...point,
-    properties: plainToClass(TelemetryDetail, point.properties),
+    properties: plainToClass(TelemetryDetail, point.properties)
   }));
-}
+};
 
+const extractUniqueCategoryNames = (pings: TelemetryDetail[]): string[] => {
+  const categorySet = new Set<string>();
+  pings.forEach((property) => {
+    property.collection_units.forEach((unit) => {
+      categorySet.add(unit.category_name);
+    });
+  });
+  return Array.from(categorySet);
+};
+
+const getUniqueData = (arr) => {
+  const combinedData = arr.reduce((acc, { category_name, unit_name }) => {
+    const existingItem = acc.get(category_name);
+
+    if (existingItem) {
+      if (!existingItem.unit_name.includes(unit_name)) {
+        existingItem.unit_name.push(unit_name);
+      }
+    } else {
+      acc.set(category_name, { category_name, unit_name: [unit_name] });
+    }
+
+    return acc;
+  }, new Map());
+
+  return Array.from(combinedData.values());
+}
 
 export {
   applyFilter,
@@ -467,5 +510,6 @@ export {
   splitPings,
   createUniqueList,
   getFormValues,
-  updatePings
+  updatePings,
+  extractUniqueCategoryNames
 };

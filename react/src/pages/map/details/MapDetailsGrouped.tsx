@@ -25,7 +25,7 @@ type GroupedCheckedStatus = {
 const rows_to_render = [
   'Colour',
   'Taxon',
-  'Collection Unit',
+  // 'Collection Unit',
   // 'Collective Unit',
   'WLH ID',
   'Critter ID',
@@ -37,11 +37,28 @@ const rows_to_render = [
   'Last Transmit Date'
 ];
 
+
+function extractUniqueCategoryNames(pings: ITelemetryGroup[]): string[] {
+  const categorySet = new Set<string>();
+  pings.forEach((ping) => {
+    ping.features.forEach((feature) => {
+      feature.properties.collection_units.forEach((unit) => {
+        categorySet.add(unit.category_name);
+      });
+    });
+  });
+  return Array.from(categorySet);
+}
+
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
   const { pings, crittersSelected, handleShowOverview, handleRowSelected } = props;
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('Critter Name');
   const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
+
+  const uniqueCategoryNames = extractUniqueCategoryNames(pings);
+
+  console.log(uniqueCategoryNames);
 
   const handleSort = (event: React.MouseEvent<unknown>, property: string): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -84,7 +101,14 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
       <Table stickyHeader size='small'>
         {pings && pings.length ? (
           <TableHead
-            headersToDisplay={[...rows_to_render, `Point Count (${totalPointCount()})`] as any}
+            headersToDisplay={
+              [
+                ...rows_to_render.slice(0, 2), // Display the first two headers: Colour and Taxon
+                ...uniqueCategoryNames, // Insert unique category names after the Taxon header
+                ...rows_to_render.slice(2), // Display the remaining headers after the unique category names
+                `Point Count (${totalPointCount()})`
+              ] as any
+            }
             headerData={pings[0].features[0].properties}
             numSelected={checkedGroups.length}
             order={order}
@@ -108,6 +132,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 row={getLatestPing(u.features)?.properties}
                 handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
+                uniqueCategoryNames={uniqueCategoryNames}
               />
             );
           })}
@@ -124,10 +149,11 @@ type MapDetailsTableRowProps = {
   row: TelemetryDetail;
   handleRowCheck: (v: GroupedCheckedStatus) => void;
   handleShowOverview: OnMapRowCellClick;
+  uniqueCategoryNames: string[];
 };
 
 function Row(props: MapDetailsTableRowProps): JSX.Element {
-  const { row, handleRowCheck, handleShowOverview, isSelectedInMap, pingCount, isChecked } = props;
+  const { row, handleRowCheck, handleShowOverview, isSelectedInMap, pingCount, isChecked, uniqueCategoryNames } = props;
 
   const onCheck = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
@@ -150,7 +176,12 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
           }}></Box>
       </TableCell>
       <TableCell>{row.taxon}</TableCell>
-      <TableCell>{row.collection_unit_display}</TableCell>
+      {uniqueCategoryNames.map((category) => {
+        const matchingUnit = row.collection_units.find((unit) => unit.category_name === category);
+        return <TableCell key={`cu_${category}`}>{matchingUnit ? matchingUnit.unit_name : null}</TableCell>;
+      })}
+
+      {/* <TableCell>{row.collection_unit_display}</TableCell> */}
       {/* <TableCell>{row.collective_unit}</TableCell> */}
       {row.critter_id ? (
         <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
