@@ -22,10 +22,24 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, labe
   const labelOverride = label ?? columnToHeader(cbRouteKey);
 
   useEffect(() => {
+    if(prop === 'proximate_predated_by_taxon_id') {
+      console.log('Current value in CbSelect ' + selected);
+
+    }
+  }, [selected])
+
+  useEffect(() => {
     if (!data?.length) return;
     if (typeof value !== 'string') return;
     setSelected(value);
   }, [isSuccess]);
+
+  useEffect(() => {
+    if (typeof value !== 'string') return;
+    if(value !== selected) {
+      setSelected(value);
+    }
+  }, [value])
 
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;

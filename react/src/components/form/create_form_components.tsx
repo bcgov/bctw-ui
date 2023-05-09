@@ -223,7 +223,7 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
 
   useEffect(() => {
     console.log('Detected obj change in CreateFormField ' + JSON.stringify(obj, null, 2))
-  })
+  }, [obj])
 
   const { prop, type, tooltip } = formField;
   const toPass = {
