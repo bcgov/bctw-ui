@@ -49,6 +49,8 @@ export default function useFormHasError(): [boolean, (r: InboundObj) => void, ()
       return;
     }
 
+    console.log('Inbond object for checkErrors: ' + JSON.stringify(v, null, 2));
+
     // find the non-error key/value
     const prop = Object.keys(v).filter((k) => k !== 'error')[0];
 

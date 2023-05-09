@@ -227,16 +227,17 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       case 'shouldUnattachDevice':
         return WorkflowStrings.device.should_unattach;
       case 'proximate_cause_of_death_id':
-        return 'PCOD';
+        return 'Proximate COD';
       case 'ultimate_cause_of_death_id':
-        return 'UCOD';
-      // case 'predator_taxon_ucod':
-      //   return 'Predator UCOD';
-      // case 'predator_taxon_pcod':
-      //   return 'Predator PCOD';
-      // case 'pcod_confidence':
-      // case 'ucod_confidence':
-        return 'Confidence';
+        return 'Ultimate COD';
+      case 'proximate_cause_of_death_confidence':
+        return 'PCOD Confidence';
+      case 'ultimate_cause_of_death_confidence':
+        return 'UCOD Confidence'
+      case 'proximate_predated_by_taxon_id':
+        return 'PCOD Predator Taxon';
+      case 'ultimate_predated_by_taxon_id':
+        return 'UCOD Predator Taxon';
       default:
         return columnToHeader(s ?? 'undefined key');
     }

@@ -108,12 +108,12 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
         <Box>
           {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_id, onChange)}
           {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_confidence, onChange)}
-          {CreateFormField(mortality, mortality.fields.proximate_predated_by_taxon_id, onChange, isPredatorKnown ? {} : {disabled: !isPredatorKnown, value: '' })}
+          {CreateFormField(mortality, mortality.fields.proximate_predated_by_taxon_id, onChange, isPredatorKnown ? { required: true } : {disabled: !isPredatorKnown, value: '' })}
         </Box>
         <Box>
           {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_id, onChange)}
           {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_confidence, onChange)}
-          {CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, isUcodPredatorKnown ? {} : {disabled: !isUcodPredatorKnown, value: ''})}
+          {CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, isUcodPredatorKnown ? { required: true } : {disabled: !isUcodPredatorKnown, value: ''})}
         </Box>
       </FormSection>
       <FormSection id={'mort-dev'} header={'Device Information'}>

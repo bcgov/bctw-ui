@@ -20,13 +20,14 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, labe
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   // console.log({ cbRouteKey }, { isLoading }, { isError });
   const labelOverride = label ?? columnToHeader(cbRouteKey);
+  
+  useEffect(() => {
+    pushChange(selected);
+  }, []) //Necessary to have the parent check for errors in this dropdown on initial render
 
   useEffect(() => {
-    if(prop === 'proximate_predated_by_taxon_id') {
-      console.log('Current value in CbSelect ' + selected);
-
-    }
-  }, [selected])
+    pushChange(selected);
+  }, [required]);
 
   useEffect(() => {
     if (!data?.length) return;
@@ -38,12 +39,13 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, labe
     if (typeof value !== 'string') return;
     if(value !== selected) {
       setSelected(value);
+      pushChange(value);
     }
-  }, [value])
+  }, [value]) //Necessary to have manual overrides of the selected value from the parent to have much effect
 
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
-    const ret = { [prop]: v, error: false };
+    const ret = { [prop]: v, error: required && !v };
     handleChange(ret);
   };
 

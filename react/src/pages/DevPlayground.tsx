@@ -114,7 +114,7 @@ const DevPlayground = (): JSX.Element => {
             <CbSelect
               prop={key}
               value={''}
-              handleChange={() => console.log('updating')}
+              handleChange={() => {}}
               key={key}
               cbRouteKey={key as ICbRouteKey}
               required={false}
