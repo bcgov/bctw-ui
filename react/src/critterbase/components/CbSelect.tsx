@@ -3,7 +3,6 @@ import { baseInputStyle, selectMenuProps } from 'components/component_constants'
 import { CreateInputProps } from 'components/form/create_form_components';
 import { isFunction } from 'components/table/table_helpers';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
-import { is } from 'date-fns/locale';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';
@@ -20,14 +19,14 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, labe
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   // console.log({ cbRouteKey }, { isLoading }, { isError });
   const labelOverride = label ?? columnToHeader(cbRouteKey);
-  
+  /*
   useEffect(() => {
     pushChange(selected);
   }, []) //Necessary to have the parent check for errors in this dropdown on initial render
-
+  
   useEffect(() => {
     pushChange(selected);
-  }, [required]);
+  }, [required]);*/
 
   useEffect(() => {
     if (!data?.length) return;
@@ -35,14 +34,14 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, labe
     setSelected(value);
   }, [isSuccess]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (typeof value !== 'string') return;
     if(value !== selected) {
       setSelected(value);
       pushChange(value);
     }
   }, [value]) //Necessary to have manual overrides of the selected value from the parent to have much effect
-
+*/
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
     const ret = { [prop]: v, error: required && !v };

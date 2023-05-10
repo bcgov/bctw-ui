@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Divider, Paper } from '@mui/material';
+import { Box, CircularProgress, Divider, Paper, capitalize } from '@mui/material';
 import { AxiosError } from 'axios';
 import { Button, Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
@@ -62,13 +62,12 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       showNotif({ severity: 'error', message: formatAxiosError(e as AxiosError) });
     } else {
       // console.log('sucess!!', e);
-      showNotif({ severity: 'success', message: `${statefulEvent.event_type} workflow form saved!` });
+      showNotif({ severity: 'success', message: `${capitalize(statefulEvent.event_type)} event saved!` });
       // if the parent implements this, call it on a successful save.
       if (typeof onEventSaved === 'function') {
         onEventSaved(statefulEvent);
-      } else {
-        handleClose(false);
       }
+      handleClose(false);
     }
   };
 

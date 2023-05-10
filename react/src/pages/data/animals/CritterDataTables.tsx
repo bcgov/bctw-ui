@@ -19,7 +19,9 @@ import { buttonProps } from 'components/component_constants';
 import { CollarHistory } from 'types/collar_history';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
-import { WorkflowType } from 'types/events/event';
+import { editObjectToEvent, WorkflowType } from 'types/events/event';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import WorkflowWrapper from '../events/WorkflowWrapper';
 
 export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
@@ -33,7 +35,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   // Modal Open States
   const [openEdit, setOpenEdit] = useState(false);
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
-  const [workflow, setWorkflow] = useState<WorkflowType>('mortality');
+  const [workflow, setWorkflow] = useState<WorkflowType>('unknown');
   const [openWorkflow, setOpenWorkflow] = useState(false);
   const [openMap, setOpenMap] = useState(false);
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
@@ -109,11 +111,6 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
       }
     ];
     const attachedItems = [
-      /*{
-        label: map,
-        icon: <Icon icon={'location'} />,
-        handleClick: _map
-      },*/
       {
         label: mortality,
         icon: <Icon icon={'dead'} />,

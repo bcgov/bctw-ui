@@ -12,11 +12,12 @@ export type DateInputProps = FormBaseProps &
     defaultValue: Dayjs;
     minDate?: Dayjs;
     maxDate?: Dayjs;
+    required?: boolean;
   };
 
 export default function DateInput(props: DateInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(defaultValue as Dayjs);
+  const { defaultValue, label, changeHandler, propName, minDate, maxDate, required } = props;
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(defaultValue ? defaultValue : null);
 
   const handleDateChange = (d: Dayjs): void => {
     setSelectedDate(d);
@@ -24,7 +25,6 @@ export default function DateInput(props: DateInputProps): JSX.Element {
       changeHandler({ [propName]: d.format(formatDay) });
     }
   };
-
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <DesktopDatePicker

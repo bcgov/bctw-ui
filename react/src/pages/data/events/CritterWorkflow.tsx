@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
-import CaptureEvent from 'types/events/capture_event';
+import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
 import ReleaseEvent from 'types/events/release_event';
 
 type CritterWorkflowProps = {
@@ -13,60 +13,42 @@ type CritterWorkflowProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWorkflowProps): JSX.Element => {
-  // const [showWorkflowForm, setShowWorkflowForm] = useState(false);
-  const [event, updateEvent] = useState<CaptureEvent | ReleaseEvent | MortalityEvent>(new MortalityEvent());
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
    */
-  const createEvent = (wfType: WorkflowType): CaptureEvent | ReleaseEvent | MortalityEvent => {
-    if (wfType === 'capture') {
-      return editObjectToEvent(editing, new CaptureEvent(), [
-        'taxon',
-        //TODO CRITTERBASE INTEGRATION
-        // 'translocation_ind',
-        // 'recapture_ind',
-        // 'region',
-        'collection_unit'
-      ]);
-    } else if (wfType === 'release') {
-      return editObjectToEvent(editing, new ReleaseEvent(), ['collection_unit']);
-    } else if (wfType === 'mortality') {
-      return editObjectToEvent(editing, new MortalityEvent(), ['critter_status']);
+  const createEvent = (wfType: WorkflowType): CaptureEvent2 | ReleaseEvent | MortalityEvent => {
+    switch (wfType) {
+      case 'capture':
+        return editObjectToEvent(editing, new CaptureEvent2(), []);
+      case 'release':
+        return editObjectToEvent(editing, new ReleaseEvent(), ['collection_unit']);
+      case 'mortality':
+        return editObjectToEvent(editing, new MortalityEvent(), ['critter_status']);
     }
   };
-
-  // /**
-  //  * if a workflow button is clicked and the event type is the same, open or close the workflow modal.
-  //  * otherwise, update the workflow type which will trigger the modal state
-  //  */
-  // const handleOpenWorkflow = (e: WorkflowType): void => {
-  //   updateEvent(createEvent(e));
-  //   setShowWorkflowForm((o) => !o);
-  // };
+  const [event, updateEvent] = useState<CaptureEvent2 | ReleaseEvent | MortalityEvent>();
 
   useEffect(() => {
-    if (workflow) {
-      updateEvent(createEvent(workflow));
-    }
-  }, [workflow, open]);
+    updateEvent(createEvent(workflow));
+  }, [workflow]);
   /**
    * when a capture workflow is saved, always show the release workflow unless a translocation_ind is underway
    * todo: is this still needed?
    */
   const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
     setOpen(false);
-    if (e.event_type === 'capture' && e instanceof CaptureEvent) {
-      if (e.translocation_ind && !e.isTranslocationComplete) {
-        // do nothing
-      } else {
-        // show the release form, populating the location and date fields
-        const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'collection_unit']);
-        // set the new event directly, triggering the display of the release form
-        updateEvent(rwf);
-        setOpen((o) => !o);
-      }
-    }
+    // if (e.event_type === 'capture' && e instanceof CaptureEvent) {
+    //   if (e.translocation_ind && !e.isTranslocationComplete) {
+    //     // do nothing
+    //   } else {
+    //     // show the release form, populating the location and date fields
+    //     const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'collection_unit']);
+    //     // set the new event directly, triggering the display of the release form
+    //     updateEvent(rwf);
+    //     setOpen((o) => !o);
+    //   }
+    // }
   };
 
   /**
@@ -94,12 +76,16 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
   };
 
   return (
-    <WorkflowWrapper
-      open={open}
-      event={event as any}
-      handleClose={(): void => setOpen(false)}
-      onEventSaved={handleWorkflowSaved}
-      onEventChain={handleWorkflowChain}
-    />
+    <>
+      {event?.event_type === workflow ? (
+        <WorkflowWrapper
+          open={open}
+          event={event as any}
+          handleClose={(): void => setOpen(false)}
+          onEventSaved={handleWorkflowSaved}
+          onEventChain={handleWorkflowChain}
+        />
+      ) : null}
+    </>
   );
 };

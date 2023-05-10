@@ -64,7 +64,12 @@ export class LocationEvent implements BCTWWorkflow<LocationEvent> {
         { prop: 'latitude', type: eInputType.number, validate: mustBeLatitude },
         { prop: 'longitude', type: eInputType.number, validate: mustBeLongitude },
         { prop: 'coordinate_uncertainty', type: eInputType.number },
-        { prop: 'coordinate_uncertainty_unit', type: eInputType.cb_select, cbRouteKey: 'coordinate_uncertainty_unit' }
+        {
+          prop: 'coordinate_uncertainty_unit',
+          type: eInputType.cb_select,
+          cbRouteKey: 'coordinate_uncertainty_unit',
+          required: true
+        }
       ],
       coords: [],
       regions: [
