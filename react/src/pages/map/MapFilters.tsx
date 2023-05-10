@@ -227,6 +227,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   const handleApplySymbolize = (): void => {
     const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
+    console.log('handleApplySymbolize: ', symbolize)
     setLegend(symbolizeBy);
     props.onApplySymbolize(symbolize, symbolizeLast, opacity);
   };

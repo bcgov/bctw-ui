@@ -206,12 +206,15 @@ const applyFilter = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryP
       const { code_header, descriptions } = groupedFilters[i];
       const featureValue = properties[code_header];
       console.log('featureValue', featureValue);
-      
+
       if (Array.isArray(featureValue)) {
-        if (descriptions.includes(FormStrings.emptySelectValue) && featureValue.some(value => value === '' || value === null)) {
+        if (
+          descriptions.includes(FormStrings.emptySelectValue) &&
+          featureValue.some((value) => value === '' || value === null)
+        ) {
           return true;
         }
-        if (!featureValue.some(value => descriptions.includes(value))) {
+        if (!featureValue.some((value) => descriptions.includes(value))) {
           return false;
         }
       } else {
@@ -226,7 +229,6 @@ const applyFilter = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryP
     return true;
   });
 };
-
 
 /**
  * @param array features to sort
@@ -274,26 +276,20 @@ const getUniquePropFromPings = (
   const ids = [];
   features?.forEach((f) => {
     const val = f.properties[prop];
-    if (Array.isArray(val)) {
-      val.forEach((item) => {
-        if (!ids.includes(item)) {
-          if (includeNulls) {
-            ids.push(item);
-          } else if (item !== null) {
-            ids.push(item);
-          }
-        }
-      });
-    } else {
-      if (!ids.includes(val)) {
-        if (includeNulls) {
-          ids.push(val);
-        } else if (val !== null) {
-          ids.push(val);
+    const items = Array.isArray(val) ? val : [val];
+
+    items.forEach((item) => {
+      if (!ids.includes(item)) {
+        if (includeNulls && item !== undefined) {
+          ids.push(item);
+        } else if (item !== null && item !== undefined) {
+          ids.push(item);
         }
       }
-    }
+    });
   });
+
+  console.log(ids);
   return ids.sort((a, b) => a - b);
 };
 
@@ -457,10 +453,16 @@ const createUniqueList = (
 
 //Formats a MapFormValues array.
 const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] => {
-  const collectionUnitKeys = Array.from(new Set(pings.map((point) => {
-    return point.properties.collectionUnitKeys;
-  }).flat()));
-  console.log('keys', collectionUnitKeys)
+  const collectionUnitKeys = Array.from(
+    new Set(
+      pings
+        .map((point) => {
+          return point.properties.collectionUnitKeys;
+        })
+        .flat()
+    )
+  );
+  console.log('keys', collectionUnitKeys);
   const collectionUnitFilters = collectionUnitKeys.map((key) => ({ header: key })) as unknown as {
     header: string;
     label?: string;
@@ -484,13 +486,18 @@ const updatePings = (newPings: ITelemetryPoint[]): ITelemetryPoint[] => {
   }));
 };
 
-// Function to create a Proxy for a TelemetryDetail object
+// Function to create a Proxy for a TelemetryDetail object with flattened collection_units
 const createTelemetryDetailProxy = (telemetryDetail: TelemetryDetail) => {
   return new Proxy(telemetryDetail, {
     get: (target, prop: string) => {
+      if (prop === 'collection_units') {
+        return target.collection_units ?? [];
+      }
+
       if (Reflect.has(target, prop)) {
         return Reflect.get(target, prop);
       }
+
       return target.collectionUnitProps[prop] ?? undefined;
     }
   });

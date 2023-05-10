@@ -109,7 +109,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   // Getter for properties in collection_units
   get collectionUnitProps(): Record<string, string[]> {
     const collectionUnitProps = {};
-    this.collection_units.forEach((unit) => {
+    (this.collection_units ?? []).forEach((unit) => {
       const key = toSnakeCase(unit.category_name);
       collectionUnitProps[key] = collectionUnitProps[key] ?? [];
       collectionUnitProps[key].push(unit.unit_name);

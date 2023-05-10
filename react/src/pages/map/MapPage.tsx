@@ -328,6 +328,7 @@ export default function MapPage(): JSX.Element {
   };
 
   const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue, includeLatest: boolean, opacity: number): void => {
+    console.log('symbolize mfv: ', mfv)
     symbolizePings(pingsLayer, mfv, includeLatest, opacity);
     symbolizePings(latestPingsLayer, mfv, includeLatest, opacity);
   };
