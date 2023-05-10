@@ -22,6 +22,7 @@ import MortalityEventForm from './MortalityEventForm';
 import ReleaseEventForm from './ReleaseEventForm';
 import RetrievalEventForm from './RetrievalEventForm';
 import { classToPlain } from 'class-transformer';
+import { CbSelectPayload } from 'critterbase/components/CbSelect';
 
 type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
   event: T;
@@ -92,7 +93,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     checkHasErr(v);
     const tmp = statefulEvent;
     const k = Object.keys(v)[0];
-    const val = Object.values(v)[0];
+    const payload = Object.values(v)[0] as CbSelectPayload;
+    const val = typeof payload === 'object' && payload !== null && 'id' in payload ? payload.id : payload;
     const { nestedEventKey } = v;
     if (nestedEventKey) {
       Object.assign(tmp[nestedEventKey], { [k]: val });

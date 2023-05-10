@@ -3,10 +3,13 @@ import { baseInputStyle, selectMenuProps } from 'components/component_constants'
 import { CreateInputProps } from 'components/form/create_form_components';
 import { isFunction } from 'components/table/table_helpers';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
+import { id, pl } from 'date-fns/locale';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
+
+export type CbSelectPayload = { id: string; value: string };
 
 export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
 export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: CbSelectProps): JSX.Element => {
@@ -26,16 +29,16 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
     setSelected(value);
   }, [isSuccess]);
 
-  const pushChange = (v: string): void => {
+  const pushChange = (pl: CbSelectPayload): void => {
     if (!isFunction(handleChange)) return;
-    const ret = { [prop]: v, error: false };
+    const ret = { [prop]: pl, error: false };
     handleChange(ret);
   };
 
-  const handleSelect = (event: SelectChangeEvent): void => {
-    const { value } = event.target;
-    setSelected(value);
-    pushChange(value);
+  const handleSelect = (pl: CbSelectPayload): void => {
+    //On enum selects id and value will be the same
+    setSelected(pl.id);
+    pushChange(pl);
   };
   return (
     <FormControl
@@ -47,12 +50,12 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
       key={`${cbRouteKey}-${String(prop)}`}
       disabled={isDisabled}>
       <InputLabel>{label}</InputLabel>
-      <Select value={selected} onChange={handleSelect} MenuProps={selectMenuProps}>
+      <Select value={selected} MenuProps={selectMenuProps}>
         {data?.map((val, idx) => {
-          const valueId = typeof val === 'string' ? val : val.id;
+          const id = typeof val === 'string' ? val : val.id;
           const value = typeof val === 'string' ? val : val.value;
           return (
-            <MenuItem value={valueId} key={`${val}-${idx}`}>
+            <MenuItem value={id} key={`${val}-${idx}`} onClick={() => handleSelect({ id, value })}>
               {capitalize(value)}
             </MenuItem>
           );
