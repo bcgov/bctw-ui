@@ -102,7 +102,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   useEffect(() => {
     handleRows();
-    console.log(values)
   }, [values]);
 
   useDidMountEffect(() => {
@@ -193,15 +192,14 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
       if (filter && filter.term) {
         const r = filterRows(values);
-        console.log(r);
         r.forEach((row) => {
           if (row['global_id'] < selectedIDs.length) {
             updatedIds[row['global_id']] = true;
           }
         });
 
-        console.log('Select All Filter');
-        console.log(updatedIds.filter((a) => a === true).length);
+        // console.log('Select All Filter');
+        // console.log(updatedIds.filter((a) => a === true).length);
         setSelectedIDs(updatedIds);
       } else {
         setSelectedIDs(new Array(data.length).fill(true));

@@ -35,9 +35,11 @@ export default function DateTimeInput(props: DateInputProps): JSX.Element {
     callParentHandler(d);
   };
 
+  //Call the parent handler when the min/maxDate values change
   useEffect(() => {
     callParentHandler(selectedTime);
   }, [minDate, maxDate]);
+
   //On mount if a defaultValue is provided call the parent handler
   useEffect(() => {
     if (defaultValue?.isValid()) {

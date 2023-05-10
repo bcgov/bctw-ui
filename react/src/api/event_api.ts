@@ -117,12 +117,12 @@ export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
   };
 
   const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
-    // if (event.event_type === 'capture') {
-    //   const c = await _saveCbCapture(event.critterbasePayload);
-    //   if (typeof c !== 'boolean') {
-    //     return c;
-    //   }
-    // }
+    if (event.event_type === 'capture') {
+      const c = await _saveCbCapture(event.critterbasePayload);
+      if (typeof c !== 'boolean') {
+        return c;
+      }
+    }
     // capture events can change the data life start
     if (typeof event.getDataLife === 'function') {
       const dli = event.getDataLife();

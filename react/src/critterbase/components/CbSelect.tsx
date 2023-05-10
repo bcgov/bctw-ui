@@ -3,7 +3,6 @@ import { baseInputStyle, selectMenuProps } from 'components/component_constants'
 import { CreateInputProps } from 'components/form/create_form_components';
 import { isFunction } from 'components/table/table_helpers';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
-import { is } from 'date-fns/locale';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';

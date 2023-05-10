@@ -65,11 +65,11 @@ export default function CaptureEventForm({
       </LocationEventForm>
 
       {/* Capture Information*/}
-      {showMortalityCheck == 'unknown' || showMortalityCheck == 'capture' ? (
+      {/* {showMortalityCheck == 'unknown' || showMortalityCheck == 'capture' ? (
         <FormSection id='died-during-checkbox' header='Capture Information'>
           {CreateFormField(capture, capture.fields.capture_mortality, onChange, { label: diedDuring('capture') })}
         </FormSection>
-      ) : null}
+      ) : null} */}
 
       {/* Release Date */}
       <FormSection id='release-date' header='Release Date'>
@@ -88,11 +88,11 @@ export default function CaptureEventForm({
       <FormSection id='died-during-checkbox-2' header='Release Information'>
         {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
       </FormSection>
-      {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
+      {/* {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
         <FormSection id='died-during-checkbox-3' header=''>
           {CreateFormField(capture, capture.fields.release_mortality, onChange, { label: diedDuring('release') })}
         </FormSection>
-      ) : null}
+      ) : null} */}
     </Box>
   );
 }
