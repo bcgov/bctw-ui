@@ -1,7 +1,7 @@
 import { BaseTextFieldProps } from '@mui/material';
 import { ICbRouteKey } from 'critterbase/types';
 import { CSSProperties, ReactNode } from 'react';
-import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
+import { CaptureEvent2 } from './events/capture_event';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
