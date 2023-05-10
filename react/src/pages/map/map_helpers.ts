@@ -188,7 +188,7 @@ const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
       groupObj[f.code_header].push(f.description);
     }
   });
-  console.log('group filters: ', groupObj)
+  console.log('group filters: ', groupObj);
   return Object.keys(groupObj).map((k) => {
     return { code_header: k, descriptions: groupObj[k] };
   });
@@ -205,17 +205,28 @@ const applyFilter = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryP
     for (let i = 0; i < groupedFilters.length; i++) {
       const { code_header, descriptions } = groupedFilters[i];
       const featureValue = properties[code_header];
-      // when the 'empty' value is checked in a filter, and a feature value is not set
-      if (descriptions.includes(FormStrings.emptySelectValue) && (featureValue === '' || featureValue === null)) {
-        return true;
-      }
-      if (!descriptions.includes(featureValue)) {
-        return false;
+      console.log('featureValue', featureValue);
+      
+      if (Array.isArray(featureValue)) {
+        if (descriptions.includes(FormStrings.emptySelectValue) && featureValue.some(value => value === '' || value === null)) {
+          return true;
+        }
+        if (!featureValue.some(value => descriptions.includes(value))) {
+          return false;
+        }
+      } else {
+        if (descriptions.includes(FormStrings.emptySelectValue) && (featureValue === '' || featureValue === null)) {
+          return true;
+        }
+        if (!descriptions.includes(featureValue)) {
+          return false;
+        }
       }
     }
     return true;
   });
 };
+
 
 /**
  * @param array features to sort
@@ -257,22 +268,35 @@ const getUniqueCritterIDsFromSelectedPings = (features: ITelemetryPoint[], selec
 // Gets unique properties from an array of telemetry points
 const getUniquePropFromPings = (
   features: ITelemetryPoint[],
-  prop: keyof TelemetryDetail = 'device_id',
+  prop: keyof TelemetryDetail | string = 'device_id',
   includeNulls?: boolean
 ): number[] | string[] => {
   const ids = [];
   features?.forEach((f) => {
     const val = f.properties[prop];
-    if (!ids.includes(val)) {
-      if (includeNulls) {
-        ids.push(val);
-      } else if (val !== null) {
-        ids.push(val);
+    if (Array.isArray(val)) {
+      val.forEach((item) => {
+        if (!ids.includes(item)) {
+          if (includeNulls) {
+            ids.push(item);
+          } else if (item !== null) {
+            ids.push(item);
+          }
+        }
+      });
+    } else {
+      if (!ids.includes(val)) {
+        if (includeNulls) {
+          ids.push(val);
+        } else if (val !== null) {
+          ids.push(val);
+        }
       }
     }
   });
   return ids.sort((a, b) => a - b);
 };
+
 
 /**
  * @returns a single feature that contains the most recent date_recorded
@@ -386,7 +410,10 @@ const getLast10Tracks = (groupedPings: ITelemetryGroup[], originalTracks: ITelem
 };
 
 //Creates a sorted unique list of items from an unique prop.
-const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoint[]): ISelectMultipleData[] => {
+const createUniqueList = (
+  propName: keyof TelemetryDetail | string,
+  pings: ITelemetryPoint[]
+): ISelectMultipleData[] => {
   const PLACEHOLDER = 'Undefined';
   const IS_DEFAULT = propName === DEFAULT_MFV.header;
   const IS_COLLECTION_UNIT = propName === 'collection_units';
@@ -430,32 +457,43 @@ const createUniqueList = (propName: keyof TelemetryDetail, pings: ITelemetryPoin
 
 //Formats a MapFormValues array.
 const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] => {
-  const staticFilters: MapFormValue[] = CODE_FILTERS.map((cf) => ({
+  const collectionUnitKeys = Array.from(new Set(pings.map((point) => {
+    return point.properties.collectionUnitKeys;
+  }).flat()));
+  console.log('keys', collectionUnitKeys)
+  const collectionUnitFilters = collectionUnitKeys.map((key) => ({ header: key })) as unknown as {
+    header: string;
+    label?: string;
+  }[];
+  console.log('collectionUnitFilters: ', collectionUnitFilters);
+  const staticFilters: MapFormValue[] = [...CODE_FILTERS, ...collectionUnitFilters].map((cf) => ({
     header: cf.header,
     label: columnToHeader(cf?.label ?? cf.header),
     values: createUniqueList(cf.header, pings)
   }));
-  console.log('static filters: ', staticFilters)
+  console.log('static filters: ', staticFilters);
 
-  const collection_units = getUniqueData(pings.map((p) => p.properties.collection_units).flat());
-  console.log('collection_units: ', collection_units)
-
-  const dynamicFilters = collection_units.map((df: { category_name: string; unit_name: string[] }) => ({
-    header: df.category_name,
-    label: df.category_name,
-    values: df.unit_name.map((name) => ({id: name, value: name, displayLabel: name, prop: df.category_name})),
-  }));
-  
-
-  return staticFilters.concat(dynamicFilters);
+  return staticFilters;
 };
 
 // Converts the properties of each ITelemetryPoint to an instance of TelemetryDetail
 const updatePings = (newPings: ITelemetryPoint[]): ITelemetryPoint[] => {
   return newPings.map((point) => ({
     ...point,
-    properties: plainToClass(TelemetryDetail, point.properties)
+    properties: createTelemetryDetailProxy(plainToClass(TelemetryDetail, point.properties))
   }));
+};
+
+// Function to create a Proxy for a TelemetryDetail object
+const createTelemetryDetailProxy = (telemetryDetail: TelemetryDetail) => {
+  return new Proxy(telemetryDetail, {
+    get: (target, prop: string) => {
+      if (Reflect.has(target, prop)) {
+        return Reflect.get(target, prop);
+      }
+      return target.collectionUnitProps[prop] ?? undefined;
+    }
+  });
 };
 
 const extractUniqueCategoryNames = (pings: TelemetryDetail[]): string[] => {
@@ -484,7 +522,7 @@ const getUniqueData = (arr) => {
   }, new Map());
 
   return Array.from(combinedData.values());
-}
+};
 
 export {
   applyFilter,

@@ -176,7 +176,6 @@ export default function MapPage(): JSX.Element {
       }
     };
     update();
-    console.log(fetchedPings)
   }, [fetchedPings]);
 
   // assigned tracks

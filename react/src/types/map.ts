@@ -106,6 +106,22 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
     return formatCollectionUnits(this.collection_units);
   }
 
+  // Getter for properties in collection_units
+  get collectionUnitProps(): Record<string, string[]> {
+    const collectionUnitProps = {};
+    this.collection_units.forEach((unit) => {
+      const key = toSnakeCase(unit.category_name);
+      collectionUnitProps[key] = collectionUnitProps[key] ?? [];
+      collectionUnitProps[key].push(unit.unit_name);
+    });
+    return collectionUnitProps;
+  }
+
+  // New getter to return the keys of the new properties
+  get collectionUnitKeys(): string[] {
+    return Object.keys(this.collectionUnitProps);
+  }
+
   get critter_status(): string {
     // console.log(`mort timestamp: ${this.mortality_timestamp}`)
     return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
@@ -118,6 +134,14 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   formatPropAsHeader(str: string): string {
     return columnToHeader(str);
   }
+}
+
+// Function to convert a string to snake_case
+function toSnakeCase(s: string): string {
+  return s
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/\s+/g, '_')
+    .toLowerCase();
 }
 
 export class TelemetryFeature implements ITelemetryPoint {
