@@ -7,6 +7,10 @@ import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat, uuid } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { FormChangeEvent, FormFieldObject } from 'types/form_types';
+import { CaptureFormField2 } from './capture_event';
+import { MortalityFormField } from './mortality_event';
+import { ReleaseFormField } from './release_event';
+import { RetrievalFormField } from './retrieval_event';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 
@@ -35,6 +39,7 @@ export const wfFields = new Map(allFields?.map((f) => [f.prop, f]));
  */
 export interface IBCTWWorkflow {
   readonly event_type: WorkflowType;
+  fields?: CaptureFormField2 | MortalityFormField | ReleaseFormField | RetrievalFormField;
   // headers displayed in the workflow modal title
   getWorkflowTitle(): string;
   // methods the workflow needs to save specific properties

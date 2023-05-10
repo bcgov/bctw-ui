@@ -52,9 +52,24 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState<ReactNode>(null);
 
-  useEffect(() => {
+  /*useEffect(() => {
     setCanSave(!hasErr);
-  }, [hasErr]);
+  }, [hasErr]);*/
+
+  const eventHasAllRequiredProperties = (): boolean => {
+    if(statefulEvent.fields) {
+      for(const [k, v] of Object.entries(statefulEvent.fields)) {
+        if(v.required && !statefulEvent[k]) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  /*useEffect(() => {
+    
+  }, [statefulEvent])*/
 
   // save response handler
   const onSuccess = async (e: AxiosError | boolean): Promise<void> => {
@@ -90,6 +105,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   // update the event when form components change
   const handleChildFormUpdated = (v: InboundObj): void => {
     checkHasErr(v);
+    
     const tmp = statefulEvent;
     const k = Object.keys(v)[0];
     const tempval = Object.values(v)[0] ;
@@ -106,6 +122,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       tmp[k] = val;
       setStatefulEvent(tmp);
     }
+
+    setCanSave(!hasErr && eventHasAllRequiredProperties());
   };
 
   /**

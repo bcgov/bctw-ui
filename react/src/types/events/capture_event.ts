@@ -265,8 +265,8 @@ export default class CaptureEvent
   //   return ret;
   // }
 
-  fields: CaptureFormField = {
+  /*fields: CaptureFormField = {
     isTranslocationComplete: { prop: 'isTranslocationComplete', type: eInputType.check },
     didDieDuringTransloc: { prop: 'didDieDuringTransloc', type: eInputType.check }
-  };
+  };*/
 }

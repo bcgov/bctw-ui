@@ -83,7 +83,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
           event={event as any}
           handleClose={(): void => setOpen(false)}
           onEventSaved={handleWorkflowSaved}
-          onEventChain={handleWorkflowChain}
+          //onEventChain={handleWorkflowChain}
         />
       ) : null}
     </>
