@@ -95,7 +95,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     const k = Object.keys(v)[0];
     const payload = Object.values(v)[0] as CbSelectPayload;
     const val = payload?.['id'] ?? payload;
-    console.log('parent handler value' + val);
+    console.log('parent handler value ' + val);
     const { nestedEventKey } = v;
     if (nestedEventKey) {
       Object.assign(tmp[nestedEventKey], { [k]: val });
