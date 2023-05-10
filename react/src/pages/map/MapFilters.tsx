@@ -227,10 +227,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
 
   const handleApplySymbolize = (): void => {
     const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
-    console.log('handleApplySymbolize: ', symbolize)
     setLegend(symbolizeBy);
     props.onApplySymbolize(symbolize, symbolizeLast, opacity);
   };
+
   /**
     1) uses a timeout to temporarily set reset status to true,
       the select components are listening for these changes, which 

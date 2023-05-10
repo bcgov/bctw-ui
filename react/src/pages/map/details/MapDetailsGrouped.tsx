@@ -58,8 +58,6 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
 
   const uniqueCategoryNames = extractUniqueCategoryNames(pings);
 
-  console.log(uniqueCategoryNames);
-
   const handleSort = (event: React.MouseEvent<unknown>, property: string): void => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -95,7 +93,6 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   };
 
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
-  // console.log(plainToClass(TelemetryDetail, pings[0].features[0].properties))
   return (
     <TableContainer component={Paper} className={'map-detail-table-container'}>
       <Table stickyHeader size='small'>

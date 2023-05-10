@@ -29,7 +29,10 @@ const selectedPointStyle = (): L.CircleMarkerOptions => {
   };
 };
 
-const animalColoredPointStyle = (ping: ITelemetryPoint, colorHandler?: (p: ITelemetryPoint, s?: boolean) => string): L.CircleMarkerOptions => {
+const animalColoredPointStyle = (
+  ping: ITelemetryPoint,
+  colorHandler?: (p: ITelemetryPoint, s?: boolean) => string
+): L.CircleMarkerOptions => {
   if (!colorHandler) colorHandler = getFillColorByStatus;
   const fillColor = colorHandler(ping);
   const color = getOutlineColor(ping);
@@ -100,7 +103,7 @@ const setupLatestPingOptions = (
   closeHandler: L.LeafletEventHandlerFn,
   colorHandler?: (p: ITelemetryPoint, s?: boolean) => string
 ): void => {
-  if(!colorHandler) {
+  if (!colorHandler) {
     colorHandler = getFillColorByStatus;
   }
   pings.options = {
@@ -112,7 +115,7 @@ const setupLatestPingOptions = (
           clickHandler(e);
           e.target.setIcon(latestSelectedPingIcon);
         });
-      } 
+      };
       // make a hidden popup that will help deal with click events
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
@@ -182,7 +185,9 @@ const highlightPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
 const getSymbolizeColours = (mfv: MapFormValue, feature: ITelemetryPoint): { fillColor: string; color: string } => {
   const { header, values } = mfv;
   const isDeviceID = header === DEFAULT_MFV.header;
-  const attr = feature.properties[header as string];
+  // TODO: Support symbolize with non-exclusive data
+  const prop = feature.properties;
+  const attr = prop[header] ? (Array.isArray(prop[header]) ? prop[header][0] : prop[header]) : undefined;
   const fillColor = values.find((val) => val.id === attr)?.colour;
   const color = isDeviceID ? getOutlineColor(feature) : MAP_COLOURS.outline;
   return { fillColor, color };
@@ -213,10 +218,11 @@ const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue, includeLatest: bool
 const setupTracksOptions = (tracks: L.GeoJSON): void => {
   tracks.options = {
     style: (feature: ITelemetryPoint) => {
-      const { fillColor } = parseAnimalColour(feature.properties.map_colour)
+      const { fillColor } = parseAnimalColour(feature.properties.map_colour);
       return {
         color: fillColor,
-        weight: 2.0};
+        weight: 2.0
+      };
     }
   };
   tracks.setZIndex(0);

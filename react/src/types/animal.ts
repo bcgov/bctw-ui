@@ -30,8 +30,8 @@ export enum eCritterFetchType {
 }
 
 export enum eCritterStatus {
-  alive = 'alive',
-  mortality = 'mortality'
+  alive = 'Alive',
+  mortality = 'Mortality'
 }
 
 export type ICollectionUnit = Record<string, string>;

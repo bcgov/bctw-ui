@@ -280,16 +280,15 @@ const getUniquePropFromPings = (
 
     items.forEach((item) => {
       if (!ids.includes(item)) {
-        if (includeNulls && item !== undefined) {
+        if (includeNulls) {
           ids.push(item);
-        } else if (item !== null && item !== undefined) {
+        } else if (item !== null) {
           ids.push(item);
         }
       }
     });
   });
 
-  console.log(ids);
   return ids.sort((a, b) => a - b);
 };
 
@@ -412,13 +411,11 @@ const createUniqueList = (
 ): ISelectMultipleData[] => {
   const PLACEHOLDER = 'Undefined';
   const IS_DEFAULT = propName === DEFAULT_MFV.header;
-  const IS_COLLECTION_UNIT = propName === 'collection_units';
   const unique = getUniquePropFromPings(pings ?? [], propName, true) as number[];
   const merged = [...unique].sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
   let undefinedCount = 0;
   const formated = merged.map((d, i) => {
     let displayLabel = PLACEHOLDER;
-    const taxon = PLACEHOLDER;
     let colour: string;
     if (d) {
       displayLabel = d.toString();
@@ -431,16 +428,13 @@ const createUniqueList = (
           ? (colour = parseAnimalColour(p.properties.map_colour).fillColor)
           : (colour = MAP_COLOURS['unassigned point']);
       }
-      //TODO critterbase integration add this back
-      // if (IS_COLLECTION_UNIT && p.properties[propName] === displayLabel) {
-      //   taxon = p.properties.taxon;
-      // }
-      return p.properties[propName] === d;
+      return p.properties[propName] === d || (Array.isArray(p.properties[propName]) && p.properties[propName].includes(d));
+
     }).length;
     return {
       id: d,
       value: d ?? displayLabel,
-      displayLabel: IS_COLLECTION_UNIT ? `${capitalize(taxon)}: ${displayLabel}` : displayLabel,
+      displayLabel: displayLabel,
       prop: propName,
       colour: colour ? colour : getEvenlySpacedColour(i),
       pointCount
@@ -513,23 +507,6 @@ const extractUniqueCategoryNames = (pings: TelemetryDetail[]): string[] => {
   return Array.from(categorySet);
 };
 
-const getUniqueData = (arr) => {
-  const combinedData = arr.reduce((acc, { category_name, unit_name }) => {
-    const existingItem = acc.get(category_name);
-
-    if (existingItem) {
-      if (!existingItem.unit_name.includes(unit_name)) {
-        existingItem.unit_name.push(unit_name);
-      }
-    } else {
-      acc.set(category_name, { category_name, unit_name: [unit_name] });
-    }
-
-    return acc;
-  }, new Map());
-
-  return Array.from(combinedData.values());
-};
 
 export {
   applyFilter,

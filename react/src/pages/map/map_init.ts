@@ -20,7 +20,7 @@ const hidePopup = (): void => {
 
 const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const doc = document.getElementById('popup');
-  const p = plainToClass(TelemetryDetail, feature.properties);
+  const p = feature.properties;
   const { coordinates } = feature.geometry;
   const t = dayjs(p.date_recorded).format(formatLocal);
   const text = `
