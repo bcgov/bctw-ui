@@ -11,6 +11,7 @@ import { editObjectToEvent } from './events/event';
 import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
 import { LocationEvent } from './events/location_event';
 import { get } from 'http';
+import MortalityEvent from './events/mortality_event';
 
 export enum eTaxon {
   caribou = 'caribou',
@@ -67,6 +68,7 @@ export interface ICapture {
 interface IMortality {
   mortality_id: uuid;
   location_id: uuid;
+  mortality_location?: uuid; //Uncertain if the critterbase payload returns this
   mortality_timestamp: Dayjs;
   proximate_cause_of_death_id: uuid;
   proximate_cause_of_death_confidence: 'Probable' | 'Definite';
@@ -179,7 +181,13 @@ export class Critter implements BCTWBase<Critter>{
       const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);
       return editObjectToEvent({...this.capture[0], capture_location, release_location }, new CaptureEvent2(), [])
     }
-    
+  }
+
+  get latestMortality(): MortalityEvent {
+    if (this.mortality?.length){
+      const mortality_location = editObjectToEvent(this.mortality[0].mortality_location, new LocationEvent('mortality'), [])
+      return editObjectToEvent({...this.mortality[0], mortality_location}, new MortalityEvent(), [])
+    }
   }
 
   get collection_unit(): string {

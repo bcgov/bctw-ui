@@ -1,18 +1,15 @@
-import { Box, Container, Grid } from '@mui/material';
+import { Box, Container, Divider, Grid } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
 import { AttachedCritter, Critter, critterFormFields } from 'types/animal';
-import { FormChangeEvent, InboundObj } from 'types/form_types';
+import { InboundObj } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
-import { boxSpreadRowProps } from '../events/EventComponents';
-import { useEffect, useMemo } from 'react';
-import { CaptureEvent2 } from 'types/events/capture_event';
-import React from 'react';
+import MortalityEventForm from '../events/MortalityEventForm';
 
 /**
  * the main animal form
@@ -80,15 +77,30 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
           };
           return (
             <Box>
-              <FormSection id='identifiers' header='Identifiers' disabled={true}>
-                {identifierFields?.map((f, i) => CreateFormField(editing, f, onChange))}
+              <FormSection id='critter' header='Critter Details' size='large'>
+                <Divider />
+                <FormSection id='identifiers' header='Identifiers'>
+                  {identifierFields?.map((f, i) => CreateFormField(editing, f, onChange))}
+                </FormSection>
+                <FormSection id='characteristics' header='Characteristics'>
+                  {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange))}
+                </FormSection>
               </FormSection>
-              <FormSection id='characteristics' header='Characteristics' disabled={true}>
-                {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange))}
-              </FormSection>
-              {editing.latestCapture ? (
+              <FormSection id='c-deets' header='Latest Capture Details' hide={!editing.latestCapture} size='large'>
+                <Divider />
                 <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} isEditing />
-              ) : null}
+              </FormSection>
+              <FormSection id='m-deets' header='Latest Mortality Details' hide={!editing.latestMortality} size='large'>
+                <Divider />
+                <MortalityEventForm event={editing.latestMortality} handleFormChange={onChange} />
+                {/* <Divider /> */}
+              </FormSection>
+              {/* {editing.latestCapture ? (
+                <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} isEditing />
+              ) : null} */}
+              {/* {editing.latestMortality ? (
+                <MortalityEventForm event={editing.latestMortality} handleFormChange={onChange} />
+              ) : null} */}
 
               {/* {
                 captureFields.map((f, i) => CreateFormField(editing, f, onChange))

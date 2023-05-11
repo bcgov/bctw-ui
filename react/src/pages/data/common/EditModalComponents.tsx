@@ -1,4 +1,4 @@
-import { Box, ButtonProps, Grid } from '@mui/material';
+import { Box, ButtonProps, Grid, Typography } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
 import { cloneElement, Children, Key, ReactElement, ReactNode } from 'react';
 
@@ -68,17 +68,18 @@ type FormSectionProps = {
   disabled?: boolean;
   hide?: boolean;
   children: ReactNode;
+  size?: 'small' | 'large';
 };
 /** creates a section of a form with a grid layout
  * @param children must not contain non valid elements (ex. fragments or nulls)
  * top level children must have key props
  */
-const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionProps): JSX.Element => {
+const FormSection = ({ id, header, btn, disabled, children, hide, size = 'small' }: FormSectionProps): JSX.Element => {
   if (hide) return null;
   return (
     <Box component='fieldset' p={2}>
       {header ? (
-        <Box component='legend' className={'legend'} mb={1} mt={1}>
+        <Box component='legend' className={size === 'small' ? 'legend' : 'large-legend'} mb={1} mt={1}>
           {header}
           {btn}
         </Box>
