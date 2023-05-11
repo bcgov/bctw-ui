@@ -10,8 +10,9 @@ import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import { boxSpreadRowProps } from '../events/EventComponents';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
+import React from 'react';
 
 /**
  * the main animal form
@@ -86,7 +87,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange))}
               </FormSection>
               {editing.latestCapture ? (
-                <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} />
+                <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} isEditing />
               ) : null}
 
               {/* {

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { WorkflowFormProps } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { parseFormChangeResult } from 'types/form_types';
+import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
@@ -86,7 +86,7 @@ export default function CaptureEventForm({
         <LocationEventForm key='ce-loc-b' event={capture.release_location} notifyChange={onChange} />
       ) : null}
 
-      {isEditing ? (
+      {!isEditing ? (
         <FormSection id='died-during-checkbox-2' header='Release Information'>
           {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
         </FormSection>

@@ -57,16 +57,12 @@ export default function LocationEventForm({
       notifyChange({ ...v, nestedEventKey: 'capture_location' });
       return;
     }
-    if(event.event_type === 'mortality') {
-      notifyChange({ ...v, nestedEventKey: 'location'})
+    if (event.event_type === 'mortality') {
+      notifyChange({ ...v, nestedEventKey: 'location' });
       return;
     }
     // notify parent that the location event changed
     notifyChange(v);
-  };
-
-  const LocationFormField = ({ fields }: { fields: FormFieldObject<LocationEvent>[] }): JSX.Element => {
-    return <>{fields.map((f, i) => CreateFormField(event, f, changeHandler))}</>;
   };
 
   return (
@@ -77,13 +73,13 @@ export default function LocationEventForm({
         </FormSection>
       ) : null}
       <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`}>
-        <LocationFormField fields={latlon} />
+        {latlon.map((f) => CreateFormField(event, f, changeHandler))}
         <Box key='bx-rec' {...boxSpreadRowProps}>
-          <LocationFormField fields={comment} />
+          {comment.map((f) => CreateFormField(event, f, changeHandler))}
         </Box>
       </FormSection>
       <FormSection id='Region' header={`${capitalize(event.event_type)} Region`}>
-        <LocationFormField fields={regions} />
+        {regions.map((f) => CreateFormField(event, f, changeHandler))}
       </FormSection>
       {/* <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`}>
         <LocationFormField fields={extra} />

@@ -70,8 +70,7 @@ export class LocationEvent implements BCTWWorkflow<LocationEvent>, ILocation {
         {
           prop: 'coordinate_uncertainty_unit',
           type: eInputType.cb_select,
-          cbRouteKey: 'coordinate_uncertainty_unit',
-          required: true
+          cbRouteKey: 'coordinate_uncertainty_unit'
         }
       ],
       regions: [
