@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { WorkflowFormProps } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { parseFormChangeResult } from 'types/form_types';
+import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
