@@ -30,8 +30,11 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
   const [event, updateEvent] = useState<CaptureEvent2 | ReleaseEvent | MortalityEvent>();
 
   useEffect(() => {
-    updateEvent(createEvent(workflow));
-  }, [workflow]);
+    const a = createEvent(workflow);
+    console.log('This is editing obj ' + JSON.stringify(editing, null, 2))
+    console.log('In workflow update effect ' + JSON.stringify(a, null, 2))
+    updateEvent(a);
+  }, [editing, workflow]);
   /**
    * when a capture workflow is saved, always show the release workflow unless a translocation_ind is underway
    * todo: is this still needed?

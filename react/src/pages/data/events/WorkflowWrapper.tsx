@@ -67,9 +67,10 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     }
   }
 
-  /*useEffect(() => {
-    
-  }, [statefulEvent])*/
+  useEffect(() => {
+    console.log('Upper event object modified, changing statefulEvent')
+    setStatefulEvent(event);
+  }, [event])
 
   // save response handler
   const onSuccess = async (e: AxiosError | boolean): Promise<void> => {
