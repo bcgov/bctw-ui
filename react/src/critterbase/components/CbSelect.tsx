@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 
-export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
-export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: CbSelectProps): JSX.Element => {
+export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey; _key: string };
+export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, _key }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
   const [selected, setSelected] = useState<uuid | string>('');
@@ -44,7 +44,7 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: Cb
       required={required}
       className={`select-control ${hasError ? 'input-error' : ''}`}
       error={!isLoading && hasError}
-      key={`${cbRouteKey}-${String(prop)}`}
+      key={`${cbRouteKey}-${String(prop)}-${_key}`}
       disabled={isDisabled}>
       <InputLabel>{label}</InputLabel>
       <Select value={selected} onChange={handleSelect} MenuProps={selectMenuProps}>

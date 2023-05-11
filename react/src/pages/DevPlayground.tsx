@@ -50,7 +50,13 @@ const release_location = editObjectToEvent(
 
 const editCritter = editObjectToEvent(
   {
-    capture: [{ capture_comment: 'test', capture_location, release_location }],
+    capture: [
+      {
+        capture_comment: 'test',
+        capture_location: { latitude: 1, longitude: 2, coordinate_uncertainty_unit: 'm' },
+        release_location: { latitude: 2, longitude: 3 }
+      }
+    ],
     latitude: 1,
     longitude: 2,
     wlh_id: '12-345',
@@ -114,9 +120,10 @@ const DevPlayground = (): JSX.Element => {
           handleClose={(): void => setBool(false)}
         />
 
-        <Box flexDirection='column'>
+        {/* <Box flexDirection='column'>
           {Object.keys(CbRoutes).map((key) => (
             <CbSelect
+              _key={key}
               prop={key}
               value={''}
               handleChange={() => console.log('updating')}
@@ -125,7 +132,7 @@ const DevPlayground = (): JSX.Element => {
               required={false}
             />
           ))}
-        </Box>
+        </Box> */}
 
         {/* <CritterDataTables detailViewAction={setDetailAnimal} /> */}
         {/* <Box sx={{ pr: 2 }}>

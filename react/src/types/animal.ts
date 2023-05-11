@@ -9,6 +9,8 @@ import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 import { editObjectToEvent } from './events/event';
 import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
+import { LocationEvent } from './events/location_event';
+import { get } from 'http';
 
 export enum eTaxon {
   caribou = 'caribou',
@@ -40,42 +42,29 @@ export type ICollectionUnit = Record<string, string>;
 
 export type Critters = Critter | AttachedCritter;
 
-interface CritterLocation {
+export interface ILocation {
   location_id: uuid;
   latitude: number;
   longitude: number;
   region_env_id: string;
   region_nr_id: string;
   wmu_id: string;
+  location_comment: string;
 }
 
-// interface CritterReleaseLocation extends CritterLocation {
-//   release_latitude: never;
-//   release_longitude: never;
-//   release_region_env_id: never;
-//   release_region_nr_id: never;
-//   release_wmu_id: never;
-// }
-
-// interface CritterCaptureLocation extends CritterLocation {
-//   capture_latitude: never;
-//   capture_longitude: never;
-//   capture_region_env_id: never;
-//   capture_region_nr_id: never;
-//   capture_wmu_id: never;
-  
-// }
-export interface CritterCapture {
+export interface ICapture {
   capture_id: uuid;
-  capture_location_id: uuid;
-  relase_location_id: uuid;
   capture_timestamp: Dayjs;
-  release_timestamp: Dayjs;
-  capture_location: CritterLocation;
-  release_location: CritterLocation;
+  capture_location_id?: uuid;
+  capture_location?: ILocation;
+  capture_comment?: string;
+  release_timestamp?: Dayjs;
+  relase_location_id?: uuid;
+  release_location: ILocation;
+  release_comment?: string;
 }
 
-interface CritterMarking {
+interface IMarking {
   marking_id: uuid;
   capture_id: uuid | null;
   mortality_id: uuid | null;
@@ -94,7 +83,7 @@ interface CritterMarking {
   text_colour: string;
 }
 
-interface CritterQualitativeMeasurement {
+interface IQualitativeMeasurement {
   measurement_qualitative_id: uuid;
   taxon_measurement_id: uuid;
   capture_id: uuid;
@@ -107,7 +96,7 @@ interface CritterQualitativeMeasurement {
   option_value: number;
 }
 
-interface CritterQuantitativeMeasurement {
+interface IQuantitativeMeasurement {
   measurement_quantitative_id: uuid;
   taxon_measurement_id: uuid;
   capture_id: uuid;
@@ -118,9 +107,9 @@ interface CritterQuantitativeMeasurement {
   measurement_name: string;
 }
 
-interface CritterMeasurement {
-  qualitative: CritterQualitativeMeasurement[];
-  quantitative: CritterQuantitativeMeasurement[];
+interface IMeasurement {
+  qualitative: IQualitativeMeasurement[];
+  quantitative: IQuantitativeMeasurement[];
 }
 
 /**
@@ -149,9 +138,9 @@ export class Critter implements BCTWBase<Critter>{
   critter_comment?: string;
   //Extra details
   mortality?: unknown[];
-  capture?: CritterCapture[];
-  marking?: CritterMarking[];
-  measurement?: CritterMeasurement[];
+  capture?: ICapture[];
+  marking?: IMarking[];
+  measurement?: IMeasurement[];
 
   readonly _merged?: boolean;
   permission_type?: eCritterPermission;
@@ -173,7 +162,12 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   get latestCapture() {
-    return this.capture?.length && editObjectToEvent(this.capture[0], new CaptureEvent2(), [])
+    if (this.capture?.length){
+      const capture_location = editObjectToEvent(this.capture[0].capture_location, new LocationEvent('capture'), []);
+      const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);
+      return editObjectToEvent({...this.capture[0], capture_location, release_location }, new CaptureEvent2(), [])
+    }
+    
   }
 
   get collection_unit(): string {

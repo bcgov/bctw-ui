@@ -96,9 +96,9 @@ export default function LocationEventForm({
       <FormSection id='Region' header={`${capitalize(event.event_type)} Region`}>
         <LocationFormField fields={regions} />
       </FormSection>
-      <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`}>
+      {/* <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`}>
         <LocationFormField fields={extra} />
-      </FormSection>
+      </FormSection> */}
 
       {/* <FormSection id='Comment' header={`${capitalize(event.location_type)} Comment`} {...baseInputProps}>
         {comment.map((f, i) => CreateFormField(event, f, changeHandler))}

@@ -18,6 +18,7 @@ import { removeProps } from 'utils/common_helpers';
 import { showField } from 'utils/taxon';
 import SelectCode from './SelectCode';
 import { CaptureEvent2 } from 'types/events/capture_event';
+import React from 'react';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -69,7 +70,7 @@ function CreateEditTextField(props: CreateInputProps): ReactElement {
 }
 
 function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
-  const newProps = Object.assign({ multiline: true, rows: 1, style: { width: '100%' } }, props);
+  const newProps = Object.assign({ multiline: true, rows: 1, style: { width: '100%', flexGrow: 1 } }, props);
   return CreateEditTextField(newProps);
 }
 
@@ -179,11 +180,7 @@ function CreateEditSelectField({
 }
 
 function CreateCbSelectField(props: CbSelectProps): ReactElement {
-  return <CbSelect {...props} />;
-}
-
-function CreateCaptureEventForm(props: CreateInputProps) {
-  return <CaptureEventForm event={new CaptureEvent2()} handleFormChange={(v) => console.log(v)} />;
+  return <CbSelect {...props} key={`${props.cbRouteKey}-${String(props.prop)}`} />;
 }
 
 // returns the funtion to create the form component based on input type

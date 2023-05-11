@@ -5,12 +5,11 @@ import ChangeContext from 'contexts/InputChangeContext';
 import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
 import { AttachedCritter, Critter, critterFormFields } from 'types/animal';
-import { CaptureEvent2 } from 'types/events/capture_event';
-import { editObjectToEvent } from 'types/events/event';
 import { InboundObj } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
+import { boxSpreadRowProps } from '../events/EventComponents';
 
 /**
  * the main animal form
@@ -85,13 +84,10 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 {identifierFields?.map((f, i) => CreateFormField(editing, f, onChange))}
               </FormSection>
               <FormSection id='characteristics' header='Characteristics' disabled={true}>
-                {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange))}
+                {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange, { _key: `${i}` }))}
               </FormSection>
               {editing.latestCapture ? (
-                <CaptureEventForm
-                  event={editObjectToEvent(editing.latestCapture, new CaptureEvent2(), [])}
-                  handleFormChange={(v) => console.log(v)}
-                />
+                <CaptureEventForm event={editing.latestCapture} handleFormChange={(v) => {}} />
               ) : null}
 
               {/* {
