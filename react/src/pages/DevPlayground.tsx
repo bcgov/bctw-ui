@@ -61,6 +61,7 @@ const editCritter = editObjectToEvent(
     longitude: 2,
     wlh_id: '12-345',
     sex: 'Male',
+    taxon: 'Moose',
     animal_id: 'Bert',
     region_env_id: '123',
     wmu_id: '1-10',

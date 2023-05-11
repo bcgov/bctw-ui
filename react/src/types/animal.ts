@@ -161,7 +161,7 @@ export class Critter implements BCTWBase<Critter>{
     return ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'critter_status'];
   }
 
-  get latestCapture() {
+  get latestCapture(): CaptureEvent2 {
     if (this.capture?.length){
       const capture_location = editObjectToEvent(this.capture[0].capture_location, new LocationEvent('capture'), []);
       const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);

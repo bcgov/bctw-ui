@@ -61,25 +61,10 @@ export default function LocationEventForm({
     notifyChange(v);
   };
 
-  const LocationFormField = ({
-    fields,
-    inputProps
-  }: {
-    fields: FormFieldObject<LocationEvent>[];
-    inputProps?: { required: boolean };
-  }): JSX.Element => {
-    return (
-      <>
-        {fields.map((f, i) => (
-          <React.Fragment key={`${i}-${String(f.prop)}`}>
-            {CreateFormField(event, f, changeHandler, inputProps)}
-          </React.Fragment>
-        ))}
-      </>
-    );
+  const LocationFormField = ({ fields }: { fields: FormFieldObject<LocationEvent>[] }): JSX.Element => {
+    return <>{fields.map((f, i) => CreateFormField(event, f, changeHandler))}</>;
   };
 
-  // const baseInputProps = { changeHandler, required: !isDev(), disabled };
   return (
     <>
       {children ? (
@@ -88,7 +73,7 @@ export default function LocationEventForm({
         </FormSection>
       ) : null}
       <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`}>
-        <LocationFormField fields={latlon} inputProps={isRequired} />
+        <LocationFormField fields={latlon} />
         <Box key='bx-rec' {...boxSpreadRowProps}>
           <LocationFormField fields={comment} />
         </Box>

@@ -5,11 +5,13 @@ import ChangeContext from 'contexts/InputChangeContext';
 import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
 import { AttachedCritter, Critter, critterFormFields } from 'types/animal';
-import { InboundObj } from 'types/form_types';
+import { FormChangeEvent, InboundObj } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import { boxSpreadRowProps } from '../events/EventComponents';
+import { useMemo } from 'react';
+import { CaptureEvent2 } from 'types/events/capture_event';
 
 /**
  * the main animal form
@@ -66,10 +68,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
       )}
     </Container>
   );
-  // const handleWorkflow = (wf: WorkflowType) => {
-  //   setWorkflow(wf);
-  //   setShowWorkflow(true);
-  // };
+
   return (
     <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing}>
       <ChangeContext.Consumer>
@@ -84,11 +83,11 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 {identifierFields?.map((f, i) => CreateFormField(editing, f, onChange))}
               </FormSection>
               <FormSection id='characteristics' header='Characteristics' disabled={true}>
-                {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange, { _key: `${i}` }))}
+                {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange))}
               </FormSection>
-              {editing.latestCapture ? (
-                <CaptureEventForm event={editing.latestCapture} handleFormChange={(v) => {}} />
-              ) : null}
+              {/* {editing.latestCapture ? (
+                <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} />
+              ) : null} */}
 
               {/* {
                 captureFields.map((f, i) => CreateFormField(editing, f, onChange))
