@@ -10,7 +10,7 @@ import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import { boxSpreadRowProps } from '../events/EventComponents';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
 
 /**
@@ -85,9 +85,9 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
               <FormSection id='characteristics' header='Characteristics' disabled={true}>
                 {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange))}
               </FormSection>
-              {/* {editing.latestCapture ? (
+              {editing.latestCapture ? (
                 <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} />
-              ) : null} */}
+              ) : null}
 
               {/* {
                 captureFields.map((f, i) => CreateFormField(editing, f, onChange))

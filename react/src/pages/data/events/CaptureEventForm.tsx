@@ -86,7 +86,7 @@ export default function CaptureEventForm({
         <LocationEventForm key='ce-loc-b' event={capture.release_location} notifyChange={onChange} />
       ) : null}
 
-      {isEditing ? (
+      {!isEditing ? (
         <FormSection id='died-during-checkbox-2' header='Release Information'>
           {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
         </FormSection>

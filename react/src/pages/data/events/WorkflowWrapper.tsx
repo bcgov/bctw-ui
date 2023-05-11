@@ -57,21 +57,21 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   }, [hasErr]);
 
   const eventHasAllRequiredProperties = (): boolean => {
-    if(statefulEvent.fields) {
-      for(const [k, v] of Object.entries(statefulEvent.fields)) {
-        if(v.required && !statefulEvent[k]) {
-          console.log(`Missing required property ${k} -> ${statefulEvent[k]}`)
+    if (statefulEvent.fields) {
+      for (const [k, v] of Object.entries(statefulEvent.fields)) {
+        if (v.required && !statefulEvent[k]) {
+          console.log(`Missing required property ${k} -> ${statefulEvent[k]}`);
           return false;
         }
       }
       console.log('No missing properties detected.');
       return true;
     }
-  }
+  };
 
   useEffect(() => {
     setStatefulEvent(event);
-  }, [event])
+  }, [event]);
 
   // save response handler
   const onSuccess = async (e: AxiosError | boolean): Promise<void> => {
@@ -107,19 +107,18 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   // update the event when form components change
   const handleChildFormUpdated = (v: InboundObj): void => {
     checkHasErr(v);
-    
+
     const tmp = statefulEvent;
     const k = Object.keys(v)[0];
-    const tempval = Object.values(v)[0] ;
-    const val = tempval === undefined || tempval === null ? null : (tempval['id'] ?? tempval);
+    const tempval = Object.values(v)[0];
+    const val = tempval === undefined || tempval === null ? null : tempval['id'] ?? tempval;
     //If tempval is undefined or null, just leave it as null. Otherwise, try to access the id property from it, but if that fails just use the non-null tempval as is.
     const { nestedEventKey } = v;
-    
+
     if (nestedEventKey) {
       Object.assign(tmp[nestedEventKey], { [k]: val });
       setStatefulEvent(tmp);
-    }
-    else if (k && k !== 'displayProps') {
+    } else if (k && k !== 'displayProps') {
       tmp[k] = val;
       setStatefulEvent(tmp);
     }
