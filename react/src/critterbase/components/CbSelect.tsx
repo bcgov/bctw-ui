@@ -9,7 +9,15 @@ import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 
 export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
-export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, label, disabled }: CbSelectProps): JSX.Element => {
+export const CbSelect = ({
+  cbRouteKey,
+  value,
+  prop,
+  required,
+  handleChange,
+  label,
+  disabled
+}: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
   const [selected, setSelected] = useState<uuid | string>('');
@@ -54,11 +62,11 @@ export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange, labe
     pushChange(value);
   };*/
 
-  const handleSelect = (id: string, label: string) => { 
-    const a = { id: id, label: label};
+  const handleSelect = (id: string, label: string) => {
+    const a = { id: id, label: label };
     setSelected(a.id);
     pushChange(a);
-  }
+  };
 
   return (
     <FormControl

@@ -13,7 +13,7 @@ import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/eve
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import { parseFormChangeResult } from 'types/form_types';
 import MalfunctionEvent from 'types/events/malfunction_event';
-import { wfFields } from 'types/events/event';
+import { wfFields } from 'types/events/form_fields';
 import { Button } from 'components/common';
 
 export default function EditCollar(props: EditorProps<Collar | AttachedCollar>): JSX.Element {

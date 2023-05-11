@@ -2,7 +2,7 @@ import { classToPlain, plainToClass } from 'class-transformer';
 import { mustBeLessThan50Words } from 'components/form/form_validators';
 import { WorkflowStrings } from 'constants/strings';
 import dayjs, { Dayjs } from 'dayjs';
-import { Critter, ICollectionUnit } from 'types/animal';
+import { Critter, ICapture, ICollectionUnit } from 'types/animal';
 import { Code } from 'types/code';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
@@ -12,7 +12,7 @@ import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 
-export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimalEventProps {
+export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimalEventProps, ICapture {
   readonly event_type: WorkflowType;
   readonly critter_id: uuid;
   readonly wlh_id: string;
@@ -22,6 +22,8 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
 
   //Critterbase fields
   capture_id: uuid;
+  capture_location_id: uuid;
+  release_location_id: uuid;
   capture_timestamp: Dayjs;
   capture_comment: string;
   capture_location: LocationEvent;

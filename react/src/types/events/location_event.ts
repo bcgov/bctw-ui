@@ -1,5 +1,7 @@
 import { classToPlain } from 'class-transformer';
 import { mustBeLatitude, mustBeLongitude, mustBeValidTemp } from 'components/form/form_validators';
+import { ILocation } from 'types/animal';
+import { uuid } from 'types/common_types';
 import { BCTWWorkflow, CbPayload, WorkflowType } from 'types/events/event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
@@ -9,8 +11,9 @@ export enum eLocationPositionType {
   coord = 'coord'
 }
 
-export class LocationEvent implements BCTWWorkflow<LocationEvent> {
+export class LocationEvent implements BCTWWorkflow<LocationEvent>, ILocation {
   readonly event_type: WorkflowType;
+  location_id: uuid;
   latitude: number;
   longitude: number;
   region_env_id: string;
@@ -71,13 +74,13 @@ export class LocationEvent implements BCTWWorkflow<LocationEvent> {
           required: true
         }
       ],
-      coords: [],
       regions: [
         { prop: 'region_env_id', type: eInputType.cb_select, cbRouteKey: 'region_env' },
         { prop: 'region_nr_id', type: eInputType.cb_select, cbRouteKey: 'region_nr' },
-        { prop: 'wmu_id', type: eInputType.cb_select, cbRouteKey: 'wmu' }
+        { prop: 'wmu_id', type: eInputType.cb_select, cbRouteKey: 'wmu' },
+        { prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp }
       ],
-      extra: [{ prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp }],
+      //extra: [{ prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp }],
       comment: [{ prop: 'location_comment', type: eInputType.text, style: FormCommentStyle }]
     };
   }

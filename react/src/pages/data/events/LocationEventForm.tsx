@@ -12,10 +12,9 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { ReactNode } from 'react';
 import { boxSpreadRowProps } from './EventComponents';
 import { isDev } from 'api/api_helpers';
-import { CreateFormField, CreateTaxonFormField } from 'components/form/create_form_components';
+import { CreateFormField } from 'components/form/create_form_components';
 import { AttachedCritter } from 'types/animal';
 import { FormSection } from '../common/EditModalComponents';
-import { wfFields } from 'types/events/event';
 
 type LocationEventProps = {
   event: LocationEvent;
@@ -66,25 +65,10 @@ export default function LocationEventForm({
     notifyChange(v);
   };
 
-  const LocationFormField = ({
-    fields,
-    inputProps
-  }: {
-    fields: FormFieldObject<LocationEvent>[];
-    inputProps?: { required: boolean };
-  }): JSX.Element => {
-    return (
-      <>
-        {fields.map((f, i) => (
-          <React.Fragment key={`${i}-${String(f.prop)}`}>
-            {CreateFormField(event, f, changeHandler, inputProps)}
-          </React.Fragment>
-        ))}
-      </>
-    );
+  const LocationFormField = ({ fields }: { fields: FormFieldObject<LocationEvent>[] }): JSX.Element => {
+    return <>{fields.map((f, i) => CreateFormField(event, f, changeHandler))}</>;
   };
 
-  // const baseInputProps = { changeHandler, required: !isDev(), disabled };
   return (
     <>
       {children ? (
@@ -93,7 +77,7 @@ export default function LocationEventForm({
         </FormSection>
       ) : null}
       <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`}>
-        <LocationFormField fields={latlon} inputProps={isRequired} />
+        <LocationFormField fields={latlon} />
         <Box key='bx-rec' {...boxSpreadRowProps}>
           <LocationFormField fields={comment} />
         </Box>
@@ -101,9 +85,9 @@ export default function LocationEventForm({
       <FormSection id='Region' header={`${capitalize(event.event_type)} Region`}>
         <LocationFormField fields={regions} />
       </FormSection>
-      <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`}>
+      {/* <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`}>
         <LocationFormField fields={extra} />
-      </FormSection>
+      </FormSection> */}
 
       {/* <FormSection id='Comment' header={`${capitalize(event.location_type)} Comment`} {...baseInputProps}>
         {comment.map((f, i) => CreateFormField(event, f, changeHandler))}

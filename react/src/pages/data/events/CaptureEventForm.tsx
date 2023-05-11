@@ -18,11 +18,12 @@ export default function CaptureEventForm({
   canSave,
   event: capture,
   handlePostponeSave,
-  handleFormChange
-}: WorkflowFormProps<CaptureEvent2>): JSX.Element {
+  handleFormChange,
+  isEditing = false
+}: WorkflowFormProps<CaptureEvent2> & { isEditing?: boolean }): JSX.Element {
   const [showRelease, setShowRelease] = useState(false);
   const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
-  const [minReleaseDate, setMinReleaseDate] = useState(capture.capture_timestamp);
+  const [minReleaseDate, setMinReleaseDate] = useState(capture?.capture_timestamp);
 
   const { diedDuring, differentReleaseDetails } = WorkflowStrings.capture;
 
@@ -72,6 +73,7 @@ export default function CaptureEventForm({
       ) : null} */}
 
       {/* Release Date */}
+
       <FormSection id='release-date' header='Release Date'>
         <Box key='bx-rec' {...boxSpreadRowProps}>
           {CreateFormField(capture, capture.fields.release_timestamp, onChange, { minDate: minReleaseDate })}
@@ -84,10 +86,13 @@ export default function CaptureEventForm({
         <LocationEventForm key='ce-loc-b' event={capture.release_location} notifyChange={onChange} />
       ) : null}
 
+      {isEditing ? (
+        <FormSection id='died-during-checkbox-2' header='Release Information'>
+          {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
+        </FormSection>
+      ) : null}
       {/* Release Information */}
-      <FormSection id='died-during-checkbox-2' header='Release Information'>
-        {CreateFormField(capture, capture.fields.show_release, handleShowRelease, { label: differentReleaseDetails })}
-      </FormSection>
+
       {/* {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
         <FormSection id='died-during-checkbox-3' header=''>
           {CreateFormField(capture, capture.fields.release_mortality, onChange, { label: diedDuring('release') })}

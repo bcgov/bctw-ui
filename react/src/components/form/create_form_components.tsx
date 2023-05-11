@@ -5,20 +5,14 @@ import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import NumberField from 'components/form/NumberInput';
 import TextField from 'components/form/TextInput';
-import { useTaxon } from 'contexts/TaxonContext';
 import { CbSelect, CbSelectProps } from 'critterbase/components/CbSelect';
-import { ICbRouteKey } from 'critterbase/types';
-import dayjs, { Dayjs } from 'dayjs';
-import { CSSProperties, ReactElement, ReactNode, useEffect } from 'react';
-import { Critter, AttachedCritter } from 'types/animal';
+import { Dayjs } from 'dayjs';
+import { CSSProperties, ReactElement, ReactNode } from 'react';
 import { ICodeFilter } from 'types/code';
 import { BCTWFormat } from 'types/common_types';
-import { WorkflowFormField } from 'types/events/event';
 import { FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';
-import { showField } from 'utils/taxon';
 import SelectCode from './SelectCode';
-import { type } from 'os';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -70,7 +64,7 @@ function CreateEditTextField(props: CreateInputProps): ReactElement {
 }
 
 function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
-  const newProps = Object.assign({ multiline: true, rows: 1, style: { width: '100%' } }, props);
+  const newProps = Object.assign({ multiline: true, rows: 1, style: { width: '100%', flexGrow: 1 } }, props);
   return CreateEditTextField(newProps);
 }
 
@@ -180,7 +174,7 @@ function CreateEditSelectField({
 }
 
 function CreateCbSelectField(props: CbSelectProps): ReactElement {
-  return <CbSelect {...props} />;
+  return <CbSelect {...props} key={`${props.cbRouteKey}-${String(props.prop)}`} />;
 }
 
 // returns the funtion to create the form component based on input type
@@ -198,6 +192,8 @@ export const getInputFnFromType = (inputType: eInputType): ((props: unknown) => 
       return CreateEditMultilineTextField;
     case eInputType.cb_select:
       return CreateCbSelectField;
+    // case eInputType.cb_capture_fields:
+    //   return CreateCaptureEventForm;
     default:
       return CreateEditTextField;
   }
@@ -243,34 +239,34 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
-interface ItaxonFormField {
-  obj: Critter | AttachedCritter;
-  formField: WorkflowFormField;
-  handleChange: FormChangeEvent;
-  inputProps?: Partial<CreateInputProps>;
-  displayBlock?: boolean;
-  style?: CSSProperties;
-}
-function CreateTaxonFormField({
-  obj,
-  formField,
-  handleChange,
-  inputProps,
-  displayBlock = false,
-  style = {}
-}: ItaxonFormField): JSX.Element {
-  const taxon = useTaxon();
-  if (!showField(formField, taxon)) {
-    return null;
-  } else {
-    return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
-  }
-}
+// interface ItaxonFormField {
+//   obj: Critter | AttachedCritter;
+//   formField: WorkflowFormField;
+//   handleChange: FormChangeEvent;
+//   inputProps?: Partial<CreateInputProps>;
+//   displayBlock?: boolean;
+//   style?: CSSProperties;
+// }
+// function CreateTaxonFormField({
+//   obj,
+//   formField,
+//   handleChange,
+//   inputProps,
+//   displayBlock = false,
+//   style = {}
+// }: ItaxonFormField): JSX.Element {
+//   const taxon = useTaxon();
+//   if (!showField(formField, taxon)) {
+//     return null;
+//   } else {
+//     return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
+//   }
+// }
 export {
   CreateEditTextField,
   CreateEditDateField,
   CreateEditCheckboxField,
   CreateEditSelectField,
-  CreateFormField,
-  CreateTaxonFormField
+  CreateFormField
+  // CreateTaxonFormField
 };

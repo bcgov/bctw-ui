@@ -11,7 +11,8 @@ import CaptivityStatusForm from './CaptivityStatusForm';
 import { boxSpreadRowProps } from './EventComponents';
 import Radio from 'components/form/Radio';
 import { WorkflowStrings } from 'constants/strings';
-import { wfFields, WorkflowFormProps } from 'types/events/event';
+import { WorkflowFormProps } from 'types/events/event';
+import { wfFields } from 'types/events/form_fields';
 
 type MortEventProps = WorkflowFormProps<MortalityEvent> & {
   event: MortalityEvent;

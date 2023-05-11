@@ -1,24 +1,23 @@
-import { Box, Button, Grid, Paper, Theme, Typography, useTheme } from '@mui/material';
+import { Box, Button, Grid, Paper, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { plainToClass } from 'class-transformer';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import { formatTag } from 'components/table/table_helpers';
 import { CbSelect } from 'critterbase/components/CbSelect';
 import { CbRoutes } from 'critterbase/routes';
 import { ICbRouteKey } from 'critterbase/types';
-import dayjs from 'dayjs';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
-import { AttachedCritter, Critter, eCritterStatus } from 'types/animal';
-import { AttachedCollar } from 'types/collar';
+import { AttachedCritter, Critter } from 'types/animal';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import { editObjectToEvent } from 'types/events/event';
+import { LocationEvent } from 'types/events/location_event';
+import MortalityEvent from 'types/events/mortality_event';
 import { columnToHeader, doNothingAsync } from 'utils/common_helpers';
 import EditCritter from './data/animals/EditCritter';
-import ManageLayout from './layouts/ManageLayout';
 import ModifyCritterWrapper from './data/animals/ModifyCritterWrapper';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import WorkflowWrapper from './data/events/WorkflowWrapper';
-import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
-import { editObjectToEvent } from 'types/events/event';
-import { plainToClass } from 'class-transformer';
-import MortalityEvent from 'types/events/mortality_event';
+import ManageLayout from './layouts/ManageLayout';
 
 // Place constants here
 const TEST = 'Testing';
@@ -29,6 +28,47 @@ const TEST_KEYX_PAYLOAD = {
   98789: true
 };
 const TAB_LIST = ['Device and Critter', 'Telemetry', 'Vectronic KeyX'];
+
+const capture_location = editObjectToEvent(
+  {
+    latitude: 1,
+    longitude: 2
+  },
+  new LocationEvent('capture'),
+  []
+);
+
+const release_location = editObjectToEvent(
+  {
+    latitude: 3,
+    longitude: 4
+  },
+  new LocationEvent('release'),
+  []
+);
+
+const editCritter = editObjectToEvent(
+  {
+    capture: [
+      {
+        capture_comment: 'test',
+        capture_location: { latitude: 1, longitude: 2, coordinate_uncertainty_unit: 'm' },
+        release_location: { latitude: 2, longitude: 3 }
+      }
+    ],
+    latitude: 1,
+    longitude: 2,
+    wlh_id: '12-345',
+    sex: 'Male',
+    taxon: 'Moose',
+    animal_id: 'Bert',
+    region_env_id: '123',
+    wmu_id: '1-10',
+    critter_comment: 'this is the critter comment'
+  },
+  new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05'),
+  []
+);
 
 /**
  * Testing area for UI comoponents.
@@ -41,6 +81,7 @@ const DevPlayground = (): JSX.Element => {
   const [detailAnimal, setDetailAnimal] = useState<AttachedCritter>(null);
   const [openCapture, setCapture] = useState(false);
   const [openMortality, setMortality] = useState(false);
+  const [openCritter, setOpenCritter] = useState(false);
   // const { data, status } = api.useType<AttachedCritter>('animal', 'c6b0a6c7-71ca-421a-96d6-1878fec07b05');
   // console.log(data);
   return (
@@ -50,6 +91,27 @@ const DevPlayground = (): JSX.Element => {
         <SubHeader text={'Component Development and Testing Area'} />
         <Button variant='contained' onClick={() => setBackground((b) => !b)}>
           {`White Background - ${background}`}
+        </Button>
+        <Button
+          variant='contained'
+          onClick={() => {
+            setCapture(true);
+          }}>
+          Open Capture
+        </Button>
+        <Button
+          variant='contained'
+          onClick={() => {
+            setCapture(true);
+          }}>
+          Open Edit Critter
+        </Button>
+        <Button
+          variant='contained'
+          onClick={() => {
+            setMortality(true);
+          }}>
+          Open Mortality
         </Button>
       </Box>
 
@@ -61,17 +123,14 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
-        <ModifyCritterWrapper editing={new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05')}>
+        <ModifyCritterWrapper editing={editCritter}>
           <EditCritter
-            open={false} // THIS is false
+            open={openCritter} // THIS is false
             editing={null}
             handleClose={(): void => setCapture(false)}
             onSave={doNothingAsync}
           />
         </ModifyCritterWrapper>
-
-        <Button variant='contained' onClick={() => {setCapture(true)}}>Open Capture</Button>
-        <Button variant='contained' onClick={() => {setMortality(true)}}>Open Mortality</Button>
 
         <WorkflowWrapper
           open={openCapture}
@@ -102,12 +161,11 @@ const DevPlayground = (): JSX.Element => {
           )}
           handleClose={(): void => setMortality(false)}
           onEventSaved={(e) => {
-            console.log('Saved Event')
-            console.log(e.critterbasePayload)
+            console.log('Saved Event');
+            console.log(e.critterbasePayload);
           }}
           onEventChain={() => console.log('chain')}
         />
-        
 
         <Box flexDirection='column'>
           {Object.keys(CbRoutes).map((key) => (
