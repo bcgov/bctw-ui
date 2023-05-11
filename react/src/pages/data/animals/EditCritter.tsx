@@ -80,40 +80,24 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
               <FormSection id='critter' header='Critter Details' size='large'>
                 <Divider />
                 <FormSection id='identifiers' header='Identifiers'>
-                  {identifierFields?.map((f, i) => CreateFormField(editing, f, onChange))}
+                  {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
                 </FormSection>
                 <FormSection id='characteristics' header='Characteristics'>
-                  {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange))}
+                  {characteristicsFields?.map((f) => CreateFormField(editing, f, onChange))}
                 </FormSection>
               </FormSection>
-              <FormSection id='c-deets' header='Latest Capture Details' hide={!editing.latestCapture} size='large'>
+              <FormSection
+                id='c-deets'
+                header='Latest Capture & Release Details'
+                hide={!editing.latestCapture}
+                size='large'>
                 <Divider />
                 <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} isEditing />
               </FormSection>
               <FormSection id='m-deets' header='Latest Mortality Details' hide={!editing.latestMortality} size='large'>
                 <Divider />
                 <MortalityEventForm event={editing.latestMortality} handleFormChange={onChange} />
-                {/* <Divider /> */}
               </FormSection>
-              {/* {editing.latestCapture ? (
-                <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} isEditing />
-              ) : null} */}
-              {/* {editing.latestMortality ? (
-                <MortalityEventForm event={editing.latestMortality} handleFormChange={onChange} />
-              ) : null} */}
-
-              {/* {
-                captureFields.map((f, i) => CreateFormField(editing, f, onChange))
-                // <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-              } */}
-              {/* <FormSection id='capture-details' header='Latest Capture Details' disabled={true}>
-
-              </FormSection> */}
-              {/* <FormSection id='release-details' header='Latest Release Details' disabled={true}>
-                {releaseFields?.map((f, i) => (
-                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))}
-              </FormSection> */}
             </Box>
           );
         }}
