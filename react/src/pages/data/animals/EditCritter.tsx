@@ -85,9 +85,9 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
               <FormSection id='characteristics' header='Characteristics' disabled={true}>
                 {characteristicsFields?.map((f, i) => CreateFormField(editing, f, onChange))}
               </FormSection>
-              {/* {editing.latestCapture ? (
+              {editing.latestCapture ? (
                 <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} />
-              ) : null} */}
+              ) : null}
 
               {/* {
                 captureFields.map((f, i) => CreateFormField(editing, f, onChange))

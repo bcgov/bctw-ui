@@ -60,11 +60,11 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     if(statefulEvent.fields) {
       for(const [k, v] of Object.entries(statefulEvent.fields)) {
         if(v.required && !statefulEvent[k]) {
-          console.log(`Missing required property ${k} -> ${statefulEvent[k]}`)
+          //console.log(`Missing required property ${k} -> ${statefulEvent[k]}`)
           return false;
         }
       }
-      console.log('No missing properties detected.');
+      //console.log('No missing properties detected.');
       return true;
     }
   }

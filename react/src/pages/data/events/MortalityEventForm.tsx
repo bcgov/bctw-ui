@@ -109,26 +109,26 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
         <Box>
           {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_id, onChange)}
           {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_confidence, onChange)}
-          {CreateFormField(mortality, mortality.fields.proximate_predated_by_taxon_id, onChange, isPredatorKnown ? {  } : {disabled: !isPredatorKnown, value: '' })}
+          {isPredatorKnown && CreateFormField(mortality, mortality.fields.proximate_predated_by_taxon_id, onChange, isPredatorKnown ? {  } : {disabled: !isPredatorKnown, value: '' })}
         </Box>
         <Box>
           {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_id, onChange)}
           {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_confidence, onChange)}
-          {CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, isUcodPredatorKnown ? {  } : {disabled: !isUcodPredatorKnown, value: ''})}
+          {isUcodPredatorKnown && CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, isUcodPredatorKnown ? {  } : {disabled: !isUcodPredatorKnown, value: ''})}
         </Box>
       </FormSection>
       <FormSection id={'mort-dev'} header={'Device Information'}>
       <Box mb={1} {...boxSpreadRowProps}>
+          {CreateFormField(mortality, {...mortality.fields.retrieved_ind, required: isRetrieved }, onChange )}
           {CreateFormField(mortality, mortality.fields.retrieval_date, onChange, {
             disabled: !isRetrieved || critterIsAlive
           })}
-          {CreateFormField(mortality, {...mortality.fields.retrieved_ind, required: isRetrieved }, onChange )}
       </Box>
       <Box mb={1} {...boxSpreadRowProps}>
+          {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
           {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
                 disabled: !isBeingUnattached || critterIsAlive
           })} 
-          {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
       </Box>
       </FormSection>
       
