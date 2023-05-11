@@ -73,13 +73,15 @@ const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string 
   }
   const { properties } = point;
   if (properties?.critter_status === 'Mortality') {
-    const { date_recorded, mortality_date } = properties;
+    const { date_recorded, mortality_timestamp } = properties;
     // if the mortality date is not set, fill all points red
     // otherwise only fill points red after the mortality date
-    if (!mortality_date || dayjs(date_recorded) > dayjs(mortality_date)) {
+    if (!mortality_timestamp || dayjs(date_recorded) > dayjs(mortality_timestamp)) {
       return MAP_COLOURS.mortality;
     }
-  } else if (properties?.device_status === 'Potential Mortality') {
+  }
+  // TODO: Is this something we want to keep?
+  else if (properties?.device_status === 'Potential Mortality') {
     return MAP_COLOURS.malfunction;
   }
   return parseAnimalColour(properties.map_colour)?.fillColor ?? MAP_COLOURS.point;
@@ -97,10 +99,10 @@ const getFillColorByDeviceStatus = (point: ITelemetryPoint, selected = false): s
   }
   const { properties } = point;
   if (properties?.device_status === 'Mortality') {
-    const { date_recorded, mortality_date } = properties;
+    const { date_recorded, mortality_timestamp } = properties;
     // if the mortality date is not set, fill all points red
     // otherwise only fill points red after the mortality date
-    if (!mortality_date || dayjs(date_recorded) > dayjs(mortality_date)) {
+    if (!mortality_timestamp || dayjs(date_recorded) > dayjs(mortality_timestamp)) {
       return MAP_COLOURS.mortality;
     }
   }
