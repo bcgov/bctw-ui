@@ -59,7 +59,6 @@ export const permissionApi = (props: ApiProps): API => {
     user: User,
     filter: eCritterPermission[] = filterOutNonePermissions
   ): Promise<UserCritterAccess[]> => {
-    console.log(user);
     if (!user?.username) {
       // eslint-disable-next-line no-console
       console.log(`unable to fetch user animal access, invalid user object ${JSON.stringify(user)}`);
@@ -72,7 +71,7 @@ export const permissionApi = (props: ApiProps): API => {
     // may not be in an array if the user only has accesss to one animal
     const d: IUserCritterAccess[] = !Array.isArray(data) ? [data] : data;
     const converted: UserCritterAccess[] = d.map((json: IUserCritterAccess) => plainToClass(UserCritterAccess, json));
-    console.log(converted)
+
     return converted;
   };
 

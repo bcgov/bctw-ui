@@ -52,17 +52,19 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState<ReactNode>(null);
 
-  /*useEffect(() => {
-    setCanSave(!hasErr);
-  }, [hasErr]);*/
+  useEffect(() => {
+    setCanSave(!hasErr && eventHasAllRequiredProperties());
+  }, [hasErr]);
 
   const eventHasAllRequiredProperties = (): boolean => {
     if(statefulEvent.fields) {
       for(const [k, v] of Object.entries(statefulEvent.fields)) {
         if(v.required && !statefulEvent[k]) {
+          console.log(`Missing required property ${k} -> ${statefulEvent[k]}`)
           return false;
         }
       }
+      console.log('No missing properties detected.');
       return true;
     }
   }
@@ -99,7 +101,6 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   // performs metadata updates of collar/critter
   const handleSave = async (): Promise<void> => {
-    console.log('This is what we will save ' + JSON.stringify(statefulEvent, null, 2));
     saveEvent(statefulEvent);
   };
 
@@ -117,15 +118,15 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     if (nestedEventKey) {
       Object.assign(tmp[nestedEventKey], { [k]: val });
       setStatefulEvent(tmp);
-      return;
     }
-
-    if (k && k !== 'displayProps') {
+    else if (k && k !== 'displayProps') {
       tmp[k] = val;
       setStatefulEvent(tmp);
     }
-
     setCanSave(!hasErr && eventHasAllRequiredProperties());
+    //const a = eventHasAllRequiredProperties();
+    //console.log(`${JSON.stringify(v)} -- Set canSave with ${!hasErr} and ${a}`)
+    //setCanSave(!hasErr && a);
   };
 
   /**

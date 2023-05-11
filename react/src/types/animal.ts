@@ -1,5 +1,5 @@
 import { Exclude, Transform } from 'class-transformer';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { FormFieldObject, eInputType, isRequired } from 'types/form_types';
@@ -174,7 +174,7 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   get critter_status(): string {
-    return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
+    return dayjs(this.mortality_timestamp).isValid() ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
   get displayProps(): (keyof Critter)[] {

@@ -251,11 +251,11 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check }
   };*/
   fields: MortalityFormField = {
-    retrieval_date: { prop: 'retrieval_date', type: eInputType.date, required: false},
+    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime, required: false},
     retrieved_ind: { prop: 'retrieved_ind', type: eInputType.check, required: false},
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check},
-    data_life_end: {prop: 'data_life_end', type: eInputType.date},
-    mortality_timestamp: { prop: 'mortality_timestamp', type: eInputType.date, required: true },
+    data_life_end: {prop: 'data_life_end', type: eInputType.datetime},
+    mortality_timestamp: { prop: 'mortality_timestamp', type: eInputType.datetime, required: true },
     mortality_comment: { prop: 'mortality_comment', type: eInputType.text, style: FormCommentStyle },
     proximate_cause_of_death_id: { prop: 'proximate_cause_of_death_id', type: eInputType.cb_select, cbRouteKey: 'cod', required: true},
     proximate_cause_of_death_confidence: { prop: 'proximate_cause_of_death_confidence', type: eInputType.cb_select, cbRouteKey: 'cause_of_death_confidence', required: true},

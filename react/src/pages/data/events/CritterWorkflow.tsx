@@ -31,8 +31,8 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
 
   useEffect(() => {
     const a = createEvent(workflow);
-    console.log('This is editing obj ' + JSON.stringify(editing, null, 2))
-    console.log('In workflow update effect ' + JSON.stringify(a, null, 2))
+    // console.log('This is editing obj ' + JSON.stringify(editing, null, 2))
+    // console.log('In workflow update effect ' + JSON.stringify(a, null, 2))
     updateEvent(a);
   }, [editing, workflow]);
   /**
