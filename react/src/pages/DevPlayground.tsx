@@ -29,24 +29,6 @@ const TEST_KEYX_PAYLOAD = {
 };
 const TAB_LIST = ['Device and Critter', 'Telemetry', 'Vectronic KeyX'];
 
-const capture_location = editObjectToEvent(
-  {
-    latitude: 1,
-    longitude: 2
-  },
-  new LocationEvent('capture'),
-  []
-);
-
-const release_location = editObjectToEvent(
-  {
-    latitude: 3,
-    longitude: 4
-  },
-  new LocationEvent('release'),
-  []
-);
-
 const editCritter = editObjectToEvent(
   {
     capture: [
@@ -92,29 +74,28 @@ const DevPlayground = (): JSX.Element => {
         <Button variant='contained' onClick={() => setBackground((b) => !b)}>
           {`White Background - ${background}`}
         </Button>
-        <Button
-          variant='contained'
-          onClick={() => {
-            setCapture(true);
-          }}>
-          Open Capture
-        </Button>
-        <Button
-          variant='contained'
-          onClick={() => {
-            setCapture(true);
-          }}>
-          Open Edit Critter
-        </Button>
-        <Button
-          variant='contained'
-          onClick={() => {
-            setMortality(true);
-          }}>
-          Open Mortality
-        </Button>
       </Box>
-
+      <Button
+        variant='contained'
+        onClick={() => {
+          setCapture(true);
+        }}>
+        Open Capture
+      </Button>
+      <Button
+        variant='contained'
+        onClick={() => {
+          setOpenCritter(true);
+        }}>
+        Open Edit Critter
+      </Button>
+      <Button
+        variant='contained'
+        onClick={() => {
+          setMortality(true);
+        }}>
+        Open Mortality
+      </Button>
       <Box sx={{ backgroundColor: background ? '#ffff' : 'transparent', display: 'flex', flexDirection: 'row' }}>
         {/* Place components below here */}
         {/* <TempComponent handleTab={setTab} tab={tab} tabList={TAB_LIST}>
@@ -127,7 +108,7 @@ const DevPlayground = (): JSX.Element => {
           <EditCritter
             open={openCritter} // THIS is false
             editing={null}
-            handleClose={(): void => setCapture(false)}
+            handleClose={(): void => setOpenCritter(false)}
             onSave={doNothingAsync}
           />
         </ModifyCritterWrapper>
@@ -167,7 +148,7 @@ const DevPlayground = (): JSX.Element => {
           onEventChain={() => console.log('chain')}
         />
 
-        <Box flexDirection='column'>
+        {/* <Box flexDirection='column'>
           {Object.keys(CbRoutes).map((key) => (
             <CbSelect
               prop={key}
@@ -178,7 +159,7 @@ const DevPlayground = (): JSX.Element => {
               required={false}
             />
           ))}
-        </Box>
+        </Box> */}
 
         {/* <CritterDataTables detailViewAction={setDetailAnimal} /> */}
         {/* <Box sx={{ pr: 2 }}>
