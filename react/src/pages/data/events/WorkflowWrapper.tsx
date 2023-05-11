@@ -68,7 +68,6 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   }
 
   useEffect(() => {
-    console.log('Upper event object modified, changing statefulEvent')
     setStatefulEvent(event);
   }, [event])
 
@@ -100,6 +99,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   // performs metadata updates of collar/critter
   const handleSave = async (): Promise<void> => {
+    console.log('This is what we will save ' + JSON.stringify(statefulEvent, null, 2));
     saveEvent(statefulEvent);
   };
 
@@ -110,7 +110,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     const tmp = statefulEvent;
     const k = Object.keys(v)[0];
     const tempval = Object.values(v)[0] ;
-    const val = tempval['id'] ?? tempval;
+    const val = tempval === undefined || tempval === null ? null : (tempval['id'] ?? tempval);
+    //If tempval is undefined or null, just leave it as null. Otherwise, try to access the id property from it, but if that fails just use the non-null tempval as is.
     const { nestedEventKey } = v;
     
     if (nestedEventKey) {

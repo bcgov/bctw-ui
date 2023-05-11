@@ -176,6 +176,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.shouldSaveDevice = true;
     this.shouldUnattachDevice = false;
     this.onlySaveAnimalStatus = false;
+    this.data_life_end = dayjs();
     // retrieval date is defaulted to end of previous day (business requirement)
     this.retrieval_date = getEndOfPreviousDay();
     this.retrieved_ind = false;
@@ -311,8 +312,8 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     const { assignment_id, data_life_end } = this;
     const ret: RemoveDeviceInput = {
       assignment_id,
-      data_life_end: formatT(data_life_end),
-      attachment_end: formatT(data_life_end)
+      data_life_end: formatT(dayjs(data_life_end)),
+      attachment_end: formatT(dayjs(data_life_end))
     };
     return ret;
   }
