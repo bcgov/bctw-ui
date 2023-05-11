@@ -1,9 +1,9 @@
 import { Type, Expose, Transform } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
-import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus, formatCollectionUnits } from 'types/animal';
+import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
-import { columnToHeader } from 'utils/common_helpers';
+import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
 import { BCTWBase, BCTWType, DayjsToPlain, nullOrDayjs, toClassOnly, toPlainOnly } from './common_types';
 import { Dayjs } from 'dayjs';
@@ -102,28 +102,22 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
     return 'device_id';
   }
 
-  get collection_unit_display(): string {
-    return formatCollectionUnits(this.collection_units);
-  }
-
   // Getter for properties in collection_units
-  get collectionUnitProps(): Record<string, string[]> {
-    const collectionUnitProps = {};
+  get collectionUnitProps(): Record<string, string> {
+    const collectionUnitProps: Record<string, string> = {};
     (this.collection_units ?? []).forEach((unit) => {
-      const key = toSnakeCase(unit.category_name);
-      collectionUnitProps[key] = collectionUnitProps[key] ?? [];
-      collectionUnitProps[key].push(unit.unit_name);
+      const key = headerToColumn(unit.category_name);
+      collectionUnitProps[key] = unit.unit_name;
     });
     return collectionUnitProps;
   }
 
-  // New getter to return the keys of the new properties
+  // Getter to return the keys of the new properties
   get collectionUnitKeys(): string[] {
     return Object.keys(this.collectionUnitProps);
   }
 
   get critter_status(): string {
-    // console.log(`mort timestamp: ${this.mortality_timestamp}`)
     return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
@@ -136,13 +130,22 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   }
 }
 
-// Function to convert a string to snake_case
-function toSnakeCase(s: string): string {
-  return s
-    .replace(/([a-z])([A-Z])/g, '$1_$2')
-    .replace(/\s+/g, '_')
-    .toLowerCase();
-}
+// Function to create a Proxy for a TelemetryDetail object with flattened collection_units
+const createTelemetryDetailProxy = (telemetryDetail: TelemetryDetail): TelemetryDetail => {
+  return new Proxy(telemetryDetail, {
+    get: (target, prop: string): unknown => {
+      if (prop === 'collection_units') {
+        return target.collection_units ?? [];
+      }
+
+      if (Reflect.has(target, prop)) {
+        return Reflect.get(target, prop);
+      }
+
+      return target.collectionUnitProps[prop] ?? undefined;
+    }
+  });
+};
 
 export class TelemetryFeature implements ITelemetryPoint {
   type: 'Feature';
@@ -206,4 +209,4 @@ export type {
   MapFormValue
 };
 
-export { doesPointArrayContainPoint };
+export { createTelemetryDetailProxy, doesPointArrayContainPoint };

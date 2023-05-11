@@ -185,9 +185,7 @@ const highlightPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
 const getSymbolizeColours = (mfv: MapFormValue, feature: ITelemetryPoint): { fillColor: string; color: string } => {
   const { header, values } = mfv;
   const isDeviceID = header === DEFAULT_MFV.header;
-  // TODO: Support symbolize with non-exclusive data
-  const prop = feature.properties;
-  const attr = prop[header] ? (Array.isArray(prop[header]) ? prop[header][0] : prop[header]) : undefined;
+  const attr = feature.properties[header];
   const fillColor = values.find((val) => val.id === attr)?.colour;
   const color = isDeviceID ? getOutlineColor(feature) : MAP_COLOURS.outline;
   return { fillColor, color };

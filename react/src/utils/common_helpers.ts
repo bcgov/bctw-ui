@@ -51,22 +51,16 @@ const columnToHeader = (prop: string): string => {
 };
 
 /**
- * formats a header to a property name ex.Population Unit -> collection_units
+ * formats a header to a property name ex.Population Unit -> population_unit
  * @param prop - header name to format backwards
  */
-
 const headerToColumn = (prop: string): string => {
-  const asArr = prop
-    //.replaceAll(' ', '_')
-    .replaceAll(' ID', ' id')
-    .replaceAll('WLH', 'wlh')
-    .replaceAll('UTM', 'utm')
-    .split(' ');
-  return asArr
-    .map((a) => a.charAt(0).toLowerCase() + a.slice(1))
-    .join(' ')
-    .replaceAll(' ', '_');
+  return prop
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/\s+/g, '_')
+    .toLowerCase();
 };
+
 /**
  * returns a copy of the provided object with null / undefined / empty string removed
  */

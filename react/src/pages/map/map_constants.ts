@@ -23,9 +23,6 @@ const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: st
   { header: 'critter_status' },
   { header: 'device_status' },
   { header: 'sex' },
-  // TODO: Finalize formatting of collection units before implementing this
-  // { header: 'collection_unit_display', label: 'Collection Unit', filter: [] },
-  // { header: 'collective_unit' }
 ];
 
 const SEARCH_PRESETS: SearchPresets = {

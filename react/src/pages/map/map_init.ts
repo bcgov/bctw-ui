@@ -4,13 +4,11 @@ import LabeledMarker from 'leaflet-labeled-circle';
 import React, { MutableRefObject } from 'react';
 import dayjs from 'dayjs';
 import length from '@turf/length';
-import { ITelemetryPoint, TelemetryDetail } from 'types/map';
+import { ITelemetryPoint } from 'types/map';
 import { MAP_COLOURS } from 'pages/map/map_helpers';
 import { MapStrings } from 'constants/strings';
 import { MapTileLayers } from 'constants/strings';
 import { formatLocal } from 'utils/time';
-import { plainToClass } from 'class-transformer';
-import { Point } from 'geojson';
 import { eCritterStatus } from 'types/animal';
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');

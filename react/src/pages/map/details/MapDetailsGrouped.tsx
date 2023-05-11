@@ -8,7 +8,8 @@ import {
   getPointIDsFromTelemetryGroup,
   getLatestPing,
   sortGroupedTelemetry,
-  parseAnimalColour
+  parseAnimalColour,
+  getUniqueCollectionUnitKeys
 } from 'pages/map/map_helpers';
 import { MapDetailsBaseProps } from './MapDetails';
 
@@ -22,33 +23,18 @@ type GroupedCheckedStatus = {
   checked: boolean;
 };
 
+// TODO: TelemetryDetail types
 const rows_to_render = [
   'Colour',
   'Taxon',
-  // 'Collection Unit',
-  // 'Collective Unit',
   'WLH ID',
   'Critter ID',
   'Critter Status',
   'Device ID',
   'Device Status',
   'Frequency (MHz)',
-  // 'Capture Date',
   'Last Transmit Date'
 ];
-
-
-function extractUniqueCategoryNames(pings: ITelemetryGroup[]): string[] {
-  const categorySet = new Set<string>();
-  pings.forEach((ping) => {
-    ping.features.forEach((feature) => {
-      feature.properties.collection_units.forEach((unit) => {
-        categorySet.add(unit.category_name);
-      });
-    });
-  });
-  return Array.from(categorySet);
-}
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
   const { pings, crittersSelected, handleShowOverview, handleRowSelected } = props;
@@ -56,7 +42,8 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const [orderBy, setOrderBy] = useState('Critter Name');
   const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
 
-  const uniqueCategoryNames = extractUniqueCategoryNames(pings);
+  // Adds a column for each unique category_name
+  const uniqueCategoryNames = getUniqueCollectionUnitKeys(pings);
 
   const handleSort = (event: React.MouseEvent<unknown>, property: string): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -173,13 +160,9 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
           }}></Box>
       </TableCell>
       <TableCell>{row.taxon}</TableCell>
-      {uniqueCategoryNames.map((category) => {
-        const matchingUnit = row.collection_units.find((unit) => unit.category_name === category);
-        return <TableCell key={`cu_${category}`}>{matchingUnit ? matchingUnit.unit_name : null}</TableCell>;
+      {uniqueCategoryNames.map((property) => {
+        return <TableCell key={`cu_${property}`}>{row[property] ?? null}</TableCell>;
       })}
-
-      {/* <TableCell>{row.collection_unit_display}</TableCell> */}
-      {/* <TableCell>{row.collective_unit}</TableCell> */}
       {row.critter_id ? (
         <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
       ) : (
@@ -194,7 +177,6 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('device', row)} />
       <TableCell>{row.device_status}</TableCell>
       <TableCell>{row.paddedFrequency}</TableCell>
-      {/* <TableCell>{row.formattedCaptureDate}</TableCell> */}
       <TableCell>{row.formattedDate}</TableCell>
       <TableCell>{pingCount}</TableCell>
     </TableRow>

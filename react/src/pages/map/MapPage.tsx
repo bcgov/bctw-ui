@@ -125,7 +125,7 @@ export default function MapPage(): JSX.Element {
   // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
 
-  // Update the fetchedPings using helper function to instatiate TelemetryDetail classes
+  // Update the fetchedPings using helper function to instantiate TelemetryDetail classes
   useEffect(() => {
     if (baseFetchedPings && !isErrorPings) {
       setFetchedPings(updatePings(baseFetchedPings));
@@ -328,7 +328,6 @@ export default function MapPage(): JSX.Element {
   };
 
   const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue, includeLatest: boolean, opacity: number): void => {
-    console.log('symbolize mfv: ', mfv)
     symbolizePings(pingsLayer, mfv, includeLatest, opacity);
     symbolizePings(latestPingsLayer, mfv, includeLatest, opacity);
   };
@@ -340,7 +339,6 @@ export default function MapPage(): JSX.Element {
       setRange(newRange);
     }*/
     // otherwise, update the filter state and apply the filters
-    console.log('filters: ', filters)
     setFilters(filters);
     applyFiltersToPings(filters);
   };
@@ -364,7 +362,6 @@ export default function MapPage(): JSX.Element {
       return;
     }
     const groupedFilters = groupFilters(filters);
-    // console.log(groupedFilters, newFeatures.length);
     const filteredPings = applyFilter(groupedFilters, fetchedPings);
 
     setPings(filteredPings);

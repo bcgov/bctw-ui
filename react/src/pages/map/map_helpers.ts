@@ -12,12 +12,12 @@ import {
   PingGroupType,
   TelemetryDetail,
   MapFormValue,
-  DEFAULT_MFV
+  DEFAULT_MFV,
+  createTelemetryDetailProxy
 } from 'types/map';
 import { capitalize, columnToHeader } from 'utils/common_helpers';
 import { CODE_FILTERS } from './map_constants';
 import { plainToClass } from 'class-transformer';
-import { log } from 'console';
 
 const MAP_COLOURS = {
   point: '#00ff44',
@@ -132,6 +132,14 @@ const fillPoint = (layer: any, selected = false): void => {
   });
 };
 
+// Converts the properties of each ITelemetryPoint to an instance of TelemetryDetail
+const updatePings = (newPings: ITelemetryPoint[]): ITelemetryPoint[] => {
+  return newPings.map((point) => ({
+    ...point,
+    properties: createTelemetryDetailProxy(plainToClass(TelemetryDetail, point.properties))
+  }));
+};
+
 /**
  * @param pings list of telemetry features to group
  * @param sortOption applied after the features are gruped by critter_id
@@ -188,7 +196,6 @@ const groupFilters = (filters: ICodeFilter[]): IGroupedCodeFilter[] => {
       groupObj[f.code_header].push(f.description);
     }
   });
-  console.log('group filters: ', groupObj);
   return Object.keys(groupObj).map((k) => {
     return { code_header: k, descriptions: groupObj[k] };
   });
@@ -205,25 +212,11 @@ const applyFilter = (groupedFilters: IGroupedCodeFilter[], features: ITelemetryP
     for (let i = 0; i < groupedFilters.length; i++) {
       const { code_header, descriptions } = groupedFilters[i];
       const featureValue = properties[code_header];
-      console.log('featureValue', featureValue);
-
-      if (Array.isArray(featureValue)) {
-        if (
-          descriptions.includes(FormStrings.emptySelectValue) &&
-          featureValue.some((value) => value === '' || value === null)
-        ) {
-          return true;
-        }
-        if (!featureValue.some((value) => descriptions.includes(value))) {
-          return false;
-        }
-      } else {
-        if (descriptions.includes(FormStrings.emptySelectValue) && (featureValue === '' || featureValue === null)) {
-          return true;
-        }
-        if (!descriptions.includes(featureValue)) {
-          return false;
-        }
+      if (descriptions.includes(FormStrings.emptySelectValue) && (featureValue === '' || featureValue === null)) {
+        return true;
+      }
+      if (!descriptions.includes(featureValue)) {
+        return false;
       }
     }
     return true;
@@ -276,22 +269,16 @@ const getUniquePropFromPings = (
   const ids = [];
   features?.forEach((f) => {
     const val = f.properties[prop];
-    const items = Array.isArray(val) ? val : [val];
-
-    items.forEach((item) => {
-      if (!ids.includes(item)) {
-        if (includeNulls) {
-          ids.push(item);
-        } else if (item !== null) {
-          ids.push(item);
-        }
+    if (!ids.includes(val)) {
+      if (includeNulls) {
+        ids.push(val);
+      } else if (val !== null) {
+        ids.push(val);
       }
-    });
+    }
   });
-
   return ids.sort((a, b) => a - b);
 };
-
 
 /**
  * @returns a single feature that contains the most recent date_recorded
@@ -428,8 +415,7 @@ const createUniqueList = (
           ? (colour = parseAnimalColour(p.properties.map_colour).fillColor)
           : (colour = MAP_COLOURS['unassigned point']);
       }
-      return p.properties[propName] === d || (Array.isArray(p.properties[propName]) && p.properties[propName].includes(d));
-
+      return p.properties[propName] === d;
     }).length;
     return {
       id: d,
@@ -447,66 +433,25 @@ const createUniqueList = (
 
 //Formats a MapFormValues array.
 const getFormValues = (pings: ITelemetryPoint[]): MapFormValue[] => {
-  const collectionUnitKeys = Array.from(
-    new Set(
-      pings
-        .map((point) => {
-          return point.properties.collectionUnitKeys;
-        })
-        .flat()
-    )
-  );
-  console.log('keys', collectionUnitKeys);
+  const collectionUnitKeys = [...new Set(pings.flatMap((feature) => feature.properties.collectionUnitKeys))];
   const collectionUnitFilters = collectionUnitKeys.map((key) => ({ header: key })) as unknown as {
     header: string;
     label?: string;
   }[];
-  console.log('collectionUnitFilters: ', collectionUnitFilters);
-  const staticFilters: MapFormValue[] = [...CODE_FILTERS, ...collectionUnitFilters].map((cf) => ({
+  const filters: MapFormValue[] = [...CODE_FILTERS, ...collectionUnitFilters].map((cf) => ({
     header: cf.header,
     label: columnToHeader(cf?.label ?? cf.header),
     values: createUniqueList(cf.header, pings)
   }));
-  console.log('static filters: ', staticFilters);
 
-  return staticFilters;
+  return filters;
 };
 
-// Converts the properties of each ITelemetryPoint to an instance of TelemetryDetail
-const updatePings = (newPings: ITelemetryPoint[]): ITelemetryPoint[] => {
-  return newPings.map((point) => ({
-    ...point,
-    properties: createTelemetryDetailProxy(plainToClass(TelemetryDetail, point.properties))
-  }));
+// returns all the unique collection_unit properties from a group of pings
+const getUniqueCollectionUnitKeys = (pings: ITelemetryGroup[]): string[] => {
+  const keys = pings.flatMap((ping) => ping.features.flatMap((feature) => feature.properties.collectionUnitKeys));
+  return [...new Set(keys)];
 };
-
-// Function to create a Proxy for a TelemetryDetail object with flattened collection_units
-const createTelemetryDetailProxy = (telemetryDetail: TelemetryDetail) => {
-  return new Proxy(telemetryDetail, {
-    get: (target, prop: string) => {
-      if (prop === 'collection_units') {
-        return target.collection_units ?? [];
-      }
-
-      if (Reflect.has(target, prop)) {
-        return Reflect.get(target, prop);
-      }
-
-      return target.collectionUnitProps[prop] ?? undefined;
-    }
-  });
-};
-
-const extractUniqueCategoryNames = (pings: TelemetryDetail[]): string[] => {
-  const categorySet = new Set<string>();
-  pings.forEach((property) => {
-    property.collection_units.forEach((unit) => {
-      categorySet.add(unit.category_name);
-    });
-  });
-  return Array.from(categorySet);
-};
-
 
 export {
   applyFilter,
@@ -533,5 +478,5 @@ export {
   createUniqueList,
   getFormValues,
   updatePings,
-  extractUniqueCategoryNames
+  getUniqueCollectionUnitKeys
 };
