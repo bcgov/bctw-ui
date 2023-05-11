@@ -38,6 +38,11 @@ const editCritter = editObjectToEvent(
         release_location: { latitude: 2, longitude: 3 }
       }
     ],
+    mortality: [
+      {
+        mortality_location: { latitude: 8, longitude: 9 }
+      }
+    ],
     latitude: 1,
     longitude: 2,
     wlh_id: '12-345',
