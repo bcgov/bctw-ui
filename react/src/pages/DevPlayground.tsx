@@ -18,6 +18,7 @@ import WorkflowWrapper from './data/events/WorkflowWrapper';
 import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
 import { editObjectToEvent } from 'types/events/event';
 import { plainToClass } from 'class-transformer';
+import { LocationEvent } from 'types/events/location_event';
 
 // Place constants here
 const TEST = 'Testing';
@@ -28,6 +29,40 @@ const TEST_KEYX_PAYLOAD = {
   98789: true
 };
 const TAB_LIST = ['Device and Critter', 'Telemetry', 'Vectronic KeyX'];
+
+const capture_location = editObjectToEvent(
+  {
+    latitude: 1,
+    longitude: 2
+  },
+  new LocationEvent('capture'),
+  []
+);
+
+const release_location = editObjectToEvent(
+  {
+    latitude: 3,
+    longitude: 4
+  },
+  new LocationEvent('release'),
+  []
+);
+
+const editCritter = editObjectToEvent(
+  {
+    capture: [{ capture_comment: 'test', capture_location, release_location }],
+    latitude: 1,
+    longitude: 2,
+    wlh_id: '12-345',
+    sex: 'Male',
+    animal_id: 'Bert',
+    region_env_id: '123',
+    wmu_id: '1-10',
+    critter_comment: 'this is the critter comment'
+  },
+  new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05'),
+  []
+);
 
 /**
  * Testing area for UI comoponents.
@@ -59,9 +94,9 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
-        <ModifyCritterWrapper editing={new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05')}>
+        <ModifyCritterWrapper editing={editCritter}>
           <EditCritter
-            open={false} // THIS is false
+            open={bool} // THIS is false
             editing={null}
             handleClose={(): void => setBool(false)}
             onSave={doNothingAsync}
@@ -69,7 +104,7 @@ const DevPlayground = (): JSX.Element => {
         </ModifyCritterWrapper>
 
         <WorkflowWrapper
-          open={bool}
+          open={false}
           event={editObjectToEvent(
             { critter_id: '0e634a79-de08-4db0-8a33-71dfdfdd9405', taxon: 'Moose' },
             new CaptureEvent2(),

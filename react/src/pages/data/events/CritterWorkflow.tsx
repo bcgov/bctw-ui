@@ -1,6 +1,6 @@
 import { Critter, AttachedCritter } from 'types/animal';
 import { useEffect, useState } from 'react';
-import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
+import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';

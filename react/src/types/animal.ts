@@ -7,6 +7,8 @@ import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
+import { editObjectToEvent } from './events/event';
+import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
 
 export enum eTaxon {
   caribou = 'caribou',
@@ -39,37 +41,38 @@ export type ICollectionUnit = Record<string, string>;
 export type Critters = Critter | AttachedCritter;
 
 interface CritterLocation {
+  location_id: uuid;
   latitude: number;
   longitude: number;
-  region_env_name: string;
-  region_nr_name: string;
-  wmu_name: string;
+  region_env_id: string;
+  region_nr_id: string;
+  wmu_id: string;
 }
 
-interface CritterReleaseLocation extends CritterLocation {
-  release_latitude: never;
-  release_longitude: never;
-  release_region_env_id: never;
-  release_region_nr_id: never;
-  release_wmu_id: never;
-}
+// interface CritterReleaseLocation extends CritterLocation {
+//   release_latitude: never;
+//   release_longitude: never;
+//   release_region_env_id: never;
+//   release_region_nr_id: never;
+//   release_wmu_id: never;
+// }
 
-interface CritterCaptureLocation extends CritterLocation {
-  capture_latitude: never;
-  capture_longitude: never;
-  capture_region_env_id: never;
-  capture_region_nr_id: never;
-  capture_wmu_id: never;
+// interface CritterCaptureLocation extends CritterLocation {
+//   capture_latitude: never;
+//   capture_longitude: never;
+//   capture_region_env_id: never;
+//   capture_region_nr_id: never;
+//   capture_wmu_id: never;
   
-}
-interface CritterCapture {
+// }
+export interface CritterCapture {
   capture_id: uuid;
   capture_location_id: uuid;
   relase_location_id: uuid;
   capture_timestamp: Dayjs;
   release_timestamp: Dayjs;
-  capture_location: CritterCaptureLocation;
-  release_location: CritterReleaseLocation;
+  capture_location: CritterLocation;
+  release_location: CritterLocation;
 }
 
 interface CritterMarking {
@@ -167,6 +170,10 @@ export class Critter implements BCTWBase<Critter>{
 
   get displayProps(): (keyof Critter)[] {
     return ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'critter_status'];
+  }
+
+  get latestCapture() {
+    return this.capture?.length && editObjectToEvent(this.capture[0], new CaptureEvent2(), [])
   }
 
   get collection_unit(): string {
@@ -297,14 +304,14 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
   }
 }
 
-export type CritterDetailsForm = Partial<Critter> & 
-CritterCapture & 
-CritterCapture['capture_location'] & 
-CritterCapture['release_location'] & 
-CritterMarking & 
-CritterMeasurement
+// export type CritterDetailsForm = Partial<Critter> & 
+// CritterCapture & 
+// CritterCapture['capture_location'] & 
+// CritterCapture['release_location'] & 
+// CritterMarking & 
+// CritterMeasurement
 
-export const critterFormFields: Record<string, FormFieldObject<CritterDetailsForm>[]> = {
+export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
   identifierFields: [
     { prop: 'taxon_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'species', ...isRequired },
     { prop: 'wlh_id', type: eInputType.text, taxon: [] },
@@ -318,21 +325,23 @@ export const critterFormFields: Record<string, FormFieldObject<CritterDetailsFor
     //{ prop: 'collection_unit', type: eInputType.cb_select, taxon: [] } //This select will need additional work, array of objects. Flatten and display multiple selects for array
   ],
   captureFields: [
-    { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
-    { prop: 'latitude', type: eInputType.number, taxon: []},
-    { prop: 'longitude', type: eInputType.number, taxon: []},
-    { prop: 'capture_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
-    { prop: 'capture_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
-    { prop: 'capture_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
-  ],
-  releaseFields: [
-    { prop: 'release_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
-    { prop: 'latitude', type: eInputType.number, taxon: []},
-    { prop: 'longitude', type: eInputType.number, taxon: []},
-    { prop: 'release_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
-    { prop: 'release_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
-    { prop: 'release_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
-  ],
+    { prop: 'capture', type: eInputType.cb_capture_fields, taxon: []},
+  ]
+  //   { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
+  //   { prop: 'latitude', type: eInputType.number, taxon: []},
+  //   { prop: 'longitude', type: eInputType.number, taxon: []},
+  //   { prop: 'capture_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
+  //   { prop: 'capture_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+  //   { prop: 'capture_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
+  // ],
+  // releaseFields: [
+  //   { prop: 'release_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
+  //   { prop: 'latitude', type: eInputType.number, taxon: []},
+  //   { prop: 'longitude', type: eInputType.number, taxon: []},
+  //   { prop: 'release_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
+  //   { prop: 'release_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+  //   { prop: 'release_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
+  // ],
   //TODO critterbase integration does not support these in the same way
   // characteristicFields2: [
   //   { prop: 'juvenile_at_heel', type: eInputType.code, taxon: [] },
@@ -372,7 +381,7 @@ export const critterFormFields: Record<string, FormFieldObject<CritterDetailsFor
 };
 
 // a 'flatteneed' critterFormFields array
-export const getAnimalFormFields = (): FormFieldObject<Partial<CritterDetailsForm>>[] => {
+export const getAnimalFormFields = (): FormFieldObject<AttachedCritter>[] => {
   return Object.values(critterFormFields).reduce((previous, current) => [...previous, ...current], []);
 };
 

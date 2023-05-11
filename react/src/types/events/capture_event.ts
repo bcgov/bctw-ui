@@ -22,6 +22,8 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
 
   //Critterbase fields
   capture_id: uuid;
+  capture_location_id: uuid;
+  release_location_id: uuid;
   capture_timestamp: Dayjs;
   capture_comment: string;
   capture_location: LocationEvent;

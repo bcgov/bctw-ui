@@ -7,18 +7,17 @@ import NumberField from 'components/form/NumberInput';
 import TextField from 'components/form/TextInput';
 import { useTaxon } from 'contexts/TaxonContext';
 import { CbSelect, CbSelectProps } from 'critterbase/components/CbSelect';
-import { ICbRouteKey } from 'critterbase/types';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
+import CaptureEventForm from 'pages/data/events/CaptureEventForm';
 import { CSSProperties, ReactElement, ReactNode } from 'react';
-import { Critter, AttachedCritter } from 'types/animal';
+import { AttachedCritter, Critter } from 'types/animal';
 import { ICodeFilter } from 'types/code';
 import { BCTWFormat } from 'types/common_types';
-import { WorkflowFormField } from 'types/events/event';
 import { FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';
 import { showField } from 'utils/taxon';
 import SelectCode from './SelectCode';
-import { type } from 'os';
+import { CaptureEvent2 } from 'types/events/capture_event';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -183,6 +182,10 @@ function CreateCbSelectField(props: CbSelectProps): ReactElement {
   return <CbSelect {...props} />;
 }
 
+function CreateCaptureEventForm(props: CreateInputProps) {
+  return <CaptureEventForm event={new CaptureEvent2()} handleFormChange={(v) => console.log(v)} />;
+}
+
 // returns the funtion to create the form component based on input type
 export const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
   switch (inputType) {
@@ -198,6 +201,8 @@ export const getInputFnFromType = (inputType: eInputType): ((props: unknown) => 
       return CreateEditMultilineTextField;
     case eInputType.cb_select:
       return CreateCbSelectField;
+    // case eInputType.cb_capture_fields:
+    //   return CreateCaptureEventForm;
     default:
       return CreateEditTextField;
   }
@@ -243,34 +248,34 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
-interface ItaxonFormField {
-  obj: Critter | AttachedCritter;
-  formField: WorkflowFormField;
-  handleChange: FormChangeEvent;
-  inputProps?: Partial<CreateInputProps>;
-  displayBlock?: boolean;
-  style?: CSSProperties;
-}
-function CreateTaxonFormField({
-  obj,
-  formField,
-  handleChange,
-  inputProps,
-  displayBlock = false,
-  style = {}
-}: ItaxonFormField): JSX.Element {
-  const taxon = useTaxon();
-  if (!showField(formField, taxon)) {
-    return null;
-  } else {
-    return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
-  }
-}
+// interface ItaxonFormField {
+//   obj: Critter | AttachedCritter;
+//   formField: WorkflowFormField;
+//   handleChange: FormChangeEvent;
+//   inputProps?: Partial<CreateInputProps>;
+//   displayBlock?: boolean;
+//   style?: CSSProperties;
+// }
+// function CreateTaxonFormField({
+//   obj,
+//   formField,
+//   handleChange,
+//   inputProps,
+//   displayBlock = false,
+//   style = {}
+// }: ItaxonFormField): JSX.Element {
+//   const taxon = useTaxon();
+//   if (!showField(formField, taxon)) {
+//     return null;
+//   } else {
+//     return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
+//   }
+// }
 export {
   CreateEditTextField,
   CreateEditDateField,
   CreateEditCheckboxField,
   CreateEditSelectField,
-  CreateFormField,
-  CreateTaxonFormField
+  CreateFormField
+  // CreateTaxonFormField
 };

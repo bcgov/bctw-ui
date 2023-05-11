@@ -1,8 +1,8 @@
 import { Dayjs } from 'dayjs';
 import { LocationEvent } from 'leaflet';
 import { ReactNode } from 'react';
-import { Critter, CritterDetailsForm, getAnimalFormFields } from 'types/animal';
-import { Collar, getDeviceFormFields, ICollar } from 'types/collar';
+import { AttachedCritter, Critter, getAnimalFormFields } from 'types/animal';
+import { AttachedCollar, Collar, getDeviceFormFields, ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat, uuid } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
@@ -26,9 +26,6 @@ export type OptionalAnimal = { [Property in keyof Critter]+?: Critter[Property] 
 export type OptionalDevice = { [Property in keyof ICollar]+?: ICollar[Property] };
 
 //
-export type WorkflowFormField = FormFieldObject<Partial<Collar> & Partial<CritterDetailsForm>>;
-const allFields: WorkflowFormField[] = [...getDeviceFormFields(), ...getAnimalFormFields()];
-export const wfFields = new Map(allFields?.map((f) => [f.prop, f]));
 
 /**
  * interface that BCTW workflows implement

@@ -16,7 +16,8 @@ export enum eInputType {
   code = 'code',
   multiline = 'multiline',
   select = 'select',
-  cb_select = 'cb_select' //critterbase select field
+  cb_select = 'cb_select', //critterbase select field
+  cb_capture_fields = 'cb_capture_fields'
 }
 
 /**

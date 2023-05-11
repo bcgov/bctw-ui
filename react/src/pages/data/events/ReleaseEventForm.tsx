@@ -4,13 +4,14 @@ import OkayModal from 'components/modal/OkayModal';
 import { releaseUnattachWarning } from 'constants/formatted_string_components';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useState } from 'react';
-import { wfFields, WorkflowFormProps } from 'types/events/event';
+import { WorkflowFormProps } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import ReleaseEvent from 'types/events/release_event';
 import { parseFormChangeResult } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
+import { wfFields } from 'types/events/form_fields';
 
 /**
  * todo:

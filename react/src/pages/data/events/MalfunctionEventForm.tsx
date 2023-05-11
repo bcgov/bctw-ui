@@ -2,7 +2,7 @@ import { useState } from 'react';
 import MalfunctionEvent, { MalfunctionDeviceStatus } from 'types/events/malfunction_event';
 import { parseFormChangeResult } from 'types/form_types';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { wfFields, WorkflowFormProps } from 'types/events/event';
+import { WorkflowFormProps } from 'types/events/event';
 import LocationEventForm from './LocationEventForm';
 import { FormSection } from '../common/EditModalComponents';
 import { CreateFormField } from 'components/form/create_form_components';
@@ -15,6 +15,7 @@ import OkayModal from 'components/modal/OkayModal';
 import DateTimeInput from 'components/form/DateTimeInput';
 import { boxSpreadRowProps } from './EventComponents';
 import { Tooltip } from 'components/common';
+import { wfFields } from 'types/events/form_fields';
 
 /**
  *

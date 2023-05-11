@@ -12,10 +12,9 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { ReactNode } from 'react';
 import { boxSpreadRowProps } from './EventComponents';
 import { isDev } from 'api/api_helpers';
-import { CreateFormField, CreateTaxonFormField } from 'components/form/create_form_components';
+import { CreateFormField } from 'components/form/create_form_components';
 import { AttachedCritter } from 'types/animal';
 import { FormSection } from '../common/EditModalComponents';
-import { wfFields } from 'types/events/event';
 
 type LocationEventProps = {
   event: LocationEvent;

@@ -63,7 +63,6 @@ export class LocationEvent implements BCTWWorkflow<LocationEvent> {
           required: true
         }
       ],
-      coords: [],
       regions: [
         { prop: 'region_env_id', type: eInputType.cb_select, cbRouteKey: 'region_env' },
         { prop: 'region_nr_id', type: eInputType.cb_select, cbRouteKey: 'region_nr' },

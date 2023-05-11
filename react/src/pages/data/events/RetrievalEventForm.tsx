@@ -7,7 +7,8 @@ import { FormSection } from '../common/EditModalComponents';
 import { boxSpreadRowProps } from './EventComponents';
 import { Dayjs } from 'dayjs';
 import { WorkflowStrings } from 'constants/strings';
-import { wfFields, WorkflowFormProps } from 'types/events/event';
+import { WorkflowFormProps } from 'types/events/event';
+import { wfFields } from 'types/events/form_fields';
 
 /**
  *
