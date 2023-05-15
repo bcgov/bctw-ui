@@ -29,6 +29,8 @@ import {
 } from 'pages/map/map_helpers';
 import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import {
+  focusPings,
+  focusTracks,
   getStyle,
   highlightLatestPings,
   highlightPings,
@@ -244,9 +246,32 @@ export default function MapPage(): JSX.Element {
   // when rows are checked in the details panel, highlight them
   // fixme: the highlight fill color is reset when new data is fetched
   const handleDetailPaneRowSelect = (pingIds: number[]): void => {
+    // console.log(pingIds)
     hidePopup();
     setSelectedPingIDs([...pingIds]);
+    highlightPings(pingsLayer, pingIds);
+    highlightLatestPings(latestPingsLayer, pingIds)
   };
+
+  // const handleDetailPaneRowHover = (pingIds: number[]): void => {
+  //   if (!pingIds.length) {
+  //     redrawPings(pings)
+  //   }
+  const handleDetailPaneRowHover = (critter_id: string): void => {
+    if (!critter_id) {
+      redrawTracks(fetchedTracks)
+      redrawPings(pings)
+    }
+    else {
+      focusPings(pingsLayer, critter_id)
+      focusPings(latestPingsLayer, critter_id)
+      // console.log('pings: ', pingsLayer)
+      // console.log('tracks: ', tracksLayer)
+      
+      focusTracks(tracksLayer, critter_id)
+      // redrawTracks(fetchedTracks)
+    }
+  }
 
   // handles the drawing and deletion of shapes, setup in map_init
   // todo: does not handle unassigned layers yet
@@ -591,6 +616,7 @@ export default function MapPage(): JSX.Element {
               handleShowOnlySelected={handleShowOnlySelected}
               handleShowOverview={handleShowOverview}
               handleRowSelected={handleDetailPaneRowSelect}
+              handleRowHovered={handleDetailPaneRowHover}
               showExportModal={showExportModal}
               setShowExportModal={setShowExportModal}
               timeRange={range}

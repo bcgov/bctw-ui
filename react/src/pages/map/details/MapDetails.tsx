@@ -21,6 +21,7 @@ import { Tooltip } from 'components/common';
 export type MapDetailsBaseProps = {
   handleRowSelected: OnPanelRowSelect;
   handleShowOverview: OnMapRowCellClick;
+  handleRowHovered: any;
 };
 
 export type MapDetailsProps = MapDetailsBaseProps & {
@@ -46,6 +47,7 @@ export default function MapDetails({
   handleShowOverview,
   handleShowOnlySelected,
   handleRowSelected,
+  handleRowHovered,
   showExportModal,
   setShowExportModal,
   timeRange
@@ -132,6 +134,7 @@ export default function MapDetails({
         pings={[...groupedPings, ...groupedUnassignedPings]}
         handleShowOverview={handleShowOverview}
         handleRowSelected={handleRowsChecked}
+        handleRowHovered={handleRowHovered}
       />
       <MapExport
         groupedAssignedPings={pingGroupChecked.length ? pingGroupChecked : groupedPings}

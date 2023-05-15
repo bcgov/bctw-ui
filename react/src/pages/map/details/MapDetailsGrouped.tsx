@@ -18,9 +18,9 @@ export type MapDetailsGroupedProps = MapDetailsBaseProps & {
   crittersSelected: string[];
 };
 
-type GroupedCheckedStatus = {
+type RowActionStatus = {
   critter_id: string;
-  checked: boolean;
+  active: boolean;
 };
 
 // TODO: TelemetryDetail types
@@ -37,7 +37,7 @@ const rows_to_render = [
 ];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
-  const { pings, crittersSelected, handleShowOverview, handleRowSelected } = props;
+  const { pings, crittersSelected, handleShowOverview, handleRowSelected, handleRowHovered } = props;
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('Critter Name');
   const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
@@ -57,7 +57,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
     pushRowCheck(newChecked);
   };
 
-  const handleRowCheck = (v: GroupedCheckedStatus): void => {
+  const handleRowAction = (v: RowActionStatus, action: (ids: string[]) => void): void => {
     let newChecked = null;
     const idxFound = checkedGroups.indexOf(v.critter_id);
     if (idxFound === -1) {
@@ -65,18 +65,33 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
     } else {
       const cp = [...checkedGroups];
       cp.splice(idxFound, idxFound + 1);
-      if (v.checked) {
+      if (v.active) {
         cp.push(v.critter_id);
       }
       newChecked = cp;
     }
-    pushRowCheck(newChecked);
+    console.log('newChecked: ', newChecked)
+    action(newChecked);
   };
-
+  
+  const handleRowCheck = (v: RowActionStatus): void => {
+    handleRowAction(v, pushRowCheck);
+  };
+  
+  const handleRowHover = (v: RowActionStatus): void => {
+    // handleRowAction(v, pushRowHover);
+    handleRowHovered(v.critter_id);
+  };
+  
   const pushRowCheck = (ids: string[]): void => {
     setCheckedGroups(ids);
     const pointIDs = getPointIDsFromTelemetryGroup(pings.filter((f) => ids.includes(f.critter_id)));
     handleRowSelected(pointIDs);
+  };
+  
+  const pushRowHover = (ids: string[]): void => {
+    const pointIDs = getPointIDsFromTelemetryGroup(pings.filter((f) => ids.includes(f.critter_id)));
+    handleRowHovered(pointIDs);
   };
 
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
@@ -116,6 +131,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 row={getLatestPing(u.features)?.properties}
                 handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
+                handleRowHover={handleRowHover}
                 uniqueCategoryNames={uniqueCategoryNames}
               />
             );
@@ -131,21 +147,26 @@ type MapDetailsTableRowProps = {
   isSelectedInMap: boolean;
   isChecked: boolean;
   row: TelemetryDetail;
-  handleRowCheck: (v: GroupedCheckedStatus) => void;
+  handleRowCheck: (v: RowActionStatus) => void;
+  handleRowHover: (v: RowActionStatus) => void;
   handleShowOverview: OnMapRowCellClick;
   uniqueCategoryNames: string[];
 };
 
 function Row(props: MapDetailsTableRowProps): JSX.Element {
-  const { row, handleRowCheck, handleShowOverview, isSelectedInMap, pingCount, isChecked, uniqueCategoryNames } = props;
+  const { row, handleRowCheck, handleRowHover, handleShowOverview, isSelectedInMap, pingCount, isChecked, uniqueCategoryNames } = props;
 
   const onCheck = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
-    handleRowCheck({ critter_id: row.critter_id, checked: val });
+    handleRowCheck({ critter_id: row.critter_id, active: val });
   };
 
   return (
-    <TableRow hover={!isSelectedInMap} className={`map-bottom-panel-row ${isSelectedInMap ? 'row-selected' : ''}`}>
+    <TableRow
+      hover={!isSelectedInMap}
+      className={`map-bottom-panel-row ${isSelectedInMap ? 'row-selected' : ''}`}
+      onMouseEnter={() => handleRowHover({ critter_id: row.critter_id, active: true })}
+      onMouseLeave={() => handleRowHover({ critter_id: '', active: false })}>
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>

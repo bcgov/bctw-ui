@@ -182,6 +182,38 @@ const highlightPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
   });
 };
 
+const focusPings = (layer: L.GeoJSON, critter_id: string): void => {
+  layer.eachLayer((p: any) => {
+    const feature = p.feature;
+    if (!(critter_id === feature.properties.critter_id)) {
+      if (typeof p.setStyle === 'function') {
+        // p.setStyle({ opacity: 0.1, fillOpacity: 0.08 }); // drop opacity
+        p.setStyle({ fillColor: MAP_COLOURS['unassigned point'], color: MAP_COLOURS_OUTLINE.point }); // greyed out
+      } else if (typeof p.setIcon === 'function') {
+        // p.setIcon(createLatestPingIcon(getFillColorByStatus(p.feature), getOutlineColor(p.feature), 0.08)); // drop opacity
+        p.setIcon(createLatestPingIcon(MAP_COLOURS['unassigned point'], MAP_COLOURS_OUTLINE.point, 1)); // greyed out
+      }
+    } else {
+      if (typeof p.setStyle === 'function') {
+        p.setStyle({ color: MAP_COLOURS.selected }); // yellow halo
+        p.bringToFront();
+      } else if (typeof p.setIcon === 'function') {
+        p.setIcon(createLatestPingIcon(getFillColorByStatus(p.feature), MAP_COLOURS.selected, 1)); // yellow halo
+      }
+    }
+  });
+};
+
+const focusTracks = (tracks: L.GeoJSON, critter_id: string): void => {
+  tracks.eachLayer((track: any) => {
+    if (track.feature.properties.critter_id !== critter_id) {
+      console.log('critter: ', track.feature.properties.critter_id)
+      track.setStyle({ color: MAP_COLOURS['unassigned point'] })
+    }
+  });
+  tracks.setZIndex(0);
+};
+
 const getSymbolizeColours = (mfv: MapFormValue, feature: ITelemetryPoint): { fillColor: string; color: string } => {
   const { header, values } = mfv;
   const isDeviceID = header === DEFAULT_MFV.header;
@@ -251,5 +283,7 @@ export {
   setupPingOptions,
   symbolizePings,
   getStyle,
-  selectedPointStyle
+  selectedPointStyle,
+  focusPings,
+  focusTracks
 };
