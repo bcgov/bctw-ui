@@ -65,15 +65,15 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   // must be defined before mutation declarations
   const handleSaveResult = async (data: IBulkUploadResults<Critter>): Promise<void> => {
     const { errors, results } = data;
-    console.log(data);
+    console.log('Data in save result' + data);
     //The response of this mutation should not be BulkResponse
     if (errors?.length) {
       showNotif({ severity: 'error', message: `${errors.map((e) => e.error)}` });
     } else {
-      const critter = results[0];
-      showNotif({ severity: 'success', message: `${critter.animal_id} saved!` });
-      setCritter(results[0]);
-      onUpdate?.(results[0].critter_id);
+      //const critter = results[0];
+      showNotif({ severity: 'success', message: `${editing.critter_id} saved!` });
+      //setCritter(results[0]);
+      onUpdate?.(editing.critter_id);
     }
   };
 
@@ -87,14 +87,15 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const onError = (error: AxiosError): void => showNotif({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutations
-  const { mutateAsync: saveMutation } = api.useSaveCritterbaseCritter({ onSuccess: handleSaveResult, onError });
+  //const { mutateAsync: saveMutation } = api.useSaveCritterbaseCritter({ onSuccess: handleSaveResult, onError });
+  const { mutateAsync: saveCritterbase, isLoading } = api.useBulkUpdateCritterbaseCritter({ onSuccess: handleSaveResult, onError});
   const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: handleDeleteResult, onError });
 
   const saveCritter = async (a: IUpsertPayload<Critter | AttachedCritter>): Promise<void> => {
-    const { body } = a;
-    const formatted = body.toJSON();
+    //const { body } = a;
+    //const formatted = body.toJSON();
     // console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
-    await saveMutation({ body: formatted });
+    await saveCritterbase(a);
   };
 
   const deleteCritter = async (critterId: string): Promise<void> => {

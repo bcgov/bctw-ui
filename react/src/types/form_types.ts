@@ -60,6 +60,7 @@ export type InboundObj = {
   id?: string;
   error?: boolean;
   nestedEventKey?: keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'> | keyof Pick<MortalityEvent, 'location'>;
+  eventKey?: string;
 };
 
 /**

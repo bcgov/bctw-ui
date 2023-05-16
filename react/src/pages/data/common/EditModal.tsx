@@ -119,7 +119,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
 
   const handleSave = async (): Promise<void> => {
     // use Object.assign to preserve class methods
-    const body = omitNull(Object.assign(editing, newObj));
+    const body = omitNull({...editing, ...newObj}/*Object.assign(editing, newObj)*/);
     const toSave: IUpsertPayload<T> = { body };
     await onSave(toSave);
     // todo: when to close the modal?
@@ -127,7 +127,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   };
 
   // triggered on a form input change, newProp will be an object with a single key and value
-  const handleChange = (newProp: InboundObj): void => {
+  /*const handleChange = (newProp: InboundObj): void => {
     checkHasErr(newProp);
     // todo: determine if object has changed from original
     // const [key, value] = parseFormChangeResult<typeof editing>(newProp);
@@ -136,7 +136,36 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     console.log(`newObj: ${JSON.stringify(newObj)}, newProp: ${JSON.stringify(newProp)}`)
     const modified = { ...newObj, ...newProp };
     setNewObj(modified);
-  };
+  };*/
+
+  const handleChange = (v: InboundObj): void => {
+    let tmp = newObj;
+    if(!tmp) return;
+    const k = Object.keys(v)[0];
+    const tempval = Object.values(v)[0];
+    const val = tempval === undefined || tempval === null ? null : tempval['id'] ?? tempval;
+    //If tempval is undefined or null, just leave it as null. Otherwise, try to access the id property from it, but if that fails just use the non-null tempval as is.
+    const { nestedEventKey, eventKey } = v;
+    if(eventKey) {
+      if(!tmp[eventKey]) {
+        tmp[eventKey] = [{}];
+      }
+      tmp = tmp[eventKey][0];
+    }
+
+    if (nestedEventKey) {
+      if(!tmp[nestedEventKey]) {
+        tmp[nestedEventKey] = {};
+      }
+      Object.assign(tmp[nestedEventKey], { [k]: val });
+      setNewObj(newObj);
+    } else if (k && k !== 'displayProps') {
+      tmp[k] = val;
+      setNewObj(newObj);
+    }
+
+    console.log(`Now have ${JSON.stringify(newObj)} from ${JSON.stringify(v)}`)
+  }
 
   const reset = (): void => {
     setNewObj({} as T);

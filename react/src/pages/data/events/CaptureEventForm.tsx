@@ -42,6 +42,7 @@ export default function CaptureEventForm({
         handleFormChange({ capture_mortality: undefined });
         break;
     }
+    v['eventKey'] = 'capture';
     handleFormChange(v);
   };
 

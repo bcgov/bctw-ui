@@ -15,22 +15,20 @@ import { CaptureEvent2 } from 'types/events/capture_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
+import { omitNull } from 'utils/common_helpers';
 
 /**
  * the main animal form
  */
-export default function EditCritter(props: EditorProps<Critter | AttachedCritter>): JSX.Element {
-  const { isCreatingNew, editing, open } = props;
+export default function EditCritter(props: EditorProps<Critter | AttachedCritter> & {onSave: (c: any) => Promise<void> }): JSX.Element {
+  const { isCreatingNew, editing, open, onSave } = props;
   editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();
   const taxon = useTaxon();
   const api = useTelemetryApi();
 
-  const { mutateAsync: handleSave, isLoading } = api.useBulkUpdateCritterbaseCritter({});
-
-  const [captureEvent, setCaptureEvent] = useState(null);
-  const [mortalityEvent, setMortalityEvent] = useState(null)
+  /*const { mutateAsync: handleSave, isLoading } = api.useBulkUpdateCritterbaseCritter({});*/
 
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   //const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
@@ -51,15 +49,53 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   //   setHasBabies(false);
   //   //updateTaxon(null);
   // };
-  const critterbaseSave = async () => {
-    console.log('Calling critterbaseSave');
-    await handleSave(editing.critterbasePayload);
-  }
+  const critterbaseSave = async (payload) => {
+      const { body } = payload;
+      const finalPayload = {
+        critters: [
+          {
+            critter_id: body.critter_id,
+            animal_id: body.animal_id,
+            sex: body.sex,
+            wlh_id: body.wlh_id,
+            taxon_id: body.taxon_id
+          }
+        ],
+        locations: [],
+        captures: [],
+        mortalities: []
+      }  
+      if(body.capture) {
+        const { capture_location, release_location, ...capture_rem } = body.capture[0];
+        const captureId = editing.capture[0]?.capture_id;
+        if(captureId) {
+          capture_rem.capture_id = captureId;
+        }
+        finalPayload.captures.push(omitNull(capture_rem));
+        if(capture_location) {
+          finalPayload.locations.push(omitNull({ ...(capture_location), location_id: editing.capture[0].capture_location_id }));
+        }
+        if(release_location) {
+          finalPayload.locations.push(omitNull({ ...(release_location), location_id: editing.capture[0].release_location_id }));
+        }
+      }
+  
+      if(body.mortality) {
+        const { location, ...mortality_rem } = body.mortality[0];
+        const mortalityId = editing.mortality[0]?.mortality_id;
+        if(mortalityId) {
+          mortality_rem.mortality_id = mortalityId;
+        }
+        finalPayload.mortalities.push(omitNull(mortality_rem));
+        if(location) {
+          finalPayload.locations.push(omitNull({ ...(location), location_id: editing.mortality[0].location_id }));
+        }
+      }
 
-  useEffect(() => {
-    setCaptureEvent(editing.latestCapture);
-    setMortalityEvent(editing.latestMortality);
-  }, [editing])
+      console.log('Final payload looks like ' + JSON.stringify(finalPayload, null, 2))
+      const r = await onSave(finalPayload);
+      return r;
+  }
 
   const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
 
@@ -87,54 +123,14 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
     </Container>
   );
 
-  const getEvent = (eventType: 'capture' | 'mortality'): CaptureEvent2 | MortalityEvent => {
-    if(eventType == 'capture') {
-      //console.log('Latest capture ' + JSON.stringify(editing.latestCapture, null, 2));
-      return editing.latestCapture ?? createEvent(editing, 'capture') as CaptureEvent2 
-    }
-    else {
-      //console.log('Latest mortality: ' + JSON.stringify(editing.latestMortality, null, 2));
-      return editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent
-    }
-  }
-
-  const onChange = (v: InboundObj, subForm?: string) => {
-    console.log('Called onChange with this InboundObj ' + JSON.stringify(v));
-    const k = Object.keys(v)[0];
-    const val = Object.values(v)[0];
-    const newVal = val ? (val['id'] ?? val) : null;
-    const {nestedEventKey} = v;
-    console.log(`k: ${k}, v: ${newVal}`);
-    if(subForm === 'capture') {
-      if(nestedEventKey) {
-        editing['capture'][0][nestedEventKey][k] = newVal;
-      }
-      else {
-        editing['capture'][0][k] = newVal;
-      }
-    }
-    else if(subForm === 'mortality') {
-      if(nestedEventKey) {
-        editing['mortality'][0][nestedEventKey][k] = newVal;
-      }
-      else {
-        editing['mortality'][0][k] = newVal;
-      }
-    }
-    else {
-      editing[k] = newVal;
-    }
-    //console.log(`State after update: ${JSON.stringify(editing, null, 2)}`);
-  }
-
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing} onSave={(garbage) => critterbaseSave()}>
+    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing} onSave={critterbaseSave}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
-          //const onChange = (v: InboundObj): void => {
-          //  handlerFromContext(v);
-          //};
+          const onChange = (v: InboundObj): void => {
+           handlerFromContext(v);
+          };
           return (
             <Box>
               <FormSection id='critter' header='Critter Details' size='large'>
@@ -152,11 +148,11 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 hide={!editing.latestCapture}
                 size='large'>
                 <Divider />
-                <CaptureEventForm event={editing.latestCapture ?? createEvent(editing, 'capture') as CaptureEvent2} handleFormChange={(v) => onChange(v, 'capture')} isEditing />
+                <CaptureEventForm event={editing.latestCapture ?? createEvent(editing, 'capture') as CaptureEvent2} handleFormChange={onChange} isEditing />
               </FormSection>
               <FormSection id='m-deets' header='Mortality Details' hide={!editing.latestMortality} size='large'>
-                <Divider />
-                <MortalityEventForm event={editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent} handleFormChange={(v) => onChange(v, 'mortality')} />
+                <Divider /> 
+                <MortalityEventForm event={editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent} handleFormChange={onChange} />
                 {/* <Divider /> */}
               </FormSection>
             </Box>

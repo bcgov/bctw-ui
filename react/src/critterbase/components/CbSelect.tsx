@@ -37,10 +37,11 @@ export const CbSelect = ({
   }, [required]);*/
 
   useEffect(() => {
+    console.log(`Triggered cbSelect ${cbRouteKey} ${isSuccess} ${isLoading}`)
     if (!data?.length) return;
     if (typeof value !== 'string') return;
     setSelected(value);
-  }, [isSuccess]);
+  }, [isSuccess, isLoading]);
 
   /*useEffect(() => {
     if (typeof value !== 'string') return;

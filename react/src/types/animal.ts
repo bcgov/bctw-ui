@@ -60,7 +60,7 @@ export interface ICapture {
   capture_location?: ILocation;
   capture_comment?: string;
   release_timestamp?: Dayjs;
-  relase_location_id?: uuid;
+  release_location_id?: uuid;
   release_location: ILocation;
   release_comment?: string;
 }
