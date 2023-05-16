@@ -82,7 +82,7 @@ export default function CaptureEventForm({
       </FormSection>
 
       {/* Release Location -> Release Environment*/}
-      {showRelease ? (
+      {isEditing || showRelease ? (
         <LocationEventForm key='ce-loc-b' event={capture.release_location} notifyChange={onChange} />
       ) : null}
 
