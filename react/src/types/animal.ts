@@ -68,7 +68,7 @@ export interface ICapture {
 interface IMortality {
   mortality_id: uuid;
   location_id: uuid;
-  mortality_location?: uuid; //Uncertain if the critterbase payload returns this
+  location?: uuid; //Uncertain if the critterbase payload returns this
   mortality_timestamp: Dayjs;
   proximate_cause_of_death_id: uuid;
   proximate_cause_of_death_confidence: 'Probable' | 'Definite';
@@ -185,8 +185,8 @@ export class Critter implements BCTWBase<Critter>{
 
   get latestMortality(): MortalityEvent {
     if (this.mortality?.length){
-      const mortality_location = editObjectToEvent(this.mortality[0].mortality_location, new LocationEvent('mortality'), [])
-      return editObjectToEvent({...this.mortality[0], mortality_location}, new MortalityEvent(), [])
+      const location = editObjectToEvent(this.mortality[0].location, new LocationEvent('mortality'), [])
+      return editObjectToEvent({...this.mortality[0], location}, new MortalityEvent(), [])
     }
   }
 

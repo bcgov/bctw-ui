@@ -40,7 +40,7 @@ const editCritter = editObjectToEvent(
     ],
     mortality: [
       {
-        mortality_location: { latitude: 8, longitude: 9 }
+        location: { latitude: 8, longitude: 9 }
       }
     ],
     latitude: 1,
