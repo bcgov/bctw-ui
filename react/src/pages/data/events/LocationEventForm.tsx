@@ -45,7 +45,10 @@ export default function LocationEventForm({
   const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];
     const value = Object.values(v)[0];
+
     event[key] = value;
+    console.log('LocationEventForm inboundObj: ' + JSON.stringify(v));
+
     if (requiredLocationInputs.includes(key as keyof LocationEvent) && value) {
       setIsRequired({ required: true });
     }

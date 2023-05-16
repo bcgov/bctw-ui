@@ -109,6 +109,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   //Critterbase Props
   mortality_id: uuid;
   mortality_timestamp: Dayjs;
+  location_id: uuid;
   location: LocationEvent;
   proximate_cause_of_death_id: uuid;
   proximate_cause_of_death_confidence: string;
@@ -156,9 +157,11 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
 
   get critterbasePayload(): CbPayload<MortalityEvent> {
     return omitNull({
+      mortality_id: this.mortality_id,
       critter_id: this.critter_id,
       mortality_timestamp: this.mortality_timestamp,
       mortality_comment: this.mortality_comment,
+      location_id: this.location_id,
       location: this.location.critterbasePayload,
       proximate_cause_of_death_id: this.proximate_cause_of_death_id,
       proximate_cause_of_death_confidence: this.proximate_cause_of_death_confidence,

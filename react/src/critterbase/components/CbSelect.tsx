@@ -62,7 +62,7 @@ export const CbSelect = ({
     pushChange(value);
   };*/
 
-  const handleSelect = (id: string, label: string) => {
+  const handleSelect = (id: string, label: string): void => {
     const a = { id: id, label: label };
     setSelected(a.id);
     pushChange(a);

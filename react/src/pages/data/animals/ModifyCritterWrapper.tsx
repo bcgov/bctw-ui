@@ -9,6 +9,7 @@ import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { IAddEditProps } from '../common/AddEditViewer';
 import { plainToClass } from 'class-transformer';
+import { editObjectToEvent } from 'types/events/event';
 
 type IModifyWrapperProps = {
   editing: Critter | AttachedCritter;
@@ -44,17 +45,22 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
    * note: if data has been previously fetched, 'status' will not be updated.
    * in that case, check if @var data exists and call @function setAnimal
    */
+
   useEffect(() => {
     if (data && status === 'success') {
       if (data.assignment_id) {
-        setAnimal(plainToClass(AttachedCritter, data));
+        const a = editObjectToEvent(data, new AttachedCritter(data.critter_id), []);
+        setAnimal(a);
+        console.log(`setAnimal to AttachedCritter: ${JSON.stringify(a)}`)
       } else {
-        setAnimal(plainToClass(Critter, data));
+        console.log('setAnimal to Critter')
+        //setAnimal(plainToClass(Critter, data));
+        setAnimal(editObjectToEvent(data, new Critter(data.critter_id), []));
       }
     }
     setHasCollar(editing instanceof AttachedCritter);
     setCanEdit(true);
-  }, [status, editing]);
+  }, [data, status, editing]);
 
   // must be defined before mutation declarations
   const handleSaveResult = async (data: IBulkUploadResults<Critter>): Promise<void> => {

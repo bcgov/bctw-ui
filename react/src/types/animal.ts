@@ -4,7 +4,7 @@ import { Code } from 'types/code';
 import { BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { FormFieldObject, eInputType, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
-import { classToArray, columnToHeader } from 'utils/common_helpers';
+import { classToArray, columnToHeader, omitNull } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 import { editObjectToEvent } from './events/event';
@@ -65,10 +65,10 @@ export interface ICapture {
   release_comment?: string;
 }
 
-interface IMortality {
+export interface IMortality {
   mortality_id: uuid;
   location_id: uuid;
-  mortality_location?: uuid; //Uncertain if the critterbase payload returns this
+  location?: uuid; //Uncertain if the critterbase payload returns this
   mortality_timestamp: Dayjs;
   proximate_cause_of_death_id: uuid;
   proximate_cause_of_death_confidence: 'Probable' | 'Definite';
@@ -78,7 +78,7 @@ interface IMortality {
   ultimate_predated_by_taxon_id: uuid;
 }
 
-interface IMarking {
+export interface IMarking {
   marking_id: uuid;
   capture_id: uuid | null;
   mortality_id: uuid | null;
@@ -175,19 +175,23 @@ export class Critter implements BCTWBase<Critter>{
     return ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'critter_status'];
   }
 
-  get latestCapture(): CaptureEvent2 {
+  get latestCapture(): CaptureEvent2 | null {
     if (this.capture?.length){
       const capture_location = editObjectToEvent(this.capture[0].capture_location, new LocationEvent('capture'), []);
       const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);
       return editObjectToEvent({...this.capture[0], capture_location, release_location }, new CaptureEvent2(), [])
-    }
+    } 
+    return null;
   }
 
-  get latestMortality(): MortalityEvent {
+  get latestMortality(): MortalityEvent | null {
     if (this.mortality?.length){
-      const mortality_location = editObjectToEvent(this.mortality[0].mortality_location, new LocationEvent('mortality'), [])
-      return editObjectToEvent({...this.mortality[0], mortality_location}, new MortalityEvent(), [])
+      const mortality_location = editObjectToEvent(this.mortality[0].location, new LocationEvent('mortality'), []);
+      const a = editObjectToEvent(this.mortality[0], new MortalityEvent(), []);
+      a.location = mortality_location;
+      return a;
     }
+    return null;
   }
 
   get collection_unit(): string {
@@ -197,6 +201,45 @@ export class Critter implements BCTWBase<Critter>{
         `${category}: ${unit[category]}`;
       })
       .join(', ');
+  }
+
+  get critterbasePayload(): Record<string, unknown> {
+    
+    const payload = omitNull({
+      critters: [
+        {
+          critter_id: this.critter_id,
+          taxon_id: this.taxon_id,
+          wlh_id: this.wlh_id,
+          animal_id: this.animal_id,
+          sex: this.sex,
+          responsible_region_nr_id: this.responsible_region_nr_id
+        }
+      ],
+      captures: [],
+      mortalities: [],
+      locations: []
+    });
+
+    if(this.latestCapture) {
+      const { capture_location, release_location, ...capture_rem } = this.latestCapture.critterbasePayload;
+      payload.captures.push(capture_rem);
+      if(capture_location) {
+        payload.locations.push({ ...(capture_location as ILocation), location_id: capture_rem.capture_location_id });
+      }
+      if(release_location) {
+        payload.locations.push({ ...(release_location as ILocation), location_id: capture_rem.release_location_id });
+      }
+    }
+
+    if(this.latestMortality) {
+      const { location, ...mortality_rem } = this.latestMortality.critterbasePayload;
+      payload.mortalities.push(mortality_rem);
+      if(location) {
+        payload.locations.push({ ...(location as ILocation), location_id: mortality_rem.location_id });
+      }
+    }
+      return payload;
   }
 
   tagColor(): string {

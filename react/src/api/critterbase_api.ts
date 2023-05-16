@@ -1,6 +1,6 @@
 import { CbRouters, CbRoutes, detailedFormat, selectFormat } from 'critterbase/routes';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
-import { API, ApiProps, IUpsertPayload } from './api_interfaces';
+import { API, ApiProps, ICbBulkUpdatePayload, IUpsertPayload } from './api_interfaces';
 import { uuid } from 'types/common_types';
 import { Critter } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
@@ -26,8 +26,15 @@ export const critterbaseApi = (props: ApiProps): API => {
     return data;
   };
 
+  const bulkUpdate = async (bulkPayload: ICbBulkUpdatePayload) => {
+    const { data } = await api.put(`${CbRouters.bulk}`, bulkPayload);
+    return data;
+  }
+
+
   return {
     getLookupTableOptions,
-    upsertCritter
+    upsertCritter,
+    bulkUpdate
   };
 };

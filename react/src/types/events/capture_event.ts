@@ -43,7 +43,10 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   get critterbasePayload(): CbPayload<CaptureEvent2> {
     return omitNull({
       //capture_id might need this...
+      capture_id: this.capture_id,
       critter_id: this.critter_id,
+      capture_location_id: this.capture_location_id,
+      release_location_id: this.release_location_id,
       capture_timestamp: this.capture_timestamp,
       capture_comment: this.capture_comment,
       capture_location: this.capture_location.critterbasePayload,

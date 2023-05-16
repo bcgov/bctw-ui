@@ -4,12 +4,17 @@ import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
-import { AttachedCritter, Critter, critterFormFields } from 'types/animal';
+import { AttachedCritter, Critter, ICapture, IMortality, critterFormFields } from 'types/animal';
 import { InboundObj } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import MortalityEventForm from '../events/MortalityEventForm';
+import { createEvent } from '../events/EventComponents';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import MortalityEvent from 'types/events/mortality_event';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useEffect, useState } from 'react';
 
 /**
  * the main animal form
@@ -20,6 +25,12 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();
   const taxon = useTaxon();
+  const api = useTelemetryApi();
+
+  const { mutateAsync: handleSave, isLoading } = api.useBulkUpdateCritterbaseCritter({});
+
+  const [captureEvent, setCaptureEvent] = useState(null);
+  const [mortalityEvent, setMortalityEvent] = useState(null)
 
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   //const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
@@ -40,6 +51,15 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   //   setHasBabies(false);
   //   //updateTaxon(null);
   // };
+  const critterbaseSave = async () => {
+    console.log('Calling critterbaseSave');
+    await handleSave(editing.critterbasePayload);
+  }
+
+  useEffect(() => {
+    setCaptureEvent(editing.latestCapture);
+    setMortalityEvent(editing.latestMortality);
+  }, [editing])
 
   const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
 
@@ -67,14 +87,54 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
     </Container>
   );
 
+  const getEvent = (eventType: 'capture' | 'mortality'): CaptureEvent2 | MortalityEvent => {
+    if(eventType == 'capture') {
+      //console.log('Latest capture ' + JSON.stringify(editing.latestCapture, null, 2));
+      return editing.latestCapture ?? createEvent(editing, 'capture') as CaptureEvent2 
+    }
+    else {
+      //console.log('Latest mortality: ' + JSON.stringify(editing.latestMortality, null, 2));
+      return editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent
+    }
+  }
+
+  const onChange = (v: InboundObj, subForm?: string) => {
+    console.log('Called onChange with this InboundObj ' + JSON.stringify(v));
+    const k = Object.keys(v)[0];
+    const val = Object.values(v)[0];
+    const newVal = val ? (val['id'] ?? val) : null;
+    const {nestedEventKey} = v;
+    console.log(`k: ${k}, v: ${newVal}`);
+    if(subForm === 'capture') {
+      if(nestedEventKey) {
+        editing['capture'][0][nestedEventKey][k] = newVal;
+      }
+      else {
+        editing['capture'][0][k] = newVal;
+      }
+    }
+    else if(subForm === 'mortality') {
+      if(nestedEventKey) {
+        editing['mortality'][0][nestedEventKey][k] = newVal;
+      }
+      else {
+        editing['mortality'][0][k] = newVal;
+      }
+    }
+    else {
+      editing[k] = newVal;
+    }
+    //console.log(`State after update: ${JSON.stringify(editing, null, 2)}`);
+  }
+
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing}>
+    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing} onSave={(garbage) => critterbaseSave()}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
-          const onChange = (v: InboundObj): void => {
-            handlerFromContext(v);
-          };
+          //const onChange = (v: InboundObj): void => {
+          //  handlerFromContext(v);
+          //};
           return (
             <Box>
               <FormSection id='critter' header='Critter Details' size='large'>
@@ -88,11 +148,11 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
               </FormSection>
               <FormSection id='c-deets' header='Latest Capture Details' hide={!editing.latestCapture} size='large'>
                 <Divider />
-                <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} isEditing />
+                <CaptureEventForm event={editing.latestCapture ?? createEvent(editing, 'capture') as CaptureEvent2} handleFormChange={(v) => onChange(v, 'capture')} isEditing />
               </FormSection>
               <FormSection id='m-deets' header='Latest Mortality Details' hide={!editing.latestMortality} size='large'>
                 <Divider />
-                <MortalityEventForm event={editing.latestMortality} handleFormChange={onChange} />
+                <MortalityEventForm event={editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent} handleFormChange={(v) => onChange(v, 'mortality')} />
                 {/* <Divider /> */}
               </FormSection>
               {/* {editing.latestCapture ? (

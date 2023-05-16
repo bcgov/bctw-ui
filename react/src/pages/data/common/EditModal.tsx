@@ -133,6 +133,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     // const [key, value] = parseFormChangeResult<typeof editing>(newProp);
     // const isSame = editing[key] === value;
     // console.log(newProp, editing[key], isSame)
+    console.log(`newObj: ${JSON.stringify(newObj)}, newProp: ${JSON.stringify(newProp)}`)
     const modified = { ...newObj, ...newProp };
     setNewObj(modified);
   };

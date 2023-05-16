@@ -28,6 +28,7 @@ import { IKeyCloakSessionInfo, User } from 'types/user';
 
 import {
   IBulkUploadResults,
+  ICbBulkUpdatePayload,
   IDeleteType,
   IUpsertPayload,
   ParsedXLSXSheetResult,
@@ -126,6 +127,14 @@ export const useTelemetryApi = () => {
       (critter) => critterbaseApi.upsertCritter(critter),
       config
     );
+
+  const useBulkUpdateCritterbaseCritter = (
+    config: UseMutationOptions<any, AxiosError, ICbBulkUpdatePayload>
+  ): UseMutationResult<any> => 
+    useMutation<any, AxiosError, ICbBulkUpdatePayload> (
+      (body) => critterbaseApi.bulkUpdate(body),
+      config
+    )
 
   /**
    *
@@ -419,7 +428,7 @@ export const useTelemetryApi = () => {
 
   // default getter for individual animals or collars
   const useType = <T>(type: BCTWType, id: string, options?: QueryEnabled): UseQueryResult<T> => {
-    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id)[0], {
+    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions,
       ...options
     });
@@ -732,6 +741,7 @@ export const useTelemetryApi = () => {
     useTakeActionOnPermissionRequest,
     useSubmitOnboardingRequest,
     useHandleOnboardingRequest,
-    useTriggerVendorTelemetry
+    useTriggerVendorTelemetry,
+    useBulkUpdateCritterbaseCritter
   };
 };
