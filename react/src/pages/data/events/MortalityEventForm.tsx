@@ -55,6 +55,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
 
   // form component changes can trigger mortality specific business logic
   const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
+    v['eventKey'] = 'mortality';
     handleFormChange(v);
     const [key, value] = parseFormChangeResult<MortalityEvent>(v);
     // retrieved_ind checkbox state enables/disables the retrieval date datetime picker

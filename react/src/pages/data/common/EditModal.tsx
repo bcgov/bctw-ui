@@ -144,6 +144,9 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     const k = Object.keys(v)[0];
     const tempval = Object.values(v)[0];
     const val = tempval === undefined || tempval === null ? null : tempval['id'] ?? tempval;
+    if (val === '') {
+      return;
+    }
     //If tempval is undefined or null, just leave it as null. Otherwise, try to access the id property from it, but if that fails just use the non-null tempval as is.
     const { nestedEventKey, eventKey } = v;
     if(eventKey) {

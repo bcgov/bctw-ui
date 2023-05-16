@@ -61,35 +61,34 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
             taxon_id: body.taxon_id
           }
         ],
-        locations: [],
         captures: [],
         mortalities: []
       }  
       if(body.capture) {
-        const { capture_location, release_location, ...capture_rem } = body.capture[0];
+        const capture = body.capture[0];
         const captureId = editing.capture[0]?.capture_id;
         if(captureId) {
-          capture_rem.capture_id = captureId;
+          capture.capture_id = captureId;
         }
-        finalPayload.captures.push(omitNull(capture_rem));
-        if(capture_location) {
-          finalPayload.locations.push(omitNull({ ...(capture_location), location_id: editing.capture[0].capture_location_id }));
+        if(capture.capture_location) {
+          capture.capture_location = omitNull(capture.capture_location);
         }
-        if(release_location) {
-          finalPayload.locations.push(omitNull({ ...(release_location), location_id: editing.capture[0].release_location_id }));
+        if(capture.release_location) {
+          capture.release_location = omitNull(capture.release_location);
         }
+        finalPayload.captures.push(omitNull(capture));
       }
   
       if(body.mortality) {
-        const { location, ...mortality_rem } = body.mortality[0];
+        const mortality = body.mortality[0];
         const mortalityId = editing.mortality[0]?.mortality_id;
         if(mortalityId) {
-          mortality_rem.mortality_id = mortalityId;
+          mortality.mortality_id = mortalityId;
         }
-        finalPayload.mortalities.push(omitNull(mortality_rem));
-        if(location) {
-          finalPayload.locations.push(omitNull({ ...(location), location_id: editing.mortality[0].location_id }));
+        if(mortality.location) {
+          mortality.location = omitNull(mortality.location);
         }
+        finalPayload.mortalities.push(omitNull(mortality));
       }
 
       console.log('Final payload looks like ' + JSON.stringify(finalPayload, null, 2))
