@@ -39,7 +39,12 @@ export enum eCritterStatus {
   mortality = 'mortality'
 }
 
-export type ICollectionUnit = Record<string, string>;
+export interface ICollectionUnit {
+  category_name: string;
+  unit_name: string;
+  collection_unit_id: uuid;
+  collection_category_id: uuid;
+}
 
 export type Critters = Critter | AttachedCritter;
 
@@ -78,7 +83,7 @@ interface IMortality {
   ultimate_predated_by_taxon_id: uuid;
 }
 
-interface IMarking {
+export interface IMarking {
   marking_id: uuid;
   capture_id: uuid | null;
   mortality_id: uuid | null;
@@ -317,13 +322,43 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
     }
   }
 }
-
-// export type CritterDetailsForm = Partial<Critter> & 
-// CritterCapture & 
-// CritterCapture['capture_location'] & 
-// CritterCapture['release_location'] & 
-// CritterMarking & 
-// CritterMeasurement
+// marking_id: uuid;
+// capture_id: uuid | null;
+// mortality_id: uuid | null;
+// identifier: string;
+// frequency: number;
+// frequency_unit: string; //This is an enum in critterbase
+// order: number;
+// comment: string;
+// attached_timestamp: Dayjs;
+// removed_timestamp: Dayjs;
+// body_location: string;
+// marking_type: string;
+// marking_material: string;
+// primary_colour: string;
+// secondary_colour: string;
+// text_colour: string;
+export const markingFormFields: Record<string, FormFieldObject<IMarking>[]> = {
+markingFields: [
+    {prop: 'marking_type', type: eInputType.cb_select, cbRouteKey: 'marking_type'},
+    {prop: 'frequency', type: eInputType.number, ...isRequired},
+    {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
+    {prop: 'identifier', type: eInputType.text},
+    {prop: 'order', type: eInputType.number},
+    {prop: 'attached_timestamp', type: eInputType.datetime, ...isRequired},
+    {prop: 'removed_timestamp', type: eInputType.datetime},
+    {prop: 'body_location', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations'},
+    {prop: 'marking_material', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
+    {prop: 'primary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'secondary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'text_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'comment', type: eInputType.multiline},
+  ],
+  // frequencyFields: [
+  //   {prop: 'frequency', type: eInputType.number, ...isRequired},
+  //   {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
+  // ]
+}
 
 export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
   identifierFields: [
@@ -340,7 +375,7 @@ export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
   ],
   captureFields: [
     { prop: 'capture', type: eInputType.cb_capture_fields, taxon: []},
-  ]
+  ],
   //   { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
   //   { prop: 'latitude', type: eInputType.number, taxon: []},
   //   { prop: 'longitude', type: eInputType.number, taxon: []},

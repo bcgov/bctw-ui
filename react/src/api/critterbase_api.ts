@@ -13,10 +13,13 @@ export const critterbaseApi = (props: ApiProps): API => {
    */
   const getLookupTableOptions = async (
     cbRouteKey: ICbRouteKey,
-    asSelect?: boolean
+    asSelect?: boolean,
+    query = ''
   ): Promise<Array<ICbSelect | string>> => {
     const route = CbRoutes[cbRouteKey];
-    const { data } = await api.get(asSelect ? `${route}${selectFormat}` : route);
+    const q = asSelect ? (query ? `${selectFormat}&${query}` : `${selectFormat}`) : `?${query}`;
+    console.log(q);
+    const { data } = await api.get(`${route}${q}`);
     return data;
   };
 

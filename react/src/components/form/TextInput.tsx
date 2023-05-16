@@ -13,6 +13,7 @@ export type TextInputProps = FormBaseProps &
   StandardTextFieldProps & {
     defaultValue: string;
     validate?: (v: string) => string;
+    fullWidth?: boolean;
   };
 
 export const inputPropsToRemove = [
@@ -26,7 +27,7 @@ export const inputPropsToRemove = [
 ];
 
 export default function TextField(props: TextInputProps): JSX.Element {
-  const { changeHandler, propName, defaultValue, style, required, validate } = props;
+  const { changeHandler, propName, defaultValue, style, required, validate, fullWidth } = props;
   const [val, setVal] = useState(defaultValue ?? '');
   const [err, setErr] = useState('');
   const empty = '';
@@ -87,7 +88,7 @@ export default function TextField(props: TextInputProps): JSX.Element {
 
   return (
     <MuiTextField
-      style={{ ...baseInputStyle, ...style }}
+      style={fullWidth ? { ...baseInputStyle, width: '100%' } : { ...baseInputStyle }}
       value={val}
       onBlur={handleBlur}
       onChange={handleChange}

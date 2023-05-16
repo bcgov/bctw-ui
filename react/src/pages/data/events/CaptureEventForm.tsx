@@ -59,7 +59,7 @@ export default function CaptureEventForm({
     <Box>
       {/* Capture Date -> Capture Environment */}
       <LocationEventForm key='ce-loc' event={capture.capture_location} notifyChange={onChange}>
-        <Box key='bx-rec' {...boxSpreadRowProps}>
+        <Box key='bx-rec' display='flex'>
           {CreateFormField(capture, capture.fields.capture_timestamp, onChange, { value: dayjs() })}
           {CreateFormField(capture, capture.fields.capture_comment, onChange)}
         </Box>
@@ -75,7 +75,7 @@ export default function CaptureEventForm({
       {/* Release Date */}
 
       <FormSection id='release-date' header='Release Date'>
-        <Box key='bx-rec' {...boxSpreadRowProps}>
+        <Box key='bx-rec' display='flex'>
           {CreateFormField(capture, capture.fields.release_timestamp, onChange, { minDate: minReleaseDate })}
           {CreateFormField(capture, capture.fields.release_comment, onChange)}
         </Box>

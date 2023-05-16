@@ -108,10 +108,13 @@ export const useTelemetryApi = () => {
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
 
   //CRITTERBASE HOOKS
-  const useCritterbaseSelectOptions = (prop: ICbRouteKey): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
+  const useCritterbaseSelectOptions = (
+    prop: ICbRouteKey,
+    query?: string
+  ): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
     return useQuery<Array<ICbSelect | string>, AxiosError>(
-      ['lookup-table-options', prop],
-      () => critterbaseApi.getLookupTableOptions(prop, true),
+      ['lookup-table-options', prop, query],
+      () => critterbaseApi.getLookupTableOptions(prop, true, query),
       {
         ...defaultQueryOptions
       }

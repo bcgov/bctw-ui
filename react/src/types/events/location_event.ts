@@ -67,20 +67,19 @@ export class LocationEvent implements BCTWWorkflow<LocationEvent>, ILocation {
         { prop: 'latitude', type: eInputType.number, validate: mustBeLatitude },
         { prop: 'longitude', type: eInputType.number, validate: mustBeLongitude },
         { prop: 'coordinate_uncertainty', type: eInputType.number },
-        {
-          prop: 'coordinate_uncertainty_unit',
-          type: eInputType.cb_select,
-          cbRouteKey: 'coordinate_uncertainty_unit'
-        }
+        // {
+        //   prop: 'coordinate_uncertainty_unit',
+        //   type: eInputType.cb_select,
+        //   cbRouteKey: 'coordinate_uncertainty_unit'
+        // },
+        { prop: 'location_comment', type: eInputType.multiline, style: FormCommentStyle }
       ],
       regions: [
         { prop: 'region_env_id', type: eInputType.cb_select, cbRouteKey: 'region_env' },
         { prop: 'region_nr_id', type: eInputType.cb_select, cbRouteKey: 'region_nr' },
         { prop: 'wmu_id', type: eInputType.cb_select, cbRouteKey: 'wmu' },
         { prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp }
-      ],
-      //extra: [{ prop: 'temperature', type: eInputType.number, validate: mustBeValidTemp }],
-      comment: [{ prop: 'location_comment', type: eInputType.text, style: FormCommentStyle }]
+      ]
     };
   }
 }
