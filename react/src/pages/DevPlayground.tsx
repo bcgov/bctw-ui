@@ -4,7 +4,7 @@ import { plainToClass } from 'class-transformer';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import { formatTag } from 'components/table/table_helpers';
 import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
-import { CbMarkingInputs } from 'critterbase/components/CbMarkingInputs';
+import { CbMarkingInput, CbMarkings } from 'critterbase/components/CbMarkingInputs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
 import { AttachedCritter, Critter } from 'types/animal';
@@ -128,7 +128,8 @@ const DevPlayground = (): JSX.Element => {
           />
         </Box> */}
         <Box my={5}>
-          <CbMarkingInputs taxon_id={editCritter.taxon_id} markings={[]} handleChange={(v) => console.log(v)} />
+          {/* <CbMarkingInput taxon_id={editCritter.taxon_id} handleChange={(v) => console.log(v)} /> */}
+          <CbMarkings taxon_id={editCritter.taxon_id} />
         </Box>
         <ModifyCritterWrapper editing={editCritter}>
           <EditCritter

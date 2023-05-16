@@ -75,10 +75,12 @@ export type FormChangeEvent = { (v: InboundObj): void };
  * b) error: boolean
  * @returns the keyof T / value record
  */
-export const parseFormChangeResult = <T>(changed: InboundObj): [keyof T, unknown] => {
+export const parseFormChangeResult = <T>(changed: InboundObj): [keyof T, unknown, string] => {
   const key = Object.keys(changed)[0] as keyof T;
-  const value = Object.values(changed)[0];
-  return [key, value];
+  const val = Object.values(changed)[0];
+  const value = val?.['id'] ?? val;
+  const label: string = val?.['label'] ?? val;
+  return [key, value, label];
 };
 
 /**

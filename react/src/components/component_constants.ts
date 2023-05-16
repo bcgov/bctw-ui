@@ -1,6 +1,6 @@
 import { ButtonProps, MenuProps, OutlinedTextFieldProps, StandardTextFieldProps } from '@mui/material';
 
-const baseInputStyle = { marginRight: '10px', marginBottom: '10px', width: '200px', minWidth: '200px' };
+const baseInputStyle = { marginRight: '10px', marginBottom: '15px', width: '200px', minWidth: '200px' };
 const baseInputProps: Pick<OutlinedTextFieldProps, 'variant'> & Pick<StandardTextFieldProps, 'size'> = {
   variant: 'outlined',
   size: 'small'

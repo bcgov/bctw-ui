@@ -345,7 +345,7 @@ markingFields: [
     {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
     {prop: 'identifier', type: eInputType.text},
     {prop: 'order', type: eInputType.number},
-    {prop: 'attached_timestamp', type: eInputType.datetime},
+    {prop: 'attached_timestamp', type: eInputType.datetime, ...isRequired},
     {prop: 'removed_timestamp', type: eInputType.datetime},
     {prop: 'body_location', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations'},
     {prop: 'marking_material', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
