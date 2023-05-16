@@ -16,10 +16,11 @@ export const CbSelect = ({
   required,
   handleChange,
   label,
-  disabled
-}: CbSelectProps): JSX.Element => {
+  disabled,
+  query
+}: CbSelectProps & { query?: string }): JSX.Element => {
   const cbApi = useTelemetryApi();
-  const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
+  const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey, query);
   const [selected, setSelected] = useState<uuid | string>('');
   // const [hasError, setHasError] = useState((required && !selected) || !cbRouteKey);
 
@@ -71,7 +72,7 @@ export const CbSelect = ({
   return (
     <FormControl
       size='small'
-      style={{ ...baseInputStyle, marginBottom: baseInputStyle.marginRight }}
+      style={{ ...baseInputStyle }}
       required={required}
       className={`select-control ${hasError ? 'input-error' : ''}`}
       error={!isLoading && hasError}

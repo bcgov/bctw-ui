@@ -109,7 +109,7 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
       style={{ ...style, ...baseInputStyle }}
       onChange={handleChange}
       onBlur={handleBlur}
-      helperText={err}
+      helperText={err !== FormStrings.isRequired && err}
       error={!!err}
       {...propsToPass}
     />

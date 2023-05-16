@@ -166,7 +166,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       ultimate_cause_of_death_id: this.ultimate_cause_of_death_id,
       ultimate_cause_of_death_confidence: this.ultimate_cause_of_death_confidence,
       ultimate_predated_by_taxon_id: this.ultimate_predated_by_taxon_id
-    })
+    });
   }
 
   constructor(mort_date = dayjs(), capture?: CaptureEvent) {
@@ -204,7 +204,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   }
 
   get displayProps(): (keyof MortalityEvent)[] {
-    return ['taxon', 'wlh_id',  'critter_id'];
+    return ['taxon', 'wlh_id', 'critter_id'];
   }
 
   getWorkflowTitle(): string {
@@ -234,7 +234,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
       case 'proximate_cause_of_death_confidence':
         return 'PCOD Confidence';
       case 'ultimate_cause_of_death_confidence':
-        return 'UCOD Confidence'
+        return 'UCOD Confidence';
       case 'proximate_predated_by_taxon_id':
         return 'PCOD Predator Taxon';
       case 'ultimate_predated_by_taxon_id':
@@ -251,20 +251,46 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check }
   };*/
   fields: MortalityFormField = {
-    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime, required: false},
-    retrieved_ind: { prop: 'retrieved_ind', type: eInputType.check, required: false},
-    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check},
-    data_life_end: {prop: 'data_life_end', type: eInputType.datetime},
+    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime, required: false },
+    retrieved_ind: { prop: 'retrieved_ind', type: eInputType.check, required: false },
+    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
+    data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
     mortality_timestamp: { prop: 'mortality_timestamp', type: eInputType.datetime, required: true },
-    mortality_comment: { prop: 'mortality_comment', type: eInputType.text, style: FormCommentStyle },
-    proximate_cause_of_death_id: { prop: 'proximate_cause_of_death_id', type: eInputType.cb_select, cbRouteKey: 'cod', required: true},
-    proximate_cause_of_death_confidence: { prop: 'proximate_cause_of_death_confidence', type: eInputType.cb_select, cbRouteKey: 'cause_of_death_confidence', required: true},
-    proximate_predated_by_taxon_id: {prop: 'proximate_predated_by_taxon_id', type: eInputType.cb_select, cbRouteKey: 'taxons'},
-    ultimate_cause_of_death_id: { prop: 'ultimate_cause_of_death_id', type: eInputType.cb_select, cbRouteKey: 'cod', required: false},
-    ultimate_cause_of_death_confidence: { prop: 'ultimate_cause_of_death_confidence', type: eInputType.cb_select, cbRouteKey: 'cause_of_death_confidence'},
-    ultimate_predated_by_taxon_id: { prop: 'ultimate_predated_by_taxon_id', type: eInputType.cb_select, cbRouteKey: 'taxons'}
-  }
-  
+    mortality_comment: { prop: 'mortality_comment', type: eInputType.multiline, style: FormCommentStyle },
+    proximate_cause_of_death_id: {
+      prop: 'proximate_cause_of_death_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'cod',
+      required: true
+    },
+    proximate_cause_of_death_confidence: {
+      prop: 'proximate_cause_of_death_confidence',
+      type: eInputType.cb_select,
+      cbRouteKey: 'cause_of_death_confidence',
+      required: true
+    },
+    proximate_predated_by_taxon_id: {
+      prop: 'proximate_predated_by_taxon_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'taxons'
+    },
+    ultimate_cause_of_death_id: {
+      prop: 'ultimate_cause_of_death_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'cod',
+      required: false
+    },
+    ultimate_cause_of_death_confidence: {
+      prop: 'ultimate_cause_of_death_confidence',
+      type: eInputType.cb_select,
+      cbRouteKey: 'cause_of_death_confidence'
+    },
+    ultimate_predated_by_taxon_id: {
+      prop: 'ultimate_predated_by_taxon_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'taxons'
+    }
+  };
 
   // retrieve the animal metadata fields from the mortality event
   getAnimal(): OptionalAnimal {
@@ -321,4 +347,4 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
 
 export type MortalityFormField = {
   [Property in keyof MortalityEvent]+?: FormFieldObject<MortalityEvent>;
-}
+};

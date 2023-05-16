@@ -37,7 +37,7 @@ export type CreateInputProps = CreateInputBaseProps &
 
 // text and number field handler
 function CreateEditTextField(props: CreateInputProps): ReactElement {
-  const { prop, type, value, errorMessage, handleChange, validate } = props;
+  const { prop, type, value, errorMessage, handleChange, validate, style } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
   return type === eInputType.number ? (
@@ -64,7 +64,7 @@ function CreateEditTextField(props: CreateInputProps): ReactElement {
 }
 
 function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
-  const newProps = Object.assign({ multiline: true, rows: 1, style: { width: '100%', flexGrow: 1 } }, props);
+  const newProps = Object.assign({ multiline: true, rows: 1, fullWidth: true }, props);
   return CreateEditTextField(newProps);
 }
 
@@ -192,8 +192,6 @@ export const getInputFnFromType = (inputType: eInputType): ((props: unknown) => 
       return CreateEditMultilineTextField;
     case eInputType.cb_select:
       return CreateCbSelectField;
-    // case eInputType.cb_capture_fields:
-    //   return CreateCaptureEventForm;
     default:
       return CreateEditTextField;
   }

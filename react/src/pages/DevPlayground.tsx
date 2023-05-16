@@ -3,15 +3,13 @@ import makeStyles from '@mui/styles/makeStyles';
 import { plainToClass } from 'class-transformer';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import { formatTag } from 'components/table/table_helpers';
-import { CbSelect } from 'critterbase/components/CbSelect';
-import { CbRoutes } from 'critterbase/routes';
-import { ICbRouteKey } from 'critterbase/types';
+import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
+import { CbMarkingInputs } from 'critterbase/components/CbMarkingInputs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
 import { AttachedCritter, Critter } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { editObjectToEvent } from 'types/events/event';
-import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { columnToHeader, doNothingAsync } from 'utils/common_helpers';
 import EditCritter from './data/animals/EditCritter';
@@ -43,8 +41,21 @@ const editCritter = editObjectToEvent(
         location: { latitude: 8, longitude: 9 }
       }
     ],
-    latitude: 1,
-    longitude: 2,
+    collection_units: [
+      {
+        category_name: 'Population Unit',
+        unit_name: 'Itcha-Ilgachuz',
+        collection_unit_id: 'a87e9e57-6c94-49e9-9aa9-4925833eaed3',
+        collection_category_id: '86552ac7-75aa-4402-bba3-d33b11dc04d7'
+      }
+      // {
+      //   category_name: 'Dummy Unit',
+      //   unit_name: 'Name 1',
+      //   collection_unit_id: '595434b1-2cde-44f5-afea-b59432aa705f',
+      //   collection_category_id: '841fbf8d-d3c1-4b4f-871b-3b4dcfd5ed03'
+      // }
+    ],
+    taxon_id: '1c891e9a-b374-404a-a075-0f5f34fa1f42',
     wlh_id: '12-345',
     sex: 'Male',
     taxon: 'Moose',
@@ -109,6 +120,16 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
+        {/* <Box my={5}>
+          <CbCollectionUnitInputs
+            taxon_id={editCritter.taxon_id}
+            collection_units={editCritter.collection_units}
+            handleChange={(v) => console.log(v)}
+          />
+        </Box> */}
+        <Box my={5}>
+          <CbMarkingInputs taxon_id={editCritter.taxon_id} markings={[]} handleChange={(v) => console.log(v)} />
+        </Box>
         <ModifyCritterWrapper editing={editCritter}>
           <EditCritter
             open={openCritter} // THIS is false

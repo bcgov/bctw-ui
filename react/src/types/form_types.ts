@@ -55,11 +55,13 @@ export const isDisabled = { disabled: true };
 // what a form component passes when it's changed
 // ex: {name: 'bill', error: false}
 export type InboundObj = {
-  [key: string]: unknown | {id: string, label: string};
-  label?: string;
-  id?: string;
+  [key: string]: unknown | { id: string; label: string };
+  // label?: string;
+  // id?: string;
   error?: boolean;
-  nestedEventKey?: keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'> | keyof Pick<MortalityEvent, 'location'>;
+  nestedEventKey?:
+    | keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'>
+    | keyof Pick<MortalityEvent, 'location'>;
 };
 
 /**
