@@ -55,6 +55,19 @@ const editCritter = editObjectToEvent(
       //   collection_category_id: '841fbf8d-d3c1-4b4f-871b-3b4dcfd5ed03'
       // }
     ],
+    marking: [
+      {
+        identifier: 'id 1',
+        marking_type: '9374d061-e2c2-4be8-9714-1962ceddd70e',
+        order: 1,
+        body_location: 'ec06df9b-1082-4178-a25d-2cec7e9025af',
+        marking_material: 'e1fc271d-c175-4647-a2fc-7a62c8fa2a0a',
+        primary_colour: '366b3697-cb9e-4d48-8858-e4d8aefa9147',
+        secondary_colour: '366b3697-cb9e-4d48-8858-e4d8aefa9147',
+        text_colour: '366b3697-cb9e-4d48-8858-e4d8aefa9147',
+        comment: 'marking comment'
+      }
+    ],
     taxon_id: '1c891e9a-b374-404a-a075-0f5f34fa1f42',
     wlh_id: '12-345',
     sex: 'Male',
@@ -128,8 +141,12 @@ const DevPlayground = (): JSX.Element => {
           />
         </Box> */}
         <Box my={5}>
-          {/* <CbMarkingInput taxon_id={editCritter.taxon_id} handleChange={(v) => console.log(v)} /> */}
-          <CbMarkings taxon_id={editCritter.taxon_id} />
+          {/* <CbMarkingInput
+            taxon_id={editCritter.taxon_id}
+            marking={editCritter.marking[0]}
+            handleChange={(v) => console.log(v)}
+          /> */}
+          <CbMarkings taxon_id={editCritter.taxon_id} markings={editCritter.marking} />
         </Box>
         <ModifyCritterWrapper editing={editCritter}>
           <EditCritter
