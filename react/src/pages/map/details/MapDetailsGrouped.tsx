@@ -12,6 +12,7 @@ import {
   getUniqueCollectionUnitKeys
 } from 'pages/map/map_helpers';
 import { MapDetailsBaseProps } from './MapDetails';
+import { useMapState } from '../MapMarkerContext';
 
 export type MapDetailsGroupedProps = MapDetailsBaseProps & {
   pings: ITelemetryGroup[];
@@ -40,7 +41,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const { pings, crittersSelected, handleShowOverview, handleRowSelected, handleRowHovered } = props;
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('Critter Name');
-  const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
+  const [{ selectedCritters }, dispatch] = useMapState();
 
   // Adds a column for each unique category_name
   const uniqueCategoryNames = getUniqueCollectionUnitKeys(pings);
@@ -53,45 +54,23 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
-    const newChecked = val ? pings.map((f) => f.critter_id) : [];
-    pushRowCheck(newChecked);
+    if (val) {
+      dispatch({ type: 'SELECT_MARKERS', ids: getPointIDsFromTelemetryGroup(pings) });
+      dispatch({ type: 'SELECT_CRITTERS', ids: pings.map((p) => p.critter_id) });
+    } else {
+      dispatch({ type: 'RESET_SELECTION' });
+      dispatch({ type: 'SELECT_CRITTERS', ids: [] });
+    }
   };
 
-  const handleRowAction = (v: RowActionStatus, action: (ids: string[]) => void): void => {
-    let newChecked = null;
-    const idxFound = checkedGroups.indexOf(v.critter_id);
-    if (idxFound === -1) {
-      newChecked = [...checkedGroups, v.critter_id];
-    } else {
-      const cp = [...checkedGroups];
-      cp.splice(idxFound, idxFound + 1);
-      if (v.active) {
-        cp.push(v.critter_id);
-      }
-      newChecked = cp;
-    }
-    console.log('newChecked: ', newChecked)
-    action(newChecked);
-  };
-  
   const handleRowCheck = (v: RowActionStatus): void => {
-    handleRowAction(v, pushRowCheck);
+    const pointIds = getPointIDsFromTelemetryGroup(pings.filter((f) => f.critter_id === v.critter_id));
+    dispatch({ type: v.active ? 'SELECT_MARKERS' : 'UNSELECT_MARKERS', ids: pointIds });
+    dispatch({ type: 'SELECT_CRITTERS', ids: v.active? [...selectedCritters, v.critter_id] : selectedCritters.filter((id) => id !== v.critter_id) });
   };
-  
+
   const handleRowHover = (v: RowActionStatus): void => {
-    // handleRowAction(v, pushRowHover);
-    handleRowHovered(v.critter_id);
-  };
-  
-  const pushRowCheck = (ids: string[]): void => {
-    setCheckedGroups(ids);
-    const pointIDs = getPointIDsFromTelemetryGroup(pings.filter((f) => ids.includes(f.critter_id)));
-    handleRowSelected(pointIDs);
-  };
-  
-  const pushRowHover = (ids: string[]): void => {
-    const pointIDs = getPointIDsFromTelemetryGroup(pings.filter((f) => ids.includes(f.critter_id)));
-    handleRowHovered(pointIDs);
+    v.active ? dispatch({ type: 'FOCUS_ANIMAL', id: v.critter_id }) : dispatch({ type: 'RESET_FOCUS' });
   };
 
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
@@ -109,7 +88,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
               ] as any
             }
             headerData={pings[0].features[0].properties}
-            numSelected={checkedGroups.length}
+            numSelected={selectedCritters.length}
             order={order}
             orderBy={orderBy ?? ''}
             onRequestSort={handleSort}
@@ -125,8 +104,8 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
               <Row
                 key={`${idx}_${u.device_id}`}
                 pingCount={u.features.length}
-                isChecked={checkedGroups.includes(u.critter_id)}
-                isSelectedInMap={crittersSelected.indexOf(u.critter_id) !== -1}
+                isChecked={selectedCritters.includes(u.critter_id)}
+                isSelectedInMap={selectedCritters.includes(u.critter_id)}
                 // fixme: should it be the latest props that are displayed?
                 row={getLatestPing(u.features)?.properties}
                 handleShowOverview={handleShowOverview}
@@ -154,7 +133,16 @@ type MapDetailsTableRowProps = {
 };
 
 function Row(props: MapDetailsTableRowProps): JSX.Element {
-  const { row, handleRowCheck, handleRowHover, handleShowOverview, isSelectedInMap, pingCount, isChecked, uniqueCategoryNames } = props;
+  const {
+    row,
+    handleRowCheck,
+    handleRowHover,
+    handleShowOverview,
+    isSelectedInMap,
+    pingCount,
+    isChecked,
+    uniqueCategoryNames
+  } = props;
 
   const onCheck = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
@@ -166,7 +154,7 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       hover={!isSelectedInMap}
       className={`map-bottom-panel-row ${isSelectedInMap ? 'row-selected' : ''}`}
       onMouseEnter={() => handleRowHover({ critter_id: row.critter_id, active: true })}
-      onMouseLeave={() => handleRowHover({ critter_id: '', active: false })}>
+      onMouseLeave={() => handleRowHover({ critter_id: row.critter_id, active: false })}>
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>

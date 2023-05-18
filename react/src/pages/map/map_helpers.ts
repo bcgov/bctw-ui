@@ -64,10 +64,7 @@ const parseAnimalColour = (colourString: string): { fillColor: string; color: st
 /**
  * @returns the hex colour value to show as the fill colour
  */
-const getFillColorByStatus = (point: ITelemetryPoint, selected = false): string => {
-  if (selected) {
-    return MAP_COLOURS.selected;
-  }
+const getFillColorByStatus = (point: ITelemetryPoint) => {
   if (!point) {
     return MAP_COLOURS.point;
   }
@@ -130,7 +127,7 @@ const fillPoint = (layer: any, selected = false): void => {
     class: selected ? 'selected-ping' : '',
     weight: 1.0,
     color: getOutlineColor(layer.feature),
-    fillColor: getFillColorByStatus(layer.feature, selected)
+    fillColor: getFillColorByStatus(layer.feature)//, selected)
   });
 };
 

@@ -17,6 +17,7 @@ import { Button } from '@mui/material';
 import { MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { Tooltip } from 'components/common';
+import { useMapState } from '../MapMarkerContext';
 
 export type MapDetailsBaseProps = {
   handleRowSelected: OnPanelRowSelect;
@@ -64,6 +65,9 @@ export default function MapDetails({
   const [showOnlySelected, setShowOnlySelected] = useState(false);
   const [sort] = useState<DetailsSortOption>('wlh_id');
 
+  const [{ selectedCritters, selectedMarkers }, dispatch] = useMapState();
+
+
   // upon initial load, display all critters in bottom panel
   useEffect(() => {
     const byCritter = groupPings(pings, sort);
@@ -88,6 +92,10 @@ export default function MapDetails({
     }
   }, [showOnlySelected]);
 
+  useEffect(() => {
+    setPingGroupChecked(groupPings([...pings, ...unassignedPings].filter((f) => selectedMarkers.includes(f.id))))
+  }, [selectedMarkers])
+
   // upon rows checked in each row, note: unassigned IDs are negative integers
   const handleRowsChecked = (ids: number[]): void => {
     const grouped = groupPings([...pings, ...unassignedPings].filter((f) => ids.includes(f.id)));
@@ -100,6 +108,7 @@ export default function MapDetails({
   };
 
   const handleShowSelectedChecked = (val: Record<string, boolean>): void => {
+    console.log(val)
     const isChecked = val[MapStrings.showOnlyCheckedLabel];
     setShowOnlySelected(isChecked);
     // call the parent handler

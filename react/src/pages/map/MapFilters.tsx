@@ -53,6 +53,7 @@ import { getStartDate, StartDateKey } from 'utils/time';
 import makeStyles from '@mui/styles/makeStyles';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { LoadingButton } from '@mui/lab';
+import { useMapState } from './MapMarkerContext';
 
 enum TabNames {
   search = 'Search',
@@ -130,7 +131,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const [symbolizeBy, setSymbolizeBy] = useState(DEFAULT_MFV.header);
   const [symbolizeLast, setSymbolizeLast] = useState(true);
   const [legend, setLegend] = useState(symbolizeBy);
-  const [opacity, setOpacity] = useState(0.8);
+
+  const [{ markers, selectedMarkers, focusedAnimal, symbolizedGroups, opacity }, dispatch] = useMapState();
+
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
 
@@ -226,9 +229,18 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   };
 
   const handleApplySymbolize = (): void => {
-    const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
     setLegend(symbolizeBy);
-    props.onApplySymbolize(symbolize, symbolizeLast, opacity);
+    if (symbolizeBy === DEFAULT_MFV.header) {
+      dispatch({ type: 'RESET_SYMBOLIZE'})
+    } else {
+      const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
+      pings.forEach((ping) => {
+        const attr = ping.properties[symbolize.header];
+        const fillColor = symbolize.values.find((val) => val.id === attr)?.colour;
+        dispatch({ type: 'SYMBOLIZE_GROUP', group: { id: ping.properties.critter_id, color: fillColor, applyToLatest: symbolizeLast } })
+      })
+    }
+    // props.onApplySymbolize(symbolize, symbolizeLast, opacity);
   };
 
   /**
@@ -439,9 +451,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       setSymbolizeBy((e.target as HTMLInputElement).value as keyof TelemetryDetail);
     };
     const handleChange = (event: Event, op: number) => {
-      setOpacity(op);
-      const symbolize = formValues.find((fv) => fv.header === legend);
-      props.onApplySymbolize(symbolize, symbolizeLast, opacity);
+      dispatch({ type: 'SET_OPACITY', val: op})
+      //const symbolize = formValues.find((fv) => fv.header === legend);
+      //props.onApplySymbolize(symbolize, symbolizeLast, opacity);
     };
     const boxContainerSpacing = isTab(symbolize) ? 2 : 0;
     return (
