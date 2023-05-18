@@ -16,12 +16,13 @@ import { wfFields } from 'types/events/form_fields';
 
 type MortEventProps = WorkflowFormProps<MortalityEvent> & {
   event: MortalityEvent;
+  isEditing?: boolean;
 };
 
 /**
  * todo: dont hardcode radio values, retrieve from code somehow
  */
-export default function MortalityEventForm({ event, handleFormChange, handleExitEarly }: MortEventProps): JSX.Element {
+export default function MortalityEventForm({ event, handleFormChange, handleExitEarly, isEditing }: MortEventProps): JSX.Element {
   const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
   // business logic workflow state
   const [isRetrieved, setIsRetrieved] = useState(false);
@@ -118,6 +119,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
           {isUcodPredatorKnown && CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, isUcodPredatorKnown ? {  } : {disabled: !isUcodPredatorKnown, value: ''})}
         </Box>
       </FormSection>
+      {!isEditing && ( 
       <FormSection id={'mort-dev'} header={'Device Information'}>
       <Box mb={1} {...boxSpreadRowProps}>
           {CreateFormField(mortality, {...mortality.fields.retrieved_ind, required: isRetrieved }, onChange )}
@@ -131,7 +133,8 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
                 disabled: !isBeingUnattached || critterIsAlive
           })} 
       </Box>
-      </FormSection>
+      </FormSection> 
+      ) }
       
     </Box>
       {/*<FormSection id='mort-a-st' header={'Critter Status'} disabled={critterIsAlive}>

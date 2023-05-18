@@ -151,7 +151,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
               </FormSection>
               <FormSection id='m-deets' header='Mortality Details' hide={!editing.latestMortality} size='large'>
                 <Divider /> 
-                <MortalityEventForm event={editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent} handleFormChange={onChange} />
+                <MortalityEventForm event={editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent} handleFormChange={onChange} isEditing/>
                 {/* <Divider /> */}
               </FormSection>
             </Box>
