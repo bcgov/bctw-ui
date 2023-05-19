@@ -16,12 +16,14 @@ import MortalityEvent from 'types/events/mortality_event';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { omitNull } from 'utils/common_helpers';
+import { QueryStatus } from 'react-query';
 
 /**
  * the main animal form
  */
-export default function EditCritter(props: EditorProps<Critter | AttachedCritter> & {busySaving?: boolean, onSave: (c: any) => Promise<void> }): JSX.Element {
-  const { isCreatingNew, editing, open, onSave, busySaving } = props;
+export default function EditCritter(props: EditorProps<Critter | AttachedCritter> & 
+  {queryStatus?: QueryStatus, busySaving?: boolean, onSave: (c: any) => Promise<void> }): JSX.Element {
+  const { isCreatingNew, editing, open, onSave, busySaving, queryStatus } = props;
   editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();
@@ -129,7 +131,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   );
 
   return (
-    <EditModal disableHistory={true} headerComponent={Header} hideSave={!canEdit || busySaving} {...props} editing={editing} onSave={critterbaseSave}>
+    <EditModal disableHistory={true} headerComponent={Header} hideSave={!canEdit || queryStatus === 'loading'} busySaving={busySaving} {...props} editing={editing} onSave={critterbaseSave}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function

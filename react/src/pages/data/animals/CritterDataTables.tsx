@@ -191,7 +191,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             paginationFooter
             exporter={
               <>
-                <Box ml={1}>
+                {/*<Box ml={1}>
                   <Button
                     {...buttonProps}
                     onClick={handleAddAnimal}
@@ -199,7 +199,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
                     startIcon={<Icon icon='plus' />}>
                     Add
                   </Button>
-                </Box>
+            </Box>*/}
                 <ExportViewer<Critter>
                   template={new Critter().displayProps}
                   eTitle={CritterStrings.exportTitle}

@@ -118,6 +118,9 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   ultimate_cause_of_death_confidence: string;
   ultimate_predated_by_taxon_id: uuid;
   mortality_comment: string;
+  
+  proximate_cause_of_death: {cod_category: string, cod_reason: string}
+  ultimate_cause_of_death: {cod_category: string, cod_reason: string}
 
   // critter props
   /*readonly critter_id: uuid;

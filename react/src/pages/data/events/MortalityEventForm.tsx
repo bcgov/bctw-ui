@@ -27,8 +27,8 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
   // business logic workflow state
   const [isRetrieved, setIsRetrieved] = useState(false);
   const [isPredation, setIsPredation] = useState(false);
-  const [isPredatorKnown, setIsPredatorKnown] = useState(!!event.proximate_predated_by_taxon_id ?? false);
-  const [isUcodPredatorKnown, setIsUcodPredatorKnown] = useState(!!event.ultimate_predated_by_taxon_id ?? false);
+  const [isPredatorKnown, setIsPredatorKnown] = useState(!!event.proximate_predated_by_taxon_id || event.proximate_cause_of_death?.cod_category === 'Predation');
+  const [isUcodPredatorKnown, setIsUcodPredatorKnown] = useState(!!event.ultimate_predated_by_taxon_id || event.ultimate_cause_of_death?.cod_category === 'Predation');
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
   const [ucodDisabled, setUcodDisabled] = useState(true);
   const [isUCODKnown, setIsUCODKnown] = useState(false);
@@ -36,8 +36,10 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
   const [critterIsAlive, setCritterIsAlive] = useState(false);
 
   useDidMountEffect(() => {
+    //console.log('Mortality event' + JSON.stringify(event, null, 2));
+    setIsPredatorKnown(event.proximate_cause_of_death?.cod_category === 'Predation');
+    setIsUcodPredatorKnown(event.ultimate_cause_of_death?.cod_category === 'Predation');
     setMortalityEvent(event);
-    
   }, [event]);
   // if critter is marked as alive, workflow wrapper will show exit workflow prompt
   useDidMountEffect(() => {

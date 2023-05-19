@@ -14,13 +14,15 @@ import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { Button, Modal } from 'components/common';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
-import { Box, Container, Divider, Paper, Tabs, Tab } from '@mui/material';
+import { Box, Container, Divider, Paper, Tabs, Tab, CircularProgress } from '@mui/material';
 import { BCTWBase } from 'types/common_types';
 import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { buttonProps } from 'components/component_constants';
 import { Typography } from '@mui/material';
 import { PageTabs } from 'components/common/partials/PageTabs';
+import { LoadingButton } from '@mui/lab';
+import makeStyles from '@mui/styles/makeStyles';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: ReactNode;
@@ -30,7 +32,20 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
   showInFullScreen?: boolean;
   onReset?: () => void;
   headerComponent?: JSX.Element;
+  busySaving?: boolean;
 };
+
+const useStyle = makeStyles((theme) => ({
+  MuiCircularProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    height: '20px !important',
+    width: '20px !important',
+    marginLeft: '-10px',
+    marginTop: '-10px'
+  }
+}));
 
 /**
  * Component that wraps a form and handles:
@@ -66,8 +81,11 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     disableHistory = true,
     hideSave = false,
     disableTabs = false,
-    showInFullScreen = true
+    showInFullScreen = true,
+    busySaving = false
   } = props;
+
+  const styles = useStyle();
 
   const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr, resetErrs] = useFormHasError();
@@ -231,9 +249,15 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
                         {hideSave ? null : (
                           <>
                             {hasErr ? <Typography mr={1}>Fields marked with * are required</Typography> : null}
-                            <Button {...buttonProps} onClick={handleSave} disabled={!canSave}>
+                            <LoadingButton 
+                              {...buttonProps} 
+                              variant='contained'
+                              loading={busySaving} 
+                              loadingIndicator={<CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />} 
+                              onClick={handleSave} 
+                              disabled={!canSave}>
                               Save
-                            </Button>
+                            </LoadingButton>
                           </>
                         )}
                         <Button {...buttonProps} variant='outlined' onClick={(): void => onClose()}>
