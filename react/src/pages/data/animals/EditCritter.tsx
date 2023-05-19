@@ -20,8 +20,8 @@ import { omitNull } from 'utils/common_helpers';
 /**
  * the main animal form
  */
-export default function EditCritter(props: EditorProps<Critter | AttachedCritter> & {onSave: (c: any) => Promise<void> }): JSX.Element {
-  const { isCreatingNew, editing, open, onSave } = props;
+export default function EditCritter(props: EditorProps<Critter | AttachedCritter> & {busySaving?: boolean, onSave: (c: any) => Promise<void> }): JSX.Element {
+  const { isCreatingNew, editing, open, onSave, busySaving } = props;
   editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();
@@ -64,8 +64,9 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
         captures: [],
         mortalities: []
       }  
-      if(body.capture) {
+      if(body.capture.length) {
         const capture = body.capture[0];
+        const og_capture = editing.capture[0];
         const captureId = editing.capture[0]?.capture_id;
         if(captureId) {
           capture.capture_id = captureId;
@@ -74,12 +75,17 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
           capture.capture_location = omitNull(capture.capture_location);
         }
         if(capture.release_location) {
+          if(capture.capture_location_id === capture.release_location_id) {
+            const clone = Object.assign({}, og_capture.capture_location);
+            capture.release_location = Object.assign(clone, capture.release_location);
+            capture.force_create_release = true;
+          }
           capture.release_location = omitNull(capture.release_location);
         }
         finalPayload.captures.push(omitNull(capture));
       }
   
-      if(body.mortality) {
+      if(body.mortality.length && editing.mortality.length) {
         const mortality = body.mortality[0];
         const mortalityId = editing.mortality[0]?.mortality_id;
         if(mortalityId) {
@@ -123,7 +129,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   );
 
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing} onSave={critterbaseSave}>
+    <EditModal headerComponent={Header} hideSave={!canEdit || busySaving} {...props} editing={editing} onSave={critterbaseSave}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function

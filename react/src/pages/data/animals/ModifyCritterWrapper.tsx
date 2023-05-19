@@ -51,10 +51,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
       if (data.assignment_id) {
         const a = editObjectToEvent(data, new AttachedCritter(data.critter_id), []);
         setAnimal(a);
-        console.log(`setAnimal to AttachedCritter: ${JSON.stringify(a)}`)
       } else {
-        console.log('setAnimal to Critter')
-        //setAnimal(plainToClass(Critter, data));
         setAnimal(editObjectToEvent(data, new Critter(data.critter_id), []));
       }
     }
@@ -124,12 +121,13 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const passTheseProps: Pick<
     IAddEditProps<Critter>,
     'onDelete' | 'onSave' | 'cannotEdit' | 'editing' | 'queryStatus'
-  > = {
+  > & {busySaving: boolean} = {
     cannotEdit: !canEdit,
     onDelete: (): void => setShowConfirmDelete((o) => !o),
     onSave: saveCritter,
     editing: animal,
-    queryStatus: status
+    queryStatus: status,
+    busySaving: isLoading
   };
   return (
     <>
