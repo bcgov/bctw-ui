@@ -143,7 +143,7 @@ export default function SimpleMap({
         initMap(
           mapRef,
           drawnItems,
-          new L.GeoJSON(),
+          // new L.GeoJSON(),
           () => {},
           () => {},
           () => {},

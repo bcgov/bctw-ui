@@ -142,7 +142,7 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
 const initMap = (
   mapRef: MutableRefObject<L.Map>,
   drawnItems: L.FeatureGroup,
-  selectedPings: L.GeoJSON,
+  // selectedPings: L.GeoJSON,
   drawSelectedLayer: () => void,
   handleDrawLine: (l) => void,
   handleDeleteLine: () => void,
@@ -165,7 +165,7 @@ const initMap = (
   addTileLayers(mapRef, layerPicker);
 
   mapRef.current.addLayer(drawnItems);
-  mapRef.current.addLayer(selectedPings);
+  // mapRef.current.addLayer(selectedPings);
 
   const drawOptions = drawToolOptions ?? { marker: false, circle: false, circlemarker: false };
 

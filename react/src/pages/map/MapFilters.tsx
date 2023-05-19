@@ -53,7 +53,7 @@ import { getStartDate, StartDateKey } from 'utils/time';
 import makeStyles from '@mui/styles/makeStyles';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { LoadingButton } from '@mui/lab';
-import { useMapState } from './MapMarkerContext';
+import { useMarkerStates } from './MapMarkerContext';
 
 enum TabNames {
   search = 'Search',
@@ -64,14 +64,10 @@ enum TabNames {
 type MapFiltersProps = {
   start: string;
   end: string;
-  // uniqueDevices: number[];
-  // collectiveUnits: string[];
-  // pingsToDisplay: boolean;
   pings: ITelemetryPoint[];
   onCollapsePanel: () => void;
   onApplySearch: (r: MapRange, filters: ICodeFilter[]) => void;
   onApplyFilters: (r: MapRange, filters: ICodeFilter[]) => void;
-  onApplySymbolize: (s: MapFormValue, includeLatest: boolean, opacity: number) => void;
   onClickEditUdf: () => void;
   onShowLatestPings: (b: boolean) => void;
   onShowLastFixes: (b: boolean) => void;
@@ -132,7 +128,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const [symbolizeLast, setSymbolizeLast] = useState(true);
   const [legend, setLegend] = useState(symbolizeBy);
 
-  const [{ markers, selectedMarkers, focusedAnimal, symbolizedGroups, opacity }, dispatch] = useMapState();
+  const [{ opacity }, markerDispatch] = useMarkerStates();
 
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
@@ -164,8 +160,8 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // handler for when a date is changed
   useEffect(() => {
     const onChangeDate = (): void => {
-      console.log(fetchedEstimate);
-      console.log(fetchedEstimate === undefined);
+      // console.log(fetchedEstimate);
+      // console.log(fetchedEstimate === undefined);
       if (end !== props.end || start !== props.start) {
         setApplyButtonStatus(false);
         setWasDatesChanged(true);
@@ -231,13 +227,13 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const handleApplySymbolize = (): void => {
     setLegend(symbolizeBy);
     if (symbolizeBy === DEFAULT_MFV.header) {
-      dispatch({ type: 'RESET_SYMBOLIZE'})
+      markerDispatch({ type: 'RESET_SYMBOLIZE'})
     } else {
       const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
       pings.forEach((ping) => {
         const attr = ping.properties[symbolize.header];
         const fillColor = symbolize.values.find((val) => val.id === attr)?.colour;
-        dispatch({ type: 'SYMBOLIZE_GROUP', group: { id: ping.properties.critter_id, color: fillColor, applyToLatest: symbolizeLast } })
+        markerDispatch({ type: 'SYMBOLIZE_GROUP', group: { id: ping.properties.critter_id, color: fillColor, applyToLatest: symbolizeLast } })
       })
     }
     // props.onApplySymbolize(symbolize, symbolizeLast, opacity);
@@ -451,7 +447,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       setSymbolizeBy((e.target as HTMLInputElement).value as keyof TelemetryDetail);
     };
     const handleChange = (event: Event, op: number) => {
-      dispatch({ type: 'SET_OPACITY', val: op})
+      markerDispatch({ type: 'SET_OPACITY', val: op})
       //const symbolize = formValues.find((fv) => fv.header === legend);
       //props.onApplySymbolize(symbolize, symbolizeLast, opacity);
     };

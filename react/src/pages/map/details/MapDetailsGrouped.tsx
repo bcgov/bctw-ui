@@ -12,11 +12,10 @@ import {
   getUniqueCollectionUnitKeys
 } from 'pages/map/map_helpers';
 import { MapDetailsBaseProps } from './MapDetails';
-import { useMapState } from '../MapMarkerContext';
+import { useMarkerStates } from '../MapMarkerContext';
 
 export type MapDetailsGroupedProps = MapDetailsBaseProps & {
   pings: ITelemetryGroup[];
-  crittersSelected: string[];
 };
 
 type RowActionStatus = {
@@ -38,10 +37,10 @@ const rows_to_render = [
 ];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
-  const { pings, crittersSelected, handleShowOverview, handleRowSelected, handleRowHovered } = props;
+  const { pings, handleShowOverview } = props;
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('Critter Name');
-  const [{ selectedCritters }, dispatch] = useMapState();
+  const [{ selectedCritters }, markerDispatch] = useMarkerStates();
 
   // Adds a column for each unique category_name
   const uniqueCategoryNames = getUniqueCollectionUnitKeys(pings);
@@ -55,22 +54,22 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
     if (val) {
-      dispatch({ type: 'SELECT_MARKERS', ids: getPointIDsFromTelemetryGroup(pings) });
-      dispatch({ type: 'SELECT_CRITTERS', ids: pings.map((p) => p.critter_id) });
+      markerDispatch({ type: 'SELECT_MARKERS', ids: getPointIDsFromTelemetryGroup(pings) });
+      markerDispatch({ type: 'SELECT_CRITTERS', ids: pings.map((p) => p.critter_id) });
     } else {
-      dispatch({ type: 'RESET_SELECTION' });
-      dispatch({ type: 'SELECT_CRITTERS', ids: [] });
+      markerDispatch({ type: 'RESET_SELECTION' });
+      markerDispatch({ type: 'SELECT_CRITTERS', ids: [] });
     }
   };
 
   const handleRowCheck = (v: RowActionStatus): void => {
     const pointIds = getPointIDsFromTelemetryGroup(pings.filter((f) => f.critter_id === v.critter_id));
-    dispatch({ type: v.active ? 'SELECT_MARKERS' : 'UNSELECT_MARKERS', ids: pointIds });
-    dispatch({ type: 'SELECT_CRITTERS', ids: v.active? [...selectedCritters, v.critter_id] : selectedCritters.filter((id) => id !== v.critter_id) });
+    markerDispatch({ type: v.active ? 'SELECT_MARKERS' : 'UNSELECT_MARKERS', ids: pointIds });
+    markerDispatch({ type: 'SELECT_CRITTERS', ids: v.active? [...selectedCritters, v.critter_id] : selectedCritters.filter((id) => id !== v.critter_id) });
   };
 
   const handleRowHover = (v: RowActionStatus): void => {
-    v.active ? dispatch({ type: 'FOCUS_ANIMAL', id: v.critter_id }) : dispatch({ type: 'RESET_FOCUS' });
+    v.active ? markerDispatch({ type: 'FOCUS_CRITTER', id: v.critter_id }) : markerDispatch({ type: 'RESET_FOCUS' });
   };
 
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);

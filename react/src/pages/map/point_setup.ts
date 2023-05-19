@@ -6,7 +6,7 @@ import {
   MAP_COLOURS_OUTLINE,
   parseAnimalColour
 } from 'pages/map/map_helpers';
-import { DEFAULT_MFV, ITelemetryPoint, MapFormValue } from 'types/map';
+import { ITelemetryPoint } from 'types/map';
 
 export type PointStyle = {
   fillColor: string;
@@ -52,9 +52,6 @@ const getStyle = (event: L.LeafletEvent): PointStyle => {
     const [color, fillColor, opacity] = obj.icon.options.attribution.split(' ');
     return { color, fillColor, opacity };
   }
-  // const { color, fillColor, opacity } = obj?.color ? obj : obj.icon.options.attribution.split(' ');
-  // console.log(color, fillColor, opacity);
-  // return { color, fillColor, opacity };
 };
 
 const createLatestPingIcon = (fillColor: string, color = '#000', opacity = defaultPointStyle.opacity): L.DivIcon => {
@@ -145,105 +142,16 @@ const setupPingOptions = (
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
         closeHandler(e);
-        e.target.setStyle({ ...e.target.prevStyle, fillOpacity: e.target.prevStyle.opacity });
+        // e.target.setStyle({ ...e.target.prevStyle, fillOpacity: e.target.prevStyle.opacity });
       });
       marker.on('click', (e) => {
         clickHandler(e);
-        e.target.setStyle(selectedPointStyle());
+        // e.target.setStyle(selectedPointStyle());
       });
       return marker;
     }
   };
 };
-
-// const highlightLatestPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
-//   layer.eachLayer((p: any) => {
-//     const feature = p.feature;
-//     if (typeof p.setIcon === 'function') {
-//       if (selectedIDs.includes(feature.id)) {
-//         p.setIcon(latestSelectedPingIcon);
-//       } else {
-//         p.setIcon(createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature)));
-//       }
-//     }
-//   });
-// };
-
-// const highlightPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
-//   layer.eachLayer((p: any) => {
-//     const feature = p.feature;
-//     if (typeof p.setStyle === 'function') {
-//       p.setStyle({
-//         weight: 1.0,
-//         color: getOutlineColor(feature),
-//         fillColor: getFillColorByStatus(feature, selectedIDs.includes(feature.id))
-//       });
-//     }
-//   });
-// };
-
-// const focusPings = (layer: L.GeoJSON, critter_id: string, mfv: MapFormValue = null): void => {
-//   layer.eachLayer((p: any) => {
-//     // console.log(p)
-//     const feature = p.feature;
-//     if (!(critter_id === feature.properties.critter_id)) {
-//       if (typeof p.setStyle === 'function') {
-//         // p.setStyle({ opacity: 0.1, fillOpacity: 0.08 }); // drop opacity
-//         p.setStyle({ fillColor: MAP_COLOURS['unassigned point'], color: MAP_COLOURS_OUTLINE.point }); // greyed out
-//       } else if (typeof p.setIcon === 'function') {
-//         // p.setIcon(createLatestPingIcon(getFillColorByStatus(p.feature), getOutlineColor(p.feature), 0.08)); // drop opacity
-//         p.setIcon(createLatestPingIcon(MAP_COLOURS['unassigned point'], MAP_COLOURS_OUTLINE.point, 1)); // greyed out
-//       }
-//     } else {
-//       if (typeof p.setStyle === 'function') {
-//         p.setStyle({ color: MAP_COLOURS.selected }); // yellow halo
-//         p.bringToFront();
-//       } else if (typeof p.setIcon === 'function') {
-//         p.setIcon(createLatestPingIcon(mfv ? getSymbolizeColours(mfv, feature).fillColor : getFillColorByStatus(p.feature), MAP_COLOURS.selected, 1)); // yellow halo
-//       }
-//     }
-//   });
-// };
-
-const focusTracks = (tracks: L.GeoJSON, critter_id: string): void => {
-  tracks.eachLayer((track: any) => {
-    if (track.feature.properties.critter_id !== critter_id) {
-      // console.log('critter: ', track.feature.properties.critter_id)
-      track.setStyle({ color: MAP_COLOURS['unassigned point'] })
-    }
-  });
-  tracks.setZIndex(0);
-};
-
-const getSymbolizeColours = (mfv: MapFormValue, feature: ITelemetryPoint): { fillColor: string; color: string } => {
-  const { header, values } = mfv;
-  const isDeviceID = header === DEFAULT_MFV.header;
-  const attr = feature.properties[header];
-  const fillColor = values.find((val) => val.id === attr)?.colour;
-  const color = isDeviceID ? getOutlineColor(feature) : MAP_COLOURS.outline;
-  return { fillColor, color };
-};
-
-// const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue, includeLatest: boolean, opacity: number): void => {
-//   layer.eachLayer((p: any) => {
-//     const { color, fillColor } = getSymbolizeColours(mfv, p.feature);
-//     if (typeof p.setStyle === 'function' && color && fillColor) {
-//       p.setStyle({
-//         weight: 1.0,
-//         color,
-//         fillColor,
-//         opacity,
-//         fillOpacity: opacity
-//       });
-//     }
-//     if (typeof p.setIcon === 'function') {
-//       const { fillColor, color } = getSymbolizeColours(mfv, p.feature);
-//       includeLatest
-//         ? p.setIcon(createLatestPingIcon(fillColor, color, opacity))
-//         : p.setIcon(createLatestPingIcon(getFillColorByStatus(p.feature), getOutlineColor(p.feature), opacity));
-//     }
-//   });
-// };
 
 // tracks setup
 const setupTracksOptions = (tracks: L.GeoJSON): void => {
@@ -274,18 +182,13 @@ const setupSelectedPings = (): L.GeoJSONOptions => {
 };
 
 export {
-  // highlightPings,
-  // highlightLatestPings,
   createLatestPingIcon,
   defaultPointStyle,
   setupSelectedPings,
   setupLatestPingOptions,
   setupTracksOptions,
   setupPingOptions,
-  // symbolizePings,
   getStyle,
   selectedPointStyle,
-  // focusPings,
-  focusTracks,
   animalColoredPointStyle
 };

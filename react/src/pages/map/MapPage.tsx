@@ -19,48 +19,29 @@ import MapLayerToggleControl from 'pages/map/MapLayerToggle';
 import MapOverView from 'pages/map/MapOverview';
 import MapDetails from 'pages/map/details/MapDetails';
 import {
-  MAP_COLOURS,
-  MAP_COLOURS_OUTLINE,
   applyFilter,
-  fillPoint,
-  getFillColorByStatus,
   getLast10Fixes,
   getUniqueCritterIDsFromSelectedPings,
   groupFilters,
-  parseAnimalColour,
   splitPings,
   updatePings
 } from 'pages/map/map_helpers';
 import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import {
-  createLatestPingIcon,
-  // focusPings,
-  // focusTracks,
-  getStyle,
-  // highlightLatestPings,
-  // highlightPings,
   setupLatestPingOptions,
   setupPingOptions,
   setupSelectedPings,
   setupTracksOptions
-  // symbolizePings
 } from 'pages/map/point_setup';
 import AddUDF from 'pages/udf/AddUDF';
 import React, { useEffect, useRef, useState } from 'react';
 import { ICodeFilter } from 'types/code';
 import { BCTWType } from 'types/common_types';
-import {
-  ITelemetryDetail,
-  ITelemetryLine,
-  ITelemetryPoint,
-  MapFormValue,
-  MapRange,
-  OnlySelectedCritters
-} from 'types/map';
+import { ITelemetryDetail, ITelemetryLine, ITelemetryPoint, MapRange, OnlySelectedCritters } from 'types/map';
 import { eUDFType } from 'types/udf';
 import { formatDay, getToday } from 'utils/time';
 import { TaxonProvider } from 'contexts/TaxonContext';
-import { MarkerProvider, createMarkers, updateLayers, useMapState } from './MapMarkerContext';
+import { MarkerProvider, createMarkers, updateLayers, useMarkerStates } from './MapMarkerContext';
 
 export default function MapPage(): JSX.Element {
   return (
@@ -93,7 +74,6 @@ export function Map(): JSX.Element {
   const [tracksLayer] = useState<L.GeoJSON<L.Polyline>>(new L.GeoJSON()); // Store Tracks
   const [pingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON()); // Store Pings
   const [latestPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON());
-  const [latestUPingsLayer] = useState<L.GeoJSON<L.Point>>(new L.GeoJSON());
 
   // tracks layer state
   const selectedPingsLayer = new L.GeoJSON();
@@ -105,7 +85,6 @@ export function Map(): JSX.Element {
   });
   // pings/tracks state is changed when filters are applied, so use these variables for the 'global' state - used in bottom panel
   const [pings, setPings] = useState<ITelemetryPoint[]>([]);
-  const [selectedPingIDs, setSelectedPingIDs] = useState<number[]>([]);
 
   // holds the most recently fetched pings data
   const [fetchedPings, setFetchedPings] = useState<ITelemetryPoint[]>([]);
@@ -126,13 +105,12 @@ export function Map(): JSX.Element {
   const [onlyLastKnown, setOnlyLastKnown] = useState(false);
   const [onlyLast10, setOnlyLast10] = useState(false);
 
-  const [{ markers, selectedMarkers, selectedCritters, focusedAnimal, symbolizedGroups, opacity }, dispatch] =
-    useMapState();
+  const [markerStates, markerDispatch] = useMarkerStates();
 
   useEffect(() => {
     const layers = [tracksLayer, pingsLayer, latestPingsLayer];
-    updateLayers({ markers, selectedMarkers, selectedCritters, focusedAnimal, symbolizedGroups, opacity }, layers);
-  }, [markers, selectedMarkers, focusedAnimal, symbolizedGroups, opacity]);
+    updateLayers(markerStates, layers);
+  }, [markerStates]);
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
@@ -146,7 +124,7 @@ export function Map(): JSX.Element {
     isError: isErrorPings,
     data: baseFetchedPings
   } = api.usePings(start, end);
-  // const { isError: isErrorUPings, data: fetchedUnassignedPings } = api.useUnassignedPings(start, end);
+
   const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
 
   // Update the fetchedPings using helper function to instantiate TelemetryDetail classes
@@ -160,7 +138,6 @@ export function Map(): JSX.Element {
   useEffect(() => {
     // wipe the attribute panel state on refresh
     setOnlySelected({ show: false, critter_ids: [] });
-    setSelectedPingIDs([]);
     clearLayers();
   }, [range]);
 
@@ -201,7 +178,7 @@ export function Map(): JSX.Element {
     };
     update();
     const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
-    dispatch({ type: 'SET_MARKERS', markers: markerData });
+    markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   }, [fetchedPings]);
 
   // assigned tracks
@@ -219,7 +196,7 @@ export function Map(): JSX.Element {
       }
     }
     const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
-    dispatch({ type: 'SET_MARKERS', markers: markerData });
+    markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   }, [fetchedTracks]);
 
   // when one of the map only filters are applied, set the state
@@ -235,7 +212,7 @@ export function Map(): JSX.Element {
         initMap(
           mapRef,
           drawnItems,
-          selectedPingsLayer,
+          // selectedPingsLayer,
           handleDrawShape,
           handleDrawLine,
           handleDeleteLine,
@@ -261,11 +238,10 @@ export function Map(): JSX.Element {
     const layer = event.target;
     const feature: ITelemetryPoint = layer?.feature;
     setPopupInnerHTML(feature);
-    event.target.prevStyle = getStyle(event);
+    // event.target.prevStyle = getStyle(event);
     // set the feature id state so bottom panel will highlight the row
-    setSelectedPingIDs([feature.id]);
-    dispatch({ type: 'SELECT_MARKER', id: feature.id });
-    dispatch({ type: 'SELECT_CRITTERS', ids: [feature.properties.critter_id] });
+    markerDispatch({ type: 'SELECT_MARKER', id: feature.id });
+    markerDispatch({ type: 'SELECT_CRITTERS', ids: [feature.properties.critter_id] });
   };
 
   /**
@@ -276,9 +252,8 @@ export function Map(): JSX.Element {
     hidePopup();
 
     // unhighlight them in bottom table
-    setSelectedPingIDs([]);
-    dispatch({ type: 'UNSELECT_MARKERS', ids: [event.target.feature.id] });
-    dispatch({ type: 'SELECT_CRITTERS', ids: [] });
+    markerDispatch({ type: 'UNSELECT_MARKERS', ids: [event.target.feature.id] });
+    markerDispatch({ type: 'SELECT_CRITTERS', ids: [] });
   };
 
   // handles the drawing and deletion of shapes, setup in map_init
@@ -290,17 +265,14 @@ export function Map(): JSX.Element {
     const pings = pingsLayer.toGeoJSON();
     const overlay = pointsWithinPolygon(pings as any, clipper as any);
     const ids = [...(overlay.features.map((f) => f.id) as number[])];
-    //highlightPings(pingsLayer, ids);
 
     const latestPings = latestPingsLayer.toGeoJSON();
     const overlayLatest = pointsWithinPolygon(latestPings as any, clipper as any);
     const latestIds = [...(overlayLatest.features.map((f) => f.id) as number[])];
-    //highlightLatestPings(latestPingsLayer, latestIds);
 
     // highlight these rows in bottom panel
-    //setSelectedPingIDs([...ids, ...latestIds]);
-    dispatch({ type: 'SELECT_MARKERS', ids: [...ids, ...latestIds] });
-    dispatch({
+    markerDispatch({ type: 'SELECT_MARKERS', ids: [...ids, ...latestIds] });
+    markerDispatch({
       type: 'SELECT_CRITTERS',
       ids: [
         ...overlay.features.map((f) => f.properties.critter_id),
@@ -310,7 +282,7 @@ export function Map(): JSX.Element {
   };
 
   const handleDeleteLayer = (): void => {
-    dispatch({ type: 'RESET_SELECTION' });
+    markerDispatch({ type: 'RESET_SELECTION' });
   };
 
   // note: using L.Layergroup isn't removing marker
@@ -350,7 +322,7 @@ export function Map(): JSX.Element {
     pingsLayer.addData(other as any);
     tracksLayer.addData(newTracks as any);
     const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
-    dispatch({ type: 'SET_MARKERS', markers: markerData });
+    markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   };
 
   // redraw only pings, if no params supplied it will default the fetched ones
@@ -363,7 +335,6 @@ export function Map(): JSX.Element {
     latestPingsLayer.clearLayers();
     pingsLayer.addData(other as any);
     latestPingsLayer.addData(latest as any);
-    // selectedPingIDs.forEach((f) => fillPoint(f, true));
   };
 
   // redraw only tracks
@@ -373,11 +344,6 @@ export function Map(): JSX.Element {
     tracksLayer.clearLayers();
     tracksLayer.addData(newTracks as any);
   };
-
-  // const handleApplyChangesFromSymbolizePanel = (mfv: MapFormValue, includeLatest: boolean, opacity: number): void => {
-  //   symbolizePings(pingsLayer, mfv, includeLatest, opacity);
-  //   symbolizePings(latestPingsLayer, mfv, includeLatest, opacity);
-  // };
 
   // triggered when side-panel filters are applied
   const handleApplyChangesFromFilterPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
@@ -502,9 +468,8 @@ export function Map(): JSX.Element {
   };
 
   const getAssignedLayers = (): L.Layer[] => [latestPingsLayer, pingsLayer, tracksLayer];
-  // const getUnassignedLayers = (): L.Layer[] => [latestUPingsLayer];
   const getTracksLayers = (): L.Layer[] => [tracksLayer];
-  const getPingLayers = (): L.Layer[] => [pingsLayer, latestPingsLayer, latestUPingsLayer];
+  const getPingLayers = (): L.Layer[] => [pingsLayer, latestPingsLayer];
 
   /**
    * when device assignment status select dropdown is changed
@@ -540,29 +505,21 @@ export function Map(): JSX.Element {
   // Add the tracks layer
   useEffect(() => {
     tracksLayer.addTo(mapRef.current);
+    console.log('tracksLayer')
   }, [tracksLayer]);
-
-  // useEffect(() => {
-  //   unassignedTracksLayer.addTo(mapRef.current);
-  //   unassignedTracksLayer.on('add', (l) => l.target.bringToBack());
-  // }, [unassignedTracksLayer]);
 
   // Add the ping layers
   useEffect(() => {
-    // cluster.addLayer(pingsLayer);
-    // cluster.addTo(mapRef.current);
     pingsLayer.addTo(mapRef.current);
+    console.log('pingsLayer')
+
   }, [pingsLayer]);
 
   useEffect(() => {
-    // cluster.addLayer(latestPingsLayer);
-    // cluster.addTo(mapRef.current);
     latestPingsLayer.addTo(mapRef.current);
-  }, [latestPingsLayer]);
+    console.log('latestPingsLayer')
 
-  // useEffect(() => {
-  //   unassignedPingsLayer.addTo(mapRef.current);
-  // }, [unassignedPingsLayer]);
+  }, [latestPingsLayer]);
 
   // todo: move this to separate component / wrapper
   // resizable state & handlers
@@ -603,14 +560,12 @@ export function Map(): JSX.Element {
           pings={pings ?? []}
           onApplySearch={handleApplyChangesFromSearchPanel}
           onApplyFilters={handleApplyChangesFromFilterPanel}
-          onApplySymbolize={() => {}} // TODO: remove
           onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
           // todo: trigger when filter panel transition is completed without timeout
           onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
           onShowLatestPings={handleShowLastKnownLocation}
           onShowLastFixes={handleShowLast10Fixes}
           isFetching={isLoadingPings}
-          // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
         />
         <div className={'map-container'}>
           {isLoadingPings ? <CircularProgress className='progress' color='secondary' /> : null}
@@ -634,11 +589,8 @@ export function Map(): JSX.Element {
             <MapDetails
               pings={[...pings]}
               unassignedPings={[]}
-              selectedAssignedIDs={selectedPingIDs}
               handleShowOnlySelected={handleShowOnlySelected}
               handleShowOverview={handleShowOverview}
-              handleRowSelected={() => {}} // TODO: remove these
-              handleRowHovered={() => {}}
               showExportModal={showExportModal}
               setShowExportModal={setShowExportModal}
               timeRange={range}
