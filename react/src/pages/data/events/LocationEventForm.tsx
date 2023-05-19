@@ -68,7 +68,7 @@ export default function LocationEventForm({
   return (
     <>
       {children ? (
-        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`}>
+        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`} flex>
           {children}
         </FormSection>
       ) : null}

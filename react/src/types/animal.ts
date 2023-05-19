@@ -344,16 +344,21 @@ markingFields: [
     {prop: 'frequency', type: eInputType.number, ...isRequired},
     {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
     {prop: 'identifier', type: eInputType.text},
-    {prop: 'order', type: eInputType.number},
+    // {prop: 'order', type: eInputType.number},
     {prop: 'attached_timestamp', type: eInputType.datetime, ...isRequired},
-    {prop: 'removed_timestamp', type: eInputType.datetime},
     {prop: 'body_location', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations', ...isRequired},
     {prop: 'marking_material', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
     {prop: 'primary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
     {prop: 'secondary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
     {prop: 'text_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'removed_timestamp', type: eInputType.datetime},
     {prop: 'comment', type: eInputType.multiline},
+
   ],
+  removedFields: [
+    {prop: 'removed_timestamp', type: eInputType.datetime},
+    {prop: 'comment', type: eInputType.multiline},
+  ]
   // frequencyFields: [
   //   {prop: 'frequency', type: eInputType.number, ...isRequired},
   //   {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},

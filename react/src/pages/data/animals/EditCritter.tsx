@@ -82,9 +82,9 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 <FormSection id='identifiers' header='Identifiers'>
                   {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
                 </FormSection>
-                <FormSection id='characteristics' header='Characteristics'>
+                {/* <FormSection id='characteristics' header='Characteristics'>
                   {characteristicsFields?.map((f) => CreateFormField(editing, f, onChange))}
-                </FormSection>
+                </FormSection> */}
               </FormSection>
               <FormSection
                 id='c-deets'

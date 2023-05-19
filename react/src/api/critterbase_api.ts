@@ -18,7 +18,6 @@ export const critterbaseApi = (props: ApiProps): API => {
   ): Promise<Array<ICbSelect | string>> => {
     const route = CbRoutes[cbRouteKey];
     const q = asSelect ? (query ? `${selectFormat}&${query}` : `${selectFormat}`) : `?${query}`;
-    console.log(q);
     const { data } = await api.get(`${route}${q}`);
     return data;
   };

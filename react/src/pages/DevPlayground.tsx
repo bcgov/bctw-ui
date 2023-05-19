@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper, Theme, Typography } from '@mui/material';
+import { Box, Button, Grid, Paper, TextField, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { plainToClass } from 'class-transformer';
 import { SubHeader } from 'components/common/partials/SubHeader';
@@ -7,7 +7,7 @@ import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitI
 import { CbMarkingInput, CbMarkings } from 'critterbase/components/CbMarkingInputs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
-import { AttachedCritter, Critter } from 'types/animal';
+import { AttachedCritter, Critter, IMarking } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { editObjectToEvent } from 'types/events/event';
 import MortalityEvent from 'types/events/mortality_event';
@@ -57,10 +57,11 @@ const editCritter = editObjectToEvent(
     ],
     marking: [
       {
+        marking_id: 'a',
         identifier: 'id 1',
         marking_type: '9374d061-e2c2-4be8-9714-1962ceddd70e',
         order: 1,
-        body_location: 'ec06df9b-1082-4178-a25d-2cec7e9025af',
+        // body_location: 'ec06df9b-1082-4178-a25d-2cec7e9025af',
         marking_material: 'e1fc271d-c175-4647-a2fc-7a62c8fa2a0a',
         primary_colour: '366b3697-cb9e-4d48-8858-e4d8aefa9147',
         secondary_colour: '366b3697-cb9e-4d48-8858-e4d8aefa9147',
@@ -147,6 +148,10 @@ const DevPlayground = (): JSX.Element => {
             handleChange={(v) => console.log(v)}
           /> */}
           <CbMarkings taxon_id={editCritter.taxon_id} markings={editCritter.marking} />
+          <Box display='flex'>
+            <TextField />
+            <TextField style={{ flexGrow: 1 }} />
+          </Box>
         </Box>
         <ModifyCritterWrapper editing={editCritter}>
           <EditCritter
