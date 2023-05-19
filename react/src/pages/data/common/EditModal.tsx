@@ -63,7 +63,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     onSave,
     onReset,
     headerComponent,
-    disableHistory = false,
+    disableHistory = true,
     hideSave = false,
     disableTabs = false,
     showInFullScreen = true
@@ -219,7 +219,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
                   <Tab label='Details' {...a11yProps(0)} />
                   {!disableHistory ? <Tab label='History' {...a11yProps(1)} /> : null}
                 </Tabs> */}
-                <PageTabs tabLabels={['Details', 'History']}>
+                <PageTabs tabLabels={['Details']}>
                   {/* tab 1 */}
                   <Box>
                     {children}

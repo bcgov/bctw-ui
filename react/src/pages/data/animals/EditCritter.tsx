@@ -129,7 +129,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   );
 
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit || busySaving} {...props} editing={editing} onSave={critterbaseSave}>
+    <EditModal disableHistory={true} headerComponent={Header} hideSave={!canEdit || busySaving} {...props} editing={editing} onSave={critterbaseSave}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
