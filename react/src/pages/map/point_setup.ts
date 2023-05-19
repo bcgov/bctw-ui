@@ -142,11 +142,11 @@ const setupPingOptions = (
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
         closeHandler(e);
-        // e.target.setStyle({ ...e.target.prevStyle, fillOpacity: e.target.prevStyle.opacity });
+        e.target.setStyle({ ...e.target.prevStyle, fillOpacity: e.target.prevStyle?.opacity ?? 0.9 });
       });
       marker.on('click', (e) => {
         clickHandler(e);
-        // e.target.setStyle(selectedPointStyle());
+        e.target.setStyle(selectedPointStyle());
       });
       return marker;
     }
@@ -189,6 +189,4 @@ export {
   setupTracksOptions,
   setupPingOptions,
   getStyle,
-  selectedPointStyle,
-  animalColoredPointStyle
 };
