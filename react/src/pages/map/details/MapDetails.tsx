@@ -76,7 +76,7 @@ export default function MapDetails({
   }, [showOnlySelected]);
 
   useEffect(() => {
-    setPingGroupChecked(groupPings([...pings, ...unassignedPings].filter((f) => selectedMarkers.includes(f.id))))
+    setPingGroupChecked(groupPings([...pings, ...unassignedPings].filter((f) => selectedMarkers.has(f.id))))
   }, [selectedMarkers])
 
   // upon rows checked in each row, note: unassigned IDs are negative integers

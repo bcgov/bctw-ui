@@ -109,7 +109,7 @@ export function Map(): JSX.Element {
 
   useEffect(() => {
     const layers = [tracksLayer, pingsLayer, latestPingsLayer];
-    updateLayers(markerStates, layers);
+    updateLayers(markerStates);//, layers);
   }, [markerStates]);
 
   // store the selection shapes
@@ -198,6 +198,11 @@ export function Map(): JSX.Element {
     const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   }, [fetchedTracks]);
+
+  useEffect(() => {
+    const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
+    markerDispatch({ type: 'SET_MARKERS', markers: markerData });
+  }, [pings])
 
   // when one of the map only filters are applied, set the state
   useEffect(() => {
@@ -347,11 +352,6 @@ export function Map(): JSX.Element {
 
   // triggered when side-panel filters are applied
   const handleApplyChangesFromFilterPanel = (newRange: MapRange, filters: ICodeFilter[]): void => {
-    // if the timerange was changed, update that first. will trigger refetch
-    /*if (newRange.start !== range.start || newRange.end !== range.end) {
-      setRange(newRange);
-    }*/
-    // otherwise, update the filter state and apply the filters
     setFilters(filters);
     applyFiltersToPings(filters);
   };
