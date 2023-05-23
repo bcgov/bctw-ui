@@ -41,7 +41,7 @@ import { ITelemetryDetail, ITelemetryLine, ITelemetryPoint, MapRange, OnlySelect
 import { eUDFType } from 'types/udf';
 import { formatDay, getToday } from 'utils/time';
 import { TaxonProvider } from 'contexts/TaxonContext';
-import { MarkerProvider, createMarkers, updateLayers, useMarkerStates } from './MapMarkerContext';
+import { MarkerProvider, createMarkersState, updateLayers, useMarkerStates } from './MapMarkerContext';
 
 export default function MapPage(): JSX.Element {
   return (
@@ -177,7 +177,7 @@ export function Map(): JSX.Element {
       }
     };
     update();
-    const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
+    const markerData = createMarkersState(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   }, [fetchedPings]);
 
@@ -195,12 +195,12 @@ export function Map(): JSX.Element {
         tracksLayer.addData(fetchedTracks as any);
       }
     }
-    const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
+    const markerData = createMarkersState(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   }, [fetchedTracks]);
 
   useEffect(() => {
-    const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
+    const markerData = createMarkersState(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   }, [pings])
 
@@ -326,7 +326,7 @@ export function Map(): JSX.Element {
     latestPingsLayer.addData(latest as any);
     pingsLayer.addData(other as any);
     tracksLayer.addData(newTracks as any);
-    const markerData = createMarkers(tracksLayer, pingsLayer, latestPingsLayer);
+    const markerData = createMarkersState(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   };
 

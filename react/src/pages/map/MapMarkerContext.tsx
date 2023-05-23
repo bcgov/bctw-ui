@@ -1,21 +1,24 @@
 import React, { createContext, useReducer, useContext } from 'react';
 import { MAP_COLOURS, MAP_COLOURS_OUTLINE, getFillColorByStatus, parseAnimalColour } from './map_helpers';
-import { LineString, MultiLineString } from 'geojson';
 import { createLatestPingIcon } from './point_setup';
-import { Layer } from 'leaflet';
+
+type MarkerColor = {
+  fillColor: string;
+  color: string;
+  opacity: number;
+};
 
 type Marker = {
   id: number | string;
   critter_id: string;
-  fillColor: string;
-  color: string;
+  baseColor: MarkerColor;
+  currentColor: MarkerColor;
   type: 'CircleMarker' | 'Divicon' | 'Polyline';
-  markerRef: Layer;
+  markerRef: L.CircleMarker | L.Polyline | L.Marker;
 };
 
 type MarkerState = {
   markers: Marker[];
-  // markerLookup: Record<string, Marker>;
   opacity: number;
   selectedMarkers: Set<number | string>; // ids of selected markers
   selectedCritters: string[];
@@ -96,7 +99,6 @@ const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerSt
 export const MarkerProvider: React.FC = ({ children }) => {
   const [markerState, markerDispatch] = useReducer(markerReducer, {
     markers: [],
-    // markerLookup: {},
     opacity: 0.9,
     selectedMarkers: new Set() as Set<string | number>,
     selectedCritters: [],
@@ -115,34 +117,46 @@ export const useMarkerStates = (): [MarkerState, React.Dispatch<MarkerAction>] =
   return context;
 };
 
-export const createMarkers = (tracks: L.GeoJSON, pings: L.GeoJSON, latestPings: L.GeoJSON): Marker[] => {
+export const createMarkersState = (tracks: L.GeoJSON, pings: L.GeoJSON, latestPings: L.GeoJSON): Marker[] => {
   const markerData: Marker[] = [];
   tracks.eachLayer((track: any) => {
+    const color = { ...parseAnimalColour(track.feature.properties.map_colour), opacity: 0.9 };
     markerData.push({
       id: track.feature.properties.critter_id,
       critter_id: track.feature.properties.critter_id,
       type: 'Polyline',
-      ...parseAnimalColour(track.feature.properties.map_colour),
+      baseColor: color,
+      currentColor: color,
       markerRef: track
     });
   });
   pings.eachLayer((ping: any) => {
+    const color = {
+      fillColor: getFillColorByStatus(ping.feature),
+      color: parseAnimalColour(ping.feature.properties.map_colour).color,
+      opacity: 0.9
+    };
     markerData.push({
       id: ping.feature.id,
       critter_id: ping.feature.properties.critter_id,
       type: 'CircleMarker',
-      fillColor: getFillColorByStatus(ping.feature),
-      color: parseAnimalColour(ping.feature.properties.map_colour).color,
+      baseColor: color,
+      currentColor: color,
       markerRef: ping
     });
   });
   latestPings.eachLayer((ping: any) => {
+    const color = {
+      fillColor: getFillColorByStatus(ping.feature),
+      color: parseAnimalColour(ping.feature.properties.map_colour).color,
+      opacity: 0.9
+    };
     markerData.push({
       id: ping.feature.id,
       critter_id: ping.feature.properties.critter_id,
       type: 'Divicon',
-      fillColor: getFillColorByStatus(ping.feature),
-      color: parseAnimalColour(ping.feature.properties.map_colour).color,
+      baseColor: color,
+      currentColor: color,
       markerRef: ping
     });
   });
@@ -151,138 +165,87 @@ export const createMarkers = (tracks: L.GeoJSON, pings: L.GeoJSON, latestPings: 
 };
 
 
-const updateMarker = (marker, fillColor, color, toFront, opacity, type) => {
-  switch (type) {
-
-    case 'CircleMarker':
-      if ((toFront || fillColor !== marker.options.fillColor || color !== marker.options.color || opacity !== marker.options.opacity || opacity !== marker.options.fillOpacity) && typeof marker.setStyle === 'function') {
+const updateMarker = (marker, fillColor, color, toFront, opacity, type): void => {
+  const markerStyles = {
+    CircleMarker: (): void => {
+      if (typeof marker.setStyle === 'function') {
         marker.setStyle({
           color: color,
           fillColor: fillColor,
           opacity,
           fillOpacity: opacity
         });
-        toFront? marker.bringToFront() : null
       }
-      return
-
-    case 'Divicon': 
-      if ((fillColor !== marker.options.fillColor || color !== marker.options.color || opacity !== marker.options.opacity || opacity !== marker.options.fillOpacity) && typeof marker.setIcon === 'function') {
+      if (toFront && typeof marker.bringToFront === 'function') {
+        marker.bringToFront();
+      }
+    },
+    Divicon: (): void => {
+      if (typeof marker.setIcon === 'function') {
         marker.setIcon(createLatestPingIcon(fillColor, color, opacity));
       }
-      return
-
-    case 'Polyline': 
-      if (fillColor !== marker.options.color && typeof marker.setStyle === 'function') {
+    },
+    Polyline: (): void => {
+      if (typeof marker.setStyle === 'function') {
         marker.setStyle({ color: fillColor });
       }
-      return
-  }
-}
+    }
+  };
 
+  const styleStrategy = markerStyles[type];
+  if (styleStrategy) {
+    styleStrategy();
+  }
+};
+
+/**
+ * This function updates the styles of all map layers based on the current marker states.
+ *
+ * @param {MarkerState} markerStates - The current states of the map markers.
+ */
 export const updateLayers = (markerStates: MarkerState): void => {
   const { markers, symbolizedGroups, selectedMarkers, focusedCritter, opacity } = markerStates;
 
+  const isSymbolized = (marker): boolean =>
+    symbolizedGroups[marker.critter_id] &&
+    (marker.type === 'CircleMarker' ||
+      (marker.type === 'Divicon' && symbolizedGroups[marker.critter_id]?.applyToLatest));
+
+  const isHighlight = (marker): boolean => focusedCritter === marker.critter_id || selectedMarkers.has(marker.id);
+
+  const isHidden = (marker): boolean => focusedCritter && focusedCritter !== marker.critter_id;
+
+  const requiresUpdate = (currentColor, newColor): boolean =>
+    currentColor.fillColor !== newColor.fillColor ||
+    currentColor.color !== newColor.color ||
+    currentColor.opacity !== newColor.opacity;
+
   markers.forEach((marker) => {
-    
-      // Default styling
-      let fillColor = marker.fillColor;
-      let outlineColor = marker.color;
-      let toFront = false;
+    let { fillColor, color } = marker.baseColor;
+    let toFront = false;
 
-      // Symbolize styling
-      if (
-        symbolizedGroups[marker.critter_id] &&
-        (marker.type === 'CircleMarker' ||
-          (marker.type === 'Divicon' && symbolizedGroups[marker.critter_id].applyToLatest))
-      ) {
-        fillColor = symbolizedGroups[marker.critter_id].color; // symbolized color
-        outlineColor = MAP_COLOURS.outline;
-      }
+    // Apply symbolized styling
+    if (isSymbolized(marker)) {
+      fillColor = symbolizedGroups[marker.critter_id]?.color; // symbolized color
+      color = MAP_COLOURS.outline;
+    }
 
-      // Selected OR Row-Hovered styling
-      if (focusedCritter === marker.critter_id || selectedMarkers.has(marker.id)) {
-        outlineColor = MAP_COLOURS.selected; // focused color
-        toFront = true;
-      }
+    // Apply selected or row-hovered styling
+    if (isHighlight(marker)) {
+      color = MAP_COLOURS.selected; // focused color
+      toFront = true;
+    }
 
-      // Greyed-out styling
-      if (focusedCritter && focusedCritter !== marker.critter_id) {
-        fillColor = MAP_COLOURS['unassigned point']; // hidden color
-        outlineColor = MAP_COLOURS_OUTLINE['unassigned point'];
-      }
+    // Apply greyed-out styling
+    if (isHidden(marker)) {
+      fillColor = MAP_COLOURS['unassigned point']; // hidden color
+      color = MAP_COLOURS_OUTLINE['unassigned point'];
+    }
 
-      updateMarker(marker.markerRef, fillColor, outlineColor, toFront, opacity, marker.type);
-  })
-}
-
-
-// const createMarkerLookup = (markers: Marker[]): Record<string, Marker> => {
-//   return markers.reduce((acc, marker) => {
-//     acc[marker.id] = marker;
-//     return acc;
-//   }, {});
-// };
-
-// export const updateLayers = (
-//   markerStates: MarkerState,
-//   layers: (L.GeoJSON<L.Polyline<LineString | MultiLineString, any>> | L.GeoJSON<L.Point>)[]
-// ): void => {
-//   const { markerLookup, symbolizedGroups, selectedMarkers, focusedCritter, opacity } = markerStates;
-
-//   console.log(markerStates.markers)
-
-//   layers.forEach((layer) => {
-//     layer.eachLayer((layerMarker: any) => {
-//       const state = markerLookup[(layerMarker as any).feature.id ?? (layerMarker as any).feature.properties.critter_id];
-
-//       if (!state) return;
-
-//       // Default styling
-//       let fillColor = state.fillColor;
-//       let outlineColor = state.color;
-//       let position = null;
-
-//       // Symbolize styling
-//       if (
-//         symbolizedGroups[state.critter_id] &&
-//         (state.type === 'CircleMarker' ||
-//           (state.type === 'Divicon' && symbolizedGroups[state.critter_id].applyToLatest))
-//       ) {
-//         fillColor = symbolizedGroups[state.critter_id].color; // symbolized color
-//         outlineColor = MAP_COLOURS.outline;
-//       }
-
-//       // Selected OR Row-Hovered styling
-//       if (focusedCritter === state.critter_id || selectedMarkers.has(state.id)) {
-//         outlineColor = MAP_COLOURS.selected; // focused color
-//         position = 'front';
-//       }
-
-//       // Greyed-out styling
-//       if (focusedCritter && focusedCritter !== state.critter_id) {
-//         fillColor = MAP_COLOURS['unassigned point']; // hidden color
-//         outlineColor = MAP_COLOURS_OUTLINE['unassigned point'];
-//         position = 'back';
-//       }
-
-//       // Apply the finalized styling
-//       if (state.type === 'Divicon' && typeof layerMarker.setIcon === 'function') {
-//         (layerMarker as L.Marker).setIcon(createLatestPingIcon(fillColor, outlineColor, opacity));
-//       } else if (state.type === 'CircleMarker' && typeof layerMarker.setStyle === 'function') {
-//         (layerMarker as L.CircleMarker).setStyle({
-//           color: outlineColor,
-//           fillColor: fillColor,
-//           opacity,
-//           fillOpacity: opacity
-//         });
-//         if (position)
-//           position === 'front'
-//             ? (layerMarker as L.CircleMarker)?.bringToFront()
-//             : (layerMarker as L.CircleMarker)?.bringToBack();
-//       } else if (state.type === 'Polyline') {
-//         (layerMarker as L.Polyline).setStyle({ color: fillColor });
-//       }
-//     });
-//   });
-// };
+    // Determine if update is needed
+    if (requiresUpdate(marker.currentColor, { fillColor, color, opacity })) {
+      marker.currentColor = { fillColor, color, opacity };
+      updateMarker(marker.markerRef, fillColor, color, toFront, opacity, marker.type);
+    }
+  });
+};
