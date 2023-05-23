@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 
-export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
+export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey; query?: string };
 export const CbSelect = ({
   cbRouteKey,
   value,
@@ -18,7 +18,7 @@ export const CbSelect = ({
   label,
   disabled,
   query
-}: CbSelectProps & { query?: string }): JSX.Element => {
+}: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey, query);
   const [selected, setSelected] = useState<uuid | string>('');

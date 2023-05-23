@@ -2,7 +2,7 @@ import { CbRouters, CbRoutes, detailedFormat, selectFormat } from 'critterbase/r
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { API, ApiProps, IUpsertPayload } from './api_interfaces';
 import { uuid } from 'types/common_types';
-import { Critter } from 'types/animal';
+import { Critter, IMarking } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { CbPayload } from 'types/events/event';
 
@@ -28,8 +28,14 @@ export const critterbaseApi = (props: ApiProps): API => {
     return data;
   };
 
+  const deleteMarking = async (marking_id: uuid): Promise<IMarking> => {
+    const { data } = await api.delete(`${CbRouters.markings}/${marking_id}`);
+    return data;
+  };
+
   return {
     getLookupTableOptions,
-    upsertCritter
+    upsertCritter,
+    deleteMarking
   };
 };

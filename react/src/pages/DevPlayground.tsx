@@ -42,12 +42,12 @@ const editCritter = editObjectToEvent(
       }
     ],
     collection_units: [
-      {
-        category_name: 'Population Unit',
-        unit_name: 'Itcha-Ilgachuz',
-        collection_unit_id: 'a87e9e57-6c94-49e9-9aa9-4925833eaed3',
-        collection_category_id: '86552ac7-75aa-4402-bba3-d33b11dc04d7'
-      }
+      // {
+      //   category_name: 'Population Unit',
+      //   unit_name: 'Itcha-Ilgachuz',
+      //   collection_unit_id: 'a87e9e57-6c94-49e9-9aa9-4925833eaed3',
+      //   collection_category_id: '86552ac7-75aa-4402-bba3-d33b11dc04d7'
+      // }
       // {
       //   category_name: 'Dummy Unit',
       //   unit_name: 'Name 1',
@@ -59,17 +59,17 @@ const editCritter = editObjectToEvent(
       {
         marking_id: 'a',
         identifier: 'id 1',
-        marking_type: '9374d061-e2c2-4be8-9714-1962ceddd70e',
+        marking_type: 'f00170b8-853c-466a-917e-2b20ec194d6a',
         order: 1,
         // body_location: 'ec06df9b-1082-4178-a25d-2cec7e9025af',
-        marking_material: 'e1fc271d-c175-4647-a2fc-7a62c8fa2a0a',
-        primary_colour: '366b3697-cb9e-4d48-8858-e4d8aefa9147',
-        secondary_colour: '366b3697-cb9e-4d48-8858-e4d8aefa9147',
-        text_colour: '366b3697-cb9e-4d48-8858-e4d8aefa9147',
+        marking_material: '283fe4cc-0087-408c-8186-24e22d93db28',
+        primary_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
+        secondary_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
+        text_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
         comment: 'marking comment'
       }
     ],
-    taxon_id: '1c891e9a-b374-404a-a075-0f5f34fa1f42',
+    taxon_id: '54063ddc-3845-447f-9c2d-e42a20d73566',
     wlh_id: '12-345',
     sex: 'Male',
     taxon: 'Moose',
@@ -78,7 +78,7 @@ const editCritter = editObjectToEvent(
     wmu_id: '1-10',
     critter_comment: 'this is the critter comment'
   },
-  new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05'),
+  new AttachedCritter('4bd8fe08-f0e1-41fd-99b3-494fab00a763'),
   []
 );
 
@@ -147,15 +147,11 @@ const DevPlayground = (): JSX.Element => {
             marking={editCritter.marking[0]}
             handleChange={(v) => console.log(v)}
           /> */}
-          <CbMarkings
+          {/* <CbMarkings
             taxon_id={editCritter.taxon_id}
             markings={editCritter.marking}
             handleMarkings={(m) => console.log(m)}
-          />
-          <Box display='flex'>
-            <TextField />
-            <TextField style={{ flexGrow: 1 }} />
-          </Box>
+          /> */}
         </Box>
         <ModifyCritterWrapper editing={editCritter}>
           <EditCritter

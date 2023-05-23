@@ -1,10 +1,11 @@
-import { Button, Typography } from '@mui/material';
+import { Box, Button, Divider, Typography } from '@mui/material';
 import { Icon, Modal } from 'components/common';
 import { CreateFormField, getInputFnFromType } from 'components/form/create_form_components';
 import OkayModal from 'components/modal/OkayModal';
 import { cbInputValue } from 'critterbase/constants';
 import { isCbVal } from 'critterbase/helper_functions';
 import useFormHasError from 'hooks/useFormHasError';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { FormSection, editEventBtnProps } from 'pages/data/common/EditModalComponents';
 import { useEffect, useState } from 'react';
 import { Critter, IMarking, markingFormFields } from 'types/animal';
@@ -63,41 +64,37 @@ export const CbMarkingInput = ({ taxon_id, marking, handleChange, index = 0 }: C
 
 type CbMarkingsProps = {
   markings?: IMarking[];
-  handleMarkings: (markings: IMarking[]) => void;
+  handleMarkings: (markings: IMarking[], error: boolean) => void;
 } & CbMarkingSharedProps;
 
 export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
   const { markings, handleMarkings } = props;
+  const cb_api = useTelemetryApi();
   const [hasErr, checkHasErr, resetErrs] = useFormHasError();
-  const [markingsData, setMarkingsData] = useState<Array<IMarking & { _updated?: boolean }>>(markings ?? []);
+
+  const [markingsData, setMarkingsData] = useState<Array<IMarking & { _delete?: boolean }>>(markings ?? []);
   const [openModal, setOpenModal] = useState(false);
   const [markingId, setMarkingId] = useState<string | undefined>();
 
   const lastMarking = markingsData[markingsData.length - 1];
-  const canAddMarking = (lastMarking || markingsData.length === 0) && !hasErr;
+  const canAddMarking = markingsData.length === 0 || (lastMarking && !hasErr) || markingsData.every((m) => m?._delete);
 
   useEffect(() => {
-    //Strip undefined
-    //Needs to check if error exists before notifying markings handler
-    if (!hasErr) {
-      const markings = markingsData.filter((m) => {
-        delete m?._updated;
-        return m;
-      });
-      handleMarkings(markings);
-    }
-  }, [JSON.stringify(markingsData)]);
+    //Strip undefined markings
+    const markings = markingsData.filter((m) => m);
+    handleMarkings(markings, hasErr);
+    console.log(markings);
+  }, [JSON.stringify(markingsData), hasErr]);
 
   const onChange = (v: InboundObj, idx: number): void => {
     const [key, value, label] = parseFormChangeResult<IMarking>(v);
     checkHasErr(v);
     const updatedMarking = value
-      ? { ...markingsData[idx], [key]: value, _updated: true }
+      ? { ...markingsData[idx], [key]: value }
       : markingsData[idx]
       ? { ...markingsData[idx] }
       : markingsData[idx];
     markingsData[idx] = updatedMarking;
-    // console.log(markingsData);
     setMarkingsData([...markingsData]);
   };
 
@@ -112,11 +109,11 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
     });
   };
 
-  const handleDeleteNewMarking = (idx: number): void => {
+  const handleDeleteMarking = (idx: number): void => {
     const marking = markingsData[idx];
-    //const markingIsEmpty = Object.keys(marking).length === 0;
     const isNewMarking = !marking?.marking_id;
     if (isNewMarking) {
+      //New markings, not yet existing in critterbase can be removed from array.
       removeMarking(idx);
     } else {
       setMarkingId(marking.marking_id);
@@ -124,23 +121,18 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
     }
   };
 
-  const handlePermDeleteMarking = (): void => {
+  const handlePermDeleteMarking = async (): Promise<void> => {
     const idx = markingsData.findIndex((o) => o.marking_id === markingId);
-    console.log('make critterbase request here');
-    removeMarking(idx);
+    //Set _delete property to notify critterbase payload
+    markingsData[idx] = { ...markingsData[idx], _delete: true };
+    setMarkingsData([...markingsData]);
     setOpenModal(false);
   };
+
   return (
     <div>
-      <OkayModal
-        open={openModal}
-        handleClose={setOpenModal}
-        handleOkay={handlePermDeleteMarking}
-        title={'Delete Marking'}
-        children={'This action will permanetly delete this marking'}
-      />
       {markingsData.map((m, i) => {
-        if (m === null) return;
+        if (m?._delete) return null;
         return (
           <FormSection
             id={`marking-${i}`}
@@ -148,10 +140,7 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
             key={`marking-${i}-${m}`}
             flex
             btn={
-              <Button
-                {...editEventBtnProps}
-                onClick={() => handleDeleteNewMarking(i)}
-                startIcon={<Icon icon={'close'} />}>
+              <Button {...editEventBtnProps} onClick={() => handleDeleteMarking(i)} startIcon={<Icon icon={'close'} />}>
                 Delete Marking
               </Button>
             }>
@@ -159,11 +148,27 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
           </FormSection>
         );
       })}
+
       {canAddMarking ? (
-        <Button {...editEventBtnProps} onClick={handleAddMarking} startIcon={<Icon icon={'plus'} />}>
-          Add Marking
-        </Button>
+        <Box component='fieldset'>
+          <Button
+            {...editEventBtnProps}
+            style={{ marginLeft: 0 }}
+            variant='contained'
+            onClick={handleAddMarking}
+            startIcon={<Icon icon={'plus'} />}>
+            Add Marking
+          </Button>
+        </Box>
       ) : null}
+
+      <OkayModal
+        open={openModal}
+        handleClose={setOpenModal}
+        handleOkay={handlePermDeleteMarking}
+        title={'Deleting Marking'}
+        children={'This action will permanetly delete this marking'}
+      />
     </div>
   );
 };
