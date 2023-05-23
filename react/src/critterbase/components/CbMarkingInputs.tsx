@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { Critter, IMarking, markingFormFields } from 'types/animal';
 import { uuid } from 'types/common_types';
 import { FormChangeEvent, InboundObj, parseFormChangeResult } from 'types/form_types';
-import { columnToHeader } from 'utils/common_helpers';
+import { columnToHeader, removeProps } from 'utils/common_helpers';
 type CbMarkingSharedProps = {
   taxon_id: uuid;
 };
@@ -63,28 +63,41 @@ export const CbMarkingInput = ({ taxon_id, marking, handleChange, index = 0 }: C
 
 type CbMarkingsProps = {
   markings?: IMarking[];
+  handleMarkings: (markings: IMarking[]) => void;
 } & CbMarkingSharedProps;
 
 export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
-  const { markings } = props;
+  const { markings, handleMarkings } = props;
   const [hasErr, checkHasErr, resetErrs] = useFormHasError();
-  console.log({ hasErr });
-  const [markingsData, setMarkingsData] = useState<Array<IMarking | null>>(markings ?? []);
+  const [markingsData, setMarkingsData] = useState<Array<IMarking & { _updated?: boolean }>>(markings ?? []);
   const [openModal, setOpenModal] = useState(false);
   const [markingId, setMarkingId] = useState<string | undefined>();
 
   const lastMarking = markingsData[markingsData.length - 1];
   const canAddMarking = (lastMarking || markingsData.length === 0) && !hasErr;
 
+  useEffect(() => {
+    //Strip undefined
+    //Needs to check if error exists before notifying markings handler
+    if (!hasErr) {
+      const markings = markingsData.filter((m) => {
+        delete m?._updated;
+        return m;
+      });
+      handleMarkings(markings);
+    }
+  }, [JSON.stringify(markingsData)]);
+
   const onChange = (v: InboundObj, idx: number): void => {
     const [key, value, label] = parseFormChangeResult<IMarking>(v);
     checkHasErr(v);
     const updatedMarking = value
-      ? { ...markingsData[idx], [key]: value }
+      ? { ...markingsData[idx], [key]: value, _updated: true }
       : markingsData[idx]
       ? { ...markingsData[idx] }
       : markingsData[idx];
     markingsData[idx] = updatedMarking;
+    // console.log(markingsData);
     setMarkingsData([...markingsData]);
   };
 
@@ -119,6 +132,13 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
   };
   return (
     <div>
+      <OkayModal
+        open={openModal}
+        handleClose={setOpenModal}
+        handleOkay={handlePermDeleteMarking}
+        title={'Delete Marking'}
+        children={'This action will permanetly delete this marking'}
+      />
       {markingsData.map((m, i) => {
         if (m === null) return;
         return (
@@ -135,7 +155,7 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
                 Delete Marking
               </Button>
             }>
-            <CbMarkingInput {...props} handleChange={onChange} index={i} marking={m} />
+            <CbMarkingInput {...removeProps(props, ['handleMarkings'])} handleChange={onChange} index={i} marking={m} />
           </FormSection>
         );
       })}
@@ -144,21 +164,6 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
           Add Marking
         </Button>
       ) : null}
-
-      <OkayModal
-        open={openModal}
-        handleClose={setOpenModal}
-        handleOkay={handlePermDeleteMarking}
-        title={'Delete Marking'}
-        children={'This action will permanetly delete this marking'}
-      />
-      {/* <Modal
-        open={openModal}
-        handleClose={() => setOpenModal(false)}
-        title='This action will permantely delete this marking. Are you sure?'>
-        <Button>Yes</Button>
-        <Button>No</Button>
-      </Modal> */}
     </div>
   );
 };

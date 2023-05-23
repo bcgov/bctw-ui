@@ -147,7 +147,11 @@ const DevPlayground = (): JSX.Element => {
             marking={editCritter.marking[0]}
             handleChange={(v) => console.log(v)}
           /> */}
-          <CbMarkings taxon_id={editCritter.taxon_id} markings={editCritter.marking} />
+          <CbMarkings
+            taxon_id={editCritter.taxon_id}
+            markings={editCritter.marking}
+            handleMarkings={(m) => console.log(m)}
+          />
           <Box display='flex'>
             <TextField />
             <TextField style={{ flexGrow: 1 }} />

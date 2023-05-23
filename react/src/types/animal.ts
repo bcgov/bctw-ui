@@ -340,7 +340,7 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
 // text_colour: string;
 export const markingFormFields: Record<string, FormFieldObject<IMarking>[]> = {
 markingFields: [
-    {prop: 'marking_type', type: eInputType.cb_select, cbRouteKey: 'marking_type'},
+    {prop: 'marking_type', type: eInputType.cb_select, cbRouteKey: 'marking_type', ...isRequired},
     {prop: 'frequency', type: eInputType.number, ...isRequired},
     {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
     {prop: 'identifier', type: eInputType.text},
