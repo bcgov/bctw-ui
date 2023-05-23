@@ -264,7 +264,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     mortality_timestamp: { prop: 'mortality_timestamp', type: eInputType.datetime, required: true },
     mortality_comment: { prop: 'mortality_comment', type: eInputType.text, style: FormCommentStyle },
     proximate_cause_of_death_id: { prop: 'proximate_cause_of_death_id', type: eInputType.cb_select, cbRouteKey: 'cod', required: true},
-    proximate_cause_of_death_confidence: { prop: 'proximate_cause_of_death_confidence', type: eInputType.cb_select, cbRouteKey: 'cause_of_death_confidence', required: true},
+    proximate_cause_of_death_confidence: { prop: 'proximate_cause_of_death_confidence', type: eInputType.cb_select, cbRouteKey: 'cause_of_death_confidence'},
     proximate_predated_by_taxon_id: {prop: 'proximate_predated_by_taxon_id', type: eInputType.cb_select, cbRouteKey: 'taxons'},
     ultimate_cause_of_death_id: { prop: 'ultimate_cause_of_death_id', type: eInputType.cb_select, cbRouteKey: 'cod', required: false},
     ultimate_cause_of_death_confidence: { prop: 'ultimate_cause_of_death_confidence', type: eInputType.cb_select, cbRouteKey: 'cause_of_death_confidence'},
