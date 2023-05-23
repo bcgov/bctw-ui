@@ -43,7 +43,6 @@ type MarkerAction =
  */
 const MapMarkerContext = createContext<[MarkerState, React.Dispatch<MarkerAction>] | undefined>(undefined);
 
-
 /**
  * Reducer for handling changes to marker state.
  *
@@ -53,10 +52,15 @@ const MapMarkerContext = createContext<[MarkerState, React.Dispatch<MarkerAction
  */
 const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerState => {
   switch (action.type) {
-
     // Initialize the marker states
     case 'SET_MARKERS':
-      return { ...markerState, markers: action.markers };
+      return {
+        ...markerState,
+        markers: action.markers,
+        selectedMarkers: new Set(),
+        focusedCritter: null,
+        symbolizedGroups: {}
+      };
 
     // Adds an array of markers to the selection
     case 'SELECT_MARKERS':
@@ -71,7 +75,7 @@ const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerSt
         ...markerState,
         selectedMarkers: new Set([...markerState.selectedMarkers].filter((id) => !action.ids.includes(id)))
       };
-    
+
     // Selects a critter_id (will apply to all markers w/ that id)
     case 'SELECT_CRITTERS':
       return { ...markerState, selectedCritters: action.ids };
@@ -89,7 +93,7 @@ const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerSt
           [action.group.id]: { color: action.group.color, applyToLatest: action.group.applyToLatest }
         }
       };
-    
+
     // Set opacity of all markers (doesn't apply to tracks)
     case 'SET_OPACITY':
       return { ...markerState, opacity: action.val };
@@ -145,7 +149,7 @@ export const useMarkerStates = (): [MarkerState, React.Dispatch<MarkerAction>] =
 /**
  * Creates the initial state of the markers.
  * TODO: types for eachLayer methods
- * 
+ *
  * @returns {Marker[]} An array of markers.
  */
 export const createMarkersStates = (tracks: L.GeoJSON, pings: L.GeoJSON, latestPings: L.GeoJSON): Marker[] => {

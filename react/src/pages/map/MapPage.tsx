@@ -339,6 +339,8 @@ export function Map(): JSX.Element {
     latestPingsLayer.clearLayers();
     pingsLayer.addData(other as any);
     latestPingsLayer.addData(latest as any);
+    const markerData = createMarkersStates(tracksLayer, pingsLayer, latestPingsLayer);
+    markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   };
 
   // redraw only tracks
@@ -347,6 +349,8 @@ export function Map(): JSX.Element {
     layerPicker.removeLayer(tracksLayer);
     tracksLayer.clearLayers();
     tracksLayer.addData(newTracks as any);
+    const markerData = createMarkersStates(tracksLayer, pingsLayer, latestPingsLayer);
+    markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   };
 
   // triggered when side-panel filters are applied
