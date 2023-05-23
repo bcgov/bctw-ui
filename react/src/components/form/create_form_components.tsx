@@ -10,9 +10,11 @@ import { Dayjs } from 'dayjs';
 import { CSSProperties, ReactElement, ReactNode } from 'react';
 import { ICodeFilter } from 'types/code';
 import { BCTWFormat } from 'types/common_types';
-import { FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
+import { CbRouteStatusHandler, FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';
 import SelectCode from './SelectCode';
+import { QueryStatus } from 'react-query';
+import { ICbRouteKey } from 'critterbase/types';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -211,7 +213,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   handleChange: FormChangeEvent,
   inputProps?: Partial<CreateInputProps>,
   displayBlock = false,
-  style: CSSProperties = {}
+  style: CSSProperties = {},
+  handleRoute?: CbRouteStatusHandler
 ): ReactNode {
   if (formField === undefined) {
     return null;
@@ -225,7 +228,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
     label: obj.formatPropAsHeader(prop as keyof T),
     style,
     ...formField,
-    ...inputProps
+    ...inputProps,
+    handleRoute
   };
 
   let Comp = getInputFnFromType(type)(toPass);

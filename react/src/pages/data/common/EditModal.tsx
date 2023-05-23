@@ -1,7 +1,7 @@
 import { IUpsertPayload } from 'api/api_interfaces';
 import { EditModalBaseProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
@@ -125,8 +125,9 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   }, [open]);
 
   // if the error state changes, update the save status
-  useDidMountEffect(() => {
+  useEffect(() => {
     setCanSave(!hasErr);
+    console.log('EditModal hasErr changed to ' + hasErr)
   }, [hasErr]);
 
   useDidMountEffect(() => {
@@ -157,6 +158,8 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   };*/
 
   const handleChange = (v: InboundObj): void => {
+    checkHasErr(v);
+
     let tmp = newObj;
     if(!tmp) return;
     const k = Object.keys(v)[0];
@@ -186,6 +189,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     }
 
     console.log(`Now have ${JSON.stringify(newObj)} from ${JSON.stringify(v)}`)
+    
   }
 
   const reset = (): void => {

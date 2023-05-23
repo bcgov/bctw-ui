@@ -17,6 +17,7 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { omitNull } from 'utils/common_helpers';
 import { QueryStatus } from 'react-query';
+import { ICbRouteKey } from 'critterbase/types';
 
 /**
  * the main animal form
@@ -35,6 +36,8 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   //const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
   const isAttached = editing instanceof AttachedCritter;
+  const [cbSelectStatus, setCbSelectStatus] = useState({});
+  const [allowSave, setAllowSave] = useState(false);
   // const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
   // const [workflow, setWorkflow] = useState<WorkflowType>();
   // const [showWorkflow, setShowWorkflow] = useState(false);
@@ -106,6 +109,16 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
 
   const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
 
+  const handleRoute = (v: QueryStatus, key: ICbRouteKey): void => {
+    const dict = {...cbSelectStatus};
+    const isLoading = v === 'loading';
+    dict[key] = isLoading;
+    const s = Object.values(dict).every(a => !a);
+    setCbSelectStatus(dict);
+    setAllowSave(s);
+    //console.log(`In Editcritter handleRoute: ${JSON.stringify(dict)} ${s}`)
+  }
+
   const Header = (
     <Container maxWidth='xl'>
       {isCreatingNew ? (
@@ -131,7 +144,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   );
 
   return (
-    <EditModal disableHistory={true} headerComponent={Header} hideSave={!canEdit || queryStatus === 'loading'} busySaving={busySaving} {...props} editing={editing} onSave={critterbaseSave}>
+    <EditModal disableHistory={true} headerComponent={Header} hideSave={!canEdit || queryStatus === 'loading' || !allowSave}  busySaving={busySaving} {...props} editing={editing} onSave={critterbaseSave}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
@@ -143,10 +156,10 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
               <FormSection id='critter' header='Critter Details' size='large'>
                 <Divider />
                 <FormSection id='identifiers' header='Identifiers'>
-                  {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
+                  {identifierFields?.map((f) => CreateFormField(editing, f, onChange, {}, false, {}, handleRoute))}
                 </FormSection>
                 <FormSection id='characteristics' header='Characteristics'>
-                  {characteristicsFields?.map((f) => CreateFormField(editing, f, onChange))}
+                  {characteristicsFields?.map((f) => CreateFormField(editing, f, onChange, {}, false, {}, handleRoute))}
                 </FormSection>
               </FormSection>
               <FormSection
@@ -155,11 +168,11 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 hide={!editing.latestCapture}
                 size='large'>
                 <Divider />
-                <CaptureEventForm event={editing.latestCapture ?? createEvent(editing, 'capture') as CaptureEvent2} handleFormChange={onChange} isEditing />
+                <CaptureEventForm event={editing.latestCapture ?? createEvent(editing, 'capture') as CaptureEvent2} handleRoute={handleRoute} handleFormChange={onChange} isEditing />
               </FormSection>
               <FormSection id='m-deets' header='Mortality Details' hide={!editing.latestMortality} size='large'>
                 <Divider /> 
-                <MortalityEventForm event={editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent} handleFormChange={onChange} isEditing/>
+                <MortalityEventForm event={editing.latestMortality ?? createEvent(editing, 'mortality') as MortalityEvent} handleRoute={handleRoute} handleFormChange={onChange} isEditing/>
                 {/* <Divider /> */}
               </FormSection>
             </Box>

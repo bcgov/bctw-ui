@@ -19,6 +19,7 @@ export default function CaptureEventForm({
   event: capture,
   handlePostponeSave,
   handleFormChange,
+  handleRoute,
   isEditing = false
 }: WorkflowFormProps<CaptureEvent2> & { isEditing?: boolean }): JSX.Element {
   const [showRelease, setShowRelease] = useState(false);
@@ -59,7 +60,7 @@ export default function CaptureEventForm({
   return (
     <Box>
       {/* Capture Date -> Capture Environment */}
-      <LocationEventForm key='ce-loc' event={capture.capture_location} notifyChange={onChange}>
+      <LocationEventForm key='ce-loc' event={capture.capture_location} notifyChange={onChange} handleRoute={handleRoute}>
         <Box key='bx-rec' {...boxSpreadRowProps}>
           {CreateFormField(capture, capture.fields.capture_timestamp, onChange, { value: dayjs() })}
           {CreateFormField(capture, capture.fields.capture_comment, onChange)}

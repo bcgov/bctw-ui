@@ -6,11 +6,13 @@ import { AttachedCollar, Collar, getDeviceFormFields, ICollar } from 'types/coll
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat, uuid } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
-import { FormChangeEvent, FormFieldObject } from 'types/form_types';
+import { CbRouteStatusHandler, FormChangeEvent, FormFieldObject } from 'types/form_types';
 import { CaptureFormField2 } from './capture_event';
 import { MortalityFormField } from './mortality_event';
 import { ReleaseFormField } from './release_event';
 import { RetrievalFormField } from './retrieval_event';
+import { QueryStatus } from 'react-query';
+import { ICbRouteKey } from 'critterbase/types';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 
@@ -20,6 +22,7 @@ export type WorkflowFormProps<T extends IBCTWWorkflow> = {
   // workflows can exit early by calling the following functions
   handleExitEarly?: (message: ReactNode) => void;
   handlePostponeSave?: (wft: WorkflowType) => void;
+  handleRoute?: CbRouteStatusHandler;
   // this state is managed in WorkflowWrapper, but some forms may want to know about it
   canSave?: boolean;
 };

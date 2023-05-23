@@ -3,6 +3,8 @@ import { ICbRouteKey } from 'critterbase/types';
 import { CSSProperties, ReactNode } from 'react';
 import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
 import MortalityEvent from './events/mortality_event';
+import { RouteKey } from 'AppRouter';
+import { QueryStatus } from 'react-query';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
@@ -67,6 +69,7 @@ export type InboundObj = {
  *
  */
 export type FormChangeEvent = { (v: InboundObj): void };
+export type CbRouteStatusHandler = { (q: QueryStatus, key: ICbRouteKey): void }
 
 /**
  * form change events pass an object with:
