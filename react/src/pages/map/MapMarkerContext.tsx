@@ -28,7 +28,6 @@ type MarkerState = {
 
 type MarkerAction =
   | { type: 'SET_MARKERS'; markers: Marker[] }
-  | { type: 'SELECT_MARKER'; id: number | string }
   | { type: 'SELECT_MARKERS'; ids: (number | string)[] }
   | { type: 'UNSELECT_MARKERS'; ids: (number | string)[] }
   | { type: 'SELECT_CRITTERS'; ids: string[] }
@@ -39,37 +38,49 @@ type MarkerAction =
   | { type: 'RESET_FOCUS' }
   | { type: 'RESET_SYMBOLIZE' };
 
+/**
+ * React context for managing state related to map markers.
+ */
 const MapMarkerContext = createContext<[MarkerState, React.Dispatch<MarkerAction>] | undefined>(undefined);
 
+
+/**
+ * Reducer for handling changes to marker state.
+ *
+ * @param {MarkerState} markerState - The current state of the markers.
+ * @param {MarkerAction} action - An action object describing the changes to apply.
+ * @returns {MarkerState} The new marker state.
+ */
 const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerState => {
   switch (action.type) {
+
+    // Initialize the marker states
     case 'SET_MARKERS':
       return { ...markerState, markers: action.markers };
 
-    case 'SELECT_MARKER':
-      return {
-        ...markerState,
-        selectedMarkers: new Set([...markerState.selectedMarkers, action.id])
-      };
-
+    // Adds an array of markers to the selection
     case 'SELECT_MARKERS':
       return {
         ...markerState,
         selectedMarkers: new Set([...markerState.selectedMarkers, ...action.ids])
       };
 
+    // Unselect 1 or many markers
     case 'UNSELECT_MARKERS':
       return {
         ...markerState,
         selectedMarkers: new Set([...markerState.selectedMarkers].filter((id) => !action.ids.includes(id)))
       };
-
+    
+    // Selects a critter_id (will apply to all markers w/ that id)
     case 'SELECT_CRITTERS':
       return { ...markerState, selectedCritters: action.ids };
 
+    // Selects a critter_id for row-hover effects
     case 'FOCUS_CRITTER':
       return { ...markerState, focusedCritter: action.id };
 
+    // Sets symbolize colors
     case 'SYMBOLIZE_GROUP':
       return {
         ...markerState,
@@ -78,10 +89,12 @@ const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerSt
           [action.group.id]: { color: action.group.color, applyToLatest: action.group.applyToLatest }
         }
       };
-
+    
+    // Set opacity of all markers (doesn't apply to tracks)
     case 'SET_OPACITY':
       return { ...markerState, opacity: action.val };
 
+    // Cases to reset different states
     case 'RESET_SELECTION':
       return { ...markerState, selectedMarkers: new Set() };
 
@@ -96,6 +109,12 @@ const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerSt
   }
 };
 
+/**
+ * Provider component for the Marker context.
+ *
+ * @param {React.PropsWithChildren<{}>} props - The props to pass to the provider.
+ * @returns {React.ReactElement} A React element that provides marker state to its descendants.
+ */
 export const MarkerProvider: React.FC = ({ children }) => {
   const [markerState, markerDispatch] = useReducer(markerReducer, {
     markers: [],
@@ -109,6 +128,12 @@ export const MarkerProvider: React.FC = ({ children }) => {
   return <MapMarkerContext.Provider value={[markerState, markerDispatch]}>{children}</MapMarkerContext.Provider>;
 };
 
+/**
+ * Custom React hook for using the Marker context.
+ *
+ * @throws {Error} If the hook is not used within a MarkerProvider.
+ * @returns {[MarkerState, React.Dispatch<MarkerAction>]} The current marker state and a dispatch function.
+ */
 export const useMarkerStates = (): [MarkerState, React.Dispatch<MarkerAction>] => {
   const context = useContext(MapMarkerContext);
   if (!context) {
@@ -117,7 +142,13 @@ export const useMarkerStates = (): [MarkerState, React.Dispatch<MarkerAction>] =
   return context;
 };
 
-export const createMarkersState = (tracks: L.GeoJSON, pings: L.GeoJSON, latestPings: L.GeoJSON): Marker[] => {
+/**
+ * Creates the initial state of the markers.
+ * TODO: types for eachLayer methods
+ * 
+ * @returns {Marker[]} An array of markers.
+ */
+export const createMarkersStates = (tracks: L.GeoJSON, pings: L.GeoJSON, latestPings: L.GeoJSON): Marker[] => {
   const markerData: Marker[] = [];
   tracks.eachLayer((track: any) => {
     const color = { ...parseAnimalColour(track.feature.properties.map_colour), opacity: 0.9 };
@@ -164,7 +195,17 @@ export const createMarkersState = (tracks: L.GeoJSON, pings: L.GeoJSON, latestPi
   return markerData;
 };
 
-
+/**
+ * Updates the style of a marker.
+ * TODO: toFront / toBack for divicons. This currently doesn't work because 'latestPings' exist on an entirely different layer.
+ *
+ * @param marker - The marker to update.
+ * @param {string} fillColor - The fill color for the marker.
+ * @param {string} color - The outline color for the marker.
+ * @param {boolean} toFront - Whether to bring the marker to front.
+ * @param {number} opacity - The opacity for the marker.
+ * @param {'CircleMarker' | 'Divicon' | 'Polyline'} type - The type of the marker.
+ */
 const updateMarker = (marker, fillColor, color, toFront, opacity, type): void => {
   const markerStyles = {
     CircleMarker: (): void => {
@@ -199,7 +240,7 @@ const updateMarker = (marker, fillColor, color, toFront, opacity, type): void =>
 };
 
 /**
- * This function updates the styles of all map layers based on the current marker states.
+ * Updates the styles of all map layers based on the current marker states.
  *
  * @param {MarkerState} markerStates - The current states of the map markers.
  */
