@@ -36,7 +36,8 @@ type MarkerAction =
   | { type: 'SET_OPACITY'; val: number }
   | { type: 'RESET_SELECTION' }
   | { type: 'RESET_FOCUS' }
-  | { type: 'RESET_SYMBOLIZE' };
+  | { type: 'RESET_SYMBOLIZE' }
+  | { type: 'RESET_ALL' };
 
 /**
  * React context for managing state related to map markers.
@@ -54,13 +55,7 @@ const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerSt
   switch (action.type) {
     // Initialize the marker states
     case 'SET_MARKERS':
-      return {
-        ...markerState,
-        markers: action.markers,
-        selectedMarkers: new Set(),
-        focusedCritter: null,
-        symbolizedGroups: {}
-      };
+      return { ...markerState, markers: action.markers };
 
     // Adds an array of markers to the selection
     case 'SELECT_MARKERS':
@@ -108,9 +103,21 @@ const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerSt
     case 'RESET_SYMBOLIZE':
       return { ...markerState, symbolizedGroups: {} };
 
+    case 'RESET_ALL':
+      return initalState;
+
     default:
       return markerState;
   }
+};
+
+const initalState = {
+  markers: [],
+  opacity: 0.9,
+  selectedMarkers: new Set() as Set<string | number>,
+  selectedCritters: [],
+  focusedCritter: null,
+  symbolizedGroups: {}
 };
 
 /**
@@ -120,14 +127,7 @@ const markerReducer = (markerState: MarkerState, action: MarkerAction): MarkerSt
  * @returns {React.ReactElement} A React element that provides marker state to its descendants.
  */
 export const MarkerProvider: React.FC = ({ children }) => {
-  const [markerState, markerDispatch] = useReducer(markerReducer, {
-    markers: [],
-    opacity: 0.9,
-    selectedMarkers: new Set() as Set<string | number>,
-    selectedCritters: [],
-    focusedCritter: null,
-    symbolizedGroups: {}
-  });
+  const [markerState, markerDispatch] = useReducer(markerReducer, initalState);
 
   return <MapMarkerContext.Provider value={[markerState, markerDispatch]}>{children}</MapMarkerContext.Provider>;
 };

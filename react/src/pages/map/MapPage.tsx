@@ -9,8 +9,6 @@ import { mdiDragHorizontalVariant } from '@mdi/js';
 import Icon from '@mdi/react';
 import { CircularProgress, Paper } from '@mui/material';
 import pointsWithinPolygon from '@turf/points-within-polygon';
-import { ISelectMultipleData } from 'components/form/MultiSelect';
-import { MapStrings } from 'constants/strings';
 import dayjs from 'dayjs';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -105,10 +103,11 @@ export function Map(): JSX.Element {
   const [onlyLastKnown, setOnlyLastKnown] = useState(false);
   const [onlyLast10, setOnlyLast10] = useState(false);
 
+  // Centralized state-management for marker selection and color-effects
   const [markerStates, markerDispatch] = useMarkerStates();
 
   useEffect(() => {
-    updateLayers(markerStates);//, layers);
+    updateLayers(markerStates);
   }, [markerStates]);
 
   // store the selection shapes
@@ -201,7 +200,7 @@ export function Map(): JSX.Element {
   useEffect(() => {
     const markerData = createMarkersStates(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
-  }, [pings])
+  }, [pings]);
 
   // when one of the map only filters are applied, set the state
   useEffect(() => {
@@ -474,54 +473,18 @@ export function Map(): JSX.Element {
   const getTracksLayers = (): L.Layer[] => [tracksLayer];
   const getPingLayers = (): L.Layer[] => [pingsLayer, latestPingsLayer];
 
-  /**
-   * when device assignment status select dropdown is changed
-   * show or hide layers depending on what was selected
-   */
-  const handleShowUnassignedDevices = (o: ISelectMultipleData[]): void => {
-    const values = o.map((s) => s.value);
-    // setting this state will trigger visibility of unassigned layers
-    // setShowUnassignedLayers(values.includes(MapStrings.assignmentStatusOptionU));
-
-    const ref = mapRef.current;
-    const layers = [0, 2].includes(values.length) ? [...getAssignedLayers()] : getAssignedLayers();
-
-    // when all or no options are selected
-    if (layers.length > 3) {
-      // ie - we are showing/hiding all layers
-      if (values.length === 2) {
-        // show all was selected
-        layers.forEach((l) => ref.addLayer(l));
-      } else if (values.length === 0) {
-        // hide all was selected
-        layers.forEach((l) => ref.removeLayer(l));
-      }
-      return;
-    }
-    if (values.includes(MapStrings.assignmentStatusOptionA)) {
-      layers.forEach((l) => ref.addLayer(l));
-    } else {
-      layers.forEach((l) => ref.removeLayer(l));
-    }
-  };
-
   // Add the tracks layer
   useEffect(() => {
     tracksLayer.addTo(mapRef.current);
-    console.log('tracksLayer')
   }, [tracksLayer]);
 
   // Add the ping layers
   useEffect(() => {
     pingsLayer.addTo(mapRef.current);
-    console.log('pingsLayer')
-
   }, [pingsLayer]);
 
   useEffect(() => {
     latestPingsLayer.addTo(mapRef.current);
-    console.log('latestPingsLayer')
-
   }, [latestPingsLayer]);
 
   // todo: move this to separate component / wrapper

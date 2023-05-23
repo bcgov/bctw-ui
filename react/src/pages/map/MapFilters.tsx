@@ -222,6 +222,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
     setSymbolizeBy(DEFAULT_MFV.header);
     setSymbolizeLast(true);
+    markerDispatch({type: 'RESET_ALL'});
   };
 
   const handleApplySymbolize = (): void => {
