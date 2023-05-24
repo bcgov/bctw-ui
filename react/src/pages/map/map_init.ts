@@ -24,7 +24,7 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const text = `
     ${p.taxon ? 'Taxon: ' + p.taxon + '<br>' : ''}
     ${p.wlh_id ? 'WLH ID: ' + p.wlh_id + '<br>' : ''}
-    ${p.animal_id ? 'Critter ID: ' + p.animal_id + '<br>' : ''}
+    ${p.animal_id ? 'Animal ID: ' + p.animal_id + '<br>' : ''}
     Device ID: ${p.formattedDevice}<br>
     Latitude: ${coordinates[1] + '<br>'}
     Longitude: ${coordinates[0] + '<br>'}

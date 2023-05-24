@@ -28,7 +28,7 @@ const rows_to_render = [
   'Colour',
   'Taxon',
   'WLH ID',
-  'Critter ID',
+  'Animal ID',
   'Critter Status',
   'Device ID',
   'Device Status',
