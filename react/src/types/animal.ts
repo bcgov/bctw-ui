@@ -95,11 +95,17 @@ export interface IMarking {
   attached_timestamp: Dayjs;
   removed_timestamp: Dayjs;
   body_location: string;
+  taxon_marking_body_location_id: uuid;
   marking_type: string;
+  marking_type_id: uuid;
   marking_material: string;
+  marking_material_id: uuid;
   primary_colour: string;
+  primary_colour_id: uuid;
   secondary_colour: string;
+  secondary_colour_id: uuid;
   text_colour: string;
+  text_colour_id: uuid;
 }
 
 interface IQualitativeMeasurement {
@@ -383,17 +389,17 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
 // text_colour: string;
 export const markingFormFields: Record<string, FormFieldObject<IMarking>[]> = {
 markingFields: [
-    {prop: 'marking_type', type: eInputType.cb_select, cbRouteKey: 'marking_type', ...isRequired},
+    {prop: 'marking_type_id', type: eInputType.cb_select, cbRouteKey: 'marking_type', ...isRequired},
     {prop: 'frequency', type: eInputType.number, ...isRequired},
     {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
     {prop: 'identifier', type: eInputType.text},
     // {prop: 'order', type: eInputType.number},
     {prop: 'attached_timestamp', type: eInputType.datetime, ...isRequired},
-    {prop: 'body_location', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations', ...isRequired},
-    {prop: 'marking_material', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
-    {prop: 'primary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
-    {prop: 'secondary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
-    {prop: 'text_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'taxon_marking_body_location_id', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations', ...isRequired},
+    {prop: 'marking_material_id', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
+    {prop: 'primary_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'secondary_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'text_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
     {prop: 'removed_timestamp', type: eInputType.datetime},
     {prop: 'comment', type: eInputType.multiline},
 

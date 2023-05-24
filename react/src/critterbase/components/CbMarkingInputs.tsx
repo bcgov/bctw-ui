@@ -50,6 +50,7 @@ export const CbMarkingInput = ({ taxon_id, marking, handleChange, index = 0 }: C
     if (['frequency', 'frequency_unit'].includes(f.prop) && !showFrequency) {
       return;
     }
+    console.log(`Setting this as defaulted value: ${JSON.stringify(marking)} ${JSON.stringify(f)}`)
     return getInputFnFromType(f.type)({
       ...f,
       value: marking?.[f.prop],
@@ -78,6 +79,12 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
 
   const lastMarking = markingsData[markingsData.length - 1];
   const canAddMarking = markingsData.length === 0 || (lastMarking && !hasErr) || markingsData.every((m) => m?._delete);
+
+  useEffect(() => {
+    if(markings) {
+      setMarkingsData(markings);
+    }
+  }, [markings])
 
   useEffect(() => {
     //Strip undefined markings
