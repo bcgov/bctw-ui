@@ -49,7 +49,9 @@ export const CbSelect = ({
       return;
     }
     if (typeof value !== 'string') return;
-    setSelected(value);
+    const val = data.find((d) => (typeof d === 'string' ? d === value : d.id === value));
+    handleSelect(value, typeof val === 'string' ? val : val.value);
+    //setSelected(value);
   }, [isSuccess, isLoading, value, data]);
 
   const pushChange = (v: string | Record<string, unknown>): void => {
