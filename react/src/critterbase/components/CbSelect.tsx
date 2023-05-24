@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 
-export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
+export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey; query?: string };
 export const CbSelect = ({
   cbRouteKey,
   value,
@@ -18,55 +18,38 @@ export const CbSelect = ({
   label,
   disabled,
   query
-}: CbSelectProps & { query?: string }): JSX.Element => {
+}: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey, query);
   const [selected, setSelected] = useState<uuid | string>('');
-  // const [hasError, setHasError] = useState((required && !selected) || !cbRouteKey);
-
-  const hasError = isError || (required && !selected) || !cbRouteKey;
+  const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
-  // console.log({ cbRouteKey }, { isLoading }, { isError });
   const labelOverride = label ?? columnToHeader(cbRouteKey);
-  /*
-  useEffect(() => {
-    pushChange(selected);
-  }, []) //Necessary to have the parent check for errors in this dropdown on initial render
-  
-  useEffect(() => {
-    pushChange(selected);
-  }, [required]);*/
 
   useEffect(() => {
     if (!data?.length) return;
+    if (!value) {
+      handleSelect();
+      return;
+    }
     if (typeof value !== 'string') return;
-    setSelected(value);
+    const val = data.find((d) => (typeof d === 'string' ? d === value : d.id === value));
+    handleSelect(value, typeof val === 'string' ? val : val.value);
   }, [isSuccess]);
 
-  /*useEffect(() => {
-    if (typeof value !== 'string') return;
-    if(value !== selected) {
-      setSelected(value);
-      pushChange(value);
-    }
-  }, [value]) //Necessary to have manual overrides of the selected value from the parent to have much effect
-*/
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
-    const ret = { [prop]: v, error: required && !v };
+    const err = !v && required;
+    setHasError(err);
+    const ret = { [prop]: v, error: err };
     handleChange(ret);
   };
 
-  /*const handleSelect = (event: SelectChangeEvent): void => {
-    const { value } = event.target;
-    setSelected(value);
-    pushChange(value);
-  };*/
-
-  const handleSelect = (id: string, label: string) => {
-    const a = { id: id, label: label };
-    setSelected(a.id);
-    pushChange(a);
+  const handleSelect = (id?: string, label?: string): void => {
+    const hasProps = id && label;
+    const a = { id, label };
+    setSelected(hasProps ? a.id : '');
+    pushChange(hasProps ? a : '');
   };
 
   return (

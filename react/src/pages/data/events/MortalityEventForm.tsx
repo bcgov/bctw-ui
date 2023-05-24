@@ -97,10 +97,8 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     <>
       <Box>
         <LocationEventForm key='mort-loc' event={mortality.location} notifyChange={onChange}>
-          <Box display='flex'>
-            {CreateFormField(mortality, mortality.fields.mortality_timestamp, onChange)}
-            {CreateFormField(mortality, mortality.fields.mortality_comment, onChange)}
-          </Box>
+          {CreateFormField(mortality, mortality.fields.mortality_timestamp, onChange)}
+          {CreateFormField(mortality, mortality.fields.mortality_comment, onChange)}
         </LocationEventForm>
         <FormSection id={'mort-cod'} header={'Cause of Death'}>
           <Box>

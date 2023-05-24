@@ -83,12 +83,16 @@ export default function TextField(props: TextInputProps): JSX.Element {
 
   const propsToPass = {
     ...baseInputProps,
-    ...removeProps(props, [...inputPropsToRemove, 'style'])
+    ...removeProps(props, [...inputPropsToRemove, 'style', 'fullWidth'])
   };
 
   return (
     <MuiTextField
-      style={fullWidth ? { ...baseInputStyle, width: '100%' } : { ...baseInputStyle }}
+      style={
+        fullWidth
+          ? { marginRight: baseInputStyle.marginRight, marginBottom: baseInputStyle.marginBottom, flexGrow: 1 }
+          : { ...baseInputStyle }
+      }
       value={val}
       onBlur={handleBlur}
       onChange={handleChange}
