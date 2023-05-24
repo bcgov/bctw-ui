@@ -8,6 +8,8 @@ export const CbRouters = {
   critters: '/critters',
   captures: '/captures',
   mortality: '/mortality',
+  markings: '/markings',
+  xref: '/xref',
   bulk: '/bulk',
 
   get lookupsEnum(): string {
@@ -18,7 +20,7 @@ export const CbRouters = {
   }
 };
 
-const { lookups, lookupsEnum, lookupsTaxons } = CbRouters;
+const { lookups, lookupsEnum, lookupsTaxons, xref } = CbRouters;
 const CbRoutes: ICbRoutes = {
   //? lookups
   region_env: `${lookups}/region-envs`,
@@ -30,6 +32,8 @@ const CbRoutes: ICbRoutes = {
   collection_category: `${lookups}/collection-unit-categories`,
   taxons: lookupsTaxons,
   species: `${lookupsTaxons}/species`,
+  colours: `${lookups}/colours`,
+
   //? lookups/enum
   sex: `${lookupsEnum}/sex`,
   critter_status: `${lookupsEnum}/critter-status`,
@@ -37,7 +41,12 @@ const CbRoutes: ICbRoutes = {
   coordinate_uncertainty_unit: `${lookupsEnum}/coordinate-uncertainty-unit`,
   frequency_units: `${lookupsEnum}/frequency-units`,
   measurement_units: `${lookupsEnum}/measurement-units`,
-  supported_systems: `${lookupsEnum}/supported-systems`
-} as const;
+  supported_systems: `${lookupsEnum}/supported-systems`,
 
+  //? xref
+  collection_units: `${xref}/collection-units`,
+  //? taxon xrefs
+  taxon_collection_categories: `${xref}/taxon-collection-categories`,
+  taxon_marking_body_locations: `${xref}/taxon-marking-body-locations`
+};
 export { CbRoutes, selectFormat, detailedFormat };

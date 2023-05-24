@@ -75,15 +75,12 @@ export default function LocationEventForm({
   return (
     <>
       {children ? (
-        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`}>
+        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`} flex>
           {children}
         </FormSection>
       ) : null}
       <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`}>
         {latlon.map((f) => CreateFormField(event, f, changeHandler))}
-        <Box key='bx-rec' {...boxSpreadRowProps}>
-          {comment.map((f) => CreateFormField(event, f, changeHandler))}
-        </Box>
       </FormSection>
       <FormSection id='Region' header={`${capitalize(event.event_type)} Region`}>
         {regions.map((f) => CreateFormField(event, f, changeHandler, {}, false, {}, handleRoute))}

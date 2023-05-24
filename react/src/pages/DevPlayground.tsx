@@ -1,17 +1,15 @@
-import { Box, Button, Grid, Paper, Theme, Typography } from '@mui/material';
+import { Box, Button, Grid, Paper, TextField, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { plainToClass } from 'class-transformer';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import { formatTag } from 'components/table/table_helpers';
-import { CbSelect } from 'critterbase/components/CbSelect';
-import { CbRoutes } from 'critterbase/routes';
-import { ICbRouteKey } from 'critterbase/types';
+import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
+import { CbMarkingInput, CbMarkings } from 'critterbase/components/CbMarkingInputs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useState } from 'react';
-import { AttachedCritter, Critter } from 'types/animal';
+import { AttachedCritter, Critter, IMarking } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { editObjectToEvent } from 'types/events/event';
-import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { columnToHeader, doNothingAsync } from 'utils/common_helpers';
 import EditCritter from './data/animals/EditCritter';
@@ -43,8 +41,35 @@ const editCritter = editObjectToEvent(
         location: { latitude: 8, longitude: 9 }
       }
     ],
-    latitude: 1,
-    longitude: 2,
+    collection_units: [
+      // {
+      //   category_name: 'Population Unit',
+      //   unit_name: 'Itcha-Ilgachuz',
+      //   collection_unit_id: 'a87e9e57-6c94-49e9-9aa9-4925833eaed3',
+      //   collection_category_id: '86552ac7-75aa-4402-bba3-d33b11dc04d7'
+      // }
+      // {
+      //   category_name: 'Dummy Unit',
+      //   unit_name: 'Name 1',
+      //   collection_unit_id: '595434b1-2cde-44f5-afea-b59432aa705f',
+      //   collection_category_id: '841fbf8d-d3c1-4b4f-871b-3b4dcfd5ed03'
+      // }
+    ],
+    marking: [
+      {
+        marking_id: 'a',
+        identifier: 'id 1',
+        marking_type: 'f00170b8-853c-466a-917e-2b20ec194d6a',
+        order: 1,
+        // body_location: 'ec06df9b-1082-4178-a25d-2cec7e9025af',
+        marking_material: '283fe4cc-0087-408c-8186-24e22d93db28',
+        primary_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
+        secondary_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
+        text_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
+        comment: 'marking comment'
+      }
+    ],
+    taxon_id: '54063ddc-3845-447f-9c2d-e42a20d73566',
     wlh_id: '12-345',
     sex: 'Male',
     taxon: 'Moose',
@@ -53,7 +78,7 @@ const editCritter = editObjectToEvent(
     wmu_id: '1-10',
     critter_comment: 'this is the critter comment'
   },
-  new AttachedCritter('c6b0a6c7-71ca-421a-96d6-1878fec07b05'),
+  new AttachedCritter('4bd8fe08-f0e1-41fd-99b3-494fab00a763'),
   []
 );
 
@@ -109,6 +134,25 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
+        {/* <Box my={5}>
+          <CbCollectionUnitInputs
+            taxon_id={editCritter.taxon_id}
+            collection_units={editCritter.collection_units}
+            handleChange={(v) => console.log(v)}
+          />
+        </Box> */}
+        <Box my={5}>
+          {/* <CbMarkingInput
+            taxon_id={editCritter.taxon_id}
+            marking={editCritter.marking[0]}
+            handleChange={(v) => console.log(v)}
+          /> */}
+          {/* <CbMarkings
+            taxon_id={editCritter.taxon_id}
+            markings={editCritter.marking}
+            handleMarkings={(m) => console.log(m)}
+          /> */}
+        </Box>
         <ModifyCritterWrapper editing={editCritter}>
           <EditCritter
             open={openCritter} // THIS is false

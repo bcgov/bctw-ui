@@ -76,11 +76,9 @@ export default function CaptureEventForm({
 
       {/* Release Date */}
 
-      <FormSection id='release-date' header='Release Date'>
-        <Box key='bx-rec' {...boxSpreadRowProps}>
-          {CreateFormField(capture, capture.fields.release_timestamp, onChange, { minDate: minReleaseDate })}
-          {CreateFormField(capture, capture.fields.release_comment, onChange)}
-        </Box>
+      <FormSection id='release-date' header='Release Date' flex>
+        {CreateFormField(capture, capture.fields.release_timestamp, onChange, { minDate: minReleaseDate })}
+        {CreateFormField(capture, capture.fields.release_comment, onChange)}
       </FormSection>
 
       {/* Release Location -> Release Environment*/}

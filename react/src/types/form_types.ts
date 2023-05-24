@@ -57,9 +57,9 @@ export const isDisabled = { disabled: true };
 // what a form component passes when it's changed
 // ex: {name: 'bill', error: false}
 export type InboundObj = {
-  [key: string]: unknown | {id: string, label: string};
-  label?: string;
-  id?: string;
+  [key: string]: unknown | { id: string; label: string };
+  // label?: string;
+  // id?: string;
   error?: boolean;
   nestedEventKey?: keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'> | keyof Pick<MortalityEvent, 'location'>;
   eventKey?: string;
@@ -77,10 +77,12 @@ export type CbRouteStatusHandler = { (q: QueryStatus, key: ICbRouteKey): void }
  * b) error: boolean
  * @returns the keyof T / value record
  */
-export const parseFormChangeResult = <T>(changed: InboundObj): [keyof T, unknown] => {
+export const parseFormChangeResult = <T>(changed: InboundObj): [keyof T, unknown, string] => {
   const key = Object.keys(changed)[0] as keyof T;
-  const value = Object.values(changed)[0];
-  return [key, value];
+  const val = Object.values(changed)[0];
+  const value = val?.['id'] ?? val;
+  const label: string = val?.['label'] ?? val;
+  return [key, value, label];
 };
 
 /**

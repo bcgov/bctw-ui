@@ -4,7 +4,7 @@ import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
-import { AttachedCritter, Critter, ICapture, IMortality, critterFormFields } from 'types/animal';
+import { AttachedCritter, Critter, ICapture, IMortality, IMarking, critterFormFields } from 'types/animal';
 import { InboundObj } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { omitNull } from 'utils/common_helpers';
 import { QueryStatus } from 'react-query';
 import { ICbRouteKey } from 'critterbase/types';
+import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
 
 /**
  * the main animal form
@@ -161,6 +162,13 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 <FormSection id='characteristics' header='Characteristics'>
                   {characteristicsFields?.map((f) => CreateFormField(editing, f, onChange, {}, false, {}, handleRoute))}
                 </FormSection>
+                <CbMarkings
+                  handleMarkings={(m, err) => {
+                    onChange({ marking: m, error: err });
+                  }}
+                  taxon_id={editing.taxon_id}
+                  markings={editing.marking}
+                />
               </FormSection>
               <FormSection
                 id='c-deets'

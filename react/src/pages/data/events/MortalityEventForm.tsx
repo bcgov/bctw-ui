@@ -55,7 +55,6 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     }
   }, [critterIsAlive]);
 
-
   // form component changes can trigger mortality specific business logic
   const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
     v['eventKey'] = 'mortality';
@@ -64,16 +63,16 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     // retrieved_ind checkbox state enables/disables the retrieval date datetime picker
     if (key === 'retrieved_ind') {
       setIsRetrieved(!!value);
-    // } else if (key === 'proximate_cause_of_death') {
-    //   setUcodDisabled(false); // enable ucod when a proximate cause is chosen
-    //   // value could be undefined ex. when a code is not selected
-    //   if ((value as string)?.toLowerCase()?.includes('pred')) {
-    //     setIsPredation(true);
-    //   }
+      // } else if (key === 'proximate_cause_of_death') {
+      //   setUcodDisabled(false); // enable ucod when a proximate cause is chosen
+      //   // value could be undefined ex. when a code is not selected
+      //   if ((value as string)?.toLowerCase()?.includes('pred')) {
+      //     setIsPredation(true);
+      //   }
     } else if (key === 'proximate_cause_of_death_id') {
       setIsPredatorKnown(value['label'] === 'Predation');
     } else if (key === 'ultimate_cause_of_death_id') {
-      setIsUcodPredatorKnown(value['label'] === 'Predation')
+      setIsUcodPredatorKnown(value['label'] === 'Predation');
     } else if (key === 'shouldUnattachDevice') {
       // make attachment end state required if user is removing device
       setIsBeingUnattached(!!value);
@@ -83,8 +82,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     //   if (value === 'Mortality' || value === 'Alive') {
     //     setCritterIsAlive(value === 'Alive');
     //   }
-  }
-
+  };
 
   // when the location event form changes, also notify wrapper about errors
   const onChangeLocationProp = (v: Record<keyof LocationEvent, unknown>): void => {
@@ -102,43 +100,48 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
     //<></>
     //TODO add this back CRITTERBASE INTEGRATION
     <>
-    <Box>
-      <LocationEventForm key='mort-loc' event={mortality.location} notifyChange={onChange}>
-        <Box key='bx-mort' {...boxSpreadRowProps}>
+      <Box>
+        <LocationEventForm key='mort-loc' event={mortality.location} notifyChange={onChange}>
           {CreateFormField(mortality, mortality.fields.mortality_timestamp, onChange)}
           {CreateFormField(mortality, mortality.fields.mortality_comment, onChange)}
-        </Box>
-      </LocationEventForm>
-      <FormSection id={'mort-cod'} header={'Cause of Death'}>
-        <Box>
-          {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_id, onChange)}
-          {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_confidence, onChange)}
-          {isPredatorKnown && CreateFormField(mortality, mortality.fields.proximate_predated_by_taxon_id, onChange, isPredatorKnown ? {  } : {disabled: !isPredatorKnown, value: '' })}
-        </Box>
-        <Box>
-          {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_id, onChange)}
-          {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_confidence, onChange)}
-          {isUcodPredatorKnown && CreateFormField(mortality, mortality.fields.ultimate_predated_by_taxon_id, onChange, isUcodPredatorKnown ? {  } : {disabled: !isUcodPredatorKnown, value: ''})}
-        </Box>
-      </FormSection>
-      {!isEditing && ( 
-      <FormSection id={'mort-dev'} header={'Device Information'}>
-      <Box mb={1} {...boxSpreadRowProps}>
-          {CreateFormField(mortality, {...mortality.fields.retrieved_ind, required: isRetrieved }, onChange )}
-          {CreateFormField(mortality, mortality.fields.retrieval_date, onChange, {
-            disabled: !isRetrieved || critterIsAlive
-          })}
+        </LocationEventForm>
+        <FormSection id={'mort-cod'} header={'Cause of Death'}>
+          <Box>
+            {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_id, onChange)}
+            {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_confidence, onChange)}
+            {CreateFormField(
+              mortality,
+              mortality.fields.proximate_predated_by_taxon_id,
+              onChange,
+              isPredatorKnown ? {} : { disabled: !isPredatorKnown, value: '' }
+            )}
+          </Box>
+          <Box>
+            {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_id, onChange)}
+            {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_confidence, onChange)}
+            {CreateFormField(
+              mortality,
+              mortality.fields.ultimate_predated_by_taxon_id,
+              onChange,
+              isUcodPredatorKnown ? {} : { disabled: !isUcodPredatorKnown, value: '' }
+            )}
+          </Box>
+        </FormSection>
+        <FormSection id={'mort-dev'} header={'Device Information'}>
+          <Box mb={1} {...boxSpreadRowProps}>
+            {CreateFormField(mortality, mortality.fields.retrieval_date, onChange, {
+              disabled: !isRetrieved || critterIsAlive
+            })}
+            {CreateFormField(mortality, { ...mortality.fields.retrieved_ind, required: isRetrieved }, onChange)}
+          </Box>
+          <Box mb={1} {...boxSpreadRowProps}>
+            {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
+              disabled: !isBeingUnattached || critterIsAlive
+            })}
+            {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
+          </Box>
+        </FormSection>
       </Box>
-      <Box mb={1} {...boxSpreadRowProps}>
-          {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
-          {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
-                disabled: !isBeingUnattached || critterIsAlive
-          })} 
-      </Box>
-      </FormSection> 
-      ) }
-      
-    </Box>
       {/*<FormSection id='mort-a-st' header={'Critter Status'} disabled={critterIsAlive}>
         {[
           <Radio

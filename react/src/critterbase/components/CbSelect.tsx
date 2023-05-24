@@ -11,7 +11,7 @@ import { CbRouteStatusHandler } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
 
 export type CbSelectProps = Omit<CreateInputProps, 'type'> & 
-  { cbRouteKey: ICbRouteKey, handleRoute: CbRouteStatusHandler  };
+  { cbRouteKey: ICbRouteKey, handleRoute?: CbRouteStatusHandler, query: string  };
 export const CbSelect = ({
   cbRouteKey,
   value,
@@ -20,16 +20,14 @@ export const CbSelect = ({
   handleChange,
   handleRoute,
   label,
-  disabled
+  disabled,
+  query
 }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isError, isLoading, isSuccess, status } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
   const [selected, setSelected] = useState<uuid | string>('');
-  // const [hasError, setHasError] = useState((required && !selected) || !cbRouteKey);
-
-  const hasError = isError || (required && !selected) || !cbRouteKey;
+  const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
-  // console.log({ cbRouteKey }, { isLoading }, { isError });
   const labelOverride = label ?? columnToHeader(cbRouteKey);
   /*
   useEffect(() => {
@@ -46,40 +44,33 @@ export const CbSelect = ({
   useEffect(() => {
     //console.log(`Triggered cbSelect ${cbRouteKey} ${isSuccess} ${isLoading}`)
     if (!data?.length) return;
+    if (!value) {
+      handleSelect();
+      return;
+    }
     if (typeof value !== 'string') return;
     setSelected(value);
   }, [isSuccess, isLoading, value, data]);
 
-  /*useEffect(() => {
-    if (typeof value !== 'string') return;
-    if(value !== selected) {
-      setSelected(value);
-      pushChange(value);
-    }
-  }, [value]) //Necessary to have manual overrides of the selected value from the parent to have much effect
-*/
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
-    const ret = { [prop]: v, error: required && !v };
+    const err = !v && required;
+    setHasError(err);
+    const ret = { [prop]: v, error: err };
     handleChange(ret);
   };
 
-  /*const handleSelect = (event: SelectChangeEvent): void => {
-    const { value } = event.target;
-    setSelected(value);
-    pushChange(value);
-  };*/
-
-  const handleSelect = (id: string, label: string): void => {
-    const a = { id: id, label: label };
-    setSelected(a.id);
-    pushChange(a);
+  const handleSelect = (id?: string, label?: string): void => {
+    const hasProps = id && label;
+    const a = { id, label };
+    setSelected(hasProps ? a.id : '');
+    pushChange(hasProps ? a : '');
   };
 
   return (
     <FormControl
       size='small'
-      style={{ ...baseInputStyle, marginBottom: baseInputStyle.marginRight }}
+      style={{ ...baseInputStyle }}
       required={required}
       className={`select-control ${hasError ? 'input-error' : ''}`}
       error={!isLoading && hasError}
