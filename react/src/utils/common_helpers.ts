@@ -43,6 +43,8 @@ const columnToHeader = (prop: string): string => {
     .replaceAll('_', ' ')
     .replaceAll('wmu', 'Wildlife Management Unit')
     .replaceAll(' id', ' ID')
+    .replaceAll('nr', 'NR')
+    .replaceAll('env', 'ENV')
     .replaceAll('wlh', 'WLH')
     .replaceAll('utm', 'UTM')
     .replaceAll('cod', 'Cause Of Death')

@@ -10,10 +10,11 @@ import { FormSection, editEventBtnProps } from 'pages/data/common/EditModalCompo
 import { useEffect, useState } from 'react';
 import { Critter, IMarking, markingFormFields } from 'types/animal';
 import { uuid } from 'types/common_types';
-import { FormChangeEvent, InboundObj, parseFormChangeResult } from 'types/form_types';
+import { CbRouteStatusHandler, FormChangeEvent, InboundObj, parseFormChangeResult } from 'types/form_types';
 import { columnToHeader, removeProps } from 'utils/common_helpers';
 type CbMarkingSharedProps = {
   taxon_id: uuid;
+  handleRoute?: CbRouteStatusHandler
 };
 
 type CbMarkingInputProps = {
@@ -22,7 +23,7 @@ type CbMarkingInputProps = {
   index?: number;
 } & CbMarkingSharedProps;
 
-export const CbMarkingInput = ({ taxon_id, marking, handleChange, index = 0 }: CbMarkingInputProps): JSX.Element => {
+export const CbMarkingInput = ({ taxon_id, marking, handleChange, handleRoute, index = 0 }: CbMarkingInputProps): JSX.Element => {
   const { markingFields } = markingFormFields;
   const [showFrequency, setShowFrequency] = useState(false);
   const props = {
@@ -37,6 +38,10 @@ export const CbMarkingInput = ({ taxon_id, marking, handleChange, index = 0 }: C
     }
   };
 
+  const markingHeaders = (label: string): string => {
+    return columnToHeader(label).replaceAll('ID', '');
+  }
+
   const onChange = (v: InboundObj): void => {
     if (v?.marking_type) {
       const isPitTag = isCbVal(v.marking_type, cbInputValue.pitTag);
@@ -50,12 +55,13 @@ export const CbMarkingInput = ({ taxon_id, marking, handleChange, index = 0 }: C
     if (['frequency', 'frequency_unit'].includes(f.prop) && !showFrequency) {
       return;
     }
-    console.log(`Setting this as defaulted value: ${JSON.stringify(marking)} ${JSON.stringify(f)}`)
+    //console.log(`Setting this as defaulted value: ${JSON.stringify(marking)} ${JSON.stringify(f)}`)
     return getInputFnFromType(f.type)({
       ...f,
       value: marking?.[f.prop],
       handleChange: onChange,
-      label: columnToHeader(f.prop),
+      label: markingHeaders(f.prop),
+      handleRoute,
       ...customProps
     });
   });
@@ -69,7 +75,7 @@ type CbMarkingsProps = {
 } & CbMarkingSharedProps;
 
 export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
-  const { markings, handleMarkings } = props;
+  const { markings, handleMarkings, handleRoute } = props;
   const cb_api = useTelemetryApi();
   const [hasErr, checkHasErr, resetErrs] = useFormHasError();
 

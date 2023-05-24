@@ -68,7 +68,8 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
           }
         ],
         captures: [],
-        mortalities: []
+        mortalities: [],
+        markings: []
       }  
       if(body.capture.length) {
         const capture = body.capture[0];
@@ -88,6 +89,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
           }
           capture.release_location = omitNull(capture.release_location);
         }
+        capture.critter_id = body.critter_id;
         finalPayload.captures.push(omitNull(capture));
       }
   
@@ -100,10 +102,17 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
         if(mortality.location) {
           mortality.location = omitNull(mortality.location);
         }
+        mortality.critter_id = body.critter_id;
         finalPayload.mortalities.push(omitNull(mortality));
       }
 
-      console.log('Final payload looks like ' + JSON.stringify(finalPayload, null, 2))
+      if(body.marking.length) {
+        finalPayload.markings = body.marking.map(m => {
+          m.critter_id = body.critter_id;
+          return omitNull(m)
+        });
+      }
+
       const r = await onSave(finalPayload);
       return r;
   }

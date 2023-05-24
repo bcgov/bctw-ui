@@ -365,6 +365,10 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
           return 'Last Transmission';
         case 'last_fetch_date':
           return 'Last Update Attempt';
+        case 'taxon_id':
+          return 'Taxon'
+        case 'responsible_region_nr_id':
+          return 'Responsible NR Region'
         default:
           return columnToHeader(str);
       }
