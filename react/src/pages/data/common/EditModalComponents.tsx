@@ -1,4 +1,4 @@
-import { Box, ButtonProps, Grid } from '@mui/material';
+import { Box, ButtonProps, Grid, GridProps, Typography } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
 import { cloneElement, Children, Key, ReactElement, ReactNode } from 'react';
 
@@ -68,17 +68,43 @@ type FormSectionProps = {
   disabled?: boolean;
   hide?: boolean;
   children: ReactNode;
+  size?: 'small' | 'large';
+  flex?: boolean;
 };
 /** creates a section of a form with a grid layout
  * @param children must not contain non valid elements (ex. fragments or nulls)
  * top level children must have key props
  */
-const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionProps): JSX.Element => {
+const FormSection = ({
+  id,
+  header,
+  btn,
+  disabled,
+  children,
+  hide,
+  size = 'small',
+  flex
+}: FormSectionProps): JSX.Element => {
   if (hide) return null;
+
+  const flexProps: GridProps = flex && {
+    display: 'flex',
+    flexWrap: 'wrap',
+    flexDirection: 'row'
+  };
+  const childrenRender = Children.map(children, (child: ReactElement, idx: number) => {
+    const isDisabled = child?.props?.disabled ?? disabled;
+    // fixme: adding colgap via child component margin-botom instead
+    return cloneElement(child, {
+      key: `${id}-${idx}`,
+      disabled: isDisabled,
+      style: { ...child.props.style }
+    });
+  });
   return (
-    <Box component='fieldset' p={2}>
+    <Box component='fieldset'>
       {header ? (
-        <Box component='legend' className={'legend'} mb={1} mt={1}>
+        <Box component='legend' className={size === 'small' ? 'legend' : 'large-legend'} mb={1} mt={1}>
           {header}
           {btn}
         </Box>
@@ -86,16 +112,8 @@ const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionP
       <Box className='fieldset-form'>
         {/* fixme: why doesn't colGap/columnspacing work? */}
         <Grid container spacing={1}>
-          <Grid item xs={12}>
-            {Children.map(children, (child: ReactElement, idx: number) => {
-              const isDisabled = child?.props?.disabled ?? disabled;
-              // fixme: adding colgap via child component margin-botom instead
-              return cloneElement(child, {
-                key: `${id}-${idx}`,
-                disabled: isDisabled,
-                style: { ...child.props.style, marginBottom: '10px' }
-              });
-            })}
+          <Grid item xs={12} {...flexProps}>
+            {childrenRender}
           </Grid>
         </Grid>
       </Box>

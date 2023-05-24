@@ -1,6 +1,8 @@
 import { BaseTextFieldProps } from '@mui/material';
 import { ICbRouteKey } from 'critterbase/types';
 import { CSSProperties, ReactNode } from 'react';
+import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
+import MortalityEvent from './events/mortality_event';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
@@ -15,7 +17,8 @@ export enum eInputType {
   code = 'code',
   multiline = 'multiline',
   select = 'select',
-  cb_select = 'cb_select' //critterbase select field
+  cb_select = 'cb_select', //critterbase select field
+  cb_capture_fields = 'cb_capture_fields'
 }
 
 /**
@@ -52,8 +55,13 @@ export const isDisabled = { disabled: true };
 // what a form component passes when it's changed
 // ex: {name: 'bill', error: false}
 export type InboundObj = {
-  [key: string]: unknown;
+  [key: string]: unknown | { id: string; label: string };
+  // label?: string;
+  // id?: string;
   error?: boolean;
+  nestedEventKey?:
+    | keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'>
+    | keyof Pick<MortalityEvent, 'location'>;
 };
 
 /**
@@ -67,10 +75,12 @@ export type FormChangeEvent = { (v: InboundObj): void };
  * b) error: boolean
  * @returns the keyof T / value record
  */
-export const parseFormChangeResult = <T>(changed: InboundObj): [keyof T, unknown] => {
+export const parseFormChangeResult = <T>(changed: InboundObj): [keyof T, unknown, string] => {
   const key = Object.keys(changed)[0] as keyof T;
-  const value = Object.values(changed)[0];
-  return [key, value];
+  const val = Object.values(changed)[0];
+  const value = val?.['id'] ?? val;
+  const label: string = val?.['label'] ?? val;
+  return [key, value, label];
 };
 
 /**

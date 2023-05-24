@@ -1,5 +1,5 @@
 import { Exclude, Transform } from 'class-transformer';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { BCTWBase, DayjsToPlain, nullOrDayjs, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { FormFieldObject, eInputType, isRequired } from 'types/form_types';
@@ -7,6 +7,11 @@ import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
+import { editObjectToEvent } from './events/event';
+import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
+import { LocationEvent } from './events/location_event';
+import { get } from 'http';
+import MortalityEvent from './events/mortality_event';
 
 export enum eTaxon {
   caribou = 'caribou',
@@ -34,45 +39,51 @@ export enum eCritterStatus {
   mortality = 'Mortality'
 }
 
-export type ICollectionUnit = Record<string, string>;
+export interface ICollectionUnit {
+  category_name: string;
+  unit_name: string;
+  collection_unit_id: uuid;
+  collection_category_id: uuid;
+}
 
 export type Critters = Critter | AttachedCritter;
 
-interface CritterLocation {
+export interface ILocation {
+  location_id: uuid;
   latitude: number;
   longitude: number;
-  region_env_name: string;
-  region_nr_name: string;
-  wmu_name: string;
+  region_env_id: string;
+  region_nr_id: string;
+  wmu_id: string;
+  location_comment: string;
 }
 
-interface CritterReleaseLocation extends CritterLocation {
-  release_latitude: never;
-  release_longitude: never;
-  release_region_env_id: never;
-  release_region_nr_id: never;
-  release_wmu_id: never;
-}
-
-interface CritterCaptureLocation extends CritterLocation {
-  capture_latitude: never;
-  capture_longitude: never;
-  capture_region_env_id: never;
-  capture_region_nr_id: never;
-  capture_wmu_id: never;
-  
-}
-interface CritterCapture {
+export interface ICapture {
   capture_id: uuid;
-  capture_location_id: uuid;
-  relase_location_id: uuid;
   capture_timestamp: Dayjs;
-  release_timestamp: Dayjs;
-  capture_location: CritterCaptureLocation;
-  release_location: CritterReleaseLocation;
+  capture_location_id?: uuid;
+  capture_location?: ILocation;
+  capture_comment?: string;
+  release_timestamp?: Dayjs;
+  relase_location_id?: uuid;
+  release_location: ILocation;
+  release_comment?: string;
 }
 
-interface CritterMarking {
+interface IMortality {
+  mortality_id: uuid;
+  location_id: uuid;
+  location?: uuid; //Uncertain if the critterbase payload returns this
+  mortality_timestamp: Dayjs;
+  proximate_cause_of_death_id: uuid;
+  proximate_cause_of_death_confidence: 'Probable' | 'Definite';
+  proximate_predated_by_taxon_id: uuid;
+  ultimate_cause_of_death_id: uuid;
+  ultimate_cause_of_death_confidence: 'Probable' | 'Definite';
+  ultimate_predated_by_taxon_id: uuid;
+}
+
+export interface IMarking {
   marking_id: uuid;
   capture_id: uuid | null;
   mortality_id: uuid | null;
@@ -91,7 +102,7 @@ interface CritterMarking {
   text_colour: string;
 }
 
-interface CritterQualitativeMeasurement {
+interface IQualitativeMeasurement {
   measurement_qualitative_id: uuid;
   taxon_measurement_id: uuid;
   capture_id: uuid;
@@ -104,7 +115,7 @@ interface CritterQualitativeMeasurement {
   option_value: number;
 }
 
-interface CritterQuantitativeMeasurement {
+interface IQuantitativeMeasurement {
   measurement_quantitative_id: uuid;
   taxon_measurement_id: uuid;
   capture_id: uuid;
@@ -115,9 +126,9 @@ interface CritterQuantitativeMeasurement {
   measurement_name: string;
 }
 
-interface CritterMeasurement {
-  qualitative: CritterQualitativeMeasurement[];
-  quantitative: CritterQuantitativeMeasurement[];
+interface IMeasurement {
+  qualitative: IQualitativeMeasurement[];
+  quantitative: IQuantitativeMeasurement[];
 }
 
 /**
@@ -152,10 +163,10 @@ export class Critter implements BCTWBase<Critter>{
   @Transform(nullToDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) readonly update_timestamp?: Dayjs;
   critter_comment?: string;
   //Extra details
-  mortality?: unknown[];
-  capture?: CritterCapture[];
-  marking?: CritterMarking[];
-  measurement?: CritterMeasurement[];
+  mortality?: IMortality[];
+  capture?: ICapture[];
+  marking?: IMarking[];
+  measurement?: IMeasurement[];
 
   readonly _merged?: boolean;
   permission_type?: eCritterPermission;
@@ -169,11 +180,26 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   get critter_status(): string {
-    return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
+    return dayjs(this.mortality_timestamp).isValid() ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
   get displayProps(): (keyof Critter)[] {
     return ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'critter_status'];
+  }
+
+  get latestCapture(): CaptureEvent2 {
+    if (this.capture?.length){
+      const capture_location = editObjectToEvent(this.capture[0].capture_location, new LocationEvent('capture'), []);
+      const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);
+      return editObjectToEvent({...this.capture[0], capture_location, release_location }, new CaptureEvent2(), [])
+    }
+  }
+
+  get latestMortality(): MortalityEvent {
+    if (this.mortality?.length){
+      const location = editObjectToEvent(this.mortality[0].location, new LocationEvent('mortality'), [])
+      return editObjectToEvent({...this.mortality[0], location}, new MortalityEvent(), [])
+    }
   }
 
   get collection_unit(): string {
@@ -298,15 +324,50 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
     }
   }
 }
+// marking_id: uuid;
+// capture_id: uuid | null;
+// mortality_id: uuid | null;
+// identifier: string;
+// frequency: number;
+// frequency_unit: string; //This is an enum in critterbase
+// order: number;
+// comment: string;
+// attached_timestamp: Dayjs;
+// removed_timestamp: Dayjs;
+// body_location: string;
+// marking_type: string;
+// marking_material: string;
+// primary_colour: string;
+// secondary_colour: string;
+// text_colour: string;
+export const markingFormFields: Record<string, FormFieldObject<IMarking>[]> = {
+markingFields: [
+    {prop: 'marking_type', type: eInputType.cb_select, cbRouteKey: 'marking_type', ...isRequired},
+    {prop: 'frequency', type: eInputType.number, ...isRequired},
+    {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
+    {prop: 'identifier', type: eInputType.text},
+    // {prop: 'order', type: eInputType.number},
+    {prop: 'attached_timestamp', type: eInputType.datetime, ...isRequired},
+    {prop: 'body_location', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations', ...isRequired},
+    {prop: 'marking_material', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
+    {prop: 'primary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'secondary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'text_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'removed_timestamp', type: eInputType.datetime},
+    {prop: 'comment', type: eInputType.multiline},
 
-export type CritterDetailsForm = Partial<Critter> & 
-CritterCapture & 
-CritterCapture['capture_location'] & 
-CritterCapture['release_location'] & 
-CritterMarking & 
-CritterMeasurement
+  ],
+  removedFields: [
+    {prop: 'removed_timestamp', type: eInputType.datetime},
+    {prop: 'comment', type: eInputType.multiline},
+  ]
+  // frequencyFields: [
+  //   {prop: 'frequency', type: eInputType.number, ...isRequired},
+  //   {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
+  // ]
+}
 
-export const critterFormFields: Record<string, FormFieldObject<CritterDetailsForm>[]> = {
+export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
   identifierFields: [
     { prop: 'taxon_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'species', ...isRequired },
     { prop: 'wlh_id', type: eInputType.text, taxon: [] },
@@ -320,21 +381,23 @@ export const critterFormFields: Record<string, FormFieldObject<CritterDetailsFor
     //{ prop: 'collection_unit', type: eInputType.cb_select, taxon: [] } //This select will need additional work, array of objects. Flatten and display multiple selects for array
   ],
   captureFields: [
-    { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
-    { prop: 'latitude', type: eInputType.number, taxon: []},
-    { prop: 'longitude', type: eInputType.number, taxon: []},
-    { prop: 'capture_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
-    { prop: 'capture_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
-    { prop: 'capture_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
+    { prop: 'capture', type: eInputType.cb_capture_fields, taxon: []},
   ],
-  releaseFields: [
-    { prop: 'release_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
-    { prop: 'latitude', type: eInputType.number, taxon: []},
-    { prop: 'longitude', type: eInputType.number, taxon: []},
-    { prop: 'release_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
-    { prop: 'release_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
-    { prop: 'release_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
-  ],
+  //   { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
+  //   { prop: 'latitude', type: eInputType.number, taxon: []},
+  //   { prop: 'longitude', type: eInputType.number, taxon: []},
+  //   { prop: 'capture_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
+  //   { prop: 'capture_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+  //   { prop: 'capture_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
+  // ],
+  // releaseFields: [
+  //   { prop: 'release_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
+  //   { prop: 'latitude', type: eInputType.number, taxon: []},
+  //   { prop: 'longitude', type: eInputType.number, taxon: []},
+  //   { prop: 'release_region_env_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_env' },
+  //   { prop: 'release_region_nr_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'region_nr' },
+  //   { prop: 'release_wmu_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'wmu'},
+  // ],
   //TODO critterbase integration does not support these in the same way
   // characteristicFields2: [
   //   { prop: 'juvenile_at_heel', type: eInputType.code, taxon: [] },
@@ -374,7 +437,7 @@ export const critterFormFields: Record<string, FormFieldObject<CritterDetailsFor
 };
 
 // a 'flatteneed' critterFormFields array
-export const getAnimalFormFields = (): FormFieldObject<Partial<CritterDetailsForm>>[] => {
+export const getAnimalFormFields = (): FormFieldObject<AttachedCritter>[] => {
   return Object.values(critterFormFields).reduce((previous, current) => [...previous, ...current], []);
 };
 

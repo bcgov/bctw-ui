@@ -5,20 +5,14 @@ import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
 import NumberField from 'components/form/NumberInput';
 import TextField from 'components/form/TextInput';
-import { useTaxon } from 'contexts/TaxonContext';
 import { CbSelect, CbSelectProps } from 'critterbase/components/CbSelect';
-import { ICbRouteKey } from 'critterbase/types';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { CSSProperties, ReactElement, ReactNode } from 'react';
-import { Critter, AttachedCritter } from 'types/animal';
 import { ICodeFilter } from 'types/code';
 import { BCTWFormat } from 'types/common_types';
-import { WorkflowFormField } from 'types/events/event';
 import { FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';
-import { showField } from 'utils/taxon';
 import SelectCode from './SelectCode';
-import { type } from 'os';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -43,7 +37,7 @@ export type CreateInputProps = CreateInputBaseProps &
 
 // text and number field handler
 function CreateEditTextField(props: CreateInputProps): ReactElement {
-  const { prop, type, value, errorMessage, handleChange, validate } = props;
+  const { prop, type, value, errorMessage, handleChange, validate, style } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
   return type === eInputType.number ? (
@@ -70,12 +64,20 @@ function CreateEditTextField(props: CreateInputProps): ReactElement {
 }
 
 function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
-  const newProps = Object.assign({ multiline: true, rows: 1, style: { width: '100%' } }, props);
+  const newProps = Object.assign({ multiline: true, rows: 1, fullWidth: true }, props);
   return CreateEditTextField(newProps);
 }
 
 // date field handler
-function CreateEditDateField({ prop, value, handleChange, label, disabled }: CreateInputProps): ReactElement {
+function CreateEditDateField({
+  prop,
+  value,
+  handleChange,
+  label,
+  disabled,
+  minDate,
+  maxDate
+}: CreateInputProps): ReactElement {
   return (
     <DateInput
       propName={prop}
@@ -83,6 +85,8 @@ function CreateEditDateField({ prop, value, handleChange, label, disabled }: Cre
       defaultValue={value as Dayjs}
       changeHandler={handleChange}
       disabled={disabled}
+      minDate={minDate}
+      maxDate={maxDate}
       key={`input-date-${String(prop)}`}
     />
   );
@@ -103,7 +107,7 @@ function CreateEditDateTimeField({
     <DateTimeInput
       propName={prop}
       label={label}
-      defaultValue={dayjs(value as Date)}
+      defaultValue={value as Dayjs}
       changeHandler={handleChange}
       disabled={disabled}
       key={`input-dt-${String(prop)}`}
@@ -170,7 +174,7 @@ function CreateEditSelectField({
 }
 
 function CreateCbSelectField(props: CbSelectProps): ReactElement {
-  return <CbSelect {...props} />;
+  return <CbSelect {...props} key={`${props.cbRouteKey}-${String(props.prop)}`} />;
 }
 
 // returns the funtion to create the form component based on input type
@@ -233,34 +237,34 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
-interface ItaxonFormField {
-  obj: Critter | AttachedCritter;
-  formField: WorkflowFormField;
-  handleChange: FormChangeEvent;
-  inputProps?: Partial<CreateInputProps>;
-  displayBlock?: boolean;
-  style?: CSSProperties;
-}
-function CreateTaxonFormField({
-  obj,
-  formField,
-  handleChange,
-  inputProps,
-  displayBlock = false,
-  style = {}
-}: ItaxonFormField): JSX.Element {
-  const taxon = useTaxon();
-  if (!showField(formField, taxon)) {
-    return null;
-  } else {
-    return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
-  }
-}
+// interface ItaxonFormField {
+//   obj: Critter | AttachedCritter;
+//   formField: WorkflowFormField;
+//   handleChange: FormChangeEvent;
+//   inputProps?: Partial<CreateInputProps>;
+//   displayBlock?: boolean;
+//   style?: CSSProperties;
+// }
+// function CreateTaxonFormField({
+//   obj,
+//   formField,
+//   handleChange,
+//   inputProps,
+//   displayBlock = false,
+//   style = {}
+// }: ItaxonFormField): JSX.Element {
+//   const taxon = useTaxon();
+//   if (!showField(formField, taxon)) {
+//     return null;
+//   } else {
+//     return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
+//   }
+// }
 export {
   CreateEditTextField,
   CreateEditDateField,
   CreateEditCheckboxField,
   CreateEditSelectField,
-  CreateFormField,
-  CreateTaxonFormField
+  CreateFormField
+  // CreateTaxonFormField
 };

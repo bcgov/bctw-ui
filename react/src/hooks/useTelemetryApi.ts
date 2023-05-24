@@ -20,7 +20,7 @@ import {
   UseQueryOptions,
   UseQueryResult
 } from 'react-query';
-import { Critter, AttachedCritter, eCritterFetchType } from 'types/animal';
+import { Critter, AttachedCritter, eCritterFetchType, IMarking } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import { AttachDeviceInput, CollarHistory, RemoveDeviceInput } from 'types/collar_history';
@@ -37,7 +37,7 @@ import { CbRoutes } from 'critterbase/routes';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { UserCritterAccess } from 'types/animal_access';
-import { BCTWType } from 'types/common_types';
+import { BCTWType, uuid } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { BCTWWorkflow } from 'types/events/event';
 import { FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
@@ -99,7 +99,7 @@ export const useTelemetryApi = () => {
   const bulkApi = bulk_api(api);
   const mapApi = map_api({ api });
   const userApi = user_api({ api });
-  const eventApi = event_api({ api });
+  const eventApi = event_api({ api, cb_api });
   const permissionApi = permission_api({ api });
   const attachmentApi = attachment_api({ api });
   const onboardApi = onboarding_api({ api });
@@ -108,10 +108,13 @@ export const useTelemetryApi = () => {
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
 
   //CRITTERBASE HOOKS
-  const useCritterbaseSelectOptions = (prop: ICbRouteKey): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
+  const useCritterbaseSelectOptions = (
+    prop: ICbRouteKey,
+    query?: string
+  ): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
     return useQuery<Array<ICbSelect | string>, AxiosError>(
-      ['lookup-table-options', prop],
-      () => critterbaseApi.getLookupTableOptions(prop, true),
+      ['lookup-table-options', prop, query],
+      () => critterbaseApi.getLookupTableOptions(prop, true, query),
       {
         ...defaultQueryOptions
       }
@@ -124,6 +127,14 @@ export const useTelemetryApi = () => {
   ): UseMutationResult<IBulkUploadResults<Critter>> =>
     useMutation<IBulkUploadResults<Critter>, AxiosError, IUpsertPayload<Critter>>(
       (critter) => critterbaseApi.upsertCritter(critter),
+      config
+    );
+
+  const useDeleteMarking = (
+    config: UseMutationOptions<IBulkUploadResults<IMarking>, AxiosError, uuid>
+  ): UseMutationResult<IBulkUploadResults<IMarking>> =>
+    useMutation<IBulkUploadResults<IMarking>, AxiosError, uuid>(
+      (marking_id) => critterbaseApi.deleteMarking(marking_id),
       config
     );
 
@@ -732,6 +743,7 @@ export const useTelemetryApi = () => {
     useTakeActionOnPermissionRequest,
     useSubmitOnboardingRequest,
     useHandleOnboardingRequest,
-    useTriggerVendorTelemetry
+    useTriggerVendorTelemetry,
+    useDeleteMarking
   };
 };

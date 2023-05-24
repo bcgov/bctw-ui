@@ -1,7 +1,7 @@
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { Critter, eCritterStatus } from 'types/animal';
 import { Collar } from 'types/collar';
-import { eInputType, FormFieldObject } from 'types/form_types';
+import { eInputType, FormCommentStyle, FormFieldObject } from 'types/form_types';
 import { LocationEvent } from 'types/events/location_event';
 import dayjs, { Dayjs } from 'dayjs';
 import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
@@ -11,7 +11,8 @@ import {
   WorkflowType,
   OptionalAnimal,
   OptionalDevice,
-  IBCTWWorkflow
+  IBCTWWorkflow,
+  CbPayload
 } from 'types/events/event';
 import { IMortalityAlert } from 'types/alert';
 import { uuid } from 'types/common_types';
@@ -20,6 +21,7 @@ import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { DataLife } from 'types/data_life';
 import { WorkflowStrings } from 'constants/strings';
 import CaptureEvent from './capture_event';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 export type MortalityDeviceEventProps = Pick<
   Collar,
@@ -45,6 +47,8 @@ export type MortalityAnimalEventProps = Pick<
   // | 'ucod_confidence'
   | 'animal_id'
   | 'wlh_id'
+  | 'collection_unit'
+  | 'taxon'
   // | 'predator_known_ind'
   // | 'captivity_status_ind'
   // | 'mortality_investigation'
@@ -62,7 +66,7 @@ type MortalitySpecificProps = Pick<IBCTWWorkflow, 'shouldUnattachDevice'> &
 export interface IMortalityEvent
   extends MortalityDeviceEventProps,
     MortalityAnimalEventProps,
-    Omit<IMortalityAlert, 'data_life_start' | 'attachment_end'>,
+    Omit<IMortalityAlert, 'data_life_start' | 'attachment_end' | 'critter_status'>,
     Readonly<Pick<CollarHistory, 'assignment_id'>>,
     MortalitySpecificProps {}
 
@@ -76,6 +80,11 @@ export type DeploymentStatusNotDeployed = 'Not Deployed';
 export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMortalityEvent {
   // event specific props - not saved. used to enable/disable fields
   readonly event_type: WorkflowType;
+  readonly critter_id: uuid;
+  readonly wlh_id: string;
+  readonly taxon: string;
+  readonly animal_id: string;
+  readonly collection_unit: string; // This will probably need to be changed to collection_units: ICollectionUnit[]
   shouldUnattachDevice: boolean;
   shouldSaveAnimal: boolean;
   shouldSaveDevice: boolean;
@@ -96,8 +105,21 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   readonly assignment_id: uuid;
   data_life_end: Dayjs;
   attachment_start: Dayjs;
+
+  //Critterbase Props
+  mortality_id: uuid;
+  mortality_timestamp: Dayjs;
+  location: LocationEvent;
+  proximate_cause_of_death_id: uuid;
+  proximate_cause_of_death_confidence: string;
+  proximate_predated_by_taxon_id: uuid;
+  ultimate_cause_of_death_id: uuid;
+  ultimate_cause_of_death_confidence: string;
+  ultimate_predated_by_taxon_id: uuid;
+  mortality_comment: string;
+
   // critter props
-  readonly critter_id: uuid;
+  /*readonly critter_id: uuid;
   readonly animal_id: string;
   readonly wlh_id: string;
   taxon: string;
@@ -114,7 +136,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   mortality_captivity_status_ind: boolean;
   predator_known_ind: boolean;
   readonly capture_date: Dayjs;
-  location_event: LocationEvent;
+  location_event: LocationEvent;*/
 
   private critterPropsToSave: (keyof Critter)[] = [
     'critter_id',
@@ -132,12 +154,29 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     // 'mortality_captivity_status_ind'
   ];
 
+  get critterbasePayload(): CbPayload<MortalityEvent> {
+    return omitNull({
+      critter_id: this.critter_id,
+      mortality_timestamp: this.mortality_timestamp,
+      mortality_comment: this.mortality_comment,
+      location: this.location.critterbasePayload,
+      proximate_cause_of_death_id: this.proximate_cause_of_death_id,
+      proximate_cause_of_death_confidence: this.proximate_cause_of_death_confidence,
+      proximate_predated_by_taxon_id: this.proximate_predated_by_taxon_id,
+      ultimate_cause_of_death_id: this.ultimate_cause_of_death_id,
+      ultimate_cause_of_death_confidence: this.ultimate_cause_of_death_confidence,
+      ultimate_predated_by_taxon_id: this.ultimate_predated_by_taxon_id
+    });
+  }
+
   constructor(mort_date = dayjs(), capture?: CaptureEvent) {
     this.event_type = 'mortality';
+    this.mortality_timestamp = dayjs();
     this.shouldSaveAnimal = true;
     this.shouldSaveDevice = true;
     this.shouldUnattachDevice = false;
     this.onlySaveAnimalStatus = false;
+    this.data_life_end = dayjs();
     // retrieval date is defaulted to end of previous day (business requirement)
     this.retrieval_date = getEndOfPreviousDay();
     this.retrieved_ind = false;
@@ -146,10 +185,11 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     this.shouldUnattachDevice = false;
     this.device_status = 'Mortality';
     this.device_deployment_status = 'Not Deployed';
-    this.critter_status = eCritterStatus.mortality;
+    //this.critter_status = eCritterStatus.mortality;
     this.wasInvestigated = false;
-    this.predator_known_ind = false;
-    this.location_event = new LocationEvent('mortality');
+    //this.predator_known_ind = false;
+    //this.location_event = new LocationEvent('mortality');
+    this.location = new LocationEvent('mortality');
     if (capture) {
       this.mortCritterPropsToSave = [...this.critterPropsToSave, ...capture.captureCritterPropsToSave];
     }
@@ -164,7 +204,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   }
 
   get displayProps(): (keyof MortalityEvent)[] {
-    return ['wlh_id', 'animal_id', 'device_id', 'attachment_start'];
+    return ['taxon', 'wlh_id', 'critter_id'];
   }
 
   getWorkflowTitle(): string {
@@ -175,39 +215,81 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     switch (s) {
       case 'attachment_start':
         return 'Capture Date';
-      case 'mortality_report_ind':
-        return WorkflowStrings.mortality.mort_wildlife;
+      // case 'mortality_report_ind':
+      //   return WorkflowStrings.mortality.mort_wildlife;
       case 'retrieved_ind':
         return WorkflowStrings.device.was_retrieved;
       case 'activation_status_ind':
         return WorkflowStrings.device.vendor_activation;
-      case 'predator_known_ind':
-        return WorkflowStrings.mortality.mort_predator_pcod;
+      // case 'predator_known_ind':
+      //   return WorkflowStrings.mortality.mort_predator_pcod;
       case 'isUCODtaxonKnown':
         return WorkflowStrings.mortality.mort_predator_ucod;
       case 'shouldUnattachDevice':
         return WorkflowStrings.device.should_unattach;
-      case 'proximate_cause_of_death':
-        return 'PCOD';
-      case 'ultimate_cause_of_death':
-        return 'UCOD';
-      case 'predator_taxon_ucod':
-        return 'Predator UCOD';
-      case 'predator_taxon_pcod':
-        return 'Predator PCOD';
-      case 'pcod_confidence':
-      case 'ucod_confidence':
-        return 'Confidence';
+      case 'proximate_cause_of_death_id':
+        return 'Proximate COD';
+      case 'ultimate_cause_of_death_id':
+        return 'Ultimate COD';
+      case 'proximate_cause_of_death_confidence':
+        return 'PCOD Confidence';
+      case 'ultimate_cause_of_death_confidence':
+        return 'UCOD Confidence';
+      case 'proximate_predated_by_taxon_id':
+        return 'PCOD Predator Taxon';
+      case 'ultimate_predated_by_taxon_id':
+        return 'UCOD Predator Taxon';
       default:
-        return columnToHeader(s);
+        return columnToHeader(s ?? 'undefined key');
     }
   }
 
   // mortality event specific fields
-  fields: { [Property in keyof MortalitySpecificProps]+?: FormFieldObject<MortalitySpecificProps> } = {
+  /*fields: { [Property in keyof MortalitySpecificProps]+?: FormFieldObject<MortalitySpecificProps> } = {
     data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
     isUCODtaxonKnown: { prop: 'isUCODtaxonKnown', type: eInputType.check },
     shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check }
+  };*/
+  fields: MortalityFormField = {
+    retrieval_date: { prop: 'retrieval_date', type: eInputType.datetime, required: false },
+    retrieved_ind: { prop: 'retrieved_ind', type: eInputType.check, required: false },
+    shouldUnattachDevice: { prop: 'shouldUnattachDevice', type: eInputType.check },
+    data_life_end: { prop: 'data_life_end', type: eInputType.datetime },
+    mortality_timestamp: { prop: 'mortality_timestamp', type: eInputType.datetime, required: true },
+    mortality_comment: { prop: 'mortality_comment', type: eInputType.multiline, style: FormCommentStyle },
+    proximate_cause_of_death_id: {
+      prop: 'proximate_cause_of_death_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'cod',
+      required: true
+    },
+    proximate_cause_of_death_confidence: {
+      prop: 'proximate_cause_of_death_confidence',
+      type: eInputType.cb_select,
+      cbRouteKey: 'cause_of_death_confidence',
+      required: true
+    },
+    proximate_predated_by_taxon_id: {
+      prop: 'proximate_predated_by_taxon_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'taxons'
+    },
+    ultimate_cause_of_death_id: {
+      prop: 'ultimate_cause_of_death_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'cod',
+      required: false
+    },
+    ultimate_cause_of_death_confidence: {
+      prop: 'ultimate_cause_of_death_confidence',
+      type: eInputType.cb_select,
+      cbRouteKey: 'cause_of_death_confidence'
+    },
+    ultimate_predated_by_taxon_id: {
+      prop: 'ultimate_predated_by_taxon_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'taxons'
+    }
   };
 
   // retrieve the animal metadata fields from the mortality event
@@ -217,15 +299,15 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     if (this.onlySaveAnimalStatus) {
       return ret;
     }
-    if (!this.predator_known_ind) {
+    /*if (!this.predator_known_ind) {
       delete ret.predator_taxon_pcod;
       delete ret.pcod_confidence;
-    }
+    }*/
     if (!this.isUCODtaxonKnown) {
       delete ret.predator_taxon_ucod;
       delete ret.ucod_confidence;
     }
-    const locationFields = this.location_event.toJSON();
+    //const locationFields = this.location_event.toJSON();
     //TODO critterbase integration
     //return omitNull({ ...ret, ...locationFields });
     return omitNull({ ...ret });
@@ -256,9 +338,13 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     const { assignment_id, data_life_end } = this;
     const ret: RemoveDeviceInput = {
       assignment_id,
-      data_life_end: formatT(data_life_end),
-      attachment_end: formatT(data_life_end)
+      data_life_end: formatT(dayjs(data_life_end)),
+      attachment_end: formatT(dayjs(data_life_end))
     };
     return ret;
   }
 }
+
+export type MortalityFormField = {
+  [Property in keyof MortalityEvent]+?: FormFieldObject<MortalityEvent>;
+};

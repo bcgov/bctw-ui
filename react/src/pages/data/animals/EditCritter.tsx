@@ -1,25 +1,16 @@
-import { Box, Container, Grid, IconButton } from '@mui/material';
-import { Button, Icon } from 'components/common';
+import { Box, Container, Divider, Grid } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
-import SelectUDF from 'components/form/SelectUDF';
-import { CreateTaxonFormField } from 'components/form/create_form_components';
-import { MapStrings } from 'constants/strings';
+import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
-import { useUpdateTaxon, useTaxon } from 'contexts/TaxonContext';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import AssignmentHistory from 'pages/data/animals/AssignmentHistory';
+import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
-import AddUDF from 'pages/udf/AddUDF';
-import { useState } from 'react';
-import { Critter, AttachedCritter, critterFormFields } from 'types/animal';
-import { WorkflowType, wfFields } from 'types/events/event';
-import { InboundObj, parseFormChangeResult } from 'types/form_types';
+import { AttachedCritter, Critter, IMarking, critterFormFields } from 'types/animal';
+import { InboundObj } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
-import { IUDF, eUDFType } from 'types/udf';
-import { hideSection } from 'utils/taxon';
-import { EditHeader, FormSection, editEventBtnProps } from '../common/EditModalComponents';
-import { CritterWorkflow } from '../events/CritterWorkflow';
-import { TaxonSelect } from 'components/form/TaxonSelect';
+import { EditHeader, FormSection } from '../common/EditModalComponents';
+import CaptureEventForm from '../events/CaptureEventForm';
+import MortalityEventForm from '../events/MortalityEventForm';
+import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
 
 /**
  * the main animal form
@@ -34,22 +25,22 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   //const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
   const isAttached = editing instanceof AttachedCritter;
-  const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
-  const [workflow, setWorkflow] = useState<WorkflowType>();
-  const [showWorkflow, setShowWorkflow] = useState(false);
-  const [showUDFModal, setShowUDFModal] = useState(false);
-  const [hasBabies, setHasBabies] = useState(false);
+  // const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
+  // const [workflow, setWorkflow] = useState<WorkflowType>();
+  // const [showWorkflow, setShowWorkflow] = useState(false);
+  // const [showUDFModal, setShowUDFModal] = useState(false);
+  // const [hasBabies, setHasBabies] = useState(false);
 
-  useDidMountEffect(() => {
-    if (open) {
-      reset();
-    }
-  }, [open]);
+  // useDidMountEffect(() => {
+  //   if (open) {
+  //     reset();
+  //   }
+  // }, [open]);
 
-  const reset = (): void => {
-    setHasBabies(false);
-    //updateTaxon(null);
-  };
+  // const reset = (): void => {
+  //   setHasBabies(false);
+  //   //updateTaxon(null);
+  // };
 
   const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
 
@@ -76,44 +67,41 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
       )}
     </Container>
   );
-  const handleWorkflow = (wf: WorkflowType) => {
-    setWorkflow(wf);
-    setShowWorkflow(true);
-  };
+
   return (
     <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: InboundObj): void => {
-            //TODO critterbase integration does not support juevnile_at_heel the same way
-            // const [key, value] = parseFormChangeResult<Critter>(v);
-            // if (key === 'juvenile_at_heel' && value) {
-            //   setHasBabies(String(value).toLowerCase() === 'y');
-            // }
             handlerFromContext(v);
           };
           return (
             <Box>
-              <FormSection id='identifiers' header='Identifiers' disabled={true}>
-                {identifierFields?.map((f, i) => (
-                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))}
+              <FormSection id='critter' header='Critter Details' size='large'>
+                <Divider />
+                <FormSection id='identifiers' header='Identifiers'>
+                  {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
+                </FormSection>
+                <CbMarkings
+                  handleMarkings={(m, err) => {
+                    onChange({ marking: m, error: err });
+                  }}
+                  taxon_id={editing.taxon_id}
+                  markings={editing.marking}
+                />
               </FormSection>
-              <FormSection id='characteristics' header='Characteristics' disabled={true}>
-                {characteristicsFields?.map((f, i) => (
-                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))}
+              <FormSection
+                id='c-deets'
+                header='Latest Capture & Release Details'
+                hide={!editing.latestCapture}
+                size='large'>
+                <Divider />
+                <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} isEditing />
               </FormSection>
-              <FormSection id='capture-details' header='Latest Capture Details' disabled={true}>
-                {captureFields?.map((f, i) => (
-                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))}
-              </FormSection>
-              <FormSection id='release-details' header='Latest Release Details' disabled={true}>
-                {releaseFields?.map((f, i) => (
-                  <CreateTaxonFormField obj={editing} key={i} formField={f} handleChange={onChange} />
-                ))}
+              <FormSection id='m-deets' header='Mortality Details' hide={!editing.latestMortality} size='large'>
+                <Divider />
+                <MortalityEventForm event={editing.latestMortality} handleFormChange={onChange} />
               </FormSection>
             </Box>
           );

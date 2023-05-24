@@ -12,10 +12,9 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { ReactNode } from 'react';
 import { boxSpreadRowProps } from './EventComponents';
 import { isDev } from 'api/api_helpers';
-import { CreateFormField, CreateTaxonFormField } from 'components/form/create_form_components';
+import { CreateFormField } from 'components/form/create_form_components';
 import { AttachedCritter } from 'types/animal';
 import { FormSection } from '../common/EditModalComponents';
-import { wfFields } from 'types/events/event';
 
 type LocationEventProps = {
   event: LocationEvent;
@@ -32,69 +31,56 @@ export default function LocationEventForm({
   childNextToDate,
   disabled = false
 }: LocationEventProps): JSX.Element {
-  // const [showUtm, setShowUtm] = useState<eLocationPositionType>(eLocationPositionType.utm);
-
   // create the form inputs
   const { regions, comment, latlon, extra } = event.fields;
-  // const fields = event.fields;
-  // const latField = fields.latlon[0];
-  // const longField = fields.latlon[1];
-  // const utmFields = fields.utm as FormFieldObject<LocationEvent>[];
-  // const dateField = fields.date as FormFieldObject<LocationEvent>;
-  // const commentField = fields.comment as FormFieldObject<LocationEvent>;
-  // const radioID = 'coord_type';
+  const [isRequired, setIsRequired] = useState({ required: false });
 
-  // radio button control on whether to show UTM or lat long fields
-  // const changeCoordinateType = (e: InboundObj): void => {
-  //   const ct = e[radioID] as eLocationPositionType;
-  //   event.coordinate_type = ct;
-  //   setShowUtm(ct);
-  // };
+  const requiredLocationInputs: Array<keyof LocationEvent> = [
+    'latitude',
+    'longitude',
+    'coordinate_uncertainty',
+    'coordinate_uncertainty_unit'
+  ];
 
   const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];
     const value = Object.values(v)[0];
     event[key] = value;
+    if (requiredLocationInputs.includes(key as keyof LocationEvent) && value) {
+      setIsRequired({ required: true });
+    }
+    if (event.event_type === 'release') {
+      notifyChange({ ...v, nestedEventKey: 'release_location' });
+      return;
+    }
+    if (event.event_type === 'capture') {
+      notifyChange({ ...v, nestedEventKey: 'capture_location' });
+      return;
+    }
+    if (event.event_type === 'mortality') {
+      notifyChange({ ...v, nestedEventKey: 'location' });
+      return;
+    }
     // notify parent that the location event changed
     notifyChange(v);
   };
 
-  // notify parent error handler that required errors need to update when utm/lat long is changed
-  //TODO add this back
-  // useDidMountEffect(() => {
-  //   notifyChange({ reset: true, toReset: showUtm ? event.utm_keys : event.coord_keys });
-  // }, [showUtm]);
-
-  const LocationFormField = ({ fields }: { fields: FormFieldObject<LocationEvent>[] }) => {
-    return (
-      <>
-        {fields.map((f, i) => (
-          <React.Fragment key={`${i}-${String(f.prop)}`}>{CreateFormField(event, f, changeHandler)}</React.Fragment>
-        ))}
-      </>
-    );
-  };
-
-  const baseInputProps = { changeHandler, required: !isDev(), disabled };
   return (
     <>
       {children ? (
-        <FormSection id='latlon' header={`${capitalize(event.location_type)} Date`} {...baseInputProps}>
+        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`} flex>
           {children}
         </FormSection>
       ) : null}
-      <FormSection id='latlon' header={`${capitalize(event.location_type)} Location`} {...baseInputProps}>
-        <LocationFormField fields={latlon} />
-        <Box key='bx-rec' {...boxSpreadRowProps}>
-          <LocationFormField fields={comment} />
-        </Box>
+      <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`}>
+        {latlon.map((f) => CreateFormField(event, f, changeHandler))}
       </FormSection>
-      <FormSection id='Region' header={`${capitalize(event.location_type)} Region`} {...baseInputProps}>
-        <LocationFormField fields={regions} />
+      <FormSection id='Region' header={`${capitalize(event.event_type)} Region`}>
+        {regions.map((f) => CreateFormField(event, f, changeHandler))}
       </FormSection>
-      <FormSection id='environment' header={`${capitalize(event.location_type)} Environment`} {...baseInputProps}>
+      {/* <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`}>
         <LocationFormField fields={extra} />
-      </FormSection>
+      </FormSection> */}
 
       {/* <FormSection id='Comment' header={`${capitalize(event.location_type)} Comment`} {...baseInputProps}>
         {comment.map((f, i) => CreateFormField(event, f, changeHandler))}

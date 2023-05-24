@@ -7,7 +7,7 @@ import { Icon } from 'components/common';
 import { removeProps } from 'utils/common_helpers';
 
 export default function Modal(props: ModalProps): JSX.Element {
-  const { disableBackdropClick, open, title, handleClose, children, useButton, onEnteredCallback, headerComp } = props;
+  const { disableBackdropClick, open, title, handleClose, children, useButton, onEnteredCallback, headercomp } = props;
   const propsToPass = removeProps(props, ['handleClose', 'disableBackdropClick', 'useButton']);
   const classes = modalStyles();
   return (
@@ -26,7 +26,7 @@ export default function Modal(props: ModalProps): JSX.Element {
         }}>
         <div className={classes.paper}>
           <Grid container alignItems='center' justifyContent='space-between'>
-            <Grid item>{headerComp ? headerComp : <h3>{title}</h3>}</Grid>
+            <Grid item>{headercomp ? headercomp : <h3>{title}</h3>}</Grid>
             <Grid item>
               {/* if this prop was passed, dont show the close button */}
               {/* <div className={classes.headerBox}> */}

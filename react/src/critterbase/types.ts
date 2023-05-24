@@ -1,5 +1,4 @@
 import { uuid } from 'types/common_types';
-import { CbRoutes } from './routes';
 
 interface ICbSelect {
   key: string;
@@ -10,6 +9,7 @@ interface ICbSelect {
 type ICbRouteKey =
   | 'region_env'
   | 'region_nr'
+  | 'colours'
   | 'wmu'
   | 'cod'
   | 'sex'
@@ -23,7 +23,10 @@ type ICbRouteKey =
   | 'measurement_units'
   | 'supported_systems'
   | 'taxons'
-  | 'species';
+  | 'species'
+  | 'collection_units'
+  | 'taxon_collection_categories'
+  | 'taxon_marking_body_locations';
 
 // interface ICbRoute {
 //   route: string;

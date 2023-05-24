@@ -13,14 +13,14 @@ export default function useFormHasError(): [boolean, (r: InboundObj) => void, ()
   const [errorsExist, setErrorsExist] = useState(false);
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
+  /*useEffect(() => {
     const numErrs = Object.keys(errors).length;
     if (isDev()) {
       // eslint-disable-next-line no-console
       console.log(`useFormHasError state updated, ${numErrs} errors ${JSON.stringify(errors)}`);
     }
     setErrorsExist(numErrs > 0);
-  }, [errors]);
+  }, [errors]);*/
 
   const forceReset = (): void => {
     setErrors({});
@@ -49,6 +49,8 @@ export default function useFormHasError(): [boolean, (r: InboundObj) => void, ()
       return;
     }
 
+    //console.log('Inbond object for checkErrors: ' + JSON.stringify(v, null, 2));
+
     // find the non-error key/value
     const prop = Object.keys(v).filter((k) => k !== 'error')[0];
 
@@ -63,5 +65,5 @@ export default function useFormHasError(): [boolean, (r: InboundObj) => void, ()
       setErrors({ ...newErrs });
     }
   };
-  return [errorsExist, checkErrors, forceReset];
+  return [/*errorsExist*/ Object.entries(errors).length > 0, checkErrors, forceReset];
 }

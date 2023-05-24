@@ -1,4 +1,5 @@
 import { FormStrings } from 'constants/strings';
+import { isDayjs } from 'dayjs';
 const maxTemp = 50;
 const mustBeNegativeNumber = (v: number): string => (v > 0 ? FormStrings.validateNegativeLongitude : '');
 
@@ -8,6 +9,14 @@ const mustbePositiveNumber = <T>(t: T): string => {
 
 const mustBeLessThan50Words = <T>(t: T): string => {
   return typeof t === 'string' && t.split(' ').length < 2 ? '' : 'must be less than 100 words';
+};
+
+const mustBeLatitude = <T>(t: T): string => {
+  return typeof t === 'number' && t <= 90 && t >= -90 ? '' : 'Latitude must be between -90 and 90';
+};
+
+const mustBeLongitude = <T>(t: T): string => {
+  return typeof t === 'number' && t <= 180 && t >= -180 ? '' : 'Longitude must be between -180 and 180';
 };
 
 const mustBeXDigits = (v: number, numDigits: number): string =>
@@ -28,5 +37,7 @@ export {
   mustBeXDigits,
   mustBeEmail,
   mustBeValidTemp,
-  mustBeLessThan50Words
+  mustBeLessThan50Words,
+  mustBeLatitude,
+  mustBeLongitude
 };

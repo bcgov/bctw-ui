@@ -3,58 +3,71 @@ import { baseInputStyle, selectMenuProps } from 'components/component_constants'
 import { CreateInputProps } from 'components/form/create_form_components';
 import { isFunction } from 'components/table/table_helpers';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
-import { is } from 'date-fns/locale';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 
-export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey };
-export const CbSelect = ({ cbRouteKey, value, prop, required, handleChange }: CbSelectProps): JSX.Element => {
+export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey; query?: string };
+export const CbSelect = ({
+  cbRouteKey,
+  value,
+  prop,
+  required,
+  handleChange,
+  label,
+  disabled,
+  query
+}: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
-  const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
+  const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey, query);
   const [selected, setSelected] = useState<uuid | string>('');
-  // const [hasError, setHasError] = useState((required && !selected) || !cbRouteKey);
-
-  const hasError = isError || (required && !selected) || !cbRouteKey;
-  const isDisabled = isLoading || isError || !cbRouteKey;
-  // console.log({ cbRouteKey }, { isLoading }, { isError });
-  const label = cbRouteKey ? columnToHeader(cbRouteKey) : 'Missing Route Key';
+  const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
+  const isDisabled = isLoading || isError || !cbRouteKey || disabled;
+  const labelOverride = label ?? columnToHeader(cbRouteKey);
 
   useEffect(() => {
     if (!data?.length) return;
+    if (!value) {
+      handleSelect();
+      return;
+    }
     if (typeof value !== 'string') return;
-    setSelected(value);
+    const val = data.find((d) => (typeof d === 'string' ? d === value : d.id === value));
+    handleSelect(value, typeof val === 'string' ? val : val.value);
   }, [isSuccess]);
 
-  const pushChange = (v: string): void => {
+  const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
-    const ret = { [prop]: v, error: false };
+    const err = !v && required;
+    setHasError(err);
+    const ret = { [prop]: v, error: err };
     handleChange(ret);
-    console.log(ret);
   };
 
-  const handleSelect = (event: SelectChangeEvent): void => {
-    const { value } = event.target;
-    setSelected(value);
-    pushChange(value);
+  const handleSelect = (id?: string, label?: string): void => {
+    const hasProps = id && label;
+    const a = { id, label };
+    setSelected(hasProps ? a.id : '');
+    pushChange(hasProps ? a : '');
   };
+
   return (
     <FormControl
       size='small'
-      style={{ ...baseInputStyle, marginBottom: baseInputStyle.marginRight }}
+      style={{ ...baseInputStyle }}
       required={required}
       className={`select-control ${hasError ? 'input-error' : ''}`}
       error={!isLoading && hasError}
       key={`${cbRouteKey}-${String(prop)}`}
       disabled={isDisabled}>
-      <InputLabel>{label}</InputLabel>
-      <Select value={selected} onChange={handleSelect} MenuProps={selectMenuProps}>
+      <InputLabel>{labelOverride}</InputLabel>
+      <Select value={selected} /*onChange={handleSelect}*/ MenuProps={selectMenuProps}>
         {data?.map((val, idx) => {
           const valueId = typeof val === 'string' ? val : val.id;
           const value = typeof val === 'string' ? val : val.value;
           return (
-            <MenuItem value={valueId} key={`${val}-${idx}`}>
+            <MenuItem value={valueId} key={`${val}-${idx}`} onClick={() => handleSelect(valueId, value)}>
               {capitalize(value)}
             </MenuItem>
           );
