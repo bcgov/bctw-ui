@@ -109,6 +109,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   //Critterbase Props
   mortality_id: uuid;
   mortality_timestamp: Dayjs;
+  location_id: uuid;
   location: LocationEvent;
   proximate_cause_of_death_id: uuid;
   proximate_cause_of_death_confidence: string;
@@ -117,6 +118,9 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
   ultimate_cause_of_death_confidence: string;
   ultimate_predated_by_taxon_id: uuid;
   mortality_comment: string;
+  
+  proximate_cause_of_death: {cod_category: string, cod_reason: string}
+  ultimate_cause_of_death: {cod_category: string, cod_reason: string}
 
   // critter props
   /*readonly critter_id: uuid;
@@ -156,9 +160,11 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
 
   get critterbasePayload(): CbPayload<MortalityEvent> {
     return omitNull({
+      mortality_id: this.mortality_id,
       critter_id: this.critter_id,
       mortality_timestamp: this.mortality_timestamp,
       mortality_comment: this.mortality_comment,
+      location_id: this.location_id,
       location: this.location.critterbasePayload,
       proximate_cause_of_death_id: this.proximate_cause_of_death_id,
       proximate_cause_of_death_confidence: this.proximate_cause_of_death_confidence,
@@ -266,8 +272,7 @@ export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMo
     proximate_cause_of_death_confidence: {
       prop: 'proximate_cause_of_death_confidence',
       type: eInputType.cb_select,
-      cbRouteKey: 'cause_of_death_confidence',
-      required: true
+      cbRouteKey: 'cause_of_death_confidence'
     },
     proximate_predated_by_taxon_id: {
       prop: 'proximate_predated_by_taxon_id',

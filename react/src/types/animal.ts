@@ -4,7 +4,7 @@ import { Code } from 'types/code';
 import { BCTWBase, DayjsToPlain, nullOrDayjs, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { FormFieldObject, eInputType, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
-import { classToArray, columnToHeader } from 'utils/common_helpers';
+import { classToArray, columnToHeader, omitNull } from 'utils/common_helpers';
 import { ICollarHistory } from './collar_history';
 import { DataLife } from './data_life';
 import { editObjectToEvent } from './events/event';
@@ -65,12 +65,12 @@ export interface ICapture {
   capture_location?: ILocation;
   capture_comment?: string;
   release_timestamp?: Dayjs;
-  relase_location_id?: uuid;
+  release_location_id?: uuid;
   release_location: ILocation;
   release_comment?: string;
 }
 
-interface IMortality {
+export interface IMortality {
   mortality_id: uuid;
   location_id: uuid;
   location?: uuid; //Uncertain if the critterbase payload returns this
@@ -95,11 +95,17 @@ export interface IMarking {
   attached_timestamp: Dayjs;
   removed_timestamp: Dayjs;
   body_location: string;
+  taxon_marking_body_location_id: uuid;
   marking_type: string;
+  marking_type_id: uuid;
   marking_material: string;
+  marking_material_id: uuid;
   primary_colour: string;
+  primary_colour_id: uuid;
   secondary_colour: string;
+  secondary_colour_id: uuid;
   text_colour: string;
+  text_colour_id: uuid;
 }
 
 interface IQualitativeMeasurement {
@@ -187,23 +193,66 @@ export class Critter implements BCTWBase<Critter>{
     return ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'critter_status'];
   }
 
-  get latestCapture(): CaptureEvent2 {
+  get latestCapture(): CaptureEvent2 | null {
     if (this.capture?.length){
       const capture_location = editObjectToEvent(this.capture[0].capture_location, new LocationEvent('capture'), []);
       const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);
       return editObjectToEvent({...this.capture[0], capture_location, release_location }, new CaptureEvent2(), [])
-    }
+    } 
+    return null;
   }
 
-  get latestMortality(): MortalityEvent {
+  get latestMortality(): MortalityEvent | null {
     if (this.mortality?.length){
-      const location = editObjectToEvent(this.mortality[0].location, new LocationEvent('mortality'), [])
-      return editObjectToEvent({...this.mortality[0], location}, new MortalityEvent(), [])
+      const mortality_location = editObjectToEvent(this.mortality[0].location, new LocationEvent('mortality'), []);
+      const a = editObjectToEvent(this.mortality[0], new MortalityEvent(), []);
+      a.location = mortality_location;
+      return a;
     }
+    return null;
   }
 
   get collection_unit(): string {
     return formatCollectionUnits(this.collection_units)
+  }
+
+  get critterbasePayload(): Record<string, unknown> {
+    
+    const payload = omitNull({
+      critters: [
+        {
+          critter_id: this.critter_id,
+          taxon_id: this.taxon_id,
+          wlh_id: this.wlh_id,
+          animal_id: this.animal_id,
+          sex: this.sex,
+          responsible_region_nr_id: this.responsible_region_nr_id
+        }
+      ],
+      captures: [],
+      mortalities: [],
+      locations: []
+    });
+
+    if(this.latestCapture) {
+      const { capture_location, release_location, ...capture_rem } = this.latestCapture.critterbasePayload;
+      payload.captures.push(capture_rem);
+      if(capture_location) {
+        payload.locations.push({ ...(capture_location as ILocation), location_id: capture_rem.capture_location_id });
+      }
+      if(release_location) {
+        payload.locations.push({ ...(release_location as ILocation), location_id: capture_rem.release_location_id });
+      }
+    }
+
+    if(this.latestMortality) {
+      const { location, ...mortality_rem } = this.latestMortality.critterbasePayload;
+      payload.mortalities.push(mortality_rem);
+      if(location) {
+        payload.locations.push({ ...(location as ILocation), location_id: mortality_rem.location_id });
+      }
+    }
+      return payload;
   }
 
   tagColor(): string {
@@ -318,6 +367,10 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
           return 'Last Transmission';
         case 'last_fetch_date':
           return 'Last Update Attempt';
+        case 'taxon_id':
+          return 'Taxon'
+        case 'responsible_region_nr_id':
+          return 'Responsible NR Region'
         default:
           return columnToHeader(str);
       }
@@ -342,17 +395,17 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
 // text_colour: string;
 export const markingFormFields: Record<string, FormFieldObject<IMarking>[]> = {
 markingFields: [
-    {prop: 'marking_type', type: eInputType.cb_select, cbRouteKey: 'marking_type', ...isRequired},
+    {prop: 'marking_type_id', type: eInputType.cb_select, cbRouteKey: 'marking_type', ...isRequired},
     {prop: 'frequency', type: eInputType.number, ...isRequired},
     {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
     {prop: 'identifier', type: eInputType.text},
     // {prop: 'order', type: eInputType.number},
     {prop: 'attached_timestamp', type: eInputType.datetime, ...isRequired},
-    {prop: 'body_location', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations', ...isRequired},
-    {prop: 'marking_material', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
-    {prop: 'primary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
-    {prop: 'secondary_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
-    {prop: 'text_colour', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'taxon_marking_body_location_id', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations', ...isRequired},
+    {prop: 'marking_material_id', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
+    {prop: 'primary_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'secondary_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
+    {prop: 'text_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
     {prop: 'removed_timestamp', type: eInputType.datetime},
     {prop: 'comment', type: eInputType.multiline},
 

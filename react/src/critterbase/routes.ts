@@ -10,6 +10,7 @@ export const CbRouters = {
   mortality: '/mortality',
   markings: '/markings',
   xref: '/xref',
+  bulk: '/bulk',
 
   get lookupsEnum(): string {
     return this.lookups + '/enum';

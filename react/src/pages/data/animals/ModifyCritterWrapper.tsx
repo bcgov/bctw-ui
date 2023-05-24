@@ -9,6 +9,7 @@ import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
 import { IAddEditProps } from '../common/AddEditViewer';
 import { plainToClass } from 'class-transformer';
+import { editObjectToEvent } from 'types/events/event';
 
 type IModifyWrapperProps = {
   editing: Critter | AttachedCritter;
@@ -44,30 +45,32 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
    * note: if data has been previously fetched, 'status' will not be updated.
    * in that case, check if @var data exists and call @function setAnimal
    */
+
   useEffect(() => {
     if (data && status === 'success') {
       if (data.assignment_id) {
-        setAnimal(plainToClass(AttachedCritter, data));
+        const a = editObjectToEvent(data, new AttachedCritter(data.critter_id), []);
+        setAnimal(a);
       } else {
-        setAnimal(plainToClass(Critter, data));
+        setAnimal(editObjectToEvent(data, new Critter(data.critter_id), []));
       }
     }
     setHasCollar(editing instanceof AttachedCritter);
     setCanEdit(true);
-  }, [status, editing]);
+  }, [data, status, editing]);
 
   // must be defined before mutation declarations
   const handleSaveResult = async (data: IBulkUploadResults<Critter>): Promise<void> => {
     const { errors, results } = data;
-    console.log(data);
+    console.log('Data in save result' + data);
     //The response of this mutation should not be BulkResponse
     if (errors?.length) {
       showNotif({ severity: 'error', message: `${errors.map((e) => e.error)}` });
     } else {
-      const critter = results[0];
-      showNotif({ severity: 'success', message: `${critter.animal_id} saved!` });
-      setCritter(results[0]);
-      onUpdate?.(results[0].critter_id);
+      //const critter = results[0];
+      showNotif({ severity: 'success', message: `${editing.critter_id} saved!` });
+      //setCritter(results[0]);
+      onUpdate?.(editing.critter_id);
     }
   };
 
@@ -81,14 +84,15 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const onError = (error: AxiosError): void => showNotif({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutations
-  const { mutateAsync: saveMutation } = api.useSaveCritterbaseCritter({ onSuccess: handleSaveResult, onError });
+  //const { mutateAsync: saveMutation } = api.useSaveCritterbaseCritter({ onSuccess: handleSaveResult, onError });
+  const { mutateAsync: saveCritterbase, isLoading } = api.useBulkUpdateCritterbaseCritter({ onSuccess: handleSaveResult, onError});
   const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: handleDeleteResult, onError });
 
   const saveCritter = async (a: IUpsertPayload<Critter | AttachedCritter>): Promise<void> => {
-    const { body } = a;
-    const formatted = body.toJSON();
-    console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
-    await saveMutation({ body: formatted });
+    //const { body } = a;
+    //const formatted = body.toJSON();
+    // console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
+    await saveCritterbase(a);
   };
 
   const deleteCritter = async (critterId: string): Promise<void> => {
@@ -117,12 +121,13 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const passTheseProps: Pick<
     IAddEditProps<Critter>,
     'onDelete' | 'onSave' | 'cannotEdit' | 'editing' | 'queryStatus'
-  > = {
+  > & {busySaving: boolean} = {
     cannotEdit: !canEdit,
     onDelete: (): void => setShowConfirmDelete((o) => !o),
     onSave: saveCritter,
     editing: animal,
-    queryStatus: status
+    queryStatus: status,
+    busySaving: isLoading
   };
   return (
     <>
