@@ -3,7 +3,7 @@ import { Transform } from 'class-transformer';
 import { columnToHeader } from 'utils/common_helpers';
 import { Critter, ICollectionUnit } from 'types/animal';
 import { Collar } from 'types/collar';
-import { BCTWBase, nullToDayjs, PartialPick } from 'types/common_types';
+import { BCTWBase, getCollectionUnitKeys, getCollectionUnitProps, nullToDayjs, PartialPick } from 'types/common_types';
 import { eCritterPermission } from 'types/permission';
 
 export interface IUserCritterAccess
@@ -14,6 +14,7 @@ export interface IUserCritterAccess
 export type IUserCritterAccessInput = Required<Pick<IUserCritterAccess, 'critter_id' | 'permission_type'>> &
   PartialPick<IUserCritterAccess, 'animal_id' | 'wlh_id'>;
 
+// * Instantiate this class with createFlattenedProxy() to expose collection_units dynamically
 export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritterAccess> {
   permission_type: eCritterPermission;
   critter_id: string;
@@ -39,15 +40,17 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   get name(): string {
     return this.animal_id ?? this.wlh_id;
   }
-  // Get a comma-separated string of collection_unit's keys and values
-  // TODO: Decide on the exact format we want for this
-  get collection_unit_display(): string {
-    const collectionUnitArray = this.collection_units?.map((unit) => {
-      const unitString = Object.entries(unit).map(([key, value]) => `${key}: ${value}`);
-      return unitString;
-    });
-    return collectionUnitArray?.join(', ') ?? '';
+
+  // Getter for properties in collection_units
+  get collectionUnitProps(): Record<string, string> {
+    return getCollectionUnitProps(this.collection_units);
   }
+
+  // Getter to return the keys of the new properties
+  get collectionUnitKeys(): string[] {
+    return getCollectionUnitKeys(this.collection_units);
+  }
+
   // Get the permission_type value or 'none' if it does not exist
   get permission_type_display(): eCritterPermission {
     return this.permission_type ?? eCritterPermission.none;
@@ -64,10 +67,9 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
   static get propsToDisplay(): (keyof UserCritterAccess)[] {
     return [
       'permission_type_display',
+      'taxon',
       'wlh_id',
       'animal_id',
-      'taxon',
-      'collection_unit_display',
       'device_id',
       'frequency',
       'device_type',

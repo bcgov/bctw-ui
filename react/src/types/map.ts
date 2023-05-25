@@ -5,7 +5,7 @@ import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus } from 'types/an
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
-import { BCTWBase, BCTWType, DayjsToPlain, nullOrDayjs, toClassOnly, toPlainOnly } from './common_types';
+import { BCTWBase, BCTWType, DayjsToPlain, getCollectionUnitKeys, getCollectionUnitProps, nullOrDayjs, toClassOnly, toPlainOnly } from './common_types';
 import { Dayjs } from 'dayjs';
 
 interface MapRange {
@@ -61,7 +61,7 @@ interface ITelemetryGroup {
 }
 
 // represents the jsonb object in the get_telemetry pg function
-// TODO: find a better solution to inherit common functions/properties like "mortality_timestamp" and "formatCollectionUnits"
+// * Instantiate this class with createFlattenedProxy() to expose collection_units dynamically
 export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDetail> {
   critter_id: string;
   taxon: string;
@@ -104,17 +104,12 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
 
   // Getter for properties in collection_units
   get collectionUnitProps(): Record<string, string> {
-    const collectionUnitProps: Record<string, string> = {};
-    (this.collection_units ?? []).forEach((unit) => {
-      const key = headerToColumn(unit.category_name);
-      collectionUnitProps[key] = unit.unit_name;
-    });
-    return collectionUnitProps;
+    return getCollectionUnitProps(this.collection_units);
   }
 
   // Getter to return the keys of the new properties
   get collectionUnitKeys(): string[] {
-    return Object.keys(this.collectionUnitProps);
+    return getCollectionUnitKeys(this.collection_units);
   }
 
   get critter_status(): string {
@@ -129,23 +124,6 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
     return columnToHeader(str);
   }
 }
-
-// Function to create a Proxy for a TelemetryDetail object with flattened collection_units
-const createTelemetryDetailProxy = (telemetryDetail: TelemetryDetail): TelemetryDetail => {
-  return new Proxy(telemetryDetail, {
-    get: (target, prop: string): unknown => {
-      if (prop === 'collection_units') {
-        return target.collection_units ?? [];
-      }
-
-      if (Reflect.has(target, prop)) {
-        return Reflect.get(target, prop);
-      }
-
-      return target.collectionUnitProps[prop] ?? undefined;
-    }
-  });
-};
 
 export class TelemetryFeature implements ITelemetryPoint {
   type: 'Feature';
@@ -209,4 +187,4 @@ export type {
   MapFormValue
 };
 
-export { createTelemetryDetailProxy, doesPointArrayContainPoint };
+export { doesPointArrayContainPoint };
