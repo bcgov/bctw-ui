@@ -48,7 +48,7 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
   }, [tabLabels.length]);
   return (
     //ml: -1 / mt: -1 is to prevent clipping issues with the boxShadow
-    <Box width='100%' sx={{ ml: -1, mt: -1 }}>
+    <Box width='100%'>
       <Tabs
         value={tab}
         sx={{

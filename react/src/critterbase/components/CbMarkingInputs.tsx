@@ -137,7 +137,6 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
             id={`marking-${i}`}
             header={`Marking ${i + 1}`}
             key={`marking-${i}-${m}`}
-            flex
             btn={
               <Button {...editEventBtnProps} onClick={() => handleDeleteMarking(i)} startIcon={<Icon icon={'close'} />}>
                 Delete Marking

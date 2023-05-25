@@ -72,7 +72,7 @@ export default function CaptureEventForm({
 
       {/* Release Date */}
 
-      <FormSection id='release-date' header='Release Date' flex>
+      <FormSection id='release-date' header='Release Date'>
         {CreateFormField(capture, capture.fields.release_timestamp, onChange, { minDate: minReleaseDate })}
         {CreateFormField(capture, capture.fields.release_comment, onChange)}
       </FormSection>

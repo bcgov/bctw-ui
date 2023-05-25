@@ -64,7 +64,7 @@ function CreateEditTextField(props: CreateInputProps): ReactElement {
 }
 
 function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
-  const newProps = Object.assign({ multiline: true, rows: 1, fullWidth: true }, props);
+  const newProps = Object.assign({ multiline: true, rows: 1, comment: true }, props);
   return CreateEditTextField(newProps);
 }
 

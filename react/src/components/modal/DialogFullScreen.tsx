@@ -23,11 +23,13 @@ const useStyles = makeStyles(() => ({
   fsDialogBackBtn: {
     marginRight: 'auto',
     color: '#ffffff',
-    float: 'left'
+    float: 'left',
+    paddingLeft: 0
   },
   fsDialogHelpBtn: {
     color: '#ffffff',
-    float: 'right'
+    float: 'right',
+    paddingRight: 0
   }
 }));
 
@@ -47,7 +49,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
   return (
     <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
       <AppBar elevation={0} className={classes.appBar}>
-        <Container>
+        <Container maxWidth='md'>
           <Toolbar disableGutters className={classes.fsDialogHeader}>
             <Button
               className={classes.fsDialogBackBtn}
@@ -55,7 +57,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
               disableElevation
               startIcon={<Icon icon={'back'} />}
               onClick={(): void => handleClose(false)}>
-              Cancel and Exit
+              Back
             </Button>
             <Button
               className={classes.fsDialogHelpBtn}

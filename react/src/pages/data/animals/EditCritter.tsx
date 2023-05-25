@@ -12,6 +12,7 @@ import CaptureEventForm from '../events/CaptureEventForm';
 import MortalityEventForm from '../events/MortalityEventForm';
 import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
 import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
+import { useEffect } from 'react';
 
 /**
  * the main animal form
@@ -20,7 +21,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   const { isCreatingNew, editing, open } = props;
   editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
-  const taxon = useTaxon();
+  //const taxon = useTaxon();
 
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const isAttached = editing instanceof AttachedCritter;
@@ -28,7 +29,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
 
   const Header = (
-    <Container>
+    <Box>
       {isCreatingNew ? (
         <Box pt={3}>
           <Box component='h1' mt={0} mb={0}>
@@ -38,7 +39,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
       ) : (
         <EditHeader<AttachedCritter>
           title={
-            <Grid container flexDirection='row'>
+            <Grid container flexDirection='row' pl={0}>
               <Grid item>WLH ID: {editing?.wlh_id ?? '-'}</Grid>
               {editing.animal_id && <Grid item>&nbsp;/ Animal ID: {editing.animal_id}</Grid>}
             </Grid>
@@ -48,8 +49,12 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
           obj={editing as AttachedCritter}
         />
       )}
-    </Container>
+    </Box>
   );
+
+  useEffect(() => {
+    console.log('editing object changed');
+  }, [JSON.stringify(editing)]);
 
   return (
     <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing}>
