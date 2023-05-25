@@ -51,7 +51,6 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState<ReactNode>(null);
-  const [eventTrigger, setEventTrigger] = useState(false);
 
   useEffect(() => {
     setCanSave(!hasErr && eventHasAllRequiredProperties());
@@ -129,7 +128,6 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       tmp[k] = val;
       setStatefulEvent(tmp);
     }
-    setEventTrigger((e) => !e);
     setCanSave(!hasErr && eventHasAllRequiredProperties());
     //const a = eventHasAllRequiredProperties();
     //console.log(`${JSON.stringify(v)} -- Set canSave with ${!hasErr} and ${a}`)
