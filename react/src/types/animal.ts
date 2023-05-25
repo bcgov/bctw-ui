@@ -1,7 +1,7 @@
 import { Exclude, Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { BCTWBase, DayjsToPlain, nullOrDayjs, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
+import { BCTWBase, DayjsToPlain, getCollectionUnitKeys, getCollectionUnitProps, nullOrDayjs, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { FormFieldObject, eInputType, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader, omitNull } from 'utils/common_helpers';
@@ -190,8 +190,18 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   get displayProps(): (keyof Critter)[] {
-    return ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'critter_status'];
+    return ['taxon', 'wlh_id', 'animal_id', 'critter_status'];
   }
+
+    // Getter for properties in collection_units
+    get collectionUnitProps(): Record<string, string> {
+      return getCollectionUnitProps(this.collection_units);
+    }
+  
+    // Getter to return the keys of the new properties
+    get collectionUnitKeys(): string[] {
+      return getCollectionUnitKeys(this.collection_units);
+    }
 
   get latestCapture(): CaptureEvent2 | null {
     if (this.capture?.length){

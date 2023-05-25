@@ -3,7 +3,7 @@ import { formatTime } from 'utils/time';
 import { UserCritterAccess } from './animal_access';
 import { TelemetryDetail } from './map';
 import { headerToColumn } from 'utils/common_helpers';
-import { ICollectionUnit } from './animal';
+import { Critter, ICollectionUnit } from './animal';
 
 export interface BCTWValidDates {
   valid_from: Date | Dayjs;
@@ -68,7 +68,7 @@ const nullToDayjs = (v: Date | null): Dayjs => dayjs(v);
 const DayjsToPlain = (v: Dayjs): string => v?.format(formatTime);
 
 // Flattens the collection units inner array into regular getter properties
-const createFlattenedProxy = <T extends UserCritterAccess | TelemetryDetail>(object: T): T => {
+const createFlattenedProxy = <T extends Critter | UserCritterAccess | TelemetryDetail>(object: T): T => {
   return new Proxy(object, {
     get: (target: T, prop: string): unknown => {
       if (prop === 'collection_units') {
