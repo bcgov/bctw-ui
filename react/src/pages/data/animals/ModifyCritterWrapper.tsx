@@ -47,13 +47,16 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
    */
 
   useEffect(() => {
-    if (data && status === 'success') {
+    if(status === 'success') {
       if (data.assignment_id) {
         const a = editObjectToEvent(data, new AttachedCritter(data.critter_id), []);
         setAnimal(a);
       } else {
         setAnimal(editObjectToEvent(data, new Critter(data.critter_id), []));
       }
+    }
+    else {
+      setAnimal(editObjectToEvent({}, new Critter() , [] as never[]));
     }
     setHasCollar(editing instanceof AttachedCritter);
     setCanEdit(true);
