@@ -83,7 +83,6 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
     //Strip undefined markings
     const markings = markingsData.filter((m) => m);
     handleMarkings(markings, hasErr);
-    console.log(markings);
   }, [JSON.stringify(markingsData), hasErr]);
 
   const onChange = (v: InboundObj, idx: number): void => {

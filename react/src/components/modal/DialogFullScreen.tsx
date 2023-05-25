@@ -47,7 +47,7 @@ export default function FullScreenDialog({ open, handleClose, children }: ModalP
   return (
     <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
       <AppBar elevation={0} className={classes.appBar}>
-        <Container maxWidth='xl'>
+        <Container>
           <Toolbar disableGutters className={classes.fsDialogHeader}>
             <Button
               className={classes.fsDialogBackBtn}

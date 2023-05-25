@@ -68,11 +68,11 @@ export default function LocationEventForm({
   return (
     <>
       {children ? (
-        <FormSection id='latlon' header={`${capitalize(event.event_type)} Date`} flex>
+        <FormSection id='date' header={`${capitalize(event.event_type)} Date`} flex>
           {children}
         </FormSection>
       ) : null}
-      <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`}>
+      <FormSection id='latlon' header={`${capitalize(event.event_type)} Location`} flex>
         {latlon.map((f) => CreateFormField(event, f, changeHandler))}
       </FormSection>
       <FormSection id='Region' header={`${capitalize(event.event_type)} Region`}>

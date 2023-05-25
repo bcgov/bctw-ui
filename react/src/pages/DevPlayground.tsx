@@ -134,13 +134,13 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
-        {/* <Box my={5}>
+        <Box my={5}>
           <CbCollectionUnitInputs
             taxon_id={editCritter.taxon_id}
             collection_units={editCritter.collection_units}
             handleChange={(v) => console.log(v)}
           />
-        </Box> */}
+        </Box>
         <Box my={5}>
           {/* <CbMarkingInput
             taxon_id={editCritter.taxon_id}

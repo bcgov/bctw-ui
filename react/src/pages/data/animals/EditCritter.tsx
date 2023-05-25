@@ -11,6 +11,7 @@ import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import MortalityEventForm from '../events/MortalityEventForm';
 import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
+import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
 
 /**
  * the main animal form
@@ -19,33 +20,15 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   const { isCreatingNew, editing, open } = props;
   editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
-  //const updateTaxon = useUpdateTaxon();
   const taxon = useTaxon();
 
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
-  //const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
   const isAttached = editing instanceof AttachedCritter;
-  // const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
-  // const [workflow, setWorkflow] = useState<WorkflowType>();
-  // const [showWorkflow, setShowWorkflow] = useState(false);
-  // const [showUDFModal, setShowUDFModal] = useState(false);
-  // const [hasBabies, setHasBabies] = useState(false);
-
-  // useDidMountEffect(() => {
-  //   if (open) {
-  //     reset();
-  //   }
-  // }, [open]);
-
-  // const reset = (): void => {
-  //   setHasBabies(false);
-  //   //updateTaxon(null);
-  // };
 
   const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
 
   const Header = (
-    <Container maxWidth='xl'>
+    <Container>
       {isCreatingNew ? (
         <Box pt={3}>
           <Box component='h1' mt={0} mb={0}>
@@ -82,6 +65,7 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 <Divider />
                 <FormSection id='identifiers' header='Identifiers'>
                   {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
+                  <CbCollectionUnitInputs {...editing} handleChange={onChange} />
                 </FormSection>
                 <CbMarkings
                   handleMarkings={(m, err) => {

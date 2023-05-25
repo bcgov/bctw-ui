@@ -169,9 +169,8 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       ) : null}
 
       <form autoComplete={'off'}>
-        {headerComponent}
-
-        <Container maxWidth='xl'>
+        <Container>
+          {headerComponent}
           <Box py={3}>
             {disableTabs ? null : (
               <Box mb={4}>

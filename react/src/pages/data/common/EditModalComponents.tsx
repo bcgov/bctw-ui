@@ -70,6 +70,7 @@ type FormSectionProps = {
   children: ReactNode;
   size?: 'small' | 'large';
   flex?: boolean;
+  idxBreak?: number;
 };
 /** creates a section of a form with a grid layout
  * @param children must not contain non valid elements (ex. fragments or nulls)
@@ -101,6 +102,7 @@ const FormSection = ({
       style: { ...child.props.style }
     });
   });
+
   return (
     <Box component='fieldset'>
       {header ? (
