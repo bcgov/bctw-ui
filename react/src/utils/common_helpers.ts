@@ -80,6 +80,20 @@ const omitNull = <T>(obj: T): T => {
   return copy;
 };
 
+const hasChangedProperties = (original: any, next: any): boolean => {
+  for (const k of Object.keys(next)) {
+    if(typeof next[k] === 'object') {
+      if(original[k] && hasChangedProperties(original[k], next[k])) {
+        return true;
+      }
+    }
+    else if(original[k] !== undefined && next[k] !== original[k]) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /**
  * used for removing props that shouldn't be passed on to material ui components
  * @param object to remove from
@@ -167,5 +181,6 @@ export {
   capitalize,
   classToArray,
   headerToColumn,
-  pluralize
+  pluralize,
+  hasChangedProperties
 };

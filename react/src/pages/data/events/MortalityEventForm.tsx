@@ -127,7 +127,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             )}
           </Box>
         </FormSection>
-        <FormSection id={'mort-dev'} header={'Device Information'}>
+        {!isEditing && <FormSection id={'mort-dev'} header={'Device Information'}>
           <Box mb={1} {...boxSpreadRowProps}>
             {CreateFormField(mortality, mortality.fields.retrieval_date, onChange, {
               disabled: !isRetrieved || critterIsAlive
@@ -140,7 +140,7 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             })}
             {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
           </Box>
-        </FormSection>
+        </FormSection>}
       </Box>
       {/*<FormSection id='mort-a-st' header={'Critter Status'} disabled={critterIsAlive}>
         {[

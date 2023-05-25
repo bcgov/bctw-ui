@@ -65,7 +65,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   // must be defined before mutation declarations
   const handleSaveResult = async (data: IBulkUploadResults<Critter>): Promise<void> => {
     const { errors, results } = data;
-    console.log('Data in save result' + data);
+    //console.log('Data in save result' + data);
     //The response of this mutation should not be BulkResponse
     if (errors?.length) {
       showNotif({ severity: 'error', message: `${errors.map((e) => e.error)}` });

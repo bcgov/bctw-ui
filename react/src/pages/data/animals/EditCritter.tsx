@@ -4,7 +4,7 @@ import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
-import { AttachedCritter, Critter, ICapture, IMortality, IMarking, critterFormFields } from 'types/animal';
+import { AttachedCritter, Critter, ICapture, IMortality, IMarking, critterFormFields, markingFormFields } from 'types/animal';
 import { InboundObj } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
@@ -15,7 +15,7 @@ import { CaptureEvent2 } from 'types/events/capture_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
-import { omitNull } from 'utils/common_helpers';
+import { hasChangedProperties, omitNull } from 'utils/common_helpers';
 import { QueryStatus } from 'react-query';
 import { ICbRouteKey } from 'critterbase/types';
 import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
@@ -57,20 +57,30 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   // };
   const critterbaseSave = async (payload) => {
       const { body } = payload;
+      const new_critter = { 
+        critter_id: body.critter_id,
+        animal_id: body.animal_id,
+        sex: body.sex,
+        wlh_id: body.wlh_id,
+        taxon_id: body.taxon_id
+      }
+      const old_critter = {
+        editing: editing.critter_id,
+        animal_id: editing.animal_id,
+        sex: editing.sex,
+        wlh_id: editing.wlh_id,
+        taxon_id: editing.taxon_id
+      }
       const finalPayload = {
         critters: [
-          {
-            critter_id: body.critter_id,
-            animal_id: body.animal_id,
-            sex: body.sex,
-            wlh_id: body.wlh_id,
-            taxon_id: body.taxon_id
-          }
         ],
         captures: [],
         mortalities: [],
         markings: []
-      }  
+      }
+      if(hasChangedProperties(old_critter, new_critter)){
+        finalPayload.critters.push(new_critter);
+      }
       if(body.capture.length) {
         const capture = body.capture[0];
         const og_capture = editing.capture[0];
@@ -90,7 +100,10 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
           capture.release_location = omitNull(capture.release_location);
         }
         capture.critter_id = body.critter_id;
-        finalPayload.captures.push(omitNull(capture));
+        const omitted = omitNull(capture);
+        if(hasChangedProperties(og_capture, omitted)) {
+          finalPayload.captures.push(omitNull(capture));
+        }
       }
   
       if(body.mortality.length && editing.mortality.length) {
@@ -103,14 +116,26 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
           mortality.location = omitNull(mortality.location);
         }
         mortality.critter_id = body.critter_id;
-        finalPayload.mortalities.push(omitNull(mortality));
+        const omitted = omitNull(mortality);
+        if(hasChangedProperties(editing.mortality[0], omitted)) {
+          finalPayload.mortalities.push(omitted);
+        }
       }
 
       if(body.marking.length) {
-        finalPayload.markings = body.marking.map(m => {
+        for (const m of body.marking) {
+          m.critter_id = body.critter_id;
+          const existing = editing.marking.find(a => a.marking_id = m.marking_id);
+          const omitted = omitNull(m);
+          if(existing && !hasChangedProperties(existing, omitted)) {
+            continue;
+          }
+          finalPayload.markings.push(m);
+        }
+        /*finalPayload.markings = body.marking.map(m => {
           m.critter_id = body.critter_id;
           return omitNull(m)
-        });
+        });*/
       }
 
       const r = await onSave(finalPayload);
