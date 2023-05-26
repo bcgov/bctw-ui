@@ -10,8 +10,11 @@ import { uuid } from 'types/common_types';
 import { CbRouteStatusHandler } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
 
-export type CbSelectProps = Omit<CreateInputProps, 'type'> & 
-  { cbRouteKey: ICbRouteKey, handleRoute?: CbRouteStatusHandler, query: string  };
+export type CbSelectProps = Omit<CreateInputProps, 'type'> & {
+  cbRouteKey: ICbRouteKey;
+  handleRoute?: CbRouteStatusHandler;
+  query: string;
+};
 export const CbSelect = ({
   cbRouteKey,
   value,
@@ -24,7 +27,7 @@ export const CbSelect = ({
   query
 }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
-  const { data, isError, isLoading, isSuccess, status } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
+  const { data, isError, isLoading, isSuccess, status } = cbApi.useCritterbaseSelectOptions(cbRouteKey, query);
   const [selected, setSelected] = useState<uuid | string>('');
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
@@ -38,8 +41,8 @@ export const CbSelect = ({
     pushChange(selected);
   }, [required]);*/
   useEffect(() => {
-    handleRoute?.(status, cbRouteKey)
-  }, [status])
+    handleRoute?.(status, cbRouteKey);
+  }, [status]);
 
   useEffect(() => {
     //console.log(`Triggered cbSelect ${cbRouteKey} ${isSuccess} ${isLoading}`)

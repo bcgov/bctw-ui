@@ -53,6 +53,7 @@ export default function EditCritter(
   const { identifierFields } = critterFormFields;
   const [cbSelectStatus, setCbSelectStatus] = useState({});
   const [allowSave, setAllowSave] = useState(false);
+  const [taxonId, setTaxonId] = useState(editing.taxon_id);
   // const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
   // const [workflow, setWorkflow] = useState<WorkflowType>();
   // const [showWorkflow, setShowWorkflow] = useState(false);
@@ -154,8 +155,6 @@ export default function EditCritter(
     const r = await onSave(finalPayload);
     return r;
   };
-
-  const [taxonId, setTaxonId] = useState(editing.taxon_id);
 
   const handleRoute = (v: QueryStatus, key: ICbRouteKey): void => {
     const dict = { ...cbSelectStatus };
