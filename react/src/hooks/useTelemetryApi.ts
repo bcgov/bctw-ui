@@ -308,6 +308,14 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const useAssignedCrittersHistoric = (config?: Record<string, unknown>): UseQueryResult<AttachedCritter[]> => {
+    return useQuery<AttachedCritter[], AxiosError>(
+      ['critters_assigned_historic'],
+      () => critterApi.getAssignedCrittersHistoric(),
+      {...config}
+    )
+  }
+
   // minimize code refetching
   const codeOptions = { ...defaultQueryOptions, refetchOnMount: false };
 
@@ -744,6 +752,7 @@ export const useTelemetryApi = () => {
     useSubmitOnboardingRequest,
     useHandleOnboardingRequest,
     useTriggerVendorTelemetry,
-    useDeleteMarking
+    useDeleteMarking,
+    useAssignedCrittersHistoric
   };
 };

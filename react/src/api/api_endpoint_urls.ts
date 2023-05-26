@@ -16,6 +16,7 @@ const upsertCritterEndpoint              = 'upsert-animal';
 const upsertDeviceEndpoint               = 'upsert-collar';
 const upsertAlertEndpoint                = 'update-user-alert';
 const getCritterEndpoint                 = 'get-animals';
+const getAttachedHistoricEndpoint        = 'get-attached-historic'
 const submitOnboardingRequest            = 'submit-onboarding-request';
 const getOnboardingRequests              = 'onboarding-requests';
 const handleOnboardingRequest            = 'handle-onboarding-request';
@@ -42,4 +43,5 @@ export {
   getCurrentOnboardStatus,
   handleOnboardingRequest,
   triggerTelemetryFetch,
+  getAttachedHistoricEndpoint
 }

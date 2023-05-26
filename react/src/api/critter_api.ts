@@ -1,4 +1,4 @@
-import { getCritterEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
+import { getAttachedHistoricEndpoint, getCritterEndpoint, upsertCritterEndpoint } from 'api/api_endpoint_urls';
 import { createUrl, postJSON } from 'api/api_helpers';
 import { API, ApiProps, IBulkUploadResults, IUpsertPayload } from 'api/api_interfaces';
 import { plainToClass } from 'class-transformer';
@@ -58,9 +58,16 @@ export const critterApi = (props: ApiProps): API => {
     return data.map((json: Critter[]) => plainToClass(Critter, json));
   };
 
+  const getAssignedCrittersHistoric = async (): Promise<AttachedCritter[]> => {
+    const url = createUrl({api: getAttachedHistoricEndpoint});
+    const { data } = await api.get(url);
+    return data;
+  }
+
   return {
     getCritters,
     getCritterHistory,
-    upsertCritter
+    upsertCritter,
+    getAssignedCrittersHistoric
   };
 };
