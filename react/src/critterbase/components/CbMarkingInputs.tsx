@@ -24,7 +24,7 @@ type CbMarkingInputProps = {
   index?: number;
 } & CbMarkingSharedProps;
 
-type CbMarkingCustomProps = Partial<Record<keyof IMarking | 'taxon_id', Partial<CbSelectProps>>>;
+type CbMarkingCustomProps = Partial<Record<keyof IMarking, Partial<CbSelectProps>>>;
 
 export const CbMarkingInput = ({
   taxon_id,
@@ -36,24 +36,11 @@ export const CbMarkingInput = ({
   const { markingFields } = markingFormFields;
   const [showFrequency, setShowFrequency] = useState(false);
   const props: CbMarkingCustomProps = {
-    taxon_id: {
-      label: 'Taxon'
-    },
-    attached_timestamp: {
-      label: 'Attached Date'
-    },
-    removed_timestamp: {
-      label: 'Removed Date'
-    },
     taxon_marking_body_location_id: {
       label: 'Body Location',
       query: `taxon_id=${taxon_id}`
     }
   };
-  // };
-  // const markingHeaders = (label: string): string => {
-  //   return columnToHeader(label).replaceAll('ID', '');
-  // };
 
   const onChange = (v: InboundObj): void => {
     if (v?.marking_type) {
@@ -68,11 +55,11 @@ export const CbMarkingInput = ({
     if (['frequency', 'frequency_unit'].includes(f.prop) && !showFrequency) {
       return;
     }
-    console.log(customProps);
     return getInputFnFromType(f.type)({
       ...f,
       value: marking?.[f.prop],
       handleChange: onChange,
+      label: columnToHeader(f.prop).replace('ID', ''),
       handleRoute,
       ...customProps
     });
@@ -88,7 +75,6 @@ type CbMarkingsProps = {
 
 export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
   const { markings, handleMarkings, handleRoute, taxon_id } = props;
-  const cb_api = useTelemetryApi();
   const [hasErr, checkHasErr, resetErrs] = useFormHasError();
 
   const [markingsData, setMarkingsData] = useState<Array<IMarking & { _delete?: boolean }>>(markings ?? []);

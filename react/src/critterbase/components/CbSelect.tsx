@@ -32,15 +32,7 @@ export const CbSelect = ({
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   const labelOverride = label ?? columnToHeader(cbRouteKey);
-  console.log(label);
-  /*
-  useEffect(() => {
-    pushChange(selected);
-  }, []) //Necessary to have the parent check for errors in this dropdown on initial render
-  
-  useEffect(() => {
-    pushChange(selected);
-  }, [required]);*/
+
   useEffect(() => {
     handleRoute?.(status, cbRouteKey);
   }, [status]);

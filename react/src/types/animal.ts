@@ -270,6 +270,8 @@ export class Critter implements BCTWBase<Critter>{
 
   formatPropAsHeader(str: keyof Critter): string {
     switch (str) {
+      case 'taxon_id':
+        return 'Taxon'
       case 'wlh_id':
         return 'WLH ID';
       default:
@@ -365,8 +367,6 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
           return 'Last Transmission';
         case 'last_fetch_date':
           return 'Last Update Attempt';
-        case 'taxon_id':
-          return 'Taxon'
         case 'responsible_region_nr_id':
           return 'Responsible NR Region'
         default:
