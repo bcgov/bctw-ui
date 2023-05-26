@@ -32,6 +32,7 @@ export const CbSelect = ({
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   const labelOverride = label ?? columnToHeader(cbRouteKey);
+  console.log(label);
   /*
   useEffect(() => {
     pushChange(selected);
