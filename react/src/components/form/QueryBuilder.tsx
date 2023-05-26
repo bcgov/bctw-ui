@@ -104,8 +104,7 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
       const uniqueItemsForColumn: any[] = [];
       const uniqueItemsCollectionUnits: any[] = [];
       
-      
-      if(col === 'collection_unit') {
+      if(col === 'collection_units') {
         const flattenCollectionUnits = data.map(r => r.collection_units).filter(v => v).flat();
         for(const f of flattenCollectionUnits) {
           if(!uniqueItemsCollectionUnits.find(a => a.collection_unit_id === f.collection_unit_id)) {
