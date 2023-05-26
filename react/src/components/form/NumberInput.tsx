@@ -30,13 +30,13 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
       return;
     }
 
-    if (typeof defaultValue === 'number') {
+    /*if (typeof defaultValue === 'number') {
       if (isFunction(validate)) {
         setValueError(defaultValue, validate(defaultValue));
         return;
       }
     }
-    setValueError(defaultValue, empty);
+    setValueError(defaultValue, empty);*/
   }, [defaultValue]);
 
   //To minimize the changeHandler from being called infinite times

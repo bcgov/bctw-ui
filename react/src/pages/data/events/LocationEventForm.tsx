@@ -6,7 +6,7 @@ import { Box, capitalize } from '@mui/material';
 import { WorkflowStrings } from 'constants/strings';
 import NumberInput from 'components/form/NumberInput';
 import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
-import { FormChangeEvent, FormFieldObject, InboundObj } from 'types/form_types';
+import { CbRouteStatusHandler, FormChangeEvent, FormFieldObject, InboundObj } from 'types/form_types';
 import DateTimeInput from 'components/form/DateTimeInput';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { ReactNode } from 'react';
@@ -15,10 +15,13 @@ import { isDev } from 'api/api_helpers';
 import { CreateFormField } from 'components/form/create_form_components';
 import { AttachedCritter } from 'types/animal';
 import { FormSection } from '../common/EditModalComponents';
+import { QueryStatus } from 'react-query';
+import { ICbRouteKey } from 'critterbase/types';
 
 type LocationEventProps = {
   event: LocationEvent;
   notifyChange: FormChangeEvent;
+  handleRoute?: CbRouteStatusHandler;
   children?: ReactNode;
   childNextToDate?: ReactNode;
   disabled?: boolean;
@@ -29,7 +32,8 @@ export default function LocationEventForm({
   notifyChange,
   children,
   childNextToDate,
-  disabled = false
+  disabled = false,
+  handleRoute = undefined
 }: LocationEventProps): JSX.Element {
   // create the form inputs
   const { regions, comment, latlon, extra } = event.fields;
@@ -45,7 +49,10 @@ export default function LocationEventForm({
   const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];
     const value = Object.values(v)[0];
+
     event[key] = value;
+    //console.log('LocationEventForm inboundObj: ' + JSON.stringify(v));
+
     if (requiredLocationInputs.includes(key as keyof LocationEvent) && value) {
       setIsRequired({ required: true });
     }
@@ -76,7 +83,7 @@ export default function LocationEventForm({
         {latlon.map((f) => CreateFormField(event, f, changeHandler))}
       </FormSection>
       <FormSection id='Region' header={`${capitalize(event.event_type)} Region`}>
-        {regions.map((f) => CreateFormField(event, f, changeHandler))}
+        {regions.map((f) => CreateFormField(event, f, changeHandler, {}, false, {}, handleRoute))}
       </FormSection>
       {/* <FormSection id='environment' header={`${capitalize(event.event_type)} Environment`}>
         <LocationFormField fields={extra} />

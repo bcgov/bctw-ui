@@ -5,28 +5,44 @@ import { isFunction } from 'components/table/table_helpers';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
+import { QueryStatus } from 'react-query';
 import { uuid } from 'types/common_types';
+import { CbRouteStatusHandler } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
 
-export type CbSelectProps = Omit<CreateInputProps, 'type'> & { cbRouteKey: ICbRouteKey; query?: string };
+export type CbSelectProps = Omit<CreateInputProps, 'type'> & 
+  { cbRouteKey: ICbRouteKey, handleRoute?: CbRouteStatusHandler, query: string  };
 export const CbSelect = ({
   cbRouteKey,
   value,
   prop,
   required,
   handleChange,
+  handleRoute,
   label,
   disabled,
   query
 }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
-  const { data, isError, isLoading, isSuccess } = cbApi.useCritterbaseSelectOptions(cbRouteKey, query);
+  const { data, isError, isLoading, isSuccess, status } = cbApi.useCritterbaseSelectOptions(cbRouteKey);
   const [selected, setSelected] = useState<uuid | string>('');
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   const labelOverride = label ?? columnToHeader(cbRouteKey);
+  /*
+  useEffect(() => {
+    pushChange(selected);
+  }, []) //Necessary to have the parent check for errors in this dropdown on initial render
+  
+  useEffect(() => {
+    pushChange(selected);
+  }, [required]);*/
+  useEffect(() => {
+    handleRoute?.(status, cbRouteKey)
+  }, [status])
 
   useEffect(() => {
+    //console.log(`Triggered cbSelect ${cbRouteKey} ${isSuccess} ${isLoading}`)
     if (!data?.length) return;
     if (!value) {
       handleSelect();
@@ -35,7 +51,8 @@ export const CbSelect = ({
     if (typeof value !== 'string') return;
     const val = data.find((d) => (typeof d === 'string' ? d === value : d.id === value));
     handleSelect(value, typeof val === 'string' ? val : val.value);
-  }, [isSuccess]);
+    //setSelected(value);
+  }, [isSuccess, isLoading, value, data]);
 
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;

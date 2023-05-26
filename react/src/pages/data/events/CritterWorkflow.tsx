@@ -5,6 +5,7 @@ import WorkflowWrapper from '../events/WorkflowWrapper';
 import MortalityEvent from 'types/events/mortality_event';
 import CaptureEvent, { CaptureEvent2 } from 'types/events/capture_event';
 import ReleaseEvent from 'types/events/release_event';
+import { createEvent } from './EventComponents';
 
 type CritterWorkflowProps = {
   editing: Critter | AttachedCritter;
@@ -17,20 +18,11 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
    */
-  const createEvent = (wfType: WorkflowType): CaptureEvent2 | ReleaseEvent | MortalityEvent => {
-    switch (wfType) {
-      case 'capture':
-        return editObjectToEvent(editing, new CaptureEvent2(), []);
-      case 'release':
-        return editObjectToEvent(editing, new ReleaseEvent(), ['collection_unit']);
-      case 'mortality':
-        return editObjectToEvent(editing, new MortalityEvent(), ['critter_status']);
-    }
-  };
+
   const [event, updateEvent] = useState<CaptureEvent2 | ReleaseEvent | MortalityEvent>();
 
   useEffect(() => {
-    const a = createEvent(workflow);
+    const a = createEvent(editing, workflow);
     // console.log('This is editing obj ' + JSON.stringify(editing, null, 2))
     // console.log('In workflow update effect ' + JSON.stringify(a, null, 2))
     updateEvent(a);

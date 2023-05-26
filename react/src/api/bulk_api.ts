@@ -68,7 +68,7 @@ export const bulkApi = (api: AxiosInstance): API => {
   const getType = async <T>(type: BCTWType, id: string): Promise<T> => {
     const url = createUrl({ api: `${type}/${id}` });
     const { data } = await api.get(url);
-    return data;
+    return data.length ? data[0] : data;
   };
 
   /**

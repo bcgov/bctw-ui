@@ -43,7 +43,10 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   get critterbasePayload(): CbPayload<CaptureEvent2> {
     return omitNull({
       //capture_id might need this...
+      capture_id: this.capture_id,
       critter_id: this.critter_id,
+      capture_location_id: this.capture_location_id,
+      release_location_id: this.release_location_id,
       capture_timestamp: this.capture_timestamp,
       capture_comment: this.capture_comment,
       capture_location: this.capture_location.critterbasePayload,
@@ -76,7 +79,7 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
   fields: CaptureFormField2 = {
     capture_timestamp: { prop: 'capture_timestamp', type: eInputType.datetime, required: true },
     //capture_mortality: { prop: 'capture_mortality', type: eInputType.check },
-    capture_comment: { prop: 'capture_comment', type: eInputType.multiline, style: FormCommentStyle, required: true },
+    capture_comment: { prop: 'capture_comment', type: eInputType.multiline, style: FormCommentStyle },
     release_timestamp: { prop: 'release_timestamp', type: eInputType.datetime },
     release_comment: { prop: 'release_comment', type: eInputType.multiline, style: FormCommentStyle },
     //release_mortality: { prop: 'release_mortality', type: eInputType.check },

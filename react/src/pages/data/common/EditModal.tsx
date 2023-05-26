@@ -1,7 +1,7 @@
 import { IUpsertPayload } from 'api/api_interfaces';
 import { EditModalBaseProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
@@ -14,13 +14,15 @@ import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { Button, Modal } from 'components/common';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 
-import { Box, Container, Divider, Paper, Tabs, Tab } from '@mui/material';
+import { Box, Container, Divider, Paper, Tabs, Tab, CircularProgress } from '@mui/material';
 import { BCTWBase } from 'types/common_types';
 import useFormHasError from 'hooks/useFormHasError';
 import { InboundObj } from 'types/form_types';
 import { buttonProps } from 'components/component_constants';
 import { Typography } from '@mui/material';
 import { PageTabs } from 'components/common/partials/PageTabs';
+import { LoadingButton } from '@mui/lab';
+import makeStyles from '@mui/styles/makeStyles';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: ReactNode;
@@ -30,7 +32,20 @@ export type IEditModalProps<T> = EditModalBaseProps<T> & {
   showInFullScreen?: boolean;
   onReset?: () => void;
   headerComponent?: JSX.Element;
+  busySaving?: boolean;
 };
+
+const useStyle = makeStyles((theme) => ({
+  MuiCircularProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    height: '20px !important',
+    width: '20px !important',
+    marginLeft: '-10px',
+    marginTop: '-10px'
+  }
+}));
 
 /**
  * Component that wraps a form and handles:
@@ -63,11 +78,14 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     onSave,
     onReset,
     headerComponent,
-    disableHistory = false,
+    disableHistory = true,
     hideSave = false,
     disableTabs = false,
-    showInFullScreen = true
+    showInFullScreen = true,
+    busySaving = false
   } = props;
+
+  const styles = useStyle();
 
   const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr, resetErrs] = useFormHasError();
@@ -107,8 +125,9 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   }, [open]);
 
   // if the error state changes, update the save status
-  useDidMountEffect(() => {
+  useEffect(() => {
     setCanSave(!hasErr);
+    console.log('EditModal hasErr changed to ' + hasErr);
   }, [hasErr]);
 
   useDidMountEffect(() => {
@@ -119,7 +138,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
 
   const handleSave = async (): Promise<void> => {
     // use Object.assign to preserve class methods
-    const body = omitNull(Object.assign(editing, newObj));
+    const body = omitNull({ ...editing, ...newObj } /*Object.assign(editing, newObj)*/);
     const toSave: IUpsertPayload<T> = { body };
     await onSave(toSave);
     // todo: when to close the modal?
@@ -127,14 +146,49 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   };
 
   // triggered on a form input change, newProp will be an object with a single key and value
-  const handleChange = (newProp: InboundObj): void => {
+  /*const handleChange = (newProp: InboundObj): void => {
     checkHasErr(newProp);
     // todo: determine if object has changed from original
     // const [key, value] = parseFormChangeResult<typeof editing>(newProp);
     // const isSame = editing[key] === value;
     // console.log(newProp, editing[key], isSame)
+    console.log(`newObj: ${JSON.stringify(newObj)}, newProp: ${JSON.stringify(newProp)}`)
     const modified = { ...newObj, ...newProp };
     setNewObj(modified);
+  };*/
+
+  const handleChange = (v: InboundObj): void => {
+    checkHasErr(v);
+
+    let tmp = newObj;
+    if (!tmp) return;
+    const k = Object.keys(v)[0];
+    const tempval = Object.values(v)[0];
+    const val = tempval === undefined || tempval === null ? null : tempval['id'] ?? tempval;
+    if (val === '') {
+      return;
+    }
+    //If tempval is undefined or null, just leave it as null. Otherwise, try to access the id property from it, but if that fails just use the non-null tempval as is.
+    const { nestedEventKey, eventKey } = v;
+    if (eventKey) {
+      if (!tmp[eventKey]) {
+        tmp[eventKey] = [{}];
+      }
+      tmp = tmp[eventKey][0];
+    }
+
+    if (nestedEventKey) {
+      if (!tmp[nestedEventKey]) {
+        tmp[nestedEventKey] = {};
+      }
+      Object.assign(tmp[nestedEventKey], { [k]: val });
+      setNewObj(newObj);
+    } else if (k && k !== 'displayProps') {
+      tmp[k] = val;
+      setNewObj(newObj);
+    }
+
+    console.log(`Now have ${JSON.stringify(newObj)} from ${JSON.stringify(v)}`);
   };
 
   const reset = (): void => {
@@ -186,9 +240,17 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
                         {hideSave ? null : (
                           <>
                             {hasErr ? <Typography mr={1}>Fields marked with * are required</Typography> : null}
-                            <Button {...buttonProps} onClick={handleSave} disabled={!canSave}>
+                            <LoadingButton
+                              {...buttonProps}
+                              variant='contained'
+                              loading={busySaving}
+                              loadingIndicator={
+                                <CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />
+                              }
+                              onClick={handleSave}
+                              disabled={!canSave}>
                               Save
-                            </Button>
+                            </LoadingButton>
                           </>
                         )}
                         <Button {...buttonProps} variant='outlined' onClick={(): void => onClose()}>
