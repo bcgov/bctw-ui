@@ -61,8 +61,12 @@ export default function CaptureEventForm({
   return (
     <Box>
       {/* Capture Date -> Capture Environment */}
-      <LocationEventForm key='ce-loc' event={capture.capture_location} notifyChange={onChange} handleRoute={handleRoute}>
-        <Box key='bx-rec' {...boxSpreadRowProps}>
+      <LocationEventForm
+        key='ce-loc'
+        event={capture.capture_location}
+        notifyChange={onChange}
+        handleRoute={handleRoute}>
+        <Box key='bx-rec'>
           {CreateFormField(capture, capture.fields.capture_timestamp, onChange, { value: dayjs() })}
           {CreateFormField(capture, capture.fields.capture_comment, onChange)}
         </Box>

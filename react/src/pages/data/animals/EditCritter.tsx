@@ -14,7 +14,6 @@ import {
   critterFormFields,
   markingFormFields
 } from 'types/animal';
-import { InboundObj } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
@@ -23,7 +22,6 @@ import { createEvent } from '../events/EventComponents';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useEffect, useState } from 'react';
 import { hasChangedProperties, omitNull } from 'utils/common_helpers';
 import { QueryStatus } from 'react-query';
 import { ICbRouteKey } from 'critterbase/types';
