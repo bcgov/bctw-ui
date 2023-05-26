@@ -41,7 +41,7 @@ export type CreateInputProps = CreateInputBaseProps &
 function CreateEditTextField(props: CreateInputProps): ReactElement {
   const { prop, type, value, errorMessage, handleChange, validate, style } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
-  const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
+  const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName', 'handleRoute']);
   return type === eInputType.number ? (
     <NumberField
       propName={prop}

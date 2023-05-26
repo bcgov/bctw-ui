@@ -1,6 +1,6 @@
 import { Box, Button, Divider, Typography } from '@mui/material';
 import { Icon, Modal } from 'components/common';
-import { CreateFormField, getInputFnFromType } from 'components/form/create_form_components';
+import { CreateFormField, CreateInputProps, getInputFnFromType } from 'components/form/create_form_components';
 import OkayModal from 'components/modal/OkayModal';
 import { cbInputValue } from 'critterbase/constants';
 import { isCbVal } from 'critterbase/helper_functions';
@@ -12,9 +12,10 @@ import { Critter, IMarking, markingFormFields } from 'types/animal';
 import { uuid } from 'types/common_types';
 import { CbRouteStatusHandler, FormChangeEvent, InboundObj, parseFormChangeResult } from 'types/form_types';
 import { columnToHeader, removeProps } from 'utils/common_helpers';
+import { CbSelectProps } from './CbSelect';
 type CbMarkingSharedProps = {
   taxon_id: uuid;
-  handleRoute?: CbRouteStatusHandler
+  handleRoute?: CbRouteStatusHandler;
 };
 
 type CbMarkingInputProps = {
@@ -23,24 +24,32 @@ type CbMarkingInputProps = {
   index?: number;
 } & CbMarkingSharedProps;
 
-export const CbMarkingInput = ({ taxon_id, marking, handleChange, handleRoute, index = 0 }: CbMarkingInputProps): JSX.Element => {
+type CbMarkingCustomProps = Partial<Record<keyof IMarking, Partial<CbSelectProps>>>;
+
+export const CbMarkingInput = ({
+  taxon_id,
+  marking,
+  handleChange,
+  handleRoute,
+  index = 0
+}: CbMarkingInputProps): JSX.Element => {
   const { markingFields } = markingFormFields;
   const [showFrequency, setShowFrequency] = useState(false);
-  const props = {
+  const props: CbMarkingCustomProps = {
     attached_timestamp: {
       label: 'Attached Date'
     },
     removed_timestamp: {
       label: 'Removed Date'
     },
-    body_location: {
+    taxon_marking_body_location_id: {
+      label: 'Body Location',
       query: `taxon_id=${taxon_id}`
     }
   };
-
   const markingHeaders = (label: string): string => {
     return columnToHeader(label).replaceAll('ID', '');
-  }
+  };
 
   const onChange = (v: InboundObj): void => {
     if (v?.marking_type) {
@@ -75,7 +84,7 @@ type CbMarkingsProps = {
 } & CbMarkingSharedProps;
 
 export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
-  const { markings, handleMarkings, handleRoute } = props;
+  const { markings, handleMarkings, handleRoute, taxon_id } = props;
   const cb_api = useTelemetryApi();
   const [hasErr, checkHasErr, resetErrs] = useFormHasError();
 
@@ -87,10 +96,10 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
   const canAddMarking = markingsData.length === 0 || (lastMarking && !hasErr) || markingsData.every((m) => m?._delete);
 
   useEffect(() => {
-    if(markings) {
+    if (markings) {
       setMarkingsData(markings);
     }
-  }, [markings])
+  }, [markings]);
 
   useEffect(() => {
     //Strip undefined markings
@@ -155,7 +164,13 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
                 Delete Marking
               </Button>
             }>
-            <CbMarkingInput {...removeProps(props, ['handleMarkings'])} handleChange={onChange} index={i} marking={m} />
+            <CbMarkingInput
+              handleRoute={handleRoute}
+              taxon_id={taxon_id}
+              handleChange={onChange}
+              index={i}
+              marking={m}
+            />
           </FormSection>
         );
       })}

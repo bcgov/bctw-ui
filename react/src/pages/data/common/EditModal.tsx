@@ -188,7 +188,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       setNewObj(newObj);
     }
 
-    console.log(`Now have ${JSON.stringify(newObj)} from ${JSON.stringify(v)}`);
+    //console.log(`Now have ${JSON.stringify(newObj)} from ${JSON.stringify(v)}`);
   };
 
   const reset = (): void => {
