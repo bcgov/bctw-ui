@@ -1,12 +1,12 @@
 import { Box, Button, Grid, Paper, TextField, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { plainToClass } from 'class-transformer';
+import { classToPlain, plainToClass } from 'class-transformer';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import { formatTag } from 'components/table/table_helpers';
 import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
 import { CbMarkingInput, CbMarkings } from 'critterbase/components/CbMarkingInputs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AttachedCritter, Critter, IMarking } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { editObjectToEvent } from 'types/events/event';
@@ -56,20 +56,20 @@ const editCritter = editObjectToEvent(
       // }
     ],
     marking: [
-      {
-        marking_id: 'a',
-        identifier: 'id 1',
-        marking_type: 'f00170b8-853c-466a-917e-2b20ec194d6a',
-        order: 1,
-        // body_location: 'ec06df9b-1082-4178-a25d-2cec7e9025af',
-        marking_material: '283fe4cc-0087-408c-8186-24e22d93db28',
-        primary_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
-        secondary_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
-        text_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
-        comment: 'marking comment'
-      }
+      // {
+      //   marking_id: 'a',
+      //   identifier: 'id 1',
+      //   marking_type: 'f00170b8-853c-466a-917e-2b20ec194d6a',
+      //   order: 1,
+      //   // body_location: 'ec06df9b-1082-4178-a25d-2cec7e9025af',
+      //   marking_material: '283fe4cc-0087-408c-8186-24e22d93db28',
+      //   primary_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
+      //   secondary_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
+      //   text_colour: '3f1aec14-5afb-4f55-9115-bf21217d5824',
+      //   comment: 'marking comment'
+      // }
     ],
-    taxon_id: '54063ddc-3845-447f-9c2d-e42a20d73566',
+    taxon_id: '120dad10-a880-405d-8f72-816aebb8b4ff',
     wlh_id: '12-345',
     sex: 'Male',
     taxon: 'Moose',
@@ -94,8 +94,17 @@ const DevPlayground = (): JSX.Element => {
   const [openCapture, setCapture] = useState(false);
   const [openMortality, setMortality] = useState(false);
   const [openCritter, setOpenCritter] = useState(false);
+  const [obj, setObj] = useState<any>({ a: 1 });
   // const { data, status } = api.useType<AttachedCritter>('animal', 'c6b0a6c7-71ca-421a-96d6-1878fec07b05');
   // console.log(data);
+  const toObject = (o) => {
+    const res = {}; //or Object.create(null)
+    for (const key in o) res[key] = o[key];
+    return res;
+  };
+  useEffect(() => {
+    console.log(obj);
+  }, [JSON.stringify(obj)]);
   return (
     <ManageLayout>
       <h1>Dev Playground</h1>
@@ -134,14 +143,22 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
-        {/* <Box my={5}>
+        <Box my={5}>
           <CbCollectionUnitInputs
             taxon_id={editCritter.taxon_id}
             collection_units={editCritter.collection_units}
             handleChange={(v) => console.log(v)}
           />
-        </Box> */}
+        </Box>
         <Box my={5}>
+          <Button
+            onClick={() => {
+              const tmp2 = editObjectToEvent(obj, new CaptureEvent2(), []);
+              const t = classToPlain(tmp2);
+              setObj({ ...t, capture_comment: `${Math.random()}` });
+            }}>
+            spread obj test
+          </Button>
           {/* <CbMarkingInput
             taxon_id={editCritter.taxon_id}
             marking={editCritter.marking[0]}

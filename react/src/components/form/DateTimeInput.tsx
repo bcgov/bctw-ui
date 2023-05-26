@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { DesktopDateTimePicker } from '@mui/lab';
 import { DateInputProps } from 'components/form/Date';
 import { FormControl, TextField } from '@mui/material';
@@ -12,9 +12,10 @@ type DateOrNull = Dayjs | null;
  */
 export default function DateTimeInput(props: DateInputProps): JSX.Element {
   const { defaultValue, label, changeHandler, propName, minDate, maxDate, required } = props;
-  const [selectedTime, setSelectedTime] = useState<DateOrNull>(defaultValue?.isValid() ? defaultValue : null);
+  const [selectedTime, setSelectedTime] = useState<DateOrNull>(dayjs(defaultValue)?.isValid() ? defaultValue : null);
 
   const checkForErr = (d: DateOrNull): boolean => {
+    d = dayjs(d);
     if (required && (!d || !d?.isValid())) return true;
     if (minDate && d && d.isBefore(minDate)) return true;
     if (maxDate && d && d.isAfter(maxDate)) return true;
@@ -42,7 +43,7 @@ export default function DateTimeInput(props: DateInputProps): JSX.Element {
 
   //On mount if a defaultValue is provided call the parent handler
   useEffect(() => {
-    if (defaultValue?.isValid()) {
+    if (dayjs(defaultValue)?.isValid()) {
       callParentHandler(defaultValue);
     }
   }, []);

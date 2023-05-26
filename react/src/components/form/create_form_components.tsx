@@ -10,9 +10,11 @@ import { Dayjs } from 'dayjs';
 import { CSSProperties, ReactElement, ReactNode } from 'react';
 import { ICodeFilter } from 'types/code';
 import { BCTWFormat } from 'types/common_types';
-import { FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
+import { CbRouteStatusHandler, FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';
 import SelectCode from './SelectCode';
+import { QueryStatus } from 'react-query';
+import { ICbRouteKey } from 'critterbase/types';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -39,7 +41,7 @@ export type CreateInputProps = CreateInputBaseProps &
 function CreateEditTextField(props: CreateInputProps): ReactElement {
   const { prop, type, value, errorMessage, handleChange, validate, style } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
-  const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
+  const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName', 'handleRoute']);
   return type === eInputType.number ? (
     <NumberField
       propName={prop}
@@ -64,7 +66,7 @@ function CreateEditTextField(props: CreateInputProps): ReactElement {
 }
 
 function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
-  const newProps = Object.assign({ multiline: true, rows: 1, fullWidth: true }, props);
+  const newProps = Object.assign({ multiline: true, rows: 1, comment: true }, props);
   return CreateEditTextField(newProps);
 }
 
@@ -209,7 +211,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   handleChange: FormChangeEvent,
   inputProps?: Partial<CreateInputProps>,
   displayBlock = false,
-  style: CSSProperties = {}
+  style: CSSProperties = {},
+  handleRoute?: CbRouteStatusHandler
 ): ReactNode {
   if (formField === undefined) {
     return null;
@@ -223,7 +226,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
     label: obj.formatPropAsHeader(prop as keyof T),
     style,
     ...formField,
-    ...inputProps
+    ...inputProps,
+    handleRoute
   };
 
   let Comp = getInputFnFromType(type)(toPass);

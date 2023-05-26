@@ -1,13 +1,22 @@
 import { CbRouters, CbRoutes, detailedFormat, selectFormat } from 'critterbase/routes';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
-import { API, ApiProps, IUpsertPayload } from './api_interfaces';
+import { API, ApiProps, ICbBulkUpdatePayload, IUpsertPayload } from './api_interfaces';
 import { uuid } from 'types/common_types';
 import { Critter, IMarking } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { CbPayload } from 'types/events/event';
+import { useQueryClient } from 'react-query';
 
 export const critterbaseApi = (props: ApiProps): API => {
   const { api } = props;
+  const qc = useQueryClient();
+
+  const invalidate = (): void => {
+    qc.invalidateQueries('critters_assigned');
+    qc.invalidateQueries('critters_unassigned');
+    qc.invalidateQueries('getType');
+    qc.invalidateQueries('pings');
+  };
   /**
    * retrieve critterbase lookup table information, optionally formatted
    */
@@ -28,6 +37,12 @@ export const critterbaseApi = (props: ApiProps): API => {
     return data;
   };
 
+  const bulkUpdate = async (bulkPayload: ICbBulkUpdatePayload) => {
+    const { data } = await api.put(`${CbRouters.bulk}`, bulkPayload);
+    invalidate();
+    return data;
+  }
+
   const deleteMarking = async (marking_id: uuid): Promise<IMarking> => {
     const { data } = await api.delete(`${CbRouters.markings}/${marking_id}`);
     return data;
@@ -36,6 +51,7 @@ export const critterbaseApi = (props: ApiProps): API => {
   return {
     getLookupTableOptions,
     upsertCritter,
+    bulkUpdate,
     deleteMarking
   };
 };

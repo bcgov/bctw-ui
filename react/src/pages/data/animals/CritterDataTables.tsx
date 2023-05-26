@@ -6,7 +6,7 @@ import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { QueryStatus } from 'react-query';
 import { AttachedCritter, Critter, Critters } from 'types/animal';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
@@ -191,7 +191,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
             paginationFooter
             exporter={
               <>
-                <Box ml={1}>
+                {/*<Box ml={1}>
                   <Button
                     {...buttonProps}
                     onClick={handleAddAnimal}
@@ -199,7 +199,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
                     startIcon={<Icon icon='plus' />}>
                     Add
                   </Button>
-                </Box>
+            </Box>*/}
                 <ExportViewer<Critter>
                   template={new Critter().displayProps}
                   eTitle={CritterStrings.exportTitle}
@@ -223,21 +223,22 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           />*/}
 
         {/* Wrapper for Adding Critter, could probably be moved into bottom wrapper. */}
-        <ModifyCritterWrapper
+        {/*<ModifyCritterWrapper
           editing={new AttachedCritter()}
           onUpdate={(critter_id: string): void => setUpdated(critter_id)}
           onDelete={(critter_id: string): void => setDeleted(critter_id)}
           setCritter={setEditObj}>
           <EditCritter {...editProps} isCreatingNew={true} open={openAddAnimal} handleClose={handleAddAnimal} />
-        </ModifyCritterWrapper>
+        </ModifyCritterWrapper>*/}
 
         {/* Wrapper to allow editing of Attached and Unattached animals */}
         <ModifyCritterWrapper
           editing={editObj}
           onUpdate={(critter_id: string): void => setUpdated(critter_id)}
           onDelete={(critter_id: string): void => setDeleted(critter_id)}
-          setCritter={setEditObj}>
-          <EditCritter {...editProps} open={openEdit} handleClose={() => setOpenEdit(false)} />
+          setCritter={setEditObj}
+          >
+          <EditCritter /*{...editProps}*/ editing={editObj} onSave={doNothingAsync} open={openEdit} handleClose={() => setOpenEdit(false)} />
         </ModifyCritterWrapper>
 
         {/* Modal for assigning or removing a device from a critter */}

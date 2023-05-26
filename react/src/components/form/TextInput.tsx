@@ -1,5 +1,5 @@
 import { StandardTextFieldProps, TextField as MuiTextField } from '@mui/material';
-import { baseInputProps, baseInputStyle } from 'components/component_constants';
+import { baseInputProps, baseInputStyle, commentInputStyle } from 'components/component_constants';
 import { useEffect } from 'react';
 import { removeProps } from 'utils/common_helpers';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ export type TextInputProps = FormBaseProps &
   StandardTextFieldProps & {
     defaultValue: string;
     validate?: (v: string) => string;
-    fullWidth?: boolean;
+    comment?: boolean;
   };
 
 export const inputPropsToRemove = [
@@ -27,7 +27,7 @@ export const inputPropsToRemove = [
 ];
 
 export default function TextField(props: TextInputProps): JSX.Element {
-  const { changeHandler, propName, defaultValue, style, required, validate, fullWidth } = props;
+  const { changeHandler, propName, defaultValue, style, required, validate, comment } = props;
   const [val, setVal] = useState(defaultValue ?? '');
   const [err, setErr] = useState('');
   const empty = '';
@@ -83,16 +83,12 @@ export default function TextField(props: TextInputProps): JSX.Element {
 
   const propsToPass = {
     ...baseInputProps,
-    ...removeProps(props, [...inputPropsToRemove, 'style', 'fullWidth'])
+    ...removeProps(props, [...inputPropsToRemove, 'style', 'comment'])
   };
 
   return (
     <MuiTextField
-      style={
-        fullWidth
-          ? { marginRight: baseInputStyle.marginRight, marginBottom: baseInputStyle.marginBottom, flexGrow: 1 }
-          : { ...baseInputStyle }
-      }
+      style={comment ? commentInputStyle : baseInputStyle}
       value={val}
       onBlur={handleBlur}
       onChange={handleChange}

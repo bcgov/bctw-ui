@@ -19,8 +19,10 @@ export default function CaptureEventForm({
   event: capture,
   handlePostponeSave,
   handleFormChange,
+  handleRoute,
   isEditing = false
 }: WorkflowFormProps<CaptureEvent2> & { isEditing?: boolean }): JSX.Element {
+  const latitude = capture.capture_location.latitude;
   const [showRelease, setShowRelease] = useState(false);
   const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
   const [minReleaseDate, setMinReleaseDate] = useState(capture?.capture_timestamp);
@@ -42,6 +44,7 @@ export default function CaptureEventForm({
         handleFormChange({ capture_mortality: undefined });
         break;
     }
+    v['eventKey'] = 'capture';
     handleFormChange(v);
   };
 
@@ -58,9 +61,15 @@ export default function CaptureEventForm({
   return (
     <Box>
       {/* Capture Date -> Capture Environment */}
-      <LocationEventForm key='ce-loc' event={capture.capture_location} notifyChange={onChange}>
-        {CreateFormField(capture, capture.fields.capture_timestamp, onChange, { value: dayjs() })}
-        {CreateFormField(capture, capture.fields.capture_comment, onChange)}
+      <LocationEventForm
+        key='ce-loc'
+        event={capture.capture_location}
+        notifyChange={onChange}
+        handleRoute={handleRoute}>
+        <Box key='bx-rec'>
+          {CreateFormField(capture, capture.fields.capture_timestamp, onChange, { value: dayjs() })}
+          {CreateFormField(capture, capture.fields.capture_comment, onChange)}
+        </Box>
       </LocationEventForm>
 
       {/* Capture Information*/}
@@ -72,7 +81,7 @@ export default function CaptureEventForm({
 
       {/* Release Date */}
 
-      <FormSection id='release-date' header='Release Date' flex>
+      <FormSection id='release-date' header='Release Date'>
         {CreateFormField(capture, capture.fields.release_timestamp, onChange, { minDate: minReleaseDate })}
         {CreateFormField(capture, capture.fields.release_comment, onChange)}
       </FormSection>

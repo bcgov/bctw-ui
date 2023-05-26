@@ -43,9 +43,12 @@ const columnToHeader = (prop: string): string => {
     .replaceAll('_', ' ')
     .replaceAll('wmu', 'Wildlife Management Unit')
     .replaceAll(' id', ' ID')
+    .replaceAll('nr', 'NR')
+    .replaceAll('env', 'ENV')
     .replaceAll('wlh', 'WLH')
     .replaceAll('utm', 'UTM')
     .replaceAll('cod', 'Cause Of Death')
+    .replaceAll('timestamp', 'Date')
     .split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
@@ -76,6 +79,19 @@ const omitNull = <T>(obj: T): T => {
     .filter((k) => obj[k] === null || obj[k] === undefined || obj[k] === '' || obj[k] === 'null' || obj[k] === -1)
     .forEach((k) => delete obj[k]);
   return copy;
+};
+
+const hasChangedProperties = (original: any, next: any): boolean => {
+  for (const k of Object.keys(next)) {
+    if (typeof next[k] === 'object') {
+      if (original[k] && hasChangedProperties(original[k], next[k])) {
+        return true;
+      }
+    } else if (original[k] !== undefined && next[k] !== original[k]) {
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
@@ -165,5 +181,6 @@ export {
   capitalize,
   classToArray,
   headerToColumn,
-  pluralize
+  pluralize,
+  hasChangedProperties
 };

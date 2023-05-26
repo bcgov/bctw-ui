@@ -72,7 +72,7 @@ export class LocationEvent implements BCTWWorkflow<LocationEvent>, ILocation {
         //   type: eInputType.cb_select,
         //   cbRouteKey: 'coordinate_uncertainty_unit'
         // },
-        { prop: 'location_comment', type: eInputType.multiline, style: FormCommentStyle }
+        { prop: 'location_comment', type: eInputType.multiline }
       ],
       regions: [
         { prop: 'region_env_id', type: eInputType.cb_select, cbRouteKey: 'region_env' },

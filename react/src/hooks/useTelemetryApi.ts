@@ -28,6 +28,7 @@ import { IKeyCloakSessionInfo, User } from 'types/user';
 
 import {
   IBulkUploadResults,
+  ICbBulkUpdatePayload,
   IDeleteType,
   IUpsertPayload,
   ParsedXLSXSheetResult,
@@ -130,6 +131,13 @@ export const useTelemetryApi = () => {
       config
     );
 
+  const useBulkUpdateCritterbaseCritter = (
+    config: UseMutationOptions<any, AxiosError, ICbBulkUpdatePayload>
+  ): UseMutationResult<any> => 
+    useMutation<any, AxiosError, ICbBulkUpdatePayload> (
+      (body) => critterbaseApi.bulkUpdate(body),
+      config
+    )
   const useDeleteMarking = (
     config: UseMutationOptions<IBulkUploadResults<IMarking>, AxiosError, uuid>
   ): UseMutationResult<IBulkUploadResults<IMarking>> =>
@@ -438,7 +446,7 @@ export const useTelemetryApi = () => {
 
   // default getter for individual animals or collars
   const useType = <T>(type: BCTWType, id: string, options?: QueryEnabled): UseQueryResult<T> => {
-    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id)[0], {
+    return useQuery<T, AxiosError>(['getType', type, id], () => bulkApi.getType(type, id), {
       ...defaultQueryOptions,
       ...options
     });
@@ -752,7 +760,8 @@ export const useTelemetryApi = () => {
     useSubmitOnboardingRequest,
     useHandleOnboardingRequest,
     useTriggerVendorTelemetry,
-    useDeleteMarking,
-    useAssignedCrittersHistoric
+    useAssignedCrittersHistoric,
+    useBulkUpdateCritterbaseCritter,
+    useDeleteMarking
   };
 };

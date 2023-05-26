@@ -47,7 +47,7 @@ const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>
             //Checks if value exists so no empty properties displayed in header
             if (value) {
               return (
-                <Box key={`header-${idx}`} display='inline' mr={2}>
+                <Box key={`header-${idx}`} display='inline' pr={1}>
                   <dd>{format(p)}:</dd>
                   <dt>{value}</dt>
                 </Box>
@@ -69,29 +69,13 @@ type FormSectionProps = {
   hide?: boolean;
   children: ReactNode;
   size?: 'small' | 'large';
-  flex?: boolean;
 };
 /** creates a section of a form with a grid layout
  * @param children must not contain non valid elements (ex. fragments or nulls)
  * top level children must have key props
  */
-const FormSection = ({
-  id,
-  header,
-  btn,
-  disabled,
-  children,
-  hide,
-  size = 'small',
-  flex
-}: FormSectionProps): JSX.Element => {
+const FormSection = ({ id, header, btn, disabled, children, hide, size = 'small' }: FormSectionProps): JSX.Element => {
   if (hide) return null;
-
-  const flexProps: GridProps = flex && {
-    display: 'flex',
-    flexWrap: 'wrap',
-    flexDirection: 'row'
-  };
   const childrenRender = Children.map(children, (child: ReactElement, idx: number) => {
     const isDisabled = child?.props?.disabled ?? disabled;
     // fixme: adding colgap via child component margin-botom instead
@@ -101,6 +85,7 @@ const FormSection = ({
       style: { ...child.props.style }
     });
   });
+
   return (
     <Box component='fieldset'>
       {header ? (
@@ -112,7 +97,7 @@ const FormSection = ({
       <Box className='fieldset-form'>
         {/* fixme: why doesn't colGap/columnspacing work? */}
         <Grid container spacing={1}>
-          <Grid item xs={12} {...flexProps}>
+          <Grid item xs={12}>
             {childrenRender}
           </Grid>
         </Grid>

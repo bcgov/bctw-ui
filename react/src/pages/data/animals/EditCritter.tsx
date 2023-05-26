@@ -4,27 +4,56 @@ import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
 import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
-import { AttachedCritter, Critter, IMarking, critterFormFields } from 'types/animal';
-import { InboundObj } from 'types/form_types';
+import { InboundObj, parseFormChangeResult } from 'types/form_types';
+import {
+  AttachedCritter,
+  Critter,
+  ICapture,
+  IMortality,
+  IMarking,
+  critterFormFields,
+  markingFormFields
+} from 'types/animal';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import MortalityEventForm from '../events/MortalityEventForm';
+import { createEvent } from '../events/EventComponents';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import MortalityEvent from 'types/events/mortality_event';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { hasChangedProperties, omitNull } from 'utils/common_helpers';
+import { QueryStatus } from 'react-query';
+import { ICbRouteKey } from 'critterbase/types';
 import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
+import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
+import { useEffect, useState } from 'react';
 
 /**
  * the main animal form
  */
-export default function EditCritter(props: EditorProps<Critter | AttachedCritter>): JSX.Element {
-  const { isCreatingNew, editing, open } = props;
+export default function EditCritter(
+  props: EditorProps<Critter | AttachedCritter> & {
+    queryStatus?: QueryStatus;
+    busySaving?: boolean;
+    onSave: (c: any) => Promise<void>;
+  }
+): JSX.Element {
+  const { isCreatingNew, editing, open, onSave, busySaving, queryStatus } = props;
   editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();
   const taxon = useTaxon();
+  const api = useTelemetryApi();
+
+  /*const { mutateAsync: handleSave, isLoading } = api.useBulkUpdateCritterbaseCritter({});*/
 
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
-  //const canEditCollectiveUnit = !!(canEdit && !editing.collective_unit);
   const isAttached = editing instanceof AttachedCritter;
+  const { identifierFields } = critterFormFields;
+  const [cbSelectStatus, setCbSelectStatus] = useState({});
+  const [allowSave, setAllowSave] = useState(false);
+  const [taxonId, setTaxonId] = useState(editing.taxon_id);
   // const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
   // const [workflow, setWorkflow] = useState<WorkflowType>();
   // const [showWorkflow, setShowWorkflow] = useState(false);
@@ -41,39 +70,133 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
   //   setHasBabies(false);
   //   //updateTaxon(null);
   // };
+  const critterbaseSave = async (payload) => {
+    const { body } = payload;
+    const new_critter = {
+      critter_id: body.critter_id,
+      animal_id: body.animal_id,
+      sex: body.sex,
+      wlh_id: body.wlh_id,
+      taxon_id: body.taxon_id
+    };
+    const old_critter = {
+      editing: editing.critter_id,
+      animal_id: editing.animal_id,
+      sex: editing.sex,
+      wlh_id: editing.wlh_id,
+      taxon_id: editing.taxon_id
+    };
+    const finalPayload = {
+      critters: [],
+      captures: [],
+      mortalities: [],
+      markings: []
+    };
+    if (hasChangedProperties(old_critter, new_critter)) {
+      finalPayload.critters.push(new_critter);
+    }
+    if (body.capture.length) {
+      const capture = body.capture[0];
+      const og_capture = editing.capture[0];
+      const captureId = editing.capture[0]?.capture_id;
+      if (captureId) {
+        capture.capture_id = captureId;
+      }
+      if (capture.capture_location) {
+        capture.capture_location = omitNull(capture.capture_location);
+      }
+      if (capture.release_location) {
+        if (capture.capture_location_id === capture.release_location_id) {
+          const clone = Object.assign({}, og_capture.capture_location);
+          capture.release_location = Object.assign(clone, capture.release_location);
+          capture.force_create_release = true;
+        }
+        capture.release_location = omitNull(capture.release_location);
+      }
+      capture.critter_id = body.critter_id;
+      const omitted = omitNull(capture);
+      if (hasChangedProperties(og_capture, omitted)) {
+        finalPayload.captures.push(omitNull(capture));
+      }
+    }
 
-  const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
+    if (body.mortality.length && editing.mortality.length) {
+      const mortality = body.mortality[0];
+      const mortalityId = editing.mortality[0]?.mortality_id;
+      if (mortalityId) {
+        mortality.mortality_id = mortalityId;
+      }
+      if (mortality.location) {
+        mortality.location = omitNull(mortality.location);
+      }
+      mortality.critter_id = body.critter_id;
+      const omitted = omitNull(mortality);
+      if (hasChangedProperties(editing.mortality[0], omitted)) {
+        finalPayload.mortalities.push(omitted);
+      }
+    }
+
+    if (body.marking.length) {
+      for (const m of body.marking) {
+        m.critter_id = body.critter_id;
+        const existing = editing.marking.find((a) => (a.marking_id = m.marking_id));
+        const omitted = omitNull(m);
+        if (existing && !hasChangedProperties(existing, omitted)) {
+          continue;
+        }
+        finalPayload.markings.push(m);
+      }
+      /*finalPayload.markings = body.marking.map(m => {
+          m.critter_id = body.critter_id;
+          return omitNull(m)
+        });*/
+    }
+
+    const r = await onSave(finalPayload);
+    return r;
+  };
+
+  const handleRoute = (v: QueryStatus, key: ICbRouteKey): void => {
+    const dict = { ...cbSelectStatus };
+    const isLoading = v === 'loading';
+    dict[key] = isLoading;
+    const s = Object.values(dict).every((a) => !a);
+    setCbSelectStatus(dict);
+    setAllowSave(s);
+    //console.log(`In Editcritter handleRoute: ${JSON.stringify(dict)} ${s}`)
+  };
 
   const Header = (
-    <Container maxWidth='xl'>
-      {isCreatingNew ? (
-        <Box pt={3}>
-          <Box component='h1' mt={0} mb={0}>
-            Add Critter
-          </Box>
-        </Box>
-      ) : (
-        <EditHeader<AttachedCritter>
-          title={
-            <Grid container flexDirection='row'>
-              <Grid item>WLH ID: {editing?.wlh_id ?? '-'}</Grid>
-              {editing.animal_id && <Grid item>&nbsp;/ Animal ID: {editing.animal_id}</Grid>}
-            </Grid>
-          }
-          headers={['taxon', 'device_id', 'critter_id', 'permission_type']}
-          format={editing.formatPropAsHeader}
-          obj={editing as AttachedCritter}
-        />
-      )}
-    </Container>
+    <EditHeader<AttachedCritter>
+      title={
+        <Grid container flexDirection='row' pl={0}>
+          <Grid item>WLH ID: {editing?.wlh_id ?? '-'}</Grid>
+          {editing.animal_id && <Grid item>&nbsp;/ Animal ID: {editing.animal_id}</Grid>}
+        </Grid>
+      }
+      headers={['taxon', 'device_id', 'critter_id', 'permission_type']}
+      format={editing.formatPropAsHeader}
+      obj={editing as AttachedCritter}
+    />
   );
 
   return (
-    <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing}>
+    <EditModal
+      disableHistory={true}
+      headerComponent={Header}
+      hideSave={!canEdit || queryStatus === 'loading' || !allowSave}
+      busySaving={busySaving}
+      {...props}
+      editing={editing}
+      onSave={critterbaseSave}>
       <ChangeContext.Consumer>
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: InboundObj): void => {
+            const [key, value, label] = parseFormChangeResult<AttachedCritter>(v);
+            if (key === 'taxon_id') {
+              setTaxonId(value as string);
+            }
             handlerFromContext(v);
           };
           return (
@@ -82,12 +205,17 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 <Divider />
                 <FormSection id='identifiers' header='Identifiers'>
                   {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
+                  <CbCollectionUnitInputs
+                    collection_units={editing.collection_units}
+                    taxon_id={taxonId}
+                    handleChange={onChange}
+                  />
                 </FormSection>
                 <CbMarkings
                   handleMarkings={(m, err) => {
                     onChange({ marking: m, error: err });
                   }}
-                  taxon_id={editing.taxon_id}
+                  taxon_id={taxonId}
                   markings={editing.marking}
                 />
               </FormSection>
@@ -97,11 +225,22 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 hide={!editing.latestCapture}
                 size='large'>
                 <Divider />
-                <CaptureEventForm event={editing.latestCapture} handleFormChange={onChange} isEditing />
+                <CaptureEventForm
+                  event={editing.latestCapture ?? (createEvent(editing, 'capture') as CaptureEvent2)}
+                  handleRoute={handleRoute}
+                  handleFormChange={onChange}
+                  isEditing
+                />
               </FormSection>
               <FormSection id='m-deets' header='Mortality Details' hide={!editing.latestMortality} size='large'>
                 <Divider />
-                <MortalityEventForm event={editing.latestMortality} handleFormChange={onChange} />
+                <MortalityEventForm
+                  event={editing.latestMortality ?? (createEvent(editing, 'mortality') as MortalityEvent)}
+                  handleRoute={handleRoute}
+                  handleFormChange={onChange}
+                  isEditing
+                />
+                {/* <Divider /> */}
               </FormSection>
             </Box>
           );
