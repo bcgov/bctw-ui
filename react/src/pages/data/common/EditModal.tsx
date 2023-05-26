@@ -171,20 +171,9 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
       <form autoComplete={'off'}>
         <Container maxWidth='md'>
           {headerComponent}
-          <Box py={3}>
+          <Box>
             {disableTabs ? null : (
               <Box mb={4}>
-                {/* 
-                //TODO critterbase integration old implementation of tabs
-                <Tabs
-                  value={currentTabID}
-                  onChange={(e, v): void => handleSwitchTab(v)}
-                  aria-label='simple tabs example'
-                  indicatorColor='primary'
-                  textColor='primary'>
-                  <Tab label='Details' {...a11yProps(0)} />
-                  {!disableHistory ? <Tab label='History' {...a11yProps(1)} /> : null}
-                </Tabs> */}
                 <PageTabs tabLabels={['Details']}>
                   {/* tab 1 */}
                   <Box>

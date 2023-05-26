@@ -48,7 +48,7 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
   }, [tabLabels.length]);
   return (
     //ml: -1 / mt: -1 is to prevent clipping issues with the boxShadow
-    <Box width='100%'>
+    <Box width='100%' sx={{ ml: -1, mt: -1 }}>
       <Tabs
         value={tab}
         sx={{
@@ -70,9 +70,7 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
                       backgroundColor: theme.palette[tabStatus]?.main
                     }
                   }}>
-                  <Typography fontWeight='bold' pr={1}>
-                    {t}
-                  </Typography>
+                  <Typography fontWeight='bold'>{t}</Typography>
                   {/* <Icon icon='circle' size={0.8} htmlColor={getColor(validation)} /> */}
                 </Badge>
               }

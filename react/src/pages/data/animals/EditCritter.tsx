@@ -5,14 +5,14 @@ import ChangeContext from 'contexts/InputChangeContext';
 import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
 import { AttachedCritter, Critter, IMarking, critterFormFields } from 'types/animal';
-import { InboundObj } from 'types/form_types';
+import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import MortalityEventForm from '../events/MortalityEventForm';
 import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
 import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * the main animal form
@@ -20,41 +20,25 @@ import { useEffect } from 'react';
 export default function EditCritter(props: EditorProps<Critter | AttachedCritter>): JSX.Element {
   const { isCreatingNew, editing, open } = props;
   editing.permission_type = eCritterPermission.admin;
-  //TODO integration add this back
-  //const taxon = useTaxon();
-
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const isAttached = editing instanceof AttachedCritter;
+  const { identifierFields } = critterFormFields;
 
-  const { captureFields, characteristicsFields, identifierFields, releaseFields } = critterFormFields;
+  const [taxonId, setTaxonId] = useState(editing.taxon_id);
 
   const Header = (
-    <Box>
-      {isCreatingNew ? (
-        <Box pt={3}>
-          <Box component='h1' mt={0} mb={0}>
-            Add Critter
-          </Box>
-        </Box>
-      ) : (
-        <EditHeader<AttachedCritter>
-          title={
-            <Grid container flexDirection='row' pl={0}>
-              <Grid item>WLH ID: {editing?.wlh_id ?? '-'}</Grid>
-              {editing.animal_id && <Grid item>&nbsp;/ Animal ID: {editing.animal_id}</Grid>}
-            </Grid>
-          }
-          headers={['taxon', 'device_id', 'critter_id', 'permission_type']}
-          format={editing.formatPropAsHeader}
-          obj={editing as AttachedCritter}
-        />
-      )}
-    </Box>
+    <EditHeader<AttachedCritter>
+      title={
+        <Grid container flexDirection='row' pl={0}>
+          <Grid item>WLH ID: {editing?.wlh_id ?? '-'}</Grid>
+          {editing.animal_id && <Grid item>&nbsp;/ Animal ID: {editing.animal_id}</Grid>}
+        </Grid>
+      }
+      headers={['taxon', 'device_id', 'critter_id', 'permission_type']}
+      format={editing.formatPropAsHeader}
+      obj={editing as AttachedCritter}
+    />
   );
-
-  useEffect(() => {
-    console.log('editing object changed');
-  }, [JSON.stringify(editing)]);
 
   return (
     <EditModal headerComponent={Header} hideSave={!canEdit} {...props} editing={editing}>
@@ -62,6 +46,10 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: InboundObj): void => {
+            const [key, value, label] = parseFormChangeResult<AttachedCritter>(v);
+            if (key === 'taxon_id') {
+              setTaxonId(value as string);
+            }
             handlerFromContext(v);
           };
           return (
@@ -70,13 +58,17 @@ export default function EditCritter(props: EditorProps<Critter | AttachedCritter
                 <Divider />
                 <FormSection id='identifiers' header='Identifiers'>
                   {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
-                  <CbCollectionUnitInputs {...editing} handleChange={onChange} />
+                  <CbCollectionUnitInputs
+                    collection_units={editing.collection_units}
+                    taxon_id={taxonId}
+                    handleChange={onChange}
+                  />
                 </FormSection>
                 <CbMarkings
                   handleMarkings={(m, err) => {
                     onChange({ marking: m, error: err });
                   }}
-                  taxon_id={editing.taxon_id}
+                  taxon_id={taxonId}
                   markings={editing.marking}
                 />
               </FormSection>

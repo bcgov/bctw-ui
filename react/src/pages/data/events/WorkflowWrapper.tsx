@@ -22,6 +22,7 @@ import MortalityEventForm from './MortalityEventForm';
 import ReleaseEventForm from './ReleaseEventForm';
 import RetrievalEventForm from './RetrievalEventForm';
 import { classToPlain } from 'class-transformer';
+import * as _ from 'lodash';
 
 type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
   event: T;
@@ -44,8 +45,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
 
-  const [statefulEvent, setStatefulEvent] = useState(event);
-  //console.log({ event }, { statefulEvent });
+  // const [event, setevent] = useState(event);
+  //console.log({ event }, { event });
   const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr] = useFormHasError();
 
@@ -57,10 +58,10 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   }, [hasErr]);
 
   const eventHasAllRequiredProperties = (): boolean => {
-    if (statefulEvent.fields) {
-      for (const [k, v] of Object.entries(statefulEvent.fields)) {
-        if (v.required && !statefulEvent[k]) {
-          console.log(`Missing required property ${k} -> ${statefulEvent[k]}`);
+    if (event.fields) {
+      for (const [k, v] of Object.entries(event.fields)) {
+        if (v.required && !event[k]) {
+          console.log(`Missing required property ${k} -> ${event[k]}`);
           return false;
         }
       }
@@ -69,20 +70,16 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     }
   };
 
-  // useEffect(() => {
-  //   setStatefulEvent(event);
-  // }, [event]);
-
   // save response handler
   const onSuccess = async (e: AxiosError | boolean): Promise<void> => {
     if ((e as AxiosError)?.isAxiosError) {
       showNotif({ severity: 'error', message: formatAxiosError(e as AxiosError) });
     } else {
       // console.log('sucess!!', e);
-      showNotif({ severity: 'success', message: `${capitalize(statefulEvent.event_type)} event saved!` });
+      showNotif({ severity: 'success', message: `${capitalize(event.event_type)} event saved!` });
       // if the parent implements this, call it on a successful save.
       if (typeof onEventSaved === 'function') {
-        onEventSaved(statefulEvent);
+        onEventSaved(event);
       }
       handleClose(false);
     }
@@ -92,7 +89,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   const onError = (e: AxiosError): void => {
     showNotif({
       severity: 'success',
-      message: `error saving ${statefulEvent.event_type} workflow: ${formatAxiosError(e)}`
+      message: `error saving ${event.event_type} workflow: ${formatAxiosError(e)}`
     });
   };
 
@@ -101,20 +98,14 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
 
   // performs metadata updates of collar/critter
   const handleSave = async (): Promise<void> => {
-    saveEvent(statefulEvent);
-  };
-
-  const toObject = (o) => {
-    const res = {}; //or Object.create(null)
-    for (const key in o) res[key] = o[key];
-    return res;
+    saveEvent(event);
   };
 
   // update the event when form components change
   const handleChildFormUpdated = (v: InboundObj): void => {
     checkHasErr(v);
 
-    const tmp = statefulEvent;
+    // const tmp = event;
     const k = Object.keys(v)[0];
     const tempval = Object.values(v)[0];
     const val = tempval === undefined || tempval === null ? null : tempval['id'] ?? tempval;
@@ -122,21 +113,12 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     const { nestedEventKey } = v;
 
     if (nestedEventKey) {
-      Object.assign(tmp[nestedEventKey], { [k]: val });
-      setStatefulEvent(tmp);
+      event[nestedEventKey][k] = val;
     } else if (k && k !== 'displayProps') {
-      tmp[k] = val;
-      setStatefulEvent(tmp);
+      event[k] = val;
     }
     setCanSave(!hasErr && eventHasAllRequiredProperties());
-    //const a = eventHasAllRequiredProperties();
-    //console.log(`${JSON.stringify(v)} -- Set canSave with ${!hasErr} and ${a}`)
-    //setCanSave(!hasErr && a);
   };
-
-  useEffect(() => {
-    console.log(statefulEvent);
-  }, [JSON.stringify(statefulEvent)]);
 
   /**
    * some forms have actions that when triggered,
@@ -154,7 +136,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
    */
   const handlePostponeSave = (wft: WorkflowType): void => {
     handleClose(false);
-    onEventChain(statefulEvent, wft);
+    onEventChain(event, wft);
   };
 
   /**
@@ -163,7 +145,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
    */
   const handleExitWorkflow = (): void => {
     // console.log('exiting workflow early!');
-    saveEvent(statefulEvent);
+    saveEvent(event);
     setShowConfirmModal(false);
   };
 
@@ -177,16 +159,16 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     handlePostponeSave
   };
   const determineWorkflow = (): JSX.Element => {
-    if (statefulEvent instanceof ReleaseEvent) {
-      return <ReleaseEventForm {...props} event={statefulEvent} />;
-    } else if (statefulEvent instanceof CaptureEvent2) {
-      return <CaptureEventForm {...props} event={statefulEvent} />;
-    } else if (statefulEvent instanceof MortalityEvent) {
-      return <MortalityEventForm {...props} event={statefulEvent} />;
-    } else if (statefulEvent instanceof RetrievalEvent) {
-      return <RetrievalEventForm {...props} event={statefulEvent} />;
-    } else if (statefulEvent instanceof MalfunctionEvent) {
-      return <MalfunctionEventForm {...props} event={statefulEvent} />;
+    if (event instanceof ReleaseEvent) {
+      return <ReleaseEventForm {...props} event={event} />;
+    } else if (event instanceof CaptureEvent2) {
+      return <CaptureEventForm {...props} event={event} />;
+    } else if (event instanceof MortalityEvent) {
+      return <MortalityEventForm {...props} event={event} />;
+    } else if (event instanceof RetrievalEvent) {
+      return <RetrievalEventForm {...props} event={event} />;
+    } else if (event instanceof MalfunctionEvent) {
+      return <MalfunctionEventForm {...props} event={event} />;
     }
     return <div>error: unable to determine workflow form type</div>;
   };
@@ -198,10 +180,10 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       useButton
       headercomp={
         <EditHeader<T>
-          title={statefulEvent?.getWorkflowTitle()}
-          headers={statefulEvent.displayProps}
-          obj={statefulEvent}
-          format={statefulEvent.formatPropAsHeader}
+          title={event?.getWorkflowTitle()}
+          headers={event.displayProps}
+          obj={event}
+          format={event.formatPropAsHeader}
         />
       }>
       <form className={'event-modal'} autoComplete={'off'}>

@@ -21,6 +21,7 @@ export default function CaptureEventForm({
   handleFormChange,
   isEditing = false
 }: WorkflowFormProps<CaptureEvent2> & { isEditing?: boolean }): JSX.Element {
+  const latitude = capture.capture_location.latitude;
   const [showRelease, setShowRelease] = useState(false);
   const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
   const [minReleaseDate, setMinReleaseDate] = useState(capture?.capture_timestamp);
