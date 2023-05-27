@@ -133,17 +133,6 @@ export default function ExportDownloadModal({
     handleClose(false);
   };
 
-  const operatorTranslation = (operatorWord: QueryBuilderOperator | ''): string => {
-    switch (operatorWord) {
-      case 'Equals':
-        return '=';
-      case 'Not Equals':
-        return '<>';
-      default:
-        return '';
-    }
-  };
-
   useDidMountEffect(() => {
     startRequest();
   }, [downloadType]);

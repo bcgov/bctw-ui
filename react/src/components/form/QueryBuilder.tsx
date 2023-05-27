@@ -105,12 +105,19 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
       const uniqueItemsCollectionUnits: any[] = [];
       
       if(col === 'collection_units') {
-        const flattenCollectionUnits = data.map(r => r.collection_units).filter(v => v).flat();
-        for(const f of flattenCollectionUnits) {
-          if(!uniqueItemsCollectionUnits.find(a => a.collection_unit_id === f.collection_unit_id)) {
-            uniqueItemsCollectionUnits.push(f);
+        const tempDict = {};
+        for(const d of data) {
+          if(d.collection_units) {
+            for(const c of d.collection_units) {
+              const tRow = rows.find(r => r.column === 'taxon')
+              if(tRow && !tRow.value.includes(d.taxon)) {
+                continue;
+              }
+              tempDict[c.collection_unit_id] = {...c, taxon: d.taxon};
+            }
           }
         }
+        uniqueItemsCollectionUnits.push(...Object.values(tempDict));
       }
       else {
         uniqueItemsForColumn.push(...data.map((o) => o[col]).filter((v, i, a) => v && a.indexOf(v) === i));
@@ -127,7 +134,7 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
         return {
           id: i + uniqueItemsForColumn.length,
           value: c.collection_unit_id,
-          displayLabel: `${c.category_name} | ${c.unit_name}`
+          displayLabel: `${c.taxon} | ${c.category_name} | ${c.unit_name}`
         }
       }) ]
     } else {
