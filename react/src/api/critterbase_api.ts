@@ -3,8 +3,6 @@ import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { API, ApiProps, ICbBulkUpdatePayload, IUpsertPayload } from './api_interfaces';
 import { uuid } from 'types/common_types';
 import { Critter, IMarking } from 'types/animal';
-import { CaptureEvent2 } from 'types/events/capture_event';
-import { CbPayload } from 'types/events/event';
 import { useQueryClient } from 'react-query';
 
 export const critterbaseApi = (props: ApiProps): API => {
@@ -41,7 +39,7 @@ export const critterbaseApi = (props: ApiProps): API => {
     const { data } = await api.put(`${CbRouters.bulk}`, bulkPayload);
     invalidate();
     return data;
-  }
+  };
 
   const deleteMarking = async (marking_id: uuid): Promise<IMarking> => {
     const { data } = await api.delete(`${CbRouters.markings}/${marking_id}`);

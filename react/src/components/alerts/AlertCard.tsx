@@ -1,6 +1,5 @@
 import { Grid, Paper } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Icon } from 'components/common';
 
 type AlertCardVariants = 'error' | 'warning';
 
