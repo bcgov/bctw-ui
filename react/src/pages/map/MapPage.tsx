@@ -51,7 +51,6 @@ import {
 } from 'types/map';
 import { eUDFType } from 'types/udf';
 import { formatDay, getToday } from 'utils/time';
-import { TaxonProvider } from 'contexts/TaxonContext';
 
 /**
   there are several forms of state in this page:
@@ -538,70 +537,68 @@ export default function MapPage(): JSX.Element {
     }
   };
   return (
-    <TaxonProvider>
-      <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
-        <MapFilters
-          start={range.start}
-          end={range.end}
-          pings={pings ?? []}
-          onApplySearch={handleApplyChangesFromSearchPanel}
-          onApplyFilters={handleApplyChangesFromFilterPanel}
-          onApplySymbolize={handleApplyChangesFromSymbolizePanel}
-          onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
-          // todo: trigger when filter panel transition is completed without timeout
-          onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
-          onShowLatestPings={handleShowLastKnownLocation}
-          onShowLastFixes={handleShowLast10Fixes}
-          isFetching={isLoadingPings}
-          // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
-        />
-        <div className={'map-container'}>
-          {isLoadingPings ? <CircularProgress className='progress' color='secondary' /> : null}
+    <div id={'map-view'} onMouseUp={onUp} onMouseMove={onMove}>
+      <MapFilters
+        start={range.start}
+        end={range.end}
+        pings={pings ?? []}
+        onApplySearch={handleApplyChangesFromSearchPanel}
+        onApplyFilters={handleApplyChangesFromFilterPanel}
+        onApplySymbolize={handleApplyChangesFromSymbolizePanel}
+        onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
+        // todo: trigger when filter panel transition is completed without timeout
+        onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
+        onShowLatestPings={handleShowLastKnownLocation}
+        onShowLastFixes={handleShowLast10Fixes}
+        isFetching={isLoadingPings}
+        // collectiveUnits={getUniquePropFromPings(fetchedPings, 'collective_unit') as string[]}
+      />
+      <div className={'map-container'}>
+        {isLoadingPings ? <CircularProgress className='progress' color='secondary' /> : null}
 
-          <div id='popup' style={{ bottom: bottomPanelHeight }} />
+        <div id='popup' style={{ bottom: bottomPanelHeight }} />
 
-          <div id='map'>
-            <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
-          </div>
-
-          <Paper
-            square
-            style={{ height: bottomPanelHeight }}
-            className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}
-            id={`map-bottom-panel`}>
-            <div onMouseDown={onDown} id='drag'>
-              <div id='drag-icon'>
-                <Icon path={mdiDragHorizontalVariant} className={'icon'} title='Drag to resize' size={1} />
-              </div>
-            </div>
-            <MapDetails
-              pings={[...pings]}
-              unassignedPings={[]}
-              selectedAssignedIDs={selectedPingIDs}
-              handleShowOnlySelected={handleShowOnlySelected}
-              handleShowOverview={handleShowOverview}
-              handleRowSelected={handleDetailPaneRowSelect}
-              showExportModal={showExportModal}
-              setShowExportModal={setShowExportModal}
-              timeRange={range}
-            />
-          </Paper>
-          {selectedDetail ? (
-            <MapOverView
-              open={showOverviewModal}
-              handleClose={setShowModal}
-              type={overviewType}
-              detail={selectedDetail}
-            />
-          ) : null}
-          <AddUDF
-            title={'Custom Critter Groups'}
-            udf_type={eUDFType.critter_group}
-            open={showUdfEdit}
-            handleClose={(): void => setShowUdfEdit(false)}
-          />
+        <div id='map'>
+          <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
         </div>
+
+        <Paper
+          square
+          style={{ height: bottomPanelHeight }}
+          className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}
+          id={`map-bottom-panel`}>
+          <div onMouseDown={onDown} id='drag'>
+            <div id='drag-icon'>
+              <Icon path={mdiDragHorizontalVariant} className={'icon'} title='Drag to resize' size={1} />
+            </div>
+          </div>
+          <MapDetails
+            pings={[...pings]}
+            unassignedPings={[]}
+            selectedAssignedIDs={selectedPingIDs}
+            handleShowOnlySelected={handleShowOnlySelected}
+            handleShowOverview={handleShowOverview}
+            handleRowSelected={handleDetailPaneRowSelect}
+            showExportModal={showExportModal}
+            setShowExportModal={setShowExportModal}
+            timeRange={range}
+          />
+        </Paper>
+        {selectedDetail ? (
+          <MapOverView
+            open={showOverviewModal}
+            handleClose={setShowModal}
+            type={overviewType}
+            detail={selectedDetail}
+          />
+        ) : null}
+        <AddUDF
+          title={'Custom Critter Groups'}
+          udf_type={eUDFType.critter_group}
+          open={showUdfEdit}
+          handleClose={(): void => setShowUdfEdit(false)}
+        />
       </div>
-    </TaxonProvider>
+    </div>
   );
 }

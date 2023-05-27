@@ -2,7 +2,6 @@ import { Box, Container, Divider, Grid } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
-import { useTaxon } from 'contexts/TaxonContext';
 import EditModal from 'pages/data/common/EditModal';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import {
@@ -43,7 +42,6 @@ export default function EditCritter(
   editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();
-  const taxon = useTaxon();
   const api = useTelemetryApi();
 
   /*const { mutateAsync: handleSave, isLoading } = api.useBulkUpdateCritterbaseCritter({});*/
