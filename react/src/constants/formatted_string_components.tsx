@@ -1,57 +1,4 @@
-import { Button, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import { Icon } from 'components/common';
-import { getTag } from 'components/table/table_helpers';
-import { AnimalNotification, MortalityAlert } from 'types/alert';
-import { AttachedCritter } from 'types/animal';
-import { eDeviceStatus } from 'types/collar';
-
-const critterImportMessage = (
-  <>
-    <h4>Add or update animals.</h4>
-    <p>
-      <i>
-        <b>critter_id</b>
-      </i>{' '}
-      must be included for the importer to perform an update to an existing animal.<br></br>
-      If{' '}
-      <i>
-        <b>device_id</b>
-      </i>{' '}
-      is present, the importer will attempt to attach the collar to the device. The device must exist.
-    </p>
-  </>
-);
-
-const deviceImportMessage = (
-  <>
-    <h4>Add or update devices</h4>
-    <p>
-      <i>
-        <b>device_id</b> AND <b>device_make</b>
-      </i>{' '}
-      must be included.
-    </p>
-  </>
-  // <p>todo: move vectronic keyx import here?</p>
-);
-
-const bothImportMessage = (
-  <h4>Add or update animal and device metadata from the same row.</h4>
-  // <p>todo: Add details here about capture/mort dates etc.</p>
-);
-
-const pointImportMessage = (
-  <>
-    <h4>Add historical telemetry data</h4>
-    <p>
-      <i>
-        <b>device_id, date_recorded, device_vendor, latitude, longitude</b>
-      </i>{' '}
-      must be included.
-    </p>
-    <p>Note that this data will not be available for viewing on the map until tomorrow</p>
-  </>
-);
+import { Typography } from '@mui/material';
 
 const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX.Element => (
   <>
@@ -60,25 +7,6 @@ const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX
     </h4>
     <p>You can attach a new device via the Device Assignment button at the top of the animal details page</p>
   </>
-);
-
-const animalBannerMortNotif = (notif: AnimalNotification) => (
-  <ListItem>
-    <ListItemIcon>{getTag(notif.device_status as eDeviceStatus)}</ListItemIcon>
-    <ListItemText
-      primary={
-        <Typography>
-          The status of <b>Device ID:</b> {notif.device_id} changed from 'Alive' to '<b>{notif.device_status}</b>' on
-          DATE
-        </Typography>
-      }
-      secondary={
-        <>
-          <b>Frequency:</b> {notif.frequency} <b>Critter ID:</b> {notif.animal_id} <b>WLH ID:</b> {notif.wlh_id}
-        </>
-      }
-    />
-  </ListItem>
 );
 
 const taxonModalMessage = (currenttaxon: string, nexttaxon: string): JSX.Element => {
@@ -111,12 +39,4 @@ const taxonModalMessage = (currenttaxon: string, nexttaxon: string): JSX.Element
   );
 };
 
-export {
-  critterImportMessage,
-  deviceImportMessage,
-  bothImportMessage,
-  pointImportMessage,
-  releaseUnattachWarning,
-  taxonModalMessage,
-  animalBannerMortNotif
-};
+export { releaseUnattachWarning, taxonModalMessage };
