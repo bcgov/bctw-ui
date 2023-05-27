@@ -15,11 +15,6 @@ import MortalityEvent from './events/mortality_event';
 
 // // used in critter getters to specify collar attachment status
 
-export interface Itaxon {
-  id: string;
-  name: string;
-}
-
 export enum eCritterFetchType {
   assigned = 'assigned',
   unassigned = 'unassigned'
