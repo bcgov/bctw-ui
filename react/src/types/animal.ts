@@ -13,15 +13,6 @@ import { LocationEvent } from './events/location_event';
 import { get } from 'http';
 import MortalityEvent from './events/mortality_event';
 
-export enum eTaxon {
-  caribou = 'caribou',
-  grizzly_bear = 'grizzly bear',
-  moose = 'moose',
-  grey_wolf = 'grey wolf'
-}
-
-const { caribou, grizzly_bear, moose, grey_wolf } = eTaxon;
-
 // // used in critter getters to specify collar attachment status
 
 export interface Itaxon {
