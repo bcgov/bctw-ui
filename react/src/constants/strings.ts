@@ -158,13 +158,6 @@ const CollarStrings = {
   csvButtonText: 'Upload CSV file'
 };
 
-const CodeStrings = {
-  addHeaderTitle: 'Add A New Code Header',
-  importTitle: 'Bulk Import Codes',
-  importText:
-    'Use this feature to add multiple codes. Codes cannot be edited here. The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional.'
-};
-
 const MapStrings = {
   startDateLabel: 'Start Date',
   startDateTooltip: 'Start date for telemetry fetch',
@@ -348,7 +341,6 @@ const DelegationRequestStrings = {
 };
 export {
   AnimalDelegationSteps,
-  CodeStrings,
   CollarStrings,
   CritterStrings,
   DataLifeStrings,

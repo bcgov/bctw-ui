@@ -71,7 +71,7 @@ type AnimalCollarRow = AnimalCollar & {
   row_index: number;
 };
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
-export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
+const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
   const { title, sheetIndex, handleSubmit, show } = props;
   const api = useTelemetryApi();
 
