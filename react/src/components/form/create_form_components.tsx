@@ -241,34 +241,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
-// interface ItaxonFormField {
-//   obj: Critter | AttachedCritter;
-//   formField: WorkflowFormField;
-//   handleChange: FormChangeEvent;
-//   inputProps?: Partial<CreateInputProps>;
-//   displayBlock?: boolean;
-//   style?: CSSProperties;
-// }
-// function CreateTaxonFormField({
-//   obj,
-//   formField,
-//   handleChange,
-//   inputProps,
-//   displayBlock = false,
-//   style = {}
-// }: ItaxonFormField): JSX.Element {
-//   const taxon = useTaxon();
-//   if (!showField(formField, taxon)) {
-//     return null;
-//   } else {
-//     return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
-//   }
-// }
+
 export {
-  CreateEditTextField,
-  CreateEditDateField,
-  CreateEditCheckboxField,
-  CreateEditSelectField,
   CreateFormField
   // CreateTaxonFormField
 };
