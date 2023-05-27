@@ -1,9 +1,8 @@
 import { INotificationMessage } from 'components/component_interfaces';
-import { useContext, createContext, useState, useEffect } from 'react';
-import { callbackify } from 'util';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-export const ApiResponseContext = createContext<INotificationMessage>(null);
-export const ApiResponseDispatch = createContext(null);
+const ApiResponseContext = createContext<INotificationMessage>(null);
+const ApiResponseDispatch = createContext(null);
 
 /**
  * fixme: change the name of this, since it's actually a context
