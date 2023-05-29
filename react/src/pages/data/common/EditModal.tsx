@@ -209,6 +209,37 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
     }
   };
 
+  // Represents the always-rendered form components (regardless of disableTabs).
+  const FormContent = (
+    <Box>
+      {children}
+      <Box my={1} mx={3}>
+        <Divider></Divider>
+      </Box>
+      <Box p={3}>
+        <Box display='flex' alignItems={'center'} justifyContent='flex-end' className='form-buttons'>
+          {hideSave ? null : (
+            <>
+              {hasErr ? <Typography mr={1}>Fields marked with * are required</Typography> : null}
+              <LoadingButton
+                {...buttonProps}
+                variant='contained'
+                loading={busySaving}
+                loadingIndicator={<CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />}
+                onClick={handleSave}
+                disabled={!canSave}>
+                Save
+              </LoadingButton>
+            </>
+          )}
+          <Button {...buttonProps} variant='outlined' onClick={(): void => onClose()}>
+            Cancel and Exit
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  );
+
   const Children = (
     /**
      * wrap children in the change context provider so they have
@@ -226,40 +257,13 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
         <Container maxWidth='md'>
           {headerComponent}
           <Box>
-            {disableTabs ? null : (
+            {disableTabs ? (
+              <Box>{FormContent}</Box>
+            ) : (
               <Box mb={4}>
                 <PageTabs tabLabels={['Details']}>
                   {/* tab 1 */}
-                  <Box>
-                    {children}
-                    <Box my={1} mx={3}>
-                      <Divider></Divider>
-                    </Box>
-                    <Box p={3}>
-                      <Box display='flex' alignItems={'center'} justifyContent='flex-end' className='form-buttons'>
-                        {hideSave ? null : (
-                          <>
-                            {hasErr ? <Typography mr={1}>Fields marked with * are required</Typography> : null}
-                            <LoadingButton
-                              {...buttonProps}
-                              variant='contained'
-                              loading={busySaving}
-                              loadingIndicator={
-                                <CircularProgress className={styles.MuiCircularProgress} color='inherit' size={16} />
-                              }
-                              onClick={handleSave}
-                              disabled={!canSave}>
-                              Save
-                            </LoadingButton>
-                          </>
-                        )}
-                        <Button {...buttonProps} variant='outlined' onClick={(): void => onClose()}>
-                          Cancel and Exit
-                        </Button>
-                      </Box>
-                    </Box>
-                  </Box>
-
+                  {FormContent}
                   {/* tab 2 */}
                   <HistoryPage {...historyParams} />
                 </PageTabs>
