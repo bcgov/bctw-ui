@@ -110,7 +110,7 @@ export default function ExportPageV2(): JSX.Element {
     }
   };
 
-  const { data: crittersData, isSuccess: critterSuccess } = api.useAssignedCritters(0);
+  const { data: crittersData, isSuccess: critterSuccess } = api.useAssignedCrittersHistoric();
 
   const handleChangeDate = (v: InboundObj): void => {
     const [key, value] = parseFormChangeResult(v);
