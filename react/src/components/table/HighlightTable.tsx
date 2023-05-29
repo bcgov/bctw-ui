@@ -10,7 +10,7 @@ import { Tooltip } from 'components/common';
 /**
  * A table that expects the data to be provided.
  */
-export type HighlightTableProps<T> = PlainTableProps<T> & {
+type HighlightTableProps<T> = PlainTableProps<T> & {
   data: T[];
   rowIdentifier: string;
   messages: any[];

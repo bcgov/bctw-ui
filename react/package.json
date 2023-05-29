@@ -78,7 +78,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "node_modules/eslint/bin/eslint.js src/**/*.ts",
-    "deadCode": "ts-prune"
+    "dead:code": "ts-prune"
   },
   "eslintConfig": {
     "extends": [

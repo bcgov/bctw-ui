@@ -11,7 +11,7 @@ import { AttachedCollar, Collar } from 'types/collar';
 
 export type QueryBuilderOperator = 'Equals' | 'Not Equals';
 export type QueryBuilderColumn = keyof Critter | keyof Collar;
-export type QueryBuilderData = Critter | AttachedCritter | Collar | AttachedCollar;
+type QueryBuilderData = Critter | AttachedCritter | Collar | AttachedCollar;
 
 export interface IFormRowEntry {
   column: QueryBuilderColumn;
@@ -26,7 +26,7 @@ type IQueryBuilderProps<T extends ISelectMultipleData> = {
   handleRowsUpdate?: (r: IFormRowEntry[]) => void;
 };
 
-export const exportStyles = makeStyles(() => ({
+const exportStyles = makeStyles(() => ({
   queryBuilderCol: {
     display: 'inline-flex',
     marginRight: '0.5rem',

@@ -216,7 +216,6 @@ export {
   fuzzySearchMutipleWords,
   getTag,
   formatTag,
-  descendingComparator,
   getComparator,
   stableSort,
   createHeadCell,
