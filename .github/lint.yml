@@ -5,11 +5,10 @@ on: [push]
 jobs:
   eslint:
     runs-on: ubuntu-latest
-    default:
-      run:
-        working-directory: ./react
     steps:
       - uses: actions/checkout@v1
+        working-directory: ./react
       - uses: stefanoeb/eslint-action@1.0.2
+        working-directory: ./react
         with:
           files: src/
