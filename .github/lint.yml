@@ -5,6 +5,9 @@ on: [push]
 jobs:
   eslint:
     runs-on: ubuntu-latest
+    default:
+      run:
+        working-directory: ./react
     steps:
       - uses: actions/checkout@v1
       - uses: stefanoeb/eslint-action@1.0.2
