@@ -239,4 +239,4 @@ const initMap = (
     });
 };
 
-export { initMap, hidePopup, setPopupInnerHTML, addTileLayers };
+export { initMap, hidePopup, setPopupInnerHTML };

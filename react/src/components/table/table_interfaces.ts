@@ -137,12 +137,10 @@ export type {
   HeadCell,
   Order,
   ICustomTableColumn,
-  ITableQuery,
   TableHeadProps,
   PlainTableProps,
   DataTableProps,
   ITableQueryProps,
   ITableSortProp,
-  ITableFilter,
-  FilterOperator
+  ITableFilter
 };

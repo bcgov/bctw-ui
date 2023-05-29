@@ -14,7 +14,7 @@ import {
 import { MapDetailsBaseProps } from './MapDetails';
 import { useMarkerStates } from '../MapMarkerContext';
 
-export type MapDetailsGroupedProps = MapDetailsBaseProps & {
+type MapDetailsGroupedProps = MapDetailsBaseProps & {
   pings: ITelemetryGroup[];
 };
 
@@ -65,7 +65,10 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const handleRowCheck = (v: RowActionStatus): void => {
     const pointIds = getPointIDsFromTelemetryGroup(pings.filter((f) => f.critter_id === v.critter_id));
     markerDispatch({ type: v.active ? 'SELECT_MARKERS' : 'UNSELECT_MARKERS', ids: pointIds });
-    markerDispatch({ type: 'SELECT_CRITTERS', ids: v.active? [...selectedCritters, v.critter_id] : selectedCritters.filter((id) => id !== v.critter_id) });
+    markerDispatch({
+      type: 'SELECT_CRITTERS',
+      ids: v.active ? [...selectedCritters, v.critter_id] : selectedCritters.filter((id) => id !== v.critter_id)
+    });
   };
 
   const handleRowHover = (v: RowActionStatus): void => {

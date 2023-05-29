@@ -8,7 +8,7 @@ import {
 } from 'pages/map/map_helpers';
 import { ITelemetryPoint } from 'types/map';
 
-export type PointStyle = {
+type PointStyle = {
   fillColor: string;
   color: string;
   opacity: number;
@@ -183,10 +183,9 @@ const setupSelectedPings = (): L.GeoJSONOptions => {
 
 export {
   createLatestPingIcon,
-  defaultPointStyle,
   setupSelectedPings,
   setupLatestPingOptions,
   setupTracksOptions,
   setupPingOptions,
-  getStyle,
+  getStyle
 };

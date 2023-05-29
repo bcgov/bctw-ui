@@ -43,7 +43,7 @@ const MAP_COLOURS_OUTLINE = {
  * @param index: The order of the colour]
  * @returns formatted string of a unique pastel colour
  */
-export const getEvenlySpacedColour = (index: number): string => `hsl(${(index + 1) * 137.508},50%,70%)`;
+const getEvenlySpacedColour = (index: number): string => `hsl(${(index + 1) * 137.508},50%,70%)`;
 /**
  * @param colourString the @type {Critter} animal_colour string
  * which in the @file {map_api.ts} -> @function {getPings} is returned
@@ -127,7 +127,7 @@ const fillPoint = (layer: any, selected = false): void => {
     class: selected ? 'selected-ping' : '',
     weight: 1.0,
     color: getOutlineColor(layer.feature),
-    fillColor: getFillColorByStatus(layer.feature)//, selected)
+    fillColor: getFillColorByStatus(layer.feature) //, selected)
   });
 };
 
@@ -454,19 +454,13 @@ const getUniqueCollectionUnitKeys = (pings: ITelemetryGroup[]): string[] => {
 
 export {
   applyFilter,
-  fillPoint,
   getPointIDsFromTelemetryGroup,
-  getEarliestPing,
   getOutlineColor,
   getFillColorByStatus,
   getFillColorByDeviceStatus,
-  getLatestPingsFromTelemetryGroup,
   getLast10Fixes,
-  getLast10Points,
-  getLast10Tracks,
   getLatestPing,
   getUniqueCritterIDsFromSelectedPings,
-  getUniquePropFromPings,
   groupPings,
   groupFilters,
   MAP_COLOURS,
@@ -474,7 +468,6 @@ export {
   parseAnimalColour,
   sortGroupedTelemetry,
   splitPings,
-  createUniqueList,
   getFormValues,
   updatePings,
   getUniqueCollectionUnitKeys

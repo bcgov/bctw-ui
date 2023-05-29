@@ -131,9 +131,6 @@ export type CaptureFormField2 = {
   [Property in keyof CaptureEvent2]+?: FormFieldObject<CaptureEvent2>;
 };
 
-export type CaptureFormField = {
-  [Property in keyof CaptureEvent]+?: FormFieldObject<CaptureEvent>;
-};
 /**
  * capture date / data life ??!?
  * assume data life is the capture date?

@@ -23,7 +23,7 @@ export type MapDetailsBaseProps = {
   handleShowOverview: OnMapRowCellClick;
 };
 
-export type MapDetailsProps = MapDetailsBaseProps & {
+type MapDetailsProps = MapDetailsBaseProps & {
   pings: ITelemetryPoint[];
   unassignedPings: ITelemetryPoint[];
   // telemetry IDs of points that have a device/animal attached
@@ -59,7 +59,6 @@ export default function MapDetails({
 
   const [{ selectedMarkers }] = useMarkerStates();
 
-
   // upon initial load, display all critters in bottom panel
   useEffect(() => {
     const byCritter = groupPings(pings, sort);
@@ -76,8 +75,8 @@ export default function MapDetails({
   }, [showOnlySelected]);
 
   useEffect(() => {
-    setPingGroupChecked(groupPings([...pings, ...unassignedPings].filter((f) => selectedMarkers.has(f.id))))
-  }, [selectedMarkers])
+    setPingGroupChecked(groupPings([...pings, ...unassignedPings].filter((f) => selectedMarkers.has(f.id))));
+  }, [selectedMarkers]);
 
   // upon rows checked in each row, note: unassigned IDs are negative integers
   const handleRowsChecked = (ids: number[]): void => {
@@ -98,8 +97,13 @@ export default function MapDetails({
 
   if (!groupedPings.length && !groupedUnassignedPings.length) {
     return (
-      <Box color='orangered' className={'map-detail-container'} display='flex' alignItems={'center'} justifyContent={'center'}>
-        <p style={{fontSize: '18px', fontWeight: 'bolder'}}>{MapStrings.noCrittersFound}</p>
+      <Box
+        color='orangered'
+        className={'map-detail-container'}
+        display='flex'
+        alignItems={'center'}
+        justifyContent={'center'}>
+        <p style={{ fontSize: '18px', fontWeight: 'bolder' }}>{MapStrings.noCrittersFound}</p>
       </Box>
     );
   }
@@ -119,10 +123,7 @@ export default function MapDetails({
           Export
         </Button>
       </Box>
-      <MapDetailsGrouped
-        pings={[...groupedPings, ...groupedUnassignedPings]}
-        handleShowOverview={handleShowOverview}
-      />
+      <MapDetailsGrouped pings={[...groupedPings, ...groupedUnassignedPings]} handleShowOverview={handleShowOverview} />
       <MapExport
         groupedAssignedPings={pingGroupChecked.length ? pingGroupChecked : groupedPings}
         groupedUnassignedPings={groupedUnassignedPings}

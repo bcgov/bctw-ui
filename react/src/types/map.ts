@@ -5,7 +5,16 @@ import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus } from 'types/an
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
-import { BCTWBase, BCTWType, DayjsToPlain, getCollectionUnitKeys, getCollectionUnitProps, nullOrDayjs, toClassOnly, toPlainOnly } from './common_types';
+import {
+  BCTWBase,
+  BCTWType,
+  DayjsToPlain,
+  getCollectionUnitKeys,
+  getCollectionUnitProps,
+  nullOrDayjs,
+  toClassOnly,
+  toPlainOnly
+} from './common_types';
 import { Dayjs } from 'dayjs';
 
 interface MapRange {
@@ -180,7 +189,6 @@ export type {
   DetailsSortOption,
   OnlySelectedCritters,
   ITelemetryLine,
-  IUnassignedTelemetryLine,
   ITelemetryPoint,
   ITelemetryGroup,
   PingGroupType,

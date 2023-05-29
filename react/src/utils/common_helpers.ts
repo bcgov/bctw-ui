@@ -165,7 +165,6 @@ export {
   countDecimals,
   doNothingAsync,
   doNothing,
-  formatLatLong,
   getProperty,
   getUniqueValuesOfT,
   omitNull,
