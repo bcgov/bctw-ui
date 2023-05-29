@@ -21,7 +21,7 @@ interface ExportQuery {
 }
 
 interface ExportAllParams {
-  queries: ExportQuery[];
+  bctw_queries: ExportQuery[];
   range: MapRange;
   polygons: string[];
   lastTelemetryOnly: boolean;

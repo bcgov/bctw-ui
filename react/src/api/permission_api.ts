@@ -71,7 +71,6 @@ export const permissionApi = (props: ApiProps): API => {
     // may not be in an array if the user only has accesss to one animal
     const d: IUserCritterAccess[] = !Array.isArray(data) ? [data] : data;
     const converted: UserCritterAccess[] = d.map((json: IUserCritterAccess) => plainToClass(UserCritterAccess, json));
-
     return converted;
   };
 

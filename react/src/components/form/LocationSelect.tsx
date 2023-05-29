@@ -72,7 +72,7 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
         initMap(
           mapRef,
           drawnItemsRef.current,
-          new L.GeoJSON(),
+          // new L.GeoJSON(),
           () => handleDrawShape(drawnItemsRef.current),
           () => {},
           () => {},

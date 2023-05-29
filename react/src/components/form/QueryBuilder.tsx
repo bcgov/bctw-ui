@@ -10,8 +10,8 @@ import { Critter, AttachedCritter } from 'types/animal';
 import { AttachedCollar, Collar } from 'types/collar';
 
 export type QueryBuilderOperator = 'Equals' | 'Not Equals';
-export type QueryBuilderColumn = keyof Critter | keyof Collar;
-export type QueryBuilderData = Critter | AttachedCritter | Collar | AttachedCollar;
+export type QueryBuilderColumn = string;
+export type QueryBuilderData = Record<string, any>;// | Animal | AttachedAnimal | Collar | AttachedCollar;
 
 export interface IFormRowEntry {
   column: QueryBuilderColumn;
@@ -101,15 +101,36 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
 
   const getUniqueValueOptions = (col: QueryBuilderColumn) => {
     if (data) {
-      const uniqueItemsForColumn = data.map((o) => o[col]).filter((v, i, a) => v && a.indexOf(v) === i);
-      uniqueItemsForColumn.sort();
-      return uniqueItemsForColumn.map((f, i) => {
+      const uniqueItemsForColumn: any[] = [];
+      const uniqueItemsCollectionUnits: any[] = [];
+      
+      
+      if(col === 'collection_unit') {
+        const flattenCollectionUnits = data.map(r => r.collection_units).filter(v => v).flat();
+        for(const f of flattenCollectionUnits) {
+          if(!uniqueItemsCollectionUnits.find(a => a.collection_unit_id === f.collection_unit_id)) {
+            uniqueItemsCollectionUnits.push(f);
+          }
+        }
+      }
+      else {
+        uniqueItemsForColumn.push(...data.map((o) => o[col]).filter((v, i, a) => v && a.indexOf(v) === i));
+      }
+
+      return [ ...uniqueItemsForColumn.sort().map((f, i) => {
         return {
           id: i,
           value: f,
           displayLabel: f
         };
-      });
+      }),
+      ...uniqueItemsCollectionUnits.sort().map((c, i) => {
+        return {
+          id: i + uniqueItemsForColumn.length,
+          value: c.collection_unit_id,
+          displayLabel: `${c.category_name} | ${c.unit_name}`
+        }
+      }) ]
     } else {
       return [{ id: 0, value: 'Loading...', displayLabel: 'Loading...' }];
     }

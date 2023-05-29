@@ -4,13 +4,11 @@ import LabeledMarker from 'leaflet-labeled-circle';
 import React, { MutableRefObject } from 'react';
 import dayjs from 'dayjs';
 import length from '@turf/length';
-import { ITelemetryPoint, TelemetryDetail } from 'types/map';
+import { ITelemetryPoint } from 'types/map';
 import { MAP_COLOURS } from 'pages/map/map_helpers';
 import { MapStrings } from 'constants/strings';
 import { MapTileLayers } from 'constants/strings';
 import { formatLocal } from 'utils/time';
-import { plainToClass } from 'class-transformer';
-import { Point } from 'geojson';
 import { eCritterStatus } from 'types/animal';
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
@@ -20,13 +18,13 @@ const hidePopup = (): void => {
 
 const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const doc = document.getElementById('popup');
-  const p = plainToClass(TelemetryDetail, feature.properties);
+  const p = feature.properties;
   const { coordinates } = feature.geometry;
   const t = dayjs(p.date_recorded).format(formatLocal);
   const text = `
     ${p.taxon ? 'Taxon: ' + p.taxon + '<br>' : ''}
     ${p.wlh_id ? 'WLH ID: ' + p.wlh_id + '<br>' : ''}
-    ${p.animal_id ? 'Critter ID: ' + p.animal_id + '<br>' : ''}
+    ${p.animal_id ? 'Animal ID: ' + p.animal_id + '<br>' : ''}
     Device ID: ${p.formattedDevice}<br>
     Latitude: ${coordinates[1] + '<br>'}
     Longitude: ${coordinates[0] + '<br>'}
@@ -144,7 +142,7 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
 const initMap = (
   mapRef: MutableRefObject<L.Map>,
   drawnItems: L.FeatureGroup,
-  selectedPings: L.GeoJSON,
+  // selectedPings: L.GeoJSON,
   drawSelectedLayer: () => void,
   handleDrawLine: (l) => void,
   handleDeleteLine: () => void,
@@ -167,7 +165,7 @@ const initMap = (
   addTileLayers(mapRef, layerPicker);
 
   mapRef.current.addLayer(drawnItems);
-  mapRef.current.addLayer(selectedPings);
+  // mapRef.current.addLayer(selectedPings);
 
   const drawOptions = drawToolOptions ?? { marker: false, circle: false, circlemarker: false };
 

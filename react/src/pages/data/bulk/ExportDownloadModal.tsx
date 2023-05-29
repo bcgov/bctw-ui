@@ -154,13 +154,19 @@ export default function ExportDownloadModal({
   });
 
   const handleAdvancedExport = (): void => {
-    const body: ExportAllParams = { queries: [], range: {start: null, end: null}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: attachedOnly };
+    const body: ExportAllParams = { bctw_queries: [], range: {start: null, end: null}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: attachedOnly };
+    const bctw_columns = ['device_id','frequency'];
     for (const row of rowEntries) {
-      body.queries.push({
-        key: row.column,
-        operator: operatorTranslation(row.operator),
-        term: row.value.map((o) => o.toString().toLowerCase().trim())
-      });
+      if(bctw_columns.includes(row.column)) {
+        body.bctw_queries.push({
+          key: row.column,
+          operator: row.operator,
+          term: row.value.map((o) => o.toString().toLowerCase().trim())
+        })
+      }
+      else {
+        body[row.column] = {body: row.value.map((o) => o.toString().toLowerCase().trim()), negate: row.operator === "Not Equals"}
+      }
     }
     body.range = {
       start: range.start.format(formatDay),
@@ -175,8 +181,8 @@ export default function ExportDownloadModal({
   };
 
   const handleSimpleExport = (): void => {
-    const body = { queries: [], range: {}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: false };
-    body.queries = [{ key: 'critter_id', operator: '=', term: critterIDs }];
+    const body: ExportAllParams = { bctw_queries: [], range: {start: null, end: null}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: false };
+    body['critter_id'] = {body: critterIDs, negate: false};
     body.range = {
       start: range.start.format(formatDay),
       end: range.end.format(formatDay)

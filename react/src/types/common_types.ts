@@ -59,7 +59,8 @@ export type PartialPick<T, K extends keyof T> = {
 const toClassOnly = { toClassOnly: true };
 const toPlainOnly = { toPlainOnly: true };
 
+const nullOrDayjs = (v: Date | null): Dayjs | null => v ? dayjs(v) : null;
 const nullToDayjs = (v: Date | null): Dayjs => dayjs(v);
 const DayjsToPlain = (v: Dayjs): string => v?.format(formatTime);
 
-export { DayjsToPlain, nullToDayjs, toPlainOnly, toClassOnly };
+export { DayjsToPlain, nullToDayjs, nullOrDayjs, toPlainOnly, toClassOnly };
