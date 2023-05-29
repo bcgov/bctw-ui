@@ -148,11 +148,18 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   };
 
   const filterRows = (rows: T[]): T[] => {
-    let results = rows.map((r, idx) => {
-      const newRow = Object.assign(Object.create(Object.getPrototypeOf(r)), r);
-      newRow.global_id = idx;
-      return newRow;
-    });
+    // Add a proxy layer with global_id such that plain objects, class objects, and proxy classes are supported
+    // ? Would it make more sense to wrap each row in a new object that contains global_id instead?
+    let results = rows.map(
+      (r, idx) =>
+        new Proxy(r, {
+          get(target, prop) {
+            if (prop === 'global_id') return idx;
+            return Reflect.get(target, prop, r);
+          }
+        })
+    );
+
     if (filter && filter.term) {
       results = fuzzySearchMutipleWords(results, filter.keys ? filter.keys : (headers as string[]), filter.term);
     }

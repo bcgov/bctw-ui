@@ -13,6 +13,7 @@ import {
 } from 'types/permission';
 import { IUserCritterAccess, UserCritterAccess } from 'types/animal_access';
 import { useQueryClient } from 'react-query';
+import { createFlattenedProxy } from 'types/common_types';
 
 // what the API returns after saving user/animal permissions
 export interface IGrantCritterAccessResults {
@@ -70,8 +71,9 @@ export const permissionApi = (props: ApiProps): API => {
     const { data } = await api.get(url);
     // may not be in an array if the user only has accesss to one animal
     const d: IUserCritterAccess[] = !Array.isArray(data) ? [data] : data;
-    const converted: UserCritterAccess[] = d.map((json: IUserCritterAccess) => plainToClass(UserCritterAccess, json));
-
+    const converted: UserCritterAccess[] = d.map((json: IUserCritterAccess) =>
+      createFlattenedProxy(plainToClass(UserCritterAccess, json))
+    );
     return converted;
   };
 

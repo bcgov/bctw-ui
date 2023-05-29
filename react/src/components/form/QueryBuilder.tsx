@@ -104,6 +104,7 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
       const uniqueItemsForColumn: any[] = [];
       const uniqueItemsCollectionUnits: any[] = [];
       
+
       if(col === 'collection_units') {
         const tempDict = {};
         for(const d of data) {

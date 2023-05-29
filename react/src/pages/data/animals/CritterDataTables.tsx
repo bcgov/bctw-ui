@@ -40,6 +40,24 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const [openMap, setOpenMap] = useState(false);
   const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
+  // Keeps track of conditionally rendered columns from collection_units
+  const [combinedHeaders, setCombinedHeaders] = useState<(keyof Critter | string)[]>(
+    new Critter().displayProps as (keyof Critter | string)[]
+  );
+
+  // Inserts unique collection_unit categories as new column headers
+  // TODO: Make this a common helper
+  const handleCollectionColumns = (rows: Critter[]): void => {
+    const keys = rows.flatMap((row) => row.collectionUnitKeys);
+    const uniqueKeys = [...new Set(keys)];
+    const baseHeaders = new Critter().displayProps;
+    setCombinedHeaders([...baseHeaders.slice(0, 2), ...uniqueKeys, ...baseHeaders.slice(2)]);
+  };
+
+  useEffect(() => {
+    handleCollectionColumns(animalData);
+  }, [animalData]);
+
   const handleSelect = <T extends Critter>(row: T): void => {
     //setEditObj(row);
     detailViewAction(row);
@@ -182,7 +200,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
 
         <Box mb={4}>
           <DataTable
-            headers={new Critter().displayProps}
+            headers={combinedHeaders as (keyof Critter)[]}
             queryProps={{ query: api.useUnassignedCritters, onNewData: (data: Critter[]): void => setAnimalData(data) }}
             updated={updated}
             deleted={deleted}
@@ -201,7 +219,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
                   </Button>
             </Box>*/}
                 <ExportViewer<Critter>
-                  template={new Critter().displayProps}
+                  template={combinedHeaders as (keyof Critter)[]}
                   eTitle={CritterStrings.exportTitle}
                   data={animalData}
                 />
@@ -236,9 +254,13 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           editing={editObj}
           onUpdate={(critter_id: string): void => setUpdated(critter_id)}
           onDelete={(critter_id: string): void => setDeleted(critter_id)}
-          setCritter={setEditObj}
-          >
-          <EditCritter /*{...editProps}*/ editing={editObj} onSave={doNothingAsync} open={openEdit} handleClose={() => setOpenEdit(false)} />
+          setCritter={setEditObj}>
+          <EditCritter
+            /*{...editProps}*/ editing={editObj}
+            onSave={doNothingAsync}
+            open={openEdit}
+            handleClose={() => setOpenEdit(false)}
+          />
         </ModifyCritterWrapper>
 
         {/* Modal for assigning or removing a device from a critter */}

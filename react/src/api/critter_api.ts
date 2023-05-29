@@ -5,6 +5,7 @@ import { plainToClass } from 'class-transformer';
 import { ITableFilter } from 'components/table/table_interfaces';
 import { useQueryClient } from 'react-query';
 import { AttachedCritter, Critter, Critters, eCritterFetchType } from 'types/animal';
+import { createFlattenedProxy } from 'types/common_types';
 
 export const critterApi = (props: ApiProps): API => {
   const { api } = props;
@@ -22,7 +23,7 @@ export const critterApi = (props: ApiProps): API => {
    */
   const _handleGetResults = (data: Critters[], type: eCritterFetchType): Critters[] => {
     const results = data.map((json: AttachedCritter) =>
-      type === eCritterFetchType.assigned ? plainToClass(AttachedCritter, json) : plainToClass(Critter, json)
+      type === eCritterFetchType.assigned ? plainToClass(AttachedCritter, json) : createFlattenedProxy(plainToClass(Critter, json))
     );
     return type === eCritterFetchType.assigned ? (results as AttachedCritter[]) : (results as Critter[]);
   };

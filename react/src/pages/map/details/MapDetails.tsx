@@ -17,9 +17,9 @@ import { Button } from '@mui/material';
 import { MapStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { Tooltip } from 'components/common';
+import { useMarkerStates } from '../MapMarkerContext';
 
 export type MapDetailsBaseProps = {
-  handleRowSelected: OnPanelRowSelect;
   handleShowOverview: OnMapRowCellClick;
 };
 
@@ -27,7 +27,6 @@ export type MapDetailsProps = MapDetailsBaseProps & {
   pings: ITelemetryPoint[];
   unassignedPings: ITelemetryPoint[];
   // telemetry IDs of points that have a device/animal attached
-  selectedAssignedIDs: number[];
   showExportModal: boolean;
   setShowExportModal: (b: boolean) => void;
   // handler for when 'show only checked' is clicked.
@@ -42,10 +41,8 @@ export type MapDetailsProps = MapDetailsBaseProps & {
 export default function MapDetails({
   pings,
   unassignedPings,
-  selectedAssignedIDs,
   handleShowOverview,
   handleShowOnlySelected,
-  handleRowSelected,
   showExportModal,
   setShowExportModal,
   timeRange
@@ -54,13 +51,14 @@ export default function MapDetails({
   const [groupedPings, setGroupedPings] = useState<ITelemetryGroup[]>([]);
   const [groupedUnassignedPings, setGroupedUnassignedPings] = useState<ITelemetryGroup[]>([]);
 
-  const [crittersSelectedInMap, setCrittersSelectedInMap] = useState<string[]>([]);
-
   // state for the 'checked' rows in the table
   const [pingGroupChecked, setPingGroupChecked] = useState<ITelemetryGroup[]>([]);
 
   const [showOnlySelected, setShowOnlySelected] = useState(false);
   const [sort] = useState<DetailsSortOption>('wlh_id');
+
+  const [{ selectedMarkers }] = useMarkerStates();
+
 
   // upon initial load, display all critters in bottom panel
   useEffect(() => {
@@ -70,15 +68,6 @@ export default function MapDetails({
     setGroupedUnassignedPings(byDevice);
   }, [pings]);
 
-  // when user limits features selection via the map highlight them in child details component
-  useEffect(() => {
-    const update = (): void => {
-      const critterIds = getUniqueCritterIDsFromSelectedPings(pings, selectedAssignedIDs);
-      setCrittersSelectedInMap(critterIds);
-    };
-    update();
-  }, [selectedAssignedIDs]);
-
   // when the 'show only selected' checkbox is changed, update parent map state
   useDidMountEffect(() => {
     if (pings) {
@@ -86,11 +75,14 @@ export default function MapDetails({
     }
   }, [showOnlySelected]);
 
+  useEffect(() => {
+    setPingGroupChecked(groupPings([...pings, ...unassignedPings].filter((f) => selectedMarkers.has(f.id))))
+  }, [selectedMarkers])
+
   // upon rows checked in each row, note: unassigned IDs are negative integers
   const handleRowsChecked = (ids: number[]): void => {
     const grouped = groupPings([...pings, ...unassignedPings].filter((f) => ids.includes(f.id)));
     setPingGroupChecked(grouped);
-    handleRowSelected(ids);
     if (showOnlySelected) {
       // fixme: unassigned not handled!
       handleShowOnlySelected({ show: true, critter_ids: grouped.map((g) => g.critter_id) });
@@ -128,10 +120,8 @@ export default function MapDetails({
         </Button>
       </Box>
       <MapDetailsGrouped
-        crittersSelected={crittersSelectedInMap}
         pings={[...groupedPings, ...groupedUnassignedPings]}
         handleShowOverview={handleShowOverview}
-        handleRowSelected={handleRowsChecked}
       />
       <MapExport
         groupedAssignedPings={pingGroupChecked.length ? pingGroupChecked : groupedPings}

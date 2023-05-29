@@ -1,11 +1,12 @@
-import { Type, Expose } from 'class-transformer';
+import { Type, Expose, Transform } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
 import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
-import { columnToHeader } from 'utils/common_helpers';
+import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
-import { BCTWBase, BCTWType } from './common_types';
+import { BCTWBase, BCTWType, DayjsToPlain, getCollectionUnitKeys, getCollectionUnitProps, nullOrDayjs, toClassOnly, toPlainOnly } from './common_types';
+import { Dayjs } from 'dayjs';
 
 interface MapRange {
   start: string;
@@ -33,7 +34,7 @@ interface ITelemetryPoint extends GeoJsonObject {
   type: 'Feature';
   geometry: Point;
   id: number;
-  properties: ITelemetryDetail;
+  properties: TelemetryDetail;
 }
 
 // represents a track
@@ -60,16 +61,15 @@ interface ITelemetryGroup {
 }
 
 // represents the jsonb object in the get_telemetry pg function
+// * Instantiate this class with createFlattenedProxy() to expose collection_units dynamically
 export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDetail> {
   critter_id: string;
   taxon: string;
   wlh_id: string;
   animal_id: string;
-  critter_status: eCritterStatus;
   @Type(() => Date) capture_date: Date;
   sex: string;
   collection_units: ICollectionUnit[];
-  collection_unit: string;
   collar_id: string;
   device_id: number;
   device_vendor: string;
@@ -78,6 +78,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   frequency_unit: string;
   device_status: string;
   collective_unit: string;
+  @Transform(nullOrDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
   @Type(() => Date) date_recorded: Date;
   @Type(() => Date) mortality_date: Date;
   @Expose() get formattedDevice(): string {
@@ -99,6 +100,20 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   }
   get identifier(): keyof TelemetryDetail {
     return 'device_id';
+  }
+
+  // Getter for properties in collection_units
+  get collectionUnitProps(): Record<string, string> {
+    return getCollectionUnitProps(this.collection_units);
+  }
+
+  // Getter to return the keys of the new properties
+  get collectionUnitKeys(): string[] {
+    return getCollectionUnitKeys(this.collection_units);
+  }
+
+  get critter_status(): string {
+    return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
   get displayProps(): (keyof TelemetryDetail)[] {
@@ -146,7 +161,7 @@ const padFrequency = (num: number): string => {
 //   pointCount: number;
 // };
 type MapFormValue = {
-  header: keyof TelemetryDetail;
+  header: keyof TelemetryDetail | string;
   label: string;
   values: ISelectMultipleData[];
 };

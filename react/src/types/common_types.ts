@@ -1,5 +1,9 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { formatTime } from 'utils/time';
+import { UserCritterAccess } from './animal_access';
+import { TelemetryDetail } from './map';
+import { headerToColumn } from 'utils/common_helpers';
+import { Critter, ICollectionUnit } from './animal';
 
 export interface BCTWValidDates {
   valid_from: Date | Dayjs;
@@ -59,7 +63,49 @@ export type PartialPick<T, K extends keyof T> = {
 const toClassOnly = { toClassOnly: true };
 const toPlainOnly = { toPlainOnly: true };
 
+const nullOrDayjs = (v: Date | null): Dayjs | null => (v ? dayjs(v) : null);
 const nullToDayjs = (v: Date | null): Dayjs => dayjs(v);
 const DayjsToPlain = (v: Dayjs): string => v?.format(formatTime);
 
-export { DayjsToPlain, nullToDayjs, toPlainOnly, toClassOnly };
+// Flattens the collection units inner array into regular getter properties
+const createFlattenedProxy = <T extends Critter | UserCritterAccess | TelemetryDetail>(object: T): T => {
+  return new Proxy(object, {
+    get: (target: T, prop: string): unknown => {
+      if (prop === 'collection_units') {
+        return target[prop] ?? [];
+      }
+
+      if (Reflect.has(target, prop)) {
+        return Reflect.get(target, prop);
+      }
+
+      return target.collectionUnitProps[prop] ?? undefined;
+    }
+  });
+};
+
+// Common helper function to expose collectionUnitProps
+const getCollectionUnitProps = (collection_units?: ICollectionUnit[]): Record<string, string> => {
+  const collectionUnitProps: Record<string, string> = {};
+  (collection_units ?? []).forEach((unit) => {
+    const key = headerToColumn(unit.category_name);
+    collectionUnitProps[key] = unit.unit_name;
+  });
+  return collectionUnitProps;
+};
+
+// Common helper function to expose collectionUnitKeys
+const getCollectionUnitKeys = (collection_units?: ICollectionUnit[]): string[] => {
+  return Object.keys(getCollectionUnitProps(collection_units));
+};
+
+export {
+  DayjsToPlain,
+  nullToDayjs,
+  nullOrDayjs,
+  toPlainOnly,
+  toClassOnly,
+  createFlattenedProxy,
+  getCollectionUnitProps,
+  getCollectionUnitKeys
+};

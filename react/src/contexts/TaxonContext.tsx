@@ -1,5 +1,5 @@
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import React, { Dispatch, ReactNode, SetStateAction } from 'react';
+import React, { Dispatch, ReactNode, SetStateAction, useEffect } from 'react';
 import { useContext, createContext, useState } from 'react';
 import { Itaxon } from 'types/animal';
 
@@ -21,15 +21,18 @@ export const TaxonProvider = (props: { children: ReactNode }): JSX.Element => {
   const [taxon, setTaxon] = useState<Itaxon | null>(null);
   const [allTaxon, setAllTaxon] = useState<Itaxon[]>([]);
 
-  if (data && !allTaxon?.length) {
-    const all = data.map((d) => {
-      return {
-        id: d.code,
-        name: d.description
-      };
-    });
-    setAllTaxon(all);
-  }
+  useEffect(() => {
+    if (data && !allTaxon?.length) {
+      const all = data.map((d) => {
+        return {
+          id: d.code,
+          name: d.description
+        };
+      });
+      setAllTaxon(all);
+    }
+  }, [data]);
+
   return (
     <UItaxonContext.Provider value={allTaxon}>
       <TaxonContext.Provider value={taxon}>

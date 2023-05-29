@@ -110,7 +110,7 @@ export default function MapModal({
       initMap(
         mapRef,
         drawnItems,
-        new L.GeoJSON(),
+        // new L.GeoJSON(),
         () => {},
         () => {},
         () => {},
