@@ -12,12 +12,12 @@ import {
   PingGroupType,
   TelemetryDetail,
   MapFormValue,
-  DEFAULT_MFV,
-  createTelemetryDetailProxy
+  DEFAULT_MFV
 } from 'types/map';
 import { capitalize, columnToHeader } from 'utils/common_helpers';
 import { CODE_FILTERS } from './map_constants';
 import { plainToClass } from 'class-transformer';
+import { createFlattenedProxy } from 'types/common_types';
 
 const MAP_COLOURS = {
   point: '#00ff44',
@@ -135,7 +135,7 @@ const fillPoint = (layer: any, selected = false): void => {
 const updatePings = (newPings: ITelemetryPoint[]): ITelemetryPoint[] => {
   return newPings.map((point) => ({
     ...point,
-    properties: createTelemetryDetailProxy(plainToClass(TelemetryDetail, point.properties))
+    properties: createFlattenedProxy(plainToClass(TelemetryDetail, point.properties))
   }));
 };
 
