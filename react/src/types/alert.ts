@@ -132,7 +132,7 @@ export interface IMortalityAlert
     Pick<Critter, 'critter_id' | 'animal_id' | 'critter_status' | 'wlh_id' | 'taxon'>,
     DataLife {}
 
-export type AnimalNotification = Pick<
+type AnimalNotification = Pick<
   AttachedCritter,
   'device_status' | 'device_id' | 'frequency' | 'taxon' | 'animal_id' | 'wlh_id'
 >;

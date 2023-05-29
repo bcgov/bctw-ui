@@ -140,4 +140,4 @@ const postJSON = async <T>(api: AxiosInstance, url: string, body: T): Promise<Ax
   return api.post(url, json);
 };
 
-export { asJSON, escapeRegex, getBaseUrl, createUrl, createFormData, isDev, sleep, postJSON, searchToQueryString };
+export { getBaseUrl, createUrl, createFormData, isDev, postJSON };

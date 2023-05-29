@@ -41,17 +41,6 @@ const QuickSummaryStrings = {
   editable: 'Editable Animals'
 };
 
-const ImportSteps = [
-  'Select the import type',
-  'Download the template.',
-  'Paste the column headers into an Excel spreadsheet',
-  'Fill out the rows',
-  'Save the file in CSV format',
-  'Click the upload button and select your CSV file',
-  'If there were errors during the upload, view them in the error table.',
-  'Fix the errors, re-download the file as a CSV and try the upload again'
-];
-
 const AnimalDelegationSteps = [
   'Enter a valid email address of the user you wish to give access to',
   'Click Add Email',
@@ -167,13 +156,6 @@ const CollarStrings = {
   collarImportMetadata: 'Import metadata for existing devices using a .CSV file',
   keyxButtonText: 'Upload .keyx files',
   csvButtonText: 'Upload CSV file'
-};
-
-const CodeStrings = {
-  addHeaderTitle: 'Add A New Code Header',
-  importTitle: 'Bulk Import Codes',
-  importText:
-    'Use this feature to add multiple codes. Codes cannot be edited here. The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional.'
 };
 
 const MapStrings = {
@@ -359,13 +341,11 @@ const DelegationRequestStrings = {
 };
 export {
   AnimalDelegationSteps,
-  CodeStrings,
   CollarStrings,
   CritterStrings,
   DataLifeStrings,
   FileStrings,
   FormStrings,
-  ImportSteps,
   MapStrings,
   MapTileLayers,
   OnboardStrings,

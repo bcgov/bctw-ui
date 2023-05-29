@@ -11,10 +11,10 @@ type SearchPresets = {
   months: MapWeekMonthPresets[];
 };
 // device status options displayed in map filters panel
-const DEVICE_STATUS_OPTIONS = [
-  { id: 1, value: MapStrings.assignmentStatusOptionA, default: true },
-  { id: 2, value: MapStrings.assignmentStatusOptionU }
-];
+// const DEVICE_STATUS_OPTIONS = [
+//   { id: 1, value: MapStrings.assignmentStatusOptionA, default: true },
+//   { id: 2, value: MapStrings.assignmentStatusOptionU }
+// ];
 
 // dropdown filters displayed in map filters panel
 const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: string[] }[] = [
@@ -37,4 +37,4 @@ const SEARCH_PRESETS: SearchPresets = {
   ]
 };
 
-export { CODE_FILTERS, DEVICE_STATUS_OPTIONS, SEARCH_PRESETS };
+export { CODE_FILTERS, SEARCH_PRESETS };

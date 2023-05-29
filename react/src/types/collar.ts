@@ -15,12 +15,6 @@ export enum eCollarAssignedStatus {
   Available = 'Available'
 }
 
-// used when creating new collars manually
-export enum eNewCollarType {
-  Other = '',
-  VHF = 'VHF',
-  Vect = 'Vectronic'
-}
 //Used in table_helpers
 export enum eDeviceStatus {
   mortality = 'Mortality',
@@ -32,7 +26,7 @@ export enum eDeviceStatus {
   potential_malfunction = 'Potential Malfunction'
 }
 
-export interface ICollarBase {
+interface ICollarBase {
   readonly collar_id: uuid;
 }
 export interface ICollarTelemetryBase extends ICollarBase {

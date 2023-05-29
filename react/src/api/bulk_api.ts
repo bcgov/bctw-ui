@@ -46,7 +46,7 @@ export const bulkApi = (api: AxiosInstance): API => {
     return data;
   };
 
-  const uploadXlsx = async <T>(form: FormData): Promise<ParsedXLSXSheetResult> => {
+  const uploadXlsx = async (form: FormData): Promise<ParsedXLSXSheetResult> => {
     const url = createUrl({ api: importXLSXEndpoint });
     const { data } = await api.post(url, form);
     return data;

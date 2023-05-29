@@ -15,7 +15,7 @@ type ILocationSelectProps = {
   height?: string;
 };
 
-export const locationStyles = makeStyles((theme) => ({
+const locationStyles = makeStyles((theme) => ({
   paper: {
     padding: '30px'
   },

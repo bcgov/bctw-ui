@@ -13,7 +13,7 @@ import { ENABLE_ALERTS } from 'api/api_helpers';
  * fixme: hooks with generic type??
  */
 
-export interface IAlertContext<T extends TelemetryAlert> {
+interface IAlertContext<T extends TelemetryAlert> {
   alerts: T[];
   getAlertTitle: () => string;
   error: string;
@@ -23,7 +23,7 @@ export const AlertContext = createContext<IAlertContext<any>>({
   getAlertTitle: (): string => 'Alerts(0)',
   error: null
 });
-export const AlertContextDispatch = createContext(null);
+const AlertContextDispatch = createContext(null);
 
 export const AlertStateContextProvider: React.FC = (props) => {
   const api = useTelemetryApi();
@@ -78,9 +78,3 @@ export const AlertStateContextProvider: React.FC = (props) => {
     </AlertContext.Provider>
   );
 };
-
-const useAlertContextDispatch = (): React.Context<IAlertContext<any>> => {
-  const context = useContext(AlertContextDispatch);
-  return context;
-};
-export { useAlertContextDispatch };

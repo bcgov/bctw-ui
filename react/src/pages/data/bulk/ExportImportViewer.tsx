@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { buttonProps } from 'components/component_constants';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 
-export type ExportPageProps<T> = {
+type ExportPageProps<T> = {
   eTitle: string;
   eMsg?: string;
   eDisabled?: boolean;

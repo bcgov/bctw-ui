@@ -16,7 +16,7 @@ const pluralize = (n: number, word: string) => (n > 1 || n == 0 ? `${word}'s` : 
 const capitalize = (s: string): string => s && s[0].toUpperCase() + s.slice(1);
 
 // formats UTM nicely
-const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
+// const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
 
 /**
  * given an array of type T, returns unique values of @param prop
@@ -166,7 +166,6 @@ export {
   doNothingAsync,
   doNothing,
   formatLatLong,
-  formatUTM,
   getProperty,
   getUniqueValuesOfT,
   omitNull,

@@ -1,21 +1,17 @@
-import { Button, Container } from '@mui/material';
+import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
-import FullScreenDialog from 'components/modal/DialogFullScreen';
-import { CritterStrings } from 'constants/strings';
-import { TaxonProvider } from 'contexts/TaxonContext';
+import makeStyles from '@mui/styles/makeStyles';
+import { AlertBanner } from 'components/alerts/AlertBanner';
+import { Icon } from 'components/common';
+import { QuickSummary } from 'components/common/QuickSummary';
+import { AlertContext } from 'contexts/UserAlertContext';
+import dayjs from 'dayjs';
 import ManageLayout from 'pages/layouts/ManageLayout';
 import { useContext, useEffect, useState } from 'react';
-import { UserAnimalAccess } from './UserAnimalAccess';
-import { QuickSummary } from 'components/common/QuickSummary';
+import { TelemetryAlert } from 'types/alert';
+import { AttachedCritter } from 'types/animal';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 import { CritterDataTables } from './CritterDataTables';
-import { AlertContext } from 'contexts/UserAlertContext';
-import { TelemetryAlert } from 'types/alert';
-import dayjs from 'dayjs';
-import { AlertBanner } from 'components/alerts/AlertBanner';
-import { AttachedCritter } from 'types/animal';
-import makeStyles from '@mui/styles/makeStyles';
-import { Icon } from 'components/common';
 import DetailedAnimalView from './DetailedAnimalView';
 
 const useStyles = makeStyles((theme) => ({
@@ -85,7 +81,6 @@ export default function CritterPage(): JSX.Element {
 
   return (
     <ManageLayout>
-      {/* <TaxonProvider> */}
       {/*
       //TODO critterbase integration this might be not needed 
       <Box className='manage-layout-titlebar'>
@@ -109,7 +104,6 @@ export default function CritterPage(): JSX.Element {
         data tables do not need to reload / re-query 
         anytime you wanna go back and forth between
         the detailed view and the data tables*/}
-      {/* </TaxonProvider> */}
     </ManageLayout>
   );
 }

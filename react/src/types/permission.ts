@@ -20,7 +20,7 @@ export enum eCritterPermission {
   admin = 'admin' // technically not an option
 }
 
-export type PermissionRequestStatus = 'approved' | 'denied' | 'pending';
+type PermissionRequestStatus = 'approved' | 'denied' | 'pending';
 
 export type PermissionWasDeniedReason = 'Not given' | 'Add other reasons here...';
 export const permissionDeniedReasons: PermissionWasDeniedReason[] = ['Not given', 'Add other reasons here...'];

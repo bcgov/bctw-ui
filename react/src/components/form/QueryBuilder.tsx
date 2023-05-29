@@ -11,7 +11,7 @@ import { AttachedCollar, Collar } from 'types/collar';
 
 export type QueryBuilderOperator = 'Equals' | 'Not Equals';
 export type QueryBuilderColumn = string;
-export type QueryBuilderData = Record<string, any>;// | Animal | AttachedAnimal | Collar | AttachedCollar;
+export type QueryBuilderData = Record<string, any>; // | Animal | AttachedAnimal | Collar | AttachedCollar;
 
 export interface IFormRowEntry {
   column: QueryBuilderColumn;
@@ -26,7 +26,7 @@ type IQueryBuilderProps<T extends ISelectMultipleData> = {
   handleRowsUpdate?: (r: IFormRowEntry[]) => void;
 };
 
-export const exportStyles = makeStyles(() => ({
+const exportStyles = makeStyles(() => ({
   queryBuilderCol: {
     display: 'inline-flex',
     marginRight: '0.5rem',
@@ -103,41 +103,41 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
     if (data) {
       const uniqueItemsForColumn: any[] = [];
       const uniqueItemsCollectionUnits: any[] = [];
-      
 
-      if(col === 'collection_units') {
+      if (col === 'collection_units') {
         const tempDict = {};
-        for(const d of data) {
-          if(d.collection_units) {
-            for(const c of d.collection_units) {
-              const tRow = rows.find(r => r.column === 'taxon')
-              if(tRow && !tRow.value.includes(d.taxon)) {
+        for (const d of data) {
+          if (d.collection_units) {
+            for (const c of d.collection_units) {
+              const tRow = rows.find((r) => r.column === 'taxon');
+              if (tRow && !tRow.value.includes(d.taxon)) {
                 continue;
               }
-              tempDict[c.collection_unit_id] = {...c, taxon: d.taxon};
+              tempDict[c.collection_unit_id] = { ...c, taxon: d.taxon };
             }
           }
         }
         uniqueItemsCollectionUnits.push(...Object.values(tempDict));
-      }
-      else {
+      } else {
         uniqueItemsForColumn.push(...data.map((o) => o[col]).filter((v, i, a) => v && a.indexOf(v) === i));
       }
 
-      return [ ...uniqueItemsForColumn.sort().map((f, i) => {
-        return {
-          id: i,
-          value: f,
-          displayLabel: f
-        };
-      }),
-      ...uniqueItemsCollectionUnits.sort().map((c, i) => {
-        return {
-          id: i + uniqueItemsForColumn.length,
-          value: c.collection_unit_id,
-          displayLabel: `${c.taxon} | ${c.category_name} | ${c.unit_name}`
-        }
-      }) ]
+      return [
+        ...uniqueItemsForColumn.sort().map((f, i) => {
+          return {
+            id: i,
+            value: f,
+            displayLabel: f
+          };
+        }),
+        ...uniqueItemsCollectionUnits.sort().map((c, i) => {
+          return {
+            id: i + uniqueItemsForColumn.length,
+            value: c.collection_unit_id,
+            displayLabel: `${c.taxon} | ${c.category_name} | ${c.unit_name}`
+          };
+        })
+      ];
     } else {
       return [{ id: 0, value: 'Loading...', displayLabel: 'Loading...' }];
     }

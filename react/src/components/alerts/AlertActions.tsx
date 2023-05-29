@@ -83,7 +83,7 @@ export default function AlertActions({ alert, showActions }: AlertActionsProps):
   const onError = (error: AxiosError): void => showNotif({ severity: 'error', message: formatAxiosError(error) });
 
   // setup the mutation to update the alert status
-  const { mutateAsync, isLoading } = api.useSaveUserAlert({ onSuccess, onError });
+  const { mutateAsync } = api.useSaveUserAlert({ onSuccess, onError });
 
   const isManager = (alert: MortalityAlert): boolean => alert.permission_type === 'manager';
 

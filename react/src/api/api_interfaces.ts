@@ -19,10 +19,10 @@ interface IUpsertPayload<T> {
 }
 
 interface ICbBulkUpdatePayload {
-  critters: Critter[],
-  captures: ICapture[],
-  locations: ILocation[],
-  mortalities: IMortality[]
+  critters: Critter[];
+  captures: ICapture[];
+  locations: ILocation[];
+  mortalities: IMortality[];
 }
 
 // what an error looks like when performing a bulk import
@@ -103,8 +103,6 @@ export type {
   IBulkUploadResults,
   IUpsertPayload,
   IDeleteType,
-  ParsedXLSXCellError,
-  ParsedXLSXRowResult,
   ParsedXLSXSheetResult,
   WarningInfo,
   CellErrorDescriptor,

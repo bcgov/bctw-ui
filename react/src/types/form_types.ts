@@ -1,10 +1,9 @@
 import { BaseTextFieldProps } from '@mui/material';
 import { ICbRouteKey } from 'critterbase/types';
 import { CSSProperties, ReactNode } from 'react';
-import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
-import MortalityEvent from './events/mortality_event';
-import { RouteKey } from 'AppRouter';
 import { QueryStatus } from 'react-query';
+import { CaptureEvent2 } from './events/capture_event';
+import MortalityEvent from './events/mortality_event';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
@@ -52,7 +51,7 @@ export const FormCommentStyle: CSSProperties = { display: 'flex', flexGrow: 1 };
 
 // spread in form field constructors to make a field required
 export const isRequired = { required: true };
-export const isDisabled = { disabled: true };
+//export const isDisabled = { disabled: true };
 
 // what a form component passes when it's changed
 // ex: {name: 'bill', error: false}
@@ -61,7 +60,9 @@ export type InboundObj = {
   // label?: string;
   // id?: string;
   error?: boolean;
-  nestedEventKey?: keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'> | keyof Pick<MortalityEvent, 'location'>;
+  nestedEventKey?:
+    | keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'>
+    | keyof Pick<MortalityEvent, 'location'>;
   eventKey?: string;
 };
 
@@ -69,7 +70,7 @@ export type InboundObj = {
  *
  */
 export type FormChangeEvent = { (v: InboundObj): void };
-export type CbRouteStatusHandler = { (q: QueryStatus, key: ICbRouteKey): void }
+export type CbRouteStatusHandler = { (q: QueryStatus, key: ICbRouteKey): void };
 
 /**
  * form change events pass an object with:
