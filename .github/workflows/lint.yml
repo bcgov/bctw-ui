@@ -5,11 +5,13 @@ on: [push]
 jobs:
   eslint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./react
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v3
         with:
-          working-directory: ./react
           node-version: "14"
           cache: "npm"
       - name: Setup Node
