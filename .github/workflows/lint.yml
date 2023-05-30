@@ -10,14 +10,15 @@ jobs:
         working-directory: ./react
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "14"
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
-      - name: Setup Node
-        run: npm install
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version: "14"
+      #     cache: "npm"
+      #     cache-dependency-path: "**/package-lock.json"
+      # - name: Setup Node
+      #   run: npm install
       - uses: stefanoeb/eslint-action@1.0.2
         with:
-          entryPoint: ./react
           files: react/src/
+      - name: ESLint
+        run: cd react
