@@ -3,7 +3,7 @@ import { mustBeLatitude, mustBeLongitude, mustBeValidTemp } from 'components/for
 import { ILocation } from 'types/animal';
 import { uuid } from 'types/common_types';
 import { BCTWWorkflow, CbPayload, WorkflowType } from 'types/events/event';
-import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
+import { FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 
 export enum eLocationPositionType {

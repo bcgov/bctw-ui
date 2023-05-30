@@ -1,5 +1,4 @@
 import { Dayjs } from 'dayjs';
-import { BCTWBase } from 'types/common_types';
 
 /**
  * types related to the TriggerFetchTelemetry page

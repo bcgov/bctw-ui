@@ -1,22 +1,21 @@
-import DataTable from 'components/table/DataTable';
-import { Button, Modal } from 'components/common';
-import FullScreenDialog from 'components/modal/DialogFullScreen';
+import { Box, MenuItem, Select } from '@mui/material';
+import { Button } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
+import DataTable from 'components/table/DataTable';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { manageLayoutStyles } from 'pages/layouts/ManageLayout';
 import { useContext, useEffect, useState } from 'react';
+import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
 import {
+  IUserCritterPermissionInput,
   adminPermissionOptions,
   eCritterPermission,
-  IUserCritterPermissionInput,
   managerPermissionOptions
 } from 'types/permission';
 import { User } from 'types/user';
-import { Select, MenuItem, SelectChangeEvent, Box } from '@mui/material';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
-import { manageLayoutStyles } from 'pages/layouts/ManageLayout';
 
 type PickCritterProps = ModalBaseProps & {
   alreadySelected: string[];
@@ -181,7 +180,7 @@ export default function PickCritterPermissionModal({
     const changeHandler = (e: any, p: eCritterPermission) => {
       e.stopPropagation();
       e.preventDefault();
-      const permission = p;//v.target.value as eCritterPermission;
+      const permission = p; //v.target.value as eCritterPermission;
       setAccess((prevState) => {
         const cp = { ...prevState };
         critterIDs.forEach((id) => {

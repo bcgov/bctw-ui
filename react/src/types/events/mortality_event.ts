@@ -1,27 +1,26 @@
-import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { Critter, eCritterStatus } from 'types/animal';
-import { Collar } from 'types/collar';
-import { eInputType, FormCommentStyle, FormFieldObject } from 'types/form_types';
-import { LocationEvent } from 'types/events/location_event';
+import { WorkflowStrings } from 'constants/strings';
 import dayjs, { Dayjs } from 'dayjs';
-import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
+import { IMortalityAlert } from 'types/alert';
+import { Critter } from 'types/animal';
+import { Code } from 'types/code';
+import { Collar } from 'types/collar';
+import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
+import { uuid } from 'types/common_types';
+import { DataLife } from 'types/data_life';
 import {
   BCTWWorkflow,
-  eventToJSON,
-  WorkflowType,
+  CbPayload,
+  IBCTWWorkflow,
   OptionalAnimal,
   OptionalDevice,
-  IBCTWWorkflow,
-  CbPayload
+  WorkflowType,
+  eventToJSON
 } from 'types/events/event';
-import { IMortalityAlert } from 'types/alert';
-import { uuid } from 'types/common_types';
-import { Code } from 'types/code';
-import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
-import { DataLife } from 'types/data_life';
-import { WorkflowStrings } from 'constants/strings';
+import { LocationEvent } from 'types/events/location_event';
+import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
+import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
 import CaptureEvent from './capture_event';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 export type MortalityDeviceEventProps = Pick<
   Collar,

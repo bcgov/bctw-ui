@@ -1,18 +1,14 @@
-import { Dayjs } from 'dayjs';
-import { LocationEvent } from 'leaflet';
 import { ReactNode } from 'react';
-import { AttachedCritter, Critter, getAnimalFormFields } from 'types/animal';
-import { AttachedCollar, Collar, getDeviceFormFields, ICollar } from 'types/collar';
+import { Critter } from 'types/animal';
+import { ICollar } from 'types/collar';
 import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
-import { BCTWFormat, uuid } from 'types/common_types';
+import { BCTWFormat } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
-import { CbRouteStatusHandler, FormChangeEvent, FormFieldObject } from 'types/form_types';
+import { CbRouteStatusHandler, FormChangeEvent } from 'types/form_types';
 import { CaptureFormField2 } from './capture_event';
 import { MortalityFormField } from './mortality_event';
 import { ReleaseFormField } from './release_event';
 import { RetrievalFormField } from './retrieval_event';
-import { QueryStatus } from 'react-query';
-import { ICbRouteKey } from 'critterbase/types';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 

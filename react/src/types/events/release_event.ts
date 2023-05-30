@@ -1,15 +1,15 @@
-import dayjs, { Dayjs } from 'dayjs';
-import { Code } from 'types/code';
-import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { BCTWWorkflow, WorkflowType, OptionalAnimal, eventToJSON, IBCTWWorkflow } from 'types/events/event';
-import { LocationEvent } from 'types/events/location_event';
-import { Critter, ICollectionUnit, eCritterStatus } from 'types/animal';
-import { IDataLifeEndProps } from 'types/data_life';
-import { eInputType, FormFieldObject } from 'types/form_types';
 import { WorkflowStrings } from 'constants/strings';
+import dayjs, { Dayjs } from 'dayjs';
+import { Critter, eCritterStatus } from 'types/animal';
+import { Code } from 'types/code';
+import { Collar } from 'types/collar';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { uuid } from 'types/common_types';
-import { Collar } from 'types/collar';
+import { IDataLifeEndProps } from 'types/data_life';
+import { BCTWWorkflow, IBCTWWorkflow, OptionalAnimal, WorkflowType, eventToJSON } from 'types/events/event';
+import { LocationEvent } from 'types/events/location_event';
+import { FormFieldObject, eInputType } from 'types/form_types';
+import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { formatTime } from 'utils/time';
 import CaptureEvent from './capture_event';
 
