@@ -1,8 +1,6 @@
-import { classToPlain, plainToClass } from 'class-transformer';
-import { mustBeLessThan50Words } from 'components/form/form_validators';
 import { WorkflowStrings } from 'constants/strings';
-import dayjs, { Dayjs } from 'dayjs';
-import { Critter, ICapture, ICollectionUnit } from 'types/animal';
+import { Dayjs } from 'dayjs';
+import { Critter, ICapture } from 'types/animal';
 import { Code } from 'types/code';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';

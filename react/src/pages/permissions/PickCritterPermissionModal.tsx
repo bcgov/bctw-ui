@@ -175,9 +175,8 @@ export default function PickCritterPermissionModal({
     const hasAccess = access[row.critter_id];
     // set default in this order
     const defaultPermission = hasAccess?.permission_type ?? row?.permission_type ?? eCritterPermission.observer;
-    // show an error if the select isn't filled out but the row is selected
-    const isError = !hasAccess ? false : critterIDs.includes(hasAccess.critter_id) && !hasAccess.wasSelected;
-    const changeHandler = (e: any, p: eCritterPermission) => {
+
+    const changeHandler = (e: React.MouseEvent<HTMLLIElement, MouseEvent>, p: eCritterPermission) => {
       e.stopPropagation();
       e.preventDefault();
       const permission = p; //v.target.value as eCritterPermission;
