@@ -4,7 +4,7 @@ import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
-import { critterbaseApi as critterbase_api, critterbaseApi } from 'api/critterbase_api';
+import { critterbaseApi as critterbase_api } from 'api/critterbase_api';
 import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
 import { mapApi as map_api } from 'api/map_api';
 import { onboardingApi as onboarding_api } from 'api/onboarding_api';
@@ -20,7 +20,7 @@ import {
   UseQueryOptions,
   UseQueryResult
 } from 'react-query';
-import { Critter, AttachedCritter, eCritterFetchType, IMarking } from 'types/animal';
+import { AttachedCritter, Critter, eCritterFetchType, IMarking } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import { AttachDeviceInput, CollarHistory, RemoveDeviceInput } from 'types/collar_history';
@@ -34,7 +34,6 @@ import {
   ParsedXLSXSheetResult,
   XLSXPayload
 } from 'api/api_interfaces';
-import { CbRoutes } from 'critterbase/routes';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
 import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { UserCritterAccess } from 'types/animal_access';
@@ -133,11 +132,8 @@ export const useTelemetryApi = () => {
 
   const useBulkUpdateCritterbaseCritter = (
     config: UseMutationOptions<any, AxiosError, ICbBulkUpdatePayload>
-  ): UseMutationResult<any> => 
-    useMutation<any, AxiosError, ICbBulkUpdatePayload> (
-      (body) => critterbaseApi.bulkUpdate(body),
-      config
-    )
+  ): UseMutationResult<any> =>
+    useMutation<any, AxiosError, ICbBulkUpdatePayload>((body) => critterbaseApi.bulkUpdate(body), config);
   const useDeleteMarking = (
     config: UseMutationOptions<IBulkUploadResults<IMarking>, AxiosError, uuid>
   ): UseMutationResult<IBulkUploadResults<IMarking>> =>
@@ -320,9 +316,9 @@ export const useTelemetryApi = () => {
     return useQuery<AttachedCritter[], AxiosError>(
       ['critters_assigned_historic'],
       () => critterApi.getAssignedCrittersHistoric(),
-      {...config}
-    )
-  }
+      { ...config }
+    );
+  };
 
   // minimize code refetching
   const codeOptions = { ...defaultQueryOptions, refetchOnMount: false };

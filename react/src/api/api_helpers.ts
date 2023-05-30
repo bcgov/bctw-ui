@@ -93,11 +93,6 @@ const isDev = (): boolean => {
   return process?.env?.NODE_ENV === 'development';
 };
 
-// for testing form handlers
-async function sleep(ms: number): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 // removes single quotes from strings
 // fixme: escape properly
 const escapeRegex = (str: string): string => {

@@ -93,7 +93,7 @@ export const bulkApi = (api: AxiosInstance): API => {
     return results;
   };
 
-  const getAllExportData = async (body: any): Promise<string[]> => {
+  const getAllExportData = async (body: unknown): Promise<string[]> => {
     const url = createUrl({ api: exportAllEndpoint });
     const { data } = await api.post(url, body);
     const results = data.flat();

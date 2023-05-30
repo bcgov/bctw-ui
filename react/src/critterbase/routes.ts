@@ -1,4 +1,4 @@
-import { ICbRoutes, ICbSelect } from './types';
+import { ICbRoutes } from './types';
 
 const selectFormat = `?format=asSelect`;
 const detailedFormat = `?format=detailed`;
