@@ -15,8 +15,6 @@ jobs:
           node-version: "14"
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
-      # - name: Setup Node
-      #   run: npm install
       - name: Install ESLint
         run: npm install eslint@7.16.0
       - name: Run ESLint
