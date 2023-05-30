@@ -6,7 +6,7 @@ import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
 import { critterbaseApi as critterbase_api } from 'api/critterbase_api';
 import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
-import { mapApi as map_api } from 'api/map_api';
+import { mapApi as map_api, PingsCap } from 'api/map_api';
 import { onboardingApi as onboarding_api } from 'api/onboarding_api';
 import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
 import { userApi as user_api } from 'api/user_api';
@@ -131,10 +131,10 @@ export const useTelemetryApi = () => {
       config
     );
 
-  const useBulkUpdateCritterbaseCritter = (
-    config: UseMutationOptions<any, AxiosError, ICbBulkUpdatePayload>
-  ): UseMutationResult<any> =>
-    useMutation<any, AxiosError, ICbBulkUpdatePayload>((body) => critterbaseApi.bulkUpdate(body), config);
+  const useBulkUpdateCritterbaseCritter = <T>(
+    config: UseMutationOptions<T, AxiosError, ICbBulkUpdatePayload>
+  ): UseMutationResult<T> =>
+    useMutation<T, AxiosError, ICbBulkUpdatePayload>((body) => critterbaseApi.bulkUpdate(body), config);
   const useDeleteMarking = (
     config: UseMutationOptions<IBulkUploadResults<IMarking>, AxiosError, uuid>
   ): UseMutationResult<IBulkUploadResults<IMarking>> =>
@@ -146,8 +146,8 @@ export const useTelemetryApi = () => {
   /**
    *
    */
-  const useEstimate = (start: string, end: string): UseQueryResult<any, AxiosError> => {
-    return useQuery<any, AxiosError>(['estimate', start, end], () => mapApi.getEstimate(start, end), {
+  const useEstimate = (start: string, end: string): UseQueryResult<PingsCap, AxiosError> => {
+    return useQuery<PingsCap, AxiosError>(['estimate', start, end], () => mapApi.getEstimate(start, end), {
       ...defaultQueryOptions,
       retry: false
     });
@@ -412,8 +412,7 @@ export const useTelemetryApi = () => {
    */
   const useCritterAccess = (
     page: number,
-    param: { user: User; filter?: eCritterPermission[] },
-    ...args: unknown[]
+    param: { user: User; filter?: eCritterPermission[] }
   ): UseQueryResult<UserCritterAccess[], AxiosError> => {
     const { user, filter } = param;
     const queryKeys = ['critterAccess', page, user];
@@ -568,7 +567,7 @@ export const useTelemetryApi = () => {
   ): UseMutationResult<IBulkUploadResults<T>, AxiosError> =>
     useMutation<IBulkUploadResults<T>, AxiosError, XLSXPayload>((body) => bulkApi.finalizeXlsx(body), config);
 
-  const useUploadXLSX = <T>(
+  const useUploadXLSX = (
     config: UseMutationOptions<ParsedXLSXSheetResult[], AxiosError, FormData>
   ): UseMutationResult<ParsedXLSXSheetResult[], AxiosError> =>
     useMutation<ParsedXLSXSheetResult[], AxiosError, FormData>((form) => bulkApi.uploadXlsx(form), config);
@@ -579,13 +578,13 @@ export const useTelemetryApi = () => {
       critterOptions
     );
   }; */
-  const useGetTemplate = (file_key: string): UseQueryResult<any> => {
-    return useQuery<any, AxiosError>(
-      ['get_template', file_key],
-      () => bulkApi.getTemplateFile(file_key),
-      defaultQueryOptions
-    );
-  };
+  // const useGetTemplate = (file_key: string): UseQueryResult<any> => {
+  //   return useQuery<any, AxiosError>(
+  //     ['get_template', file_key],
+  //     () => bulkApi.getTemplateFile(file_key),
+  //     defaultQueryOptions
+  //   );
+  // };
 
   const useGetCollarKeyX = (device_ids?: number[]): UseQueryResult<DeviceWithVectronicKeyX[], AxiosError> => {
     return useQuery<DeviceWithVectronicKeyX[], AxiosError>(
@@ -740,7 +739,7 @@ export const useTelemetryApi = () => {
     useUploadXLSX,
     useFinalizeXLSX,
     useUploadXML,
-    useGetTemplate,
+    // useGetTemplate,
     useSaveDevice,
     useSaveAnimal,
     useAttachDevice,

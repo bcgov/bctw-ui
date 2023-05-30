@@ -71,7 +71,7 @@ const omitNull = <T>(obj: T): T => {
   return copy;
 };
 
-const hasChangedProperties = (original: any, next: any): boolean => {
+const hasChangedProperties = <T>(original: Partial<T>, next: Partial<T>): boolean => {
   for (const k of Object.keys(next)) {
     if (typeof next[k] === 'object') {
       if (original[k] && hasChangedProperties(original[k], next[k])) {

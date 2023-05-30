@@ -83,7 +83,6 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
   const showNotif = useResponseDispatch();
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
   const styles = useStyles();
-  // const { isSuccess, data: importData, error, refetch } = api.useGetTemplate('import_template');
 
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});

@@ -104,8 +104,7 @@ export const bulkApi = (api: AxiosInstance): API => {
     const body = `file_key=${file_key}`;
     const url = createUrl({ api: 'get-template', query: body });
     const { data } = await api.get(url);
-    const results = data;
-    return results;
+    return data;
   };
 
   const getKeyX = async (device_ids?: number[]): Promise<DeviceWithVectronicKeyX[]> => {
