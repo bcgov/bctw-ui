@@ -1,16 +1,15 @@
+import { Box, Button, ButtonProps } from '@mui/material';
 import { IUpsertPayload } from 'api/api_interfaces';
-import { EditorProps } from 'components/component_interfaces';
-import { IEditModalProps } from 'pages/data/common/EditModal';
-import { cloneElement, useState } from 'react';
-import { BCTWBase } from 'types/common_types';
-import { Box, Button, ButtonProps, IconButton } from '@mui/material';
 import { Icon, Tooltip } from 'components/common';
-import { QueryStatus } from 'react-query';
 import { buttonProps } from 'components/component_constants';
-import LoadingButton from '@mui/lab/LoadingButton';
+import { EditorProps } from 'components/component_interfaces';
 import { useAttachmentChanged } from 'contexts/DeviceAttachmentChangedContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Critter, AttachedCritter } from 'types/animal';
+import { IEditModalProps } from 'pages/data/common/EditModal';
+import { cloneElement, useState } from 'react';
+import { QueryStatus } from 'react-query';
+import { AttachedCritter, Critter } from 'types/animal';
+import { BCTWBase } from 'types/common_types';
 
 /**
  * handles the show/hide functionality of the childEditComponent

@@ -12,16 +12,13 @@ import { AttachedCritter, Critter, Critters } from 'types/animal';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 
-import { Button, Tooltip } from 'components/common';
+import { Tooltip } from 'components/common';
 import { ActionsMenu } from 'components/common/ActionsMenu';
 import { ConditionalWrapper } from 'components/common/ConditionalWrapper';
-import { buttonProps } from 'components/component_constants';
 import { CollarHistory } from 'types/collar_history';
+import { WorkflowType } from 'types/events/event';
 import { CritterWorkflow } from '../events/CritterWorkflow';
 import { AttachRemoveDevice } from './AttachRemoveDevice';
-import { editObjectToEvent, WorkflowType } from 'types/events/event';
-import { CaptureEvent2 } from 'types/events/capture_event';
-import WorkflowWrapper from '../events/WorkflowWrapper';
 
 export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();

@@ -1,23 +1,23 @@
+import { plainToClass } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { FormStrings } from 'constants/strings';
 import dayjs from 'dayjs';
 import { ICodeFilter, IGroupedCodeFilter } from 'types/code';
+import { createFlattenedProxy } from 'types/common_types';
 import {
+  DEFAULT_MFV,
   DetailsSortOption,
   ITelemetryDetail,
-  ITelemetryPoint,
   ITelemetryGroup,
   ITelemetryLine,
-  doesPointArrayContainPoint,
+  ITelemetryPoint,
+  MapFormValue,
   PingGroupType,
   TelemetryDetail,
-  MapFormValue,
-  DEFAULT_MFV
+  doesPointArrayContainPoint
 } from 'types/map';
-import { capitalize, columnToHeader } from 'utils/common_helpers';
+import { columnToHeader } from 'utils/common_helpers';
 import { CODE_FILTERS } from './map_constants';
-import { plainToClass } from 'class-transformer';
-import { createFlattenedProxy } from 'types/common_types';
 
 const MAP_COLOURS = {
   point: '#00ff44',
@@ -57,7 +57,6 @@ const parseAnimalColour = (colourString: string): { fillColor: string; color: st
   const n = colourString.lastIndexOf(',');
   const s1 = colourString.substring(0, n);
   const s2 = colourString.substring(n + 1);
-  const s = colourString.split(',');
   return { fillColor: s1, color: s2 };
 };
 
@@ -113,22 +112,6 @@ const getOutlineColor = (feature: ITelemetryPoint): string => {
   }
   const c = feature?.properties?.map_colour;
   return c ? parseAnimalColour(c)?.color : MAP_COLOURS.outline;
-};
-
-/**
- * sets the @param layer {setStyle} function
- */
-const fillPoint = (layer: any, selected = false): void => {
-  // dont style tracks or invalid points
-  if (!layer.feature || layer.feature?.geometry?.type === 'LineString' || typeof layer.setStyle !== 'function') {
-    return;
-  }
-  layer.setStyle({
-    class: selected ? 'selected-ping' : '',
-    weight: 1.0,
-    color: getOutlineColor(layer.feature),
-    fillColor: getFillColorByStatus(layer.feature) //, selected)
-  });
 };
 
 // Converts the properties of each ITelemetryPoint to an instance of TelemetryDetail
@@ -285,15 +268,6 @@ const getUniquePropFromPings = (
 const getLatestPing = (features: ITelemetryPoint[]): ITelemetryPoint => {
   return features.reduce((accum, current) => {
     return dayjs(current.properties.date_recorded).isAfter(dayjs(accum.properties.date_recorded)) ? current : accum;
-  });
-};
-
-/**
- * @returns a single feature that contains the oldest date_recorded
- */
-const getEarliestPing = (features: ITelemetryPoint[]): ITelemetryPoint => {
-  return features.reduce((accum, current) => {
-    return dayjs(current.properties.date_recorded).isBefore(dayjs(accum.properties.date_recorded)) ? current : accum;
   });
 };
 

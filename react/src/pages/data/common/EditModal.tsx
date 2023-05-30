@@ -1,28 +1,26 @@
 import { IUpsertPayload } from 'api/api_interfaces';
 import { EditModalBaseProps } from 'components/component_interfaces';
 import ChangeContext from 'contexts/InputChangeContext';
+import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
 import { ReactNode, useEffect, useState } from 'react';
 import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { omitNull } from 'utils/common_helpers';
-import { IHistoryPageProps } from 'pages/data/common/HistoryPage';
-import { EditTabPanel, a11yProps } from 'pages/data/common/EditModalComponents';
 
-import HistoryPage from './HistoryPage';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import FullScreenDialog from 'components/modal/DialogFullScreen';
 import { Button, Modal } from 'components/common';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
 import useDidMountEffect from 'hooks/useDidMountEffect';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import HistoryPage from './HistoryPage';
 
-import { Box, Container, Divider, Paper, Tabs, Tab, CircularProgress } from '@mui/material';
-import { BCTWBase } from 'types/common_types';
-import useFormHasError from 'hooks/useFormHasError';
-import { InboundObj } from 'types/form_types';
-import { buttonProps } from 'components/component_constants';
-import { Typography } from '@mui/material';
-import { PageTabs } from 'components/common/partials/PageTabs';
 import { LoadingButton } from '@mui/lab';
+import { Box, CircularProgress, Container, Divider, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import { PageTabs } from 'components/common/partials/PageTabs';
+import { buttonProps } from 'components/component_constants';
+import useFormHasError from 'hooks/useFormHasError';
+import { BCTWBase } from 'types/common_types';
+import { InboundObj } from 'types/form_types';
 
 export type IEditModalProps<T> = EditModalBaseProps<T> & {
   children: ReactNode;

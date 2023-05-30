@@ -1,20 +1,17 @@
 import 'styles/AppHeader.scss';
 
-import { mdiAccountCircle, mdiAccountRemove, mdiBell, mdiHelpCircle, mdiProgressClock } from '@mdi/js';
-import { useContext, useState } from 'react';
-import { AlertContext } from 'contexts/UserAlertContext';
-import { IconButton } from '@mui/material';
-import { User } from 'types/user';
-import { UserContext } from 'contexts/UserContext';
-import headerImage from 'assets/images/gov3_bc_logo.png';
-import useDidMountEffect from 'hooks/useDidMountEffect';
+import { mdiAccountCircle, mdiAccountRemove, mdiHelpCircle, mdiProgressClock } from '@mdi/js';
 import Icon from '@mdi/react';
-import Modal from 'components/modal/Modal';
-import UserAlert from 'components/alerts/AlertActions';
+import { IconButton } from '@mui/material';
+import headerImage from 'assets/images/gov3_bc_logo.png';
 import { urls } from 'constants/external_urls';
-import { ENABLE_ALERTS } from 'api/api_helpers';
+import { AlertContext } from 'contexts/UserAlertContext';
+import { UserContext } from 'contexts/UserContext';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { useContext, useState } from 'react';
+import { TelemetryAlert } from 'types/alert';
+import { User } from 'types/user';
 import { AlertMenu } from '../alerts/AlertMenu';
-import { TelemetryAlert, MortalityAlert } from 'types/alert';
 
 type AppheaderProps = {
   children?: JSX.Element;

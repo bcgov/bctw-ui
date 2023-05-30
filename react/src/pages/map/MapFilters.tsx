@@ -1,59 +1,52 @@
+import { LoadingButton } from '@mui/lab';
 import {
   Box,
   Button,
+  CircularProgress,
   Divider,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
   IconButton,
+  List,
+  ListItem,
+  ListSubheader,
+  Paper,
   Radio,
   RadioGroup,
+  Slider,
   Tab,
-  TableHead,
+  Table,
+  TableBody,
   TableCell,
+  TableContainer,
+  TableHead,
   TableRow,
   Tabs,
-  Typography,
-  TableContainer,
-  TableBody,
-  Table,
-  Paper,
-  List,
-  ListItemText,
-  ListItemButton,
-  ListSubheader,
-  ListItem,
-  ButtonGroup,
-  Slider,
-  CircularProgress,
-  ThemeProvider
+  Typography
 } from '@mui/material';
-import AutoComplete from 'components/form/Autocomplete';
-import clsx from 'clsx';
-import React, { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { ICodeFilter } from 'types/code';
-import { DEFAULT_MFV, MapFormValue, MapRange, TelemetryDetail } from 'types/map';
-import drawerStyles from 'components/sidebar/drawer_classes';
-import Checkbox from 'components/form/Checkbox';
-import SelectUDF from 'components/form/SelectUDF';
-import { eUDFType, IUDF, transformUdfToCodeFilter } from 'types/udf';
-import { Icon } from 'components/common';
-import { MapStrings } from 'constants/strings';
-import { columnToHeader } from 'utils/common_helpers';
-import { ISelectMultipleData } from 'components/form/MultiSelect';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Tooltip } from 'components/common';
-import DateInput from 'components/form/Date';
-import dayjs from 'dayjs';
-import { ITelemetryPoint } from 'types/map';
-import { getFormValues } from './map_helpers';
-import { MapWeekMonthPresets, SEARCH_PRESETS } from './map_constants';
-import { getStartDate, StartDateKey } from 'utils/time';
 import makeStyles from '@mui/styles/makeStyles';
+import clsx from 'clsx';
+import { Icon, Tooltip } from 'components/common';
+import AutoComplete from 'components/form/Autocomplete';
+import Checkbox from 'components/form/Checkbox';
+import DateInput from 'components/form/Date';
+import { ISelectMultipleData } from 'components/form/MultiSelect';
+import SelectUDF from 'components/form/SelectUDF';
+import drawerStyles from 'components/sidebar/drawer_classes';
+import { MapStrings } from 'constants/strings';
+import dayjs from 'dayjs';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { LoadingButton } from '@mui/lab';
+import React, { ReactNode, SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import { ICodeFilter } from 'types/code';
+import { DEFAULT_MFV, ITelemetryPoint, MapFormValue, MapRange, TelemetryDetail } from 'types/map';
+import { IUDF, eUDFType, transformUdfToCodeFilter } from 'types/udf';
+import { columnToHeader } from 'utils/common_helpers';
+import { StartDateKey, getStartDate } from 'utils/time';
 import { useMarkerStates } from './MapMarkerContext';
+import { SEARCH_PRESETS } from './map_constants';
+import { getFormValues } from './map_helpers';
 
 enum TabNames {
   search = 'Search',
@@ -129,7 +122,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const [legend, setLegend] = useState(symbolizeBy);
 
   const [{ opacity }, markerDispatch] = useMarkerStates();
-
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
 
@@ -222,20 +214,23 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     }
     setSymbolizeBy(DEFAULT_MFV.header);
     setSymbolizeLast(true);
-    markerDispatch({type: 'RESET_ALL'});
+    markerDispatch({ type: 'RESET_ALL' });
   };
 
   const handleApplySymbolize = (): void => {
     setLegend(symbolizeBy);
     if (symbolizeBy === DEFAULT_MFV.header) {
-      markerDispatch({ type: 'RESET_SYMBOLIZE'})
+      markerDispatch({ type: 'RESET_SYMBOLIZE' });
     } else {
       const symbolize = formValues.find((fv) => fv.header === symbolizeBy);
       pings.forEach((ping) => {
         const attr = ping.properties[symbolize.header];
         const fillColor = symbolize.values.find((val) => val.id === attr)?.colour;
-        markerDispatch({ type: 'SYMBOLIZE_GROUP', group: { id: ping.properties.critter_id, color: fillColor, applyToLatest: symbolizeLast } })
-      })
+        markerDispatch({
+          type: 'SYMBOLIZE_GROUP',
+          group: { id: ping.properties.critter_id, color: fillColor, applyToLatest: symbolizeLast }
+        });
+      });
     }
     // props.onApplySymbolize(symbolize, symbolizeLast, opacity);
   };
@@ -448,7 +443,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       setSymbolizeBy((e.target as HTMLInputElement).value as keyof TelemetryDetail);
     };
     const handleChange = (event: Event, op: number) => {
-      markerDispatch({ type: 'SET_OPACITY', val: op})
+      markerDispatch({ type: 'SET_OPACITY', val: op });
       //const symbolize = formValues.find((fv) => fv.header === legend);
       //props.onApplySymbolize(symbolize, symbolizeLast, opacity);
     };

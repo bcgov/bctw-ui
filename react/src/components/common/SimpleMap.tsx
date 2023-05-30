@@ -1,14 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import { TelemetryAlert } from 'types/alert';
-import dayjs, { Dayjs } from 'dayjs';
-import { AttachedCritter } from 'types/animal';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { ITelemetryPoint } from 'types/map';
-import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
-import { getStyle, setupLatestPingOptions, setupPingOptions, setupTracksOptions } from 'pages/map/point_setup';
-import { getFillColorByDeviceStatus, splitPings } from 'pages/map/map_helpers';
 import { Box, CircularProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import dayjs, { Dayjs } from 'dayjs';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { getFillColorByDeviceStatus, splitPings } from 'pages/map/map_helpers';
+import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
+import { getStyle, setupLatestPingOptions, setupPingOptions, setupTracksOptions } from 'pages/map/point_setup';
+import { useEffect, useRef, useState } from 'react';
+import { ITelemetryPoint } from 'types/map';
 import { formatDay } from 'utils/time';
 
 interface SimpleMapProps {

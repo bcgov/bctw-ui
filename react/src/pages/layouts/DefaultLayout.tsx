@@ -1,16 +1,13 @@
-import { useState, useEffect, useContext } from 'react';
-import { UserContext } from 'contexts/UserContext';
 import { AlertContext } from 'contexts/UserAlertContext';
-import UserAlert from 'components/alerts/AlertActions';
+import { UserContext } from 'contexts/UserContext';
+import { useContext, useEffect, useState } from 'react';
 // import Modal from "components/modal/Modal";
-import { AxiosError } from 'axios';
-import { formatAxiosError } from 'utils/errors';
-import UserOnboarding from 'pages/onboarding/UserOnboarding';
-import useDidMountEffect from 'hooks/useDidMountEffect';
 import { ENABLE_ALERTS, isDev } from 'api/api_helpers';
-import { doNothing } from 'utils/common_helpers';
+import { AxiosError } from 'axios';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import UserOnboarding from 'pages/onboarding/UserOnboarding';
 import { TelemetryAlert } from 'types/alert';
-import Modal from 'components/modal/Modal';
+import { formatAxiosError } from 'utils/errors';
 
 type IDefaultLayoutProps = {
   children: React.ReactNode;

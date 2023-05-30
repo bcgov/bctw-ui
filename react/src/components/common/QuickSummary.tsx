@@ -3,8 +3,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
 import { LatestDataRetrieval, QuickSummaryStrings } from 'constants/strings';
 import { UserContext } from 'contexts/UserContext';
-import { isToday } from 'date-fns/esm';
-import dayjs from 'dayjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useContext, useEffect, useState } from 'react';
 import { InfoCard } from './InfoCard';

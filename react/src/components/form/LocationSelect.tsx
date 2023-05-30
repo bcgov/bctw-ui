@@ -39,7 +39,6 @@ const locationStyles = makeStyles((theme) => ({
  * Pass a handleDrawShape function that will be called every time a new shape is drawn on the map, regardless of drawing method.
  */
 export default function LocationSelect(props: ILocationSelectProps): JSX.Element {
-  const theme = useTheme();
   const { handleDrawShape, height } = props;
   const styles = locationStyles();
 

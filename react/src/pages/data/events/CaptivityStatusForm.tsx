@@ -1,10 +1,7 @@
 import { Box } from '@mui/material';
-import { CreateFormField } from 'components/form/create_form_components';
-import { eInputType, FormFieldObject } from 'types/form_types';
+import { BCTWWorkflow, IBCTWWorkflow, WorkflowFormProps } from 'types/events/event';
 import MortalityEvent from 'types/events/mortality_event';
 import { boxSpreadRowProps } from './EventComponents';
-import { BCTWWorkflow, IBCTWWorkflow, OptionalAnimal, WorkflowFormProps } from 'types/events/event';
-import { WorkflowStrings } from 'constants/strings';
 
 type CaptivityStatusFormProps<T extends IBCTWWorkflow> = WorkflowFormProps<T> & {
   disabled?: boolean;

@@ -1,9 +1,6 @@
 import { Badge, Box, Tab, Tabs, Typography, useTheme } from '@mui/material';
-import { Icon } from 'components/common';
 import { TabsProvider, useTabs } from 'contexts/TabsContext';
 import React, { useEffect } from 'react';
-import { useState } from 'react';
-import { BR } from 'themes/appTheme';
 
 // export const isTab = <T,>(tab: T, currentTab: T): boolean => tab === currentTab;
 

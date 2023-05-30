@@ -1,6 +1,6 @@
-import { Box, ButtonProps, Grid, GridProps, Typography } from '@mui/material';
+import { Box, ButtonProps, Grid } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
-import { cloneElement, Children, Key, ReactElement, ReactNode } from 'react';
+import { Children, Key, ReactElement, ReactNode, cloneElement } from 'react';
 
 interface TabPanelProps {
   children?: ReactNode;

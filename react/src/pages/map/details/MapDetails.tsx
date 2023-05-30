@@ -1,23 +1,21 @@
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
+import { Tooltip } from 'components/common';
+import Checkbox from 'components/form/Checkbox';
+import { MapStrings } from 'constants/strings';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import MapExport from 'pages/map/MapExport';
 import MapDetailsGrouped from 'pages/map/details/MapDetailsGrouped';
 import { useEffect, useState } from 'react';
 import {
   DetailsSortOption,
-  ITelemetryPoint,
   ITelemetryGroup,
-  OnPanelRowSelect,
+  ITelemetryPoint,
+  MapRange,
   OnMapRowCellClick,
-  OnlySelectedCritters,
-  MapRange
+  OnlySelectedCritters
 } from 'types/map';
-import Checkbox from 'components/form/Checkbox';
-import { getPointIDsFromTelemetryGroup, getUniqueCritterIDsFromSelectedPings, groupPings } from '../map_helpers';
-import MapExport from 'pages/map/MapExport';
-import { Button } from '@mui/material';
-import { MapStrings } from 'constants/strings';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Tooltip } from 'components/common';
 import { useMarkerStates } from '../MapMarkerContext';
+import { getPointIDsFromTelemetryGroup, groupPings } from '../map_helpers';
 
 export type MapDetailsBaseProps = {
   handleShowOverview: OnMapRowCellClick;

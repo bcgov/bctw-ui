@@ -1,13 +1,11 @@
-import Select from 'components/form/BasicSelect';
-import AutoComplete from 'components/form/Autocomplete';
-import { Button, Icon } from 'components/common';
 import { Box, IconButton, Button as MUIButton } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Icon } from 'components/common';
+import AutoComplete from 'components/form/Autocomplete';
+import Select from 'components/form/BasicSelect';
 import { useEffect, useState } from 'react';
 import { columnToHeader, headerToColumn } from 'utils/common_helpers';
-import makeStyles from '@mui/styles/makeStyles';
 import { ISelectMultipleData } from './MultiSelect';
-import { Critter, AttachedCritter } from 'types/animal';
-import { AttachedCollar, Collar } from 'types/collar';
 
 export type QueryBuilderOperator = 'Equals' | 'Not Equals';
 export type QueryBuilderColumn = string;

@@ -1,18 +1,16 @@
 import { Box } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
+import { WorkflowStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { parseFormChangeResult } from 'types/form_types';
 import { FormSection } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';
-import { useEffect, useState } from 'react';
-import { LocationEvent } from 'types/events/location_event';
-import MortalityEvent from 'types/events/mortality_event';
-import CaptivityStatusForm from './CaptivityStatusForm';
-import { boxSpreadRowProps } from './EventComponents';
-import Radio from 'components/form/Radio';
-import { WorkflowStrings } from 'constants/strings';
+import { useState } from 'react';
 import { WorkflowFormProps } from 'types/events/event';
 import { wfFields } from 'types/events/form_fields';
+import { LocationEvent } from 'types/events/location_event';
+import MortalityEvent from 'types/events/mortality_event';
+import { parseFormChangeResult } from 'types/form_types';
+import { boxSpreadRowProps } from './EventComponents';
 
 type MortEventProps = WorkflowFormProps<MortalityEvent> & {
   event: MortalityEvent;
@@ -22,13 +20,22 @@ type MortEventProps = WorkflowFormProps<MortalityEvent> & {
 /**
  * todo: dont hardcode radio values, retrieve from code somehow
  */
-export default function MortalityEventForm({ event, handleFormChange, handleExitEarly, isEditing }: MortEventProps): JSX.Element {
+export default function MortalityEventForm({
+  event,
+  handleFormChange,
+  handleExitEarly,
+  isEditing
+}: MortEventProps): JSX.Element {
   const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
   // business logic workflow state
   const [isRetrieved, setIsRetrieved] = useState(false);
   const [isPredation, setIsPredation] = useState(false);
-  const [isPredatorKnown, setIsPredatorKnown] = useState(!!event.proximate_predated_by_taxon_id || event.proximate_cause_of_death?.cod_category === 'Predation');
-  const [isUcodPredatorKnown, setIsUcodPredatorKnown] = useState(!!event.ultimate_predated_by_taxon_id || event.ultimate_cause_of_death?.cod_category === 'Predation');
+  const [isPredatorKnown, setIsPredatorKnown] = useState(
+    !!event.proximate_predated_by_taxon_id || event.proximate_cause_of_death?.cod_category === 'Predation'
+  );
+  const [isUcodPredatorKnown, setIsUcodPredatorKnown] = useState(
+    !!event.ultimate_predated_by_taxon_id || event.ultimate_cause_of_death?.cod_category === 'Predation'
+  );
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
   const [ucodDisabled, setUcodDisabled] = useState(true);
   const [isUCODKnown, setIsUCODKnown] = useState(false);
@@ -127,20 +134,22 @@ export default function MortalityEventForm({ event, handleFormChange, handleExit
             )}
           </Box>
         </FormSection>
-        {!isEditing && <FormSection id={'mort-dev'} header={'Device Information'}>
-          <Box mb={1} {...boxSpreadRowProps}>
-            {CreateFormField(mortality, mortality.fields.retrieval_date, onChange, {
-              disabled: !isRetrieved || critterIsAlive
-            })}
-            {CreateFormField(mortality, { ...mortality.fields.retrieved_ind, required: isRetrieved }, onChange)}
-          </Box>
-          <Box mb={1} {...boxSpreadRowProps}>
-            {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
-              disabled: !isBeingUnattached || critterIsAlive
-            })}
-            {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
-          </Box>
-        </FormSection>}
+        {!isEditing && (
+          <FormSection id={'mort-dev'} header={'Device Information'}>
+            <Box mb={1} {...boxSpreadRowProps}>
+              {CreateFormField(mortality, mortality.fields.retrieval_date, onChange, {
+                disabled: !isRetrieved || critterIsAlive
+              })}
+              {CreateFormField(mortality, { ...mortality.fields.retrieved_ind, required: isRetrieved }, onChange)}
+            </Box>
+            <Box mb={1} {...boxSpreadRowProps}>
+              {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
+                disabled: !isBeingUnattached || critterIsAlive
+              })}
+              {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
+            </Box>
+          </FormSection>
+        )}
       </Box>
       {/*<FormSection id='mort-a-st' header={'Critter Status'} disabled={critterIsAlive}>
         {[

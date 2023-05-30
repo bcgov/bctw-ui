@@ -1,22 +1,9 @@
-import React, { useState } from 'react';
-import { LocationEvent, eLocationPositionType } from 'types/events/location_event';
-import TextField from 'components/form/TextInput';
-import Radio from 'components/form/Radio';
 import { Box, capitalize } from '@mui/material';
-import { WorkflowStrings } from 'constants/strings';
-import NumberInput from 'components/form/NumberInput';
-import { mustBeNegativeNumber, mustBeXDigits } from 'components/form/form_validators';
-import { CbRouteStatusHandler, FormChangeEvent, FormFieldObject, InboundObj } from 'types/form_types';
-import DateTimeInput from 'components/form/DateTimeInput';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { ReactNode } from 'react';
-import { boxSpreadRowProps } from './EventComponents';
-import { isDev } from 'api/api_helpers';
 import { CreateFormField } from 'components/form/create_form_components';
-import { AttachedCritter } from 'types/animal';
+import { ReactNode, useState } from 'react';
+import { LocationEvent } from 'types/events/location_event';
+import { CbRouteStatusHandler, FormChangeEvent, InboundObj } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
-import { QueryStatus } from 'react-query';
-import { ICbRouteKey } from 'critterbase/types';
 
 type LocationEventProps = {
   event: LocationEvent;
