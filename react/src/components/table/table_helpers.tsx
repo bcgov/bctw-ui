@@ -1,13 +1,13 @@
-import { matchSorter } from 'match-sorter';
-import { getProperty, countDecimals } from 'utils/common_helpers';
-import { Order, HeadCell } from 'components/table/table_interfaces';
-import { dateObjectToTimeStr, formatT, formatTime, getDaysDiff } from 'utils/time';
-import { Icon, Tooltip } from 'components/common';
+import { Chip } from '@mui/material';
+import { Icon } from 'components/common';
+import { HeadCell, Order } from 'components/table/table_interfaces';
 import dayjs, { isDayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { matchSorter } from 'match-sorter';
 import { eDeviceStatus } from 'types/collar';
-import { Chip } from '@mui/material';
-import { Critter, ICollectionUnit, eCritterStatus } from 'types/animal';
+import { countDecimals, getProperty } from 'utils/common_helpers';
+import { dateObjectToTimeStr, formatT, formatTime, getDaysDiff } from 'utils/time';
+import { Critter } from 'types/animal';
 dayjs.extend(relativeTime);
 /**
  * converts an object to a list of HeadCells

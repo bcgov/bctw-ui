@@ -2,7 +2,7 @@ import { Box, CircularProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { getFillColorByDeviceStatus, splitPings } from 'pages/map/map_helpers';
+import { getFillColorByDeviceStatus, splitPings, voidFunc } from 'pages/map/map_helpers';
 import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import { getStyle, setupLatestPingOptions, setupPingOptions, setupTracksOptions } from 'pages/map/point_setup';
 import { useEffect, useRef, useState } from 'react';
@@ -49,7 +49,6 @@ export default function SimpleMap({
 
   const {
     isFetching: fetchingPings,
-    isLoading: isLoadingPings,
     isError: isErrorPings,
     data: fetchedPings
   } = api.usePingsPerCritter(
@@ -142,10 +141,10 @@ export default function SimpleMap({
           mapRef,
           drawnItems,
           // new L.GeoJSON(),
-          () => {},
-          () => {},
-          () => {},
-          () => {},
+          voidFunc,
+          voidFunc,
+          voidFunc,
+          voidFunc,
           drawOptions,
           true,
           DIV_ID

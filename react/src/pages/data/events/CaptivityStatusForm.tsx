@@ -19,7 +19,6 @@ export default function CaptivityStatusForm<T extends BCTWWorkflow<T>>({
   hideMortStatus = false
 }: CaptivityStatusFormProps<T>): JSX.Element {
   // only disable captivity status in mortality workflow
-  const isDisabled = event instanceof MortalityEvent;
 
   // const captivity_status_ind: FormFieldObject<T> = {
   //   prop: 'captivity_status_ind',

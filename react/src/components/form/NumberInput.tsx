@@ -3,7 +3,6 @@ import { baseInputStyle } from 'components/component_constants';
 import { inputPropsToRemove } from 'components/form/TextInput';
 import { isFunction } from 'components/table/table_helpers';
 import { FormStrings } from 'constants/strings';
-import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useEffect, useState } from 'react';
 import { FormBaseProps } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';

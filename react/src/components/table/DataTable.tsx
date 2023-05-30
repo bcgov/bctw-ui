@@ -6,7 +6,6 @@ import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import { fuzzySearchMutipleWords, getComparator, isFunction, stableSort } from 'components/table/table_helpers';
 import { DataTableProps, ITableFilter, Order } from 'components/table/table_interfaces';
-import { useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import React, { useEffect, useState } from 'react';
 import { UseQueryResult } from 'react-query';
@@ -34,7 +33,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     headers,
     queryProps,
     title,
-    onSelect,
+    // onSelect,
     onSelectMultiple,
     deleted,
     updated,
@@ -44,14 +43,13 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     requestDataByPage = false,
     paginationFooter = false,
     fullScreenHeight = false,
-    alreadySelected = [],
+    // alreadySelected = [],
     customColumns = []
   } = props;
 
   const styles = useStyles();
 
   const rowsPerPageOptions = [100, 250, 500, 1000];
-  const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
   const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
@@ -66,7 +64,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const isMultiSelect = isFunction(onSelectMultiple);
   // fetch the data from the props query
-  const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
+  const { isLoading, isError, data, isSuccess }: UseQueryResult<T[], AxiosError> = query(
     requestDataByPage ? page : null,
     param
     //filter

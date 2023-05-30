@@ -426,6 +426,10 @@ const getUniqueCollectionUnitKeys = (pings: ITelemetryGroup[]): string[] => {
   return [...new Set(keys)];
 };
 
+const voidFunc = () => {
+  //empty
+};
+
 export {
   applyFilter,
   getPointIDsFromTelemetryGroup,
@@ -444,5 +448,6 @@ export {
   splitPings,
   getFormValues,
   updatePings,
-  getUniqueCollectionUnitKeys
+  getUniqueCollectionUnitKeys,
+  voidFunc
 };

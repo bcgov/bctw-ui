@@ -1,12 +1,12 @@
-import { darken, lighten, Table, TableBody, TableCell, TableRow, useTheme } from '@mui/material';
-import TableContainer from 'components/table/TableContainer';
+import { lighten, Table, TableBody, TableCell, TableRow, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Tooltip } from 'components/common';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
-import { PlainTableProps, Order } from 'components/table/table_interfaces';
+import { Order, PlainTableProps } from 'components/table/table_interfaces';
+import TableContainer from 'components/table/TableContainer';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { BCTWBase } from 'types/common_types';
-import makeStyles from '@mui/styles/makeStyles';
-import { Tooltip } from 'components/common';
 /**
  * A table that expects the data to be provided.
  */

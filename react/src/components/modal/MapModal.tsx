@@ -11,7 +11,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet.markercluster';
 import 'leaflet/dist/leaflet.css';
 import 'pages/map/MapPage.scss';
-import { splitPings } from 'pages/map/map_helpers';
+import { splitPings, voidFunc } from 'pages/map/map_helpers';
 import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
 import { getStyle, setupLatestPingOptions, setupPingOptions, setupTracksOptions } from 'pages/map/point_setup';
 import { useEffect, useRef, useState } from 'react';
@@ -111,10 +111,10 @@ export default function MapModal({
         mapRef,
         drawnItems,
         // new L.GeoJSON(),
-        () => {},
-        () => {},
-        () => {},
-        () => {},
+        voidFunc,
+        voidFunc,
+        voidFunc,
+        voidFunc,
         drawOptions,
         true
       );

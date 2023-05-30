@@ -9,6 +9,7 @@ import { initMap } from 'pages/map/map_init';
 import { useEffect, useRef, useState } from 'react';
 import shpjs from 'shpjs';
 import FileInput from './FileInput';
+import { voidFunc } from 'pages/map/map_helpers';
 
 type ILocationSelectProps = {
   handleDrawShape: (features: L.FeatureGroup) => void;
@@ -51,9 +52,7 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
   /*
    * 0 - Min Lat, 1 -  Max Lat,  2 - Min Lon, 3-  Max Lon
    */
-  const emptyFn = () => {
-    //Empty
-  };
+
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
@@ -71,8 +70,8 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
           drawnItemsRef.current,
           // new L.GeoJSON(),
           () => handleDrawShape(drawnItemsRef.current),
-          emptyFn,
-          emptyFn,
+          voidFunc,
+          voidFunc,
           handleDeleteLayers,
           drawOptions
         );

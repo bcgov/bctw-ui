@@ -5,7 +5,6 @@ interface DottedBorderBoxProps {
 }
 
 export const DottedBorderBox = (props: DottedBorderBoxProps) => {
-  const theme = useTheme();
   const { children } = props;
   return (
     <Box
