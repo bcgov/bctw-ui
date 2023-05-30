@@ -78,6 +78,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "node_modules/eslint/bin/eslint.js src/**/*.ts --max-warnings=0",
+    "lint2": "npx eslint src/",
     "dead:code": "ts-prune"
   },
   "eslintConfig": {

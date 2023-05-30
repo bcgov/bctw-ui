@@ -362,7 +362,7 @@ export const useTelemetryApi = () => {
     config: Record<string, unknown>
   ): UseQueryResult<CollarHistory[]> => {
     return useQuery<CollarHistory[], AxiosError>(
-      ['collarAssignmentHistory', critterId],
+      ['collarAssignmentHistory', critterId, page],
       () => attachmentApi.getCollarAssignmentHistory(critterId),
       config
     );
@@ -373,7 +373,7 @@ export const useTelemetryApi = () => {
    */
   const useCollarHistory = (page: number, collarId: string, config?: Record<string, unknown>): UseQueryResult => {
     return useQuery<Collar[], AxiosError>(
-      ['collarHistory', collarId],
+      ['collarHistory', collarId, page],
       () => collarApi.getCollarHistory(collarId),
       config
     );
