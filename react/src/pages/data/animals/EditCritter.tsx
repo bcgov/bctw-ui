@@ -1,32 +1,24 @@
-import { Box, Container, Divider, Grid } from '@mui/material';
+import { Box, Divider, Grid } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
+import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
+import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
+import { ICbRouteKey } from 'critterbase/types';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditModal from 'pages/data/common/EditModal';
-import { InboundObj, parseFormChangeResult } from 'types/form_types';
-import {
-  AttachedCritter,
-  Critter,
-  ICapture,
-  IMortality,
-  IMarking,
-  critterFormFields,
-  markingFormFields
-} from 'types/animal';
-import { eCritterPermission, permissionCanModify } from 'types/permission';
-import { EditHeader, FormSection } from '../common/EditModalComponents';
-import CaptureEventForm from '../events/CaptureEventForm';
-import MortalityEventForm from '../events/MortalityEventForm';
-import { createEvent } from '../events/EventComponents';
+import { useState } from 'react';
+import { QueryStatus } from 'react-query';
+import { AttachedCritter, Critter, critterFormFields } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import MortalityEvent from 'types/events/mortality_event';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { InboundObj, parseFormChangeResult } from 'types/form_types';
+import { eCritterPermission, permissionCanModify } from 'types/permission';
 import { hasChangedProperties, omitNull } from 'utils/common_helpers';
-import { QueryStatus } from 'react-query';
-import { ICbRouteKey } from 'critterbase/types';
-import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
-import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
-import { useEffect, useState } from 'react';
+import { EditHeader, FormSection } from '../common/EditModalComponents';
+import CaptureEventForm from '../events/CaptureEventForm';
+import { createEvent } from '../events/EventComponents';
+import MortalityEventForm from '../events/MortalityEventForm';
 
 /**
  * the main animal form
@@ -35,10 +27,10 @@ export default function EditCritter(
   props: EditorProps<Critter | AttachedCritter> & {
     queryStatus?: QueryStatus;
     busySaving?: boolean;
-    onSave: (c: any) => Promise<void>;
+    onSave: (c: Record<string, unknown>) => Promise<void>;
   }
 ): JSX.Element {
-  const { isCreatingNew, editing, open, onSave, busySaving, queryStatus } = props;
+  const { isCreatingNew, editing, onSave, busySaving, queryStatus } = props;
   editing.permission_type = eCritterPermission.admin;
   //TODO integration add this back
   //const updateTaxon = useUpdateTaxon();

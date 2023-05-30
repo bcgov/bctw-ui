@@ -23,15 +23,15 @@ export default function LocationEventForm({
   handleRoute = undefined
 }: LocationEventProps): JSX.Element {
   // create the form inputs
-  const { regions, comment, latlon, extra } = event.fields;
-  const [isRequired, setIsRequired] = useState({ required: false });
+  const { regions, latlon } = event.fields;
+  // const [isRequired, setIsRequired] = useState({ required: false });
 
-  const requiredLocationInputs: Array<keyof LocationEvent> = [
-    'latitude',
-    'longitude',
-    'coordinate_uncertainty',
-    'coordinate_uncertainty_unit'
-  ];
+  // const requiredLocationInputs: Array<keyof LocationEvent> = [
+  //   'latitude',
+  //   'longitude',
+  //   'coordinate_uncertainty',
+  //   'coordinate_uncertainty_unit'
+  // ];
 
   const changeHandler = (v: InboundObj): void => {
     const key = Object.keys(v)[0];
@@ -40,9 +40,9 @@ export default function LocationEventForm({
     event[key] = value;
     //console.log('LocationEventForm inboundObj: ' + JSON.stringify(v));
 
-    if (requiredLocationInputs.includes(key as keyof LocationEvent) && value) {
-      setIsRequired({ required: true });
-    }
+    // if (requiredLocationInputs.includes(key as keyof LocationEvent) && value) {
+    //   setIsRequired({ required: true });
+    // }
     if (event.event_type === 'release') {
       notifyChange({ ...v, nestedEventKey: 'release_location' });
       return;

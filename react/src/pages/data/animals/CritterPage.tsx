@@ -1,49 +1,35 @@
 import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
-import makeStyles from '@mui/styles/makeStyles';
 import { AlertBanner } from 'components/alerts/AlertBanner';
 import { Icon } from 'components/common';
 import { QuickSummary } from 'components/common/QuickSummary';
-import { AlertContext } from 'contexts/UserAlertContext';
 import dayjs from 'dayjs';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import { useContext, useEffect, useState } from 'react';
-import { TelemetryAlert } from 'types/alert';
+import { useState } from 'react';
 import { AttachedCritter } from 'types/animal';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 import { CritterDataTables } from './CritterDataTables';
 import DetailedAnimalView from './DetailedAnimalView';
 
-const useStyles = makeStyles((theme) => ({
-  progress: {
-    position: 'absolute',
-    zIndex: 1000,
-    marginTop: '30px'
-  }
-}));
-
 export default function CritterPage(): JSX.Element {
-  const useAlert = useContext(AlertContext);
+  // const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
-  const [openManageAnimals, setOpenManageAnimals] = useState(false);
   const [detailAnimal, setDetailAnimal] = useState<AttachedCritter>(null);
 
-  const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
-  const inverseManageModal = (): void => {
-    setOpenManageAnimals((a) => !a);
-  };
+  // const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
+
   const inverseDataRetrieval = (): void => {
     setShowDataRetrieval((d) => !d);
   };
-  useEffect(() => {
-    if (useAlert?.alerts?.length) {
-      //Set only the valid (null valid_to) alerts where snoozed_to date < today
-      const nonSnoozedValidAlerts = useAlert.alerts.filter(
-        (a) => !a.valid_to.isValid() && !(dayjs(a.snoozed_to).diff(dayjs()) > 0)
-      );
-      setAlerts(nonSnoozedValidAlerts);
-    }
-  }, [useAlert]);
+  // useEffect(() => {
+  //   if (useAlert?.alerts?.length) {
+  //     //Set only the valid (null valid_to) alerts where snoozed_to date < today
+  //     const nonSnoozedValidAlerts = useAlert.alerts.filter(
+  //       (a) => !a.valid_to.isValid() && !(dayjs(a.snoozed_to).diff(dayjs()) > 0)
+  //     );
+  //     setAlerts(nonSnoozedValidAlerts);
+  //   }
+  // }, [useAlert]);
 
   const dataTables = (): JSX.Element => (
     <Box>

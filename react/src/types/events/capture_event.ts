@@ -76,11 +76,11 @@ export class CaptureEvent2 implements BCTWWorkflow<CaptureEvent2>, CaptureAnimal
 
   fields: CaptureFormField2 = {
     capture_timestamp: { prop: 'capture_timestamp', type: eInputType.datetime, required: true },
-    //capture_mortality: { prop: 'capture_mortality', type: eInputType.check },
+    capture_mortality: { prop: 'capture_mortality', type: eInputType.check },
     capture_comment: { prop: 'capture_comment', type: eInputType.multiline, style: FormCommentStyle },
     release_timestamp: { prop: 'release_timestamp', type: eInputType.datetime },
     release_comment: { prop: 'release_comment', type: eInputType.multiline, style: FormCommentStyle },
-    //release_mortality: { prop: 'release_mortality', type: eInputType.check },
+    release_mortality: { prop: 'release_mortality', type: eInputType.check },
     show_release: { prop: 'show_release', type: eInputType.check }
   };
 }

@@ -1,17 +1,16 @@
-import { Box, Button, Divider, Typography } from '@mui/material';
-import { Icon, Modal } from 'components/common';
-import { CreateFormField, CreateInputProps, getInputFnFromType } from 'components/form/create_form_components';
+import { Box, Button } from '@mui/material';
+import { Icon } from 'components/common';
+import { getInputFnFromType } from 'components/form/create_form_components';
 import OkayModal from 'components/modal/OkayModal';
 import { cbInputValue } from 'critterbase/constants';
 import { isCbVal } from 'critterbase/helper_functions';
 import useFormHasError from 'hooks/useFormHasError';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { FormSection, editEventBtnProps } from 'pages/data/common/EditModalComponents';
 import { useEffect, useState } from 'react';
-import { Critter, IMarking, markingFormFields } from 'types/animal';
+import { IMarking, markingFormFields } from 'types/animal';
 import { uuid } from 'types/common_types';
-import { CbRouteStatusHandler, FormChangeEvent, InboundObj, parseFormChangeResult } from 'types/form_types';
-import { columnToHeader, removeProps } from 'utils/common_helpers';
+import { CbRouteStatusHandler, InboundObj, parseFormChangeResult } from 'types/form_types';
+import { columnToHeader } from 'utils/common_helpers';
 import { CbSelectProps } from './CbSelect';
 type CbMarkingSharedProps = {
   taxon_id: uuid;
@@ -75,7 +74,7 @@ type CbMarkingsProps = {
 
 export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
   const { markings, handleMarkings, handleRoute, taxon_id } = props;
-  const [hasErr, checkHasErr, resetErrs] = useFormHasError();
+  const [hasErr, checkHasErr] = useFormHasError();
 
   const [markingsData, setMarkingsData] = useState<Array<IMarking & { _delete?: boolean }>>(markings ?? []);
   const [openModal, setOpenModal] = useState(false);
@@ -97,7 +96,7 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
   }, [JSON.stringify(markingsData), hasErr]);
 
   const onChange = (v: InboundObj, idx: number): void => {
-    const [key, value, label] = parseFormChangeResult<IMarking>(v);
+    const [key, value] = parseFormChangeResult<IMarking>(v);
     checkHasErr(v);
     const updatedMarking = value
       ? { ...markingsData[idx], [key]: value }

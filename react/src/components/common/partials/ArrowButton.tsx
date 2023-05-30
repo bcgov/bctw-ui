@@ -1,14 +1,6 @@
-import { Button, TypographyProps } from '@mui/material';
+import { Button } from '@mui/material';
 import { Icon } from 'components/common';
-type S = {
-  variant: TypographyProps['variant'];
-  iconSize: number;
-};
-type StylesType = {
-  small: S;
-  medium: S;
-  large: S;
-};
+
 interface ArrowButtonProps {
   onClick?: () => void;
   size: 'small' | 'medium' | 'large';

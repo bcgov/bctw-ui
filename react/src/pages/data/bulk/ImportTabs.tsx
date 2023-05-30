@@ -72,11 +72,11 @@ type AnimalCollarRow = AnimalCollar & {
 };
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
-  const { title, sheetIndex, handleSubmit, show } = props;
+  const { title, sheetIndex, show } = props;
   const api = useTelemetryApi();
 
   const user = useUser();
-  const { data: users, isLoading: loadingUsers } = api.useUsers(0);
+  const { data: users } = api.useUsers(0);
   const [importUserID, setImportUserID] = useState<number>(null);
   const userID = importUserID ?? user?.id;
 
@@ -357,19 +357,19 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
 //Make sure the reset/handleFileClear is called after both the telemetry and animalDevice
 export const AnimalAndDeviceImportTab = (props: ImportTabProps) => {
   const handleSubmit = (): void => {
-    console.log('submitting animal and device');
+    // console.log('submitting animal and device');
   };
   return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.AnimalAndDevice} handleSubmit={handleSubmit} />;
 };
 export const TelemetryImportTab = (props: ImportTabProps) => {
   const handleSubmit = (): void => {
-    console.log('submitting telemetry');
+    // console.log('submitting telemetry');
   };
   return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.Telemetry} handleSubmit={handleSubmit} />;
 };
 export const KeyXImportTab = (props: ImportTabProps) => {
   const { title, show, tabIndex } = props;
-  const { setTabStatus, tabsValidation } = useTabs();
+  const { setTabStatus } = useTabs();
   const handleAllKeyXUploaded = (status: boolean): void => {
     setTabStatus(tabIndex, status ? 'success' : 'warning');
   };

@@ -1,15 +1,13 @@
-import { Critter, AttachedCritter } from 'types/animal';
-import { cloneElement, useState, useEffect } from 'react';
-import { permissionCanModify } from 'types/permission';
-import ConfirmModal from 'components/modal/ConfirmModal';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import { AxiosError } from 'axios';
-import { formatAxiosError } from 'utils/errors';
 import { IBulkUploadResults, IDeleteType, IUpsertPayload } from 'api/api_interfaces';
-import { IAddEditProps } from '../common/AddEditViewer';
-import { plainToClass } from 'class-transformer';
+import { AxiosError } from 'axios';
+import ConfirmModal from 'components/modal/ConfirmModal';
+import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { cloneElement, useEffect, useState } from 'react';
+import { AttachedCritter, Critter } from 'types/animal';
 import { editObjectToEvent } from 'types/events/event';
+import { formatAxiosError } from 'utils/errors';
+import { IAddEditProps } from '../common/AddEditViewer';
 
 type IModifyWrapperProps = {
   editing: Critter | AttachedCritter;
@@ -26,7 +24,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
 
-  const { children, editing, onDelete, setCritter, onUpdate } = props;
+  const { children, editing, onDelete, onUpdate } = props;
   // used in child AddEditViewer component to determine the add/edit button state (view/edit)
   const [canEdit, setCanEdit] = useState(false);
   // used to determine the state of the delete modal
@@ -47,16 +45,15 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
    */
 
   useEffect(() => {
-    if(status === 'success') {
+    if (status === 'success') {
       if (data.assignment_id) {
         const a = editObjectToEvent(data, new AttachedCritter(data.critter_id), []);
         setAnimal(a);
       } else {
         setAnimal(editObjectToEvent(data, new Critter(data.critter_id), []));
       }
-    }
-    else {
-      setAnimal(editObjectToEvent({}, new Critter() , [] as never[]));
+    } else {
+      setAnimal(editObjectToEvent({}, new Critter(), [] as never[]));
     }
     setHasCollar(editing instanceof AttachedCritter);
     setCanEdit(true);
@@ -64,7 +61,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
 
   // must be defined before mutation declarations
   const handleSaveResult = async (data: IBulkUploadResults<Critter>): Promise<void> => {
-    const { errors, results } = data;
+    const { errors } = data;
     //console.log('Data in save result' + data);
     //The response of this mutation should not be BulkResponse
     if (errors?.length) {
@@ -88,7 +85,10 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
 
   // setup the mutations
   //const { mutateAsync: saveMutation } = api.useSaveCritterbaseCritter({ onSuccess: handleSaveResult, onError });
-  const { mutateAsync: saveCritterbase, isLoading } = api.useBulkUpdateCritterbaseCritter({ onSuccess: handleSaveResult, onError});
+  const { mutateAsync: saveCritterbase, isLoading } = api.useBulkUpdateCritterbaseCritter({
+    onSuccess: handleSaveResult,
+    onError
+  });
   const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: handleDeleteResult, onError });
 
   const saveCritter = async (a: IUpsertPayload<Critter | AttachedCritter>): Promise<void> => {
@@ -124,7 +124,7 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   const passTheseProps: Pick<
     IAddEditProps<Critter>,
     'onDelete' | 'onSave' | 'cannotEdit' | 'editing' | 'queryStatus'
-  > & {busySaving: boolean} = {
+  > & { busySaving: boolean } = {
     cannotEdit: !canEdit,
     onDelete: (): void => setShowConfirmDelete((o) => !o),
     onSave: saveCritter,

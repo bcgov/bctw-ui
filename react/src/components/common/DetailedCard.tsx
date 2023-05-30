@@ -95,10 +95,10 @@ const DetailedStatusCard = <T extends AttachedCritter | Collar>({
             </>
           );
         })}
-        {displayKeysInBox.map((m) => {
+        {displayKeysInBox.map((m, i) => {
           return (
             <>
-              <Grid item xs={12}>
+              <Grid item xs={12} key={`card-${i}`}>
                 <SubHeader size='extra-small' text={formatHeader(m)} />
                 <Box className={style.boxElement}>
                   <Typography className={style.valueSize}>

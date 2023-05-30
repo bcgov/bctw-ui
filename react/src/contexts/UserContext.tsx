@@ -1,10 +1,11 @@
+/* eslint-disable no-console */
 import { AxiosError } from 'axios';
 import { plainToClass } from 'class-transformer';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useState, createContext, useEffect, useContext } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { UseQueryOptions } from 'react-query/types/react';
-import { User, IKeyCloakSessionInfo } from 'types/user';
+import { IKeyCloakSessionInfo, User } from 'types/user';
 
 interface IUserContext {
   user: User | null;

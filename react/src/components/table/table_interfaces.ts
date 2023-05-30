@@ -1,7 +1,3 @@
-import { AxiosError } from 'axios';
-import { Dispatch, SetStateAction } from 'react';
-import { UseQueryResult } from 'react-query';
-
 type Order = 'asc' | 'desc';
 
 /**
@@ -12,16 +8,6 @@ interface ITableSortProp<T> {
   property: keyof T;
   order: Order;
 }
-
-/**
- * a property name from the useTelemetry hook (@file 'hooks/useTelemetryApi.ts)
- * is passed to a data table
- */
-type ITableQuery<T> = (
-  page: number,
-  param?: unknown,
-  config?: Record<string, unknown>
-) => UseQueryResult<T[], AxiosError>;
 
 /**
  * @param defaultSort

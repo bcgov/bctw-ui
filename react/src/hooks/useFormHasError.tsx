@@ -1,5 +1,4 @@
-import { isDev } from 'api/api_helpers';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { InboundObj } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';
 
@@ -10,7 +9,6 @@ import { removeProps } from 'utils/common_helpers';
  * @retursn a function that can reset the error state
  */
 export default function useFormHasError(): [boolean, (r: InboundObj) => void, () => void] {
-  const [errorsExist, setErrorsExist] = useState(false);
   const [errors, setErrors] = useState({});
 
   /*useEffect(() => {

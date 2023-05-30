@@ -1,15 +1,14 @@
 import { Box } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
 import { WorkflowStrings } from 'constants/strings';
-import { useEffect, useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
+import { useState } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import { WorkflowFormProps } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
-import { FormChangeEvent, parseFormChangeResult } from 'types/form_types';
+import { parseFormChangeResult } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';
-import { boxSpreadRowProps } from './EventComponents';
 import LocationEventForm from './LocationEventForm';
-import dayjs, { Dayjs } from 'dayjs';
 /**
  * todo: deal with data life
  * devices not assigned here?
@@ -22,12 +21,11 @@ export default function CaptureEventForm({
   handleRoute,
   isEditing = false
 }: WorkflowFormProps<CaptureEvent2> & { isEditing?: boolean }): JSX.Element {
-  const latitude = capture.capture_location.latitude;
   const [showRelease, setShowRelease] = useState(false);
   const [showMortalityCheck, setMortalityCheck] = useState<'capture' | 'release' | 'unknown'>('unknown');
   const [minReleaseDate, setMinReleaseDate] = useState(capture?.capture_timestamp);
 
-  const { diedDuring, differentReleaseDetails } = WorkflowStrings.capture;
+  const { differentReleaseDetails, diedDuring } = WorkflowStrings.capture;
 
   const onChange = (v: Record<keyof CaptureEvent2 | keyof LocationEvent, unknown>): void => {
     const [key, value] = parseFormChangeResult<CaptureEvent2>(v);
@@ -57,7 +55,7 @@ export default function CaptureEventForm({
     return <p>unable to load capture workflow</p>;
   }
 
-  //TODO the form doesnt currently null entries in the release section if showRelease is set to false
+  //TODO This form needs to null capture/release mortality checkboxes if editing object has a mortality
   return (
     <Box>
       {/* Capture Date -> Capture Environment */}
@@ -73,11 +71,11 @@ export default function CaptureEventForm({
       </LocationEventForm>
 
       {/* Capture Information*/}
-      {/* {showMortalityCheck == 'unknown' || showMortalityCheck == 'capture' ? (
+      {showMortalityCheck == 'unknown' || showMortalityCheck == 'capture' ? (
         <FormSection id='died-during-checkbox' header='Capture Information'>
           {CreateFormField(capture, capture.fields.capture_mortality, onChange, { label: diedDuring('capture') })}
         </FormSection>
-      ) : null} */}
+      ) : null}
 
       {/* Release Date */}
 
@@ -98,11 +96,11 @@ export default function CaptureEventForm({
       ) : null}
       {/* Release Information */}
 
-      {/* {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
-        <FormSection id='died-during-checkbox-3' header=''>
+      {showMortalityCheck == 'unknown' || showMortalityCheck == 'release' ? (
+        <FormSection id='died-during-checkbox-3' header={isEditing ? 'Release Information' : ''}>
           {CreateFormField(capture, capture.fields.release_mortality, onChange, { label: diedDuring('release') })}
         </FormSection>
-      ) : null} */}
+      ) : null}
     </Box>
   );
 }

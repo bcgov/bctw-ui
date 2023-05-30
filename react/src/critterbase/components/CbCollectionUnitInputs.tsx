@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { AttachedCritter, Critter, ICollectionUnit, IMarking } from 'types/animal';
-import { CbSelect } from './CbSelect';
-import { Box } from '@mui/material';
-import { query } from 'esri-leaflet';
+import { ICbSelect } from 'critterbase/types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { CbRoutes } from 'critterbase/routes';
+import { ICollectionUnit } from 'types/animal';
 import { uuid } from 'types/common_types';
-import { ICbRoutes, ICbSelect } from 'critterbase/types';
-import { CommonProps } from '@mui/material/OverridableComponent';
 import { FormChangeEvent } from 'types/form_types';
+import { CbSelect } from './CbSelect';
 
 type CbCollectionUnitInputsProps = {
   taxon_id: uuid;

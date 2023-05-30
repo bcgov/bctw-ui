@@ -1,7 +1,6 @@
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
 import { CollarHistory, hasCollarCurrentlyAssigned } from 'types/collar_history';
-import { IAssignmentHistoryPageProps } from './AssignmentHistory';
 import PerformAssignmentAction, { PerformAssignmentPageProps } from './PerformAssignmentAction';
 
 export const AttachRemoveDevice = (props: PerformAssignmentPageProps): JSX.Element => {

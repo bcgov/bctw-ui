@@ -29,7 +29,6 @@ export default function MortalityEventForm({
   const [mortality, setMortalityEvent] = useState<MortalityEvent>(event);
   // business logic workflow state
   const [isRetrieved, setIsRetrieved] = useState(false);
-  const [isPredation, setIsPredation] = useState(false);
   const [isPredatorKnown, setIsPredatorKnown] = useState(
     !!event.proximate_predated_by_taxon_id || event.proximate_cause_of_death?.cod_category === 'Predation'
   );
@@ -37,7 +36,6 @@ export default function MortalityEventForm({
     !!event.ultimate_predated_by_taxon_id || event.ultimate_cause_of_death?.cod_category === 'Predation'
   );
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
-  const [ucodDisabled, setUcodDisabled] = useState(true);
   const [isUCODKnown, setIsUCODKnown] = useState(false);
   // setting critter_status to alive disables the form.
   const [critterIsAlive, setCritterIsAlive] = useState(false);
@@ -89,11 +87,6 @@ export default function MortalityEventForm({
     //   if (value === 'Mortality' || value === 'Alive') {
     //     setCritterIsAlive(value === 'Alive');
     //   }
-  };
-
-  // when the location event form changes, also notify wrapper about errors
-  const onChangeLocationProp = (v: Record<keyof LocationEvent, unknown>): void => {
-    handleFormChange(v);
   };
 
   const fields = mortality.fields;
