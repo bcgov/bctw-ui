@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
-import { Critter, AttachedCritter, eCritterStatus } from 'types/animal';
+import { Critter, eCritterStatus } from 'types/animal';
 import { Collar, IAttachedCollar } from 'types/collar';
 import { BCTWBase, BCTWValidDates, nullToDayjs, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
@@ -132,10 +132,10 @@ export interface IMortalityAlert
     Pick<Critter, 'critter_id' | 'animal_id' | 'critter_status' | 'wlh_id' | 'taxon'>,
     DataLife {}
 
-type AnimalNotification = Pick<
-  AttachedCritter,
-  'device_status' | 'device_id' | 'frequency' | 'taxon' | 'animal_id' | 'wlh_id'
->;
+// type AnimalNotification = Pick<
+//   AttachedCritter,
+//   'device_status' | 'device_id' | 'frequency' | 'taxon' | 'animal_id' | 'wlh_id'
+// >;
 
 type MortalityAlertProp = keyof IMortalityAlert;
 /**

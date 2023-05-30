@@ -6,12 +6,8 @@ const countDecimals = (value: number): number => {
   return value.toString().split('.')[1].length || 0;
 };
 
-// formats lat long nicely
-const formatLatLong = (lat: number, long: number): string => {
-  return `${lat.toFixed(2)}\xb0 ${long.toFixed(2)}\xb0`;
-};
 // Appends ('s) to end of word if multiple n values
-const pluralize = (n: number, word: string) => (n > 1 || n == 0 ? `${word}'s` : word);
+const pluralize = (n: number, word: string): string => (n > 1 || n == 0 ? `${word}'s` : word);
 //Capitalizes the first letter of a word
 const capitalize = (s: string): string => s && s[0].toUpperCase() + s.slice(1);
 

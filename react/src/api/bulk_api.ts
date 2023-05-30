@@ -100,7 +100,7 @@ export const bulkApi = (api: AxiosInstance): API => {
     return results;
   };
 
-  const getTemplateFile = async (file_key: string): Promise<any> => {
+  const getTemplateFile = async (file_key: string): Promise<unknown> => {
     const body = `file_key=${file_key}`;
     const url = createUrl({ api: 'get-template', query: body });
     const { data } = await api.get(url);

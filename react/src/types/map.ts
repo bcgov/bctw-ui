@@ -1,9 +1,10 @@
-import { Type, Expose, Transform } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
+import { Dayjs } from 'dayjs';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
 import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
-import { columnToHeader, headerToColumn } from 'utils/common_helpers';
+import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
 import {
   BCTWBase,
@@ -15,7 +16,6 @@ import {
   toClassOnly,
   toPlainOnly
 } from './common_types';
-import { Dayjs } from 'dayjs';
 
 interface MapRange {
   start: string;
@@ -53,11 +53,11 @@ interface ITelemetryLine extends GeoJsonObject {
   geometry: LineString;
 }
 
-interface IUnassignedTelemetryLine extends GeoJsonObject {
-  type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'collar_id' | 'device_id'>;
-  geometry: LineString;
-}
+// interface IUnassignedTelemetryLine extends GeoJsonObject {
+//   type: 'Feature';
+//   properties: Pick<ITelemetryDetail, 'collar_id' | 'device_id'>;
+//   geometry: LineString;
+// }
 
 // a grouped by critter_id version of @type {ITelemetryPoint}
 interface ITelemetryGroup {
@@ -194,5 +194,4 @@ export type {
   PingGroupType,
   MapFormValue
 };
-
 export { doesPointArrayContainPoint };

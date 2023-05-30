@@ -5,12 +5,9 @@ import { BCTWBase, DayjsToPlain, getCollectionUnitKeys, getCollectionUnitProps, 
 import { FormFieldObject, eInputType, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader, omitNull } from 'utils/common_helpers';
-import { ICollarHistory } from './collar_history';
-import { DataLife } from './data_life';
+import { CaptureEvent2 } from './events/capture_event';
 import { editObjectToEvent } from './events/event';
-import CaptureEvent, { CaptureEvent2 } from './events/capture_event';
 import { LocationEvent } from './events/location_event';
-import { get } from 'http';
 import MortalityEvent from './events/mortality_event';
 
 // // used in critter getters to specify collar attachment status

@@ -89,6 +89,7 @@ type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
  * Returns a set of supported api methods.
  * @return {object} object whose properties are supported api methods.
  */
+/* eslint-disable-next-line */
 export const useTelemetryApi = () => {
   const api = useApi();
   const cb_api = useCritterbaseApi();

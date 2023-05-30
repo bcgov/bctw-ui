@@ -1,5 +1,4 @@
 import { AxiosError } from 'axios';
-import { map } from 'leaflet';
 
 /**
  * formats an Axios error to a string
