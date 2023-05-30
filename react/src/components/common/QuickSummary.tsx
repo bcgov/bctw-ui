@@ -7,6 +7,8 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useContext, useEffect, useState } from 'react';
 import { InfoCard } from './InfoCard';
 import { SubHeader } from './partials/SubHeader';
+import { isToday } from 'utils/time';
+import dayjs from 'dayjs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -67,9 +69,9 @@ export const QuickSummary = ({ handleDetails, showDetails }: QuickSummaryProps):
         counts[animal.permission_type] += 1;
         if (animal.date_recorded) {
           //TODO add this back CRITTERBASE INTEGRATION
-          // if (!isToday(dayjs(animal.date_recorded))) {
-          //   setRetrievalSuccess(false);
-          // }
+          if (!isToday(dayjs(animal.date_recorded))) {
+            setRetrievalSuccess(false);
+          }
         }
       });
       setAnimalPermsCount(counts);

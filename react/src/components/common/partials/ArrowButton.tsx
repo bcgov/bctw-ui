@@ -1,4 +1,4 @@
-import { Button, Link, Typography, TypographyProps } from '@mui/material';
+import { Button, TypographyProps } from '@mui/material';
 import { Icon } from 'components/common';
 type S = {
   variant: TypographyProps['variant'];

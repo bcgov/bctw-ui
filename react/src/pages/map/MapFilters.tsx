@@ -134,12 +134,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     justifyContent: 'center'
   };
 
-  const {
-    isFetching: fetchingEstimate,
-    isError: isErrorEstimate,
-    data: fetchedEstimate,
-    isSuccess: estimateSuccess
-  } = api.useEstimate(start, end);
+  const { isError: isErrorEstimate, data: fetchedEstimate, isSuccess: estimateSuccess } = api.useEstimate(start, end);
 
   // Update the formfield values when pings are loaded.
   // Use memo to minimize computing result.

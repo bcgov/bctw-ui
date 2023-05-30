@@ -16,7 +16,7 @@ export type DateInputProps = FormBaseProps &
   };
 
 export default function DateInput(props: DateInputProps): JSX.Element {
-  const { defaultValue, label, changeHandler, propName, minDate, maxDate, required } = props;
+  const { defaultValue, label, changeHandler, propName, minDate, maxDate } = props;
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(defaultValue ? defaultValue : null);
 
   const handleDateChange = (d: Dayjs): void => {

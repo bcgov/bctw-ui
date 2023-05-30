@@ -1,4 +1,4 @@
-import { Alert, Collapse, IconButton, List, ListItem, Stack, Theme } from '@mui/material';
+import { Alert, Collapse, IconButton, List, ListItem, Theme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
 import { BannerStrings } from 'constants/strings';

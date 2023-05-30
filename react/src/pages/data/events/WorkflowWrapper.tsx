@@ -19,7 +19,6 @@ import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
 import MalfunctionEventForm from './MalfunctionEventForm';
 import MortalityEventForm from './MortalityEventForm';
-import ReleaseEventForm from './ReleaseEventForm';
 import RetrievalEventForm from './RetrievalEventForm';
 
 type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
@@ -157,9 +156,7 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
     handlePostponeSave
   };
   const determineWorkflow = (): JSX.Element => {
-    if (event instanceof ReleaseEvent) {
-      return <ReleaseEventForm {...props} event={event} />;
-    } else if (event instanceof CaptureEvent2) {
+    if (event instanceof CaptureEvent2) {
       return <CaptureEventForm {...props} event={event} />;
     } else if (event instanceof MortalityEvent) {
       return <MortalityEventForm {...props} event={event} />;

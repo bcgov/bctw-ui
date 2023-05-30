@@ -1,4 +1,4 @@
-import { Box, Paper, TextField, useTheme } from '@mui/material';
+import { Box, Paper, TextField } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { AllGeoJSON } from '@turf/helpers';
 import simplify from '@turf/simplify';
@@ -51,11 +51,9 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
   /*
    * 0 - Min Lat, 1 -  Max Lat,  2 - Min Lon, 3-  Max Lon
    */
-
-  useEffect(() => {
-    console.log(boundingBox);
-  }, [boundingBox]);
-
+  const emptyFn = () => {
+    //Empty
+  };
   useEffect(() => {
     const updateComponent = (): void => {
       if (!mapRef.current) {
@@ -73,8 +71,8 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
           drawnItemsRef.current,
           // new L.GeoJSON(),
           () => handleDrawShape(drawnItemsRef.current),
-          () => {},
-          () => {},
+          emptyFn,
+          emptyFn,
           handleDeleteLayers,
           drawOptions
         );

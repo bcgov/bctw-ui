@@ -1,7 +1,5 @@
-import { Chip, TextField } from '@mui/material';
-import { Autocomplete as MUIAutocomplete } from '@mui/material';
+import { Chip, Autocomplete as MUIAutocomplete, TextField } from '@mui/material';
 import { SxProps } from '@mui/system';
-import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useEffect, useState } from 'react';
 import { ISelectMultipleData } from './MultiSelect';
 
