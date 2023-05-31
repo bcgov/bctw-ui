@@ -1,9 +1,9 @@
 import { Box } from '@mui/material';
 import { Button } from 'components/common';
-import Export from 'pages/data/bulk/Export';
 import { useState } from 'react';
 import { buttonProps } from 'components/component_constants';
 import { ITableQueryProps } from 'components/table/table_interfaces';
+import Export from './Export';
 
 type ExportPageProps<T> = {
   eTitle: string;

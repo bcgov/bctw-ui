@@ -1,4 +1,4 @@
-import { Box, TableCell, TableRow, Toolbar, Typography } from '@mui/material';
+import { Box, TableCell, TableRow, Toolbar } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import TableFilter from './TableFilters';
@@ -42,7 +42,7 @@ type TableToolbarProps<T> = {
 
 export default function TableToolbar<T>(props: TableToolbarProps<T>): JSX.Element {
   const classes = useToolbarStyles();
-  const { numSelected, sibling, title, showTooltip, disableSearch, darkHeader } = props;
+  const { numSelected, sibling, title, showTooltip, disableSearch } = props;
   return (
     <Toolbar disableGutters className={classes.root}>
       <Box width='100%'>

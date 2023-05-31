@@ -1,8 +1,7 @@
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useState, createContext, useEffect, useContext } from 'react';
-import { TelemetryAlert } from 'types/alert';
-import { UserContext } from 'contexts/UserContext';
 import { ENABLE_ALERTS } from 'api/api_helpers';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { createContext, useEffect, useState } from 'react';
+import { TelemetryAlert } from 'types/alert';
 
 /**
  * Context that children components can listen to.

@@ -5,7 +5,6 @@ import ChangeContext from 'contexts/InputChangeContext';
 import { CbCollectionUnitInputs } from 'critterbase/components/CbCollectionUnitInputs';
 import { CbMarkings } from 'critterbase/components/CbMarkingInputs';
 import { ICbRouteKey } from 'critterbase/types';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { QueryStatus } from 'react-query';
@@ -32,34 +31,13 @@ export default function EditCritter(
 ): JSX.Element {
   const { isCreatingNew, editing, onSave, busySaving, queryStatus } = props;
   editing.permission_type = eCritterPermission.admin;
-  //TODO integration add this back
-  //const updateTaxon = useUpdateTaxon();
-  const api = useTelemetryApi();
-
-  /*const { mutateAsync: handleSave, isLoading } = api.useBulkUpdateCritterbaseCritter({});*/
 
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
-  const isAttached = editing instanceof AttachedCritter;
   const { identifierFields } = critterFormFields;
   const [cbSelectStatus, setCbSelectStatus] = useState({});
   const [allowSave, setAllowSave] = useState(false);
   const [taxonId, setTaxonId] = useState(editing.taxon_id);
-  // const [showAssignmentHistory, setShowAssignmentHistory] = useState(false);
-  // const [workflow, setWorkflow] = useState<WorkflowType>();
-  // const [showWorkflow, setShowWorkflow] = useState(false);
-  // const [showUDFModal, setShowUDFModal] = useState(false);
-  // const [hasBabies, setHasBabies] = useState(false);
 
-  // useDidMountEffect(() => {
-  //   if (open) {
-  //     reset();
-  //   }
-  // }, [open]);
-
-  // const reset = (): void => {
-  //   setHasBabies(false);
-  //   //updateTaxon(null);
-  // };
   const critterbaseSave = async (payload) => {
     const { body } = payload;
     const new_critter = {
@@ -183,7 +161,7 @@ export default function EditCritter(
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: InboundObj): void => {
-            const [key, value, label] = parseFormChangeResult<AttachedCritter>(v);
+            const [key, value] = parseFormChangeResult<AttachedCritter>(v);
             if (key === 'taxon_id') {
               setTaxonId(value as string);
             }

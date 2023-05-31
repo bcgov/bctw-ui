@@ -1,6 +1,5 @@
 import { Box, Grid, Paper } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { style } from '@mui/system';
 import { DetailedStatusCard } from 'components/common/DetailedCard';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import SimpleMap from 'components/common/SimpleMap';

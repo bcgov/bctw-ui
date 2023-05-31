@@ -1,4 +1,4 @@
-import { Box, useTheme } from '@mui/material';
+import { Box } from '@mui/material';
 
 interface DottedBorderBoxProps {
   children?: JSX.Element;

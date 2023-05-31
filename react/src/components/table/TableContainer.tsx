@@ -1,4 +1,4 @@
-import { TableContainer as MUITableContainer, Paper, Box, useTheme, Theme } from '@mui/material';
+import { TableContainer as MUITableContainer, Paper, Theme, useTheme } from '@mui/material';
 import { SxProps } from '@mui/system';
 
 type TableContainerProps = {
@@ -10,13 +10,19 @@ type TableContainerProps = {
 /**
  * wraps table components
  */
-export default function TableContainer({ children, toolbar, fullScreenHeight=false, sx={}}: TableContainerProps): JSX.Element {
-  const theme = useTheme();
+export default function TableContainer({
+  children,
+  toolbar,
+  fullScreenHeight = false,
+  sx = {}
+}: TableContainerProps): JSX.Element {
   return (
     <>
       {toolbar}
-      <Paper sx={{ width: '100%', overflow: 'hidden' , ...sx}} variant='outlined'>
-        <MUITableContainer  component={Paper} sx={fullScreenHeight ? {...sx, maxHeight: 'calc(100vh - 286px)' }:{ ...sx, maxHeight: '30rem' }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', ...sx }} variant='outlined'>
+        <MUITableContainer
+          component={Paper}
+          sx={fullScreenHeight ? { ...sx, maxHeight: 'calc(100vh - 286px)' } : { ...sx, maxHeight: '30rem' }}>
           {children}
         </MUITableContainer>
       </Paper>

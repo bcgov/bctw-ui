@@ -5,6 +5,7 @@ import 'leaflet.markercluster';
 import 'leaflet/dist/leaflet.css';
 import 'pages/map/MapPage.scss';
 
+import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import Box from '@mui/material/Box';
 import makeStyles from '@mui/styles/makeStyles';
 import { InfoBanner } from 'components/alerts/Banner';
@@ -21,11 +22,10 @@ import dayjs from 'dayjs';
 import { FeatureCollection } from 'geojson';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import React, { MouseEventHandler, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AttachedCritter } from 'types/animal';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import ExportDownloadModal from './ExportDownloadModal';
-import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 
 export interface DateRange {
   start: dayjs.Dayjs;
@@ -105,12 +105,11 @@ export default function ExportPageV2(): JSX.Element {
           arr.push(`POLYGON ((${pointsInPostGISformat}))`);
         }
       });
-      console.log(JSON.stringify(arr));
       setCurrentGeometry(arr);
     }
   };
 
-  const { data: crittersData, isSuccess: critterSuccess } = api.useAssignedCrittersHistoric();
+  const { data: crittersData } = api.useAssignedCrittersHistoric();
 
   const handleChangeDate = (v: InboundObj): void => {
     const [key, value] = parseFormChangeResult(v);
@@ -136,8 +135,9 @@ export default function ExportPageV2(): JSX.Element {
     setCritterIDs(critters);
   };
 
-  const handleRadioChange = (event) => {
-    const newVal = (event.target as HTMLInputElement).value as ExportRangeType;
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // const newVal = (event.target as HTMLInputElement).value as ExportRangeType;
+    const newVal = event.target.value as ExportRangeType;
     if (newVal === exportRangeType) {
       setExportRangeType('date_range');
     } else {
@@ -170,12 +170,12 @@ export default function ExportPageV2(): JSX.Element {
           <RadioGroup row name='export-radio' value={exportRangeType}>
             <FormControlLabel
               value='lifetime'
-              control={<Radio onClick={handleRadioChange} />}
+              control={<Radio onChange={handleRadioChange} />}
               label={ExportStrings.allTelemetryButton}
             />
             <FormControlLabel
               value='last_telemetry'
-              control={<Radio onClick={handleRadioChange} />}
+              control={<Radio onChange={handleRadioChange} />}
               label={ExportStrings.mostRecentTelemetryButton}
             />
           </RadioGroup>

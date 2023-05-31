@@ -7,7 +7,6 @@ import { matchSorter } from 'match-sorter';
 import { eDeviceStatus } from 'types/collar';
 import { countDecimals, getProperty } from 'utils/common_helpers';
 import { dateObjectToTimeStr, formatT, formatTime, getDaysDiff } from 'utils/time';
-import { Critter } from 'types/animal';
 dayjs.extend(relativeTime);
 /**
  * converts an object to a list of HeadCells

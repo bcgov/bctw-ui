@@ -1,5 +1,3 @@
-import { Typography } from '@mui/material';
-
 const releaseUnattachWarning = (device: number, aid: string, wlhid: string): JSX.Element => (
   <>
     <h4>

@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import { Box, CircularProgress } from '@mui/material';
+import { Button, Modal } from 'components/common';
 import DataTable from 'components/table/DataTable';
-import { Collar, eCollarAssignedStatus } from 'types/collar';
 import { CritterStrings as CS } from 'constants/strings';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import DataLifeInputForm from 'components/form/DataLifeInputForm';
-import { AttachDeviceInput } from 'types/collar_history';
-import { Critter } from 'types/animal';
-import { DataLifeInput } from 'types/data_life';
-import { Button, Modal } from 'components/common';
+import { useState } from 'react';
 import { MutationStatus } from 'react-query';
-import { Box, CircularProgress } from '@mui/material';
+import { Critter } from 'types/animal';
+import { Collar, eCollarAssignedStatus } from 'types/collar';
+import { AttachDeviceInput } from 'types/collar_history';
+import { DataLifeInput } from 'types/data_life';
 
 type IAssignNewCollarModal = Pick<Critter, 'critter_id'> & {
   show: boolean;

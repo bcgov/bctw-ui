@@ -1,11 +1,10 @@
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, capitalize } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, capitalize } from '@mui/material';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
 import { CreateInputProps } from 'components/form/create_form_components';
 import { isFunction } from 'components/table/table_helpers';
-import { ICbRouteKey, ICbSelect } from 'critterbase/types';
+import { ICbRouteKey } from 'critterbase/types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useEffect, useState } from 'react';
-import { QueryStatus } from 'react-query';
 import { uuid } from 'types/common_types';
 import { CbRouteStatusHandler } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
