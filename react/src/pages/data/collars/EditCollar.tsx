@@ -46,7 +46,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
 
   const handleOpenWorkflow = (e: WorkflowType): void => {
     const event = createEvent(e);
-    updateEvent(event as any);
+    updateEvent(event);
     setShowWorkflowForm((o) => !o);
   };
 

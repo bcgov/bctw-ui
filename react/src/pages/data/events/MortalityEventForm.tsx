@@ -1,6 +1,5 @@
 import { Box } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
-import { WorkflowStrings } from 'constants/strings';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { FormSection } from 'pages/data//common/EditModalComponents';
 import LocationEventForm from 'pages/data/events/LocationEventForm';

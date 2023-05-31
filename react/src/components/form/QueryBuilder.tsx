@@ -4,13 +4,12 @@ import { Icon } from 'components/common';
 import AutoComplete from 'components/form/Autocomplete';
 import Select from 'components/form/BasicSelect';
 import { useEffect, useState } from 'react';
-import { columnToHeader, headerToColumn } from 'utils/common_helpers';
-import { ISelectMultipleData } from './MultiSelect';
 import { AttachedCritter } from 'types/animal';
+import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 
 export type QueryBuilderOperator = 'Equals' | 'Not Equals';
 export type QueryBuilderColumn = string;
-export type QueryBuilderData = AttachedCritter; // | Animal | AttachedAnimal | Collar | AttachedCollar;
+//export type QueryBuilderData = AttachedCritter; // | Animal | AttachedAnimal | Collar | AttachedCollar;
 
 export interface IFormRowEntry {
   column: QueryBuilderColumn;

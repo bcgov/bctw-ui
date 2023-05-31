@@ -1,8 +1,3 @@
-import { UseQueryResult } from 'react-query';
-import { AxiosError } from 'axios';
-import { IOnboardUser } from 'types/onboarding';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-
 type Order = 'asc' | 'desc';
 
 /**

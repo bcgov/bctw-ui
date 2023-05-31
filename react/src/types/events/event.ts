@@ -5,9 +5,9 @@ import { AttachDeviceInput, RemoveDeviceInput } from 'types/collar_history';
 import { BCTWFormat } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
 import { CbRouteStatusHandler, FormChangeEvent } from 'types/form_types';
-import { CaptureEvent2, CaptureFormField2 } from './capture_event';
-import MortalityEvent, { MortalityFormField } from './mortality_event';
-import ReleaseEvent, { ReleaseFormField } from './release_event';
+import { CaptureFormField2 } from './capture_event';
+import { MortalityFormField } from './mortality_event';
+import { ReleaseFormField } from './release_event';
 import { RetrievalFormField } from './retrieval_event';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';

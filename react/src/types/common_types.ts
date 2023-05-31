@@ -4,6 +4,7 @@ import { UserCritterAccess } from './animal_access';
 import { TelemetryDetail } from './map';
 import { headerToColumn } from 'utils/common_helpers';
 import { Critter, ICollectionUnit } from './animal';
+import { CbPayload } from './events/event';
 
 export interface BCTWValidDates {
   valid_from: Date | Dayjs;
@@ -24,6 +25,7 @@ export type BCTWFormat<T> = {
   formatPropAsHeader(k: keyof T): string;
   get displayProps(): (keyof T)[];
   historyDisplayProps?(): (keyof T)[];
+  critterbasePayload?: CbPayload<T>;
 };
 
 /**

@@ -12,7 +12,7 @@ import { BCTWBase } from 'types/common_types';
  * A table that expects the data to be provided.
  */
 type HighlightTableProps<T> = PlainTableProps<T> & {
-  data: T[];
+  data: Partial<T>[];
   rowIdentifier: string;
   messages: Record<number, Partial<Record<keyof T, string>>>[];
   onSelectCell: (row_idx: number, cellname: string) => void;
@@ -60,7 +60,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
         {data === undefined ? null : (
           <TableHead
             headersToDisplay={headers}
-            headerData={data && data[0]}
+            headerData={data && (data[0] as T)}
             secondaryHeaders={secondaryHeaders}
             isMultiSelect={false}
             numSelected={0}

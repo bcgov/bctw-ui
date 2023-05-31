@@ -12,7 +12,6 @@ import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
 import DataTableRow from './DataTableRow';
 import './table.scss';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 const useStyles = makeStyles((theme) => ({
   bottomOfTableBody: {

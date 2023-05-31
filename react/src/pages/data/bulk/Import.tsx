@@ -1,9 +1,7 @@
 import { Box } from '@mui/material';
 import { PageTabs } from 'components/common/partials/PageTabs';
-import { AnimalAndDeviceImportTab } from './ImportTabs';
-import { TelemetryImportTab } from './ImportTabs';
-import { KeyXImportTab } from './ImportTabs';
 import ManageLayout from 'pages/layouts/ManageLayout';
+import { AnimalAndDeviceImportTab, KeyXImportTab } from './ImportTabs';
 
 /**
  * @param message whats displayed as body of import modal
