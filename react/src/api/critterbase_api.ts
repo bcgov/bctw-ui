@@ -29,6 +29,14 @@ export const critterbaseApi = (props: ApiProps): API => {
     return data;
   };
 
+  const verifyMarkingsAgainstTaxon = async (
+    taxon_id: string,
+    markings: IMarking[]
+  ) => {
+    const { data } = await api.post(`${CbRouters.markings}/verify`, {taxon_id: taxon_id, markings: markings});
+    return data;
+  }
+
   const upsertCritter = async (critter: IUpsertPayload<Critter>): Promise<Critter> => {
     // critter.body.sex = 'test';
     const { data } = await api.put(`${CbRouters.critters}/${critter.body.critter_id}${detailedFormat}`, critter.body);
@@ -50,6 +58,7 @@ export const critterbaseApi = (props: ApiProps): API => {
     getLookupTableOptions,
     upsertCritter,
     bulkUpdate,
-    deleteMarking
+    deleteMarking,
+    verifyMarkingsAgainstTaxon
   };
 };

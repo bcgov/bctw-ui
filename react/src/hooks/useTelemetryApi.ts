@@ -122,6 +122,14 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const useVerifyMarkingsAgainstTaxon = (
+    config: UseMutationOptions<string[], AxiosError, {taxon_id: string, markings: IMarking}>
+  ): UseMutationResult<string[]> => 
+  useMutation<string[], AxiosError, {taxon_id: string, markings: IMarking}>(
+    ({taxon_id, markings}) => critterbaseApi.verifyMarkingsAgainstTaxon(taxon_id, markings),
+    config
+  );
+
   /** upsert an animal */
   const useSaveCritterbaseCritter = (
     config: UseMutationOptions<IBulkUploadResults<Critter>, AxiosError, IUpsertPayload<Critter>>
@@ -758,6 +766,7 @@ export const useTelemetryApi = () => {
     useTriggerVendorTelemetry,
     useAssignedCrittersHistoric,
     useBulkUpdateCritterbaseCritter,
-    useDeleteMarking
+    useDeleteMarking,
+    useVerifyMarkingsAgainstTaxon
   };
 };

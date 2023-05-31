@@ -1,4 +1,4 @@
-import { Box, Divider, Grid } from '@mui/material';
+import { Box, Divider, Grid, Typography } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
@@ -18,6 +18,9 @@ import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import { createEvent } from '../events/EventComponents';
 import MortalityEventForm from '../events/MortalityEventForm';
+import { Modal } from 'components/common';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { CbSelect } from 'critterbase/components/CbSelect';
 
 /**
  * the main animal form
@@ -37,6 +40,7 @@ export default function EditCritter(
   const [cbSelectStatus, setCbSelectStatus] = useState({});
   const [allowSave, setAllowSave] = useState(false);
   const [taxonId, setTaxonId] = useState(editing.taxon_id);
+  const [taxonErrorModalOpen, setTaxonErrorModalOpen] = useState(false);
 
   const critterbaseSave = async (payload) => {
     const { body } = payload;
@@ -134,6 +138,35 @@ export default function EditCritter(
     //console.log(`In Editcritter handleRoute: ${JSON.stringify(dict)} ${s}`)
   };
 
+  const api = useTelemetryApi();
+  const { isSuccess, data, mutateAsync } = api.useVerifyMarkingsAgainstTaxon({});
+
+  const checkIfTaxonChangeAllowed = async (new_taxon: string): Promise<boolean> => {
+    if(!new_taxon) {
+      return true;
+    }
+    const result = await mutateAsync({taxon_id: new_taxon, markings: editing.marking});
+    if(result.length) {
+      setTaxonErrorModalOpen(true);
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
+  const formatMarking = (marking_id: string): JSX.Element => {
+    if(editing.marking) {
+      const mark = editing.marking.find(a => a.marking_id === marking_id);
+      if(mark) {
+        return (<>
+          <li>{mark.marking_id} -- Type: {mark.marking_type}, Color: {mark.primary_colour}</li>
+        </>)
+      }
+    }
+    return null;
+  }
+
   const Header = (
     <EditHeader<AttachedCritter>
       title={
@@ -172,7 +205,16 @@ export default function EditCritter(
               <FormSection id='critter' header='Critter Details' size='large'>
                 <Divider />
                 <FormSection id='identifiers' header='Identifiers'>
-                  {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
+                  <CbSelect
+                    value={editing.taxon_id} 
+                    prop={'taxon'} 
+                    handleChange={onChange} 
+                    isSelectionAllowed={checkIfTaxonChangeAllowed}
+                    cbRouteKey={'species'} 
+                    query={''}
+                    {...(identifierFields.find(a => a.prop === 'taxon_id'))}
+                    />
+                  {identifierFields?.filter(a => a.prop !== 'taxon_id').map((f) => CreateFormField(editing, f, onChange))}
                   <CbCollectionUnitInputs
                     collection_units={editing.collection_units}
                     taxon_id={taxonId}
@@ -214,6 +256,15 @@ export default function EditCritter(
           );
         }}
       </ChangeContext.Consumer>
+      <Modal open={isSuccess && data.length > 0 && taxonErrorModalOpen} handleClose={() => {setTaxonErrorModalOpen(false)}}>
+        <Typography>It is not possible to assign this taxon to this critter as 
+          the critter has markings and/or measurements that are not compatible with the desired taxon.</Typography>
+        <ul>
+        {
+          data?.map(a => formatMarking(a))
+        }
+        </ul>
+      </Modal>
     </EditModal>
   );
 }
