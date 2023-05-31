@@ -61,8 +61,7 @@ export const CbSelect = ({
 
   const handleSelect = async (id?: string, label?: string): Promise<void> => {
     const shouldChange = await isSelectionAllowed?.(id);
-    console.log('handleSelect fired')
-    if(!shouldChange) {
+    if(typeof isSelectionAllowed === 'function' && !shouldChange) {
       return;
     }
     const hasProps = id && label;
@@ -86,7 +85,7 @@ export const CbSelect = ({
           const valueId = typeof val === 'string' ? val : val.id;
           const value = typeof val === 'string' ? val : val.value;
           return (
-            <MenuItem value={valueId} key={`${val}-${idx}`} onClick={() => handleSelect(valueId, value)}>
+            <MenuItem value={valueId} key={`${val}-${idx}`} onClick={async () => await handleSelect(valueId, value)}>
               {capitalize(value)}
             </MenuItem>
           );
