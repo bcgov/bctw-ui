@@ -1,3 +1,6 @@
+import { UseQueryResult } from 'react-query';
+import { AxiosError } from 'axios';
+
 type Order = 'asc' | 'desc';
 
 /**
@@ -17,8 +20,8 @@ interface ITableSortProp<T> {
 interface ITableQueryProps<T> {
   defaultSort?: ITableSortProp<T>;
   param?: unknown;
+  //query: ReturnType<typeof useTelemetryApi>[keyof ReturnType<typeof useTelemetryApi>];
   query: any;
-  // query: APIHandler;
   onNewData?: (data: T[]) => void;
 }
 

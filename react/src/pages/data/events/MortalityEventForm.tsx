@@ -36,7 +36,7 @@ export default function MortalityEventForm({
   );
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
   // setting critter_status to alive disables the form.
-  const [critterIsAlive, setCritterIsAlive] = useState(false);
+  // const [critterIsAlive, setCritterIsAlive] = useState(false);
 
   useDidMountEffect(() => {
     //console.log('Mortality event' + JSON.stringify(event, null, 2));
@@ -45,18 +45,19 @@ export default function MortalityEventForm({
     setMortalityEvent(event);
   }, [event]);
   // if critter is marked as alive, workflow wrapper will show exit workflow prompt
-  useDidMountEffect(() => {
-    event.onlySaveAnimalStatus = critterIsAlive;
-    if (critterIsAlive) {
-      // update these props to indicate that device/attachment should not be saved
-      event.shouldSaveDevice = false;
-      event.shouldUnattachDevice = false;
-      // call the exite early handler from WorkflowWrapper, passing the confirmation message
-      handleExitEarly(<p>{WorkflowStrings.mortality.exitEarly}</p>);
-    } else {
-      event.shouldSaveDevice = true;
-    }
-  }, [critterIsAlive]);
+
+  // useDidMountEffect(() => {
+  //   event.onlySaveAnimalStatus = critterIsAlive;
+  //   if (critterIsAlive) {
+  //     // update these props to indicate that device/attachment should not be saved
+  //     event.shouldSaveDevice = false;
+  //     event.shouldUnattachDevice = false;
+  //     // call the exite early handler from WorkflowWrapper, passing the confirmation message
+  //     handleExitEarly(<p>{WorkflowStrings.mortality.exitEarly}</p>);
+  //   } else {
+  //     event.shouldSaveDevice = true;
+  //   }
+  // }, [critterIsAlive]);
 
   // form component changes can trigger mortality specific business logic
   const onChange = (v: Record<keyof MortalityEvent, unknown>): void => {
@@ -91,7 +92,7 @@ export default function MortalityEventForm({
     return null;
   }
 
-  const isDisabled = { disabled: critterIsAlive };
+  // const isDisabled = { disabled: critterIsAlive };
   return (
     //<></>
     //TODO add this back CRITTERBASE INTEGRATION
@@ -127,15 +128,15 @@ export default function MortalityEventForm({
           <FormSection id={'mort-dev'} header={'Device Information'}>
             <Box mb={1} {...boxSpreadRowProps}>
               {CreateFormField(mortality, mortality.fields.retrieval_date, onChange, {
-                disabled: !isRetrieved || critterIsAlive
+                disabled: !isRetrieved
               })}
               {CreateFormField(mortality, { ...mortality.fields.retrieved_ind, required: isRetrieved }, onChange)}
             </Box>
             <Box mb={1} {...boxSpreadRowProps}>
               {CreateFormField(mortality, { ...fields.data_life_end, required: isBeingUnattached }, onChange, {
-                disabled: !isBeingUnattached || critterIsAlive
+                disabled: !isBeingUnattached
               })}
-              {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange, isDisabled)}
+              {CreateFormField(mortality, { ...fields.shouldUnattachDevice }, onChange)}
             </Box>
           </FormSection>
         )}

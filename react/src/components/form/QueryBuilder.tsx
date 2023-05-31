@@ -6,10 +6,11 @@ import Select from 'components/form/BasicSelect';
 import { useEffect, useState } from 'react';
 import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import { ISelectMultipleData } from './MultiSelect';
+import { AttachedCritter } from 'types/animal';
 
 export type QueryBuilderOperator = 'Equals' | 'Not Equals';
 export type QueryBuilderColumn = string;
-export type QueryBuilderData = Record<string, any>; // | Animal | AttachedAnimal | Collar | AttachedCollar;
+export type QueryBuilderData = AttachedCritter; // | Animal | AttachedAnimal | Collar | AttachedCollar;
 
 export interface IFormRowEntry {
   column: QueryBuilderColumn;
@@ -17,10 +18,10 @@ export interface IFormRowEntry {
   value: string[];
 }
 
-type IQueryBuilderProps<T extends ISelectMultipleData> = {
+type IQueryBuilderProps<T> = {
   operators: QueryBuilderOperator[];
   columns: QueryBuilderColumn[];
-  data: QueryBuilderData[];
+  data: T[];
   handleRowsUpdate?: (r: IFormRowEntry[]) => void;
 };
 
@@ -50,7 +51,7 @@ const exportStyles = makeStyles(() => ({
  * You are intended to pass props corresponding to columns in the table you intend to query, as well as operations to use on the Value Autocomplete field.
  * Autocomplete options are filled according to keys in the data prop which correspond to your columns
  */
-export default function QueryBuilder<T extends ISelectMultipleData>(props: IQueryBuilderProps<T>): JSX.Element {
+export default function QueryBuilder<T extends AttachedCritter>(props: IQueryBuilderProps<T>): JSX.Element {
   const { operators, columns, handleRowsUpdate, data } = props;
   const [rows, setRows] = useState<IFormRowEntry[]>([{ column: 'taxon', operator: 'Equals', value: [] }]);
   const styles = exportStyles();
@@ -99,8 +100,8 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
 
   const getUniqueValueOptions = (col: QueryBuilderColumn) => {
     if (data) {
-      const uniqueItemsForColumn: any[] = [];
-      const uniqueItemsCollectionUnits: any[] = [];
+      const uniqueItemsForColumn = [];
+      const uniqueItemsCollectionUnits = [];
 
       if (col === 'collection_units') {
         const tempDict = {};
@@ -168,7 +169,7 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
               return { id: i, value: o, displayLabel: o };
             })}
             changeHandler={(o) => {
-              handleAutocompleteChange(o as T[], idx);
+              handleAutocompleteChange(o, idx);
             }}
             triggerReset={row.column}
             isMultiSearch
