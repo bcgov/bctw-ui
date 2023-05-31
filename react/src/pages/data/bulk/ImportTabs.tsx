@@ -167,8 +167,8 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
 
     return headers;
   };
-  //What is the return type of this function?
-  const getTableHelpMessages = (sheet: ParsedXLSXSheetResult) => {
+
+  const getTableHelpMessages = (sheet: ParsedXLSXSheetResult): Record<number, Partial<Record<string, string>>>[] => {
     const messages = sheet.rows.map((e, idx) => {
       return Object.entries(e.errors).reduce((prev, curr) => {
         const headerIdx = sheet.headers.indexOf(curr[0]);

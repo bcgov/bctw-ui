@@ -200,3 +200,5 @@ export class BatteryAlert extends MortalityAlert {
     return editObjectToEvent(this, workflow, ['device_status']);
   }
 }
+
+export type Alert = TelemetryAlert | BatteryAlert | MalfunctionAlert | BatteryAlert;

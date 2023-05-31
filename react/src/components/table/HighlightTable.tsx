@@ -7,13 +7,14 @@ import TableContainer from 'components/table/TableContainer';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { BCTWBase } from 'types/common_types';
+
 /**
  * A table that expects the data to be provided.
  */
 type HighlightTableProps<T> = PlainTableProps<T> & {
   data: T[];
   rowIdentifier: string;
-  messages: any[];
+  messages: Record<number, Partial<Record<keyof T, string>>>[];
   onSelectCell: (row_idx: number, cellname: string) => void;
   dimFirstColumn: boolean;
   secondaryHeaders: string[];
@@ -48,9 +49,9 @@ export default function HighlightTable<T extends BCTWBase<T>>({
     setOrderBy(property);
   };
 
-  const handleClickCell = (row_idx: any, cellname: any): void => {
+  const handleClickCell = (row_idx: number, cellname: keyof T): void => {
     if (typeof onSelectCell === 'function' && data?.length) {
-      onSelectCell(row_idx, cellname);
+      onSelectCell(row_idx, String(cellname));
     }
   };
   return (
@@ -95,7 +96,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                     return null;
                   }
                   const { value } = formatTableCell(obj, k);
-                  const isMessage = messages.length ? messages[prop][k] !== undefined : false;
+                  const isMessage = messages.length ? messages[prop][String(k)] !== undefined : false;
                   return (
                     <>
                       {isMessage ? (
@@ -104,7 +105,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                           className={style.badCell}
                           key={`${String(k)}${i}`}
                           align={'left'}>
-                          <Tooltip title={messages[prop][k]}>
+                          <Tooltip title={messages[prop][String(k)]}>
                             <>{value}</>
                           </Tooltip>
                         </TableCell>

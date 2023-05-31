@@ -1,7 +1,7 @@
 import { ENABLE_ALERTS } from 'api/api_helpers';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { createContext, useEffect, useState } from 'react';
-import { TelemetryAlert } from 'types/alert';
+import { Alert, TelemetryAlert } from 'types/alert';
 
 /**
  * Context that children components can listen to.
@@ -17,7 +17,7 @@ interface IAlertContext<T extends TelemetryAlert> {
   getAlertTitle: () => string;
   error: string;
 }
-export const AlertContext = createContext<IAlertContext<any>>({
+export const AlertContext = createContext<IAlertContext<Alert>>({
   alerts: [],
   getAlertTitle: (): string => 'Alerts(0)',
   error: null
@@ -28,7 +28,7 @@ export const AlertStateContextProvider: React.FC = (props) => {
   const api = useTelemetryApi();
   //const useUser = useContext(UserContext);
 
-  const [alertContext, setAlertContext] = useState<IAlertContext<any> | null>(null);
+  const [alertContext, setAlertContext] = useState<IAlertContext<Alert> | null>(null);
   //const [shouldFetchAlerts, setShouldFetchAlerts] = useState(false);
 
   const { data, status, error, dataUpdatedAt } = api.useAlert({
@@ -52,7 +52,6 @@ export const AlertStateContextProvider: React.FC = (props) => {
       if (status === 'success') {
         setAlertContext({ alerts: data, getAlertTitle, error: null });
       } else if (status === 'error') {
-        console.error(`error fetching user alerts ${error.toString()}`);
         setAlertContext({ alerts: [], getAlertTitle, error: error.toString() });
       }
     };
