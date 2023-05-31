@@ -11,7 +11,6 @@ import { CaptureEvent2 } from 'types/events/capture_event';
 import { BCTWWorkflow, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import MortalityEvent from 'types/events/mortality_event';
-import ReleaseEvent from 'types/events/release_event';
 import RetrievalEvent from 'types/events/retrieval_event';
 import { InboundObj } from 'types/form_types';
 import { formatAxiosError } from 'utils/errors';

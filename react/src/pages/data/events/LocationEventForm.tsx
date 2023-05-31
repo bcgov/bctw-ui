@@ -1,6 +1,6 @@
 import { Box, capitalize } from '@mui/material';
 import { CreateFormField } from 'components/form/create_form_components';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { LocationEvent } from 'types/events/location_event';
 import { CbRouteStatusHandler, FormChangeEvent, InboundObj } from 'types/form_types';
 import { FormSection } from '../common/EditModalComponents';

@@ -7,7 +7,6 @@ import LocationEventForm from 'pages/data/events/LocationEventForm';
 import { useState } from 'react';
 import { WorkflowFormProps } from 'types/events/event';
 import { wfFields } from 'types/events/form_fields';
-import { LocationEvent } from 'types/events/location_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { parseFormChangeResult } from 'types/form_types';
 import { boxSpreadRowProps } from './EventComponents';

@@ -1,15 +1,14 @@
 import Box from '@mui/material/Box';
 import Icon from 'components/common/Icon';
 import DataTable from 'components/table/DataTable';
-import { CritterStrings, CritterStrings as CS } from 'constants/strings';
+import { CritterStrings } from 'constants/strings';
 import { RowSelectedProvider } from 'contexts/TableRowSelectContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import EditCritter from 'pages/data/animals/EditCritter';
 import ExportViewer from 'pages/data/bulk/ExportImportViewer';
 import { useEffect, useState } from 'react';
-import { QueryStatus } from 'react-query';
 import { AttachedCritter, Critter, Critters } from 'types/animal';
-import { doNothing, doNothingAsync } from 'utils/common_helpers';
+import { doNothingAsync } from 'utils/common_helpers';
 import ModifyCritterWrapper from './ModifyCritterWrapper';
 
 import { Tooltip } from 'components/common';
@@ -34,8 +33,6 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);
   const [workflow, setWorkflow] = useState<WorkflowType>('unknown');
   const [openWorkflow, setOpenWorkflow] = useState(false);
-  const [openMap, setOpenMap] = useState(false);
-  const [openAddAnimal, setOpenAddAnimal] = useState(false);
 
   // Keeps track of conditionally rendered columns from collection_units
   const [combinedHeaders, setCombinedHeaders] = useState<(keyof Critter | string)[]>(
@@ -59,27 +56,24 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
     //setEditObj(row);
     detailViewAction(row);
   };
-  const handleSelectTemp = <T extends Critter>(row: T[]): void =>
-    setEditObj(row.length ? row[0] : new AttachedCritter());
-  //const lastDt = editObj?.last_transmission_date;
 
-  // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
-  const editProps = {
-    editing: null,
-    open: false,
-    onSave: doNothingAsync,
-    handleClose: doNothing
-  };
+  // // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
+  // const editProps = {
+  //   editing: null,
+  //   open: false,
+  //   onSave: doNothingAsync,
+  //   handleClose: doNothing
+  // };
 
-  const addEditProps = {
-    editing: null,
-    empty: new AttachedCritter(),
-    addTooltip: CS.addTooltip,
-    queryStatus: 'idle' as QueryStatus,
-    disableEdit: true,
-    disableDelete: true,
-    modalControl: true
-  };
+  // const addEditProps = {
+  //   editing: null,
+  //   empty: new AttachedCritter(),
+  //   addTooltip: CS.addTooltip,
+  //   queryStatus: 'idle' as QueryStatus,
+  //   disableEdit: true,
+  //   disableDelete: true,
+  //   modalControl: true
+  // };
 
   const Status = (row: AttachedCritter, idx: number): JSX.Element => {
     if (row.last_fetch_date.isValid()) {
@@ -93,10 +87,9 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   };
 
   const Menu = (row: Critters, idx: number, attached: boolean): JSX.Element => {
-    const { edit, map, attach, mortality, removeCollar, capture } = CritterStrings.menuItems;
+    const { edit, attach, mortality, removeCollar, capture } = CritterStrings.menuItems;
     const rowNotMerged = row?._merged === false;
     const _edit = () => setOpenEdit(true);
-    const _map = () => setOpenMap(true);
 
     const handleWorkflow = (wf: WorkflowType): void => {
       setWorkflow(wf);
@@ -155,10 +148,6 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         />
       </ConditionalWrapper>
     );
-  };
-
-  const handleAddAnimal = (): void => {
-    setOpenAddAnimal((a) => !a);
   };
 
   return (

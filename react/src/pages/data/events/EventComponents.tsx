@@ -12,7 +12,10 @@ const boxSpreadRowProps: Pick<BoxProps, 'display' | 'justifyContent' | 'alignIte
   alignItems: 'center'
 };
 
-const createEvent = (critter: Critter | AttachedCritter, wfType: WorkflowType): CaptureEvent2 | ReleaseEvent | MortalityEvent => {
+const createEvent = (
+  critter: Critter | AttachedCritter,
+  wfType: WorkflowType
+): CaptureEvent2 | ReleaseEvent | MortalityEvent => {
   switch (wfType) {
     case 'capture':
       return editObjectToEvent(critter, new CaptureEvent2(), []);
@@ -23,4 +26,4 @@ const createEvent = (critter: Critter | AttachedCritter, wfType: WorkflowType): 
   }
 };
 
-export {createEvent, boxSpreadRowProps };
+export { createEvent, boxSpreadRowProps };

@@ -92,12 +92,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   // history-related & tab state
   const [showHistory, setShowHistory] = useState(false);
   const [historyParams, setHistoryParams] = useState<IHistoryPageProps<T>>();
-  const [currentTabID, setCurrentTabID] = useState(0);
   const [openFullScreen, setOpenFullScreen] = useState(open);
-  // state handler for when the history / current properties tab is selected
-  const handleSwitchTab = (newValue: number): void => {
-    setCurrentTabID(newValue);
-  };
 
   // set the history query status
   useDidMountEffect(() => {
@@ -125,7 +120,6 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   // if the error state changes, update the save status
   useEffect(() => {
     setCanSave(!hasErr);
-    console.log('EditModal hasErr changed to ' + hasErr);
   }, [hasErr]);
 
   useDidMountEffect(() => {

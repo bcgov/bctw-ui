@@ -28,6 +28,8 @@ export default function DefaultLayout({ children }: IDefaultLayoutProps): JSX.El
 
   // set user state when user context changes
   useEffect(() => {
+    //TODO temp eslint 'no-unused-vars' fix, does this component still need to handle alerts?
+    showAlerts;
     const { error } = useUser;
     if (error) {
       setUserErr(error);

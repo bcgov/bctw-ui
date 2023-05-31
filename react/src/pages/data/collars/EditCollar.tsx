@@ -26,7 +26,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   const [isActive, setIsActive] = useState(false);
   const [hasDropoff, setHasDropoff] = useState(false);
   const [showWorkflowForm, setShowWorkflowForm] = useState(false);
-  const [event, updateEvent] = useState(new MalfunctionEvent());
+  const [event, updateEvent] = useState<MalfunctionEvent | RetrievalEvent>(new MalfunctionEvent());
 
   const createEvent = (type: WorkflowType): MalfunctionEvent | RetrievalEvent => {
     if (type === 'retrieval') {
@@ -56,7 +56,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
     if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved_ind) {
       // console.log('im supposed to show the retrieval form', e);
       const retrievalWF = editObjectToEvent(e, new RetrievalEvent(), ['event_type']);
-      await updateEvent(retrievalWF as any); // fixme:
+      await updateEvent(retrievalWF); // fixme:
       await setShowWorkflowForm((o) => !o);
     }
   };
@@ -198,7 +198,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                   </FormSection>
                   <WorkflowWrapper
                     open={showWorkflowForm}
-                    event={event}
+                    event={event as any}
                     handleClose={(): void => setShowWorkflowForm(false)}
                     onEventSaved={handleWorkflowSaved}
                   />

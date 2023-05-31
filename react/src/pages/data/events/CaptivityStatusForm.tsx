@@ -1,6 +1,5 @@
 import { Box } from '@mui/material';
 import { BCTWWorkflow, IBCTWWorkflow, WorkflowFormProps } from 'types/events/event';
-import MortalityEvent from 'types/events/mortality_event';
 import { boxSpreadRowProps } from './EventComponents';
 
 type CaptivityStatusFormProps<T extends IBCTWWorkflow> = WorkflowFormProps<T> & {

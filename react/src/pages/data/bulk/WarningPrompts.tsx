@@ -1,4 +1,4 @@
-import { Box, Checkbox, Tooltip, Typography } from '@mui/material';
+import { Box, Checkbox, Tooltip } from '@mui/material';
 import { WarningInfo } from 'api/api_interfaces';
 import { Icon } from 'components/common';
 
