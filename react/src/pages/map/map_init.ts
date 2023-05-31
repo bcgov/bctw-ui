@@ -92,15 +92,15 @@ const getWMU = (): L.TileLayer.WMS => {
   });
 };
 
-// TRIM contour lines
-const getTCL = (): L.TileLayer.WMS => {
-  return L.tileLayer.wms(bcgw_url, {
-    layers: 'WHSE_BASEMAPPING.TRIM_CONTOUR_LINES',
-    format: 'image/png',
-    transparent: true,
-    opacity: 0.6
-  });
-};
+// // TRIM contour lines
+// const getTCL = (): L.TileLayer.WMS => {
+//   return L.tileLayer.wms(bcgw_url, {
+//     layers: 'WHSE_BASEMAPPING.TRIM_CONTOUR_LINES',
+//     format: 'image/png',
+//     transparent: true,
+//     opacity: 0.6
+//   });
+// };
 
 // ungulate winter ranges
 const getUWR = (): L.TileLayer.WMS => {
@@ -157,7 +157,6 @@ const initMap = (
     container['_leaflet_id'] = null;
   }
   mapRef.current = L.map(DIV_ID, { zoomControl: true }).setView([55, -128], 6);
-  console.log('initMap: ' + DIV_ID);
   const layerPicker = L.control.layers(null, null, { position: 'topleft' });
   L.drawLocal.draw.toolbar.buttons.polyline = MapStrings.drawLineLabel;
   L.drawLocal.draw.toolbar.buttons.polygon = MapStrings.drawPolygonLabel;
@@ -218,17 +217,17 @@ const initMap = (
   // Set up the drawing events
   mapRef.current
     .on('draw:created', (e) => {
-      drawnItems.addLayer((e as any).layer);
-      if ((e as any).layerType === 'polyline') {
+      drawnItems.addLayer(e.layer);
+      if (e.layer.layerType === 'polyline') {
         const line = drawLabel(e);
         handleDrawLine(line);
         return line;
       }
       drawSelectedLayer();
     })
-    .on('draw:deleted', (data: any) => {
+    .on('draw:deleted', (data) => {
       //Leaflet Draw does not appear to have proper typing for this event type. Annoying!
-      handleDeleteLayer?.(data.layers);
+      handleDeleteLayer?.(data.layer);
     })
     .on('draw:edited', (e) => {
       drawSelectedLayer();

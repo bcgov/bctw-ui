@@ -1,6 +1,7 @@
 import React, { createContext, useReducer, useContext } from 'react';
 import { MAP_COLOURS, MAP_COLOURS_OUTLINE, getFillColorByStatus, parseAnimalColour } from './map_helpers';
 import { createLatestPingIcon } from './point_setup';
+import { ITelemetryPoint } from 'types/map';
 
 type MarkerColor = {
   fillColor: string;
@@ -152,47 +153,53 @@ export const useMarkerStates = (): [MarkerState, React.Dispatch<MarkerAction>] =
  *
  * @returns {Marker[]} An array of markers.
  */
+type CustomLayer = L.GeoJSON & {
+  feature: ITelemetryPoint;
+};
 export const createMarkersStates = (tracks: L.GeoJSON, pings: L.GeoJSON, latestPings: L.GeoJSON): Marker[] => {
   const markerData: Marker[] = [];
-  tracks.eachLayer((track: any) => {
-    const color = { ...parseAnimalColour(track.feature.properties.map_colour), opacity: 0.9 };
+  tracks.eachLayer((track) => {
+    const castedTrack = track as CustomLayer;
+    const color = { ...parseAnimalColour(castedTrack.feature.properties.map_colour), opacity: 0.9 };
     markerData.push({
-      id: track.feature.properties.critter_id,
-      critter_id: track.feature.properties.critter_id,
+      id: castedTrack.feature.properties.critter_id,
+      critter_id: castedTrack.feature.properties.critter_id,
       type: 'Polyline',
       baseColor: color,
       currentColor: color,
-      markerRef: track
+      markerRef: track as unknown as L.Marker
     });
   });
-  pings.eachLayer((ping: any) => {
+  pings.eachLayer((ping) => {
+    const castedPing = ping as CustomLayer;
     const color = {
-      fillColor: getFillColorByStatus(ping.feature),
-      color: parseAnimalColour(ping.feature.properties.map_colour).color,
+      fillColor: getFillColorByStatus(castedPing.feature),
+      color: parseAnimalColour(castedPing.feature.properties.map_colour).color,
       opacity: 0.9
     };
     markerData.push({
-      id: ping.feature.id,
-      critter_id: ping.feature.properties.critter_id,
+      id: castedPing.feature.id,
+      critter_id: castedPing.feature.properties.critter_id,
       type: 'CircleMarker',
       baseColor: color,
       currentColor: color,
-      markerRef: ping
+      markerRef: ping as unknown as L.Marker
     });
   });
-  latestPings.eachLayer((ping: any) => {
+  latestPings.eachLayer((ping) => {
+    const castedPing = ping as CustomLayer;
     const color = {
-      fillColor: getFillColorByStatus(ping.feature),
-      color: parseAnimalColour(ping.feature.properties.map_colour).color,
+      fillColor: getFillColorByStatus(castedPing.feature),
+      color: parseAnimalColour(castedPing.feature.properties.map_colour).color,
       opacity: 0.9
     };
     markerData.push({
-      id: ping.feature.id,
-      critter_id: ping.feature.properties.critter_id,
+      id: castedPing.feature.id,
+      critter_id: castedPing.feature.properties.critter_id,
       type: 'Divicon',
       baseColor: color,
       currentColor: color,
-      markerRef: ping
+      markerRef: ping as unknown as L.Marker
     });
   });
 

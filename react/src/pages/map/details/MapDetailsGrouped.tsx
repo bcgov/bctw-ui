@@ -87,7 +87,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
                 ...uniqueCategoryNames, // Insert unique category names after the Taxon header
                 ...rows_to_render.slice(2), // Display the remaining headers after the unique category names
                 `Point Count (${totalPointCount()})`
-              ] as any
+              ] as unknown as (keyof TelemetryDetail)[]
             }
             headerData={pings[0].features[0].properties}
             numSelected={selectedCritters.length}

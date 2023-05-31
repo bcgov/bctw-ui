@@ -1,4 +1,3 @@
-import { MapStrings } from 'constants/strings';
 import { TelemetryDetail } from 'types/map';
 import { StartDateKey } from 'utils/time';
 
@@ -22,7 +21,7 @@ const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: st
   { header: 'taxon' },
   { header: 'critter_status' },
   { header: 'device_status' },
-  { header: 'sex' },
+  { header: 'sex' }
 ];
 
 const SEARCH_PRESETS: SearchPresets = {

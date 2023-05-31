@@ -8,6 +8,7 @@ import './MapPage.scss';
 import { mdiDragHorizontalVariant } from '@mdi/js';
 import Icon from '@mdi/react';
 import { CircularProgress, Paper } from '@mui/material';
+import { Feature, MultiPoint } from '@turf/helpers';
 import pointsWithinPolygon from '@turf/points-within-polygon';
 import dayjs from 'dayjs';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -39,7 +40,6 @@ import { ITelemetryDetail, ITelemetryLine, ITelemetryPoint, MapRange, OnlySelect
 import { eUDFType } from 'types/udf';
 import { formatDay, getToday } from 'utils/time';
 import { MarkerProvider, createMarkersStates, updateLayers, useMarkerStates } from './MapMarkerContext';
-
 export default function MapPage(): JSX.Element {
   return (
     <MarkerProvider>
@@ -115,14 +115,9 @@ export function Map(): JSX.Element {
 
   // fetch the map data
   const { start, end } = range;
-  const {
-    isFetching: fetchingPings,
-    isLoading: isLoadingPings,
-    isError: isErrorPings,
-    data: baseFetchedPings
-  } = api.usePings(start, end);
+  const { isLoading: isLoadingPings, isError: isErrorPings, data: baseFetchedPings } = api.usePings(start, end);
 
-  const { isFetching: fetchingTracks, isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
+  const { isError: isErrorTracks, data: fetchedTracks } = api.useTracks(start, end);
 
   // Update the fetchedPings using helper function to instantiate TelemetryDetail classes
   useEffect(() => {
@@ -168,8 +163,8 @@ export function Map(): JSX.Element {
           }
         } else if (!filters.length) {
           const { latest, other } = splitPings(fetchedPings);
-          pingsLayer.addData(other as any);
-          latestPingsLayer.addData(latest as any);
+          pingsLayer.addData(other as unknown as GeoJSON.GeoJsonObject);
+          latestPingsLayer.addData(latest as unknown as GeoJSON.GeoJsonObject);
         }
       }
     };
@@ -189,7 +184,7 @@ export function Map(): JSX.Element {
       if (filters.length) {
         applyFiltersToTracks(pings);
       } else {
-        tracksLayer.addData(fetchedTracks as any);
+        tracksLayer.addData(fetchedTracks as unknown as GeoJSON.GeoJsonObject);
       }
     }
     const markerData = createMarkersStates(tracksLayer, pingsLayer, latestPingsLayer);
@@ -258,18 +253,23 @@ export function Map(): JSX.Element {
     markerDispatch({ type: 'SELECT_CRITTERS', ids: [] });
   };
 
+  type IPointsWithinPolygon = Parameters<typeof pointsWithinPolygon>;
   // handles the drawing and deletion of shapes, setup in map_init
   // todo: does not handle unassigned layers yet
   const handleDrawShape = (): void => {
     hidePopup();
     const clipper = drawnItems.toGeoJSON();
-
     const pings = pingsLayer.toGeoJSON();
-    const overlay = pointsWithinPolygon(pings as any, clipper as any);
+
+    const overlay = pointsWithinPolygon(pings as IPointsWithinPolygon[0], clipper as IPointsWithinPolygon[1]);
+
     const ids = [...(overlay.features.map((f) => f.id) as number[])];
 
     const latestPings = latestPingsLayer.toGeoJSON();
-    const overlayLatest = pointsWithinPolygon(latestPings as any, clipper as any);
+    const overlayLatest = pointsWithinPolygon(
+      latestPings as IPointsWithinPolygon[0],
+      clipper as IPointsWithinPolygon[1]
+    );
     const latestIds = [...(overlayLatest.features.map((f) => f.id) as number[])];
 
     // highlight these rows in bottom panel
@@ -277,8 +277,14 @@ export function Map(): JSX.Element {
     markerDispatch({
       type: 'SELECT_CRITTERS',
       ids: [
-        ...overlay.features.map((f) => f.properties.critter_id),
-        ...overlayLatest.features.map((f) => f.properties.critter_id)
+        ...overlay.features.map((f) => {
+          const cast = f as Feature<MultiPoint & { properties: { critter_id: string } }>;
+          return cast.properties.critter_id;
+        }),
+        ...overlayLatest.features.map((f) => {
+          const cast = f as Feature<MultiPoint & { properties: { critter_id: string } }>;
+          return cast.properties.critter_id;
+        })
       ]
     });
   };
@@ -320,9 +326,9 @@ export function Map(): JSX.Element {
   const redrawLayers = (newPings = fetchedPings, newTracks = fetchedTracks): void => {
     clearLayers();
     const { latest, other } = splitPings(newPings);
-    latestPingsLayer.addData(latest as any);
-    pingsLayer.addData(other as any);
-    tracksLayer.addData(newTracks as any);
+    latestPingsLayer.addData(latest as unknown as GeoJSON.GeoJsonObject);
+    pingsLayer.addData(other as unknown as GeoJSON.GeoJsonObject);
+    tracksLayer.addData(newTracks as unknown as GeoJSON.GeoJsonObject);
     const markerData = createMarkersStates(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   };
@@ -335,8 +341,8 @@ export function Map(): JSX.Element {
     layerPicker.removeLayer(latestPingsLayer);
     pingsLayer.clearLayers();
     latestPingsLayer.clearLayers();
-    pingsLayer.addData(other as any);
-    latestPingsLayer.addData(latest as any);
+    pingsLayer.addData(other as unknown as GeoJSON.GeoJsonObject);
+    latestPingsLayer.addData(latest as unknown as GeoJSON.GeoJsonObject);
     const markerData = createMarkersStates(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   };
@@ -346,7 +352,7 @@ export function Map(): JSX.Element {
     const layerPicker = L.control.layers();
     layerPicker.removeLayer(tracksLayer);
     tracksLayer.clearLayers();
-    tracksLayer.addData(newTracks as any);
+    tracksLayer.addData(newTracks as unknown as GeoJSON.GeoJsonObject);
     const markerData = createMarkersStates(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
   };
@@ -406,7 +412,6 @@ export function Map(): JSX.Element {
     setOverviewType(type);
     setSelectedDetail(row);
     setShowModal((o) => !o);
-    console.log(type, row);
   };
 
   /**
