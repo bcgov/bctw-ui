@@ -9,7 +9,7 @@ import { BCTWBase } from 'types/common_types';
 import './table.scss';
 
 type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' | 'onSelect' | 'onSelectMultiple'> & {
-  row: { [key in keyof T]: any };
+  row: T;
   index: number;
   selected: boolean;
   rowIdentifier: string;
