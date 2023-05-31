@@ -13,8 +13,6 @@ import { BCTWFormat } from 'types/common_types';
 import { CbRouteStatusHandler, FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';
 import SelectCode from './SelectCode';
-import { QueryStatus } from 'react-query';
-import { ICbRouteKey } from 'critterbase/types';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -39,7 +37,7 @@ export type CreateInputProps = CreateInputBaseProps &
 
 // text and number field handler
 function CreateEditTextField(props: CreateInputProps): ReactElement {
-  const { prop, type, value, errorMessage, handleChange, validate, style } = props;
+  const { prop, type, value, errorMessage, handleChange, validate } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
   const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName', 'handleRoute']);
   return type === eInputType.number ? (

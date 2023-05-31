@@ -27,7 +27,7 @@ export const inputPropsToRemove = [
 ];
 
 export default function TextField(props: TextInputProps): JSX.Element {
-  const { changeHandler, propName, defaultValue, style, required, validate, comment } = props;
+  const { changeHandler, propName, defaultValue, required, validate, comment } = props;
   const [val, setVal] = useState(defaultValue ?? '');
   const [err, setErr] = useState('');
   const empty = '';

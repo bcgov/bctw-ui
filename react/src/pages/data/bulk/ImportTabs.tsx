@@ -317,8 +317,8 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
                   label='Assign data to'
                   values={users ? users.map((u) => u.nameID) : [user?.nameID]}
                   handleChange={(n: string): void => {
-                    const [name, id] = n.split(' - ');
-                    setImportUserID(parseInt(id));
+                    const nameID = n.split(' - ');
+                    setImportUserID(parseInt(nameID[1]));
                   }}
                 />
               ) : null}

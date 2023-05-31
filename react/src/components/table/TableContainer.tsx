@@ -1,4 +1,4 @@
-import { TableContainer as MUITableContainer, Paper, Theme, useTheme } from '@mui/material';
+import { TableContainer as MUITableContainer, Paper, Theme } from '@mui/material';
 import { SxProps } from '@mui/system';
 
 type TableContainerProps = {

@@ -1,4 +1,3 @@
-import React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Container from '@mui/material/Container';
 import Dialog from '@mui/material/Dialog';
@@ -6,12 +5,12 @@ import Fade from '@mui/material/Fade';
 import Toolbar from '@mui/material/Toolbar';
 import { TransitionProps } from '@mui/material/transitions';
 import { ModalProps } from 'components/component_interfaces';
+import React from 'react';
 import './modal.scss';
 
 import makeStyles from '@mui/styles/makeStyles';
 import { Button, Icon } from 'components/common';
 import { urls } from 'constants/external_urls';
-import { Box } from '@mui/material';
 
 const useStyles = makeStyles(() => ({
   appBar: {

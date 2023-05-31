@@ -2,7 +2,6 @@ import { Box, CircularProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
-import modalStyles from 'components/modal/modal_styles';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import * as L from 'leaflet'; // must be imported first
@@ -66,7 +65,6 @@ export default function MapModal({
 
   const {
     isFetching: fetchingPings,
-    isLoading: isLoadingPings,
     isError: isErrorPings,
     data: fetchedPings
   } = api.usePingsPerCritter(startDate.format(formatDay), endDate.format(formatDay), critter_id, open);
@@ -156,8 +154,8 @@ export default function MapModal({
         const crittersPings = fetchedPings;
         const { latest, other } = splitPings(crittersPings);
         setLatestPings(latest);
-        pingsLayer.addData(other as any);
-        latestPingsLayer.addData(latest as any);
+        pingsLayer.addData(other as unknown as GeoJSON.GeoJsonObject);
+        latestPingsLayer.addData(latest as unknown as GeoJSON.GeoJsonObject);
 
         flyToLatestPings(latest);
 
@@ -173,13 +171,12 @@ export default function MapModal({
       tracksLayer.clearLayers();
       setupTracksOptions(tracksLayer);
       const crittersTracks = fetchedTracks;
-      tracksLayer.addData(crittersTracks as any);
+      tracksLayer.addData(crittersTracks as unknown as GeoJSON.GeoJsonObject);
       latestPingsLayer.bringToFront();
       tracksLayer.bringToBack();
     }
   }, [fetchedTracks, mapWasLoaded]);
 
-  const classes = modalStyles();
   return (
     <Modal
       open={open}

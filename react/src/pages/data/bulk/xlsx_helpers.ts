@@ -1,4 +1,4 @@
-import { WarningInfo, ParsedXLSXSheetResult, CheckedWarningInfo } from 'api/api_interfaces';
+import { ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
 import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
@@ -12,21 +12,6 @@ const computeXLSXCol = (idx: number): string => {
   str = str.concat(String.fromCharCode(65 + (idx - a * 26)));
 
   return str;
-};
-
-const collectErrorsFromResultsOld = (results: ParsedXLSXSheetResult): string[] => {
-  const errArr = [];
-  results.rows.forEach((r, idx) => {
-    errArr.push(
-      ...Object.keys(r.errors).map((e) => {
-        const headerIdx = results.headers.indexOf(e);
-        return e === 'identifier' || e === 'missing_data'
-          ? `Row ${idx + 2}: ${r.errors[e].desc}`
-          : `At cell ${computeXLSXCol(headerIdx)}${idx + 2} in column "${columnToHeader(e)}": ${r.errors[e].desc}`;
-      })
-    );
-  });
-  return errArr;
 };
 
 interface FormattedErrorEntry {

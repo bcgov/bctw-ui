@@ -100,8 +100,8 @@ export default function SimpleMap({
         const crittersPings = fetchedPings;
         const { latest, other } = splitPings(crittersPings);
         setLatestPings(latest);
-        pingsLayer.addData(other as any);
-        latestPingsLayer.addData(latest as any);
+        pingsLayer.addData(other as unknown as GeoJSON.GeoJsonObject);
+        latestPingsLayer.addData(latest as unknown as GeoJSON.GeoJsonObject);
 
         flyToLatestPings(latest);
 
@@ -118,7 +118,7 @@ export default function SimpleMap({
       tracksLayer.clearLayers();
       setupTracksOptions(tracksLayer);
       const crittersTracks = fetchedTracks;
-      tracksLayer.addData(crittersTracks as any);
+      tracksLayer.addData(crittersTracks as unknown as GeoJSON.GeoJsonObject);
       latestPingsLayer.bringToFront();
       tracksLayer.bringToBack();
     }

@@ -35,7 +35,6 @@ export default function MortalityEventForm({
     !!event.ultimate_predated_by_taxon_id || event.ultimate_cause_of_death?.cod_category === 'Predation'
   );
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
-  const [isUCODKnown, setIsUCODKnown] = useState(false);
   // setting critter_status to alive disables the form.
   const [critterIsAlive, setCritterIsAlive] = useState(false);
 
@@ -80,8 +79,6 @@ export default function MortalityEventForm({
     } else if (key === 'shouldUnattachDevice') {
       // make attachment end state required if user is removing device
       setIsBeingUnattached(!!value);
-    } else if (key === 'isUCODtaxonKnown') {
-      setIsUCODKnown(!!value);
     } //else if (key === 'critter_status') {
     //   if (value === 'Mortality' || value === 'Alive') {
     //     setCritterIsAlive(value === 'Alive');

@@ -1,9 +1,9 @@
-import { Box, Button, Dialog, Grid, IconButton } from '@mui/material';
+import { Button, Dialog, Grid, IconButton } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
-import modalStyles from 'components/modal/modal_styles';
-import { ModalProps } from 'components/component_interfaces';
 import { Icon } from 'components/common';
+import { ModalProps } from 'components/component_interfaces';
+import modalStyles from 'components/modal/modal_styles';
 import { removeProps } from 'utils/common_helpers';
 
 export default function Modal(props: ModalProps): JSX.Element {
