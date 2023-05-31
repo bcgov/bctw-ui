@@ -1,5 +1,7 @@
 import { UseQueryResult } from 'react-query';
 import { AxiosError } from 'axios';
+import { IOnboardUser } from 'types/onboarding';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 type Order = 'asc' | 'desc';
 
@@ -20,8 +22,10 @@ interface ITableSortProp<T> {
 interface ITableQueryProps<T> {
   defaultSort?: ITableSortProp<T>;
   param?: unknown;
-  //query: ReturnType<typeof useTelemetryApi>[keyof ReturnType<typeof useTelemetryApi>];
-  query: any;
+  // query: ReturnType<typeof useTelemetryApi>[keyof ReturnType<typeof useTelemetryApi>];
+  //TODO is this possible to fully type??
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: (...args: unknown[]) => any;
   onNewData?: (data: T[]) => void;
 }
 

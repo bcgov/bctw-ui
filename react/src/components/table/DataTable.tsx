@@ -12,6 +12,7 @@ import { UseQueryResult } from 'react-query';
 import { BCTWBase } from 'types/common_types';
 import DataTableRow from './DataTableRow';
 import './table.scss';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 const useStyles = makeStyles((theme) => ({
   bottomOfTableBody: {
@@ -69,6 +70,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     param
     //filter
   );
+
   const noPagination = !requestDataByPage && !paginationFooter;
   const noData = isSuccess && !data?.length;
 
