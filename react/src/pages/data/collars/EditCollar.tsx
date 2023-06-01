@@ -7,7 +7,7 @@ import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { AttachedCollar, Collar, collarFormFields } from 'types/collar';
-import { IWorkflow, SuperWorkflow, WorkflowType, editObjectToEvent } from 'types/events/event';
+import { SuperWorkflow, WorkflowType, editObjectToEvent } from 'types/events/event';
 import { wfFields } from 'types/events/form_fields';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import RetrievalEvent from 'types/events/retrieval_event';

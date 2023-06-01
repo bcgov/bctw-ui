@@ -8,7 +8,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ReactNode, useEffect, useState } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
-import { IWorkflow, SuperWorkflow, WorkflowType } from 'types/events/event';
+import { SuperWorkflow, WorkflowType } from 'types/events/event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEvent from 'types/events/retrieval_event';

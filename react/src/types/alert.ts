@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { Critter, eCritterStatus } from 'types/animal';
 import { Collar, IAttachedCollar } from 'types/collar';
-import { BCTWBase, BCTWValidDates, BaseTimestamps, nullToDayjs, uuid } from 'types/common_types';
+import { BCTWValidDates, BaseTimestamps, nullToDayjs, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { formatDay } from 'utils/time';
 

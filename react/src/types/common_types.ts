@@ -4,7 +4,6 @@ import { formatTime } from 'utils/time';
 import { Critter, ICollectionUnit } from './animal';
 import { UserCritterAccess } from './animal_access';
 import { TelemetryDetail } from './map';
-import { SuperWorkflow } from './events/event';
 
 export interface BCTWValidDates {
   valid_from: Date | Dayjs;

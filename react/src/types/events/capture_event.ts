@@ -1,11 +1,8 @@
 import { WorkflowStrings } from 'constants/strings';
 import { Dayjs } from 'dayjs';
 import { Critter, ICapture } from 'types/animal';
-import { Code } from 'types/code';
-import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
-import { IDataLifeStartProps } from 'types/data_life';
-import { CbPayload, IWorkflow, OptionalAnimal, SuperWorkflow, WorkflowType, eventToJSON } from 'types/events/event';
+import { CbPayload, IWorkflow, SuperWorkflow } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
@@ -108,30 +105,30 @@ type CaptureAnimalEventProps = Pick<
   // | 'captivity_status_ind'
 >;
 
-type ReleaseAnimalProps = Pick<
-  Critter,
-  // | 'ear_tag_left_id'
-  // | 'ear_tag_right_id'
-  // | 'ear_tag_left_colour'
-  // | 'ear_tag_right_colour'
-  // | 'juvenile_at_heel'
-  // | 'juvenile_at_heel_count'
-  // | 'animal_colouration'
-  // | 'life_stage'
-  //TODO CRITTERBASE INTEGRATION temp fix
-  'critter_id'
->;
+// type ReleaseAnimalProps = Pick<
+//   Critter,
+//   // | 'ear_tag_left_id'
+//   // | 'ear_tag_right_id'
+//   // | 'ear_tag_left_colour'
+//   // | 'ear_tag_right_colour'
+//   // | 'juvenile_at_heel'
+//   // | 'juvenile_at_heel_count'
+//   // | 'animal_colouration'
+//   // | 'life_stage'
+//   //TODO CRITTERBASE INTEGRATION temp fix
+//   'critter_id'
+// >;
 
-type CaptureReleaseProps = {
-  // workflow should proceed to release workflow
-  wasReleased: boolean;
-  // workflow should proceed to mortality workflow
-  didDieDuringCapture: boolean;
-  didDieDuringTransloc: boolean;
-  // indicates the animal was released after successful translocation
-  // workflow should proceed to release
-  isTranslocationComplete: boolean;
-};
+// type CaptureReleaseProps = {
+//   // workflow should proceed to release workflow
+//   wasReleased: boolean;
+//   // workflow should proceed to mortality workflow
+//   didDieDuringCapture: boolean;
+//   didDieDuringTransloc: boolean;
+//   // indicates the animal was released after successful translocation
+//   // workflow should proceed to release
+//   isTranslocationComplete: boolean;
+// };
 
 export type CaptureFormField2 = {
   [Property in keyof CaptureEvent2]+?: FormFieldObject<CaptureEvent2>;

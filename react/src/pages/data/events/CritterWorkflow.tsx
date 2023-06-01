@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { AttachedCritter, Critter } from 'types/animal';
 import { IWorkflow, WorkflowType } from 'types/events/event';
 // import ReleaseEvent from 'types/events/release_event';
-import { CaptureEvent2 } from 'types/events/capture_event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import { createEvent } from './EventComponents';
 
