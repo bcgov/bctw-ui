@@ -8,7 +8,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ReactNode, useEffect, useState } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
-import { BCTWWorkflow, IBCTWWorkflow, WorkflowType } from 'types/events/event';
+import { BCTWWorkflow, BCTW_Event, IBCTWWorkflow, WorkflowType } from 'types/events/event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEvent from 'types/events/retrieval_event';
@@ -20,10 +20,10 @@ import MalfunctionEventForm from './MalfunctionEventForm';
 import MortalityEventForm from './MortalityEventForm';
 import RetrievalEventForm from './RetrievalEventForm';
 
-type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
+type WorkflowWrapperProps<T extends BCTW_Event<T>> = ModalBaseProps & {
   event: T;
-  onEventSaved?: (e: BCTWWorkflow<T>) => void; // to notify alert that event was saved
-  onEventChain?: (e: BCTWWorkflow<T>, wft: WorkflowType) => void;
+  onEventSaved?: (e: T) => void; // to notify alert that event was saved
+  onEventChain?: (e: T, wft: WorkflowType) => void;
 };
 
 /**
@@ -31,7 +31,7 @@ type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
  * modal open state
  * saving
  */
-export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
+export default function WorkflowWrapper<T extends BCTW_Event<T>>({
   event,
   onEventChain,
   onEventSaved,

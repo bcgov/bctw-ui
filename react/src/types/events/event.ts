@@ -28,6 +28,12 @@ export type WorkflowFormProps<T extends IBCTWWorkflow> = {
 export type OptionalAnimal = { [Property in keyof Critter]+?: Critter[Property] };
 export type OptionalDevice = { [Property in keyof ICollar]+?: ICollar[Property] };
 
+export interface BCTW_Event<T> extends BCTWFormat<T> {
+  readonly event_type: WorkflowType;
+  fields?: CaptureFormField2 | MortalityFormField | ReleaseFormField | RetrievalFormField;
+  getWorkflowTitle(): string;
+}
+
 //
 
 /**
