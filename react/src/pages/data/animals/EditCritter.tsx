@@ -44,6 +44,8 @@ export default function EditCritter(
 
   const critterbaseSave = async (payload) => {
     const { body } = payload;
+    console.log(`Here is editingObj: ${JSON.stringify(editing, null, 2)}`)
+    console.log('Received this body: ' + JSON.stringify(body, null, 2));
     const new_critter = {
       critter_id: body.critter_id,
       animal_id: body.animal_id,
@@ -62,7 +64,8 @@ export default function EditCritter(
       critters: [],
       captures: [],
       mortalities: [],
-      markings: []
+      markings: [],
+      collections: []
     };
     if (hasChangedProperties(old_critter, new_critter)) {
       finalPayload.critters.push(new_critter);
@@ -118,12 +121,19 @@ export default function EditCritter(
         }
         finalPayload.markings.push(m);
       }
-      /*finalPayload.markings = body.marking.map(m => {
-          m.critter_id = body.critter_id;
-          return omitNull(m)
-        });*/
     }
 
+    if(body.collection_units) {
+        for(const c of body.collection_units) {
+          if(old_critter.taxon_id !== new_critter.taxon_id && c.critter_collection_unit_id) {
+            c._delete = true;
+          }
+          c.critter_id = new_critter.critter_id;
+        }
+        finalPayload.collections = body.collection_units;
+    }
+    
+    console.log(`Here is the final payload ${JSON.stringify(finalPayload, null, 2)}`)
     const r = await onSave(finalPayload);
     return r;
   };
@@ -194,6 +204,7 @@ export default function EditCritter(
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: InboundObj): void => {
+            console.log(`ChangeContext inbound obj: ${JSON.stringify(v, null, 2)}`)
             const [key, value] = parseFormChangeResult<AttachedCritter>(v);
             if (key === 'taxon_id') {
               setTaxonId(value as string);

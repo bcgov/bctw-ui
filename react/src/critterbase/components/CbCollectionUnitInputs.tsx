@@ -2,8 +2,9 @@ import { ICbSelect } from 'critterbase/types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ICollectionUnit } from 'types/animal';
 import { uuid } from 'types/common_types';
-import { FormChangeEvent } from 'types/form_types';
+import { FormChangeEvent, InboundObj, parseFormChangeResult } from 'types/form_types';
 import { CbSelect } from './CbSelect';
+import { useEffect, useState } from 'react';
 
 type CbCollectionUnitInputsProps = {
   taxon_id: uuid;
@@ -17,6 +18,29 @@ export const CbCollectionUnitInputs = ({
 }: CbCollectionUnitInputsProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isSuccess } = cbApi.useCritterbaseSelectOptions('taxon_collection_categories', `taxon_id=${taxon_id}`);
+  const [internalLookup, setInternalLookup] = useState<Partial<ICollectionUnit>[]>(collection_units ?? []);
+
+  useEffect(() => {
+    setInternalLookup(collection_units ?? []);
+  }, [collection_units])
+
+  const onChange = (v: InboundObj, category_id: string): void => {
+    const [key, value] = parseFormChangeResult(v);
+    if(!value) {
+      return;
+    }
+    const existing = internalLookup.findIndex(a => a.collection_category_id === category_id);
+    if(existing > -1) {
+      internalLookup[existing].collection_unit_id = value as string;
+    }
+    else {
+      internalLookup.push({
+        collection_unit_id: value as string,
+        collection_category_id: category_id
+      })
+    }
+    console.log(`State of internalLookup: ${JSON.stringify(internalLookup, null, 2)}`)
+  }
 
   return (
     <>
@@ -24,9 +48,9 @@ export const CbCollectionUnitInputs = ({
         ? (data as ICbSelect[]).map((s) => (
             <CbSelect
               key={s.id}
-              value={collection_units.find((c) => c.collection_category_id === s.id)?.collection_unit_id ?? ''}
-              prop={s.value}
-              handleChange={handleChange}
+              value={collection_units?.find((c) => c.collection_category_id === s.id)?.collection_unit_id ?? ''}
+              prop={'collection_units'}
+              handleChange={(v) => onChange(v, s.id)}
               cbRouteKey={'collection_units'}
               query={`category_id=${s.id}`}
               label={s.value}
