@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
  * @param alerts Array of TelemetryAlerts, which in most cases are going to either be MortalityAlerts or MalfunctionAlerts
  * @returns
  */
-export const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
+const ViewAllAlerts = ({ alerts }: ViewAllAlertsProps): JSX.Element => {
   const styles = useStyles();
   const SelectOptions = ['Date', 'Device', 'Type'];
   const [sortBy, setSortBy] = useState(SelectOptions[0]);

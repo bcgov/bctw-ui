@@ -1,6 +1,5 @@
 import { AlertProps } from '@mui/material/Alert';
 import { IUpsertPayload } from 'api/api_interfaces';
-import { WorkflowType } from 'types/events/event';
 
 /**
  * all modals and dialogs require these props
@@ -12,6 +11,7 @@ type ModalBaseProps = {
   open: boolean;
   handleClose: (v: boolean) => void;
   title?: string;
+  headercomp?: JSX.Element;
   disableBackdropClick?: boolean;
   useButton?: boolean;
   onEnteredCallback?: () => void;
@@ -50,7 +50,7 @@ type EditorProps<T> = EditModalBaseProps<T> & {
  */
 interface INotificationMessage extends Pick<AlertProps, 'severity'> {
   message: string;
-  callback?: Function;
+  callback?: () => void;
 }
 
 export type { EditorProps, ModalProps, ModalBaseProps, EditModalBaseProps, INotificationMessage };

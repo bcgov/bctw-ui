@@ -6,17 +6,13 @@ const countDecimals = (value: number): number => {
   return value.toString().split('.')[1].length || 0;
 };
 
-// formats lat long nicely
-const formatLatLong = (lat: number, long: number): string => {
-  return `${lat.toFixed(2)}\xb0 ${long.toFixed(2)}\xb0`;
-};
 // Appends ('s) to end of word if multiple n values
-const pluralize = (n: number, word: string) => (n > 1 || n == 0 ? `${word}'s` : word);
+const pluralize = (n: number, word: string): string => (n > 1 || n == 0 ? `${word}'s` : word);
 //Capitalizes the first letter of a word
 const capitalize = (s: string): string => s && s[0].toUpperCase() + s.slice(1);
 
 // formats UTM nicely
-const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
+// const formatUTM = (zone: number, easting: number, northing: number): string => `${zone}/${easting}/${northing}`;
 
 /**
  * given an array of type T, returns unique values of @param prop
@@ -34,36 +30,36 @@ const getUniqueValuesOfT = <T>(arr: T[], prop: keyof T): string[] => {
 };
 
 /**
- * formats a property name as a table header ex. collection_unit -> Population Unit
+ * formats a property name as a table header ex. collection_units -> Population Unit
  * @param prop - property name to format
  */
 const columnToHeader = (prop: string): string => {
   const asArr = prop
+    .replaceAll('_display', '')
     .replaceAll('_', ' ')
+    .replaceAll('wmu', 'Wildlife Management Unit')
     .replaceAll(' id', ' ID')
+    .replaceAll('nr', 'NR')
+    .replaceAll('env', 'ENV')
     .replaceAll('wlh', 'WLH')
     .replaceAll('utm', 'UTM')
+    .replaceAll('cod', 'Cause Of Death')
+    .replaceAll('timestamp', 'Date')
     .split(' ');
   return asArr.map((a) => a.charAt(0).toUpperCase() + a.slice(1)).join(' ');
 };
 
 /**
- * formats a header to a property name ex.Population Unit -> collection_unit
+ * formats a header to a property name ex.Population Unit -> population_unit
  * @param prop - header name to format backwards
  */
-
 const headerToColumn = (prop: string): string => {
-  const asArr = prop
-    //.replaceAll(' ', '_')
-    .replaceAll(' ID', ' id')
-    .replaceAll('WLH', 'wlh')
-    .replaceAll('UTM', 'utm')
-    .split(' ');
-  return asArr
-    .map((a) => a.charAt(0).toLowerCase() + a.slice(1))
-    .join(' ')
-    .replaceAll(' ', '_');
+  return prop
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/\s+/g, '_')
+    .toLowerCase();
 };
+
 /**
  * returns a copy of the provided object with null / undefined / empty string removed
  */
@@ -73,6 +69,19 @@ const omitNull = <T>(obj: T): T => {
     .filter((k) => obj[k] === null || obj[k] === undefined || obj[k] === '' || obj[k] === 'null' || obj[k] === -1)
     .forEach((k) => delete obj[k]);
   return copy;
+};
+
+const hasChangedProperties = <T>(original: Partial<T>, next: Partial<T>): boolean => {
+  for (const k of Object.keys(next)) {
+    if (typeof next[k] === 'object') {
+      if (original[k] && hasChangedProperties(original[k], next[k])) {
+        return true;
+      }
+    } else if (original[k] !== undefined && next[k] !== original[k]) {
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
@@ -136,7 +145,7 @@ const parseArgs = (args: unknown[]): Omit<ITableFilter, 'operator'>[] => {
 };
 /**
  * Converts a class to an array of keys
- * @param keys class converted to its object keys. ie Object.keys(new Animal())
+ * @param keys class converted to its object keys. ie Object.keys(new Critter())
  * @param startsWith items which append the array
  * @param excluded array of items to exclude from final array.
  *
@@ -152,8 +161,6 @@ export {
   countDecimals,
   doNothingAsync,
   doNothing,
-  formatLatLong,
-  formatUTM,
   getProperty,
   getUniqueValuesOfT,
   omitNull,
@@ -162,5 +169,6 @@ export {
   capitalize,
   classToArray,
   headerToColumn,
-  pluralize
+  pluralize,
+  hasChangedProperties
 };

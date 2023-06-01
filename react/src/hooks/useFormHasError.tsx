@@ -1,5 +1,4 @@
-import { isDev } from 'api/api_helpers';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { InboundObj } from 'types/form_types';
 import { removeProps } from 'utils/common_helpers';
 
@@ -10,33 +9,32 @@ import { removeProps } from 'utils/common_helpers';
  * @retursn a function that can reset the error state
  */
 export default function useFormHasError(): [boolean, (r: InboundObj) => void, () => void] {
-  const [errorsExist, setErrorsExist] = useState(false);
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
+  /*useEffect(() => {
     const numErrs = Object.keys(errors).length;
-    if (isDev() && numErrs) {
+    if (isDev()) {
       // eslint-disable-next-line no-console
       console.log(`useFormHasError state updated, ${numErrs} errors ${JSON.stringify(errors)}`);
     }
     setErrorsExist(numErrs > 0);
-  }, [errors]);
+  }, [errors]);*/
 
   const forceReset = (): void => {
     setErrors({});
-  }
+  };
 
   // if v contains the toReset string[], only remove those errors
-  const reset = (v: InboundObj & {toReset?: string[]}): void => {
+  const reset = (v: InboundObj & { toReset?: string[] }): void => {
     if (Object.prototype.hasOwnProperty.call(v, 'toReset')) {
       const { toReset } = v;
       if (Array.isArray(toReset)) {
-        setErrors(errs => removeProps(errs, toReset));
+        setErrors((errs) => removeProps(errs, toReset));
       }
     } else {
       setErrors({});
     }
-  }
+  };
 
   const checkErrors = (v: InboundObj): void => {
     // if v contains a reset key, wipe errors
@@ -49,19 +47,21 @@ export default function useFormHasError(): [boolean, (r: InboundObj) => void, ()
       return;
     }
 
+    //console.log('Inbond object for checkErrors: ' + JSON.stringify(v, null, 2));
+
     // find the non-error key/value
-    const prop = Object.keys(v).filter(k => k !== 'error')[0];
+    const prop = Object.keys(v).filter((k) => k !== 'error')[0];
 
     const hasErr = !!v.error;
     if (hasErr) {
       const newErrs = Object.assign(errors, { [prop]: true });
-      setErrors({...newErrs});
+      setErrors({ ...newErrs });
     } else if (errors[prop] && errors[prop] === true) {
       // need to remove this error
       const newErrs = Object.assign(errors);
       delete newErrs[prop];
-      setErrors({...newErrs});
+      setErrors({ ...newErrs });
     }
-  }
-  return [errorsExist, checkErrors, forceReset];
+  };
+  return [/*errorsExist*/ Object.entries(errors).length > 0, checkErrors, forceReset];
 }

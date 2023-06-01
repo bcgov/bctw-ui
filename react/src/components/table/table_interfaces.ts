@@ -1,7 +1,3 @@
-import { AxiosError } from 'axios';
-import { Dispatch, SetStateAction } from 'react';
-import { UseQueryResult } from 'react-query';
-
 type Order = 'asc' | 'desc';
 
 /**
@@ -14,16 +10,6 @@ interface ITableSortProp<T> {
 }
 
 /**
- * a property name from the useTelemetry hook (@file 'hooks/useTelemetryApi.ts)
- * is passed to a data table
- */
-type ITableQuery<T> = (
-  page: number,
-  param?: unknown,
-  config?: Record<string, unknown>
-) => UseQueryResult<T[], AxiosError>;
-
-/**
  * @param defaultSort
  * @param query - the bctwApi hook
  * @param onNewData handler to call when new data is loaded
@@ -31,8 +17,10 @@ type ITableQuery<T> = (
 interface ITableQueryProps<T> {
   defaultSort?: ITableSortProp<T>;
   param?: unknown;
-  query: any;
-  // query: APIHandler;
+  // query: ReturnType<typeof useTelemetryApi>[keyof ReturnType<typeof useTelemetryApi>];
+  //TODO is this possible to fully type??
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: (...args: unknown[]) => any;
   onNewData?: (data: T[]) => void;
 }
 
@@ -137,12 +125,10 @@ export type {
   HeadCell,
   Order,
   ICustomTableColumn,
-  ITableQuery,
   TableHeadProps,
   PlainTableProps,
   DataTableProps,
   ITableQueryProps,
   ITableSortProp,
-  ITableFilter,
-  FilterOperator
+  ITableFilter
 };

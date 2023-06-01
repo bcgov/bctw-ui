@@ -6,9 +6,9 @@ import {
   MAP_COLOURS_OUTLINE,
   parseAnimalColour
 } from 'pages/map/map_helpers';
-import { DEFAULT_MFV, ITelemetryPoint, MapFormValue } from 'types/map';
+import { ITelemetryPoint } from 'types/map';
 
-export type PointStyle = {
+type PointStyle = {
   fillColor: string;
   color: string;
   opacity: number;
@@ -29,7 +29,10 @@ const selectedPointStyle = (): L.CircleMarkerOptions => {
   };
 };
 
-const animalColoredPointStyle = (ping: ITelemetryPoint, colorHandler?: (p: ITelemetryPoint, s?: boolean) => string): L.CircleMarkerOptions => {
+const animalColoredPointStyle = (
+  ping: ITelemetryPoint,
+  colorHandler?: (p: ITelemetryPoint, s?: boolean) => string
+): L.CircleMarkerOptions => {
   if (!colorHandler) colorHandler = getFillColorByStatus;
   const fillColor = colorHandler(ping);
   const color = getOutlineColor(ping);
@@ -49,9 +52,6 @@ const getStyle = (event: L.LeafletEvent): PointStyle => {
     const [color, fillColor, opacity] = obj.icon.options.attribution.split(' ');
     return { color, fillColor, opacity };
   }
-  // const { color, fillColor, opacity } = obj?.color ? obj : obj.icon.options.attribution.split(' ');
-  // console.log(color, fillColor, opacity);
-  // return { color, fillColor, opacity };
 };
 
 const createLatestPingIcon = (fillColor: string, color = '#000', opacity = defaultPointStyle.opacity): L.DivIcon => {
@@ -100,7 +100,7 @@ const setupLatestPingOptions = (
   closeHandler: L.LeafletEventHandlerFn,
   colorHandler?: (p: ITelemetryPoint, s?: boolean) => string
 ): void => {
-  if(!colorHandler) {
+  if (!colorHandler) {
     colorHandler = getFillColorByStatus;
   }
   pings.options = {
@@ -112,7 +112,7 @@ const setupLatestPingOptions = (
           clickHandler(e);
           e.target.setIcon(latestSelectedPingIcon);
         });
-      } 
+      };
       // make a hidden popup that will help deal with click events
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
@@ -142,7 +142,7 @@ const setupPingOptions = (
       marker.bindPopup('', { className: 'marker-popup' }).openPopup();
       marker.on('popupclose', (e) => {
         closeHandler(e);
-        e.target.setStyle({ ...e.target.prevStyle, fillOpacity: e.target.prevStyle.opacity });
+        e.target.setStyle({ ...e.target.prevStyle, fillOpacity: e.target.prevStyle?.opacity ?? 0.9 });
       });
       marker.on('click', (e) => {
         clickHandler(e);
@@ -153,70 +153,15 @@ const setupPingOptions = (
   };
 };
 
-const highlightLatestPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
-  layer.eachLayer((p: any) => {
-    const feature = p.feature;
-    if (typeof p.setIcon === 'function') {
-      if (selectedIDs.includes(feature.id)) {
-        p.setIcon(latestSelectedPingIcon);
-      } else {
-        p.setIcon(createLatestPingIcon(getFillColorByStatus(feature), getOutlineColor(feature)));
-      }
-    }
-  });
-};
-
-const highlightPings = (layer: L.GeoJSON, selectedIDs: number[]): void => {
-  layer.eachLayer((p: any) => {
-    const feature = p.feature;
-    if (typeof p.setStyle === 'function') {
-      p.setStyle({
-        weight: 1.0,
-        color: getOutlineColor(feature),
-        fillColor: getFillColorByStatus(feature, selectedIDs.includes(feature.id))
-      });
-    }
-  });
-};
-
-const getSymbolizeColours = (mfv: MapFormValue, feature: ITelemetryPoint): { fillColor: string; color: string } => {
-  const { header, values } = mfv;
-  const isDeviceID = header === DEFAULT_MFV.header;
-  const attr = feature.properties[header as string];
-  const fillColor = values.find((val) => val.id === attr)?.colour;
-  const color = isDeviceID ? getOutlineColor(feature) : MAP_COLOURS.outline;
-  return { fillColor, color };
-};
-
-const symbolizePings = (layer: L.GeoJSON, mfv: MapFormValue, includeLatest: boolean, opacity: number): void => {
-  layer.eachLayer((p: any) => {
-    const { color, fillColor } = getSymbolizeColours(mfv, p.feature);
-    if (typeof p.setStyle === 'function' && color && fillColor) {
-      p.setStyle({
-        weight: 1.0,
-        color,
-        fillColor,
-        opacity,
-        fillOpacity: opacity
-      });
-    }
-    if (typeof p.setIcon === 'function') {
-      const { fillColor, color } = getSymbolizeColours(mfv, p.feature);
-      includeLatest
-        ? p.setIcon(createLatestPingIcon(fillColor, color, opacity))
-        : p.setIcon(createLatestPingIcon(getFillColorByStatus(p.feature), getOutlineColor(p.feature), opacity));
-    }
-  });
-};
-
 // tracks setup
 const setupTracksOptions = (tracks: L.GeoJSON): void => {
   tracks.options = {
     style: (feature: ITelemetryPoint) => {
-      const { fillColor } = parseAnimalColour(feature.properties.map_colour)
+      const { fillColor } = parseAnimalColour(feature.properties.map_colour);
       return {
         color: fillColor,
-        weight: 2.0};
+        weight: 2.0
+      };
     }
   };
   tracks.setZIndex(0);
@@ -237,15 +182,10 @@ const setupSelectedPings = (): L.GeoJSONOptions => {
 };
 
 export {
-  highlightPings,
-  highlightLatestPings,
   createLatestPingIcon,
-  defaultPointStyle,
   setupSelectedPings,
   setupLatestPingOptions,
   setupTracksOptions,
   setupPingOptions,
-  symbolizePings,
-  getStyle,
-  selectedPointStyle
+  getStyle
 };

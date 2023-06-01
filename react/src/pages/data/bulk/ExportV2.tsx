@@ -5,6 +5,7 @@ import 'leaflet.markercluster';
 import 'leaflet/dist/leaflet.css';
 import 'pages/map/MapPage.scss';
 
+import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import Box from '@mui/material/Box';
 import makeStyles from '@mui/styles/makeStyles';
 import { InfoBanner } from 'components/alerts/Banner';
@@ -21,11 +22,10 @@ import dayjs from 'dayjs';
 import { FeatureCollection } from 'geojson';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import ManageLayout from 'pages/layouts/ManageLayout';
-import React, { MouseEventHandler, useEffect, useState } from 'react';
-import { AttachedAnimal } from 'types/animal';
+import { useEffect, useState } from 'react';
+import { AttachedCritter } from 'types/animal';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import ExportDownloadModal from './ExportDownloadModal';
-import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 
 export interface DateRange {
   start: dayjs.Dayjs;
@@ -80,7 +80,7 @@ export default function ExportPageV2(): JSX.Element {
   const styles = exportPageStyles();
 
   const operators: QueryBuilderOperator[] = ['Equals', 'Not Equals'];
-  const columns: QueryBuilderColumn[] = ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
+  const columns: QueryBuilderColumn[] = ['taxon', 'collection_units', 'wlh_id', 'animal_id', 'device_id', 'frequency'];
   const TABS: ExportTab[] = ['Quick Export', 'Advanced Export'];
   const [exportType, setExportType] = useState<ExportTab>(TABS[0]);
   const [start, setStart] = useState(dayjs().subtract(3, 'month'));
@@ -105,12 +105,11 @@ export default function ExportPageV2(): JSX.Element {
           arr.push(`POLYGON ((${pointsInPostGISformat}))`);
         }
       });
-      console.log(JSON.stringify(arr));
       setCurrentGeometry(arr);
     }
   };
 
-  const { data: crittersData, isSuccess: critterSuccess } = api.useAssignedCritters(0);
+  const { data: crittersData } = api.useAssignedCrittersHistoric();
 
   const handleChangeDate = (v: InboundObj): void => {
     const [key, value] = parseFormChangeResult(v);
@@ -129,15 +128,16 @@ export default function ExportPageV2(): JSX.Element {
     }
   };
 
-  const handleDataTableSelect = (selected: AttachedAnimal[]): void => {
+  const handleDataTableSelect = (selected: AttachedCritter[]): void => {
     const ids = selected.map((v) => v.collar_id);
     const critters = selected.map((v) => v.critter_id);
     setCollarIDs(ids); //<-- To remove, we probably do not want to do these queries by collar id anymore.
     setCritterIDs(critters);
   };
 
-  const handleRadioChange = (event) => {
-    const newVal = (event.target as HTMLInputElement).value as ExportRangeType;
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // const newVal = (event.target as HTMLInputElement).value as ExportRangeType;
+    const newVal = event.target.value as ExportRangeType;
     if (newVal === exportRangeType) {
       setExportRangeType('date_range');
     } else {
@@ -170,12 +170,12 @@ export default function ExportPageV2(): JSX.Element {
           <RadioGroup row name='export-radio' value={exportRangeType}>
             <FormControlLabel
               value='lifetime'
-              control={<Radio onClick={handleRadioChange} />}
+              control={<Radio onChange={handleRadioChange} />}
               label={ExportStrings.allTelemetryButton}
             />
             <FormControlLabel
               value='last_telemetry'
-              control={<Radio onClick={handleRadioChange} />}
+              control={<Radio onChange={handleRadioChange} />}
               label={ExportStrings.mostRecentTelemetryButton}
             />
           </RadioGroup>
@@ -189,7 +189,7 @@ export default function ExportPageV2(): JSX.Element {
         {datePicker()}
         <Box className={styles.innerSection}>
           <DataTable
-            headers={AttachedAnimal.attachedCritterDisplayProps}
+            headers={AttachedCritter.attachedCritterDisplayProps}
             title={<SubHeader text={ExportStrings.animalTableHeader} size='small' dark />}
             onSelectMultiple={handleDataTableSelect}
             queryProps={{ query: api.useAssignedCritters }}
@@ -249,7 +249,7 @@ export default function ExportPageV2(): JSX.Element {
   };
   return (
     <ManageLayout>
-      <h1>Export My Animal Telemetry</h1>
+      <h1>Export My Critter Telemetry</h1>
       <Box className={styles.section}>
         <InfoBanner text={ExportStrings.infoBannerMesgs} />
       </Box>

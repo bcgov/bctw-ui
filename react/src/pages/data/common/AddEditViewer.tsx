@@ -1,16 +1,15 @@
+import { Box, Button, ButtonProps } from '@mui/material';
 import { IUpsertPayload } from 'api/api_interfaces';
-import { EditorProps } from 'components/component_interfaces';
-import { IEditModalProps } from 'pages/data/common/EditModal';
-import { cloneElement, useState } from 'react';
-import { BCTWBase } from 'types/common_types';
-import { Box, Button, ButtonProps, IconButton } from '@mui/material';
 import { Icon, Tooltip } from 'components/common';
-import { QueryStatus } from 'react-query';
 import { buttonProps } from 'components/component_constants';
-import LoadingButton from '@mui/lab/LoadingButton';
+import { EditorProps } from 'components/component_interfaces';
 import { useAttachmentChanged } from 'contexts/DeviceAttachmentChangedContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
-import { Animal, AttachedAnimal } from 'types/animal';
+import { IEditModalProps } from 'pages/data/common/EditModal';
+import { cloneElement, useState } from 'react';
+import { QueryStatus } from 'react-query';
+import { AttachedCritter, Critter } from 'types/animal';
+import { BCTWBase } from 'types/common_types';
 
 /**
  * handles the show/hide functionality of the childEditComponent
@@ -60,9 +59,9 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
     onDelete,
     onSave,
     addText,
-    editText,
+    //editText,
     deleteText,
-    editTooltip,
+    //editTooltip,
     addTooltip,
     deleteTooltip,
     queryStatus,
@@ -83,7 +82,7 @@ export default function AddEditViewer<T extends BCTWBase<T>>(props: IAddEditProp
    * a device is attached or removed
    */
   useDidMountEffect(() => {
-    if (editing instanceof AttachedAnimal || editing instanceof Animal) {
+    if (editing instanceof AttachedCritter || editing instanceof Critter) {
       inverseModalState();
     }
   }, [deviceAttachmentChange]);

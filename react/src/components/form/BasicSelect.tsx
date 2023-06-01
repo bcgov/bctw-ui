@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 export type SharedSelectProps = SelectProps & {
   defaultValue: string;
-  triggerReset?: any;
+  triggerReset?: number | string | boolean;
 };
 
 type BasicSelectProps = SharedSelectProps & {

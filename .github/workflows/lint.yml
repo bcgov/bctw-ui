@@ -1,0 +1,21 @@
+name: Lint
+
+on: [push]
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./react
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+      - name: Setup Node
+        run: npm install
+      - name: Run ESLint
+        run: npm run lint

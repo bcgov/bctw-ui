@@ -11,13 +11,13 @@ type IToastProps = Pick<AlertProps, 'severity'> & {
 };
 
 export default function Toast({ message, show, action, onClose, severity }: IToastProps): JSX.Element {
-  const onCloseHandler = (event: React.SyntheticEvent<any, Event>, reason: SnackbarCloseReason): void => {
-      if(reason !== 'clickaway') {
-        onClose();
-      }
-      //Disables clickaway functionality^ Added this since clickaway is triggered on download completion, which would dismiss snackbars.
-      //I think this change is fine, since it does not affect autoHide timeout or the X buttons.
-  }
+  const onCloseHandler = (event: unknown, reason: SnackbarCloseReason): void => {
+    if (reason !== 'clickaway') {
+      onClose();
+    }
+    //Disables clickaway functionality^ Added this since clickaway is triggered on download completion, which would dismiss snackbars.
+    //I think this change is fine, since it does not affect autoHide timeout or the X buttons.
+  };
 
   return (
     <>

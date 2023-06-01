@@ -4,13 +4,12 @@ import LabeledMarker from 'leaflet-labeled-circle';
 import React, { MutableRefObject } from 'react';
 import dayjs from 'dayjs';
 import length from '@turf/length';
-import { ITelemetryPoint, TelemetryDetail } from 'types/map';
+import { ITelemetryPoint } from 'types/map';
 import { MAP_COLOURS } from 'pages/map/map_helpers';
 import { MapStrings } from 'constants/strings';
 import { MapTileLayers } from 'constants/strings';
 import { formatLocal } from 'utils/time';
-import { plainToClass } from 'class-transformer';
-import { Point } from 'geojson';
+import { eCritterStatus } from 'types/animal';
 const hidePopup = (): void => {
   const doc = document.getElementById('popup');
   doc.innerHTML = '';
@@ -19,7 +18,7 @@ const hidePopup = (): void => {
 
 const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
   const doc = document.getElementById('popup');
-  const p = plainToClass(TelemetryDetail, feature.properties);
+  const p = feature.properties;
   const { coordinates } = feature.geometry;
   const t = dayjs(p.date_recorded).format(formatLocal);
   const text = `
@@ -31,8 +30,8 @@ const setPopupInnerHTML = (feature: ITelemetryPoint): void => {
     Longitude: ${coordinates[0] + '<br>'}
     Elevation: ${p.elevation + ' meters' + '<br>'}
     Frequency (MHz): ${p.paddedFrequency}<br>
-    ${p.critter_status ? 'Animal Status: ' + '<b>' + p.critter_status + '</b><br>' : ''}
-    ${p.critter_status === 'Mortality' ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
+    ${p.critter_status ? 'Critter Status: ' + '<b>' + p.critter_status + '</b><br>' : ''}
+    ${p.critter_status === eCritterStatus.mortality ? 'Mortality Date: ' + p.mortality_date + '<br>' : ''}
     ${p.sex ? 'Sex: ' + p.sex + '<br>' : ''}
     ${p.device_status ? 'Device Status: ' + '<b>' + p.device_status + '</b><br>' : ''}
     Time: ${dayjs(t).format('MMMM D, YYYY h:mm A')} UTC<br>
@@ -93,15 +92,15 @@ const getWMU = (): L.TileLayer.WMS => {
   });
 };
 
-// TRIM contour lines
-const getTCL = (): L.TileLayer.WMS => {
-  return L.tileLayer.wms(bcgw_url, {
-    layers: 'WHSE_BASEMAPPING.TRIM_CONTOUR_LINES',
-    format: 'image/png',
-    transparent: true,
-    opacity: 0.6
-  });
-};
+// // TRIM contour lines
+// const getTCL = (): L.TileLayer.WMS => {
+//   return L.tileLayer.wms(bcgw_url, {
+//     layers: 'WHSE_BASEMAPPING.TRIM_CONTOUR_LINES',
+//     format: 'image/png',
+//     transparent: true,
+//     opacity: 0.6
+//   });
+// };
 
 // ungulate winter ranges
 const getUWR = (): L.TileLayer.WMS => {
@@ -143,7 +142,7 @@ const addTileLayers = (mapRef: React.MutableRefObject<L.Map>, layerPicker: L.Con
 const initMap = (
   mapRef: MutableRefObject<L.Map>,
   drawnItems: L.FeatureGroup,
-  selectedPings: L.GeoJSON,
+  // selectedPings: L.GeoJSON,
   drawSelectedLayer: () => void,
   handleDrawLine: (l) => void,
   handleDeleteLine: () => void,
@@ -158,7 +157,6 @@ const initMap = (
     container['_leaflet_id'] = null;
   }
   mapRef.current = L.map(DIV_ID, { zoomControl: true }).setView([55, -128], 6);
-  console.log('initMap: ' + DIV_ID);
   const layerPicker = L.control.layers(null, null, { position: 'topleft' });
   L.drawLocal.draw.toolbar.buttons.polyline = MapStrings.drawLineLabel;
   L.drawLocal.draw.toolbar.buttons.polygon = MapStrings.drawPolygonLabel;
@@ -166,7 +164,7 @@ const initMap = (
   addTileLayers(mapRef, layerPicker);
 
   mapRef.current.addLayer(drawnItems);
-  mapRef.current.addLayer(selectedPings);
+  // mapRef.current.addLayer(selectedPings);
 
   const drawOptions = drawToolOptions ?? { marker: false, circle: false, circlemarker: false };
 
@@ -219,17 +217,17 @@ const initMap = (
   // Set up the drawing events
   mapRef.current
     .on('draw:created', (e) => {
-      drawnItems.addLayer((e as any).layer);
-      if ((e as any).layerType === 'polyline') {
+      drawnItems.addLayer(e.layer);
+      if (e.layer.layerType === 'polyline') {
         const line = drawLabel(e);
         handleDrawLine(line);
         return line;
       }
       drawSelectedLayer();
     })
-    .on('draw:deleted', (data: any) => {
+    .on('draw:deleted', (data) => {
       //Leaflet Draw does not appear to have proper typing for this event type. Annoying!
-      handleDeleteLayer?.(data.layers);
+      handleDeleteLayer?.(data.layer);
     })
     .on('draw:edited', (e) => {
       drawSelectedLayer();
@@ -240,4 +238,4 @@ const initMap = (
     });
 };
 
-export { initMap, hidePopup, setPopupInnerHTML, addTileLayers };
+export { initMap, hidePopup, setPopupInnerHTML };

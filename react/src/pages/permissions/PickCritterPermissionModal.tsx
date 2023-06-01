@@ -1,22 +1,21 @@
-import DataTable from 'components/table/DataTable';
-import { Button, Modal } from 'components/common';
-import FullScreenDialog from 'components/modal/DialogFullScreen';
+import { Box, MenuItem, Select } from '@mui/material';
+import { Button } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
+import FullScreenDialog from 'components/modal/DialogFullScreen';
+import DataTable from 'components/table/DataTable';
 import { ITableQueryProps } from 'components/table/table_interfaces';
 import { UserContext } from 'contexts/UserContext';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { manageLayoutStyles } from 'pages/layouts/ManageLayout';
 import { useContext, useEffect, useState } from 'react';
+import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
 import {
+  IUserCritterPermissionInput,
   adminPermissionOptions,
   eCritterPermission,
-  IUserCritterPermissionInput,
   managerPermissionOptions
 } from 'types/permission';
 import { User } from 'types/user';
-import { Select, MenuItem, SelectChangeEvent, Box } from '@mui/material';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { IUserCritterAccessInput, UserCritterAccess } from 'types/animal_access';
-import { manageLayoutStyles } from 'pages/layouts/ManageLayout';
 
 type PickCritterProps = ModalBaseProps & {
   alreadySelected: string[];
@@ -77,6 +76,11 @@ export default function PickCritterPermissionModal({
    */
   const [permissionsAccessible, setPermissionsAccessible] = useState<eCritterPermission[]>([]);
 
+  // Keeps track of conditionally rendered columns from collection_units
+  const [combinedHeaders, setCombinedHeaders] = useState<(keyof UserCritterAccess | string)[]>(
+    UserCritterAccess.animalManagerDisplayProps as (keyof UserCritterAccess | string)[]
+  );
+
   const canSave = showSelectPermission && Object.values(access).filter((a) => a.wasSelected);
   const classes = manageLayoutStyles();
 
@@ -103,12 +107,24 @@ export default function PickCritterPermissionModal({
       });
       return copy;
     });
+    handleCollectionColumns(rows);
   };
 
   const tableProps: ITableQueryProps<UserCritterAccess> = {
     query: api.useCritterAccess,
     param: { user, filter },
     onNewData
+  };
+
+  // Inserts unique collection_unit categories as new column headers
+  const handleCollectionColumns = (rows: UserCritterAccess[]): void => {
+    const keys = rows.flatMap((row) => row.collectionUnitKeys);
+    const uniqueKeys = [...new Set(keys)];
+    setCombinedHeaders([
+      ...UserCritterAccess.animalManagerDisplayProps.slice(0, 2),
+      ...uniqueKeys,
+      ...UserCritterAccess.animalManagerDisplayProps.slice(2)
+    ]);
   };
 
   /**
@@ -159,23 +175,20 @@ export default function PickCritterPermissionModal({
     const hasAccess = access[row.critter_id];
     // set default in this order
     const defaultPermission = hasAccess?.permission_type ?? row?.permission_type ?? eCritterPermission.observer;
-    // show an error if the select isn't filled out but the row is selected
-    const isError = !hasAccess ? false : critterIDs.includes(hasAccess.critter_id) && !hasAccess.wasSelected;
-    const changeHandler = (e: any, p: eCritterPermission) => {
-          e.stopPropagation();
-          e.preventDefault();
-          const permission = p;//v.target.value as eCritterPermission;
-          setAccess((prevState) => {
-            const cp = { ...prevState };
-            critterIDs.forEach((id) => {
-              cp[id].permission_type = permission;
-              cp[id].wasSelected = true;
-            });
-            return cp;
-          });
-          // setForceRefresh((o) => !o);
-        //setTriggerReset((prev) => prev + 1);
-    }
+
+    const changeHandler = (e: React.MouseEvent<HTMLLIElement, MouseEvent>, p: eCritterPermission) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const permission = p; //v.target.value as eCritterPermission;
+      setAccess((prevState) => {
+        const cp = { ...prevState };
+        critterIDs.forEach((id) => {
+          cp[id].permission_type = permission;
+          cp[id].wasSelected = true;
+        });
+        return cp;
+      });
+    };
     return (
       <Select
         required={true}
@@ -184,8 +197,7 @@ export default function PickCritterPermissionModal({
         value={defaultPermission}
         disabled={!isSelected}
         sx={{ minWidth: 120 }}
-        onClick={(e) => e.stopPropagation()}
-        >
+        onClick={(e) => e.stopPropagation()}>
         {/* show select dropdown options based on user role */}
         {permissionsAccessible.sort().map((d) => (
           <MenuItem key={`menuItem-${d}`} value={d} onClick={(e) => changeHandler(e, d)}>
@@ -200,20 +212,22 @@ export default function PickCritterPermissionModal({
    * adds a compact index column to the table
    */
   const IdxColumn = (row: UserCritterAccess, idx: number): JSX.Element => {
-    return <Box className={'dimmed-cell'} padding={'none'}>{idx + 1} </Box>;
+    return (
+      <Box className={'dimmed-cell'} padding={'none'}>
+        {idx + 1}{' '}
+      </Box>
+    );
   };
 
   return (
     <FullScreenDialog open={open} handleClose={beforeClose}>
       <Box py={1} px={4} className={classes.manageLayoutContent}>
         <DataTable
-          headers={UserCritterAccess.animalManagerDisplayProps}
+          headers={combinedHeaders as (keyof UserCritterAccess)[]}
           title={title}
           queryProps={tableProps}
           onSelectMultiple={handleSelect}
-          //resetSelections={triggerReset}
           alreadySelected={alreadySelected}
-          //forceRowRefresh={forceRefresh}
           customColumns={
             showSelectPermission
               ? [

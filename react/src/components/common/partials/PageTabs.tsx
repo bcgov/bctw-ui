@@ -1,9 +1,6 @@
 import { Badge, Box, Tab, Tabs, Typography, useTheme } from '@mui/material';
-import { Icon } from 'components/common';
 import { TabsProvider, useTabs } from 'contexts/TabsContext';
 import React, { useEffect } from 'react';
-import { useState } from 'react';
-import { BR } from 'themes/appTheme';
 
 // export const isTab = <T,>(tab: T, currentTab: T): boolean => tab === currentTab;
 
@@ -70,9 +67,7 @@ const PT = ({ tabLabels, children, keepMounted }: PageTabsProps): JSX.Element =>
                       backgroundColor: theme.palette[tabStatus]?.main
                     }
                   }}>
-                  <Typography fontWeight='bold' pr={1}>
-                    {t}
-                  </Typography>
+                  <Typography fontWeight='bold'>{t}</Typography>
                   {/* <Icon icon='circle' size={0.8} htmlColor={getColor(validation)} /> */}
                 </Badge>
               }

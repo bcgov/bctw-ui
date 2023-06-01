@@ -69,7 +69,11 @@ export default function AssignmentHistory(props: IAssignmentHistoryPageProps): J
       <DataTable
         title={CollarStrings.assignmentHistoryByAnimalTitle}
         headers={CollarHistory.propsToDisplay}
-        queryProps={{ query: api.useCollarAssignmentHistory, param: critter_id, onNewData: onNewData }}
+        queryProps={{
+          query: api.useCollarAssignmentHistory,
+          param: critter_id,
+          onNewData: onNewData
+        }}
         customColumns={[{ column: EditDatalifeColumn, header: <b>Modify Data Life</b> }]}
       />
       <PerformAssignmentAction

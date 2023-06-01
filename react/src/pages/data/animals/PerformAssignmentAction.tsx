@@ -7,7 +7,6 @@ import { CritterStrings as CS } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useAttachmentDispatch } from 'contexts/DeviceAttachmentChangedContext';
 import dayjs from 'dayjs';
-import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AssignNewCollarModal from 'pages/data/animals/AssignNewCollar';
 import { useEffect, useState } from 'react';

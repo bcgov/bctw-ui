@@ -1,20 +1,19 @@
+import { Box } from '@mui/material';
+import Radio from 'components/form/Radio';
+import { CreateFormField } from 'components/form/create_form_components';
+import OkayModal from 'components/modal/OkayModal';
+import { WorkflowStrings } from 'constants/strings';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useState } from 'react';
+import { Code } from 'types/code';
+import { WorkflowFormProps } from 'types/events/event';
+import { wfFields } from 'types/events/form_fields';
+import { LocationEvent } from 'types/events/location_event';
 import MalfunctionEvent, { MalfunctionDeviceStatus } from 'types/events/malfunction_event';
 import { parseFormChangeResult } from 'types/form_types';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { wfFields, WorkflowFormProps } from 'types/events/event';
-import LocationEventForm from './LocationEventForm';
 import { FormSection } from '../common/EditModalComponents';
-import { CreateFormField } from 'components/form/create_form_components';
-import { Box } from '@mui/material';
-import { LocationEvent } from 'types/events/location_event';
-import Radio from 'components/form/Radio';
-import { Code } from 'types/code';
-import { WorkflowStrings } from 'constants/strings';
-import OkayModal from 'components/modal/OkayModal';
-import DateTimeInput from 'components/form/DateTimeInput';
 import { boxSpreadRowProps } from './EventComponents';
-import { Tooltip } from 'components/common';
+import LocationEventForm from './LocationEventForm';
 
 /**
  *
@@ -107,7 +106,7 @@ export default function MalfunctionEventForm({
                 onChange,
                 { disabled: deviceIsActive }
               )}
-              <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
+              {/* <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
                 <DateTimeInput
                   propName={'offline_date'}
                   label={'Offline Date'}
@@ -116,7 +115,7 @@ export default function MalfunctionEventForm({
                   disabled={deviceIsActive}
                   required={true}
                 />
-              </Tooltip>
+              </Tooltip> */}
             </Box>
           ) : deviceStatus === 'Malfunction' ? (
             <Box key='mf-mf' mt={2} {...boxSpreadRowProps}>
@@ -126,7 +125,7 @@ export default function MalfunctionEventForm({
                 onChange,
                 { disabled: deviceIsActive }
               )}
-              <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
+              {/* <Tooltip title={WorkflowStrings.malfunction.lastTransmission}>
                 <DateTimeInput
                   propName={'malfunction_date'}
                   label={'Malfunction Date'}
@@ -134,7 +133,7 @@ export default function MalfunctionEventForm({
                   changeHandler={onChange}
                   disabled={deviceIsActive}
                 />
-              </Tooltip>
+              </Tooltip> */}
             </Box>
           ) : (
             <span key='empty'></span>

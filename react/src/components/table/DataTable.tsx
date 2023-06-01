@@ -6,7 +6,6 @@ import TableHead from 'components/table/TableHead';
 import TableToolbar from 'components/table/TableToolbar';
 import { fuzzySearchMutipleWords, getComparator, isFunction, stableSort } from 'components/table/table_helpers';
 import { DataTableProps, ITableFilter, Order } from 'components/table/table_interfaces';
-import { useTableRowSelectedState } from 'contexts/TableRowSelectContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import React, { useEffect, useState } from 'react';
 import { UseQueryResult } from 'react-query';
@@ -34,7 +33,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     headers,
     queryProps,
     title,
-    onSelect,
+    // onSelect,
     onSelectMultiple,
     deleted,
     updated,
@@ -44,14 +43,13 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     requestDataByPage = false,
     paginationFooter = false,
     fullScreenHeight = false,
-    alreadySelected = [],
+    // alreadySelected = [],
     customColumns = []
   } = props;
 
   const styles = useStyles();
 
   const rowsPerPageOptions = [100, 250, 500, 1000];
-  const useRowState = useTableRowSelectedState();
   const { query, param, onNewData, defaultSort } = queryProps;
   const [filter, setFilter] = useState<ITableFilter>({} as ITableFilter);
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
@@ -66,11 +64,12 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
   const isMultiSelect = isFunction(onSelectMultiple);
   // fetch the data from the props query
-  const { isFetching, isLoading, isError, data, isPreviousData, isSuccess }: UseQueryResult<T[], AxiosError> = query(
+  const { isLoading, isError, data, isSuccess }: UseQueryResult<T[], AxiosError> = query(
     requestDataByPage ? page : null,
     param
     //filter
   );
+
   const noPagination = !requestDataByPage && !paginationFooter;
   const noData = isSuccess && !data?.length;
 
@@ -148,9 +147,18 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   };
 
   const filterRows = (rows: T[]): T[] => {
-    let results = rows.map((r, idx) => {
-      return { ...r, global_id: idx };
-    });
+    // Add a proxy layer with global_id such that plain objects, class objects, and proxy classes are supported
+    // ? Would it make more sense to wrap each row in a new object that contains global_id instead?
+    let results = rows.map(
+      (r, idx) =>
+        new Proxy(r, {
+          get(target, prop) {
+            if (prop === 'global_id') return idx;
+            return Reflect.get(target, prop, r);
+          }
+        })
+    );
+
     if (filter && filter.term) {
       results = fuzzySearchMutipleWords(results, filter.keys ? filter.keys : (headers as string[]), filter.term);
     }
@@ -190,15 +198,14 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
 
       if (filter && filter.term) {
         const r = filterRows(values);
-        console.log(r);
         r.forEach((row) => {
           if (row['global_id'] < selectedIDs.length) {
             updatedIds[row['global_id']] = true;
           }
         });
 
-        console.log('Select All Filter');
-        console.log(updatedIds.filter((a) => a === true).length);
+        // console.log('Select All Filter');
+        // console.log(updatedIds.filter((a) => a === true).length);
         setSelectedIDs(updatedIds);
       } else {
         setSelectedIDs(new Array(data.length).fill(true));

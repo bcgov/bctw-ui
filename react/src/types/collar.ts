@@ -1,7 +1,7 @@
 import { Exclude, Transform } from 'class-transformer';
 import { mustbePositiveNumber } from 'components/form/form_validators';
 import { Dayjs } from 'dayjs';
-import { Animal } from 'types/animal';
+import { Critter } from 'types/animal';
 import { Code } from 'types/code';
 import { BCTWBase, DayjsToPlain, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
 import { eInputType, FormFieldObject, isRequired } from 'types/form_types';
@@ -15,12 +15,6 @@ export enum eCollarAssignedStatus {
   Available = 'Available'
 }
 
-// used when creating new collars manually
-export enum eNewCollarType {
-  Other = '',
-  VHF = 'VHF',
-  Vect = 'Vectronic'
-}
 //Used in table_helpers
 export enum eDeviceStatus {
   mortality = 'Mortality',
@@ -32,7 +26,7 @@ export enum eDeviceStatus {
   potential_malfunction = 'Potential Malfunction'
 }
 
-export interface ICollarBase {
+interface ICollarBase {
   readonly collar_id: uuid;
 }
 export interface ICollarTelemetryBase extends ICollarBase {
@@ -176,13 +170,13 @@ export class Collar implements BCTWBase<Collar>, ICollar {
     ];
   }
 
-  get displayProps(): (keyof Collar)[] {
+  displayProps(): (keyof Collar)[] {
     return Collar.propsToDisplay;
   }
 
   historyDisplayProps(): (keyof Collar)[] {
     const keys = Object.keys(new Collar()) as unknown as (keyof Collar)[];
-    const startsWith = this.displayProps;
+    const startsWith = this.displayProps();
     const excludes = ['collar_id', 'collar_transaction_id'] as (keyof Collar)[];
     return classToArray(keys, startsWith, excludes);
   }
@@ -193,7 +187,7 @@ export class Collar implements BCTWBase<Collar>, ICollar {
   }
 }
 
-export interface IAttachedCollar extends ICollar, Pick<Animal, 'wlh_id' | 'animal_id' | 'critter_id'> {
+export interface IAttachedCollar extends ICollar, Pick<Critter, 'wlh_id' | 'animal_id' | 'critter_id'> {
   last_transmission_date?: Dayjs; // present on attached devices
 }
 

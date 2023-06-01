@@ -3,7 +3,7 @@ import { ICode, ICodeHeader } from 'types/code';
 import { API, ApiProps, IBulkUploadResults } from './api_interfaces';
 
 // all code retrievals must provide the code_header.code_header_name as a parameter
-export interface IGetCodeProps {
+interface IGetCodeProps {
   page: number;
   codeHeader: string;
   taxon?: string | null;

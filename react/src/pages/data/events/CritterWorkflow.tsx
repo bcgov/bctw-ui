@@ -1,71 +1,35 @@
-import { Animal, AttachedAnimal } from 'types/animal';
 import { useEffect, useState } from 'react';
-import { editObjectToEvent, IBCTWWorkflow, WorkflowType, wfFields } from 'types/events/event';
+import { AttachedCritter, Critter } from 'types/animal';
+import { IWorkflow, WorkflowType } from 'types/events/event';
+// import ReleaseEvent from 'types/events/release_event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
-import MortalityEvent from 'types/events/mortality_event';
-import CaptureEvent from 'types/events/capture_event';
-import ReleaseEvent from 'types/events/release_event';
+import { createEvent } from './EventComponents';
 
 type CritterWorkflowProps = {
-  editing: Animal | AttachedAnimal;
+  editing: Critter | AttachedCritter;
   workflow: WorkflowType;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWorkflowProps): JSX.Element => {
-  // const [showWorkflowForm, setShowWorkflowForm] = useState(false);
-  const [event, updateEvent] = useState<CaptureEvent | ReleaseEvent | MortalityEvent>(new MortalityEvent());
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
+   * casting as CaptureEvent2 to prevent workflowWrapper error
    */
-  const createEvent = (wfType: WorkflowType): CaptureEvent | ReleaseEvent | MortalityEvent => {
-    if (wfType === 'capture') {
-      return editObjectToEvent(editing, new CaptureEvent(), [
-        'taxon',
-        'translocation_ind',
-        'recapture_ind',
-        'region',
-        'collection_unit'
-      ]);
-    } else if (wfType === 'release') {
-      return editObjectToEvent(editing, new ReleaseEvent(), ['region', 'collection_unit']);
-    } else if (wfType === 'mortality') {
-      return editObjectToEvent(editing, new MortalityEvent(), ['critter_status']);
-    }
-  };
 
-  // /**
-  //  * if a workflow button is clicked and the event type is the same, open or close the workflow modal.
-  //  * otherwise, update the workflow type which will trigger the modal state
-  //  */
-  // const handleOpenWorkflow = (e: WorkflowType): void => {
-  //   updateEvent(createEvent(e));
-  //   setShowWorkflowForm((o) => !o);
-  // };
+  const [event, updateEvent] = useState(createEvent(editing, workflow));
 
   useEffect(() => {
-    if (workflow) {
-      updateEvent(createEvent(workflow));
-    }
-  }, [workflow, open]);
+    const a = createEvent(editing, workflow);
+    updateEvent(a);
+  }, [editing, workflow]);
   /**
    * when a capture workflow is saved, always show the release workflow unless a translocation_ind is underway
    * todo: is this still needed?
    */
-  const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
+  const handleWorkflowSaved = async (e: IWorkflow<typeof event>): Promise<void> => {
     setOpen(false);
-    if (e.event_type === 'capture' && e instanceof CaptureEvent) {
-      if (e.translocation_ind && !e.isTranslocationComplete) {
-        // do nothing
-      } else {
-        // show the release form, populating the location and date fields
-        const rwf = editObjectToEvent(e, new ReleaseEvent(e), ['region', 'collection_unit']);
-        // set the new event directly, triggering the display of the release form
-        updateEvent(rwf);
-        setOpen((o) => !o);
-      }
-    }
   };
 
   /**
@@ -73,32 +37,36 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
    * this is a separate handler because we do not want to save the form until the
    * @param nextWorkflow is completed
    */
-  const handleWorkflowChain = async (e: CaptureEvent, nextWorkflow: WorkflowType): Promise<void> => {
-    if (e.event_type !== 'capture') {
-      return;
-    }
-    let newwf;
-    if (nextWorkflow === 'mortality') {
-      newwf = new MortalityEvent(undefined, e);
-    } else if (nextWorkflow === 'release') {
-      newwf = new ReleaseEvent(e);
-    }
-    if (!newwf) {
-      return;
-    }
-    // there are only animal-related fields in capture workflows
-    const next = editObjectToEvent(e.getAnimal(), newwf, []);
-    await updateEvent(next);
-    await setOpen((o) => !o);
-  };
+  // const handleWorkflowChain = async (e: CaptureEvent, nextWorkflow: WorkflowType): Promise<void> => {
+  //   if (e.event_type !== 'capture') {
+  //     return;
+  //   }
+  //   let newwf;
+  //   if (nextWorkflow === 'mortality') {
+  //     newwf = new MortalityEvent(undefined, e);
+  //   } else if (nextWorkflow === 'release') {
+  //     newwf = new ReleaseEvent(e);
+  //   }
+  //   if (!newwf) {
+  //     return;
+  //   }
+  //   // there are only animal-related fields in capture workflows
+  //   const next = editObjectToEvent(e.getAnimal(), newwf, []);
+  //   await updateEvent(next);
+  //   await setOpen((o) => !o);
+  // };
 
   return (
-    <WorkflowWrapper
-      open={open}
-      event={event as any}
-      handleClose={(): void => setOpen(false)}
-      onEventSaved={handleWorkflowSaved}
-      onEventChain={handleWorkflowChain}
-    />
+    <>
+      {event?.event_type === workflow ? (
+        <WorkflowWrapper
+          open={open}
+          event={event}
+          handleClose={(): void => setOpen(false)}
+          onEventSaved={handleWorkflowSaved}
+          //onEventChain={handleWorkflowChain}
+        />
+      ) : null}
+    </>
   );
 };

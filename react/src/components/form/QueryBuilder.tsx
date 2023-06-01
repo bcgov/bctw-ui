@@ -1,17 +1,15 @@
-import Select from 'components/form/BasicSelect';
-import AutoComplete from 'components/form/Autocomplete';
-import { Button, Icon } from 'components/common';
 import { Box, IconButton, Button as MUIButton } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 import makeStyles from '@mui/styles/makeStyles';
-import { ISelectMultipleData } from './MultiSelect';
-import { Animal, AttachedAnimal } from 'types/animal';
-import { AttachedCollar, Collar } from 'types/collar';
+import { Icon } from 'components/common';
+import AutoComplete from 'components/form/Autocomplete';
+import Select from 'components/form/BasicSelect';
+import { useEffect, useState } from 'react';
+import { AttachedCritter } from 'types/animal';
+import { columnToHeader, headerToColumn } from 'utils/common_helpers';
 
 export type QueryBuilderOperator = 'Equals' | 'Not Equals';
 export type QueryBuilderColumn = string;
-export type QueryBuilderData = Record<string, any>;// | Animal | AttachedAnimal | Collar | AttachedCollar;
+//export type QueryBuilderData = AttachedCritter; // | Animal | AttachedAnimal | Collar | AttachedCollar;
 
 export interface IFormRowEntry {
   column: QueryBuilderColumn;
@@ -19,14 +17,14 @@ export interface IFormRowEntry {
   value: string[];
 }
 
-type IQueryBuilderProps<T extends ISelectMultipleData> = {
+type IQueryBuilderProps<T> = {
   operators: QueryBuilderOperator[];
   columns: QueryBuilderColumn[];
-  data: QueryBuilderData[];
+  data: T[];
   handleRowsUpdate?: (r: IFormRowEntry[]) => void;
 };
 
-export const exportStyles = makeStyles(() => ({
+const exportStyles = makeStyles(() => ({
   queryBuilderCol: {
     display: 'inline-flex',
     marginRight: '0.5rem',
@@ -52,7 +50,7 @@ export const exportStyles = makeStyles(() => ({
  * You are intended to pass props corresponding to columns in the table you intend to query, as well as operations to use on the Value Autocomplete field.
  * Autocomplete options are filled according to keys in the data prop which correspond to your columns
  */
-export default function QueryBuilder<T extends ISelectMultipleData>(props: IQueryBuilderProps<T>): JSX.Element {
+export default function QueryBuilder<T extends AttachedCritter>(props: IQueryBuilderProps<T>): JSX.Element {
   const { operators, columns, handleRowsUpdate, data } = props;
   const [rows, setRows] = useState<IFormRowEntry[]>([{ column: 'taxon', operator: 'Equals', value: [] }]);
   const styles = exportStyles();
@@ -101,36 +99,43 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
 
   const getUniqueValueOptions = (col: QueryBuilderColumn) => {
     if (data) {
-      const uniqueItemsForColumn: any[] = [];
-      const uniqueItemsCollectionUnits: any[] = [];
-      
-      
-      if(col === 'collection_unit') {
-        const flattenCollectionUnits = data.map(r => r.collection_units).filter(v => v).flat();
-        for(const f of flattenCollectionUnits) {
-          if(!uniqueItemsCollectionUnits.find(a => a.collection_unit_id === f.collection_unit_id)) {
-            uniqueItemsCollectionUnits.push(f);
+      const uniqueItemsForColumn = [];
+      const uniqueItemsCollectionUnits = [];
+
+      if (col === 'collection_units') {
+        const tempDict = {};
+        for (const d of data) {
+          if (d.collection_units) {
+            for (const c of d.collection_units) {
+              const tRow = rows.find((r) => r.column === 'taxon');
+              if (tRow && !tRow.value.includes(d.taxon)) {
+                continue;
+              }
+              tempDict[c.collection_unit_id] = { ...c, taxon: d.taxon };
+            }
           }
         }
-      }
-      else {
+        uniqueItemsCollectionUnits.push(...Object.values(tempDict));
+      } else {
         uniqueItemsForColumn.push(...data.map((o) => o[col]).filter((v, i, a) => v && a.indexOf(v) === i));
       }
 
-      return [ ...uniqueItemsForColumn.sort().map((f, i) => {
-        return {
-          id: i,
-          value: f,
-          displayLabel: f
-        };
-      }),
-      ...uniqueItemsCollectionUnits.sort().map((c, i) => {
-        return {
-          id: i + uniqueItemsForColumn.length,
-          value: c.collection_unit_id,
-          displayLabel: `${c.category_name} | ${c.unit_name}`
-        }
-      }) ]
+      return [
+        ...uniqueItemsForColumn.sort().map((f, i) => {
+          return {
+            id: i,
+            value: f,
+            displayLabel: f
+          };
+        }),
+        ...uniqueItemsCollectionUnits.sort().map((c, i) => {
+          return {
+            id: i + uniqueItemsForColumn.length,
+            value: c.collection_unit_id,
+            displayLabel: `${c.taxon} | ${c.category_name} | ${c.unit_name}`
+          };
+        })
+      ];
     } else {
       return [{ id: 0, value: 'Loading...', displayLabel: 'Loading...' }];
     }
@@ -163,7 +168,7 @@ export default function QueryBuilder<T extends ISelectMultipleData>(props: IQuer
               return { id: i, value: o, displayLabel: o };
             })}
             changeHandler={(o) => {
-              handleAutocompleteChange(o as T[], idx);
+              handleAutocompleteChange(o, idx);
             }}
             triggerReset={row.column}
             isMultiSearch

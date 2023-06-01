@@ -1,13 +1,13 @@
 import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { isDev } from 'api/api_helpers';
 import { RouteKey } from 'AppRouter';
-import { Icon, Tooltip } from 'components/common';
+import { isDev } from 'api/api_helpers';
+import { Icon } from 'components/common';
 import { UserContext } from 'contexts/UserContext';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { eUserRole } from 'types/user';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
 
 type SideBarProps = {
   routes: RouteKey[]; // links at top of the drawer
@@ -15,11 +15,11 @@ type SideBarProps = {
 };
 
 const useStyles = makeStyles({
-  sidebarAlert:{
+  sidebarAlert: {
     marginTop: '-2em',
     marginLeft: '0em',
-    marginRight: '-3em',
-  },
+    marginRight: '-3em'
+  }
 });
 
 export default function SideBar({ routes }: SideBarProps): JSX.Element {
@@ -83,9 +83,10 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
   }, [location, isAdmin, isCritterManager, isDataAdmin]); // only fire when these states change
 
   useEffect(() => {
-    if (onboardingDataSuccess){
-      setUserOnboardPending(onboardingData.some(user => user.access === 'pending'));}
-  }, [onboardingData])
+    if (onboardingDataSuccess) {
+      setUserOnboardPending(onboardingData.some((user) => user.access === 'pending'));
+    }
+  }, [onboardingData]);
 
   const routesToShow: RouteKey[] = Object.values(visibleRoutes.sort((a, b) => a.sort - b.sort));
   return (
@@ -102,13 +103,13 @@ export default function SideBar({ routes }: SideBarProps): JSX.Element {
                     <Icon icon={route.icon} />
                   </ListItemIcon>
                   <ListItemText className={'list-item-txt'} primary={route.title} />
-                  { route.title === 'Onboarding Requests' &&
-                    userOnboardPending &&
-                  <Box className={styles.sidebarAlert} >
-                    <ListItemIcon>                    
-                      <Icon icon='exclaim' htmlColor='red' size={0.75}/> 
-                    </ListItemIcon>
-                  </Box>}
+                  {route.title === 'Onboarding Requests' && userOnboardPending && (
+                    <Box className={styles.sidebarAlert}>
+                      <ListItemIcon>
+                        <Icon icon='exclaim' htmlColor='red' size={0.75} />
+                      </ListItemIcon>
+                    </Box>
+                  )}
                 </ListItem>
                 {/* </Tooltip> */}
               </div>

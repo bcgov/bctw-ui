@@ -1,39 +1,37 @@
-import { Box, CircularProgress, Container, Divider, Paper } from '@mui/material';
+import { Box, CircularProgress, Divider, Paper, capitalize } from '@mui/material';
 import { AxiosError } from 'axios';
 import { Button, Modal } from 'components/common';
 import { ModalBaseProps } from 'components/component_interfaces';
+import ConfirmModal from 'components/modal/ConfirmModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import useFormHasError from 'hooks/useFormHasError';
-import { InboundObj } from 'types/form_types';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ReactNode, useEffect, useState } from 'react';
-import { BCTWWorkflow, IBCTWWorkflow, WorkflowType } from 'types/events/event';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import { SuperWorkflow, WorkflowType } from 'types/events/event';
+import MalfunctionEvent from 'types/events/malfunction_event';
+import MortalityEvent from 'types/events/mortality_event';
+import RetrievalEvent from 'types/events/retrieval_event';
+import { InboundObj } from 'types/form_types';
 import { formatAxiosError } from 'utils/errors';
 import { EditHeader } from '../common/EditModalComponents';
 import CaptureEventForm from './CaptureEventForm';
-import MortalityEventForm from './MortalityEventForm';
-import ReleaseEventForm from './ReleaseEventForm';
-import MortalityEvent from 'types/events/mortality_event';
-import RetrievalEventForm from './RetrievalEventForm';
-import RetrievalEvent from 'types/events/retrieval_event';
-import ConfirmModal from 'components/modal/ConfirmModal';
-import CaptureEvent from 'types/events/capture_event';
-import ReleaseEvent from 'types/events/release_event';
-import MalfunctionEvent from 'types/events/malfunction_event';
 import MalfunctionEventForm from './MalfunctionEventForm';
+import MortalityEventForm from './MortalityEventForm';
+import RetrievalEventForm from './RetrievalEventForm';
 
-type WorkflowWrapperProps<T extends IBCTWWorkflow> = ModalBaseProps & {
+type WorkflowWrapperProps<T extends SuperWorkflow> = ModalBaseProps & {
   event: T;
-  onEventSaved?: (e: BCTWWorkflow<T>) => void; // to notify alert that event was saved
-  onEventChain?: (e: BCTWWorkflow<T>, wft: WorkflowType) => void;
+  onEventSaved?: (e: T) => void; // to notify alert that event was saved
+  onEventChain?: (e: T, wft: WorkflowType) => void;
 };
 
 /**
  * wraps all of the workflow components that handles:
-    * modal open state
-    * saving
+ * modal open state
+ * saving
  */
-export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
+export default function WorkflowWrapper<T extends SuperWorkflow>({
   event,
   onEventChain,
   onEventSaved,
@@ -43,6 +41,8 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
 
+  // const [event, setevent] = useState(event);
+  //console.log({ event }, { event });
   const [canSave, setCanSave] = useState(false);
   const [hasErr, checkHasErr] = useFormHasError();
 
@@ -50,8 +50,21 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   const [confirmMessage, setConfirmMessage] = useState<ReactNode>(null);
 
   useEffect(() => {
-    setCanSave(!hasErr);
+    setCanSave(!hasErr && eventHasAllRequiredProperties());
   }, [hasErr]);
+
+  const eventHasAllRequiredProperties = (): boolean => {
+    if (event.fields) {
+      for (const [k, v] of Object.entries(event.fields)) {
+        if (v.required && !event[k]) {
+          // console.log(`Missing required property ${k} -> ${event[k]}`);
+          return false;
+        }
+      }
+      //console.log('No missing properties detected.');
+      return true;
+    }
+  };
 
   // save response handler
   const onSuccess = async (e: AxiosError | boolean): Promise<void> => {
@@ -59,19 +72,21 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
       showNotif({ severity: 'error', message: formatAxiosError(e as AxiosError) });
     } else {
       // console.log('sucess!!', e);
-      showNotif({ severity: 'success', message: `${event.event_type} workflow form saved!` });
+      showNotif({ severity: 'success', message: `${capitalize(event.event_type)} event saved!` });
       // if the parent implements this, call it on a successful save.
       if (typeof onEventSaved === 'function') {
         onEventSaved(event);
-      } else {
-        handleClose(false);
       }
+      handleClose(false);
     }
   };
 
   // error response handler
   const onError = (e: AxiosError): void => {
-    showNotif({ severity: 'success', message: `error saving ${event.event_type} workflow: ${formatAxiosError(e)}` });
+    showNotif({
+      severity: 'success',
+      message: `error saving ${event.event_type} workflow: ${formatAxiosError(e)}`
+    });
   };
 
   // setup save mutation
@@ -85,10 +100,20 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   // update the event when form components change
   const handleChildFormUpdated = (v: InboundObj): void => {
     checkHasErr(v);
+
+    // const tmp = event;
     const k = Object.keys(v)[0];
-    if (k && k !== 'displayProps') {
-      event[k] = Object.values(v)[0];
+    const tempval = Object.values(v)[0];
+    const val = tempval === undefined || tempval === null ? null : tempval['id'] ?? tempval;
+    //If tempval is undefined or null, just leave it as null. Otherwise, try to access the id property from it, but if that fails just use the non-null tempval as is.
+    const { nestedEventKey } = v;
+
+    if (nestedEventKey) {
+      event[nestedEventKey][k] = val;
+    } else if (k && k !== 'displayProps') {
+      event[k] = val;
     }
+    setCanSave(!hasErr && eventHasAllRequiredProperties());
   };
 
   /**
@@ -101,18 +126,18 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   };
 
   /**
-   * if the postpone flag is set, skip the confirmation modal and 
+   * if the postpone flag is set, skip the confirmation modal and
    * close this workflow and immediately call the @param onEventSaved handler
    * which 'continues' to the next workflow
    */
   const handlePostponeSave = (wft: WorkflowType): void => {
     handleClose(false);
     onEventChain(event, wft);
-  }
+  };
 
   /**
    * when 'yes' is selected to confirm the workflow early exit,
-   * still trigger the save. 
+   * still trigger the save.
    */
   const handleExitWorkflow = (): void => {
     // console.log('exiting workflow early!');
@@ -123,12 +148,14 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   /**
    * based on the event class, render the workflow form
    */
+  const props = {
+    canSave,
+    handleFormChange: handleChildFormUpdated,
+    handleExitEarly: handleShowExitWorkflow,
+    handlePostponeSave
+  };
   const determineWorkflow = (): JSX.Element => {
-    const props = { canSave, handleFormChange: handleChildFormUpdated, handleExitEarly: handleShowExitWorkflow, handlePostponeSave };
-
-    if (event instanceof ReleaseEvent) {
-      return <ReleaseEventForm {...props} event={event} />;
-    } else if (event instanceof CaptureEvent) {
+    if (event instanceof CaptureEvent2) {
       return <CaptureEventForm {...props} event={event} />;
     } else if (event instanceof MortalityEvent) {
       return <MortalityEventForm {...props} event={event} />;
@@ -141,40 +168,42 @@ export default function WorkflowWrapper<T extends BCTWWorkflow<T>>({
   };
 
   return (
-    <Modal open={open} handleClose={handleClose}>
-      <form className={'event-modal'} autoComplete={'off'}>
+    <Modal
+      open={open}
+      handleClose={handleClose}
+      useButton
+      headercomp={
         <EditHeader<T>
           title={event?.getWorkflowTitle()}
-          headers={event.displayProps}
+          headers={event.displayProps()}
           obj={event}
           format={event.formatPropAsHeader}
         />
+      }>
+      <form className={'event-modal'} autoComplete={'off'}>
+        <Box>
+          <Paper sx={{ padding: 3 }}>
+            {determineWorkflow()}
+            <Box my={1} mx={3}>
+              <Divider></Divider>
+            </Box>
 
-        <Container maxWidth='xl'>
-          <Box py={3}>
-            <Paper>
-              {determineWorkflow()}
-              <Box my={1} mx={3}>
-                <Divider></Divider>
-              </Box>
-
-              <Box p={3}>
-                <Box display='flex' justifyContent='flex-end' className='form-buttons'>
-                  {isLoading ? (
-                    <CircularProgress />
-                  ) : (
-                    <Button onClick={handleSave} disabled={!canSave}>
-                      Save
-                    </Button>
-                  )}
-                  <Button variant='outlined' onClick={(): void => handleClose(false)}>
-                    Cancel and Exit
+            <Box p={3}>
+              <Box display='flex' justifyContent='flex-end' className='form-buttons'>
+                {isLoading ? (
+                  <CircularProgress />
+                ) : (
+                  <Button onClick={handleSave} disabled={!canSave}>
+                    Save
                   </Button>
-                </Box>
+                )}
+                <Button variant='outlined' onClick={(): void => handleClose(false)}>
+                  Cancel
+                </Button>
               </Box>
-            </Paper>
-          </Box>
-        </Container>
+            </Box>
+          </Paper>
+        </Box>
       </form>
       <ConfirmModal
         message={confirmMessage}

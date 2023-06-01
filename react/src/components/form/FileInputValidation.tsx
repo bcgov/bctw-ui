@@ -1,4 +1,4 @@
-import { Box, CircularProgress, IconButton, Paper, Typography } from '@mui/material';
+import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
 import { DottedBorderBox } from 'components/common/partials/DottedBorderBox';

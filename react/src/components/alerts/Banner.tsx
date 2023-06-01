@@ -1,4 +1,4 @@
-import { Alert, Collapse, IconButton, List, ListItem, Stack, Theme } from '@mui/material';
+import { Alert, Collapse, IconButton, List, ListItem, Theme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
 import { BannerStrings } from 'constants/strings';
@@ -95,14 +95,14 @@ export const Banner = ({ variant, icon, text, action, hiddenContent }: BannerPro
 /**
  * Used for bulk request handling. Usually bottom page
  */
-type SuccessBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
-export const SuccessBanner = (props: SuccessBannerProps) => <Banner variant='success' action='both' {...props} />;
+// type SuccessBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
+// export const SuccessBanner = (props: SuccessBannerProps) => <Banner variant='success' action='both' {...props} />;
 
-/**
- * Used for bulk error handling. Usually bottom page
- */
-type ErrorBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
-export const ErrorBanner = (props: ErrorBannerProps) => <Banner variant='error' action='both' {...props} />;
+// /**
+//  * Used for bulk error handling. Usually bottom page
+//  */
+// type ErrorBannerProps = Pick<BannerProps, 'text' | 'hiddenContent'>;
+// export const ErrorBanner = (props: ErrorBannerProps) => <Banner variant='error' action='both' {...props} />;
 
 /**
  * Used at top of page for help / info

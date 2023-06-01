@@ -18,6 +18,8 @@
     "noImplicitThis": true,
     "baseUrl": "src",
     "experimentalDecorators": true
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true
   },
   "include": ["src"],
   "exclude": ["**/node_modules", "**/dist"]

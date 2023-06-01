@@ -1,12 +1,10 @@
-import { Box, useTheme } from '@mui/material';
-import React from 'react';
+import { Box } from '@mui/material';
 
 interface DottedBorderBoxProps {
   children?: JSX.Element;
 }
 
 export const DottedBorderBox = (props: DottedBorderBoxProps) => {
-  const theme = useTheme();
   const { children } = props;
   return (
     <Box

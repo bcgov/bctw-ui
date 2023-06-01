@@ -24,7 +24,6 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
 
   const successXLSX = (d: ParsedXLSXSheetResult[]) => {
     if (d.length) {
-      console.log(d);
       setSanitizedFile(d);
       showNotif({ severity: 'success', message: 'File uploaded and sanitized' });
       // setTabsValidation(validation => ({...validation}))
@@ -37,16 +36,7 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
     showNotif({ severity: 'error', message: 'bulk upload failed' });
   };
 
-  const {
-    mutateAsync,
-    isIdle,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-    data,
-    reset: mutateReset
-  } = api.useUploadXLSX({
+  const { mutateAsync, isLoading } = api.useUploadXLSX({
     onSuccess: successXLSX,
     onError: errorXLSX
   });

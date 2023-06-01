@@ -1,53 +1,35 @@
-import { Button, Container } from '@mui/material';
+import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
-import FullScreenDialog from 'components/modal/DialogFullScreen';
-import { CritterStrings } from 'constants/strings';
-import { TaxonProvider } from 'contexts/TaxonContext';
-import ManageLayout from 'pages/layouts/ManageLayout';
-import { useContext, useEffect, useState } from 'react';
-import { UserAnimalAccess } from './UserAnimalAccess';
+import { AlertBanner } from 'components/alerts/AlertBanner';
+import { Icon } from 'components/common';
 import { QuickSummary } from 'components/common/QuickSummary';
+import dayjs from 'dayjs';
+import ManageLayout from 'pages/layouts/ManageLayout';
+import { useState } from 'react';
+import { AttachedCritter } from 'types/animal';
 import { DataRetrievalDataTable } from '../collars/DataRetrievalDataTable';
 import { CritterDataTables } from './CritterDataTables';
-import { AlertContext } from 'contexts/UserAlertContext';
-import { TelemetryAlert } from 'types/alert';
-import dayjs from 'dayjs';
-import { AlertBanner } from 'components/alerts/AlertBanner';
-import { AttachedAnimal } from 'types/animal';
-import makeStyles from '@mui/styles/makeStyles';
-import { Icon } from 'components/common';
 import DetailedAnimalView from './DetailedAnimalView';
 
-const useStyles = makeStyles((theme) => ({
-  progress: {
-    position: 'absolute',
-    zIndex: 1000,
-    marginTop: '30px'
-  }
-}));
-
 export default function CritterPage(): JSX.Element {
-  const useAlert = useContext(AlertContext);
+  // const useAlert = useContext(AlertContext);
   const [showDataRetrieval, setShowDataRetrieval] = useState(false);
-  const [openManageAnimals, setOpenManageAnimals] = useState(false);
-  const [detailAnimal, setDetailAnimal] = useState<AttachedAnimal>(null);
+  const [detailAnimal, setDetailAnimal] = useState<AttachedCritter>(null);
 
-  const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
-  const inverseManageModal = (): void => {
-    setOpenManageAnimals((a) => !a);
-  };
+  // const [alerts, setAlerts] = useState<TelemetryAlert[]>([]);
+
   const inverseDataRetrieval = (): void => {
     setShowDataRetrieval((d) => !d);
   };
-  useEffect(() => {
-    if (useAlert?.alerts?.length) {
-      //Set only the valid (null valid_to) alerts where snoozed_to date < today
-      const nonSnoozedValidAlerts = useAlert.alerts.filter(
-        (a) => !a.valid_to.isValid() && !(dayjs(a.snoozed_to).diff(dayjs()) > 0)
-      );
-      setAlerts(nonSnoozedValidAlerts);
-    }
-  }, [useAlert]);
+  // useEffect(() => {
+  //   if (useAlert?.alerts?.length) {
+  //     //Set only the valid (null valid_to) alerts where snoozed_to date < today
+  //     const nonSnoozedValidAlerts = useAlert.alerts.filter(
+  //       (a) => !a.valid_to.isValid() && !(dayjs(a.snoozed_to).diff(dayjs()) > 0)
+  //     );
+  //     setAlerts(nonSnoozedValidAlerts);
+  //   }
+  // }, [useAlert]);
 
   const dataTables = (): JSX.Element => (
     <Box>
@@ -73,7 +55,7 @@ export default function CritterPage(): JSX.Element {
       <Box width='100%' sx={{ ml: -1 }}>
         <Button
           startIcon={<Icon icon='back' />}
-          onClick={() => {
+          onClick={(): void => {
             setDetailAnimal(null);
           }}>
           Back to My Animals
@@ -85,8 +67,9 @@ export default function CritterPage(): JSX.Element {
 
   return (
     <ManageLayout>
-      {/* <TaxonProvider> */}
-      {/* <Box className='manage-layout-titlebar'>
+      {/*
+      //TODO critterbase integration this might be not needed 
+      <Box className='manage-layout-titlebar'>
           <h1>{CritterStrings.title}</h1>
           <Box display='flex' alignItems='center'>
             <Button size='medium' variant='outlined' onClick={inverseManageModal}>
@@ -107,7 +90,6 @@ export default function CritterPage(): JSX.Element {
         data tables do not need to reload / re-query 
         anytime you wanna go back and forth between
         the detailed view and the data tables*/}
-      {/* </TaxonProvider> */}
     </ManageLayout>
   );
 }

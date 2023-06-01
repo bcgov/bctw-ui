@@ -1,6 +1,5 @@
 import { Grid, Paper } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Icon } from 'components/common';
 
 type AlertCardVariants = 'error' | 'warning';
 
@@ -26,13 +25,8 @@ const useStyles = makeStyles((theme) => ({
  * @param variant Determins theming and icon of the card
  * @returns
  */
-export const AlertCard = ({ content, variant }: AlertCardProps): JSX.Element => {
+const AlertCard = ({ content, variant }: AlertCardProps): JSX.Element => {
   const styles = useStyles();
-
-  const htmlColorMap = {
-    error: 'red',
-    warning: 'orange'
-  };
 
   return (
     <Paper className={styles[variant]}>

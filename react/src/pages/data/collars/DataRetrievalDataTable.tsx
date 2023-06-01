@@ -12,7 +12,6 @@ import { ResponseTelemetry, TelemetryResultCounts } from 'types/events/vendor';
 import { doNothing, doNothingAsync } from 'utils/common_helpers';
 import { formatAxiosError } from 'utils/errors';
 import { formatT } from 'utils/time';
-import AddEditViewer from '../common/AddEditViewer';
 import EditCollar from './EditCollar';
 import ModifyCollarWrapper from './ModifyCollarWrapper';
 export const DataRetrievalDataTable = (): JSX.Element => {
@@ -22,7 +21,6 @@ export const DataRetrievalDataTable = (): JSX.Element => {
   const [editObj, setEditObj] = useState<Collar | AttachedCollar>({} as Collar);
   const handleSelect = <T extends Collar>(row: T): void => setEditObj(row);
   const [openEdit, setOpenEdit] = useState(false);
-  const [showImport, setShowImport] = useState(false);
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
 

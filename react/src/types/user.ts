@@ -72,7 +72,7 @@ export class User extends UserBase implements BCTWBase<User>, IUser {
     return this.role_type === eUserRole.administrator;
   }
 
-  get displayProps(): (keyof User)[] {
+  displayProps(): (keyof User)[] {
     const props: (keyof User)[] = ['name', 'username', 'email', 'idir', 'bceid', 'role_type', 'is_manager'];
     if (isDev()) {
       props.unshift('id');

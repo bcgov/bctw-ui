@@ -4,45 +4,46 @@ import { getComparator } from 'components/table/table_helpers';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { Order } from 'components/table/table_interfaces';
-import { plainToClass } from 'class-transformer';
 import {
   getPointIDsFromTelemetryGroup,
   getLatestPing,
   sortGroupedTelemetry,
-  parseAnimalColour
+  parseAnimalColour,
+  getUniqueCollectionUnitKeys
 } from 'pages/map/map_helpers';
 import { MapDetailsBaseProps } from './MapDetails';
+import { useMarkerStates } from '../MapMarkerContext';
 
-export type MapDetailsGroupedProps = MapDetailsBaseProps & {
+type MapDetailsGroupedProps = MapDetailsBaseProps & {
   pings: ITelemetryGroup[];
-  crittersSelected: string[];
 };
 
-type GroupedCheckedStatus = {
+type RowActionStatus = {
   critter_id: string;
-  checked: boolean;
+  active: boolean;
 };
 
+// TODO: TelemetryDetail types
 const rows_to_render = [
   'Colour',
-  'taxon',
-  'Population Unit',
-  'Collective Unit',
+  'Taxon',
   'WLH ID',
   'Animal ID',
-  'Animal Status',
+  'Critter Status',
   'Device ID',
   'Device Status',
   'Frequency (MHz)',
-  'Capture Date',
   'Last Transmit Date'
 ];
 
 export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.Element {
-  const { pings, crittersSelected, handleShowOverview, handleRowSelected } = props;
+  const { pings, handleShowOverview } = props;
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('Critter Name');
-  const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
+  const [{ selectedCritters }, markerDispatch] = useMarkerStates();
+
+  // Adds a column for each unique category_name
+  const uniqueCategoryNames = getUniqueCollectionUnitKeys(pings);
 
   const handleSort = (event: React.MouseEvent<unknown>, property: string): void => {
     const isAsc = orderBy === property && order === 'asc';
@@ -52,42 +53,44 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
-    const newChecked = val ? pings.map((f) => f.critter_id) : [];
-    pushRowCheck(newChecked);
-  };
-
-  const handleRowCheck = (v: GroupedCheckedStatus): void => {
-    let newChecked = null;
-    const idxFound = checkedGroups.indexOf(v.critter_id);
-    if (idxFound === -1) {
-      newChecked = [...checkedGroups, v.critter_id];
+    if (val) {
+      markerDispatch({ type: 'SELECT_MARKERS', ids: getPointIDsFromTelemetryGroup(pings) });
+      markerDispatch({ type: 'SELECT_CRITTERS', ids: pings.map((p) => p.critter_id) });
     } else {
-      const cp = [...checkedGroups];
-      cp.splice(idxFound, idxFound + 1);
-      if (v.checked) {
-        cp.push(v.critter_id);
-      }
-      newChecked = cp;
+      markerDispatch({ type: 'RESET_SELECTION' });
+      markerDispatch({ type: 'SELECT_CRITTERS', ids: [] });
     }
-    pushRowCheck(newChecked);
   };
 
-  const pushRowCheck = (ids: string[]): void => {
-    setCheckedGroups(ids);
-    const pointIDs = getPointIDsFromTelemetryGroup(pings.filter((f) => ids.includes(f.critter_id)));
-    handleRowSelected(pointIDs);
+  const handleRowCheck = (v: RowActionStatus): void => {
+    const pointIds = getPointIDsFromTelemetryGroup(pings.filter((f) => f.critter_id === v.critter_id));
+    markerDispatch({ type: v.active ? 'SELECT_MARKERS' : 'UNSELECT_MARKERS', ids: pointIds });
+    markerDispatch({
+      type: 'SELECT_CRITTERS',
+      ids: v.active ? [...selectedCritters, v.critter_id] : selectedCritters.filter((id) => id !== v.critter_id)
+    });
+  };
+
+  const handleRowHover = (v: RowActionStatus): void => {
+    v.active ? markerDispatch({ type: 'FOCUS_CRITTER', id: v.critter_id }) : markerDispatch({ type: 'RESET_FOCUS' });
   };
 
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
-
   return (
     <TableContainer component={Paper} className={'map-detail-table-container'}>
       <Table stickyHeader size='small'>
         {pings && pings.length ? (
           <TableHead
-            headersToDisplay={[...rows_to_render, `Point Count (${totalPointCount()})`] as any}
-            headerData={plainToClass(TelemetryDetail, pings[0].features[0].properties) as TelemetryDetail}
-            numSelected={checkedGroups.length}
+            headersToDisplay={
+              [
+                ...rows_to_render.slice(0, 2), // Display the first two headers: Colour and Taxon
+                ...uniqueCategoryNames, // Insert unique category names after the Taxon header
+                ...rows_to_render.slice(2), // Display the remaining headers after the unique category names
+                `Point Count (${totalPointCount()})`
+              ] as unknown as (keyof TelemetryDetail)[]
+            }
+            headerData={pings[0].features[0].properties}
+            numSelected={selectedCritters.length}
             order={order}
             orderBy={orderBy ?? ''}
             onRequestSort={handleSort}
@@ -103,12 +106,14 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
               <Row
                 key={`${idx}_${u.device_id}`}
                 pingCount={u.features.length}
-                isChecked={checkedGroups.includes(u.critter_id)}
-                isSelectedInMap={crittersSelected.indexOf(u.critter_id) !== -1}
+                isChecked={selectedCritters.includes(u.critter_id)}
+                isSelectedInMap={selectedCritters.includes(u.critter_id)}
                 // fixme: should it be the latest props that are displayed?
-                row={plainToClass(TelemetryDetail, getLatestPing(u.features)?.properties)}
+                row={getLatestPing(u.features)?.properties}
                 handleShowOverview={handleShowOverview}
                 handleRowCheck={handleRowCheck}
+                handleRowHover={handleRowHover}
+                uniqueCategoryNames={uniqueCategoryNames}
               />
             );
           })}
@@ -123,20 +128,35 @@ type MapDetailsTableRowProps = {
   isSelectedInMap: boolean;
   isChecked: boolean;
   row: TelemetryDetail;
-  handleRowCheck: (v: GroupedCheckedStatus) => void;
+  handleRowCheck: (v: RowActionStatus) => void;
+  handleRowHover: (v: RowActionStatus) => void;
   handleShowOverview: OnMapRowCellClick;
+  uniqueCategoryNames: string[];
 };
 
 function Row(props: MapDetailsTableRowProps): JSX.Element {
-  const { row, handleRowCheck, handleShowOverview, isSelectedInMap, pingCount, isChecked } = props;
+  const {
+    row,
+    handleRowCheck,
+    handleRowHover,
+    handleShowOverview,
+    isSelectedInMap,
+    pingCount,
+    isChecked,
+    uniqueCategoryNames
+  } = props;
 
   const onCheck = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
-    handleRowCheck({ critter_id: row.critter_id, checked: val });
+    handleRowCheck({ critter_id: row.critter_id, active: val });
   };
 
   return (
-    <TableRow hover={!isSelectedInMap} className={`map-bottom-panel-row ${isSelectedInMap ? 'row-selected' : ''}`}>
+    <TableRow
+      hover={!isSelectedInMap}
+      className={`map-bottom-panel-row ${isSelectedInMap ? 'row-selected' : ''}`}
+      onMouseEnter={() => handleRowHover({ critter_id: row.critter_id, active: true })}
+      onMouseLeave={() => handleRowHover({ critter_id: row.critter_id, active: false })}>
       <TableCell padding='checkbox'>
         <Checkbox color='primary' onChange={onCheck} checked={isChecked} />
       </TableCell>
@@ -151,8 +171,9 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
           }}></Box>
       </TableCell>
       <TableCell>{row.taxon}</TableCell>
-      <TableCell>{row.collection_unit}</TableCell>
-      <TableCell>{row.collective_unit}</TableCell>
+      {uniqueCategoryNames.map((property) => {
+        return <TableCell key={`cu_${property}`}>{row[property] ?? null}</TableCell>;
+      })}
       {row.critter_id ? (
         <CellWithLink row={row} propName={'wlh_id'} onClickLink={(): void => handleShowOverview('animal', row)} />
       ) : (
@@ -167,7 +188,6 @@ function Row(props: MapDetailsTableRowProps): JSX.Element {
       <CellWithLink row={row} propName={'device_id'} onClickLink={(): void => handleShowOverview('device', row)} />
       <TableCell>{row.device_status}</TableCell>
       <TableCell>{row.paddedFrequency}</TableCell>
-      <TableCell>{row.formattedCaptureDate}</TableCell>
       <TableCell>{row.formattedDate}</TableCell>
       <TableCell>{pingCount}</TableCell>
     </TableRow>

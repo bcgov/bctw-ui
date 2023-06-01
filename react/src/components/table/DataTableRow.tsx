@@ -7,10 +7,9 @@ import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useEffect, useState } from 'react';
 import { BCTWBase } from 'types/common_types';
 import './table.scss';
-import { ClassNames } from '@emotion/react';
 
 type DataTableRowProps<T> = Pick<DataTableProps<T>, 'headers' | 'customColumns' | 'onSelect' | 'onSelectMultiple'> & {
-  row: { [key in keyof T]: any };
+  row: T;
   index: number;
   selected: boolean;
   rowIdentifier: string;
@@ -40,6 +39,8 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
   const dispatchRowSelected = useTableRowSelectedDispatch();
   const styles = useStyles();
   const [isSelectedStatus, setSelectedStatus] = useState(false);
+  //TODO Is this updateRow still needed?
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [updateRow, setUpdateRow] = useState(false);
 
   const isMulti = isFunction(onSelectMultiple);
@@ -62,29 +63,29 @@ export default function DataTableRow<T extends BCTWBase<T>>(props: DataTableRowP
       isSelectedStatus ? handleAddSingleSelect() : null;
       return;
     }
-    if (isMulti) {
-      handleAddRemoveMultiSelect(isSelectedStatus);
-      return;
-    }
+    // if (isMulti) {
+    //   handleAddRemoveMultiSelect(isSelectedStatus);
+    //   return;
+    // }
   }, [isSelectedStatus]);
 
-  const handleAddRemoveMultiSelect = (add: boolean) => {
-    const rows = [];
-    /*setSelectedRows((r) => {
-      rows = r;
-      if (add) {
-        rows.push(row);
-      } else {
-        const indexOfRow = rows.indexOf(row);
-        if (indexOfRow > -1) {
-          rows.splice(indexOfRow, 1);
-        }
-      }
-      return rows;
-    });*/
-    //console.log('Called selectMultiple in DataTableRows')
-    //onSelectMultiple(rows);
-  };
+  // const handleAddRemoveMultiSelect = (add: boolean) => {
+  //   const rows = [];
+  //   /*setSelectedRows((r) => {
+  //     rows = r;
+  //     if (add) {
+  //       rows.push(row);
+  //     } else {
+  //       const indexOfRow = rows.indexOf(row);
+  //       if (indexOfRow > -1) {
+  //         rows.splice(indexOfRow, 1);
+  //       }
+  //     }
+  //     return rows;
+  //   });*/
+  //   //console.log('Called selectMultiple in DataTableRows')
+  //   //onSelectMultiple(rows);
+  // };
 
   const handleAddSingleSelect = (): void => {
     onSelect(row);

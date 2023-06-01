@@ -1,22 +1,22 @@
-import { INotificationMessage, ModalBaseProps } from 'components/component_interfaces';
-import { Box, CircularProgress } from '@mui/material';
-import { Icon, Modal } from 'components/common';
-import { DateRange, ExportTab, TabNames } from './ExportV2';
-import download from 'downloadjs';
-import { omitNull } from 'utils/common_helpers';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import tokml from 'tokml';
-import { formatDay } from 'utils/time';
-import { useState } from 'react';
 import { LoadingButton } from '@mui/lab';
+import { Box, CircularProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useDidMountEffect from 'hooks/useDidMountEffect';
-import { IFormRowEntry, QueryBuilderOperator } from 'components/form/QueryBuilder';
 import { AxiosError } from 'axios';
-import { formatAxiosError } from 'utils/errors';
+import { Icon, Modal } from 'components/common';
+import { INotificationMessage, ModalBaseProps } from 'components/component_interfaces';
+import { IFormRowEntry } from 'components/form/QueryBuilder';
+import { ExportStrings } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
-import { ExportStrings as constants, ExportStrings } from 'constants/strings';
+import download from 'downloadjs';
+import useDidMountEffect from 'hooks/useDidMountEffect';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useState } from 'react';
+import tokml from 'tokml';
 import { ExportAllParams } from 'types/export';
+import { omitNull } from 'utils/common_helpers';
+import { formatAxiosError } from 'utils/errors';
+import { formatDay } from 'utils/time';
+import { DateRange, ExportTab } from './ExportV2';
 
 type ExportModalProps = ModalBaseProps & {
   rowEntries: IFormRowEntry[];
@@ -133,17 +133,6 @@ export default function ExportDownloadModal({
     handleClose(false);
   };
 
-  const operatorTranslation = (operatorWord: QueryBuilderOperator | ''): string => {
-    switch (operatorWord) {
-      case 'Equals':
-        return '=';
-      case 'Not Equals':
-        return '<>';
-      default:
-        return '';
-    }
-  };
-
   useDidMountEffect(() => {
     startRequest();
   }, [downloadType]);
@@ -154,18 +143,26 @@ export default function ExportDownloadModal({
   });
 
   const handleAdvancedExport = (): void => {
-    const body: ExportAllParams = { bctw_queries: [], range: {start: null, end: null}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: attachedOnly };
-    const bctw_columns = ['device_id','frequency'];
+    const body: ExportAllParams = {
+      bctw_queries: [],
+      range: { start: null, end: null },
+      polygons: [],
+      lastTelemetryOnly: lastTelemetryOnly,
+      attachedOnly: attachedOnly
+    };
+    const bctw_columns = ['device_id', 'frequency'];
     for (const row of rowEntries) {
-      if(bctw_columns.includes(row.column)) {
+      if (bctw_columns.includes(row.column)) {
         body.bctw_queries.push({
           key: row.column,
           operator: row.operator,
           term: row.value.map((o) => o.toString().toLowerCase().trim())
-        })
-      }
-      else {
-        body[row.column] = {body: row.value.map((o) => o.toString().toLowerCase().trim()), negate: row.operator === "Not Equals"}
+        });
+      } else {
+        body[row.column] = {
+          body: row.value.map((o) => o.toString().toLowerCase().trim()),
+          negate: row.operator === 'Not Equals'
+        };
       }
     }
     body.range = {
@@ -181,8 +178,14 @@ export default function ExportDownloadModal({
   };
 
   const handleSimpleExport = (): void => {
-    const body: ExportAllParams = { bctw_queries: [], range: {start: null, end: null}, polygons: [], lastTelemetryOnly: lastTelemetryOnly, attachedOnly: false };
-    body['critter_id'] = {body: critterIDs, negate: false};
+    const body: ExportAllParams = {
+      bctw_queries: [],
+      range: { start: null, end: null },
+      polygons: [],
+      lastTelemetryOnly: lastTelemetryOnly,
+      attachedOnly: false
+    };
+    body['critter_id'] = { body: critterIDs, negate: false };
     body.range = {
       start: range.start.format(formatDay),
       end: range.end.format(formatDay)

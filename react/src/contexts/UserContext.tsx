@@ -1,12 +1,13 @@
+/* eslint-disable no-console */
 import { AxiosError } from 'axios';
 import { plainToClass } from 'class-transformer';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { useState, createContext, useEffect, useContext } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { UseQueryOptions } from 'react-query/types/react';
-import { User, IKeyCloakSessionInfo } from 'types/user';
+import { IKeyCloakSessionInfo, User } from 'types/user';
 
-export interface IUserContext {
+interface IUserContext {
   user: User | null;
   session: IKeyCloakSessionInfo | null;
   error: AxiosError | null;
@@ -18,7 +19,7 @@ export const UserContext = createContext<IUserContext>({
   error: null
 });
 
-export const UserContextDispatch = createContext(null);
+const UserContextDispatch = createContext(null);
 
 /**
  * provided in @file {App.tsx}
@@ -146,10 +147,3 @@ export const UserStateContextProvider: React.FC = (props) => {
     </UserContext.Provider>
   );
 };
-
-const useUserContextDispatch = () => {
-  const context = useContext(UserContextDispatch);
-  return context;
-};
-
-export { useUserContextDispatch };

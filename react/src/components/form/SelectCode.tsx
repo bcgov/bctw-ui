@@ -22,7 +22,6 @@ import { FormBaseProps } from 'types/form_types';
 import { SharedSelectProps } from './BasicSelect';
 import { PartialPick } from 'types/common_types';
 import { baseInputStyle, selectMenuProps } from 'components/component_constants';
-import { useTaxon } from 'contexts/TaxonContext';
 
 /* eslint-disable indent */
 type ChildRefs = {
@@ -70,7 +69,6 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
     istaxonSelect
   } = props;
   const api = useTelemetryApi();
-  const taxon = useTaxon();
 
   const [value, setValue] = useState(defaultValue);
   const [values, setValues] = useState<string[]>(defaultValues ? defaultValues : []);
@@ -96,7 +94,7 @@ const SelectCode = forwardRef((props: SelectCodeProps, ref: MutableRefObject<Chi
     'defaultValue'
   ]);
   // load the codeHeaders codes from db
-  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader, taxon?.id, {
+  const { data, error, isFetching, isError, isLoading, isSuccess } = api.useCodes(0, codeHeader, undefined, {
     // cacheTime set to zero to prevent weird caching behaviour with taxon selection
     cacheTime: ref ? 0 : 5000,
     enabled: !istaxonSelect

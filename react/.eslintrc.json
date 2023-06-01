@@ -20,12 +20,22 @@
     "no-console": "warn",
     // "@typescript-eslint/indent": ["warn", 2],
     "@typescript-eslint/ban-ts-comment": ["warn"],
-    "@typescript-eslint/explicit-function-return-type": [
+    "@typescript-eslint/no-unused-vars": [
       "warn",
       {
-        "allowTypedFunctionExpressions": true
+        "args": "none",
+        "ignoreRestSiblings": true,
+        "caughtErrors": "none"
       }
     ],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    // "no-unused-vars": "off",
+    // "@typescript-eslint/explicit-function-return-type": [
+    //   "warn",
+    //   {
+    //     "allowTypedFunctionExpressions": true
+    //   }
+    // ],
     "@typescript-eslint/no-empty-function": "warn"
   },
   "settings": {},

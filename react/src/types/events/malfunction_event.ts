@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { BCTWWorkflow, WorkflowType, eventToJSON, IBCTWWorkflow, OptionalDevice } from 'types/events/event';
+import { WorkflowType, eventToJSON, OptionalDevice, IWorkflow, SuperWorkflow } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { IDataLifeEndProps } from 'types/data_life';
 import { FormFieldObject } from 'types/form_types';
@@ -32,7 +32,7 @@ export type MalfunctionFormField = {
 interface IMalfunctionEvent
   extends MalfunctionDeviceProps,
     Readonly<Pick<CollarHistory, 'assignment_id'>>,
-    Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
+    Pick<IWorkflow<MalfunctionEvent>, 'shouldUnattachDevice'>,
     IDataLifeEndProps {}
 
 export type MalfunctionDeviceStatus = 'Potential Malfunction' | 'Active' | 'Offline' | 'Malfunction';
@@ -42,7 +42,7 @@ export type MalfunctionDeviceStatus = 'Potential Malfunction' | 'Active' | 'Offl
  * data life / attachment end date
  * start retrieval workflow??
  */
-export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow<MalfunctionEvent> {
+export default class MalfunctionEvent extends SuperWorkflow implements IMalfunctionEvent, IWorkflow<MalfunctionEvent> {
   // workflow props
   readonly event_type: WorkflowType;
   readonly shouldSaveDevice = true;
@@ -68,10 +68,11 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
   readonly last_transmission_date: Dayjs;
 
   constructor(last_transmission = dayjs()) {
+    super();
     this.onlySaveDeviceStatus = false;
     this.event_type = 'malfunction';
     // pass true as the disableDate param.
-    this.location_event = new LocationEvent('malfunction', last_transmission ?? dayjs(), true);
+    //this.location_event = new LocationEvent('malfunction', last_transmission ?? dayjs(), true);
     this.device_status = 'Potential Malfunction';
   }
 
@@ -87,7 +88,8 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
         return columnToHeader(s);
     }
   }
-  get displayProps(): (keyof MalfunctionEvent)[] {
+  displayProps(): (keyof SuperWorkflow)[];
+  displayProps(): (keyof MalfunctionEvent)[] {
     return ['device_id'];
   }
   getWorkflowTitle(): string {
@@ -113,10 +115,10 @@ export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow
     else if (this.device_status === 'Offline') {
       props.push('offline_type', 'offline_date');
       ret = eventToJSON(props, this);
-      locs.offline_comment = locs.malfunction_comment;
-      locs.offline_date = locs.malfunction_date;
-      delete locs.malfunction_comment;
-      delete locs.malfunction_date;
+      // locs.offline_comment = locs.malfunction_comment;
+      // locs.offline_date = locs.malfunction_date;
+      // delete locs.malfunction_comment;
+      // delete locs.malfunction_date;
     }
     return omitNull({ ...ret, ...locs });
   }

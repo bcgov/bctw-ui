@@ -9,44 +9,10 @@ import { formatT } from 'utils/time';
 
 type ImportProps<T> = ModalBaseProps & { template: (keyof T)[]; data: T[] };
 
-export default function Export<T, J>({ handleClose, open, template, title, data }: ImportProps<T>): JSX.Element {
+export default function Export<T>({ handleClose, open, template, title, data }: ImportProps<T>): JSX.Element {
   // const api = useTelemetryApi();
   const [downloading, setIsDownloading] = useState(false);
   const fields = template.join(',');
-  //const [results, setResults] = useState([]);
-
-  //const { query, param, onNewData, defaultSort } = queryProps;
-
-  // const [aResults, setAResults] = useState([]);
-  // const [uResults, setUResults] = useState([]);
-
-  // fixme: better way to determine which page
-  // const isCritter = template[0] === 'critter_id';
-  // const templateString = JSON.stringify(template);
-  // const isUnattachedCritter = templateString === JSON.stringify(new Animal().displayProps);
-  // const isAttachedCritter = templateString === JSON.stringify(AttachedAnimal.attachedCritterDisplayProps);
-  //Old code
-  // const {
-  //   isError: isAError,
-  //   data: aData,
-  //   status: aStatus
-  // } = isAttachedCritter ? api.useAssignedCritters(0) : api.useAttachedDevices(0);
-  // const {
-  //   isError: isUError,
-  //   data: uData,
-  //   status: uStatus
-  // } = isUnattachedCritter ? api.useUnassignedCritters(0) : api.useUnattachedDevices(0);
-
-  //const { isFetching, isLoading, isError, data, isPreviousData, isSuccess } = query();
-
-  // useDidMountEffect(() => {
-  //   if (isSuccess && !isError) {
-  //     setResults(data);
-  //   }
-  //   // if (uStatus === 'success' && !isUError) {
-  //   //   setUResults(uData);
-  //   // }
-  // }, [isSuccess]);
 
   useDidMountEffect(() => {
     if (open) {

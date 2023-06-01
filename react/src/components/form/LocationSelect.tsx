@@ -1,4 +1,4 @@
-import { Box, Paper, TextField, useTheme } from '@mui/material';
+import { Box, Paper, TextField } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { AllGeoJSON } from '@turf/helpers';
 import simplify from '@turf/simplify';
@@ -9,13 +9,14 @@ import { initMap } from 'pages/map/map_init';
 import { useEffect, useRef, useState } from 'react';
 import shpjs from 'shpjs';
 import FileInput from './FileInput';
+import { voidFunc } from 'pages/map/map_helpers';
 
 type ILocationSelectProps = {
   handleDrawShape: (features: L.FeatureGroup) => void;
   height?: string;
 };
 
-export const locationStyles = makeStyles((theme) => ({
+const locationStyles = makeStyles((theme) => ({
   paper: {
     padding: '30px'
   },
@@ -39,7 +40,6 @@ export const locationStyles = makeStyles((theme) => ({
  * Pass a handleDrawShape function that will be called every time a new shape is drawn on the map, regardless of drawing method.
  */
 export default function LocationSelect(props: ILocationSelectProps): JSX.Element {
-  const theme = useTheme();
   const { handleDrawShape, height } = props;
   const styles = locationStyles();
 
@@ -52,10 +52,6 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
   /*
    * 0 - Min Lat, 1 -  Max Lat,  2 - Min Lon, 3-  Max Lon
    */
-
-  useEffect(() => {
-    console.log(boundingBox);
-  }, [boundingBox]);
 
   useEffect(() => {
     const updateComponent = (): void => {
@@ -72,10 +68,10 @@ export default function LocationSelect(props: ILocationSelectProps): JSX.Element
         initMap(
           mapRef,
           drawnItemsRef.current,
-          new L.GeoJSON(),
+          // new L.GeoJSON(),
           () => handleDrawShape(drawnItemsRef.current),
-          () => {},
-          () => {},
+          voidFunc,
+          voidFunc,
           handleDeleteLayers,
           drawOptions
         );

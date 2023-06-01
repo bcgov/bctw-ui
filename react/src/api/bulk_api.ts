@@ -46,7 +46,7 @@ export const bulkApi = (api: AxiosInstance): API => {
     return data;
   };
 
-  const uploadXlsx = async <T>(form: FormData): Promise<ParsedXLSXSheetResult> => {
+  const uploadXlsx = async (form: FormData): Promise<ParsedXLSXSheetResult> => {
     const url = createUrl({ api: importXLSXEndpoint });
     const { data } = await api.post(url, form);
     return data;
@@ -68,7 +68,7 @@ export const bulkApi = (api: AxiosInstance): API => {
   const getType = async <T>(type: BCTWType, id: string): Promise<T> => {
     const url = createUrl({ api: `${type}/${id}` });
     const { data } = await api.get(url);
-    return data;
+    return data.length ? data[0] : data;
   };
 
   /**
@@ -93,19 +93,18 @@ export const bulkApi = (api: AxiosInstance): API => {
     return results;
   };
 
-  const getAllExportData = async (body: any): Promise<string[]> => {
+  const getAllExportData = async (body: unknown): Promise<string[]> => {
     const url = createUrl({ api: exportAllEndpoint });
     const { data } = await api.post(url, body);
     const results = data.flat();
     return results;
   };
 
-  const getTemplateFile = async (file_key: string): Promise<any> => {
+  const getTemplateFile = async (file_key: string): Promise<unknown> => {
     const body = `file_key=${file_key}`;
     const url = createUrl({ api: 'get-template', query: body });
     const { data } = await api.get(url);
-    const results = data;
-    return results;
+    return data;
   };
 
   const getKeyX = async (device_ids?: number[]): Promise<DeviceWithVectronicKeyX[]> => {

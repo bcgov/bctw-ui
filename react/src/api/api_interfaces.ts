@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { ITableFilter } from 'components/table/table_interfaces';
-import { Animal } from 'types/animal';
+import { Critter, ICapture, ILocation, IMortality } from 'types/animal';
 import { Collar } from 'types/collar';
 import { uuid } from 'types/common_types';
 
@@ -16,6 +16,13 @@ type ApiProps = {
  */
 interface IUpsertPayload<T> {
   body: T;
+}
+
+interface ICbBulkUpdatePayload {
+  critters: Critter[];
+  captures: ICapture[];
+  locations: ILocation[];
+  mortalities: IMortality[];
 }
 
 // what an error looks like when performing a bulk import
@@ -38,7 +45,7 @@ type CellErrorDescriptor = {
 };
 
 type ParsedXLSXCellError = {
-  [key in (keyof Animal | keyof Collar) | 'identifier' | 'missing_data']?: CellErrorDescriptor;
+  [key in (keyof Critter | keyof Collar) | 'identifier' | 'missing_data']?: CellErrorDescriptor;
 };
 
 type WarningInfo = {
@@ -50,7 +57,7 @@ type WarningInfo = {
 
 type CheckedWarningInfo = WarningInfo & { checked: boolean };
 
-type AnimalCollar = Animal | Collar;
+type AnimalCollar = Critter | Collar;
 
 type XLSXPayload = {
   user_id: number;
@@ -96,12 +103,11 @@ export type {
   IBulkUploadResults,
   IUpsertPayload,
   IDeleteType,
-  ParsedXLSXCellError,
-  ParsedXLSXRowResult,
   ParsedXLSXSheetResult,
   WarningInfo,
   CellErrorDescriptor,
   CheckedWarningInfo,
   AnimalCollar,
-  XLSXPayload
+  XLSXPayload,
+  ICbBulkUpdatePayload
 };

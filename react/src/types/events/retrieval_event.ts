@@ -2,9 +2,9 @@ import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { BCTWWorkflow, eventToJSON, WorkflowType, OptionalDevice } from 'types/events/event';
+import { IWorkflow, eventToJSON, WorkflowType, OptionalDevice, SuperWorkflow } from 'types/events/event';
 import { MortalityDeviceEventProps } from 'types/events/mortality_event';
-import { Animal } from 'types/animal';
+import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
 import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
 import { DataLife } from 'types/data_life';
@@ -16,7 +16,7 @@ interface IRetrievalEvent
   extends Omit<MortalityDeviceEventProps, 'device_status'>,
     Pick<CollarHistory, 'assignment_id'>,
     Readonly<Pick<Collar, 'malfunction_date' | 'retrieval_comment'>>,
-    Readonly<Pick<Animal, 'capture_date' | 'mortality_date' | 'wlh_id' | 'animal_id'>>,
+    Readonly<Pick<Critter, 'wlh_id' | 'animal_id'>>,
     DataLife {}
 
 export type RetrievalFormField = {
@@ -28,7 +28,7 @@ export type RetrievalFormField = {
  * todo: display as checkbox if retrieved_ind is no??
  * todo: need to preserve is_retrievable?
  */
-export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<RetrievalEvent> {
+export default class RetrievalEvent extends SuperWorkflow implements IRetrievalEvent, IWorkflow<RetrievalEvent> {
   readonly event_type: WorkflowType;
   shouldUnattachDevice: boolean;
   readonly shouldSaveAnimal = false;
@@ -63,6 +63,7 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
   readonly mortality_date: Dayjs;
 
   constructor() {
+    super();
     this.event_type = 'retrieval';
     this.retrieved_ind = true;
     this.retrieval_date = getEndOfPreviousDay();
@@ -80,7 +81,8 @@ export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<Ret
         return columnToHeader(s);
     }
   }
-  get displayProps(): (keyof RetrievalEvent)[] {
+  displayProps(): (keyof SuperWorkflow)[];
+  displayProps(): (keyof RetrievalEvent)[] {
     return ['wlh_id', 'animal_id', 'device_id'];
   }
 

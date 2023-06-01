@@ -1,19 +1,20 @@
-import { darken, lighten, Table, TableBody, TableCell, TableRow, useTheme } from '@mui/material';
-import TableContainer from 'components/table/TableContainer';
+import { lighten, Table, TableBody, TableCell, TableRow, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Tooltip } from 'components/common';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
-import { PlainTableProps, Order } from 'components/table/table_interfaces';
+import { Order, PlainTableProps } from 'components/table/table_interfaces';
+import TableContainer from 'components/table/TableContainer';
 import TableHead from 'components/table/TableHead';
 import { useState } from 'react';
 import { BCTWBase } from 'types/common_types';
-import makeStyles from '@mui/styles/makeStyles';
-import { Tooltip } from 'components/common';
+
 /**
  * A table that expects the data to be provided.
  */
-export type HighlightTableProps<T> = PlainTableProps<T> & {
-  data: T[];
+type HighlightTableProps<T> = PlainTableProps<T> & {
+  data: Partial<T>[];
   rowIdentifier: string;
-  messages: any[];
+  messages: Record<number, Partial<Record<keyof T, string>>>[];
   onSelectCell: (row_idx: number, cellname: string) => void;
   dimFirstColumn: boolean;
   secondaryHeaders: string[];
@@ -48,9 +49,9 @@ export default function HighlightTable<T extends BCTWBase<T>>({
     setOrderBy(property);
   };
 
-  const handleClickCell = (row_idx: any, cellname: any): void => {
+  const handleClickCell = (row_idx: number, cellname: keyof T): void => {
     if (typeof onSelectCell === 'function' && data?.length) {
-      onSelectCell(row_idx, cellname);
+      onSelectCell(row_idx, String(cellname));
     }
   };
   return (
@@ -59,7 +60,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
         {data === undefined ? null : (
           <TableHead
             headersToDisplay={headers}
-            headerData={data && data[0]}
+            headerData={data && (data[0] as T)}
             secondaryHeaders={secondaryHeaders}
             isMultiSelect={false}
             numSelected={0}
@@ -95,7 +96,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                     return null;
                   }
                   const { value } = formatTableCell(obj, k);
-                  const isMessage = messages.length ? messages[prop][k] !== undefined : false;
+                  const isMessage = messages.length ? messages[prop][String(k)] !== undefined : false;
                   return (
                     <>
                       {isMessage ? (
@@ -104,7 +105,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
                           className={style.badCell}
                           key={`${String(k)}${i}`}
                           align={'left'}>
-                          <Tooltip title={messages[prop][k]}>
+                          <Tooltip title={messages[prop][String(k)]}>
                             <>{value}</>
                           </Tooltip>
                         </TableCell>

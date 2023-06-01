@@ -1,6 +1,4 @@
 import { Banner, BannerProps } from 'components/alerts/Banner';
-import { Icon } from 'components/common';
-import { useEffect, useState } from 'react';
 import WarningPrompts, { WarningPromptsProps } from './WarningPrompts';
 
 type WarningPromptsBannerProps = WarningPromptsProps &

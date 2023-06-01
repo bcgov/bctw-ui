@@ -33,10 +33,10 @@ type ExportRange = 'all' | 'selected';
   2) all time data - uses the export API endpoint to retrieve data older than the currently
   selected window.
 */
-export default function Export({ open, handleClose, groupedAssignedPings, range}: ImportProps): JSX.Element {
+export default function Export({ open, handleClose, groupedAssignedPings, range }: ImportProps): JSX.Element {
   const api = useTelemetryApi();
   const showNotif = useResponseDispatch();
-  const [exportParams, setExportParams] = useState<{type: eExportType, timespan: ExportRange}>(null);
+  const [exportParams, setExportParams] = useState<{ type: eExportType; timespan: ExportRange }>(null);
   const [critter_ids, setCritterIDs] = useState<string[]>([]);
   const [collar_ids, setCollarIDs] = useState<string[]>([]);
   const [start, setStart] = useState<Dayjs>(dayjs(range.start));
@@ -44,22 +44,22 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
   const [rangeType, setRangeType] = useState<ExportRange>('selected');
 
   useDidMountEffect(() => {
-    const critters = groupedAssignedPings.map(d => d.critter_id).filter(a => a);
-    const collars = groupedAssignedPings.map(d => d.collar_id).filter(a => a);
+    const critters = groupedAssignedPings.map((d) => d.critter_id).filter((a) => a);
+    const collars = groupedAssignedPings.map((d) => d.collar_id).filter((a) => a);
     setCritterIDs(critters);
     setCollarIDs(collars);
-  }, [groupedAssignedPings])
+  }, [groupedAssignedPings]);
 
   // when the export state changes, fetch the data to be exported
   useDidMountEffect(() => {
     const fetchExportData = async (): Promise<void> => {
       if (exportParams) {
-        const { type, timespan } = exportParams; 
+        const { type, timespan } = exportParams;
 
         const body: ExportQueryParams = {
           collar_ids,
           critter_ids,
-          type,
+          type
         };
         if (timespan === 'selected') {
           body.range = {
@@ -101,36 +101,36 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
 
   const formatResultAsCSV = (data: unknown[]): string => {
     const headers = Object.keys(data[0]).join();
-    const values = data.map(d => Object.values(d).join()).join('\n')
+    const values = data.map((d) => Object.values(d).join()).join('\n');
     const ret = `${headers}\n${values}`;
     return ret;
-  }
+  };
 
   const formatResultAsKML = (data: Record<string, unknown>[][]): string => {
-    const flattened: Record<string,unknown>[] = data.flatMap(d => omitNull(d));
+    const flattened: Record<string, unknown>[] = data.flatMap((d) => omitNull(d));
     const asGeoJSON = flattened.map((d, i) => {
       const withoutGeom = Object.assign({}, d);
       // remove objects from the geojson feature.
       delete withoutGeom.geom;
-      return { 
+      return {
         type: 'Feature',
         id: i,
         geometry: d.geom,
-        properties: withoutGeom 
-      }
-    })
-    const ret = tokml({type: 'FeatureCollection', features: asGeoJSON})
+        properties: withoutGeom
+      };
+    });
+    const ret = tokml({ type: 'FeatureCollection', features: asGeoJSON });
     return ret;
-  }
+  };
 
   // show notification when an error occurs
-  const onError = (err): void => showNotif({severity: 'error', message: formatAxiosError(err)});
+  const onError = (err): void => showNotif({ severity: 'error', message: formatAxiosError(err) });
 
-  // setup the API call 
+  // setup the API call
   const { mutateAsync, reset, isLoading } = api.useExport({ onSuccess, onError });
 
   // when an export button is clicked, set the download state
-  const clickExport = (type: eExportType): void => setExportParams({type, timespan: rangeType});
+  const clickExport = (type: eExportType): void => setExportParams({ type, timespan: rangeType });
 
   const handleChangeRange = (v: InboundObj): void => {
     setRangeType('selected');
@@ -139,19 +139,24 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
     if (key === 'tstart') {
       setStart(dayjs(val));
     } else {
-      setEnd(dayjs(val))
+      setEnd(dayjs(val));
     }
-  }
+  };
 
   return (
     <Modal open={open} handleClose={handleClose} title={'Export'}>
-      <Box px={5} py={2} style={{backgroundColor: '#fff'}}>
+      <Box px={5} py={2} style={{ backgroundColor: '#fff' }}>
         {isLoading ? <CircularProgress /> : null}
         <p>
-          <b>{critter_ids.length}</b> unique {critter_ids.length == 1 ? 'animal' : 'animals'} selected.<br />
-          <b>{collar_ids.length}</b> unique {collar_ids.length == 1 ? 'device' : 'devices'}  selected.<br />
+          <b>{critter_ids.length}</b> unique {critter_ids.length == 1 ? 'animal' : 'animals'} selected.
+          <br />
+          <b>{collar_ids.length}</b> unique {collar_ids.length == 1 ? 'device' : 'devices'} selected.
+          <br />
         </p>
-        <h3>Export history {rangeType === 'selected' ? `from ${start.format(formatDay)} to ${end.format(formatDay)}` : 'for all time'}</h3>
+        <h3>
+          Export history{' '}
+          {rangeType === 'selected' ? `from ${start.format(formatDay)} to ${end.format(formatDay)}` : 'for all time'}
+        </h3>
 
         <Box display='flex' columnGap={3} mb={5} alignItems={'center'}>
           <Box width={'50%'} display={'flex'} flexDirection={'column'} rowGap={2}>
@@ -170,15 +175,19 @@ export default function Export({ open, handleClose, groupedAssignedPings, range}
               minDate={start}
             />
           </Box>
-          <Box><b>— or —</b></Box>
+          <Box>
+            <b>— or —</b>
+          </Box>
           <Tooltip title={MapStrings.export.allTime}>
-            <Button variant='outlined' onClick={(): void => setRangeType('all')}>All Time</Button>
+            <Button variant='outlined' onClick={(): void => setRangeType('all')}>
+              All Time
+            </Button>
           </Tooltip>
         </Box>
-        <hr/>
+        <hr />
         <h3>Download</h3>
         <Box display={'flex'} columnGap={2}>
-          <Button onClick={(): void => clickExport(eExportType.animal)}>Animal Metadata</Button>
+          <Button onClick={(): void => clickExport(eExportType.animal)}>Critter Metadata</Button>
           <Button onClick={(): void => clickExport(eExportType.collar)}>Device Metadata</Button>
           <Button onClick={(): void => clickExport(eExportType.movement)}>Location Data</Button>
         </Box>

@@ -53,7 +53,7 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
     return columnToHeader(s);
   }
 
-  get displayProps(): (keyof OnboardUser)[] {
+  displayProps(): (keyof OnboardUser)[] {
     const props: (keyof OnboardUser)[] = [
       'username',
       'firstname',
@@ -74,7 +74,7 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
 
 // sent as part of the onboarding request
 // currently only used as details in the email sent to admin
-export interface IOnboardEmailDetails {
+interface IOnboardEmailDetails {
   populationUnit?: string;
   projectManager?: string;
   projectName?: string;

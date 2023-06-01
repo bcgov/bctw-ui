@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Paper, TablePagination, Theme, Typography, useTheme } from '@mui/material';
+import { CardContent, Paper, TablePagination, Theme, Typography, useTheme } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -70,7 +70,7 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
 
   const onSuccessKeyX = (response: IBulkUploadResults<VectronicKeyX>): void => {
     //Currently not doing anything with errors on upload
-    const { errors, results } = response;
+    const { results } = response;
     results.length
       ? showNotif({ severity: 'success', message: `Successfully imported ${results.length} Vectronic KeyX files` })
       : showNotif({ severity: 'warning', message: `No new Vectronic KeyX files were imported` });
@@ -83,7 +83,6 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
   };
 
   const onErrorKeyX = (e: AxiosError): void => {
-    console.log(e.message);
     showNotif({ severity: 'error', message: formatAxiosError(e) });
   };
 

@@ -1,11 +1,10 @@
-import * as React from 'react';
+import { Button, CardActions } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/styles';
-import { useState } from 'react';
-import { Button, CardActions, CardContent } from '@mui/material';
 import { Icon } from 'components/common';
+import { useState } from 'react';
 
 interface InfoCardProps {
   element: JSX.Element;

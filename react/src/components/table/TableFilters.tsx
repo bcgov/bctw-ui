@@ -102,7 +102,7 @@ function TableFilter<T>(props: TableFilterProps<T>): JSX.Element {
           displayLabel: columnToHeader(f as string)
         } as ISelectMultipleData;
       }),
-    []
+    [filterableProperties]
   );
   return (
     <Box display='flex' alignItems='center' columnGap={1}>

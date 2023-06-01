@@ -2,7 +2,7 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
-import { AnimalCollar, CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
+import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
 import { Banner, InfoBanner } from 'components/alerts/Banner';
 import { Icon, Modal } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
@@ -18,7 +18,6 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import useUser from 'hooks/useUser';
 import { KeyXUploader } from 'pages/vendor/KeyXUploader';
 import { useEffect, useState } from 'react';
-import { BCTWBase } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import WarningPromptsBanner from './WarningPromptsBanner';
 import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
@@ -67,23 +66,22 @@ interface ImportTabProps {
   show?: boolean;
 }
 
-type AnimalCollarRow = AnimalCollar & {
-  row_index: number;
-};
+// type AnimalCollarRow = AnimalCollar & {
+//   row_index: number;
+// };
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
-export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
-  const { title, sheetIndex, handleSubmit, show } = props;
+const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
+  const { title, sheetIndex, show } = props;
   const api = useTelemetryApi();
 
   const user = useUser();
-  const { data: users, isLoading: loadingUsers } = api.useUsers(0);
+  const { data: users } = api.useUsers(0);
   const [importUserID, setImportUserID] = useState<number>(null);
   const userID = importUserID ?? user?.id;
 
   const showNotif = useResponseDispatch();
   const { isValidated, isLoading, reset, setFile, sanitizedFile } = useImported_XLSX_File();
   const styles = useStyles();
-  // const { isSuccess, data: importData, error, refetch } = api.useGetTemplate('import_template');
 
   const [selectedError, setSelectedError] = useState<CellErrorDescriptor>(null);
   const [selectedCell, setSelectedCell] = useState<RowColPair>({});
@@ -139,10 +137,10 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
     reset();
   };
 
-  const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
+  const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean) => {
     let headers = [];
     if (hideEmpty) {
-      headers = [...getAllUniqueKeys(sheet)];
+      headers = ['row_index', ...getAllUniqueKeys(sheet)];
     } else {
       headers = sheet.headers;
     }
@@ -152,9 +150,9 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
   /**
    * TODO Add correct type for this.
    */
-  const getTableData = (): any[] => {
+  const getTableData = () => {
     const rows = currentSheet.rows.map((o, idx) => {
-      return { row_index: idx + 2, ...o.row } as AnimalCollarRow;
+      return { row_index: idx + 2, ...o.row };
     });
     return rows;
   };
@@ -168,8 +166,8 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 
     return headers;
   };
-  //What is the return type of this function?
-  const getTableHelpMessages = (sheet: ParsedXLSXSheetResult) => {
+
+  const getTableHelpMessages = (sheet: ParsedXLSXSheetResult): Record<number, Partial<Record<string, string>>>[] => {
     const messages = sheet.rows.map((e, idx) => {
       return Object.entries(e.errors).reduce((prev, curr) => {
         const headerIdx = sheet.headers.indexOf(curr[0]);
@@ -206,7 +204,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
         <Box className={styles.spacing}>
           <InfoBanner
             //Dont love this, but enums are dumb
-            text={sheetIndex === SheetNames.Telemetry ? constants['Telemetry'] : constants['Animal and Device']}
+            text={sheetIndex === SheetNames.Telemetry ? constants['Telemetry'] : constants['Critter and Device']}
           />
         </Box>
         <FileInputValidation
@@ -272,12 +270,7 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                   {/* TODO Add correct type for the headers */}
                   <HighlightTable
                     data={getTableData()}
-                    headers={
-                      [
-                        'row_index',
-                        ...getHeaders(currentSheet, hideEmptyColumns)
-                      ] as (keyof BCTWBase<AnimalCollarRow>)[]
-                    }
+                    headers={[...getHeaders(currentSheet, hideEmptyColumns)]}
                     secondaryHeaders={computeExcelHeaderRow(currentSheet, hideEmptyColumns)}
                     onSelectCell={handleCellSelected}
                     messages={getTableHelpMessages(currentSheet)}
@@ -318,8 +311,8 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
                   label='Assign data to'
                   values={users ? users.map((u) => u.nameID) : [user?.nameID]}
                   handleChange={(n: string): void => {
-                    const [name, id] = n.split(' - ');
-                    setImportUserID(parseInt(id));
+                    const nameID = n.split(' - ');
+                    setImportUserID(parseInt(nameID[1]));
                   }}
                 />
               ) : null}
@@ -358,19 +351,19 @@ export const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetN
 //Make sure the reset/handleFileClear is called after both the telemetry and animalDevice
 export const AnimalAndDeviceImportTab = (props: ImportTabProps) => {
   const handleSubmit = (): void => {
-    console.log('submitting animal and device');
+    // console.log('submitting animal and device');
   };
   return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.AnimalAndDevice} handleSubmit={handleSubmit} />;
 };
 export const TelemetryImportTab = (props: ImportTabProps) => {
   const handleSubmit = (): void => {
-    console.log('submitting telemetry');
+    // console.log('submitting telemetry');
   };
   return <ImportAndPreviewTab {...props} sheetIndex={SheetNames.Telemetry} handleSubmit={handleSubmit} />;
 };
 export const KeyXImportTab = (props: ImportTabProps) => {
   const { title, show, tabIndex } = props;
-  const { setTabStatus, tabsValidation } = useTabs();
+  const { setTabStatus } = useTabs();
   const handleAllKeyXUploaded = (status: boolean): void => {
     setTabStatus(tabIndex, status ? 'success' : 'warning');
   };

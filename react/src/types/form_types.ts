@@ -1,5 +1,9 @@
 import { BaseTextFieldProps } from '@mui/material';
-import { ReactNode } from 'react';
+import { ICbRouteKey } from 'critterbase/types';
+import { CSSProperties, ReactNode } from 'react';
+import { QueryStatus } from 'react-query';
+import { CaptureEvent2 } from './events/capture_event';
+import MortalityEvent from './events/mortality_event';
 
 export type KeyType = string | number | symbol;
 //export type taxonCast = {[key in keyof typeof etaxon]?: string};
@@ -12,7 +16,10 @@ export enum eInputType {
   datetime = 'datetime',
   time = 'time',
   code = 'code',
-  multiline = 'multiline'
+  multiline = 'multiline',
+  select = 'select',
+  cb_select = 'cb_select', //critterbase select field
+  cb_capture_fields = 'cb_capture_fields'
 }
 
 /**
@@ -30,31 +37,40 @@ export type FormBaseProps = Pick<BaseTextFieldProps, 'label'> & {
  */
 export type FormFieldObject<T> = Pick<BaseTextFieldProps, 'disabled' | 'required'> & {
   prop: keyof T;
-  // prop: KeyType;
   type: eInputType;
   taxon?: string[];
-  //cast?: taxonCast // ex: {moose: 'wildlife_unit', grey_wolf: 'wildlife_unit'}
   codeName?: string;
+  cbRouteKey?: ICbRouteKey;
   span?: boolean;
   tooltip?: ReactNode;
   validate?: <T>(input: T) => string;
+  style?: CSSProperties;
 };
+
+export const FormCommentStyle: CSSProperties = { display: 'flex', flexGrow: 1 };
 
 // spread in form field constructors to make a field required
 export const isRequired = { required: true };
-export const isDisabled = { disabled: true };
+//export const isDisabled = { disabled: true };
 
 // what a form component passes when it's changed
 // ex: {name: 'bill', error: false}
 export type InboundObj = {
-  [key: string]: unknown;
+  [key: string]: unknown | { id: string; label: string };
+  // label?: string;
+  // id?: string;
   error?: boolean;
+  nestedEventKey?:
+    | keyof Pick<CaptureEvent2, 'capture_location' | 'release_location'>
+    | keyof Pick<MortalityEvent, 'location'>;
+  eventKey?: string;
 };
 
 /**
  *
  */
 export type FormChangeEvent = { (v: InboundObj): void };
+export type CbRouteStatusHandler = { (q: QueryStatus, key: ICbRouteKey): void };
 
 /**
  * form change events pass an object with:
@@ -62,10 +78,12 @@ export type FormChangeEvent = { (v: InboundObj): void };
  * b) error: boolean
  * @returns the keyof T / value record
  */
-export const parseFormChangeResult = <T>(changed: InboundObj): [keyof T, unknown] => {
+export const parseFormChangeResult = <T>(changed: InboundObj): [keyof T, unknown, string] => {
   const key = Object.keys(changed)[0] as keyof T;
-  const value = Object.values(changed)[0];
-  return [key, value];
+  const val = Object.values(changed)[0];
+  const value = val?.['id'] ?? val;
+  const label: string = val?.['label'] ?? val;
+  return [key, value, label];
 };
 
 /**

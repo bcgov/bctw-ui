@@ -1,6 +1,6 @@
 import { Box, ButtonProps, Grid } from '@mui/material';
 import { formatTableCell } from 'components/table/table_helpers';
-import { cloneElement, Children, Key, ReactElement, ReactNode } from 'react';
+import { Children, Key, ReactElement, ReactNode, cloneElement } from 'react';
 
 interface TabPanelProps {
   children?: ReactNode;
@@ -36,7 +36,7 @@ type EditHeaderProps<T> = {
  */
 const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>): JSX.Element => {
   return (
-    <Box display='flex' justifyContent='space-between' alignItems='top' pt={3} mx={3}>
+    <Box display='flex' justifyContent='space-between' alignItems='top' py={2}>
       <Box>
         <Box component='h1' mt={0} mb={1}>
           {title}
@@ -44,12 +44,15 @@ const EditHeader = <T,>({ title, headers, obj, format, btn }: EditHeaderProps<T>
         <dl className='headergroup-dl'>
           {headers.map((p, idx: number) => {
             const { value } = formatTableCell<T>(obj, p);
-            return (
-              <Box key={`header-${idx}`} display='inline' mr={2}>
-                <dd>{format(p)}:</dd>
-                <dt>{value}</dt>
-              </Box>
-            );
+            //Checks if value exists so no empty properties displayed in header
+            if (value) {
+              return (
+                <Box key={`header-${idx}`} display='inline' pr={1}>
+                  <dd>{format(p)}:</dd>
+                  <dt>{value}</dt>
+                </Box>
+              );
+            }
           })}
         </dl>
       </Box>
@@ -65,17 +68,28 @@ type FormSectionProps = {
   disabled?: boolean;
   hide?: boolean;
   children: ReactNode;
+  size?: 'small' | 'large';
 };
 /** creates a section of a form with a grid layout
  * @param children must not contain non valid elements (ex. fragments or nulls)
  * top level children must have key props
  */
-const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionProps): JSX.Element => {
+const FormSection = ({ id, header, btn, disabled, children, hide, size = 'small' }: FormSectionProps): JSX.Element => {
   if (hide) return null;
+  const childrenRender = Children.map(children, (child: ReactElement, idx: number) => {
+    const isDisabled = child?.props?.disabled ?? disabled;
+    // fixme: adding colgap via child component margin-botom instead
+    return cloneElement(child, {
+      key: `${id}-${idx}`,
+      disabled: isDisabled,
+      style: { ...child.props.style }
+    });
+  });
+
   return (
-    <Box component='fieldset' p={2}>
+    <Box component='fieldset'>
       {header ? (
-        <Box component='legend' className={'legend'} mb={1} mt={1}>
+        <Box component='legend' className={size === 'small' ? 'legend' : 'large-legend'} mb={1} mt={1}>
           {header}
           {btn}
         </Box>
@@ -84,15 +98,7 @@ const FormSection = ({ id, header, btn, disabled, children, hide }: FormSectionP
         {/* fixme: why doesn't colGap/columnspacing work? */}
         <Grid container spacing={1}>
           <Grid item xs={12}>
-            {Children.map(children, (child: ReactElement, idx: number) => {
-              const isDisabled = child?.props?.disabled ?? disabled;
-              // fixme: adding colgap via child component margin-botom instead
-              return cloneElement(child, {
-                key: `${id}-${idx}`,
-                disabled: isDisabled,
-                style: { ...child.props.style, marginBottom: '10px' }
-              });
-            })}
+            {childrenRender}
           </Grid>
         </Grid>
       </Box>

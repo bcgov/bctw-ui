@@ -1,14 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import { TelemetryAlert } from 'types/alert';
-import dayjs, { Dayjs } from 'dayjs';
-import { AttachedAnimal } from 'types/animal';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { ITelemetryPoint } from 'types/map';
-import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
-import { getStyle, setupLatestPingOptions, setupPingOptions, setupTracksOptions } from 'pages/map/point_setup';
-import { getFillColorByDeviceStatus, splitPings } from 'pages/map/map_helpers';
 import { Box, CircularProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import dayjs, { Dayjs } from 'dayjs';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { getFillColorByDeviceStatus, splitPings, voidFunc } from 'pages/map/map_helpers';
+import { hidePopup, initMap, setPopupInnerHTML } from 'pages/map/map_init';
+import { getStyle, setupLatestPingOptions, setupPingOptions, setupTracksOptions } from 'pages/map/point_setup';
+import { useEffect, useRef, useState } from 'react';
+import { ITelemetryPoint } from 'types/map';
 import { formatDay } from 'utils/time';
 
 interface SimpleMapProps {
@@ -51,7 +49,6 @@ export default function SimpleMap({
 
   const {
     isFetching: fetchingPings,
-    isLoading: isLoadingPings,
     isError: isErrorPings,
     data: fetchedPings
   } = api.usePingsPerCritter(
@@ -103,8 +100,8 @@ export default function SimpleMap({
         const crittersPings = fetchedPings;
         const { latest, other } = splitPings(crittersPings);
         setLatestPings(latest);
-        pingsLayer.addData(other as any);
-        latestPingsLayer.addData(latest as any);
+        pingsLayer.addData(other as unknown as GeoJSON.GeoJsonObject);
+        latestPingsLayer.addData(latest as unknown as GeoJSON.GeoJsonObject);
 
         flyToLatestPings(latest);
 
@@ -121,7 +118,7 @@ export default function SimpleMap({
       tracksLayer.clearLayers();
       setupTracksOptions(tracksLayer);
       const crittersTracks = fetchedTracks;
-      tracksLayer.addData(crittersTracks as any);
+      tracksLayer.addData(crittersTracks as unknown as GeoJSON.GeoJsonObject);
       latestPingsLayer.bringToFront();
       tracksLayer.bringToBack();
     }
@@ -143,11 +140,11 @@ export default function SimpleMap({
         initMap(
           mapRef,
           drawnItems,
-          new L.GeoJSON(),
-          () => {},
-          () => {},
-          () => {},
-          () => {},
+          // new L.GeoJSON(),
+          voidFunc,
+          voidFunc,
+          voidFunc,
+          voidFunc,
           drawOptions,
           true,
           DIV_ID

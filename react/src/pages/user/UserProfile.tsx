@@ -1,17 +1,14 @@
-import { Button } from 'components/common';
-import { useContext, useEffect, useState } from 'react';
-import { UserContext } from 'contexts/UserContext';
-import { User } from 'types/user';
 import { Box, Typography } from '@mui/material';
-import DataTable from 'components/table/DataTable';
-import { ITableQueryProps } from 'components/table/table_interfaces';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import ManageLayout from 'pages/layouts/ManageLayout';
-import { UserCritterAccess } from 'types/animal_access';
+import { AlertBanner } from 'components/alerts/AlertBanner';
+import { Button } from 'components/common';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
+import { UserContext } from 'contexts/UserContext';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { UserAnimalAccess } from 'pages/data/animals/UserAnimalAccess';
-import { AlertBanner } from 'components/alerts/AlertBanner';
+import ManageLayout from 'pages/layouts/ManageLayout';
+import { useContext, useEffect, useState } from 'react';
+import { User } from 'types/user';
 
 export default function UserProfile(): JSX.Element {
   const useUser = useContext(UserContext);

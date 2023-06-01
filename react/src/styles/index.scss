@@ -30,6 +30,12 @@ fieldset {
   font-weight: 700;
 }
 
+.large-legend {
+  float: left;
+  font-weight: 700;
+  font-size: 20px;
+}
+
 .fieldset-form {
   flex: 1 1 auto;
 }
@@ -60,7 +66,7 @@ fieldset {
 // Header Group
 .headergroup-dl {
   margin: 0;
-  margin-left: 0.5rem;
+  // margin-left: 0.5rem;
 
   dd,
   dt {
@@ -106,7 +112,7 @@ fieldset {
 
 .tabs {
   border-bottom: 1;
-  border-color: 'divider'
+  border-color: 'divider';
 }
 
 // Table

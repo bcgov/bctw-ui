@@ -93,11 +93,6 @@ const isDev = (): boolean => {
   return process?.env?.NODE_ENV === 'development';
 };
 
-// for testing form handlers
-async function sleep(ms: number): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 // removes single quotes from strings
 // fixme: escape properly
 const escapeRegex = (str: string): string => {
@@ -140,4 +135,4 @@ const postJSON = async <T>(api: AxiosInstance, url: string, body: T): Promise<Ax
   return api.post(url, json);
 };
 
-export { asJSON, escapeRegex, getBaseUrl, createUrl, createFormData, isDev, sleep, postJSON, searchToQueryString };
+export { getBaseUrl, createUrl, createFormData, isDev, postJSON };

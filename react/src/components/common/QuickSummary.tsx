@@ -1,14 +1,14 @@
-import { Box, Button, CircularProgress, Link, Skeleton, Theme, Typography, useTheme } from '@mui/material';
+import { Box, Button, Theme, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Icon } from 'components/common';
+import { LatestDataRetrieval, QuickSummaryStrings } from 'constants/strings';
+import { UserContext } from 'contexts/UserContext';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { useContext, useEffect, useState } from 'react';
 import { InfoCard } from './InfoCard';
 import { SubHeader } from './partials/SubHeader';
-import makeStyles from '@mui/styles/makeStyles';
-import { useContext, useEffect, useState } from 'react';
-import { useTelemetryApi } from 'hooks/useTelemetryApi';
-import { UserContext } from 'contexts/UserContext';
-import { Icon } from 'components/common';
-import { CritterStrings, LatestDataRetrieval, QuickSummaryStrings } from 'constants/strings';
-import dayjs, { Dayjs } from 'dayjs';
-import { isToday } from 'date-fns/esm';
+import { isToday } from 'utils/time';
+import dayjs from 'dayjs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -68,6 +68,7 @@ export const QuickSummary = ({ handleDetails, showDetails }: QuickSummaryProps):
       data.forEach((animal) => {
         counts[animal.permission_type] += 1;
         if (animal.date_recorded) {
+          //TODO add this back CRITTERBASE INTEGRATION
           if (!isToday(dayjs(animal.date_recorded))) {
             setRetrievalSuccess(false);
           }

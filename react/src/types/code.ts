@@ -1,12 +1,7 @@
-import { BCTWBase } from './common_types';
-import { Type } from 'class-transformer';
-import { columnToHeader } from 'utils/common_helpers';
-import { eInputType, FormFieldObject } from './form_types';
-
 // just a string alias, but makes it clearer in other types when property should be a code
 type Code = string;
 
-// used in select multiple component 
+// used in select multiple component
 interface ICodeFilter {
   code_header: string;
   code_header_title: string;
@@ -34,7 +29,7 @@ interface ICode {
 
 interface ICodeHeader {
   id: number;
-  type: string
+  type: string;
   title: string;
   description: string;
 }
@@ -49,73 +44,71 @@ interface ICodeHeader {
 // }
 
 // represents the objects retrieved from the database
-export class CodeHeader implements BCTWBase<CodeHeader>, ICodeHeader {
-  id: number;
-  type: string
-  title: string;
-  description: string;
+// class CodeHeader implements BCTWBase<CodeHeader>, ICodeHeader {
+//   id: number;
+//   type: string;
+//   title: string;
+//   description: string;
 
-  get displayProps(): (keyof CodeHeader)[] {
-    return [];
-  }
+//   displayProps(): (keyof CodeHeader)[] {
+//     return [];
+//   }
 
-  static getProps(): (keyof ICode)[] {
-    return ['id', 'code', 'description', 'long_description'];
-  }
+//   static getProps(): (keyof ICode)[] {
+//     return ['id', 'code', 'description', 'long_description'];
+//   }
 
-  toJSON(): CodeHeader { return this }
+//   toJSON(): CodeHeader {
+//     return this;
+//   }
 
-  get identifier(): keyof CodeHeader { return 'id' }
+//   get identifier(): keyof CodeHeader {
+//     return 'id';
+//   }
 
-  formatPropAsHeader(str: string): string {
-    return columnToHeader(str);
-  }
-}
+//   formatPropAsHeader(str: string): string {
+//     return columnToHeader(str);
+//   }
+// }
 
 // represents what a code header should look like when sending to api
-export class CodeHeaderInput implements BCTWBase<CodeHeaderInput> {
-  code_category_id: number;
-  code_header_name: string;
-  code_header_title: string;
-  code_header_description: string;
-  @Type(() => Date)valid_from: Date;
-  @Type(() => Date)valid_to: Date;
-  get identifier(): keyof CodeHeaderInput {
-    return 'code_header_name';
-  }
+// class CodeHeaderInput implements BCTWBase<CodeHeaderInput> {
+//   code_category_id: number;
+//   code_header_name: string;
+//   code_header_title: string;
+//   code_header_description: string;
+//   @Type(() => Date) valid_from: Date;
+//   @Type(() => Date) valid_to: Date;
+//   get identifier(): keyof CodeHeaderInput {
+//     return 'code_header_name';
+//   }
 
-  get displayProps(): (keyof CodeHeaderInput)[] {
-    return [];
-  }
+//   displayProps(): (keyof CodeHeaderInput)[] {
+//     return [];
+//   }
 
-  constructor() {
-    this.code_category_id = 1; // the bctw code category
-    this.code_header_name = '';
-    this.code_header_title = '';
-    this.code_header_description = '';
-  }
+//   constructor() {
+//     this.code_category_id = 1; // the bctw code category
+//     this.code_header_name = '';
+//     this.code_header_title = '';
+//     this.code_header_description = '';
+//   }
 
-  toJSON(): CodeHeaderInput {
-    return this;
-  }
+//   toJSON(): CodeHeaderInput {
+//     return this;
+//   }
 
-  formatPropAsHeader(str: string): string {
-    // remove the prepended 'code_' part of the string
-    const trimCode = str.slice(str.indexOf('_') + 1);
-    return columnToHeader(trimCode);
-  }
-}
+//   formatPropAsHeader(str: string): string {
+//     // remove the prepended 'code_' part of the string
+//     const trimCode = str.slice(str.indexOf('_') + 1);
+//     return columnToHeader(trimCode);
+//   }
+// }
 
-export const CodeFormFields: FormFieldObject<CodeHeaderInput>[] = [
-  { prop: 'code_header_name', type: eInputType.text },
-  { prop: 'code_header_title', type: eInputType.text },
-  { prop: 'code_header_description', type: eInputType.text },
-];
+// const CodeFormFields: FormFieldObject<CodeHeaderInput>[] = [
+//   { prop: 'code_header_name', type: eInputType.text },
+//   { prop: 'code_header_title', type: eInputType.text },
+//   { prop: 'code_header_description', type: eInputType.text }
+// ];
 
-export type {
-  ICode,
-  ICodeFilter,
-  IGroupedCodeFilter,
-  ICodeHeader,
-  Code,
-};
+export type { ICode, ICodeFilter, IGroupedCodeFilter, ICodeHeader, Code };

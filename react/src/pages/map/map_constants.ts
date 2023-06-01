@@ -1,4 +1,3 @@
-import { MapStrings } from 'constants/strings';
 import { TelemetryDetail } from 'types/map';
 import { StartDateKey } from 'utils/time';
 
@@ -11,10 +10,10 @@ type SearchPresets = {
   months: MapWeekMonthPresets[];
 };
 // device status options displayed in map filters panel
-const DEVICE_STATUS_OPTIONS = [
-  { id: 1, value: MapStrings.assignmentStatusOptionA, default: true },
-  { id: 2, value: MapStrings.assignmentStatusOptionU }
-];
+// const DEVICE_STATUS_OPTIONS = [
+//   { id: 1, value: MapStrings.assignmentStatusOptionA, default: true },
+//   { id: 2, value: MapStrings.assignmentStatusOptionU }
+// ];
 
 // dropdown filters displayed in map filters panel
 const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: string[] }[] = [
@@ -22,9 +21,7 @@ const CODE_FILTERS: { header: keyof TelemetryDetail; label?: string; filter?: st
   { header: 'taxon' },
   { header: 'critter_status' },
   { header: 'device_status' },
-  { header: 'sex' },
-  { header: 'collection_unit', filter: [] },
-  { header: 'collective_unit' }
+  { header: 'sex' }
 ];
 
 const SEARCH_PRESETS: SearchPresets = {
@@ -39,4 +36,4 @@ const SEARCH_PRESETS: SearchPresets = {
   ]
 };
 
-export { CODE_FILTERS, DEVICE_STATUS_OPTIONS, SEARCH_PRESETS };
+export { CODE_FILTERS, SEARCH_PRESETS };

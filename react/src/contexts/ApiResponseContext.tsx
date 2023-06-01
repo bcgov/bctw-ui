@@ -1,29 +1,28 @@
 import { INotificationMessage } from 'components/component_interfaces';
-import { useContext, createContext, useState, useEffect } from 'react';
-import { callbackify } from 'util';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-export const ApiResponseContext = createContext<INotificationMessage>(null);
-export const ApiResponseDispatch = createContext(null);
+const ApiResponseContext = createContext<INotificationMessage>(null);
+const ApiResponseDispatch = createContext(null);
 
 /**
- * fixme: change the name of this, since it's actually a context 
+ * fixme: change the name of this, since it's actually a context
  * that any child can use to show a notification
-*/
+ */
 
 const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => {
   const { children } = props;
   const [state, dispatch] = useState<INotificationMessage>(null);
 
   const clearNotif = (): void => {
-      dispatch(null);
-      state?.callback?.();
-  }
-  const notifDisplayTime = 3000;
+    dispatch(null);
+    state?.callback?.();
+  };
+  const notifDisplayTime = 4000;
   // automatically clear the notification after timer elapsed
   // or if the message is blank
   useEffect(() => {
     const timeout = (): void => {
-      if(!state){
+      if (!state) {
         return;
       }
       if (state?.message) {
@@ -33,7 +32,6 @@ const ResponseProvider = (props: { children: React.ReactNode }): JSX.Element => 
         clearNotif();
         return;
       }
-
     };
     timeout();
   }, [state]);

@@ -1,14 +1,12 @@
-import { Box, Button, Grid, ListItem, ListItemIcon, ListItemText, Typography, useTheme } from '@mui/material';
+import { Box, Grid, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Icon } from 'components/common';
 import MapModal from 'components/modal/MapModal';
-import Modal from 'components/modal/Modal';
 import { getTag } from 'components/table/table_helpers';
 import dayjs from 'dayjs';
 
 import { useState } from 'react';
 import { eAlertType, MalfunctionAlert, MortalityAlert, TelemetryAlert } from 'types/alert';
-import { eDeviceStatus } from 'types/collar';
 import { capitalize } from 'utils/common_helpers';
 import { formatT, getDaysDiff } from 'utils/time';
 import AlertActions from './AlertActions';
@@ -112,7 +110,7 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
                 }
                 secondary={
                   <>
-                    <b>Alert Date:</b> {formatT(alert.valid_from)} <b> Animal ID:</b> {alert?.animal_id ?? 'None'}{' '}
+                    <b>Alert Date:</b> {formatT(alert.valid_from)} <b> Critter ID:</b> {alert?.animal_id ?? 'None'}{' '}
                     <b>WLH ID:</b> {alert?.wlh_id ?? 'None'}
                   </>
                 }
@@ -137,7 +135,7 @@ export const FormatAlert = ({ alert, format }: FormattedAlertProps): JSX.Element
                   <Typography className={styles.spacing}>{`taxon: ${alert.taxon}`}</Typography>
                 </Grid>
                 <Grid item>
-                  <Typography className={styles.spacing}>{`Animal ID: ${alert?.animal_id ?? 'None'}`}</Typography>
+                  <Typography className={styles.spacing}>{`Critter ID: ${alert?.animal_id ?? 'None'}`}</Typography>
                 </Grid>
                 <Grid item>
                   <Typography className={styles.spacing}>{`Wildlife Health ID: ${alert?.wlh_id ?? 'None'}`}</Typography>

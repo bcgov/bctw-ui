@@ -19,6 +19,7 @@ const CritterStrings = {
     edit: 'Edit',
     map: 'Show on Map',
     mortality: 'Report Mortality',
+    capture: 'Add Capture & Release event',
     removeCollar: 'Remove Collar',
     attach: 'Attach Collar'
   },
@@ -39,17 +40,6 @@ const QuickSummaryStrings = {
   observed: 'Observed Animals',
   editable: 'Editable Animals'
 };
-
-const ImportSteps = [
-  'Select the import type',
-  'Download the template.',
-  'Paste the column headers into an Excel spreadsheet',
-  'Fill out the rows',
-  'Save the file in CSV format',
-  'Click the upload button and select your CSV file',
-  'If there were errors during the upload, view them in the error table.',
-  'Fix the errors, re-download the file as a CSV and try the upload again'
-];
 
 const AnimalDelegationSteps = [
   'Enter a valid email address of the user you wish to give access to',
@@ -84,7 +74,7 @@ const WorkflowStrings = {
     coordTypeUTM: 'Use UTM'
   },
   captivity: {
-    captivity: 'Animal is or has been part of a captivity program',
+    captivity: 'Critter is or has been part of a captivity program',
     isCaptive: 'Is the animal in a captivity program?',
     mort_captivity_status:
       'Did the mortality occur when animal was in the wild (natural range) or in captivity? (e.g., maternity pen, conservation breeding centre)?'
@@ -106,7 +96,8 @@ const WorkflowStrings = {
       'The previous device has been unassigned from this animal, you must assign a new device to the animal'
   },
   capture: {
-    workflowTitle: 'Capture Event Workflow',
+    workflowTitle: 'Capture & Release Event',
+    differentReleaseDetails: 'Are the release details different than the capture?',
     areUpdates: 'Are there updates to the animal identifiers or characteristics?',
     shouldReviewNotif: 'Please review the entire metadata for this animal for updates not captured in this form',
     isRecapture: 'Is this a recapture?',
@@ -118,7 +109,7 @@ const WorkflowStrings = {
     associatedID: 'What is the associated animal’s WLHID?',
     associatedRel: 'What is the relationship of the individual to the captured individual?',
     beenReleased: 'Has the animal been released?',
-    diedDuring: (wf: 'capture' | 'translocation_ind'): string => `Did the animal die during ${wf}?`,
+    diedDuring: (wf: 'capture' | 'release' | 'translocation_ind'): string => `Did the animal die during the ${wf}?`,
     btnContinueTo: (wf: 'Mortality' | 'Release'): string => `Continue to ${wf} Workflow`
   },
   retrieval: {
@@ -167,13 +158,6 @@ const CollarStrings = {
   csvButtonText: 'Upload CSV file'
 };
 
-const CodeStrings = {
-  addHeaderTitle: 'Add A New Code Header',
-  importTitle: 'Bulk Import Codes',
-  importText:
-    'Use this feature to add multiple codes. Codes cannot be edited here. The first row should include the headers Code Type, Code Name, Code Description. Valid From and Valid To are optional.'
-};
-
 const MapStrings = {
   startDateLabel: 'Start Date',
   startDateTooltip: 'Start date for telemetry fetch',
@@ -194,15 +178,15 @@ const MapStrings = {
   codeFiltersTooltips: {
     device_id: 'Filter for specific device within date range',
     taxon: 'Select taxon to filter',
-    critter_status: 'Animal status filter',
+    critter_status: 'Critter status filter',
     device_status: 'Device status filter',
     sex: 'Filter critter sex',
-    collection_unit: 'Filter by population unit',
+    collection_units: 'Filter by population unit',
     collective_unit: 'Filter by collection unit'
   },
   collectiveUnitLabel: 'Collective Unit',
   collectiveUnitTooltip: 'Filter by collection unit ',
-  customAnimalGroupLabel: 'Custom Animal Group',
+  customAnimalGroupLabel: 'Custom Critter Group',
   customAnimalGroupTooltip: 'Filter by existing animal group, or click pencil to create one',
   showOnlyCheckedLabel: 'Show Selected Records Only',
   showOnlyCheckedTooltip: 'Show only selected records in attribute table',
@@ -323,8 +307,8 @@ const ExportStrings = {
 };
 
 const ImportStrings = {
-  importToolHeader: 'Animal+Device Metadata and Telemetry',
-  uploadButton: 'Upload Animal+Device/Telemetry Template',
+  importToolHeader: 'Critter+Device Metadata and Telemetry',
+  uploadButton: 'Upload Critter+Device/Telemetry Template',
   downloadButton: 'Download Template',
   validValuesModal: 'Valid values for this field',
   checkboxLabel: 'Hide Empty Columns',
@@ -335,9 +319,9 @@ const ImportStrings = {
   errorBanner:
     'Hover over highlighted cells to view error info. Fix these errors in your spreadsheet application and re-upload.',
   detailBannerIdle: 'Click a cell for detailed information on that error.',
-  ['Animal and Device']: [
+  ['Critter and Device']: [
     'To add a new animal and collar, create a new row in the Device Metadata template and fill out the required fields.',
-    'Device IDs already assigned to an Animal ID must first be released by their owner before they can be assigned to a new Animal ID.'
+    'Device IDs already assigned to an Critter ID must first be released by their owner before they can be assigned to a new Critter ID.'
   ],
   ['Telemetry']: [
     'Telemetry import used for missing Telemetry of existing tracked vendor devices',
@@ -357,13 +341,11 @@ const DelegationRequestStrings = {
 };
 export {
   AnimalDelegationSteps,
-  CodeStrings,
   CollarStrings,
   CritterStrings,
   DataLifeStrings,
   FileStrings,
   FormStrings,
-  ImportSteps,
   MapStrings,
   MapTileLayers,
   OnboardStrings,

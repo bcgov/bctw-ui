@@ -1,6 +1,6 @@
 import { IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { Icon } from 'components/common';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 interface IMenuItem {
   label: string;
@@ -21,7 +21,6 @@ interface IActionsMenu {
  *
  */
 export const ActionsMenu = ({ menuItems, disabled, onOpen }: IActionsMenu): JSX.Element => {
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const setAnchor = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -30,7 +29,6 @@ export const ActionsMenu = ({ menuItems, disabled, onOpen }: IActionsMenu): JSX.
     setAnchorEl(event.currentTarget);
     //onOpen?.();
     event.stopPropagation();
-    
   };
   const handleClose = (event: React.MouseEvent<HTMLLIElement>) => {
     setAnchorEl(null);

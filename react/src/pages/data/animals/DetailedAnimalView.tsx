@@ -1,10 +1,9 @@
 import { Box, Grid, Paper } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { style } from '@mui/system';
 import { DetailedStatusCard } from 'components/common/DetailedCard';
 import { SubHeader } from 'components/common/partials/SubHeader';
 import SimpleMap from 'components/common/SimpleMap';
-import { AttachedAnimal } from 'types/animal';
+import { AttachedCritter } from 'types/animal';
 
 const useStyles = makeStyles((theme) => ({
   topHeader: {
@@ -20,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface DetailedAnimalViewProps {
-  detailAnimal: AttachedAnimal;
+  detailAnimal: AttachedCritter;
   height: string;
 }
 
@@ -38,7 +37,7 @@ export default function DetailedAnimalView({ detailAnimal, height }: DetailedAni
     <Grid className={styles.gridContainer} container spacing={4}>
       <Grid item md={12} lg={6}>
         <Box className={styles.topHeader}>
-          <SubHeader size='small' text='Animal Details' />
+          <SubHeader size='small' text='Critter Details' />
         </Box>
         <DetailedStatusCard
           displayObject={detailAnimal}
@@ -48,11 +47,11 @@ export default function DetailedAnimalView({ detailAnimal, height }: DetailedAni
             'wlh_id',
             'animal_id',
             'collection_unit',
-            'sex',
-            'capture_date',
-            'mortality_date'
+            'sex'
+            // 'capture_date',
+            // 'mortality_date'
           ]}
-          displayKeysInBox={['animal_comment']}
+          displayKeysInBox={['critter_comment']}
           headerOverride={headerOverrides}
         />
       </Grid>
@@ -72,7 +71,7 @@ export default function DetailedAnimalView({ detailAnimal, height }: DetailedAni
             'attachment_start',
             'attachment_end'
           ]}
-          displayKeysInBox={['capture_comment']}
+          displayKeysInBox={[]}
           headerOverride={headerOverrides}
         />
       </Grid>

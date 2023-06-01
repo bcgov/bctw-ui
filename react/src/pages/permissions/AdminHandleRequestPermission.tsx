@@ -1,30 +1,27 @@
-import { Box, Button, CircularProgress, IconButton, MenuItem, Select, Typography } from '@mui/material';
-import { List } from 'components/common';
-import { Icon, NotificationMessage } from 'components/common';
+import { Box, Button, CircularProgress, MenuItem, Select, Typography } from '@mui/material';
+import { isDev } from 'api/api_helpers';
+import { AxiosError } from 'axios';
+import { List, NotificationMessage } from 'components/common';
 import TextField from 'components/form/TextInput';
 import ConfirmModal from 'components/modal/ConfirmModal';
 import EditTable from 'components/table/EditTable';
+import { DelegationRequestStrings as msgStrings } from 'constants/strings';
 import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import AuthLayout from 'pages/layouts/AuthLayout';
-import { useState, useEffect, useRef } from 'react';
-import { doNothing, getUniqueValuesOfT } from 'utils/common_helpers';
+import { useEffect, useRef, useState } from 'react';
 import {
-  groupPermissionRequests,
   IExecutePermissionRequest,
   IGroupedRequest,
-  IPermissionRequest,
-  permissionDeniedReasons,
-  PermissionRequest,
-  PermissionWasDeniedReason
+  PermissionWasDeniedReason,
+  groupPermissionRequests,
+  permissionDeniedReasons
 } from 'types/permission';
-import { formatAxiosError } from 'utils/errors';
-import { AxiosError } from 'axios';
-import { formatDay } from 'utils/time';
-import { isDev } from 'api/api_helpers';
 import { eUserRole } from 'types/user';
-import { DelegationRequestStrings as msgStrings } from 'constants/strings';
+import { doNothing, getUniqueValuesOfT } from 'utils/common_helpers';
+import { formatAxiosError } from 'utils/errors';
+import { formatDay } from 'utils/time';
 
 /**
  * page that an admin uses to grant or deny permission requests from managers
@@ -35,8 +32,6 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
   const { data, status, error } = api.usePermissionRequests();
   const [requests, setRequests] = useState<IGroupedRequest[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-  const [showMapModal, setShowMapModal] = useState(false);
 
   const [isGrant, setIsGrant] = useState(false);
   const [denyReason, setDenyReason] = useState<PermissionWasDeniedReason>('Not given');
@@ -62,8 +57,8 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   const onSuccess = (data: IExecutePermissionRequest[]): void => {
     const successfulRequests: number[] = [];
-    for(const item of data) {
-      if('errormsg' in item === false) {
+    for (const item of data) {
+      if ('errormsg' in item === false) {
         successfulRequests.push(item.request_id);
       }
     }
@@ -170,11 +165,11 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
    */
   const DenyConfirmMessage = (
     <>
-      <Typography>{
-        selectedMultiRequestIDs.length > 1 ? 
-        msgStrings.confirmDenyMesgMulti(selectedMultiRequestIDs.length)
-         : msgStrings.confirmDenyMesg}
-        </Typography>
+      <Typography>
+        {selectedMultiRequestIDs.length > 1
+          ? msgStrings.confirmDenyMesgMulti(selectedMultiRequestIDs.length)
+          : msgStrings.confirmDenyMesg}
+      </Typography>
       <Typography>Please select a reason you are denying the request:</Typography>
       <Select
         variant={'outlined'}
@@ -204,7 +199,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
     'Requested By',
     'Date',
     'Email',
-    'Animal ID',
+    'Critter ID',
     'WLH ID',
     'Permission',
     'Comment'
@@ -226,7 +221,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
         <NotificationMessage severity={'error'} message={formatAxiosError(error)} />
       ) : (
         <>
-          <h1>Animal Access Delegation Requests</h1>
+          <h1>Critter Access Delegation Requests</h1>
           <Typography mb={3} variant='body1' component='p'>
             Grant or deny animal access requests from managers.
           </Typography>

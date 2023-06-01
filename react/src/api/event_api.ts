@@ -7,13 +7,16 @@ import {
   upsertDeviceEndpoint
 } from 'api/api_endpoint_urls';
 import { createUrl, postJSON } from 'api/api_helpers';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosInstance } from 'axios';
 import { RemoveDeviceInput } from 'types/collar_history';
 import { ChangeDataLifeInput } from 'types/data_life';
-import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice } from 'types/events/event';
+import { WorkflowType, OptionalAnimal, OptionalDevice, CbPayload, IWorkflow, IEvent } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { API, IBulkUploadResults, ApiProps } from './api_interfaces';
 import { useQueryClient } from 'react-query';
+import { CaptureEvent2 } from 'types/events/capture_event';
+import { CbRouters, CbRoutes } from 'critterbase/routes';
+import MortalityEvent from 'types/events/mortality_event';
 
 /**
  * API for saving workflow events @type {EventType}
@@ -21,8 +24,8 @@ import { useQueryClient } from 'react-query';
 
 export type WorkflowAPIResponse = true | AxiosError;
 
-export const eventApi = (props: ApiProps): API => {
-  const { api } = props;
+export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
+  const { api, cb_api } = props;
   const queryClient = useQueryClient();
 
   // since saving an event can affect many queries, invalidate everything
@@ -103,7 +106,48 @@ export const eventApi = (props: ApiProps): API => {
     }
   };
 
-  const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
+  const _saveCbCapture = async (payload: CbPayload<CaptureEvent2>): Promise<WorkflowAPIResponse> => {
+    try {
+      const { data } = await cb_api.post(`${CbRouters.captures}/create`, payload);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`error creating critterbase capture & release event ${formatAxiosError(err)}`);
+      return err;
+    }
+  };
+
+  const _saveCbMortality = async (payload: CbPayload<MortalityEvent>): Promise<WorkflowAPIResponse> => {
+    try {
+      const { data: cods } = await cb_api.get(`${CbRoutes.cod}`);
+      const predation_id = cods.find((a) => a.cod_category === 'Predation')?.cod_id;
+      if (payload.proximate_cause_of_death_id !== predation_id) {
+        delete payload.proximate_predated_by_taxon_id;
+      }
+      if (payload.ultimate_cause_of_death_id !== predation_id) {
+        delete payload.ultimate_predated_by_taxon_id;
+      }
+      const { data } = await cb_api.post(`${CbRouters.mortality}/create`, payload);
+      return _handleBulkResults(data);
+    } catch (err) {
+      console.error(`error creating critterbase mortality event ${formatAxiosError(err)}`);
+      return err;
+    }
+  };
+
+  const saveEvent = async <T extends IEvent>(event: IWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
+    if (event.event_type === 'capture') {
+      const c = await _saveCbCapture(event.critterbasePayload);
+      if (typeof c !== 'boolean') {
+        return c;
+      }
+    }
+    if (event.event_type === 'mortality') {
+      console.log('Mortality cb payload ' + JSON.stringify(event.critterbasePayload, null, 2));
+      const m = await _saveCbMortality(event.critterbasePayload);
+      if (typeof m !== 'boolean') {
+        return m;
+      }
+    }
     // capture events can change the data life start
     if (typeof event.getDataLife === 'function') {
       const dli = event.getDataLife();

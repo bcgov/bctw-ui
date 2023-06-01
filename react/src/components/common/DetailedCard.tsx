@@ -1,10 +1,12 @@
 import { Box, Grid, Paper, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { formatTag } from 'components/table/table_helpers';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
 import { formatDay } from 'utils/time';
 import { SubHeader } from './partials/SubHeader';
+import { AttachedCritter } from 'types/animal';
+import { Collar } from 'types/collar';
 
 interface DetailedStatusHeaderOverride {
   [key: string]: string;
@@ -34,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const DetailedStatusCard = <T extends Record<string, any>>({
+const DetailedStatusCard = <T extends AttachedCritter | Collar>({
   displayObject,
   displayKeysInGrid,
   displayKeysInBox,
@@ -66,7 +68,8 @@ const DetailedStatusCard = <T extends Record<string, any>>({
         key as string
       )
     ) {
-      retElement = dayjs(obj[key]).isValid() ? dayjs(obj[key]).format(formatDay) : 'None';
+      const castDayjs = obj[key] as unknown as Dayjs;
+      retElement = castDayjs.isValid() ? dayjs(castDayjs).format(formatDay) : 'None';
     } else {
       retElement =
         obj[key] === undefined || obj[key] === null || String(obj[key]) === 'Invalid Date' ? 'None' : String(obj[key]);
@@ -92,10 +95,10 @@ const DetailedStatusCard = <T extends Record<string, any>>({
             </>
           );
         })}
-        {displayKeysInBox.map((m) => {
+        {displayKeysInBox.map((m, i) => {
           return (
             <>
-              <Grid item xs={12}>
+              <Grid item xs={12} key={`card-${i}`}>
                 <SubHeader size='extra-small' text={formatHeader(m)} />
                 <Box className={style.boxElement}>
                   <Typography className={style.valueSize}>

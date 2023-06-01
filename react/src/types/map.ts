@@ -1,11 +1,21 @@
-import { Type, Expose } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
+import { Dayjs } from 'dayjs';
 import { GeoJsonObject, LineString, Point, Position } from 'geojson';
-import { IAnimalTelemetryBase, ICollectionUnit, eCritterStatus } from 'types/animal';
+import { ICollectionUnit, ICritterTelemetryBase, eCritterStatus } from 'types/animal';
 import { ICollarTelemetryBase } from 'types/collar';
 import { columnToHeader } from 'utils/common_helpers';
 import { dateObjectToDateStr } from 'utils/time';
-import { BCTWBase, BCTWType } from './common_types';
+import {
+  BCTWBase,
+  BCTWType,
+  DayjsToPlain,
+  getCollectionUnitKeys,
+  getCollectionUnitProps,
+  nullOrDayjs,
+  toClassOnly,
+  toPlainOnly
+} from './common_types';
 
 interface MapRange {
   start: string;
@@ -22,7 +32,7 @@ type DetailsSortOption = 'wlh_id' | 'device_id' | 'frequency' | 'date_recorded';
 type OnPanelRowSelect = (ids: number[]) => void;
 type OnMapRowCellClick = (type: BCTWType, row: ITelemetryDetail) => void;
 
-interface ITelemetryDetail extends ICollarTelemetryBase, IAnimalTelemetryBase {
+interface ITelemetryDetail extends ICollarTelemetryBase, ICritterTelemetryBase {
   critter_id: string;
   mortality_date: Date;
   date_recorded: Date;
@@ -33,21 +43,21 @@ interface ITelemetryPoint extends GeoJsonObject {
   type: 'Feature';
   geometry: Point;
   id: number;
-  properties: ITelemetryDetail;
+  properties: TelemetryDetail;
 }
 
 // represents a track
 interface ITelemetryLine extends GeoJsonObject {
   type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'critter_id' | 'collection_unit' | 'taxon' | 'map_colour'>;
+  properties: Pick<ITelemetryDetail, 'critter_id' | 'collection_units' | 'taxon' | 'map_colour'>;
   geometry: LineString;
 }
 
-interface IUnassignedTelemetryLine extends GeoJsonObject {
-  type: 'Feature';
-  properties: Pick<ITelemetryDetail, 'collar_id' | 'device_id'>;
-  geometry: LineString;
-}
+// interface IUnassignedTelemetryLine extends GeoJsonObject {
+//   type: 'Feature';
+//   properties: Pick<ITelemetryDetail, 'collar_id' | 'device_id'>;
+//   geometry: LineString;
+// }
 
 // a grouped by critter_id version of @type {ITelemetryPoint}
 interface ITelemetryGroup {
@@ -60,15 +70,15 @@ interface ITelemetryGroup {
 }
 
 // represents the jsonb object in the get_telemetry pg function
+// * Instantiate this class with createFlattenedProxy() to expose collection_units dynamically
 export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDetail> {
   critter_id: string;
   taxon: string;
   wlh_id: string;
   animal_id: string;
-  critter_status: eCritterStatus;
   @Type(() => Date) capture_date: Date;
   sex: string;
-  collection_unit: ICollectionUnit[];
+  collection_units: ICollectionUnit[];
   collar_id: string;
   device_id: number;
   device_vendor: string;
@@ -77,6 +87,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
   frequency_unit: string;
   device_status: string;
   collective_unit: string;
+  @Transform(nullOrDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
   @Type(() => Date) date_recorded: Date;
   @Type(() => Date) mortality_date: Date;
   @Expose() get formattedDevice(): string {
@@ -100,7 +111,21 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
     return 'device_id';
   }
 
-  get displayProps(): (keyof TelemetryDetail)[] {
+  // Getter for properties in collection_units
+  get collectionUnitProps(): Record<string, string> {
+    return getCollectionUnitProps(this.collection_units);
+  }
+
+  // Getter to return the keys of the new properties
+  get collectionUnitKeys(): string[] {
+    return getCollectionUnitKeys(this.collection_units);
+  }
+
+  get critter_status(): string {
+    return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
+  }
+
+  displayProps(): (keyof TelemetryDetail)[] {
     return [];
   }
 
@@ -145,7 +170,7 @@ const padFrequency = (num: number): string => {
 //   pointCount: number;
 // };
 type MapFormValue = {
-  header: keyof TelemetryDetail;
+  header: keyof TelemetryDetail | string;
   label: string;
   values: ISelectMultipleData[];
 };
@@ -164,11 +189,9 @@ export type {
   DetailsSortOption,
   OnlySelectedCritters,
   ITelemetryLine,
-  IUnassignedTelemetryLine,
   ITelemetryPoint,
   ITelemetryGroup,
   PingGroupType,
   MapFormValue
 };
-
 export { doesPointArrayContainPoint };

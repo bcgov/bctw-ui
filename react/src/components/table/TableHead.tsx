@@ -1,9 +1,8 @@
-import { Checkbox, TableCell, TableHead as MuiTableHead, TableRow, TableSortLabel } from '@mui/material';
+import { Checkbox, TableHead as MuiTableHead, TableCell, TableRow, TableSortLabel } from '@mui/material';
 import { createHeadCell } from 'components/table/table_helpers';
+import { HeadCell, TableHeadProps } from 'components/table/table_interfaces';
 import { BCTWBase } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
-import { HeadCell, TableHeadProps } from 'components/table/table_interfaces';
-import { useState } from 'react';
 
 export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T>): JSX.Element {
   const {
@@ -14,14 +13,14 @@ export default function TableHead<T extends BCTWBase<T>>(props: TableHeadProps<T
     onRequestSort,
     headerData,
     headersToDisplay,
-    numSelected,
+    //numSelected,
     onSelectAllClick,
     selectAll,
-    rowCount,
+    //rowCount,
     isMultiSelect,
     hiddenHeaders,
-    secondaryHeaders,
-    showIndex
+    secondaryHeaders
+    //showIndex
   } = props;
 
   // const handleChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean): void => {

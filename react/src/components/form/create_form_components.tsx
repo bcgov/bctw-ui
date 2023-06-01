@@ -1,21 +1,18 @@
-import TextField from 'components/form/TextInput';
-import NumberField from 'components/form/NumberInput';
-import SelectCode from './SelectCode';
+import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
+import { Tooltip } from 'components/common';
+import CheckBox from 'components/form/Checkbox';
 import DateInput, { DateInputProps } from 'components/form/Date';
 import DateTimeInput from 'components/form/DateTimeInput';
-import CheckBox from 'components/form/Checkbox';
+import NumberField from 'components/form/NumberInput';
+import TextField from 'components/form/TextInput';
+import { CbSelect, CbSelectProps } from 'critterbase/components/CbSelect';
+import { Dayjs } from 'dayjs';
 import { CSSProperties, ReactElement, ReactNode } from 'react';
-import { removeProps } from 'utils/common_helpers';
-import { eInputType, FormChangeEvent, FormFieldObject, KeyType, Overlap } from 'types/form_types';
-import dayjs, { Dayjs } from 'dayjs';
-import { BCTWFormat } from 'types/common_types';
-import { Tooltip } from 'components/common';
-import { BaseTextFieldProps, FormControlLabelProps, InputProps } from '@mui/material';
-import { Animal, AttachedAnimal } from 'types/animal';
-import { WorkflowFormField } from 'types/events/event';
 import { ICodeFilter } from 'types/code';
-import { showField } from 'utils/taxon';
-import { useTaxon } from 'contexts/TaxonContext';
+import { BCTWFormat } from 'types/common_types';
+import { CbRouteStatusHandler, FormChangeEvent, FormFieldObject, KeyType, Overlap, eInputType } from 'types/form_types';
+import { removeProps } from 'utils/common_helpers';
+import SelectCode from './SelectCode';
 
 type CreateInputBaseProps = {
   value: unknown;
@@ -24,7 +21,7 @@ type CreateInputBaseProps = {
   handleChange: FormChangeEvent;
 };
 
-type CreateInputProps = CreateInputBaseProps &
+export type CreateInputProps = CreateInputBaseProps &
   Pick<InputProps, 'rows' | 'multiline' | 'disabled' | 'required' | 'style'> &
   Pick<DateInputProps, 'minDate' | 'maxDate'> &
   Pick<BaseTextFieldProps, 'label'> &
@@ -42,7 +39,7 @@ type CreateInputProps = CreateInputBaseProps &
 function CreateEditTextField(props: CreateInputProps): ReactElement {
   const { prop, type, value, errorMessage, handleChange, validate } = props;
   // note: passing 'value' will cause the component to consider itself 'controlled'
-  const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName']);
+  const propsToPass = removeProps(props, ['value', 'errorMessage', 'codeName', 'handleRoute']);
   return type === eInputType.number ? (
     <NumberField
       propName={prop}
@@ -67,12 +64,20 @@ function CreateEditTextField(props: CreateInputProps): ReactElement {
 }
 
 function CreateEditMultilineTextField(props: CreateInputProps): ReactElement {
-  const newProps = Object.assign({ multiline: true, rows: 1, style: { width: '100%' } }, props);
+  const newProps = Object.assign({ multiline: true, rows: 1, comment: true }, props);
   return CreateEditTextField(newProps);
 }
 
 // date field handler
-function CreateEditDateField({ prop, value, handleChange, label, disabled }: CreateInputProps): ReactElement {
+function CreateEditDateField({
+  prop,
+  value,
+  handleChange,
+  label,
+  disabled,
+  minDate,
+  maxDate
+}: CreateInputProps): ReactElement {
   return (
     <DateInput
       propName={prop}
@@ -80,6 +85,8 @@ function CreateEditDateField({ prop, value, handleChange, label, disabled }: Cre
       defaultValue={value as Dayjs}
       changeHandler={handleChange}
       disabled={disabled}
+      minDate={minDate}
+      maxDate={maxDate}
       key={`input-date-${String(prop)}`}
     />
   );
@@ -100,7 +107,7 @@ function CreateEditDateTimeField({
     <DateTimeInput
       propName={prop}
       label={label}
-      defaultValue={dayjs(value as Date)}
+      defaultValue={value as Dayjs}
       changeHandler={handleChange}
       disabled={disabled}
       key={`input-dt-${String(prop)}`}
@@ -166,8 +173,12 @@ function CreateEditSelectField({
   );
 }
 
+function CreateCbSelectField(props: CbSelectProps): ReactElement {
+  return <CbSelect {...props} key={`${props.cbRouteKey}-${String(props.prop)}`} />;
+}
+
 // returns the funtion to create the form component based on input type
-const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
+export const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactElement) => {
   switch (inputType) {
     case eInputType.check:
       return CreateEditCheckboxField;
@@ -179,6 +190,8 @@ const getInputFnFromType = (inputType: eInputType): ((props: unknown) => ReactEl
       return CreateEditSelectField;
     case eInputType.multiline:
       return CreateEditMultilineTextField;
+    case eInputType.cb_select:
+      return CreateCbSelectField;
     default:
       return CreateEditTextField;
   }
@@ -196,7 +209,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   handleChange: FormChangeEvent,
   inputProps?: Partial<CreateInputProps>,
   displayBlock = false,
-  style = {}
+  style: CSSProperties = {},
+  handleRoute?: CbRouteStatusHandler
 ): ReactNode {
   if (formField === undefined) {
     return null;
@@ -210,7 +224,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
     label: obj.formatPropAsHeader(prop as keyof T),
     style,
     ...formField,
-    ...inputProps
+    ...inputProps,
+    handleRoute
   };
 
   let Comp = getInputFnFromType(type)(toPass);
@@ -224,34 +239,8 @@ function CreateFormField<T extends BCTWFormat<T>, U extends Overlap<T, U>>(
   }
   return displayBlock ? <div>{Comp}</div> : Comp;
 }
-interface ItaxonFormField {
-  obj: Animal | AttachedAnimal;
-  formField: WorkflowFormField;
-  handleChange: FormChangeEvent;
-  inputProps?: Partial<CreateInputProps>;
-  displayBlock?: boolean;
-  style?: CSSProperties;
-}
-function CreateTaxonFormField({
-  obj,
-  formField,
-  handleChange,
-  inputProps,
-  displayBlock = false,
-  style = {}
-}: ItaxonFormField): JSX.Element {
-  const taxon = useTaxon();
-  if (!showField(formField, taxon)) {
-    return null;
-  } else {
-    return CreateFormField(obj, formField, handleChange, inputProps, displayBlock, style) as JSX.Element;
-  }
-}
+
 export {
-  CreateEditTextField,
-  CreateEditDateField,
-  CreateEditCheckboxField,
-  CreateEditSelectField,
-  CreateFormField,
-  CreateTaxonFormField
+  CreateFormField
+  // CreateTaxonFormField
 };
