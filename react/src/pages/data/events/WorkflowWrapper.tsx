@@ -8,7 +8,7 @@ import useFormHasError from 'hooks/useFormHasError';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { ReactNode, useEffect, useState } from 'react';
 import { CaptureEvent2 } from 'types/events/capture_event';
-import { IWorkflow, WorkflowType } from 'types/events/event';
+import { IWorkflow, SuperWorkflow, WorkflowType } from 'types/events/event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import MortalityEvent from 'types/events/mortality_event';
 import RetrievalEvent from 'types/events/retrieval_event';
@@ -20,7 +20,7 @@ import MalfunctionEventForm from './MalfunctionEventForm';
 import MortalityEventForm from './MortalityEventForm';
 import RetrievalEventForm from './RetrievalEventForm';
 
-type WorkflowWrapperProps<T extends IWorkflow<T>> = ModalBaseProps & {
+type WorkflowWrapperProps<T extends SuperWorkflow> = ModalBaseProps & {
   event: T;
   onEventSaved?: (e: T) => void; // to notify alert that event was saved
   onEventChain?: (e: T, wft: WorkflowType) => void;
@@ -31,7 +31,7 @@ type WorkflowWrapperProps<T extends IWorkflow<T>> = ModalBaseProps & {
  * modal open state
  * saving
  */
-export default function WorkflowWrapper<T extends IWorkflow<T>>({
+export default function WorkflowWrapper<T extends SuperWorkflow>({
   event,
   onEventChain,
   onEventSaved,
@@ -175,7 +175,7 @@ export default function WorkflowWrapper<T extends IWorkflow<T>>({
       headercomp={
         <EditHeader<T>
           title={event?.getWorkflowTitle()}
-          headers={event.displayProps}
+          headers={event.displayProps()}
           obj={event}
           format={event.formatPropAsHeader}
         />

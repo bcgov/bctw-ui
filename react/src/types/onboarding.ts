@@ -53,7 +53,7 @@ export class OnboardUser extends UserBase implements BCTWBase<OnboardUser>, IOnb
     return columnToHeader(s);
   }
 
-  get displayProps(): (keyof OnboardUser)[] {
+  displayProps(): (keyof OnboardUser)[] {
     const props: (keyof OnboardUser)[] = [
       'username',
       'firstname',

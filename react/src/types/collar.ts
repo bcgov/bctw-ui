@@ -170,13 +170,13 @@ export class Collar implements BCTWBase<Collar>, ICollar {
     ];
   }
 
-  get displayProps(): (keyof Collar)[] {
+  displayProps(): (keyof Collar)[] {
     return Collar.propsToDisplay;
   }
 
   historyDisplayProps(): (keyof Collar)[] {
     const keys = Object.keys(new Collar()) as unknown as (keyof Collar)[];
-    const startsWith = this.displayProps;
+    const startsWith = this.displayProps();
     const excludes = ['collar_id', 'collar_transaction_id'] as (keyof Collar)[];
     return classToArray(keys, startsWith, excludes);
   }

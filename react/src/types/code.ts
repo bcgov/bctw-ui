@@ -50,7 +50,7 @@ interface ICodeHeader {
 //   title: string;
 //   description: string;
 
-//   get displayProps(): (keyof CodeHeader)[] {
+//   displayProps(): (keyof CodeHeader)[] {
 //     return [];
 //   }
 
@@ -83,7 +83,7 @@ interface ICodeHeader {
 //     return 'code_header_name';
 //   }
 
-//   get displayProps(): (keyof CodeHeaderInput)[] {
+//   displayProps(): (keyof CodeHeaderInput)[] {
 //     return [];
 //   }
 

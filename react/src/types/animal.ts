@@ -172,7 +172,7 @@ export class Critter implements BCTWBase<Critter>{
     return dayjs(this.mortality_timestamp).isValid() ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
-  get displayProps(): (keyof Critter)[] {
+  displayProps(): (keyof Critter)[] {
     return ['taxon', 'wlh_id', 'animal_id', 'critter_status'];
   }
 
@@ -275,7 +275,7 @@ export class Critter implements BCTWBase<Critter>{
   }
   historyDisplayProps(): (keyof Critter)[] {
     const keys = Object.keys(new Critter()) as unknown as (keyof Critter)[];
-    const startsWith = this.displayProps;
+    const startsWith = this.displayProps();
     const excludes = ['critter_id'] as (keyof Critter)[];
     return classToArray(keys, startsWith, excludes);
   }
@@ -653,7 +653,7 @@ export const getAnimalFormFields = (): FormFieldObject<AttachedCritter>[] => {
 //     }
 //   }
 
-//   get displayProps(): (keyof Critter)[] {
+//   displayProps(): (keyof Critter)[] {
 //     return ['taxon', 'collection_unit', 'wlh_id', 'animal_id', 'critter_status'];
 //     //return Critter.toCSVHeaderTemplate;
 //   }

@@ -76,7 +76,7 @@ export class UserCritterAccess implements IUserCritterAccess, BCTWBase<UserCritt
       'device_make'
     ];
   }
-  get displayProps(): (keyof UserCritterAccess)[] {
+  displayProps(): (keyof UserCritterAccess)[] {
     return UserCritterAccess.propsToDisplay;
   }
 

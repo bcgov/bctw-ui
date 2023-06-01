@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { WorkflowType, eventToJSON, OptionalDevice, IWorkflow } from 'types/events/event';
+import { WorkflowType, eventToJSON, OptionalDevice, IWorkflow, SuperWorkflow } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { IDataLifeEndProps } from 'types/data_life';
 import { FormFieldObject } from 'types/form_types';
@@ -42,7 +42,7 @@ export type MalfunctionDeviceStatus = 'Potential Malfunction' | 'Active' | 'Offl
  * data life / attachment end date
  * start retrieval workflow??
  */
-export default class MalfunctionEvent implements IMalfunctionEvent, IWorkflow<MalfunctionEvent> {
+export default class MalfunctionEvent extends SuperWorkflow implements IMalfunctionEvent, IWorkflow<MalfunctionEvent> {
   // workflow props
   readonly event_type: WorkflowType;
   readonly shouldSaveDevice = true;
@@ -68,6 +68,7 @@ export default class MalfunctionEvent implements IMalfunctionEvent, IWorkflow<Ma
   readonly last_transmission_date: Dayjs;
 
   constructor(last_transmission = dayjs()) {
+    super();
     this.onlySaveDeviceStatus = false;
     this.event_type = 'malfunction';
     // pass true as the disableDate param.
@@ -87,7 +88,8 @@ export default class MalfunctionEvent implements IMalfunctionEvent, IWorkflow<Ma
         return columnToHeader(s);
     }
   }
-  get displayProps(): (keyof MalfunctionEvent)[] {
+  displayProps(): (keyof SuperWorkflow)[];
+  displayProps(): (keyof MalfunctionEvent)[] {
     return ['device_id'];
   }
   getWorkflowTitle(): string {

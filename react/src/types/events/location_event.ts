@@ -57,7 +57,7 @@ export class LocationEvent implements IWorkflow<LocationEvent>, ILocation {
     return columnToHeader(k);
   }
 
-  get displayProps(): (keyof LocationEvent)[] {
+  displayProps(): (keyof LocationEvent)[] {
     return ['latitude', 'longitude'];
   }
 

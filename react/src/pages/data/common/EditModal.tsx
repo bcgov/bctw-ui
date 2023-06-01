@@ -98,7 +98,7 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   useDidMountEffect(() => {
     const params: Pick<IHistoryPageProps<T>, 'param' | 'propsToDisplay'> = {
       param: editing[editing.identifier],
-      propsToDisplay: editing.displayProps
+      propsToDisplay: editing.displayProps()
     };
     if (editing instanceof Critter) {
       params.propsToDisplay = editing.historyDisplayProps();

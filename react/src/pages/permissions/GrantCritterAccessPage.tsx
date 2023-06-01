@@ -55,7 +55,7 @@ export default function GrantCritterAccessPage(): JSX.Element {
           A user has access to devices through the user-animal association.
         </Typography>
         <DataTable
-          headers={new User().displayProps.filter((prop) => !['idir', 'bceid'].includes(prop))}
+          headers={new User().displayProps().filter((prop) => !['idir', 'bceid'].includes(prop))}
           title='Users'
           queryProps={{ query: api.useUsers }}
           onSelect={(u: User): void => setUser(u)}

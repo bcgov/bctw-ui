@@ -36,7 +36,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
 
   // Keeps track of conditionally rendered columns from collection_units
   const [combinedHeaders, setCombinedHeaders] = useState<(keyof Critter | string)[]>(
-    new Critter().displayProps as (keyof Critter | string)[]
+    new Critter().displayProps() as (keyof Critter | string)[]
   );
 
   // Inserts unique collection_unit categories as new column headers
@@ -44,7 +44,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const handleCollectionColumns = (rows: Critter[]): void => {
     const keys = rows.flatMap((row) => row.collectionUnitKeys);
     const uniqueKeys = [...new Set(keys)];
-    const baseHeaders = new Critter().displayProps;
+    const baseHeaders = new Critter().displayProps();
     setCombinedHeaders([...baseHeaders.slice(0, 2), ...uniqueKeys, ...baseHeaders.slice(2)]);
   };
 

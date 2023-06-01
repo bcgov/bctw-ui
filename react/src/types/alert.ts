@@ -2,13 +2,13 @@ import { Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { Critter, eCritterStatus } from 'types/animal';
 import { Collar, IAttachedCollar } from 'types/collar';
-import { BCTWBase, BCTWValidDates, nullToDayjs, uuid } from 'types/common_types';
+import { BCTWBase, BCTWValidDates, BaseTimestamps, nullToDayjs, uuid } from 'types/common_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { formatDay } from 'utils/time';
 
 import { Code } from 'types/code';
 import { DataLife } from 'types/data_life';
-import { editObjectToEvent } from './events/event';
+import { IWorkflow, SuperWorkflow, editObjectToEvent } from './events/event';
 import { eCritterPermission } from './permission';
 
 // telemetry alerts types
@@ -30,7 +30,10 @@ type AlertProp = keyof ITelemetryAlert;
 /**
  * base class for user telemetry alerts.
  */
-export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITelemetryAlert> {
+export class TelemetryAlert
+  extends SuperWorkflow
+  implements IWorkflow<TelemetryAlert>, DataLife, ITelemetryAlert, BaseTimestamps
+{
   alert_id: number;
   alert_type: eAlertType;
   @Transform(nullToDayjs) valid_from: Dayjs;
@@ -43,8 +46,8 @@ export class TelemetryAlert implements DataLife, ITelemetryAlert, BCTWBase<ITele
   @Transform(nullToDayjs) attachment_end: Dayjs;
   @Transform(nullToDayjs) data_life_start: Dayjs;
   @Transform(nullToDayjs) data_life_end: Dayjs;
-
-  get displayProps(): (keyof ITelemetryAlert)[] {
+  displayProps(): (keyof SuperWorkflow)[];
+  displayProps(): (keyof TelemetryAlert)[] {
     return [];
   }
   get isSnoozed(): boolean {
@@ -177,7 +180,7 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
     return super.formatPropAsHeader(s);
   }
 
-  toWorkflow<T>(workflow: T): T {
+  toWorkflow<T>(workflow: T) {
     // don't preserve animal status from the alert.
     return editObjectToEvent(this, workflow, ['critter_status']);
   }
@@ -189,14 +192,14 @@ export class MortalityAlert extends TelemetryAlert implements IMortalityAlert {
  * The missing data event triggers the device malfunction workflow
  */
 export class MalfunctionAlert extends MortalityAlert {
-  toWorkflow<T>(workflow: T): T {
+  toWorkflow<T>(workflow: T) {
     return editObjectToEvent(this, workflow, ['device_status']);
   }
 }
 
 /* This workflow might not be correct. Just need a type for the battery malfunction. */
 export class BatteryAlert extends MortalityAlert {
-  toWorkflow<T>(workflow: T): T {
+  toWorkflow<T>(workflow: T) {
     return editObjectToEvent(this, workflow, ['device_status']);
   }
 }

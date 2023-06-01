@@ -93,7 +93,7 @@ export class PermissionRequest implements IPermissionRequest, BCTWBase<Permissio
   @Transform(nullToDayjs) valid_to: Dayjs;
   status: PermissionRequestStatus;
 
-  get displayProps(): (keyof PermissionRequest)[] {
+  displayProps(): (keyof PermissionRequest)[] {
     return [];
   }
 

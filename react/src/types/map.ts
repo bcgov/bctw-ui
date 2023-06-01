@@ -125,7 +125,7 @@ export class TelemetryDetail implements ITelemetryDetail, BCTWBase<TelemetryDeta
     return this.mortality_timestamp ? eCritterStatus.mortality : eCritterStatus.alive;
   }
 
-  get displayProps(): (keyof TelemetryDetail)[] {
+  displayProps(): (keyof TelemetryDetail)[] {
     return [];
   }
 

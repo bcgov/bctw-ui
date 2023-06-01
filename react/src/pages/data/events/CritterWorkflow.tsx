@@ -19,10 +19,10 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
    * casting as CaptureEvent2 to prevent workflowWrapper error
    */
 
-  const [event, updateEvent] = useState(createEvent(editing, workflow) as CaptureEvent2);
+  const [event, updateEvent] = useState(createEvent(editing, workflow));
 
   useEffect(() => {
-    const a = createEvent(editing, workflow) as CaptureEvent2;
+    const a = createEvent(editing, workflow);
     updateEvent(a);
   }, [editing, workflow]);
   /**

@@ -72,7 +72,7 @@ export class CollarHistory implements BCTWBase<CollarHistory>, ICollarHistory {
     return props;
   }
 
-  get displayProps(): (keyof CollarHistory)[] {
+  displayProps(): (keyof CollarHistory)[] {
     return CollarHistory.propsToDisplay;
   }
 

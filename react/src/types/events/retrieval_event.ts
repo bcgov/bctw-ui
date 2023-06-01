@@ -2,7 +2,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { IWorkflow, eventToJSON, WorkflowType, OptionalDevice } from 'types/events/event';
+import { IWorkflow, eventToJSON, WorkflowType, OptionalDevice, SuperWorkflow } from 'types/events/event';
 import { MortalityDeviceEventProps } from 'types/events/mortality_event';
 import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
@@ -28,7 +28,7 @@ export type RetrievalFormField = {
  * todo: display as checkbox if retrieved_ind is no??
  * todo: need to preserve is_retrievable?
  */
-export default class RetrievalEvent implements IRetrievalEvent, IWorkflow<RetrievalEvent> {
+export default class RetrievalEvent extends SuperWorkflow implements IRetrievalEvent, IWorkflow<RetrievalEvent> {
   readonly event_type: WorkflowType;
   shouldUnattachDevice: boolean;
   readonly shouldSaveAnimal = false;
@@ -63,6 +63,7 @@ export default class RetrievalEvent implements IRetrievalEvent, IWorkflow<Retrie
   readonly mortality_date: Dayjs;
 
   constructor() {
+    super();
     this.event_type = 'retrieval';
     this.retrieved_ind = true;
     this.retrieval_date = getEndOfPreviousDay();
@@ -80,7 +81,8 @@ export default class RetrievalEvent implements IRetrievalEvent, IWorkflow<Retrie
         return columnToHeader(s);
     }
   }
-  get displayProps(): (keyof RetrievalEvent)[] {
+  displayProps(): (keyof SuperWorkflow)[];
+  displayProps(): (keyof RetrievalEvent)[] {
     return ['wlh_id', 'animal_id', 'device_id'];
   }
 

@@ -7,7 +7,7 @@ import ChangeContext from 'contexts/InputChangeContext';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { AttachedCollar, Collar, collarFormFields } from 'types/collar';
-import { IWorkflow, WorkflowType, editObjectToEvent } from 'types/events/event';
+import { IWorkflow, SuperWorkflow, WorkflowType, editObjectToEvent } from 'types/events/event';
 import { wfFields } from 'types/events/form_fields';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import RetrievalEvent from 'types/events/retrieval_event';
@@ -51,7 +51,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   };
 
   // if a malfunction event is saved and the device is retrieved, open the retrieval workflow
-  const handleWorkflowSaved = async (e: IWorkflow<MalfunctionEvent>): Promise<void> => {
+  const handleWorkflowSaved = async (e: SuperWorkflow): Promise<void> => {
     await setShowWorkflowForm(false);
     if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved_ind) {
       // console.log('im supposed to show the retrieval form', e);
@@ -198,7 +198,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                   </FormSection>
                   <WorkflowWrapper
                     open={showWorkflowForm}
-                    event={event as MalfunctionEvent}
+                    event={event}
                     handleClose={(): void => setShowWorkflowForm(false)}
                     onEventSaved={handleWorkflowSaved}
                   />

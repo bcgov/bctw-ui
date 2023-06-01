@@ -10,7 +10,7 @@ import { MortalityFormField } from './mortality_event';
 // import { ReleaseFormField } from './release_event';
 import { RetrievalFormField } from './retrieval_event';
 
-export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
+export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown' | 'alert';
 
 export type WorkflowFormProps<T extends IWorkflow<T>> = {
   event: T;
@@ -86,3 +86,20 @@ export const editObjectToEvent = <WF, E>(editing: E, workflow: WF, toRemove: (ke
   }
   return Object.assign(workflow, cp);
 };
+
+export class SuperWorkflow implements IWorkflow<SuperWorkflow> {
+  event_type: WorkflowType;
+  displayProps(): (keyof SuperWorkflow)[] {
+    throw new Error('Method not implemented.');
+  }
+  formatPropAsHeader(k: keyof SuperWorkflow): string {
+    return 'event_type';
+  }
+  getWorkflowTitle() {
+    return 'Super Workflow Title';
+  }
+  fields?: CaptureFormField2 | MortalityFormField | RetrievalFormField;
+  constructor() {
+    return this;
+  }
+}

@@ -67,7 +67,7 @@ export default function OnboardingAdminPage(): JSX.Element {
           Grant or deny new user requests. Only requests with Access type pending can be modified.
         </Typography>
         <DataTable
-          headers={new OnboardUser().displayProps}
+          headers={new OnboardUser().displayProps()}
           title='New user requests'
           queryProps={{ query: api.useOnboardRequests }}
           onSelect={handleSelectRequest}

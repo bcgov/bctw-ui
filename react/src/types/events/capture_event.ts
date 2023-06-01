@@ -5,14 +5,17 @@ import { Code } from 'types/code';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 import { IDataLifeStartProps } from 'types/data_life';
-import { CbPayload, IWorkflow, OptionalAnimal, WorkflowType, eventToJSON } from 'types/events/event';
+import { CbPayload, IWorkflow, OptionalAnimal, SuperWorkflow, WorkflowType, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 
 // export class CaptureEvent2 implements BCTW_Event, BCTWWorkflow<CaptureEvent2>, CaptureAnimalEventProps, ICapture {
-export class CaptureEvent2 implements IWorkflow<CaptureEvent2>, CaptureAnimalEventProps, ICapture {
-  readonly event_type: WorkflowType;
+export class CaptureEvent2
+  extends SuperWorkflow
+  implements IWorkflow<CaptureEvent2>, CaptureAnimalEventProps, ICapture
+{
+  //readonly event_type: WorkflowType;
   readonly critter_id: uuid;
   readonly wlh_id: string;
   readonly taxon: string;
@@ -58,12 +61,13 @@ export class CaptureEvent2 implements IWorkflow<CaptureEvent2>, CaptureAnimalEve
   }
 
   constructor() {
+    super();
     this.event_type = 'capture';
     this.capture_location = new LocationEvent('capture');
     this.release_location = new LocationEvent('release');
   }
-
-  get displayProps(): (keyof CaptureEvent2)[] {
+  displayProps(): (keyof SuperWorkflow)[];
+  displayProps(): (keyof CaptureEvent2)[] {
     return ['taxon', 'wlh_id', 'critter_id'];
   }
 
@@ -84,6 +88,9 @@ export class CaptureEvent2 implements IWorkflow<CaptureEvent2>, CaptureAnimalEve
     release_mortality: { prop: 'release_mortality', type: eInputType.check },
     show_release: { prop: 'show_release', type: eInputType.check }
   };
+  get captureCritterPropsToSave(): (keyof Critter)[] {
+    return ['critter_id', 'taxon'];
+  }
 }
 
 type CaptureAnimalEventProps = Pick<
@@ -130,144 +137,144 @@ export type CaptureFormField2 = {
   [Property in keyof CaptureEvent2]+?: FormFieldObject<CaptureEvent2>;
 };
 
-/**
- * capture date / data life ??!?
- * assume data life is the capture date?
- */
-export default class CaptureEvent
-  implements
-    CaptureAnimalEventProps,
-    ReleaseAnimalProps,
-    Readonly<Pick<CollarHistory, 'assignment_id'>>,
-    IDataLifeStartProps,
-    IWorkflow<CaptureEvent>,
-    CaptureReleaseProps
-{
-  // workflow props
-  readonly event_type: WorkflowType;
-  shouldSaveDevice: boolean;
-  readonly shouldSaveAnimal = true;
-  isAssociated: boolean; // has an animal association
-  location_event: LocationEvent;
-  wasReleased: boolean;
-  didDieDuringCapture: boolean;
-  didDieDuringTransloc: boolean;
-  isTranslocationComplete: boolean;
-  // data life props
-  readonly assignment_id: uuid;
-  attachment_start: Dayjs;
-  data_life_start: Dayjs;
-  // critter props
-  readonly critter_id: uuid;
-  readonly wlh_id: string;
-  readonly animal_id: string;
-  taxon: Code;
-  recapture_ind: boolean;
-  translocation_ind: boolean;
-  associated_animal_id: string;
-  associated_animal_relationship: Code; // required if associated_animal_id populated
-  // region & popunit are enabled when animal is translocated
-  region: Code;
-  collection_unit: string;
-  captivity_status_ind: boolean;
-  // characteristic fields
-  ear_tag_left_id: string;
-  ear_tag_right_id: string;
-  ear_tag_left_colour: string;
-  ear_tag_right_colour: string;
-  juvenile_at_heel: Code;
-  juvenile_at_heel_count: number;
-  animal_colouration: string;
-  life_stage: Code;
+// /**
+//  * capture date / data life ??!?
+//  * assume data life is the capture date?
+//  */
+// export default class CaptureEvent
+//   implements
+//     CaptureAnimalEventProps,
+//     ReleaseAnimalProps,
+//     Readonly<Pick<CollarHistory, 'assignment_id'>>,
+//     IDataLifeStartProps,
+//     IWorkflow<CaptureEvent>,
+//     CaptureReleaseProps
+// {
+//   // workflow props
+//   readonly event_type: WorkflowType;
+//   shouldSaveDevice: boolean;
+//   readonly shouldSaveAnimal = true;
+//   isAssociated: boolean; // has an animal association
+//   location_event: LocationEvent;
+//   wasReleased: boolean;
+//   didDieDuringCapture: boolean;
+//   didDieDuringTransloc: boolean;
+//   isTranslocationComplete: boolean;
+//   // data life props
+//   readonly assignment_id: uuid;
+//   attachment_start: Dayjs;
+//   data_life_start: Dayjs;
+//   // critter props
+//   readonly critter_id: uuid;
+//   readonly wlh_id: string;
+//   readonly animal_id: string;
+//   taxon: Code;
+//   recapture_ind: boolean;
+//   translocation_ind: boolean;
+//   associated_animal_id: string;
+//   associated_animal_relationship: Code; // required if associated_animal_id populated
+//   // region & popunit are enabled when animal is translocated
+//   region: Code;
+//   collection_unit: string;
+//   captivity_status_ind: boolean;
+//   // characteristic fields
+//   ear_tag_left_id: string;
+//   ear_tag_right_id: string;
+//   ear_tag_left_colour: string;
+//   ear_tag_right_colour: string;
+//   juvenile_at_heel: Code;
+//   juvenile_at_heel_count: number;
+//   animal_colouration: string;
+//   life_stage: Code;
 
-  constructor() {
-    this.event_type = 'capture';
-    this.recapture_ind = false;
-    this.translocation_ind = false;
-    this.isTranslocationComplete = true;
-    this.location_event = new LocationEvent('capture');
-  }
+//   constructor() {
+//     this.event_type = 'capture';
+//     this.recapture_ind = false;
+//     this.translocation_ind = false;
+//     this.isTranslocationComplete = true;
+//     this.location_event = new LocationEvent('capture');
+//   }
 
-  formatPropAsHeader(s: keyof CaptureEvent): string {
-    switch (s) {
-      case 'captivity_status_ind':
-        return WorkflowStrings.captivity.isCaptive;
-      case 'associated_animal_relationship':
-        return 'Associated Relationship';
-      case 'isTranslocationComplete':
-        return WorkflowStrings.capture.isTranslocCompleted;
-      default:
-        return columnToHeader(s);
-    }
-  }
-  get displayProps(): (keyof CaptureEvent)[] {
-    return ['wlh_id', 'animal_id'];
-  }
-  getWorkflowTitle(): string {
-    return WorkflowStrings.capture.workflowTitle;
-  }
+//   formatPropAsHeader(s: keyof CaptureEvent): string {
+//     switch (s) {
+//       case 'captivity_status_ind':
+//         return WorkflowStrings.captivity.isCaptive;
+//       case 'associated_animal_relationship':
+//         return 'Associated Relationship';
+//       case 'isTranslocationComplete':
+//         return WorkflowStrings.capture.isTranslocCompleted;
+//       default:
+//         return columnToHeader(s);
+//     }
+//   }
+//   displayProps(): (keyof CaptureEvent)[] {
+//     return ['wlh_id', 'animal_id'];
+//   }
+//   getWorkflowTitle(): string {
+//     return WorkflowStrings.capture.workflowTitle;
+//   }
 
-  get captureCritterPropsToSave(): (keyof Critter)[] {
-    return [
-      'critter_id',
-      // 'recapture_ind',
-      // 'translocation_ind',
-      'taxon'
-      // 'associated_animal_id',
-      // 'associated_animal_relationship',
-      // 'captivity_status_ind',
-      // 'ear_tag_left_colour',
-      // 'ear_tag_left_id',
-      // 'ear_tag_right_colour',
-      // 'ear_tag_right_id',
-      // 'juvenile_at_heel',
-      // 'juvenile_at_heel_count',
-      // 'animal_colouration',
-      // 'life_stage'
-    ];
-  }
+//   get captureCritterPropsToSave(): (keyof Critter)[] {
+//     return [
+//       'critter_id',
+//       // 'recapture_ind',
+//       // 'translocation_ind',
+//       'taxon'
+//       // 'associated_animal_id',
+//       // 'associated_animal_relationship',
+//       // 'captivity_status_ind',
+//       // 'ear_tag_left_colour',
+//       // 'ear_tag_left_id',
+//       // 'ear_tag_right_colour',
+//       // 'ear_tag_right_id',
+//       // 'juvenile_at_heel',
+//       // 'juvenile_at_heel_count',
+//       // 'animal_colouration',
+//       // 'life_stage'
+//     ];
+//   }
 
-  getAnimal(): OptionalAnimal {
-    const props = this.captureCritterPropsToSave;
-    if (this.translocation_ind) {
-      // if the translocation is completed, save the new region/population unit.
-      // otherwise, need to update critter_status to 'in translocation';
-      if (this.isTranslocationComplete) {
-        props.push('responsible_region', 'collection_unit');
-      } else {
-        props.push('critter_status');
-      }
-    }
-    const ret = eventToJSON(props, this);
-    if (!this.juvenile_at_heel) {
-      delete ret.juvenile_at_heel_count;
-    }
-    if (this.translocation_ind && !this.isTranslocationComplete) {
-      ret['critter_status'] = 'In Translocation';
-    }
-    if (!ret.associated_animal_id) {
-      delete ret.associated_animal_relationship;
-    }
-    //TODO Critterbase integration old code
-    //return omitNull({ ...ret, ...this.location_event.toJSON() });
-    return omitNull({ ...ret });
-  }
+//   getAnimal(): OptionalAnimal {
+//     const props = this.captureCritterPropsToSave;
+//     if (this.translocation_ind) {
+//       // if the translocation is completed, save the new region/population unit.
+//       // otherwise, need to update critter_status to 'in translocation';
+//       if (this.isTranslocationComplete) {
+//         props.push('responsible_region', 'collection_unit');
+//       } else {
+//         props.push('critter_status');
+//       }
+//     }
+//     const ret = eventToJSON(props, this);
+//     if (!this.juvenile_at_heel) {
+//       delete ret.juvenile_at_heel_count;
+//     }
+//     if (this.translocation_ind && !this.isTranslocationComplete) {
+//       ret['critter_status'] = 'In Translocation';
+//     }
+//     if (!ret.associated_animal_id) {
+//       delete ret.associated_animal_relationship;
+//     }
+//     //TODO Critterbase integration old code
+//     //return omitNull({ ...ret, ...this.location_event.toJSON() });
+//     return omitNull({ ...ret });
+//   }
 
-  // todo: should data life be updated??
-  // getDataLife(): ChangeDataLifeInput{
-  //   if (!this.assignment_id|| !this.location_event.date) {
-  //     console.error('cannot update data life in capture event, missing props', this);
-  //     return null;
-  //   }
-  //   const ret: ChangeDataLifeInput = {
-  //     assignment_id: this.assignment_id,
-  //     data_life_start: this.location_event.date.format(formatTime)
-  //   }
-  //   return ret;
-  // }
+//   // todo: should data life be updated??
+//   // getDataLife(): ChangeDataLifeInput{
+//   //   if (!this.assignment_id|| !this.location_event.date) {
+//   //     console.error('cannot update data life in capture event, missing props', this);
+//   //     return null;
+//   //   }
+//   //   const ret: ChangeDataLifeInput = {
+//   //     assignment_id: this.assignment_id,
+//   //     data_life_start: this.location_event.date.format(formatTime)
+//   //   }
+//   //   return ret;
+//   // }
 
-  /*fields: CaptureFormField = {
-    isTranslocationComplete: { prop: 'isTranslocationComplete', type: eInputType.check },
-    didDieDuringTransloc: { prop: 'didDieDuringTransloc', type: eInputType.check }
-  };*/
-}
+//   /*fields: CaptureFormField = {
+//     isTranslocationComplete: { prop: 'isTranslocationComplete', type: eInputType.check },
+//     didDieDuringTransloc: { prop: 'didDieDuringTransloc', type: eInputType.check }
+//   };*/
+// }

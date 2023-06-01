@@ -7,12 +7,20 @@ import { Collar } from 'types/collar';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 import { DataLife } from 'types/data_life';
-import { CbPayload, IWorkflow, OptionalAnimal, OptionalDevice, WorkflowType, eventToJSON } from 'types/events/event';
+import {
+  CbPayload,
+  IWorkflow,
+  OptionalAnimal,
+  OptionalDevice,
+  SuperWorkflow,
+  WorkflowType,
+  eventToJSON
+} from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 import { formatT, formatTime, getEndOfPreviousDay } from 'utils/time';
-import CaptureEvent from './capture_event';
+import { CaptureEvent2 } from './capture_event';
 
 export type MortalityDeviceEventProps = Pick<
   Collar,
@@ -68,7 +76,7 @@ type DeploymentStatusNotDeployed = 'Not Deployed';
 /**
  * todo: when a device removal is performed...what happens in the ui?
  */
-export default class MortalityEvent implements IWorkflow<MortalityEvent>, IMortalityEvent {
+export default class MortalityEvent extends SuperWorkflow implements IWorkflow<MortalityEvent>, IMortalityEvent {
   // event specific props - not saved. used to enable/disable fields
   readonly event_type: WorkflowType;
   readonly critter_id: uuid;
@@ -166,7 +174,8 @@ export default class MortalityEvent implements IWorkflow<MortalityEvent>, IMorta
     });
   }
 
-  constructor(mort_date = dayjs(), capture?: CaptureEvent) {
+  constructor(mort_date = dayjs(), capture?: CaptureEvent2) {
+    super();
     this.event_type = 'mortality';
     this.mortality_timestamp = dayjs();
     this.shouldSaveAnimal = true;
@@ -199,8 +208,8 @@ export default class MortalityEvent implements IWorkflow<MortalityEvent>, IMorta
   get mortCritterPropsToSave(): (keyof Critter)[] {
     return this.onlySaveAnimalStatus ? ['critter_id', 'critter_status'] : this.critterPropsToSave;
   }
-
-  get displayProps(): (keyof MortalityEvent)[] {
+  displayProps(): (keyof SuperWorkflow)[];
+  displayProps(): (keyof MortalityEvent)[] {
     return ['taxon', 'wlh_id', 'critter_id'];
   }
 

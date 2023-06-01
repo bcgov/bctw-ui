@@ -4,6 +4,7 @@ import { formatTime } from 'utils/time';
 import { Critter, ICollectionUnit } from './animal';
 import { UserCritterAccess } from './animal_access';
 import { TelemetryDetail } from './map';
+import { SuperWorkflow } from './events/event';
 
 export interface BCTWValidDates {
   valid_from: Date | Dayjs;
@@ -22,7 +23,7 @@ export interface BaseTimestamps extends PartialPick<BCTWValidDates, 'valid_from'
 // extended for types / classes that implement formatters
 export type BCTWFormat<T> = {
   formatPropAsHeader(k: keyof T): string;
-  get displayProps(): (keyof T)[];
+  displayProps(): (keyof T)[];
   historyDisplayProps?(): (keyof T)[];
 };
 
