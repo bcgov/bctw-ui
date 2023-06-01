@@ -1,20 +1,20 @@
 import Box from '@mui/material/Box';
-import ChangeContext from 'contexts/InputChangeContext';
 import Container from '@mui/material/Container';
-import EditModal from 'pages/data/common/EditModal';
-import { AttachedCollar, Collar, collarFormFields } from 'types/collar';
+import { Button } from 'components/common';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
-import { permissionCanModify } from 'types/permission';
+import ChangeContext from 'contexts/InputChangeContext';
+import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
-import { editEventBtnProps, FormSection } from '../common/EditModalComponents';
-import RetrievalEvent from 'types/events/retrieval_event';
-import { editObjectToEvent, IBCTWWorkflow, WorkflowType } from 'types/events/event';
-import WorkflowWrapper from '../events/WorkflowWrapper';
-import { parseFormChangeResult } from 'types/form_types';
-import MalfunctionEvent from 'types/events/malfunction_event';
+import { AttachedCollar, Collar, collarFormFields } from 'types/collar';
+import { IWorkflow, WorkflowType, editObjectToEvent } from 'types/events/event';
 import { wfFields } from 'types/events/form_fields';
-import { Button } from 'components/common';
+import MalfunctionEvent from 'types/events/malfunction_event';
+import RetrievalEvent from 'types/events/retrieval_event';
+import { parseFormChangeResult } from 'types/form_types';
+import { permissionCanModify } from 'types/permission';
+import { FormSection, editEventBtnProps } from '../common/EditModalComponents';
+import WorkflowWrapper from '../events/WorkflowWrapper';
 
 export default function EditCollar(props: EditorProps<Collar | AttachedCollar>): JSX.Element {
   const { isCreatingNew, editing } = props;
@@ -51,7 +51,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
   };
 
   // if a malfunction event is saved and the device is retrieved, open the retrieval workflow
-  const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
+  const handleWorkflowSaved = async (e: IWorkflow<MalfunctionEvent>): Promise<void> => {
     await setShowWorkflowForm(false);
     if (e.event_type === 'malfunction' && e instanceof MalfunctionEvent && !!e.retrieved_ind) {
       // console.log('im supposed to show the retrieval form', e);
@@ -198,7 +198,7 @@ export default function EditCollar(props: EditorProps<Collar | AttachedCollar>):
                   </FormSection>
                   <WorkflowWrapper
                     open={showWorkflowForm}
-                    event={event as any}
+                    event={event as MalfunctionEvent}
                     handleClose={(): void => setShowWorkflowForm(false)}
                     onEventSaved={handleWorkflowSaved}
                   />

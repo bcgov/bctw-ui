@@ -7,12 +7,12 @@ import { ChangeDataLifeInput } from 'types/data_life';
 import { CbRouteStatusHandler, FormChangeEvent } from 'types/form_types';
 import { CaptureFormField2 } from './capture_event';
 import { MortalityFormField } from './mortality_event';
-import { ReleaseFormField } from './release_event';
+// import { ReleaseFormField } from './release_event';
 import { RetrievalFormField } from './retrieval_event';
 
 export type WorkflowType = 'malfunction' | 'mortality' | 'release' | 'capture' | 'retrieval' | 'unknown';
 
-export type WorkflowFormProps<T extends IBCTWWorkflow> = {
+export type WorkflowFormProps<T extends IWorkflow<T>> = {
   event: T;
   handleFormChange: FormChangeEvent;
   // workflows can exit early by calling the following functions
@@ -28,23 +28,15 @@ export type WorkflowFormProps<T extends IBCTWWorkflow> = {
 export type OptionalAnimal = { [Property in keyof Critter]+?: Critter[Property] };
 export type OptionalDevice = { [Property in keyof ICollar]+?: ICollar[Property] };
 
-export interface BCTW_Event<T> extends BCTWFormat<T> {
+export interface IEvent {
   readonly event_type: WorkflowType;
-  fields?: CaptureFormField2 | MortalityFormField | ReleaseFormField | RetrievalFormField;
-  getWorkflowTitle(): string;
+  fields?: CaptureFormField2 | MortalityFormField | RetrievalFormField;
 }
 
-//
+type IEventFormat<T extends IEvent> = IEvent & BCTWFormat<T>;
 
-/**
- * interface that BCTW workflows implement
- */
-export interface IBCTWWorkflow {
-  readonly event_type: WorkflowType;
-  fields?: CaptureFormField2 | MortalityFormField | ReleaseFormField | RetrievalFormField;
-  // headers displayed in the workflow modal title
-  getWorkflowTitle(): string;
-  // methods the workflow needs to save specific properties
+export interface IWorkflow<T extends IEvent> extends IEventFormat<T> {
+  getWorkflowTitle?: () => string;
   getAnimal?(): OptionalAnimal;
   getDevice?(): OptionalDevice;
   getAttachment?(): AttachDeviceInput | RemoveDeviceInput;
@@ -54,11 +46,10 @@ export interface IBCTWWorkflow {
   // must implement this to determine how the workflow should be saved
   shouldSaveAnimal?: boolean;
   shouldSaveDevice?: boolean;
+  critterbasePayload?: CbPayload<T>;
 }
 
 export type CbPayload<T> = Partial<Record<keyof T, unknown>> | undefined;
-
-export type BCTWWorkflow<T> = IBCTWWorkflow & { critterbasePayload?: CbPayload<T> } & BCTWFormat<T>;
 
 /**
  * converts an event to json for posting to API

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { AttachedCritter, Critter } from 'types/animal';
+import { IWorkflow, WorkflowType } from 'types/events/event';
+// import ReleaseEvent from 'types/events/release_event';
 import { CaptureEvent2 } from 'types/events/capture_event';
-import { IBCTWWorkflow, WorkflowType } from 'types/events/event';
-import MortalityEvent from 'types/events/mortality_event';
-import ReleaseEvent from 'types/events/release_event';
 import WorkflowWrapper from '../events/WorkflowWrapper';
 import { createEvent } from './EventComponents';
 
@@ -17,19 +16,20 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
+   * casting as CaptureEvent2 to prevent workflowWrapper error
    */
 
-  const [event, updateEvent] = useState<CaptureEvent2 | ReleaseEvent | MortalityEvent>();
+  const [event, updateEvent] = useState(createEvent(editing, workflow) as CaptureEvent2);
 
   useEffect(() => {
-    const a = createEvent(editing, workflow);
+    const a = createEvent(editing, workflow) as CaptureEvent2;
     updateEvent(a);
   }, [editing, workflow]);
   /**
    * when a capture workflow is saved, always show the release workflow unless a translocation_ind is underway
    * todo: is this still needed?
    */
-  const handleWorkflowSaved = async (e: IBCTWWorkflow): Promise<void> => {
+  const handleWorkflowSaved = async (e: IWorkflow<typeof event>): Promise<void> => {
     setOpen(false);
   };
 
@@ -62,7 +62,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
       {event?.event_type === workflow ? (
         <WorkflowWrapper
           open={open}
-          event={event as any}
+          event={event}
           handleClose={(): void => setOpen(false)}
           onEventSaved={handleWorkflowSaved}
           //onEventChain={handleWorkflowChain}

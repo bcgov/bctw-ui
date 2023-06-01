@@ -39,7 +39,7 @@ import { MortalityAlert, TelemetryAlert } from 'types/alert';
 import { UserCritterAccess } from 'types/animal_access';
 import { BCTWType, uuid } from 'types/common_types';
 import { ChangeDataLifeInput } from 'types/data_life';
-import { BCTWWorkflow } from 'types/events/event';
+import { IWorkflow } from 'types/events/event';
 import { FetchTelemetryInput, ResponseTelemetry } from 'types/events/vendor';
 import { ExportAllParams, ExportQueryParams } from 'types/export';
 import { ITelemetryLine, ITelemetryPoint } from 'types/map';
@@ -627,7 +627,7 @@ export const useTelemetryApi = () => {
     useMutation<TelemetryAlert[], AxiosError, TelemetryAlert[]>((body) => userApi.updateAlert(body), config);
 
   /** POST a mortality event form */
-  const useSaveWorkflowEvent = <T extends BCTWWorkflow<T>>(
+  const useSaveWorkflowEvent = <T extends IWorkflow<T>>(
     config: UseMutationOptions<WorkflowAPIResponse, AxiosError, T>
   ): UseMutationResult<WorkflowAPIResponse, AxiosError, T> =>
     useMutation<WorkflowAPIResponse, AxiosError, T>((body) => eventApi.saveEvent(body), config);

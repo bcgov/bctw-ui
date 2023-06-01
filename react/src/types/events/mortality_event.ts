@@ -7,15 +7,7 @@ import { Collar } from 'types/collar';
 import { CollarHistory, RemoveDeviceInput } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 import { DataLife } from 'types/data_life';
-import {
-  BCTWWorkflow,
-  CbPayload,
-  IBCTWWorkflow,
-  OptionalAnimal,
-  OptionalDevice,
-  WorkflowType,
-  eventToJSON
-} from 'types/events/event';
+import { CbPayload, IWorkflow, OptionalAnimal, OptionalDevice, WorkflowType, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
@@ -55,7 +47,7 @@ type MortalityAnimalEventProps = Pick<
   // | 'mortality_captivity_status_ind'
 >;
 
-type MortalitySpecificProps = Pick<IBCTWWorkflow, 'shouldUnattachDevice'> &
+type MortalitySpecificProps = Pick<IWorkflow<MortalityEvent>, 'shouldUnattachDevice'> &
   Pick<DataLife, 'data_life_end'> & {
     wasInvestigated: boolean;
     isUCODtaxonKnown: boolean;
@@ -76,7 +68,7 @@ type DeploymentStatusNotDeployed = 'Not Deployed';
 /**
  * todo: when a device removal is performed...what happens in the ui?
  */
-export default class MortalityEvent implements BCTWWorkflow<MortalityEvent>, IMortalityEvent {
+export default class MortalityEvent implements IWorkflow<MortalityEvent>, IMortalityEvent {
   // event specific props - not saved. used to enable/disable fields
   readonly event_type: WorkflowType;
   readonly critter_id: uuid;

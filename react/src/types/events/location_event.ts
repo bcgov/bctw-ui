@@ -2,7 +2,7 @@ import { classToPlain } from 'class-transformer';
 import { mustBeLatitude, mustBeLongitude, mustBeValidTemp } from 'components/form/form_validators';
 import { ILocation } from 'types/animal';
 import { uuid } from 'types/common_types';
-import { BCTWWorkflow, CbPayload, WorkflowType } from 'types/events/event';
+import { IWorkflow, CbPayload, WorkflowType } from 'types/events/event';
 import { FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 
@@ -11,7 +11,7 @@ export enum eLocationPositionType {
   coord = 'coord'
 }
 
-export class LocationEvent implements BCTWWorkflow<LocationEvent>, ILocation {
+export class LocationEvent implements IWorkflow<LocationEvent>, ILocation {
   readonly event_type: WorkflowType;
   location_id: uuid;
   latitude: number;

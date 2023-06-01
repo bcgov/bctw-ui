@@ -2,7 +2,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { uuid } from 'types/common_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { BCTWWorkflow, eventToJSON, WorkflowType, OptionalDevice } from 'types/events/event';
+import { IWorkflow, eventToJSON, WorkflowType, OptionalDevice } from 'types/events/event';
 import { MortalityDeviceEventProps } from 'types/events/mortality_event';
 import { Critter } from 'types/animal';
 import { Collar } from 'types/collar';
@@ -28,7 +28,7 @@ export type RetrievalFormField = {
  * todo: display as checkbox if retrieved_ind is no??
  * todo: need to preserve is_retrievable?
  */
-export default class RetrievalEvent implements IRetrievalEvent, BCTWWorkflow<RetrievalEvent> {
+export default class RetrievalEvent implements IRetrievalEvent, IWorkflow<RetrievalEvent> {
   readonly event_type: WorkflowType;
   shouldUnattachDevice: boolean;
   readonly shouldSaveAnimal = false;

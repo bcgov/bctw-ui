@@ -10,7 +10,7 @@ import { createUrl, postJSON } from 'api/api_helpers';
 import { AxiosError, AxiosInstance } from 'axios';
 import { RemoveDeviceInput } from 'types/collar_history';
 import { ChangeDataLifeInput } from 'types/data_life';
-import { BCTWWorkflow, WorkflowType, OptionalAnimal, OptionalDevice, CbPayload } from 'types/events/event';
+import { WorkflowType, OptionalAnimal, OptionalDevice, CbPayload, IWorkflow, IEvent } from 'types/events/event';
 import { formatAxiosError } from 'utils/errors';
 import { API, IBulkUploadResults, ApiProps } from './api_interfaces';
 import { useQueryClient } from 'react-query';
@@ -134,7 +134,7 @@ export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
     }
   };
 
-  const saveEvent = async <T>(event: BCTWWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
+  const saveEvent = async <T extends IEvent>(event: IWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
     if (event.event_type === 'capture') {
       const c = await _saveCbCapture(event.critterbasePayload);
       if (typeof c !== 'boolean') {

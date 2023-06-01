@@ -10,7 +10,6 @@ import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import WorkflowWrapper from 'pages/data/events/WorkflowWrapper';
 import { useEffect, useState } from 'react';
 import { MalfunctionAlert, MortalityAlert, TelemetryAlert, eAlertType } from 'types/alert';
-import { BCTWWorkflow, IBCTWWorkflow } from 'types/events/event';
 import MalfunctionEvent from 'types/events/malfunction_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { pluralize } from 'utils/common_helpers';
@@ -48,7 +47,7 @@ export default function AlertActions({ alert, showActions }: AlertActionsProps):
   const [snoozeMessage, setSnoozeMessage] = useState('');
   const [openMap, setOpenMap] = useState(false);
   // when an alert row is selected, clicking the 'update' button will trigger a workflow modal based on the alert type
-  const [workflow, createWorkflow] = useState<IBCTWWorkflow | null>(null);
+  const [workflow, createWorkflow] = useState<MortalityEvent | MalfunctionEvent | null>(null);
   const isMortality = alert.alert_type === eAlertType.mortality;
   /**
    * when a new alert is passed as props:
@@ -320,7 +319,7 @@ export default function AlertActions({ alert, showActions }: AlertActionsProps):
       />
       {workflow ? (
         <WorkflowWrapper
-          event={workflow as BCTWWorkflow<typeof workflow>}
+          event={workflow as MalfunctionEvent}
           open={showEventModal}
           handleClose={(): void => setShowEventModal(false)}
           onEventSaved={handleEventSaved}

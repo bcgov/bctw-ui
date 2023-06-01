@@ -77,8 +77,7 @@
     "build": "cp node_modules/reflect-metadata/Reflect.js public && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "node_modules/eslint/bin/eslint.js src/**/*.ts --max-warnings=0",
-    "lint2": "npx eslint src/",
+    "lint": "node_modules/eslint/bin/eslint.js src/ --max-warnings=0",
     "dead:code": "ts-prune | (! grep -v 'used in module')"
   },
   "eslintConfig": {

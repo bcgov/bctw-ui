@@ -5,14 +5,13 @@ import { Code } from 'types/code';
 import { CollarHistory } from 'types/collar_history';
 import { uuid } from 'types/common_types';
 import { IDataLifeStartProps } from 'types/data_life';
-import { BCTWWorkflow, BCTW_Event, CbPayload, OptionalAnimal, WorkflowType, eventToJSON } from 'types/events/event';
+import { CbPayload, IWorkflow, OptionalAnimal, WorkflowType, eventToJSON } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { FormCommentStyle, FormFieldObject, eInputType } from 'types/form_types';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
 
-export class CaptureEvent2
-  implements BCTW_Event<CaptureEvent2>, BCTWWorkflow<CaptureEvent2>, CaptureAnimalEventProps, ICapture
-{
+// export class CaptureEvent2 implements BCTW_Event, BCTWWorkflow<CaptureEvent2>, CaptureAnimalEventProps, ICapture {
+export class CaptureEvent2 implements IWorkflow<CaptureEvent2>, CaptureAnimalEventProps, ICapture {
   readonly event_type: WorkflowType;
   readonly critter_id: uuid;
   readonly wlh_id: string;
@@ -141,7 +140,7 @@ export default class CaptureEvent
     ReleaseAnimalProps,
     Readonly<Pick<CollarHistory, 'assignment_id'>>,
     IDataLifeStartProps,
-    BCTWWorkflow<CaptureEvent>,
+    IWorkflow<CaptureEvent>,
     CaptureReleaseProps
 {
   // workflow props

@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
 import { columnToHeader, omitNull } from 'utils/common_helpers';
-import { BCTWWorkflow, WorkflowType, eventToJSON, IBCTWWorkflow, OptionalDevice } from 'types/events/event';
+import { WorkflowType, eventToJSON, OptionalDevice, IWorkflow } from 'types/events/event';
 import { LocationEvent } from 'types/events/location_event';
 import { IDataLifeEndProps } from 'types/data_life';
 import { FormFieldObject } from 'types/form_types';
@@ -32,7 +32,7 @@ export type MalfunctionFormField = {
 interface IMalfunctionEvent
   extends MalfunctionDeviceProps,
     Readonly<Pick<CollarHistory, 'assignment_id'>>,
-    Pick<IBCTWWorkflow, 'shouldUnattachDevice'>,
+    Pick<IWorkflow<MalfunctionEvent>, 'shouldUnattachDevice'>,
     IDataLifeEndProps {}
 
 export type MalfunctionDeviceStatus = 'Potential Malfunction' | 'Active' | 'Offline' | 'Malfunction';
@@ -42,7 +42,7 @@ export type MalfunctionDeviceStatus = 'Potential Malfunction' | 'Active' | 'Offl
  * data life / attachment end date
  * start retrieval workflow??
  */
-export default class MalfunctionEvent implements IMalfunctionEvent, BCTWWorkflow<MalfunctionEvent> {
+export default class MalfunctionEvent implements IMalfunctionEvent, IWorkflow<MalfunctionEvent> {
   // workflow props
   readonly event_type: WorkflowType;
   readonly shouldSaveDevice = true;
