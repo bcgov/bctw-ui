@@ -8,12 +8,12 @@ import { ICbRouteKey } from 'critterbase/types';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { QueryStatus } from 'react-query';
-import { AttachedCritter, Critter, critterFormFields } from 'types/animal';
+import { AttachedCritter, Critter, IMarking, critterFormFields } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
-import { hasChangedProperties, omitNull } from 'utils/common_helpers';
+import { columnToHeader, hasChangedProperties, omitNull } from 'utils/common_helpers';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import { createEvent } from '../events/EventComponents';
@@ -21,6 +21,7 @@ import MortalityEventForm from '../events/MortalityEventForm';
 import { Modal } from 'components/common';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
 import { CbSelect } from 'critterbase/components/CbSelect';
+import { CritterStrings } from 'constants/strings';
 
 /**
  * the main animal form
@@ -34,18 +35,19 @@ export default function EditCritter(
 ): JSX.Element {
   const { isCreatingNew, editing, onSave, busySaving, queryStatus } = props;
   editing.permission_type = eCritterPermission.admin;
-
+  const { markingIncompatibility, removeMarkingsPlease } = CritterStrings;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const { identifierFields } = critterFormFields;
   const [cbSelectStatus, setCbSelectStatus] = useState({});
   const [allowSave, setAllowSave] = useState(false);
   const [taxonId, setTaxonId] = useState(editing.taxon_id);
+  const [markingState, setMarkingState] = useState<(IMarking & {_delete?: boolean})[]>(editing.marking);
   const [taxonErrorModalOpen, setTaxonErrorModalOpen] = useState(false);
 
   const critterbaseSave = async (payload) => {
     const { body } = payload;
-    console.log(`Here is editingObj: ${JSON.stringify(editing, null, 2)}`)
-    console.log('Received this body: ' + JSON.stringify(body, null, 2));
+    //console.log(`Here is editingObj: ${JSON.stringify(editing, null, 2)}`)
+    //console.log('Received this body: ' + JSON.stringify(body, null, 2));
     const new_critter = {
       critter_id: body.critter_id,
       animal_id: body.animal_id,
@@ -116,7 +118,7 @@ export default function EditCritter(
         m.critter_id = body.critter_id;
         const existing = editing.marking.find((a) => (a.marking_id = m.marking_id));
         const omitted = omitNull(m);
-        if (existing && !hasChangedProperties(existing, omitted)) {
+        if (existing && !hasChangedProperties(existing, omitted) && !m._delete) {
           continue;
         }
         finalPayload.markings.push(m);
@@ -133,7 +135,7 @@ export default function EditCritter(
         finalPayload.collections = body.collection_units;
     }
     
-    console.log(`Here is the final payload ${JSON.stringify(finalPayload, null, 2)}`)
+    //console.log(`Here is the final payload ${JSON.stringify(finalPayload, null, 2)}`)
     const r = await onSave(finalPayload);
     return r;
   };
@@ -155,7 +157,7 @@ export default function EditCritter(
     if(!new_taxon) {
       return true;
     }
-    const result = await mutateAsync({taxon_id: new_taxon, markings: editing.marking});
+    const result = await mutateAsync({taxon_id: new_taxon, markings: markingState.filter(a => !a._delete)});
     if(result.length) {
       setTaxonErrorModalOpen(true);
       return false;
@@ -168,9 +170,18 @@ export default function EditCritter(
   const formatMarking = (marking_id: string): JSX.Element => {
     if(editing.marking) {
       const mark = editing.marking.find(a => a.marking_id === marking_id);
+      const englishNames:  (keyof IMarking)[] = ['marking_type', 'marking_material', 'body_location', 'primary_colour', 'secondary_colour', 'identifier']
       if(mark) {
         return (<>
-          <li>{mark.marking_id} -- Type: {mark.marking_type}, Color: {mark.primary_colour}</li>
+          <li>Marking UUID: {mark.marking_id}
+            <ul>
+            <>
+              {
+                englishNames.map(a => mark[a] ? <li>{`${columnToHeader(a)}: ${mark[a]}`}</li> : null)
+              }
+              </>
+            </ul>
+          </li>
         </>)
       }
     }
@@ -204,10 +215,12 @@ export default function EditCritter(
         {(handlerFromContext): JSX.Element => {
           // override the modal's onChange function
           const onChange = (v: InboundObj): void => {
-            console.log(`ChangeContext inbound obj: ${JSON.stringify(v, null, 2)}`)
             const [key, value] = parseFormChangeResult<AttachedCritter>(v);
             if (key === 'taxon_id') {
               setTaxonId(value as string);
+            }
+            else if(key === 'marking') {
+              setMarkingState(value as IMarking[]);
             }
             handlerFromContext(v);
           };
@@ -267,9 +280,12 @@ export default function EditCritter(
           );
         }}
       </ChangeContext.Consumer>
-      <Modal open={isSuccess && data.length > 0 && taxonErrorModalOpen} handleClose={() => {setTaxonErrorModalOpen(false)}}>
-        <Typography>It is not possible to assign this taxon to this critter as 
-          the critter has markings and/or measurements that are not compatible with the desired taxon.</Typography>
+      <Modal 
+        open={isSuccess && data.length > 0 && taxonErrorModalOpen} 
+        handleClose={() => {setTaxonErrorModalOpen(false)}}
+      >
+        <Typography>{markingIncompatibility}</Typography>
+        <Typography>{removeMarkingsPlease}</Typography>
         <ul>
         {
           data?.map(a => formatMarking(a))

@@ -25,7 +25,8 @@ export const CbCollectionUnitInputs = ({
   }, [collection_units])
 
   const onChange = (v: InboundObj, category_id: string): void => {
-    const [key, value] = parseFormChangeResult(v);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [key, value] = parseFormChangeResult(v); //Easier to just disable for this line so we can still use the array destructuring
     if(!value) {
       return;
     }
@@ -39,7 +40,6 @@ export const CbCollectionUnitInputs = ({
         collection_category_id: category_id
       })
     }
-    console.log(`State of internalLookup: ${JSON.stringify(internalLookup, null, 2)}`)
   }
 
   return (
