@@ -1,4 +1,4 @@
-import { Box, Divider, Grid } from '@mui/material';
+import { Box, Divider, Grid, Typography } from '@mui/material';
 import { EditorProps } from 'components/component_interfaces';
 import { CreateFormField } from 'components/form/create_form_components';
 import ChangeContext from 'contexts/InputChangeContext';
@@ -8,16 +8,20 @@ import { ICbRouteKey } from 'critterbase/types';
 import EditModal from 'pages/data/common/EditModal';
 import { useState } from 'react';
 import { QueryStatus } from 'react-query';
-import { AttachedCritter, Critter, critterFormFields } from 'types/animal';
+import { AttachedCritter, Critter, IMarking, critterFormFields } from 'types/animal';
 import { CaptureEvent2 } from 'types/events/capture_event';
 import MortalityEvent from 'types/events/mortality_event';
 import { InboundObj, parseFormChangeResult } from 'types/form_types';
 import { eCritterPermission, permissionCanModify } from 'types/permission';
-import { hasChangedProperties, omitNull } from 'utils/common_helpers';
+import { columnToHeader, hasChangedProperties, omitNull } from 'utils/common_helpers';
 import { EditHeader, FormSection } from '../common/EditModalComponents';
 import CaptureEventForm from '../events/CaptureEventForm';
 import { createEvent } from '../events/EventComponents';
 import MortalityEventForm from '../events/MortalityEventForm';
+import { Modal } from 'components/common';
+import { useTelemetryApi } from 'hooks/useTelemetryApi';
+import { CbSelect } from 'critterbase/components/CbSelect';
+import { CritterStrings } from 'constants/strings';
 
 /**
  * the main animal form
@@ -31,15 +35,19 @@ export default function EditCritter(
 ): JSX.Element {
   const { isCreatingNew, editing, onSave, busySaving, queryStatus } = props;
   editing.permission_type = eCritterPermission.admin;
-
+  const { markingIncompatibility, removeMarkingsPlease } = CritterStrings;
   const canEdit = permissionCanModify(editing.permission_type) || isCreatingNew;
   const { identifierFields } = critterFormFields;
   const [cbSelectStatus, setCbSelectStatus] = useState({});
   const [allowSave, setAllowSave] = useState(false);
   const [taxonId, setTaxonId] = useState(editing.taxon_id);
+  const [markingState, setMarkingState] = useState<(IMarking & {_delete?: boolean})[]>(editing.marking);
+  const [taxonErrorModalOpen, setTaxonErrorModalOpen] = useState(false);
 
   const critterbaseSave = async (payload) => {
     const { body } = payload;
+    //console.log(`Here is editingObj: ${JSON.stringify(editing, null, 2)}`)
+    //console.log('Received this body: ' + JSON.stringify(body, null, 2));
     const new_critter = {
       critter_id: body.critter_id,
       animal_id: body.animal_id,
@@ -58,7 +66,8 @@ export default function EditCritter(
       critters: [],
       captures: [],
       mortalities: [],
-      markings: []
+      markings: [],
+      collections: []
     };
     if (hasChangedProperties(old_critter, new_critter)) {
       finalPayload.critters.push(new_critter);
@@ -109,17 +118,24 @@ export default function EditCritter(
         m.critter_id = body.critter_id;
         const existing = editing.marking.find((a) => (a.marking_id = m.marking_id));
         const omitted = omitNull(m);
-        if (existing && !hasChangedProperties(existing, omitted)) {
+        if (existing && !hasChangedProperties(existing, omitted) && !m._delete) {
           continue;
         }
         finalPayload.markings.push(m);
       }
-      /*finalPayload.markings = body.marking.map(m => {
-          m.critter_id = body.critter_id;
-          return omitNull(m)
-        });*/
     }
 
+    if(body.collection_units) {
+        for(const c of body.collection_units) {
+          if(old_critter.taxon_id !== new_critter.taxon_id && c.critter_collection_unit_id) {
+            c._delete = true;
+          }
+          c.critter_id = new_critter.critter_id;
+        }
+        finalPayload.collections = body.collection_units;
+    }
+    
+    //console.log(`Here is the final payload ${JSON.stringify(finalPayload, null, 2)}`)
     const r = await onSave(finalPayload);
     return r;
   };
@@ -133,6 +149,44 @@ export default function EditCritter(
     setAllowSave(s);
     //console.log(`In Editcritter handleRoute: ${JSON.stringify(dict)} ${s}`)
   };
+
+  const api = useTelemetryApi();
+  const { isSuccess, data, mutateAsync } = api.useVerifyMarkingsAgainstTaxon({});
+
+  const checkIfTaxonChangeAllowed = async (new_taxon: string): Promise<boolean> => {
+    if(!new_taxon) {
+      return true;
+    }
+    const result = await mutateAsync({taxon_id: new_taxon, markings: markingState.filter(a => !a._delete)});
+    if(result.length) {
+      setTaxonErrorModalOpen(true);
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
+  const formatMarking = (marking_id: string): JSX.Element => {
+    if(editing.marking) {
+      const mark = editing.marking.find(a => a.marking_id === marking_id);
+      const englishNames:  (keyof IMarking)[] = ['marking_type', 'marking_material', 'body_location', 'primary_colour', 'secondary_colour', 'identifier']
+      if(mark) {
+        return (<>
+          <li>Marking UUID: {mark.marking_id}
+            <ul>
+            <>
+              {
+                englishNames.map(a => mark[a] ? <li>{`${columnToHeader(a)}: ${mark[a]}`}</li> : null)
+              }
+              </>
+            </ul>
+          </li>
+        </>)
+      }
+    }
+    return null;
+  }
 
   const Header = (
     <EditHeader<AttachedCritter>
@@ -165,6 +219,9 @@ export default function EditCritter(
             if (key === 'taxon_id') {
               setTaxonId(value as string);
             }
+            else if(key === 'marking') {
+              setMarkingState(value as IMarking[]);
+            }
             handlerFromContext(v);
           };
           return (
@@ -172,7 +229,16 @@ export default function EditCritter(
               <FormSection id='critter' header='Critter Details' size='large'>
                 <Divider />
                 <FormSection id='identifiers' header='Identifiers'>
-                  {identifierFields?.map((f) => CreateFormField(editing, f, onChange))}
+                  <CbSelect
+                    value={editing.taxon_id} 
+                    prop={'taxon'} 
+                    handleChange={onChange} 
+                    isSelectionAllowed={checkIfTaxonChangeAllowed}
+                    cbRouteKey={'species'} 
+                    query={''}
+                    {...(identifierFields.find(a => a.prop === 'taxon_id'))}
+                    />
+                  {identifierFields?.filter(a => a.prop !== 'taxon_id').map((f) => CreateFormField(editing, f, onChange))}
                   <CbCollectionUnitInputs
                     collection_units={editing.collection_units}
                     taxon_id={taxonId}
@@ -214,6 +280,18 @@ export default function EditCritter(
           );
         }}
       </ChangeContext.Consumer>
+      <Modal 
+        open={isSuccess && data.length > 0 && taxonErrorModalOpen} 
+        handleClose={() => {setTaxonErrorModalOpen(false)}}
+      >
+        <Typography>{markingIncompatibility}</Typography>
+        <Typography>{removeMarkingsPlease}</Typography>
+        <ul>
+        {
+          data?.map(a => formatMarking(a))
+        }
+        </ul>
+      </Modal>
     </EditModal>
   );
 }

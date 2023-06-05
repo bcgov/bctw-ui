@@ -13,6 +13,7 @@ export type CbSelectProps = Omit<CreateInputProps, 'type'> & {
   cbRouteKey: ICbRouteKey;
   handleRoute?: CbRouteStatusHandler;
   query: string;
+  isSelectionAllowed?: (newval: unknown) => boolean | Promise<boolean>
 };
 export const CbSelect = ({
   cbRouteKey,
@@ -23,7 +24,8 @@ export const CbSelect = ({
   handleRoute,
   label,
   disabled,
-  query
+  query,
+  isSelectionAllowed
 }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
   const { data, isError, isLoading, isSuccess, status } = cbApi.useCritterbaseSelectOptions(cbRouteKey, query);
@@ -57,7 +59,11 @@ export const CbSelect = ({
     handleChange(ret);
   };
 
-  const handleSelect = (id?: string, label?: string): void => {
+  const handleSelect = async (id?: string, label?: string): Promise<void> => {
+    const shouldChange = await isSelectionAllowed?.(id);
+    if(typeof isSelectionAllowed === 'function' && !shouldChange) {
+      return;
+    }
     const hasProps = id && label;
     const a = { id, label };
     setSelected(hasProps ? a.id : '');
@@ -79,7 +85,7 @@ export const CbSelect = ({
           const valueId = typeof val === 'string' ? val : val.id;
           const value = typeof val === 'string' ? val : val.value;
           return (
-            <MenuItem value={valueId} key={`${val}-${idx}`} onClick={() => handleSelect(valueId, value)}>
+            <MenuItem value={valueId} key={`${val}-${idx}`} onClick={async () => await handleSelect(valueId, value)}>
               {capitalize(value)}
             </MenuItem>
           );

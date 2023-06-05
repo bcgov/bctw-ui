@@ -25,7 +25,9 @@ const CritterStrings = {
   },
   collaredAnimals: 'Collared Animals',
   nonCollaredAnimals: 'Non-collared Animals',
-  manageMyAnimals: 'Manage my Animals'
+  manageMyAnimals: 'Manage my Animals',
+  markingIncompatibility: 'It is not possible to assign this taxon to this critter as the critter has markings and/or measurements that are not compatible with the desired taxon.',
+  removeMarkingsPlease: 'The markings below must be removed before you are allowed to switch taxons.'
 };
 
 const LatestDataRetrieval = {
