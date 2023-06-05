@@ -11,6 +11,8 @@ export const CbRouters = {
   markings: '/markings',
   xref: '/xref',
   bulk: '/bulk',
+  login: '/login',
+  signup: '/signup',
 
   get lookupsEnum(): string {
     return this.lookups + '/enum';

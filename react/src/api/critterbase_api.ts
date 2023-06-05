@@ -46,10 +46,22 @@ export const critterbaseApi = (props: ApiProps): API => {
     return data;
   };
 
+  const loginToCritterbase = async (system_user_id: string | undefined, keycloak_id: string | undefined): Promise<Record<string, unknown>> => {
+    try {
+      const { data } = await api.post(`${CbRouters.login}`, {system_user_id: system_user_id, keycloak_uuid: keycloak_id, system_name: 'BCTW'});
+      return data;
+    }
+    catch(e) {
+      const { data } = await api.post(`${CbRouters.signup}`, {system_user_id: system_user_id, keycloak_uuid: keycloak_id, system_name: 'BCTW'});
+      return data;
+    }
+  }
+
   return {
     getLookupTableOptions,
     upsertCritter,
     bulkUpdate,
-    deleteMarking
+    deleteMarking,
+    loginToCritterbase
   };
 };

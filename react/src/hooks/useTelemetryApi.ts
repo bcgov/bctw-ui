@@ -24,7 +24,7 @@ import { AttachedCritter, Critter, eCritterFetchType, IMarking } from 'types/ani
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import { AttachDeviceInput, CollarHistory, RemoveDeviceInput } from 'types/collar_history';
-import { IKeyCloakSessionInfo, User } from 'types/user';
+import { ICritterbaseLoginResponse, IKeyCloakSessionInfo, User } from 'types/user';
 
 import {
   IBulkUploadResults,
@@ -397,6 +397,14 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const useCritterbaseSessionInfo = (user_id: string, keycloak_id: string, config?: QueryEnabled): UseQueryResult<ICritterbaseLoginResponse, AxiosError> => {
+    return useQuery<ICritterbaseLoginResponse, AxiosError>(
+      ['critterbase-session', user_id, keycloak_id],
+      () => critterbaseApi.loginToCritterbase(user_id, keycloak_id),
+      {...defaultQueryOptions, ...config}
+    )
+  }
+
   /**
    * requires admin role
    * @returns a list of all users
@@ -758,6 +766,7 @@ export const useTelemetryApi = () => {
     useTriggerVendorTelemetry,
     useAssignedCrittersHistoric,
     useBulkUpdateCritterbaseCritter,
-    useDeleteMarking
+    useDeleteMarking,
+    useCritterbaseSessionInfo
   };
 };
