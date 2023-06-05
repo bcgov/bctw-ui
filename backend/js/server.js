@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const axios = require("axios");
 const cors = require("cors");
 const express = require("express");
@@ -141,7 +141,6 @@ const proxyApi = function (req, res, next) {
     // connect to API without using Keycloak authentication
     url = `${apiHost}:${apiPort}/${endpoint}?${parameters}`;
   }
-
 
   const errHandler = (err) => {
     const { response } = err;
@@ -297,6 +296,8 @@ if (isProd) {
   app
     .get("/", keycloak.protect(), pageHandler)
     .get("/api/get-template", keycloak.protect())
+    .get("/api/lookups/", pageHandler)
+    .get("/api/xref/", pageHandler)
     // .get('/api/session-info', retrieveSessionInfo)
     .get("/api/:endpoint", keycloak.protect(), proxyApi)
     .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
