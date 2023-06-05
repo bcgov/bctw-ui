@@ -24,6 +24,10 @@ export interface IKeyCloakSessionInfo {
   keycloak_guid: string;
 }
 
+export interface ICritterbaseLoginResponse {
+  user_id: string
+}
+
 // all user classes implement
 type UserBaseType = {
   firstname: string;

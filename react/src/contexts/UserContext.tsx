@@ -46,6 +46,18 @@ export const UserStateContextProvider: React.FC = (props) => {
     status: sessionStatus,
     error: sessionError
   } = api.useUserSessionInfo();
+
+  const {data: critterLoginData, status: critterLoginStatus } = api.useCritterbaseSessionInfo(
+    sessionData?.username, 
+    sessionData?.keycloak_guid, 
+    {enabled: sessionStatus === 'success' && userStatus === 'success' && !userError} 
+    //Ensure keycloak session and user hook retrieve their info successfully before logging into critterbase
+    //Shouldn't sign people up if they don't have access to bctw yet
+  );
+
+  useEffect(() => {
+    console.log(`Status of Critter login hook: ${JSON.stringify(critterLoginData)}, ${critterLoginStatus}`);
+  }, [critterLoginData, critterLoginStatus ])
   // setup the mutation, used if the user row in the database is out of date
   const onSuccess = (v: User): void => {
     console.log('UserContext: new user object is', v);
@@ -69,6 +81,7 @@ export const UserStateContextProvider: React.FC = (props) => {
       setSession(sessionData);
       setUserContext((o) => ({ ...o, session: sessionData }));
     }
+    console.log(`Session status: ${sessionStatus} ${sessionData}`);
   }, [sessionStatus]);
 
   /**

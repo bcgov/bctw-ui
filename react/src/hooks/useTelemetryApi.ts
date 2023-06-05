@@ -24,7 +24,7 @@ import { AttachedCritter, Critter, eCritterFetchType, IMarking } from 'types/ani
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import { AttachDeviceInput, CollarHistory, RemoveDeviceInput } from 'types/collar_history';
-import { IKeyCloakSessionInfo, User } from 'types/user';
+import { ICritterbaseLoginResponse, IKeyCloakSessionInfo, User } from 'types/user';
 
 import {
   IBulkUploadResults,
@@ -123,12 +123,12 @@ export const useTelemetryApi = () => {
   };
 
   const useVerifyMarkingsAgainstTaxon = (
-    config: UseMutationOptions<string[], AxiosError, {taxon_id: string, markings: IMarking}>
-  ): UseMutationResult<string[]> => 
-  useMutation<string[], AxiosError, {taxon_id: string, markings: IMarking}>(
-    ({taxon_id, markings}) => critterbaseApi.verifyMarkingsAgainstTaxon(taxon_id, markings),
-    config
-  );
+    config: UseMutationOptions<string[], AxiosError, { taxon_id: string; markings: IMarking }>
+  ): UseMutationResult<string[]> =>
+    useMutation<string[], AxiosError, { taxon_id: string; markings: IMarking }>(
+      ({ taxon_id, markings }) => critterbaseApi.verifyMarkingsAgainstTaxon(taxon_id, markings),
+      config
+    );
 
   /** upsert an animal */
   const useSaveCritterbaseCritter = (
@@ -402,6 +402,18 @@ export const useTelemetryApi = () => {
       'user-session',
       () => userApi.getSessionInfo(),
       defaultQueryOptions
+    );
+  };
+
+  const useCritterbaseSessionInfo = (
+    user_id: string,
+    keycloak_id: string,
+    config?: QueryEnabled
+  ): UseQueryResult<ICritterbaseLoginResponse, AxiosError> => {
+    return useQuery<ICritterbaseLoginResponse, AxiosError>(
+      ['critterbase-session', user_id, keycloak_id],
+      () => critterbaseApi.loginToCritterbase(user_id, keycloak_id),
+      { ...defaultQueryOptions, ...config }
     );
   };
 
@@ -767,6 +779,7 @@ export const useTelemetryApi = () => {
     useAssignedCrittersHistoric,
     useBulkUpdateCritterbaseCritter,
     useDeleteMarking,
-    useVerifyMarkingsAgainstTaxon
+    useVerifyMarkingsAgainstTaxon,
+    useCritterbaseSessionInfo
   };
 };

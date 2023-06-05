@@ -44,7 +44,6 @@ export const userApi = (props: ApiProps): API => {
     }
     const url = createUrl({ api: 'session-info' });
     const { data } = await api.get(url);
-    //console.log('retrieve session info', data);
     return data;
   };
 

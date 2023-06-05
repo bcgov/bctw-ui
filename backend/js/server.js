@@ -1,3 +1,4 @@
+require('dotenv').config();
 const axios = require("axios");
 const cors = require("cors");
 const express = require("express");
@@ -140,6 +141,7 @@ const proxyApi = function (req, res, next) {
     // connect to API without using Keycloak authentication
     url = `${apiHost}:${apiPort}/${endpoint}?${parameters}`;
   }
+
 
   const errHandler = (err) => {
     const { response } = err;
