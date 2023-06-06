@@ -141,6 +141,12 @@ const proxyApi = function (req, res, next) {
     url = `${apiHost}:${apiPort}/${endpoint}?${parameters}`;
   }
 
+  if (req.header("API-KEY")) {
+    //Critterbase Request.
+    url = `${cbApi}:${apiPort}/${endpoint}?${parameters}`;
+    console.log("critterbase requestb " + { url });
+  }
+
   const errHandler = (err) => {
     const { response } = err;
     res.status(response.status).json({ error: response.data });
