@@ -1,4 +1,3 @@
-require("dotenv").config();
 const axios = require("axios");
 const cors = require("cors");
 const express = require("express");
@@ -10,7 +9,6 @@ const keycloakConnect = require("keycloak-connect");
 const morgan = require("morgan");
 const multer = require("multer");
 const path = require("path");
-const { response } = require("express");
 
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 
@@ -18,8 +16,9 @@ const isProd = process.env.NODE_ENV === "production" ? true : false;
 const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
+const cbApi = process.env.CRITTERBASE_API;
 
-console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt });
+console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt, cbApi });
 // use Express memory store for session and Keycloak object
 var memoryStore = new expressSession.MemoryStore();
 
@@ -265,6 +264,11 @@ const devServerRedirect = function (_, res) {
   res.redirect("localhost:1111");
 };
 
+// const log = (req, res, next) => {
+//   console.log("request");
+//   return next();
+// };
+
 // use enhanced logging in non-production environments
 const logger = isProd ? "combined" : "dev";
 
@@ -272,7 +276,9 @@ const logger = isProd ? "combined" : "dev";
 var app = express()
   .use(helmet())
   .use(cors())
-  .use(morgan(logger))
+  .use(morgan("dev"))
+  // .use(morgan(logger))
+  // .use(log)
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
   .use(expressSession(session))
@@ -296,8 +302,6 @@ if (isProd) {
   app
     .get("/", keycloak.protect(), pageHandler)
     .get("/api/get-template", keycloak.protect())
-    .get("/api/lookups/", pageHandler)
-    .get("/api/xref/", pageHandler)
     // .get('/api/session-info', retrieveSessionInfo)
     .get("/api/:endpoint", keycloak.protect(), proxyApi)
     .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
