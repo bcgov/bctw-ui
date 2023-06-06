@@ -123,7 +123,6 @@ const proxyApi = function (req, res, next) {
     .join("&");
 
   let url;
-  let headers;
   if (isProd) {
     // split out the domain and username of logged-in user
     const { domain, keycloak_guid } = getProperties(
@@ -154,14 +153,6 @@ const proxyApi = function (req, res, next) {
     return res.json(response.data);
   };
 
-  const isCritterbaseRequest = api === "cb-api";
-
-  if (isCritterbaseRequest) {
-    url = `${cbApi}/${endpoint}?${parameters}`;
-    headers = {
-      "API-KEY": "test",
-    };
-  }
   // console.log(headers);
 
   if (req.method === "POST") {
@@ -173,13 +164,10 @@ const proxyApi = function (req, res, next) {
       // console.log(JSON.stringify(form, null, 2));
       axios.post(url, form, config).then(successHandler).catch(errHandler);
     } else {
-      axios
-        .post(url, req.body, { headers })
-        .then(successHandler)
-        .catch(errHandler);
+      axios.post(url, req.body).then(successHandler).catch(errHandler);
     }
   } else if (req.method === "DELETE") {
-    axios.delete(url, { headers }).then(successHandler).catch(url);
+    axios.delete(url).then(successHandler).catch(url);
   }
   // handle get
   else {
@@ -198,7 +186,7 @@ const proxyApi = function (req, res, next) {
         res.send(Buffer.from(response.data));
       });
     } else {
-      axios.get(url, { headers }).then(successHandler).catch(errHandler);
+      axios.get(url).then(successHandler).catch(errHandler);
     }
   }
 };
