@@ -17,6 +17,7 @@ const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
 const cbApi = process.env.CRITTERBASE_API;
+const cbApiKey = process.env.CRITTERBASE_API_KEY;
 
 console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt, cbApi });
 // use Express memory store for session and Keycloak object
@@ -112,6 +113,8 @@ const retrieveSessionInfo = function (req, res, next) {
 const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
+  const api = req.params.api;
+  // console.log({ api }, { endpoint });
   // create a string of key-value pairs from the parameters passed
   const parameters = Object.keys(req.query)
     .map((key) => {
@@ -120,6 +123,7 @@ const proxyApi = function (req, res, next) {
     .join("&");
 
   let url;
+  let headers;
   if (isProd) {
     // split out the domain and username of logged-in user
     const { domain, keycloak_guid } = getProperties(
@@ -141,12 +145,6 @@ const proxyApi = function (req, res, next) {
     url = `${apiHost}:${apiPort}/${endpoint}?${parameters}`;
   }
 
-  if (req.header("API-KEY")) {
-    //Critterbase Request.
-    url = `${cbApi}:${apiPort}/${endpoint}?${parameters}`;
-    console.log("critterbase requestb " + { url });
-  }
-
   const errHandler = (err) => {
     const { response } = err;
     res.status(response.status).json({ error: response.data });
@@ -155,6 +153,16 @@ const proxyApi = function (req, res, next) {
   const successHandler = (response) => {
     return res.json(response.data);
   };
+
+  const isCritterbaseRequest = api === "cb-api";
+
+  if (isCritterbaseRequest) {
+    url = `${cbApi}/${endpoint}?${parameters}`;
+    headers = {
+      "API-KEY": "test",
+    };
+  }
+  // console.log(headers);
 
   if (req.method === "POST") {
     const { file, files } = req;
@@ -165,10 +173,13 @@ const proxyApi = function (req, res, next) {
       // console.log(JSON.stringify(form, null, 2));
       axios.post(url, form, config).then(successHandler).catch(errHandler);
     } else {
-      axios.post(url, req.body).then(successHandler).catch(errHandler);
+      axios
+        .post(url, req.body, { headers })
+        .then(successHandler)
+        .catch(errHandler);
     }
   } else if (req.method === "DELETE") {
-    axios.delete(url).then(successHandler).catch(url);
+    axios.delete(url, { headers }).then(successHandler).catch(url);
   }
   // handle get
   else {
@@ -187,7 +198,7 @@ const proxyApi = function (req, res, next) {
         res.send(Buffer.from(response.data));
       });
     } else {
-      axios.get(url).then(successHandler).catch(errHandler);
+      axios.get(url, { headers }).then(successHandler).catch(errHandler);
     }
   }
 };
@@ -270,14 +281,35 @@ const devServerRedirect = function (_, res) {
   res.redirect("localhost:1111");
 };
 
-// const log = (req, res, next) => {
-//   console.log("request");
-//   return next();
-// };
+const cbProxyApi = (req, res, next) => {
+  const endpoint = req.params[0];
+  const headers = {
+    "API-KEY": cbApiKey,
+  };
+  const params = req.query;
+  const url = `${cbApi}${endpoint}`;
+  const errHandler = (err) => {
+    const { response } = err;
+    res.status(response.status).json({ error: response.data });
+  };
+
+  const successHandler = (response) => {
+    return res.json(response.data);
+  };
+
+  if (req.method === "POST") {
+    axios
+      .post(url, req.body, { headers, params })
+      .then(successHandler)
+      .catch(errHandler);
+  }
+  if (req.method === "GET") {
+    axios.get(url, { headers, params }).then(successHandler).catch(errHandler);
+  }
+};
 
 // use enhanced logging in non-production environments
 const logger = isProd ? "combined" : "dev";
-
 // Server configuration
 var app = express()
   .use(helmet())
@@ -296,7 +328,8 @@ var app = express()
 if (isProd) {
   app
     .get("/api/session-info", retrieveSessionInfo)
-    .all("*", keycloak.protect(), pageHandler);
+    .all("*", keycloak.protect(), pageHandler)
+    .all("/cb-api/*", cbProxyApi);
 } else {
   app
     .post("/api/import-xlsx", upload.single("validated-file"), pageHandler)
