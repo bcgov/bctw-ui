@@ -1,4 +1,4 @@
-import { getBaseUrl } from 'api/api_helpers';
+import { CritterbaseApiKey, CritterbaseApiURL, getBaseUrl } from 'api/api_helpers';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
@@ -75,9 +75,9 @@ const useApi = (): AxiosInstance => {
 const useCritterbaseApi = (): AxiosInstance => {
   const instance = useMemo(() => {
     return axios.create({
-      baseURL: process.env.REACT_APP_CRITTERBASE_API,
+      baseURL: CritterbaseApiURL,
       headers: {
-        'API-KEY': process.env.REACT_APP_CRITTERBASE_API_KEY
+        'API-KEY': CritterbaseApiKey
       }
     });
   }, []);

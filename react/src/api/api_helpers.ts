@@ -10,7 +10,8 @@ const IS_PROD = +window.location.port === 1111 ? false : true;
 if (!IS_PROD) {
   dotenv.config();
 }
-
+export const CritterbaseApiURL = process.env.CRITTERBASE_API;
+export const CritterbaseApiKey = process.env.CRITTERBASE_API_KEY;
 //Disabled while fixing alerts bugs...
 export const ENABLE_ALERTS = true;
 
