@@ -66,7 +66,8 @@ import { parseArgs } from 'utils/common_helpers';
 const useApi = (): AxiosInstance => {
   const instance = useMemo(() => {
     return axios.create({
-      baseURL: getBaseUrl()
+      baseURL: getBaseUrl(),
+      withCredentials: true
     });
   }, []);
   return instance;
@@ -78,7 +79,8 @@ const useCritterbaseApi = (): AxiosInstance => {
       baseURL: CritterbaseApiURL,
       headers: {
         'API-KEY': CritterbaseApiKey
-      }
+      },
+      withCredentials: true
     });
   }, []);
   return instance;
