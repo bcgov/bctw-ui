@@ -56,7 +56,6 @@ var session = {
   saveUninitialized: true,
   secret: sessionSalt,
   store: memoryStore,
-  "critterbase.sid": undefined,
 };
 
 // TODO: move into separate package?
@@ -291,17 +290,12 @@ const cbProxyApi = (req, res, next) => {
   const successHandler = (response) => {
     if (isAuth) {
       const sid = response.data["critterbase.sid"];
-      // let sid = req.session["critterbase.sid"];
-      // if (!sid) {
-      //   sid = response.data["critterbase.sid"];
-      // }
-      // if (!sid) {
-      //   console.error("Error occurred setting critterbase SID");
-      // }
+      res.clearCookie("critterbase.sid");
       res.cookie("critterbase.sid", sid, { signed: true });
     }
     return res.json(response.data);
   };
+  //req.headers["API-KEY"] = cbApiKey;
   if (req.method === "POST") {
     api
       .post(url, req.body, {
@@ -318,10 +312,11 @@ const cbProxyApi = (req, res, next) => {
       .catch(errHandler);
   }
 };
-// const log = (req, res, next) => {
-//   //console.log(req.cookies);
-//   next();
-// };
+
+const assist = (req, res, next) => {
+  req.headers["API-KEY"] = cbApiKey;
+  next();
+};
 
 // use enhanced logging in non-production environments
 const logger = isProd ? "combined" : "dev";
@@ -331,6 +326,7 @@ var app = express()
   .use(cors({ credentials: true }))
   .use(cookieParser(sessionSalt))
   .use(morgan("dev"))
+  .use(assist)
   // .use(log)
   // .use(morgan(logger))
   //.use(sessionLog)
