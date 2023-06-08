@@ -156,8 +156,6 @@ const proxyApi = function (req, res, next) {
     return res.json(response.data);
   };
 
-  // console.log(headers);
-
   if (req.method === "POST") {
     const { file, files } = req;
     if (file || files) {
@@ -320,6 +318,11 @@ const assist = (req, res, next) => {
   req.headers["API-KEY"] = cbApiKey;
   next();
 };
+const log = (req, res, next) => {
+  //console.log(req.url);
+  console.log(req.url);
+  next();
+};
 
 // use enhanced logging in non-production environments
 const logger = isProd ? "combined" : "dev";
@@ -328,11 +331,8 @@ var app = express()
   .use(helmet())
   .use(cors({ credentials: true }))
   .use(cookieParser(sessionSalt))
-  .use(morgan("dev"))
   .use(assist)
-  // .use(log)
-  // .use(morgan(logger))
-  //.use(sessionLog)
+  // .use(morgan("dev"))
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
   .use(expressSession(session))
@@ -344,20 +344,22 @@ var app = express()
 if (isProd) {
   app
     .get("/api/session-info", retrieveSessionInfo)
-    .all("*", keycloak.protect(), pageHandler)
-    .all("/cb-api/*", cbProxyApi);
+    .all("*", keycloak.protect(), pageHandler);
 } else {
   app
     .post("/api/import-xlsx", upload.single("validated-file"), pageHandler)
     .post("/api/import-csv", upload.single("csv"), pageHandler)
     .post("/api/import-xml", upload.array("xml"), pageHandler)
+    .post("/api/cb/*", cbProxyApi)
     .post("/api/:endpoint", proxyApi);
 }
 if (isProd) {
   app
     .get("/", keycloak.protect(), pageHandler)
     .get("/api/get-template", keycloak.protect())
+    // .get("/api/cb/*", keycloak.protect(), cbProxyApi)
     // .get('/api/session-info', retrieveSessionInfo)
+    .get("/api/cb/*", keycloak.protect(), cbProxyApi)
     .get("/api/:endpoint", keycloak.protect(), proxyApi)
     .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
     // bulk file import handlers
@@ -379,6 +381,7 @@ if (isProd) {
       keycloak.protect(),
       pageHandler
     )
+    .post("/api/cb/*", keycloak.protect(), cbProxyApi)
     .post("/api/:endpoint", keycloak.protect(), proxyApi)
     // delete handlers
     .delete("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi);

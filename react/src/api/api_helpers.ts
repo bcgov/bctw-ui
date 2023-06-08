@@ -21,7 +21,7 @@ const getBaseUrl = (noApiPrefix?: boolean, cbReq?: boolean): string => {
   const h2 = window.location.hostname;
   const h3 = IS_PROD ? window.location.port : 3000;
   let h4 = '';
-  if (!noApiPrefix) h4 = IS_PROD ? (cbReq ? '/cb-api' : '/api') : '';
+  if (!noApiPrefix) h4 = IS_PROD ? (cbReq ? '/api/cb' : '/api') : '';
   const url = `${h1}//${h2}:${h3}${h4}`;
   return url;
 };
