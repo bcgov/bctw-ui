@@ -8,10 +8,10 @@ const http = require("http");
 const keycloakConnect = require("keycloak-connect");
 const morgan = require("morgan");
 const multer = require("multer");
+const cookieParser = require("cookie-parser");
 const path = require("path");
-
 const sessionSalt = process.env.BCTW_SESSION_SALT;
-
+const api = axios.create({ withCredentials: true });
 const isProd = process.env.NODE_ENV === "production" ? true : false;
 const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
@@ -56,6 +56,7 @@ var session = {
   saveUninitialized: true,
   secret: sessionSalt,
   store: memoryStore,
+  "critterbase.sid": undefined,
 };
 
 // TODO: move into separate package?
@@ -111,9 +112,12 @@ const retrieveSessionInfo = function (req, res, next) {
 // TODO: move into separate package?
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
+  // const critterbaseSID = req.session["critterbase.sid"];
+  // if (critterbaseSID) {
+  //   res.cookie("critterbase.sid", critterbaseSID, { signed: true });
+  // }
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
-  const api = req.params.api;
   // console.log({ api }, { endpoint });
   // create a string of key-value pairs from the parameters passed
   const parameters = Object.keys(req.query)
@@ -162,12 +166,15 @@ const proxyApi = function (req, res, next) {
       // create a new formdata object to pass on to the server
       const { form, config } = file ? handleFile(file) : handleFiles(files);
       // console.log(JSON.stringify(form, null, 2));
-      axios.post(url, form, config).then(successHandler).catch(errHandler);
+      api.post(url, form, config).then(successHandler).catch(errHandler);
     } else {
-      axios.post(url, req.body).then(successHandler).catch(errHandler);
+      api
+        .post(url, req.body, { headers: req.headers })
+        .then(successHandler)
+        .catch(errHandler);
     }
   } else if (req.method === "DELETE") {
-    axios.delete(url).then(successHandler).catch(url);
+    api.delete(url).then(successHandler).catch(url);
   }
   // handle get
   else {
@@ -186,7 +193,10 @@ const proxyApi = function (req, res, next) {
         res.send(Buffer.from(response.data));
       });
     } else {
-      axios.get(url).then(successHandler).catch(errHandler);
+      api
+        .get(url, { headers: req.headers })
+        .then(successHandler)
+        .catch(errHandler);
     }
   }
 };
@@ -271,40 +281,59 @@ const devServerRedirect = function (_, res) {
 
 const cbProxyApi = (req, res, next) => {
   const endpoint = req.params[0];
-  const headers = {
-    "API-KEY": cbApiKey,
-  };
   const params = req.query;
   const url = `${cbApi}${endpoint}`;
   const errHandler = (err) => {
     const { response } = err;
     res.status(response.status).json({ error: response.data });
   };
-
+  const isAuth = endpoint === "login" || endpoint === "signup";
   const successHandler = (response) => {
+    if (isAuth) {
+      const sid = response.data["critterbase.sid"];
+      // let sid = req.session["critterbase.sid"];
+      // if (!sid) {
+      //   sid = response.data["critterbase.sid"];
+      // }
+      // if (!sid) {
+      //   console.error("Error occurred setting critterbase SID");
+      // }
+      res.cookie("critterbase.sid", sid, { signed: true });
+    }
     return res.json(response.data);
   };
-
   if (req.method === "POST") {
-    axios
-      .post(url, req.body, { headers, params })
+    api
+      .post(url, req.body, {
+        headers: req.headers,
+        params,
+      })
       .then(successHandler)
       .catch(errHandler);
   }
   if (req.method === "GET") {
-    axios.get(url, { headers, params }).then(successHandler).catch(errHandler);
+    api
+      .get(url, { headers: req.headers, params })
+      .then(successHandler)
+      .catch(errHandler);
   }
 };
+// const log = (req, res, next) => {
+//   //console.log(req.cookies);
+//   next();
+// };
 
 // use enhanced logging in non-production environments
 const logger = isProd ? "combined" : "dev";
 // Server configuration
 var app = express()
   .use(helmet())
-  .use(cors())
-  .use(morgan("dev"))
-  // .use(morgan(logger))
+  .use(cors({ credentials: true }))
+  .use(cookieParser(sessionSalt))
+  // .use(morgan("dev"))
   // .use(log)
+  // .use(morgan(logger))
+  //.use(sessionLog)
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
   .use(expressSession(session))
