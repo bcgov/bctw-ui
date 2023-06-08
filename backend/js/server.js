@@ -149,7 +149,6 @@ const proxyApi = function (req, res, next) {
 
   const errHandler = (err) => {
     const { response } = err;
-    console.log(err);
     res.status(response.status).json({ error: response.data });
   };
 
@@ -285,6 +284,7 @@ const cbProxyApi = (req, res, next) => {
   const url = `${cbApi}${endpoint}`;
   const errHandler = (err) => {
     const { response } = err;
+    console.log(err);
     res.status(response.status).json({ error: response.data });
   };
   const isAuth = endpoint === "login" || endpoint === "signup";
