@@ -149,6 +149,7 @@ const proxyApi = function (req, res, next) {
 
   const errHandler = (err) => {
     const { response } = err;
+    console.log(err);
     res.status(response.status).json({ error: response.data });
   };
 
