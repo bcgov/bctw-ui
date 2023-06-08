@@ -296,6 +296,8 @@ const cbProxyApi = (req, res, next) => {
     return res.json(response.data);
   };
   //req.headers["API-KEY"] = cbApiKey;
+  const headers = req.headers;
+  console.log({ url }, { params }, { headers });
   if (req.method === "POST") {
     api
       .post(url, req.body, {
