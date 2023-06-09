@@ -1,3 +1,4 @@
+require('dotenv').config();
 const axios = require("axios");
 const cors = require("cors");
 const express = require("express");
@@ -116,6 +117,7 @@ const proxyApi = function (req, res, next) {
   //   res.cookie("critterbase.sid", critterbaseSID, { signed: true });
   // }
   // URL of the endpoint being targeted
+  
   const endpoint = req.params.endpoint;
   // console.log({ api }, { endpoint });
   // create a string of key-value pairs from the parameters passed
@@ -146,6 +148,7 @@ const proxyApi = function (req, res, next) {
     // connect to API without using Keycloak authentication
     url = `${apiHost}:${apiPort}/${endpoint}?${parameters}`;
   }
+
 
   const errHandler = (err) => {
     const { response } = err;
@@ -307,6 +310,7 @@ const cbProxyApi = (req, res, next) => {
     }
     return res.json(response.data);
   };
+
   if (req.method === "POST") {
     api
       .post(url, req.body, {

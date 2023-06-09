@@ -80,7 +80,7 @@ const useCritterbaseApi = (): AxiosInstance => {
       headers: {
         'API-KEY': CritterbaseApiKey
       },
-      withCredentials: true
+      withCredentials: false
     });
   }, []);
   return instance;
