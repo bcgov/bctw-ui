@@ -27,6 +27,7 @@
     "date-fns": "^2.24.0",
     "dayjs": "^1.10.4",
     "downloadjs": "^1.4.7",
+    "env-cmd": "^10.1.0",
     "esri-leaflet": "^3.0.0",
     "iframe-resizer-react": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
@@ -74,7 +75,7 @@
   },
   "scripts": {
     "start": "PORT=1111 FAST_REFRESH=false react-scripts start ",
-    "build": "cp node_modules/reflect-metadata/Reflect.js public && CRITTERBASE_API=$CRITTERBASE_API CRITTERBASE_API_KEY=$CRITTERBASE_API_KEY && react-scripts build",
+    "build": "cp node_modules/reflect-metadata/Reflect.js public && env-cmd -f ../backend/.env react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "node_modules/eslint/bin/eslint.js src/ --max-warnings=0",
