@@ -16,17 +16,17 @@ export const ENABLE_ALERTS = true;
 /**
  * @param noApiPrefix if true, exclude '/api' beginning of the base url
  */
-const getBaseUrl = (noApiPrefix?: boolean, cbReq?: boolean): string => {
+const getBaseUrl = (noApiPrefix?: boolean): string => {
   const h1 = window.location.protocol;
   const h2 = window.location.hostname;
   const h3 = IS_PROD ? window.location.port : 3000;
   let h4 = '';
-  if (!noApiPrefix) h4 = IS_PROD ? (cbReq ? '/api/cb' : '/api') : '';
+  if (!noApiPrefix) h4 = IS_PROD ? '/api' : '';
   const url = `${h1}//${h2}:${h3}${h4}`;
   return url;
 };
 
-export const CritterbaseApiURL = IS_PROD ? getBaseUrl(false, true) : process.env.CRITTERBASE_URL;
+export const CritterbaseApiURL = IS_PROD ? getBaseUrl() + '/cb' : process.env.CRITTERBASE_URL;
 export const CritterbaseApiKey = process.env.CRITTERBASE_API_KEY;
 
 /**
