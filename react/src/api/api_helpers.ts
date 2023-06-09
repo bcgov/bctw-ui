@@ -1,17 +1,19 @@
-//import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { ITableFilter } from 'components/table/table_interfaces';
 import { isDayjs } from 'dayjs';
 import { omitNull } from 'utils/common_helpers';
 import { formatTime } from 'utils/time';
 import { CreateUrlParams } from './api_interfaces';
-
 const IS_PROD = +window.location.port === 1111 ? false : true;
-if (!IS_PROD) {
-  //dotenv.config();
-  /** REMOVED THIS ^^ Just to make sure that it uses the .env.local variables for now */
-}
-
+// if (!IS_PROD) {
+//   //dotenv.config();
+//   /** REMOVED THIS ^^ Just to make sure that it uses the .env.local variables for now */
+// }
+// dotenv.config({ path: '../../../backend/.env' });
+// console.log(process.env);
+// console.log(process.env);
+console.log(process.env);
 //Disabled while fixing alerts bugs...
 export const ENABLE_ALERTS = true;
 
@@ -28,8 +30,8 @@ const getBaseUrl = (noApiPrefix?: boolean): string => {
   return url;
 };
 
-export const CritterbaseApiURL = process.env.REACT_APP_CRITTERBASE_API //process.env.CRITTERBASE_API;
-export const CritterbaseApiKey = process.env.REACT_APP_CRITTERBASE_API_KEY //process.env.CRITTERBASE_API_KEY;
+export const CritterbaseApiURL = process.env.REACT_APP_CRITTERBASE_API; //process.env.CRITTERBASE_API;
+export const CritterbaseApiKey = process.env.REACT_APP_CRITTERBASE_API_KEY; //process.env.CRITTERBASE_API_KEY;
 
 /**
  * appends the @param query to @param url

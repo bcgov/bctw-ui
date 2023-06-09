@@ -73,8 +73,8 @@
     "@types/react": "^17.0.30"
   },
   "scripts": {
-    "start": "PORT=1111 FAST_REFRESH=false react-scripts start",
-    "build": "cp node_modules/reflect-metadata/Reflect.js public && react-scripts build",
+    "start": "PORT=1111 FAST_REFRESH=false react-scripts start ",
+    "build": "cp node_modules/reflect-metadata/Reflect.js public && CRITTERBASE_API=$CRITTERBASE_API CRITTERBASE_API_KEY=$CRITTERBASE_API_KEY && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "node_modules/eslint/bin/eslint.js src/ --max-warnings=0",
