@@ -291,8 +291,12 @@ const cbProxyApi = (req, res, next) => {
     const { response } = err;
     // console.log(err);
     res
-      .status(response?.status ?? 400)
-      .json({ error: response?.data ?? "unknown critterbase proxy error" });
+      .status(response.status ? res.status : 400)
+      .json({
+        error: response.data
+          ? response.data
+          : "unknown critterbase proxy error",
+      });
   };
   const isAuth = endpoint === "login" || endpoint === "signup";
   const successHandler = (response) => {
