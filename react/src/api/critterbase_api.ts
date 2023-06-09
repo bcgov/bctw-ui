@@ -4,6 +4,7 @@ import { API, ApiProps, ICbBulkUpdatePayload, IUpsertPayload } from './api_inter
 import { uuid } from 'types/common_types';
 import { Critter, IMarking } from 'types/animal';
 import { useQueryClient } from 'react-query';
+import axios from 'axios';
 
 export const critterbaseApi = (props: ApiProps): API => {
   const { api } = props;
