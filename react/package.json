@@ -75,7 +75,7 @@
   },
   "scripts": {
     "start": "PORT=1111 FAST_REFRESH=false react-scripts start ",
-    "build": "cp node_modules/reflect-metadata/Reflect.js public && env-cmd -f ../backend/.env react-scripts build",
+    "build": "cp node_modules/reflect-metadata/Reflect.js public && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "node_modules/eslint/bin/eslint.js src/ --max-warnings=0",
