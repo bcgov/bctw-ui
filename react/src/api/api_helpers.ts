@@ -26,7 +26,7 @@ const getBaseUrl = (noApiPrefix?: boolean): string => {
   return url;
 };
 
-export const CritterbaseApiURL = IS_PROD ? getBaseUrl() + '/cb' : process.env.CRITTERBASE_URL;
+export const cbURL = process.env.CRITTERBASE_URL ?? 'https://moe-critterbase-api-dev.apps.silver.devops.gov.bc.ca/api/';
 export const CritterbaseApiKey = process.env.CRITTERBASE_API_KEY;
 
 /**
