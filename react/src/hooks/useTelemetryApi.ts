@@ -1,4 +1,4 @@
-import { CritterbaseApiKey, cbURL, getBaseUrl } from 'api/api_helpers';
+import { CritterbaseApiKey, CritterbaseApiURL, getBaseUrl } from 'api/api_helpers';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
@@ -66,8 +66,7 @@ import { parseArgs } from 'utils/common_helpers';
 const useApi = (): AxiosInstance => {
   const instance = useMemo(() => {
     return axios.create({
-      baseURL: getBaseUrl(),
-      withCredentials: true
+      baseURL: getBaseUrl()
     });
   }, []);
   return instance;
@@ -76,7 +75,7 @@ const useApi = (): AxiosInstance => {
 const useCritterbaseApi = (): AxiosInstance => {
   const instance = useMemo(() => {
     return axios.create({
-      baseURL: cbURL,
+      baseURL: CritterbaseApiURL,
       headers: {
         'API-KEY': CritterbaseApiKey
       },
