@@ -281,12 +281,18 @@ const cbProxyApi = (req, res, next) => {
   const params = req.query;
   const url = `${cbApi}${endpoint}`;
   const payload = req.body;
-  const cbRequest = { url, payload, params };
+  const headers = {
+    cookie: req.headers.cookie,
+    "API-KEY": req.headers["API-KEY"],
+  };
+  const cbRequest = { url, payload, params, headers };
   console.log({ cbRequest });
   const errHandler = (err) => {
     const { response } = err;
     // console.log(err);
-    res.status(response.status).json({ error: response.data });
+    res
+      .status(response?.status ?? 400)
+      .json({ error: response?.data ?? "unknown critterbase proxy error" });
   };
   const isAuth = endpoint === "login" || endpoint === "signup";
   const successHandler = (response) => {
@@ -297,14 +303,10 @@ const cbProxyApi = (req, res, next) => {
     }
     return res.json(response.data);
   };
-  //req.headers["API-KEY"] = cbApiKey;
-  // const headers = req.headers;
-  // const reqUrl = req.url;
-  // console.log({ url }, { reqUrl }, { params }, { headers });
   if (req.method === "POST") {
     api
       .post(url, req.body, {
-        headers: req.headers,
+        headers: headers,
         params,
       })
       .then(successHandler)
@@ -312,7 +314,7 @@ const cbProxyApi = (req, res, next) => {
   }
   if (req.method === "GET") {
     api
-      .get(url, { headers: req.headers, params })
+      .get(url, { headers: headers, params })
       .then(successHandler)
       .catch(errHandler);
   }
@@ -385,15 +387,15 @@ if (isProd) {
       keycloak.protect(),
       pageHandler
     )
-    .post("/login", (req, res, next) => {
-      console.log("/login hit");
-    })
-    .post("/api/login", (req, res, next) => {
-      console.log("api/login hit");
-    })
-    .post("/api/cb/login", (req, res, next) => {
-      console.log("api/cb/login hit");
-    })
+    // .post("/login", (req, res, next) => {
+    //   console.log("/login hit");
+    // })
+    // .post("/api/login", (req, res, next) => {
+    //   console.log("api/login hit");
+    // })
+    // .post("/api/cb/login", (req, res, next) => {
+    //   console.log("api/cb/login hit");
+    // })
     .post("/api/cb/*", keycloak.protect(), cbProxyApi)
     .post("/api/:endpoint", keycloak.protect(), proxyApi)
     // delete handlers
