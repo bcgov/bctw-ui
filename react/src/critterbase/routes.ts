@@ -1,8 +1,8 @@
 import { ICbRoutes } from './types';
 
-const selectFormat = `?format=asSelect`;
-const detailedFormat = `?format=detailed`;
-const cb = '/cb';
+const selectFormat = `format=asSelect`;
+const detailedFormat = `format=detailed`;
+const cb = 'cb';
 export const CbRouters = {
   lookups: `${cb}/lookups`,
   critters: `${cb}/critters`,
