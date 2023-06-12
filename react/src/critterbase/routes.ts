@@ -2,17 +2,17 @@ import { ICbRoutes } from './types';
 
 const selectFormat = `?format=asSelect`;
 const detailedFormat = `?format=detailed`;
-
+const cb = '/cb';
 export const CbRouters = {
-  lookups: '/lookups',
-  critters: '/critters',
-  captures: '/captures',
-  mortality: '/mortality',
-  markings: '/markings',
-  xref: '/xref',
-  bulk: '/bulk',
-  login: '/login',
-  signup: '/signup',
+  lookups: `${cb}/lookups`,
+  critters: `${cb}/critters`,
+  captures: `${cb}/captures`,
+  mortality: `${cb}/mortality`,
+  markings: `${cb}/markings`,
+  xref: `${cb}/xref`,
+  bulk: `${cb}/bulk`,
+  login: `${cb}/login`,
+  signup: `${cb}/signup`,
 
   get lookupsEnum(): string {
     return this.lookups + '/enum';

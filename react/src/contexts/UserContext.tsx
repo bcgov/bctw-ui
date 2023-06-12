@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { isDev } from 'api/api_helpers';
 import { AxiosError } from 'axios';
 import { plainToClass } from 'class-transformer';
 import useDidMountEffect from 'hooks/useDidMountEffect';
@@ -47,17 +48,18 @@ export const UserStateContextProvider: React.FC = (props) => {
     error: sessionError
   } = api.useUserSessionInfo();
 
-  const {data: critterLoginData, status: critterLoginStatus } = api.useCritterbaseSessionInfo(
-    sessionData?.username, 
-    sessionData?.keycloak_guid, 
-    {enabled: sessionStatus === 'success' && userStatus === 'success' && !userError} 
+  //Temp fix with isDev()
+  const { data: critterLoginData, status: critterLoginStatus } = api.useCritterbaseSessionInfo(
+    isDev() ? `${userData?.id}` : sessionData?.username,
+    isDev() ? process.env.REACT_APP_IDENTIFIER : sessionData?.keycloak_guid,
+    { enabled: sessionStatus === 'success' && userStatus === 'success' && !userError }
     //Ensure keycloak session and user hook retrieve their info successfully before logging into critterbase
     //Shouldn't sign people up if they don't have access to bctw yet
   );
 
   useEffect(() => {
     console.log(`Status of Critter login hook: ${JSON.stringify(critterLoginData)}, ${critterLoginStatus}`);
-  }, [critterLoginData, critterLoginStatus ])
+  }, [critterLoginData, critterLoginStatus]);
   // setup the mutation, used if the user row in the database is out of date
   const onSuccess = (v: User): void => {
     console.log('UserContext: new user object is', v);

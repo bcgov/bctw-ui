@@ -105,7 +105,7 @@ export const useTelemetryApi = () => {
   const permissionApi = permission_api({ api });
   const attachmentApi = attachment_api({ api });
   const onboardApi = onboarding_api({ api });
-  const critterbaseApi = critterbase_api({ api: cb_api });
+  const critterbaseApi = critterbase_api({ api });
 
   const defaultQueryOptions: Pick<UseQueryOptions, 'refetchOnWindowFocus'> = { refetchOnWindowFocus: false };
 
