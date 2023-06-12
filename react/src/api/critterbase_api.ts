@@ -5,6 +5,8 @@ import { uuid } from 'types/common_types';
 import { Critter, IMarking } from 'types/animal';
 import { useQueryClient } from 'react-query';
 import axios from 'axios';
+import { createUrl } from './api_helpers';
+import { Route } from 'react-router';
 
 export const critterbaseApi = (props: ApiProps): API => {
   const { api } = props;
@@ -25,30 +27,35 @@ export const critterbaseApi = (props: ApiProps): API => {
     query = ''
   ): Promise<Array<ICbSelect | string>> => {
     const route = CbRoutes[cbRouteKey];
-    const q = asSelect ? (query ? `${selectFormat}&${query}` : `${selectFormat}`) : `?${query}`;
-    const { data } = await api.get(`${route}${q}`);
+    const q = asSelect ? (query ? `${selectFormat}&${query}` : `${selectFormat}`) : `${query}`;
+    const url = createUrl({api: route, query: q })
+    const { data } = await api.get(url);
     return data;
   };
 
   const verifyMarkingsAgainstTaxon = async (taxon_id: string, markings: IMarking[]) => {
-    const { data } = await api.post(`${CbRouters.markings}/verify`, { taxon_id: taxon_id, markings: markings });
+    const url = createUrl({api: `${CbRouters.markings}/verify`})
+    const { data } = await api.post(url, { taxon_id: taxon_id, markings: markings });
     return data;
   };
 
   const upsertCritter = async (critter: IUpsertPayload<Critter>): Promise<Critter> => {
     // critter.body.sex = 'test';
-    const { data } = await api.put(`${CbRouters.critters}/${critter.body.critter_id}${detailedFormat}`, critter.body);
+    const url = createUrl({api: `${CbRouters.critters}/${critter.body.critter_id}${detailedFormat}` });
+    const { data } = await api.put(url, critter.body);
     return data;
   };
 
   const bulkUpdate = async (bulkPayload: ICbBulkUpdatePayload) => {
-    const { data } = await api.put(`${CbRouters.bulk}`, bulkPayload);
+    const url = createUrl({api:`${CbRouters.bulk}`});
+    const { data } = await api.put(url, bulkPayload);
     invalidate();
     return data;
   };
 
   const deleteMarking = async (marking_id: uuid): Promise<IMarking> => {
-    const { data } = await api.delete(`${CbRouters.markings}/${marking_id}`);
+    const url = createUrl({api: `${CbRouters.markings}/${marking_id}` });
+    const { data } = await api.delete(url);
     return data;
   };
 
