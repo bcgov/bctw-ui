@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const axios = require("axios");
 const cors = require("cors");
 const express = require("express");
@@ -11,6 +11,7 @@ const morgan = require("morgan");
 const multer = require("multer");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const cbEndpoint = "cb";
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 const api = axios.create({ withCredentials: true });
 const isProd = process.env.NODE_ENV === "production" ? true : false;
@@ -112,20 +113,12 @@ const retrieveSessionInfo = function (req, res, next) {
 // TODO: move into separate package?
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
-  // const critterbaseSID = req.session["critterbase.sid"];
-  // if (critterbaseSID) {
-  //   res.cookie("critterbase.sid", critterbaseSID, { signed: true });
-  // }
   // URL of the endpoint being targeted
-  
   const endpoint = req.params.endpoint;
-  // console.log({ api }, { endpoint });
-  // create a string of key-value pairs from the parameters passed
-  const parameters = Object.keys(req.query)
-    .map((key) => {
-      return `${key}=${req.query[key]}`;
-    })
-    .join("&");
+  const cbEndpoint = req.params.cbEndpoint;
+  const options = { headers: req.headers, params: req.query };
+
+  const path = req.path.replace("/api/", "");
 
   let url;
   if (isProd) {
@@ -134,21 +127,14 @@ const proxyApi = function (req, res, next) {
       req.kauth.grant.access_token.content
     );
 
-    // build up URL from ENV variables and targeted endpoint
-    url = `${apiHost}:${apiPort}/${endpoint}`;
+    url = `${apiHost}:${apiPort}/${path}`;
 
-    // if endpointId is known, append to URL
-    if (req.params.endpointId) {
-      url += `/${req.params.endpointId}`;
-    }
     // add parameters and username to URL
-    url = appendQueryToUrl(url, parameters);
     url = appendQueryToUrl(url, `${domain}=${keycloak_guid}`);
   } else {
     // connect to API without using Keycloak authentication
-    url = `${apiHost}:${apiPort}/${endpoint}?${parameters}`;
+    url = `${apiHost}:${apiPort}/${path}?${parameters}`;
   }
-
 
   const errHandler = (err) => {
     const { response } = err;
@@ -166,15 +152,15 @@ const proxyApi = function (req, res, next) {
       // create a new formdata object to pass on to the server
       const { form, config } = file ? handleFile(file) : handleFiles(files);
       // console.log(JSON.stringify(form, null, 2));
-      api.post(url, form, config).then(successHandler).catch(errHandler);
-    } else {
       api
-        .post(url, req.body, { headers: req.headers })
+        .post(url, form, { ...options, ...config })
         .then(successHandler)
         .catch(errHandler);
+    } else {
+      api.post(url, req.body, options).then(successHandler).catch(errHandler);
     }
   } else if (req.method === "DELETE") {
-    api.delete(url).then(successHandler).catch(url);
+    api.delete(url, options).then(successHandler).catch(url);
   }
   // handle get
   else {
@@ -185,6 +171,7 @@ const proxyApi = function (req, res, next) {
         method: "get",
         url: url,
         responseType: "arraybuffer",
+        ...options,
       }).then(function (response) {
         res.set(
           "Content-Type",
@@ -193,10 +180,7 @@ const proxyApi = function (req, res, next) {
         res.send(Buffer.from(response.data));
       });
     } else {
-      api
-        .get(url, { headers: req.headers })
-        .then(successHandler)
-        .catch(errHandler);
+      api.get(url, options).then(successHandler).catch(errHandler);
     }
   }
 };
@@ -279,65 +263,6 @@ const devServerRedirect = function (_, res) {
   res.redirect("localhost:1111");
 };
 
-const cbProxyApi = (req, res, next) => {
-  const endpoint = req.params[0];
-  const params = req.query;
-  const url = `${cbApi}${endpoint}`;
-  const payload = req.body;
-  const headers = {
-    cookie: req.headers.cookie,
-    "API-KEY": req.headers["API-KEY"],
-  };
-  const cbRequest = { url, payload, params, headers };
-  console.log({ cbRequest });
-  const errHandler = (err) => {
-    const { response } = err;
-    // console.log(err);
-    res
-      .status(response.status ? res.status : 400)
-      .json({
-        error: response.data
-          ? response.data
-          : "unknown critterbase proxy error",
-      });
-  };
-  const isAuth = endpoint === "login" || endpoint === "signup";
-  const successHandler = (response) => {
-    if (isAuth) {
-      const sid = response.data["critterbase.sid"];
-      res.clearCookie("critterbase.sid");
-      res.cookie("critterbase.sid", sid, { signed: true });
-    }
-    return res.json(response.data);
-  };
-
-  if (req.method === "POST") {
-    api
-      .post(url, req.body, {
-        headers: headers,
-        params,
-      })
-      .then(successHandler)
-      .catch(errHandler);
-  }
-  if (req.method === "GET") {
-    api
-      .get(url, { headers: headers, params })
-      .then(successHandler)
-      .catch(errHandler);
-  }
-};
-
-const assist = (req, res, next) => {
-  req.headers["API-KEY"] = cbApiKey;
-  next();
-};
-const log = (req, res, next) => {
-  //console.log(req.url);
-  console.log(req.url);
-  next();
-};
-
 // use enhanced logging in non-production environments
 const logger = isProd ? "combined" : "dev";
 // Server configuration
@@ -345,7 +270,6 @@ var app = express()
   .use(helmet())
   .use(cors({ credentials: true }))
   .use(cookieParser(sessionSalt))
-  .use(assist)
   // .use(morgan("dev"))
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
@@ -364,16 +288,22 @@ if (isProd) {
     .post("/api/import-xlsx", upload.single("validated-file"), pageHandler)
     .post("/api/import-csv", upload.single("csv"), pageHandler)
     .post("/api/import-xml", upload.array("xml"), pageHandler)
-    .post("/api/cb/*", cbProxyApi)
+
+    //Critterbase Post requests
+    .post("/api/cb/:cbEndpoint", proxyApi)
+    .post("/api/cb/:cbEndpoint/*", proxyApi)
+
     .post("/api/:endpoint", proxyApi);
 }
 if (isProd) {
   app
     .get("/", keycloak.protect(), pageHandler)
     .get("/api/get-template", keycloak.protect())
-    // .get("/api/cb/*", keycloak.protect(), cbProxyApi)
-    // .get('/api/session-info', retrieveSessionInfo)
-    .get("/api/cb/*", keycloak.protect(), cbProxyApi)
+
+    //Critterbase Get requests
+    .get("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+    .get("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+
     .get("/api/:endpoint", keycloak.protect(), proxyApi)
     .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
     // bulk file import handlers
@@ -395,16 +325,10 @@ if (isProd) {
       keycloak.protect(),
       pageHandler
     )
-    // .post("/login", (req, res, next) => {
-    //   console.log("/login hit");
-    // })
-    // .post("/api/login", (req, res, next) => {
-    //   console.log("api/login hit");
-    // })
-    // .post("/api/cb/login", (req, res, next) => {
-    //   console.log("api/cb/login hit");
-    // })
-    .post("/api/cb/*", keycloak.protect(), cbProxyApi)
+    //Critterbase Post requests
+    .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+    .post("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+
     .post("/api/:endpoint", keycloak.protect(), proxyApi)
     // delete handlers
     .delete("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi);
