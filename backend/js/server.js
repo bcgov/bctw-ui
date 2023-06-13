@@ -146,8 +146,8 @@ const proxyApi = function (req, res, next) {
 
   const errHandler = (err) => {
     const { response } = err;
-    res.status(response?.status ? response.status : 400).json({
-      error: response?.data ? response.data : "unknown proxyApi error",
+    res.status(response.status ? response.status : 400).json({
+      error: response.data ? response.data : "unknown proxyApi error",
     });
   };
 
