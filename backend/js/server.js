@@ -123,7 +123,7 @@ const proxyApi = function (req, res, next) {
     headers: { ...req.headers, "api-key": cbApiKey },
     params: req.query,
   };
-  if (req?.session?.user) {
+  if (req.session.user) {
     res.set("user-id", req.session.user.critterbase_user_id);
     res.set("keycloak-uuid", req.session.user.keycloak_uuid);
   }
