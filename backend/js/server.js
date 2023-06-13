@@ -120,14 +120,13 @@ const proxyApi = function (req, res, next) {
   const endpoint = req.params.endpoint;
   const cbEndpoint = req.params.cbEndpoint;
   const options = {
-    headers: req.headers,
+    headers: { ...req.headers, "api-key": cbApiKey },
     params: req.query,
   };
   if (req?.session?.user) {
     res.set("user-id", req.session.user.critterbase_user_id);
     res.set("keycloak-uuid", req.session.user.keycloak_uuid);
   }
-  // console.log(req.session.user);
   const path = req.path.replace("/api/", "");
   let url;
   if (isProd) {
@@ -147,7 +146,9 @@ const proxyApi = function (req, res, next) {
 
   const errHandler = (err) => {
     const { response } = err;
-    res.status(response.status).json({ error: response.data });
+    res.status(response?.status ? response.status : 400).json({
+      error: response?.data ? response.data : "unknown proxyApi error",
+    });
   };
 
   const successHandler = (response) => {
