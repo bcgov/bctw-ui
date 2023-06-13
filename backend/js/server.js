@@ -58,6 +58,7 @@ var session = {
   saveUninitialized: true,
   secret: sessionSalt,
   store: memoryStore,
+  user: undefined,
 };
 
 // TODO: move into separate package?
@@ -107,19 +108,20 @@ const retrieveSessionInfo = function (req, res, next) {
     given_name,
     ...getProperties(data),
   };
+  // req.session.user = sessionInfo;
   res.status(200).send(sessionInfo);
 };
 
 // TODO: move into separate package?
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
+  // console.log(req.headers);
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
   const cbEndpoint = req.params.cbEndpoint;
   const options = { headers: req.headers, params: req.query };
-
+  // console.log(req.session.user);
   const path = req.path.replace("/api/", "");
-
   let url;
   if (isProd) {
     // split out the domain and username of logged-in user
@@ -142,6 +144,13 @@ const proxyApi = function (req, res, next) {
   };
 
   const successHandler = (response) => {
+    if (endpoint === "get-user") {
+      // req.session.user = {
+      //   bctw_user_id: response.data.id,
+      //   keycloak_guid: response.data.keycloak_guid,
+      //   cb_user_id: response.data.cb_user_id,
+      // };
+    }
     return res.json(response.data);
   };
 

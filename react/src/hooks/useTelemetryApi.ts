@@ -1,4 +1,4 @@
-import { CritterbaseApiKey, CritterbaseApiURL, getBaseUrl } from 'api/api_helpers';
+import { CritterbaseApiKey, CritterbaseApiURL, CritterbaseUserID, KeycloakUUID, getBaseUrl } from 'api/api_helpers';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
@@ -54,6 +54,10 @@ import {
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { parseArgs } from 'utils/common_helpers';
 
+const CB_HEADERS = {
+  'user-id': CritterbaseUserID,
+  'keycloak-uuid': KeycloakUUID
+};
 /**const critterbase = axios.create({
   baseURL: CB_API_URL,
   headers: {
@@ -66,7 +70,8 @@ import { parseArgs } from 'utils/common_helpers';
 const useApi = (): AxiosInstance => {
   const instance = useMemo(() => {
     return axios.create({
-      baseURL: getBaseUrl()
+      baseURL: getBaseUrl(),
+      headers: CB_HEADERS
     });
   }, []);
   return instance;
