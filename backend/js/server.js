@@ -117,15 +117,15 @@ const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
   const cbEndpoint = req.params.cbEndpoint;
+  req.headers["api-key"] = cbApiKey;
+  if (req.session.user) {
+    req.headers["user-id"] = req.session.user.critterbase_user_id;
+    req.headers["keycloak-uuid"] = req.session.user.keycloak_uuid;
+  }
   const options = {
     params: req.query,
   };
-  if (req.session.user) {
-    const user = req.session.user;
-    res.set("user-id", user.critterbase_user_id);
-    res.set("api-key", cbApiKey);
-    res.set("keycloak-uuid", user.keycloak_uuid);
-  }
+
   const path = req.path.replace("/api/", "");
   let url;
   if (isProd) {
