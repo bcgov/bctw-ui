@@ -117,14 +117,17 @@ const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
   const cbEndpoint = req.params.cbEndpoint;
-  req.headers["api-key"] = cbApiKey;
-  if (req.session.user) {
-    req.headers["user-id"] = req.session.user.critterbase_user_id;
-    req.headers["keycloak-uuid"] = req.session.user.keycloak_uuid;
-  }
-  const options = {
+  const user = req.session.user;
+  let options = {
+    headers: { "api-key": cbApiKey },
     params: req.query,
   };
+  if (user) {
+    if (user.keycloak_uuid && user.critterbase_user_id) {
+      options.headers["keycloak-uuid"] = req.session.user.keycloak_uuid;
+      options.headers["user-id"] = req.session.user.critterbase_user_id;
+    }
+  }
 
   const path = req.path.replace("/api/", "");
   let url;
@@ -153,8 +156,8 @@ const proxyApi = function (req, res, next) {
   const successHandler = (response) => {
     if (endpoint === "get-user") {
       req.session.user = {
-        // keycloak_uuid: response.data.keycloak_guid,
-        // critterbase_user_id: response.data.critterbase_user_id,
+        keycloak_uuid: response.data.keycloak_guid,
+        critterbase_user_id: response.data.critterbase_user_id,
       };
     }
     return res.json(response.data);
