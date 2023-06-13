@@ -9,9 +9,8 @@ const http = require("http");
 const keycloakConnect = require("keycloak-connect");
 const morgan = require("morgan");
 const multer = require("multer");
-const cookieParser = require("cookie-parser");
 const path = require("path");
-const cbEndpoint = "cb";
+const MemoryStore = require("memorystore")(expressSession);
 const sessionSalt = process.env.BCTW_SESSION_SALT;
 const api = axios.create({ withCredentials: true });
 const isProd = process.env.NODE_ENV === "production" ? true : false;
@@ -23,7 +22,7 @@ const cbApiKey = process.env.CRITTERBASE_API_KEY;
 
 console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt, cbApi });
 // use Express memory store for session and Keycloak object
-var memoryStore = new expressSession.MemoryStore();
+// var memoryStore = new expressSession.MemoryStore();
 
 // multer configuration for handling bulk imports
 const storage = multer.memoryStorage();
@@ -40,26 +39,25 @@ var keyCloakConfig = {
   realm: process.env.KEYCLOAK_REALM,
 };
 
-// instantiate Keycloak Node.js adapter, passing in configuration
-var keycloak = new keycloakConnect(
-  {
-    store: memoryStore,
-  },
-  keyCloakConfig
-);
-
 // set up the session
 var session = {
   cookie: {
     maxAge: 24 * 60 * 60 * 1000, // 1,000 days
     secure: false,
   },
+  store: new MemoryStore({ checkPeriod: 86400000 }),
   resave: false,
   saveUninitialized: true,
   secret: sessionSalt,
-  store: memoryStore,
   user: undefined,
 };
+// instantiate Keycloak Node.js adapter, passing in configuration
+var keycloak = new keycloakConnect(
+  {
+    store: session.store,
+  },
+  keyCloakConfig
+);
 
 // TODO: move into separate package?
 // creates a well-formed URL with query string given a parameter
@@ -124,8 +122,13 @@ const proxyApi = function (req, res, next) {
     params: req.query,
   };
   if (req.session.user) {
-    res.set("user-id", req.session.user.critterbase_user_id);
-    res.set("keycloak-uuid", req.session.user.keycloak_uuid);
+    const user = req.session.user;
+    console.log(user);
+    options.headers = {
+      ...options.headers,
+      "user-id": user.critterbase_user_id,
+      "keycloak-uuid": user.keycloak_uuid,
+    };
   }
   const path = req.path.replace("/api/", "");
   let url;
@@ -285,8 +288,7 @@ const logger = isProd ? "combined" : "dev";
 var app = express()
   .use(helmet())
   .use(cors({ credentials: true }))
-  .use(cookieParser(sessionSalt))
-  // .use(morgan("dev"))
+  .use(morgan("dev"))
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
   .use(expressSession(session))
