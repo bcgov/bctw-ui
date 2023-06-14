@@ -108,7 +108,8 @@ export const eventApi = (props: ApiProps): API => {
 
   const _saveCbCapture = async (payload: CbPayload<CaptureEvent2>): Promise<WorkflowAPIResponse> => {
     try {
-      const { data } = await api.post(`${CbRouters.captures}/create`, payload);
+      const url = createUrl({ api: `${CbRouters.captures}/create` });
+      const { data } = await api.post(url, payload);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`error creating critterbase capture & release event ${formatAxiosError(err)}`);
@@ -118,7 +119,8 @@ export const eventApi = (props: ApiProps): API => {
 
   const _saveCbMortality = async (payload: CbPayload<MortalityEvent>): Promise<WorkflowAPIResponse> => {
     try {
-      const { data: cods } = await api.get(`${CbRoutes.cod}`);
+      const cod_url = createUrl({ api: `${CbRoutes.cod}` });
+      const { data: cods } = await api.get(cod_url);
       const predation_id = cods.find((a) => a.cod_category === 'Predation')?.cod_id;
       if (payload.proximate_cause_of_death_id !== predation_id) {
         delete payload.proximate_predated_by_taxon_id;
@@ -126,7 +128,8 @@ export const eventApi = (props: ApiProps): API => {
       if (payload.ultimate_cause_of_death_id !== predation_id) {
         delete payload.ultimate_predated_by_taxon_id;
       }
-      const { data } = await api.post(`${CbRouters.mortality}/create`, payload);
+      const capture_url = createUrl({ api: `${CbRouters.mortality}/create` });
+      const { data } = await api.post(capture_url, payload);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`error creating critterbase mortality event ${formatAxiosError(err)}`);
