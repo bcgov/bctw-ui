@@ -1,4 +1,4 @@
-import { CritterbaseApiKey, CritterbaseApiURL, CritterbaseUserID, KeycloakUUID, getBaseUrl } from 'api/api_helpers';
+import { CritterbaseApiKey, CritterbaseUserID, KeycloakUUID, getBaseUrl, isDev } from 'api/api_helpers';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
@@ -54,41 +54,19 @@ import {
 import { eUDFType, IUDF, UDF } from 'types/udf';
 import { parseArgs } from 'utils/common_helpers';
 
-const CB_HEADERS = {
-  'user-id': CritterbaseUserID,
-  'keycloak-uuid': KeycloakUUID
-};
-/**const critterbase = axios.create({
-  baseURL: CB_API_URL,
-  headers: {
-    'API-KEY': CB_API_KEY,
-  },
-});
+/**
  * Returns an instance of axios with baseURL set.
  * @return {AxiosInstance}
  */
 const useApi = (): AxiosInstance => {
   const instance = useMemo(() => {
     return axios.create({
-      baseURL: getBaseUrl(),
-      headers: CB_HEADERS
+      baseURL: getBaseUrl()
     });
   }, []);
   return instance;
 };
 
-const useCritterbaseApi = (): AxiosInstance => {
-  const instance = useMemo(() => {
-    return axios.create({
-      baseURL: CritterbaseApiURL,
-      headers: {
-        'API-KEY': CritterbaseApiKey
-      },
-      withCredentials: false
-    });
-  }, []);
-  return instance;
-};
 type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
 
 /**
@@ -98,7 +76,7 @@ type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
 /* eslint-disable-next-line */
 export const useTelemetryApi = () => {
   const api = useApi();
-  const cb_api = useCritterbaseApi();
+  // const cb_api = useCritterbaseApi();
 
   const collarApi = collar_api({ api });
   const critterApi = critter_api({ api });
@@ -106,7 +84,7 @@ export const useTelemetryApi = () => {
   const bulkApi = bulk_api(api);
   const mapApi = map_api({ api });
   const userApi = user_api({ api });
-  const eventApi = event_api({ api, cb_api });
+  const eventApi = event_api({ api });
   const permissionApi = permission_api({ api });
   const attachmentApi = attachment_api({ api });
   const onboardApi = onboarding_api({ api });

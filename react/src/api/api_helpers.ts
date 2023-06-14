@@ -22,7 +22,6 @@ const getBaseUrl = (noApiPrefix?: boolean): string => {
   return url;
 };
 
-export const CritterbaseApiURL = process.env.REACT_APP_CRITTERBASE_API; //process.env.CRITTERBASE_API;
 export const CritterbaseApiKey = process.env.REACT_APP_CRITTERBASE_API_KEY; //process.env.CRITTERBASE_API_KEY;
 export const CritterbaseUserID = process.env.REACT_APP_CRITTERBASE_USER_ID;
 export const KeycloakUUID = process.env.REACT_APP_IDENTIFIER;

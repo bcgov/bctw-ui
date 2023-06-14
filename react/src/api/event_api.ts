@@ -24,8 +24,8 @@ import MortalityEvent from 'types/events/mortality_event';
 
 export type WorkflowAPIResponse = true | AxiosError;
 
-export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
-  const { api, cb_api } = props;
+export const eventApi = (props: ApiProps): API => {
+  const { api } = props;
   const queryClient = useQueryClient();
 
   // since saving an event can affect many queries, invalidate everything
@@ -108,7 +108,7 @@ export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
 
   const _saveCbCapture = async (payload: CbPayload<CaptureEvent2>): Promise<WorkflowAPIResponse> => {
     try {
-      const { data } = await cb_api.post(`${CbRouters.captures}/create`, payload);
+      const { data } = await api.post(`${CbRouters.captures}/create`, payload);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`error creating critterbase capture & release event ${formatAxiosError(err)}`);
@@ -118,7 +118,7 @@ export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
 
   const _saveCbMortality = async (payload: CbPayload<MortalityEvent>): Promise<WorkflowAPIResponse> => {
     try {
-      const { data: cods } = await cb_api.get(`${CbRoutes.cod}`);
+      const { data: cods } = await api.get(`${CbRoutes.cod}`);
       const predation_id = cods.find((a) => a.cod_category === 'Predation')?.cod_id;
       if (payload.proximate_cause_of_death_id !== predation_id) {
         delete payload.proximate_predated_by_taxon_id;
@@ -126,7 +126,7 @@ export const eventApi = (props: ApiProps & { cb_api: AxiosInstance }): API => {
       if (payload.ultimate_cause_of_death_id !== predation_id) {
         delete payload.ultimate_predated_by_taxon_id;
       }
-      const { data } = await cb_api.post(`${CbRouters.mortality}/create`, payload);
+      const { data } = await api.post(`${CbRouters.mortality}/create`, payload);
       return _handleBulkResults(data);
     } catch (err) {
       console.error(`error creating critterbase mortality event ${formatAxiosError(err)}`);
