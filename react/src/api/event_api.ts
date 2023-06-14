@@ -7,16 +7,16 @@ import {
   upsertDeviceEndpoint
 } from 'api/api_endpoint_urls';
 import { createUrl, postJSON } from 'api/api_helpers';
-import { AxiosError, AxiosInstance } from 'axios';
+import { AxiosError } from 'axios';
+import { CbRouters, CbRoutes } from 'critterbase/routes';
+import { useQueryClient } from 'react-query';
 import { RemoveDeviceInput } from 'types/collar_history';
 import { ChangeDataLifeInput } from 'types/data_life';
-import { WorkflowType, OptionalAnimal, OptionalDevice, CbPayload, IWorkflow, IEvent } from 'types/events/event';
-import { formatAxiosError } from 'utils/errors';
-import { API, IBulkUploadResults, ApiProps } from './api_interfaces';
-import { useQueryClient } from 'react-query';
 import { CaptureEvent2 } from 'types/events/capture_event';
-import { CbRouters, CbRoutes } from 'critterbase/routes';
+import { CbPayload, IEvent, IWorkflow, OptionalAnimal, OptionalDevice, WorkflowType } from 'types/events/event';
 import MortalityEvent from 'types/events/mortality_event';
+import { formatAxiosError } from 'utils/errors';
+import { API, ApiProps, IBulkUploadResults } from './api_interfaces';
 
 /**
  * API for saving workflow events @type {EventType}

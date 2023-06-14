@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { isDev } from 'api/api_helpers';
 import { AxiosError } from 'axios';
 import { plainToClass } from 'class-transformer';
 import useDidMountEffect from 'hooks/useDidMountEffect';

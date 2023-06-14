@@ -1,12 +1,10 @@
 import { CbRouters, CbRoutes, detailedFormat, selectFormat } from 'critterbase/routes';
 import { ICbRouteKey, ICbSelect } from 'critterbase/types';
-import { API, ApiProps, ICbBulkUpdatePayload, IUpsertPayload } from './api_interfaces';
-import { uuid } from 'types/common_types';
-import { Critter, IMarking } from 'types/animal';
 import { useQueryClient } from 'react-query';
-import axios from 'axios';
+import { Critter, IMarking } from 'types/animal';
+import { uuid } from 'types/common_types';
 import { createUrl } from './api_helpers';
-import { Route } from 'react-router';
+import { API, ApiProps, ICbBulkUpdatePayload, IUpsertPayload } from './api_interfaces';
 
 export const critterbaseApi = (props: ApiProps): API => {
   const { api } = props;
@@ -28,33 +26,33 @@ export const critterbaseApi = (props: ApiProps): API => {
   ): Promise<Array<ICbSelect | string>> => {
     const route = CbRoutes[cbRouteKey];
     const q = asSelect ? (query ? `${selectFormat}&${query}` : `${selectFormat}`) : `${query}`;
-    const url = createUrl({api: route, query: q })
+    const url = createUrl({ api: route, query: q });
     const { data } = await api.get(url);
     return data;
   };
 
   const verifyMarkingsAgainstTaxon = async (taxon_id: string, markings: IMarking[]) => {
-    const url = createUrl({api: `${CbRouters.markings}/verify`})
+    const url = createUrl({ api: `${CbRouters.markings}/verify` });
     const { data } = await api.post(url, { taxon_id: taxon_id, markings: markings });
     return data;
   };
 
   const upsertCritter = async (critter: IUpsertPayload<Critter>): Promise<Critter> => {
     // critter.body.sex = 'test';
-    const url = createUrl({api: `${CbRouters.critters}/${critter.body.critter_id}${detailedFormat}` });
+    const url = createUrl({ api: `${CbRouters.critters}/${critter.body.critter_id}${detailedFormat}` });
     const { data } = await api.put(url, critter.body);
     return data;
   };
 
   const bulkUpdate = async (bulkPayload: ICbBulkUpdatePayload) => {
-    const url = createUrl({api:`${CbRouters.bulk}`});
+    const url = createUrl({ api: `${CbRouters.bulk}` });
     const { data } = await api.put(url, bulkPayload);
     invalidate();
     return data;
   };
 
   const deleteMarking = async (marking_id: uuid): Promise<IMarking> => {
-    const url = createUrl({api: `${CbRouters.markings}/${marking_id}` });
+    const url = createUrl({ api: `${CbRouters.markings}/${marking_id}` });
     const { data } = await api.delete(url);
     return data;
   };

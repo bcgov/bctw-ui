@@ -1,26 +1,26 @@
-import { CritterbaseApiKey, CritterbaseUserID, KeycloakUUID, getBaseUrl, isDev } from 'api/api_helpers';
+import { getBaseUrl } from 'api/api_helpers';
 import { attachmentApi as attachment_api } from 'api/attachment_api';
 import { bulkApi as bulk_api } from 'api/bulk_api';
 import { codeApi as code_api } from 'api/code_api';
 import { collarApi as collar_api } from 'api/collar_api';
 import { critterApi as critter_api } from 'api/critter_api';
 import { critterbaseApi as critterbase_api } from 'api/critterbase_api';
-import { eventApi as event_api, WorkflowAPIResponse } from 'api/event_api';
-import { mapApi as map_api, PingsCap } from 'api/map_api';
+import { WorkflowAPIResponse, eventApi as event_api } from 'api/event_api';
+import { PingsCap, mapApi as map_api } from 'api/map_api';
 import { onboardingApi as onboarding_api } from 'api/onboarding_api';
 import { IGrantCritterAccessResults, permissionApi as permission_api } from 'api/permission_api';
 import { userApi as user_api } from 'api/user_api';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { useMemo } from 'react';
 import {
-  useMutation,
   UseMutationOptions,
   UseMutationResult,
-  useQuery,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
+  useMutation,
+  useQuery
 } from 'react-query';
-import { AttachedCritter, Critter, eCritterFetchType, IMarking } from 'types/animal';
+import { AttachedCritter, Critter, IMarking, eCritterFetchType } from 'types/animal';
 import { ICode, ICodeHeader } from 'types/code';
 import { AttachedCollar, Collar, DeviceWithVectronicKeyX, VectronicKeyX } from 'types/collar';
 import { AttachDeviceInput, CollarHistory, RemoveDeviceInput } from 'types/collar_history';
@@ -45,13 +45,13 @@ import { ExportAllParams, ExportQueryParams } from 'types/export';
 import { ITelemetryLine, ITelemetryPoint } from 'types/map';
 import { HandleOnboardInput, IOnboardUser, OnboardUser, OnboardUserRequest } from 'types/onboarding';
 import {
-  eCritterPermission,
   IExecutePermissionRequest,
   IPermissionRequestInput,
   IUserCritterPermissionInput,
-  PermissionRequest
+  PermissionRequest,
+  eCritterPermission
 } from 'types/permission';
-import { eUDFType, IUDF, UDF } from 'types/udf';
+import { IUDF, UDF, eUDFType } from 'types/udf';
 import { parseArgs } from 'utils/common_helpers';
 
 /**

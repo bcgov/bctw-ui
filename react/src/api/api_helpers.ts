@@ -1,4 +1,3 @@
-import * as dotenv from 'dotenv';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { ITableFilter } from 'components/table/table_interfaces';
 import { isDayjs } from 'dayjs';
