@@ -95,13 +95,15 @@ export const useTelemetryApi = () => {
   //CRITTERBASE HOOKS
   const useCritterbaseSelectOptions = (
     prop: ICbRouteKey,
-    query?: string
+    query?: string,
+    enabled?: boolean
   ): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
     return useQuery<Array<ICbSelect | string>, AxiosError>(
       ['lookup-table-options', prop, query],
       () => critterbaseApi.getLookupTableOptions(prop, true, query),
       {
-        ...defaultQueryOptions
+        ...defaultQueryOptions,
+        enabled
       }
     );
   };

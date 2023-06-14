@@ -37,7 +37,8 @@ export const CbMarkingInput = ({
   const props: CbMarkingCustomProps = {
     taxon_marking_body_location_id: {
       label: 'Body Location',
-      query: `taxon_id=${taxon_id}`
+      query: `taxon_id=${taxon_id}`,
+      disabled: taxon_id === undefined
     }
   };
 

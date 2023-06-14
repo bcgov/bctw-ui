@@ -17,30 +17,33 @@ export const CbCollectionUnitInputs = ({
   handleChange
 }: CbCollectionUnitInputsProps): JSX.Element => {
   const cbApi = useTelemetryApi();
-  const { data, isSuccess } = cbApi.useCritterbaseSelectOptions('taxon_collection_categories', `taxon_id=${taxon_id}`);
+  const { data, isSuccess } = cbApi.useCritterbaseSelectOptions(
+    'taxon_collection_categories',
+    `taxon_id=${taxon_id}`,
+    !!taxon_id
+  );
   const [internalLookup, setInternalLookup] = useState<Partial<ICollectionUnit>[]>(collection_units ?? []);
 
   useEffect(() => {
     setInternalLookup(collection_units ?? []);
-  }, [collection_units])
+  }, [collection_units]);
 
   const onChange = (v: InboundObj, category_id: string): void => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [key, value] = parseFormChangeResult(v); //Easier to just disable for this line so we can still use the array destructuring
-    if(!value) {
+    if (!value) {
       return;
     }
-    const existing = internalLookup.findIndex(a => a.collection_category_id === category_id);
-    if(existing > -1) {
+    const existing = internalLookup.findIndex((a) => a.collection_category_id === category_id);
+    if (existing > -1) {
       internalLookup[existing].collection_unit_id = value as string;
-    }
-    else {
+    } else {
       internalLookup.push({
         collection_unit_id: value as string,
         collection_category_id: category_id
-      })
+      });
     }
-  }
+  };
 
   return (
     <>
