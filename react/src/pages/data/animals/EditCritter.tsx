@@ -122,13 +122,11 @@ export default function EditCritter(
         if (existing && !hasChangedProperties(existing, omitted) && !m._delete) {
           continue;
         }
-        console.log(`Marking added: ${existing} && ${!hasChangedProperties(existing, omitted)} && ${!m._delete}`)
         finalPayload.markings.push(m);
       }
     }
 
     if(body.collection_units) {
-      console.log(`Collections editing: ${JSON.stringify(editing.collection_units, null, 2)} and body ${JSON.stringify(body.collection_units, null, 2)}`)
         for(const c of body.collection_units) {
           c.critter_id = new_critter.critter_id;
           if(old_critter.taxon_id !== new_critter.taxon_id && c.critter_collection_unit_id) {

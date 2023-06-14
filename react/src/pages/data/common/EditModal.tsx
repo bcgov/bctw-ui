@@ -130,8 +130,6 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
 
   const handleSave = async (): Promise<void> => {
     // use Object.assign to preserve class methods
-    console.log(`handleSave editing: ${JSON.stringify(editing, null, 2)}`)
-    console.log(`handleSave newObj: ${JSON.stringify(newObj, null, 2)}`)
     const body = omitNull({ ...editing, ...newObj } /*Object.assign(editing, newObj)*/);
     const toSave: IUpsertPayload<T> = { body };
     await onSave(toSave);
@@ -152,7 +150,6 @@ export default function EditModal<T extends BCTWBase<T>>(props: IEditModalProps<
   };*/
 
   const handleChange = (v: InboundObj): void => {
-    console.log(`Handling change with ${JSON.stringify(v)}`)
     checkHasErr(v);
 
     let tmp = newObj;
