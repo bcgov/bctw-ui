@@ -120,7 +120,7 @@ const proxyApi = function (req, res, next) {
   const cbEndpoint = req.params.cbEndpoint;
   const user = req.session.user;
   const sessionId = req.sessionID;
-  console.log({ user }, { sessionId });
+
   let options = {
     headers: { "api-key": cbApiKey, ...user },
     params: req.query,
@@ -142,6 +142,7 @@ const proxyApi = function (req, res, next) {
     // connect to API without using Keycloak authentication
     url = `${apiHost}:${apiPort}/${path}?${parameters}`;
   }
+
 
   const errHandler = (err) => {
     const { response } = err;
@@ -176,6 +177,8 @@ const proxyApi = function (req, res, next) {
     }
   } else if (req.method === "DELETE") {
     api.delete(url, options).then(successHandler).catch(url);
+  } else if (req.method === "PUT") {
+    api.put(url, req.body, options).then(successHandler).catch(url);
   }
   // handle get
   else {
@@ -315,6 +318,8 @@ if (isProd) {
     .get("/api/get-template", keycloak.protect())
 
     //Critterbase Get requests
+    .put("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+    .put("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
     .get("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
     .get("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
 
@@ -342,6 +347,7 @@ if (isProd) {
     //Critterbase Post requests
     .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
     .post("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+
 
     .post("/api/:endpoint", keycloak.protect(), proxyApi)
     // delete handlers
