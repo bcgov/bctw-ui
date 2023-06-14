@@ -23,6 +23,7 @@ export enum eCritterStatus {
 }
 
 export interface ICollectionUnit {
+  critter_collection_unit_id: uuid;
   category_name: string;
   unit_name: string;
   collection_unit_id: uuid;
