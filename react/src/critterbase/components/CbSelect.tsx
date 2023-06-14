@@ -13,7 +13,7 @@ export type CbSelectProps = Omit<CreateInputProps, 'type'> & {
   cbRouteKey: ICbRouteKey;
   handleRoute?: CbRouteStatusHandler;
   query: string;
-  isSelectionAllowed?: (newval: unknown) => boolean | Promise<boolean>
+  isSelectionAllowed?: (newval: unknown) => boolean | Promise<boolean>;
 };
 export const CbSelect = ({
   cbRouteKey,
@@ -28,7 +28,11 @@ export const CbSelect = ({
   isSelectionAllowed
 }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
-  const { data, isError, isLoading, isSuccess, status } = cbApi.useCritterbaseSelectOptions(cbRouteKey, query);
+  const { data, isError, isLoading, isSuccess, status } = cbApi.useCritterbaseSelectOptions(
+    cbRouteKey,
+    query,
+    !disabled
+  );
   const [selected, setSelected] = useState<uuid | string>('');
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
@@ -61,7 +65,7 @@ export const CbSelect = ({
 
   const handleSelect = async (id?: string, label?: string): Promise<void> => {
     const shouldChange = await isSelectionAllowed?.(id);
-    if(typeof isSelectionAllowed === 'function' && !shouldChange) {
+    if (typeof isSelectionAllowed === 'function' && !shouldChange) {
       return;
     }
     const hasProps = id && label;
