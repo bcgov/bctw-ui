@@ -114,25 +114,35 @@ export default function EditCritter(
     }
 
     if (body.marking.length) {
+
       for (const m of body.marking) {
         m.critter_id = body.critter_id;
-        const existing = editing.marking.find((a) => (a.marking_id = m.marking_id));
+        const existing = editing.marking.find((a) => (a.marking_id === m.marking_id));
         const omitted = omitNull(m);
         if (existing && !hasChangedProperties(existing, omitted) && !m._delete) {
           continue;
         }
+        console.log(`Marking added: ${existing} && ${!hasChangedProperties(existing, omitted)} && ${!m._delete}`)
         finalPayload.markings.push(m);
       }
     }
 
     if(body.collection_units) {
+      console.log(`Collections editing: ${JSON.stringify(editing.collection_units, null, 2)} and body ${JSON.stringify(body.collection_units, null, 2)}`)
         for(const c of body.collection_units) {
+          c.critter_id = new_critter.critter_id;
           if(old_critter.taxon_id !== new_critter.taxon_id && c.critter_collection_unit_id) {
             c._delete = true;
           }
-          c.critter_id = new_critter.critter_id;
+          
+          const existing = editing.collection_units.find((a) => a.critter_collection_unit_id === c.critter_collection_unit_id);
+          const omitted = omitNull(c);
+          if(existing && !hasChangedProperties(existing, omitted) && !c._delete) {
+            continue;
+          }
+          finalPayload.collections.push(c);
         }
-        finalPayload.collections = body.collection_units;
+        
     }
     
     //console.log(`Here is the final payload ${JSON.stringify(finalPayload, null, 2)}`)

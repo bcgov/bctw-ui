@@ -22,10 +22,22 @@ export const CbCollectionUnitInputs = ({
     `taxon_id=${taxon_id}`,
     !!taxon_id
   );
-  const [internalLookup, setInternalLookup] = useState<Partial<ICollectionUnit>[]>(collection_units ?? []);
+  const [internalLookup, setInternalLookup] = useState<Partial<ICollectionUnit>[]>(
+    collection_units
+      ? collection_units.map((a) => {
+          return { ...a };
+        })
+      : []
+  );
 
   useEffect(() => {
-    setInternalLookup(collection_units ?? []);
+    setInternalLookup(
+      collection_units
+        ? collection_units.map((a) => {
+            return { ...a };
+          })
+        : []
+    );
   }, [collection_units]);
 
   const onChange = (v: InboundObj, category_id: string): void => {
@@ -43,6 +55,7 @@ export const CbCollectionUnitInputs = ({
         collection_category_id: category_id
       });
     }
+    handleChange({ collection_units: internalLookup });
   };
 
   return (
