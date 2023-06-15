@@ -129,7 +129,7 @@ export default function AdminHandleRequestPermissionPage(): JSX.Element {
 
   const getConfirmMessage = (): string | JSX.Element => {
     if (selectedMultiRequestIDs.length) {
-      return isGrant ? msgStrings.confirmDenyMesgMulti(selectedMultiRequestIDs.length) : DenyConfirmMessage;
+      return isGrant ? msgStrings.confirmGrantMesgMulti(selectedMultiRequestIDs.length) : DenyConfirmMessage;
     } else {
       return isGrant ? msgStrings.confirmGrantMesg : DenyConfirmMessage;
     }

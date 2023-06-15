@@ -81,7 +81,7 @@ export default function PickCritterPermissionModal({
     UserCritterAccess.animalManagerDisplayProps as (keyof UserCritterAccess | string)[]
   );
 
-  const canSave = showSelectPermission && Object.values(access).filter((a) => a.wasSelected);
+  const canSave = showSelectPermission && Object.values(access).some((a) => a.wasSelected);
   const classes = manageLayoutStyles();
 
   // if a user is not passed in as a prop, default the state to the current user
@@ -137,6 +137,15 @@ export default function PickCritterPermissionModal({
         ? (selected as string[])
         : (selected as UserCritterAccess[]).map((v) => v[v.identifier]);
     setCritterIDs(ids);
+
+    // Update the access state to reflect the selected critters
+    ids.forEach(id => {
+      setAccess(prevState => {
+        const cp = { ...prevState };
+        cp[id].wasSelected = true;
+        return cp;
+      });
+    });
   };
 
   const handleSave = (): void => {
@@ -184,7 +193,7 @@ export default function PickCritterPermissionModal({
         const cp = { ...prevState };
         critterIDs.forEach((id) => {
           cp[id].permission_type = permission;
-          cp[id].wasSelected = true;
+          cp[id].wasSelected = isSelected;
         });
         return cp;
       });

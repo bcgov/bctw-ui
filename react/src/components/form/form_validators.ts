@@ -1,5 +1,5 @@
 import { FormStrings } from 'constants/strings';
-const maxTemp = 50;
+const maxTemp = 70;
 const mustBeNegativeNumber = (v: number): string => (v > 0 ? FormStrings.validateNegativeLongitude : '');
 
 const mustbePositiveNumber = <T>(t: T): string => {
@@ -28,7 +28,7 @@ const mustBeEmail = (email: string): string => {
 };
 
 const mustBeValidTemp = <T>(temp: T): string =>
-  typeof temp === 'number' && temp < maxTemp ? '' : `Temperature must be below ${maxTemp} celcius`;
+  typeof temp === 'number' && temp < maxTemp ? '' : `Temperature must be below ${maxTemp} celsius`;
 
 export {
   mustbePositiveNumber,

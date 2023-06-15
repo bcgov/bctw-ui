@@ -191,7 +191,7 @@ export default function ManagerRequestPermission(): JSX.Element {
   const canSubmitRequest = (): boolean => {
     const access = permission?.access ?? [];
     access.forEach((a: IUserCritterAccessInput) => {
-      if (!managerPermissionOptions.includes(a.permission_type)) {
+      if (!managerPermissionOptions.includes(a?.permission_type)) {
         return false;
       }
     });

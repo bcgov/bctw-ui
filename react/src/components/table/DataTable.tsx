@@ -140,6 +140,14 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     }
   }, [data]);
 
+  useEffect(() => {
+    //When the filter changes send the filtered data up to export tool
+    if (!isFunction(onNewData)) return;
+    const filteredRows = filterRows(values);
+    if (filteredRows.length === values.length) return;
+    onNewData(filteredRows);
+  }, [filter.term]);
+
   const truncateRows = (rows: T[]): T[] => {
     const start = page * rowsPerPage;
     const end = rowsPerPage * (page + 1);
