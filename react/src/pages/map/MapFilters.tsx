@@ -292,16 +292,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
           <Box mb={2} mt={2}>
             <Grid container spacing={2}>
               <Grid item sm={6}>
-                <Tooltip title={<p>{MapStrings.startDateTooltip}</p>}>
-                  <DateInput
-                    fullWidth
-                    propName='tstart'
-                    label={MapStrings.startDateLabel}
-                    defaultValue={dayjs(start)}
-                    changeHandler={(e): void => setStart(e['tstart'] as string)}
-                    maxDate={dayjs(end)}
-                  />
-                </Tooltip>
+                <DateInput
+                  fullWidth
+                  propName='tstart'
+                  label={MapStrings.startDateLabel}
+                  defaultValue={dayjs(start)}
+                  changeHandler={(e): void => setStart(e['tstart'] as string)}
+                  maxDate={dayjs(end)}
+                />
                 <ListSubheader sx={{ pl: 0, pt: 0, pb: 0 }}>Month Presets</ListSubheader>
                 <List sx={{ pt: 0 }}>
                   {SEARCH_PRESETS.months.map((sp) => (
@@ -319,16 +317,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                 </List>
               </Grid>
               <Grid item sm={6}>
-                <Tooltip title={<p>{MapStrings.endDateTooltip}</p>}>
-                  <DateInput
-                    fullWidth
-                    propName='tend'
-                    label={MapStrings.endDateLabel}
-                    defaultValue={dayjs(end)}
-                    changeHandler={(e): void => setEnd(e['tend'] as string)}
-                    minDate={dayjs(start)}
-                  />
-                </Tooltip>
+                <DateInput
+                  fullWidth
+                  propName='tend'
+                  label={MapStrings.endDateLabel}
+                  defaultValue={dayjs(end)}
+                  changeHandler={(e): void => setEnd(e['tend'] as string)}
+                  minDate={dayjs(start)}
+                />
                 <ListSubheader sx={{ pl: 0, pt: 0, pb: 0 }}>Week Presets</ListSubheader>
                 <List sx={{ pt: 0 }}>
                   {SEARCH_PRESETS.weeks.map((sp) => (
