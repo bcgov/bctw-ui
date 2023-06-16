@@ -142,7 +142,7 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
     if (hideEmpty) {
       headers = ['row_index', ...getAllUniqueKeys(sheet)];
     } else {
-      headers = sheet.headers;
+      headers = ['row_index', ...sheet.headers];
     }
     return headers;
   };
@@ -159,7 +159,7 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
 
   const computeExcelHeaderRow = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
     const headers = ['1'];
-    getHeaders(sheet, hideEmpty).forEach((o) => {
+    getHeaders(sheet, hideEmpty).filter(a => a !== 'row_index').forEach((o) => {
       const idx = sheet.headers.indexOf(o);
       headers.push(computeXLSXCol(idx));
     });
