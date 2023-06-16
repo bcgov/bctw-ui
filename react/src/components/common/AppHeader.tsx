@@ -12,6 +12,7 @@ import { useContext, useState } from 'react';
 import { TelemetryAlert } from 'types/alert';
 import { User } from 'types/user';
 import { AlertMenu } from '../alerts/AlertMenu';
+import BCLogo from '../../assets/images/bcgov_logo.svg';
 
 type AppheaderProps = {
   children?: JSX.Element;
@@ -56,7 +57,8 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
     <header className={'app-header'}>
       <div className={'container'}>
         <a href='/home' className={'brand'} color={'inherit'}>
-          <img src={urls.bc_logo_url || headerImage} width={155} height={52} alt={'Government of British Columbia'} />
+          {/* <img src={urls.bc_logo_url || headerImage} width={155} height={52} alt={'Government of British Columbia'} /> */}
+          <img src={BCLogo} width={155} height={52} alt={'Government of British Columbia'} />
           BCTW
         </a>
         <nav id={'top-nav'} className={'app-nav'} style={topNavStyle}>
