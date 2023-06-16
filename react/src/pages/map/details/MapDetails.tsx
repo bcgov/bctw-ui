@@ -49,10 +49,6 @@ export default function MapDetails({
   const [groupedPings, setGroupedPings] = useState<ITelemetryGroup[]>([]);
   const [groupedUnassignedPings, setGroupedUnassignedPings] = useState<ITelemetryGroup[]>([]);
 
-  // state for the 'checked' rows in the table
-  const [pingGroupChecked, setPingGroupChecked] = useState<ITelemetryGroup[]>([]);
-
-  const [showOnlySelected, setShowOnlySelected] = useState(false);
   const [sort] = useState<DetailsSortOption>('wlh_id');
 
   const [{ selectedMarkers }] = useMarkerStates();
@@ -64,34 +60,6 @@ export default function MapDetails({
     setGroupedPings(byCritter);
     setGroupedUnassignedPings(byDevice);
   }, [pings]);
-
-  // when the 'show only selected' checkbox is changed, update parent map state
-  useDidMountEffect(() => {
-    if (pings) {
-      handleRowsChecked(getPointIDsFromTelemetryGroup(pingGroupChecked));
-    }
-  }, [showOnlySelected]);
-
-  useEffect(() => {
-    setPingGroupChecked(groupPings([...pings, ...unassignedPings].filter((f) => selectedMarkers.has(f.id))));
-  }, [selectedMarkers]);
-
-  // upon rows checked in each row, note: unassigned IDs are negative integers
-  const handleRowsChecked = (ids: number[]): void => {
-    const grouped = groupPings([...pings, ...unassignedPings].filter((f) => ids.includes(f.id)));
-    setPingGroupChecked(grouped);
-    if (showOnlySelected) {
-      // fixme: unassigned not handled!
-      handleShowOnlySelected({ show: true, critter_ids: grouped.map((g) => g.critter_id) });
-    }
-  };
-
-  const handleShowSelectedChecked = (val: Record<string, boolean>): void => {
-    const isChecked = val[MapStrings.showOnlyCheckedLabel];
-    setShowOnlySelected(isChecked);
-    // call the parent handler
-    handleShowOnlySelected({ show: isChecked, critter_ids: pingGroupChecked.map((g) => g.critter_id) });
-  };
 
   if (!groupedPings.length && !groupedUnassignedPings.length) {
     return (
@@ -108,27 +76,7 @@ export default function MapDetails({
 
   return (
     <Box className={'map-detail-container'} display='flex' flexDirection='column'>
-      <Box className={'map-detail-titlebar'} display='flex' justifyContent='flex-end' p={2}>
-        <Tooltip inline={true} placement='left-start' title={<p>{MapStrings.showOnlyCheckedTooltip}</p>}>
-          <Checkbox
-            propName={MapStrings.showOnlyCheckedLabel}
-            label={MapStrings.showOnlyCheckedLabel}
-            initialValue={false}
-            changeHandler={handleShowSelectedChecked}
-          />
-        </Tooltip>
-        <Button onClick={(): void => setShowExportModal(true)} variant='outlined'>
-          Export
-        </Button>
-      </Box>
       <MapDetailsGrouped pings={[...groupedPings, ...groupedUnassignedPings]} handleShowOverview={handleShowOverview} />
-      <MapExport
-        groupedAssignedPings={pingGroupChecked.length ? pingGroupChecked : groupedPings}
-        groupedUnassignedPings={groupedUnassignedPings}
-        open={showExportModal}
-        handleClose={(): void => setShowExportModal(false)}
-        range={timeRange}
-      />
     </Box>
   );
 }

@@ -46,7 +46,8 @@ import { columnToHeader } from 'utils/common_helpers';
 import { StartDateKey, getStartDate } from 'utils/time';
 import { useMarkerStates } from './MapMarkerContext';
 import { SEARCH_PRESETS } from './map_constants';
-import { getFormValues } from './map_helpers';
+import { getFormValues, groupPings } from './map_helpers';
+import MapExport from './MapExport';
 
 enum TabNames {
   search = 'Search',
@@ -121,7 +122,9 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   const [symbolizeLast, setSymbolizeLast] = useState(true);
   const [legend, setLegend] = useState(symbolizeBy);
 
-  const [{ opacity }, markerDispatch] = useMarkerStates();
+  const [showExportModal, setShowExportModal] = useState(false);
+
+  const [{ opacity, selectedCritters }, markerDispatch] = useMarkerStates();
 
   const isTab = (tabName: TabNames): boolean => tabName === tab;
 
@@ -622,6 +625,22 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
                   'Searching over this date range will load an excessive amount of data.\n Please refine your search and try again.'
                 }
               </Typography>
+            </Box>
+          )}
+          {isTab(search) && (
+            <Box display='flex' justifyContent='flex-end' py={2} whiteSpace='normal'>
+              <Button onClick={(): void => setShowExportModal(true)} variant='outlined'>
+                Export
+              </Button>
+              <MapExport
+                groupedAssignedPings={groupPings(
+                  pings.filter((p) => selectedCritters.includes(p.properties.critter_id))
+                )}
+                groupedUnassignedPings={[]}
+                open={showExportModal}
+                handleClose={(): void => setShowExportModal(false)}
+                range={{ start: start, end: end }}
+              />
             </Box>
           )}
           {createSymbolizeLegend()}

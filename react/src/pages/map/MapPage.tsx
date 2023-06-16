@@ -109,6 +109,17 @@ export function Map(): JSX.Element {
     updateLayers(markerStates);
   }, [markerStates]);
 
+  // when the selected markers changes, show only those markers, but if its empty, show all
+  useEffect(() => {
+    if (markerStates.selectedMarkers.size > 0) {
+      const p = fetchedPings.filter((f) => markerStates.selectedMarkers.has(f.id));
+      const t = fetchedTracks.filter((f) => markerStates.selectedCritters.includes(f.properties.critter_id));
+      redrawLayers(p, t);
+    } else if (fetchedPings && fetchedTracks) {
+      redrawLayers();
+    }
+  }, [markerStates.selectedMarkers, markerStates.selectedCritters]);
+
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
   const drawnLines = [];
@@ -460,6 +471,7 @@ export function Map(): JSX.Element {
     redrawTracks(tracks);
   };
 
+  // TODO: update based on selected critters
   // only show critters selected in map details in the map
   const handleShowOnlySelected = (o: OnlySelectedCritters): void => {
     setOnlySelected(o);
