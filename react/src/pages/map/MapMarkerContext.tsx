@@ -256,16 +256,20 @@ const updateMarker = (marker, fillColor, color, toFront, opacity, type): void =>
  * @param {MarkerState} markerStates - The current states of the map markers.
  */
 export const updateLayers = (markerStates: MarkerState): void => {
-  const { markers, symbolizedGroups, selectedCritters, focusedCritter, opacity } = markerStates;
+  const { markers, symbolizedGroups, selectedCritters, selectedMarkers, focusedCritter, opacity } = markerStates;
 
   const isSymbolized = (marker): boolean =>
     symbolizedGroups[marker.critter_id] &&
     (marker.type === 'CircleMarker' ||
       (marker.type === 'Divicon' && symbolizedGroups[marker.critter_id]?.applyToLatest));
 
-  const isHighlight = (marker): boolean => focusedCritter === marker.critter_id;
+  const isHighlight = (marker): boolean =>
+    focusedCritter === marker.critter_id || (selectedMarkers.has(marker.id) && selectedMarkers.size === 1);
 
-  const isHidden = (marker): boolean => focusedCritter && (selectedCritters.length > 0 ? selectedCritters.includes(focusedCritter) : true) && focusedCritter !== marker.critter_id;
+  const isHidden = (marker): boolean =>
+    focusedCritter &&
+    (selectedCritters.length > 0 ? selectedCritters.includes(focusedCritter) : true) &&
+    focusedCritter !== marker.critter_id;
 
   const requiresUpdate = (currentColor, newColor): boolean =>
     currentColor.fillColor !== newColor.fillColor ||

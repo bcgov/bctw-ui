@@ -90,7 +90,6 @@ export function Map(): JSX.Element {
   const [showOverviewModal, setShowModal] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState<ITelemetryDetail>(null);
   const [overviewType, setOverviewType] = useState<BCTWType>();
-  const [showExportModal, setShowExportModal] = useState(false);
   const [showUdfEdit, setShowUdfEdit] = useState(false);
 
   // filter state
@@ -118,7 +117,7 @@ export function Map(): JSX.Element {
     } else if (fetchedPings && fetchedTracks) {
       redrawLayers();
     }
-  }, [markerStates.selectedMarkers, markerStates.selectedCritters]);
+  }, [markerStates.selectedCritters]);
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
@@ -234,10 +233,10 @@ export function Map(): JSX.Element {
 
   // hide popup when modals are displayed
   useDidMountEffect(() => {
-    if (showExportModal || showOverviewModal || showUdfEdit) {
+    if ( showOverviewModal || showUdfEdit) {
       hidePopup();
     }
-  }, [showExportModal, showOverviewModal, showUdfEdit]);
+  }, [showOverviewModal, showUdfEdit]);
   /**
    * when a map point is clicked,
    * populate the popup with metadata and show it
@@ -249,19 +248,16 @@ export function Map(): JSX.Element {
     // event.target.prevStyle = getStyle(event);
     // set the feature id state so bottom panel will highlight the row
     markerDispatch({ type: 'SELECT_MARKERS', ids: [feature.id] });
-    markerDispatch({ type: 'SELECT_CRITTERS', ids: [feature.properties.critter_id] });
   };
 
   /**
    * when the native leaflet popup (always hidden) is 'closed'
    */
-  // todo: handle unselected pings
   const handlePointClose = (event: L.LeafletEvent): void => {
     hidePopup();
 
     // unhighlight them in bottom table
     markerDispatch({ type: 'UNSELECT_MARKERS', ids: [event.target.feature.id] });
-    markerDispatch({ type: 'SELECT_CRITTERS', ids: [] });
   };
 
   type IPointsWithinPolygon = Parameters<typeof pointsWithinPolygon>;
@@ -469,20 +465,6 @@ export function Map(): JSX.Element {
     const { pings, tracks } = getLast10Fixes(fetchedPings, fetchedTracks);
     redrawPings(pings);
     redrawTracks(tracks);
-  };
-
-  // TODO: update based on selected critters
-  // only show critters selected in map details in the map
-  const handleShowOnlySelected = (o: OnlySelectedCritters): void => {
-    setOnlySelected(o);
-    const { show, critter_ids } = o;
-    if (show) {
-      const p = fetchedPings.filter((f) => critter_ids.includes(f.properties.critter_id));
-      const t = fetchedTracks.filter((f) => critter_ids.includes(f.properties.critter_id));
-      redrawLayers(p, t);
-    } else {
-      redrawLayers();
-    }
   };
 
   const getAssignedLayers = (): L.Layer[] => [latestPingsLayer, pingsLayer, tracksLayer];
