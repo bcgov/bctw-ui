@@ -352,6 +352,36 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     );
   };
 
+  const createExport = (): ReactNode => {
+    return (
+      <>
+        {isTab(search) && (
+          <>
+            {/* TODO: Build out this export section */}
+            {/* <h2>Export</h2> */}
+            <Box display='flex' justifyContent='flex-start' py={2} whiteSpace='normal'>
+              <Button
+                onClick={(): void => setShowExportModal(true)}
+                variant='contained'
+                disabled={!(selectedCritters?.length > 0)}>
+                Export
+              </Button>
+              <MapExport
+                groupedAssignedPings={groupPings(
+                  pings.filter((p) => selectedCritters.includes(p.properties.critter_id))
+                )}
+                groupedUnassignedPings={[]}
+                open={showExportModal}
+                handleClose={(): void => setShowExportModal(false)}
+                range={{ start: start, end: end }}
+              />
+            </Box>
+          </>
+        )}
+      </>
+    );
+  };
+
   // creates select elements
   const createFilters = (): React.ReactNode => {
     const itemSpacing = isTab(filter) ? 12 : false;
@@ -627,25 +657,7 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
               </Typography>
             </Box>
           )}
-          {isTab(search) && (
-            <Box display='flex' justifyContent='flex-start' py={2} whiteSpace='normal'>
-              <Button
-                onClick={(): void => setShowExportModal(true)}
-                variant='contained'
-                disabled={!(selectedCritters?.length > 0)}>
-                Export
-              </Button>
-              <MapExport
-                groupedAssignedPings={groupPings(
-                  pings.filter((p) => selectedCritters.includes(p.properties.critter_id))
-                )}
-                groupedUnassignedPings={[]}
-                open={showExportModal}
-                handleClose={(): void => setShowExportModal(false)}
-                range={{ start: start, end: end }}
-              />
-            </Box>
-          )}
+          {createExport()}
           {createSymbolizeLegend()}
         </Box>
       </Box>
