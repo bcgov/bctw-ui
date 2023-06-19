@@ -41,6 +41,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState('Critter Name');
   const [{ selectedCritters }, markerDispatch] = useMarkerStates();
+  const [allSelected, setAllSelected] = useState(false);
 
   // Adds a column for each unique category_name
   const uniqueCategoryNames = getUniqueCollectionUnitKeys(pings);
@@ -54,9 +55,11 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
     if (val) {
+      setAllSelected(true);
       markerDispatch({ type: 'SELECT_MARKERS', ids: getPointIDsFromTelemetryGroup(pings) });
       markerDispatch({ type: 'SELECT_CRITTERS', ids: pings.map((p) => p.critter_id) });
     } else {
+      setAllSelected(false);
       markerDispatch({ type: 'RESET_SELECTION' });
       markerDispatch({ type: 'SELECT_CRITTERS', ids: [] });
     }
@@ -64,6 +67,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
 
   const handleRowCheck = (v: RowActionStatus): void => {
     const pointIds = getPointIDsFromTelemetryGroup(pings.filter((f) => f.critter_id === v.critter_id));
+    setAllSelected(false);
     markerDispatch({ type: v.active ? 'SELECT_MARKERS' : 'UNSELECT_MARKERS', ids: pointIds });
     markerDispatch({
       type: 'SELECT_CRITTERS',
@@ -76,6 +80,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
   };
 
   const totalPointCount = (): number => pings.reduce((accum, cur) => cur.count + accum, 0);
+
   return (
     <TableContainer component={Paper} className={'map-detail-table-container'}>
       <Table stickyHeader size='small'>
@@ -97,6 +102,7 @@ export default function MapDetailsGrouped(props: MapDetailsGroupedProps): JSX.El
             rowCount={pings.length}
             isMultiSelect={true}
             onSelectAllClick={handleSelectAllClick}
+            selectAll={allSelected}
             customHeaders={[]}
           />
         ) : null}
