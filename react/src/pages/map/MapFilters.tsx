@@ -628,8 +628,11 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
             </Box>
           )}
           {isTab(search) && (
-            <Box display='flex' justifyContent='flex-end' py={2} whiteSpace='normal'>
-              <Button onClick={(): void => setShowExportModal(true)} variant='outlined'>
+            <Box display='flex' justifyContent='flex-start' py={2} whiteSpace='normal'>
+              <Button
+                onClick={(): void => setShowExportModal(true)}
+                variant='contained'
+                disabled={!(selectedCritters?.length > 0)}>
                 Export
               </Button>
               <MapExport

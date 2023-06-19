@@ -556,10 +556,8 @@ export function Map(): JSX.Element {
         <div id='map'>
           <MapLayerToggleControl handleTogglePings={togglePings} handleToggleTracks={toggleTracks} />
         </div>
-
         <Paper
-          square
-          style={{ height: bottomPanelHeight }}
+          style={{ height: bottomPanelHeight, borderRadius: 0 }}
           className={`map-bottom-panel ${showOverviewModal || showUdfEdit ? '' : 'appear-above-map'}`}
           id={`map-bottom-panel`}>
           <div onMouseDown={onDown} id='drag'>
@@ -567,15 +565,7 @@ export function Map(): JSX.Element {
               <Icon path={mdiDragHorizontalVariant} className={'icon'} title='Drag to resize' size={1} />
             </div>
           </div>
-          <MapDetails
-            pings={[...pings]}
-            unassignedPings={[]}
-            handleShowOnlySelected={handleShowOnlySelected}
-            handleShowOverview={handleShowOverview}
-            showExportModal={showExportModal}
-            setShowExportModal={setShowExportModal}
-            timeRange={range}
-          />
+          <MapDetails pings={[...pings]} unassignedPings={[]} handleShowOverview={handleShowOverview} />
         </Paper>
         {selectedDetail ? (
           <MapOverView
