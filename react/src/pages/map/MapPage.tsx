@@ -36,10 +36,11 @@ import AddUDF from 'pages/udf/AddUDF';
 import React, { useEffect, useRef, useState } from 'react';
 import { ICodeFilter } from 'types/code';
 import { BCTWType } from 'types/common_types';
-import { ITelemetryDetail, ITelemetryLine, ITelemetryPoint, MapRange, OnlySelectedCritters } from 'types/map';
+import { ITelemetryDetail, ITelemetryLine, ITelemetryPoint, MapRange } from 'types/map';
 import { eUDFType } from 'types/udf';
 import { formatDay, getToday } from 'utils/time';
 import { MarkerProvider, createMarkersStates, updateLayers, useMarkerStates } from './MapMarkerContext';
+
 export default function MapPage(): JSX.Element {
   return (
     <MarkerProvider>
@@ -81,7 +82,8 @@ export function Map(): JSX.Element {
     end: getToday()
   });
   // pings/tracks state is changed when filters are applied, so use these variables for the 'global' state - used in bottom panel
-  const [pings, setPings] = useState<ITelemetryPoint[]>([]);
+  const [filteredPings, setFilteredPings] = useState<ITelemetryPoint[]>([]);
+  const [filteredTracks, setFilteredTracks] = useState<ITelemetryLine[]>([]);
 
   // holds the most recently fetched pings data
   const [fetchedPings, setFetchedPings] = useState<ITelemetryPoint[]>([]);
@@ -97,7 +99,6 @@ export function Map(): JSX.Element {
 
   // state for tracking filters that limit map layers
   const [isMapOnlyFilterApplied, setIsMapOnlyFilterApplied] = useState(false);
-  const [onlySelected, setOnlySelected] = useState<OnlySelectedCritters>({ show: false, critter_ids: [] });
   const [onlyLastKnown, setOnlyLastKnown] = useState(false);
   const [onlyLast10, setOnlyLast10] = useState(false);
 
@@ -110,14 +111,28 @@ export function Map(): JSX.Element {
 
   // when the selected markers changes, show only those markers, but if its empty, show all
   useEffect(() => {
+    if (fetchedPings && fetchedTracks) {
+      applyFiltersToPings(filters);
+    }
     if (markerStates.selectedMarkers.size > 0) {
-      const p = fetchedPings.filter((f) => markerStates.selectedMarkers.has(f.id));
-      const t = fetchedTracks.filter((f) => markerStates.selectedCritters.includes(f.properties.critter_id));
+      const p = (filteredPings ?? fetchedPings).filter((f) => markerStates.selectedMarkers.has(f.id));
+      const t = (filteredTracks ?? fetchedTracks).filter((f) =>
+        markerStates.selectedCritters.includes(f.properties.critter_id)
+      );
       redrawLayers(p, t);
     } else if (fetchedPings && fetchedTracks) {
       redrawLayers();
     }
   }, [markerStates.selectedCritters]);
+
+  // re-apply filters when onlyLastKnown or onlyLast10 changes
+  useEffect(() => {
+    if (fetchedPings && fetchedTracks) {
+      markerDispatch({ type: 'RESET_ALL' });
+      redrawLayers();
+      applyFiltersToPings(filters);
+    }
+  }, [onlyLastKnown, onlyLast10]);
 
   // store the selection shapes
   const drawnItems = new L.FeatureGroup();
@@ -139,7 +154,6 @@ export function Map(): JSX.Element {
   // refetch pings when start/end times are changed
   useEffect(() => {
     // wipe the attribute panel state on refresh
-    setOnlySelected({ show: false, critter_ids: [] });
     clearLayers();
   }, [range]);
 
@@ -154,16 +168,13 @@ export function Map(): JSX.Element {
         if (filters.length) {
           applyFiltersToPings(filters);
         } else {
-          setPings(fetchedPings);
+          setFilteredPings(fetchedPings);
+          setFilteredTracks(fetchedTracks);
         }
 
         if (isMapOnlyFilterApplied) {
           // filter what's shown on the map, but not the bottom panel
-          if (onlySelected.show) {
-            const predicate = (l: ITelemetryPoint): boolean =>
-              onlySelected.critter_ids.includes(l.properties.critter_id);
-            redrawLayers(fetchedPings.filter(predicate));
-          } else if (onlyLast10) {
+          if (onlyLast10) {
             const { pings, tracks } = getLast10Fixes(fetchedPings, fetchedTracks ?? []);
             redrawPings(pings);
             redrawTracks(tracks);
@@ -192,7 +203,7 @@ export function Map(): JSX.Element {
         since pings are what filter the tracks?
       */
       if (filters.length) {
-        applyFiltersToTracks(pings);
+        applyFiltersToTracks(filteredPings);
       } else {
         tracksLayer.addData(fetchedTracks as unknown as GeoJSON.GeoJsonObject);
       }
@@ -204,13 +215,13 @@ export function Map(): JSX.Element {
   useEffect(() => {
     const markerData = createMarkersStates(tracksLayer, pingsLayer, latestPingsLayer);
     markerDispatch({ type: 'SET_MARKERS', markers: markerData });
-  }, [pings]);
+  }, [filteredPings]);
 
   // when one of the map only filters are applied, set the state
   useEffect(() => {
-    const b = onlyLast10 || onlyLastKnown || (onlySelected && onlySelected.show);
+    const b = onlyLast10 || onlyLastKnown;
     setIsMapOnlyFilterApplied(b);
-  }, [onlyLast10, onlyLastKnown, onlySelected]);
+  }, [onlyLast10, onlyLastKnown]);
 
   // initialize the map
   useEffect(() => {
@@ -233,7 +244,7 @@ export function Map(): JSX.Element {
 
   // hide popup when modals are displayed
   useDidMountEffect(() => {
-    if ( showOverviewModal || showUdfEdit) {
+    if (showOverviewModal || showUdfEdit) {
       hidePopup();
     }
   }, [showOverviewModal, showUdfEdit]);
@@ -330,7 +341,10 @@ export function Map(): JSX.Element {
    * clears existing pings/tracks layers, draws the new ones
    * @param newPings @param newTracks defaults to existing if not supplied
    */
-  const redrawLayers = (newPings = fetchedPings, newTracks = fetchedTracks): void => {
+  const redrawLayers = (
+    newPings = filteredPings ?? fetchedPings,
+    newTracks = filteredTracks ?? fetchedTracks
+  ): void => {
     clearLayers();
     const { latest, other } = splitPings(newPings);
     latestPingsLayer.addData(latest as unknown as GeoJSON.GeoJsonObject);
@@ -382,19 +396,25 @@ export function Map(): JSX.Element {
 
   // the handler that actually updates the ping state when the filter state is changed
   const applyFiltersToPings = (filters: ICodeFilter[]): void => {
+    handleShowLastKnownLocation(onlyLastKnown);
+    // eslint-disable-next-line prefer-const
+    let { pings, tracks } = onlyLast10
+      ? getLast10Fixes(fetchedPings, fetchedTracks)
+      : { pings: fetchedPings, tracks: fetchedTracks };
     if (!filters.length) {
       // reset map state and bottom panel state
-      setPings(fetchedPings);
-      redrawLayers();
+      setFilteredPings(pings);
+      setFilteredTracks(tracks);
+      redrawLayers(pings, tracks);
       return;
     }
     const groupedFilters = groupFilters(filters);
-    const filteredPings = applyFilter(groupedFilters, fetchedPings);
+    pings = applyFilter(groupedFilters, pings);
 
-    setPings(filteredPings);
-    redrawPings(filteredPings);
+    setFilteredPings(pings);
+    redrawPings(pings);
 
-    applyFiltersToTracks(filteredPings);
+    applyFiltersToTracks(pings, tracks);
   };
 
   /**
@@ -402,15 +422,16 @@ export function Map(): JSX.Element {
    * because that will determine which critters are displayed
    * this function will be triggered when @var {critterIDsDisplayed} is changed
    */
-  const applyFiltersToTracks = (p = pings): void => {
-    if (!fetchedTracks) {
+  const applyFiltersToTracks = (p = filteredPings, tracks = fetchedTracks): void => {
+    if (!tracks) {
       return;
     }
     const uniqueCritterIDs = getUniqueCritterIDsFromSelectedPings(
       p,
-      pings.map((p) => p.id)
+      filteredPings.map((p) => p.id)
     );
-    const filteredTracks = fetchedTracks.filter((t) => uniqueCritterIDs.includes(t.properties.critter_id));
+    const filteredTracks = tracks.filter((t) => uniqueCritterIDs.includes(t.properties.critter_id));
+    setFilteredTracks(filteredTracks);
     redrawTracks(filteredTracks);
   };
 
@@ -428,7 +449,6 @@ export function Map(): JSX.Element {
    * fixme: points within drawn polygons are still displayed
    */
   const handleShowLastKnownLocation = (show: boolean): void => {
-    setOnlyLastKnown(show);
     if (show) {
       mapRef.current.removeLayer(pingsLayer);
       mapRef.current.removeLayer(tracksLayer);
@@ -451,20 +471,6 @@ export function Map(): JSX.Element {
     // const layers = showUnassignedLayers ? getPingLayers() : getPingLayers().slice(0, 2);
     const layers = getPingLayers().slice(0, 2);
     layers.forEach((l) => (show ? ref.addLayer(l) : ref.removeLayer(l)));
-  };
-
-  /**
-   * @param b boolean on whether the map should be filtered to each critter's last 10 pings
-   */
-  const handleShowLast10Fixes = (b: boolean): void => {
-    setOnlyLast10(b);
-    if (!b) {
-      redrawLayers();
-      return;
-    }
-    const { pings, tracks } = getLast10Fixes(fetchedPings, fetchedTracks);
-    redrawPings(pings);
-    redrawTracks(tracks);
   };
 
   const getAssignedLayers = (): L.Layer[] => [latestPingsLayer, pingsLayer, tracksLayer];
@@ -520,14 +526,14 @@ export function Map(): JSX.Element {
       <MapFilters
         start={range.start}
         end={range.end}
-        pings={pings ?? []}
+        pings={filteredPings ?? []}
         onApplySearch={handleApplyChangesFromSearchPanel}
         onApplyFilters={handleApplyChangesFromFilterPanel}
         onClickEditUdf={(): void => setShowUdfEdit((o) => !o)}
         // todo: trigger when filter panel transition is completed without timeout
         onCollapsePanel={(): unknown => setTimeout(() => mapRef.current.invalidateSize(), 200)}
-        onShowLatestPings={handleShowLastKnownLocation}
-        onShowLastFixes={handleShowLast10Fixes}
+        onShowLatestPings={setOnlyLastKnown}
+        onShowLastFixes={setOnlyLast10}
         isFetching={isLoadingPings}
       />
       <div className={'map-container'}>
@@ -547,7 +553,7 @@ export function Map(): JSX.Element {
               <Icon path={mdiDragHorizontalVariant} className={'icon'} title='Drag to resize' size={1} />
             </div>
           </div>
-          <MapDetails pings={[...pings]} unassignedPings={[]} handleShowOverview={handleShowOverview} />
+          <MapDetails pings={filteredPings} unassignedPings={[]} handleShowOverview={handleShowOverview} />
         </Paper>
         {selectedDetail ? (
           <MapOverView

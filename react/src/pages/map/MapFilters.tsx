@@ -100,7 +100,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
   // state for start and end ranges (date pickers)
   const [start, setStart] = useState(props.start);
   const [end, setEnd] = useState(props.end);
-  const [wasDatesChanged, setWasDatesChanged] = useState(false);
 
   // reset filter button status
   const [reset, setReset] = useState(false);
@@ -154,7 +153,6 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
       // console.log(fetchedEstimate === undefined);
       if (end !== props.end || start !== props.start) {
         setApplyButtonStatus(false);
-        setWasDatesChanged(true);
       }
 
       if (fetchedEstimate === undefined || fetchedEstimate.is_pings_cap) {
@@ -200,19 +198,14 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
    * @param reset force calling the parent handler with empty array
    */
   const handleApplyFilters = (event: React.MouseEvent<HTMLInputElement>, reset = false): void => {
+    markerDispatch({ type: 'RESET_ALL' });
     if (isTab(filter)) {
       props.onApplyFilters({ start, end }, reset ? [] : filters);
     } else {
       props.onApplySearch({ start, end }, reset ? [] : filters);
     }
-    // if dates were changed, it will draw all the new points, so
-    // set the status of the show latest pings checkbox to false
-    if (wasDatesChanged) {
-      setIsLatestPing(false);
-    }
     setSymbolizeBy(DEFAULT_MFV.header);
     setSymbolizeLast(true);
-    markerDispatch({ type: 'RESET_ALL' });
   };
 
   const handleApplySymbolize = (): void => {
@@ -240,6 +233,10 @@ export default function MapFilters(props: MapFiltersProps): JSX.Element {
     2) also resets the apply button enabled state  
   */
   const resetFilters = (): void => {
+    props.onShowLatestPings(false);
+    props.onShowLastFixes(false);
+    setIsLastFixes(false);
+    setIsLatestPing(false);
     setApplyButtonStatus(fetchedEstimate === undefined || fetchedEstimate.is_pings_cap);
     setReset(true);
     setTimeout(() => setReset(false), 1000);
