@@ -29,6 +29,7 @@ import { ICritterbaseLoginResponse, IKeyCloakSessionInfo, User } from 'types/use
 import {
   IBulkUploadResults,
   ICbBulkUpdatePayload,
+  ICbMarkingVerifyResult,
   IDeleteType,
   IUpsertPayload,
   ParsedXLSXSheetResult,
@@ -109,9 +110,9 @@ export const useTelemetryApi = () => {
   };
 
   const useVerifyMarkingsAgainstTaxon = (
-    config: UseMutationOptions<string[], AxiosError, { taxon_id: string; markings: IMarking }>
-  ): UseMutationResult<string[]> =>
-    useMutation<string[], AxiosError, { taxon_id: string; markings: IMarking }>(
+    config: UseMutationOptions<ICbMarkingVerifyResult, AxiosError, { taxon_id: string; markings: IMarking }>
+  ): UseMutationResult<ICbMarkingVerifyResult> =>
+    useMutation<ICbMarkingVerifyResult, AxiosError, { taxon_id: string; markings: IMarking }>(
       ({ taxon_id, markings }) => critterbaseApi.verifyMarkingsAgainstTaxon(taxon_id, markings),
       config
     );

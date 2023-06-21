@@ -18,6 +18,11 @@ interface IUpsertPayload<T> {
   body: T;
 }
 
+interface ICbMarkingVerifyResult {
+  verified: boolean;
+  invalid_markings: string[];
+}
+
 interface ICbBulkUpdatePayload {
   critters: Critter[];
   captures: ICapture[];
@@ -109,5 +114,6 @@ export type {
   CheckedWarningInfo,
   AnimalCollar,
   XLSXPayload,
-  ICbBulkUpdatePayload
+  ICbBulkUpdatePayload,
+  ICbMarkingVerifyResult
 };

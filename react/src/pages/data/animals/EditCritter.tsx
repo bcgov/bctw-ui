@@ -166,12 +166,12 @@ export default function EditCritter(
       return true;
     }
     const result = await mutateAsync({taxon_id: new_taxon, markings: markingState.filter(a => !a._delete)});
-    if(result.length) {
-      setTaxonErrorModalOpen(true);
-      return false;
+    if(result.verified) {
+      return true;
     }
     else {
-      return true;
+      setTaxonErrorModalOpen(true);
+      return false;
     }
   }
 
@@ -289,14 +289,14 @@ export default function EditCritter(
         }}
       </ChangeContext.Consumer>
       <Modal 
-        open={isSuccess && data.length > 0 && taxonErrorModalOpen} 
+        open={isSuccess && data.verified === false && taxonErrorModalOpen} 
         handleClose={() => {setTaxonErrorModalOpen(false)}}
       >
         <Typography>{markingIncompatibility}</Typography>
         <Typography>{removeMarkingsPlease}</Typography>
         <ul>
         {
-          data?.map(a => formatMarking(a))
+          data?.invalid_markings.map(a => formatMarking(a))
         }
         </ul>
       </Modal>
