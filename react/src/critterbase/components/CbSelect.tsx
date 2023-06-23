@@ -34,10 +34,19 @@ export const CbSelect = ({
     query,
     !disabled
   );
-  const [selected, setSelected] = useState<uuid | string>(typeof value === 'string' ? value : '');
+  const [selected, setSelected] = useState<uuid | string>('');
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   const labelOverride = label ?? columnToHeader(cbRouteKey);
+  const valType = typeof value;
+
+  useEffect(() => {
+    prop === 'proximate_predated_by_taxon_id' && console.log({value});
+    if (selected == value) return;
+    if (typeof value === 'string') {
+      setSelected(value);
+      }
+    }, [value]);
 
   useEffect(() => {
     handleRoute?.(status, cbRouteKey);
