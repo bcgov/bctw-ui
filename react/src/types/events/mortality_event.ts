@@ -272,7 +272,7 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
     proximate_cause_of_death_confidence: {
       prop: 'proximate_cause_of_death_confidence',
       type: eInputType.cb_select,
-      cbRouteKey: 'cause_of_death_confidence'
+      cbRouteKey: 'cause_of_death_confidence',
     },
     proximate_predated_by_taxon_id: {
       prop: 'proximate_predated_by_taxon_id',
@@ -283,12 +283,11 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
       prop: 'ultimate_cause_of_death_id',
       type: eInputType.cb_select,
       cbRouteKey: 'cod',
-      required: false
     },
     ultimate_cause_of_death_confidence: {
       prop: 'ultimate_cause_of_death_confidence',
       type: eInputType.cb_select,
-      cbRouteKey: 'cause_of_death_confidence'
+      cbRouteKey: 'cause_of_death_confidence',
     },
     ultimate_predated_by_taxon_id: {
       prop: 'ultimate_predated_by_taxon_id',

@@ -15,6 +15,7 @@ export type CbSelectProps = Omit<CreateInputProps, 'type'> & {
   query: string;
   isSelectionAllowed?: (newval: unknown) => boolean | Promise<boolean>;
 };
+
 export const CbSelect = ({
   cbRouteKey,
   value,
@@ -33,7 +34,7 @@ export const CbSelect = ({
     query,
     !disabled
   );
-  const [selected, setSelected] = useState<uuid | string>('');
+  const [selected, setSelected] = useState<uuid | string>(typeof value === 'string' ? value : '');
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   const labelOverride = label ?? columnToHeader(cbRouteKey);
@@ -42,18 +43,6 @@ export const CbSelect = ({
     handleRoute?.(status, cbRouteKey);
   }, [status]);
 
-  useEffect(() => {
-    //console.log(`Triggered cbSelect ${cbRouteKey} ${isSuccess} ${isLoading}`)
-    if (!data?.length) return;
-    if (!value) {
-      handleSelect();
-      return;
-    }
-    if (typeof value !== 'string') return;
-    const val = data.find((d) => (typeof d === 'string' ? d === value : d.id === value));
-    handleSelect(value, typeof val === 'string' ? val : val.value);
-    //setSelected(value);
-  }, [isSuccess, isLoading, value, data]);
 
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
@@ -61,11 +50,12 @@ export const CbSelect = ({
     setHasError(err);
     const ret = { [prop]: v, error: err };
     handleChange(ret);
+    //console.log(ret);
   };
 
   const handleSelect = async (id?: string, label?: string): Promise<void> => {
     const shouldChange = await isSelectionAllowed?.(id);
-    if (typeof isSelectionAllowed === 'function' && !shouldChange) {
+    if (isFunction(isSelectionAllowed) && !shouldChange) {
       return;
     }
     const hasProps = id && label;
