@@ -3,7 +3,6 @@ import 'styles/AppHeader.scss';
 import { mdiAccountCircle, mdiAccountRemove, mdiHelpCircle, mdiProgressClock } from '@mdi/js';
 import Icon from '@mdi/react';
 import { IconButton } from '@mui/material';
-import headerImage from 'assets/images/gov3_bc_logo.png';
 import { urls } from 'constants/external_urls';
 import { AlertContext } from 'contexts/UserAlertContext';
 import { UserContext } from 'contexts/UserContext';
