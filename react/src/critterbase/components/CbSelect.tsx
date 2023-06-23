@@ -34,7 +34,7 @@ export const CbSelect = ({
     query,
     !disabled
   );
-  const [selected, setSelected] = useState<uuid | string>('');
+  const [selected, setSelected] = useState<uuid | string>(typeof value === 'string' ? value : '');
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   const labelOverride = label ?? columnToHeader(cbRouteKey);
