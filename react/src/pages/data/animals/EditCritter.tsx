@@ -120,13 +120,12 @@ export default function EditCritter(
     if (body.marking.length) {
 
       for (const m of body.marking) {
-        m.critter_id = body.critter_id;
         const existing = editing.marking.find((a) => (a.marking_id === m.marking_id));
         const omitted = omitNull(m);
         if (existing && !hasChangedProperties(existing, omitted) && !m._delete) {
           continue;
         }
-        finalPayload.markings.push(m);
+        finalPayload.markings.push({...m, critter_id: new_critter.critter_id});
       }
     }
 
