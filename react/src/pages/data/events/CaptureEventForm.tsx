@@ -65,7 +65,7 @@ export default function CaptureEventForm({
         notifyChange={onChange}
         handleRoute={handleRoute}>
         <Box key='bx-rec'>
-          {CreateFormField(capture, capture.fields.capture_timestamp, onChange, { value: dayjs() })}
+          {CreateFormField(capture, capture.fields.capture_timestamp, onChange)}
           {CreateFormField(capture, capture.fields.capture_comment, onChange)}
         </Box>
       </LocationEventForm>

@@ -56,7 +56,7 @@ export default function EditCritter(
       taxon_id: body.taxon_id
     };
     const old_critter = {
-      editing: editing.critter_id,
+      critter_id: editing.critter_id,
       animal_id: editing.animal_id,
       sex: editing.sex,
       wlh_id: editing.wlh_id,
@@ -79,21 +79,24 @@ export default function EditCritter(
       if (captureId) {
         capture.capture_id = captureId;
       }
-      if (capture.capture_location) {
-        capture.capture_location = omitNull(capture.capture_location);
-      }
       if (capture.release_location) {
-        if (capture.capture_location_id === capture.release_location_id) {
+        console.log(`In capture release location block ${JSON.stringify(capture.release_location, null, 2)}`)
+        if (capture.capture_location_id === capture.release_location_id && hasChangedProperties(capture.capture_location, capture.release_location)) {
           const clone = Object.assign({}, og_capture.capture_location);
           capture.release_location = Object.assign(clone, capture.release_location);
           capture.force_create_release = true;
         }
-        capture.release_location = omitNull(capture.release_location);
       }
-      capture.critter_id = body.critter_id;
-      const omitted = omitNull(capture);
+      
+      const omitted = omitNull(
+        {...capture, 
+        capture_location: capture.capture_location ? omitNull(capture.capture_location) : null, 
+        release_location: capture.release_location ? omitNull(capture.release_location) : null
+        });
+      console.log(`In capture payload, omitted: ${JSON.stringify(omitted, null, 2)} og_capture: ${JSON.stringify(og_capture, null, 2)}`);
       if (hasChangedProperties(og_capture, omitted)) {
-        finalPayload.captures.push(omitNull(capture));
+        omitted.critter_id = body.critter_id;
+        finalPayload.captures.push(omitted);
       }
     }
 
@@ -106,9 +109,10 @@ export default function EditCritter(
       if (mortality.location) {
         mortality.location = omitNull(mortality.location);
       }
-      mortality.critter_id = body.critter_id;
+      
       const omitted = omitNull(mortality);
       if (hasChangedProperties(editing.mortality[0], omitted)) {
+        omitted.critter_id = body.critter_id;
         finalPayload.mortalities.push(omitted);
       }
     }
@@ -128,17 +132,15 @@ export default function EditCritter(
 
     if(body.collection_units) {
         for(const c of body.collection_units) {
-          c.critter_id = new_critter.critter_id;
           if(old_critter.taxon_id !== new_critter.taxon_id && c.critter_collection_unit_id) {
             c._delete = true;
           }
-          
           const existing = editing.collection_units.find((a) => a.critter_collection_unit_id === c.critter_collection_unit_id);
           const omitted = omitNull(c);
           if(existing && !hasChangedProperties(existing, omitted) && !c._delete) {
             continue;
           }
-          finalPayload.collections.push(c);
+          finalPayload.collections.push({...c, critter_id: new_critter.critter_id});
         }
         
     }
