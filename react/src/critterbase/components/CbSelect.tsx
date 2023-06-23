@@ -43,14 +43,12 @@ export const CbSelect = ({
     handleRoute?.(status, cbRouteKey);
   }, [status]);
 
-
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
     const err = !v && required;
     setHasError(err);
     const ret = { [prop]: v, error: err };
     handleChange(ret);
-    //console.log(ret);
   };
 
   const handleSelect = async (id?: string, label?: string): Promise<void> => {
@@ -74,7 +72,7 @@ export const CbSelect = ({
       key={`${cbRouteKey}-${String(prop)}`}
       disabled={isDisabled}>
       <InputLabel>{labelOverride}</InputLabel>
-      <Select value={selected} /*onChange={handleSelect}*/ MenuProps={selectMenuProps}>
+      <Select value={isSuccess ? selected : ''} /*onChange={handleSelect}*/ MenuProps={selectMenuProps}>
         {data?.map((val, idx) => {
           const valueId = typeof val === 'string' ? val : val.id;
           const value = typeof val === 'string' ? val : val.value;
