@@ -68,7 +68,6 @@ export default function MortalityEventForm({
   if (!fields || !wfFields) {
     return null;
   }
-console.log({isPredatorKnown, isUcodPredatorKnown});
   return (
     <>
       <Box>
