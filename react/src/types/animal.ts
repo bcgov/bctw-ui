@@ -189,7 +189,7 @@ export class Critter implements BCTWBase<Critter>{
 
   get latestCapture(): CaptureEvent2 | null {
     if (this.capture?.length){
-      const capture_location = editObjectToEvent(this.capture[0].capture_location, new LocationEvent('capture'), []);
+      const capture_location = editObjectToEvent(this.capture[0].capture_location, new LocationEvent('capture', true), []);
       const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);
       return editObjectToEvent({...this.capture[0], capture_location, release_location }, new CaptureEvent2(), [])
     } 

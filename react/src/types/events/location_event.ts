@@ -24,8 +24,11 @@ export class LocationEvent implements IWorkflow<LocationEvent>, ILocation {
   temperature: number;
   location_comment: string;
 
-  constructor(event_type: WorkflowType) {
+  isLatLonRequired: boolean;
+
+  constructor(event_type: WorkflowType, latlon_required?: boolean) {
     this.event_type = event_type;
+    this.isLatLonRequired = latlon_required ?? false;
   }
 
   get critterbasePayload(): CbPayload<LocationEvent> {
@@ -64,8 +67,8 @@ export class LocationEvent implements IWorkflow<LocationEvent>, ILocation {
   get fields(): Record<string, FormFieldObject<LocationEvent>[]> {
     return {
       latlon: [
-        { prop: 'latitude', type: eInputType.number, validate: mustBeLatitude },
-        { prop: 'longitude', type: eInputType.number, validate: mustBeLongitude },
+        { prop: 'latitude', type: eInputType.number, required: this.isLatLonRequired, validate: mustBeLatitude },
+        { prop: 'longitude', type: eInputType.number, required: this.isLatLonRequired, validate: mustBeLongitude },
         { prop: 'coordinate_uncertainty', type: eInputType.number },
         // {
         //   prop: 'coordinate_uncertainty_unit',

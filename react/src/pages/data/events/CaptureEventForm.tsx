@@ -31,7 +31,7 @@ export default function CaptureEventForm({
     const [key, value] = parseFormChangeResult<CaptureEvent2>(v);
     switch (key) {
       case 'capture_timestamp':
-        setMinReleaseDate(value as Dayjs);
+        setMinReleaseDate(dayjs(String(value)) as Dayjs);
         break;
       case 'capture_mortality':
         setMortalityCheck(value ? 'capture' : 'unknown');
@@ -65,7 +65,7 @@ export default function CaptureEventForm({
         notifyChange={onChange}
         handleRoute={handleRoute}>
         <Box key='bx-rec'>
-          {CreateFormField(capture, capture.fields.capture_timestamp, onChange, { value: dayjs() })}
+          {CreateFormField(capture, capture.fields.capture_timestamp, onChange)}
           {CreateFormField(capture, capture.fields.capture_comment, onChange)}
         </Box>
       </LocationEventForm>

@@ -20,7 +20,26 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
   const { changeHandler, propName, defaultValue, style, validate, required } = props;
 
   const empty = '';
-  const [val, setVal] = useState<number | ''>(typeof defaultValue === 'number' ? defaultValue : empty);
+  const castDefault = (n: number): string => {
+    if(typeof defaultValue === 'number' && !isNaN(defaultValue)) {
+      return String(defaultValue);
+    }
+    else {
+      return empty;
+    }
+  }
+
+  const resolveValue = (val: string) => {
+    const num = parseFloat(val);
+    if(isNaN(num)) {
+      return null;
+    }
+    else {
+      return num;
+    }
+  }
+
+  const [val, setVal] = useState<string | ''>(castDefault(defaultValue));
   const [err, setErr] = useState(required ? FormStrings.isRequired : empty);
 
   useEffect(() => {
@@ -29,23 +48,24 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
       return;
     }
 
-    /*if (typeof defaultValue === 'number') {
+    if (typeof defaultValue === 'number') {
       if (isFunction(validate)) {
-        setValueError(defaultValue, validate(defaultValue));
+        setValueError(castDefault(defaultValue), validate(defaultValue));
         return;
       }
     }
-    setValueError(defaultValue, empty);*/
+    setValueError(castDefault(defaultValue), empty);
   }, [defaultValue]);
 
   //To minimize the changeHandler from being called infinite times
   useEffect(() => {
-    if (defaultValue !== val) {
-      changeHandler({ [propName]: val, error: !!err });
-    }
+      changeHandler({ [propName]: resolveValue(val), error: !!err });
+    // if (String(defaultValue) !== val) {
+      
+    // }
   }, [defaultValue]);
 
-  const setValueError = (value: number | '', error: string): void => {
+  const setValueError = (value: string | '', error: string): void => {
     setVal(value);
     setErr(error);
   };
@@ -76,13 +96,15 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
       return;
     }
 
-    if (isFunction(validate)) {
-      setValueError(n, validate(n));
+    if (isFunction(validate) && validate(n)) {
+      setValueError(String(n), validate(n));
       return;
     }
 
-    const newVal = target[target.length - 1] === '.' ? target : n;
-    setValueError(newVal, empty);
+    //const newVal = target[target.length - 1] === '.' ? target : n;
+
+    //console.log(`Will set valueError ${newVal}, evaluate cond: ${target[target.length - 1] === '.'}, n: ${n}`)
+    setValueError(target, empty);
   };
 
   // only update the parent when blur event is triggered, reducing rerenders
@@ -94,7 +116,7 @@ export default function NumberField(props: NumberInputProps): JSX.Element {
       error = FormStrings.isRequired;
     }
     setValueError(value, error);
-    changeHandler({ [propName]: value, error: !!error });
+    changeHandler({ [propName]: resolveValue(value), error: !!error });
   };
 
   // will receive warnings if these are not deleted
