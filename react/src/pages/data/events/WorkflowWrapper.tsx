@@ -50,10 +50,10 @@ export default function WorkflowWrapper<T extends SuperWorkflow>({
   const [confirmMessage, setConfirmMessage] = useState<ReactNode>(null);
 
   useEffect(() => {
-    setCanSave(!hasErr && eventHasAllRequiredProperties());
+    setCanSave(!hasErr /*&& eventHasAllRequiredProperties()*/);
   }, [hasErr]);
 
-  const eventHasAllRequiredProperties = (): boolean => {
+  /*const eventHasAllRequiredProperties = (): boolean => {
     if (event.fields) {
       for (const [k, v] of Object.entries(event.fields)) {
         if (v.required && !event[k]) {
@@ -64,7 +64,7 @@ export default function WorkflowWrapper<T extends SuperWorkflow>({
       //console.log('No missing properties detected.');
       return true;
     }
-  };
+  };*/
 
   // save response handler
   const onSuccess = async (e: AxiosError | boolean): Promise<void> => {
@@ -113,7 +113,7 @@ export default function WorkflowWrapper<T extends SuperWorkflow>({
     } else if (k && k !== 'displayProps') {
       event[k] = val;
     }
-    setCanSave(!hasErr && eventHasAllRequiredProperties());
+    setCanSave(!hasErr /*&& eventHasAllRequiredProperties()*/);
   };
 
   /**

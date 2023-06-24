@@ -1,5 +1,5 @@
 import { WorkflowStrings } from 'constants/strings';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Critter, ICapture } from 'types/animal';
 import { uuid } from 'types/common_types';
 import { CbPayload, IWorkflow, SuperWorkflow } from 'types/events/event';
@@ -60,7 +60,9 @@ export class CaptureEvent2
   constructor() {
     super();
     this.event_type = 'capture';
-    this.capture_location = new LocationEvent('capture');
+    this.capture_timestamp = dayjs();
+    this.release_timestamp = dayjs();
+    this.capture_location = new LocationEvent('capture', true);
     this.release_location = new LocationEvent('release');
   }
   displayProps(): (keyof SuperWorkflow)[];

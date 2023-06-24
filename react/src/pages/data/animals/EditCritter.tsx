@@ -80,10 +80,9 @@ export default function EditCritter(
         capture.capture_id = captureId;
       }
       if (capture.release_location) {
-        console.log(`In capture release location block ${JSON.stringify(capture.release_location, null, 2)}`)
-        if (capture.capture_location_id === capture.release_location_id && hasChangedProperties(capture.capture_location, capture.release_location)) {
-          const clone = Object.assign({}, og_capture.capture_location);
-          capture.release_location = Object.assign(clone, capture.release_location);
+        if (og_capture.capture_location_id === og_capture.release_location_id && hasChangedProperties(capture.capture_location, capture.release_location)) {
+          /*const clone = Object.assign({}, og_capture.capture_location);
+          capture.release_location = Object.assign(clone, capture.release_location);*/
           capture.force_create_release = true;
         }
       }
@@ -93,7 +92,6 @@ export default function EditCritter(
         capture_location: capture.capture_location ? omitNull(capture.capture_location) : null, 
         release_location: capture.release_location ? omitNull(capture.release_location) : null
         });
-      console.log(`In capture payload, omitted: ${JSON.stringify(omitted, null, 2)} og_capture: ${JSON.stringify(og_capture, null, 2)}`);
       if (hasChangedProperties(og_capture, omitted)) {
         omitted.critter_id = body.critter_id;
         finalPayload.captures.push(omitted);
