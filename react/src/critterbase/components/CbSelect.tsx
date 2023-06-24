@@ -15,6 +15,7 @@ export type CbSelectProps = Omit<CreateInputProps, 'type'> & {
   query: string;
   isSelectionAllowed?: (newval: unknown) => boolean | Promise<boolean>;
 };
+
 export const CbSelect = ({
   cbRouteKey,
   value,
@@ -33,27 +34,23 @@ export const CbSelect = ({
     query,
     !disabled
   );
-  const [selected, setSelected] = useState<uuid | string>('');
+  const [selected, setSelected] = useState<uuid | string>(typeof value === 'string' ? value : '');
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   const labelOverride = label ?? columnToHeader(cbRouteKey);
 
   useEffect(() => {
-    handleRoute?.(status, cbRouteKey);
-  }, [status]);
+    prop === 'proximate_predated_by_taxon_id' && console.log({value});
+    if (selected == value) return;
+    if (typeof value === 'string') {
+      setSelected(value);
+      pushChange(value);
+      }
+    }, [value]);
 
   useEffect(() => {
-    //console.log(`Triggered cbSelect ${cbRouteKey} ${isSuccess} ${isLoading}`)
-    if (!data?.length) return;
-    if (!value) {
-      handleSelect();
-      return;
-    }
-    if (typeof value !== 'string') return;
-    const val = data.find((d) => (typeof d === 'string' ? d === value : d.id === value));
-    handleSelect(value, typeof val === 'string' ? val : val.value);
-    //setSelected(value);
-  }, [isSuccess, isLoading, value, data]);
+    handleRoute?.(status, cbRouteKey);
+  }, [status]);
 
   const pushChange = (v: string | Record<string, unknown>): void => {
     if (!isFunction(handleChange)) return;
@@ -65,7 +62,7 @@ export const CbSelect = ({
 
   const handleSelect = async (id?: string, label?: string): Promise<void> => {
     const shouldChange = await isSelectionAllowed?.(id);
-    if (typeof isSelectionAllowed === 'function' && !shouldChange) {
+    if (isFunction(isSelectionAllowed) && !shouldChange) {
       return;
     }
     const hasProps = id && label;
@@ -84,7 +81,7 @@ export const CbSelect = ({
       key={`${cbRouteKey}-${String(prop)}`}
       disabled={isDisabled}>
       <InputLabel>{labelOverride}</InputLabel>
-      <Select value={selected} /*onChange={handleSelect}*/ MenuProps={selectMenuProps}>
+      <Select value={isSuccess ? selected : ''} /*onChange={handleSelect}*/ MenuProps={selectMenuProps}>
         {data?.map((val, idx) => {
           const valueId = typeof val === 'string' ? val : val.id;
           const value = typeof val === 'string' ? val : val.value;
