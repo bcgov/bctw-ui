@@ -38,13 +38,13 @@ export const CbSelect = ({
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
   const isDisabled = isLoading || isError || !cbRouteKey || disabled;
   const labelOverride = label ?? columnToHeader(cbRouteKey);
-  const valType = typeof value;
 
   useEffect(() => {
     prop === 'proximate_predated_by_taxon_id' && console.log({value});
     if (selected == value) return;
     if (typeof value === 'string') {
       setSelected(value);
+      pushChange(value);
       }
     }, [value]);
 
