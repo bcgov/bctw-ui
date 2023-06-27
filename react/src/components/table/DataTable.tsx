@@ -80,6 +80,9 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
    */
   const [values, setValues] = useState<T[]>([]);
 
+
+
+
   useDidMountEffect(() => {
     if (deleted) {
       handleRowDeleted(deleted);
@@ -126,6 +129,7 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
         if (!found) {
           newV.push(d);
         }
+        //console.log(!!updated && d[rowIdentifier] === updated)
         if (updated && d[rowIdentifier] === updated && d !== values[i]) {
           //If updated identifier is set, insert new data into array
           values[i] = d;

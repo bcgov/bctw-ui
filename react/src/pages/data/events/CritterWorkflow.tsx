@@ -10,8 +10,9 @@ type CritterWorkflowProps = {
   workflow: WorkflowType;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onUpdate?: (critter_id: string) => void;
 };
-export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWorkflowProps): JSX.Element => {
+export const CritterWorkflow = ({ editing, workflow, open, setOpen, onUpdate }: CritterWorkflowProps): JSX.Element => {
   /**
    * when a workflow button is clicked, update the event type
    * binding all properties of the @var editing to the event
@@ -30,6 +31,7 @@ export const CritterWorkflow = ({ editing, workflow, open, setOpen }: CritterWor
    */
   const handleWorkflowSaved = async (e: IWorkflow<typeof event>): Promise<void> => {
     setOpen(false);
+    onUpdate?.(editing.critter_id);
   };
 
   /**

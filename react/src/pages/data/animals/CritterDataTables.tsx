@@ -214,26 +214,6 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           />
         </Box>
 
-        {/* Displays the recent animal telemetry map modal */}
-        {/*<MapModal
-          title={`Recent Critter Movement`}
-          open={openMap}
-          handleClose={(v: boolean) => setOpenMap(v)}
-          startDate={lastDt && lastDt.isValid() ? lastDt.subtract(24, 'weeks') : dayjs().subtract(24, 'weeks')}
-          endDate={lastDt && lastDt.isValid() ? lastDt : dayjs()}
-          width={'800px'}
-          height={'600px'}
-          critter_id={editObj?.current.critter_id}
-          />*/}
-
-        {/* Wrapper for Adding Critter, could probably be moved into bottom wrapper. */}
-        {/*<ModifyCritterWrapper
-          editing={new AttachedCritter()}
-          onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-          onDelete={(critter_id: string): void => setDeleted(critter_id)}
-          setCritter={setEditObj}>
-          <EditCritter {...editProps} isCreatingNew={true} open={openAddAnimal} handleClose={handleAddAnimal} />
-        </ModifyCritterWrapper>*/}
 
         {/* Wrapper to allow editing of Attached and Unattached animals */}
         <ModifyCritterWrapper
@@ -260,7 +240,11 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         />
 
         {/* Modal for critter workflows */}
-        <CritterWorkflow editing={editObj} workflow={workflow} open={openWorkflow} setOpen={setOpenWorkflow} />
+        <CritterWorkflow editing={editObj}
+          onUpdate={(critter_id: string) => setUpdated(critter_id)}
+          workflow={workflow}
+          open={openWorkflow}
+          setOpen={setOpenWorkflow} />
       </>
     </RowSelectedProvider>
   );
