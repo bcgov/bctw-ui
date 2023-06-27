@@ -36,11 +36,11 @@ const _appendQueryToUrl = (url: string, query: string): string => {
  * @param search the table filter object
  * @returns a query string with the destructured search object
  */
-const searchToQueryString = (search: ITableFilter[]): string => {
+const _appendSearchQueryToString = (url: string, search: ITableFilter[]): string => {
   if (!search) {
     return '';
   }
-  return search
+  const joined_terms = search
     .map((s) => {
       const { term, keys } = s;
       const termStr = `&term=${term}`;
@@ -50,6 +50,7 @@ const searchToQueryString = (search: ITableFilter[]): string => {
       return `&keys=${keys}${termStr}`;
     })
     .join('');
+  return url.includes('?') ? url += joined_terms : url += joined_terms.replace('&', '?'); //This will only replace the first occurence
 };
 
 /**
@@ -72,7 +73,7 @@ const createUrl = ({ api, query, page, noApiPrefix, search }: CreateUrlParams): 
     url = _appendQueryToUrl(url, `page=${page}`);
   }
   if (search) {
-    url += searchToQueryString(search);
+    url = _appendSearchQueryToString(url, search);
   }
   // console.log('created URL:', url)
   return url;
