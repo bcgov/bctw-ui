@@ -122,7 +122,7 @@ export const KeyXUploader = ({ device_ids, pageRows = 10, handleAllKeyXUploaded 
 
   const UploadKeyXBtn = ({ text }: { text: string }): JSX.Element => (
     <FileInput
-      accept='.keyx'
+      accept='.keyx,.zip'
       buttonText={text}
       buttonVariant='text'
       fileName={''}

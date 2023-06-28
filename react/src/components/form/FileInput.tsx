@@ -6,7 +6,7 @@ export interface FileInputProps extends StandardTextFieldProps {
   multiple?: boolean;
   fileName?: string;
   buttonVariant?: 'contained' | 'outlined' | 'text';
-  accept: '.keyx' | '.csv' | '.zip' | '.xlsx';
+  accept: '.keyx' | '.csv' | '.zip' | '.xlsx' | '.keyx,.zip';
   onFileChosen: (fieldName: string, files: FileList) => void;
 }
 
