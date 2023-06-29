@@ -6,7 +6,6 @@ import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api
 import { Banner, InfoBanner } from 'components/alerts/Banner';
 import { Icon, Modal } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
-import Select from 'components/form/BasicSelect';
 import Checkbox from 'components/form/Checkbox';
 import FileInputValidation from 'components/form/FileInputValidation';
 import HighlightTable from 'components/table/HighlightTable';
@@ -21,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import WarningPromptsBanner from './WarningPromptsBanner';
 import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
+import Select from 'components/form/BasicSelect';
 
 const useStyles = makeStyles((theme: Theme) => ({
   userSelect: {
@@ -71,6 +71,10 @@ interface ImportTabProps {
 // };
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
+  const rowIndexHeader = 'row_index';
+  const critterDropdownHeader = 'select_critter';
+
+
   const { title, sheetIndex, show } = props;
   const api = useTelemetryApi();
 
@@ -140,26 +144,45 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
   const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean) => {
     let headers = [];
     if (hideEmpty) {
-      headers = ['row_index', ...getAllUniqueKeys(sheet)];
+      headers = [rowIndexHeader, critterDropdownHeader, ...getAllUniqueKeys(sheet)];
     } else {
-      headers = ['row_index', ...sheet.headers];
+      headers = [rowIndexHeader, critterDropdownHeader, ...sheet.headers];
     }
     return headers;
   };
 
+  const selectCritterDropdownElement = (possible_ids: string[], defaultVal: string, onChange: (selectedVal: string) => void): JSX.Element => {
+    const possible_items = possible_ids.length == 0 ? ['New Critter'] : [...possible_ids, 'New Critter' ];
+    return (<Select 
+      className='' //remove default styling which affects the width of this field
+      sx={{minWidth: '360px'}}
+      disabled={possible_ids.length == 0} 
+      defaultValue={defaultVal ?? 'New Critter'} 
+      values={possible_items} 
+      handleChange={onChange} />);
+  }
   /**
    * TODO Add correct type for this.
    */
   const getTableData = () => {
     const rows = currentSheet.rows.map((o, idx) => {
-      return { row_index: idx + 2, ...o.row };
+      return { 
+        [rowIndexHeader]: idx + 2,
+        [critterDropdownHeader]: 
+          selectCritterDropdownElement(
+            o.row.possible_critter_ids,
+            o.row.selected_critter_id,
+            (v) => {o.row.selected_critter_id = v}
+          ),
+         ...o.row 
+        };
     });
     return rows;
   };
 
   const computeExcelHeaderRow = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
-    const headers = ['1'];
-    getHeaders(sheet, hideEmpty).filter(a => a !== 'row_index').forEach((o) => {
+    const headers = ['1', ''];
+    getHeaders(sheet, hideEmpty).filter(a => a !== rowIndexHeader && a !== critterDropdownHeader).forEach((o) => {
       const idx = sheet.headers.indexOf(o);
       headers.push(computeXLSXCol(idx));
     });
