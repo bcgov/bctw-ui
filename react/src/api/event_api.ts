@@ -138,6 +138,7 @@ export const eventApi = (props: ApiProps): API => {
   };
 
   const saveEvent = async <T extends IEvent>(event: IWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
+    console.log(event)
     if (event.event_type === 'capture') {
       const c = await _saveCbCapture(event.critterbasePayload);
       if (typeof c !== 'boolean') {
@@ -145,7 +146,6 @@ export const eventApi = (props: ApiProps): API => {
       }
     }
     if (event.event_type === 'mortality') {
-      console.log('Mortality cb payload ' + JSON.stringify(event.critterbasePayload, null, 2));
       const m = await _saveCbMortality(event.critterbasePayload);
       if (typeof m !== 'boolean') {
         return m;
@@ -181,7 +181,7 @@ export const eventApi = (props: ApiProps): API => {
     if (typeof event.getDevice === 'function' && event.shouldSaveDevice) {
       const device = event.getDevice();
       if (device) {
-        const s = _saveDevice(device, event.event_type);
+        const s = await _saveDevice(device, event.event_type);
         if (typeof s !== 'boolean') {
           return s;
         }
