@@ -55,7 +55,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
   const [order, setOrder] = useState<Order>(defaultSort?.order ?? 'asc');
   const [orderBy, setOrderBy] = useState<keyof T>(defaultSort?.property);
   const [rowIdentifier, setRowIdentifier] = useState('id');
-  //const [selectedRows, setSelectedRows] = useState<T[]>([]);
   const [selectedIDs, setSelectedIDs] = useState<boolean[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [page, setPage] = useState(0);
@@ -69,6 +68,8 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     param
     //filter
   );
+  useEffect(() => {console.log('query called')}, [data])
+  useEffect(() => {console.log(updated)}, [updated])
 
   const noPagination = !requestDataByPage && !paginationFooter;
   const noData = isSuccess && !data?.length;
@@ -124,13 +125,16 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
        * otherwise, query doesn't guarantee order, which can result in duplicates
        * across different pages / limitoffset
        */
+      console.log(1)
       data.forEach((d, i) => {
         const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
+          console.log(2)
           newV.push(d);
         }
-        //console.log(!!updated && d[rowIdentifier] === updated)
         if (updated && d[rowIdentifier] === updated && d !== values[i]) {
+          console.log(3)
+          console.log(d)
           //If updated identifier is set, insert new data into array
           values[i] = d;
           setValues(values);
