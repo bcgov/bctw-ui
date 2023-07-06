@@ -8,6 +8,7 @@ export type SharedSelectProps = SelectProps & {
 
 type BasicSelectProps = SharedSelectProps & {
   values: string[];
+  valueLabels?: string[];
   handleChange: (v: string) => void;
 };
 
@@ -23,6 +24,7 @@ export default function Select({
   disabled,
   defaultValue = '',
   className = 'select-control-small',
+  valueLabels = []
 }: BasicSelectProps): JSX.Element {
   const [selected, setSelected] = useState(defaultValue);
 
@@ -41,7 +43,7 @@ export default function Select({
       <MUISelect disabled={disabled} onChange={onChange} value={selected} required={true}>
         {values.map((v, idx) => (
           <MenuItem key={`${idx}-${v}`} value={v}>
-            {v}
+            {valueLabels?.[idx] ?? v}
           </MenuItem>
         ))}
       </MUISelect>

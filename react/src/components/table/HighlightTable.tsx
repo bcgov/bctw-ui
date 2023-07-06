@@ -1,7 +1,6 @@
 import { lighten, Table, TableBody, TableCell, TableRow, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Tooltip } from 'components/common';
-import Select from 'components/form/BasicSelect';
 import { formatTableCell, getComparator, stableSort } from 'components/table/table_helpers';
 import { Order, PlainTableProps } from 'components/table/table_interfaces';
 import TableContainer from 'components/table/TableContainer';

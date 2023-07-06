@@ -1,5 +1,5 @@
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/material';
+import { Box, Button, CircularProgress,  Paper, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
 import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import WarningPromptsBanner from './WarningPromptsBanner';
 import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
+import { Critter } from 'types/animal';
 import Select from 'components/form/BasicSelect';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -151,15 +152,19 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
     return headers;
   };
 
-  const selectCritterDropdownElement = (possible_ids: string[], defaultVal: string, onChange: (selectedVal: string) => void): JSX.Element => {
-    const possible_items = possible_ids.length == 0 ? ['New Critter'] : [...possible_ids, 'New Critter' ];
+  const selectCritterDropdownElement = (possible_critters: Partial<Critter>[], defaultVal: string, onChange: (selectedVal: string) => void): JSX.Element => {
+    const possible_values = possible_critters.length == 0 ? ['New Critter'] : [...possible_critters.map(a => a.critter_id), 'New Critter' ];
+    const value_labels = possible_critters.length == 0 ? ['New Critter'] : [...possible_critters.map(a => a.wlh_id ?? a.critter_id), 'New Critter' ];
+
     return (<Select 
       className='' //remove default styling which affects the width of this field
-      sx={{minWidth: '360px'}}
-      disabled={possible_ids.length == 0} 
+      sx={{minWidth: '160px'}}
+      disabled={possible_critters.length == 0} 
       defaultValue={defaultVal ?? 'New Critter'} 
-      values={possible_items} 
-      handleChange={onChange} />);
+      values={possible_values} 
+      handleChange={onChange} 
+      valueLabels={value_labels}/>
+    );
   }
   /**
    * TODO Add correct type for this.
@@ -170,7 +175,7 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
         [rowIndexHeader]: idx + 2,
         [critterDropdownHeader]: 
           selectCritterDropdownElement(
-            o.row.possible_critter_ids,
+            o.row.possible_critters,
             o.row.selected_critter_id,
             (v) => {o.row.selected_critter_id = v}
           ),

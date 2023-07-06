@@ -40,7 +40,6 @@ export const CbSelect = ({
   const labelOverride = label ?? columnToHeader(cbRouteKey);
 
   useEffect(() => {
-    prop === 'proximate_predated_by_taxon_id' && console.log({value});
     if (selected == value) return;
     if (typeof value === 'string') {
       setSelected(value);

@@ -70,7 +70,7 @@ type XLSXPayload = {
 };
 
 type ParsedXLSXRowResult = {
-  row: AnimalCollar & {possible_critter_ids: string[], selected_critter_id?: string};
+  row: AnimalCollar & {possible_critters: Partial<Critter>[], selected_critter_id?: string};
   errors: ParsedXLSXCellError;
   warnings: WarningInfo[];
   success: boolean;
