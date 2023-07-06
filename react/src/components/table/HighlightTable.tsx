@@ -54,6 +54,7 @@ export default function HighlightTable<T extends BCTWBase<T>>({
       onSelectCell(row_idx, String(cellname));
     }
   };
+
   return (
     <TableContainer>
       <Table className={'table'} size='small'>
