@@ -8,6 +8,7 @@ export type SharedSelectProps = SelectProps & {
 
 type BasicSelectProps = SharedSelectProps & {
   values: string[];
+  valueLabels?: string[];
   handleChange: (v: string) => void;
 };
 
@@ -20,8 +21,10 @@ export default function Select({
   values,
   triggerReset,
   sx,
+  disabled,
   defaultValue = '',
-  className = 'select-control-small'
+  className = 'select-control-small',
+  valueLabels = []
 }: BasicSelectProps): JSX.Element {
   const [selected, setSelected] = useState(defaultValue);
 
@@ -37,10 +40,10 @@ export default function Select({
   return (
     <FormControl className={className} size='small' sx={sx}>
       <InputLabel>{label}</InputLabel>
-      <MUISelect onChange={onChange} value={selected} required={true}>
+      <MUISelect disabled={disabled} onChange={onChange} value={selected} required={true}>
         {values.map((v, idx) => (
           <MenuItem key={`${idx}-${v}`} value={v}>
-            {v}
+            {valueLabels?.[idx] ?? v}
           </MenuItem>
         ))}
       </MUISelect>

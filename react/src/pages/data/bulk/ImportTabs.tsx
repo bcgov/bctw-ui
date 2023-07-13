@@ -1,12 +1,11 @@
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, CircularProgress, Paper, Theme, Typography } from '@mui/material';
+import { Box, Button, CircularProgress,  Paper, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { createUrl } from 'api/api_helpers';
 import { CellErrorDescriptor, ParsedXLSXSheetResult, WarningInfo } from 'api/api_interfaces';
 import { Banner, InfoBanner } from 'components/alerts/Banner';
 import { Icon, Modal } from 'components/common';
 import { SubHeader } from 'components/common/partials/SubHeader';
-import Select from 'components/form/BasicSelect';
 import Checkbox from 'components/form/Checkbox';
 import FileInputValidation from 'components/form/FileInputValidation';
 import HighlightTable from 'components/table/HighlightTable';
@@ -21,6 +20,8 @@ import { useEffect, useState } from 'react';
 import { columnToHeader } from 'utils/common_helpers';
 import WarningPromptsBanner from './WarningPromptsBanner';
 import { collectErrorsFromResults, collectWarningsFromResults, computeXLSXCol, getAllUniqueKeys } from './xlsx_helpers';
+import { Critter } from 'types/animal';
+import Select from 'components/form/BasicSelect';
 
 const useStyles = makeStyles((theme: Theme) => ({
   userSelect: {
@@ -71,6 +72,10 @@ interface ImportTabProps {
 // };
 //sheetIndex: 0 -> animal and device : 1 -> telemetry
 const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; handleSubmit: () => void }) => {
+  const rowIndexHeader = 'row_index';
+  const critterDropdownHeader = 'select_critter';
+
+
   const { title, sheetIndex, show } = props;
   const api = useTelemetryApi();
 
@@ -140,26 +145,49 @@ const ImportAndPreviewTab = (props: ImportTabProps & { sheetIndex: SheetNames; h
   const getHeaders = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean) => {
     let headers = [];
     if (hideEmpty) {
-      headers = ['row_index', ...getAllUniqueKeys(sheet)];
+      headers = [rowIndexHeader, critterDropdownHeader, ...getAllUniqueKeys(sheet)];
     } else {
-      headers = ['row_index', ...sheet.headers];
+      headers = [rowIndexHeader, critterDropdownHeader, ...sheet.headers];
     }
     return headers;
   };
 
+  const selectCritterDropdownElement = (possible_critters: Partial<Critter>[], defaultVal: string, onChange: (selectedVal: string) => void): JSX.Element => {
+    const possible_values = possible_critters.length == 0 ? ['New Critter'] : [...possible_critters.map(a => a.critter_id), 'New Critter' ];
+    const value_labels = possible_critters.length == 0 ? ['New Critter'] : [...possible_critters.map(a => a.wlh_id ?? a.critter_id), 'New Critter' ];
+
+    return (<Select 
+      className='' //remove default styling which affects the width of this field
+      sx={{minWidth: '160px'}}
+      disabled={possible_critters.length == 0} 
+      defaultValue={defaultVal ?? 'New Critter'} 
+      values={possible_values} 
+      handleChange={onChange} 
+      valueLabels={value_labels}/>
+    );
+  }
   /**
    * TODO Add correct type for this.
    */
   const getTableData = () => {
     const rows = currentSheet.rows.map((o, idx) => {
-      return { row_index: idx + 2, ...o.row };
+      return { 
+        [rowIndexHeader]: idx + 2,
+        [critterDropdownHeader]: 
+          selectCritterDropdownElement(
+            o.row.possible_critters,
+            o.row.selected_critter_id,
+            (v) => {o.row.selected_critter_id = v}
+          ),
+         ...o.row 
+        };
     });
     return rows;
   };
 
   const computeExcelHeaderRow = (sheet: ParsedXLSXSheetResult, hideEmpty: boolean): string[] => {
-    const headers = ['1'];
-    getHeaders(sheet, hideEmpty).filter(a => a !== 'row_index').forEach((o) => {
+    const headers = ['1', ''];
+    getHeaders(sheet, hideEmpty).filter(a => a !== rowIndexHeader && a !== critterDropdownHeader).forEach((o) => {
       const idx = sheet.headers.indexOf(o);
       headers.push(computeXLSXCol(idx));
     });
