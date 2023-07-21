@@ -100,6 +100,10 @@ const retrieveSessionInfo = function (req, res, next) {
       .status(500)
       .send("Error: Unable to retrieve Keycloak session information");
   }
+
+  console.log(`Keycloak Access Token Content... `);
+  console.log(req.kauth.grant.access_token.content);
+
   const { family_name, given_name, email } = data;
   const sessionInfo = {
     email,
@@ -122,9 +126,15 @@ const proxyApi = function (req, res, next) {
   const sessionId = req.sessionID;
 
   let options = {
-    headers: { "api-key": cbApiKey, ...user },
+    headers: {
+      "api-key": cbApiKey,
+      ...user,
+      Authorization: `Bearer ${req.kauth.grant.access_token.token}`,
+    },
     params: req.query,
   };
+
+  console.log("proxyApi options: ", options);
 
   const path = req.path.replace("/api/", "");
   let url;
@@ -137,12 +147,12 @@ const proxyApi = function (req, res, next) {
     url = `${apiHost}:${apiPort}/${path}`;
 
     // add parameters and username to URL
-    url = appendQueryToUrl(url, `${domain}=${keycloak_guid}`);
+    // Handle this inside the api
+    // url = appendQueryToUrl(url, `${domain}=${keycloak_guid}`);
   } else {
     // connect to API without using Keycloak authentication
     url = `${apiHost}:${apiPort}/${path}?${parameters}`;
   }
-
 
   const errHandler = (err) => {
     const { response } = err;
@@ -347,7 +357,6 @@ if (isProd) {
     //Critterbase Post requests
     .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
     .post("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
-
 
     .post("/api/:endpoint", keycloak.protect(), proxyApi)
     // delete handlers
