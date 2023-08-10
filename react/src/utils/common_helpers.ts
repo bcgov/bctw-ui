@@ -78,8 +78,6 @@ const hasChangedProperties = <T>(original: Partial<T>, next: Partial<T>): boolea
         return true;
       }
     } else if (/*original[k] !== undefined && */next[k] !== original[k]) {
-      console.log(`Original vs Next ${JSON.stringify(original, null, 2)} ${JSON.stringify(next, null, 2)}`)
-      console.log(`hasChangedProperties evaluates true for ${k}: ${original[k]} !==  ${next[k]}`)
       return true;
     }
   }
