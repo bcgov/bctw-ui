@@ -18,7 +18,6 @@ const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
 const cbApi = process.env.CRITTERBASE_API;
-const cbApiKey = process.env.CRITTERBASE_API_KEY;
 
 console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt, cbApi });
 // use Express memory store for session and Keycloak object
@@ -117,14 +116,9 @@ const retrieveSessionInfo = function (req, res, next) {
 const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
-  const cbEndpoint = req.params.cbEndpoint;
-  const user = req.session.user;
-  const sessionId = req.sessionID;
 
   let options = {
     headers: {
-      "api-key": cbApiKey,
-      ...user,
       Authorization: `Bearer ${req.kauth.grant.access_token.token}`,
     },
     params: req.query,
