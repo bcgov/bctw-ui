@@ -101,9 +101,6 @@ const retrieveSessionInfo = function (req, res, next) {
       .send("Error: Unable to retrieve Keycloak session information");
   }
 
-  console.log(`Keycloak Access Token Content... `);
-  console.log(req.kauth.grant.access_token.content);
-
   const { family_name, given_name, email } = data;
   const sessionInfo = {
     email,
@@ -118,7 +115,6 @@ const retrieveSessionInfo = function (req, res, next) {
 // TODO: move into separate package?
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
-  // console.log(req.headers);
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
   const cbEndpoint = req.params.cbEndpoint;
@@ -133,8 +129,6 @@ const proxyApi = function (req, res, next) {
     },
     params: req.query,
   };
-
-  console.log("proxyApi options: ", options);
 
   const path = req.path.replace("/api/", "");
   let url;
@@ -177,7 +171,6 @@ const proxyApi = function (req, res, next) {
       // depending on the type of file uploaded
       // create a new formdata object to pass on to the server
       const { form, config } = file ? handleFile(file) : handleFiles(files);
-      // console.log(JSON.stringify(form, null, 2));
       api
         .post(url, form, { ...options, ...config })
         .then(successHandler)
