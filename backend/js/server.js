@@ -17,9 +17,8 @@ const isProd = process.env.NODE_ENV === "production" ? true : false;
 const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
-const cbApi = process.env.CRITTERBASE_API;
 
-console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt, cbApi });
+console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt });
 // use Express memory store for session and Keycloak object
 // var memoryStore = new expressSession.MemoryStore();
 
@@ -125,22 +124,7 @@ const proxyApi = function (req, res, next) {
   };
 
   const path = req.path.replace("/api/", "");
-  let url;
-  if (isProd) {
-    // split out the domain and username of logged-in user
-    const { domain, keycloak_guid } = getProperties(
-      req.kauth.grant.access_token.content
-    );
-
-    url = `${apiHost}:${apiPort}/${path}`;
-
-    // add parameters and username to URL
-    // Handle this inside the api
-    // url = appendQueryToUrl(url, `${domain}=${keycloak_guid}`);
-  } else {
-    // connect to API without using Keycloak authentication
-    url = `${apiHost}:${apiPort}/${path}?${parameters}`;
-  }
+  const url = `${apiHost}:${apiPort}/${path}`;
 
   const errHandler = (err) => {
     const { response } = err;
