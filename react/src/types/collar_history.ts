@@ -97,10 +97,10 @@ export class CollarHistory implements BCTWBase<CollarHistory>, ICollarHistory {
 export const hasCollarCurrentlyAssigned = (history: CollarHistory[]): CollarHistory | undefined => {
   const currentlyAssigned = history?.filter((h) => {
     // a null valid_to is considered valid - as in it has no expiry
-    if (!h.data_life_end.isValid()) {
+    if (!h.attachment_end.isValid()) {
       return true;
     }
-    return dayjs().isBefore(h.data_life_end);
+    return dayjs().isBefore(h.attachment_end);
   });
   return currentlyAssigned.length ? currentlyAssigned[0] : undefined;
 };
