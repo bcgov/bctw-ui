@@ -74,12 +74,10 @@ const omitNull = <T>(obj: T): T => {
 const hasChangedProperties = <T>(original: Partial<T>, next: Partial<T>): boolean => {
   for (const k of Object.keys(next)) {
     if (typeof next[k] === 'object') {
-      if (/*original[k] && */!original[k] || hasChangedProperties(original[k], next[k])) {
+      if (/*original[k] && */ !original[k] || hasChangedProperties(original[k], next[k])) {
         return true;
       }
-    } else if (/*original[k] !== undefined && */next[k] !== original[k]) {
-      console.log(`Original vs Next ${JSON.stringify(original, null, 2)} ${JSON.stringify(next, null, 2)}`)
-      console.log(`hasChangedProperties evaluates true for ${k}: ${original[k]} !==  ${next[k]}`)
+    } else if (/*original[k] !== undefined && */ next[k] !== original[k]) {
       return true;
     }
   }

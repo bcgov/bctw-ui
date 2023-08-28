@@ -68,8 +68,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
     param
     //filter
   );
-  useEffect(() => {console.log('query called')}, [data])
-  useEffect(() => {console.log(updated)}, [updated])
 
   const noPagination = !requestDataByPage && !paginationFooter;
   const noData = isSuccess && !data?.length;
@@ -80,9 +78,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
    * this state is passed to the parent select handlers
    */
   const [values, setValues] = useState<T[]>([]);
-
-
-
 
   useDidMountEffect(() => {
     if (deleted) {
@@ -125,16 +120,12 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
        * otherwise, query doesn't guarantee order, which can result in duplicates
        * across different pages / limitoffset
        */
-      console.log(1)
       data.forEach((d, i) => {
         const found = values.find((v) => d[rowIdentifier] === v[rowIdentifier]);
         if (!found) {
-          console.log(2)
           newV.push(d);
         }
         if (updated && d[rowIdentifier] === updated && d !== values[i]) {
-          console.log(3)
-          console.log(d)
           //If updated identifier is set, insert new data into array
           values[i] = d;
           setValues(values);
@@ -220,8 +211,6 @@ export default function DataTable<T extends BCTWBase<T>>(props: DataTableProps<T
           }
         });
 
-        // console.log('Select All Filter');
-        // console.log(updatedIds.filter((a) => a === true).length);
         setSelectedIDs(updatedIds);
       } else {
         setSelectedIDs(new Array(data.length).fill(true));

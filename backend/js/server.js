@@ -143,7 +143,6 @@ const proxyApi = function (req, res, next) {
     url = `${apiHost}:${apiPort}/${path}?${parameters}`;
   }
 
-
   const errHandler = (err) => {
     const { response } = err;
     res.status(response.status ? response.status : 400).json({
@@ -351,7 +350,6 @@ if (isProd) {
     //Critterbase Post requests
     .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
     .post("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
-
 
     .post("/api/:endpoint", keycloak.protect(), proxyApi)
     // delete handlers
