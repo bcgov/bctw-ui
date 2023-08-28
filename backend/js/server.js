@@ -17,10 +17,8 @@ const isProd = process.env.NODE_ENV === "production" ? true : false;
 const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
-const cbApi = process.env.CRITTERBASE_API;
-const cbApiKey = process.env.CRITTERBASE_API_KEY;
 
-console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt, cbApi });
+console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt });
 // use Express memory store for session and Keycloak object
 // var memoryStore = new expressSession.MemoryStore();
 
@@ -100,6 +98,7 @@ const retrieveSessionInfo = function (req, res, next) {
       .status(500)
       .send("Error: Unable to retrieve Keycloak session information");
   }
+
   const { family_name, given_name, email } = data;
   const sessionInfo = {
     email,
@@ -114,34 +113,18 @@ const retrieveSessionInfo = function (req, res, next) {
 // TODO: move into separate package?
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
-  // console.log(req.headers);
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
-  const cbEndpoint = req.params.cbEndpoint;
-  const user = req.session.user;
-  const sessionId = req.sessionID;
 
   let options = {
-    headers: { "api-key": cbApiKey, ...user },
+    headers: {
+      Authorization: `Bearer ${req.kauth.grant.access_token.token}`,
+    },
     params: req.query,
   };
 
   const path = req.path.replace("/api/", "");
-  let url;
-  if (isProd) {
-    // split out the domain and username of logged-in user
-    const { domain, keycloak_guid } = getProperties(
-      req.kauth.grant.access_token.content
-    );
-
-    url = `${apiHost}:${apiPort}/${path}`;
-
-    // add parameters and username to URL
-    url = appendQueryToUrl(url, `${domain}=${keycloak_guid}`);
-  } else {
-    // connect to API without using Keycloak authentication
-    url = `${apiHost}:${apiPort}/${path}?${parameters}`;
-  }
+  const url = `${apiHost}:${apiPort}/${path}`;
 
   const errHandler = (err) => {
     const { response } = err;
@@ -166,7 +149,6 @@ const proxyApi = function (req, res, next) {
       // depending on the type of file uploaded
       // create a new formdata object to pass on to the server
       const { form, config } = file ? handleFile(file) : handleFiles(files);
-      // console.log(JSON.stringify(form, null, 2));
       api
         .post(url, form, { ...options, ...config })
         .then(successHandler)

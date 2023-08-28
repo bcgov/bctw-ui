@@ -77,7 +77,7 @@ const hasChangedProperties = <T>(original: Partial<T>, next: Partial<T>): boolea
       if (/*original[k] && */ !original[k] || hasChangedProperties(original[k], next[k])) {
         return true;
       }
-    } else if (/*original[k] !== undefined && */ next[k] !== original[k]) {
+    } else if (/*original[k] !== undefined && */next[k] !== original[k]) {
       return true;
     }
   }
