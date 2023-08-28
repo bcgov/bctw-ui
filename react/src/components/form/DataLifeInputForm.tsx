@@ -110,7 +110,7 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
         />
         {displayInRows ? <Box></Box> : <Box component={'span'} m={1} />}
         {/* data life end field */}
-        <DateTimeInput
+        {/*<DateTimeInput
           propName='data_life_end'
           label='Data Life End'
           defaultValue={dli.data_life_end}
@@ -118,7 +118,7 @@ export default function DataLifeInputForm(props: DataLifeInputProps): JSX.Elemen
           maxDate={maxDate}
           required={propsRequired?.includes('data_life_end')}
           {...DTPRops}
-        />
+      />*/}
         <Box component={'span'} m={1} />
         {/* attachment end field */}
         <DateTimeInput

@@ -149,8 +149,9 @@ const proxyApi = function (req, res, next) {
       // depending on the type of file uploaded
       // create a new formdata object to pass on to the server
       const { form, config } = file ? handleFile(file) : handleFiles(files);
+      config.headers = { ...config.headers, ...options.headers};
       api
-        .post(url, form, { ...options, ...config })
+        .post(url, form, { ...config })
         .then(successHandler)
         .catch(errHandler);
     } else {
@@ -315,19 +316,19 @@ if (isProd) {
       "/api/import-xlsx",
       upload.single("validated-file"),
       keycloak.protect(),
-      pageHandler
+      proxyApi
     )
     .post(
       "/api/import-csv",
       upload.single("csv"),
       keycloak.protect(),
-      pageHandler
+      proxyApi
     )
     .post(
       "/api/import-xml",
       upload.array("xml"),
       keycloak.protect(),
-      pageHandler
+      proxyApi
     )
     //Critterbase Post requests
     .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)

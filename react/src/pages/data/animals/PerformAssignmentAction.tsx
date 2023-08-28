@@ -153,7 +153,7 @@ export default function PerformAssignmentAction({
   const ConfirmRemoval = (
     <>
       {CS.collarRemovalText(current_attachment?.device_id, current_attachment?.device_make)}
-      <DataLifeInputForm dli={dli} enableEditEnd={true} enableEditStart={false} />
+      <DataLifeInputForm dli={dli} disableDLEnd={true} enableEditEnd={true} enableEditStart={false} />
     </>
   );
   return (
