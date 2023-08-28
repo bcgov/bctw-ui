@@ -40,13 +40,13 @@ export const critterbaseApi = (props: ApiProps): API => {
   const upsertCritter = async (critter: IUpsertPayload<Critter>): Promise<Critter> => {
     // critter.body.sex = 'test';
     const url = createUrl({ api: `${CbRouters.critters}/${critter.body.critter_id}${detailedFormat}` });
-    const { data } = await api.put(url, critter.body);
+    const { data } = await api.patch(url, critter.body);
     return data;
   };
 
   const bulkUpdate = async (bulkPayload: ICbBulkUpdatePayload) => {
     const url = createUrl({ api: `${CbRouters.bulk}` });
-    const { data } = await api.put(url, bulkPayload);
+    const { data } = await api.patch(url, bulkPayload);
     invalidate();
     return data;
   };

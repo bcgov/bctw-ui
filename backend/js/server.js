@@ -160,6 +160,8 @@ const proxyApi = function (req, res, next) {
     api.delete(url, options).then(successHandler).catch(url);
   } else if (req.method === "PUT") {
     api.put(url, req.body, options).then(successHandler).catch(url);
+  } else if (req.method === "PATCH") {
+    api.patch(url, req.body, options).then(successHandler).catch(url);
   }
   // handle get
   else {
@@ -301,6 +303,8 @@ if (isProd) {
     //Critterbase Get requests
     .put("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
     .put("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+    .patch("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+    .patch("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
     .get("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
     .get("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
 
