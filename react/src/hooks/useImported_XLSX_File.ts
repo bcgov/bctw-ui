@@ -5,6 +5,7 @@ import { useResponseDispatch } from 'contexts/ApiResponseContext';
 import { useTabs } from 'contexts/TabsContext';
 import { useEffect, useState } from 'react';
 import { useTelemetryApi } from './useTelemetryApi';
+import { Critter } from 'types/animal';
 const SIZE_LIMIT = 31457280;
 interface SanitizeAndFinalize {
   isValidated: boolean;
@@ -12,6 +13,7 @@ interface SanitizeAndFinalize {
   sanitizedFile: ParsedXLSXSheetResult[];
   isLoading: boolean;
   setFile: (fieldName: string, files: FileList) => void;
+  defaultCritterValue: (list: {critter_id: string, wlh_id: string}[], wlhId: string) => string;
 }
 
 export default function useImported_XLSX_File(): SanitizeAndFinalize {
@@ -22,8 +24,23 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
   const [isValidated, setValidation] = useState(false);
   const [sanitizedFile, setSanitizedFile] = useState<ParsedXLSXSheetResult[]>(null);
 
+  const defaultCritterValue = (possible_critter_values: {critter_id: string, wlh_id: string}[], wlhIdForThisRow: string): string => {
+    let defaultVal: string;
+    if(possible_critter_values.length == 0) {
+      defaultVal = 'New Critter';
+    }
+    else if (possible_critter_values.length == 1 && possible_critter_values[0].wlh_id === wlhIdForThisRow) {
+      defaultVal = possible_critter_values[0].critter_id;
+    }
+    else {
+      defaultVal = '';
+    }
+    return defaultVal;
+  }
+
   const successXLSX = (d: ParsedXLSXSheetResult[]) => {
     if (d.length) {
+      d.forEach(a => a.rows.forEach(r => r.row.selected_critter_id = defaultCritterValue(r.row.possible_critters, (r.row as Critter).wlh_id)));
       setSanitizedFile(d);
       showNotif({ severity: 'success', message: 'File uploaded and sanitized' });
       // setTabsValidation(validation => ({...validation}))
@@ -32,8 +49,8 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
     }
   };
 
-  const errorXLSX = (): void => {
-    showNotif({ severity: 'error', message: 'bulk upload failed' });
+  const errorXLSX = (error: AxiosError, variables: FormData, context: unknown): void => {
+    showNotif({ severity: 'error', message: `${JSON.stringify(error.response.data)}` });
   };
 
   const { mutateAsync, isLoading } = api.useUploadXLSX({
@@ -46,7 +63,8 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
       return await mutateAsync(form);
     } catch (err) {
       const e = err as AxiosError;
-      showNotif({ severity: 'error', message: e.message });
+      const responseData = e.response.data;
+      showNotif({ severity: 'error', message: responseData?.error ? responseData.error : JSON.stringify(responseData) });
       return null;
     }
   };
@@ -81,5 +99,5 @@ export default function useImported_XLSX_File(): SanitizeAndFinalize {
     setTabStatus(tab, null);
   };
 
-  return { isValidated, reset, sanitizedFile, setFile, isLoading };
+  return { isValidated, reset, sanitizedFile, setFile, isLoading, defaultCritterValue };
 }
