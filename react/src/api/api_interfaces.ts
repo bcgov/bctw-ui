@@ -63,6 +63,7 @@ type WarningInfo = {
 type CheckedWarningInfo = WarningInfo & { checked: boolean };
 
 type AnimalCollar = Critter | Collar;
+export type ParsedAnimalCollar = AnimalCollar & {possible_critters: Pick<Critter, 'critter_id' | 'wlh_id'>[], selected_critter_id?: string}
 
 type XLSXPayload = {
   user_id: number;
@@ -70,7 +71,7 @@ type XLSXPayload = {
 };
 
 type ParsedXLSXRowResult = {
-  row: AnimalCollar & {possible_critters: Partial<Critter>[], selected_critter_id?: string};
+  row: ParsedAnimalCollar;
   errors: ParsedXLSXCellError;
   warnings: WarningInfo[];
   success: boolean;
