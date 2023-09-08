@@ -160,7 +160,7 @@ export default function ExportDownloadModal({
         });
       } else {
         body[row.column] = {
-          body: row.value.map((o) => o.toString().toLowerCase().trim()),
+          body: row.value.map((o) => o.toString().trim()),
           negate: row.operator === 'Not Equals'
         };
       }
