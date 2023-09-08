@@ -135,7 +135,7 @@ export default function ExportPageV2(): JSX.Element {
     setCritterIDs(critters);
   };
 
-  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRadioChange = (event) => {
     // const newVal = (event.target as HTMLInputElement).value as ExportRangeType;
     const newVal = event.target.value as ExportRangeType;
     if (newVal === exportRangeType) {
@@ -170,12 +170,12 @@ export default function ExportPageV2(): JSX.Element {
           <RadioGroup row name='export-radio' value={exportRangeType}>
             <FormControlLabel
               value='lifetime'
-              control={<Radio onChange={handleRadioChange} />}
+              control={<Radio onClick={handleRadioChange} />}
               label={ExportStrings.allTelemetryButton}
             />
             <FormControlLabel
               value='last_telemetry'
-              control={<Radio onChange={handleRadioChange} />}
+              control={<Radio onClick={handleRadioChange} />}
               label={ExportStrings.mostRecentTelemetryButton}
             />
           </RadioGroup>
