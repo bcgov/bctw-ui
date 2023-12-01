@@ -55,7 +55,7 @@ var keycloak = new keycloakConnect(
   {
     store: session.store,
   },
-  keyCloakConfig
+  keyCloakConfig,
 );
 
 // TODO: move into separate package?
@@ -72,7 +72,7 @@ const appendQueryToUrl = (url, parameter) => {
 const getProperties = (ob) => {
   const domain = ob.idir_user_guid ? "idir" : "bceid";
   const isIdir = domain === "idir";
-  const keycloak_guid = isIdir ? ob.idir_user_guid : ob.bceid_business_guid;
+  const keycloak_guid = isIdir ? ob.idir_user_guid : ob.bceid_user_guid;
   const username = isIdir
     ? ob.idir_username.toLowerCase()
     : ob.bceid_username.toLowerCase();
@@ -149,7 +149,7 @@ const proxyApi = function (req, res, next) {
       // depending on the type of file uploaded
       // create a new formdata object to pass on to the server
       const { form, config } = file ? handleFile(file) : handleFiles(files);
-      config.headers = { ...config.headers, ...options.headers};
+      config.headers = { ...config.headers, ...options.headers };
       api
         .post(url, form, { ...config })
         .then(successHandler)
@@ -177,7 +177,7 @@ const proxyApi = function (req, res, next) {
       }).then(function (response) {
         res.set(
           "Content-Type",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         );
         res.send(Buffer.from(response.data));
       });
@@ -259,7 +259,7 @@ const denied = function (req, res) {
 };
 
 /* ## devServerRedirect
-  Redirect traffic to the React dev server 
+  Redirect traffic to the React dev server
 */
 const devServerRedirect = function (_, res) {
   res.redirect("localhost:1111");
@@ -316,20 +316,10 @@ if (isProd) {
       "/api/import-xlsx",
       upload.single("validated-file"),
       keycloak.protect(),
-      proxyApi
+      proxyApi,
     )
-    .post(
-      "/api/import-csv",
-      upload.single("csv"),
-      keycloak.protect(),
-      proxyApi
-    )
-    .post(
-      "/api/import-xml",
-      upload.array("xml"),
-      keycloak.protect(),
-      proxyApi
-    )
+    .post("/api/import-csv", upload.single("csv"), keycloak.protect(), proxyApi)
+    .post("/api/import-xml", upload.array("xml"), keycloak.protect(), proxyApi)
     //Critterbase Post requests
     .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
     .post("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
