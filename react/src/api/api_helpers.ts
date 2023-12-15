@@ -20,9 +20,6 @@ const getBaseUrl = (noApiPrefix?: boolean): string => {
   return url;
 };
 
-export const CritterbaseApiKey = process.env.REACT_APP_CRITTERBASE_API_KEY; //process.env.CRITTERBASE_API_KEY;
-export const CritterbaseUserID = process.env.REACT_APP_CRITTERBASE_USER_ID;
-//export const KeycloakUUID = process.env.REACT_APP_IDENTIFIER;
 /**
  * appends the @param query to @param url
  */
@@ -64,10 +61,6 @@ const createUrl = ({ api, query, page, noApiPrefix, search }: CreateUrlParams): 
   if (query && query.length) {
     url = _appendQueryToUrl(url, query);
   }
-  // if (!IS_PROD) {
-  //   // in dev, append domain and the username
-  //   url = _appendQueryToUrl(url, `${process.env.REACT_APP_DOMAIN}=${process.env.REACT_APP_IDENTIFIER}`);
-  // }
   if (page) {
     url = _appendQueryToUrl(url, `page=${page}`);
   }

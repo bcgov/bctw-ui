@@ -28,7 +28,7 @@ const upload = multer({ storage });
 let devKeycloakToken;
 
 // set up the session
-var session = {
+const session = {
   cookie: {
     maxAge: 24 * 60 * 60 * 1000, // 1,000 days
     secure: false,
@@ -41,24 +41,20 @@ var session = {
   user: undefined,
 };
 
-// create a Keycloak config object (deprecates use of keycloak.json)
-// see: https://www.keycloak.org/docs/latest/securing_apps/index.html#_nodejs_adapter
-var keyCloakConfig = {
-  authServerUrl: process.env.KEYCLOAK_SERVER_URL,
-  clientId: process.env.KEYCLOAK_CLIENT_ID,
-  secret: process.env.KEYCLOAK_CLIENT_SECRET,
-  resource: process.env.KEYCLOAK_CLIENT_ID,
-  publicClient: isPublic,
-  realm: process.env.KEYCLOAK_REALM,
-  //bearerOnly: true,
-};
-
 // instantiate Keycloak Node.js adapter, passing in configuration
-var keycloak = new keycloakConnect(
+const keycloak = new keycloakConnect(
   {
     store: session.store,
   },
-  keyCloakConfig,
+  {
+    // see: https://www.keycloak.org/docs/latest/securing_apps/index.html#_nodejs_adapter
+    authServerUrl: process.env.KEYCLOAK_SERVER_URL,
+    clientId: process.env.KEYCLOAK_CLIENT_ID,
+    secret: process.env.KEYCLOAK_CLIENT_SECRET,
+    resource: process.env.KEYCLOAK_CLIENT_ID,
+    publicClient: isPublic,
+    realm: process.env.KEYCLOAK_REALM,
+  },
 );
 
 // TODO: move into separate package?
@@ -80,16 +76,11 @@ const getProperties = (ob) => {
 // TODO: move into separate package?
 // endpoint that returns Keycloak session information
 const retrieveSessionInfo = function (req, res, next) {
-  //console.log(req.kauth.grant.access_token.content);
-  // if (!isProd) {
-  //   return res
-  //     .status(500)
-  //     .send("Keycloak session info available: not PROD environment");
-  // }
   // get contents of the current Keycloak access token
   const data = isProd
     ? req.kauth.grant.access_token.content
     : devKeycloakToken.content;
+
   if (!data) {
     return res
       .status(500)
@@ -106,7 +97,6 @@ const retrieveSessionInfo = function (req, res, next) {
   res.status(200).send(sessionInfo);
 };
 
-// TODO: move into separate package?
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
 const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
@@ -214,38 +204,7 @@ const handleFiles = function (files) {
   }
 };
 
-/** ## gardenGate
-  Check that the user is authenticated before continuing.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
-*/
-// const gardenGate = function (req, res, next) {
-//   //console.log(keycloak.getConfig());
-//   //console.log(req.kauth);
-//   return next();
-//   // if (keycloak.checkSso()) {
-//   //   console.log(req.kauth);
-//   //   return next();
-//   // } else {
-//   //   console.log("User NOT authenticated; denying access");
-//   //   return res
-//   //     .status(404)
-//   //     .send("<p>Error: You must be authenticated to use this application.</p>");
-//   // }
-// };
-
-/* ## notFound
-  Catch-all router for any request that does not have an endpoint defined.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
- */
-// const notFound = function (req, res) {
-//   return res
-//     .status(404)
-//     .send("<p>Express server.js says: : Sorry, but you must be lost.</p>");
-// };
-
-/** ## pageHandler
+/**
   Pass-through function for Express.
   @param req {object} Node/Express request object
   @param res {object} Node/Express response object
@@ -266,7 +225,6 @@ const devKeycloakHandler = function (req, res, next) {
   const keycloakAuth = req.kauth.grant;
   if (keycloakAuth) {
     devKeycloakToken = keycloakAuth.access_token;
-    console.log(devKeycloakToken);
   }
   return next();
 };
@@ -288,7 +246,9 @@ var app = express()
   .use(express.urlencoded({ limit: "50mb", extended: true }))
   .use(expressSession(session))
   .use(keycloak.middleware())
+
   .get("/dev-login", keycloak.protect(), devKeycloakHandler)
+
   .all("*", keycloakProtectProd(), pageHandler)
 
   .get("/api/get-template", proxyApi)
@@ -297,12 +257,6 @@ var app = express()
   //critterbase requests
   .all("/api/cb/:cbEndpoint", proxyApi)
   .all("/api/cb/:cbEndpoint/*", proxyApi)
-  // .patch("/api/cb/:cbEndpoint", proxyApi)
-  // .patch("/api/cb/:cbEndpoint/*", proxyApi)
-  // .get("/api/cb/:cbEndpoint", proxyApi)
-  // .get("/api/cb/:cbEndpoint/*", proxyApi)
-  // .post("/api/cb/:cbEndpoint", proxyApi)
-  // .post("/api/cb/:cbEndpoint/*", proxyApi)
 
   .get("/api/:endpoint", proxyApi)
   .get("/api/:endpoint/:endpointId", proxyApi)
@@ -319,7 +273,6 @@ if (isProd) {
   app
     .use(express["static"](path.join(__dirname, "../../react/build")))
     .get("*", (_req, res) => {
-      // pass all remaning requests (i.e. not defined in Express) to React
       res.sendFile(path.join(__dirname + "../../../react/build/index.html"));
     });
 } else {

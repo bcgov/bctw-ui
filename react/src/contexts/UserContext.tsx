@@ -27,7 +27,7 @@ const UserContextDispatch = createContext(null);
     * a) user table in the database @function getUser which includes the BCTW specific user role (ex. admin)
     * b) the proxy server endpoint that retrieves keycloak session info @function getSessionInfo
 
-  * if the user table's row is outdated, ie keycloak has newer info, update it 
+  * if the user table's row is outdated, ie keycloak has newer info, update it
  */
 export const UserStateContextProvider: React.FC = (props) => {
   const api = useTelemetryApi();
@@ -47,17 +47,6 @@ export const UserStateContextProvider: React.FC = (props) => {
     error: sessionError
   } = api.useUserSessionInfo();
 
-  /*//Temp fix with isDev()
-  const { data: critterLoginData, status: critterLoginStatus } = api.useCritterbaseSessionInfo(
-    isDev() ? `${userData?.id}` : sessionData?.username,
-    isDev() ? process.env.REACT_APP_IDENTIFIER : sessionData?.keycloak_guid,
-    { enabled: sessionStatus === 'success' && userStatus === 'success' && !userError }
-  );*/
-
-  /*useEffect(() => {
-    console.log(`Status of Critter login hook: ${JSON.stringify(critterLoginData)}, ${critterLoginStatus}`);
-  }, [critterLoginData, critterLoginStatus]);*/
-  // setup the mutation, used if the user row in the database is out of date
   const onSuccess = (v: User): void => {
     console.log('UserContext: new user object is', v);
   };
