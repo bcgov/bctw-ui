@@ -28,3 +28,6 @@ yarn-error.log*
 
 # used in class-transformer but copied at build-time
 public/Reflect.js
+
+# contains docker npm log files
+.npm

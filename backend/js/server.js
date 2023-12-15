@@ -17,25 +17,15 @@ const isProd = process.env.NODE_ENV === "production" ? true : false;
 const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
 const apiPort = process.env.BCTW_API_PORT;
+const appPort = process.env.BCTW_APP_PORT ? process.env.BCTW_APP_PORT : 1111;
 
 console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt });
-// use Express memory store for session and Keycloak object
-// var memoryStore = new expressSession.MemoryStore();
 
 // multer configuration for handling bulk imports
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// create a Keycloak config object (deprecates use of keycloak.json)
-// see: https://www.keycloak.org/docs/latest/securing_apps/index.html#_nodejs_adapter
-var keyCloakConfig = {
-  authServerUrl: process.env.KEYCLOAK_SERVER_URL,
-  clientId: process.env.KEYCLOAK_CLIENT_ID,
-  secret: process.env.KEYCLOAK_CLIENT_SECRET,
-  resource: process.env.KEYCLOAK_CLIENT_ID,
-  publicClient: isPublic,
-  realm: process.env.KEYCLOAK_REALM,
-};
+let devKeycloakToken;
 
 // set up the session
 var session = {
@@ -50,6 +40,19 @@ var session = {
   secret: sessionSalt,
   user: undefined,
 };
+
+// create a Keycloak config object (deprecates use of keycloak.json)
+// see: https://www.keycloak.org/docs/latest/securing_apps/index.html#_nodejs_adapter
+var keyCloakConfig = {
+  authServerUrl: process.env.KEYCLOAK_SERVER_URL,
+  clientId: process.env.KEYCLOAK_CLIENT_ID,
+  secret: process.env.KEYCLOAK_CLIENT_SECRET,
+  resource: process.env.KEYCLOAK_CLIENT_ID,
+  publicClient: isPublic,
+  realm: process.env.KEYCLOAK_REALM,
+  //bearerOnly: true,
+};
+
 // instantiate Keycloak Node.js adapter, passing in configuration
 var keycloak = new keycloakConnect(
   {
@@ -57,15 +60,6 @@ var keycloak = new keycloakConnect(
   },
   keyCloakConfig,
 );
-
-// TODO: move into separate package?
-// creates a well-formed URL with query string given a parameter
-const appendQueryToUrl = (url, parameter) => {
-  if (!parameter) return url;
-  return url.includes("?")
-    ? (url += `&${parameter}`)
-    : (url += `?${parameter}`);
-};
 
 // TODO: move into separate package?
 // split out the username and  domain ('username@idir' or 'username@bceid-business') from Keycloak preferred_username
@@ -86,13 +80,16 @@ const getProperties = (ob) => {
 // TODO: move into separate package?
 // endpoint that returns Keycloak session information
 const retrieveSessionInfo = function (req, res, next) {
-  if (!isProd) {
-    return res
-      .status(500)
-      .send("Keycloak session info available: not PROD environment");
-  }
+  //console.log(req.kauth.grant.access_token.content);
+  // if (!isProd) {
+  //   return res
+  //     .status(500)
+  //     .send("Keycloak session info available: not PROD environment");
+  // }
   // get contents of the current Keycloak access token
-  const data = req.kauth.grant.access_token.content;
+  const data = isProd
+    ? req.kauth.grant.access_token.content
+    : devKeycloakToken.content;
   if (!data) {
     return res
       .status(500)
@@ -106,7 +103,6 @@ const retrieveSessionInfo = function (req, res, next) {
     given_name,
     ...getProperties(data),
   };
-  // req.session.user = sessionInfo;
   res.status(200).send(sessionInfo);
 };
 
@@ -116,9 +112,13 @@ const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
 
+  const token = isProd
+    ? req.kauth.grant.access_token.token
+    : devKeycloakToken.token;
+
   let options = {
     headers: {
-      Authorization: `Bearer ${req.kauth.grant.access_token.token}`,
+      Authorization: `Bearer ${token}`,
     },
     params: req.query,
   };
@@ -127,6 +127,7 @@ const proxyApi = function (req, res, next) {
   const url = `${apiHost}:${apiPort}/${path}`;
 
   const errHandler = (err) => {
+    console.log(err);
     const { response } = err;
     res.status(response.status ? response.status : 400).json({
       error: response.data ? response.data : "unknown proxyApi error",
@@ -213,34 +214,38 @@ const handleFiles = function (files) {
   }
 };
 
-/* ## gardenGate
+/** ## gardenGate
   Check that the user is authenticated before continuing.
   @param req {object} Node/Express request object
   @param res {object} Node/Express response object
 */
-const gardenGate = function (req, res, next) {
-  if (keycloak.checkSso()) {
-    return next();
-  } else {
-    console.log("User NOT authenticated; denying access");
-    return res
-      .status(404)
-      .send("<p>Error: You must be authenticated to use this application.</p>");
-  }
-};
+// const gardenGate = function (req, res, next) {
+//   //console.log(keycloak.getConfig());
+//   //console.log(req.kauth);
+//   return next();
+//   // if (keycloak.checkSso()) {
+//   //   console.log(req.kauth);
+//   //   return next();
+//   // } else {
+//   //   console.log("User NOT authenticated; denying access");
+//   //   return res
+//   //     .status(404)
+//   //     .send("<p>Error: You must be authenticated to use this application.</p>");
+//   // }
+// };
 
 /* ## notFound
   Catch-all router for any request that does not have an endpoint defined.
   @param req {object} Node/Express request object
   @param res {object} Node/Express response object
  */
-const notFound = function (req, res) {
-  return res
-    .status(404)
-    .send("<p>Express server.js says: : Sorry, but you must be lost.</p>");
-};
+// const notFound = function (req, res) {
+//   return res
+//     .status(404)
+//     .send("<p>Express server.js says: : Sorry, but you must be lost.</p>");
+// };
 
-/* ## pageHandler
+/** ## pageHandler
   Pass-through function for Express.
   @param req {object} Node/Express request object
   @param res {object} Node/Express response object
@@ -250,96 +255,174 @@ const pageHandler = function (req, res, next) {
   return next();
 };
 
-/* ## denied
-  The route to the denied service page
-  TODO: Deprecate as all remaining traffic goes to React.
-*/
-const denied = function (req, res) {
-  res.render("denied", req);
-};
-
 /* ## devServerRedirect
   Redirect traffic to the React dev server
 */
 const devServerRedirect = function (_, res) {
-  res.redirect("localhost:1111");
+  res.redirect(`${apiHost}:${appPort}`);
 };
 
-// use enhanced logging in non-production environments
-const logger = isProd ? "combined" : "dev";
+const devKeycloakHandler = function (req, res, next) {
+  const keycloakAuth = req.kauth.grant;
+  if (keycloakAuth) {
+    devKeycloakToken = keycloakAuth.access_token;
+    console.log(devKeycloakToken);
+  }
+  return next();
+};
+
+const keycloakProtectProd = function () {
+  if (isProd) {
+    return keycloak.protect();
+  }
+  return pageHandler;
+};
+
 // Server configuration
 var app = express()
   .use(helmet())
-  .use(cors({ credentials: true }))
-  .use(morgan("dev"))
+  .use(cors())
+  .use(cors())
+  .use(morgan(isProd ? "combined" : "dev"))
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
   .use(expressSession(session))
   .use(keycloak.middleware())
-  .use(gardenGate) // Keycloak Gate
-  .get("/denied", denied);
+  .get("/dev-login", keycloak.protect(), devKeycloakHandler)
+  .all("*", keycloakProtectProd(), pageHandler)
+
+  .get("/api/get-template", proxyApi)
+  .get("/api/session-info", retrieveSessionInfo)
+
+  //critterbase requests
+  .all("/api/cb/:cbEndpoint", proxyApi)
+  .all("/api/cb/:cbEndpoint/*", proxyApi)
+  // .patch("/api/cb/:cbEndpoint", proxyApi)
+  // .patch("/api/cb/:cbEndpoint/*", proxyApi)
+  // .get("/api/cb/:cbEndpoint", proxyApi)
+  // .get("/api/cb/:cbEndpoint/*", proxyApi)
+  // .post("/api/cb/:cbEndpoint", proxyApi)
+  // .post("/api/cb/:cbEndpoint/*", proxyApi)
+
+  .get("/api/:endpoint", proxyApi)
+  .get("/api/:endpoint/:endpointId", proxyApi)
+  // bulk file import handlers
+  .post("/api/import-xlsx", upload.single("validated-file"), proxyApi)
+  .post("/api/import-csv", upload.single("csv"), proxyApi)
+  .post("/api/import-xml", upload.array("xml"), proxyApi)
+
+  .post("/api/:endpoint", proxyApi)
+  // delete handlers
+  .delete("/api/:endpoint/:endpointId", proxyApi);
+
+if (isProd) {
+  app
+    .use(express["static"](path.join(__dirname, "../../react/build")))
+    .get("*", (_req, res) => {
+      // pass all remaning requests (i.e. not defined in Express) to React
+      res.sendFile(path.join(__dirname + "../../../react/build/index.html"));
+    });
+} else {
+  app.get("*", (_req, res) => {
+    devServerRedirect(_req, res);
+  });
+}
+// React Redirects
+// handle static assets
+
+// .get("*", (_req, res) => {
+//   // pass all remaning requests (i.e. not defined in Express) to React
+//   isProd
+//     ? // direct production requests to react build directory
+//       res.sendFile(path.join(__dirname + "../../../react/build/index.html"))
+//     : // direct dev requests to development server (hot reloading)
+//       //res.sendFile(path.join(__dirname + "../../../react/build/index.html"));
+//       devServerRedirect(_req, res);
+// });
 
 // Use keycloak authentication only in Production
-if (isProd) {
-  app
-    .get("/api/session-info", retrieveSessionInfo)
-    .all("*", keycloak.protect(), pageHandler);
-} else {
-  app
-    .post("/api/import-xlsx", upload.single("validated-file"), pageHandler)
-    .post("/api/import-csv", upload.single("csv"), pageHandler)
-    .post("/api/import-xml", upload.array("xml"), pageHandler)
+// if (isProd) {
+//   app
+//     .get("/api/session-info", retrieveSessionInfo)
+//     .all("*", keycloak.protect(), pageHandler);
+// } else {
+//   app
+//     .post("/api/import-xlsx", upload.single("validated-file"), pageHandler)
+//     .post("/api/import-csv", upload.single("csv"), pageHandler)
+//     .post("/api/import-xml", upload.array("xml"), pageHandler)
+//
+//     //Critterbase Post requests
+//     .post("/api/cb/:cbEndpoint", proxyApi)
+//     .post("/api/cb/:cbEndpoint/*", proxyApi)
+//
+//     .post("/api/:endpoint", proxyApi);
+// }
+// if (isProd) {
+//   app
+//     .get("/", keycloak.protect(), pageHandler)
+//     .get("/api/get-template", keycloak.protect())
+//
+//     //Critterbase Get requests
+//     .put("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+//     .put("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+//     .patch("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+//     .patch("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+//     .get("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+//     .get("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+//
+//     .get("/api/:endpoint", keycloak.protect(), proxyApi)
+//     .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
+//     // bulk file import handlers
+//     .post(
+//       "/api/import-xlsx",
+//       upload.single("validated-file"),
+//       keycloak.protect(),
+//       proxyApi,
+//     )
+//     .post("/api/import-csv", upload.single("csv"), keycloak.protect(), proxyApi)
+//     .post("/api/import-xml", upload.array("xml"), keycloak.protect(), proxyApi)
+//     //Critterbase Post requests
+//     .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+//     .post("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+//
+//     .post("/api/:endpoint", keycloak.protect(), proxyApi)
+//     // delete handlers
+//     .delete("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi);
+// }
 
-    //Critterbase Post requests
-    .post("/api/cb/:cbEndpoint", proxyApi)
-    .post("/api/cb/:cbEndpoint/*", proxyApi)
-
-    .post("/api/:endpoint", proxyApi);
-}
-if (isProd) {
-  app
-    .get("/", keycloak.protect(), pageHandler)
-    .get("/api/get-template", keycloak.protect())
-
-    //Critterbase Get requests
-    .put("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
-    .put("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
-    .patch("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
-    .patch("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
-    .get("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
-    .get("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
-
-    .get("/api/:endpoint", keycloak.protect(), proxyApi)
-    .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
-    // bulk file import handlers
-    .post(
-      "/api/import-xlsx",
-      upload.single("validated-file"),
-      keycloak.protect(),
-      proxyApi,
-    )
-    .post("/api/import-csv", upload.single("csv"), keycloak.protect(), proxyApi)
-    .post("/api/import-xml", upload.array("xml"), keycloak.protect(), proxyApi)
-    //Critterbase Post requests
-    .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
-    .post("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
-
-    .post("/api/:endpoint", keycloak.protect(), proxyApi)
-    // delete handlers
-    .delete("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi);
-}
-
-// handle static assets
-app.use(express["static"](path.join(__dirname, "../../react/build")));
-
-// pass all remaning requests (i.e. not defined in Express) to React
-if (isProd) {
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname + "../../../react/build/index.html"));
-  });
-} else {
-  app.get("*", devServerRedirect);
-}
+// app
+//   .get("/api/session-info", retrieveSessionInfo)
+//   .all("*", keycloak.protect(), pageHandler)
+//   .get("/", keycloak.protect(), pageHandler)
+//   .get("/api/get-template", keycloak.protect())
+//
+//   //Critterbase Requests
+//   .put("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+//   .put("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+//   .patch("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+//   .patch("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+//   .get("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+//   .get("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+//   .post("/api/cb/:cbEndpoint", keycloak.protect(), proxyApi)
+//   .post("/api/cb/:cbEndpoint/*", keycloak.protect(), proxyApi)
+//
+//   .get("/api/:endpoint", keycloak.protect(), proxyApi)
+//   .get("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi)
+//   // bulk file import handlers
+//   .post(
+//     "/api/import-xlsx",
+//     upload.single("validated-file"),
+//     keycloak.protect(),
+//     proxyApi,
+//   )
+//   .post("/api/import-csv", upload.single("csv"), keycloak.protect(), proxyApi)
+//   .post("/api/import-xml", upload.array("xml"), keycloak.protect(), proxyApi)
+//
+//   .post("/api/:endpoint", keycloak.protect(), proxyApi)
+//   // delete handlers
+//   .delete("/api/:endpoint/:endpointId", keycloak.protect(), proxyApi);
 
 // start Express server on port 8080
-http.createServer(app).listen(8080);
+http
+  .createServer(app)
+  .listen(process.env.PROXY_PORT ? process.env.PROXY_PORT : 8080);

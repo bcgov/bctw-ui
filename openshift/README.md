@@ -1,6 +1,8 @@
 British Columbia Telemetry Warehouse - BCTW-UI
 ======================
 
+# !! DEPRRECATED 12/12/23 !!
+
 ## Running in OpenShift
 
 This project uses the scripts found in [openshift-project-tools](https://github.com/BCDevOps/openshift-project-tools) to setup and maintain OpenShift environments (both local and hosted).  Refer to the [OpenShift Scripts](https://github.com/BCDevOps/openshift-project-tools/blob/master/bin/README.md) documentation for details.
@@ -19,7 +21,7 @@ Prior to importing OpenShift object manifests, ensure that you have completed th
 
 1. Verify the "licence plate" in openshift/settings.sh matches the actual project namespace set you have
 2. Run `initOSProjects.sh` to update the permissions on the projects.  This will allow projects other than "tools" for your project namespace set to access the images located in "tools"
-3. Import any required images.  
+3. Import any required images.
 
 ## Running in a Local OpenShift Cluster
 
@@ -46,7 +48,7 @@ genParams.sh -l
 
 ### Preparing for local deployment
 
-1. Install the oc cli.  
+1. Install the oc cli.
 2. Start an OpenShift cluster.  If you are using Docker you can use the `oc-cluster-up.sh` scripts from [openshift-project-tools](https://github.com/BCDevOps/openshift-project-tools).
 3. Run `generateLocalProjects.sh` to create the projects in your local cluster.
 4. Run `initOSProjects.sh` to update the deployment permissions on the projects.

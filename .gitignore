@@ -2,6 +2,7 @@
 **/node_modules
 .vscode/settings.json
 todo.md
+.npm
 
 # npm root package-lock
 package-lock.json

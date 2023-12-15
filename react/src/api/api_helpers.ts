@@ -4,7 +4,7 @@ import { isDayjs } from 'dayjs';
 import { omitNull } from 'utils/common_helpers';
 import { formatTime } from 'utils/time';
 import { CreateUrlParams } from './api_interfaces';
-const IS_PROD = +window.location.port === 1111 ? false : true;
+const IS_PROD = process.env.NODE_ENV === 'production';
 //Disabled while fixing alerts bugs...
 export const ENABLE_ALERTS = true;
 
@@ -14,16 +14,15 @@ export const ENABLE_ALERTS = true;
 const getBaseUrl = (noApiPrefix?: boolean): string => {
   const h1 = window.location.protocol;
   const h2 = window.location.hostname;
-  const h3 = IS_PROD ? window.location.port : 3000;
-  let h4 = '';
-  if (!noApiPrefix) h4 = IS_PROD ? '/api' : '';
+  const h3 = IS_PROD ? window.location.port : 8080;
+  const h4 = noApiPrefix ? '' : '/api';
   const url = `${h1}//${h2}:${h3}${h4}`;
   return url;
 };
 
 export const CritterbaseApiKey = process.env.REACT_APP_CRITTERBASE_API_KEY; //process.env.CRITTERBASE_API_KEY;
 export const CritterbaseUserID = process.env.REACT_APP_CRITTERBASE_USER_ID;
-export const KeycloakUUID = process.env.REACT_APP_IDENTIFIER;
+//export const KeycloakUUID = process.env.REACT_APP_IDENTIFIER;
 /**
  * appends the @param query to @param url
  */
@@ -50,7 +49,7 @@ const _appendSearchQueryToString = (url: string, search: ITableFilter[]): string
       return `&keys=${keys}${termStr}`;
     })
     .join('');
-  return url.includes('?') ? url += joined_terms : url += joined_terms.replace('&', '?'); //This will only replace the first occurence
+  return url.includes('?') ? (url += joined_terms) : (url += joined_terms.replace('&', '?')); //This will only replace the first occurence
 };
 
 /**
@@ -65,10 +64,10 @@ const createUrl = ({ api, query, page, noApiPrefix, search }: CreateUrlParams): 
   if (query && query.length) {
     url = _appendQueryToUrl(url, query);
   }
-  if (!IS_PROD) {
-    // in dev, append domain and the username
-    url = _appendQueryToUrl(url, `${process.env.REACT_APP_DOMAIN}=${process.env.REACT_APP_IDENTIFIER}`);
-  }
+  // if (!IS_PROD) {
+  //   // in dev, append domain and the username
+  //   url = _appendQueryToUrl(url, `${process.env.REACT_APP_DOMAIN}=${process.env.REACT_APP_IDENTIFIER}`);
+  // }
   if (page) {
     url = _appendQueryToUrl(url, `page=${page}`);
   }
