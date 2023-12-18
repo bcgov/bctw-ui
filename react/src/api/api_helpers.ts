@@ -16,7 +16,7 @@ const getBaseUrl = (noApiPrefix?: boolean): string => {
   const h2 = window.location.hostname;
   const h3 = IS_PROD ? window.location.port : 8080;
   const h4 = noApiPrefix ? '' : '/api';
-  const url = `${h1}//${h2}:${h3}${h4}`;
+  const url = IS_PROD ? `${h1}//${h2}:${h3}${h4}` : ``;
   return url;
 };
 

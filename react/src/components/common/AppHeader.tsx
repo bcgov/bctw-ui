@@ -96,23 +96,6 @@ const AppHeader = ({ children }: AppheaderProps): JSX.Element => {
         </nav>
         <nav className='profile-nav'>
           <ul className={'header-ul'}>
-            {/* Previous Alert Code */}
-            {/* {alertCount > 0 && ENABLE_ALERTS ? (
-              <li>
-                <div className={'alerts'}>
-                  <IconButton onClick={(): void => setShowAlerts((o) => !o)} disabled={!alertCount} size='large'>
-                    <Icon
-                      path={mdiBell}
-                      color={alertCount ? 'red' : 'white'}
-                      className={'icon'}
-                      title='User Alerts'
-                      size={1}
-                    />
-                    {alertCount}
-                  </IconButton>
-                </div>
-              </li>
-            ) : null} */}
             {/* New Alert Code */}
             <AlertMenu alerts={telemetryAlerts} />
             <li className={'username'}>

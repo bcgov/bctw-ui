@@ -81,6 +81,7 @@
     "lint": "node_modules/eslint/bin/eslint.js src/ --max-warnings=5",
     "dead:code": "ts-prune | (! grep -v 'used in module')"
   },
+  "proxy": "http://proxy:8080/api/",
   "eslintConfig": {
     "extends": [
       "react-app",

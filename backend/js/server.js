@@ -53,7 +53,9 @@ const keycloak = new keycloakConnect(
     secret: process.env.KEYCLOAK_CLIENT_SECRET,
     resource: process.env.KEYCLOAK_CLIENT_ID,
     publicClient: isPublic,
+    reverseRewriteHostInResponseHeaders: false,
     realm: process.env.KEYCLOAK_REALM,
+    proxy: "passthrough",
   },
 );
 
@@ -77,9 +79,7 @@ const getProperties = (ob) => {
 // endpoint that returns Keycloak session information
 const retrieveSessionInfo = function (req, res, next) {
   // get contents of the current Keycloak access token
-  const data = isProd
-    ? req.kauth.grant.access_token.content
-    : devKeycloakToken.content;
+  const data = req.kauth.grant.access_token.content;
 
   if (!data) {
     return res
@@ -102,9 +102,7 @@ const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
 
-  const token = isProd
-    ? req.kauth.grant.access_token.token
-    : devKeycloakToken.token;
+  const token = req.kauth.grant.access_token.token;
 
   let options = {
     headers: {
@@ -117,7 +115,6 @@ const proxyApi = function (req, res, next) {
   const url = `${apiHost}:${apiPort}/${path}`;
 
   const errHandler = (err) => {
-    console.log(err);
     const { response } = err;
     res.status(response.status ? response.status : 400).json({
       error: response.data ? response.data : "unknown proxyApi error",
@@ -221,35 +218,19 @@ const devServerRedirect = function (_, res) {
   res.redirect(`${apiHost}:${appPort}`);
 };
 
-const devKeycloakHandler = function (req, res, next) {
-  const keycloakAuth = req.kauth.grant;
-  if (keycloakAuth) {
-    devKeycloakToken = keycloakAuth.access_token;
-  }
-  return next();
-};
-
-const keycloakProtectProd = function () {
-  if (isProd) {
-    return keycloak.protect();
-  }
-  return pageHandler;
-};
-
 // Server configuration
 var app = express()
   .use(helmet())
   .use(cors())
-  .use(cors())
+  .use(cors({ credentials: true }))
+  .options("*", cors())
   .use(morgan(isProd ? "combined" : "dev"))
   .use(express.json({ limit: "50mb" }))
   .use(express.urlencoded({ limit: "50mb", extended: true }))
   .use(expressSession(session))
   .use(keycloak.middleware())
 
-  .get("/dev-login", keycloak.protect(), devKeycloakHandler)
-
-  .all("*", keycloakProtectProd(), pageHandler)
+  .all("*", keycloak.protect(), pageHandler)
 
   .get("/api/get-template", proxyApi)
   .get("/api/session-info", retrieveSessionInfo)
@@ -275,12 +256,16 @@ if (isProd) {
     .get("*", (_req, res) => {
       res.sendFile(path.join(__dirname + "../../../react/build/index.html"));
     });
-} else {
-  app.get("*", (_req, res) => {
-    devServerRedirect(_req, res);
-  });
 }
-// React Redirects
+
+// if (isProd) {
+//   app;
+// } else {
+//   app.get("*", (_req, res) => {
+//     devServerRedirect(_req, res);
+//   });
+// }
+// // React Redirects
 // handle static assets
 
 // .get("*", (_req, res) => {

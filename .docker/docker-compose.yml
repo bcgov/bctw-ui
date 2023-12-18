@@ -33,8 +33,17 @@ services:
       - /opt/app-root/src/build # ignore build
       - /dev/null:/opt/app-root/src/.env # ignore .env, instead inject env into container
     command: sh -c "npm rebuild node-sass && npm run start:dev"
+    # depends_on:
+    #   - traefik
     networks:
       - bctw-network
+    # labels:
+    #   - "traefik.http.routers.app.rule=Host(`app.localhost`)"
+    #   - "traefik.http.middlewares.originHeader.headers.customrequestheaders.origin=http://proxy.localhost"
+    #   - "traefik.http.middlewares.originHeader.headers.customrequestheaders.referer=http://proxy.localhost"
+    #   - "traefik.http.routers.app.middlewares=originHeader@docker"
+    #
+
 
   api:
     image: ${DOCKER_PROJECT_NAME}-api-img
@@ -60,8 +69,12 @@ services:
       - /opt/app-root/src/build # ignore build
       - /dev/null:/opt/app-root/src/.env # ignore .env, instead inject env into container
     command: sh -c "npm run start:dev"
+    # depends_on:
+    #   - traefik
     networks:
       - bctw-network
+    # labels:
+    #   - "traefik.http.routers.api.rule=Host(`api.localhost`)"
 
   proxy:
     image: ${DOCKER_PROJECT_NAME}-proxy-img
@@ -82,14 +95,30 @@ services:
       - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
       - KEYCLOAK_SERVER_URL=${KEYCLOAK_SERVER_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-
     volumes:
       - ../backend:/opt/app-root/src
       - /opt/app-root/src/build # ignore build
       - /dev/null:/opt/app-root/src/.env # ignore .env, instead inject env into container
     command: sh -c "npm run dev"
+    # depends_on:
+    #   - traefik
     networks:
       - bctw-network
+    # labels:
+    #   - "traefik.http.routers.proxy.rule=Host(`proxy.localhost`)"
+      # - "traefik.http.middlewares.originHeader.headers.origin=http://proxy.localhost"
+      # - "traefik.http.routers.app.middlewares=originHeader@docker"
+
+  # traefik:
+  #   image: traefik:v2.10
+  #   command:
+  #     - --api.insecure=true
+  #     - --providers.docker
+  #   ports:
+  #     - "80:80"
+  #     - "8080:8080"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
 
   # TODO: create local db container for development
   #postgres
