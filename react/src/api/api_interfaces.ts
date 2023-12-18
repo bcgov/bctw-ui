@@ -63,7 +63,10 @@ type WarningInfo = {
 type CheckedWarningInfo = WarningInfo & { checked: boolean };
 
 type AnimalCollar = Critter | Collar;
-export type ParsedAnimalCollar = AnimalCollar & {possible_critters: Pick<Critter, 'critter_id' | 'wlh_id'>[], selected_critter_id?: string}
+export type ParsedAnimalCollar = AnimalCollar & {
+  possible_critters: Pick<Critter, 'critter_id' | 'wlh_id'>[];
+  selected_critter_id?: string;
+};
 
 type XLSXPayload = {
   user_id: number;
@@ -97,7 +100,6 @@ interface CreateUrlParams {
   api: string;
   query?: string;
   page?: number;
-  noApiPrefix?: boolean;
   search?: ITableFilter[];
 }
 

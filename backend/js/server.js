@@ -4,6 +4,7 @@ const cors = require("cors");
 const express = require("express");
 const expressSession = require("express-session");
 const helmet = require("helmet");
+const { createProxyMiddleware } = require("http-proxy-middleware");
 const formData = require("form-data");
 const http = require("http");
 const keycloakConnect = require("keycloak-connect");
@@ -24,8 +25,6 @@ console.table({ isProd, isPublic, apiHost, apiPort, sessionSalt });
 // multer configuration for handling bulk imports
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-
-let devKeycloakToken;
 
 // set up the session
 const session = {
@@ -55,7 +54,6 @@ const keycloak = new keycloakConnect(
     publicClient: isPublic,
     reverseRewriteHostInResponseHeaders: false,
     realm: process.env.KEYCLOAK_REALM,
-    proxy: "passthrough",
   },
 );
 
@@ -128,7 +126,8 @@ const proxyApi = function (req, res, next) {
         "user-id": response.data.critterbase_user_id,
       };
     }
-    return res.json(response.data);
+    console.log(response.status);
+    return res.status(response.status).json(response.data);
   };
 
   if (req.method === "POST") {
@@ -211,13 +210,6 @@ const pageHandler = function (req, res, next) {
   return next();
 };
 
-/* ## devServerRedirect
-  Redirect traffic to the React dev server
-*/
-const devServerRedirect = function (_, res) {
-  res.redirect(`${apiHost}:${appPort}`);
-};
-
 // Server configuration
 var app = express()
   .use(helmet())
@@ -256,6 +248,13 @@ if (isProd) {
     .get("*", (_req, res) => {
       res.sendFile(path.join(__dirname + "../../../react/build/index.html"));
     });
+} else {
+  app.use(
+    "/",
+    createProxyMiddleware({
+      target: `http://app:${appPort}`,
+    }),
+  );
 }
 
 // if (isProd) {

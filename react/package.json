@@ -74,14 +74,13 @@
     "@types/react": "^17.0.30"
   },
   "scripts": {
-    "start:dev": "PORT=1111 FAST_REFRESH=false react-scripts start ",
+    "start:dev": "FAST_REFRESH=false react-scripts start ",
     "build": "cp node_modules/reflect-metadata/Reflect.js public && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "node_modules/eslint/bin/eslint.js src/ --max-warnings=5",
     "dead:code": "ts-prune | (! grep -v 'used in module')"
   },
-  "proxy": "http://proxy:8080/api/",
   "eslintConfig": {
     "extends": [
       "react-app",

@@ -8,15 +8,11 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 //Disabled while fixing alerts bugs...
 export const ENABLE_ALERTS = true;
 
-/**
- * @param noApiPrefix if true, exclude '/api' beginning of the base url
- */
-const getBaseUrl = (noApiPrefix?: boolean): string => {
+const getBaseUrl = (): string => {
   const h1 = window.location.protocol;
   const h2 = window.location.hostname;
-  const h3 = IS_PROD ? window.location.port : 8080;
-  const h4 = noApiPrefix ? '' : '/api';
-  const url = IS_PROD ? `${h1}//${h2}:${h3}${h4}` : ``;
+  const h3 = window.location.port;
+  const url = `${h1}//${h2}:${h3}/api`;
   return url;
 };
 
@@ -54,8 +50,8 @@ const _appendSearchQueryToString = (url: string, search: ITableFilter[]): string
  * if in development mode, uses environment variables from .env.local
  * @returns a query string constructed from params
  */
-const createUrl = ({ api, query, page, noApiPrefix, search }: CreateUrlParams): string => {
-  const baseUrl = getBaseUrl(noApiPrefix);
+const createUrl = ({ api, query, page, search }: CreateUrlParams): string => {
+  const baseUrl = getBaseUrl();
   // console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
