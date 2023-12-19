@@ -11,9 +11,14 @@ WORKDIR $HOME
 # A wildcard is used to ensure both package.json AND package-lock.json are copied where available (npm@5+)
 COPY package*.json ./
 
+# install dependencies
+RUN npm install
+
 ENV PATH ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+
+# copy the rest of the files
+COPY . ./
 
 VOLUME ${HOME}
 
-# start command passed in with docker.compose
-
+CMD ["npm", "run", "reload"]

@@ -2,27 +2,13 @@ version: "3.5"
 name: ${DOCKER_PROJECT_NAME}
 
 services:
-  # app:
-  #   image: ${DOCKER_PROJECT_NAME}-app-img
-  #   container_name: ${DOCKER_PROJECT_NAME}-app-container
-  #   build:
-  #     context: ../react
-  #     dockerfile: ../.docker/Dockerfile
-  #   stdin_open: true
-  #   ports:
-  #     - ${APP_PORT}:${APP_PORT}
-  #   environment:
-  #     - NODE_ENV=${NODE_ENV}
-  #   #volumes:
-  #     #- ../react:/opt/app-root/src
-  #     #- /opt/app-root/src/node_modules # prevents local node_modules overriding container node_modules
-  #   networks:
-  #     - bctw-network
 
   app: # proxy relies on this value
     image: ${DOCKER_PROJECT_NAME}-app-img
     container_name: ${DOCKER_PROJECT_NAME}-app-container
-    build: .
+    build:
+      context: ./react
+      dockerfile: ./.docker/app/Dockerfile
     stdin_open: true
     ports:
       - ${APP_PORT}:${APP_PORT}
@@ -31,16 +17,17 @@ services:
       - PORT=${APP_PORT} # only needed for development
     volumes:
       - ../react:/opt/app-root/src
-      - /opt/app-root/src/build # ignore build
+      - /opt/app-root/src/node_modules
       - /dev/null:/opt/app-root/src/.env # ignore .env, instead inject env into container
-    command: sh -c "npm rebuild node-sass && npm run start:dev"
     networks:
       - bctw-network
 
   api:
     image: ${DOCKER_PROJECT_NAME}-api-img
     container_name: ${DOCKER_PROJECT_NAME}-api-container
-    build: .
+    build:
+      context: ../../bctw-api/bctw-api
+      dockerfile: ./.docker/api/Dockerfile
     stdin_open: true
     ports:
       - ${API_PORT}:${API_PORT}
@@ -58,39 +45,38 @@ services:
       - CRITTERBASE_API=${CRITTERBASE_API}
     volumes:
       - ../../bctw-api/bctw-api:/opt/app-root/src
-      - /opt/app-root/src/build # ignore build
       - /dev/null:/opt/app-root/src/.env # ignore .env, instead inject env into container
-    command: sh -c "npm run start:dev"
     networks:
       - bctw-network
 
   proxy:
-    image: ${DOCKER_PROJECT_NAME}-proxy-img
-    container_name: ${DOCKER_PROJECT_NAME}-proxy-container
-    build: .
-    stdin_open: true
-    ports:
-      - ${PROXY_PORT}:${PROXY_PORT}
-    environment:
-      - NODE_ENV=${NODE_ENV}
-      - HOST=http://${BCTW_HOST}:${PROXY_PORT}
-      - PROXY_PORT=${PROXY_PORT}
-      - BCTW_SESSION_SALT=${BCTW_SESSION_SALT}
-      - BCTW_API_HOST=${BCTW_HOST}
-      - BCTW_API_PORT=${API_PORT}
-      - BCTW_APP_PORT=${APP_PORT}
-      - KEYCLOAK_CLIENT_TYPE=${KEYCLOAK_CLIENT_TYPE}
-      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
-      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
-      - KEYCLOAK_SERVER_URL=${KEYCLOAK_SERVER_URL}
-      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-    volumes:
-      - ../backend:/opt/app-root/src
-      - /opt/app-root/src/build # ignore build
-      - /dev/null:/opt/app-root/src/.env # ignore .env, instead inject env into container
-    command: sh -c "npm run dev"
-    networks:
-      - bctw-network
+   image: ${DOCKER_PROJECT_NAME}-proxy-img
+   container_name: ${DOCKER_PROJECT_NAME}-proxy-container
+   build:
+    context: ./backend
+    dockerfile: ./.docker/proxy/Dockerfile
+   stdin_open: true
+   ports:
+     - ${PROXY_PORT}:${PROXY_PORT}
+   environment:
+     - NODE_ENV=${NODE_ENV}
+     - HOST=http://${BCTW_HOST}:${PROXY_PORT}
+     - PROXY_PORT=${PROXY_PORT}
+     - BCTW_SESSION_SALT=${BCTW_SESSION_SALT}
+     - BCTW_API_HOST=${BCTW_HOST}
+     - BCTW_API_PORT=${API_PORT}
+     - BCTW_APP_PORT=${APP_PORT}
+     - KEYCLOAK_CLIENT_TYPE=${KEYCLOAK_CLIENT_TYPE}
+     - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+     - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+     - KEYCLOAK_SERVER_URL=${KEYCLOAK_SERVER_URL}
+     - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+   volumes:
+     - ../backend:/opt/app-root/src
+     - /dev/null:/opt/app-root/src/.env # ignore .env, instead inject env into container
+   command: sh -c "npm run dev"
+   networks:
+     - bctw-network
 
   # TODO: create local db container for development
   #postgres
