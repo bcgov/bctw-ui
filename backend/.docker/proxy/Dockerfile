@@ -21,4 +21,4 @@ COPY . ./
 
 VOLUME ${HOME}
 
-CMD ["npm", "run", "reload"]
+CMD ["npm", "run", "dev"]

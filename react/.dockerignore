@@ -1,7 +1,4 @@
 *
 
-**/.config
-**/.npm
-
 !package.json
 !package-lock.json

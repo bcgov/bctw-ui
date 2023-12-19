@@ -3,6 +3,7 @@
 .vscode/settings.json
 todo.md
 .npm
+.config
 
 # npm root package-lock
 package-lock.json

@@ -20,8 +20,6 @@
     "@turf/helpers": "^6.5.0",
     "@turf/length": "^6.3.0",
     "@turf/points-within-polygon": "^6.3.0",
-    "@types/jsonwebtoken": "^8.5.8",
-    "@types/leaflet-markercluster": "^1.0.3",
     "axios": "^0.21.1",
     "class-transformer": "^0.3.1",
     "date-fns": "^2.24.0",
@@ -64,6 +62,8 @@
     "@types/shpjs": "^3.4.1",
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/leaflet-markercluster": "^1.0.3",
     "eslint": "^7.16.0",
     "prettier": "^2.2.1",
     "shpjs": "^4.0.4",
@@ -74,7 +74,7 @@
     "@types/react": "^17.0.30"
   },
   "scripts": {
-    "start:dev": "FAST_REFRESH=false react-scripts start ",
+    "start:dev": "react-scripts start ",
     "build": "cp node_modules/reflect-metadata/Reflect.js public && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
