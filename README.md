@@ -1,6 +1,6 @@
 ![Lifecycle: Maturing](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)
 
-# BC Telemetry Warehouse: Application - Updated: 19/12/23
+# BC Telemetry Warehouse Application - Updated: 19/12/23
 
 ## Note:
 
@@ -10,7 +10,7 @@ The bctw application installation now expects BOTH the bctw-api and bctw-ui dire
 
 ---
 
-# Developer Quick Start: localhost:8080
+# Developer Quick Start: [localhost:8080](localhost:8080)
 
 ## See Makefile for available `make` commands
 
