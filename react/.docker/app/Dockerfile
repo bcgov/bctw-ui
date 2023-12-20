@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:12 AS base
 
 ENV HOME=/opt/app-root/src
 
@@ -11,10 +11,14 @@ WORKDIR $HOME
 # A wildcard is used to ensure both package.json AND package-lock.json are copied where available (npm@5+)
 COPY package*.json ./
 
+FROM base as dependencies
+
 # install dependencies
 RUN npm install
 
 ENV PATH ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+
+FROM dependencies as copy
 
 # copy the rest of the files
 COPY . ./

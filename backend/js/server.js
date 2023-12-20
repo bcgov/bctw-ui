@@ -126,8 +126,9 @@ const proxyApi = function (req, res, next) {
         "user-id": response.data.critterbase_user_id,
       };
     }
-    console.log(response.status);
-    return res.status(response.status).json(response.data);
+    return res
+      .status(response.status ? response.status : 418)
+      .json(response.data);
   };
 
   if (req.method === "POST") {
@@ -141,6 +142,7 @@ const proxyApi = function (req, res, next) {
         .post(url, form, { ...config })
         .then(successHandler)
         .catch(errHandler);
+      asdfa;
     } else {
       api.post(url, req.body, options).then(successHandler).catch(errHandler);
     }
@@ -253,6 +255,7 @@ if (isProd) {
     "/",
     createProxyMiddleware({
       target: `http://app:${appPort}`,
+      ws: true,
     }),
   );
 }

@@ -74,6 +74,7 @@ services:
      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
    volumes:
       - ./backend:/opt/app-root/src
+      #- ./react:/opt/app-root/src/react # make proxy aware of changes to react code
       - /opt/app-root/src/node_modules # prevent overwrite of node_modules
       - /dev/null:/opt/app-root/src/.env # ignore .env, instead inject env into container
    networks:

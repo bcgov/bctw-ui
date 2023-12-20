@@ -1,4 +1,4 @@
-import { Grid, Stack, Theme, Typography } from '@mui/material';
+import { Box, Stack, Theme, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import GovLinkBox from 'components/common/GovLinkBox';
 import { useTelemetryApi } from 'hooks/useTelemetryApi';
@@ -18,18 +18,19 @@ const Home = (): JSX.Element => {
   const api = useTelemetryApi();
   const { data } = api.useCodeDesc('HOME_HDR');
   const { welcome, support, resources } = HomePageStrings;
+
   return (
     <div className='container'>
       <Typography variant='h2' style={{ fontWeight: 'bold' }}>
-        BC Telemetry Warehouse
+        BC Telemetry Warehousesss
       </Typography>
       <Typography paragraph className={styles.callout} children={data ?? welcome} />
 
       <Stack direction='column' justifyContent='flex-start' alignItems='flex-end' spacing={2}>
-        <Grid item xl={2} lg={3} xs={12} md={4}>
+        <Box sx={{ maxWidth: 400 }}>
           <GovLinkBox title={resources.title} data={resources.data} />
           <GovLinkBox title={support.title} data={support.data} />
-        </Grid>
+        </Box>
       </Stack>
     </div>
   );

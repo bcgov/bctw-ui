@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node js/server.js",
     "dev": "node node_modules/nodemon/bin/nodemon.js node js/server.js",
-    "reload": "nodemon -r dotenv/config js/server.js"
+    "reload": "nodemon --ext '*' --watch react --watch js -r dotenv/config js/server.js"
   },
   "author": "",
   "license": "ISC",
