@@ -13,7 +13,7 @@ const multer = require("multer");
 const path = require("path");
 const MemoryStore = require("memorystore")(expressSession);
 const sessionSalt = process.env.BCTW_SESSION_SALT;
-const api = axios.create({ withCredentials: true });
+//const api = axios.create({ withCredentials: true });
 const isProd = process.env.NODE_ENV === "production" ? true : false;
 const isPublic = process.env.KEYCLOAK_CLIENT_TYPE === "public" ? true : false;
 const apiHost = `http://${process.env.BCTW_API_HOST}`;
@@ -37,7 +37,6 @@ const session = {
   resave: false,
   saveUninitialized: true,
   secret: sessionSalt,
-  user: undefined,
 };
 
 // instantiate Keycloak Node.js adapter, passing in configuration
@@ -95,91 +94,6 @@ const retrieveSessionInfo = function (req, res, next) {
   res.status(200).send(sessionInfo);
 };
 
-// Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
-// This was created before the addition of createProxyMiddleware package
-// TODO: instead use createProxyMiddlware to proxy the bctw/critterbase reqs
-const proxyApi = function (req, res, next) {
-  // URL of the endpoint being targeted
-  const endpoint = req.params.endpoint;
-
-  const token = req.kauth.grant.access_token.token;
-
-  let options = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    params: req.query,
-  };
-
-  const path = req.path.replace("/api/", "");
-  const url = `${apiHost}:${apiPort}/${path}`;
-
-  const errHandler = (err) => {
-    const unknownErr = "unknown proxyApi error";
-    const { response } = err;
-    if (!response) {
-      res.status(500).json({ error: unknownErr });
-    }
-    res.status(response.status ? response.status : 400).json({
-      error: response.data ? response.data : unknownErr,
-    });
-  };
-
-  const successHandler = (response) => {
-    if (endpoint === "get-user") {
-      req.session.user = {
-        "keycloak-uuid": response.data.keycloak_guid,
-        "user-id": response.data.critterbase_user_id,
-      };
-    }
-    return res
-      .status(response.status ? response.status : 418)
-      .json(response.data);
-  };
-  if (req._parsedOriginalUrl.pathname === "/api/get-template") {
-    axios({
-      method: "get",
-      url: url,
-      responseType: "arraybuffer",
-      ...options,
-    }).then(function (response) {
-      res.set(
-        "Content-Type",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      );
-      return res.send(Buffer.from(response.data));
-    });
-  }
-
-  if (req.method === "POST") {
-    const { file, files } = req;
-    if (file || files) {
-      // depending on the type of file uploaded
-      // create a new formdata object to pass on to the server
-      const { form, config } = file ? handleFile(file) : handleFiles(files);
-      config.headers = { ...config.headers, ...options.headers };
-      api
-        .post(url, form, { ...config })
-        .then(successHandler)
-        .catch(errHandler);
-      asdfa;
-    } else {
-      api.post(url, req.body, options).then(successHandler).catch(errHandler);
-    }
-  } else if (req.method === "DELETE") {
-    api.delete(url, options).then(successHandler).catch(url);
-  } else if (req.method === "PUT") {
-    api.put(url, req.body, options).then(successHandler).catch(url);
-  } else if (req.method === "PATCH") {
-    api.patch(url, req.body, options).then(successHandler).catch(url);
-  }
-  // handle get
-  else {
-    // get-template should be retrieved as octet-stream, not JSON
-    api.get(url, options).then(successHandler).catch(errHandler);
-  }
-};
-
 /**
  * csv files can only be imported one at a time
  */
@@ -207,14 +121,52 @@ const handleFiles = function (files) {
 };
 
 /**
-  Pass-through function for Express.
-  @param req {object} Node/Express request object
-  @param res {object} Node/Express response object
-  @param next {function} Node/Express function for flow control
+ * Pass-through function for Express.
+ * @param req {object} Node/Express request object
+ * @param res {object} Node/Express response object
+ * @param next {function} Node/Express function for flow control
  */
 const pageHandler = function (req, res, next) {
   return next();
 };
+
+/**
+ * Proxy for BCTW api
+ * @endpoint /api
+ * 1. Appends bearer token authorization to each request
+ * Note: strips prepended /api from the request ie: /api/get-user -> /get-user
+ **/
+const BctwApiProxy = createProxyMiddleware(["/api"], {
+  target: `${apiHost}:${apiPort}`,
+  changeOrigin: true,
+  pathRewrite: { "^/api": "" },
+  onProxyReq: (proxyReq, req, res) => {
+    const { file, files } = req;
+
+    // set bearer authorization for api
+    const token = req.kauth.grant.access_token.token;
+    proxyReq.setHeader("Authorization", `Bearer ${token}`);
+
+    if (file || files) {
+      console.log("FILE IN PROXY");
+      // PREVIOUS IMPLEMENTATION FOR FILE UPLOADS.
+      // Configure proxy if this is needed
+      //
+      // const { form, config } = file ? handleFile(file) : handleFiles(files);
+      // config.headers = { ...config.headers, ...options.headers };
+      // api
+      //   .post(url, form, { ...config })
+      //   .then(successHandler)
+      //   .catch(errHandler);
+    }
+  },
+});
+
+const DevFrontendProxy = createProxyMiddleware(["!/*.hot-update.json"], {
+  target: `http://app:${appPort}`,
+  changeOrigin: true,
+  ws: true,
+});
 
 // Server configuration
 var app = express()
@@ -230,29 +182,23 @@ var app = express()
 
   .all("*", keycloak.protect(), pageHandler)
   .get("/api/session-info", retrieveSessionInfo)
-  // .use(
-  //   "/api",
-  //   createProxyMiddleware({
-  //     target: `${apiHost}:${apiPort}`,
-  //     changeOrigin: true,
-  //   }),
-  // )
-  .get("/api/get-template", proxyApi)
-
-  //critterbase requests
-  .all("/api/cb/:cbEndpoint", proxyApi)
-  .all("/api/cb/:cbEndpoint/*", proxyApi)
-
-  .get("/api/:endpoint", proxyApi)
-  .get("/api/:endpoint/:endpointId", proxyApi)
-  // bulk file import handlers
-  .post("/api/import-xlsx", upload.single("validated-file"), proxyApi)
-  .post("/api/import-csv", upload.single("csv"), proxyApi)
-  .post("/api/import-xml", upload.array("xml"), proxyApi)
-
-  .post("/api/:endpoint", proxyApi)
-  // delete handlers
-  .delete("/api/:endpoint/:endpointId", proxyApi);
+  .use(BctwApiProxy);
+// .get("/api/get-template", proxyApi)
+//
+// //critterbase requests
+// .all("/api/cb/:cbEndpoint", proxyApi)
+// .all("/api/cb/:cbEndpoint/*", proxyApi)
+//
+// .get("/api/:endpoint", proxyApi)
+// .get("/api/:endpoint/:endpointId", proxyApi)
+// // bulk file import handlers
+// .post("/api/import-xlsx", upload.single("validated-file"), proxyApi)
+// .post("/api/import-csv", upload.single("csv"), proxyApi)
+// .post("/api/import-xml", upload.array("xml"), proxyApi)
+//
+// .post("/api/:endpoint", proxyApi)
+// // delete handlers
+// .delete("/api/:endpoint/:endpointId", proxyApi);
 
 if (isProd) {
   app
@@ -261,14 +207,7 @@ if (isProd) {
       res.sendFile(path.join(__dirname + "../../../react/build/index.html"));
     });
 } else {
-  app.use(
-    "/",
-    createProxyMiddleware(["!/*.hot-update.json"], {
-      target: `http://app:${appPort}`,
-      changeOrigin: true,
-      ws: true,
-    }),
-  );
+  app.use(DevFrontendProxy);
 }
 
 // if (isProd) {
