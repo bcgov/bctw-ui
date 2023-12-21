@@ -52,7 +52,6 @@ const _appendSearchQueryToString = (url: string, search: ITableFilter[]): string
  */
 const createUrl = ({ api, query, page, search }: CreateUrlParams): string => {
   const baseUrl = getBaseUrl();
-  // console.log('createURL() -- base URL:', baseUrl)
   let url = `${baseUrl}/${api}`;
   if (query && query.length) {
     url = _appendQueryToUrl(url, query);
@@ -63,7 +62,6 @@ const createUrl = ({ api, query, page, search }: CreateUrlParams): string => {
   if (search) {
     url = _appendSearchQueryToString(url, search);
   }
-  // console.log('created URL:', url)
   return url;
 };
 

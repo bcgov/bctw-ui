@@ -96,6 +96,8 @@ const retrieveSessionInfo = function (req, res, next) {
 };
 
 // Keycloak-protected service for proxying calls to the API host (browser -> proxy -> API)
+// This was created before the addition of createProxyMiddleware package
+// TODO: instead use createProxyMiddlware to proxy the bctw/critterbase reqs
 const proxyApi = function (req, res, next) {
   // URL of the endpoint being targeted
   const endpoint = req.params.endpoint;
@@ -134,6 +136,20 @@ const proxyApi = function (req, res, next) {
       .status(response.status ? response.status : 418)
       .json(response.data);
   };
+  if (req._parsedOriginalUrl.pathname === "/api/get-template") {
+    axios({
+      method: "get",
+      url: url,
+      responseType: "arraybuffer",
+      ...options,
+    }).then(function (response) {
+      res.set(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      );
+      return res.send(Buffer.from(response.data));
+    });
+  }
 
   if (req.method === "POST") {
     const { file, files } = req;
@@ -160,23 +176,7 @@ const proxyApi = function (req, res, next) {
   // handle get
   else {
     // get-template should be retrieved as octet-stream, not JSON
-    const isTemplateEndpoint = endpoint === "get-template";
-    if (isTemplateEndpoint) {
-      axios({
-        method: "get",
-        url: url,
-        responseType: "arraybuffer",
-        ...options,
-      }).then(function (response) {
-        res.set(
-          "Content-Type",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        );
-        res.send(Buffer.from(response.data));
-      });
-    } else {
-      api.get(url, options).then(successHandler).catch(errHandler);
-    }
+    api.get(url, options).then(successHandler).catch(errHandler);
   }
 };
 
@@ -229,9 +229,15 @@ var app = express()
   .use(keycloak.middleware())
 
   .all("*", keycloak.protect(), pageHandler)
-
-  .get("/api/get-template", proxyApi)
   .get("/api/session-info", retrieveSessionInfo)
+  // .use(
+  //   "/api",
+  //   createProxyMiddleware({
+  //     target: `${apiHost}:${apiPort}`,
+  //     changeOrigin: true,
+  //   }),
+  // )
+  .get("/api/get-template", proxyApi)
 
   //critterbase requests
   .all("/api/cb/:cbEndpoint", proxyApi)
