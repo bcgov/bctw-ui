@@ -113,9 +113,13 @@ const proxyApi = function (req, res, next) {
   const url = `${apiHost}:${apiPort}/${path}`;
 
   const errHandler = (err) => {
+    const unknownErr = "unknown proxyApi error";
     const { response } = err;
+    if (!response) {
+      res.status(500).json({ error: unknownErr });
+    }
     res.status(response.status ? response.status : 400).json({
-      error: response.data ? response.data : "unknown proxyApi error",
+      error: response.data ? response.data : unknownErr,
     });
   };
 
@@ -253,8 +257,9 @@ if (isProd) {
 } else {
   app.use(
     "/",
-    createProxyMiddleware({
+    createProxyMiddleware(["!/*.hot-update.json"], {
       target: `http://app:${appPort}`,
+      changeOrigin: true,
       ws: true,
     }),
   );

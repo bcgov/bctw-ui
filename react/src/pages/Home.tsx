@@ -22,7 +22,7 @@ const Home = (): JSX.Element => {
   return (
     <div className='container'>
       <Typography variant='h2' style={{ fontWeight: 'bold' }}>
-        BC Telemetry Warehousesss
+        BC Telemetry Warehouse
       </Typography>
       <Typography paragraph className={styles.callout} children={data ?? welcome} />
 

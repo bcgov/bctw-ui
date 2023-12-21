@@ -15,6 +15,7 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV}
       - PORT=${APP_PORT} # only needed for development
+      - FAST_REFRESH=false
     volumes:
       - ./react:/opt/app-root/src
       - /opt/app-root/src/node_modules # prevent overwrite of node_modules
