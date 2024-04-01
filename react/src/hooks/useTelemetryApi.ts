@@ -109,6 +109,20 @@ export const useTelemetryApi = () => {
     );
   };
 
+  const useCritterbaseDetailedCritter = (
+    critter_id: string,
+    enabled?: boolean
+  ): UseQueryResult<Critter, AxiosError> => {
+    return useQuery<Critter, AxiosError>(
+      ['detailed-critter', critter_id],
+      () => critterbaseApi.getDetailedCritter(critter_id),
+      {
+        ...defaultQueryOptions,
+        enabled
+      }
+    );
+  };
+
   const useVerifyMarkingsAgainstTaxon = (
     config: UseMutationOptions<ICbMarkingVerifyResult, AxiosError, { taxon_id: string; markings: IMarking }>
   ): UseMutationResult<ICbMarkingVerifyResult> =>
@@ -767,6 +781,7 @@ export const useTelemetryApi = () => {
     useBulkUpdateCritterbaseCritter,
     useDeleteMarking,
     useVerifyMarkingsAgainstTaxon,
-    useCritterbaseSessionInfo
+    useCritterbaseSessionInfo,
+    useCritterbaseDetailedCritter
   };
 };

@@ -23,7 +23,9 @@ export const critterApi = (props: ApiProps): API => {
    */
   const _handleGetResults = (data: Critters[], type: eCritterFetchType): Critters[] => {
     const results = data.map((json: AttachedCritter) =>
-      type === eCritterFetchType.assigned ? plainToClass(AttachedCritter, json) : createFlattenedProxy(plainToClass(Critter, json))
+      type === eCritterFetchType.assigned
+        ? plainToClass(AttachedCritter, json)
+        : createFlattenedProxy(plainToClass(Critter, json))
     );
     return type === eCritterFetchType.assigned ? (results as AttachedCritter[]) : (results as Critter[]);
   };
@@ -60,10 +62,10 @@ export const critterApi = (props: ApiProps): API => {
   };
 
   const getAssignedCrittersHistoric = async (): Promise<AttachedCritter[]> => {
-    const url = createUrl({api: getAttachedHistoricEndpoint});
+    const url = createUrl({ api: getAttachedHistoricEndpoint });
     const { data } = await api.get(url);
     return data;
-  }
+  };
 
   return {
     getCritters,

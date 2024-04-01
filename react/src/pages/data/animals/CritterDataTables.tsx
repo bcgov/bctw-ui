@@ -21,12 +21,18 @@ import { AttachRemoveDevice } from './AttachRemoveDevice';
 
 export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
+
   const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedCritter[]>([]);
   const [animalData, setAnimalData] = useState<Critter[]>([]);
 
-  const [editObj, setEditObj] = useState<Critters>(new AttachedCritter());
+  const [critterRow, setCritterRow] = useState<Critters>(new AttachedCritter());
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
+
+  const { data: detailedCritter } = api.useCritterbaseDetailedCritter(
+    critterRow.critter_id,
+    Boolean(critterRow.critter_id)
+  );
 
   // Modal Open States
   const [openEdit, setOpenEdit] = useState(false);
@@ -53,7 +59,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   }, [animalData]);
 
   const handleSelect = <T extends Critter>(row: T): void => {
-    //setEditObj(row);
+    setCritterRow(row);
     detailViewAction(row);
   };
 
@@ -143,7 +149,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           disabled={rowNotMerged}
           menuItems={attached ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]}
           onOpen={() => {
-            setEditObj(row);
+            setCritterRow(row);
           }}
         />
       </ConditionalWrapper>
@@ -214,25 +220,26 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           />
         </Box>
 
-
         {/* Wrapper to allow editing of Attached and Unattached animals */}
-        <ModifyCritterWrapper
-          editing={editObj}
-          onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-          onDelete={(critter_id: string): void => setDeleted(critter_id)}
-          setCritter={setEditObj}>
-          <EditCritter
-            /*{...editProps}*/ editing={editObj}
-            onSave={doNothingAsync}
-            open={openEdit}
-            handleClose={() => setOpenEdit(false)}
-          />
-        </ModifyCritterWrapper>
+        {detailedCritter ? (
+          <ModifyCritterWrapper
+            editing={detailedCritter}
+            onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+            onDelete={(critter_id: string): void => setDeleted(critter_id)}
+            setCritter={setCritterRow}>
+            <EditCritter
+              /*{...editProps}*/ editing={critterRow}
+              onSave={doNothingAsync}
+              open={openEdit}
+              handleClose={() => setOpenEdit(false)}
+            />
+          </ModifyCritterWrapper>
+        ) : null}
 
         {/* Modal for assigning or removing a device from a critter */}
         <AttachRemoveDevice
-          critter_id={editObj.critter_id}
-          permission_type={editObj?.permission_type}
+          critter_id={critterRow.critter_id}
+          permission_type={critterRow?.permission_type}
           current_attachment={new CollarHistory()}
           openModal={openAttachRemoveCollar}
           handleShowModal={setOpenAttachRemoveCollar}
@@ -240,11 +247,13 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         />
 
         {/* Modal for critter workflows */}
-        <CritterWorkflow editing={editObj}
+        <CritterWorkflow
+          editing={critterRow}
           onUpdate={(critter_id: string) => setUpdated(critter_id)}
           workflow={workflow}
           open={openWorkflow}
-          setOpen={setOpenWorkflow} />
+          setOpen={setOpenWorkflow}
+        />
       </>
     </RowSelectedProvider>
   );
