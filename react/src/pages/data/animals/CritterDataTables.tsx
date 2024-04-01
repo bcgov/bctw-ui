@@ -25,14 +25,11 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedCritter[]>([]);
   const [animalData, setAnimalData] = useState<Critter[]>([]);
 
-  const [critterRow, setCritterRow] = useState<Critters>(new AttachedCritter());
+  const [editObj, setEditObj] = useState<Critters>(new AttachedCritter());
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
 
-  const { data: detailedCritter } = api.useCritterbaseDetailedCritter(
-    critterRow.critter_id,
-    Boolean(critterRow.critter_id)
-  );
+  //const { data: detailedCritter } = api.useCritterbaseDetailedCritter(editObj.critter_id, Boolean(editObj.critter_id));
 
   // Modal Open States
   const [openEdit, setOpenEdit] = useState(false);
@@ -59,27 +56,9 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   }, [animalData]);
 
   const handleSelect = <T extends Critter>(row: T): void => {
-    setCritterRow(row);
+    setEditObj(row);
     detailViewAction(row);
   };
-
-  // // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
-  // const editProps = {
-  //   editing: null,
-  //   open: false,
-  //   onSave: doNothingAsync,
-  //   handleClose: doNothing
-  // };
-
-  // const addEditProps = {
-  //   editing: null,
-  //   empty: new AttachedCritter(),
-  //   addTooltip: CS.addTooltip,
-  //   queryStatus: 'idle' as QueryStatus,
-  //   disableEdit: true,
-  //   disableDelete: true,
-  //   modalControl: true
-  // };
 
   const Status = (row: AttachedCritter, idx: number): JSX.Element => {
     if (row.last_fetch_date.isValid()) {
@@ -149,7 +128,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           disabled={rowNotMerged}
           menuItems={attached ? [...defaultItems, ...attachedItems] : [...defaultItems, ...animalItems]}
           onOpen={() => {
-            setCritterRow(row);
+            setEditObj(row);
           }}
         />
       </ConditionalWrapper>
@@ -221,25 +200,23 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         </Box>
 
         {/* Wrapper to allow editing of Attached and Unattached animals */}
-        {detailedCritter ? (
-          <ModifyCritterWrapper
-            editing={detailedCritter}
-            onUpdate={(critter_id: string): void => setUpdated(critter_id)}
-            onDelete={(critter_id: string): void => setDeleted(critter_id)}
-            setCritter={setCritterRow}>
-            <EditCritter
-              /*{...editProps}*/ editing={critterRow}
-              onSave={doNothingAsync}
-              open={openEdit}
-              handleClose={() => setOpenEdit(false)}
-            />
-          </ModifyCritterWrapper>
-        ) : null}
+        <ModifyCritterWrapper
+          editing={editObj}
+          onUpdate={(critter_id: string): void => setUpdated(critter_id)}
+          onDelete={(critter_id: string): void => setDeleted(critter_id)}
+          setCritter={setEditObj}>
+          <EditCritter
+            editing={editObj}
+            onSave={doNothingAsync}
+            open={openEdit}
+            handleClose={() => setOpenEdit(false)}
+          />
+        </ModifyCritterWrapper>
 
         {/* Modal for assigning or removing a device from a critter */}
         <AttachRemoveDevice
-          critter_id={critterRow.critter_id}
-          permission_type={critterRow?.permission_type}
+          critter_id={editObj.critter_id}
+          permission_type={editObj?.permission_type}
           current_attachment={new CollarHistory()}
           openModal={openAttachRemoveCollar}
           handleShowModal={setOpenAttachRemoveCollar}
@@ -248,7 +225,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
 
         {/* Modal for critter workflows */}
         <CritterWorkflow
-          editing={critterRow}
+          editing={editObj}
           onUpdate={(critter_id: string) => setUpdated(critter_id)}
           workflow={workflow}
           open={openWorkflow}

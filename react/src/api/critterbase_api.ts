@@ -78,27 +78,12 @@ export const critterbaseApi = (props: ApiProps): API => {
     }
   };
 
-  /**
-   * Get detailed critter from Critterbase.
-   * Includes all related attributes of the Critter. ie: markings, collection_units...
-   *
-   * @async
-   * @param {string} critter_id - Primary critter identifier.
-   * @returns {Promise<Critter>} Critterbase Critter.
-   */
-  const getDetailedCritter = async (critter_id: string): Promise<Critter> => {
-    const url = createUrl({ api: `${CbRouters.critters}/${critter_id}?${detailedFormat}` });
-    const { data } = await api.get(url);
-    return data;
-  };
-
   return {
     getLookupTableOptions,
     upsertCritter,
     bulkUpdate,
     deleteMarking,
     verifyMarkingsAgainstTaxon,
-    loginToCritterbase,
-    getDetailedCritter
+    loginToCritterbase
   };
 };

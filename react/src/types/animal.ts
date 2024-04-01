@@ -169,9 +169,9 @@ export class Critter implements BCTWBase<Critter> {
   critter_comment?: string;
   //Extra details
   mortality?: IMortality[];
-  capture?: ICapture[];
-  marking?: IMarking[];
-  measurement?: IMeasurement[];
+  captures?: ICapture[];
+  markings?: IMarking[];
+  measurements?: IMeasurement[];
 
   readonly _merged?: boolean;
   permission_type?: eCritterPermission;
@@ -203,14 +203,14 @@ export class Critter implements BCTWBase<Critter> {
   }
 
   get latestCapture(): CaptureEvent2 | null {
-    if (this.capture?.length) {
+    if (this.captures?.length) {
       const capture_location = editObjectToEvent(
-        this.capture[0].capture_location,
+        this.captures[0].capture_location,
         new LocationEvent('capture', true),
         []
       );
-      const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);
-      return editObjectToEvent({ ...this.capture[0], capture_location, release_location }, new CaptureEvent2(), []);
+      const release_location = editObjectToEvent(this.captures[0].release_location, new LocationEvent('release'), []);
+      return editObjectToEvent({ ...this.captures[0], capture_location, release_location }, new CaptureEvent2(), []);
     }
     return null;
   }

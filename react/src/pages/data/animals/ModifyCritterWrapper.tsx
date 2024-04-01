@@ -38,7 +38,6 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     enabled: !!editing.critter_id
   });
 
-  // console.log(data);
   /**
    * note: if data has been previously fetched, 'status' will not be updated.
    * in that case, check if @var data exists and call @function setAnimal
