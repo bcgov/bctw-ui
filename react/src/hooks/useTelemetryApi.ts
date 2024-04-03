@@ -59,7 +59,7 @@ import { parseArgs } from 'utils/common_helpers';
  * Returns an instance of axios with baseURL set.
  * @return {AxiosInstance}
  */
-const useApi = (): AxiosInstance => {
+export const useApi = (): AxiosInstance => {
   const instance = useMemo(() => {
     return axios.create({
       baseURL: getBaseUrl()
@@ -77,7 +77,6 @@ type QueryEnabled = Pick<UseQueryOptions, 'enabled'>;
 /* eslint-disable-next-line */
 export const useTelemetryApi = () => {
   const api = useApi();
-  // const cb_api = useCritterbaseApi();
 
   const collarApi = collar_api({ api });
   const critterApi = critter_api({ api });
@@ -97,11 +96,12 @@ export const useTelemetryApi = () => {
   const useCritterbaseSelectOptions = (
     prop: ICbRouteKey,
     query?: string,
-    enabled?: boolean
+    enabled?: boolean,
+    param?: string
   ): UseQueryResult<Array<ICbSelect | string>, AxiosError> => {
     return useQuery<Array<ICbSelect | string>, AxiosError>(
-      ['lookup-table-options', prop, query],
-      () => critterbaseApi.getLookupTableOptions(prop, true, query),
+      ['lookup-table-options', prop, query, param],
+      () => critterbaseApi.getLookupTableOptions(prop, true, param, query),
       {
         ...defaultQueryOptions,
         enabled
@@ -130,6 +130,7 @@ export const useTelemetryApi = () => {
     config: UseMutationOptions<T, AxiosError, ICbBulkUpdatePayload>
   ): UseMutationResult<T> =>
     useMutation<T, AxiosError, ICbBulkUpdatePayload>((body) => critterbaseApi.bulkUpdate(body), config);
+
   const useDeleteMarking = (
     config: UseMutationOptions<IBulkUploadResults<IMarking>, AxiosError, uuid>
   ): UseMutationResult<IBulkUploadResults<IMarking>> =>
@@ -704,6 +705,7 @@ export const useTelemetryApi = () => {
 
   return {
     // queries
+    critterbaseApi,
     useAlert,
     useCodes,
     useCodeDesc,

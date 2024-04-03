@@ -80,14 +80,21 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
     }
   };
 
-  const onError = (error: AxiosError): void => showNotif({ severity: 'error', message: formatAxiosError(error) });
+  const onError = (error: AxiosError): void => {
+    console.log('onError');
+    showNotif({ severity: 'error', message: formatAxiosError(error) });
+  };
 
   // setup the mutations
   //const { mutateAsync: saveMutation } = api.useSaveCritterbaseCritter({ onSuccess: handleSaveResult, onError });
   const { mutateAsync: saveCritterbase, isLoading } = api.useBulkUpdateCritterbaseCritter({
     onSuccess: handleSaveResult,
-    onError
+    onError,
+    onMutate: (vars) => {
+      console.log('mutating', { vars });
+    }
   });
+
   const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: handleDeleteResult, onError });
 
   const saveCritter = async (a: IUpsertPayload<Critter | AttachedCritter>): Promise<void> => {

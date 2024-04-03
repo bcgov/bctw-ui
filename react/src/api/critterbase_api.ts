@@ -8,13 +8,14 @@ import { API, ApiProps, ICbBulkUpdatePayload, IUpsertPayload } from './api_inter
 
 export const critterbaseApi = (props: ApiProps): API => {
   const { api } = props;
+
   const qc = useQueryClient();
 
   const invalidate = (): void => {
-    qc.invalidateQueries('critters_assigned');
-    qc.invalidateQueries('critters_unassigned');
+    // qc.invalidateQueries('critters_assigned');
+    // qc.invalidateQueries('critters_unassigned');
     qc.invalidateQueries('getType');
-    qc.invalidateQueries('pings');
+    // qc.invalidateQueries('pings');
   };
   /**
    * retrieve critterbase lookup table information, optionally formatted
@@ -22,9 +23,10 @@ export const critterbaseApi = (props: ApiProps): API => {
   const getLookupTableOptions = async (
     cbRouteKey: ICbRouteKey,
     asSelect?: boolean,
+    param?: string,
     query = ''
   ): Promise<Array<ICbSelect | string>> => {
-    const route = CbRoutes[cbRouteKey];
+    const route = param ? `${CbRoutes[cbRouteKey]}/${param}` : CbRoutes[cbRouteKey];
     const q = asSelect ? (query ? `${selectFormat}&${query}` : `${selectFormat}`) : `${query}`;
     const url = createUrl({ api: route, query: q });
     const { data } = await api.get(url);
@@ -38,7 +40,6 @@ export const critterbaseApi = (props: ApiProps): API => {
   };
 
   const upsertCritter = async (critter: IUpsertPayload<Critter>): Promise<Critter> => {
-    // critter.body.sex = 'test';
     const url = createUrl({ api: `${CbRouters.critters}/${critter.body.critter_id}${detailedFormat}` });
     const { data } = await api.patch(url, critter.body);
     return data;

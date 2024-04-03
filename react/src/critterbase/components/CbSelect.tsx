@@ -12,8 +12,9 @@ import { columnToHeader } from 'utils/common_helpers';
 export type CbSelectProps = Omit<CreateInputProps, 'type'> & {
   cbRouteKey: ICbRouteKey;
   handleRoute?: CbRouteStatusHandler;
-  query: string;
+  query?: string;
   isSelectionAllowed?: (newval: unknown) => boolean | Promise<boolean>;
+  param?: string;
 };
 
 export const CbSelect = ({
@@ -26,13 +27,16 @@ export const CbSelect = ({
   label,
   disabled,
   query,
+  param,
   isSelectionAllowed
 }: CbSelectProps): JSX.Element => {
   const cbApi = useTelemetryApi();
+
   const { data, isError, isLoading, isSuccess, status } = cbApi.useCritterbaseSelectOptions(
     cbRouteKey,
     query,
-    !disabled
+    !disabled,
+    param
   );
   const [selected, setSelected] = useState<uuid | string>(typeof value === 'string' ? value : '');
   const [hasError, setHasError] = useState(isError || (required && !selected) || !cbRouteKey);
@@ -44,8 +48,8 @@ export const CbSelect = ({
     if (typeof value === 'string') {
       setSelected(value);
       pushChange(value);
-      }
-    }, [value]);
+    }
+  }, [value]);
 
   useEffect(() => {
     handleRoute?.(status, cbRouteKey);

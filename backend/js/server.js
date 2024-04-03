@@ -4,7 +4,10 @@ const cors = require("cors");
 const express = require("express");
 const expressSession = require("express-session");
 const helmet = require("helmet");
-const { createProxyMiddleware } = require("http-proxy-middleware");
+const {
+  createProxyMiddleware,
+  fixRequestBody,
+} = require("http-proxy-middleware");
 const formData = require("form-data");
 const http = require("http");
 const keycloakConnect = require("keycloak-connect");
@@ -56,8 +59,6 @@ const keycloak = new keycloakConnect(
   },
 );
 
-// TODO: move into separate package?
-// endpoint that returns Keycloak session information
 const retrieveSessionInfo = function (req, res, next) {
   // get contents of the current Keycloak access token
   const data = req.kauth.grant.access_token.content;
@@ -148,6 +149,11 @@ const BctwApiProxy = createProxyMiddleware(["/api"], {
       //   .then(successHandler)
       //   .catch(errHandler);
     }
+    /**
+     * This fixes the request bodies for POST / PATCH requests in tandem with express.json
+     * https://github.com/chimurai/http-proxy-middleware/tree/v2.0.6?tab=readme-ov-file#intercept-and-manipulate-requests
+     */
+    fixRequestBody(proxyReq, req, res);
   },
 });
 
@@ -168,7 +174,6 @@ var app = express()
   .use(express.urlencoded({ limit: "50mb", extended: true }))
   .use(expressSession(session))
   .use(keycloak.middleware())
-
   .all("*", keycloak.protect(), pageHandler)
   .get("/api/session-info", retrieveSessionInfo)
   .use(BctwApiProxy);

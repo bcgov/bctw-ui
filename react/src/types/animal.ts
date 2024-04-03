@@ -71,10 +71,10 @@ export interface IMortality {
   mortality_timestamp: Dayjs;
   proximate_cause_of_death_id: uuid;
   proximate_cause_of_death_confidence: 'Probable' | 'Definite';
-  proximate_predated_by_taxon_id: uuid;
+  proximate_predated_by_itis_tsn: uuid;
   ultimate_cause_of_death_id: uuid;
   ultimate_cause_of_death_confidence: 'Probable' | 'Definite';
-  ultimate_predated_by_taxon_id: uuid;
+  ultimate_predated_by_itis_tsn: uuid;
 }
 
 export interface IMarking {
@@ -425,7 +425,7 @@ export const markingFormFields: Record<string, FormFieldObject<IMarking>[]> = {
 
 export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
   identifierFields: [
-    { prop: 'itis_tsn', type: eInputType.cb_select, taxon: [], cbRouteKey: 'species', ...isRequired },
+    { prop: 'itis_scientific_name', type: eInputType.text, taxon: [], ...isRequired, disabled: true },
     { prop: 'wlh_id', type: eInputType.text, taxon: [] },
     { prop: 'animal_id', type: eInputType.text, taxon: [] },
     { prop: 'sex', type: eInputType.cb_select, taxon: [], ...isRequired, cbRouteKey: 'sex' }
@@ -436,7 +436,7 @@ export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
     { prop: 'critter_comment', type: eInputType.multiline, taxon: [] }
     //{ prop: 'collection_unit', type: eInputType.cb_select, taxon: [] } //This select will need additional work, array of objects. Flatten and display multiple selects for array
   ],
-  captureFields: [{ prop: 'capture', type: eInputType.cb_capture_fields, taxon: [] }]
+  captureFields: [{ prop: 'captures', type: eInputType.cb_capture_fields, taxon: [] }]
   //   { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
   //   { prop: 'latitude', type: eInputType.number, taxon: []},
   //   { prop: 'longitude', type: eInputType.number, taxon: []},

@@ -29,8 +29,6 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const [deleted, setDeleted] = useState('');
   const [updated, setUpdated] = useState('');
 
-  //const { data: detailedCritter } = api.useCritterbaseDetailedCritter(editObj.critter_id, Boolean(editObj.critter_id));
-
   // Modal Open States
   const [openEdit, setOpenEdit] = useState(false);
   const [openAttachRemoveCollar, setOpenAttachRemoveCollar] = useState(false);

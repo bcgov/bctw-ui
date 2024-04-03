@@ -7,21 +7,17 @@ import { CbSelect } from './CbSelect';
 import { useEffect, useState } from 'react';
 
 type CbCollectionUnitInputsProps = {
-  taxon_id: uuid;
+  tsn: number;
   collection_units?: ICollectionUnit[];
   handleChange: FormChangeEvent;
 };
 export const CbCollectionUnitInputs = ({
-  taxon_id,
+  tsn,
   collection_units,
   handleChange
 }: CbCollectionUnitInputsProps): JSX.Element => {
   const cbApi = useTelemetryApi();
-  const { data, isSuccess } = cbApi.useCritterbaseSelectOptions(
-    'taxon_collection_categories',
-    `taxon_id=${taxon_id}`,
-    !!taxon_id
-  );
+  const { data, isSuccess } = cbApi.useCritterbaseSelectOptions('taxon_collection_categories', `tsn=${tsn}`, !!tsn);
   const [internalLookup, setInternalLookup] = useState<Partial<ICollectionUnit>[]>(
     collection_units
       ? collection_units.map((a) => {
@@ -68,7 +64,7 @@ export const CbCollectionUnitInputs = ({
               prop={'collection_units'}
               handleChange={(v) => onChange(v, s.id)}
               cbRouteKey={'collection_units'}
-              query={`category_id=${s.id}`}
+              param={s.id}
               label={s.value}
             />
           ))
