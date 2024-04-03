@@ -12,10 +12,10 @@ export const critterbaseApi = (props: ApiProps): API => {
   const qc = useQueryClient();
 
   const invalidate = (): void => {
-    // qc.invalidateQueries('critters_assigned');
-    // qc.invalidateQueries('critters_unassigned');
+    qc.invalidateQueries('critters_assigned');
+    qc.invalidateQueries('critters_unassigned');
     qc.invalidateQueries('getType');
-    // qc.invalidateQueries('pings');
+    qc.invalidateQueries('pings');
   };
   /**
    * retrieve critterbase lookup table information, optionally formatted

@@ -242,9 +242,9 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
       case 'ultimate_cause_of_death_confidence':
         return 'UCOD Confidence';
       case 'proximate_predated_by_itis_tsn':
-        return 'PCOD Predator Taxon';
+        return 'PCOD Predator ITIS TSN';
       case 'ultimate_predated_by_itis_tsn':
-        return 'UCOD Predator Taxon';
+        return 'UCOD Predator ITIS TSN';
       default:
         return columnToHeader(s ?? 'undefined key');
     }
@@ -276,8 +276,7 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
     },
     proximate_predated_by_itis_tsn: {
       prop: 'proximate_predated_by_itis_tsn',
-      type: eInputType.cb_select,
-      cbRouteKey: 'taxons'
+      type: eInputType.number
     },
     ultimate_cause_of_death_id: {
       prop: 'ultimate_cause_of_death_id',
@@ -291,8 +290,7 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
     },
     ultimate_predated_by_itis_tsn: {
       prop: 'ultimate_predated_by_itis_tsn',
-      type: eInputType.cb_select,
-      cbRouteKey: 'taxons'
+      type: eInputType.number
     }
   };
 
