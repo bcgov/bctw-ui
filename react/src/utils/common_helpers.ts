@@ -72,12 +72,15 @@ const omitNull = <T>(obj: T): T => {
 };
 
 const hasChangedProperties = <T>(original: Partial<T>, next: Partial<T>): boolean => {
+  if (!original || !next) {
+    console.log({ original, next });
+  }
   for (const k of Object.keys(next)) {
     if (typeof next[k] === 'object') {
       if (/*original[k] && */ !original[k] || hasChangedProperties(original[k], next[k])) {
         return true;
       }
-    } else if (/*original[k] !== undefined && */next[k] !== original[k]) {
+    } else if (/*original[k] !== undefined && */ next[k] !== original[k]) {
       return true;
     }
   }
@@ -95,7 +98,7 @@ const removeProps = <T>(obj: T, propsToRemove: string[]): T => {
   return copyOfT;
 };
 
-/** 
+/**
  * @param {K} key
  * @param {T} object of type T
  * given a property name of an object T, return its type.
