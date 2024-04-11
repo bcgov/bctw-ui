@@ -116,12 +116,8 @@ export default function EditCritter(props: EditCritterProps): JSX.Element {
 
     if (body.marking.length) {
       for (const m of body.marking) {
-        const existing = editing.markings.find((a) => a.marking_id === m.marking_id);
         const omitted = omitNull(m);
-        if (existing && !hasChangedProperties(existing, omitted) && !m._delete) {
-          continue;
-        }
-        finalPayload.markings.push({ ...m, critter_id: new_critter.critter_id });
+        finalPayload.markings.push({ ...omitted, critter_id: new_critter.critter_id });
       }
     }
 
@@ -140,7 +136,6 @@ export default function EditCritter(props: EditCritterProps): JSX.Element {
         finalPayload.collections.push({ ...c, critter_id: new_critter.critter_id });
       }
     }
-
     const r = await onSave(finalPayload);
     return r;
   };
