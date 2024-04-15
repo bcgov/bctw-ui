@@ -112,10 +112,10 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
   location: LocationEvent;
   proximate_cause_of_death_id: uuid;
   proximate_cause_of_death_confidence: string;
-  proximate_predated_by_taxon_id: uuid;
+  proximate_predated_by_itis_tsn: uuid;
   ultimate_cause_of_death_id: uuid;
   ultimate_cause_of_death_confidence: string;
-  ultimate_predated_by_taxon_id: uuid;
+  ultimate_predated_by_itis_tsn: uuid;
   mortality_comment: string;
 
   proximate_cause_of_death: { cod_category: string; cod_reason: string };
@@ -167,10 +167,10 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
       location: this.location.critterbasePayload,
       proximate_cause_of_death_id: this.proximate_cause_of_death_id,
       proximate_cause_of_death_confidence: this.proximate_cause_of_death_confidence,
-      proximate_predated_by_taxon_id: this.proximate_predated_by_taxon_id,
+      proximate_predated_by_itis_tsn: this.proximate_predated_by_itis_tsn,
       ultimate_cause_of_death_id: this.ultimate_cause_of_death_id,
       ultimate_cause_of_death_confidence: this.ultimate_cause_of_death_confidence,
-      ultimate_predated_by_taxon_id: this.ultimate_predated_by_taxon_id
+      ultimate_predated_by_itis_tsn: this.ultimate_predated_by_itis_tsn
     });
   }
 
@@ -241,10 +241,10 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
         return 'PCOD Confidence';
       case 'ultimate_cause_of_death_confidence':
         return 'UCOD Confidence';
-      case 'proximate_predated_by_taxon_id':
-        return 'PCOD Predator Taxon';
-      case 'ultimate_predated_by_taxon_id':
-        return 'UCOD Predator Taxon';
+      case 'proximate_predated_by_itis_tsn':
+        return 'PCOD Predator ITIS TSN';
+      case 'ultimate_predated_by_itis_tsn':
+        return 'UCOD Predator ITIS TSN';
       default:
         return columnToHeader(s ?? 'undefined key');
     }
@@ -272,27 +272,25 @@ export default class MortalityEvent extends SuperWorkflow implements IWorkflow<M
     proximate_cause_of_death_confidence: {
       prop: 'proximate_cause_of_death_confidence',
       type: eInputType.cb_select,
-      cbRouteKey: 'cause_of_death_confidence',
+      cbRouteKey: 'cause_of_death_confidence'
     },
-    proximate_predated_by_taxon_id: {
-      prop: 'proximate_predated_by_taxon_id',
-      type: eInputType.cb_select,
-      cbRouteKey: 'taxons'
+    proximate_predated_by_itis_tsn: {
+      prop: 'proximate_predated_by_itis_tsn',
+      type: eInputType.number
     },
     ultimate_cause_of_death_id: {
       prop: 'ultimate_cause_of_death_id',
       type: eInputType.cb_select,
-      cbRouteKey: 'cod',
+      cbRouteKey: 'cod'
     },
     ultimate_cause_of_death_confidence: {
       prop: 'ultimate_cause_of_death_confidence',
       type: eInputType.cb_select,
-      cbRouteKey: 'cause_of_death_confidence',
+      cbRouteKey: 'cause_of_death_confidence'
     },
-    ultimate_predated_by_taxon_id: {
-      prop: 'ultimate_predated_by_taxon_id',
-      type: eInputType.cb_select,
-      cbRouteKey: 'taxons'
+    ultimate_predated_by_itis_tsn: {
+      prop: 'ultimate_predated_by_itis_tsn',
+      type: eInputType.number
     }
   };
 

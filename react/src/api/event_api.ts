@@ -123,10 +123,10 @@ export const eventApi = (props: ApiProps): API => {
       const { data: cods } = await api.get(cod_url);
       const predation_id = cods.find((a) => a.cod_category === 'Predation')?.cod_id;
       if (payload.proximate_cause_of_death_id !== predation_id) {
-        delete payload.proximate_predated_by_taxon_id;
+        delete payload.proximate_predated_by_itis_tsn;
       }
       if (payload.ultimate_cause_of_death_id !== predation_id) {
-        delete payload.ultimate_predated_by_taxon_id;
+        delete payload.ultimate_predated_by_itis_tsn;
       }
       const capture_url = createUrl({ api: `${CbRouters.mortality}/create` });
       const { data } = await api.post(capture_url, payload);
@@ -138,7 +138,7 @@ export const eventApi = (props: ApiProps): API => {
   };
 
   const saveEvent = async <T extends IEvent>(event: IWorkflow<T>): Promise<true | WorkflowAPIResponse> => {
-    console.log(event)
+    console.log(event);
     if (event.event_type === 'capture') {
       const c = await _saveCbCapture(event.critterbasePayload);
       if (typeof c !== 'boolean') {

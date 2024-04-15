@@ -30,7 +30,9 @@ export default function DetailedAnimalView({ detailAnimal, height }: DetailedAni
     attachment_start: 'Deployment Date',
     attachment_end: 'Retrieval Date',
     last_fetch_date: 'Last Data Retrieval',
-    capture_comment: 'Deployment Comment'
+    capture_comment: 'Deployment Comment',
+    itis_scientific_name: 'Scientific Name',
+    itis_tsn: 'TSN'
   };
 
   return (
@@ -42,7 +44,8 @@ export default function DetailedAnimalView({ detailAnimal, height }: DetailedAni
         <DetailedStatusCard
           displayObject={detailAnimal}
           displayKeysInGrid={[
-            'taxon',
+            'itis_scientific_name',
+            'itis_tsn',
             'critter_status',
             'wlh_id',
             'animal_id',

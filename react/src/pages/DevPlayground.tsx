@@ -70,7 +70,6 @@ const editCritter = editObjectToEvent(
       //   comment: 'marking comment'
       // }
     ],
-    taxon_id: '120dad10-a880-405d-8f72-816aebb8b4ff',
     wlh_id: '12-345',
     sex: 'Male',
     taxon: 'Moose',
@@ -144,13 +143,7 @@ const DevPlayground = (): JSX.Element => {
             <SubHeader text={'Placeholder text'} />
           </>
         </TempComponent> */}
-        <Box my={5}>
-          <CbCollectionUnitInputs
-            taxon_id={editCritter.taxon_id}
-            collection_units={editCritter.collection_units}
-            handleChange={(v) => console.log(v)}
-          />
-        </Box>
+        <Box my={5}></Box>
         <Box my={5}>
           <Button
             onClick={() => {
@@ -160,16 +153,6 @@ const DevPlayground = (): JSX.Element => {
             }}>
             spread obj test
           </Button>
-          {/* <CbMarkingInput
-            taxon_id={editCritter.taxon_id}
-            marking={editCritter.marking[0]}
-            handleChange={(v) => console.log(v)}
-          /> */}
-          {/* <CbMarkings
-            taxon_id={editCritter.taxon_id}
-            markings={editCritter.marking}
-            handleMarkings={(m) => console.log(m)}
-          /> */}
         </Box>
         <ModifyCritterWrapper editing={editCritter}>
           <EditCritter

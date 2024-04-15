@@ -1,9 +1,10 @@
-import { Transform } from 'class-transformer';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Dayjs } from 'dayjs';
 import { columnToHeader } from 'utils/common_helpers';
 import { Critter } from 'types/animal';
-import { BCTWBase, BCTWValidDates, nullToDayjs } from 'types/common_types';
 import { IUserCritterAccessInput } from 'types/animal_access';
+import { Transform } from 'class-transformer';
+import { BCTWBase, BCTWValidDates, nullToDayjs } from 'types/common_types';
 
 // interface used to construct objects for updating/granting users access to animals
 export interface IUserCritterPermissionInput {

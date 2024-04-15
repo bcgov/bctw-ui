@@ -1,7 +1,17 @@
 import { Exclude, Transform } from 'class-transformer';
 import dayjs, { Dayjs } from 'dayjs';
 import { Code } from 'types/code';
-import { BCTWBase, DayjsToPlain, getCollectionUnitKeys, getCollectionUnitProps, nullOrDayjs, nullToDayjs, toClassOnly, toPlainOnly, uuid } from 'types/common_types';
+import {
+  BCTWBase,
+  DayjsToPlain,
+  getCollectionUnitKeys,
+  getCollectionUnitProps,
+  nullOrDayjs,
+  nullToDayjs,
+  toClassOnly,
+  toPlainOnly,
+  uuid
+} from 'types/common_types';
 import { FormFieldObject, eInputType, isRequired } from 'types/form_types';
 import { eCritterPermission } from 'types/permission';
 import { classToArray, columnToHeader, omitNull } from 'utils/common_helpers';
@@ -61,10 +71,10 @@ export interface IMortality {
   mortality_timestamp: Dayjs;
   proximate_cause_of_death_id: uuid;
   proximate_cause_of_death_confidence: 'Probable' | 'Definite';
-  proximate_predated_by_taxon_id: uuid;
+  proximate_predated_by_itis_tsn: uuid;
   ultimate_cause_of_death_id: uuid;
   ultimate_cause_of_death_confidence: 'Probable' | 'Definite';
-  ultimate_predated_by_taxon_id: uuid;
+  ultimate_predated_by_itis_tsn: uuid;
 }
 
 export interface IMarking {
@@ -124,7 +134,10 @@ interface IMeasurement {
 /**
  * Critter properties that are re-used in Telemetry classes (map.ts)
  */
-export type ICritterTelemetryBase = {map_colour: Code} & Pick<Critter, 'animal_id' | 'critter_status' | 'taxon' | 'collection_units' | 'wlh_id' | 'mortality_timestamp'>
+export type ICritterTelemetryBase = { map_colour: Code } & Pick<
+  Critter,
+  'animal_id' | 'critter_status' | 'taxon' | 'collection_units' | 'wlh_id' | 'mortality_timestamp'
+>;
 
 const formatCollectionUnits = (collection_units: ICollectionUnit[]): string => {
   return collection_units
@@ -132,15 +145,17 @@ const formatCollectionUnits = (collection_units: ICollectionUnit[]): string => {
       return `${unit.category_name}: ${unit.unit_name}`;
     })
     .join(', ');
-}
+};
 
 // * CRITTERBASE INTEGRATION *
-export class Critter implements BCTWBase<Critter>{
+export class Critter implements BCTWBase<Critter> {
   readonly critter_id: uuid;
   wlh_id: string;
   animal_id: string;
   sex: string;
   taxon_id: uuid;
+  itis_tsn: number;
+  readonly itis_scientific_name: string;
   readonly taxon: string;
   collection_units: ICollectionUnit[];
   @Transform(nullOrDayjs, toClassOnly) @Transform(DayjsToPlain, toPlainOnly) mortality_timestamp: Dayjs;
@@ -154,9 +169,9 @@ export class Critter implements BCTWBase<Critter>{
   critter_comment?: string;
   //Extra details
   mortality?: IMortality[];
-  capture?: ICapture[];
-  marking?: IMarking[];
-  measurement?: IMeasurement[];
+  captures?: ICapture[];
+  markings?: IMarking[];
+  measurements?: IMeasurement[];
 
   readonly _merged?: boolean;
   permission_type?: eCritterPermission;
@@ -174,30 +189,34 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   displayProps(): (keyof Critter)[] {
-    return ['taxon', 'wlh_id', 'animal_id', 'critter_status'];
+    return ['itis_scientific_name', 'taxon', 'wlh_id', 'animal_id', 'critter_status'];
   }
 
-    // Getter for properties in collection_units
-    get collectionUnitProps(): Record<string, string> {
-      return getCollectionUnitProps(this.collection_units);
-    }
-  
-    // Getter to return the keys of the new properties
-    get collectionUnitKeys(): string[] {
-      return getCollectionUnitKeys(this.collection_units);
-    }
+  // Getter for properties in collection_units
+  get collectionUnitProps(): Record<string, string> {
+    return getCollectionUnitProps(this.collection_units);
+  }
+
+  // Getter to return the keys of the new properties
+  get collectionUnitKeys(): string[] {
+    return getCollectionUnitKeys(this.collection_units);
+  }
 
   get latestCapture(): CaptureEvent2 | null {
-    if (this.capture?.length){
-      const capture_location = editObjectToEvent(this.capture[0].capture_location, new LocationEvent('capture', true), []);
-      const release_location = editObjectToEvent(this.capture[0].release_location, new LocationEvent('release'), []);
-      return editObjectToEvent({...this.capture[0], capture_location, release_location }, new CaptureEvent2(), [])
-    } 
+    if (this.captures?.length) {
+      const capture_location = editObjectToEvent(
+        this.captures[0].capture_location,
+        new LocationEvent('capture', true),
+        []
+      );
+      const release_location = editObjectToEvent(this.captures[0].release_location, new LocationEvent('release'), []);
+      return editObjectToEvent({ ...this.captures[0], capture_location, release_location }, new CaptureEvent2(), []);
+    }
     return null;
   }
 
   get latestMortality(): MortalityEvent | null {
-    if (this.mortality?.length){
+    if (this.mortality?.length) {
       const mortality_location = editObjectToEvent(this.mortality[0].location, new LocationEvent('mortality'), []);
       const a = editObjectToEvent(this.mortality[0], new MortalityEvent(), []);
       a.location = mortality_location;
@@ -207,11 +226,10 @@ export class Critter implements BCTWBase<Critter>{
   }
 
   get collection_unit(): string {
-    return formatCollectionUnits(this.collection_units)
+    return formatCollectionUnits(this.collection_units);
   }
 
   get critterbasePayload(): Record<string, unknown> {
-    
     const payload = omitNull({
       critters: [
         {
@@ -228,29 +246,29 @@ export class Critter implements BCTWBase<Critter>{
       locations: []
     });
 
-    if(this.latestCapture) {
+    if (this.latestCapture) {
       const { capture_location, release_location, ...capture_rem } = this.latestCapture.critterbasePayload;
       payload.captures.push(capture_rem);
-      if(capture_location) {
+      if (capture_location) {
         payload.locations.push({ ...(capture_location as ILocation), location_id: capture_rem.capture_location_id });
       }
-      if(release_location) {
+      if (release_location) {
         payload.locations.push({ ...(release_location as ILocation), location_id: capture_rem.release_location_id });
       }
     }
 
-    if(this.latestMortality) {
+    if (this.latestMortality) {
       const { location, ...mortality_rem } = this.latestMortality.critterbasePayload;
       payload.mortalities.push(mortality_rem);
-      if(location) {
+      if (location) {
         payload.locations.push({ ...(location as ILocation), location_id: mortality_rem.location_id });
       }
     }
-      return payload;
+    return payload;
   }
 
   tagColor(): string {
-    switch (this.taxon.toLowerCase()) {
+    switch (this.itis_scientific_name.toLowerCase()) {
       case 'caribou' || 'rangifer tarandus':
         return '#9575cd';
       case 'moose' || 'alces alces':
@@ -259,6 +277,8 @@ export class Critter implements BCTWBase<Critter>{
         return '#4db6ac';
       case 'grizzly bear' || 'usrsus arctos':
         return '#81c784';
+      case 'bear' || 'ursus':
+        return '#81c784';
       default:
         return '#bdbdbd';
     }
@@ -266,8 +286,8 @@ export class Critter implements BCTWBase<Critter>{
 
   formatPropAsHeader(str: keyof Critter): string {
     switch (str) {
-      case 'taxon_id':
-        return 'Taxon'
+      case 'itis_scientific_name':
+        return 'Taxon';
       case 'wlh_id':
         return 'WLH ID';
       default:
@@ -287,11 +307,9 @@ export class Critter implements BCTWBase<Critter>{
     return n;
   }
 
-
   constructor(critter_id = '') {
     this.critter_id = critter_id;
   }
-
 }
 
 export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter> {
@@ -321,7 +339,7 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
 
   static get attachedCritterDisplayProps(): (keyof AttachedCritter)[] {
     return [
-      'taxon',
+      'itis_scientific_name',
       'wlh_id',
       'animal_id',
       'device_status',
@@ -334,7 +352,7 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
 
   static get attachedCritterExportProps(): (keyof AttachedCritter)[] {
     return [
-      'taxon',
+      'itis_scientific_name',
       'wlh_id',
       'animal_id',
       'device_status',
@@ -355,6 +373,8 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
       return super.formatPropAsHeader(str as keyof Critter);
     } else {
       switch (str) {
+        case 'itis_scientific_name':
+          return 'Taxon';
         case 'device_status':
           return 'Collar Status';
         case 'lastLatLong':
@@ -364,59 +384,48 @@ export class AttachedCritter extends Critter implements BCTWBase<AttachedCritter
         case 'last_fetch_date':
           return 'Last Update Attempt';
         case 'responsible_region_nr_id':
-          return 'Responsible NR Region'
+          return 'Responsible NR Region';
         default:
           return columnToHeader(str);
       }
     }
   }
 }
-// marking_id: uuid;
-// capture_id: uuid | null;
-// mortality_id: uuid | null;
-// identifier: string;
-// frequency: number;
-// frequency_unit: string; //This is an enum in critterbase
-// order: number;
-// comment: string;
-// attached_timestamp: Dayjs;
-// removed_timestamp: Dayjs;
-// body_location: string;
-// marking_type: string;
-// marking_material: string;
-// primary_colour: string;
-// secondary_colour: string;
-// text_colour: string;
-export const markingFormFields: Record<string, FormFieldObject<IMarking>[]> = {
-markingFields: [
-    {prop: 'marking_type_id', type: eInputType.cb_select, cbRouteKey: 'marking_type', ...isRequired},
-    {prop: 'frequency', type: eInputType.number, ...isRequired},
-    {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
-    {prop: 'identifier', type: eInputType.text},
-    // {prop: 'order', type: eInputType.number},
-    {prop: 'attached_timestamp', type: eInputType.datetime, ...isRequired},
-    {prop: 'taxon_marking_body_location_id', type: eInputType.cb_select, cbRouteKey: 'taxon_marking_body_locations', ...isRequired},
-    {prop: 'marking_material_id', type: eInputType.cb_select, cbRouteKey: 'marking_materials'},
-    {prop: 'primary_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
-    {prop: 'secondary_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
-    {prop: 'text_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours'},
-    {prop: 'removed_timestamp', type: eInputType.datetime},
-    {prop: 'comment', type: eInputType.multiline},
 
+export const markingFormFields: Record<string, FormFieldObject<IMarking>[]> = {
+  markingFields: [
+    { prop: 'marking_type_id', type: eInputType.cb_select, cbRouteKey: 'marking_type', ...isRequired },
+    { prop: 'frequency', type: eInputType.number, ...isRequired },
+    { prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired },
+    { prop: 'identifier', type: eInputType.text },
+    // {prop: 'order', type: eInputType.number},
+    { prop: 'attached_timestamp', type: eInputType.datetime, ...isRequired },
+    {
+      prop: 'taxon_marking_body_location_id',
+      type: eInputType.cb_select,
+      cbRouteKey: 'taxon_marking_body_locations',
+      ...isRequired
+    },
+    { prop: 'marking_material_id', type: eInputType.cb_select, cbRouteKey: 'marking_materials' },
+    { prop: 'primary_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours' },
+    { prop: 'secondary_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours' },
+    { prop: 'text_colour_id', type: eInputType.cb_select, cbRouteKey: 'colours' },
+    { prop: 'removed_timestamp', type: eInputType.datetime },
+    { prop: 'comment', type: eInputType.multiline }
   ],
   removedFields: [
-    {prop: 'removed_timestamp', type: eInputType.datetime},
-    {prop: 'comment', type: eInputType.multiline},
+    { prop: 'removed_timestamp', type: eInputType.datetime },
+    { prop: 'comment', type: eInputType.multiline }
   ]
   // frequencyFields: [
   //   {prop: 'frequency', type: eInputType.number, ...isRequired},
   //   {prop: 'frequency_unit', type: eInputType.cb_select, cbRouteKey: 'frequency_units', ...isRequired},
   // ]
-}
+};
 
 export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
   identifierFields: [
-    { prop: 'taxon_id', type: eInputType.cb_select, taxon: [], cbRouteKey: 'species', ...isRequired },
+    { prop: 'itis_scientific_name', type: eInputType.text, taxon: [], ...isRequired, disabled: true },
     { prop: 'wlh_id', type: eInputType.text, taxon: [] },
     { prop: 'animal_id', type: eInputType.text, taxon: [] },
     { prop: 'sex', type: eInputType.cb_select, taxon: [], ...isRequired, cbRouteKey: 'sex' }
@@ -427,9 +436,7 @@ export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
     { prop: 'critter_comment', type: eInputType.multiline, taxon: [] }
     //{ prop: 'collection_unit', type: eInputType.cb_select, taxon: [] } //This select will need additional work, array of objects. Flatten and display multiple selects for array
   ],
-  captureFields: [
-    { prop: 'capture', type: eInputType.cb_capture_fields, taxon: []},
-  ],
+  captureFields: [{ prop: 'captures', type: eInputType.cb_capture_fields, taxon: [] }]
   //   { prop: 'capture_timestamp', type: eInputType.datetime, taxon: [] }, //TODO critterbase integration change to capture_timestamp
   //   { prop: 'latitude', type: eInputType.number, taxon: []},
   //   { prop: 'longitude', type: eInputType.number, taxon: []},
@@ -487,8 +494,6 @@ export const critterFormFields: Record<string, FormFieldObject<Critter>[]> = {
 export const getAnimalFormFields = (): FormFieldObject<AttachedCritter>[] => {
   return Object.values(critterFormFields).reduce((previous, current) => [...previous, ...current], []);
 };
-
-
 
 // export interface IAnimal extends BaseTimestamps, IAnimalTelemetryBase {
 //   animal_colouration: string;
@@ -689,7 +694,4 @@ export const getAnimalFormFields = (): FormFieldObject<AttachedCritter>[] => {
 // // animals attached to devices should have additional properties
 // export interface IAttachedAnimal extends ICollarHistory, DataLife {}
 
-
-
 // taxon: [] represents field applies to all taxon, used for optimization on searching
-

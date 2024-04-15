@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Expose, Transform, Type } from 'class-transformer';
 import { ISelectMultipleData } from 'components/form/MultiSelect';
 import { Dayjs } from 'dayjs';

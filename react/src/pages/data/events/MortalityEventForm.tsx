@@ -30,11 +30,9 @@ export default function MortalityEventForm({
   const is_ucod_predation = event.ultimate_cause_of_death?.cod_category === 'Predation';
 
   const [isRetrieved, setIsRetrieved] = useState(false);
-  const [isPredatorKnown, setIsPredatorKnown] = useState(
-    !!event.proximate_predated_by_taxon_id || is_pcod_predation
-  );
+  const [isPredatorKnown, setIsPredatorKnown] = useState(!!event.proximate_predated_by_itis_tsn || is_pcod_predation);
   const [isUcodPredatorKnown, setIsUcodPredatorKnown] = useState(
-    !!event.ultimate_predated_by_taxon_id || is_ucod_predation
+    !!event.ultimate_predated_by_itis_tsn || is_ucod_predation
   );
   const [isBeingUnattached, setIsBeingUnattached] = useState(false);
 
@@ -81,7 +79,7 @@ export default function MortalityEventForm({
             {CreateFormField(mortality, mortality.fields.proximate_cause_of_death_confidence, onChange)}
             {CreateFormField(
               mortality,
-              mortality.fields.proximate_predated_by_taxon_id,
+              mortality.fields.proximate_predated_by_itis_tsn,
               onChange,
               isPredatorKnown ? {} : { disabled: !isPredatorKnown, value: '' }
             )}
@@ -91,7 +89,7 @@ export default function MortalityEventForm({
             {CreateFormField(mortality, mortality.fields.ultimate_cause_of_death_confidence, onChange)}
             {CreateFormField(
               mortality,
-              mortality.fields.ultimate_predated_by_taxon_id,
+              mortality.fields.ultimate_predated_by_itis_tsn,
               onChange,
               isUcodPredatorKnown ? {} : { disabled: !isUcodPredatorKnown, value: '' }
             )}

@@ -8,12 +8,11 @@ import useFormHasError from 'hooks/useFormHasError';
 import { FormSection, editEventBtnProps } from 'pages/data/common/EditModalComponents';
 import { useEffect, useState } from 'react';
 import { IMarking, markingFormFields } from 'types/animal';
-import { uuid } from 'types/common_types';
 import { CbRouteStatusHandler, InboundObj, parseFormChangeResult } from 'types/form_types';
 import { columnToHeader } from 'utils/common_helpers';
 import { CbSelectProps } from './CbSelect';
 type CbMarkingSharedProps = {
-  taxon_id: uuid;
+  tsn: number;
   handleRoute?: CbRouteStatusHandler;
 };
 
@@ -26,7 +25,7 @@ type CbMarkingInputProps = {
 type CbMarkingCustomProps = Partial<Record<keyof IMarking, Partial<CbSelectProps>>>;
 
 export const CbMarkingInput = ({
-  taxon_id,
+  tsn,
   marking,
   handleChange,
   handleRoute,
@@ -37,8 +36,8 @@ export const CbMarkingInput = ({
   const props: CbMarkingCustomProps = {
     taxon_marking_body_location_id: {
       label: 'Body Location',
-      query: `taxon_id=${taxon_id}`,
-      disabled: taxon_id === undefined
+      query: `tsn=${tsn}`,
+      disabled: tsn === undefined
     }
   };
 
@@ -74,7 +73,7 @@ type CbMarkingsProps = {
 } & CbMarkingSharedProps;
 
 export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
-  const { markings, handleMarkings, handleRoute, taxon_id } = props;
+  const { markings, handleMarkings, handleRoute, tsn } = props;
   const [hasErr, checkHasErr] = useFormHasError();
 
   const [markingsData, setMarkingsData] = useState<Array<IMarking & { _delete?: boolean }>>(markings ?? []);
@@ -153,13 +152,7 @@ export const CbMarkings = (props: CbMarkingsProps): JSX.Element => {
                 Delete Marking
               </Button>
             }>
-            <CbMarkingInput
-              handleRoute={handleRoute}
-              taxon_id={taxon_id}
-              handleChange={onChange}
-              index={i}
-              marking={m}
-            />
+            <CbMarkingInput handleRoute={handleRoute} tsn={tsn} handleChange={onChange} index={i} marking={m} />
           </FormSection>
         );
       })}

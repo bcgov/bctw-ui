@@ -49,7 +49,7 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   return 0;
 }
 
-/**  
+/**
  * @param {Order} order
  * @param {Key} orderBy
   calls the descendingComparator with provided order
@@ -124,18 +124,18 @@ const formatTag = (key: string, value: string): JSX.Element => {
     //   //   return getTag('P. Mortality', null, 'warning');
     // }
   }
-  if (key === 'taxon') {
-    switch (value) {
-      case 'Caribou':
+  if (key === 'itis_scientific_name') {
+    switch (value?.toLowerCase()) {
+      case 'rangifer tarandus':
         return getTag(value, '#9575cd');
-      case 'Moose':
+      case 'alces alces':
         return getTag(value, '#64b5f6');
-      case 'Grey Wolf':
+      case 'canis lupus':
         return getTag(value, '#4db6ac');
-      case 'Grizzly Bear':
+      case 'ursus':
         return getTag(value, '#81c784');
     }
-    return getTag(value); // returns default tag color for unknown values
+    return value ? getTag(value, '#4db6ac') : getTag('Unknown');
   }
   if (key === 'last_transmission_date') {
     const { diff, asText } = getDaysDiff(dayjs(value));
@@ -163,7 +163,7 @@ interface ICellFormat {
 const align: Pick<ICellFormat, 'align'> = { align: 'left' };
 function formatTableCell<T>(obj: T, key: keyof T): ICellFormat {
   const value: unknown = obj[key];
-  if (['device_status', 'taxon', 'last_transmission_date'].includes(key as string)) {
+  if (['device_status', 'itis_scientific_name', 'last_transmission_date'].includes(key as string)) {
     return { ...align, value: formatTag(key as string, isDayjs(value) ? formatT(value) : (value as string)) };
   }
   if (key === 'last_update_attempt') {

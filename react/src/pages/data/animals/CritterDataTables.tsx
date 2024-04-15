@@ -21,6 +21,7 @@ import { AttachRemoveDevice } from './AttachRemoveDevice';
 
 export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   const api = useTelemetryApi();
+
   const [attachedAnimalData, setAttachedAnimalData] = useState<AttachedCritter[]>([]);
   const [animalData, setAnimalData] = useState<Critter[]>([]);
 
@@ -53,27 +54,9 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
   }, [animalData]);
 
   const handleSelect = <T extends Critter>(row: T): void => {
-    //setEditObj(row);
+    setEditObj(row);
     detailViewAction(row);
   };
-
-  // // props to be passed to the edit modal component most props are overwritten in {ModifyCritterWrappper}
-  // const editProps = {
-  //   editing: null,
-  //   open: false,
-  //   onSave: doNothingAsync,
-  //   handleClose: doNothing
-  // };
-
-  // const addEditProps = {
-  //   editing: null,
-  //   empty: new AttachedCritter(),
-  //   addTooltip: CS.addTooltip,
-  //   queryStatus: 'idle' as QueryStatus,
-  //   disableEdit: true,
-  //   disableDelete: true,
-  //   modalControl: true
-  // };
 
   const Status = (row: AttachedCritter, idx: number): JSX.Element => {
     if (row.last_fetch_date.isValid()) {
@@ -214,7 +197,6 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           />
         </Box>
 
-
         {/* Wrapper to allow editing of Attached and Unattached animals */}
         <ModifyCritterWrapper
           editing={editObj}
@@ -222,7 +204,7 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
           onDelete={(critter_id: string): void => setDeleted(critter_id)}
           setCritter={setEditObj}>
           <EditCritter
-            /*{...editProps}*/ editing={editObj}
+            editing={editObj}
             onSave={doNothingAsync}
             open={openEdit}
             handleClose={() => setOpenEdit(false)}
@@ -240,11 +222,13 @@ export const CritterDataTables = ({ detailViewAction }): JSX.Element => {
         />
 
         {/* Modal for critter workflows */}
-        <CritterWorkflow editing={editObj}
+        <CritterWorkflow
+          editing={editObj}
           onUpdate={(critter_id: string) => setUpdated(critter_id)}
           workflow={workflow}
           open={openWorkflow}
-          setOpen={setOpenWorkflow} />
+          setOpen={setOpenWorkflow}
+        />
       </>
     </RowSelectedProvider>
   );
