@@ -61,7 +61,6 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   // must be defined before mutation declarations
   const handleSaveResult = async (data: IBulkUploadResults<Critter>): Promise<void> => {
     const { errors } = data;
-    //console.log('Data in save result' + data);
     //The response of this mutation should not be BulkResponse
     if (errors?.length) {
       showNotif({ severity: 'error', message: `${errors.map((e) => e.error)}` });
@@ -81,26 +80,18 @@ export default function ModifyCritterWrapper(props: IModifyWrapperProps): JSX.El
   };
 
   const onError = (error: AxiosError): void => {
-    console.log('onError');
     showNotif({ severity: 'error', message: formatAxiosError(error) });
   };
 
   // setup the mutations
-  //const { mutateAsync: saveMutation } = api.useSaveCritterbaseCritter({ onSuccess: handleSaveResult, onError });
   const { mutateAsync: saveCritterbase, isLoading } = api.useBulkUpdateCritterbaseCritter({
     onSuccess: handleSaveResult,
-    onError,
-    onMutate: (vars) => {
-      console.log('mutating', { vars });
-    }
+    onError
   });
 
   const { mutateAsync: deleteMutation } = api.useDelete({ onSuccess: handleDeleteResult, onError });
 
   const saveCritter = async (a: IUpsertPayload<Critter | AttachedCritter>): Promise<void> => {
-    //const { body } = a;
-    //const formatted = body.toJSON();
-    // console.log('ModifyCritterWrapper: saving animal ', JSON.stringify(formatted, null, 2));
     await saveCritterbase(a);
   };
 
